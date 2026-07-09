@@ -65,9 +65,13 @@ public sealed partial class OdfPackage
     /// Executes the Save operation.
     /// 將目前 ODF 封裝儲存到指定的目標資料流中。
     /// </summary>
-    /// <param name="stream">要寫入的目標資料流</param>
-    /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
-    public void Save(Stream stream, OdfSaveOptions? options = null)
+    public void Save(Stream stream) => Save(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Save(Stream stream, OdfSaveOptions? options)
     {
         SaveToStream(stream, options);
     }
@@ -91,40 +95,52 @@ public sealed partial class OdfPackage
     /// Executes the WriteEntry operation.
     /// 將指定的位元組內容寫入或覆寫封裝中的專案。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <param name="content">要寫入的位元組內容</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
-    public void WriteEntry(string name, byte[] content, string? mediaType = null)
+    public void WriteEntry(string name, byte[] content) => WriteEntry(name, content, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void WriteEntry(string name, byte[] content, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
 
     /// <summary>
     /// Executes the WriteEntry operation.
     /// 將指定的資料流內容寫入或覆寫封裝中的專案。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <param name="contentStream">要寫入的內容來源資料流</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
-    public void WriteEntry(string name, Stream contentStream, string? mediaType = null)
+    public void WriteEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void WriteEntry(string name, Stream contentStream, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
 
     /// <summary>
     /// Executes the AddEntry operation.
     /// 將指定的位元組內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <param name="content">要新增的位元組內容</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
-    public void AddEntry(string name, byte[] content, string? mediaType = null)
+    public void AddEntry(string name, byte[] content) => WriteEntry(name, content, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddEntry(string name, byte[] content, string? mediaType)
         => WriteEntry(name, content, mediaType);
 
     /// <summary>
     /// Executes the AddEntry operation.
     /// 將指定的資料流內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <param name="contentStream">要新增的內容來源資料流</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
-    public void AddEntry(string name, Stream contentStream, string? mediaType = null)
+    public void AddEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddEntry(string name, Stream contentStream, string? mediaType)
         => WriteEntry(name, contentStream, mediaType);
 
     /// <summary>
@@ -311,13 +327,25 @@ public sealed partial class OdfPackage
         private byte[] _buffer;
         private int _written;
 
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public SimpleBufferWriter(int initialCapacity = 256)
         {
             _buffer = new byte[initialCapacity];
         }
 
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public ReadOnlySpan<byte> WrittenReadOnlySpan => _buffer.AsSpan(0, _written);
 
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public void Advance(int count)
         {
             if (count < 0)
@@ -327,12 +355,20 @@ public sealed partial class OdfPackage
             _written += count;
         }
 
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public Memory<byte> GetMemory(int sizeHint = 0)
         {
             EnsureCapacity(sizeHint);
             return _buffer.AsMemory(_written);
         }
 
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public Span<byte> GetSpan(int sizeHint = 0)
         {
             EnsureCapacity(sizeHint);
@@ -412,6 +448,10 @@ internal sealed class OdfPackageDebugEntry
 
     public ushort? CompressionMethod { get; }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override string ToString()
         => $"{Path} ({MediaType}, {Size} bytes, Dirty: {Dirty})";
 

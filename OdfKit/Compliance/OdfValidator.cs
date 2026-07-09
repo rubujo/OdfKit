@@ -55,14 +55,23 @@ public static class OdfValidator
     /// Validates the ODF document in the specified stream.
     /// 驗證指定串流中的 ODF 文件。
     /// </summary>
-    /// <param name="stream">The ODF document stream to validate. / 要驗證的 ODF 文件串流。</param>
-    /// <param name="fileName">The file name used to assist format detection. / 用於輔助格式偵測的檔案名稱。</param>
-    /// <param name="profile">The compliance profile. / 相容性設定檔。</param>
     /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(Stream stream) => Validate(stream, null, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfValidationReport Validate(Stream stream, string? fileName) => Validate(stream, fileName, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static OdfValidationReport Validate(
         Stream stream,
-        string? fileName = null,
-        OdfComplianceProfile? profile = null)
+        string? fileName,
+        OdfComplianceProfile? profile)
     {
         return Validate(stream, new OdfValidationOptions { FileName = fileName, Profile = profile });
     }
@@ -95,14 +104,23 @@ public static class OdfValidator
     /// Validates an already-open ODF package.
     /// 驗證已開啟的 ODF 封裝。
     /// </summary>
-    /// <param name="package">The ODF package to validate. / 要驗證的 ODF 封裝。</param>
-    /// <param name="profile">The compliance profile. / 相容性設定檔。</param>
-    /// <param name="fileName">The file name used to assist format detection. / 用於輔助格式偵測的檔案名稱。</param>
     /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(OdfPackage package) => Validate(package, null, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfValidationReport Validate(OdfPackage package, OdfComplianceProfile? profile) => Validate(package, profile, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static OdfValidationReport Validate(
         OdfPackage package,
-        OdfComplianceProfile? profile = null,
-        string? fileName = null)
+        OdfComplianceProfile? profile,
+        string? fileName)
     {
         return Validate(package, new OdfValidationOptions { FileName = fileName, Profile = profile });
     }

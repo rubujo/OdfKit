@@ -185,7 +185,9 @@ public static class OdfKitCli
         }
 
         using OdfPackage package = OdfPackage.Open(args[1]);
-        OdfValidationReport report = OdfValidator.Validate(package, fileName: args[1]);
+        OdfValidationReport report = OdfValidator.Validate(
+            package,
+            new OdfValidationOptions { FileName = args[1] });
         output.WriteLine("path: " + args[1]);
         output.WriteLine("kind: " + report.DocumentKind);
         output.WriteLine("mime: " + (package.MimeType ?? string.Empty));

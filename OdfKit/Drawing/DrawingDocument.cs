@@ -118,32 +118,58 @@ public partial class DrawingDocument : OdfDocument
     /// Asynchronously loads an ODG drawing document from the specified path.
     /// 非同步從指定路徑載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="path">The ODG document path. / ODG 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="DrawingDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/>。</returns>
-    public new static Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public new static Task<DrawingDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(path, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", cancellationToken);
 
     /// <summary>
     /// Loads an ODG drawing document from the specified stream.
     /// 從指定資料流載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODG document content. / 包含 ODG 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="DrawingDocument"/> instance. / 載入完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
     /// <exception cref="InvalidOperationException">When the specified document is not an ODG drawing. / 當指定文件不是 ODG 繪圖時擲出。</exception>
-    public new static DrawingDocument Load(Stream stream, string? fileName = null) =>
+    public new static DrawingDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static DrawingDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName);
 
     /// <summary>
     /// Asynchronously loads an ODG drawing document from the specified stream.
     /// 非同步從指定資料流載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODG document content. / 包含 ODG 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="DrawingDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/>。</returns>
-    public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public new static Task<DrawingDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public new static Task<DrawingDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName, cancellationToken);
 
     internal IReadOnlyList<OdfDrawPage> GetPagesSnapshot()

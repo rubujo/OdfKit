@@ -11,10 +11,14 @@ public partial class OdfImageDocument
     /// Inspects images for practical portable-editing risks.
     /// 檢查圖片的實務可攜編輯風險。
     /// </summary>
-    /// <param name="options">The inspection options. / 檢查選項。</param>
     /// <returns>The image inspection report. / 圖片檢查報告。</returns>
-    public OdfImageInspectionReport InspectImages(OdfImageInspectionOptions? options = null) =>
-        InspectImages(options, null);
+    public OdfImageInspectionReport InspectImages() => InspectImages(null, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImageInspectionReport InspectImages(OdfImageInspectionOptions? options) => InspectImages(options, null);
 
     /// <summary>
     /// Inspects images for practical portable-editing risks with a compatibility profile.

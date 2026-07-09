@@ -67,6 +67,10 @@ internal class OdfPackageEntry : IDisposable
         internal set => _wasStoredInZip = value;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public void SetContent(byte[] bytes)
     {
         _stream?.Dispose();
@@ -88,6 +92,10 @@ internal class OdfPackageEntry : IDisposable
         _isModified = true;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public long GetEstimatedSize()
     {
         if (_bytes != null)
@@ -101,12 +109,20 @@ internal class OdfPackageEntry : IDisposable
         return 0;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfPackageEntry(string name, ZipArchiveEntry zipEntry)
     {
         Name = name;
         _zipEntry = zipEntry;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfPackageEntry(string name, byte[] bytes)
     {
         Name = name;
@@ -114,6 +130,10 @@ internal class OdfPackageEntry : IDisposable
         _isModified = true;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfPackageEntry(string name, OdfMmfEntryInfo mmfEntry, OdfPackage package)
     {
         Name = name;
@@ -121,6 +141,10 @@ internal class OdfPackageEntry : IDisposable
         _package = package;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfPackageEntry(string name, Stream stream)
     {
         Name = name;
@@ -268,6 +292,10 @@ internal class OdfPackageEntry : IDisposable
         throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_InvalidOdfpackageentryState"));
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public Stream OpenReader()
     {
         _prefetchTask?.GetAwaiter().GetResult();
@@ -363,6 +391,10 @@ internal class OdfPackageEntry : IDisposable
         }
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public void Dispose()
     {
         _stream?.Dispose();
@@ -383,6 +415,10 @@ internal class PeekableStream : Stream
     private readonly bool _leaveOpen;
     private int _peekPosition;
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public PeekableStream(Stream underlying, byte[] peekBuffer, int peekedCount, bool leaveOpen)
     {
         _underlying = underlying ?? throw new ArgumentNullException(nameof(underlying));
@@ -394,6 +430,10 @@ internal class PeekableStream : Stream
     public override bool CanRead => true;
     public override bool CanSeek => false;
     public override bool CanWrite => false;
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     public override long Position
     {
@@ -401,8 +441,16 @@ internal class PeekableStream : Stream
         set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override void Flush() => _underlying.Flush();
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override int Read(byte[] buffer, int offset, int count)
     {
         int bytesRead = 0;
@@ -425,8 +473,20 @@ internal class PeekableStream : Stream
         return bytesRead;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     protected override void Dispose(bool disposing)

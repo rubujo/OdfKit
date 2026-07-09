@@ -120,16 +120,24 @@ public sealed class DrawingDocumentBuilder
     /// Adds a page containing a connected flow diagram.
     /// 新增包含已連接流程圖的頁面。
     /// </summary>
-    /// <param name="pageName">The page name. / 頁面名稱。</param>
-    /// <param name="steps">The flow steps. / 流程步驟。</param>
-    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
-    /// <param name="layoutOptions">The optional explicit flow layout options. / 選用的明確流程版面選項。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public DrawingDocumentBuilder AddFlow(string pageName, IEnumerable<OdfFlowStepRequest> steps) => AddFlow(pageName, steps, OdfConnectorType.Straight, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawingDocumentBuilder AddFlow(string pageName, IEnumerable<OdfFlowStepRequest> steps, OdfConnectorType connectorType) => AddFlow(pageName, steps, connectorType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public DrawingDocumentBuilder AddFlow(
         string pageName,
         IEnumerable<OdfFlowStepRequest> steps,
-        OdfConnectorType connectorType = OdfConnectorType.Straight,
-        OdfFlowLayoutOptions? layoutOptions = null)
+        OdfConnectorType connectorType,
+        OdfFlowLayoutOptions? layoutOptions)
     {
         if (steps is null)
         {
@@ -201,14 +209,23 @@ public sealed class DrawingDocumentBuilder
     /// Adds a default-named page containing a connected flow diagram.
     /// 新增包含已連接流程圖的預設命名頁面。
     /// </summary>
-    /// <param name="steps">The flow steps. / 流程步驟。</param>
-    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
-    /// <param name="layoutOptions">The optional explicit flow layout options. / 選用的明確流程版面選項。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public DrawingDocumentBuilder AddFlow(IEnumerable<OdfFlowStepRequest> steps) => AddFlow($"Page {_pageCount + 1}", steps, OdfConnectorType.Straight, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawingDocumentBuilder AddFlow(IEnumerable<OdfFlowStepRequest> steps, OdfConnectorType connectorType) => AddFlow($"Page {_pageCount + 1}", steps, connectorType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public DrawingDocumentBuilder AddFlow(
         IEnumerable<OdfFlowStepRequest> steps,
-        OdfConnectorType connectorType = OdfConnectorType.Straight,
-        OdfFlowLayoutOptions? layoutOptions = null)
+        OdfConnectorType connectorType,
+        OdfFlowLayoutOptions? layoutOptions)
     {
         return AddFlow($"Page {_pageCount + 1}", steps, connectorType, layoutOptions);
     }
@@ -438,20 +455,26 @@ public sealed class OdfDrawPageBuilder
     /// Adds a coordinate-based connector.
     /// 新增座標式連接線。
     /// </summary>
-    /// <param name="x1Cm">The start X position in centimeters. / 起點 X 位置（公分）。</param>
-    /// <param name="y1Cm">The start Y position in centimeters. / 起點 Y 位置（公分）。</param>
-    /// <param name="x2Cm">The end X position in centimeters. / 終點 X 位置（公分）。</param>
-    /// <param name="y2Cm">The end Y position in centimeters. / 終點 Y 位置（公分）。</param>
-    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
-    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public OdfDrawPageBuilder AddConnector(double x1Cm, double y1Cm, double x2Cm, double y2Cm) => AddConnector(x1Cm, y1Cm, x2Cm, y2Cm, OdfConnectorType.Standard, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddConnector(double x1Cm, double y1Cm, double x2Cm, double y2Cm, OdfConnectorType connectorType) => AddConnector(x1Cm, y1Cm, x2Cm, y2Cm, connectorType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfDrawPageBuilder AddConnector(
         double x1Cm,
         double y1Cm,
         double x2Cm,
         double y2Cm,
-        OdfConnectorType connectorType = OdfConnectorType.Standard,
-        Action<OdfDrawShapeBuilder>? configure = null)
+        OdfConnectorType connectorType,
+        Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddConnector(
             OdfLength.FromCentimeters(x1Cm),
@@ -468,16 +491,24 @@ public sealed class OdfDrawPageBuilder
     /// Adds a connector linking two shapes.
     /// 新增連接兩個圖形的連接線。
     /// </summary>
-    /// <param name="startShapeId">The start shape identifier. / 起點圖形識別碼。</param>
-    /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
-    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
-    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public OdfDrawPageBuilder AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType) => AddConnector(startShapeId, endShapeId, connectorType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfDrawPageBuilder AddConnector(
         string startShapeId,
         string endShapeId,
-        OdfConnectorType connectorType = OdfConnectorType.Standard,
-        Action<OdfDrawShapeBuilder>? configure = null)
+        OdfConnectorType connectorType,
+        Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddConnector(startShapeId, endShapeId, connectorType);
         ApplyThemedConnectorStyle(shape);

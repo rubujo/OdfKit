@@ -68,7 +68,7 @@
 | 基線路徑 | `OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt` |
 | 0.x 策略 | **全量在 Unshipped**；1.0 發佈時移入 Shipped |
 | RS0016／RS0017 | **error**（阻擋未登錄新增與意外移除） |
-| RS0026／RS0027 | **suggestion**（既有可選參數多載與生成 DOM grandfather；新增 API 仍應遵循 Roslyn 可選參數指引） |
+| RS0026／RS0027 | **error**（手寫）；生成 DOM／schema 目錄為 **none**；見 [public-api-optional-parameters.md](public-api-optional-parameters.md) |
 | 重產腳本 | `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify` |
 | 說明 | [OdfKit/PublicAPI/README.md](../OdfKit/PublicAPI/README.md) |
 
@@ -153,9 +153,9 @@ ODF 實務流通並非「全站只活在最新 1.4」：
 
 | 項目 | 說明 |
 |------|------|
-| 1.0 API 凍結 | Unshipped → Shipped；手寫路徑 RS0026／RS0027 升 warning／error |
+| 1.0 API 凍結 | Unshipped → Shipped；搭配 `PackageValidationBaselineVersion` |
 | Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
-| 生成 DOM 可選參數形狀 | 改 `OdfSchemaGenerator` 後整批重產（與是否拆 NuGet 無關） |
+| 其餘單一可選參數公開 API | 非 RS 強制；可依使用頻率改為明確多載鏈 |
 
 ## 7. 相關文件
 

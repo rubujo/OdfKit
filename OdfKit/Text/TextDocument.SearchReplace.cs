@@ -15,10 +15,13 @@ public partial class TextDocument
     /// Searches for the specified text and replaces it with new text.
     /// 搜尋指定文字並替換為新文字。
     /// </summary>
-    /// <param name="search">The keyword to search for. / 要搜尋的關鍵字。</param>
-    /// <param name="replacement">The replacement text. / 要替換的新文字。</param>
-    /// <param name="styleAction">The style delegate applied to replaced text runs. / 套用於替換後文字片段的樣式委派作業。</param>
-    public void ReplaceText(string search, string replacement, Action<OdfTextRun>? styleAction = null)
+    public new void ReplaceText(string search, string replacement) => ReplaceText(search, replacement, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void ReplaceText(string search, string replacement, Action<OdfTextRun>? styleAction)
     {
         if (styleAction is null)
         {
@@ -34,10 +37,13 @@ public partial class TextDocument
     /// Searches for text using a regular expression and replaces it with new text.
     /// 以規則運算式搜尋文字並替換為新文字。
     /// </summary>
-    /// <param name="regex">The regular expression object representing the search condition. / 代表搜尋條件的規則運算式物件。</param>
-    /// <param name="replacement">The replacement text. / 要替換的新文字。</param>
-    /// <param name="styleAction">The style delegate applied to replaced text runs. / 套用於替換後文字片段的樣式委派作業。</param>
-    public void ReplaceText(Regex regex, string replacement, Action<OdfTextRun>? styleAction = null) =>
+    public void ReplaceText(Regex regex, string replacement) => ReplaceText(regex, replacement, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void ReplaceText(Regex regex, string replacement, Action<OdfTextRun>? styleAction) =>
         TextDocumentSearchReplaceEngine.ReplaceText(this, regex, replacement, styleAction);
 
     #endregion

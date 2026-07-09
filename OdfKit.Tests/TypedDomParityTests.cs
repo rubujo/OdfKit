@@ -2095,7 +2095,9 @@ public partial class TypedDomParityTests
         foreach (var sample in samples)
         {
             string className = sample.Match.Groups["name"].Value;
-            Assert.Contains($"public {className}(string? prefix = null)", sample.Code, StringComparison.Ordinal);
+            // RS0026／RS0027：prefix 不得為 optional；改為明確多載鏈（參數化 prefix + 無參轉呼叫）。
+            Assert.Contains($"public {className}() : this((string?)null)", sample.Code, StringComparison.Ordinal);
+            Assert.Contains($"public {className}(string? prefix)", sample.Code, StringComparison.Ordinal);
             Assert.Contains($"public {className}(params OdfNode[] children) : this()", sample.Code, StringComparison.Ordinal);
         }
     }

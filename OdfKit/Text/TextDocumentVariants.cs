@@ -48,31 +48,57 @@ public sealed class TextTemplateDocument : TextDocument
     /// Asynchronously loads an OTT text template document from the specified path.
     /// 非同步從指定路徑載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="path">The OTT document path. / OTT 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextTemplateDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/>。</returns>
-    public static new async Task<TextTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<TextTemplateDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an OTT text template document from the specified stream.
     /// 從指定資料流載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTT document content. / 包含 OTT 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="TextTemplateDocument"/> instance. / 載入完成的 <see cref="TextTemplateDocument"/> 執行個體。</returns>
-    public static new TextTemplateDocument Load(Stream stream, string? fileName = null) =>
+    public static new TextTemplateDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new TextTemplateDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads an OTT text template document from the specified stream.
     /// 非同步從指定資料流載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTT document content. / 包含 OTT 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextTemplateDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/>。</returns>
-    public static new async Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<TextTemplateDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<TextTemplateDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
@@ -132,31 +158,57 @@ public sealed class TextMasterDocument : TextDocument
     /// Asynchronously loads an ODM master text document from the specified path.
     /// 非同步從指定路徑載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="path">The ODM document path. / ODM 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextMasterDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/>。</returns>
-    public static new async Task<TextMasterDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<TextMasterDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextMasterDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an ODM master text document from the specified stream.
     /// 從指定資料流載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODM document content. / 包含 ODM 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="TextMasterDocument"/> instance. / 載入完成的 <see cref="TextMasterDocument"/> 執行個體。</returns>
-    public static new TextMasterDocument Load(Stream stream, string? fileName = null) =>
+    public static new TextMasterDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new TextMasterDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads an ODM master text document from the specified stream.
     /// 非同步從指定資料流載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODM document content. / 包含 ODM 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextMasterDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/>。</returns>
-    public static new async Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<TextMasterDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<TextMasterDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
@@ -507,31 +559,57 @@ public sealed class TextWebDocument : TextDocument
     /// Asynchronously loads an OTH web template document from the specified path.
     /// 非同步從指定路徑載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="path">The OTH document path. / OTH 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextWebDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/>。</returns>
-    public static new async Task<TextWebDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<TextWebDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextWebDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an OTH web template document from the specified stream.
     /// 從指定資料流載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTH document content. / 包含 OTH 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="TextWebDocument"/> instance. / 載入完成的 <see cref="TextWebDocument"/> 執行個體。</returns>
-    public static new TextWebDocument Load(Stream stream, string? fileName = null) =>
+    public static new TextWebDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new TextWebDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads an OTH web template document from the specified stream.
     /// 非同步從指定資料流載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTH document content. / 包含 OTH 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="TextWebDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/>。</returns>
-    public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<TextWebDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<TextWebDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<TextWebDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
@@ -591,31 +669,57 @@ public sealed class FlatTextDocument : TextDocument
     /// Asynchronously loads a FODT flat XML text document from the specified path.
     /// 非同步從指定路徑載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="path">The FODT document path. / FODT 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="FlatTextDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/>。</returns>
-    public static new async Task<FlatTextDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatTextDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatTextDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads a FODT flat XML text document from the specified stream.
     /// 從指定資料流載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="stream">The stream containing the FODT document content. / 包含 FODT 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="FlatTextDocument"/> instance. / 載入完成的 <see cref="FlatTextDocument"/> 執行個體。</returns>
-    public static new FlatTextDocument Load(Stream stream, string? fileName = null) =>
+    public static new FlatTextDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new FlatTextDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads a FODT flat XML text document from the specified stream.
     /// 非同步從指定資料流載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="stream">The stream containing the FODT document content. / 包含 FODT 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="FlatTextDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/>。</returns>
-    public static new async Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatTextDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<FlatTextDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>

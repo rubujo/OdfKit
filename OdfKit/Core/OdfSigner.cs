@@ -39,14 +39,17 @@ public static partial class OdfSigner
     /// Asynchronously signs the ODF package with the default XMLDSig options.
     /// 以預設 XMLDSig 選項非同步簽署 ODF 封裝。
     /// </summary>
-    /// <param name="package">The ODF package to sign. / 要簽署的 ODF 封裝。</param>
-    /// <param name="certificate">The X.509 certificate used to sign the package. / 用於簽署封裝的 X.509 憑證。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous signing operation. / 代表非同步簽署作業的工作。</returns>
+    public static Task SignAsync(OdfPackage package, X509Certificate2 certificate) => SignAsync(package, certificate, new OdfSigningOptions { Level = XadesLevel.None }, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return SignAsync(package, certificate, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken);
     }
@@ -55,20 +58,22 @@ public static partial class OdfSigner
     /// Asynchronously signs the ODF package with the specified signing options.
     /// 使用指定簽署選項非同步簽署 ODF 封裝。
     /// </summary>
-    /// <param name="package">The ODF package to sign. / 要簽署的 ODF 封裝。</param>
-    /// <param name="certificate">The X.509 certificate used to sign the package. / 用於簽署封裝的 X.509 憑證。</param>
-    /// <param name="options">The signing options. / 簽署選項。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous signing operation. / 代表非同步簽署作業的工作。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。
     /// </remarks>
+    public static Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options) => SignAsync(package, certificate, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,
         OdfSigningOptions options,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return OdfSignatureSigner.SignAsync(package, certificate, options, cancellationToken);
     }
@@ -96,14 +101,18 @@ public static partial class OdfSigner
     /// Executes the VerifySignatures operation.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果。
     /// </summary>
-    /// <param name="package">要驗證的 ODF 封裝</param>
-    /// <param name="options">簽署選項</param>
     /// <returns>詳細的數位簽章驗證結果</returns>
     /// <remarks>
     /// Prefer <see cref="VerifySignaturesAsync(OdfPackage, OdfSigningOptions?, CancellationToken)"/> in server environments to avoid blocking request threads.
     /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="VerifySignaturesAsync(OdfPackage, OdfSigningOptions?, CancellationToken)"/> 以避免阻塞要求執行緒。
     /// </remarks>
-    public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options = null)
+    public static OdfSignatureValidationResult VerifySignatures(OdfPackage package) => VerifySignatures(package, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options)
     {
         return VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
     }
@@ -112,17 +121,38 @@ public static partial class OdfSigner
     /// Executes the VerifySignaturesAsync operation.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
     /// </summary>
-    /// <param name="package">要驗證的 ODF 封裝</param>
-    /// <param name="options">簽署選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在簽章解析與 HTTP（CRL）期間協作檢查取消語彙。
     /// </remarks>
+    public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package) => VerifySignaturesAsync(package, null, default);
+
+    /// <summary>
+    /// Asynchronously verifies all digital signatures in the ODF package with a cancellation token.
+    /// 以取消語彙基元非同步驗證 ODF 封裝中的所有數位簽章。
+    /// </summary>
+    /// <param name="package">The ODF package to verify. / 要驗證的 ODF 封裝。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the detailed signature validation result. / 代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfPackage package,
-        OdfSigningOptions? options = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken) =>
+        VerifySignaturesAsync(package, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options) => VerifySignaturesAsync(package, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(
+        OdfPackage package,
+        OdfSigningOptions? options,
+        CancellationToken cancellationToken)
         => OdfSignatureVerifier.VerifySignaturesAsync(package, options, cancellationToken);
 }

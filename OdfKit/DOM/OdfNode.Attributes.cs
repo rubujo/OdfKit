@@ -31,8 +31,6 @@ public partial class OdfNode
     /// Executes the GetAttribute operation.
     /// 取得指定屬性名稱與命名空間的屬性值。
     /// </summary>
-    /// <param name="localName">屬性的局部名稱</param>
-    /// <param name="namespaceUri">屬性的命名空間</param>
     /// <returns>屬性值；如果找不到，則為 <see langword="null"/></returns>
     public string? GetAttribute(string localName, XNamespace namespaceUri) => GetAttribute(localName, namespaceUri.NamespaceName);
 
@@ -40,11 +38,13 @@ public partial class OdfNode
     /// Executes the SetAttribute operation.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
-    /// <param name="localName">屬性的局部名稱</param>
-    /// <param name="namespaceUri">屬性的命名空間 URI</param>
-    /// <param name="value">要設定的屬性值</param>
-    /// <param name="prefix">選用的命名空間前綴</param>
-    public void SetAttribute(string localName, string namespaceUri, string value, string? prefix = null)
+    public void SetAttribute(string localName, string namespaceUri, string value) => SetAttribute(localName, namespaceUri, value, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SetAttribute(string localName, string namespaceUri, string value, string? prefix)
     {
 #if DEBUG
         ValidateAttributeWrite(localName, namespaceUri, value);
@@ -88,11 +88,13 @@ public partial class OdfNode
     /// Executes the SetAttribute operation.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
-    /// <param name="localName">屬性的局部名稱</param>
-    /// <param name="namespaceUri">屬性的命名空間</param>
-    /// <param name="value">要設定的屬性值</param>
-    /// <param name="prefix">選用的命名空間前綴</param>
-    public void SetAttribute(string localName, XNamespace namespaceUri, string value, string? prefix = null) => SetAttribute(localName, namespaceUri.NamespaceName, value, prefix);
+    public void SetAttribute(string localName, XNamespace namespaceUri, string value) => SetAttribute(localName, namespaceUri.NamespaceName, value, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SetAttribute(string localName, XNamespace namespaceUri, string value, string? prefix) => SetAttribute(localName, namespaceUri.NamespaceName, value, prefix);
 
     /// <summary>
     /// Removes the attribute with the specified local name and namespace.
@@ -130,8 +132,6 @@ public partial class OdfNode
     /// Removes the attribute with the specified local name and namespace.
     /// 移除指定屬性名稱與命名空間的屬性。
     /// </summary>
-    /// <param name="localName">The attribute local name. / 屬性的局部名稱。</param>
-    /// <param name="namespaceUri">The attribute namespace. / 屬性的命名空間。</param>
     /// <returns><see langword="true"/> if the attribute was removed; otherwise, <see langword="false"/>. / 若已移除屬性則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool RemoveAttribute(string localName, XNamespace namespaceUri) => RemoveAttribute(localName, namespaceUri.NamespaceName);
 

@@ -308,11 +308,14 @@ public partial class OdfDrawPage
     /// Creates a connector linking a start shape and an end shape on the drawing page.
     /// 在繪圖頁面上建立起點與終點相連的連接線。
     /// </summary>
-    /// <param name="startShapeId">The start shape identifier. / 起點圖形識別碼。</param>
-    /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
-    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
     /// <returns>The newly added connector shape instance. / 新增的連接線圖形執行個體。</returns>
-    public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
+    public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType)
     {
         if (string.IsNullOrEmpty(startShapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_StartingCannotBeEmpty"), nameof(startShapeId));

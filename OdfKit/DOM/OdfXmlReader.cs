@@ -26,19 +26,26 @@ public static class OdfXmlReader
     /// Executes the Parse operation.
     /// 將 ODF XML 唯讀位元組區段解析為記憶體 DOM 節點樹。
     /// </summary>
-    /// <param name="xmlData">包含 XML 資料的唯讀位元組區段</param>
-    /// <param name="options">載入選項；如果為 <see langword="null"/>，則使用預設選項</param>
     /// <returns>解析完成的根元素節點</returns>
-    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, OdfLoadOptions? options = null)
-    {
-        return Parse(xmlData, IntPtr.Zero, options);
-    }
+    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData) => Parse(xmlData, IntPtr.Zero, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, OdfLoadOptions? options) => Parse(xmlData, IntPtr.Zero, options);
 
     /// <summary>
     /// Executes the Parse operation.
     /// 將 ODF XML 唯讀位元組區段與基底指標解析為記憶體 DOM 節點樹。
     /// </summary>
-    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr, OdfLoadOptions? options = null)
+    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr) => Parse(xmlData, basePtr, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr, OdfLoadOptions? options)
     {
         options ??= OdfLoadOptions.Default;
         if (!options.AllowLazyLoading)
@@ -434,13 +441,17 @@ public static class OdfXmlReader
     /// Executes the Parse operation.
     /// 將 ODF XML 檔案串流解析為記憶體 DOM 節點樹。
     /// </summary>
-    /// <param name="stream">要解析的 XML 輸入串流</param>
-    /// <param name="options">載入選項；如果為 <see langword="null"/>，則使用預設選項</param>
     /// <returns>解析完成的根元素節點</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="stream"/> 為 <see langword="null"/> 時擲出</exception>
     /// <exception cref="SecurityException">當 XML 巢狀深度超過限制時擲出</exception>
     /// <exception cref="InvalidDataException">當 XML 結構無效（例如找不到根元素）時擲出</exception>
-    public static OdfNode Parse(Stream stream, OdfLoadOptions? options = null)
+    public static OdfNode Parse(Stream stream) => Parse(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfNode Parse(Stream stream, OdfLoadOptions? options)
     {
         var stopwatch = Stopwatch.StartNew();
         if (stream is null)

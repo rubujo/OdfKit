@@ -124,36 +124,62 @@ public partial class SpreadsheetDocument : OdfDocument
     /// Asynchronously loads an ODS spreadsheet document from the specified path.
     /// 非同步從指定路徑載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="path">The ODS document path. / ODS 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="SpreadsheetDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public new static Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public new static Task<SpreadsheetDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<SpreadsheetDocument>(path, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", cancellationToken);
 
     /// <summary>
     /// Loads an ODS spreadsheet document from the specified stream.
     /// 從指定資料流載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODS document content. / 包含 ODS 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="SpreadsheetDocument"/> instance. / 載入完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
     /// <exception cref="InvalidOperationException">When the specified document is not an ODS spreadsheet. / 當指定文件不是 ODS 試算表時擲出。</exception>
-    public new static SpreadsheetDocument Load(Stream stream, string? fileName = null) =>
+    public new static SpreadsheetDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static SpreadsheetDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<SpreadsheetDocument>(stream, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", fileName);
 
     /// <summary>
     /// Asynchronously loads an ODS spreadsheet document from the specified stream.
     /// 非同步從指定資料流載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODS document content. / 包含 ODS 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="SpreadsheetDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
-    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<SpreadsheetDocument>(stream, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", fileName, cancellationToken);
 
     /// <summary>

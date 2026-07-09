@@ -27,15 +27,17 @@ public static partial class OdfStreamingMailMerge
     /// Asynchronously applies template data merging and writes the result to the target stream.
     /// 非同步套用範本資料合併，並將結果輸出至目標串流。
     /// </summary>
-    /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
-    /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
-    /// <param name="data">The merge data dictionary. / 套印資料字典。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
+    public static Task ApplyTemplateAsync(Stream templateStream, Stream outputStream, IDictionary<string, object?> data) => ApplyTemplateAsync(templateStream, outputStream, data, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static async Task ApplyTemplateAsync(
         Stream templateStream,
         Stream outputStream,
         IDictionary<string, object?> data,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (templateStream is null)
             throw new ArgumentNullException(nameof(templateStream));
@@ -86,15 +88,17 @@ public static partial class OdfStreamingMailMerge
     /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，並將結果輸出至目標串流。
     /// </summary>
-    /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
-    /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
-    /// <param name="dataSequence">The large data sequence, where each record is a field value dictionary. / 大批量的資料序列，每筆資料為一個欄位值字典。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
+    public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,
         IEnumerable<IDictionary<string, object?>> dataSequence,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (templateStream is null)
             throw new ArgumentNullException(nameof(templateStream));
@@ -114,15 +118,17 @@ public static partial class OdfStreamingMailMerge
     /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，資料序列以非同步方式列舉，並將結果輸出至目標串流。
     /// </summary>
-    /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
-    /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
-    /// <param name="dataSequence">The asynchronous data sequence, where each record is a field value dictionary. / 非同步資料序列，每筆資料為一個欄位值字典。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
+    public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IAsyncEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,
         IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (templateStream is null)
             throw new ArgumentNullException(nameof(templateStream));
@@ -283,20 +289,22 @@ public static partial class OdfStreamingMailMerge
     /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，支援 DbDataReader，並將結果輸出至目標串流。
     /// </summary>
-    /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
-    /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
-    /// <param name="reader">The DbDataReader containing multiple records. / 包含多筆資料的 DbDataReader。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
+    public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, DbDataReader reader) => ApplyBatchTemplateAsync(templateStream, outputStream, reader, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,
         DbDataReader reader,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (reader is null)
             throw new ArgumentNullException(nameof(reader));
 
-        var sequence = AsAsyncEnumerable(reader);
+        var sequence = AsAsyncEnumerable(reader, default);
         return ApplyBatchTemplateAsync(templateStream, outputStream, sequence, cancellationToken);
     }
 

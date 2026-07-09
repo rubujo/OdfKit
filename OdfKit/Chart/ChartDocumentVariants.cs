@@ -54,31 +54,57 @@ public sealed class ChartTemplateDocument : ChartDocument
     /// Asynchronously loads an OTC chart template document from the specified path.
     /// 非同步從指定路徑載入 OTC 圖表範本文件。
     /// </summary>
-    /// <param name="path">The OTC document path. / OTC 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="ChartTemplateDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="ChartTemplateDocument"/>。</returns>
-    public static new async Task<ChartTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<ChartTemplateDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<ChartTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an OTC chart template document from the specified stream.
     /// 從指定資料流載入 OTC 圖表範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTC document content. / 包含 OTC 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="ChartTemplateDocument"/> instance. / 載入完成的 <see cref="ChartTemplateDocument"/> 執行個體。</returns>
-    public static new ChartTemplateDocument Load(Stream stream, string? fileName = null) =>
+    public static new ChartTemplateDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new ChartTemplateDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads an OTC chart template document from the specified stream.
     /// 非同步從指定資料流載入 OTC 圖表範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing the OTC document content. / 包含 OTC 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="ChartTemplateDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="ChartTemplateDocument"/>。</returns>
-    public static new async Task<ChartTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<ChartTemplateDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<ChartTemplateDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<ChartTemplateDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<ChartTemplateDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
@@ -148,31 +174,57 @@ public sealed class FlatChartDocument : ChartDocument
     /// Asynchronously loads a FODC flat XML chart document from the specified path.
     /// 非同步從指定路徑載入 FODC 扁平 XML 圖表文件。
     /// </summary>
-    /// <param name="path">The FODC document path. / FODC 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="FlatChartDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatChartDocument"/>。</returns>
-    public static new async Task<FlatChartDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatChartDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatChartDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads a FODC flat XML chart document from the specified stream.
     /// 從指定資料流載入 FODC 扁平 XML 圖表文件。
     /// </summary>
-    /// <param name="stream">The stream containing the FODC document content. / 包含 FODC 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="FlatChartDocument"/> instance. / 載入完成的 <see cref="FlatChartDocument"/> 執行個體。</returns>
-    public static new FlatChartDocument Load(Stream stream, string? fileName = null) =>
+    public static new FlatChartDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new FlatChartDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads a FODC flat XML chart document from the specified stream.
     /// 非同步從指定資料流載入 FODC 扁平 XML 圖表文件。
     /// </summary>
-    /// <param name="stream">The stream containing the FODC document content. / 包含 FODC 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="FlatChartDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatChartDocument"/>。</returns>
-    public static new async Task<FlatChartDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatChartDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<FlatChartDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<FlatChartDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatChartDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>

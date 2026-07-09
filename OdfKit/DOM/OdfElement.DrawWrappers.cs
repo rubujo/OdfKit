@@ -13,7 +13,6 @@ namespace OdfKit.DOM;
 /// Provides the DrawFrameElement API.
 /// 表示 ODF 中的 draw:frame 元素。
 /// </summary>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
@@ -53,7 +52,6 @@ public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame
 /// Provides the DrawImageElement API.
 /// 表示 ODF 中的 draw:image 元素。
 /// </summary>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawImageElement(string? prefix = null) : OdfElement("image", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
@@ -304,7 +302,6 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
 /// Provides the DrawObjectElement API.
 /// 表示 ODF 中的 draw:object 元素。
 /// </summary>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawObjectElement(string? prefix = null) : OdfElement("object", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
@@ -328,8 +325,6 @@ public partial class DrawObjectElement(string? prefix = null) : OdfElement("obje
 /// Provides the DrawShapeElement API.
 /// 表示 ODF 中的繪圖形狀元素。
 /// </summary>
-/// <param name="shapeKind">形狀種類</param>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawShapeElement(string shapeKind, string? prefix = null) : OdfElement(shapeKind, OdfNamespaces.Draw, prefix)
 {
     /// <summary>
@@ -369,14 +364,12 @@ public partial class DrawShapeElement(string shapeKind, string? prefix = null) :
 /// Provides the DrawGroupElement API.
 /// 表示 ODF 中的 draw:g 元素。
 /// </summary>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawGroupElement(string? prefix = null) : OdfElement("g", OdfNamespaces.Draw, prefix);
 
 /// <summary>
 /// Provides the DrawConnectorElement API.
 /// 表示 ODF 中的 draw:connector 元素。
 /// </summary>
-/// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawConnectorElement(string? prefix = null) : OdfElement("connector", OdfNamespaces.Draw, prefix);
 
 
@@ -389,6 +382,10 @@ internal static class OdfTransformHelper
 {
     private static readonly System.Text.RegularExpressions.Regex MatrixRegex = new(@"matrix\s*\(\s*([^)]+)\s*\)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static System.Numerics.Matrix3x2 ParseTransform(string? transformStr)
     {
         if (string.IsNullOrEmpty(transformStr))
@@ -471,6 +468,10 @@ internal static class OdfTransformHelper
         return result;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static string FormatTransform(System.Numerics.Matrix3x2 matrix)
     {
         return string.Format(System.Globalization.CultureInfo.InvariantCulture,

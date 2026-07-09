@@ -546,7 +546,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// Completes synchronously when the requested data is already prefetched; otherwise the blocking read is dispatched to the thread pool so the caller thread is never blocked.
     /// 當要求的資料已在預讀緩衝區內時同步完成；否則將阻塞式讀取排入執行緒集區執行，避免以同步讀取偽裝非同步而阻塞呼叫端執行緒。
     /// </remarks>
-    public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {

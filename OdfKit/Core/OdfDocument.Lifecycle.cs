@@ -21,12 +21,17 @@ public abstract partial class OdfDocument
     /// Saves the document back to its package container.
     /// 將文件儲存回其 ODF 封裝容器。
     /// </summary>
-    /// <param name="options">The save options to apply. / 要套用的儲存選項。</param>
     /// <remarks>
     /// Prefer <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> in server environments to avoid blocking request threads.
     /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞要求執行緒。
     /// </remarks>
-    public virtual void Save(OdfSaveOptions? options = null)
+    public virtual void Save() => Save((OdfSaveOptions?)null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public virtual void Save(OdfSaveOptions? options)
     {
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -37,9 +42,13 @@ public abstract partial class OdfDocument
     /// Saves the document to the specified file path.
     /// 將文件儲存至指定檔案路徑。
     /// </summary>
-    /// <param name="path">The destination file path. / 目的地檔案路徑。</param>
-    /// <param name="options">The save options to apply. / 要套用的儲存選項。</param>
-    public void Save(string path, OdfSaveOptions? options = null)
+    public void Save(string path) => Save(path, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Save(string path, OdfSaveOptions? options)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -61,14 +70,24 @@ public abstract partial class OdfDocument
     /// Executes the SaveAsync operation.
     /// 非同步儲存文件至 ODF 封裝容器中。
     /// </summary>
-    /// <param name="options">儲存設定選項</param>
-    /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的 Task 執行個體</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
     /// </remarks>
-    public virtual async Task SaveAsync(OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    public virtual Task SaveAsync() => SaveAsync((OdfSaveOptions?)null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public virtual Task SaveAsync(OdfSaveOptions? options) => SaveAsync(options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public virtual async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken)
     {
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -79,15 +98,33 @@ public abstract partial class OdfDocument
     /// Executes the SaveAsync operation.
     /// 非同步將文件保存到指定檔案路徑。
     /// </summary>
-    /// <param name="path">要寫入的檔案路徑</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步儲存作業的工作</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與檔案 I/O 期間協作檢查取消語彙。
     /// </remarks>
-    public async Task SaveAsync(string path, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    public Task SaveAsync(string path) => SaveAsync(path, null, default);
+
+    /// <summary>
+    /// Asynchronously saves the document to the specified path with a cancellation token.
+    /// 以取消語彙基元非同步將文件儲存至指定路徑。
+    /// </summary>
+    /// <param name="path">The destination file path. / 目標檔案路徑。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous save operation. / 代表非同步儲存作業的工作。</returns>
+    public Task SaveAsync(string path, CancellationToken cancellationToken) => SaveAsync(path, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveAsync(string path, OdfSaveOptions? options) => SaveAsync(path, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public async Task SaveAsync(string path, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -125,9 +162,13 @@ public abstract partial class OdfDocument
     /// Executes the SaveToStream operation.
     /// 將文件儲存至指定的資料流。
     /// </summary>
-    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    public void SaveToStream(Stream destinationStream, OdfSaveOptions? options = null)
+    public void SaveToStream(Stream destinationStream) => SaveToStream(destinationStream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
         if (destinationStream == null)
             throw new ArgumentNullException(nameof(destinationStream));
@@ -146,26 +187,64 @@ public abstract partial class OdfDocument
     /// Executes the SaveAsync operation.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
-    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步儲存作業的工作</returns>
-    public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default) =>
+    public Task SaveAsync(Stream destinationStream) => SaveToStreamAsync(destinationStream, null, default);
+
+    /// <summary>
+    /// Asynchronously saves the document to the specified stream with a cancellation token.
+    /// 以取消語彙基元非同步將文件儲存至指定資料流。
+    /// </summary>
+    /// <param name="destinationStream">The destination stream. / 目標資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous save operation. / 代表非同步儲存作業的工作。</returns>
+    public Task SaveAsync(Stream destinationStream, CancellationToken cancellationToken) =>
+        SaveToStreamAsync(destinationStream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken) =>
         SaveToStreamAsync(destinationStream, options, cancellationToken);
 
     /// <summary>
     /// Executes the SaveToStreamAsync operation.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
-    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步儲存作業的工作</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
     /// </remarks>
-    public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    public Task SaveToStreamAsync(Stream destinationStream) => SaveToStreamAsync(destinationStream, null, default);
+
+    /// <summary>
+    /// Asynchronously saves the document to the specified stream with a cancellation token.
+    /// 以取消語彙基元非同步將文件儲存至指定資料流。
+    /// </summary>
+    /// <param name="destinationStream">The destination stream. / 目標資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous save operation. / 代表非同步儲存作業的工作。</returns>
+    public Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken) =>
+        SaveToStreamAsync(destinationStream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
         if (destinationStream is null)
             throw new ArgumentNullException(nameof(destinationStream));
@@ -314,9 +393,13 @@ public abstract partial class OdfDocument
     /// Executes the SaveAsFlatXml operation.
     /// 將文件儲存為單一 Flat XML 格式的檔案。
     /// </summary>
-    /// <param name="path">要儲存的檔案路徑</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    public void SaveAsFlatXml(string path, OdfSaveOptions? options = null)
+    public void SaveAsFlatXml(string path) => SaveAsFlatXml(path, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SaveAsFlatXml(string path, OdfSaveOptions? options)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -338,9 +421,13 @@ public abstract partial class OdfDocument
     /// Executes the SaveAsFlatXml operation.
     /// 將文件儲存為單一 Flat XML 格式並寫入指定的資料流。
     /// </summary>
-    /// <param name="stream">目標資料流</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
-    public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options = null)
+    public void SaveAsFlatXml(Stream stream) => SaveAsFlatXml(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
@@ -359,13 +446,21 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the LoadFromFlatXml operation.
+    /// Loads an ODF document from the specified Flat XML file path.
     /// 從指定的 Flat XML 檔案載入 ODF 文件。
     /// </summary>
-    /// <param name="path">Flat XML 檔案路徑</param>
-    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
-    /// <returns>載入完成的 ODF 文件</returns>
-    public static OdfDocument LoadFromFlatXml(string path, OdfLoadOptions? options = null)
+    /// <param name="path">The Flat XML file path. / Flat XML 檔案路徑。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(string path) => LoadFromFlatXml(path, null);
+
+    /// <summary>
+    /// Loads an ODF document from the specified Flat XML file path and load options.
+    /// 從指定的 Flat XML 檔案與載入選項載入 ODF 文件。
+    /// </summary>
+    /// <param name="path">The Flat XML file path. / Flat XML 檔案路徑。</param>
+    /// <param name="options">The load options; when <see langword="null"/>, defaults are used. / 載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(string path, OdfLoadOptions? options)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -376,13 +471,21 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the LoadFromFlatXml operation.
+    /// Loads an ODF document from the specified Flat XML stream.
     /// 從指定的 Flat XML 資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">Flat XML 資料流</param>
-    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
-    /// <returns>載入完成 of ODF 文件</returns>
-    public static OdfDocument LoadFromFlatXml(Stream stream, OdfLoadOptions? options = null)
+    /// <param name="stream">The Flat XML stream. / Flat XML 資料流。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(Stream stream) => LoadFromFlatXml(stream, null);
+
+    /// <summary>
+    /// Loads an ODF document from the specified Flat XML stream and load options.
+    /// 從指定的 Flat XML 資料流與載入選項載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">The Flat XML stream. / Flat XML 資料流。</param>
+    /// <param name="options">The load options; when <see langword="null"/>, defaults are used. / 載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(Stream stream, OdfLoadOptions? options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));

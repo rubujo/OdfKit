@@ -124,20 +124,28 @@ public class FormulaDocument : OdfFormulaDocument
     /// Asynchronously loads a high-level formula document from the specified file path.
     /// 非同步從指定檔案路徑載入高階公式文件。
     /// </summary>
-    /// <param name="path">The ODF formula document path. / ODF 公式文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded high-level <see cref="FormulaDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="FormulaDocument"/>。</returns>
-    public new static async Task<FormulaDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public new static Task<FormulaDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static async Task<FormulaDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads a high-level formula document from the specified stream.
     /// 從指定資料流載入高階公式文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF formula document content. / 包含 ODF 公式文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded high-level <see cref="FormulaDocument"/> instance. / 載入完成的高階 <see cref="FormulaDocument"/> 執行個體。</returns>
-    public new static FormulaDocument Load(Stream stream, string? fileName = null)
+    public new static FormulaDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static FormulaDocument Load(Stream stream, string? fileName)
     {
         return EnsureFormula(OdfDocumentFactory.LoadDocument(stream, fileName));
     }
@@ -146,11 +154,29 @@ public class FormulaDocument : OdfFormulaDocument
     /// Asynchronously loads a high-level formula document from the specified stream.
     /// 非同步從指定資料流載入高階公式文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF formula document content. / 包含 ODF 公式文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded high-level <see cref="FormulaDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="FormulaDocument"/>。</returns>
-    public new static async Task<FormulaDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public new static Task<FormulaDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public new static Task<FormulaDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<FormulaDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static async Task<FormulaDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>

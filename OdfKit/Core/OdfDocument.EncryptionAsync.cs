@@ -21,8 +21,8 @@ public abstract partial class OdfDocument
     /// <returns>A task representing the asynchronous save operation. / 代表非同步儲存作業的工作。</returns>
     public Task SaveEncryptedAsync(
         string password,
-        OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256,
-        CancellationToken cancellationToken = default)
+        OdfEncryptionAlgorithm algorithm,
+        CancellationToken cancellationToken)
     {
         OdfSaveOptions options = OdfPackage.CreateEncryptedSaveOptions(password, algorithm);
         return SaveAsync(options, cancellationToken);
@@ -40,8 +40,8 @@ public abstract partial class OdfDocument
     public Task SaveEncryptedAsync(
         string path,
         string password,
-        OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256,
-        CancellationToken cancellationToken = default)
+        OdfEncryptionAlgorithm algorithm,
+        CancellationToken cancellationToken)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -62,8 +62,8 @@ public abstract partial class OdfDocument
     public Task SaveEncryptedAsync(
         Stream destinationStream,
         string password,
-        OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256,
-        CancellationToken cancellationToken = default)
+        OdfEncryptionAlgorithm algorithm,
+        CancellationToken cancellationToken)
     {
         if (destinationStream is null)
             throw new ArgumentNullException(nameof(destinationStream));
@@ -83,7 +83,7 @@ public abstract partial class OdfDocument
     public static Task<OdfDocument> LoadEncryptedAsync(
         string path,
         string password,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -103,8 +103,8 @@ public abstract partial class OdfDocument
     public static Task<OdfDocument> LoadEncryptedAsync(
         Stream stream,
         string password,
-        string? fileName = null,
-        CancellationToken cancellationToken = default)
+        string? fileName,
+        CancellationToken cancellationToken)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));

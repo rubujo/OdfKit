@@ -62,14 +62,18 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// Asynchronously loads an ODF document from the specified path.
     /// 非同步從指定路徑載入 ODF 文件。
     /// </summary>
-    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static Task<OdfDocument> LoadAsync(string path) => LoadAsync(path, cancellationToken: default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken);
 
     /// <summary>
@@ -85,62 +89,98 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// Asynchronously loads an ODF document from the specified path and load options.
     /// 非同步從指定路徑與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
-    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken = default) =>
+    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options) => LoadAsync(path, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(path, options, cancellationToken);
 
     /// <summary>
     /// Loads an ODF document from the specified stream.
     /// 從指定資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
-    public static OdfDocument Load(Stream stream, string? fileName = null) => OdfDocumentFactory.LoadDocument(stream, fileName);
+    public static OdfDocument Load(Stream stream) => Load(stream, fileName: null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfDocument Load(Stream stream, string? fileName) => OdfDocumentFactory.LoadDocument(stream, fileName);
 
     /// <summary>
     /// Asynchronously loads an ODF document from the specified stream.
     /// 非同步從指定資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static Task<OdfDocument> LoadAsync(Stream stream) => LoadAsync(stream, fileName: null, cancellationToken: default);
+
+    /// <summary>
+    /// Asynchronously loads an ODF document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, fileName: null, cancellationToken: cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken);
 
     /// <summary>
     /// Loads an ODF document from the specified stream and load options.
     /// 從指定資料流與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
-    public static OdfDocument Load(Stream stream, OdfLoadOptions? options, string? fileName = null) =>
+    public static OdfDocument Load(Stream stream, OdfLoadOptions? options) => Load(stream, options, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfDocument Load(Stream stream, OdfLoadOptions? options, string? fileName) =>
         OdfDocumentFactory.LoadDocument(stream, options, fileName);
 
     /// <summary>
     /// Asynchronously loads an ODF document from the specified stream and load options.
     /// 非同步從指定資料流與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options) => LoadAsync(stream, options, null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName) => LoadAsync(stream, options, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, options, fileName, cancellationToken);
 
     /// <summary>
@@ -406,6 +446,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 
     private readonly struct CoreXmlLoadJob
     {
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
         public CoreXmlLoadJob(int index, string entryName, string defaultXml)
         {
             Index = index;

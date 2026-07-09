@@ -138,8 +138,8 @@ dotnet_diagnostic.CA1307.severity = none
 [*.cs]
 dotnet_diagnostic.RS0016.severity = error
 dotnet_diagnostic.RS0017.severity = error
-dotnet_diagnostic.RS0026.severity = suggestion
-dotnet_diagnostic.RS0027.severity = suggestion
+dotnet_diagnostic.RS0026.severity = error
+dotnet_diagnostic.RS0027.severity = error
 # 生成 DOM／schema 包裝不強制可選參數設計指引
 [OdfKit/DOM/Generated/**.cs]
 dotnet_diagnostic.RS0026.severity = none

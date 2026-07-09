@@ -14,6 +14,10 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
         set { }
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override object? GetEntity(Uri absoluteUri, string? role, Type? ofObjectToReturn)
     {
         if (absoluteUri == null)
@@ -61,6 +65,10 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
         return null;
     }
 
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public override Uri ResolveUri(Uri? baseUri, string? relativeUri)
     {
         if (baseUri == null)

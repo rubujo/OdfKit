@@ -216,15 +216,20 @@ public sealed class OdfSheetBuilder
     /// <param name="firstDataRow">The numeric value. / 第一筆資料列，採 1 為基準</param>
     /// <param name="lastDataRow">The numeric value. / 最後一筆資料列，採 1 為基準</param>
     /// <param name="formulaFactory">The delegate to invoke. / 依 1-based 列號產生 ODF 公式文字的委派</param>
-    /// <param name="headerRow">The name or identifier. / 標題列，採 1 為基準</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddFormulaColumn(string columnName, string header, int firstDataRow, int lastDataRow, Func<int, string> formulaFactory) => AddFormulaColumn(columnName, header, firstDataRow, lastDataRow, formulaFactory, 1);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder AddFormulaColumn(
         string columnName,
         string header,
         int firstDataRow,
         int lastDataRow,
         Func<int, string> formulaFactory,
-        int headerRow = 1)
+        int headerRow)
     {
         if (string.IsNullOrWhiteSpace(columnName))
             throw new ArgumentNullException(nameof(columnName));
@@ -252,8 +257,13 @@ public sealed class OdfSheetBuilder
     /// <param name="lastDataRow">The last one-based data row. / 最後一筆資料列，採 1 為基準。</param>
     /// <param name="formulaFactory">The formula factory using one-based row numbers. / 依 1 為基準列號產生 ODF 公式文字的委派。</param>
     /// <param name="cachedValueFactory">The cached value factory using one-based row numbers. / 依 1 為基準列號產生快取值的委派。</param>
-    /// <param name="headerRow">The one-based header row. / 標題列，採 1 為基準。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public OdfSheetBuilder AddFormulaColumn(string columnName, string header, int firstDataRow, int lastDataRow, Func<int, string> formulaFactory, Func<int, object?> cachedValueFactory) => AddFormulaColumn(columnName, header, firstDataRow, lastDataRow, formulaFactory, cachedValueFactory, 1);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder AddFormulaColumn(
         string columnName,
         string header,
@@ -261,7 +271,7 @@ public sealed class OdfSheetBuilder
         int lastDataRow,
         Func<int, string> formulaFactory,
         Func<int, object?> cachedValueFactory,
-        int headerRow = 1)
+        int headerRow)
     {
         if (string.IsNullOrWhiteSpace(columnName))
             throw new ArgumentNullException(nameof(columnName));
@@ -496,14 +506,17 @@ public sealed class OdfSheetBuilder
     /// Inserts an embedded chart into the current worksheet for immediate configuration.
     /// 在目前工作表插入可立即設定的嵌入圖表。
     /// </summary>
-    /// <param name="dataRange">The cell range. / 圖表資料來源範圍</param>
-    /// <param name="chartType">The value to use. / 圖表類型</param>
-    /// <param name="configure">The delegate to invoke. / 圖表設定委派</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
+    public OdfSheetBuilder InsertChart(OdfCellRange dataRange, OdfChartType chartType) => InsertChart(dataRange, chartType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder InsertChart(
         OdfCellRange dataRange,
         OdfChartType chartType,
-        Action<OdfChartDocument>? configure = null)
+        Action<OdfChartDocument>? configure)
     {
         OdfChartDocument chart = _sheet.InsertChart(EnsureSheetName(dataRange), chartType);
         configure?.Invoke(chart);
@@ -514,14 +527,17 @@ public sealed class OdfSheetBuilder
     /// Inserts an embedded chart into the current worksheet for immediate configuration.
     /// 在目前工作表插入可立即設定的嵌入圖表。
     /// </summary>
-    /// <param name="dataRange">The cell range. / 圖表資料來源範圍字串，例如 <c>A1:D10</c></param>
-    /// <param name="chartType">The value to use. / 圖表類型</param>
-    /// <param name="configure">The delegate to invoke. / 圖表設定委派</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
+    public OdfSheetBuilder InsertChart(string dataRange, OdfChartType chartType) => InsertChart(ParseRange(dataRange), chartType, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder InsertChart(
         string dataRange,
         OdfChartType chartType,
-        Action<OdfChartDocument>? configure = null)
+        Action<OdfChartDocument>? configure)
         => InsertChart(ParseRange(dataRange), chartType, configure);
 
     /// <summary>
@@ -540,20 +556,26 @@ public sealed class OdfSheetBuilder
     /// Adds a decimal numeric range data validation rule.
     /// 新增十進位數值範圍資料驗證規則。
     /// </summary>
-    /// <param name="range">The cell range. / 套用驗證的儲存格範圍</param>
-    /// <param name="minimum">The numeric value. / 允許的最小值</param>
-    /// <param name="maximum">The numeric value. / 允許的最大值</param>
-    /// <param name="errorTitle">The value to use. / 輸入錯誤時顯示的標題</param>
-    /// <param name="errorMessage">The value to use. / 輸入錯誤時顯示的訊息內容</param>
-    /// <param name="alertStyle">The value to use. / 輸入錯誤時的警告樣式等級</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDecimalValidation(OdfCellRange range, double minimum, double maximum) => AddDecimalValidation(range, minimum, maximum, null, null, OdfValidationAlertStyle.Stop);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddDecimalValidation(OdfCellRange range, double minimum, double maximum, string? errorTitle, string? errorMessage) => AddDecimalValidation(range, minimum, maximum, errorTitle, errorMessage, OdfValidationAlertStyle.Stop);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder AddDecimalValidation(
         OdfCellRange range,
         double minimum,
         double maximum,
-        string? errorTitle = null,
-        string? errorMessage = null,
-        OdfValidationAlertStyle alertStyle = OdfValidationAlertStyle.Stop)
+        string? errorTitle,
+        string? errorMessage,
+        OdfValidationAlertStyle alertStyle)
     {
         _document.AddDataValidation(_sheet.Name, new OdfDataValidation
         {
@@ -572,20 +594,26 @@ public sealed class OdfSheetBuilder
     /// Adds a decimal numeric range data validation rule.
     /// 新增十進位數值範圍資料驗證規則。
     /// </summary>
-    /// <param name="range">The cell range. / 套用驗證的儲存格範圍字串，例如 <c>B2:C20</c></param>
-    /// <param name="minimum">The numeric value. / 允許的最小值</param>
-    /// <param name="maximum">The numeric value. / 允許的最大值</param>
-    /// <param name="errorTitle">The value to use. / 輸入錯誤時顯示的標題</param>
-    /// <param name="errorMessage">The value to use. / 輸入錯誤時顯示的訊息內容</param>
-    /// <param name="alertStyle">The value to use. / 輸入錯誤時的警告樣式等級</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDecimalValidation(string range, double minimum, double maximum) => AddDecimalValidation(ParseRange(range), minimum, maximum, null, null, OdfValidationAlertStyle.Stop);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddDecimalValidation(string range, double minimum, double maximum, string? errorTitle, string? errorMessage) => AddDecimalValidation(ParseRange(range), minimum, maximum, errorTitle, errorMessage, OdfValidationAlertStyle.Stop);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public OdfSheetBuilder AddDecimalValidation(
         string range,
         double minimum,
         double maximum,
-        string? errorTitle = null,
-        string? errorMessage = null,
-        OdfValidationAlertStyle alertStyle = OdfValidationAlertStyle.Stop)
+        string? errorTitle,
+        string? errorMessage,
+        OdfValidationAlertStyle alertStyle)
         => AddDecimalValidation(ParseRange(range), minimum, maximum, errorTitle, errorMessage, alertStyle);
 
     /// <summary>

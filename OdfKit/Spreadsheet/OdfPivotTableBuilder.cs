@@ -159,10 +159,14 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     /// Adds a data value field and its calculation function to the pivot table.
     /// 新增資料值欄位與對應的計算函式至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">The field name. / 欄位名稱。</param>
-    /// <param name="function">The calculation function to use; the default is <see cref="OdfPivotFunction.Sum"/>. / 使用的計算函式，預設為 <see cref="OdfPivotFunction.Sum"/>。</param>
     /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
-    public OdfPivotTableBuilder AddDataField(string fieldName, OdfPivotFunction function = OdfPivotFunction.Sum)
+    public OdfPivotTableBuilder AddDataField(string fieldName) => AddDataField(fieldName, OdfPivotFunction.Sum);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPivotTableBuilder AddDataField(string fieldName, OdfPivotFunction function)
     {
         _fields.Add((fieldName, "data", FunctionToString(function), null));
         return this;

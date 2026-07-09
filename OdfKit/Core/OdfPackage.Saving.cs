@@ -19,8 +19,13 @@ public sealed partial class OdfPackage
     /// Executes the Save operation.
     /// 將所有變更儲存回原來的檔案或資料流中。
     /// </summary>
-    /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
-    public void Save(OdfSaveOptions? options = null)
+    public void Save() => Save((OdfSaveOptions?)null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Save(OdfSaveOptions? options)
     {
         if (_mode == OdfPackageMode.Read)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotSaveReadOnly_2"));
@@ -42,10 +47,20 @@ public sealed partial class OdfPackage
     /// Executes the SaveAsync operation.
     /// 將所有變更儲存回原來的檔案或資料流中（非同步）。
     /// </summary>
-    /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的工作</returns>
-    public Task SaveAsync(CancellationToken cancellationToken = default)
-        => SaveAsync(null, cancellationToken);
+    public Task SaveAsync() => SaveAsync(null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveAsync(CancellationToken cancellationToken) => SaveAsync(null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveAsync(OdfSaveOptions? options) => SaveAsync(options, default);
 
     /// <summary>
     /// Executes the SaveAsync operation.
@@ -58,7 +73,7 @@ public sealed partial class OdfPackage
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
     /// </remarks>
-    public async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken)
     {
         if (_mode == OdfPackageMode.Read)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotSaveReadOnly_2"));
@@ -81,9 +96,13 @@ public sealed partial class OdfPackage
     /// Executes the SaveToStream operation.
     /// 將封裝序列化儲存至指定的目的地資料流。
     /// </summary>
-    /// <param name="destinationStream">目標目的地資料流</param>
-    /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
-    public void SaveToStream(Stream destinationStream, OdfSaveOptions? options = null)
+    public void SaveToStream(Stream destinationStream) => SaveToStream(destinationStream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
         _lock.Wait();
         OdfSaveOptions previousOptions = UseSaveOptions(options);
@@ -102,13 +121,17 @@ public sealed partial class OdfPackage
     /// Executes the Save operation.
     /// 將封裝序列化儲存至指定的位元組緩衝區寫入器。
     /// </summary>
-    /// <param name="destination">目標位元組緩衝區寫入器</param>
-    /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
     /// <remarks>
     /// 此入口會將 ZIP 或 Flat XML 輸出直接寫入 <paramref name="destination"/>，適合與 ASP.NET Core、
     /// pipelines 或自訂零拷貝緩衝區整合，避免呼叫端必須先建立中介 <see cref="MemoryStream"/>。
     /// </remarks>
-    public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options = null)
+    public void Save(IBufferWriter<byte> destination) => Save(destination, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options)
     {
         if (destination is null)
             throw new ArgumentNullException(nameof(destination));
@@ -121,11 +144,20 @@ public sealed partial class OdfPackage
     /// Executes the SaveToStreamAsync operation.
     /// 將封裝序列化儲存至指定的目的地資料流（非同步）。
     /// </summary>
-    /// <param name="destinationStream">目標目的地資料流</param>
-    /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的工作</returns>
-    public Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken = default)
-        => SaveToStreamAsync(destinationStream, null, cancellationToken);
+    public Task SaveToStreamAsync(Stream destinationStream) => SaveToStreamAsync(destinationStream, null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken) => SaveToStreamAsync(destinationStream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
 
     /// <summary>
     /// Executes the SaveToStreamAsync operation.
@@ -142,7 +174,7 @@ public sealed partial class OdfPackage
     public async Task SaveToStreamAsync(
         Stream destinationStream,
         OdfSaveOptions? options,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         OdfSaveOptions previousOptions = UseSaveOptions(options);

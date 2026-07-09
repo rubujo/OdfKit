@@ -41,7 +41,7 @@ public abstract partial class OdfDocument
     public async Task<OdfValidationReport> ValidateAsync(OdfComplianceProfile? profile = null, CancellationToken cancellationToken = default)
     {
         using MemoryStream snapshot = new();
-        await SaveToStreamAsync(snapshot, cancellationToken: cancellationToken).ConfigureAwait(false);
+        await SaveToStreamAsync(snapshot, options: null, cancellationToken).ConfigureAwait(false);
         OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
         return MergeTopologyReport(packageReport);
     }

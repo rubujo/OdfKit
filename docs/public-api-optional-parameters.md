@@ -32,22 +32,23 @@ public void Foo(string s = "") { } // RS0026：多個皆可選
 
 | 範圍 | 嚴重度 | 說明 |
 |------|--------|------|
-| 手寫公開 API | **suggestion**（`.editorconfig`） | 新增 API 必須遵守上方模式；既有多載分批收斂（明確多載轉呼叫） |
-| 生成 DOM（`DOM/Generated`） | 與手寫相同；**禁止手改 `.g.cs`** | 產生器輸出 `Type()`／`Type(string? prefix)`／`Type(params OdfNode[])`，**無** `prefix = null`；改 `DomWrappersCSharpWriter` 後 `pwsh eng/Generate-OdfSchemaProvider.ps1` 重產 |
-| schema provider 產生碼 | 不適用公開多載規則為主 | 非公開 API 形狀焦點 |
-| 示範收斂 | `TableTableElement.InsertRows`／`DeleteRows` | 無預設最長多載 + 短多載轉呼叫 |
+| 手寫公開 API | **error**（`.editorconfig`） | 不得再引入 RS0026／RS0027；既有核心路徑（`Save`／`Load`／`Open`／文件變體等）已改為明確多載鏈 |
+| 生成 DOM（`DOM/Generated`） | **none**（目錄覆寫）；**禁止手改 `.g.cs`** | 產生器輸出 `Type()`／`Type(string? prefix)`／`Type(params OdfNode[])`，**無** `prefix = null`；改 `DomWrappersCSharpWriter` 後 `pwsh eng/Generate-OdfSchemaProvider.ps1` 重產 |
+| schema provider 產生碼 | **none**（`Compliance/Generated` 覆寫） | 非公開 API 形狀焦點 |
+| 示範收斂 | `TableTableElement.InsertRows`／`DeleteRows`、`OdfDocument.Save`／`LoadAsync` | 無預設最長多載 + 短多載轉呼叫 |
+
+> 說明：單一公開方法可保留尾端可選參數（不觸發 RS0026）；**兩個以上同名多載皆含可選參數**才違反 RS0026。RS0027 要求含可選參數的多載必須是同名中參數最多者。本專案對高頻 API 偏好「全部無 `=` 預設的明確鏈」，以利跨語言與 PublicAPI 基線穩定。
 
 ## 新增公開 API 檢查清單
 
 1. 避免在多個同名多載上同時使用可選參數。  
 2. 優先：`Foo(required…)` + `Foo(required…, optional…)`（最長可不帶 `=` 預設，改由短多載轉呼叫）。  
-3. 更新雙 TFM `PublicAPI.Unshipped.txt`（或 `Generate-PublicApiBaseline.ps1`）。  
-4. 本機建置：`CI=true` 且 `RunAnalyzersDuringBuild=true`。
+3. 更新雙 TFM `PublicAPI.Unshipped.txt`（或 `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify`）。  
+4. 本機建置：`CI=true` 且 `RunAnalyzersDuringBuild=true`；RS0026／RS0027 為 **error**。
 
 ## 1.0 展望
 
-- 手寫路徑可將 RS0026／RS0027 升為 **warning** 或 **error**。  
-- 生成 DOM 若要收斂，應改 `OdfSchemaGenerator` 樣板後整批重產與基線更新。  
+- 其餘仍帶單一可選參數的公開 API，可依使用頻率分批改為明確多載鏈（非 RS 強制）。  
 - 穩定版後搭配 `PackageValidationBaselineVersion` 防破壞性變更。
 
 ## 相關

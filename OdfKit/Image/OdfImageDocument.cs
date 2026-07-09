@@ -73,21 +73,29 @@ public partial class OdfImageDocument : OdfDocument
     /// Asynchronously loads an ODI image document from the specified path.
     /// 非同步從指定路徑載入 ODI 影像文件。
     /// </summary>
-    /// <param name="path">The ODI document path. / ODI 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="OdfImageDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/>。</returns>
-    public new static async Task<OdfImageDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public new static Task<OdfImageDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static async Task<OdfImageDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an ODI image document from the specified stream.
     /// 從指定資料流載入 ODI 影像文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODI document content. / 包含 ODI 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="OdfImageDocument"/> instance. / 載入完成的 <see cref="OdfImageDocument"/> 執行個體。</returns>
     /// <exception cref="InvalidOperationException">When the specified document is not an ODI image. / 當指定文件不是 ODI 影像時擲出。</exception>
-    public new static OdfImageDocument Load(Stream stream, string? fileName = null)
+    public new static OdfImageDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static OdfImageDocument Load(Stream stream, string? fileName)
     {
         return EnsureImage(OdfDocumentFactory.LoadDocument(stream, fileName));
     }
@@ -96,11 +104,29 @@ public partial class OdfImageDocument : OdfDocument
     /// Asynchronously loads an ODI image document from the specified stream.
     /// 非同步從指定資料流載入 ODI 影像文件。
     /// </summary>
-    /// <param name="stream">The stream containing the ODI document content. / 包含 ODI 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="OdfImageDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/>。</returns>
-    public new static async Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public new static Task<OdfImageDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public new static Task<OdfImageDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public new static async Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>

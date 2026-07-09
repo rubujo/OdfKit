@@ -75,26 +75,30 @@ public static class OdfDocumentFactory
     /// Asynchronously loads a high-level ODF document wrapper from the specified path.
     /// 非同步從指定路徑載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadDocumentAsync(string path, CancellationToken cancellationToken = default)
-    {
-        return LoadDocumentAsync(path, options: null, cancellationToken);
-    }
+    public static Task<OdfDocument> LoadDocumentAsync(string path) => LoadDocumentAsync(path, null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadDocumentAsync(string path, CancellationToken cancellationToken) => LoadDocumentAsync(path, null, cancellationToken);
 
     /// <summary>
     /// Asynchronously loads a high-level ODF document wrapper from the specified path and load options.
     /// 非同步從指定路徑與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
-    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadDocumentAsync(string path, OdfLoadOptions? options) => LoadDocumentAsync(path, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static async Task<OdfDocument> LoadDocumentAsync(
         string path,
         OdfLoadOptions? options,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));
@@ -107,13 +111,20 @@ public static class OdfDocumentFactory
     /// Loads a high-level ODF document wrapper from the specified stream.
     /// 從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
-    public static OdfDocument LoadDocument(Stream stream, string? fileName = null)
-    {
-        return LoadDocument(stream, options: null, fileName);
-    }
+    public static OdfDocument LoadDocument(Stream stream) => LoadDocument(stream, null, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfDocument LoadDocument(Stream stream, string? fileName) => LoadDocument(stream, null, fileName);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options) => LoadDocument(stream, options, null);
 
     /// <summary>
     /// Loads a high-level ODF document wrapper from the specified stream and load options.
@@ -123,12 +134,12 @@ public static class OdfDocumentFactory
     /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
     /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
-    public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName = null)
+    public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
 
-        OdfPackage package = OdfPackage.Open(stream, options: options);
+        OdfPackage package = OdfPackage.Open(stream, leaveOpen: false, options: options);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, fileName));
     }
 
@@ -136,17 +147,32 @@ public static class OdfDocumentFactory
     /// Asynchronously loads a high-level ODF document wrapper from the specified stream.
     /// 非同步從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadDocumentAsync(
-        Stream stream,
-        string? fileName = null,
-        CancellationToken cancellationToken = default)
-    {
-        return LoadDocumentAsync(stream, options: null, fileName, cancellationToken);
-    }
+    public static Task<OdfDocument> LoadDocumentAsync(Stream stream) => LoadDocumentAsync(stream, null, null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadDocumentAsync(Stream stream, string? fileName) => LoadDocumentAsync(stream, null, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadDocumentAsync(Stream stream, string? fileName, CancellationToken cancellationToken) => LoadDocumentAsync(stream, null, fileName, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadDocumentAsync(Stream stream, OdfLoadOptions? options) => LoadDocumentAsync(stream, options, null, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfDocument> LoadDocumentAsync(Stream stream, OdfLoadOptions? options, string? fileName) => LoadDocumentAsync(stream, options, fileName, default);
 
     /// <summary>
     /// Asynchronously loads a high-level ODF document wrapper from the specified stream and load options.
@@ -160,13 +186,13 @@ public static class OdfDocumentFactory
     public static async Task<OdfDocument> LoadDocumentAsync(
         Stream stream,
         OdfLoadOptions? options,
-        string? fileName = null,
-        CancellationToken cancellationToken = default)
+        string? fileName,
+        CancellationToken cancellationToken)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
 
-        OdfPackage package = await OdfPackage.OpenAsync(stream, options: options, cancellationToken: cancellationToken)
+        OdfPackage package = await OdfPackage.OpenAsync(stream, leaveOpen: false, options: options, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, fileName));
     }
@@ -175,18 +201,42 @@ public static class OdfDocumentFactory
     /// Creates a minimally packaged ODF document in the provided stream.
     /// 在提供的資料流中建立一個最小封裝的 ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream that receives the packaged ODF document. / 接收封裝 ODF 文件的資料流。</param>
-    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
-    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
-    /// <param name="leaveOpen">If <see langword="true"/>, keeps the stream open after the package is disposed; otherwise <see langword="false"/>. / 若為 <see langword="true"/> ，則在釋放封裝後保持資料流開啟；否則為 <see langword="false"/>。</param>
-    /// <param name="options">The options for saving the document. / 儲存文件的選項。</param>
     /// <returns>The created <see cref="OdfPackage"/> instance. / 傳回建立的 <see cref="OdfPackage"/> 執行個體。</returns>
+    public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind) => CreatePackage(stream, kind, OdfVersion.Odf14, false, null);
+
+    /// <summary>
+    /// Creates a minimally packaged ODF document in the provided stream with an explicit leave-open flag.
+    /// 在提供的資料流中建立最小封裝 ODF 文件，並明確指定是否保持資料流開啟。
+    /// </summary>
+    /// <param name="stream">The destination stream. / 目標資料流。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件種類。</param>
+    /// <param name="leaveOpen">Whether to leave the stream open after disposing the package. / 封裝釋放後是否保持資料流開啟。</param>
+    /// <returns>The created <see cref="OdfPackage"/> instance. / 傳回建立的 <see cref="OdfPackage"/> 執行個體。</returns>
+    public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind, bool leaveOpen) =>
+        CreatePackage(stream, kind, OdfVersion.Odf14, leaveOpen, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind, OdfVersion version) => CreatePackage(stream, kind, version, false, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind, OdfVersion version, bool leaveOpen) => CreatePackage(stream, kind, version, leaveOpen, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static OdfPackage CreatePackage(
         Stream stream,
         OdfDocumentKind kind,
-        OdfVersion version = OdfVersion.Odf14,
-        bool leaveOpen = false,
-        OdfSaveOptions? options = null)
+        OdfVersion version,
+        bool leaveOpen,
+        OdfSaveOptions? options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
@@ -202,16 +252,24 @@ public static class OdfDocumentFactory
     /// Creates a minimally packaged ODF document at the provided path.
     /// 在提供的路徑上建立一個最小封裝的 ODF 文件。
     /// </summary>
-    /// <param name="path">The file path at which to create the packaged ODF document. / 建立封裝 ODF 文件的檔案路徑。</param>
-    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
-    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
-    /// <param name="options">The options for saving the document. / 儲存文件的選項。</param>
     /// <returns>The created <see cref="OdfPackage"/> instance. / 傳回建立的 <see cref="OdfPackage"/> 執行個體。</returns>
+    public static OdfPackage CreatePackage(string path, OdfDocumentKind kind) => CreatePackage(path, kind, OdfVersion.Odf14, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage CreatePackage(string path, OdfDocumentKind kind, OdfVersion version) => CreatePackage(path, kind, version, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static OdfPackage CreatePackage(
         string path,
         OdfDocumentKind kind,
-        OdfVersion version = OdfVersion.Odf14,
-        OdfSaveOptions? options = null)
+        OdfVersion version,
+        OdfSaveOptions? options)
     {
         if (path is null)
             throw new ArgumentNullException(nameof(path));

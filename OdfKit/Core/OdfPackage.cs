@@ -225,10 +225,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Opens an existing ODF package from the specified file path.
     /// 從指定的檔案路徑開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="path">The path of the ODF file. / ODF 檔案的路徑。</param>
-    /// <param name="options">The load options. / 載入選項。</param>
     /// <returns>The opened <see cref="OdfPackage"/> instance. / 開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
-    public static OdfPackage Open(string path, OdfLoadOptions? options = null)
+    public static OdfPackage Open(string path) => Open(path, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Open(string path, OdfLoadOptions? options)
     {
         string journalPath = path + ".journal";
         if (File.Exists(journalPath))
@@ -274,14 +278,29 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// 從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
     /// <remarks>
-    /// When lazy loading is enabled, this method starts a background task that reads well-known entries (e.g. content.xml, styles.xml, meta.xml, settings.xml) from <paramref name="stream"/>; <see cref="Dispose()"/> and <see cref="DisposeAsync"/> both wait for this task to finish. Callers that pass <see langword="true"/> for <paramref name="leaveOpen"/> must fully dispose the returned <see cref="OdfPackage"/> (e.g. by scoping it in an explicit <c>using</c> block) before repositioning or reopening the same <paramref name="stream"/>; otherwise the background read and a subsequent foreground read race on the stream's cursor and can corrupt the read.
-    /// 啟用延遲載入時，此方法會啟動一個背景工作，從 <paramref name="stream"/> 讀取已知專案（例如 content.xml、styles.xml、meta.xml、settings.xml）；<see cref="Dispose()"/> 與 <see cref="DisposeAsync"/> 都會等待此工作完成。呼叫端若對 <paramref name="leaveOpen"/> 傳入 <see langword="true"/>，必須在重新定位或重新開啟同一個 <paramref name="stream"/> 之前完整釋放傳回的 <see cref="OdfPackage"/>（例如以明確的 <c>using</c> 區塊限定其存活範圍），否則背景讀取與後續的前景讀取會競爭該資料流的游標，可能導致讀取內容毀損。
+    /// When lazy loading is enabled, this method starts a background task that reads well-known entries (e.g. content.xml, styles.xml, meta.xml, settings.xml) from <paramref name="stream"/>; <see cref="Dispose()"/> and <see cref="DisposeAsync"/> both wait for this task to finish. Callers that pass <see langword="true"/> for  must fully dispose the returned <see cref="OdfPackage"/> (e.g. by scoping it in an explicit <c>using</c> block) before repositioning or reopening the same <paramref name="stream"/>; otherwise the background read and a subsequent foreground read race on the stream's cursor and can corrupt the read.
+    /// 啟用延遲載入時，此方法會啟動一個背景工作，從 <paramref name="stream"/> 讀取已知專案（例如 content.xml、styles.xml、meta.xml、settings.xml）；<see cref="Dispose()"/> 與 <see cref="DisposeAsync"/> 都會等待此工作完成。呼叫端若對  傳入 <see langword="true"/>，必須在重新定位或重新開啟同一個 <paramref name="stream"/> 之前完整釋放傳回的 <see cref="OdfPackage"/>（例如以明確的 <c>using</c> 區塊限定其存活範圍），否則背景讀取與後續的前景讀取會競爭該資料流的游標，可能導致讀取內容毀損。
     /// </remarks>
-    /// <param name="stream">The stream containing the ODF package data. / 包含 ODF 封裝資料的資料流。</param>
-    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
-    /// <param name="options">The load options. / 載入選項。</param>
     /// <returns>The opened <see cref="OdfPackage"/> instance. / 開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
-    public static OdfPackage Open(Stream stream, bool leaveOpen = false, OdfLoadOptions? options = null)
+    public static OdfPackage Open(Stream stream) => Open(stream, false, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Open(Stream stream, bool leaveOpen) => Open(stream, leaveOpen, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Open(Stream stream, OdfLoadOptions? options) => Open(stream, false, options);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Open(Stream stream, bool leaveOpen, OdfLoadOptions? options)
     {
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
         if (stream is FileStream fs)
@@ -309,18 +328,37 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Asynchronously opens an existing ODF package from the specified file path.
     /// 非同步從指定的檔案路徑開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="path">The path of the ODF file. / ODF 檔案的路徑。</param>
-    /// <param name="options">The load options. / 載入選項。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous open operation, whose result is the opened <see cref="OdfPackage"/> instance. / 代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
     /// </remarks>
+    public static Task<OdfPackage> OpenAsync(string path) => OpenAsync(path, null, default);
+
+    /// <summary>
+    /// Asynchronously opens an ODF package from a file path with a cancellation token.
+    /// 以取消語彙基元非同步從檔案路徑開啟 ODF 封裝。
+    /// </summary>
+    /// <param name="path">The package file path. / 封裝檔案路徑。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the opened package. / 代表非同步開啟作業的工作，其結果為已開啟的封裝。</returns>
+    public static Task<OdfPackage> OpenAsync(string path, CancellationToken cancellationToken) =>
+        OpenAsync(path, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfPackage> OpenAsync(string path, OdfLoadOptions? options) => OpenAsync(path, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         string path,
-        OdfLoadOptions? options = null,
-        CancellationToken cancellationToken = default)
+        OdfLoadOptions? options,
+        CancellationToken cancellationToken)
     {
         string journalPath = path + ".journal";
         if (File.Exists(journalPath))
@@ -365,20 +403,61 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Asynchronously opens an existing ODF package from the specified stream.
     /// 非同步從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">The stream containing the ODF package data. / 包含 ODF 封裝資料的資料流。</param>
-    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
-    /// <param name="options">The load options. / 載入選項。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>A task representing the asynchronous open operation, whose result is the opened <see cref="OdfPackage"/> instance. / 代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     /// <remarks>
-    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 若  已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
     /// </remarks>
+    public static Task<OdfPackage> OpenAsync(Stream stream) => OpenAsync(stream, false, null, default);
+
+    /// <summary>
+    /// Asynchronously opens an ODF package from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流開啟 ODF 封裝。
+    /// </summary>
+    /// <param name="stream">The package stream. / 封裝資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the opened package. / 代表非同步開啟作業的工作，其結果為已開啟的封裝。</returns>
+    public static Task<OdfPackage> OpenAsync(Stream stream, CancellationToken cancellationToken) =>
+        OpenAsync(stream, false, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen) => OpenAsync(stream, leaveOpen, null, default);
+
+    /// <summary>
+    /// Asynchronously opens an ODF package from a stream with leave-open and cancellation options.
+    /// 以是否保持資料流開啟與取消語彙基元非同步從資料流開啟 ODF 封裝。
+    /// </summary>
+    /// <param name="stream">The package stream. / 封裝資料流。</param>
+    /// <param name="leaveOpen">Whether to leave the stream open. / 是否保持資料流開啟。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the opened package. / 代表非同步開啟作業的工作，其結果為已開啟的封裝。</returns>
+    public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen, CancellationToken cancellationToken) =>
+        OpenAsync(stream, leaveOpen, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfPackage> OpenAsync(Stream stream, OdfLoadOptions? options) => OpenAsync(stream, false, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen, OdfLoadOptions? options) => OpenAsync(stream, leaveOpen, options, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         Stream stream,
-        bool leaveOpen = false,
-        OdfLoadOptions? options = null,
-        CancellationToken cancellationToken = default)
+        bool leaveOpen,
+        OdfLoadOptions? options,
+        CancellationToken cancellationToken)
     {
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
         if (stream is FileStream fs)
@@ -412,10 +491,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Creates a new ODF package at the specified file path.
     /// 在指定的檔案路徑建立一個新的 ODF 封裝。
     /// </summary>
-    /// <param name="path">The file path at which to create the package. / 要建立的檔案路徑。</param>
-    /// <param name="options">The save and encryption options. / 儲存與加密選項。</param>
     /// <returns>The created <see cref="OdfPackage"/> instance. / 建立的 <see cref="OdfPackage"/> 執行個體。</returns>
-    public static OdfPackage Create(string path, OdfSaveOptions? options = null)
+    public static OdfPackage Create(string path) => Create(path, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Create(string path, OdfSaveOptions? options)
     {
         FileStream stream = new(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
         return new OdfPackage(OdfPackageMode.Create, stream, false, null, options);
@@ -425,11 +508,26 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Creates a new ODF package in the specified stream.
     /// 在指定的資料流建立一個新的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">The stream to which the ODF package is written. / 要寫入 ODF 封裝的資料流。</param>
-    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
-    /// <param name="options">The save and encryption options. / 儲存與加密選項。</param>
     /// <returns>The created <see cref="OdfPackage"/> instance. / 建立的 <see cref="OdfPackage"/> 執行個體。</returns>
-    public static OdfPackage Create(Stream stream, bool leaveOpen = false, OdfSaveOptions? options = null)
+    public static OdfPackage Create(Stream stream) => Create(stream, false, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Create(Stream stream, bool leaveOpen) => Create(stream, leaveOpen, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Create(Stream stream, OdfSaveOptions? options) => Create(stream, false, options);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfPackage Create(Stream stream, bool leaveOpen, OdfSaveOptions? options)
     {
         return new OdfPackage(OdfPackageMode.Create, stream, leaveOpen, null, options);
     }

@@ -32,13 +32,14 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// Initializes a new instance of the <see cref="OdtStreamWriter"/> class.
     /// 初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="outputStream">The target stream to which the ODT document is written. / 用來輸出 ODT 文件的目標資料流。</param>
-    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="outputStream"/> is null. / 當 <paramref name="outputStream"/> 為 null 時擲出。</exception>
-    public OdtStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
-        : this(outputStream, version, ownsStream: false)
-    {
-    }
+    public OdtStreamWriter(Stream outputStream) : this(outputStream, OdfVersion.Odf14, false) { }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdtStreamWriter(Stream outputStream, OdfVersion version) : this(outputStream, version, false) { }
 
     private OdtStreamWriter(Stream outputStream, OdfVersion version, bool ownsStream)
     {
@@ -73,21 +74,26 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// Initializes a new instance of the <see cref="OdtStreamWriter"/> class from a file path.
     /// 從檔案路徑初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="path">The ODT file path to create or overwrite. / 要建立或覆寫的 ODT 檔案路徑。</param>
-    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="path"/> is null. / 當 <paramref name="path"/> 為 null 時擲出。</exception>
-    public OdtStreamWriter(string path, OdfVersion version = OdfVersion.Odf14)
-        : this(CreateFileStream(path), version, ownsStream: true)
-    {
-    }
+    public OdtStreamWriter(string path) : this(CreateFileStream(path), OdfVersion.Odf14, true) { }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdtStreamWriter(string path, OdfVersion version) : this(CreateFileStream(path), version, true) { }
 
     /// <summary>
     /// Adds a paragraph with the specified text content.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The paragraph text. / 段落文字。</param>
-    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
-    public void AddParagraph(string text, string? styleName = null)
+    public void AddParagraph(string text) => AddParagraph(text, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddParagraph(string text, string? styleName)
     {
         EnsureNotDisposed();
         // null 與空字串語意：寫出空段落，不擲出例外。
@@ -99,9 +105,13 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// Adds a paragraph with the specified rich text runs.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The paragraph text. / 段落文字。</param>
-    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
-    public void AddParagraph(ReadOnlySpan<char> text, string? styleName = null)
+    public void AddParagraph(ReadOnlySpan<char> text) => AddParagraph(text, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddParagraph(ReadOnlySpan<char> text, string? styleName)
     {
         EnsureNotDisposed();
         WriteTextElement("p", text, styleName, headingLevel: null);
@@ -111,19 +121,27 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// Adds a paragraph from a prebound writer callback.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The paragraph text. / 段落文字。</param>
-    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
-    public void AddParagraph(ReadOnlyMemory<char> text, string? styleName = null) =>
-        AddParagraph(text.Span, styleName);
+    public void AddParagraph(ReadOnlyMemory<char> text) => AddParagraph(text.Span, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddParagraph(ReadOnlyMemory<char> text, string? styleName) => AddParagraph(text.Span, styleName);
 
     /// <summary>
     /// Adds a heading paragraph.
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
-    public void AddHeading(string text, int level = 1)
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
+    public void AddHeading(string text) => AddHeading(text, 1);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddHeading(string text, int level)
     {
         EnsureNotDisposed();
         if (level is < 1 or > 6)
@@ -140,9 +158,14 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
-    public void AddHeading(ReadOnlySpan<char> text, int level = 1)
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
+    public void AddHeading(ReadOnlySpan<char> text) => AddHeading(text, 1);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddHeading(ReadOnlySpan<char> text, int level)
     {
         EnsureNotDisposed();
         if (level is < 1 or > 6)
@@ -158,10 +181,14 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
-    public void AddHeading(ReadOnlyMemory<char> text, int level = 1) =>
-        AddHeading(text.Span, level);
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
+    public void AddHeading(ReadOnlyMemory<char> text) => AddHeading(text.Span, 1);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddHeading(ReadOnlyMemory<char> text, int level) => AddHeading(text.Span, level);
 
     /// <summary>
     /// Begins a list.

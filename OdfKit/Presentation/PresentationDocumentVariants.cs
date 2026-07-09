@@ -44,31 +44,57 @@ public sealed class PresentationTemplateDocument : PresentationDocument
     /// Asynchronously loads an OTP presentation template document from the specified path.
     /// 非同步從指定路徑載入 OTP 簡報範本文件。
     /// </summary>
-    /// <param name="path">The OTP document path. / OTP 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A task representing the asynchronous load operation, with the loaded <see cref="PresentationTemplateDocument"/> as its result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationTemplateDocument"/>。</returns>
-    public static new async Task<PresentationTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<PresentationTemplateDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<PresentationTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads an OTP presentation template document from the specified stream.
     /// 從指定資料流載入 OTP 簡報範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing OTP document content. / 包含 OTP 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="PresentationTemplateDocument"/> instance. / 載入完成的 <see cref="PresentationTemplateDocument"/> 執行個體。</returns>
-    public static new PresentationTemplateDocument Load(Stream stream, string? fileName = null) =>
+    public static new PresentationTemplateDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new PresentationTemplateDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads an OTP presentation template document from the specified stream.
     /// 非同步從指定資料流載入 OTP 簡報範本文件。
     /// </summary>
-    /// <param name="stream">The stream containing OTP document content. / 包含 OTP 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A task representing the asynchronous load operation, with the loaded <see cref="PresentationTemplateDocument"/> as its result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationTemplateDocument"/>。</returns>
-    public static new async Task<PresentationTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<PresentationTemplateDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<PresentationTemplateDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<PresentationTemplateDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<PresentationTemplateDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
@@ -128,31 +154,57 @@ public sealed class FlatPresentationDocument : PresentationDocument
     /// Asynchronously loads a FODP flat XML presentation document from the specified path.
     /// 非同步從指定路徑載入 FODP 扁平 XML 簡報文件。
     /// </summary>
-    /// <param name="path">The FODP document path. / FODP 文件路徑。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A task representing the asynchronous load operation, with the loaded <see cref="FlatPresentationDocument"/> as its result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatPresentationDocument"/>。</returns>
-    public static new async Task<FlatPresentationDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatPresentationDocument> LoadAsync(string path) => LoadAsync(path, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatPresentationDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// Loads a FODP flat XML presentation document from the specified stream.
     /// 從指定資料流載入 FODP 扁平 XML 簡報文件。
     /// </summary>
-    /// <param name="stream">The stream containing FODP document content. / 包含 FODP 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
     /// <returns>The loaded <see cref="FlatPresentationDocument"/> instance. / 載入完成的 <see cref="FlatPresentationDocument"/> 執行個體。</returns>
-    public static new FlatPresentationDocument Load(Stream stream, string? fileName = null) =>
+    public static new FlatPresentationDocument Load(Stream stream) => Load(stream, null);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new FlatPresentationDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// Asynchronously loads a FODP flat XML presentation document from the specified stream.
     /// 非同步從指定資料流載入 FODP 扁平 XML 簡報文件。
     /// </summary>
-    /// <param name="stream">The stream containing FODP document content. / 包含 FODP 文件內容的資料流。</param>
-    /// <param name="fileName">The optional file name used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A task representing the asynchronous load operation, with the loaded <see cref="FlatPresentationDocument"/> as its result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatPresentationDocument"/>。</returns>
-    public static new async Task<FlatPresentationDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+    public static new Task<FlatPresentationDocument> LoadAsync(Stream stream) => LoadAsync(stream, null, default);
+
+    /// <summary>
+    /// Asynchronously loads the document from a stream with a cancellation token.
+    /// 以取消語彙基元非同步從資料流載入文件。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件資料流。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task whose result is the loaded document. / 代表非同步載入作業的工作，其結果為載入完成的文件。</returns>
+    public static new Task<FlatPresentationDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new Task<FlatPresentationDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static new async Task<FlatPresentationDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>

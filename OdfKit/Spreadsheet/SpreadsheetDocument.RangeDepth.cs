@@ -10,9 +10,6 @@ public partial class SpreadsheetDocument
     /// Sets a rectangular block of values in the specified worksheet.
     /// 在指定工作表設定一個矩形資料區塊。
     /// </summary>
-    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
-    /// <param name="startAddress">The top-left target cell. / 左上角目標儲存格。</param>
-    /// <param name="values">The two-dimensional values to write. / 要寫入的二維資料。</param>
     /// <returns>The updated range. / 已更新的範圍。</returns>
     public OdfCellRange SetValues(string sheetName, OdfCellAddress startAddress, object?[,] values) =>
         RequireSheet(sheetName).SetValues(startAddress, values);
@@ -21,10 +18,6 @@ public partial class SpreadsheetDocument
     /// Sets a rectangular block of values in the specified worksheet and returns a write report.
     /// 在指定工作表設定矩形資料區塊並傳回寫入報告。
     /// </summary>
-    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
-    /// <param name="startAddress">The top-left target cell. / 左上角目標儲存格。</param>
-    /// <param name="values">The two-dimensional values to write. / 要寫入的二維資料。</param>
-    /// <param name="options">The range write options. / 範圍寫入選項。</param>
     /// <returns>The range write report. / 範圍寫入報告。</returns>
     public OdfRangeWriteReport SetValues(string sheetName, OdfCellAddress startAddress, object?[,] values, OdfRangeWriteOptions? options) =>
         RequireSheet(sheetName).SetValues(startAddress, values, options);
@@ -58,9 +51,14 @@ public partial class SpreadsheetDocument
     /// </summary>
     /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
     /// <param name="rows">The row values to append. / 要附加的資料列。</param>
-    /// <param name="startColumn">The zero-based start column. / 以 0 為基準的起始欄。</param>
     /// <returns>The appended range. / 已附加的範圍。</returns>
-    public OdfCellRange AppendRows(string sheetName, IEnumerable<IEnumerable<object?>> rows, int startColumn = 0) =>
+    public OdfCellRange AppendRows(string sheetName, IEnumerable<IEnumerable<object?>> rows) => AppendRows(sheetName, rows, 0);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfCellRange AppendRows(string sheetName, IEnumerable<IEnumerable<object?>> rows, int startColumn) =>
         RequireSheet(sheetName).AppendRows(rows, startColumn);
 
     /// <summary>

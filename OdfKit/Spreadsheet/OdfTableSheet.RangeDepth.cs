@@ -13,8 +13,6 @@ public partial class OdfTableSheet
     /// Sets a rectangular block of values starting at the specified cell.
     /// 從指定儲存格開始設定一個矩形資料區塊。
     /// </summary>
-    /// <param name="startAddress">The top-left target cell. / 左上角目標儲存格。</param>
-    /// <param name="values">The two-dimensional values to write. / 要寫入的二維資料。</param>
     /// <returns>The updated range. / 已更新的範圍。</returns>
     public OdfCellRange SetValues(OdfCellAddress startAddress, object?[,] values) =>
         SetValues(startAddress, values, OdfRangeWriteOptions.Default).Range;
@@ -23,9 +21,6 @@ public partial class OdfTableSheet
     /// Sets a rectangular block of values and returns a write report.
     /// 設定一個矩形資料區塊並傳回寫入報告。
     /// </summary>
-    /// <param name="startAddress">The top-left target cell. / 左上角目標儲存格。</param>
-    /// <param name="values">The two-dimensional values to write. / 要寫入的二維資料。</param>
-    /// <param name="options">The range write options. / 範圍寫入選項。</param>
     /// <returns>The range write report. / 範圍寫入報告。</returns>
     public OdfRangeWriteReport SetValues(OdfCellAddress startAddress, object?[,] values, OdfRangeWriteOptions? options)
     {
@@ -117,9 +112,14 @@ public partial class OdfTableSheet
     /// 將資料列附加到目前已使用範圍之後。
     /// </summary>
     /// <param name="rows">The row values to append. / 要附加的資料列。</param>
-    /// <param name="startColumn">The zero-based start column. / 以 0 為基準的起始欄。</param>
     /// <returns>The appended range. / 已附加的範圍。</returns>
-    public OdfCellRange AppendRows(IEnumerable<IEnumerable<object?>> rows, int startColumn = 0) =>
+    public OdfCellRange AppendRows(IEnumerable<IEnumerable<object?>> rows) => AppendRows(rows, 0);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfCellRange AppendRows(IEnumerable<IEnumerable<object?>> rows, int startColumn) =>
         AppendRows(rows, startColumn, OdfRangeWriteOptions.Default).Range;
 
     /// <summary>
