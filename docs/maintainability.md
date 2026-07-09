@@ -65,11 +65,23 @@
 - 契約測試：`DocsAndCorpusContractTests` 與 `eng/Test-BilingualXmlDocs.ps1`。  
 - 一行式 summary 靜態閘門：`eng/Test-OneLineXmlSummary.ps1`。
 
-## 5. 建議的後續債（未在本輪一次做完）
+## 5. 進度與後續債
+
+### 已完成（摘要）
 
 | 項目 | 說明 |
 |------|------|
-| 弱 partial 合併批次 | 依 `Analyze-PartialSplits.ps1` 的 `MERGE`／`MERGE-SMALL` 清單分批合併 |
+| 在地化拆檔 | `OdfLocalizer.Exceptions.<culture>.cs` × 12 + 入口 |
+| 歷史腳本歸檔 | `eng/historical-refactor/` |
+| 產生碼 README | DOM／Compliance `Generated/` |
+| 一行式 summary 閘門 | `eng/Test-OneLineXmlSummary.ps1` |
+| 弱 partial 合併（批次 1） | 合併 `OdfAnimation`；移除空殼 `OdfSchemaPattern*Matcher` 根檔、`OdfElementSchemaRegistry` 空根檔；合併 `OdfSignatureVerifier.Common` 進主檔 |
+
+### 建議的後續債
+
+| 項目 | 說明 |
+|------|------|
+| 弱 partial 合併批次 2 | 依 `Analyze-PartialSplits.ps1` 剩餘 `REVIEW` 再評估（勿機械合併） |
 | 協作者抽取 | 對仍 >2000 行總量的領域根再抽 engine |
 | 在地化產線 | 自 JSON／resx 產生 `Exceptions.*.cs`（可選） |
 | Schema 套件拆分 | 降低預設 nupkg 體積（產品決策） |

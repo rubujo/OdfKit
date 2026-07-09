@@ -25,6 +25,12 @@ $keepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]:
     'OdfFormulaTranslator'
     'OdfStyleEngine'
     'OdsStreamWriter'
+    'OdtStreamWriter'
+    'OdfLocalizer'                 # 語系資源表拆分（Exceptions.<culture> 等），見 docs/maintainability.md
+    'OdfSignatureVerifier'         # 簽章驗證管線（Dsig／Revocation／Timestamp）
+    'OdfSchemaPatternAttributeMatcher'  # RELAX NG 屬性模式子驗證器
+    'OdfSchemaPatternContentMatcher'    # RELAX NG 內容模式子驗證器
+    'OdfElementSchemaRegistry'     # schema 枚舉 token 註冊表（多領域 partial）
 ) | ForEach-Object { [void]$keepTypes.Add($_) }
 
 # 已評估完成：雙檔拆分具實際邏輯邊界，永久保留
