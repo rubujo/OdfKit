@@ -31,6 +31,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private readonly ZipArchive _zip;
     private readonly Stream _contentEntryStream;
     private readonly XmlWriter _writer;
+    private readonly OdfRawXmlWriter _rawWriter;
     private readonly List<SheetBuffer> _sheetBuffers = [];
     private readonly Dictionary<string, SheetBuffer> _sheetBuffersByName = new(StringComparer.Ordinal);
     private SheetBuffer? _activeSheetBuffer;
@@ -105,9 +106,16 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         var settings = new XmlWriterSettings
         {
             Encoding = new UTF8Encoding(false),
-            Indent = false // 最小化大小
+            Indent = false, // 最小化大小
+            // 關閉 XmlWriter 內建逐字元檢查以降低大量資料寫入時的熱迴圈成本；
+            // 使用者提供的文字與屬性值改由 OdfXmlCharacterGuard 在寫入前做輕量的
+            // XML 1.0 合法性驗證，維持「非法字元快速失敗」的既有語意。
+            CheckCharacters = false
         };
         _writer = XmlWriter.Create(_contentEntryStream, settings);
+        // 熱迴圈（工作表／資料列／儲存格）改由原始 XML 組裝器批次寫入，
+        // 經 WriteRaw 流入同一個 _writer，與 WriteNode 等 XmlWriter 直接路徑共享輸出順序。
+        _rawWriter = new OdfRawXmlWriter(_writer);
 
         // 寫入 ODF XML 標頭與根 document-content 標籤
         _writer.WriteStartDocument();
@@ -134,15 +142,17 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// 若需要在多張工作表之間交錯寫入，請使用 <see cref="SwitchToSheet(string)"/>；
     /// 該模式會暫存各工作表片段，便利性較高但記憶體用量會隨已緩衝內容增加。
     /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="sheetName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="sheetName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteStartSheet(string sheetName)
     {
         if (_disposed)
             return;
+        OdfXmlCharacterGuard.ValidateText(sheetName.AsSpan(), nameof(sheetName));
         if (_isSheetStarted)
             WriteEndSheet();
         _activeSheetBuffer = null;
-        _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
-        _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+        _rawWriter.WriteStartElement("table:table");
+        _rawWriter.WriteAttribute("table:name", sheetName.AsSpan());
         _isSheetStarted = true;
     }
 
@@ -157,13 +167,15 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// 並於釋放寫入器時依首次出現順序輸出。若要維持嚴格低記憶體串流語意，請使用
     /// <see cref="WriteStartSheet(string)"/> 與 <see cref="WriteEndSheet"/> 依序完成每張工作表。
     /// </remarks>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="sheetName"/> is <see langword="null"/> or whitespace. / 當 <paramref name="sheetName"/> 為 <see langword="null"/> 或空白時擲出。</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="sheetName"/> is <see langword="null"/> or whitespace, or contains a character that is not valid in XML 1.0. / 當 <paramref name="sheetName"/> 為 <see langword="null"/>、空白，或含有 XML 1.0 不允許的字元時擲出。</exception>
     public void SwitchToSheet(string sheetName)
     {
         if (_disposed)
             return;
         if (string.IsNullOrWhiteSpace(sheetName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdsStreamWriter_SheetNameRequired"), nameof(sheetName));
+        // 與 WriteStartSheet 一致：在建立緩衝前先驗證名稱，避免只在 SheetBuffer 建構時才失敗。
+        OdfXmlCharacterGuard.ValidateText(sheetName.AsSpan(), nameof(sheetName));
 
         if (_isRowStarted)
             WriteEndRow();
@@ -188,18 +200,20 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="width">The column width. / 資料欄寬度。</param>
     /// <param name="styleName">The style name; if <see langword="null"/>, one is generated automatically. / 樣式名稱，如果為 <see langword="null"/> 則自動產生。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteColumn(OdfLength width, string? styleName = null)
     {
         if (_disposed)
             return;
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
         string name = string.IsNullOrEmpty(styleName)
             ? $"co_auto_{++_autoColumnStyleIndex}"
             : styleName!;
 
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
-        writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
-        writer.WriteEndElement();
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-column");
+        raw.WriteAttribute("table:style-name", name.AsSpan());
+        raw.WriteEndElement("table:table-column");
 
         _columnStyles.Add((name, width));
     }
@@ -211,10 +225,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <param name="height">The row height. / 資料列高度。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
     /// <param name="useOptimalHeight">Whether to use optimal height. / 是否使用最佳高度。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
     {
         if (_disposed)
             return;
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
         if (_isRowStarted)
             WriteEndRow();
         _isRowStarted = true;
@@ -231,11 +247,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             _rowStyles.Add((resolvedStyleName!, rowHeight, useOptimalHeight));
         }
 
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-row");
         if (!string.IsNullOrEmpty(resolvedStyleName))
         {
-            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, resolvedStyleName);
+            raw.WriteAttribute("table:style-name", resolvedStyleName.AsSpan());
         }
     }
 
@@ -245,9 +261,30 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="value">The cell value. / 儲存格的值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> or <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="value"/> 或 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(string value, string? styleName = null)
     {
-        WriteCell(value.AsSpan(), styleName);
+        if (_disposed)
+            return;
+        // null 與空字串語意維持既有行為：寫出空的 text:p，不擲出例外。
+        ReadOnlySpan<char> text = value is null ? default : value.AsSpan();
+        // 於寫入任何元素前先驗證，避免例外發生時留下未關閉的儲存格標籤。
+        OdfXmlCharacterGuard.ValidateText(text, nameof(value));
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-cell");
+        raw.WriteAttribute("office:value-type", "string".AsSpan());
+        if (!string.IsNullOrEmpty(styleName))
+        {
+            raw.WriteAttribute("table:style-name", styleName.AsSpan());
+        }
+        raw.WriteStartElement("text:p");
+        if (!text.IsEmpty)
+        {
+            raw.WriteText(text);
+        }
+        raw.WriteEndElement("text:p");
+        raw.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -256,24 +293,29 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="value">The cell value. / 儲存格的值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> or <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="value"/> 或 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(ReadOnlySpan<char> value, string? styleName = null)
     {
         if (_disposed)
             return;
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
+        // 於寫入任何元素前先驗證，避免例外發生時留下未關閉的儲存格標籤。
+        OdfXmlCharacterGuard.ValidateText(value, nameof(value));
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-cell");
+        raw.WriteAttribute("office:value-type", "string".AsSpan());
         if (!string.IsNullOrEmpty(styleName))
         {
-            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            raw.WriteAttribute("table:style-name", styleName.AsSpan());
         }
-        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        raw.WriteStartElement("text:p");
         if (!value.IsEmpty)
         {
-            writer.WriteString(ToStringValue(value));
+            // 直寫路徑可直接消費 span，不再需要 ToStringValue 的字元複本。
+            raw.WriteText(value);
         }
-        writer.WriteEndElement(); // text:p
-        writer.WriteEndElement(); // table:cell
+        raw.WriteEndElement("text:p");
+        raw.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -282,6 +324,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="value">The cell value. / 儲存格的值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> or <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="value"/> 或 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(ReadOnlyMemory<char> value, string? styleName = null) =>
         WriteCell(value.Span, styleName);
 
@@ -291,22 +334,26 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="value">The cell numeric value. / 儲存格的數值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(double value, string? styleName = null)
     {
         if (_disposed)
             return;
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
-        writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(CultureInfo.InvariantCulture));
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        // office:value 屬性與 text:p 內文共用同一次格式化結果，避免重複的 ToString 配置。
+        string text = value.ToString(CultureInfo.InvariantCulture);
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-cell");
+        raw.WriteAttribute("office:value-type", "float".AsSpan());
+        raw.WriteAttribute("office:value", text.AsSpan());
         if (!string.IsNullOrEmpty(styleName))
         {
-            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            raw.WriteAttribute("table:style-name", styleName.AsSpan());
         }
-        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        writer.WriteString(value.ToString(CultureInfo.InvariantCulture));
-        writer.WriteEndElement(); // text:p
-        writer.WriteEndElement(); // table:cell
+        raw.WriteStartElement("text:p");
+        raw.WriteText(text.AsSpan());
+        raw.WriteEndElement("text:p");
+        raw.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -316,13 +363,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <param name="value">The cell date and time value. / 儲存格的日期時間值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
     /// <param name="timezoneNaive">Whether to ignore time zone conversion. / 是否忽略時區轉換。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
     {
         if (_disposed)
             return;
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
 
         string isoDate;
         if (value == DateTime.MinValue || value == DateTime.MaxValue)
@@ -338,15 +384,18 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                 : value.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture) + "Z";
         }
 
-        writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-cell");
+        raw.WriteAttribute("office:value-type", "date".AsSpan());
+        raw.WriteAttribute("office:date-value", isoDate.AsSpan());
         if (!string.IsNullOrEmpty(styleName))
         {
-            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            raw.WriteAttribute("table:style-name", styleName.AsSpan());
         }
-        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        writer.WriteString(isoDate);
-        writer.WriteEndElement(); // text:p
-        writer.WriteEndElement(); // table:cell
+        raw.WriteStartElement("text:p");
+        raw.WriteText(isoDate.AsSpan());
+        raw.WriteEndElement("text:p");
+        raw.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -355,22 +404,24 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="value">The cell Boolean value. / 儲存格的布林值。</param>
     /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(bool value, string? styleName = null)
     {
         if (_disposed)
             return;
-        XmlWriter writer = CurrentWriter;
-        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
-        writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        OdfRawXmlWriter raw = CurrentRawWriter;
+        raw.WriteStartElement("table:table-cell");
+        raw.WriteAttribute("office:value-type", "boolean".AsSpan());
+        raw.WriteAttribute("office:boolean-value", value ? "true".AsSpan() : "false".AsSpan());
         if (!string.IsNullOrEmpty(styleName))
         {
-            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            raw.WriteAttribute("table:style-name", styleName.AsSpan());
         }
-        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        writer.WriteString(value ? "TRUE" : "FALSE");
-        writer.WriteEndElement(); // text:p
-        writer.WriteEndElement(); // table:cell
+        raw.WriteStartElement("text:p");
+        raw.WriteText(value ? "TRUE".AsSpan() : "FALSE".AsSpan());
+        raw.WriteEndElement("text:p");
+        raw.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -379,6 +430,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="node">The DOM node to write. / 要寫入的 DOM 節點。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="node"/> is <see langword="null"/>. / 當 <paramref name="node"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">Thrown when the subtree contains text or attribute values with characters that are not valid in XML 1.0. / 當子樹的文字或屬性值含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
         if (node is null)
@@ -386,18 +438,40 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         if (_disposed)
             return;
 
+        // 底層 XmlWriter 已關閉 CheckCharacters，寫入前先以輕量防線驗證整棵子樹，
+        // 維持與先前「XmlWriter 於寫入時擲出」等價的快速失敗語意。
+        ValidateNodeXmlCharacters(node);
+        // 交接同步點：任意 DOM 子樹維持走 XmlWriter，寫入前先閉合快速路徑的
+        // 未完成起始標籤並清空其字元緩衝，確保輸出順序正確。
+        CurrentRawWriter.FlushToTarget();
         Dictionary<string, string> namespaces = CreateFragmentNamespaceMap(node);
         int openElementsCount = 0;
         OdfXmlWriter.WriteNode(node, CurrentWriter, namespaces, ref openElementsCount, isRoot: false, depth: 1);
     }
 
-    private static string ToStringValue(ReadOnlySpan<char> value)
+    private static void ValidateNodeXmlCharacters(OdfNode node)
     {
-#if NETSTANDARD2_0
-        return new string(value.ToArray());
-#else
-        return new string(value);
-#endif
+        // 惰性節點（尚未實體化且無已載入子節點）由 TryWriteLazyXml 走 WriteRaw 原始位元組路徑；
+        // WriteRaw 在 CheckCharacters 開啟時本來就不受 XmlWriter 字元檢查，且其內容來自既有
+        // 文件的解析結果，故略過驗證以保留惰性寫入最佳化，語意與先前一致。
+        if (node._isLazy && node.Children.LoadedCount == 0)
+            return;
+
+        if (node.NodeType != OdfNodeType.Element)
+        {
+            OdfXmlCharacterGuard.ValidateText(node.TextContent.AsSpan(), nameof(node));
+            return;
+        }
+
+        foreach (KeyValuePair<OdfAttributeName, string> attribute in node.Attributes)
+        {
+            OdfXmlCharacterGuard.ValidateText(attribute.Value.AsSpan(), nameof(node));
+        }
+
+        foreach (OdfNode child in node.Children)
+        {
+            ValidateNodeXmlCharacters(child);
+        }
     }
 
     /// <summary>
@@ -554,7 +628,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             return;
         if (_isRowStarted)
         {
-            CurrentWriter.WriteEndElement(); // table-row
+            CurrentRawWriter.WriteEndElement("table:table-row");
             _isRowStarted = false;
         }
     }
@@ -572,10 +646,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         if (_isSheetStarted)
         {
             if (_activeSheetBuffer is null)
-                _writer.WriteEndElement(); // table:table
+                _rawWriter.WriteEndElement("table:table");
             _isSheetStarted = false;
         }
     }
+
     /// <summary>
     /// Closes all underlying streams and releases resources used by <see cref="OdsStreamWriter"/>.
     /// 關閉所有底層資料流並釋放 <see cref="OdsStreamWriter"/> 使用的資源。
@@ -612,11 +687,17 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             if (_isSheetStarted)
                 WriteEndSheet();
 
+            // 快速路徑交接：先將主要原始緩衝沖入 _writer，之後的緩衝工作表
+            // 與收尾標籤才能以正確順序寫出。
+            _rawWriter.FlushToTarget();
+
             // 緩衝工作表片段一律透過 _writer.WriteRaw 寫入（而非直接寫原始位元組到
             // _contentEntryStream），讓 _writer 自己知道先前延後關閉的 <office:spreadsheet>
             // 起始標籤已被後續寫入操作結束，才能正確補上 '>'；否則會產生
             // <office:spreadsheet<table:table ...> 這種缺少 '>' 分隔的畸形 XML。
             WriteBufferedSheets();
+
+            _rawWriter.Dispose();
 
             // 關閉 spreadsheet、body、document-content 標籤
             _writer.WriteEndElement(); // office:spreadsheet
@@ -656,6 +737,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     #endregion
 
     private XmlWriter CurrentWriter => _activeSheetBuffer?.Writer ?? _writer;
+
+    private OdfRawXmlWriter CurrentRawWriter => _activeSheetBuffer?.RawWriter ?? _rawWriter;
 
     /// <summary>
     /// Generates XML fragments for multiple worksheets in parallel and writes them to the current ODS package in job list order.
@@ -715,7 +798,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                     // 建構後立即指派，確保寫入工作中途失敗時 catch 能處置到此緩衝
                     var buffer = new SheetBuffer(job.SheetName);
                     buffers[jobIndex] = buffer;
-                    var sheetWriter = new OdsSheetWriter(buffer.Writer);
+                    var sheetWriter = new OdsSheetWriter(buffer.RawWriter);
                     await job.WriteAsync(sheetWriter, cancellationToken).ConfigureAwait(false);
                     sheetWriter.CloseOpenRow();
                     buffer.Close();
@@ -791,25 +874,38 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
         public SheetBuffer(string sheetName)
         {
+            // 與主要 content.xml 寫入器一致：關閉內建逐字元檢查，
+            // 使用者輸入由 OdfXmlCharacterGuard 於各寫入入口驗證。
+            OdfXmlCharacterGuard.ValidateText(sheetName.AsSpan(), nameof(sheetName));
             Writer = XmlWriter.Create(
                 _stream,
                 new XmlWriterSettings
                 {
                     Encoding = new UTF8Encoding(false),
                     Indent = false,
-                    ConformanceLevel = ConformanceLevel.Fragment
+                    ConformanceLevel = ConformanceLevel.Fragment,
+                    CheckCharacters = false
                 });
             Writer.WriteStartElement("table", "table", OdfNamespaces.Table);
             Writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+            RawWriter = new OdfRawXmlWriter(Writer);
         }
 
         public XmlWriter Writer { get; }
+
+        /// <summary>
+        /// 熱迴圈原始 XML 組裝器；內容經 WriteRaw 流入 <see cref="Writer"/>，
+        /// 與主要 content.xml 路徑輸出相同的標記形狀。
+        /// </summary>
+        public OdfRawXmlWriter RawWriter { get; }
 
         public void Close()
         {
             if (_closed)
                 return;
 
+            // 先將快速路徑緩衝沖入片段寫入器，再關閉 table:table 起始標籤。
+            RawWriter.FlushToTarget();
             Writer.WriteEndElement();
             Writer.Flush();
             _closed = true;
@@ -858,6 +954,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
         public void Dispose()
         {
+            RawWriter.Dispose();
             Writer.Dispose();
             _stream.Dispose();
         }

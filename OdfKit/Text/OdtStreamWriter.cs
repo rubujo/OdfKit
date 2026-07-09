@@ -23,6 +23,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     private readonly ZipArchive _zip;
     private readonly Stream _contentEntryStream;
     private readonly XmlWriter _writer;
+    private readonly OdfRawXmlWriter _rawWriter;
     private readonly OdfVersion _version;
     private bool _isListStarted;
     private bool _disposed;
@@ -62,6 +63,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
         var contentEntry = _zip.CreateEntry("content.xml", CompressionLevel.Fastest);
         _contentEntryStream = contentEntry.Open();
         _writer = XmlWriter.Create(_contentEntryStream, CreateXmlWriterSettings());
+        // 段落／標題／清單熱路徑改由原始 XML 組裝器批次寫入，與 XmlWriter 文件骨架共用輸出順序。
+        _rawWriter = new OdfRawXmlWriter(_writer);
 
         WriteContentStart();
     }
@@ -87,7 +90,9 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(string text, string? styleName = null)
     {
         EnsureNotDisposed();
-        WriteTextElement("p", text.AsSpan(), styleName, headingLevel: null);
+        // null 與空字串語意：寫出空段落，不擲出例外。
+        ReadOnlySpan<char> span = text is null ? default : text.AsSpan();
+        WriteTextElement("p", span, styleName, headingLevel: null);
     }
 
     /// <summary>
@@ -126,7 +131,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             throw new ArgumentOutOfRangeException(nameof(level), OdfLocalizer.GetMessage("Err_OdtStreamWriter_TitleLevelBetween1"));
         }
 
-        WriteTextElement("h", text.AsSpan(), styleName: null, headingLevel: level);
+        ReadOnlySpan<char> span = text is null ? default : text.AsSpan();
+        WriteTextElement("h", span, styleName: null, headingLevel: level);
     }
 
     /// <summary>
@@ -171,10 +177,11 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_ListStarted"));
         }
 
-        _writer.WriteStartElement("text", "list", OdfNamespaces.Text);
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        _rawWriter.WriteStartElement("text:list");
         if (!string.IsNullOrWhiteSpace(styleName))
         {
-            _writer.WriteAttributeString("text", "style-name", OdfNamespaces.Text, styleName);
+            _rawWriter.WriteAttribute("text:style-name", styleName.AsSpan());
         }
 
         _isListStarted = true;
@@ -194,9 +201,10 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_AddlistitemCalledBetweenBeginlist"));
         }
 
-        _writer.WriteStartElement("text", "list-item", OdfNamespaces.Text);
-        WriteTextElement("p", text.AsSpan(), styleName: null, headingLevel: null);
-        _writer.WriteEndElement();
+        ReadOnlySpan<char> span = text is null ? default : text.AsSpan();
+        _rawWriter.WriteStartElement("text:list-item");
+        WriteTextElement("p", span, styleName: null, headingLevel: null);
+        _rawWriter.WriteEndElement("text:list-item");
     }
 
     /// <summary>
@@ -213,9 +221,9 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_AddlistitemCalledBetweenBeginlist"));
         }
 
-        _writer.WriteStartElement("text", "list-item", OdfNamespaces.Text);
+        _rawWriter.WriteStartElement("text:list-item");
         WriteTextElement("p", text, styleName: null, headingLevel: null);
-        _writer.WriteEndElement();
+        _rawWriter.WriteEndElement("text:list-item");
     }
 
     /// <summary>
@@ -238,7 +246,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         }
 
-        _writer.WriteEndElement();
+        _rawWriter.WriteEndElement("text:list");
         _isListStarted = false;
     }
 
@@ -258,6 +266,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="node">The DOM node to write. / 要寫入的 DOM 節點。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="node"/> is null. / 當 <paramref name="node"/> 為 null 時擲出。</exception>
+    /// <exception cref="ArgumentException">Thrown when the subtree contains text or attribute values with characters that are not valid in XML 1.0. / 當子樹的文字或屬性值含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
         if (node is null)
@@ -266,6 +275,9 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
         }
 
         EnsureNotDisposed();
+        ValidateNodeXmlCharacters(node);
+        // 交接同步點：DOM 子樹維持走 XmlWriter，寫入前先沖洗快速路徑緩衝。
+        _rawWriter.FlushToTarget();
         Dictionary<string, string> namespaces = new(StringComparer.Ordinal)
         {
             [OdfNamespaces.Office] = "office",
@@ -296,20 +308,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         }
 
-        _disposed = true;
-        if (_isListStarted)
-        {
-            _writer.WriteEndElement();
-            _isListStarted = false;
-        }
-
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndDocument();
-        _writer.Dispose();
-        _contentEntryStream.Dispose();
-        _zip.Dispose();
+        FinalizeContentAndArchive();
         _ownedStream?.Dispose();
     }
 
@@ -325,20 +324,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         }
 
-        _disposed = true;
-        if (_isListStarted)
-        {
-            _writer.WriteEndElement();
-            _isListStarted = false;
-        }
-
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndDocument();
-        _writer.Dispose();
-        _contentEntryStream.Dispose();
-        _zip.Dispose();
+        FinalizeContentAndArchive();
 
         if (_ownedStream is IAsyncDisposable asyncDisposable)
         {
@@ -348,6 +334,28 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
         {
             _ownedStream?.Dispose();
         }
+    }
+
+    private void FinalizeContentAndArchive()
+    {
+        _disposed = true;
+        if (_isListStarted)
+        {
+            _rawWriter.WriteEndElement("text:list");
+            _isListStarted = false;
+        }
+
+        // 先沖洗段落／清單快速路徑，再以 XmlWriter 關閉 body／document-content 骨架。
+        _rawWriter.FlushToTarget();
+        _rawWriter.Dispose();
+
+        _writer.WriteEndElement(); // office:text
+        _writer.WriteEndElement(); // office:body
+        _writer.WriteEndElement(); // office:document-content
+        _writer.WriteEndDocument();
+        _writer.Dispose();
+        _contentEntryStream.Dispose();
+        _zip.Dispose();
     }
 
     private static FileStream CreateFileStream(string path)
@@ -363,7 +371,9 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     private static XmlWriterSettings CreateXmlWriterSettings() => new()
     {
         Encoding = new UTF8Encoding(false),
-        Indent = false
+        Indent = false,
+        // 關閉內建逐字元檢查；使用者文字／樣式名稱改由 OdfXmlCharacterGuard 驗證。
+        CheckCharacters = false
     };
 
     private void WriteMimeType()
@@ -462,32 +472,52 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
     private void WriteTextElement(string localName, ReadOnlySpan<char> text, string? styleName, int? headingLevel)
     {
-        _writer.WriteStartElement("text", localName, OdfNamespaces.Text);
+        // 於寫入任何元素前先驗證，避免例外發生時留下未關閉的標籤。
+        // 參數名稱固定為公開 API 的 text／styleName，方便呼叫端對應。
+        OdfXmlCharacterGuard.ValidateText(text, "text");
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), "styleName");
+
+        string elementName = localName == "h" ? "text:h" : "text:p";
+        _rawWriter.WriteStartElement(elementName);
         if (!string.IsNullOrWhiteSpace(styleName))
         {
-            _writer.WriteAttributeString("text", "style-name", OdfNamespaces.Text, styleName);
+            _rawWriter.WriteAttribute("text:style-name", styleName.AsSpan());
         }
 
         if (headingLevel.HasValue)
         {
-            _writer.WriteAttributeString("text", "outline-level", OdfNamespaces.Text, headingLevel.Value.ToString(CultureInfo.InvariantCulture));
+            string levelText = headingLevel.Value.ToString(CultureInfo.InvariantCulture);
+            _rawWriter.WriteAttribute("text:outline-level", levelText.AsSpan());
         }
 
         if (!text.IsEmpty)
         {
-            _writer.WriteString(ToStringValue(text));
+            _rawWriter.WriteText(text);
         }
 
-        _writer.WriteEndElement();
+        _rawWriter.WriteEndElement(elementName);
     }
 
-    private static string ToStringValue(ReadOnlySpan<char> value)
+    private static void ValidateNodeXmlCharacters(OdfNode node)
     {
-#if NETSTANDARD2_0
-        return new string(value.ToArray());
-#else
-        return new string(value);
-#endif
+        if (node._isLazy && node.Children.LoadedCount == 0)
+            return;
+
+        if (node.NodeType != OdfNodeType.Element)
+        {
+            OdfXmlCharacterGuard.ValidateText(node.TextContent.AsSpan(), nameof(node));
+            return;
+        }
+
+        foreach (KeyValuePair<OdfAttributeName, string> attribute in node.Attributes)
+        {
+            OdfXmlCharacterGuard.ValidateText(attribute.Value.AsSpan(), nameof(node));
+        }
+
+        foreach (OdfNode child in node.Children)
+        {
+            ValidateNodeXmlCharacters(child);
+        }
     }
 
     private void EnsureNotDisposed()

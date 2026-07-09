@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Xml;
 using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
@@ -11,10 +10,10 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public sealed class OdsSheetWriter
 {
-    private readonly XmlWriter _writer;
+    private readonly OdfRawXmlWriter _writer;
     private bool _isRowStarted;
 
-    internal OdsSheetWriter(XmlWriter writer) => _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+    internal OdsSheetWriter(OdfRawXmlWriter writer) => _writer = writer ?? throw new ArgumentNullException(nameof(writer));
 
     /// <summary>
     /// Starts writing a new data row.
@@ -27,7 +26,7 @@ public sealed class OdsSheetWriter
             WriteEndRow();
         }
 
-        _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+        _writer.WriteStartElement("table:table-row");
         _isRowStarted = true;
     }
 
@@ -42,7 +41,7 @@ public sealed class OdsSheetWriter
             return;
         }
 
-        _writer.WriteEndElement();
+        _writer.WriteEndElement("table:table-row");
         _isRowStarted = false;
     }
 
@@ -51,17 +50,22 @@ public sealed class OdsSheetWriter
     /// 寫入字串型態的儲存格。
     /// </summary>
     /// <param name="value">The cell text. / 儲存格文字。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="value"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteCell(string value)
     {
+        // null 與空字串語意維持既有行為：寫出空的 text:p，不擲出例外。
+        ReadOnlySpan<char> text = value is null ? default : value.AsSpan();
+        // 目標寫入器已關閉 CheckCharacters，寫入前先以輕量防線驗證使用者文字。
+        OdfXmlCharacterGuard.ValidateText(text, nameof(value));
         WriteCellStart("string");
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        if (!string.IsNullOrEmpty(value))
+        _writer.WriteStartElement("text:p");
+        if (!text.IsEmpty)
         {
-            _writer.WriteString(value);
+            _writer.WriteText(text);
         }
 
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
+        _writer.WriteEndElement("text:p");
+        _writer.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -73,11 +77,11 @@ public sealed class OdsSheetWriter
     {
         string text = value.ToString(CultureInfo.InvariantCulture);
         WriteCellStart("float");
-        _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, text);
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(text);
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
+        _writer.WriteAttribute("office:value", text.AsSpan());
+        _writer.WriteStartElement("text:p");
+        _writer.WriteText(text.AsSpan());
+        _writer.WriteEndElement("text:p");
+        _writer.WriteEndElement("table:table-cell");
     }
 
     /// <summary>
@@ -88,11 +92,11 @@ public sealed class OdsSheetWriter
     public void WriteCell(bool value)
     {
         WriteCellStart("boolean");
-        _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(value ? "TRUE" : "FALSE");
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
+        _writer.WriteAttribute("office:boolean-value", value ? "true".AsSpan() : "false".AsSpan());
+        _writer.WriteStartElement("text:p");
+        _writer.WriteText(value ? "TRUE".AsSpan() : "FALSE".AsSpan());
+        _writer.WriteEndElement("text:p");
+        _writer.WriteEndElement("table:table-cell");
     }
 
     internal void CloseOpenRow() => WriteEndRow();
@@ -104,7 +108,7 @@ public sealed class OdsSheetWriter
             WriteStartRow();
         }
 
-        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, valueType);
+        _writer.WriteStartElement("table:table-cell");
+        _writer.WriteAttribute("office:value-type", valueType.AsSpan());
     }
 }
