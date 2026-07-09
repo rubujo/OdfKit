@@ -525,7 +525,9 @@ public static class OdfDocumentFactory
             return mimeKind;
         }
 
-        OdfValidationReport report = OdfPackageValidator.Validate(package, fileName: fileName);
+        OdfValidationReport report = OdfPackageValidator.Validate(
+            package,
+            new OdfValidationOptions { FileName = fileName });
 
         return report.DocumentKind != OdfDocumentKind.Unknown
             ? report.DocumentKind

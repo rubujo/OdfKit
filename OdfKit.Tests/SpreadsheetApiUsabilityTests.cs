@@ -264,7 +264,7 @@ public class SpreadsheetApiUsabilityTests
         {
             writer.WriteStartSheet("資料");
             writer.WriteColumn(OdfLength.FromCentimeters(2.5));
-            writer.WriteStartRow(height: 18.5, useOptimalHeight: false);
+            writer.WriteStartRow(new OdsRowWriteOptions { Height = 18.5, UseOptimalHeight = false });
             writer.WriteCell("列高");
             writer.WriteEndRow();
             writer.WriteEndSheet();

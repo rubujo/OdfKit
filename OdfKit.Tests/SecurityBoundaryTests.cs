@@ -141,7 +141,7 @@ public class SecurityBoundaryTests
             using (var writer = new OdsStreamWriter(ms1))
             {
                 writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow(height: -15.0);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = -15.0 });
                 writer.WriteCell("Negative Height");
             }
             ms1.Position = 0;
@@ -157,7 +157,7 @@ public class SecurityBoundaryTests
             using (var writer = new OdsStreamWriter(ms2))
             {
                 writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow(height: 0.0);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = 0.0 });
                 writer.WriteCell("Zero Height");
             }
             ms2.Position = 0;
@@ -175,8 +175,8 @@ public class SecurityBoundaryTests
             using (var writer = new OdsStreamWriter(ms3))
             {
                 writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow(height: double.NaN);
-                writer.WriteStartRow(height: double.PositiveInfinity);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = double.NaN });
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = double.PositiveInfinity });
             }
             ms3.Position = 0;
             using var zip3 = new ZipArchive(ms3, ZipArchiveMode.Read);

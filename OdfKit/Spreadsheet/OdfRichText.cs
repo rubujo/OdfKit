@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using OdfKit.DOM;
-using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
 
@@ -26,27 +25,35 @@ public sealed class OdfRichText
     public void Clear() => _runs.Clear();
 
     /// <summary>
-    /// Adds a formatted run.
-    /// 新增一個格式片段。
+    /// Adds a plain text run with default formatting.
+    /// 以預設格式新增純文字片段。
     /// </summary>
     /// <param name="text">The run text. / 片段文字。</param>
-    /// <param name="bold">Whether to apply bold styling. / 是否套用粗體。</param>
-    /// <param name="italic">Whether to apply italic styling. / 是否套用斜體。</param>
-    /// <param name="color">The text color; <see langword="null"/> inherits the default color. / 文字色彩；<see langword="null"/> 表示繼承預設色彩。</param>
-    /// <param name="fontFamily">The font family name; <see langword="null"/> indicates inheritance. / 字型名稱；<see langword="null"/> 表示繼承。</param>
-    /// <param name="underline">Whether to apply underline styling. / 是否套用底線。</param>
     /// <returns>The current rich text object for chaining. / 目前富文字物件，方便鏈式呼叫。</returns>
-    public OdfRichText AddRun(string text, bool bold = false, bool italic = false,
-        OdfColor? color = null, string? fontFamily = null, bool underline = false)
+    public OdfRichText AddRun(string text) => AddRun(text, OdfRichTextRunOptions.Default);
+
+    /// <summary>
+    /// Adds a formatted run using an options object.
+    /// 以 options 物件新增格式片段。
+    /// </summary>
+    /// <param name="text">The run text. / 片段文字。</param>
+    /// <param name="options">The run formatting options. / 片段格式選項。</param>
+    /// <returns>The current rich text object for chaining. / 目前富文字物件，方便鏈式呼叫。</returns>
+    public OdfRichText AddRun(string text, OdfRichTextRunOptions options)
     {
+        if (text is null)
+            throw new ArgumentNullException(nameof(text));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
         _runs.Add(new OdfRichTextRun
         {
             Text = text,
-            Bold = bold,
-            Italic = italic,
-            Underline = underline,
-            Color = color,
-            FontFamily = fontFamily,
+            Bold = options.Bold,
+            Italic = options.Italic,
+            Underline = options.Underline,
+            Color = options.Color,
+            FontFamily = options.FontFamily,
         });
 
         return this;

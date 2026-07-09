@@ -44,8 +44,22 @@
 可選參數多載收斂是 **API 形狀紀律**，與檔案拆分無關：
 
 - 生成 DOM：產生器輸出無 optional prefix 多載。  
-- 手寫：同名多載至多一個帶可選參數，且應為參數最多者；本專案偏好 **全改明確多載轉呼叫**。  
+- 手寫：同名多載至多一個帶可選參數，且應為參數最多者。  
+- 恰好一個可選參數：明確多載鏈；多可選參數：優先 options 物件。  
 - 見 [`public-api-optional-parameters.md`](public-api-optional-parameters.md)。
+
+## 本輪大型檔審查（不為拆而拆）
+
+| 檔案／區域 | 約行數 | 決策 |
+|------------|--------|------|
+| `Compliance/Generated/*SchemaProvider*.g.cs` | 4 萬+ | **KEEP** 產生碼；改產生器 |
+| `DOM/Generated/*` | 大 | **KEEP**；禁止手改 |
+| `OdsStreamWriter.cs` | ~1.3k | **KEEP**；再拆須有串流領域邊界，非行數 |
+| `OdfStreamingMailMerge*.cs` | 已 partial | **KEEP** 現有 Segments／ExpressionCache |
+| `TextDocumentBuilder`／`SpreadsheetDocumentBuilder` | ~1k | **KEEP** 高階 façade 聚合 |
+| `OdfTableSheet.ObjectBinding` 等 | 引擎 partial | **KEEP**；改功能時限域 |
+
+結論：目前**沒有**因「檔案太大」而必須新切 partial 的項目；後續只在改到該區且領域邊界清楚時小步抽取協作者。
 
 ## 相關
 

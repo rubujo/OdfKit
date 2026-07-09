@@ -97,7 +97,15 @@ public static class OdfValidator
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true, options.LoadOptions);
         return package.IsFlatXml
             ? OdfFlatDocumentValidator.Validate(Rewind(stream), options.FileName, options.Profile)
-            : OdfPackageValidator.Validate(package, options.Profile, options.FileName);
+            : OdfPackageValidator.Validate(
+                package,
+                new OdfValidationOptions
+                {
+                    Profile = options.Profile,
+                    FileName = options.FileName,
+                    LoadOptions = options.LoadOptions,
+                    Culture = options.Culture,
+                });
     }
 
     /// <summary>
@@ -138,7 +146,15 @@ public static class OdfValidator
             throw new ArgumentNullException(nameof(package));
 
         options ??= OdfValidationOptions.Default;
-        return OdfPackageValidator.Validate(package, options.Profile, options.FileName);
+        return OdfPackageValidator.Validate(
+            package,
+            new OdfValidationOptions
+            {
+                Profile = options.Profile,
+                FileName = options.FileName,
+                LoadOptions = options.LoadOptions,
+                Culture = options.Culture,
+            });
     }
 
     private static bool IsFlatXmlFileName(string? fileName)

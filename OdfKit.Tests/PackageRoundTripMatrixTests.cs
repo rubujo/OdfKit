@@ -64,6 +64,6 @@ public class PackageRoundTripMatrixTests
         }
 
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        return OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended, "document" + format.Extension);
+        return OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "document" + format.Extension });
     }
 }

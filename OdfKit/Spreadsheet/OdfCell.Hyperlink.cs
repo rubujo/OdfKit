@@ -131,7 +131,16 @@ public partial class OdfCell
                     string? colorVal = _doc.StyleEngine.GetStyleProperty(styleName, "color", OdfNamespaces.Fo, "text");
                     OdfColor? color = colorVal != null && OdfColor.TryParse(colorVal, out OdfColor c) ? c : (OdfColor?)null;
                     string? fontName = _doc.StyleEngine.GetStyleProperty(styleName, "font-name", OdfNamespaces.Style, "text");
-                    richText.AddRun(inner.TextContent, bold, italic, color, fontName, underline);
+                    richText.AddRun(
+                        inner.TextContent,
+                        new OdfRichTextRunOptions
+                        {
+                            Bold = bold,
+                            Italic = italic,
+                            Color = color,
+                            FontFamily = fontName,
+                            Underline = underline,
+                        });
                 }
                 else if (inner.NodeType == OdfNodeType.Text && !string.IsNullOrEmpty(inner.TextContent))
                 {

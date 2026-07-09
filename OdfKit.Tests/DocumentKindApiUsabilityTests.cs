@@ -149,7 +149,7 @@ public class DocumentKindApiUsabilityTests
         chart.AddSeries("Sheet1.A1:A3", "Sheet1.A1");
 
         using OdfChartDocument loaded = RoundTrip(chart, "chart.odc", OdfChartDocument.Load);
-        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "chart.odc");
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "chart.odc" });
 
         Assert.Equal("application/vnd.oasis.opendocument.chart", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());
@@ -194,7 +194,7 @@ public class DocumentKindApiUsabilityTests
             OdfMathToken.Number("1"));
 
         using OdfFormulaDocument loaded = RoundTrip(formula, "formula.odf", OdfFormulaDocument.Load);
-        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "formula.odf");
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "formula.odf" });
 
         Assert.Equal("application/vnd.oasis.opendocument.formula", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());
@@ -232,7 +232,7 @@ public class DocumentKindApiUsabilityTests
         string href = image.SetImage(bytes, "TinyPng.png");
 
         using ImageDocument loaded = RoundTrip(image, "image.odi", ImageDocument.Load);
-        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "image.odi");
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "image.odi" });
 
         Assert.Equal("application/vnd.oasis.opendocument.image", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());
@@ -287,7 +287,7 @@ public class DocumentKindApiUsabilityTests
         Assert.True(database.RemoveDataSourceSetting("ScratchSetting"));
 
         using DatabaseDocument loaded = RoundTrip(database, "database.odb", DatabaseDocument.Load);
-        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "database.odb");
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "database.odb" });
 
         Assert.Equal("application/vnd.oasis.opendocument.base", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());

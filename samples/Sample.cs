@@ -523,7 +523,7 @@ static void DemoOdsStreamWriter(string outputDir)
         // 模擬寫入大量測試數據列
         for (int i = 1; i <= 100; i++)
         {
-            writer.WriteStartRow(useOptimalHeight: true); // 展示最佳高度
+            writer.WriteStartRow(new OdsRowWriteOptions { UseOptimalHeight = true }); // 展示最佳高度
             writer.WriteCell($"TXN-{i:D5}");
             writer.WriteCell(new DateTime(2026, 6, 1, 12, 0, 0, DateTimeKind.Utc).AddHours(i));
             writer.WriteCell(99.9d * i);

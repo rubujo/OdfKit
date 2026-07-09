@@ -35,10 +35,12 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 
 ## 後續僅在「改到該區」時小步抽取
 
-- `OdsStreamWriter` 熱路徑已共用 `OdfRawXmlWriter`；再拆以功能邊界為準。  
+- `OdsStreamWriter` 熱路徑已共用 `OdfRawXmlWriter`；再拆以功能邊界為準（見 [human-agent-maintainability.md](human-agent-maintainability.md) 審查表）。  
 - `TextDocumentBuilder`／`SpreadsheetDocumentBuilder` 等 builder 維持高階 API 聚合。  
+- 多可選參數高頻面改以 **options 物件**收斂（`OdfRichTextRunOptions`、`OdsRowWriteOptions`、`OdfValidationOptions`），**不是**靠切檔解決。
 
 ## 相關
 
 - [maintainability.md](maintainability.md)  
+- [human-agent-maintainability.md](human-agent-maintainability.md)  
 - [AGENTS.md](../AGENTS.md) §C2  

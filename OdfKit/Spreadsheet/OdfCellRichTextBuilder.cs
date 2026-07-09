@@ -31,30 +31,28 @@ public sealed class OdfCellRichTextBuilder
     }
 
     /// <summary>
-    /// Appends a text run.
-    /// 追加一段文字。
+    /// Appends a plain text run with default formatting.
+    /// 以預設格式追加一段文字。
     /// </summary>
     /// <param name="text">The text to append. / 要追加的文字。</param>
-    /// <param name="bold">Whether to apply bold styling. / 是否套用粗體。</param>
-    /// <param name="italic">Whether to apply italic styling. / 是否套用斜體。</param>
-    /// <param name="color">The text color; <see langword="null"/> inherits the default color. / 文字色彩；<see langword="null"/> 表示繼承預設色彩。</param>
-    /// <param name="fontFamily">The font family name; <see langword="null"/> indicates inheritance. / 字型名稱；<see langword="null"/> 表示繼承。</param>
-    /// <param name="underline">Whether to apply underline styling. / 是否套用底線。</param>
     /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
-    public OdfCellRichTextBuilder Append(
-        string text,
-        bool bold = false,
-        bool italic = false,
-        OdfColor? color = null,
-        string? fontFamily = null,
-        bool underline = false)
+    public OdfCellRichTextBuilder Append(string text) => Append(text, OdfRichTextRunOptions.Default);
+
+    /// <summary>
+    /// Appends a text run using an options object.
+    /// 以 options 物件追加一段文字。
+    /// </summary>
+    /// <param name="text">The text to append. / 要追加的文字。</param>
+    /// <param name="options">The run formatting options. / 片段格式選項。</param>
+    /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
+    public OdfCellRichTextBuilder Append(string text, OdfRichTextRunOptions options)
     {
         if (text is null)
-        {
             throw new ArgumentNullException(nameof(text));
-        }
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
 
-        _richText.AddRun(text, bold, italic, color, fontFamily, underline);
+        _richText.AddRun(text, options);
         Commit();
         return this;
     }
@@ -80,14 +78,21 @@ public sealed class OdfCellRichTextBuilder
     public OdfCellRichTextBuilder Set(OdfRichText richText)
     {
         if (richText is null)
-        {
             throw new ArgumentNullException(nameof(richText));
-        }
 
         _richText.Clear();
         foreach (OdfRichTextRun run in richText.Runs)
         {
-            _richText.AddRun(run.Text, run.Bold, run.Italic, run.Color, run.FontFamily, run.Underline);
+            _richText.AddRun(
+                run.Text,
+                new OdfRichTextRunOptions
+                {
+                    Bold = run.Bold,
+                    Italic = run.Italic,
+                    Color = run.Color,
+                    FontFamily = run.FontFamily,
+                    Underline = run.Underline,
+                });
         }
 
         Commit();

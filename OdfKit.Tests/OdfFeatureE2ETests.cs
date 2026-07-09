@@ -1423,7 +1423,7 @@ namespace OdfKit.Tests
             doc.Package.Save(ms);
             ms.Position = 0;
             using var validationPackage = OdfPackage.Open(ms, leaveOpen: true);
-            var report = OdfPackageValidator.Validate(validationPackage, OdfComplianceProfiles.OasisOdf14Strict, "workbook.ods");
+            var report = OdfPackageValidator.Validate(validationPackage, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "workbook.ods" });
             // Schema validation should detect format issues or succeed at least-effort depending on profile
             Assert.NotNull(report);
         }

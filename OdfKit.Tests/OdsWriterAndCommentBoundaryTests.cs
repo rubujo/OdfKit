@@ -28,7 +28,7 @@ namespace OdfKit.Tests
                 writer.WriteColumn(OdfLength.FromCentimeters(5.5), "ColStyle");
 
                 // 2. Pass height and optimal height to row
-                writer.WriteStartRow(height: 15.0, styleName: "RowStyle", useOptimalHeight: true);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = 15.0, StyleName = "RowStyle", UseOptimalHeight = true });
 
                 writer.WriteCell("Value");
                 writer.WriteEndRow();

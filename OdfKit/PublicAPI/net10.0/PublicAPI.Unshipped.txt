@@ -712,6 +712,8 @@ OdfKit.Compliance.OdfValidationIssueJsonModel.Severity.get -> string!
 OdfKit.Compliance.OdfValidationIssueJsonModel.SuggestedFix.get -> string!
 OdfKit.Compliance.OdfValidationIssueJsonModel.XPath.get -> string?
 OdfKit.Compliance.OdfValidationOptions
+OdfKit.Compliance.OdfValidationOptions.Culture.get -> System.Globalization.CultureInfo?
+OdfKit.Compliance.OdfValidationOptions.Culture.set -> void
 OdfKit.Compliance.OdfValidationOptions.FileName.get -> string?
 OdfKit.Compliance.OdfValidationOptions.FileName.set -> void
 OdfKit.Compliance.OdfValidationOptions.LoadOptions.get -> OdfKit.Core.OdfLoadOptions?
@@ -15005,7 +15007,8 @@ OdfKit.Spreadsheet.OdfCellRangeSelection.Unmerge() -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Unprotect() -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.VerifyPassword(string! password) -> bool
 OdfKit.Spreadsheet.OdfCellRichTextBuilder
-OdfKit.Spreadsheet.OdfCellRichTextBuilder.Append(string! text, bool bold = false, bool italic = false, OdfKit.DOM.OdfColor? color = null, string? fontFamily = null, bool underline = false) -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
+OdfKit.Spreadsheet.OdfCellRichTextBuilder.Append(string! text) -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
+OdfKit.Spreadsheet.OdfCellRichTextBuilder.Append(string! text, OdfKit.Spreadsheet.OdfRichTextRunOptions! options) -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
 OdfKit.Spreadsheet.OdfCellRichTextBuilder.Clear() -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
 OdfKit.Spreadsheet.OdfCellRichTextBuilder.LineBreak() -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
 OdfKit.Spreadsheet.OdfCellRichTextBuilder.Set(OdfKit.Spreadsheet.OdfRichText! richText) -> OdfKit.Spreadsheet.OdfCellRichTextBuilder!
@@ -15471,7 +15474,8 @@ OdfKit.Spreadsheet.OdfRangeWriteReport.WrittenCellCount.get -> int
 OdfKit.Spreadsheet.OdfRangeWriteReport.WrittenCellCount.set -> void
 OdfKit.Spreadsheet.OdfRichText
 OdfKit.Spreadsheet.OdfRichText.AddLineBreak() -> OdfKit.Spreadsheet.OdfRichText!
-OdfKit.Spreadsheet.OdfRichText.AddRun(string! text, bool bold = false, bool italic = false, OdfKit.DOM.OdfColor? color = null, string? fontFamily = null, bool underline = false) -> OdfKit.Spreadsheet.OdfRichText!
+OdfKit.Spreadsheet.OdfRichText.AddRun(string! text) -> OdfKit.Spreadsheet.OdfRichText!
+OdfKit.Spreadsheet.OdfRichText.AddRun(string! text, OdfKit.Spreadsheet.OdfRichTextRunOptions! options) -> OdfKit.Spreadsheet.OdfRichText!
 OdfKit.Spreadsheet.OdfRichText.Clear() -> void
 OdfKit.Spreadsheet.OdfRichText.OdfRichText() -> void
 OdfKit.Spreadsheet.OdfRichText.Runs.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfRichTextRun!>!
@@ -15489,6 +15493,18 @@ OdfKit.Spreadsheet.OdfRichTextRun.Text.get -> string!
 OdfKit.Spreadsheet.OdfRichTextRun.Text.init -> void
 OdfKit.Spreadsheet.OdfRichTextRun.Underline.get -> bool
 OdfKit.Spreadsheet.OdfRichTextRun.Underline.init -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Bold.get -> bool
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Bold.set -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Color.get -> OdfKit.DOM.OdfColor?
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Color.set -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.FontFamily.get -> string?
+OdfKit.Spreadsheet.OdfRichTextRunOptions.FontFamily.set -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Italic.get -> bool
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Italic.set -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.OdfRichTextRunOptions() -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Underline.get -> bool
+OdfKit.Spreadsheet.OdfRichTextRunOptions.Underline.set -> void
 OdfKit.Spreadsheet.OdfRowCellCollection
 OdfKit.Spreadsheet.OdfRowCellCollection.this[int column].get -> OdfKit.Spreadsheet.OdfCell!
 OdfKit.Spreadsheet.OdfRowCollection
@@ -15825,6 +15841,14 @@ OdfKit.Spreadsheet.OdfWorksheetCollection.GetEnumerator() -> System.Collections.
 OdfKit.Spreadsheet.OdfWorksheetCollection.OdfWorksheetCollection(OdfKit.Spreadsheet.SpreadsheetDocument! document) -> void
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[int index].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[string! name].get -> OdfKit.Spreadsheet.OdfTableSheet!
+OdfKit.Spreadsheet.OdsRowWriteOptions
+OdfKit.Spreadsheet.OdsRowWriteOptions.Height.get -> double?
+OdfKit.Spreadsheet.OdsRowWriteOptions.Height.set -> void
+OdfKit.Spreadsheet.OdsRowWriteOptions.OdsRowWriteOptions() -> void
+OdfKit.Spreadsheet.OdsRowWriteOptions.StyleName.get -> string?
+OdfKit.Spreadsheet.OdsRowWriteOptions.StyleName.set -> void
+OdfKit.Spreadsheet.OdsRowWriteOptions.UseOptimalHeight.get -> bool
+OdfKit.Spreadsheet.OdsRowWriteOptions.UseOptimalHeight.set -> void
 OdfKit.Spreadsheet.OdsSheetWriteJob
 OdfKit.Spreadsheet.OdsSheetWriteJob.OdsSheetWriteJob(string! sheetName, System.Func<OdfKit.Spreadsheet.OdsSheetWriter!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! writeAsync) -> void
 OdfKit.Spreadsheet.OdsSheetWriteJob.SheetName.get -> string!
@@ -15881,7 +15905,8 @@ OdfKit.Spreadsheet.OdsStreamWriter.WriteEndRow() -> void
 OdfKit.Spreadsheet.OdsStreamWriter.WriteEndSheet() -> void
 OdfKit.Spreadsheet.OdsStreamWriter.WriteNode(OdfKit.DOM.OdfNode! node) -> void
 OdfKit.Spreadsheet.OdsStreamWriter.WriteSheetsAsync(System.Collections.Generic.IEnumerable<OdfKit.Spreadsheet.OdsSheetWriteJob!>! jobs, int maxConcurrency = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-OdfKit.Spreadsheet.OdsStreamWriter.WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false) -> void
+OdfKit.Spreadsheet.OdsStreamWriter.WriteStartRow() -> void
+OdfKit.Spreadsheet.OdsStreamWriter.WriteStartRow(OdfKit.Spreadsheet.OdsRowWriteOptions! options) -> void
 OdfKit.Spreadsheet.OdsStreamWriter.WriteStartSheet(string! sheetName) -> void
 OdfKit.Spreadsheet.SparklineType
 OdfKit.Spreadsheet.SparklineType.Column = 1 -> OdfKit.Spreadsheet.SparklineType
@@ -17554,7 +17579,9 @@ static OdfKit.Compliance.OdfLocalizer.GetMessage(string! messageKey, System.Glob
 static OdfKit.Compliance.OdfLocalizer.GetMessage(string! messageKey, System.Globalization.CultureInfo? culture, params object?[]! args) -> string!
 static OdfKit.Compliance.OdfLocalizer.GetSuggestedFix(string! ruleId) -> string!
 static OdfKit.Compliance.OdfLocalizer.GetSuggestedFix(string! ruleId, System.Globalization.CultureInfo? culture) -> string!
-static OdfKit.Compliance.OdfPackageValidator.Validate(OdfKit.Core.OdfPackage! package, OdfKit.Compliance.OdfComplianceProfile? profile = null, string? fileName = null, System.Globalization.CultureInfo? culture = null) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfPackageValidator.Validate(OdfKit.Core.OdfPackage! package) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfPackageValidator.Validate(OdfKit.Core.OdfPackage! package, OdfKit.Compliance.OdfComplianceProfile? profile) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfPackageValidator.Validate(OdfKit.Core.OdfPackage! package, OdfKit.Compliance.OdfValidationOptions! options) -> OdfKit.Compliance.OdfValidationReport!
 static OdfKit.Compliance.OdfPracticalCompatibilityIssue.operator !=(OdfKit.Compliance.OdfPracticalCompatibilityIssue? left, OdfKit.Compliance.OdfPracticalCompatibilityIssue? right) -> bool
 static OdfKit.Compliance.OdfPracticalCompatibilityIssue.operator ==(OdfKit.Compliance.OdfPracticalCompatibilityIssue? left, OdfKit.Compliance.OdfPracticalCompatibilityIssue? right) -> bool
 static OdfKit.Compliance.OdfPracticalCompatibilityValidator.Validate(OdfKit.Core.OdfDocument! document, OdfKit.Compliance.OdfPracticalCompatibilityProfile profile) -> OdfKit.Compliance.OdfPracticalCompatibilityReport!
@@ -18141,6 +18168,7 @@ static OdfKit.Spreadsheet.OdfCellRange.TryParse(string! value, out OdfKit.Spread
 static OdfKit.Spreadsheet.OdfFrozenPanes.operator !=(OdfKit.Spreadsheet.OdfFrozenPanes left, OdfKit.Spreadsheet.OdfFrozenPanes right) -> bool
 static OdfKit.Spreadsheet.OdfFrozenPanes.operator ==(OdfKit.Spreadsheet.OdfFrozenPanes left, OdfKit.Spreadsheet.OdfFrozenPanes right) -> bool
 static OdfKit.Spreadsheet.OdfRangeWriteOptions.Default.get -> OdfKit.Spreadsheet.OdfRangeWriteOptions!
+static OdfKit.Spreadsheet.OdfRichTextRunOptions.Default.get -> OdfKit.Spreadsheet.OdfRichTextRunOptions!
 static OdfKit.Spreadsheet.OdfSplitPanes.operator !=(OdfKit.Spreadsheet.OdfSplitPanes left, OdfKit.Spreadsheet.OdfSplitPanes right) -> bool
 static OdfKit.Spreadsheet.OdfSplitPanes.operator ==(OdfKit.Spreadsheet.OdfSplitPanes left, OdfKit.Spreadsheet.OdfSplitPanes right) -> bool
 static OdfKit.Spreadsheet.OdfSpreadsheetFormula.Atom(string! body) -> OdfKit.Spreadsheet.OdfSpreadsheetFormula
@@ -18151,6 +18179,7 @@ static OdfKit.Spreadsheet.OdfSpreadsheetFormula.Raw(string! body) -> OdfKit.Spre
 static OdfKit.Spreadsheet.OdfSpreadsheetFormula.Reference(string! address) -> OdfKit.Spreadsheet.OdfSpreadsheetFormula
 static OdfKit.Spreadsheet.OdfSpreadsheetTableInfo.operator !=(OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? left, OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? right) -> bool
 static OdfKit.Spreadsheet.OdfSpreadsheetTableInfo.operator ==(OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? left, OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? right) -> bool
+static OdfKit.Spreadsheet.OdsRowWriteOptions.Default.get -> OdfKit.Spreadsheet.OdsRowWriteOptions!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!

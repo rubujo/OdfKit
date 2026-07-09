@@ -1097,10 +1097,7 @@ namespace OdfKit.Tests
                 CreateDocumentContent("1.4"));
 
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                package,
-                OdfComplianceProfiles.OasisOdf14Strict,
-                "document.zip");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "document.zip" });
 
             Assert.False(report.IsValid);
             Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);
@@ -1117,10 +1114,7 @@ namespace OdfKit.Tests
                 CreateDocumentContent("1.4"));
 
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                package,
-                OdfComplianceProfiles.OasisOdf14Strict,
-                "workbook.ods");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "workbook.ods" });
 
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);

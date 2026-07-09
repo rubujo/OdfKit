@@ -233,18 +233,27 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
 
     /// <summary>
-    /// Starts writing a new data row.
-    /// 開始寫入一個新的資料列。
+    /// Starts a table row with default options.
+    /// 以預設選項開始資料列。
     /// </summary>
-    /// <param name="height">The row height. / 資料列高度。</param>
-    /// <param name="styleName">The style name. / 樣式名稱。</param>
-    /// <param name="useOptimalHeight">Whether to use optimal height. / 是否使用最佳高度。</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
-    public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
+    public void WriteStartRow() => WriteStartRow(OdsRowWriteOptions.Default);
+
+    /// <summary>
+    /// Starts a table row using an options object.
+    /// 以 options 物件開始資料列。
+    /// </summary>
+    /// <param name="options">The row write options. / 資料列寫入選項。</param>
+    public void WriteStartRow(OdsRowWriteOptions options)
     {
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
         if (_disposed)
             return;
-        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
+        string? styleName = options.StyleName;
+        double? height = options.Height;
+        bool useOptimalHeight = options.UseOptimalHeight;
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(options.StyleName));
         if (_isRowStarted)
             WriteEndRow();
         _isRowStarted = true;

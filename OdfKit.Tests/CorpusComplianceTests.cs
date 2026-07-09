@@ -102,7 +102,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.2\"><office:body><office:text><text:p>Hello World</text:p></office:text></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict, "test.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "test.odt" });
             LogReport("OasisOdf14Strict_Negative_VersionMismatch", report);
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001" && issue.PackagePath == "test.odt" && issue.XPath == "/office:document-content[1]");
@@ -114,7 +114,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\"><office:body><office:text><text:non-existent-element /></office:text></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict, "test.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "test.odt" });
             LogReport("OasisOdf14Strict_Negative_NamespaceExtension", report);
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowInvalidOdfNamespaceExtensions" && issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:non-existent-element[1]" && issue.RequiredVersion == null);
@@ -138,7 +138,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\"><office:body><office:text><text:non-existent-element /></office:text></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended, "test.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Extended, FileName = "test.odt" });
             LogReport("OasisOdf14Extended_Negative_InvalidOdfExtension", report);
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "RequireOdfNamespaceValidity" && issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:non-existent-element[1]");
@@ -162,7 +162,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300_2015, "test.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.IsoIec26300_2015, FileName = "test.odt" });
             LogReport("IsoIec26300_Negative_VersionMismatch", report);
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001" && issue.PackagePath == "test.odt" && issue.XPath == "/office:document-content[1]");
@@ -359,10 +359,7 @@ namespace OdfKit.Tests
                              "</draw:frame></office:text></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                package,
-                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools,
-                "remote-resource.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.RocTaiwanGovernmentOdfTools, FileName = "remote-resource.odt" });
 
             LogReport("RocTaiwanGovernmentOdfTools_Negative_RemoteResourceReferences", report);
             Assert.Contains(report.Issues, issue =>
@@ -496,10 +493,7 @@ namespace OdfKit.Tests
 
             ms.Position = 0;
             using OdfPackage reopened = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                reopened,
-                OdfComplianceProfiles.OasisOdf14Strict,
-                fileName);
+            OdfValidationReport report = OdfPackageValidator.Validate(reopened, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = fileName });
 
             LogReport("OasisOdf14Corpus_Positive_AllPackageBodyKinds_" + kind, report);
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
@@ -721,10 +715,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\"><office:body><office:text><text:not-in-schema /></office:text></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                package,
-                OdfComplianceProfiles.OasisOdf14Strict,
-                "document.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "document.odt" });
 
             LogReport("OasisOdf14Corpus_Negative_StrictOdfNamespaceExtension", report);
             Assert.False(report.IsValid);
@@ -745,10 +736,7 @@ namespace OdfKit.Tests
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
 
-            OdfValidationReport report = OdfPackageValidator.Validate(
-                package,
-                OdfComplianceProfiles.OasisOdf14Strict,
-                "document.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "document.odt" });
 
             LogReport("OasisOdf14Corpus_Negative_StrictOdfNamespaceAttributeExtension", report);
             Assert.False(report.IsValid);

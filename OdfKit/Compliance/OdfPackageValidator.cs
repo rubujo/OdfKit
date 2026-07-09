@@ -32,19 +32,44 @@ public static partial class OdfPackageValidator
         [OdfSignerConstants.SignaturePath] = "text/xml"
     };
     /// <summary>
-    /// Executes the Validate operation.
-    /// 驗證 ODF 套件是否符合套件層級規則與選用的設定檔。
+    /// Validates an ODF package with default options.
+    /// 以預設選項驗證 ODF 套件。
     /// </summary>
-    /// <param name="package">ODF 套件</param>
-    /// <param name="profile">相容性設定檔</param>
-    /// <param name="fileName">檔案名稱</param>
-    /// <param name="culture">指定此問題生成時使用的文化特性，若為 null 則自動偵測</param>
-    /// <returns>驗證結果報告</returns>
-    public static OdfValidationReport Validate(
+    /// <param name="package">The ODF package. / ODF 套件。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(OdfPackage package) =>
+        ValidateCore(package, profile: null, fileName: null, culture: null);
+
+    /// <summary>
+    /// Validates an ODF package using an options object.
+    /// 以 options 物件驗證 ODF 套件。
+    /// </summary>
+    /// <param name="package">The ODF package. / ODF 套件。</param>
+    /// <param name="options">The validation options. / 驗證選項。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(OdfPackage package, OdfValidationOptions options)
+    {
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
+        return ValidateCore(package, options.Profile, options.FileName, options.Culture);
+    }
+
+    /// <summary>
+    /// Validates an ODF package with a compliance profile.
+    /// 以相容性設定檔驗證 ODF 套件。
+    /// </summary>
+    /// <param name="package">The ODF package. / ODF 套件。</param>
+    /// <param name="profile">The compliance profile. / 相容性設定檔。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(OdfPackage package, OdfComplianceProfile? profile) =>
+        Validate(package, new OdfValidationOptions { Profile = profile });
+
+    private static OdfValidationReport ValidateCore(
         OdfPackage package,
-        OdfComplianceProfile? profile = null,
-        string? fileName = null,
-        CultureInfo? culture = null)
+        OdfComplianceProfile? profile,
+        string? fileName,
+        CultureInfo? culture)
     {
         if (package is null)
             throw new ArgumentNullException(nameof(package));

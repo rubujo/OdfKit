@@ -1168,9 +1168,9 @@ public class SpreadsheetHighLevelApiTests
         // 1. SetRichText 包含粗體、斜體、色彩
         var cell = sheet.GetCell(0, 0);
         var rt = new OdfRichText();
-        rt.AddRun("普通", bold: false);
-        rt.AddRun("粗體", bold: true);
-        rt.AddRun("紅色", color: new OdfKit.DOM.OdfColor("#ff0000"));
+        rt.AddRun("普通", new OdfRichTextRunOptions { Bold = false });
+        rt.AddRun("粗體", new OdfRichTextRunOptions { Bold = true });
+        rt.AddRun("紅色", new OdfRichTextRunOptions { Color = new OdfKit.DOM.OdfColor("#ff0000") });
         cell.SetRichText(rt);
         Assert.Equal("string", cell.ValueType);
 
@@ -1191,8 +1191,8 @@ public class SpreadsheetHighLevelApiTests
         // 4. 相同格式的 run 共用同一個樣式名稱（XML 去重）
         var cell3 = sheet.GetCell(0, 2);
         var rt2 = new OdfRichText();
-        rt2.AddRun("A", bold: true);
-        rt2.AddRun("B", bold: true);
+        rt2.AddRun("A", new OdfRichTextRunOptions { Bold = true });
+        rt2.AddRun("B", new OdfRichTextRunOptions { Bold = true });
         cell3.SetRichText(rt2);
 
         using var stream = new MemoryStream();
@@ -1219,9 +1219,9 @@ public class SpreadsheetHighLevelApiTests
 
         cell.RichText
             .Clear()
-            .Append("第一行", bold: true)
+            .Append("第一行", new OdfRichTextRunOptions { Bold = true })
             .LineBreak()
-            .Append("第二行", italic: true, color: new OdfKit.DOM.OdfColor("#336699"));
+            .Append("第二行", new OdfRichTextRunOptions { Italic = true, Color = new OdfKit.DOM.OdfColor("#336699") });
 
         Assert.Equal("第一行\n第二行", cell.DisplayText);
         Assert.Equal("wrap", doc.StyleEngine.GetStyleProperty(cell.StyleName!, "wrap-option", OdfNamespaces.Fo, "table-cell"));

@@ -35,7 +35,7 @@ public partial class OdfCell
         var richText = new OdfRichText();
         foreach ((string segmentText, string fontName) in OdfFontSegmenter.SegmentText(text, options.BaseFont))
         {
-            richText.AddRun(segmentText, fontFamily: fontName);
+            richText.AddRun(segmentText, new OdfRichTextRunOptions { FontFamily = fontName });
         }
 
         SetRichText(richText);

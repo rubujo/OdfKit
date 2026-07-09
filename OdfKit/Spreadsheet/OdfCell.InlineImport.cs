@@ -60,7 +60,16 @@ public partial class OdfCell
             if (segment.Color is not null && OdfColor.TryParse(segment.Color, out OdfColor parsed))
                 color = parsed;
 
-            richText.AddRun(segment.Text, segment.Bold, segment.Italic, color, segment.FontFamily, segment.Underline);
+            richText.AddRun(
+                segment.Text,
+                new OdfRichTextRunOptions
+                {
+                    Bold = segment.Bold,
+                    Italic = segment.Italic,
+                    Color = color,
+                    FontFamily = segment.FontFamily,
+                    Underline = segment.Underline,
+                });
         }
 
         SetRichText(richText);

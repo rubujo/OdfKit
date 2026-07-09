@@ -26,7 +26,7 @@ namespace OdfKit.Tests
             {
                 writer.WriteStartSheet("Sheet1");
                 // Height in points: -28.35 pt ≈ -1.0000 cm
-                writer.WriteStartRow(height: -28.35);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = -28.35 });
                 writer.WriteCell("Value");
             }
 
@@ -56,7 +56,7 @@ namespace OdfKit.Tests
                 using (var writer = new OdsStreamWriter(ms))
                 {
                     writer.WriteStartSheet("Sheet1");
-                    writer.WriteStartRow(height: double.NaN);
+                    writer.WriteStartRow(new OdsRowWriteOptions { Height = double.NaN });
                     writer.WriteCell("Value");
                 }
 
@@ -79,7 +79,7 @@ namespace OdfKit.Tests
                 using (var writer = new OdsStreamWriter(ms))
                 {
                     writer.WriteStartSheet("Sheet1");
-                    writer.WriteStartRow(height: double.PositiveInfinity);
+                    writer.WriteStartRow(new OdsRowWriteOptions { Height = double.PositiveInfinity });
                     writer.WriteCell("Value");
                 }
 
@@ -104,7 +104,7 @@ namespace OdfKit.Tests
             using (var writer = new OdsStreamWriter(ms))
             {
                 writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow(height: 28.35, useOptimalHeight: true);
+                writer.WriteStartRow(new OdsRowWriteOptions { Height = 28.35, UseOptimalHeight = true });
                 writer.WriteCell("Value");
             }
 
