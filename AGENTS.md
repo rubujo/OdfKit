@@ -80,6 +80,7 @@
 - **協作者／大型結構**：見 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md) 與 [`docs/maintainability.md`](docs/maintainability.md)；禁止機械 `historical-refactor/Split-*`。
 - **XML 摘要**：`Test-OneLineXmlSummary.ps1 -FailOnIssues`。
 - **產生碼**：`DOM/Generated` 與 schema provider `.g.cs` 不可手改；schema 重產後須重跑 Public API 基線。
+- **Schema 與流通性（非目標）**：核心預設內建 ODF **1.1～1.4** 官方 schema 覆蓋，以支援存量檔、封存與跨 LO／舊版互通；**禁止**為瘦身 nupkg 或「看起來模組化」而將 schema 拆成可選套件或刪減多版覆蓋。體積代價以建置／分析器策略與文件說明吸收；詳見 [`docs/maintainability.md`](docs/maintainability.md)「Schema 與流通性」。
 
 ### D. Git 提交規範 (Conventional Commits)
 - **規範標準**：嚴格遵循「慣例式提交 (Conventional Commits) v1.0.0」規範。

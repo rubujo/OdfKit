@@ -575,6 +575,10 @@ public class DocsAndCorpusContractTests
         Assert.Contains("TablePageState", tableSparse, StringComparison.Ordinal);
         Assert.Contains("architecture-collaborators.md", docsIndex, StringComparison.Ordinal);
         Assert.Contains("public-api-optional-parameters.md", docsIndex, StringComparison.Ordinal);
+        Assert.Contains("Schema 與流通性", maintainability, StringComparison.Ordinal);
+        Assert.Contains("非目標", maintainability, StringComparison.Ordinal);
+        Assert.Contains("Schema 與流通性", agents, StringComparison.Ordinal);
+        Assert.DoesNotContain("Schema 可選套件", maintainability, StringComparison.Ordinal);
         // 歷史 Split 腳本不得再留在 eng/ 根目錄（應在 historical-refactor/）。
         Assert.Empty(
             Directory.EnumerateFiles(Path.Combine(repoRoot, "eng"), "Split-*.ps1", SearchOption.TopDirectoryOnly));

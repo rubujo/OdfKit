@@ -22,7 +22,7 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 | 串流郵件合併 | `OdfStreamingMailMerge` | 本體；`.Segments`；`.ExpressionCache` |
 | 文字 | `TextDocument` | TrackChanges／FormFields／Html*／*Collaborators* |
 | 在地化 | `OdfLocalizer` | JSON `Compliance/i18n` → 產生 `Exceptions.<culture>.cs` |
-| Schema | `Odf*OfficialSchemaProvider` | **產生碼**；體積屬產品策略（可選套件，非 0.0.1 拆 nupkg） |
+| Schema | `Odf*OfficialSchemaProvider`（1.1～1.4） | **產生碼**；多版內建以利 ODF **封存／存量流通**；**非目標**拆成可選 NuGet（見 [maintainability.md](maintainability.md)「Schema 與流通性」） |
 
 ## 刻意保留的大型面
 
@@ -31,6 +31,7 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 | `OdfElement` 屬性／值 partial | Schema 驅動屬性面，KEEP |
 | `OdfElementSchemaRegistry.*` | 枚舉 token 註冊，KEEP |
 | 生成 DOM 包裝 | 規格覆蓋代價；不可手改 `.g.cs` |
+| 多版 Official Schema Provider | ODF 實際流通跨版本；體大 ≠ 應拆包 |
 
 ## 後續僅在「改到該區」時小步抽取
 

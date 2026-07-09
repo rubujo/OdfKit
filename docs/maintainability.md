@@ -92,11 +92,11 @@
 | `OdfKit/DOM/Generated/*.g.cs` | `OdfSchemaGenerator` | **不可手改**；重產見 `eng/Generate-OdfSchemaProvider.ps1` |
 | `OdfKit/Compliance/Generated/Odf*OfficialSchemaProvider.g.cs` | 同上 | 同上 |
 
-- 產生碼體積大是規格覆蓋的代價；不應為了「看起來乾淨」而刪減 schema 覆蓋。  
+- 產生碼體積大是 **ODF 多版規格覆蓋與封存流通** 的代價；不應為了「看起來乾淨」或單純瘦身 nupkg 而刪減 schema 覆蓋。  
 - 建置效能：本機可關 analyzer（`Directory.Build.props`）；CI 維持檢查。  
 - Trim analyzer 對巨型產生碼關閉，改以 `eng/Test-TrimSmoke.ps1` 實機把關。  
-- 若未來要縮小預設套件，評估**可選 schema 套件**（例如僅 1.4），而非手改 `.g.cs`。  
-- schema 重產後若公開表面變動，須重跑 `Generate-PublicApiBaseline.ps1`。
+- schema 重產後若公開表面變動，須重跑 `Generate-PublicApiBaseline.ps1`。  
+- **非目標（0.x）**：將 ODF 1.1～1.4 schema provider **拆成可選 NuGet**（見下方「Schema 與流通性」）。
 
 ## 5. XML 文件與註解
 
@@ -130,16 +130,32 @@
 
 ### 大型結構現況（v0.0.1 完滿）
 
-完整地圖見 [architecture-collaborators.md](architecture-collaborators.md)。生成 schema 體積屬**產品決策**（可選 nupkg），不在 0.0.1 強制拆套件。
+完整地圖見 [architecture-collaborators.md](architecture-collaborators.md)。
+
+### Schema 與流通性（非目標：可選套件拆分）
+
+ODF 實務流通並非「全站只活在最新 1.4」：
+
+- **存量檔**（機關封存、舊範本、公文）常橫跨 1.1／1.2／1.3。  
+- **LibreOffice** 長期以 1.2／1.3（含 Extended）為日常寫出主力，近版才強化 1.4。  
+- **互通與歸檔**敘事依賴「能打開舊版 ODF」，而非只產生最新版。
+
+因此核心套件**預設內建多版官方 schema provider（1.1～1.4）是產品選擇**，體積大是規格覆蓋代價，**不是**待清的架構缺陷。
+
+| 政策 | 說明 |
+|------|------|
+| **0.x 非目標** | 為瘦身而將 schema 拆成 `OdfKit.Schema.Odf12` 等可選 NuGet，或預設「僅 1.4」。 |
+| **禁止** | 以「為拆而拆／看起來比較模組化」為由刪減多版覆蓋。 |
+| **允許的洩壓** | 建置／分析器策略（本機關 CA、關 trim 分析）、執行期依文件版本選 provider、文件誠實說明包體。 |
+| **何時才重談拆包** | 僅當有**實測體積痛點**且有使用者開啟檔的版本分佈證據，並能證明不傷害封存／互通敘事時；預設答案仍是不拆。 |
 
 ### 建議的後 0.0.1／1.0 債
 
 | 項目 | 說明 |
 |------|------|
-| Schema 可選套件 | 降低預設 nupkg 體積（產品決策） |
 | 1.0 API 凍結 | Unshipped → Shipped；手寫路徑 RS0026／RS0027 升 warning／error |
 | Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
-| 生成 DOM 可選參數形狀 | 改 `OdfSchemaGenerator` 後整批重產 |
+| 生成 DOM 可選參數形狀 | 改 `OdfSchemaGenerator` 後整批重產（與是否拆 NuGet 無關） |
 
 ## 7. 相關文件
 
