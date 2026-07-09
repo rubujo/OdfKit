@@ -68,8 +68,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SetContent that accepts bytes.
+    /// SetContent 完整多載：接受 bytes。
     /// </summary>
     public void SetContent(byte[] bytes)
     {
@@ -93,8 +93,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Creates or invokes GetEstimatedSize using default values for optional parameters.
+    /// 以可選參數的預設值建立或呼叫 GetEstimatedSize。
     /// </summary>
     public long GetEstimatedSize()
     {
@@ -110,8 +110,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfPackageEntry that accepts name and zipEntry.
+    /// OdfPackageEntry 完整多載：接受 name 與 zipEntry。
     /// </summary>
     public OdfPackageEntry(string name, ZipArchiveEntry zipEntry)
     {
@@ -120,8 +120,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfPackageEntry that accepts name and bytes.
+    /// OdfPackageEntry 完整多載：接受 name 與 bytes。
     /// </summary>
     public OdfPackageEntry(string name, byte[] bytes)
     {
@@ -131,8 +131,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfPackageEntry that accepts name, mmfEntry, and package.
+    /// OdfPackageEntry 完整多載：接受 name、mmfEntry 與 package。
     /// </summary>
     public OdfPackageEntry(string name, OdfMmfEntryInfo mmfEntry, OdfPackage package)
     {
@@ -142,8 +142,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfPackageEntry that accepts name and stream.
+    /// OdfPackageEntry 完整多載：接受 name 與 stream。
     /// </summary>
     public OdfPackageEntry(string name, Stream stream)
     {
@@ -293,8 +293,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Creates or invokes OpenReader using default values for optional parameters.
+    /// 以可選參數的預設值建立或呼叫 OpenReader。
     /// </summary>
     public Stream OpenReader()
     {
@@ -392,8 +392,8 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Creates or invokes Dispose using default values for optional parameters.
+    /// 以可選參數的預設值建立或呼叫 Dispose。
     /// </summary>
     public void Dispose()
     {
@@ -416,8 +416,8 @@ internal class PeekableStream : Stream
     private int _peekPosition;
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of PeekableStream that accepts underlying, peekBuffer, peekedCount, and leaveOpen.
+    /// PeekableStream 完整多載：接受 underlying、peekBuffer、peekedCount 與 leaveOpen。
     /// </summary>
     public PeekableStream(Stream underlying, byte[] peekBuffer, int peekedCount, bool leaveOpen)
     {
@@ -431,9 +431,10 @@ internal class PeekableStream : Stream
     public override bool CanSeek => false;
     public override bool CanWrite => false;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Gets the length of the stream. Not supported for this non-seekable stream.
+    /// 取得資料流長度。此不可尋覽資料流不支援此作業。
     /// </summary>
+    /// <exception cref="NotSupportedException">Always thrown. / 一律擲出。</exception>
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     public override long Position
     {
@@ -442,14 +443,14 @@ internal class PeekableStream : Stream
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Flush that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Flush 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public override void Flush() => _underlying.Flush();
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Read that accepts buffer, offset, and count.
+    /// Read 完整多載：接受 buffer、offset 與 count。
     /// </summary>
     public override int Read(byte[] buffer, int offset, int count)
     {
@@ -474,18 +475,18 @@ internal class PeekableStream : Stream
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Seek that accepts offset and origin; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 offset 與 origin；其餘可選參數使用預設值並轉呼叫最長 Seek 多載。
     /// </summary>
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLength that accepts value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 SetLength 多載。
     /// </summary>
     public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Write that accepts buffer, offset, and count; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 buffer、offset 與 count；其餘可選參數使用預設值並轉呼叫最長 Write 多載。
     /// </summary>
     public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 

@@ -95,8 +95,8 @@ public partial class OdfNode
     public OdfNode(OdfNodeType nodeType, string localName, string namespaceUri) : this(nodeType, localName, namespaceUri, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfNode that accepts nodeType, localName, namespaceUri, and prefix.
+    /// OdfNode 完整多載：接受 nodeType、localName、namespaceUri 與 prefix。
     /// </summary>
     public OdfNode(OdfNodeType nodeType, string localName, string namespaceUri, string? prefix)
     {
@@ -114,8 +114,8 @@ public partial class OdfNode
     public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri) : this(nodeType, localName, namespaceUri.NamespaceName, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfNode that accepts nodeType, localName, namespaceUri, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 nodeType、localName、namespaceUri 與 prefix；其餘可選參數使用預設值並轉呼叫最長 OdfNode 多載。
     /// </summary>
     public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri, string? prefix)
         : this(nodeType, localName, namespaceUri.NamespaceName, prefix)
@@ -373,8 +373,8 @@ public partial class OdfNode
         private long _position;
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of OdfSequenceStream that accepts buffers.
+        /// OdfSequenceStream 完整多載：接受 buffers。
         /// </summary>
         public OdfSequenceStream(params ReadOnlyMemory<byte>[] buffers)
         {
@@ -385,9 +385,10 @@ public partial class OdfNode
         public override bool CanSeek => false;
         public override bool CanWrite => false;
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Gets the length of the stream. Not supported for this non-seekable stream.
+        /// 取得資料流長度。此不可尋覽資料流不支援此作業。
         /// </summary>
+        /// <exception cref="NotSupportedException">Always thrown. / 一律擲出。</exception>
         public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         public override long Position
         {
@@ -396,14 +397,14 @@ public partial class OdfNode
         }
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Creates or invokes Flush using default values for optional parameters.
+        /// 以可選參數的預設值建立或呼叫 Flush。
         /// </summary>
         public override void Flush() { }
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of Read that accepts buffer, offset, and count.
+        /// Read 完整多載：接受 buffer、offset 與 count。
         /// </summary>
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -435,18 +436,18 @@ public partial class OdfNode
         }
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of Seek that accepts offset and origin; remaining optional parameters use defaults and forward to the full overload.
+        /// 便利多載：提供 offset 與 origin；其餘可選參數使用預設值並轉呼叫最長 Seek 多載。
         /// </summary>
         public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of SetLength that accepts value; remaining optional parameters use defaults and forward to the full overload.
+        /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 SetLength 多載。
         /// </summary>
         public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of Write that accepts buffer, offset, and count; remaining optional parameters use defaults and forward to the full overload.
+        /// 便利多載：提供 buffer、offset 與 count；其餘可選參數使用預設值並轉呼叫最長 Write 多載。
         /// </summary>
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
@@ -517,8 +518,8 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
     private readonly byte* _pointer;
     private readonly int _length;
     /// <summary>
-    /// Executes the UnmanagedMemoryManager operation.
-    /// 執行 UnmanagedMemoryManager 作業。
+    /// Performs unmanaged memory manager.
+    /// 執行 Unmanaged Memory Manager。
     /// </summary>
 
     public UnmanagedMemoryManager(byte* pointer, int length)
@@ -527,8 +528,8 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
         _length = length;
     }
     /// <summary>
-    /// Executes the UnmanagedMemoryManager operation.
-    /// 執行 UnmanagedMemoryManager 作業。
+    /// Performs unmanaged memory manager.
+    /// 執行 Unmanaged Memory Manager。
     /// </summary>
 
     public UnmanagedMemoryManager(IntPtr pointer, int length)
@@ -537,14 +538,14 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
         _length = length;
     }
     /// <summary>
-    /// Executes the GetSpan operation.
-    /// 執行 GetSpan 作業。
+    /// Gets span.
+    /// 取得 Span。
     /// </summary>
 
     public override Span<byte> GetSpan() => new Span<byte>(_pointer, _length);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Pin that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Pin 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public System.Buffers.MemoryHandle Pin() => Pin(0);
 
@@ -562,14 +563,14 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
     }
 
     /// <summary>
-    /// Executes the Unpin operation.
+    /// Performs the Unpin operation.
     /// 執行 Unpin 作業。
     /// </summary>
 
     public override void Unpin() { }
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
 
     protected override void Dispose(bool disposing) { }

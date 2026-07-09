@@ -9,7 +9,7 @@ namespace OdfKit.Compliance;
 public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
 {
     /// <summary>
-    /// Executes the OdfQualifiedName operation.
+    /// Performs odf qualified name.
     /// 初始化限定名稱的新執行個體。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -37,8 +37,8 @@ public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
     public string LocalName { get; }
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public bool Equals(OdfQualifiedName? other)
@@ -49,15 +49,15 @@ public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
     }
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => Equals(obj as OdfQualifiedName);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode()
@@ -70,8 +70,8 @@ public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
-    /// 執行 ToString 作業。
+    /// Converts to string.
+    /// 轉換為 String。
     /// </summary>
     /// <inheritdoc />
     public override string ToString() => "{" + NamespaceUri + "}" + LocalName;

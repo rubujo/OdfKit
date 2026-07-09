@@ -28,14 +28,14 @@ public partial class OfficeDrawingElement
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendPage that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendPage 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public DrawPageElement AppendPage() => AppendPage(null);
 
 
     /// <summary>
-    /// Executes the AppendPage operation.
+    /// Appends page.
     /// 在 <c>office:drawing</c> 主要 content 區段新增繪圖頁面。
     /// </summary>
     /// <param name="name">選用的頁面名稱</param>

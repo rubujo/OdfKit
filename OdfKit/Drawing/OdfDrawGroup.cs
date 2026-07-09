@@ -79,8 +79,8 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         return new OdfShape(shapeNode, Document);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddConnector that accepts startShapeId and endShapeId; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 startShapeId 與 endShapeId；其餘可選參數使用預設值並轉呼叫最長 AddConnector 多載。
     /// </summary>
     public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
 

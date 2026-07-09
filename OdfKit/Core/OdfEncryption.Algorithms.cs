@@ -17,7 +17,7 @@ public static partial class OdfEncryption
     #region Hash & Cipher Primitives
 
     /// <summary>
-    /// Executes the ComputeHash operation.
+    /// Computes hash.
     /// 計算資料的雜湊值。
     /// </summary>
     /// <param name="data">輸入資料的位元組陣列</param>
@@ -55,7 +55,7 @@ public static partial class OdfEncryption
     }
 
     /// <summary>
-    /// Executes the ByteArrayEquals operation.
+    /// Performs byte array equals.
     /// 比較兩個位元組陣列是否相等。
     /// </summary>
     /// <param name="a">第一個位元組陣列</param>

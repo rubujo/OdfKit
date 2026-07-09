@@ -10,7 +10,7 @@ namespace OdfKit.Compliance;
 public sealed class OdfValidationReportJsonModel
 {
     /// <summary>
-    /// Executes the OdfValidationReportJsonModel operation.
+    /// Performs odf validation report json model.
     /// 初始化 <see cref="OdfValidationReportJsonModel"/> 類別的新執行個體。
     /// </summary>
     /// <param name="isValid">文件是否通過驗證</param>

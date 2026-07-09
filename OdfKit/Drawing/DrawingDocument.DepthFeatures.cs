@@ -95,32 +95,32 @@ public partial class DrawingDocument
         return result;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateShapes that accepts names; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 names；其餘可選參數使用預設值並轉呼叫最長 UpdateShapes 多載。
     /// </summary>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names) => UpdateShapes(names, null, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateShapes that accepts names and x; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 names 與 x；其餘可選參數使用預設值並轉呼叫最長 UpdateShapes 多載。
     /// </summary>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x) => UpdateShapes(names, x, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateShapes that accepts names, x, and y; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 names、x 與 y；其餘可選參數使用預設值並轉呼叫最長 UpdateShapes 多載。
     /// </summary>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y) => UpdateShapes(names, x, y, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateShapes that accepts names, x, y, and width; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 names、x、y 與 width；其餘可選參數使用預設值並轉呼叫最長 UpdateShapes 多載。
     /// </summary>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y, OdfLength? width) => UpdateShapes(names, x, y, width, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateShapes that accepts names, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 names、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 UpdateShapes 多載。
     /// </summary>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height) => UpdateShapes(names, x, y, width, height, null);
 

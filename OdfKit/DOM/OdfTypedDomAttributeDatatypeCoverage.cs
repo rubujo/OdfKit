@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public sealed class OdfTypedDomAttributeDatatypeCoverage
 {
     /// <summary>
-    /// Executes the OdfTypedDomAttributeDatatypeCoverage operation.
+    /// Performs odf typed dom attribute datatype coverage.
     /// 初始化 schema 屬性值類型覆蓋專案。
     /// </summary>
     /// <param name="schemaValueType">schema 宣告的屬性值類型</param>

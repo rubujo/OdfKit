@@ -16,7 +16,7 @@ namespace OdfKit.Compliance;
 public static partial class OdfSchemaPatternValidator
 {
     /// <summary>
-    /// Executes the ValidateElement operation.
+    /// Validates element.
     /// 根據具名的結構描述模式驗證 XML 元素。
     /// </summary>
     /// <param name="element">XML 元素</param>

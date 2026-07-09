@@ -26,14 +26,14 @@ public partial class OfficeSpreadsheetElement
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendTable that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendTable 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TableTableElement AppendTable() => AppendTable(null);
 
 
     /// <summary>
-    /// Executes the AppendTable operation.
+    /// Appends table.
     /// 在 <c>office:spreadsheet</c> 末尾新增工作表表格。
     /// </summary>
     /// <param name="name">選用的表格名稱</param>

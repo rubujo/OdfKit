@@ -18,38 +18,38 @@ public static partial class OdfEncryption
 {
     #region Entry Encryption & Decryption
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DecryptEntry that accepts ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, and iv; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ciphertext、password、algorithmUri、derivationName、keySize、iterationCount、salt 與 iv；其餘可選參數使用預設值並轉呼叫最長 DecryptEntry 多載。
     /// </summary>
     public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, null, null, 3, 65536, 4);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DecryptEntry that accepts ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, and startKeyGenName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ciphertext、password、algorithmUri、derivationName、keySize、iterationCount、salt、iv 與 startKeyGenName；其餘可選參數使用預設值並轉呼叫最長 DecryptEntry 多載。
     /// </summary>
     public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, null, 3, 65536, 4);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DecryptEntry that accepts ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, and kdfName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ciphertext、password、algorithmUri、derivationName、keySize、iterationCount、salt、iv、startKeyGenName 與 kdfName；其餘可選參數使用預設值並轉呼叫最長 DecryptEntry 多載。
     /// </summary>
     public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, 3, 65536, 4);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DecryptEntry that accepts ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, and argon2T; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ciphertext、password、algorithmUri、derivationName、keySize、iterationCount、salt、iv、startKeyGenName、kdfName 與 argon2T；其餘可選參數使用預設值並轉呼叫最長 DecryptEntry 多載。
     /// </summary>
     public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, 65536, 4);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DecryptEntry that accepts ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, and argon2M; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ciphertext、password、algorithmUri、derivationName、keySize、iterationCount、salt、iv、startKeyGenName、kdfName、argon2T 與 argon2M；其餘可選參數使用預設值並轉呼叫最長 DecryptEntry 多載。
     /// </summary>
     public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, argon2M, 4);
 
 
     /// <summary>
-    /// Executes the DecryptEntry operation.
+    /// Decrypts entry.
     /// 解密單一封裝專案。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
     /// </summary>
     /// <param name="ciphertext">加密的密文資料位元組陣列</param>
@@ -215,7 +215,7 @@ public static partial class OdfEncryption
 
 
     /// <summary>
-    /// Executes the EncryptEntry operation.
+    /// Encrypts entry.
     /// 加密單一封裝專案。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
     /// </summary>
     /// <param name="plaintext">待加密的純文字資料位元組陣列</param>

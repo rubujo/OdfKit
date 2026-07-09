@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public sealed class OdfTypedDomChildElementRelationCoverage
 {
     /// <summary>
-    /// Executes the OdfTypedDomChildElementRelationCoverage operation.
+    /// Performs odf typed dom child element relation coverage.
     /// 初始化 schema 子元素關係覆蓋專案。
     /// </summary>
     /// <param name="parentNamespaceUri">父元素命名空間 URI</param>

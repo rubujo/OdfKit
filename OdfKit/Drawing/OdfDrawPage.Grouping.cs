@@ -15,8 +15,8 @@ namespace OdfKit.Drawing;
 public partial class OdfDrawPage
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GroupShapes that accepts shapeIds; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeIds；其餘可選參數使用預設值並轉呼叫最長 GroupShapes 多載。
     /// </summary>
     public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds) => GroupShapes(shapeIds, null);
 

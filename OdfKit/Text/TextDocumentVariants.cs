@@ -52,8 +52,8 @@ public sealed class TextTemplateDocument : TextDocument
     public static new Task<TextTemplateDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -66,8 +66,8 @@ public sealed class TextTemplateDocument : TextDocument
     public static new TextTemplateDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public static new TextTemplateDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -89,14 +89,14 @@ public sealed class TextTemplateDocument : TextDocument
     public static new Task<TextTemplateDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -162,8 +162,8 @@ public sealed class TextMasterDocument : TextDocument
     public static new Task<TextMasterDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextMasterDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -176,8 +176,8 @@ public sealed class TextMasterDocument : TextDocument
     public static new TextMasterDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public static new TextMasterDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -199,14 +199,14 @@ public sealed class TextMasterDocument : TextDocument
     public static new Task<TextMasterDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -223,14 +223,14 @@ public sealed class TextMasterDocument : TextDocument
         return results;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of MergeSubDocuments that accepts baseDirectory; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 baseDirectory；其餘可選參數使用預設值並轉呼叫最長 MergeSubDocuments 多載。
     /// </summary>
     public TextDocument MergeSubDocuments(string baseDirectory) => MergeSubDocuments(baseDirectory, null, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of MergeSubDocuments that accepts baseDirectory and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 baseDirectory 與 options；其餘可選參數使用預設值並轉呼叫最長 MergeSubDocuments 多載。
     /// </summary>
     public TextDocument MergeSubDocuments(string baseDirectory, OdfMergeOptions? options) => MergeSubDocuments(baseDirectory, options, 0);
 
@@ -576,8 +576,8 @@ public sealed class TextWebDocument : TextDocument
     public static new Task<TextWebDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextWebDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -590,8 +590,8 @@ public sealed class TextWebDocument : TextDocument
     public static new TextWebDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public static new TextWebDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -613,20 +613,20 @@ public sealed class TextWebDocument : TextDocument
     public static new Task<TextWebDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new Task<TextWebDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
-    /// Executes the CreateFromDocument operation.
+    /// Creates from document.
     /// 從現有的 ODT 文字文件建立新的 OTH 網頁範本文件，完整保留其內容、樣式與母片頁面。
     /// </summary>
     /// <param name="document">The text document used as the web template content source. / 作為網頁範本內容來源的文字文件。</param>
@@ -686,8 +686,8 @@ public sealed class FlatTextDocument : TextDocument
     public static new Task<FlatTextDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<FlatTextDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -700,8 +700,8 @@ public sealed class FlatTextDocument : TextDocument
     public static new FlatTextDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public static new FlatTextDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -723,14 +723,14 @@ public sealed class FlatTextDocument : TextDocument
     public static new Task<FlatTextDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public static new async Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));

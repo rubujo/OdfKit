@@ -16,8 +16,8 @@ public partial class OdfCell
 {
     #region Hyperlink, Rich Text & Annotation
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetHyperlink that accepts url; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 url；其餘可選參數使用預設值並轉呼叫最長 SetHyperlink 多載。
     /// </summary>
     public void SetHyperlink(string url) => SetHyperlink(url, null);
 
@@ -232,14 +232,14 @@ public partial class OdfCell
         return null;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetAnnotation that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 SetAnnotation 多載。
     /// </summary>
     public void SetAnnotation(string text) => SetAnnotation(text, null, false);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetAnnotation that accepts text and author; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text 與 author；其餘可選參數使用預設值並轉呼叫最長 SetAnnotation 多載。
     /// </summary>
     public void SetAnnotation(string text, string? author) => SetAnnotation(text, author, false);
 

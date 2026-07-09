@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
 {
     /// <summary>
-    /// Executes the OdfBorderWidths operation.
+    /// Performs odf border widths.
     /// 以三段邊框線寬 lexical form 建立 <see cref="OdfBorderWidths"/>。
     /// </summary>
     /// <param name="value">三段正長度字串，例如 <c>0.05pt 0.10pt 0.05pt</c></param>
@@ -29,7 +29,7 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     }
 
     /// <summary>
-    /// Executes the OdfBorderWidths operation.
+    /// Performs odf border widths.
     /// 以三個正長度值建立 <see cref="OdfBorderWidths"/>。
     /// </summary>
     /// <param name="innerLineWidth">內側線寬</param>
@@ -74,7 +74,7 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     public OdfLength OuterLineWidth { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析三段邊框線寬字串。
     /// </summary>
     /// <param name="value">三段邊框線寬字串</param>
@@ -93,14 +93,14 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始三段邊框線寬字串。
     /// </summary>
     /// <returns>三段邊框線寬字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一組三段邊框線寬。
     /// </summary>
     /// <param name="other">要比較的三段邊框線寬</param>
@@ -108,21 +108,21 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     public bool Equals(OdfBorderWidths other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfBorderWidths other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩組三段邊框線寬是否相等。
     /// </summary>
     /// <param name="left">左側三段邊框線寬</param>
@@ -131,7 +131,7 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     public static bool operator ==(OdfBorderWidths left, OdfBorderWidths right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩組三段邊框線寬是否不相等。
     /// </summary>
     /// <param name="left">左側三段邊框線寬</param>

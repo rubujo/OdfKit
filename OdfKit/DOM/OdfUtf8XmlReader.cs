@@ -27,7 +27,7 @@ public ref struct OdfUtf8XmlReader
     public readonly int Position => _position;
 
     /// <summary>
-    /// Executes the OdfUtf8XmlReader operation.
+    /// Performs odf utf 8 xml reader.
     /// 初始化 <see cref="OdfUtf8XmlReader"/> 結構的新執行個體。
     /// </summary>
     /// <param name="xml">XML 的 UTF-8 位元組 Span</param>
@@ -40,7 +40,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 拉取並讀取下一個 XML 標記。
     /// </summary>
     /// <param name="token">輸出的標記資訊</param>
@@ -175,7 +175,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
-    /// Executes the ReadValueChunk operation.
+    /// Reads value chunk.
     /// 將目前文字值以 UTF-8 位元組分塊讀入指定緩衝區。
     /// </summary>
     /// <param name="buffer">接收目前文字值片段的緩衝區</param>
@@ -193,14 +193,14 @@ public ref struct OdfUtf8XmlReader
         return count;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CopyValueTo that accepts writer; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 writer；其餘可選參數使用預設值並轉呼叫最長 CopyValueTo 多載。
     /// </summary>
     public int CopyValueTo(IBufferWriter<byte> writer) => CopyValueTo(writer, 81920);
 
 
     /// <summary>
-    /// Executes the CopyValueTo operation.
+    /// Copies value to.
     /// 將目前文字值從目前分塊游標位置直接複製到指定的位元組寫入器。
     /// </summary>
     /// <param name="writer">接收 UTF-8 文字值的位元組寫入器</param>
@@ -293,7 +293,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
-    /// Executes the GetCommonPrefixLength operation.
+    /// Gets common prefix length.
     /// 快速比對常見命名空間字首。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -521,7 +521,7 @@ public ref struct OdfUtf8XmlReader
     internal static int LastEntityFastDecodeCountForTests;
 
     /// <summary>
-    /// Executes the GetStringMaybeDecoded operation.
+    /// Gets string maybe decoded.
     /// 解碼給定 Span 位元組為 UTF-8 字串，並在必要時進行 XML 實體（Entity）解碼。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -875,14 +875,14 @@ public readonly ref struct OdfUtf8XmlToken
     }
 
     /// <summary>
-    /// Executes the GetNameString operation.
+    /// Gets name string.
     /// 取得標記名稱的字串形式。
     /// </summary>
     /// <returns>標記名稱字串</returns>
     public string GetNameString() => Encoding.UTF8.GetString(Name.ToArray());
 
     /// <summary>
-    /// Executes the GetValueString operation.
+    /// Gets value string.
     /// 取得標記值的字串形式。
     /// </summary>
     /// <returns>標記值字串</returns>

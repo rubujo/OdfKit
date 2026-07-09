@@ -14,14 +14,14 @@ public partial class OdfElement
 {
     #region Attribute Values - Style, Form, Table & Media
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleLineBreakAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleLineBreakAttributeValue 多載。
     /// </summary>
     public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri) => GetStyleLineBreakAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleLineBreakAttributeValue operation.
+    /// Gets style line break attribute value.
     /// 取得具有 schema awareness 的斷行規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -34,21 +34,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleLineBreak>(value, OdfElementSchemaRegistry.TryParseStyleLineBreak);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleLineBreakAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleLineBreakAttributeValue 多載。
     /// </summary>
     public void SetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfStyleLineBreak value) => SetStyleLineBreakAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleLineBreakAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleLineBreakAttributeValue 多載。
     /// </summary>
     public void SetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfStyleLineBreak value, string? prefix) => SetStyleLineBreakAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleLineBreakAttributeValue operation.
+    /// Sets style line break attribute value.
     /// 設定具有 schema awareness 的斷行規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -62,14 +62,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleRepeatAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleRepeatAttributeValue 多載。
     /// </summary>
     public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri) => GetStyleRepeatAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleRepeatAttributeValue operation.
+    /// Gets style repeat attribute value.
     /// 取得具有 schema awareness 的背景重複屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -82,21 +82,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleRepeat>(value, OdfElementSchemaRegistry.TryParseStyleRepeat);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleRepeatAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleRepeatAttributeValue 多載。
     /// </summary>
     public void SetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfStyleRepeat value) => SetStyleRepeatAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleRepeatAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleRepeatAttributeValue 多載。
     /// </summary>
     public void SetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfStyleRepeat value, string? prefix) => SetStyleRepeatAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleRepeatAttributeValue operation.
+    /// Sets style repeat attribute value.
     /// 設定具有 schema awareness 的背景重複屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -110,14 +110,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleDirectionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleDirectionAttributeValue 多載。
     /// </summary>
     public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri) => GetStyleDirectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleDirectionAttributeValue operation.
+    /// Gets style direction attribute value.
     /// 取得具有 schema awareness 的樣式方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -130,21 +130,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleDirection>(value, OdfElementSchemaRegistry.TryParseStyleDirection);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleDirectionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleDirectionAttributeValue 多載。
     /// </summary>
     public void SetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfStyleDirection value) => SetStyleDirectionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleDirectionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleDirectionAttributeValue 多載。
     /// </summary>
     public void SetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfStyleDirection value, string? prefix) => SetStyleDirectionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleDirectionAttributeValue operation.
+    /// Sets style direction attribute value.
     /// 設定具有 schema awareness 的樣式方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -158,14 +158,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFormOrientationAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFormOrientationAttributeValue 多載。
     /// </summary>
     public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri) => GetFormOrientationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFormOrientationAttributeValue operation.
+    /// Gets form orientation attribute value.
     /// 取得具有 schema awareness 的表單方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -178,21 +178,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFormOrientation>(value, OdfElementSchemaRegistry.TryParseFormOrientation);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFormOrientationAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFormOrientationAttributeValue 多載。
     /// </summary>
     public void SetFormOrientationAttributeValue(string localName, string namespaceUri, OdfFormOrientation value) => SetFormOrientationAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFormOrientationAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFormOrientationAttributeValue 多載。
     /// </summary>
     public void SetFormOrientationAttributeValue(string localName, string namespaceUri, OdfFormOrientation value, string? prefix) => SetFormOrientationAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFormOrientationAttributeValue operation.
+    /// Sets form orientation attribute value.
     /// 設定具有 schema awareness 的表單方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -206,14 +206,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTableDirectionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetTableDirectionAttributeValue 多載。
     /// </summary>
     public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri) => GetTableDirectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetTableDirectionAttributeValue operation.
+    /// Gets table direction attribute value.
     /// 取得具有 schema awareness 的表格方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -226,21 +226,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableDirection>(value, OdfElementSchemaRegistry.TryParseTableDirection);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableDirectionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetTableDirectionAttributeValue 多載。
     /// </summary>
     public void SetTableDirectionAttributeValue(string localName, string namespaceUri, OdfTableDirection value) => SetTableDirectionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableDirectionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetTableDirectionAttributeValue 多載。
     /// </summary>
     public void SetTableDirectionAttributeValue(string localName, string namespaceUri, OdfTableDirection value, string? prefix) => SetTableDirectionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetTableDirectionAttributeValue operation.
+    /// Sets table direction attribute value.
     /// 設定具有 schema awareness 的表格方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -254,14 +254,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTableOrientationAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetTableOrientationAttributeValue 多載。
     /// </summary>
     public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri) => GetTableOrientationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetTableOrientationAttributeValue operation.
+    /// Gets table orientation attribute value.
     /// 取得具有 schema awareness 的表格方位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -274,21 +274,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableOrientation>(value, OdfElementSchemaRegistry.TryParseTableOrientation);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableOrientationAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetTableOrientationAttributeValue 多載。
     /// </summary>
     public void SetTableOrientationAttributeValue(string localName, string namespaceUri, OdfTableOrientation value) => SetTableOrientationAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableOrientationAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetTableOrientationAttributeValue 多載。
     /// </summary>
     public void SetTableOrientationAttributeValue(string localName, string namespaceUri, OdfTableOrientation value, string? prefix) => SetTableOrientationAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetTableOrientationAttributeValue operation.
+    /// Sets table orientation attribute value.
     /// 設定具有 schema awareness 的表格方位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -302,14 +302,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleFamilyAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleFamilyAttributeValue 多載。
     /// </summary>
     public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri) => GetStyleFamilyAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleFamilyAttributeValue operation.
+    /// Gets style family attribute value.
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -322,21 +322,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleFamily>(value, OdfElementSchemaRegistry.TryParseStyleFamily);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleFamilyAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleFamilyAttributeValue 多載。
     /// </summary>
     public void SetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfStyleFamily value) => SetStyleFamilyAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleFamilyAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleFamilyAttributeValue 多載。
     /// </summary>
     public void SetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfStyleFamily value, string? prefix) => SetStyleFamilyAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleFamilyAttributeValue operation.
+    /// Sets style family attribute value.
     /// 設定具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -350,14 +350,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetOdfVersionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetOdfVersionAttributeValue 多載。
     /// </summary>
     public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri) => GetOdfVersionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetOdfVersionAttributeValue operation.
+    /// Gets odf version attribute value.
     /// 取得具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -370,21 +370,21 @@ public partial class OdfElement
         return OdfElementDomainAttributeAccess.GetVersion(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetOdfVersionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetOdfVersionAttributeValue 多載。
     /// </summary>
     public void SetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion value) => SetOdfVersionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetOdfVersionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetOdfVersionAttributeValue 多載。
     /// </summary>
     public void SetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion value, string? prefix) => SetOdfVersionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetOdfVersionAttributeValue operation.
+    /// Sets odf version attribute value.
     /// 設定具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -398,14 +398,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetMediaTypeAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetMediaTypeAttributeValue 多載。
     /// </summary>
     public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri) => GetMediaTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetMediaTypeAttributeValue operation.
+    /// Gets media type attribute value.
     /// 取得具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -418,21 +418,21 @@ public partial class OdfElement
         return OdfElementDomainAttributeAccess.GetNullable<OdfMediaType>(value, OdfMediaType.TryParse);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetMediaTypeAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetMediaTypeAttributeValue 多載。
     /// </summary>
     public void SetMediaTypeAttributeValue(string localName, string namespaceUri, OdfMediaType value) => SetMediaTypeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetMediaTypeAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetMediaTypeAttributeValue 多載。
     /// </summary>
     public void SetMediaTypeAttributeValue(string localName, string namespaceUri, OdfMediaType value, string? prefix) => SetMediaTypeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetMediaTypeAttributeValue operation.
+    /// Sets media type attribute value.
     /// 設定具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

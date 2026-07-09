@@ -14,13 +14,13 @@ namespace OdfKit.Core;
 public abstract partial class OdfDocument
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Validate that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Validate 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfValidationReport Validate() => Validate(null);
 
     /// <summary>
-    /// Executes the Validate operation.
+    /// Performs the Validate operation.
     /// 驗證目前文件（反映記憶體中尚未儲存的編輯內容）是否符合 ODF 規格。
     /// </summary>
     /// <param name="profile">相容性設定檔；若為 <see langword="null"/> 則使用預設設定檔</param>
@@ -37,21 +37,21 @@ public abstract partial class OdfDocument
         return MergeTopologyReport(packageReport);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateAsync that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ValidateAsync 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task<OdfValidationReport> ValidateAsync() => ValidateAsync(null, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateAsync that accepts profile; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 profile；其餘可選參數使用預設值並轉呼叫最長 ValidateAsync 多載。
     /// </summary>
     public Task<OdfValidationReport> ValidateAsync(OdfComplianceProfile? profile) => ValidateAsync(profile, default);
 
 
 
     /// <summary>
-    /// Executes the ValidateAsync operation.
+    /// Validates async.
     /// 非同步驗證目前文件（反映記憶體中尚未儲存的編輯內容）是否符合 ODF 規格。
     /// </summary>
     /// <param name="profile">相容性設定檔；若為 <see langword="null"/> 則使用預設設定檔</param>

@@ -79,8 +79,8 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         return true;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of EnqueueAsync that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：EnqueueAsync 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public ValueTask EnqueueAsync() => EnqueueAsync(default);
 
@@ -106,8 +106,8 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WaitForIdleAsync that accepts timeout; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 timeout；其餘可選參數使用預設值並轉呼叫最長 WaitForIdleAsync 多載。
     /// </summary>
     public Task WaitForIdleAsync(TimeSpan timeout) => WaitForIdleAsync(timeout, default);
 
@@ -137,8 +137,8 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     public void Dispose()
@@ -167,8 +167,8 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Executes the DisposeAsync operation.
-    /// 執行 DisposeAsync 作業。
+    /// Releases resources for async.
+    /// 釋放 Async 資源。
     /// </summary>
     /// <inheritdoc />
     public async ValueTask DisposeAsync()

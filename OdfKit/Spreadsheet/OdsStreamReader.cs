@@ -368,8 +368,8 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     };
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)

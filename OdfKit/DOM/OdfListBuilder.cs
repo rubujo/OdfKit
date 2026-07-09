@@ -31,7 +31,7 @@ public sealed class OdfListBuilder
     }
 
     /// <summary>
-    /// Executes the Item operation.
+    /// Performs item.
     /// 在當前清單中新增一個清單項目，並寫入純文字內容。
     /// </summary>
     /// <param name="text">項目的純文字內容</param>
@@ -54,7 +54,7 @@ public sealed class OdfListBuilder
     }
 
     /// <summary>
-    /// Executes the Item operation.
+    /// Performs item.
     /// 在當前清單中新增一個清單項目，並允許透過委派對該項目的段落（<see cref="OdfParagraph"/>）進行細部配置。
     /// </summary>
     /// <param name="configure">配置段落的委派動作</param>
@@ -77,14 +77,14 @@ public sealed class OdfListBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SubList that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：SubList 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfListBuilder SubList() => SubList(null);
 
 
     /// <summary>
-    /// Executes the SubList operation.
+    /// Performs sub list.
     /// 在當前清單項目的下方，建立一個子（巢狀）清單。
     /// </summary>
     /// <param name="styleName">子清單的樣式名稱，選填</param>
@@ -103,7 +103,7 @@ public sealed class OdfListBuilder
 
 
     /// <summary>
-    /// Executes the Up operation.
+    /// Performs up.
     /// 回到上層清單建構器（若是頂層清單則回傳自身）。
     /// </summary>
     /// <returns>上層清單建構器執行個體</returns>

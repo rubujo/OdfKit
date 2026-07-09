@@ -29,8 +29,8 @@ public partial class TextDocument
     internal void AddEndnote(OdfParagraph paragraph, string citation, string bodyText) =>
         TextDocumentNotesEngine.AddEndnote(MutationContext, paragraph, citation, bodyText);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddAlphabeticalIndex that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddAlphabeticalIndex 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAlphabeticalIndex AddAlphabeticalIndex() => AddAlphabeticalIndex("Alphabetical Index");
 
@@ -45,8 +45,8 @@ public partial class TextDocument
         TextDocumentNotesEngine.AddAlphabeticalIndex(this, MutationContext, title);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddBibliography that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddBibliography 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfBibliography AddBibliography() => AddBibliography("Bibliography");
 

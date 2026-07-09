@@ -15,26 +15,26 @@ public sealed class OdfSchemaSet
     private readonly IReadOnlyList<OdfSchemaNameClass> _nameClasses;
     private readonly IReadOnlyDictionary<string, OdfSchemaPatternDefinition> _patterns;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaSet that accepts version, sourceUrl, sourceDate, and elements; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 version、sourceUrl、sourceDate 與 elements；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaSet 多載。
     /// </summary>
     public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements) : this(version, sourceUrl, sourceDate, elements, null, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaSet that accepts version, sourceUrl, sourceDate, elements, and attributes; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 version、sourceUrl、sourceDate、elements 與 attributes；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaSet 多載。
     /// </summary>
     public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements, IEnumerable<OdfAttributeDefinition>? attributes) : this(version, sourceUrl, sourceDate, elements, attributes, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaSet that accepts version, sourceUrl, sourceDate, elements, attributes, and nameClasses; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 version、sourceUrl、sourceDate、elements、attributes 與 nameClasses；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaSet 多載。
     /// </summary>
     public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements, IEnumerable<OdfAttributeDefinition>? attributes, IEnumerable<OdfSchemaNameClass>? nameClasses) : this(version, sourceUrl, sourceDate, elements, attributes, nameClasses, null) { }
 
 
     /// <summary>
-    /// Executes the OdfSchemaSet operation.
+    /// Performs odf schema set.
     /// 初始化結構描述中繼資料集的新執行個體。
     /// </summary>
     /// <param name="version">ODF 版本</param>
@@ -119,14 +119,14 @@ public sealed class OdfSchemaSet
     /// </summary>
     public IReadOnlyDictionary<string, OdfSchemaPatternDefinition> Patterns => _patterns;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of MergeWith that accepts additional; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 additional；其餘可選參數使用預設值並轉呼叫最長 MergeWith 多載。
     /// </summary>
     public OdfSchemaSet MergeWith(OdfSchemaSet additional) => MergeWith(additional, false);
 
 
     /// <summary>
-    /// Executes the MergeWith operation.
+    /// Merges with.
     /// 藉由合併此中繼資料與另一個結構描述集，建立新的結構描述集。
     /// </summary>
     /// <param name="additional">要合併的額外結構描述集</param>
@@ -194,7 +194,7 @@ public sealed class OdfSchemaSet
 
 
     /// <summary>
-    /// Executes the FindElement operation.
+    /// Finds element.
     /// 根據命名空間 URI 與區域名稱尋找元素定義。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -208,7 +208,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
-    /// Executes the ContainsElement operation.
+    /// Performs contains element.
     /// 傳回此中繼資料集中是否存在該元素。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -217,7 +217,7 @@ public sealed class OdfSchemaSet
     public bool ContainsElement(string namespaceUri, string localName) => FindElement(namespaceUri, localName) is not null;
 
     /// <summary>
-    /// Executes the FindAttribute operation.
+    /// Finds attribute.
     /// 根據命名空間 URI 與區域名稱尋找屬性定義。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -231,7 +231,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
-    /// Executes the FindPattern operation.
+    /// Finds pattern.
     /// 根據定義名稱尋找具名的 RELAX NG 模式樹。
     /// </summary>
     /// <param name="name">定義名稱</param>
@@ -270,7 +270,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
-    /// Executes the IsNameAllowedByNameClasses operation.
+    /// Returns whether this instance is name allowed by name classes.
     /// 傳回保留的扁平名稱類別集是否允許該限定名稱。
     /// </summary>
     /// <remarks>

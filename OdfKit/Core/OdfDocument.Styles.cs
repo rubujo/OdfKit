@@ -13,7 +13,7 @@ namespace OdfKit.Core;
 public abstract partial class OdfDocument
 {
     /// <summary>
-    /// Executes the GetMasterPages operation.
+    /// Gets master pages.
     /// 取得文件中所有的主控頁面（Master Page）。
     /// </summary>
     /// <returns>主控頁面集合</returns>
@@ -30,7 +30,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the AddMasterPage operation.
+    /// Adds master page.
     /// 新增一個指定名稱的主控頁面（Master Page）。
     /// </summary>
     /// <param name="name">主控頁面的名稱</param>

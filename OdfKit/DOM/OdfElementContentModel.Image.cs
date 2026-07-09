@@ -27,14 +27,14 @@ public partial class OfficeImageElement
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendImageFrame that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendImageFrame 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public DrawFrameElement AppendImageFrame() => AppendImageFrame(null);
 
 
     /// <summary>
-    /// Executes the AppendImageFrame operation.
+    /// Appends image frame.
     /// 在 <c>office:image</c> 末尾新增影像框架。
     /// </summary>
     /// <param name="name">選用的框架名稱</param>

@@ -34,7 +34,7 @@ public static class OdfExternalValidator
 
 
     /// <summary>
-    /// Executes the ValidateWithOdfValidator operation.
+    /// Validates with odf validator.
     /// 使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
     /// <param name="filePath">要驗證的 ODF 文件路徑</param>
@@ -80,7 +80,7 @@ public static class OdfExternalValidator
 
 
     /// <summary>
-    /// Executes the ValidateWithOdfValidatorAsync operation.
+    /// Validates with odf validator async.
     /// 非同步使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
     /// <remarks>
@@ -129,7 +129,7 @@ public static class OdfExternalValidator
 
 
     /// <summary>
-    /// Executes the ValidateWithCommand operation.
+    /// Validates with command.
     /// 執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
     /// <param name="commandPath">外部命令路徑</param>
@@ -159,7 +159,7 @@ public static class OdfExternalValidator
 
 
     /// <summary>
-    /// Executes the ValidateWithCommandAsync operation.
+    /// Validates with command async.
     /// 非同步執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
     /// <remarks>

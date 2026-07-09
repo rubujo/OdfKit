@@ -94,7 +94,7 @@ public partial class TableTableElement
         public OdfCellView Current { get; private set; }
 
         /// <summary>
-        /// Executes the MoveNext operation.
+        /// Performs move next.
         /// 移至下一個儲存格檢視。
         /// </summary>
         /// <returns>若成功移至下一筆資料則為 <see langword="true"/>；否則為 <see langword="false"/></returns>

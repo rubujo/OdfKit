@@ -12,7 +12,7 @@ public sealed class OdfSchemaPatternDefinition
     private readonly IReadOnlyList<OdfSchemaPatternNode> _roots;
 
     /// <summary>
-    /// Executes the OdfSchemaPatternDefinition operation.
+    /// Performs odf schema pattern definition.
     /// 初始化命名模式定義的新執行個體。
     /// </summary>
     /// <param name="name">定義名稱</param>

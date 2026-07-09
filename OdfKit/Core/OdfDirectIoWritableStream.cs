@@ -97,8 +97,8 @@ public sealed class OdfDirectIoWritableStream : Stream
     public override bool CanWrite => !_isDisposed;
 
     /// <summary>
-    /// Executes the Length operation.
-    /// 執行 Length 作業。
+    /// Performs length.
+    /// 執行 Length。
     /// </summary>
     /// <inheritdoc />
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
@@ -115,8 +115,8 @@ public sealed class OdfDirectIoWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Flush operation.
-    /// 執行 Flush 作業。
+    /// Performs flush.
+    /// 執行 Flush。
     /// </summary>
     /// <inheritdoc />
     public override void Flush()
@@ -128,28 +128,28 @@ public sealed class OdfDirectIoWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 執行 Read 作業。
     /// </summary>
     /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the Seek operation.
-    /// 執行 Seek 作業。
+    /// Performs seek.
+    /// 執行 Seek。
     /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the SetLength operation.
-    /// 執行 SetLength 作業。
+    /// Sets length.
+    /// 設定 Length。
     /// </summary>
     /// <inheritdoc />
     public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the Write operation.
+    /// Performs the Write operation.
     /// 執行 Write 作業。
     /// </summary>
     /// <inheritdoc />
@@ -212,8 +212,8 @@ public sealed class OdfDirectIoWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the WriteAsync operation.
-    /// 執行 WriteAsync 作業。
+    /// Writes async.
+    /// 寫入 Async。
     /// </summary>
     /// <inheritdoc />
     public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -235,8 +235,8 @@ public sealed class OdfDirectIoWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)

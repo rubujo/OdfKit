@@ -19,7 +19,7 @@ public sealed class OdfTransaction : IDisposable
     }
 
     /// <summary>
-    /// Executes the Begin operation.
+    /// Performs begin.
     /// 開始一個新的沙盒事務。
     /// </summary>
     /// <param name="package">要保護的 OdfPackage</param>
@@ -30,7 +30,7 @@ public sealed class OdfTransaction : IDisposable
     }
 
     /// <summary>
-    /// Executes the Commit operation.
+    /// Performs commit.
     /// 提交事務，確認所有修改。
     /// </summary>
     public void Commit()
@@ -43,7 +43,7 @@ public sealed class OdfTransaction : IDisposable
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
+    /// Releases unmanaged resources.
     /// 釋放並結束事務。如果未呼叫 Commit，將自動進行 Rollback。
     /// </summary>
     public void Dispose()

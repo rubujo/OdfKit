@@ -13,32 +13,32 @@ public sealed class OdfSchemaPatternNode
     private readonly IReadOnlyList<OdfSchemaPatternNode> _children;
     private readonly IReadOnlyList<OdfSchemaDatatypeParameter> _dataParameters;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaPatternNode that accepts kind, occurrence, namespaceUri, localName, referenceName, dataType, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 kind、occurrence、namespaceUri、localName、referenceName、dataType 與 value；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaPatternNode 多載。
     /// </summary>
     public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, null, null, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaPatternNode that accepts kind, occurrence, namespaceUri, localName, referenceName, dataType, value, and nameClasses; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 kind、occurrence、namespaceUri、localName、referenceName、dataType、value 與 nameClasses；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaPatternNode 多載。
     /// </summary>
     public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, null, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaPatternNode that accepts kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, and children; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 kind、occurrence、namespaceUri、localName、referenceName、dataType、value、nameClasses 與 children；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaPatternNode 多載。
     /// </summary>
     public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternNode>? children) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, children, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaPatternNode that accepts kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, and children; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 kind、occurrence、namespaceUri、localName、referenceName、dataType、value、nameClasses 與 children；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaPatternNode 多載。
     /// </summary>
     public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternNode>? children, IEnumerable<KeyValuePair<string, string>>? dataParameters) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, children, dataParameters, null) { }
 
 
     /// <summary>
-    /// Executes the OdfSchemaPatternNode operation.
+    /// Performs odf schema pattern node.
     /// 初始化模式節點中繼資料專案的新執行個體。
     /// </summary>
     /// <param name="kind">模式節點種類</param>

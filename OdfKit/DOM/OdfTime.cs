@@ -13,7 +13,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     private static readonly TimeSpan MaximumTimezoneOffset = TimeSpan.FromHours(14);
 
     /// <summary>
-    /// Executes the OdfTime operation.
+    /// Performs odf time.
     /// 使用沒有時區 offset 的日內時間建立 <see cref="OdfTime"/>。
     /// </summary>
     /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00</param>
@@ -23,7 +23,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     }
 
     /// <summary>
-    /// Executes the OdfTime operation.
+    /// Performs odf time.
     /// 使用日內時間與選用時區 offset 建立 <see cref="OdfTime"/>。
     /// </summary>
     /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00</param>
@@ -58,7 +58,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     public TimeSpan? Offset { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析 XML Schema <c>time</c> 字串。
     /// </summary>
     /// <param name="value">要解析的字串</param>
@@ -102,7 +102,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回 XML Schema <c>time</c> 字串。
     /// </summary>
     /// <returns>可寫入 ODF 屬性的時間字串</returns>
@@ -131,7 +131,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     }
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個 ODF 時間。
     /// </summary>
     /// <param name="other">要比較的 ODF 時間</param>
@@ -139,21 +139,21 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     public bool Equals(OdfTime other) => TimeOfDay == other.TimeOfDay && Offset == other.Offset;
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfTime other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(TimeOfDay, Offset);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 ODF 時間是否相等。
     /// </summary>
     /// <param name="left">左側 ODF 時間</param>
@@ -162,7 +162,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     public static bool operator ==(OdfTime left, OdfTime right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 ODF 時間是否不相等。
     /// </summary>
     /// <param name="left">左側 ODF 時間</param>

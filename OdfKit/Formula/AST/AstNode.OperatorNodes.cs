@@ -14,15 +14,15 @@ namespace OdfKit.Formula.AST;
 public class UnaryNode(char op, AstNode child) : AstNode
 {
     /// <summary>
-    /// Executes the GetRanges operation.
-    /// 執行 GetRanges 作業。
+    /// Gets ranges.
+    /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => child.GetRanges(context);
 
     /// <summary>
-    /// Executes the Evaluate operation.
-    /// 執行 Evaluate 作業。
+    /// Performs evaluate.
+    /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
@@ -53,8 +53,8 @@ public class UnaryNode(char op, AstNode child) : AstNode
     }
 
     /// <summary>
-    /// Executes the Serialize operation.
-    /// 執行 Serialize 作業。
+    /// Performs serialize.
+    /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
     public override string Serialize()
@@ -75,8 +75,8 @@ public class UnaryNode(char op, AstNode child) : AstNode
 public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 {
     /// <summary>
-    /// Executes the GetRanges operation.
-    /// 執行 GetRanges 作業。
+    /// Gets ranges.
+    /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
@@ -88,8 +88,8 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     }
 
     /// <summary>
-    /// Executes the Evaluate operation.
-    /// 執行 Evaluate 作業。
+    /// Performs evaluate.
+    /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
@@ -187,8 +187,8 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     }
 
     /// <summary>
-    /// Executes the Serialize operation.
-    /// 執行 Serialize 作業。
+    /// Performs serialize.
+    /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}{op}{right.Serialize()}";

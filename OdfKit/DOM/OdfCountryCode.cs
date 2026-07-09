@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
 {
     /// <summary>
-    /// Executes the OdfCountryCode operation.
+    /// Performs odf country code.
     /// 以國別代碼 lexical form 建立 <see cref="OdfCountryCode"/>。
     /// </summary>
     /// <param name="value">國別代碼，例如 <c>US</c> 或 <c>TW</c></param>
@@ -31,7 +31,7 @@ public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析國別代碼。
     /// </summary>
     /// <param name="value">國別代碼字串</param>
@@ -50,14 +50,14 @@ public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始國別代碼字串。
     /// </summary>
     /// <returns>國別代碼字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個國別代碼。
     /// </summary>
     /// <param name="other">要比較的國別代碼</param>
@@ -65,21 +65,21 @@ public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
     public bool Equals(OdfCountryCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfCountryCode other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個國別代碼是否相等。
     /// </summary>
     /// <param name="left">左側國別代碼</param>
@@ -88,7 +88,7 @@ public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
     public static bool operator ==(OdfCountryCode left, OdfCountryCode right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個國別代碼是否不相等。
     /// </summary>
     /// <param name="left">左側國別代碼</param>

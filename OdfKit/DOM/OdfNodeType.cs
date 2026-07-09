@@ -52,7 +52,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     public string NamespaceUri { get; } = OdfAttributeStringPool.InternName(namespaceUri);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 指示目前物件是否等於另一個相同類型的物件。
     /// </summary>
     /// <param name="other">要與目前物件進行比較的物件</param>
@@ -62,7 +62,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
         string.Equals(NamespaceUri, other.NamespaceUri, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 指示此執行個體與指定的物件是否相等。
     /// </summary>
     /// <param name="obj">要比較的物件</param>
@@ -70,7 +70,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     public override bool Equals(object? obj) => obj is OdfAttributeName name && Equals(name);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
+    /// Gets hash code.
     /// 傳回此執行個體的雜湊碼。
     /// </summary>
     /// <returns>32 位元有號整數雜湊碼</returns>

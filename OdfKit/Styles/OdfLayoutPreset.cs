@@ -7,7 +7,7 @@
 public sealed class OdfLayoutPreset
 {
     /// <summary>
-    /// Executes the BusinessDeck operation.
+    /// Performs business deck.
     /// 取得適合年度報告與商業簡報的內建版面。
     /// </summary>
     public static OdfLayoutPreset BusinessDeck => new()
@@ -21,7 +21,7 @@ public sealed class OdfLayoutPreset
     };
 
     /// <summary>
-    /// Executes the FlowDiagram operation.
+    /// Performs flow diagram.
     /// 取得適合流程圖與架構圖的內建版面。
     /// </summary>
     public static OdfLayoutPreset FlowDiagram => new()
@@ -80,7 +80,7 @@ public sealed class OdfLayoutPreset
     public double FlowNodeGapCm { get; set; } = 2;
 
     /// <summary>
-    /// Executes the GetFlowNodeBounds operation.
+    /// Gets flow node bounds.
     /// 依序號取得流程圖節點區塊。
     /// </summary>
     /// <param name="index">流程圖節點序號</param>

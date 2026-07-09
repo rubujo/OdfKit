@@ -11,7 +11,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressList>
 {
     /// <summary>
-    /// Executes the OdfCellRangeAddressList operation.
+    /// Performs odf cell range address list.
     /// 以儲存格範圍位址清單 lexical form 建立 <see cref="OdfCellRangeAddressList"/>。
     /// </summary>
     /// <param name="value">以空白分隔的儲存格範圍位址清單</param>
@@ -28,7 +28,7 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     }
 
     /// <summary>
-    /// Executes the OdfCellRangeAddressList operation.
+    /// Performs odf cell range address list.
     /// 以儲存格範圍位址集合建立 <see cref="OdfCellRangeAddressList"/>。
     /// </summary>
     /// <param name="ranges">要寫入的儲存格範圍位址集合</param>
@@ -58,7 +58,7 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     public IReadOnlyList<OdfCellRangeAddress> Ranges { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析儲存格範圍位址清單。
     /// </summary>
     /// <param name="value">儲存格範圍位址清單字串</param>
@@ -77,14 +77,14 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始儲存格範圍位址清單字串。
     /// </summary>
     /// <returns>儲存格範圍位址清單字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個儲存格範圍位址清單。
     /// </summary>
     /// <param name="other">要比較的儲存格範圍位址清單</param>
@@ -92,21 +92,21 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     public bool Equals(OdfCellRangeAddressList other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfCellRangeAddressList other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個儲存格範圍位址清單是否相等。
     /// </summary>
     /// <param name="left">左側儲存格範圍位址清單</param>
@@ -115,7 +115,7 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     public static bool operator ==(OdfCellRangeAddressList left, OdfCellRangeAddressList right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個儲存格範圍位址清單是否不相等。
     /// </summary>
     /// <param name="left">左側儲存格範圍位址清單</param>

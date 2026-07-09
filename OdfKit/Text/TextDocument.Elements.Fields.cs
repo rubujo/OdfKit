@@ -11,8 +11,8 @@ public partial class TextDocument
 {
     #region Document Elements - Fields & Variables
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddParagraph that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddParagraph 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraph AddParagraph() => AddParagraph("");
 
@@ -27,8 +27,8 @@ public partial class TextDocument
         TextDocumentFieldsEngine.AddParagraph(this, MutationContext, text);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BeginParagraphPrebinding that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：BeginParagraphPrebinding 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraphPrebindingWriter BeginParagraphPrebinding() => BeginParagraphPrebinding(null);
 
@@ -53,8 +53,8 @@ public partial class TextDocument
     public OdfHeading AddHeading(string text, int outlineLevel) =>
         TextDocumentFieldsEngine.AddHeading(this, MutationContext, text, outlineLevel);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddList that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddList 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfList AddList() => AddList(null);
 
@@ -79,14 +79,14 @@ public partial class TextDocument
     public OdfList AddListWithStyle(string styleName, IReadOnlyList<OdfListLevelStyle> levels) =>
         TextDocumentFieldsEngine.AddListWithStyle(this, MutationContext, styleName, levels);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExtractFields that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ExtractFields 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public IReadOnlyDictionary<string, string> ExtractFields() => ExtractFields("[", "]");
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExtractFields that accepts startDelimiter; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 startDelimiter；其餘可選參數使用預設值並轉呼叫最長 ExtractFields 多載。
     /// </summary>
     public IReadOnlyDictionary<string, string> ExtractFields(string startDelimiter) => ExtractFields(startDelimiter, "]");
 
@@ -105,14 +105,14 @@ public partial class TextDocument
         TextDocumentFieldExtractionEngine.ExtractFieldValues(this, startDelimiter, endDelimiter);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExtractFieldInfos that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ExtractFieldInfos 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos() => ExtractFieldInfos("[", "]");
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExtractFieldInfos that accepts startDelimiter; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 startDelimiter；其餘可選參數使用預設值並轉呼叫最長 ExtractFieldInfos 多載。
     /// </summary>
     public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos(string startDelimiter) => ExtractFieldInfos(startDelimiter, "]");
 

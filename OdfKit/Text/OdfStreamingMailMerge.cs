@@ -30,8 +30,8 @@ public static partial class OdfStreamingMailMerge
     public static Task ApplyTemplateAsync(Stream templateStream, Stream outputStream, IDictionary<string, object?> data) => ApplyTemplateAsync(templateStream, outputStream, data, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ApplyTemplateAsync that accepts templateStream, outputStream, and cancellationToken.
+    /// ApplyTemplateAsync 完整多載：接受 templateStream、outputStream 與 cancellationToken。
     /// </summary>
     public static async Task ApplyTemplateAsync(
         Stream templateStream,
@@ -85,14 +85,14 @@ public static partial class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Executes the ApplyBatchTemplateAsync operation.
+    /// Applies batch template async.
     /// 非同步套用批次範本資料合併，並將結果輸出至目標串流。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ApplyBatchTemplateAsync that accepts templateStream, outputStream, and cancellationToken.
+    /// ApplyBatchTemplateAsync 完整多載：接受 templateStream、outputStream 與 cancellationToken。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
@@ -115,14 +115,14 @@ public static partial class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Executes the ApplyBatchTemplateAsync operation.
+    /// Applies batch template async.
     /// 非同步套用批次範本資料合併，資料序列以非同步方式列舉，並將結果輸出至目標串流。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IAsyncEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ApplyBatchTemplateAsync that accepts templateStream, outputStream, and cancellationToken.
+    /// ApplyBatchTemplateAsync 完整多載：接受 templateStream、outputStream 與 cancellationToken。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
@@ -286,14 +286,14 @@ public static partial class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Executes the ApplyBatchTemplateAsync operation.
+    /// Applies batch template async.
     /// 非同步套用批次範本資料合併，支援 DbDataReader，並將結果輸出至目標串流。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, DbDataReader reader) => ApplyBatchTemplateAsync(templateStream, outputStream, reader, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ApplyBatchTemplateAsync that accepts templateStream, outputStream, reader, and cancellationToken.
+    /// ApplyBatchTemplateAsync 完整多載：接受 templateStream、outputStream、reader 與 cancellationToken。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,

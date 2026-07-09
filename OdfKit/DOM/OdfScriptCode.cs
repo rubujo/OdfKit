@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfScriptCode : IEquatable<OdfScriptCode>
 {
     /// <summary>
-    /// Executes the OdfScriptCode operation.
+    /// Performs odf script code.
     /// 以文字系統代碼 lexical form 建立 <see cref="OdfScriptCode"/>。
     /// </summary>
     /// <param name="value">文字系統代碼，例如 <c>Latn</c> 或 <c>Hant</c></param>
@@ -31,7 +31,7 @@ public readonly struct OdfScriptCode : IEquatable<OdfScriptCode>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析文字系統代碼。
     /// </summary>
     /// <param name="value">文字系統代碼字串</param>
@@ -50,14 +50,14 @@ public readonly struct OdfScriptCode : IEquatable<OdfScriptCode>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始文字系統代碼字串。
     /// </summary>
     /// <returns>文字系統代碼字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個文字系統代碼。
     /// </summary>
     /// <param name="other">要比較的文字系統代碼</param>
@@ -65,21 +65,21 @@ public readonly struct OdfScriptCode : IEquatable<OdfScriptCode>
     public bool Equals(OdfScriptCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfScriptCode other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個文字系統代碼是否相等。
     /// </summary>
     /// <param name="left">左側文字系統代碼</param>
@@ -88,7 +88,7 @@ public readonly struct OdfScriptCode : IEquatable<OdfScriptCode>
     public static bool operator ==(OdfScriptCode left, OdfScriptCode right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個文字系統代碼是否不相等。
     /// </summary>
     /// <param name="left">左側文字系統代碼</param>

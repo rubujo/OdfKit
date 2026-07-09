@@ -52,7 +52,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the ImportData operation.
+    /// Imports data.
     /// 將 <see cref="DataTable"/> 的資料逐列匯入至目前表格。
     /// </summary>
     /// <param name="table">資料表</param>
@@ -77,7 +77,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the ImportData operation.
+    /// Imports data.
     /// 將實體集合逐列匯入至目前表格。
     /// </summary>
     /// <typeparam name="T">資料列型別</typeparam>

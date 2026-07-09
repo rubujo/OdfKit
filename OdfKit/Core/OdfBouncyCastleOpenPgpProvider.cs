@@ -56,13 +56,13 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         };
 
     /// <summary>
-    /// Executes the OdfBouncyCastleOpenPgpProvider operation.
+    /// Performs odf bouncy castle open pgp provider.
     /// 建立僅支援加密（無法解密）的提供者實例。
     /// </summary>
     public OdfBouncyCastleOpenPgpProvider() { }
 
     /// <summary>
-    /// Executes the OdfBouncyCastleOpenPgpProvider operation.
+    /// Performs odf bouncy castle open pgp provider.
     /// 建立同時支援加密與解密的提供者實例。
     /// </summary>
     /// <param name="secretKeyRingData">
@@ -79,8 +79,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     }
 
     /// <summary>
-    /// Executes the EncryptSessionKey operation.
-    /// 執行 EncryptSessionKey 作業。
+    /// Encrypts session key.
+    /// 加密 Session Key。
     /// </summary>
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException"><paramref name="sessionKey"/> 或 <paramref name="recipient"/> 為 null</exception>
@@ -105,8 +105,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     }
 
     /// <summary>
-    /// Executes the DecryptSessionKey operation.
-    /// 執行 DecryptSessionKey 作業。
+    /// Decrypts session key.
+    /// 解密 Session Key。
     /// </summary>
     /// <inheritdoc />
     /// <exception cref="InvalidOperationException">此實例以純加密模式建立，無法執行解密</exception>

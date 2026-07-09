@@ -65,7 +65,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the Find operation.
+    /// Performs the Find operation.
     /// 搜尋符合條件的第一個子節點（與 <see cref="List{T}.Find"/> 語意相同）。
     /// </summary>
     public OdfNode? Find(Predicate<OdfNode> match)
@@ -87,14 +87,14 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the Add operation.
+    /// Performs the Add operation.
     /// 執行 Add 作業。
     /// </summary>
     /// <inheritdoc />
     public void Add(OdfNode item) => Append(item);
 
     /// <summary>
-    /// Executes the Clear operation.
+    /// Performs the Clear operation.
     /// 執行 Clear 作業。
     /// </summary>
     /// <inheritdoc />
@@ -110,8 +110,8 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the Contains operation.
-    /// 執行 Contains 作業。
+    /// Performs contains.
+    /// 執行 Contains。
     /// </summary>
     /// <inheritdoc />
     public bool Contains(OdfNode item)
@@ -121,8 +121,8 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the CopyTo operation.
-    /// 執行 CopyTo 作業。
+    /// Copies to.
+    /// 複製 To。
     /// </summary>
     /// <inheritdoc />
     public void CopyTo(OdfNode[] array, int arrayIndex)
@@ -150,8 +150,8 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the GetEnumerator operation.
-    /// 執行 GetEnumerator 作業。
+    /// Gets enumerator.
+    /// 取得 Enumerator。
     /// </summary>
     /// <inheritdoc />
     public IEnumerator<OdfNode> GetEnumerator()
@@ -164,8 +164,8 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the IndexOf operation.
-    /// 執行 IndexOf 作業。
+    /// Performs index of.
+    /// 執行 Index Of。
     /// </summary>
     /// <inheritdoc />
     public int IndexOf(OdfNode item)
@@ -196,7 +196,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the Insert operation.
+    /// Performs the Insert operation.
     /// 執行 Insert 作業。
     /// </summary>
     /// <inheritdoc />
@@ -219,7 +219,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the Remove operation.
+    /// Performs the Remove operation.
     /// 執行 Remove 作業。
     /// </summary>
     /// <inheritdoc />
@@ -235,8 +235,8 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
-    /// Executes the RemoveAt operation.
-    /// 執行 RemoveAt 作業。
+    /// Removes at.
+    /// 移除 At。
     /// </summary>
     /// <inheritdoc />
     public void RemoveAt(int index)

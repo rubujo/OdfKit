@@ -13,14 +13,14 @@ public partial class OdfElement
 {
     #region Attribute Accessors - FO, Draw & Position
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFoTextTransformAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFoTextTransformAttributeValue 多載。
     /// </summary>
     public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri) => GetFoTextTransformAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFoTextTransformAttributeValue operation.
+    /// Gets fo text transform attribute value.
     /// 取得具有 schema awareness 的 FO 文字轉換屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -33,21 +33,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextTransform>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoTextTransformAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFoTextTransformAttributeValue 多載。
     /// </summary>
     public void SetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfFoTextTransform value) => SetFoTextTransformAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoTextTransformAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFoTextTransformAttributeValue 多載。
     /// </summary>
     public void SetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfFoTextTransform value, string? prefix) => SetFoTextTransformAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFoTextTransformAttributeValue operation.
+    /// Sets fo text transform attribute value.
     /// 設定具有 schema awareness 的 FO 文字轉換屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,14 +61,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFoTextAlignAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFoTextAlignAttributeValue 多載。
     /// </summary>
     public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri) => GetFoTextAlignAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFoTextAlignAttributeValue operation.
+    /// Gets fo text align attribute value.
     /// 取得具有 schema awareness 的 FO 文字對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -81,21 +81,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextAlign>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoTextAlignAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFoTextAlignAttributeValue 多載。
     /// </summary>
     public void SetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfFoTextAlign value) => SetFoTextAlignAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoTextAlignAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFoTextAlignAttributeValue 多載。
     /// </summary>
     public void SetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfFoTextAlign value, string? prefix) => SetFoTextAlignAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFoTextAlignAttributeValue operation.
+    /// Sets fo text align attribute value.
     /// 設定具有 schema awareness 的 FO 文字對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -109,14 +109,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleTextRotationScaleAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleTextRotationScaleAttributeValue 多載。
     /// </summary>
     public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri) => GetStyleTextRotationScaleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleTextRotationScaleAttributeValue operation.
+    /// Gets style text rotation scale attribute value.
     /// 取得具有 schema awareness 的樣式文字旋轉縮放屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -129,21 +129,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextRotationScale>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleTextRotationScaleAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleTextRotationScaleAttributeValue 多載。
     /// </summary>
     public void SetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfStyleTextRotationScale value) => SetStyleTextRotationScaleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleTextRotationScaleAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleTextRotationScaleAttributeValue 多載。
     /// </summary>
     public void SetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfStyleTextRotationScale value, string? prefix) => SetStyleTextRotationScaleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleTextRotationScaleAttributeValue operation.
+    /// Sets style text rotation scale attribute value.
     /// 設定具有 schema awareness 的樣式文字旋轉縮放屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -157,14 +157,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleTextCombineAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleTextCombineAttributeValue 多載。
     /// </summary>
     public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri) => GetStyleTextCombineAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleTextCombineAttributeValue operation.
+    /// Gets style text combine attribute value.
     /// 取得具有 schema awareness 的樣式文字組合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -177,21 +177,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextCombine>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleTextCombineAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleTextCombineAttributeValue 多載。
     /// </summary>
     public void SetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfStyleTextCombine value) => SetStyleTextCombineAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleTextCombineAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleTextCombineAttributeValue 多載。
     /// </summary>
     public void SetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfStyleTextCombine value, string? prefix) => SetStyleTextCombineAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleTextCombineAttributeValue operation.
+    /// Sets style text combine attribute value.
     /// 設定具有 schema awareness 的樣式文字組合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,14 +205,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDrawFillAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDrawFillAttributeValue 多載。
     /// </summary>
     public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri) => GetDrawFillAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDrawFillAttributeValue operation.
+    /// Gets draw fill attribute value.
     /// 取得具有 schema awareness 的繪圖填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -225,21 +225,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFill>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawFillAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDrawFillAttributeValue 多載。
     /// </summary>
     public void SetDrawFillAttributeValue(string localName, string namespaceUri, OdfDrawFill value) => SetDrawFillAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawFillAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDrawFillAttributeValue 多載。
     /// </summary>
     public void SetDrawFillAttributeValue(string localName, string namespaceUri, OdfDrawFill value, string? prefix) => SetDrawFillAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDrawFillAttributeValue operation.
+    /// Sets draw fill attribute value.
     /// 設定具有 schema awareness 的繪圖填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -253,14 +253,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetSmilFillAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetSmilFillAttributeValue 多載。
     /// </summary>
     public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri) => GetSmilFillAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetSmilFillAttributeValue operation.
+    /// Gets smil fill attribute value.
     /// 取得具有 schema awareness 的 SMIL 動畫填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -273,21 +273,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfSmilFill>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSmilFillAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetSmilFillAttributeValue 多載。
     /// </summary>
     public void SetSmilFillAttributeValue(string localName, string namespaceUri, OdfSmilFill value) => SetSmilFillAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSmilFillAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetSmilFillAttributeValue 多載。
     /// </summary>
     public void SetSmilFillAttributeValue(string localName, string namespaceUri, OdfSmilFill value, string? prefix) => SetSmilFillAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetSmilFillAttributeValue operation.
+    /// Sets smil fill attribute value.
     /// 設定具有 schema awareness 的 SMIL 動畫填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -301,14 +301,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDrawFillImageRefPointAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDrawFillImageRefPointAttributeValue 多載。
     /// </summary>
     public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri) => GetDrawFillImageRefPointAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDrawFillImageRefPointAttributeValue operation.
+    /// Gets draw fill image ref point attribute value.
     /// 取得具有 schema awareness 的繪圖填滿圖片參照點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -321,21 +321,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFillImageRefPoint>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawFillImageRefPointAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDrawFillImageRefPointAttributeValue 多載。
     /// </summary>
     public void SetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfDrawFillImageRefPoint value) => SetDrawFillImageRefPointAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawFillImageRefPointAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDrawFillImageRefPointAttributeValue 多載。
     /// </summary>
     public void SetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfDrawFillImageRefPoint value, string? prefix) => SetDrawFillImageRefPointAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDrawFillImageRefPointAttributeValue operation.
+    /// Sets draw fill image ref point attribute value.
     /// 設定具有 schema awareness 的繪圖填滿圖片參照點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -349,14 +349,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDrawColorModeAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDrawColorModeAttributeValue 多載。
     /// </summary>
     public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri) => GetDrawColorModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDrawColorModeAttributeValue operation.
+    /// Gets draw color mode attribute value.
     /// 取得具有 schema awareness 的繪圖色彩模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -369,21 +369,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawColorMode>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawColorModeAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDrawColorModeAttributeValue 多載。
     /// </summary>
     public void SetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfDrawColorMode value) => SetDrawColorModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawColorModeAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDrawColorModeAttributeValue 多載。
     /// </summary>
     public void SetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfDrawColorMode value, string? prefix) => SetDrawColorModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDrawColorModeAttributeValue operation.
+    /// Sets draw color mode attribute value.
     /// 設定具有 schema awareness 的繪圖色彩模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -397,14 +397,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleVerticalAlignAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleVerticalAlignAttributeValue 多載。
     /// </summary>
     public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri) => GetStyleVerticalAlignAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleVerticalAlignAttributeValue operation.
+    /// Gets style vertical align attribute value.
     /// 取得具有 schema awareness 的樣式垂直對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -417,21 +417,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalAlign>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalAlignAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalAlignAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfStyleVerticalAlign value) => SetStyleVerticalAlignAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalAlignAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalAlignAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfStyleVerticalAlign value, string? prefix) => SetStyleVerticalAlignAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleVerticalAlignAttributeValue operation.
+    /// Sets style vertical align attribute value.
     /// 設定具有 schema awareness 的樣式垂直對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -445,14 +445,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleVerticalPosAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleVerticalPosAttributeValue 多載。
     /// </summary>
     public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri) => GetStyleVerticalPosAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleVerticalPosAttributeValue operation.
+    /// Gets style vertical pos attribute value.
     /// 取得具有 schema awareness 的樣式垂直位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -465,21 +465,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalPos>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalPosAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalPosAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfStyleVerticalPos value) => SetStyleVerticalPosAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalPosAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalPosAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfStyleVerticalPos value, string? prefix) => SetStyleVerticalPosAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleVerticalPosAttributeValue operation.
+    /// Sets style vertical pos attribute value.
     /// 設定具有 schema awareness 的樣式垂直位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -493,14 +493,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleVerticalRelAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleVerticalRelAttributeValue 多載。
     /// </summary>
     public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri) => GetStyleVerticalRelAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleVerticalRelAttributeValue operation.
+    /// Gets style vertical rel attribute value.
     /// 取得具有 schema awareness 的樣式垂直相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -513,21 +513,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalRel>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalRelAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalRelAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfStyleVerticalRel value) => SetStyleVerticalRelAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleVerticalRelAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleVerticalRelAttributeValue 多載。
     /// </summary>
     public void SetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfStyleVerticalRel value, string? prefix) => SetStyleVerticalRelAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleVerticalRelAttributeValue operation.
+    /// Sets style vertical rel attribute value.
     /// 設定具有 schema awareness 的樣式垂直相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -541,14 +541,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetStyleHorizontalPosAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetStyleHorizontalPosAttributeValue 多載。
     /// </summary>
     public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri) => GetStyleHorizontalPosAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetStyleHorizontalPosAttributeValue operation.
+    /// Gets style horizontal pos attribute value.
     /// 取得具有 schema awareness 的樣式水平位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -561,21 +561,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleHorizontalPos>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleHorizontalPosAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetStyleHorizontalPosAttributeValue 多載。
     /// </summary>
     public void SetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalPos value) => SetStyleHorizontalPosAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetStyleHorizontalPosAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetStyleHorizontalPosAttributeValue 多載。
     /// </summary>
     public void SetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalPos value, string? prefix) => SetStyleHorizontalPosAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetStyleHorizontalPosAttributeValue operation.
+    /// Sets style horizontal pos attribute value.
     /// 設定具有 schema awareness 的樣式水平位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

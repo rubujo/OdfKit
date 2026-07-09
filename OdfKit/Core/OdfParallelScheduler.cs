@@ -70,14 +70,14 @@ public static class OdfParallelScheduler
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetEffectiveConcurrency that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：GetEffectiveConcurrency 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static int GetEffectiveConcurrency() => GetEffectiveConcurrency(0);
 
 
     /// <summary>
-    /// Executes the GetEffectiveConcurrency operation.
+    /// Gets effective concurrency.
     /// 依指定的平行度與目前核心預留比例，計算實際可使用的工作平行度。
     /// </summary>
     /// <param name="requestedMaxConcurrency">呼叫端要求的最大平行度；小於 1 時自動依核心數與預留比例計算</param>

@@ -20,8 +20,8 @@ public sealed class OdfCrc32Stream : Stream
     private uint _currentCrc = 0xFFFFFFFF;
 #endif
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfCrc32Stream that accepts underlyingStream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 underlyingStream；其餘可選參數使用預設值並轉呼叫最長 OdfCrc32Stream 多載。
     /// </summary>
     public OdfCrc32Stream(Stream underlyingStream) : this(underlyingStream, null) { }
 
@@ -93,28 +93,28 @@ public sealed class OdfCrc32Stream : Stream
     }
 
     /// <summary>
-    /// Executes the Flush operation.
-    /// 執行 Flush 作業。
+    /// Performs flush.
+    /// 執行 Flush。
     /// </summary>
     /// <inheritdoc />
     public override void Flush() => _underlyingStream.Flush();
 
     /// <summary>
-    /// Executes the Seek operation.
-    /// 執行 Seek 作業。
+    /// Performs seek.
+    /// 執行 Seek。
     /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin) => _underlyingStream.Seek(offset, origin);
 
     /// <summary>
-    /// Executes the SetLength operation.
-    /// 執行 SetLength 作業。
+    /// Sets length.
+    /// 設定 Length。
     /// </summary>
     /// <inheritdoc />
     public override void SetLength(long value) => _underlyingStream.SetLength(value);
 
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 執行 Read 作業。
     /// </summary>
     /// <inheritdoc />
@@ -137,7 +137,7 @@ public sealed class OdfCrc32Stream : Stream
     }
 
     /// <summary>
-    /// Executes the Write operation.
+    /// Performs the Write operation.
     /// 執行 Write 作業。
     /// </summary>
     /// <inheritdoc />
@@ -165,8 +165,8 @@ public sealed class OdfCrc32Stream : Stream
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)

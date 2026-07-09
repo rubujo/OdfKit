@@ -215,14 +215,14 @@ public sealed class OdfMathBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Fenced that accepts inner; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 inner；其餘可選參數使用預設值並轉呼叫最長 Fenced 多載。
     /// </summary>
     public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner) => Fenced(inner, "(", ")");
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Fenced that accepts inner and open; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 inner 與 open；其餘可選參數使用預設值並轉呼叫最長 Fenced 多載。
     /// </summary>
     public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner, string open) => Fenced(inner, open, ")");
 

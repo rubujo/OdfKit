@@ -19,26 +19,26 @@ public partial class OdfImageDocument
     public IReadOnlyList<OdfImageFrameInfo> GetImageFrames() =>
         OdfImageDocumentReadEngine.GetImageFrames(this);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImageFrame that accepts imageBytes, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddImageFrame 多載。
     /// </summary>
     public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddImageFrame(imageBytes, x, y, width, height, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImageFrame that accepts imageBytes, x, y, width, height, and preferredName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、width、height 與 preferredName；其餘可選參數使用預設值並轉呼叫最長 AddImageFrame 多載。
     /// </summary>
     public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName) => AddImageFrame(imageBytes, x, y, width, height, preferredName, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImageFrame that accepts imageBytes, x, y, width, height, preferredName, and name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、width、height、preferredName 與 name；其餘可選參數使用預設值並轉呼叫最長 AddImageFrame 多載。
     /// </summary>
     public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name) => AddImageFrame(imageBytes, x, y, width, height, preferredName, name, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImageFrame that accepts imageBytes, x, y, width, height, preferredName, name, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、width、height、preferredName、name 與 title；其餘可選參數使用預設值並轉呼叫最長 AddImageFrame 多載。
     /// </summary>
     public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name, string? title) => AddImageFrame(imageBytes, x, y, width, height, preferredName, name, title, null);
 

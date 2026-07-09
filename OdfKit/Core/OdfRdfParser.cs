@@ -14,8 +14,8 @@ internal static class OdfRdfParser
     private static readonly XNamespace RdfNs = RdfNamespace;
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Parse that accepts stream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream；其餘可選參數使用預設值並轉呼叫最長 Parse 多載。
     /// </summary>
     public static OdfRdfMetadata Parse(Stream stream) => Parse(stream, 0);
 

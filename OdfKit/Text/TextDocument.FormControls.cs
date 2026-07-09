@@ -12,14 +12,14 @@ public partial class TextDocument
 {
     #region 表單控制項（Form Controls）
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFormControl that accepts type, name, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type、name、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddFormControl 多載。
     /// </summary>
     public OdfFormControl AddFormControl(OdfControlType type, string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddFormControl(type, name, x, y, width, height, "", null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFormControl that accepts type, name, x, y, width, height, and label; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type、name、x、y、width、height 與 label；其餘可選參數使用預設值並轉呼叫最長 AddFormControl 多載。
     /// </summary>
     public OdfFormControl AddFormControl(OdfControlType type, string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string label) => AddFormControl(type, name, x, y, width, height, label, null);
 

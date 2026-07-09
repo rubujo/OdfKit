@@ -45,14 +45,14 @@ public partial class DrawPageElement
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendFrame that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendFrame 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public DrawFrameElement AppendFrame() => AppendFrame(null);
 
 
     /// <summary>
-    /// Executes the AppendFrame operation.
+    /// Appends frame.
     /// 在 <c>draw:page</c> 末尾新增框架。
     /// </summary>
     /// <param name="name">選用的框架名稱</param>
@@ -69,14 +69,14 @@ public partial class DrawPageElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendRectangle that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendRectangle 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public DrawRectElement AppendRectangle() => AppendRectangle(null);
 
 
     /// <summary>
-    /// Executes the AppendRectangle operation.
+    /// Appends rectangle.
     /// 在 <c>draw:page</c> 末尾新增矩形。
     /// </summary>
     /// <param name="name">選用的形狀名稱</param>
@@ -94,7 +94,7 @@ public partial class DrawPageElement
 
 
     /// <summary>
-    /// Executes the AppendNotes operation.
+    /// Appends notes.
     /// 在 <c>draw:page</c> 末尾新增簡報備忘稿。
     /// </summary>
     /// <returns>新增的 <c>presentation:notes</c> 元素</returns>

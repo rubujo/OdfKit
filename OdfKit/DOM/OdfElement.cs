@@ -19,8 +19,8 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     : OdfNode(OdfNodeType.Element, localName, namespaceUri, prefix)
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetAttributeValue 多載。
     /// </summary>
     public string? GetAttributeValue(string localName, string namespaceUri) => GetAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -42,14 +42,14 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
         return GetAttribute(localName, namespaceUri);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetAttributeValue 多載。
     /// </summary>
     public void SetAttributeValue(string localName, string namespaceUri, string value) => SetAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetAttributeValue 多載。
     /// </summary>
     public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix) => SetAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 

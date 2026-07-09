@@ -143,8 +143,8 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Flush operation.
-    /// 執行 Flush 作業。
+    /// Performs flush.
+    /// 執行 Flush。
     /// </summary>
     /// <inheritdoc />
     public override void Flush()
@@ -152,8 +152,8 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Seek operation.
-    /// 執行 Seek 作業。
+    /// Performs seek.
+    /// 執行 Seek。
     /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin)
@@ -190,14 +190,14 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
     /// <summary>
-    /// Executes the SetLength operation.
-    /// 執行 SetLength 作業。
+    /// Sets length.
+    /// 設定 Length。
     /// </summary>
     /// <inheritdoc />
     public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 執行 Read 作業。
     /// </summary>
     /// <inheritdoc />
@@ -467,15 +467,15 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Write operation.
+    /// Performs the Write operation.
     /// 執行 Write 作業。
     /// </summary>
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the ReadAsync operation.
-    /// 執行 ReadAsync 作業。
+    /// Reads async.
+    /// 讀取 Async。
     /// </summary>
     /// <inheritdoc />
     /// <remarks>
@@ -511,7 +511,7 @@ public sealed class OdfDirectIoReadableStream : Stream
 
 #if NET10_0_OR_GREATER
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 執行 Read 作業。
     /// </summary>
     /// <inheritdoc />
@@ -538,8 +538,8 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
     /// <summary>
-    /// Executes the ReadAsync operation.
-    /// 執行 ReadAsync 作業。
+    /// Reads async.
+    /// 讀取 Async。
     /// </summary>
     /// <inheritdoc />
     /// <remarks>
@@ -570,8 +570,8 @@ public sealed class OdfDirectIoReadableStream : Stream
 #endif
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)

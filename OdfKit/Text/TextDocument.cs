@@ -58,8 +58,8 @@ public partial class TextDocument : OdfDocument
         return (TextDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Text);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateFromTemplate that accepts template; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 template；其餘可選參數使用預設值並轉呼叫最長 CreateFromTemplate 多載。
     /// </summary>
     public static TextDocument CreateFromTemplate(TextTemplateDocument template) => CreateFromTemplate(template, false);
 
@@ -78,8 +78,8 @@ public partial class TextDocument : OdfDocument
 
 
     /// <summary>
-    /// Executes the ClearTemplateUserContent operation.
-    /// 執行 ClearTemplateUserContent 作業。
+    /// Clears template user content.
+    /// 清除 Template User Content。
     /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
@@ -140,8 +140,8 @@ public partial class TextDocument : OdfDocument
     public new static Task<TextDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<TextDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<TextDocument>(path, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", cancellationToken);
@@ -155,8 +155,8 @@ public partial class TextDocument : OdfDocument
     public new static TextDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public new static TextDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<TextDocument>(stream, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", fileName);
@@ -178,14 +178,14 @@ public partial class TextDocument : OdfDocument
     public new static Task<TextDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<TextDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<TextDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<TextDocument>(stream, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", fileName, cancellationToken);
@@ -261,8 +261,8 @@ public partial class TextDocument : OdfDocument
         return $"Table{(tableCount + 1).ToString(CultureInfo.InvariantCulture)}";
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendList that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendList 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfListBuilder AppendList() => AppendList(null);
 
@@ -333,14 +333,14 @@ public partial class TextDocument : OdfDocument
 
     #region TOC (Table of Contents)
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTableOfContents that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddTableOfContents 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTableOfContents AddTableOfContents() => AddTableOfContents("Table of Contents", 10);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTableOfContents that accepts title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title；其餘可選參數使用預設值並轉呼叫最長 AddTableOfContents 多載。
     /// </summary>
     public OdfTableOfContents AddTableOfContents(string title) => AddTableOfContents(title, 10);
 
@@ -356,14 +356,14 @@ public partial class TextDocument : OdfDocument
     public OdfTableOfContents AddTableOfContents(string title, int outlineLevel) => TextDocumentTocEngine.AddTableOfContents(this, CoreCollaborators, title, outlineLevel);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertTableOfContents that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：InsertTableOfContents 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTableOfContents InsertTableOfContents() => InsertTableOfContents("Table of Contents", 10);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertTableOfContents that accepts title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title；其餘可選參數使用預設值並轉呼叫最長 InsertTableOfContents 多載。
     /// </summary>
     public OdfTableOfContents InsertTableOfContents(string title) => InsertTableOfContents(title, 10);
 
@@ -490,8 +490,8 @@ public partial class TextDocument : OdfDocument
         return null;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddPageStyle that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 AddPageStyle 多載。
     /// </summary>
     public OdfPageStyle AddPageStyle(string name) => AddPageStyle(name, null);
 
@@ -577,8 +577,8 @@ public partial class TextDocument : OdfDocument
         return new OdfSection(section, this);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddSubDocumentReference that accepts name and subDocumentUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 subDocumentUri；其餘可選參數使用預設值並轉呼叫最長 AddSubDocumentReference 多載。
     /// </summary>
     public OdfSection AddSubDocumentReference(string name, string subDocumentUri) => AddSubDocumentReference(name, subDocumentUri, false);
 
@@ -654,14 +654,14 @@ public partial class TextDocument : OdfDocument
 
     #region XML Helper
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFontFace that accepts name and fontFamily; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 fontFamily；其餘可選參數使用預設值並轉呼叫最長 AddFontFace 多載。
     /// </summary>
     public void AddFontFace(string name, string fontFamily) => AddFontFace(name, fontFamily, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFontFace that accepts name, fontFamily, and genericFamily; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、fontFamily 與 genericFamily；其餘可選參數使用預設值並轉呼叫最長 AddFontFace 多載。
     /// </summary>
     public void AddFontFace(string name, string fontFamily, string? genericFamily) => AddFontFace(name, fontFamily, genericFamily, null);
 
@@ -727,8 +727,8 @@ public partial class TextDocument : OdfDocument
     public IReadOnlyList<TextDocument> MailMerge(IEnumerable<IReadOnlyDictionary<string, object?>> records)
         => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of StreamingMailMergeAsync that accepts outputStream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 outputStream；其餘可選參數使用預設值並轉呼叫最長 StreamingMailMergeAsync 多載。
     /// </summary>
     public Task StreamingMailMergeAsync(Stream outputStream, IDictionary<string, object?> dataSource) => StreamingMailMergeAsync(outputStream, dataSource, default);
 

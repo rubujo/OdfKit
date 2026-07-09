@@ -13,7 +13,7 @@ public partial class OdfNode
 
 
     /// <summary>
-    /// Executes the AppendChild operation.
+    /// Appends child.
     /// 將指定的節點新增至此節點的子節點清單末尾。
     /// </summary>
     /// <param name="child">要新增的子節點</param>
@@ -36,7 +36,7 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the InsertBefore operation.
+    /// Inserts before.
     /// 在現有的子節點之前插入新的子節點。
     /// </summary>
     /// <param name="newChild">要插入的新子節點</param>
@@ -67,7 +67,7 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the InsertAfter operation.
+    /// Inserts after.
     /// 在現有的子節點之後插入新的子節點。
     /// </summary>
     /// <param name="newChild">要插入的新子節點</param>
@@ -122,7 +122,7 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the Descendants operation.
+    /// Performs descendants.
     /// 取得此節點的所有後代節點。
     /// </summary>
     /// <returns>後代節點的列舉</returns>

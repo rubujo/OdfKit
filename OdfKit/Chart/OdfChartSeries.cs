@@ -132,14 +132,14 @@ public sealed class OdfChartSeries
         return points;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddDataPoint that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddDataPoint 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddDataPoint() => AddDataPoint(1, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddDataPoint that accepts repeated; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 repeated；其餘可選參數使用預設值並轉呼叫最長 AddDataPoint 多載。
     /// </summary>
     public void AddDataPoint(int repeated) => AddDataPoint(repeated, null);
 

@@ -23,27 +23,27 @@ public static class OdfXmlReader
     public const int MaxElementDepth = 256;
 
     /// <summary>
-    /// Executes the Parse operation.
+    /// Performs the Parse operation.
     /// 將 ODF XML 唯讀位元組區段解析為記憶體 DOM 節點樹。
     /// </summary>
     /// <returns>解析完成的根元素節點</returns>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData) => Parse(xmlData, IntPtr.Zero, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Parse that accepts xmlData and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xmlData 與 options；其餘可選參數使用預設值並轉呼叫最長 Parse 多載。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, OdfLoadOptions? options) => Parse(xmlData, IntPtr.Zero, options);
 
     /// <summary>
-    /// Executes the Parse operation.
+    /// Performs the Parse operation.
     /// 將 ODF XML 唯讀位元組區段與基底指標解析為記憶體 DOM 節點樹。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr) => Parse(xmlData, basePtr, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Parse that accepts xmlData, basePtr, and options.
+    /// Parse 完整多載：接受 xmlData、basePtr 與 options。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr, OdfLoadOptions? options)
     {
@@ -438,7 +438,7 @@ public static class OdfXmlReader
     }
 
     /// <summary>
-    /// Executes the Parse operation.
+    /// Performs the Parse operation.
     /// 將 ODF XML 檔案串流解析為記憶體 DOM 節點樹。
     /// </summary>
     /// <returns>解析完成的根元素節點</returns>
@@ -448,8 +448,8 @@ public static class OdfXmlReader
     public static OdfNode Parse(Stream stream) => Parse(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Parse that accepts stream and options.
+    /// Parse 完整多載：接受 stream 與 options。
     /// </summary>
     public static OdfNode Parse(Stream stream, OdfLoadOptions? options)
     {

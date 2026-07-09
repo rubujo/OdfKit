@@ -29,8 +29,8 @@ public sealed class OdfRowCollection
     /// <returns>The specified row. / 指定列。</returns>
     public OdfSheetRow this[int index] => new(_sheet, index);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Group that accepts startRow and endRow; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 startRow 與 endRow；其餘可選參數使用預設值並轉呼叫最長 Group 多載。
     /// </summary>
     public void Group(int startRow, int endRow) => Group(startRow, endRow, false);
 

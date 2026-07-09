@@ -15,13 +15,13 @@ public static class OdfPerformanceTelemetry
 {
 #if NET6_0_OR_GREATER
     /// <summary>
-    /// Executes the new operation.
+    /// Performs new.
     /// OdfKit 的 ActivitySource，用於追蹤關鍵操作的生命週期。
     /// </summary>
     public static readonly ActivitySource ActivitySource = new("OdfKit.Core", OdfVersionInfo.DefaultVersionString);
 
     /// <summary>
-    /// Executes the new operation.
+    /// Performs new.
     /// OdfKit 的 Meter，用於收集效能度量指標。
     /// </summary>
     public static readonly Meter Meter = new("OdfKit.Core", OdfVersionInfo.DefaultVersionString);
@@ -56,7 +56,7 @@ public static class OdfPerformanceTelemetry
 #endif
 
     /// <summary>
-    /// Executes the RecordZipDecompression operation.
+    /// Performs record zip decompression.
     /// 記錄一次 Zip 解壓操作效能。
     /// </summary>
     /// <param name="milliseconds">解壓縮花費毫秒數</param>
@@ -69,7 +69,7 @@ public static class OdfPerformanceTelemetry
     }
 
     /// <summary>
-    /// Executes the RecordXmlParse operation.
+    /// Performs record xml parse.
     /// 記錄一次 XML 解析操作效能。
     /// </summary>
     /// <param name="milliseconds">解析花費毫秒數</param>
@@ -82,7 +82,7 @@ public static class OdfPerformanceTelemetry
     }
 
     /// <summary>
-    /// Executes the RecordMemoryAllocation operation.
+    /// Performs record memory allocation.
     /// 記錄非受控記憶體分配。
     /// </summary>
     /// <param name="bytes">分配的位元組數</param>
@@ -94,7 +94,7 @@ public static class OdfPerformanceTelemetry
     }
 
     /// <summary>
-    /// Executes the RecordMemoryFree operation.
+    /// Performs record memory free.
     /// 記錄非受控記憶體釋放。
     /// </summary>
     /// <param name="bytes">釋放的位元組數</param>

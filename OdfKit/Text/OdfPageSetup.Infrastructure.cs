@@ -261,14 +261,14 @@ public partial class OdfPageSetup
         return node;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFontFace that accepts name and fontFamily; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 fontFamily；其餘可選參數使用預設值並轉呼叫最長 AddFontFace 多載。
     /// </summary>
     public void AddFontFace(string name, string fontFamily) => AddFontFace(name, fontFamily, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFontFace that accepts name, fontFamily, and genericFamily; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、fontFamily 與 genericFamily；其餘可選參數使用預設值並轉呼叫最長 AddFontFace 多載。
     /// </summary>
     public void AddFontFace(string name, string fontFamily, string? genericFamily) => AddFontFace(name, fontFamily, genericFamily, null);
 

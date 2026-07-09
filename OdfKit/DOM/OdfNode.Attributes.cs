@@ -15,7 +15,7 @@ public partial class OdfNode
 
 
     /// <summary>
-    /// Executes the GetAttribute operation.
+    /// Gets attribute.
     /// 取得指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -28,21 +28,21 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the GetAttribute operation.
+    /// Gets attribute.
     /// 取得指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <returns>屬性值；如果找不到，則為 <see langword="null"/></returns>
     public string? GetAttribute(string localName, XNamespace namespaceUri) => GetAttribute(localName, namespaceUri.NamespaceName);
 
     /// <summary>
-    /// Executes the SetAttribute operation.
+    /// Sets attribute.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
     public void SetAttribute(string localName, string namespaceUri, string value) => SetAttribute(localName, namespaceUri, value, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SetAttribute that accepts localName, namespaceUri, value, and prefix.
+    /// SetAttribute 完整多載：接受 localName、namespaceUri、value 與 prefix。
     /// </summary>
     public void SetAttribute(string localName, string namespaceUri, string value, string? prefix)
     {
@@ -85,14 +85,14 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the SetAttribute operation.
+    /// Sets attribute.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
     public void SetAttribute(string localName, XNamespace namespaceUri, string value) => SetAttribute(localName, namespaceUri.NamespaceName, value, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetAttribute that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetAttribute 多載。
     /// </summary>
     public void SetAttribute(string localName, XNamespace namespaceUri, string value, string? prefix) => SetAttribute(localName, namespaceUri.NamespaceName, value, prefix);
 
@@ -118,7 +118,7 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the GetAttributePrefix operation.
+    /// Gets attribute prefix.
     /// 取得指定屬性的原始命名空間前綴。
     /// </summary>
     /// <param name="attributeName">屬性名稱</param>

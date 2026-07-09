@@ -12,13 +12,13 @@ namespace OdfKit.Csv;
 public static class OdfCsvImporter
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ImportFromStream that accepts csvStream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 csvStream；其餘可選參數使用預設值並轉呼叫最長 ImportFromStream 多載。
     /// </summary>
     public static SpreadsheetDocument ImportFromStream(Stream csvStream) => ImportFromStream(csvStream, null);
 
     /// <summary>
-    /// Executes the ImportFromStream operation.
+    /// Imports from stream.
     /// 從資料流讀取 CSV 並建立新的 SpreadsheetDocument
     /// </summary>
     /// <param name="csvStream">CSV 來源資料流（不得為 null）</param>
@@ -66,14 +66,14 @@ public static class OdfCsvImporter
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ImportFromFile that accepts csvPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 csvPath；其餘可選參數使用預設值並轉呼叫最長 ImportFromFile 多載。
     /// </summary>
     public static SpreadsheetDocument ImportFromFile(string csvPath) => ImportFromFile(csvPath, null);
 
 
     /// <summary>
-    /// Executes the ImportFromFile operation.
+    /// Imports from file.
     /// 從檔案路徑讀取 CSV 並建立新的 SpreadsheetDocument。
     /// </summary>
     /// <param name="csvPath">CSV 檔案路徑</param>

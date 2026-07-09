@@ -40,20 +40,20 @@ public sealed class OdfPagedGatherWritableStream : Stream
 
     internal static int ReturnedPageCountForTests;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfPagedGatherWritableStream that accepts underlyingStream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 underlyingStream；其餘可選參數使用預設值並轉呼叫最長 OdfPagedGatherWritableStream 多載。
     /// </summary>
     public OdfPagedGatherWritableStream(Stream underlyingStream) : this(underlyingStream, DefaultPageSize, DefaultPagesPerFlush, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfPagedGatherWritableStream that accepts underlyingStream and pageSize; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 underlyingStream 與 pageSize；其餘可選參數使用預設值並轉呼叫最長 OdfPagedGatherWritableStream 多載。
     /// </summary>
     public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize) : this(underlyingStream, pageSize, DefaultPagesPerFlush, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfPagedGatherWritableStream that accepts underlyingStream, pageSize, and pagesPerFlush; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 underlyingStream、pageSize 與 pagesPerFlush；其餘可選參數使用預設值並轉呼叫最長 OdfPagedGatherWritableStream 多載。
     /// </summary>
     public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize, int pagesPerFlush) : this(underlyingStream, pageSize, pagesPerFlush, false) { }
 
@@ -119,8 +119,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     public override bool CanWrite => !_isDisposed && _underlyingStream.CanWrite;
 
     /// <summary>
-    /// Executes the Length operation.
-    /// 執行 Length 作業。
+    /// Performs length.
+    /// 執行 Length。
     /// </summary>
     /// <inheritdoc />
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
@@ -137,8 +137,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Flush operation.
-    /// 執行 Flush 作業。
+    /// Performs flush.
+    /// 執行 Flush。
     /// </summary>
     /// <inheritdoc />
     public override void Flush()
@@ -149,8 +149,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the FlushAsync operation.
-    /// 執行 FlushAsync 作業。
+    /// Performs flush async.
+    /// 執行 Flush Async。
     /// </summary>
     /// <inheritdoc />
     public override async Task FlushAsync(CancellationToken cancellationToken)
@@ -161,28 +161,28 @@ public sealed class OdfPagedGatherWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Seek operation.
-    /// 執行 Seek 作業。
+    /// Performs seek.
+    /// 執行 Seek。
     /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the SetLength operation.
-    /// 執行 SetLength 作業。
+    /// Sets length.
+    /// 設定 Length。
     /// </summary>
     /// <inheritdoc />
     public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the Read operation.
+    /// Performs the Read operation.
     /// 執行 Read 作業。
     /// </summary>
     /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Executes the Write operation.
+    /// Performs the Write operation.
     /// 執行 Write 作業。
     /// </summary>
     /// <inheritdoc />
@@ -209,8 +209,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the WriteAsync operation.
-    /// 執行 WriteAsync 作業。
+    /// Writes async.
+    /// 寫入 Async。
     /// </summary>
     /// <inheritdoc />
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -236,8 +236,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)

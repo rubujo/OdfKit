@@ -60,7 +60,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
+    /// Releases unmanaged resources.
     /// 釋放 <see cref="OdfPackage"/> 類別所使用的資源。
     /// </summary>
     public void Dispose()
@@ -70,7 +70,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the DisposeAsync operation.
+    /// Releases resources for async.
     /// 非同步釋放 <see cref="OdfPackage"/> 類別所使用的資源。
     /// </summary>
     /// <returns>代表非同步處置作業的 ValueTask</returns>

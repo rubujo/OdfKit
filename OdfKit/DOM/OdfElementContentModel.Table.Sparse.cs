@@ -423,7 +423,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
+    /// Releases unmanaged resources.
     /// 釋放非託管頁面記憶體。
     /// </summary>
     public void Dispose()
@@ -855,7 +855,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the MaterializeSparseCells operation.
+    /// Performs materialize sparse cells.
     /// 將尚未具現化的稀疏儲存格全部加載至 DOM。在文件序列化存檔前呼叫。
     /// </summary>
     public void MaterializeSparseCells()
@@ -906,8 +906,8 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the TryWriteOverride operation.
-    /// 執行 TryWriteOverride 作業。
+    /// Tries to write override.
+    /// 嘗試寫入 Override。
     /// </summary>
     /// <inheritdoc />
     public override bool TryWriteOverride(System.Xml.XmlWriter writer, Dictionary<string, string> nsDict)
@@ -1139,7 +1139,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the CompressColdPages operation.
+    /// Compresses cold pages.
     /// 將所有已分配的熱頁 (Hot-Page) 進行壓縮並轉為冷頁 (Cold-Page) 以節省記憶體。
     /// </summary>
     public void CompressColdPages()

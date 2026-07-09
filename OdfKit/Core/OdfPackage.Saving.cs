@@ -16,14 +16,14 @@ public sealed partial class OdfPackage
     #region Saving and Atomic Save
 
     /// <summary>
-    /// Executes the Save operation.
+    /// Performs the Save operation.
     /// 將所有變更儲存回原來的檔案或資料流中。
     /// </summary>
     public void Save() => Save((OdfSaveOptions?)null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Save that accepts options.
+    /// Save 完整多載：接受 options。
     /// </summary>
     public void Save(OdfSaveOptions? options)
     {
@@ -44,26 +44,26 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the SaveAsync operation.
+    /// Saves async.
     /// 將所有變更儲存回原來的檔案或資料流中（非同步）。
     /// </summary>
     /// <returns>代表非同步作業的工作</returns>
     public Task SaveAsync() => SaveAsync(null, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public Task SaveAsync(CancellationToken cancellationToken) => SaveAsync(null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 options；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public Task SaveAsync(OdfSaveOptions? options) => SaveAsync(options, default);
 
     /// <summary>
-    /// Executes the SaveAsync operation.
+    /// Saves async.
     /// 使用指定儲存選項，將所有變更儲存回原來的檔案或資料流中（非同步）。
     /// </summary>
     /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
@@ -93,14 +93,14 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the SaveToStream operation.
+    /// Saves to stream.
     /// 將封裝序列化儲存至指定的目的地資料流。
     /// </summary>
     public void SaveToStream(Stream destinationStream) => SaveToStream(destinationStream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveToStream that accepts destinationStream and options.
+    /// SaveToStream 完整多載：接受 destinationStream 與 options。
     /// </summary>
     public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
@@ -118,7 +118,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the Save operation.
+    /// Performs the Save operation.
     /// 將封裝序列化儲存至指定的位元組緩衝區寫入器。
     /// </summary>
     /// <remarks>
@@ -128,8 +128,8 @@ public sealed partial class OdfPackage
     public void Save(IBufferWriter<byte> destination) => Save(destination, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Save that accepts destination and options.
+    /// Save 完整多載：接受 destination 與 options。
     /// </summary>
     public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options)
     {
@@ -141,26 +141,26 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the SaveToStreamAsync operation.
+    /// Saves to stream async.
     /// 將封裝序列化儲存至指定的目的地資料流（非同步）。
     /// </summary>
     /// <returns>代表非同步作業的工作</returns>
     public Task SaveToStreamAsync(Stream destinationStream) => SaveToStreamAsync(destinationStream, null, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveToStreamAsync that accepts destinationStream and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 destinationStream 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 SaveToStreamAsync 多載。
     /// </summary>
     public Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken) => SaveToStreamAsync(destinationStream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveToStreamAsync that accepts destinationStream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 destinationStream 與 options；其餘可選參數使用預設值並轉呼叫最長 SaveToStreamAsync 多載。
     /// </summary>
     public Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
 
     /// <summary>
-    /// Executes the SaveToStreamAsync operation.
+    /// Saves to stream async.
     /// 使用指定儲存選項，將封裝序列化儲存至指定的目的地資料流（非同步）。
     /// </summary>
     /// <param name="destinationStream">目標目的地資料流</param>

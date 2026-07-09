@@ -9,8 +9,8 @@ namespace OdfKit.Formula;
 public sealed class OdfFormulaDiagnostic
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfFormulaDiagnostic that accepts code, message, and severity; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 code、message 與 severity；其餘可選參數使用預設值並轉呼叫最長 OdfFormulaDiagnostic 多載。
     /// </summary>
     public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity) : this(code, message, severity, null) { }
 

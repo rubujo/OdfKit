@@ -110,8 +110,8 @@ public partial class OdfFormulaDocument : OdfDocument
     public new static Task<OdfFormulaDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static async Task<OdfFormulaDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -125,8 +125,8 @@ public partial class OdfFormulaDocument : OdfDocument
     public new static OdfFormulaDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Load that accepts stream and fileName.
+    /// Load 完整多載：接受 stream 與 fileName。
     /// </summary>
     public new static OdfFormulaDocument Load(Stream stream, string? fileName)
     {
@@ -150,14 +150,14 @@ public partial class OdfFormulaDocument : OdfDocument
     public new static Task<OdfFormulaDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<OdfFormulaDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static async Task<OdfFormulaDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -175,7 +175,7 @@ public partial class OdfFormulaDocument : OdfDocument
     public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", MathMlNamespace, "math");
 
     /// <summary>
-    /// Executes the MathText operation.
+    /// Performs math text.
     /// 取得 MathML 呈現內容（presentation MathML）的純文字摘要，不含
     /// </summary>
     public string MathText => GetPresentationTextContent(MathNode);

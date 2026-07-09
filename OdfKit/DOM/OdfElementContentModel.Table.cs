@@ -52,7 +52,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the EnumerateCellViews operation.
+    /// Enumerates cell views.
     /// 以輕量檢視列舉表格儲存格，避免為稀疏儲存格建立 <see cref="TableTableCellElement"/> facade。
     /// </summary>
     /// <returns>儲存格檢視列舉器</returns>
@@ -130,7 +130,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the CopyRows operation.
+    /// Copies rows.
     /// 將指定範圍的列複製到目標位置，並同步複製尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="sourcePosition">以零為基準的來源起始列索引</param>
@@ -166,7 +166,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the MoveRows operation.
+    /// Performs move rows.
     /// 將指定範圍的列移動到目標位置，並同步移動尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="sourcePosition">以零為基準的來源起始列索引</param>
@@ -239,7 +239,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the EnsureTableColumns operation.
+    /// Ensures table columns.
     /// 取得或建立 <c>table:table-columns</c> 容器，供後續新增欄定義使用。
     /// </summary>
     /// <returns>表格欄位容器元素</returns>
@@ -255,7 +255,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the AppendColumn operation.
+    /// Appends column.
     /// 在欄位結構區段末尾新增單一欄定義。
     /// </summary>
     /// <returns>新增的 <c>table:table-column</c> 元素</returns>
@@ -266,7 +266,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the AppendRow operation.
+    /// Appends row.
     /// 在列結構區段末尾新增表格列。
     /// </summary>
     /// <returns>新增的 <c>table:table-row</c> 元素</returns>
@@ -276,7 +276,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the AppendHeaderRows operation.
+    /// Appends header rows.
     /// 新增表頭列容器；表頭列固定置於所有一般資料列（<c>table:table-row</c>／
     /// </summary>
     /// <returns>新增的 <c>table:table-header-rows</c> 元素</returns>
@@ -296,7 +296,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
-    /// Executes the InsertColumnStructure operation.
+    /// Inserts column structure.
     /// 在欄位結構 choice group 的語意位置插入子元素。
     /// </summary>
     /// <typeparam name="TElement">欄位結構元素型別</typeparam>

@@ -32,20 +32,20 @@ public partial class TextDocument
         set => TrackedChanges = value;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RecordTrackedChange that accepts changeType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType；其餘可選參數使用預設值並轉呼叫最長 RecordTrackedChange 多載。
     /// </summary>
     public string RecordTrackedChange(string changeType) => RecordTrackedChange(changeType, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RecordTrackedChange that accepts changeType and extraContent; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType 與 extraContent；其餘可選參數使用預設值並轉呼叫最長 RecordTrackedChange 多載。
     /// </summary>
     public string RecordTrackedChange(string changeType, OdfNode? extraContent) => RecordTrackedChange(changeType, extraContent, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RecordTrackedChange that accepts changeType, extraContent, and originalStyleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType、extraContent 與 originalStyleName；其餘可選參數使用預設值並轉呼叫最長 RecordTrackedChange 多載。
     /// </summary>
     public string RecordTrackedChange(string changeType, OdfNode? extraContent, string? originalStyleName) => RecordTrackedChange(changeType, extraContent, originalStyleName, null);
 
@@ -63,20 +63,20 @@ public partial class TextDocument
         AddTrackedChange(changeType, "Author", DateTime.UtcNow, extraContent, originalStyleName, targetFamily);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTrackedChange that accepts changeType, creator, and date; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType、creator 與 date；其餘可選參數使用預設值並轉呼叫最長 AddTrackedChange 多載。
     /// </summary>
     public string AddTrackedChange(string changeType, string creator, DateTime date) => AddTrackedChange(changeType, creator, date, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTrackedChange that accepts changeType, creator, date, and extraContent; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType、creator、date 與 extraContent；其餘可選參數使用預設值並轉呼叫最長 AddTrackedChange 多載。
     /// </summary>
     public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent) => AddTrackedChange(changeType, creator, date, extraContent, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTrackedChange that accepts changeType, creator, date, extraContent, and originalStyleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 changeType、creator、date、extraContent 與 originalStyleName；其餘可選參數使用預設值並轉呼叫最長 AddTrackedChange 多載。
     /// </summary>
     public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent, string? originalStyleName) => AddTrackedChange(changeType, creator, date, extraContent, originalStyleName, null);
 

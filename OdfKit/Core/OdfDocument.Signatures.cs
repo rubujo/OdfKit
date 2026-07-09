@@ -44,8 +44,8 @@ public abstract partial class OdfDocument
     public Task SignAsync(X509Certificate2 certificate) => SignAsync(certificate, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SignAsync that accepts certificate and cancellationToken.
+    /// SignAsync 完整多載：接受 certificate 與 cancellationToken。
     /// </summary>
     public async Task SignAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
     {
@@ -53,7 +53,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SignDocumentAsync operation.
+    /// Signs document async.
     /// 非同步使用指定的 X.509 憑證對文件進行一鍵式數位簽章。
     /// </summary>
     /// <returns>代表非同步簽章作業的工作</returns>
@@ -64,8 +64,8 @@ public abstract partial class OdfDocument
     public Task SignDocumentAsync(X509Certificate2 certificate) => SignDocumentAsync(certificate, new OdfSigningOptions { Level = XadesLevel.None }, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SignDocumentAsync that accepts certificate and cancellationToken.
+    /// SignDocumentAsync 完整多載：接受 certificate 與 cancellationToken。
     /// </summary>
     public Task SignDocumentAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
     {
@@ -73,7 +73,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SignDocumentAsync operation.
+    /// Signs document async.
     /// 非同步使用指定的 X.509 憑證與簽章選項對文件進行一鍵式數位簽章。
     /// </summary>
     /// <returns>代表非同步簽章作業的工作</returns>
@@ -84,8 +84,8 @@ public abstract partial class OdfDocument
     public Task SignDocumentAsync(X509Certificate2 certificate, OdfSigningOptions? options) => SignDocumentAsync(certificate, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SignDocumentAsync that accepts certificate, options, and cancellationToken.
+    /// SignDocumentAsync 完整多載：接受 certificate、options 與 cancellationToken。
     /// </summary>
     public async Task SignDocumentAsync(
         X509Certificate2 certificate,
@@ -103,7 +103,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the GetSignatureSummary operation.
+    /// Gets signature summary.
     /// 取得文件封裝內數位簽章專案的摘要狀態。
     /// </summary>
     /// <returns>描述簽章專案存在狀態、可讀性與簽章數量的摘要</returns>
@@ -128,7 +128,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the VerifySignatures operation.
+    /// Verifies signatures.
     /// 驗證文件中的所有數位簽章。
     /// </summary>
     /// <param name="certificates">輸出參數，傳回驗證通過的憑證集合</param>
@@ -139,15 +139,15 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the VerifySignatures operation.
+    /// Verifies signatures.
     /// 驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
     /// <returns>詳細的數位簽章驗證結果</returns>
     public OdfSignatureValidationResult VerifySignatures() => VerifySignatures((OdfSigningOptions?)null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of VerifySignatures that accepts options.
+    /// VerifySignatures 完整多載：接受 options。
     /// </summary>
     public OdfSignatureValidationResult VerifySignatures(OdfSigningOptions? options)
     {
@@ -155,7 +155,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the VerifySignaturesAsync operation.
+    /// Verifies signatures async.
     /// 非同步驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
@@ -175,14 +175,14 @@ public abstract partial class OdfDocument
         VerifySignaturesAsync(null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of VerifySignaturesAsync that accepts options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 options；其餘可選參數使用預設值並轉呼叫最長 VerifySignaturesAsync 多載。
     /// </summary>
     public Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfSigningOptions? options) => VerifySignaturesAsync(options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of VerifySignaturesAsync that accepts options and cancellationToken.
+    /// VerifySignaturesAsync 完整多載：接受 options 與 cancellationToken。
     /// </summary>
     public Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfSigningOptions? options,

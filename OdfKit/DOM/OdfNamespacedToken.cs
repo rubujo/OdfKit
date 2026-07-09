@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
 {
     /// <summary>
-    /// Executes the OdfNamespacedToken operation.
+    /// Performs odf namespaced token.
     /// 以 QName lexical form 建立 <see cref="OdfNamespacedToken"/>。
     /// </summary>
     /// <param name="value">QName 字串，例如 <c>draw:shape</c></param>
@@ -46,7 +46,7 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     public string LocalName { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析 QName 字串。
     /// </summary>
     /// <param name="value">QName 字串</param>
@@ -65,14 +65,14 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始 QName 字串。
     /// </summary>
     /// <returns>QName 字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個命名空間 token。
     /// </summary>
     /// <param name="other">要比較的命名空間 token</param>
@@ -80,21 +80,21 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     public bool Equals(OdfNamespacedToken other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfNamespacedToken other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個命名空間 token 是否相等。
     /// </summary>
     /// <param name="left">左側命名空間 token</param>
@@ -103,7 +103,7 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     public static bool operator ==(OdfNamespacedToken left, OdfNamespacedToken right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個命名空間 token 是否不相等。
     /// </summary>
     /// <param name="left">左側命名空間 token</param>

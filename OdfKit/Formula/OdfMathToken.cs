@@ -328,8 +328,8 @@ public sealed class OdfMathToken
         return new OdfMathToken(OdfMathTokenKind.Fraction, string.Empty, numerator, denominator);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Radical that accepts radicand; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 radicand；其餘可選參數使用預設值並轉呼叫最長 Radical 多載。
     /// </summary>
     public static OdfMathToken Radical(OdfMathToken radicand) => Radical(radicand, null);
 
@@ -410,14 +410,14 @@ public sealed class OdfMathToken
         return new OdfMathToken(OdfMathTokenKind.UnderOver, string.Empty, null, null, [baseToken, under, over]);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Fenced that accepts inner; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 inner；其餘可選參數使用預設值並轉呼叫最長 Fenced 多載。
     /// </summary>
     public static OdfMathToken Fenced(OdfMathToken inner) => Fenced(inner, "(", ")");
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Fenced that accepts inner and open; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 inner 與 open；其餘可選參數使用預設值並轉呼叫最長 Fenced 多載。
     /// </summary>
     public static OdfMathToken Fenced(OdfMathToken inner, string open) => Fenced(inner, open, ")");
 
@@ -437,8 +437,8 @@ public sealed class OdfMathToken
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Style that accepts inner; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 inner；其餘可選參數使用預設值並轉呼叫最長 Style 多載。
     /// </summary>
     public static OdfMathToken Style(OdfMathToken inner) => Style(inner, null);
 

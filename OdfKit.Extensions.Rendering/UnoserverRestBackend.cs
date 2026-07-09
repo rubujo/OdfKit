@@ -54,8 +54,8 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
     }
 
     /// <summary>
-    /// Executes the ConvertAsync operation.
-    /// 執行 ConvertAsync 作業。
+    /// Converts async.
+    /// 轉換 Async。
     /// </summary>
     /// <inheritdoc />
     public async Task<Stream> ConvertAsync(Stream input, string inputExtension, string convertTo, CancellationToken ct)

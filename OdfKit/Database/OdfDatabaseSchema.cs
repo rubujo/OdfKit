@@ -516,20 +516,20 @@ public sealed class OdfSchemaTable
 public sealed class OdfSchemaColumn
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaColumn that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaColumn 多載。
     /// </summary>
     public OdfSchemaColumn(string name) : this(name, "VARCHAR", true, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaColumn that accepts name and typeName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 typeName；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaColumn 多載。
     /// </summary>
     public OdfSchemaColumn(string name, string typeName) : this(name, typeName, true, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaColumn that accepts name, typeName, and isNullable; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、typeName 與 isNullable；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaColumn 多載。
     /// </summary>
     public OdfSchemaColumn(string name, string typeName, bool isNullable) : this(name, typeName, isNullable, false) { }
 
@@ -683,14 +683,14 @@ public sealed class OdfSchemaPrimaryKey
 public sealed class OdfSchemaForeignKey
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaForeignKey that accepts name, referencedTable, and keyColumns; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、referencedTable 與 keyColumns；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaForeignKey 多載。
     /// </summary>
     public OdfSchemaForeignKey(string? name, string referencedTable, IEnumerable<OdfSchemaKeyMapping> keyColumns) : this(name, referencedTable, keyColumns, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfSchemaForeignKey that accepts name, referencedTable, keyColumns, and updateRule; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、referencedTable、keyColumns 與 updateRule；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaForeignKey 多載。
     /// </summary>
     public OdfSchemaForeignKey(string? name, string referencedTable, IEnumerable<OdfSchemaKeyMapping> keyColumns, string? updateRule) : this(name, referencedTable, keyColumns, updateRule, null) { }
 

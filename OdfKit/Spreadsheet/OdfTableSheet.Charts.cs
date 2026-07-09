@@ -11,44 +11,44 @@ public partial class OdfTableSheet
 {
     #region 圖表
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange) => InsertChart(dataRange, OdfChartType.Bar, null, null, null, null, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange and chartType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange 與 chartType；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType) => InsertChart(dataRange, chartType, null, null, null, null, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange, chartType, and x; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange、chartType 與 x；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x) => InsertChart(dataRange, chartType, x, null, null, null, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange, chartType, x, and y; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange、chartType、x 與 y；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y) => InsertChart(dataRange, chartType, x, y, null, null, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange, chartType, x, y, and width; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange、chartType、x、y 與 width；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width) => InsertChart(dataRange, chartType, x, y, width, null, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange, chartType, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange、chartType、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height) => InsertChart(dataRange, chartType, x, y, width, height, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChart that accepts dataRange, chartType, x, y, width, height, and firstRowAsHeader; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange、chartType、x、y、width、height 與 firstRowAsHeader；其餘可選參數使用預設值並轉呼叫最長 InsertChart 多載。
     /// </summary>
     public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height, bool firstRowAsHeader) => InsertChart(dataRange, chartType, x, y, width, height, firstRowAsHeader, true);
 

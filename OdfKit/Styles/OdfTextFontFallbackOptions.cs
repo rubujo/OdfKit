@@ -8,14 +8,14 @@ public sealed class OdfTextFontFallbackOptions
 {
     private const string DefaultBaseFont = "TW-Kai";
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfTextFontFallbackOptions that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：OdfTextFontFallbackOptions 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextFontFallbackOptions() : this(DefaultBaseFont, true) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfTextFontFallbackOptions that accepts baseFont; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 baseFont；其餘可選參數使用預設值並轉呼叫最長 OdfTextFontFallbackOptions 多載。
     /// </summary>
     public OdfTextFontFallbackOptions(string? baseFont) : this(baseFont, true) { }
 
@@ -55,8 +55,8 @@ public sealed class OdfTextFontFallbackOptions
 
     internal IReadOnlyList<OdfFontFaceInfo> FontFaces { get; }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Cns11643 that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Cns11643 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfTextFontFallbackOptions Cns11643() => Cns11643(DefaultBaseFont);
 

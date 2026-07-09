@@ -6,7 +6,7 @@
 public readonly struct OdfLayoutBounds
 {
     /// <summary>
-    /// Executes the OdfLayoutBounds operation.
+    /// Performs odf layout bounds.
     /// 初始化 <see cref="OdfLayoutBounds"/> 結構的新執行個體。
     /// </summary>
     /// <param name="xCm">左側位置（公分）</param>

@@ -14,7 +14,7 @@ public static class OdfCustomAttributeRegistry
     private static List<OdfCustomAttributeEntry> _entries = [];
 
     /// <summary>
-    /// Executes the Register operation.
+    /// Performs the Register operation.
     /// 註冊需要在 UTF-8 解析階段快速識別的自訂 XML 屬性。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>

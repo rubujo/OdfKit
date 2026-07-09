@@ -24,8 +24,8 @@ public partial class OdfDatabaseDocument
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddParameterizedQuery that accepts name, command, and parameters; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、command 與 parameters；其餘可選參數使用預設值並轉呼叫最長 AddParameterizedQuery 多載。
     /// </summary>
     public OdfNode AddParameterizedQuery(string name, string command, IEnumerable<OdfDatabaseQueryParameter> parameters) => AddParameterizedQuery(name, command, parameters, null);
 

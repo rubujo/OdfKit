@@ -51,7 +51,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
-    /// Executes the GetOrCreateLocalStyle operation.
+    /// Gets or create local style.
     /// 取得或建立特定 DOM 節點在記憶體中的局部編輯樣式節點。
     /// </summary>
     /// <param name="elementNode">DOM 專案節點</param>
@@ -99,20 +99,20 @@ public partial class OdfStyleEngine
         return styleNode;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLocalStyleProperty that accepts elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 elementNode、family、propElementLocalName、propAttrLocalName、propAttrNsUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetLocalStyleProperty 多載。
     /// </summary>
     public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value) => SetLocalStyleProperty(elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, value, null, false);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLocalStyleProperty that accepts elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, value, and propAttrPrefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 elementNode、family、propElementLocalName、propAttrLocalName、propAttrNsUri、value 與 propAttrPrefix；其餘可選參數使用預設值並轉呼叫最長 SetLocalStyleProperty 多載。
     /// </summary>
     public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value, string? propAttrPrefix) => SetLocalStyleProperty(elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, value, propAttrPrefix, false);
 
 
     /// <summary>
-    /// Executes the SetLocalStyleProperty operation.
+    /// Sets local style property.
     /// 設定局部樣式屬性。
     /// </summary>
     /// <param name="elementNode">DOM 專案節點</param>
@@ -259,7 +259,7 @@ public partial class OdfStyleEngine
 
 
     /// <summary>
-    /// Executes the DeduplicateAndSaveStyles operation.
+    /// Performs deduplicate and save styles.
     /// 執行自動樣式去重，將記憶體中的臨時局部樣式合併寫入 XML 並更新 DOM 節點參照。
     /// </summary>
     public void DeduplicateAndSaveStyles()

@@ -39,8 +39,8 @@ public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
     /// <returns>The specified slide. / 指定投影片。</returns>
     public OdfSlide this[int index] => _document.GetSlidesSnapshot()[index];
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Add that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Add 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSlide Add() => Add(null);
 

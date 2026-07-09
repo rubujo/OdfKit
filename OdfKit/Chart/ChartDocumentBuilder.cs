@@ -109,14 +109,14 @@ public sealed class ChartDocumentBuilder
         return WithStyles(styles);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithDataRange that accepts sheetName and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName 與 range；其餘可選參數使用預設值並轉呼叫最長 WithDataRange 多載。
     /// </summary>
     public ChartDocumentBuilder WithDataRange(string sheetName, OdfCellRange range) => WithDataRange(sheetName, range, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithDataRange that accepts sheetName, range, and firstRowAsHeader; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、range 與 firstRowAsHeader；其餘可選參數使用預設值並轉呼叫最長 WithDataRange 多載。
     /// </summary>
     public ChartDocumentBuilder WithDataRange(string sheetName, OdfCellRange range, bool firstRowAsHeader) => WithDataRange(sheetName, range, firstRowAsHeader, true);
 
@@ -138,14 +138,14 @@ public sealed class ChartDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithLegend that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithLegend 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public ChartDocumentBuilder WithLegend() => WithLegend("end", null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithLegend that accepts position; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 position；其餘可選參數使用預設值並轉呼叫最長 WithLegend 多載。
     /// </summary>
     public ChartDocumentBuilder WithLegend(string? position) => WithLegend(position, null);
 

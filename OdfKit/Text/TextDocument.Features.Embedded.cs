@@ -14,8 +14,8 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImageFrame that accepts paragraph, imageBytes, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 paragraph、imageBytes、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddImageFrame 多載。
     /// </summary>
     public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height) => AddImageFrame(paragraph, imageBytes, width, height, null);
 

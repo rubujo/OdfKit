@@ -16,14 +16,14 @@ public partial class OdfChartDocument
 {
     #region Data Range Binding
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDataRange that accepts sheetName and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName 與 range；其餘可選參數使用預設值並轉呼叫最長 SetDataRange 多載。
     /// </summary>
     public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range) => SetDataRange(sheetName, range, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDataRange that accepts sheetName, range, and firstRowAsHeader; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、range 與 firstRowAsHeader；其餘可選參數使用預設值並轉呼叫最長 SetDataRange 多載。
     /// </summary>
     public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) => SetDataRange(sheetName, range, firstRowAsHeader, true);
 

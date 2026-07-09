@@ -24,8 +24,8 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Add that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Add 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraph Add() => Add("");
 

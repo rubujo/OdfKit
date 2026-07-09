@@ -40,7 +40,7 @@ public partial class OdfStyleEngine
     private readonly Dictionary<OdfNode, Dictionary<OdfAttributeName, string?>> _directStyleProperties = new();
 
     /// <summary>
-    /// Executes the OdfStyleEngine operation.
+    /// Performs odf style engine.
     /// 初始化 <see cref="OdfStyleEngine"/> 類別的新執行個體。
     /// </summary>
     /// <param name="contentRoot">內容 XML 的根節點</param>
@@ -54,7 +54,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
-    /// Executes the RebuildStyleIndex operation.
+    /// Performs rebuild style index.
     /// 重新建構樣式索引。
     /// </summary>
     public void RebuildStyleIndex()
@@ -141,7 +141,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
-    /// Executes the StyleExists operation.
+    /// Performs style exists.
     /// 判斷指定的樣式是否存在。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>
@@ -152,7 +152,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
-    /// Executes the GetStyleProperty operation.
+    /// Gets style property.
     /// 取得指定的樣式屬性，自動支援層級回溯與循環繼承保護。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>

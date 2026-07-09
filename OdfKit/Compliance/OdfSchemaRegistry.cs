@@ -30,13 +30,13 @@ public static class OdfSchemaRegistry
     private static readonly Dictionary<OdfVersion, OdfSchemaSet> RegisteredSchemas = [];
 
     /// <summary>
-    /// Executes the Latest operation.
+    /// Performs latest.
     /// 取得此程式庫中可用的最新 ODF 結構描述中繼資料。
     /// </summary>
     public static OdfSchemaSet Latest => GetSchema(OdfVersion.Odf14);
 
     /// <summary>
-    /// Executes the Odf14 operation.
+    /// Performs odf 14.
     /// 取得 ODF 1.4 結構描述中繼資料種子。
     /// </summary>
     public static OdfSchemaSet Odf14 => GetSchema(OdfVersion.Odf14);
@@ -57,7 +57,7 @@ public static class OdfSchemaRegistry
     }
 
     /// <summary>
-    /// Executes the GetSchema operation.
+    /// Gets schema.
     /// 取得指定版本的結構描述中繼資料。
     /// </summary>
     /// <param name="version">ODF 版本</param>

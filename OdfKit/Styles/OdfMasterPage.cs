@@ -19,7 +19,7 @@ public sealed class OdfMasterPage
     public OdfNode Node => _node;
 
     /// <summary>
-    /// Executes the OdfMasterPage operation.
+    /// Performs odf master page.
     /// 初始化 <see cref="OdfMasterPage"/> 類別的新執行個體。
     /// </summary>
     /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>

@@ -15,7 +15,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
         RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Executes the OdfPoint3D operation.
+    /// Performs odf point 3 D.
     /// 以三維點 lexical form 建立 <see cref="OdfPoint3D"/>。
     /// </summary>
     /// <param name="value">三維點字串，例如 <c>(1cm 0mm -0.5in)</c></param>
@@ -34,7 +34,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     }
 
     /// <summary>
-    /// Executes the OdfPoint3D operation.
+    /// Performs odf point 3 D.
     /// 以三個帶單位座標值建立 <see cref="OdfPoint3D"/>。
     /// </summary>
     /// <param name="x">X 座標值</param>
@@ -79,7 +79,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     public OdfLength Z { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析三維點字串。
     /// </summary>
     /// <param name="value">三維點字串</param>
@@ -98,14 +98,14 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始三維點字串。
     /// </summary>
     /// <returns>三維點字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個三維點。
     /// </summary>
     /// <param name="other">要比較的三維點</param>
@@ -113,21 +113,21 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     public bool Equals(OdfPoint3D other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfPoint3D other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個三維點是否相等。
     /// </summary>
     /// <param name="left">左側三維點</param>
@@ -136,7 +136,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     public static bool operator ==(OdfPoint3D left, OdfPoint3D right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個三維點是否不相等。
     /// </summary>
     /// <param name="left">左側三維點</param>

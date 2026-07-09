@@ -261,8 +261,8 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
         return new OdfShape(shapeNode, Slide.Document);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddPicture that accepts imageBytes, x, y, w, and h; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、w 與 h；其餘可選參數使用預設值並轉呼叫最長 AddPicture 多載。
     /// </summary>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h) => AddPicture(imageBytes, x, y, w, h, null);
 

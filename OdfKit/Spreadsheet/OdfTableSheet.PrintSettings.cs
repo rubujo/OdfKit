@@ -104,14 +104,14 @@ public partial class OdfTableSheet
     public void SetPrintScale(int percent) =>
         OdfTableSheetPrintSettingsEngine.SetPrintScale(MutationContext, percent);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFitToPage that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：SetFitToPage 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void SetFitToPage() => SetFitToPage(1, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFitToPage that accepts maxPagesWide; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 maxPagesWide；其餘可選參數使用預設值並轉呼叫最長 SetFitToPage 多載。
     /// </summary>
     public void SetFitToPage(int maxPagesWide) => SetFitToPage(maxPagesWide, 0);
 

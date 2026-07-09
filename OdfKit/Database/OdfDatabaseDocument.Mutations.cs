@@ -15,8 +15,8 @@ public partial class OdfDatabaseDocument
 {
     #region Add Operations
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTable that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 AddTable 多載。
     /// </summary>
     public OdfNode AddTable(string name) => AddTable(name, null);
 
@@ -52,20 +52,20 @@ public partial class OdfDatabaseDocument
         return table;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddQuery that accepts name and command; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 command；其餘可選參數使用預設值並轉呼叫最長 AddQuery 多載。
     /// </summary>
     public OdfNode AddQuery(string name, string command) => AddQuery(name, command, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddQuery that accepts name, command, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、command 與 title；其餘可選參數使用預設值並轉呼叫最長 AddQuery 多載。
     /// </summary>
     public OdfNode AddQuery(string name, string command, string? title) => AddQuery(name, command, title, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddQuery that accepts name, command, title, and description; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、command、title 與 description；其餘可選參數使用預設值並轉呼叫最長 AddQuery 多載。
     /// </summary>
     public OdfNode AddQuery(string name, string command, string? title, string? description) => AddQuery(name, command, title, description, null);
 
@@ -200,26 +200,26 @@ public partial class OdfDatabaseDocument
         return setting;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddForm that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 AddForm 多載。
     /// </summary>
     public OdfNode AddForm(string name) => AddForm(name, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddForm that accepts name and href; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 href；其餘可選參數使用預設值並轉呼叫最長 AddForm 多載。
     /// </summary>
     public OdfNode AddForm(string name, string? href) => AddForm(name, href, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddForm that accepts name, href, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、href 與 title；其餘可選參數使用預設值並轉呼叫最長 AddForm 多載。
     /// </summary>
     public OdfNode AddForm(string name, string? href, string? title) => AddForm(name, href, title, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddForm that accepts name, href, title, and description; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、href、title 與 description；其餘可選參數使用預設值並轉呼叫最長 AddForm 多載。
     /// </summary>
     public OdfNode AddForm(string name, string? href, string? title, string? description) => AddForm(name, href, title, description, null);
 
@@ -276,26 +276,26 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddReport that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 AddReport 多載。
     /// </summary>
     public OdfNode AddReport(string name) => AddReport(name, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddReport that accepts name and href; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 href；其餘可選參數使用預設值並轉呼叫最長 AddReport 多載。
     /// </summary>
     public OdfNode AddReport(string name, string? href) => AddReport(name, href, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddReport that accepts name, href, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、href 與 title；其餘可選參數使用預設值並轉呼叫最長 AddReport 多載。
     /// </summary>
     public OdfNode AddReport(string name, string? href, string? title) => AddReport(name, href, title, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddReport that accepts name, href, title, and description; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、href、title 與 description；其餘可選參數使用預設值並轉呼叫最長 AddReport 多載。
     /// </summary>
     public OdfNode AddReport(string name, string? href, string? title, string? description) => AddReport(name, href, title, description, null);
 

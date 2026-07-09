@@ -24,7 +24,7 @@ public interface IFontSubsetter
 public sealed class OdfFontSubsetRequest
 {
     /// <summary>
-    /// Executes the OdfFontSubsetRequest operation.
+    /// Performs odf font subset request.
     /// 初始化 <see cref="OdfFontSubsetRequest"/> 類別的新執行個體。
     /// </summary>
     /// <param name="fontName">ODF 字型宣告名稱</param>
@@ -63,7 +63,7 @@ public sealed class OdfFontSubsetRequest
 public sealed class OdfFontSubset
 {
     /// <summary>
-    /// Executes the OdfFontSubset operation.
+    /// Performs odf font subset.
     /// 初始化 <see cref="OdfFontSubset"/> 類別的新執行個體。
     /// </summary>
     /// <param name="bytes">字型子集二進位資料</param>

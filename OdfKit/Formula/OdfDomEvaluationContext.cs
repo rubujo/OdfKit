@@ -11,8 +11,8 @@ namespace OdfKit.Formula;
 internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of IsBlank that accepts address; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 address；其餘可選參數使用預設值並轉呼叫最長 IsBlank 多載。
     /// </summary>
     public bool IsBlank(OdfCellAddress address) =>
         !_cellValues.ContainsKey(address) && !_cellFormulas.ContainsKey(address);
@@ -25,15 +25,15 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     private readonly OdfNode _contentRoot;
     private readonly OdfExternalLinkManager? _externalLinks;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfDomEvaluationContext that accepts contentRoot and evaluator; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 contentRoot 與 evaluator；其餘可選參數使用預設值並轉呼叫最長 OdfDomEvaluationContext 多載。
     /// </summary>
     public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator) : this(contentRoot, evaluator, null) { }
 
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of OdfDomEvaluationContext that accepts contentRoot, evaluator, and externalLinks.
+    /// OdfDomEvaluationContext 完整多載：接受 contentRoot、evaluator 與 externalLinks。
     /// </summary>
     public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator, OdfExternalLinkManager? externalLinks)
     {
@@ -173,8 +173,8 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of GetCellValue that accepts address.
+    /// GetCellValue 完整多載：接受 address。
     /// </summary>
     public object GetCellValue(OdfCellAddress address)
     {
@@ -208,9 +208,11 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Gets the values of the specified cell range as a two-dimensional array.
+    /// 取得指定儲存格範圍的值，並以二維陣列傳回。
     /// </summary>
+    /// <param name="range">The cell range to read. / 要讀取的儲存格範圍。</param>
+    /// <returns>A two-dimensional array of cell values. / 儲存格值的二維陣列。</returns>
     public object[,] GetRangeValues(OdfCellRange range)
     {
         if (_externalLinks is not null && _externalLinks.TryGetRangeValues(range, out object[,] externalValues))
@@ -245,8 +247,8 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of GetCellFormula that accepts address.
+    /// GetCellFormula 完整多載：接受 address。
     /// </summary>
     public string? GetCellFormula(OdfCellAddress address)
     {
@@ -259,8 +261,8 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of GetNamedRangeOrExpressionValue that accepts name.
+    /// GetNamedRangeOrExpressionValue 完整多載：接受 name。
     /// </summary>
     public object GetNamedRangeOrExpressionValue(string name)
     {

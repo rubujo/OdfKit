@@ -12,13 +12,13 @@ namespace OdfKit.DOM;
 public static class OdfXmlWriter
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Write that accepts rootNode and stream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 rootNode 與 stream；其餘可選參數使用預設值並轉呼叫最長 Write 多載。
     /// </summary>
     public static void Write(OdfNode rootNode, Stream stream) => Write(rootNode, stream, null);
 
     /// <summary>
-    /// Executes the Write operation.
+    /// Performs the Write operation.
     /// 將記憶體 DOM 節點樹序列化寫入 XML 檔案流。
     /// </summary>
     /// <param name="rootNode">要寫入的根節點</param>

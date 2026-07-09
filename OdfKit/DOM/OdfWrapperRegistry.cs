@@ -13,7 +13,7 @@ public static class OdfWrapperRegistry
     private static readonly Dictionary<OdfWrapperKey, Func<string?, OdfElement>> Factories = new();
 
     /// <summary>
-    /// Executes the Register operation.
+    /// Performs the Register operation.
     /// 註冊指定元素名稱對應的 typed DOM wrapper factory。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>
@@ -35,7 +35,7 @@ public static class OdfWrapperRegistry
     }
 
     /// <summary>
-    /// Executes the Unregister operation.
+    /// Performs unregister.
     /// 移除指定元素名稱的自訂 typed DOM wrapper 註冊。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>

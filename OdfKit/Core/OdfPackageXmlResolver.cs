@@ -15,8 +15,8 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of GetEntity that accepts absoluteUri, role, and ofObjectToReturn.
+    /// GetEntity 完整多載：接受 absoluteUri、role 與 ofObjectToReturn。
     /// </summary>
     public override object? GetEntity(Uri absoluteUri, string? role, Type? ofObjectToReturn)
     {
@@ -66,8 +66,8 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ResolveUri that accepts baseUri and relativeUri.
+    /// ResolveUri 完整多載：接受 baseUri 與 relativeUri。
     /// </summary>
     public override Uri ResolveUri(Uri? baseUri, string? relativeUri)
     {

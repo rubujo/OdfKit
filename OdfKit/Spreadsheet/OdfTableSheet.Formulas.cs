@@ -126,8 +126,8 @@ public partial class OdfTableSheet
         return updatedCount;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ReplaceFormulaText that accepts oldValue and newValue; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 oldValue 與 newValue；其餘可選參數使用預設值並轉呼叫最長 ReplaceFormulaText 多載。
     /// </summary>
     public int ReplaceFormulaText(string oldValue, string newValue) => ReplaceFormulaText(oldValue, newValue, StringComparison.Ordinal);
 

@@ -46,8 +46,8 @@ public partial class OdfTableSheet
     public bool IsColumnVisible(int col) =>
         OdfTableSheetVisibilityEngine.IsColumnVisible(MutationContext, col);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddNamedRange that accepts name and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 range；其餘可選參數使用預設值並轉呼叫最長 AddNamedRange 多載。
     /// </summary>
     public void AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
 
@@ -70,8 +70,8 @@ public partial class OdfTableSheet
     public IReadOnlyList<OdfNamedRangeInfo> NamedRanges =>
         OdfTableSheetNamedRangeEngine.GetNamedRanges(MutationContext);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddNamedExpression that accepts name and expression; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 expression；其餘可選參數使用預設值並轉呼叫最長 AddNamedExpression 多載。
     /// </summary>
     public void AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
 

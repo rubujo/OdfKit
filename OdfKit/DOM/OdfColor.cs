@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfColor : IEquatable<OdfColor>
 {
     /// <summary>
-    /// Executes the OdfColor operation.
+    /// Performs odf color.
     /// 以色彩 lexical form 建立 <see cref="OdfColor"/>。
     /// </summary>
     /// <param name="value">色彩字串，例如 <c>#ffcc00</c></param>
@@ -32,7 +32,7 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析色彩字串。
     /// </summary>
     /// <param name="value">色彩字串</param>
@@ -51,7 +51,7 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     }
 
     /// <summary>
-    /// Executes the FromRgb operation.
+    /// Creates from rgb.
     /// 從紅、綠、藍色彩通道建立 <see cref="OdfColor"/>。
     /// </summary>
     /// <param name="red">紅色通道</param>
@@ -61,35 +61,35 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     public static OdfColor FromRgb(byte red, byte green, byte blue) => new($"#{red:x2}{green:x2}{blue:x2}");
 
     /// <summary>
-    /// Executes the OdfColor operation.
+    /// Performs odf color.
     /// 將 HTML 色碼字串隱式轉換為 <see cref="OdfColor"/>。
     /// </summary>
     /// <param name="value">色彩字串，例如 <c>#ffcc00</c></param>
     public static implicit operator OdfColor(string value) => new(value);
 
     /// <summary>
-    /// Executes the OdfColor operation.
+    /// Performs odf color.
     /// 將 <see cref="Color"/> 隱式轉換為 <see cref="OdfColor"/>。
     /// </summary>
     /// <param name="color">來源色彩值</param>
     public static implicit operator OdfColor(Color color) => FromRgb(color.R, color.G, color.B);
 
     /// <summary>
-    /// Executes the string operation.
+    /// Performs string.
     /// 將 <see cref="OdfColor"/> 隱式轉換為色彩字串。
     /// </summary>
     /// <param name="color">來源色彩值</param>
     public static implicit operator string(OdfColor color) => color.ToString();
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始色彩字串。
     /// </summary>
     /// <returns>色彩字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個色彩。
     /// </summary>
     /// <param name="other">要比較的色彩</param>
@@ -97,21 +97,21 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     public bool Equals(OdfColor other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfColor other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個色彩是否相等。
     /// </summary>
     /// <param name="left">左側色彩</param>
@@ -120,7 +120,7 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     public static bool operator ==(OdfColor left, OdfColor right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個色彩是否不相等。
     /// </summary>
     /// <param name="left">左側色彩</param>

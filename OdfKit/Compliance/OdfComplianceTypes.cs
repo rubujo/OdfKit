@@ -283,7 +283,7 @@ public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
     public static OdfVersionRange AllKnown { get; } = new(OdfVersion.Odf10, OdfVersion.Odf14);
 
     /// <summary>
-    /// Executes the Exact operation.
+    /// Performs exact.
     /// 建立僅包含單一特定 ODF 版本的範圍。
     /// </summary>
     /// <param name="version">目標 ODF 版本</param>
@@ -291,7 +291,7 @@ public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
     public static OdfVersionRange Exact(OdfVersion version) => new(version, version);
 
     /// <summary>
-    /// Executes the Contains operation.
+    /// Performs contains.
     /// 判斷指定的 ODF 版本是否在此範圍內。
     /// </summary>
     /// <param name="version">要判斷的 ODF 版本</param>

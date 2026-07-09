@@ -15,7 +15,7 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
         RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Executes the OdfVector3D operation.
+    /// Performs odf vector 3 D.
     /// 以三維向量 lexical form 建立 <see cref="OdfVector3D"/>。
     /// </summary>
     /// <param name="value">三維向量字串，例如 <c>(1 0 -0.5)</c></param>
@@ -34,7 +34,7 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     }
 
     /// <summary>
-    /// Executes the OdfVector3D operation.
+    /// Performs odf vector 3 D.
     /// 以三個座標值建立 <see cref="OdfVector3D"/>。
     /// </summary>
     /// <param name="x">X 座標值</param>
@@ -73,7 +73,7 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     public decimal Z { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析三維向量字串。
     /// </summary>
     /// <param name="value">三維向量字串</param>
@@ -92,14 +92,14 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始三維向量字串。
     /// </summary>
     /// <returns>三維向量字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個三維向量。
     /// </summary>
     /// <param name="other">要比較的三維向量</param>
@@ -107,21 +107,21 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     public bool Equals(OdfVector3D other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfVector3D other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個三維向量是否相等。
     /// </summary>
     /// <param name="left">左側三維向量</param>
@@ -130,7 +130,7 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     public static bool operator ==(OdfVector3D left, OdfVector3D right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個三維向量是否不相等。
     /// </summary>
     /// <param name="left">左側三維向量</param>

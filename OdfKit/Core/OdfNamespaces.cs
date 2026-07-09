@@ -167,7 +167,7 @@ public static class OdfNamespaces
     public const string Report = "urn:oasis:names:tc:opendocument:xmlns:report:1.0";
 
     /// <summary>
-    /// Executes the GetPrefix operation.
+    /// Gets prefix.
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -212,7 +212,7 @@ public static class OdfNamespaces
     }
 
     /// <summary>
-    /// Executes the LookupNamespaceUri operation.
+    /// Performs lookup namespace uri.
     /// 根據命名空間前綴查找標準命名空間 URI。
     /// </summary>
     /// <param name="prefix">命名空間前綴</param>

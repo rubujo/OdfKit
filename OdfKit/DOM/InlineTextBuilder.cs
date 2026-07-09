@@ -25,14 +25,14 @@ public sealed class InlineTextBuilder
         _doc = doc ?? throw new ArgumentNullException(nameof(doc));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Bold that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Bold 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Bold() => Bold(true);
 
 
     /// <summary>
-    /// Executes the Bold operation.
+    /// Performs bold.
     /// 設定後續文字是否為粗體。
     /// </summary>
     /// <param name="bold">是否為粗體，預設為 <see langword="true"/></param>
@@ -44,14 +44,14 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Italic that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Italic 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Italic() => Italic(true);
 
 
     /// <summary>
-    /// Executes the Italic operation.
+    /// Performs italic.
     /// 設定後續文字是否為斜體。
     /// </summary>
     /// <param name="italic">是否為斜體，預設為 <see langword="true"/></param>
@@ -63,14 +63,14 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Underline that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Underline 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Underline() => Underline(true);
 
 
     /// <summary>
-    /// Executes the Underline operation.
+    /// Performs underline.
     /// 設定後續文字是否具備下劃線。
     /// </summary>
     /// <param name="underline">是否具備下劃線，預設為 <see langword="true"/></param>
@@ -83,7 +83,7 @@ public sealed class InlineTextBuilder
 
 
     /// <summary>
-    /// Executes the Color operation.
+    /// Performs color.
     /// 設定後續文字的顏色（如十六進位色彩碼 "#FF0000"）。
     /// </summary>
     /// <param name="colorHex">顏色的十六進位碼字串</param>
@@ -95,7 +95,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Executes the FontSize operation.
+    /// Performs font size.
     /// 設定後續文字的字型大小（例如 "12pt" 或 "120%"）。
     /// </summary>
     /// <param name="size">字型大小描述字串</param>
@@ -107,7 +107,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Executes the Clear operation.
+    /// Performs the Clear operation.
     /// 清除目前累積的所有行內樣式狀態，重設為預設文字。
     /// </summary>
     /// <returns>當前建構器執行個體，支援鏈式呼叫</returns>
@@ -122,7 +122,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Executes the Text operation.
+    /// Performs text.
     /// 在段落中追加一段指定樣式的文字。
     /// </summary>
     /// <param name="value">要寫入的文字內容</param>

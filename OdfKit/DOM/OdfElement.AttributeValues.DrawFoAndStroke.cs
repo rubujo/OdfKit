@@ -12,14 +12,14 @@ public partial class OdfElement
 {
     #region Attribute Values - Draw, FO & Stroke
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDrawNoHrefAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDrawNoHrefAttributeValue 多載。
     /// </summary>
     public OdfDrawNoHref? GetDrawNoHrefAttributeValue(string localName, string namespaceUri) => GetDrawNoHrefAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDrawNoHrefAttributeValue operation.
+    /// Gets draw no href attribute value.
     /// 取得具有 schema awareness 的繪圖無連結屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -32,21 +32,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawNoHref>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawNoHrefAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDrawNoHrefAttributeValue 多載。
     /// </summary>
     public void SetDrawNoHrefAttributeValue(string localName, string namespaceUri, OdfDrawNoHref value) => SetDrawNoHrefAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawNoHrefAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDrawNoHrefAttributeValue 多載。
     /// </summary>
     public void SetDrawNoHrefAttributeValue(string localName, string namespaceUri, OdfDrawNoHref value, string? prefix) => SetDrawNoHrefAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDrawNoHrefAttributeValue operation.
+    /// Sets draw no href attribute value.
     /// 設定具有 schema awareness 的繪圖無連結屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -60,14 +60,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTableFunctionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetTableFunctionAttributeValue 多載。
     /// </summary>
     public OdfTableFunction? GetTableFunctionAttributeValue(string localName, string namespaceUri) => GetTableFunctionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetTableFunctionAttributeValue operation.
+    /// Gets table function attribute value.
     /// 取得具有 schema awareness 的表格彙總函式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -80,21 +80,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableFunction>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableFunctionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetTableFunctionAttributeValue 多載。
     /// </summary>
     public void SetTableFunctionAttributeValue(string localName, string namespaceUri, OdfTableFunction value) => SetTableFunctionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableFunctionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetTableFunctionAttributeValue 多載。
     /// </summary>
     public void SetTableFunctionAttributeValue(string localName, string namespaceUri, OdfTableFunction value, string? prefix) => SetTableFunctionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetTableFunctionAttributeValue operation.
+    /// Sets table function attribute value.
     /// 設定具有 schema awareness 的表格彙總函式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -108,14 +108,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDrawStrokeLineJoinAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDrawStrokeLineJoinAttributeValue 多載。
     /// </summary>
     public OdfDrawStrokeLineJoin? GetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri) => GetDrawStrokeLineJoinAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDrawStrokeLineJoinAttributeValue operation.
+    /// Gets draw stroke line join attribute value.
     /// 取得具有 schema awareness 的繪圖線條接合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -128,21 +128,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawStrokeLineJoin>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawStrokeLineJoinAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDrawStrokeLineJoinAttributeValue 多載。
     /// </summary>
     public void SetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri, OdfDrawStrokeLineJoin value) => SetDrawStrokeLineJoinAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDrawStrokeLineJoinAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDrawStrokeLineJoinAttributeValue 多載。
     /// </summary>
     public void SetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri, OdfDrawStrokeLineJoin value, string? prefix) => SetDrawStrokeLineJoinAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDrawStrokeLineJoinAttributeValue operation.
+    /// Sets draw stroke line join attribute value.
     /// 設定具有 schema awareness 的繪圖線條接合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -156,14 +156,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetSvgStrokeLineCapAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetSvgStrokeLineCapAttributeValue 多載。
     /// </summary>
     public OdfSvgStrokeLineCap? GetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri) => GetSvgStrokeLineCapAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetSvgStrokeLineCapAttributeValue operation.
+    /// Gets svg stroke line cap attribute value.
     /// 取得具有 schema awareness 的 SVG 線端樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -176,21 +176,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfSvgStrokeLineCap>(value);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSvgStrokeLineCapAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetSvgStrokeLineCapAttributeValue 多載。
     /// </summary>
     public void SetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri, OdfSvgStrokeLineCap value) => SetSvgStrokeLineCapAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSvgStrokeLineCapAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetSvgStrokeLineCapAttributeValue 多載。
     /// </summary>
     public void SetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri, OdfSvgStrokeLineCap value, string? prefix) => SetSvgStrokeLineCapAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetSvgStrokeLineCapAttributeValue operation.
+    /// Sets svg stroke line cap attribute value.
     /// 設定具有 schema awareness 的 SVG 線端樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -204,14 +204,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFoKeepTogetherAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFoKeepTogetherAttributeValue 多載。
     /// </summary>
     public OdfFoKeepTogether? GetFoKeepTogetherAttributeValue(string localName, string namespaceUri) => GetFoKeepTogetherAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFoKeepTogetherAttributeValue operation.
+    /// Gets fo keep together attribute value.
     /// 取得具有 schema awareness 的 FO 分頁保持屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -224,21 +224,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFoKeepTogether>(value, OdfElementSchemaRegistry.TryParseFoKeepTogether);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoKeepTogetherAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFoKeepTogetherAttributeValue 多載。
     /// </summary>
     public void SetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfFoKeepTogether value) => SetFoKeepTogetherAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoKeepTogetherAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFoKeepTogetherAttributeValue 多載。
     /// </summary>
     public void SetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfFoKeepTogether value, string? prefix) => SetFoKeepTogetherAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFoKeepTogetherAttributeValue operation.
+    /// Sets fo keep together attribute value.
     /// 設定具有 schema awareness 的 FO 分頁保持屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -252,14 +252,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFoWrapOptionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFoWrapOptionAttributeValue 多載。
     /// </summary>
     public OdfFoWrapOption? GetFoWrapOptionAttributeValue(string localName, string namespaceUri) => GetFoWrapOptionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFoWrapOptionAttributeValue operation.
+    /// Gets fo wrap option attribute value.
     /// 取得具有 schema awareness 的 FO 換行選項屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -272,21 +272,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFoWrapOption>(value, OdfElementSchemaRegistry.TryParseFoWrapOption);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoWrapOptionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFoWrapOptionAttributeValue 多載。
     /// </summary>
     public void SetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfFoWrapOption value) => SetFoWrapOptionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFoWrapOptionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFoWrapOptionAttributeValue 多載。
     /// </summary>
     public void SetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfFoWrapOption value, string? prefix) => SetFoWrapOptionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFoWrapOptionAttributeValue operation.
+    /// Sets fo wrap option attribute value.
     /// 設定具有 schema awareness 的 FO 換行選項屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -300,14 +300,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDr3dProjectionAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDr3dProjectionAttributeValue 多載。
     /// </summary>
     public OdfDr3dProjection? GetDr3dProjectionAttributeValue(string localName, string namespaceUri) => GetDr3dProjectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDr3dProjectionAttributeValue operation.
+    /// Gets dr 3 d projection attribute value.
     /// 取得具有 schema awareness 的 3D 投影屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -320,21 +320,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfDr3dProjection>(value, OdfElementSchemaRegistry.TryParseDr3dProjection);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDr3dProjectionAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDr3dProjectionAttributeValue 多載。
     /// </summary>
     public void SetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfDr3dProjection value) => SetDr3dProjectionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDr3dProjectionAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDr3dProjectionAttributeValue 多載。
     /// </summary>
     public void SetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfDr3dProjection value, string? prefix) => SetDr3dProjectionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDr3dProjectionAttributeValue operation.
+    /// Sets dr 3 d projection attribute value.
     /// 設定具有 schema awareness 的 3D 投影屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -348,14 +348,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetDr3dShadeModeAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetDr3dShadeModeAttributeValue 多載。
     /// </summary>
     public OdfDr3dShadeMode? GetDr3dShadeModeAttributeValue(string localName, string namespaceUri) => GetDr3dShadeModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetDr3dShadeModeAttributeValue operation.
+    /// Gets dr 3 d shade mode attribute value.
     /// 取得具有 schema awareness 的 3D 著色模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -368,21 +368,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfDr3dShadeMode>(value, OdfElementSchemaRegistry.TryParseDr3dShadeMode);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDr3dShadeModeAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetDr3dShadeModeAttributeValue 多載。
     /// </summary>
     public void SetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfDr3dShadeMode value) => SetDr3dShadeModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDr3dShadeModeAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetDr3dShadeModeAttributeValue 多載。
     /// </summary>
     public void SetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfDr3dShadeMode value, string? prefix) => SetDr3dShadeModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetDr3dShadeModeAttributeValue operation.
+    /// Sets dr 3 d shade mode attribute value.
     /// 設定具有 schema awareness 的 3D 著色模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -396,14 +396,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetSvgFillRuleAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetSvgFillRuleAttributeValue 多載。
     /// </summary>
     public OdfSvgFillRule? GetSvgFillRuleAttributeValue(string localName, string namespaceUri) => GetSvgFillRuleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetSvgFillRuleAttributeValue operation.
+    /// Gets svg fill rule attribute value.
     /// 取得具有 schema awareness 的 SVG 填滿規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -416,21 +416,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfSvgFillRule>(value, OdfElementSchemaRegistry.TryParseSvgFillRule);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSvgFillRuleAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetSvgFillRuleAttributeValue 多載。
     /// </summary>
     public void SetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfSvgFillRule value) => SetSvgFillRuleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetSvgFillRuleAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetSvgFillRuleAttributeValue 多載。
     /// </summary>
     public void SetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfSvgFillRule value, string? prefix) => SetSvgFillRuleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetSvgFillRuleAttributeValue operation.
+    /// Sets svg fill rule attribute value.
     /// 設定具有 schema awareness 的 SVG 填滿規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -444,14 +444,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTableBorderModelAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetTableBorderModelAttributeValue 多載。
     /// </summary>
     public OdfTableBorderModel? GetTableBorderModelAttributeValue(string localName, string namespaceUri) => GetTableBorderModelAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetTableBorderModelAttributeValue operation.
+    /// Gets table border model attribute value.
     /// 取得具有 schema awareness 的表格邊框模型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -464,21 +464,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableBorderModel>(value, OdfElementSchemaRegistry.TryParseTableBorderModel);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableBorderModelAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetTableBorderModelAttributeValue 多載。
     /// </summary>
     public void SetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfTableBorderModel value) => SetTableBorderModelAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetTableBorderModelAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetTableBorderModelAttributeValue 多載。
     /// </summary>
     public void SetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfTableBorderModel value, string? prefix) => SetTableBorderModelAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetTableBorderModelAttributeValue operation.
+    /// Sets table border model attribute value.
     /// 設定具有 schema awareness 的表格邊框模型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

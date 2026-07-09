@@ -50,14 +50,14 @@ public static class OdfMemoryTracker
     /// </summary>
     public static long BoxingWarningThreshold { get; set; } = 10_000;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Track that accepts ptr and size; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 ptr 與 size；其餘可選參數使用預設值並轉呼叫最長 Track 多載。
     /// </summary>
     public static void Track(IntPtr ptr, long size) => Track(ptr, size, null);
 
 
     /// <summary>
-    /// Executes the Track operation.
+    /// Performs track.
     /// 追蹤非受控記憶體或 POH 鎖定分配。
     /// </summary>
     /// <param name="ptr">記憶體區塊指標</param>
@@ -81,7 +81,7 @@ public static class OdfMemoryTracker
 
 
     /// <summary>
-    /// Executes the Untrack operation.
+    /// Performs untrack.
     /// 取消追蹤並釋放非受控記憶體。
     /// </summary>
     /// <param name="ptr">記憶體區塊指標</param>
@@ -97,26 +97,26 @@ public static class OdfMemoryTracker
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ReportLoadProfile that accepts nodeCount; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 nodeCount；其餘可選參數使用預設值並轉呼叫最長 ReportLoadProfile 多載。
     /// </summary>
     public static void ReportLoadProfile(long nodeCount) => ReportLoadProfile(nodeCount, null, 0, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ReportLoadProfile that accepts nodeCount and allocatedBytes; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 nodeCount 與 allocatedBytes；其餘可選參數使用預設值並轉呼叫最長 ReportLoadProfile 多載。
     /// </summary>
     public static void ReportLoadProfile(long nodeCount, long? allocatedBytes) => ReportLoadProfile(nodeCount, allocatedBytes, 0, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ReportLoadProfile that accepts nodeCount, allocatedBytes, and boxedValueCount; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 nodeCount、allocatedBytes 與 boxedValueCount；其餘可選參數使用預設值並轉呼叫最長 ReportLoadProfile 多載。
     /// </summary>
     public static void ReportLoadProfile(long nodeCount, long? allocatedBytes, long boxedValueCount) => ReportLoadProfile(nodeCount, allocatedBytes, boxedValueCount, null);
 
 
     /// <summary>
-    /// Executes the ReportLoadProfile operation.
+    /// Performs report load profile.
     /// 回報單次載入或批次操作的記憶體與反模式特徵，超過門檻時輸出診斷警示。
     /// </summary>
     /// <param name="nodeCount">本次載入或操作涉及的 DOM 節點數</param>
@@ -150,14 +150,14 @@ public static class OdfMemoryTracker
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CheckLeaks that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：CheckLeaks 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static bool CheckLeaks() => CheckLeaks(true);
 
 
     /// <summary>
-    /// Executes the CheckLeaks operation.
+    /// Performs check leaks.
     /// 檢查是否有尚未釋放的非受控記憶體。
     /// </summary>
     /// <param name="reportLeaks">是否列印洩漏報告</param>

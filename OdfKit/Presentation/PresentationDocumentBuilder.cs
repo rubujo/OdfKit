@@ -87,8 +87,8 @@ public sealed class PresentationDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithMasterPage that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 WithMasterPage 多載。
     /// </summary>
     public PresentationDocumentBuilder WithMasterPage(string name) => WithMasterPage(name, null);
 
@@ -144,14 +144,14 @@ public sealed class PresentationDocumentBuilder
         return AddSlide($"Slide {_slideCount + 1}", configure);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitleSlide that accepts name and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 title；其餘可選參數使用預設值並轉呼叫最長 AddTitleSlide 多載。
     /// </summary>
     public PresentationDocumentBuilder AddTitleSlide(string name, string title) => AddTitleSlide(name, title, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitleSlide that accepts name, title, and subtitle; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、title 與 subtitle；其餘可選參數使用預設值並轉呼叫最長 AddTitleSlide 多載。
     /// </summary>
     public PresentationDocumentBuilder AddTitleSlide(string name, string title, string? subtitle) => AddTitleSlide(name, title, subtitle, null);
 
@@ -188,8 +188,8 @@ public sealed class PresentationDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTwoColumnSlide that accepts name, title, leftParagraphs, and rightParagraphs; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、title、leftParagraphs 與 rightParagraphs；其餘可選參數使用預設值並轉呼叫最長 AddTwoColumnSlide 多載。
     /// </summary>
     public PresentationDocumentBuilder AddTwoColumnSlide(string name, string title, IEnumerable<string> leftParagraphs, IEnumerable<string> rightParagraphs) => AddTwoColumnSlide(name, title, leftParagraphs, rightParagraphs, null);
 
@@ -220,8 +220,8 @@ public sealed class PresentationDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddChartSlide that accepts name and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 title；其餘可選參數使用預設值並轉呼叫最長 AddChartSlide 多載。
     /// </summary>
     public PresentationDocumentBuilder AddChartSlide(string name, string title) => AddChartSlide(name, title, null);
 
@@ -290,26 +290,26 @@ public sealed class OdfSlideBuilder
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitle that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AddTitle 多載。
     /// </summary>
     public OdfSlideBuilder AddTitle(string text) => AddTitle(text, 1, 1, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitle that accepts text and xCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text 與 xCm；其餘可選參數使用預設值並轉呼叫最長 AddTitle 多載。
     /// </summary>
     public OdfSlideBuilder AddTitle(string text, double xCm) => AddTitle(text, xCm, 1, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitle that accepts text, xCm, and yCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text、xCm 與 yCm；其餘可選參數使用預設值並轉呼叫最長 AddTitle 多載。
     /// </summary>
     public OdfSlideBuilder AddTitle(string text, double xCm, double yCm) => AddTitle(text, xCm, yCm, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitle that accepts text, xCm, yCm, and widthCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text、xCm、yCm 與 widthCm；其餘可選參數使用預設值並轉呼叫最長 AddTitle 多載。
     /// </summary>
     public OdfSlideBuilder AddTitle(string text, double xCm, double yCm, double widthCm) => AddTitle(text, xCm, yCm, widthCm, 2);
 
@@ -414,8 +414,8 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddShape that accepts shapeType, xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeType、xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddShape 多載。
     /// </summary>
     public OdfSlideBuilder AddShape(OdfShapeType shapeType, double xCm, double yCm, double widthCm, double heightCm) => AddShape(shapeType, xCm, yCm, widthCm, heightCm, null);
 
@@ -488,20 +488,20 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId and effect; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId 與 effect；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect) => AddEmphasisEffect(shapeId, effect, 0.5, OdfAnimationTrigger.OnClick, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId, effect, and durationSeconds; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 durationSeconds；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, double durationSeconds) => AddEmphasisEffect(shapeId, effect, durationSeconds, OdfAnimationTrigger.OnClick, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId, effect, durationSeconds, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect、durationSeconds 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, double durationSeconds, OdfAnimationTrigger trigger) => AddEmphasisEffect(shapeId, effect, durationSeconds, trigger, 0);
 
@@ -523,14 +523,14 @@ public sealed class OdfSlideBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddExitEffect that accepts shapeId and effect; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId 與 effect；其餘可選參數使用預設值並轉呼叫最長 AddExitEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddExitEffect(string shapeId, OdfAnimationEffect effect) => AddExitEffect(shapeId, effect, OdfAnimationTrigger.AfterPrevious, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddExitEffect that accepts shapeId, effect, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddExitEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddExitEffect(shapeId, effect, trigger, 0);
 
@@ -551,26 +551,26 @@ public sealed class OdfSlideBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitlePlaceholder that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddTitlePlaceholder 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSlideBuilder AddTitlePlaceholder() => AddTitlePlaceholder(1, 1, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitlePlaceholder that accepts xCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm；其餘可選參數使用預設值並轉呼叫最長 AddTitlePlaceholder 多載。
     /// </summary>
     public OdfSlideBuilder AddTitlePlaceholder(double xCm) => AddTitlePlaceholder(xCm, 1, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitlePlaceholder that accepts xCm and yCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm 與 yCm；其餘可選參數使用預設值並轉呼叫最長 AddTitlePlaceholder 多載。
     /// </summary>
     public OdfSlideBuilder AddTitlePlaceholder(double xCm, double yCm) => AddTitlePlaceholder(xCm, yCm, 10, 2);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTitlePlaceholder that accepts xCm, yCm, and widthCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm、yCm 與 widthCm；其餘可選參數使用預設值並轉呼叫最長 AddTitlePlaceholder 多載。
     /// </summary>
     public OdfSlideBuilder AddTitlePlaceholder(double xCm, double yCm, double widthCm) => AddTitlePlaceholder(xCm, yCm, widthCm, 2);
 
@@ -619,8 +619,8 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithTransition that accepts type; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type；其餘可選參數使用預設值並轉呼叫最長 WithTransition 多載。
     /// </summary>
     public OdfSlideBuilder WithTransition(OdfTransitionType type) => WithTransition(type, 72);
 
@@ -638,14 +638,14 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntranceEffect that accepts shapeId and effect; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId 與 effect；其餘可選參數使用預設值並轉呼叫最長 AddEntranceEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddEntranceEffect(string shapeId, OdfAnimationEffect effect) => AddEntranceEffect(shapeId, effect, OdfAnimationTrigger.OnClick, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntranceEffect that accepts shapeId, effect, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddEntranceEffect 多載。
     /// </summary>
     public OdfSlideBuilder AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddEntranceEffect(shapeId, effect, trigger, 0);
 

@@ -26,14 +26,14 @@ public partial class OfficeTextElement
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendParagraph that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendParagraph 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextPElement AppendParagraph() => AppendParagraph("");
 
 
     /// <summary>
-    /// Executes the AppendParagraph operation.
+    /// Appends paragraph.
     /// 在 <c>office:text</c> 末尾新增段落。
     /// </summary>
     /// <param name="text">段落文字內容</param>
@@ -50,14 +50,14 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendHeading that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AppendHeading 多載。
     /// </summary>
     public TextHElement AppendHeading(string text) => AppendHeading(text, 1);
 
 
     /// <summary>
-    /// Executes the AppendHeading operation.
+    /// Appends heading.
     /// 在 <c>office:text</c> 末尾新增標題。
     /// </summary>
     /// <param name="text">標題文字內容</param>
@@ -72,14 +72,14 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendList that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendList 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextListElement AppendList() => AppendList(null);
 
 
     /// <summary>
-    /// Executes the AppendList operation.
+    /// Appends list.
     /// 在 <c>office:text</c> 末尾新增專案清單。
     /// </summary>
     /// <param name="styleName">選用的清單樣式名稱</param>
@@ -96,14 +96,14 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendTable that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AppendTable 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TableTableElement AppendTable() => AppendTable(null);
 
 
     /// <summary>
-    /// Executes the AppendTable operation.
+    /// Appends table.
     /// 在 <c>office:text</c> 末尾新增表格。
     /// </summary>
     /// <param name="name">選用的表格名稱</param>
@@ -121,7 +121,7 @@ public partial class OfficeTextElement
 
 
     /// <summary>
-    /// Executes the AppendSection operation.
+    /// Appends section.
     /// 在 <c>office:text</c> 末尾新增章節。
     /// </summary>
     /// <param name="name">章節名稱</param>

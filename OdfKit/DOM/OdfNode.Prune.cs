@@ -11,7 +11,7 @@ namespace OdfKit.DOM;
 public partial class OdfNode
 {
     /// <summary>
-    /// Executes the ReleaseUnusedNodes operation.
+    /// Performs release unused nodes.
     /// 釋放此節點已載入子樹中的可重建查詢快取，而不移除 DOM 節點或具現化延遲 XML。
     /// </summary>
     /// <returns>已掃描並釋放快取的已載入節點數，包含此節點本身。</returns>
@@ -24,14 +24,14 @@ public partial class OdfNode
         return ReleaseUnusedNodesCore();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of PruneAndCollect that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：PruneAndCollect 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public int PruneAndCollect() => PruneAndCollect(false);
 
 
     /// <summary>
-    /// Executes the PruneAndCollect operation.
+    /// Performs prune and collect.
     /// 將此節點子樹自目前 DOM 樹斷開，並釋放其子節點、屬性與延遲載入 XML 參照。
     /// </summary>
     /// <param name="collectGarbage">是否在剪裁後要求執行一次最佳化 GC 收集</param>

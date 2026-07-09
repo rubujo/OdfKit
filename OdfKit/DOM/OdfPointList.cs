@@ -17,7 +17,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
         RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Executes the OdfPointList operation.
+    /// Performs odf point list.
     /// 以座標清單 lexical form 建立 <see cref="OdfPointList"/>。
     /// </summary>
     /// <param name="value">座標清單字串，例如 <c>0,0 10,20 -5,30</c></param>
@@ -34,7 +34,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     }
 
     /// <summary>
-    /// Executes the OdfPointList operation.
+    /// Performs odf point list.
     /// 以座標集合建立 <see cref="OdfPointList"/>。
     /// </summary>
     /// <param name="points">要寫入的座標集合</param>
@@ -64,7 +64,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     public IReadOnlyList<OdfPoint2D> Points { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析座標清單。
     /// </summary>
     /// <param name="value">座標清單字串</param>
@@ -83,14 +83,14 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始座標清單字串。
     /// </summary>
     /// <returns>座標清單字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個座標清單。
     /// </summary>
     /// <param name="other">要比較的座標清單</param>
@@ -98,21 +98,21 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     public bool Equals(OdfPointList other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfPointList other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個座標清單是否相等。
     /// </summary>
     /// <param name="left">左側座標清單</param>
@@ -121,7 +121,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     public static bool operator ==(OdfPointList left, OdfPointList right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個座標清單是否不相等。
     /// </summary>
     /// <param name="left">左側座標清單</param>
@@ -182,7 +182,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
 public readonly struct OdfPoint2D : IEquatable<OdfPoint2D>
 {
     /// <summary>
-    /// Executes the OdfPoint2D operation.
+    /// Performs odf point 2 D.
     /// 以 X 與 Y 座標建立 <see cref="OdfPoint2D"/>。
     /// </summary>
     /// <param name="x">X 座標</param>
@@ -206,7 +206,7 @@ public readonly struct OdfPoint2D : IEquatable<OdfPoint2D>
     public int Y { get; }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回座標的 lexical form。
     /// </summary>
     /// <returns>座標字串</returns>
@@ -216,7 +216,7 @@ public readonly struct OdfPoint2D : IEquatable<OdfPoint2D>
     }
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前座標是否等於另一個座標。
     /// </summary>
     /// <param name="other">要比較的座標</param>
@@ -224,21 +224,21 @@ public readonly struct OdfPoint2D : IEquatable<OdfPoint2D>
     public bool Equals(OdfPoint2D other) => X == other.X && Y == other.Y;
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfPoint2D other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(X, Y);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個座標是否相等。
     /// </summary>
     /// <param name="left">左側座標</param>
@@ -247,7 +247,7 @@ public readonly struct OdfPoint2D : IEquatable<OdfPoint2D>
     public static bool operator ==(OdfPoint2D left, OdfPoint2D right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個座標是否不相等。
     /// </summary>
     /// <param name="left">左側座標</param>

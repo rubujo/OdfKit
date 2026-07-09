@@ -14,7 +14,7 @@ public sealed class OdfParagraphStyleProxy
     private readonly OdfParagraph _paragraph;
 
     /// <summary>
-    /// Executes the OdfParagraphStyleProxy operation.
+    /// Performs odf paragraph style proxy.
     /// 初始化 <see cref="OdfParagraphStyleProxy"/> 類別的新執行個體。
     /// </summary>
     /// <param name="paragraph">目標段落</param>

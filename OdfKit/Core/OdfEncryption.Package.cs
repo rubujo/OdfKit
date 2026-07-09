@@ -23,7 +23,7 @@ public static partial class OdfEncryption
     internal static int LastParallelEncryptionMaxDegreeForTests { get; private set; }
 
     /// <summary>
-    /// Executes the Decrypt operation.
+    /// Performs the Decrypt operation.
     /// 解密指定 ODF 封裝中的所有加密專案。
     /// </summary>
     /// <param name="package">要解密的 ODF 封裝執行個體</param>
@@ -190,14 +190,14 @@ public static partial class OdfEncryption
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Encrypt that accepts package and password; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 package 與 password；其餘可選參數使用預設值並轉呼叫最長 Encrypt 多載。
     /// </summary>
     public static void Encrypt(OdfPackage package, string password) => Encrypt(package, password, OdfEncryptionAlgorithm.Aes256);
 
 
     /// <summary>
-    /// Executes the Encrypt operation.
+    /// Performs the Encrypt operation.
     /// 加密指定 ODF 封裝中的所有適用專案。
     /// </summary>
     /// <param name="package">要加密的 ODF 封裝執行個體</param>

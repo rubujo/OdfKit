@@ -11,7 +11,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
 {
     /// <summary>
-    /// Executes the OdfStyleNameList operation.
+    /// Performs odf style name list.
     /// 以樣式名稱參照清單 lexical form 建立 <see cref="OdfStyleNameList"/>。
     /// </summary>
     /// <param name="value">以空白分隔的樣式名稱參照清單</param>
@@ -28,7 +28,7 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     }
 
     /// <summary>
-    /// Executes the OdfStyleNameList operation.
+    /// Performs odf style name list.
     /// 以樣式名稱集合建立 <see cref="OdfStyleNameList"/>。
     /// </summary>
     /// <param name="styleNames">要寫入的樣式名稱集合</param>
@@ -52,7 +52,7 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     public IReadOnlyList<OdfStyleName> StyleNames { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析樣式名稱參照清單。
     /// </summary>
     /// <param name="value">樣式名稱參照清單字串</param>
@@ -71,14 +71,14 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始樣式名稱參照清單字串。
     /// </summary>
     /// <returns>樣式名稱參照清單字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個樣式名稱參照清單。
     /// </summary>
     /// <param name="other">要比較的樣式名稱參照清單</param>
@@ -86,21 +86,21 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     public bool Equals(OdfStyleNameList other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfStyleNameList other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個樣式名稱參照清單是否相等。
     /// </summary>
     /// <param name="left">左側樣式名稱參照清單</param>
@@ -109,7 +109,7 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     public static bool operator ==(OdfStyleNameList left, OdfStyleNameList right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個樣式名稱參照清單是否不相等。
     /// </summary>
     /// <param name="left">左側樣式名稱參照清單</param>

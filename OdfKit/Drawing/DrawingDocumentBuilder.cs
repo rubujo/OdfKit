@@ -124,14 +124,14 @@ public sealed class DrawingDocumentBuilder
     public DrawingDocumentBuilder AddFlow(string pageName, IEnumerable<OdfFlowStepRequest> steps) => AddFlow(pageName, steps, OdfConnectorType.Straight, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFlow that accepts pageName, steps, and connectorType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 pageName、steps 與 connectorType；其餘可選參數使用預設值並轉呼叫最長 AddFlow 多載。
     /// </summary>
     public DrawingDocumentBuilder AddFlow(string pageName, IEnumerable<OdfFlowStepRequest> steps, OdfConnectorType connectorType) => AddFlow(pageName, steps, connectorType, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddFlow that accepts pageName, steps, connectorType, and layoutOptions.
+    /// AddFlow 完整多載：接受 pageName、steps、connectorType 與 layoutOptions。
     /// </summary>
     public DrawingDocumentBuilder AddFlow(
         string pageName,
@@ -213,14 +213,14 @@ public sealed class DrawingDocumentBuilder
     public DrawingDocumentBuilder AddFlow(IEnumerable<OdfFlowStepRequest> steps) => AddFlow($"Page {_pageCount + 1}", steps, OdfConnectorType.Straight, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFlow that accepts steps and connectorType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 steps 與 connectorType；其餘可選參數使用預設值並轉呼叫最長 AddFlow 多載。
     /// </summary>
     public DrawingDocumentBuilder AddFlow(IEnumerable<OdfFlowStepRequest> steps, OdfConnectorType connectorType) => AddFlow($"Page {_pageCount + 1}", steps, connectorType, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddFlow that accepts steps, connectorType, and layoutOptions.
+    /// AddFlow 完整多載：接受 steps、connectorType 與 layoutOptions。
     /// </summary>
     public DrawingDocumentBuilder AddFlow(
         IEnumerable<OdfFlowStepRequest> steps,
@@ -274,8 +274,8 @@ public sealed class OdfDrawPageBuilder
         _layoutPreset = layoutPreset ?? throw new ArgumentNullException(nameof(layoutPreset));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddRectangle that accepts xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddRectangle 多載。
     /// </summary>
     public OdfDrawPageBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm) => AddRectangle(xCm, yCm, widthCm, heightCm, null);
 
@@ -304,8 +304,8 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEllipse that accepts xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddEllipse 多載。
     /// </summary>
     public OdfDrawPageBuilder AddEllipse(double xCm, double yCm, double widthCm, double heightCm) => AddEllipse(xCm, yCm, widthCm, heightCm, null);
 
@@ -333,14 +333,14 @@ public sealed class OdfDrawPageBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFlowStep that accepts id, text, and index; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 id、text 與 index；其餘可選參數使用預設值並轉呼叫最長 AddFlowStep 多載。
     /// </summary>
     public OdfDrawPageBuilder AddFlowStep(string id, string text, int index) => AddFlowStep(id, text, index, OdfShapeType.Rectangle, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFlowStep that accepts id, text, index, and shapeType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 id、text、index 與 shapeType；其餘可選參數使用預設值並轉呼叫最長 AddFlowStep 多載。
     /// </summary>
     public OdfDrawPageBuilder AddFlowStep(string id, string text, int index, OdfShapeType shapeType) => AddFlowStep(id, text, index, shapeType, null);
 
@@ -406,8 +406,8 @@ public sealed class OdfDrawPageBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddPath that accepts svgPathData, xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 svgPathData、xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddPath 多載。
     /// </summary>
     public OdfDrawPageBuilder AddPath(string svgPathData, double xCm, double yCm, double widthCm, double heightCm) => AddPath(svgPathData, xCm, yCm, widthCm, heightCm, null);
 
@@ -437,8 +437,8 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddLine that accepts x1Cm, y1Cm, x2Cm, and y2Cm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x1Cm、y1Cm、x2Cm 與 y2Cm；其餘可選參數使用預設值並轉呼叫最長 AddLine 多載。
     /// </summary>
     public OdfDrawPageBuilder AddLine(double x1Cm, double y1Cm, double x2Cm, double y2Cm) => AddLine(x1Cm, y1Cm, x2Cm, y2Cm, null);
 
@@ -474,14 +474,14 @@ public sealed class OdfDrawPageBuilder
     public OdfDrawPageBuilder AddConnector(double x1Cm, double y1Cm, double x2Cm, double y2Cm) => AddConnector(x1Cm, y1Cm, x2Cm, y2Cm, OdfConnectorType.Standard, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddConnector that accepts x1Cm, y1Cm, x2Cm, y2Cm, and connectorType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x1Cm、y1Cm、x2Cm、y2Cm 與 connectorType；其餘可選參數使用預設值並轉呼叫最長 AddConnector 多載。
     /// </summary>
     public OdfDrawPageBuilder AddConnector(double x1Cm, double y1Cm, double x2Cm, double y2Cm, OdfConnectorType connectorType) => AddConnector(x1Cm, y1Cm, x2Cm, y2Cm, connectorType, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddConnector that accepts x1Cm, y1Cm, x2Cm, y2Cm, connectorType, and configure.
+    /// AddConnector 完整多載：接受 x1Cm、y1Cm、x2Cm、y2Cm、connectorType 與 configure。
     /// </summary>
     public OdfDrawPageBuilder AddConnector(
         double x1Cm,
@@ -510,14 +510,14 @@ public sealed class OdfDrawPageBuilder
     public OdfDrawPageBuilder AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddConnector that accepts startShapeId, endShapeId, and connectorType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 startShapeId、endShapeId 與 connectorType；其餘可選參數使用預設值並轉呼叫最長 AddConnector 多載。
     /// </summary>
     public OdfDrawPageBuilder AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType) => AddConnector(startShapeId, endShapeId, connectorType, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddConnector that accepts startShapeId, endShapeId, connectorType, and configure.
+    /// AddConnector 完整多載：接受 startShapeId、endShapeId、connectorType 與 configure。
     /// </summary>
     public OdfDrawPageBuilder AddConnector(
         string startShapeId,
@@ -531,8 +531,8 @@ public sealed class OdfDrawPageBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImage that accepts imageBytes, xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddImage 多載。
     /// </summary>
     public OdfDrawPageBuilder AddImage(byte[] imageBytes, double xCm, double yCm, double widthCm, double heightCm) => AddImage(imageBytes, xCm, yCm, widthCm, heightCm, null);
 
@@ -590,14 +590,14 @@ public sealed class OdfDrawPageBuilder
         shape.StrokeColor = _theme.ConnectorColor;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddLayer that accepts name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name；其餘可選參數使用預設值並轉呼叫最長 AddLayer 多載。
     /// </summary>
     public OdfDrawPageBuilder AddLayer(string name) => AddLayer(name, false, "screen");
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddLayer that accepts name and isProtected; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 isProtected；其餘可選參數使用預設值並轉呼叫最長 AddLayer 多載。
     /// </summary>
     public OdfDrawPageBuilder AddLayer(string name, bool isProtected) => AddLayer(name, isProtected, "screen");
 
@@ -735,8 +735,8 @@ public sealed class OdfDrawGroupBuilder
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddRectangle that accepts xCm, yCm, widthCm, and heightCm; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 xCm、yCm、widthCm 與 heightCm；其餘可選參數使用預設值並轉呼叫最長 AddRectangle 多載。
     /// </summary>
     public OdfDrawGroupBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm) => AddRectangle(xCm, yCm, widthCm, heightCm, null);
 

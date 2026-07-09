@@ -434,32 +434,32 @@ internal readonly record struct OdfInlineTextSegment(
     public static OdfInlineTextSegment LineBreak { get; } = new(string.Empty, true, false, false, false, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateText that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 CreateText 多載。
     /// </summary>
     public static OdfInlineTextSegment CreateText(string text) => CreateText(text, false, false, false, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateText that accepts text and bold; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text 與 bold；其餘可選參數使用預設值並轉呼叫最長 CreateText 多載。
     /// </summary>
     public static OdfInlineTextSegment CreateText(string text, bool bold) => CreateText(text, bold, false, false, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateText that accepts text, bold, and italic; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text、bold 與 italic；其餘可選參數使用預設值並轉呼叫最長 CreateText 多載。
     /// </summary>
     public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic) => CreateText(text, bold, italic, false, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateText that accepts text, bold, italic, and underline; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text、bold、italic 與 underline；其餘可選參數使用預設值並轉呼叫最長 CreateText 多載。
     /// </summary>
     public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic, bool underline) => CreateText(text, bold, italic, underline, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateText that accepts text, bold, italic, underline, and color; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text、bold、italic、underline 與 color；其餘可選參數使用預設值並轉呼叫最長 CreateText 多載。
     /// </summary>
     public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic, bool underline, string? color) => CreateText(text, bold, italic, underline, color, null);
 

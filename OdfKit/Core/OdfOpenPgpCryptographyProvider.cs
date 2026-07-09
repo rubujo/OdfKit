@@ -14,7 +14,7 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     private readonly IOdfOpenPgpKeyProvider _keyProvider;
 
     /// <summary>
-    /// Executes the OdfOpenPgpCryptographyProvider operation.
+    /// Performs odf open pgp cryptography provider.
     /// 初始化 <see cref="OdfOpenPgpCryptographyProvider"/> 類別的新執行個體。
     /// </summary>
     /// <param name="keyProvider">負責 Session Key 加解密的 OpenPGP 金鑰提供者</param>
@@ -25,8 +25,8 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     }
 
     /// <summary>
-    /// Executes the CanHandle operation.
-    /// 執行 CanHandle 作業。
+    /// Returns whether this instance is handle is allowed.
+    /// 傳回是否可 Handle。
     /// </summary>
     /// <inheritdoc />
     public bool CanHandle(OdfEncryptionInfo info)
@@ -36,7 +36,7 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     }
 
     /// <summary>
-    /// Executes the Decrypt operation.
+    /// Performs the Decrypt operation.
     /// 執行 Decrypt 作業。
     /// </summary>
     /// <inheritdoc />
@@ -76,7 +76,7 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     }
 
     /// <summary>
-    /// Executes the Encrypt operation.
+    /// Performs the Encrypt operation.
     /// 執行 Encrypt 作業。
     /// </summary>
     /// <inheritdoc />

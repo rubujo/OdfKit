@@ -76,8 +76,8 @@ public sealed class TextDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddHeading that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AddHeading 多載。
     /// </summary>
     public TextDocumentBuilder AddHeading(string text) => AddHeading(text, 1);
 
@@ -97,8 +97,8 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddParagraph that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AddParagraph 多載。
     /// </summary>
     public TextDocumentBuilder AddParagraph(string text) => AddParagraph(text, null);
 
@@ -141,20 +141,20 @@ public sealed class TextDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddCoverPage that accepts title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title；其餘可選參數使用預設值並轉呼叫最長 AddCoverPage 多載。
     /// </summary>
     public TextDocumentBuilder AddCoverPage(string title) => AddCoverPage(title, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddCoverPage that accepts title and subtitle; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title 與 subtitle；其餘可選參數使用預設值並轉呼叫最長 AddCoverPage 多載。
     /// </summary>
     public TextDocumentBuilder AddCoverPage(string title, string? subtitle) => AddCoverPage(title, subtitle, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddCoverPage that accepts title, subtitle, and author; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title、subtitle 與 author；其餘可選參數使用預設值並轉呼叫最長 AddCoverPage 多載。
     /// </summary>
     public TextDocumentBuilder AddCoverPage(string title, string? subtitle, string? author) => AddCoverPage(title, subtitle, author, null);
 
@@ -221,14 +221,14 @@ public sealed class TextDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTableOfContents that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddTableOfContents 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextDocumentBuilder AddTableOfContents() => AddTableOfContents("目錄", 10);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTableOfContents that accepts title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 title；其餘可選參數使用預設值並轉呼叫最長 AddTableOfContents 多載。
     /// </summary>
     public TextDocumentBuilder AddTableOfContents(string title) => AddTableOfContents(title, 10);
 
@@ -247,8 +247,8 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTable that accepts rows and columns; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 rows 與 columns；其餘可選參數使用預設值並轉呼叫最長 AddTable 多載。
     /// </summary>
     public TextDocumentBuilder AddTable(int rows, int columns) => AddTable(rows, columns, null);
 
@@ -270,8 +270,8 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddSection that accepts name, columnCount, and gap; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、columnCount 與 gap；其餘可選參數使用預設值並轉呼叫最長 AddSection 多載。
     /// </summary>
     public TextDocumentBuilder AddSection(string name, int columnCount, OdfLength gap) => AddSection(name, columnCount, gap, null);
 
@@ -672,8 +672,8 @@ public sealed class TextParagraphBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImage that accepts imageBytes, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddImage 多載。
     /// </summary>
     public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height) => AddImage(imageBytes, width, height, null);
 
@@ -811,8 +811,8 @@ public sealed class TextSectionBuilder
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddHeading that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AddHeading 多載。
     /// </summary>
     public TextSectionBuilder AddHeading(string text) => AddHeading(text, 1);
 
@@ -834,8 +834,8 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Protected that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Protected 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextSectionBuilder Protected() => Protected(true);
 

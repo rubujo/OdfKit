@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfCharacter : IEquatable<OdfCharacter>
 {
     /// <summary>
-    /// Executes the OdfCharacter operation.
+    /// Performs odf character.
     /// 以單一字元 lexical form 建立 <see cref="OdfCharacter"/>。
     /// </summary>
     /// <param name="value">單一字元字串</param>
@@ -32,7 +32,7 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析單一字元字串。
     /// </summary>
     /// <param name="value">字元字串</param>
@@ -51,14 +51,14 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始字元字串。
     /// </summary>
     /// <returns>字元字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個字元。
     /// </summary>
     /// <param name="other">要比較的字元</param>
@@ -66,21 +66,21 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     public bool Equals(OdfCharacter other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfCharacter other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個字元是否相等。
     /// </summary>
     /// <param name="left">左側字元</param>
@@ -89,7 +89,7 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     public static bool operator ==(OdfCharacter left, OdfCharacter right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個字元是否不相等。
     /// </summary>
     /// <param name="left">左側字元</param>

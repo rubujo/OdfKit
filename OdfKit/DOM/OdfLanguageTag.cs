@@ -14,7 +14,7 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
         RegexOptions.CultureInvariant);
 
     /// <summary>
-    /// Executes the OdfLanguageTag operation.
+    /// Performs odf language tag.
     /// 以語言標記 lexical form 建立 <see cref="OdfLanguageTag"/>。
     /// </summary>
     /// <param name="value">語言標記，例如 <c>en-US</c> 或 <c>zh-Hant-TW</c></param>
@@ -36,7 +36,7 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析語言標記。
     /// </summary>
     /// <param name="value">語言標記字串</param>
@@ -55,14 +55,14 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始語言標記字串。
     /// </summary>
     /// <returns>語言標記字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個語言標記。
     /// </summary>
     /// <param name="other">要比較的語言標記</param>
@@ -70,21 +70,21 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
     public bool Equals(OdfLanguageTag other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfLanguageTag other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個語言標記是否相等。
     /// </summary>
     /// <param name="left">左側語言標記</param>
@@ -93,7 +93,7 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
     public static bool operator ==(OdfLanguageTag left, OdfLanguageTag right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個語言標記是否不相等。
     /// </summary>
     /// <param name="left">左側語言標記</param>

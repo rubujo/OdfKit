@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfXmlName : IEquatable<OdfXmlName>
 {
     /// <summary>
-    /// Executes the OdfXmlName operation.
+    /// Performs odf xml name.
     /// 以 XML 名稱 lexical form 建立 <see cref="OdfXmlName"/>。
     /// </summary>
     /// <param name="value">XML 名稱，例如 <c>Shape1</c> 或 <c>chart-title</c></param>
@@ -32,7 +32,7 @@ public readonly struct OdfXmlName : IEquatable<OdfXmlName>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析 XML 名稱。
     /// </summary>
     /// <param name="value">XML 名稱字串</param>
@@ -51,14 +51,14 @@ public readonly struct OdfXmlName : IEquatable<OdfXmlName>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始 XML 名稱。
     /// </summary>
     /// <returns>XML 名稱</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個 XML 名稱。
     /// </summary>
     /// <param name="other">要比較的 XML 名稱</param>
@@ -66,21 +66,21 @@ public readonly struct OdfXmlName : IEquatable<OdfXmlName>
     public bool Equals(OdfXmlName other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfXmlName other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 XML 名稱是否相等。
     /// </summary>
     /// <param name="left">左側 XML 名稱</param>
@@ -89,7 +89,7 @@ public readonly struct OdfXmlName : IEquatable<OdfXmlName>
     public static bool operator ==(OdfXmlName left, OdfXmlName right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 XML 名稱是否不相等。
     /// </summary>
     /// <param name="left">左側 XML 名稱</param>

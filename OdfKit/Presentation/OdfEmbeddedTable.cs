@@ -72,44 +72,44 @@ public sealed class OdfEmbeddedTable
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row and column; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row 與 column；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column) => SetCellTextStyle(row, column, null, null, null, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, and bold; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column 與 bold；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold) => SetCellTextStyle(row, column, bold, null, null, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, bold, and italic; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、bold 與 italic；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic) => SetCellTextStyle(row, column, bold, italic, null, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, bold, italic, and underline; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、bold、italic 與 underline；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline) => SetCellTextStyle(row, column, bold, italic, underline, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, bold, italic, underline, and strikethrough; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、bold、italic、underline 與 strikethrough；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, bold, italic, underline, strikethrough, and textPosition; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、bold、italic、underline、strikethrough 與 textPosition；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough, string? textPosition) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, textPosition, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetCellTextStyle that accepts row, column, bold, italic, underline, strikethrough, textPosition, and fontSize; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、bold、italic、underline、strikethrough、textPosition 與 fontSize；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
     /// </summary>
     public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough, string? textPosition, string? fontSize) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, textPosition, fontSize, null);
 

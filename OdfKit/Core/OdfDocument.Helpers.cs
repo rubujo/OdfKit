@@ -13,7 +13,7 @@ public abstract partial class OdfDocument
     #region Helper Methods
 
     /// <summary>
-    /// Executes the FindOrCreateMetaRoot operation.
+    /// Finds or create meta root.
     /// 尋找或建立 office:meta 根節點。
     /// </summary>
     /// <returns>office:meta 節點</returns>
@@ -21,7 +21,7 @@ public abstract partial class OdfDocument
         => OdfDocumentMetadataEngine.FindOrCreateMetaRoot(MetaDom);
 
     /// <summary>
-    /// Executes the FindSettingsConfigItem operation.
+    /// Finds settings config item.
     /// 尋找指定名稱的設定專案。
     /// </summary>
     /// <param name="name">設定專案名稱</param>
@@ -30,7 +30,7 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindSettingsConfigItem(SettingsDom, name);
 
     /// <summary>
-    /// Executes the FindOrCreateSettingsNode operation.
+    /// Finds or create settings node.
     /// 尋找或建立指定名稱的設定集合節點。
     /// </summary>
     /// <param name="root">設定 DOM 根節點</param>
@@ -40,7 +40,7 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindOrCreateSettingsNode(root, name);
 
     /// <summary>
-    /// Executes the FindSettingsNode operation.
+    /// Finds settings node.
     /// 尋找指定名稱的設定集合節點。
     /// </summary>
     /// <param name="root">設定 DOM 根節點</param>
@@ -50,7 +50,7 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindSettingsNode(root, name);
 
     /// <summary>
-    /// Executes the FindOrCreateMapNode operation.
+    /// Finds or create map node.
     /// 尋找或建立設定 map 節點。
     /// </summary>
     /// <param name="setNode">設定集合節點</param>
@@ -60,7 +60,7 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindOrCreateMapNode(setNode, name);
 
     /// <summary>
-    /// Executes the FindOrCreateMapEntryNode operation.
+    /// Finds or create map entry node.
     /// 尋找或建立設定 map entry 節點。
     /// </summary>
     /// <param name="mapNode">設定 map 節點</param>
@@ -69,7 +69,7 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindOrCreateMapEntryNode(mapNode);
 
     /// <summary>
-    /// Executes the FindOrCreateConfigItemNode operation.
+    /// Finds or create config item node.
     /// 尋找或建立設定專案節點。
     /// </summary>
     /// <param name="entryNode">設定 map entry 節點</param>

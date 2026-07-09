@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfStyleName : IEquatable<OdfStyleName>
 {
     /// <summary>
-    /// Executes the OdfStyleName operation.
+    /// Performs odf style name.
     /// 以樣式名稱 lexical form 建立 <see cref="OdfStyleName"/>。
     /// </summary>
     /// <param name="value">樣式名稱，例如 <c>Standard</c> 或 <c>Heading1</c></param>
@@ -32,7 +32,7 @@ public readonly struct OdfStyleName : IEquatable<OdfStyleName>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析樣式名稱。
     /// </summary>
     /// <param name="value">樣式名稱字串</param>
@@ -51,14 +51,14 @@ public readonly struct OdfStyleName : IEquatable<OdfStyleName>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始樣式名稱。
     /// </summary>
     /// <returns>樣式名稱</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個樣式名稱。
     /// </summary>
     /// <param name="other">要比較的樣式名稱</param>
@@ -66,21 +66,21 @@ public readonly struct OdfStyleName : IEquatable<OdfStyleName>
     public bool Equals(OdfStyleName other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfStyleName other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個樣式名稱是否相等。
     /// </summary>
     /// <param name="left">左側樣式名稱</param>
@@ -89,7 +89,7 @@ public readonly struct OdfStyleName : IEquatable<OdfStyleName>
     public static bool operator ==(OdfStyleName left, OdfStyleName right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個樣式名稱是否不相等。
     /// </summary>
     /// <param name="left">左側樣式名稱</param>

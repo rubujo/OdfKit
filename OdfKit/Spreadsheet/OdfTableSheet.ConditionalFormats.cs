@@ -41,8 +41,8 @@ public partial class OdfTableSheet
         OdfTableSheetConditionalFormatEngine.AddConditionalFormat(
             MutationContext, range, conditionValue, styleName);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddColorScaleFormat that accepts range, minColor, and maxColor; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 range、minColor 與 maxColor；其餘可選參數使用預設值並轉呼叫最長 AddColorScaleFormat 多載。
     /// </summary>
     public void AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor) => AddColorScaleFormat(range, minColor, maxColor, null);
 
@@ -60,8 +60,8 @@ public partial class OdfTableSheet
             MutationContext, range, minColor, maxColor, midColor);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddDataBarFormat that accepts range and positiveColor; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 range 與 positiveColor；其餘可選參數使用預設值並轉呼叫最長 AddDataBarFormat 多載。
     /// </summary>
     public void AddDataBarFormat(OdfCellRange range, OdfColor positiveColor) => AddDataBarFormat(range, positiveColor, null);
 
@@ -78,8 +78,8 @@ public partial class OdfTableSheet
             MutationContext, range, positiveColor, negativeColor);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddDataBar that accepts range and color; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 range 與 color；其餘可選參數使用預設值並轉呼叫最長 AddDataBar 多載。
     /// </summary>
     public void AddDataBar(OdfCellRange range, OdfColor color) => AddDataBar(range, color, null);
 
@@ -113,8 +113,8 @@ public partial class OdfTableSheet
     public void AddIconSet(OdfCellRange range, OdfIconSetType iconSet) =>
         AddIconSetFormat(range, iconSet);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddSparklineGroup that accepts dataRange and hostCell; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dataRange 與 hostCell；其餘可選參數使用預設值並轉呼叫最長 AddSparklineGroup 多載。
     /// </summary>
     public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell) => AddSparklineGroup(dataRange, hostCell, SparklineType.Line);
 

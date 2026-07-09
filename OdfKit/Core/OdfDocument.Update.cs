@@ -17,7 +17,7 @@ public abstract partial class OdfDocument
     public bool IsUpdateActive => _updateDepth > 0;
 
     /// <summary>
-    /// Executes the BeginUpdate operation.
+    /// Performs begin update.
     /// 開始批次更新範圍，暫緩樣式重對照與自動樣式去重，直到最外層範圍結束。
     /// </summary>
     /// <returns>可釋放的批次更新範圍；建議搭配 <c>using</c> 使用</returns>
@@ -32,7 +32,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the EndUpdate operation.
+    /// Performs end update.
     /// 結束目前批次更新範圍，並在離開最外層範圍時重新整理延後的樣式變更。
     /// </summary>
     /// <exception cref="InvalidOperationException">當未先呼叫 <see cref="BeginUpdate"/> 時擲出</exception>

@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfIriReference : IEquatable<OdfIriReference>
 {
     /// <summary>
-    /// Executes the OdfIriReference operation.
+    /// Performs odf iri reference.
     /// 以 IRI 參照 lexical form 建立 <see cref="OdfIriReference"/>。
     /// </summary>
     /// <param name="value">IRI 參照字串，可為絕對 IRI、相對 IRI、片段或空參照</param>
@@ -31,7 +31,7 @@ public readonly struct OdfIriReference : IEquatable<OdfIriReference>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析 IRI 參照字串。
     /// </summary>
     /// <param name="value">IRI 參照字串</param>
@@ -50,14 +50,14 @@ public readonly struct OdfIriReference : IEquatable<OdfIriReference>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始 IRI 參照字串。
     /// </summary>
     /// <returns>IRI 參照字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個 IRI 參照。
     /// </summary>
     /// <param name="other">要比較的 IRI 參照</param>
@@ -65,21 +65,21 @@ public readonly struct OdfIriReference : IEquatable<OdfIriReference>
     public bool Equals(OdfIriReference other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfIriReference other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 IRI 參照是否相等。
     /// </summary>
     /// <param name="left">左側 IRI 參照</param>
@@ -88,7 +88,7 @@ public readonly struct OdfIriReference : IEquatable<OdfIriReference>
     public static bool operator ==(OdfIriReference left, OdfIriReference right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個 IRI 參照是否不相等。
     /// </summary>
     /// <param name="left">左側 IRI 參照</param>

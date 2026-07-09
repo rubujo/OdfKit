@@ -7,7 +7,7 @@
 public partial class OdfNode
 {
     /// <summary>
-    /// Executes the As operation.
+    /// Performs as.
     /// 嘗試將此節點轉型為指定的 typed DOM 元素型別，成功時回傳同一個節點實例。
     /// </summary>
     /// <typeparam name="TElement">目標 typed DOM 元素型別</typeparam>

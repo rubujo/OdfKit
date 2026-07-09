@@ -152,14 +152,14 @@ public partial class OdfImageDocument
         return null;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateImageFrame that accepts name, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 UpdateImageFrame 多載。
     /// </summary>
     public bool UpdateImageFrame(string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => UpdateImageFrame(name, x, y, width, height, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of UpdateImageFrame that accepts name, x, y, width, height, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、x、y、width、height 與 title；其餘可選參數使用預設值並轉呼叫最長 UpdateImageFrame 多載。
     /// </summary>
     public bool UpdateImageFrame(string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? title) => UpdateImageFrame(name, x, y, width, height, title, null);
 

@@ -61,14 +61,14 @@ public class OdfAlphabeticalIndex : OdfIndex
         set => SourceNode?.SetAttribute("ignore-case", OdfNamespaces.Text, value ? "true" : "false", "text");
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConfigureSource that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ConfigureSource 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void ConfigureSource() => ConfigureSource(false, false);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConfigureSource that accepts commaSeparated; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 commaSeparated；其餘可選參數使用預設值並轉呼叫最長 ConfigureSource 多載。
     /// </summary>
     public void ConfigureSource(bool commaSeparated) => ConfigureSource(commaSeparated, false);
 

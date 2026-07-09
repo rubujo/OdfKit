@@ -21,14 +21,14 @@ public sealed class OdfRdfMetadata
 
     internal bool IsDirty { get; private set; }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddTriple that accepts subject, predicate, and objectValue; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 subject、predicate 與 objectValue；其餘可選參數使用預設值並轉呼叫最長 AddTriple 多載。
     /// </summary>
     public void AddTriple(string subject, string predicate, string objectValue) => AddTriple(subject, predicate, objectValue, true);
 
 
     /// <summary>
-    /// Executes the AddTriple operation.
+    /// Adds triple.
     /// 新增一筆 RDF triple。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -43,7 +43,7 @@ public sealed class OdfRdfMetadata
 
 
     /// <summary>
-    /// Executes the AddTriple operation.
+    /// Adds triple.
     /// 新增一筆 RDF triple。
     /// </summary>
     /// <param name="triple">要新增的 RDF triple</param>
@@ -56,14 +56,14 @@ public sealed class OdfRdfMetadata
         IsDirty = true;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTriples that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：GetTriples 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public IReadOnlyList<OdfRdfTriple> GetTriples() => GetTriples(null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetTriples that accepts subject; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 subject；其餘可選參數使用預設值並轉呼叫最長 GetTriples 多載。
     /// </summary>
     public IReadOnlyList<OdfRdfTriple> GetTriples(string? subject) => GetTriples(subject, null);
 
@@ -93,7 +93,7 @@ public sealed class OdfRdfMetadata
 
 
     /// <summary>
-    /// Executes the TryGetLiteral operation.
+    /// Tries to get literal.
     /// 嘗試取得指定主詞與述詞的 literal 受詞。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -117,7 +117,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
-    /// Executes the LinkDocumentPart operation.
+    /// Performs link document part.
     /// 建立文件主詞與封裝組件之間的 <c>pkg:hasPart</c> 關聯。
     /// </summary>
     /// <param name="documentSubject">文件主詞 IRI（通常為空字串或 <c>./</c>）</param>
@@ -128,7 +128,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
-    /// Executes the SetPartMimeType operation.
+    /// Sets part mime type.
     /// 設定封裝組件的 <c>pkg:mimeType</c> literal。
     /// </summary>
     /// <param name="partSubject">組件主詞 IRI</param>
@@ -138,14 +138,14 @@ public sealed class OdfRdfMetadata
         AddTriple(partSubject, OdfPkgRdfPredicates.MimeType, mimeType, isLiteral: true);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SyncWithPackageEntries that accepts entryPaths; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 entryPaths；其餘可選參數使用預設值並轉呼叫最長 SyncWithPackageEntries 多載。
     /// </summary>
     public int SyncWithPackageEntries(IEnumerable<string> entryPaths, IReadOnlyDictionary<string, string> mediaTypes) => SyncWithPackageEntries(entryPaths, mediaTypes, null);
 
 
     /// <summary>
-    /// Executes the SyncWithPackageEntries operation.
+    /// Performs sync with package entries.
     /// 依目前封裝專案同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
     /// </summary>
     /// <param name="entryPaths">封裝專案路徑集合</param>
@@ -202,7 +202,7 @@ public sealed class OdfRdfMetadata
 
 
     /// <summary>
-    /// Executes the GetLinkedPartPaths operation.
+    /// Gets linked part paths.
     /// 取得指定文件主詞已連結的封裝組件路徑。
     /// </summary>
     /// <param name="documentSubject">文件主詞 IRI</param>
@@ -216,14 +216,14 @@ public sealed class OdfRdfMetadata
             .ToArray();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RemoveTriples that accepts subject; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 subject；其餘可選參數使用預設值並轉呼叫最長 RemoveTriples 多載。
     /// </summary>
     public int RemoveTriples(string subject) => RemoveTriples(subject, null);
 
 
     /// <summary>
-    /// Executes the RemoveTriples operation.
+    /// Removes triples.
     /// 移除符合主詞與述詞的 RDF triples。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -244,7 +244,7 @@ public sealed class OdfRdfMetadata
 
 
     /// <summary>
-    /// Executes the Clear operation.
+    /// Performs the Clear operation.
     /// 清除全部 RDF triples。
     /// </summary>
     public void Clear()
@@ -349,7 +349,7 @@ public sealed class OdfRdfMetadata
 public sealed class OdfRdfTriple
 {
     /// <summary>
-    /// Executes the OdfRdfTriple operation.
+    /// Performs odf rdf triple.
     /// 以指定主詞、述詞與受詞建立新的 RDF triple。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>

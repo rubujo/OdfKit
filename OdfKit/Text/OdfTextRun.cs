@@ -71,14 +71,14 @@ public class OdfTextRun
         set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFont that accepts westernFont; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernFont；其餘可選參數使用預設值並轉呼叫最長 SetFont 多載。
     /// </summary>
     public void SetFont(string westernFont) => SetFont(westernFont, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFont that accepts westernFont and asianFont; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernFont 與 asianFont；其餘可選參數使用預設值並轉呼叫最長 SetFont 多載。
     /// </summary>
     public void SetFont(string westernFont, string? asianFont) => SetFont(westernFont, asianFont, null);
 
@@ -98,14 +98,14 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontSize that accepts westernSize; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernSize；其餘可選參數使用預設值並轉呼叫最長 SetFontSize 多載。
     /// </summary>
     public void SetFontSize(string westernSize) => SetFontSize(westernSize, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontSize that accepts westernSize and asianSize; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernSize 與 asianSize；其餘可選參數使用預設值並轉呼叫最長 SetFontSize 多載。
     /// </summary>
     public void SetFontSize(string westernSize, string? asianSize) => SetFontSize(westernSize, asianSize, null);
 
@@ -286,8 +286,8 @@ public class OdfTextRun
         _doc.DeleteNode(Node);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithBold that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithBold 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithBold() => WithBold(true);
 
@@ -305,8 +305,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithItalic that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithItalic 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithItalic() => WithItalic(true);
 
@@ -324,8 +324,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithStrikethrough that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithStrikethrough 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithStrikethrough() => WithStrikethrough(true);
 
@@ -343,8 +343,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithSuperscript that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithSuperscript 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithSuperscript() => WithSuperscript(true);
 
@@ -362,8 +362,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithSubscript that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithSubscript 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithSubscript() => WithSubscript(true);
 
@@ -393,14 +393,14 @@ public class OdfTextRun
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithFontName that accepts westernFont; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernFont；其餘可選參數使用預設值並轉呼叫最長 WithFontName 多載。
     /// </summary>
     public OdfTextRun WithFontName(string westernFont) => WithFontName(westernFont, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithFontName that accepts westernFont and asianFont; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 westernFont 與 asianFont；其餘可選參數使用預設值並轉呼叫最長 WithFontName 多載。
     /// </summary>
     public OdfTextRun WithFontName(string westernFont, string? asianFont) => WithFontName(westernFont, asianFont, null);
 

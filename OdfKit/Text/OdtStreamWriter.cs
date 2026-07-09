@@ -36,8 +36,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public OdtStreamWriter(Stream outputStream) : this(outputStream, OdfVersion.Odf14, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdtStreamWriter that accepts outputStream and version; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 outputStream 與 version；其餘可選參數使用預設值並轉呼叫最長 OdtStreamWriter 多載。
     /// </summary>
     public OdtStreamWriter(Stream outputStream, OdfVersion version) : this(outputStream, version, false) { }
 
@@ -78,8 +78,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public OdtStreamWriter(string path) : this(CreateFileStream(path), OdfVersion.Odf14, true) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdtStreamWriter that accepts path and version; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 version；其餘可選參數使用預設值並轉呼叫最長 OdtStreamWriter 多載。
     /// </summary>
     public OdtStreamWriter(string path, OdfVersion version) : this(CreateFileStream(path), version, true) { }
 
@@ -90,8 +90,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(string text) => AddParagraph(text, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddParagraph that accepts text and styleName.
+    /// AddParagraph 完整多載：接受 text 與 styleName。
     /// </summary>
     public void AddParagraph(string text, string? styleName)
     {
@@ -108,8 +108,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(ReadOnlySpan<char> text) => AddParagraph(text, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddParagraph that accepts text and styleName.
+    /// AddParagraph 完整多載：接受 text 與 styleName。
     /// </summary>
     public void AddParagraph(ReadOnlySpan<char> text, string? styleName)
     {
@@ -124,8 +124,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(ReadOnlyMemory<char> text) => AddParagraph(text.Span, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddParagraph that accepts text and styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text 與 styleName；其餘可選參數使用預設值並轉呼叫最長 AddParagraph 多載。
     /// </summary>
     public void AddParagraph(ReadOnlyMemory<char> text, string? styleName) => AddParagraph(text.Span, styleName);
 
@@ -138,8 +138,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(string text) => AddHeading(text, 1);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddHeading that accepts text and level.
+    /// AddHeading 完整多載：接受 text 與 level。
     /// </summary>
     public void AddHeading(string text, int level)
     {
@@ -162,8 +162,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(ReadOnlySpan<char> text) => AddHeading(text, 1);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddHeading that accepts text and level.
+    /// AddHeading 完整多載：接受 text 與 level。
     /// </summary>
     public void AddHeading(ReadOnlySpan<char> text, int level)
     {
@@ -185,13 +185,13 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(ReadOnlyMemory<char> text) => AddHeading(text.Span, 1);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddHeading that accepts text and level; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text 與 level；其餘可選參數使用預設值並轉呼叫最長 AddHeading 多載。
     /// </summary>
     public void AddHeading(ReadOnlyMemory<char> text, int level) => AddHeading(text.Span, level);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BeginList that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：BeginList 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void BeginList() => BeginList(null);
 

@@ -83,13 +83,13 @@ public sealed class OdfValidationIssue(
     public IReadOnlyDictionary<string, string?> Details { get; } = OdfValidationReport.CopyDetails(details);
 
     /// <summary>
-    /// Executes the SuggestedFix operation.
+    /// Performs suggested fix.
     /// 取得使用者可採取的建議修復文字。
     /// </summary>
     public string SuggestedFix => BuildSuggestedFix();
 
     /// <summary>
-    /// Executes the ToJsonModel operation.
+    /// Converts to json model.
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
     /// <returns>包含驗證問題欄位的 JSON 匯出模型</returns>

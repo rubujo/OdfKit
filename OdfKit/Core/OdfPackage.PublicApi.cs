@@ -16,7 +16,7 @@ public sealed partial class OdfPackage
     #region Public API
 
     /// <summary>
-    /// Executes the HasEntry operation.
+    /// Returns whether this instance is entry is present.
     /// 檢查封裝中是否包含指定名稱的專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -37,7 +37,7 @@ public sealed partial class OdfPackage
         public string Path { get; }
 
         /// <summary>
-        /// Executes the OdfPackageEntryInfo operation.
+        /// Performs odf package entry info.
         /// 初始化 <see cref="OdfPackageEntryInfo"/> 類別的新執行個體。
         /// </summary>
         /// <param name="path">專案的相對路徑</param>
@@ -45,7 +45,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the GetEntries operation.
+    /// Gets entries.
     /// 取得封裝中所有實體專案的資訊集合。
     /// </summary>
     /// <returns>所有專案的資訊集合</returns>
@@ -53,7 +53,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.GetEntries(EntryCollaborators);
 
     /// <summary>
-    /// Executes the ReadEntry operation.
+    /// Reads entry.
     /// 讀取指定路徑專案的完整內容位元組。
     /// </summary>
     /// <param name="path">專案的相對路徑名稱</param>
@@ -62,14 +62,14 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.ReadEntry(EntryCollaborators, path);
 
     /// <summary>
-    /// Executes the Save operation.
+    /// Performs the Save operation.
     /// 將目前 ODF 封裝儲存到指定的目標資料流中。
     /// </summary>
     public void Save(Stream stream) => Save(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Save that accepts stream and options.
+    /// Save 完整多載：接受 stream 與 options。
     /// </summary>
     public void Save(Stream stream, OdfSaveOptions? options)
     {
@@ -77,7 +77,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the GetEntryStream operation.
+    /// Gets entry stream.
     /// 取得指定專案的唯讀資料流。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -92,53 +92,53 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the WriteEntry operation.
+    /// Writes entry.
     /// 將指定的位元組內容寫入或覆寫封裝中的專案。
     /// </summary>
     public void WriteEntry(string name, byte[] content) => WriteEntry(name, content, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WriteEntry that accepts name, content, and mediaType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、content 與 mediaType；其餘可選參數使用預設值並轉呼叫最長 WriteEntry 多載。
     /// </summary>
     public void WriteEntry(string name, byte[] content, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
 
     /// <summary>
-    /// Executes the WriteEntry operation.
+    /// Writes entry.
     /// 將指定的資料流內容寫入或覆寫封裝中的專案。
     /// </summary>
     public void WriteEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WriteEntry that accepts name, contentStream, and mediaType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、contentStream 與 mediaType；其餘可選參數使用預設值並轉呼叫最長 WriteEntry 多載。
     /// </summary>
     public void WriteEntry(string name, Stream contentStream, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
 
     /// <summary>
-    /// Executes the AddEntry operation.
+    /// Adds entry.
     /// 將指定的位元組內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
     public void AddEntry(string name, byte[] content) => WriteEntry(name, content, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntry that accepts name, content, and mediaType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、content 與 mediaType；其餘可選參數使用預設值並轉呼叫最長 AddEntry 多載。
     /// </summary>
     public void AddEntry(string name, byte[] content, string? mediaType)
         => WriteEntry(name, content, mediaType);
 
     /// <summary>
-    /// Executes the AddEntry operation.
+    /// Adds entry.
     /// 將指定的資料流內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
     public void AddEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntry that accepts name, contentStream, and mediaType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name、contentStream 與 mediaType；其餘可選參數使用預設值並轉呼叫最長 AddEntry 多載。
     /// </summary>
     public void AddEntry(string name, Stream contentStream, string? mediaType)
         => WriteEntry(name, contentStream, mediaType);
@@ -153,7 +153,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.RemoveEntry(EntryCollaborators, name);
 
     /// <summary>
-    /// Executes the PruneUnusedMedia operation.
+    /// Performs prune unused media.
     /// 清理封裝中未被參照的圖片等媒體檔案。
     /// </summary>
     /// <param name="referencedMediaPaths">所有目前正被參照的媒體檔案路徑集合</param>
@@ -168,7 +168,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.PruneUnusedMedia(EntryCollaborators, referencedMediaPaths);
 
     /// <summary>
-    /// Executes the SetMimeType operation.
+    /// Sets mime type.
     /// 設定 ODF 封裝的主要 MIME 媒體類型。
     /// </summary>
     /// <param name="mimetype">媒體類型字串</param>
@@ -180,7 +180,7 @@ public sealed partial class OdfPackage
     #region Embedded Objects Extraction
 
     /// <summary>
-    /// Executes the GetEmbeddedObjects operation.
+    /// Gets embedded objects.
     /// 取得此封裝中所內嵌的 ODF 物件資料夾路徑清單。
     /// </summary>
     /// <returns>內嵌物件路徑的集合</returns>
@@ -188,7 +188,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.GetEmbeddedObjects(EntryCollaborators);
 
     /// <summary>
-    /// Executes the ExtractObjectStream operation.
+    /// Extracts object stream.
     /// 擷取內嵌物件的主要內容 XML 資料流。
     /// </summary>
     /// <param name="objectName">內嵌物件的路徑名稱</param>
@@ -197,7 +197,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.ExtractObjectStream(EntryCollaborators, objectName);
 
     /// <summary>
-    /// Executes the RawEntryPatch operation.
+    /// Performs raw entry patch.
     /// 支援免 DOM 解析的原始二進位直改。
     /// </summary>
     /// <param name="entryName">專案的相對路徑名稱</param>
@@ -302,7 +302,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
-    /// Executes the DumpVfsLayout operation.
+    /// Performs dump vfs layout.
     /// 傳回代表封裝內部虛擬檔案系統（VFS）結構的視覺化佈局字串。
     /// </summary>
     /// <returns>VFS 結構的視覺化字串</returns>
@@ -327,15 +327,15 @@ public sealed partial class OdfPackage
         private byte[] _buffer;
         private int _written;
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of SimpleBufferWriter that uses default values for all optional parameters and forwards to the full overload.
+        /// 便利多載：SimpleBufferWriter 的所有可選參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public SimpleBufferWriter() : this(256) { }
 
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of SimpleBufferWriter that accepts initialCapacity.
+        /// SimpleBufferWriter 完整多載：接受 initialCapacity。
         /// </summary>
         public SimpleBufferWriter(int initialCapacity)
         {
@@ -344,14 +344,14 @@ public sealed partial class OdfPackage
 
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Gets the written portion of the buffer as a read-only span.
+        /// 取得緩衝區已寫入部分的唯讀跨度。
         /// </summary>
         public ReadOnlySpan<byte> WrittenReadOnlySpan => _buffer.AsSpan(0, _written);
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of Advance that accepts count.
+        /// Advance 完整多載：接受 count。
         /// </summary>
         public void Advance(int count)
         {
@@ -362,15 +362,15 @@ public sealed partial class OdfPackage
             _written += count;
         }
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of GetMemory that uses default values for all optional parameters and forwards to the full overload.
+        /// 便利多載：GetMemory 的所有可選參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Memory<byte> GetMemory() => GetMemory(0);
 
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of GetMemory that accepts sizeHint.
+        /// GetMemory 完整多載：接受 sizeHint。
         /// </summary>
         public Memory<byte> GetMemory(int sizeHint)
         {
@@ -379,15 +379,15 @@ public sealed partial class OdfPackage
         }
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Short overload of GetSpan that uses default values for all optional parameters and forwards to the full overload.
+        /// 便利多載：GetSpan 的所有可選參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Span<byte> GetSpan() => GetSpan(0);
 
 
         /// <summary>
-        /// Convenience overload that uses default values for remaining parameters.
-        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+        /// Full overload of GetSpan that accepts sizeHint.
+        /// GetSpan 完整多載：接受 sizeHint。
         /// </summary>
         public Span<byte> GetSpan(int sizeHint)
         {
@@ -470,8 +470,8 @@ internal sealed class OdfPackageDebugEntry
     public ushort? CompressionMethod { get; }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ToString that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ToString 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public override string ToString()
         => $"{Path} ({MediaType}, {Size} bytes, Dirty: {Dirty})";
@@ -507,7 +507,7 @@ internal sealed class OdfPackageDebugEntry
 }
 
 /// <summary>
-/// Executes the OdfRawEntryPatcher operation.
+/// Performs odf raw entry patcher.
 /// 表示免 DOM 解析的原始二進位直改委派。
 /// </summary>
 /// <param name="input">原始 Entry 唯讀位元組區段</param>

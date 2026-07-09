@@ -16,7 +16,7 @@ public sealed class OdfCellStyleProxy
     private OdfCellFillProxy? _fill;
 
     /// <summary>
-    /// Executes the OdfCellStyleProxy operation.
+    /// Performs odf cell style proxy.
     /// 初始化 <see cref="OdfCellStyleProxy"/> 類別的新執行個體。
     /// </summary>
     /// <param name="cell">目標儲存格</param>
@@ -26,13 +26,13 @@ public sealed class OdfCellStyleProxy
     }
 
     /// <summary>
-    /// Executes the Font operation.
+    /// Performs font.
     /// 取得此儲存格的字型樣式代理。
     /// </summary>
     public OdfCellFontProxy Font => _font ??= new OdfCellFontProxy(_cell);
 
     /// <summary>
-    /// Executes the Fill operation.
+    /// Performs fill.
     /// 取得此儲存格的填充背景樣式代理。
     /// </summary>
     public OdfCellFillProxy Fill => _fill ??= new OdfCellFillProxy(_cell);

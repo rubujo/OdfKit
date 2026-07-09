@@ -13,7 +13,7 @@ namespace OdfKit.Styles;
 public static class OdfNumberFormatEngine
 {
     /// <summary>
-    /// Executes the Format operation.
+    /// Performs the Format operation.
     /// 依 ODF 數字/貨幣/百分比格式定義節點格式化浮點數值。
     /// </summary>
     /// <param name="value">要格式化的數值</param>
@@ -38,7 +38,7 @@ public static class OdfNumberFormatEngine
     }
 
     /// <summary>
-    /// Executes the Format operation.
+    /// Performs the Format operation.
     /// 依 ODF 日期/時間格式定義節點格式化日期時間值。
     /// </summary>
     /// <param name="value">要格式化的日期時間值</param>
@@ -54,7 +54,7 @@ public static class OdfNumberFormatEngine
     }
 
     /// <summary>
-    /// Executes the Format operation.
+    /// Performs the Format operation.
     /// 依樣式名稱從文件樣式 DOM 查找對應格式節點並格式化。
     /// </summary>
     /// <param name="value">要格式化的值（double、DateTime、bool、string）</param>
@@ -85,7 +85,7 @@ public static class OdfNumberFormatEngine
     }
 
     /// <summary>
-    /// Executes the FindFormatNode operation.
+    /// Finds format node.
     /// 在 stylesDom 中查找指定名稱的 number:*-style 節點。
     /// </summary>
     public static OdfNode? FindFormatNode(OdfNode stylesDom, string styleName)

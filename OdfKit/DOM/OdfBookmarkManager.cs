@@ -16,7 +16,7 @@ public sealed class OdfBookmarkManager
     private readonly OdfDocument _doc;
 
     /// <summary>
-    /// Executes the OdfBookmarkManager operation.
+    /// Performs odf bookmark manager.
     /// 初始化 <see cref="OdfBookmarkManager"/> 類別的新執行個體。
     /// </summary>
     /// <param name="doc">所屬的 ODF 文件</param>
@@ -27,7 +27,7 @@ public sealed class OdfBookmarkManager
     }
 
     /// <summary>
-    /// Executes the new operation.
+    /// Performs new.
     /// 取得指定名稱的書籤操作介面。
     /// </summary>
     /// <param name="name">書籤名稱</param>

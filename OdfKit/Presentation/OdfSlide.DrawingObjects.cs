@@ -131,8 +131,8 @@ public partial class OdfSlide
         return new OdfTextBox(frame, this);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddVideo that accepts packagePath, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 packagePath、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddVideo 多載。
     /// </summary>
     public OdfMediaObject AddVideo(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddVideo(packagePath, x, y, width, height, "video/mp4");
 
@@ -153,8 +153,8 @@ public partial class OdfSlide
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddAudio that accepts packagePath, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 packagePath、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddAudio 多載。
     /// </summary>
     public OdfMediaObject AddAudio(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddAudio(packagePath, x, y, width, height, "audio/mpeg");
 
@@ -284,8 +284,8 @@ public partial class OdfSlide
         return new OdfShape(shapeNode, this);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddPicture that accepts imageBytes, x, y, w, and h; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes、x、y、w 與 h；其餘可選參數使用預設值並轉呼叫最長 AddPicture 多載。
     /// </summary>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h) => AddPicture(imageBytes, x, y, w, h, null);
 

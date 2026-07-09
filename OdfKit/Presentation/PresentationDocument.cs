@@ -72,8 +72,8 @@ public partial class PresentationDocument : OdfDocument
         return (PresentationDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Presentation);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateFromTemplate that accepts template; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 template；其餘可選參數使用預設值並轉呼叫最長 CreateFromTemplate 多載。
     /// </summary>
     public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template) => CreateFromTemplate(template, false);
 
@@ -101,8 +101,8 @@ public partial class PresentationDocument : OdfDocument
         (PresentationDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Presentation, targetIsFlatXml: false);
 
     /// <summary>
-    /// Executes the ClearTemplateUserContent operation.
-    /// 執行 ClearTemplateUserContent 作業。
+    /// Clears template user content.
+    /// 清除 Template User Content。
     /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
@@ -128,8 +128,8 @@ public partial class PresentationDocument : OdfDocument
     public new static Task<PresentationDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(path, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", cancellationToken);
@@ -143,8 +143,8 @@ public partial class PresentationDocument : OdfDocument
     public new static PresentationDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Load that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Load 多載。
     /// </summary>
     public new static PresentationDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName);
@@ -166,14 +166,14 @@ public partial class PresentationDocument : OdfDocument
     public new static Task<PresentationDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName, cancellationToken);

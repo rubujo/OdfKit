@@ -312,8 +312,8 @@ public partial class OdfDrawPage
     public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddConnector that accepts startShapeId, endShapeId, and connectorType.
+    /// AddConnector 完整多載：接受 startShapeId、endShapeId 與 connectorType。
     /// </summary>
     public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType)
     {
@@ -456,8 +456,8 @@ public partial class OdfDrawPage
             }),
     };
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddGroup that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddGroup 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfDrawGroup AddGroup() => AddGroup(null);
 

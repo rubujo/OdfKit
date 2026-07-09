@@ -50,8 +50,8 @@ public class OdfList
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddListItem that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddListItem 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfListItem AddListItem() => AddListItem("");
 
@@ -75,14 +75,14 @@ public class OdfList
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddItem that accepts text; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 text；其餘可選參數使用預設值並轉呼叫最長 AddItem 多載。
     /// </summary>
     public OdfListItem AddItem(string text) => AddItem(text, 1);
 
 
     /// <summary>
-    /// Executes the AddItem operation.
+    /// Adds item.
     /// 在指定層級新增清單專案（1-based）。層級 1 直接加入此清單；
     /// </summary>
     /// <param name="text">The item text content. / 專案文字內容。</param>
@@ -147,8 +147,8 @@ public class OdfList
         return null;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RestartNumbering that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：RestartNumbering 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void RestartNumbering() => RestartNumbering(1);
 

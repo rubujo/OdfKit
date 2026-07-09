@@ -23,7 +23,7 @@ public static class OdfVersionInfo
     public const string DefaultVersionString = "1.4";
 
     /// <summary>
-    /// Executes the ToVersionString operation.
+    /// Converts to version string.
     /// 將 OdfVersion 轉換為對應的規格版本字串。
     /// </summary>
     /// <param name="version">ODF 版本</param>
@@ -42,7 +42,7 @@ public static class OdfVersionInfo
     }
 
     /// <summary>
-    /// Executes the TryParseVersionString operation.
+    /// Tries to parse version string.
     /// 嘗試將規格版本字串轉換為 <see cref="OdfVersion"/>。
     /// </summary>
     /// <param name="value">版本字串，例如 <c>1.4</c></param>

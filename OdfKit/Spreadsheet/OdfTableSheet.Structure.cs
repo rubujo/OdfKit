@@ -11,8 +11,8 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertRows that accepts position; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 position；其餘可選參數使用預設值並轉呼叫最長 InsertRows 多載。
     /// </summary>
     public void InsertRows(int position) => InsertRows(position, 1);
 
@@ -48,8 +48,8 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DeleteRows that accepts position; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 position；其餘可選參數使用預設值並轉呼叫最長 DeleteRows 多載。
     /// </summary>
     public void DeleteRows(int position) => DeleteRows(position, 1);
 
@@ -144,8 +144,8 @@ public partial class OdfTableSheet
         InvalidateAccessCache();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertColumns that accepts position; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 position；其餘可選參數使用預設值並轉呼叫最長 InsertColumns 多載。
     /// </summary>
     public void InsertColumns(int position) => InsertColumns(position, 1);
 
@@ -178,8 +178,8 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of DeleteColumns that accepts position; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 position；其餘可選參數使用預設值並轉呼叫最長 DeleteColumns 多載。
     /// </summary>
     public void DeleteColumns(int position) => DeleteColumns(position, 1);
 

@@ -13,14 +13,14 @@ public partial class OdfElement
 {
     #region Attribute Values - Line & Font
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetLineWidthAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetLineWidthAttributeValue 多載。
     /// </summary>
     public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri) => GetLineWidthAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetLineWidthAttributeValue operation.
+    /// Gets line width attribute value.
     /// 取得具有 schema awareness 的線條寬度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -33,21 +33,21 @@ public partial class OdfElement
         return OdfElementDomainAttributeAccess.GetNullable<OdfLineWidth>(value, OdfLineWidth.TryParse);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLineWidthAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetLineWidthAttributeValue 多載。
     /// </summary>
     public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value) => SetLineWidthAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLineWidthAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetLineWidthAttributeValue 多載。
     /// </summary>
     public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value, string? prefix) => SetLineWidthAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetLineWidthAttributeValue operation.
+    /// Sets line width attribute value.
     /// 設定具有 schema awareness 的線條寬度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,14 +61,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetLineModeAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetLineModeAttributeValue 多載。
     /// </summary>
     public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri) => GetLineModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetLineModeAttributeValue operation.
+    /// Gets line mode attribute value.
     /// 取得具有 schema awareness 的線條模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -81,21 +81,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfLineMode>(value, OdfElementSchemaRegistry.TryParseLineMode);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLineModeAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetLineModeAttributeValue 多載。
     /// </summary>
     public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value) => SetLineModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLineModeAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetLineModeAttributeValue 多載。
     /// </summary>
     public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix) => SetLineModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetLineModeAttributeValue operation.
+    /// Sets line mode attribute value.
     /// 設定具有 schema awareness 的線條模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -109,14 +109,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontStyleAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontStyleAttributeValue 多載。
     /// </summary>
     public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri) => GetFontStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontStyleAttributeValue operation.
+    /// Gets font style attribute value.
     /// 取得具有 schema awareness 的字型樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -129,21 +129,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStyle>(value, OdfElementSchemaRegistry.TryParseFontStyle);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontStyleAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontStyleAttributeValue 多載。
     /// </summary>
     public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value) => SetFontStyleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontStyleAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontStyleAttributeValue 多載。
     /// </summary>
     public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix) => SetFontStyleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontStyleAttributeValue operation.
+    /// Sets font style attribute value.
     /// 設定具有 schema awareness 的字型樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -157,14 +157,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontVariantAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontVariantAttributeValue 多載。
     /// </summary>
     public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri) => GetFontVariantAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontVariantAttributeValue operation.
+    /// Gets font variant attribute value.
     /// 取得具有 schema awareness 的字型變體屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -177,21 +177,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontVariant>(value, OdfElementSchemaRegistry.TryParseFontVariant);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontVariantAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontVariantAttributeValue 多載。
     /// </summary>
     public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value) => SetFontVariantAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontVariantAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontVariantAttributeValue 多載。
     /// </summary>
     public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix) => SetFontVariantAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontVariantAttributeValue operation.
+    /// Sets font variant attribute value.
     /// 設定具有 schema awareness 的字型變體屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,14 +205,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontWeightAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontWeightAttributeValue 多載。
     /// </summary>
     public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri) => GetFontWeightAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontWeightAttributeValue operation.
+    /// Gets font weight attribute value.
     /// 取得具有 schema awareness 的字型粗細屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -225,21 +225,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontWeight>(value, OdfElementSchemaRegistry.TryParseFontWeight);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontWeightAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontWeightAttributeValue 多載。
     /// </summary>
     public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value) => SetFontWeightAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontWeightAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontWeightAttributeValue 多載。
     /// </summary>
     public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix) => SetFontWeightAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontWeightAttributeValue operation.
+    /// Sets font weight attribute value.
     /// 設定具有 schema awareness 的字型粗細屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -253,14 +253,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontFamilyGenericAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontFamilyGenericAttributeValue 多載。
     /// </summary>
     public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri) => GetFontFamilyGenericAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontFamilyGenericAttributeValue operation.
+    /// Gets font family generic attribute value.
     /// 取得具有 schema awareness 的通用字型家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -273,21 +273,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontFamilyGeneric>(value, OdfElementSchemaRegistry.TryParseFontFamilyGeneric);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontFamilyGenericAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontFamilyGenericAttributeValue 多載。
     /// </summary>
     public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value) => SetFontFamilyGenericAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontFamilyGenericAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontFamilyGenericAttributeValue 多載。
     /// </summary>
     public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix) => SetFontFamilyGenericAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontFamilyGenericAttributeValue operation.
+    /// Sets font family generic attribute value.
     /// 設定具有 schema awareness 的通用字型家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -301,14 +301,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontPitchAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontPitchAttributeValue 多載。
     /// </summary>
     public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri) => GetFontPitchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontPitchAttributeValue operation.
+    /// Gets font pitch attribute value.
     /// 取得具有 schema awareness 的字型間距屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -321,21 +321,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontPitch>(value, OdfElementSchemaRegistry.TryParseFontPitch);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontPitchAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontPitchAttributeValue 多載。
     /// </summary>
     public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value) => SetFontPitchAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontPitchAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontPitchAttributeValue 多載。
     /// </summary>
     public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix) => SetFontPitchAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontPitchAttributeValue operation.
+    /// Sets font pitch attribute value.
     /// 設定具有 schema awareness 的字型間距屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -349,14 +349,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontReliefAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontReliefAttributeValue 多載。
     /// </summary>
     public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri) => GetFontReliefAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontReliefAttributeValue operation.
+    /// Gets font relief attribute value.
     /// 取得具有 schema awareness 的字型浮雕屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -369,21 +369,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontRelief>(value, OdfElementSchemaRegistry.TryParseFontRelief);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontReliefAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontReliefAttributeValue 多載。
     /// </summary>
     public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value) => SetFontReliefAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontReliefAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontReliefAttributeValue 多載。
     /// </summary>
     public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix) => SetFontReliefAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontReliefAttributeValue operation.
+    /// Sets font relief attribute value.
     /// 設定具有 schema awareness 的字型浮雕屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -397,14 +397,14 @@ public partial class OdfElement
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetFontStretchAttributeValue that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 GetFontStretchAttributeValue 多載。
     /// </summary>
     public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri) => GetFontStretchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
 
     /// <summary>
-    /// Executes the GetFontStretchAttributeValue operation.
+    /// Gets font stretch attribute value.
     /// 取得具有 schema awareness 的字型伸縮屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -417,21 +417,21 @@ public partial class OdfElement
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStretch>(value, OdfElementSchemaRegistry.TryParseFontStretch);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontStretchAttributeValue that accepts localName, namespaceUri, and value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri 與 value；其餘可選參數使用預設值並轉呼叫最長 SetFontStretchAttributeValue 多載。
     /// </summary>
     public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value) => SetFontStretchAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetFontStretchAttributeValue that accepts localName, namespaceUri, value, and prefix; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName、namespaceUri、value 與 prefix；其餘可選參數使用預設值並轉呼叫最長 SetFontStretchAttributeValue 多載。
     /// </summary>
     public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix) => SetFontStretchAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
 
 
 
     /// <summary>
-    /// Executes the SetFontStretchAttributeValue operation.
+    /// Sets font stretch attribute value.
     /// 設定具有 schema awareness 的字型伸縮屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

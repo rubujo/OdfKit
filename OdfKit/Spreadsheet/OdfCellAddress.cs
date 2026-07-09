@@ -48,26 +48,26 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     /// </summary>
     public bool IsSheetAbsolute { get; }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfCellAddress that accepts row and column; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row 與 column；其餘可選參數使用預設值並轉呼叫最長 OdfCellAddress 多載。
     /// </summary>
     public OdfCellAddress(int row, int column) : this(row, column, null, false, false, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfCellAddress that accepts row, column, and sheetName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column 與 sheetName；其餘可選參數使用預設值並轉呼叫最長 OdfCellAddress 多載。
     /// </summary>
     public OdfCellAddress(int row, int column, string? sheetName) : this(row, column, sheetName, false, false, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfCellAddress that accepts row, column, sheetName, and isRowAbsolute; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、sheetName 與 isRowAbsolute；其餘可選參數使用預設值並轉呼叫最長 OdfCellAddress 多載。
     /// </summary>
     public OdfCellAddress(int row, int column, string? sheetName, bool isRowAbsolute) : this(row, column, sheetName, isRowAbsolute, false, false) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OdfCellAddress that accepts row, column, sheetName, isRowAbsolute, and isColumnAbsolute; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 row、column、sheetName、isRowAbsolute 與 isColumnAbsolute；其餘可選參數使用預設值並轉呼叫最長 OdfCellAddress 多載。
     /// </summary>
     public OdfCellAddress(int row, int column, string? sheetName, bool isRowAbsolute, bool isColumnAbsolute) : this(row, column, sheetName, isRowAbsolute, isColumnAbsolute, false) { }
 
@@ -400,8 +400,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         return sb.ToString();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ToOdfString that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：ToOdfString 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public string ToOdfString() => ToOdfString(false);
 

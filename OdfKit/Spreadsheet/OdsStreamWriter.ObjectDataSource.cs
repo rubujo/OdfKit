@@ -20,14 +20,14 @@ public partial class OdsStreamWriter
     public Task WriteDataAsync<T>(IEnumerable<T> source) => WriteDataAsync(source, false, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WriteDataAsync that accepts source and includeColumnNames; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 source 與 includeColumnNames；其餘可選參數使用預設值並轉呼叫最長 WriteDataAsync 多載。
     /// </summary>
     public Task WriteDataAsync<T>(IEnumerable<T> source, bool includeColumnNames) => WriteDataAsync(source, includeColumnNames, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of WriteDataAsync that accepts source, includeColumnNames, and cancellationToken.
+    /// WriteDataAsync 完整多載：接受 source、includeColumnNames 與 cancellationToken。
     /// </summary>
     public async Task WriteDataAsync<T>(
         IEnumerable<T> source,
@@ -48,14 +48,14 @@ public partial class OdsStreamWriter
     public Task WriteDataAsync<T>(IAsyncEnumerable<T> source) => WriteDataAsync(source, false, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WriteDataAsync that accepts source and includeColumnNames; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 source 與 includeColumnNames；其餘可選參數使用預設值並轉呼叫最長 WriteDataAsync 多載。
     /// </summary>
     public Task WriteDataAsync<T>(IAsyncEnumerable<T> source, bool includeColumnNames) => WriteDataAsync(source, includeColumnNames, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of WriteDataAsync that accepts source, includeColumnNames, and cancellationToken.
+    /// WriteDataAsync 完整多載：接受 source、includeColumnNames 與 cancellationToken。
     /// </summary>
     public async Task WriteDataAsync<T>(
         IAsyncEnumerable<T> source,

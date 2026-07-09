@@ -13,8 +13,8 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OptimizeMedia that accepts maxDpi and jpegQuality; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 maxDpi 與 jpegQuality；其餘可選參數使用預設值並轉呼叫最長 OptimizeMedia 多載。
     /// </summary>
     public int OptimizeMedia(double maxDpi, int jpegQuality) => OptimizeMedia(maxDpi, jpegQuality, null);
 

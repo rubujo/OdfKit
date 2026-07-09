@@ -42,25 +42,25 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     public IReadOnlyList<OdfValidationIssue> Issues => _issues;
 
     /// <summary>
-    /// Executes the InfoCount operation.
+    /// Performs info count.
     /// 取得資訊性問題數量。
     /// </summary>
     public int InfoCount => CountSeverity(OdfIssueSeverity.Info);
 
     /// <summary>
-    /// Executes the WarningCount operation.
+    /// Performs warning count.
     /// 取得警告問題數量。
     /// </summary>
     public int WarningCount => CountSeverity(OdfIssueSeverity.Warning);
 
     /// <summary>
-    /// Executes the ErrorCount operation.
+    /// Performs error count.
     /// 取得錯誤問題數量。
     /// </summary>
     public int ErrorCount => CountSeverity(OdfIssueSeverity.Error);
 
     /// <summary>
-    /// Executes the FatalCount operation.
+    /// Performs fatal count.
     /// 取得致命問題數量。
     /// </summary>
     public int FatalCount => CountSeverity(OdfIssueSeverity.Fatal);
@@ -84,7 +84,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     };
 
     /// <summary>
-    /// Executes the ToJsonModel operation.
+    /// Converts to json model.
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
     /// <returns>包含驗證報告摘要與問題清單的 JSON 匯出模型</returns>
@@ -103,7 +103,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     }
 
     /// <summary>
-    /// Executes the ToJson operation.
+    /// Converts to json.
     /// 將驗證報告匯出為穩定 JSON 字串。
     /// </summary>
     /// <returns>JSON 格式的驗證報告</returns>

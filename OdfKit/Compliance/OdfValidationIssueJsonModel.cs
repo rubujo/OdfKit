@@ -10,7 +10,7 @@ namespace OdfKit.Compliance;
 public sealed class OdfValidationIssueJsonModel
 {
     /// <summary>
-    /// Executes the OdfValidationIssueJsonModel operation.
+    /// Performs odf validation issue json model.
     /// 初始化 <see cref="OdfValidationIssueJsonModel"/> 類別的新執行個體。
     /// </summary>
     /// <param name="severity">問題嚴重性</param>

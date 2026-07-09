@@ -9,7 +9,7 @@ public sealed class OdfDesignTheme
     private readonly string[] _accentFillColors;
 
     /// <summary>
-    /// Executes the OdfDesignTheme operation.
+    /// Performs odf design theme.
     /// 初始化 <see cref="OdfDesignTheme"/> 類別的新執行個體。
     /// </summary>
     public OdfDesignTheme()
@@ -30,7 +30,7 @@ public sealed class OdfDesignTheme
     }
 
     /// <summary>
-    /// Executes the Flowchart operation.
+    /// Performs flowchart.
     /// 取得適合流程圖與架構圖的內建主題。
     /// </summary>
     public static OdfDesignTheme Flowchart => new(
@@ -58,7 +58,7 @@ public sealed class OdfDesignTheme
     public string ConnectorColor { get; set; } = "#333333";
 
     /// <summary>
-    /// Executes the GetAccentFillColor operation.
+    /// Gets accent fill color.
     /// 依序號取得圖形填滿色彩。
     /// </summary>
     /// <param name="index">圖形序號</param>
@@ -70,7 +70,7 @@ public sealed class OdfDesignTheme
     }
 
     /// <summary>
-    /// Executes the WithAccentFillColors operation.
+    /// Performs with accent fill colors.
     /// 取代主題使用的強調填滿色彩序列。
     /// </summary>
     /// <param name="colors">色彩序列</param>

@@ -14,14 +14,14 @@ public partial class OdfSlide
 {
     #region Slide Animations
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntranceEffect that accepts shapeId, effect, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddEntranceEffect 多載。
     /// </summary>
     public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddEntranceEffect(shapeId, effect, trigger, default, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEntranceEffect that accepts shapeId, effect, trigger, and delay; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect、trigger 與 delay；其餘可選參數使用預設值並轉呼叫最長 AddEntranceEffect 多載。
     /// </summary>
     public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay) => AddEntranceEffect(shapeId, effect, trigger, delay, default);
 
@@ -105,14 +105,14 @@ public partial class OdfSlide
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddExitEffect that accepts shapeId, effect, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddExitEffect 多載。
     /// </summary>
     public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddExitEffect(shapeId, effect, trigger, default, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddExitEffect that accepts shapeId, effect, trigger, and delay; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect、trigger 與 delay；其餘可選參數使用預設值並轉呼叫最長 AddExitEffect 多載。
     /// </summary>
     public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay) => AddExitEffect(shapeId, effect, trigger, delay, default);
 
@@ -196,20 +196,20 @@ public partial class OdfSlide
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId and effect; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId 與 effect；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect) => AddEmphasisEffect(shapeId, effect, default, OdfAnimationTrigger.OnClick, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId, effect, and duration; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect 與 duration；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration) => AddEmphasisEffect(shapeId, effect, duration, OdfAnimationTrigger.OnClick, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddEmphasisEffect that accepts shapeId, effect, duration, and trigger; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 shapeId、effect、duration 與 trigger；其餘可選參數使用預設值並轉呼叫最長 AddEmphasisEffect 多載。
     /// </summary>
     public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration, OdfAnimationTrigger trigger) => AddEmphasisEffect(shapeId, effect, duration, trigger, default);
 

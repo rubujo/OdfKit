@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public static class OdfNodeTraversalExtensions
 {
     /// <summary>
-    /// Executes the Children operation.
+    /// Performs children.
     /// 列舉指定節點的直接子節點，並只傳回指定型別。
     /// </summary>
     /// <typeparam name="TNode">要篩選的子節點型別</typeparam>
@@ -35,7 +35,7 @@ public static class OdfNodeTraversalExtensions
     }
 
     /// <summary>
-    /// Executes the Descendants operation.
+    /// Performs descendants.
     /// 列舉指定節點的所有後代節點，並只傳回指定型別。
     /// </summary>
     /// <typeparam name="TNode">要篩選的後代節點型別</typeparam>
@@ -60,7 +60,7 @@ public static class OdfNodeTraversalExtensions
     }
 
     /// <summary>
-    /// Executes the Append operation.
+    /// Performs the Append operation.
     /// 將多個子節點依序加入來源節點，並傳回同一個來源節點以便鏈式建立 DOM。
     /// </summary>
     /// <typeparam name="TNode">來源節點型別</typeparam>

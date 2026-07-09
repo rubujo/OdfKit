@@ -32,26 +32,26 @@ public partial class OdfDatabaseDocument
             int.TryParse(login.GetAttribute("login-timeout", DatabaseNamespace), out int timeout) ? timeout : null);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLogin that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：SetLogin 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNode SetLogin() => SetLogin(null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLogin that accepts userName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 userName；其餘可選參數使用預設值並轉呼叫最長 SetLogin 多載。
     /// </summary>
     public OdfNode SetLogin(string? userName) => SetLogin(userName, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLogin that accepts userName and useSystemUser; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 userName 與 useSystemUser；其餘可選參數使用預設值並轉呼叫最長 SetLogin 多載。
     /// </summary>
     public OdfNode SetLogin(string? userName, bool? useSystemUser) => SetLogin(userName, useSystemUser, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetLogin that accepts userName, useSystemUser, and isPasswordRequired; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 userName、useSystemUser 與 isPasswordRequired；其餘可選參數使用預設值並轉呼叫最長 SetLogin 多載。
     /// </summary>
     public OdfNode SetLogin(string? userName, bool? useSystemUser, bool? isPasswordRequired) => SetLogin(userName, useSystemUser, isPasswordRequired, null);
 
@@ -122,32 +122,32 @@ public partial class OdfDatabaseDocument
             driverSettings.GetAttribute("base-dn", DatabaseNamespace));
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDriverSettings that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：SetDriverSettings 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNode SetDriverSettings() => SetDriverSettings(null, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDriverSettings that accepts showDeleted; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 showDeleted；其餘可選參數使用預設值並轉呼叫最長 SetDriverSettings 多載。
     /// </summary>
     public OdfNode SetDriverSettings(bool? showDeleted) => SetDriverSettings(showDeleted, null, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDriverSettings that accepts showDeleted and isFirstRowHeaderLine; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 showDeleted 與 isFirstRowHeaderLine；其餘可選參數使用預設值並轉呼叫最長 SetDriverSettings 多載。
     /// </summary>
     public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDriverSettings that accepts showDeleted, isFirstRowHeaderLine, and parameterNameSubstitution; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 showDeleted、isFirstRowHeaderLine 與 parameterNameSubstitution；其餘可選參數使用預設值並轉呼叫最長 SetDriverSettings 多載。
     /// </summary>
     public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine, bool? parameterNameSubstitution) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, parameterNameSubstitution, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetDriverSettings that accepts showDeleted, isFirstRowHeaderLine, parameterNameSubstitution, and systemDriverSettings; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 showDeleted、isFirstRowHeaderLine、parameterNameSubstitution 與 systemDriverSettings；其餘可選參數使用預設值並轉呼叫最長 SetDriverSettings 多載。
     /// </summary>
     public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine, bool? parameterNameSubstitution, string? systemDriverSettings) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, parameterNameSubstitution, systemDriverSettings, null);
 

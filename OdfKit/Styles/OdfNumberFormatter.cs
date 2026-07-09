@@ -22,7 +22,7 @@ public partial class OdfNumberFormatter
     private int _styleCounter;
 
     /// <summary>
-    /// Executes the OdfNumberFormatter operation.
+    /// Performs odf number formatter.
     /// 初始化 <see cref="OdfNumberFormatter"/> 類別的新執行個體。
     /// </summary>
     /// <param name="contentRoot">內容 XML 的根節點</param>
@@ -35,14 +35,14 @@ public partial class OdfNumberFormatter
         PopulateCacheFromExistingStyles();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of GetOrCreateNumberStyle that accepts dotNetFormat; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 dotNetFormat；其餘可選參數使用預設值並轉呼叫最長 GetOrCreateNumberStyle 多載。
     /// </summary>
     public string GetOrCreateNumberStyle(string dotNetFormat) => GetOrCreateNumberStyle(dotNetFormat, null);
 
 
     /// <summary>
-    /// Executes the GetOrCreateNumberStyle operation.
+    /// Gets or create number style.
     /// 註冊 .NET 格式字串，必要時將其翻譯為 ODF 樣式，並傳回要參考的樣式名稱。
     /// </summary>
     /// <param name="dotNetFormat">.NET 格式字串</param>
@@ -100,7 +100,7 @@ public partial class OdfNumberFormatter
 
 
     /// <summary>
-    /// Executes the GetNumberStyleNode operation.
+    /// Gets number style node.
     /// 將樣式名稱解析為節點。若找不到，則傳回後備的 Standard 數字樣式以防止 NullReferenceException。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>

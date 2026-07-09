@@ -28,7 +28,7 @@ public partial class OfficeDatabaseElement
     }
 
     /// <summary>
-    /// Executes the EnsureDataSource operation.
+    /// Ensures data source.
     /// 取得或建立 <c>db:data-source</c> 節點。
     /// </summary>
     /// <returns>資料來源元素</returns>
@@ -50,7 +50,7 @@ public partial class OfficeDatabaseElement
     }
 
     /// <summary>
-    /// Executes the EnsureForms operation.
+    /// Ensures forms.
     /// 取得或建立 <c>db:forms</c> 容器。
     /// </summary>
     /// <returns>表單元件容器</returns>
@@ -58,7 +58,7 @@ public partial class OfficeDatabaseElement
         DatabaseFormsChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseFormsElement("db"), DatabaseComponentRank.Forms);
 
     /// <summary>
-    /// Executes the EnsureReports operation.
+    /// Ensures reports.
     /// 取得或建立 <c>db:reports</c> 容器。
     /// </summary>
     /// <returns>報表元件容器</returns>
@@ -66,7 +66,7 @@ public partial class OfficeDatabaseElement
         DatabaseReportsChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseReportsElement("db"), DatabaseComponentRank.Reports);
 
     /// <summary>
-    /// Executes the EnsureQueries operation.
+    /// Ensures queries.
     /// 取得或建立 <c>db:queries</c> 容器。
     /// </summary>
     /// <returns>查詢容器</returns>
@@ -74,7 +74,7 @@ public partial class OfficeDatabaseElement
         DatabaseQueriesChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseQueriesElement("db"), DatabaseComponentRank.Queries);
 
     /// <summary>
-    /// Executes the EnsureTableRepresentations operation.
+    /// Ensures table representations.
     /// 取得或建立 <c>db:table-representations</c> 容器。
     /// </summary>
     /// <returns>資料表描述容器</returns>

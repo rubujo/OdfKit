@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 """Rewrite generic convenience-overload XML summaries with parameter-aware bilingual text.
 
-Targets high-frequency public API files listed in HIGH_FREQ_FILES (relative to repo root).
+Default: all hand-written C# under OdfKit / OdfKit.Extensions.* (excludes Generated/bin/obj).
+Optional: pass explicit relative paths as CLI args to limit scope.
+
 Only rewrites the fixed template:
 
   Convenience overload that uses default values for remaining parameters.
   便利多載：其餘參數使用預設值並轉呼叫最長多載。
-
-Handles methods, static methods, and constructors; distinguishes `=>` forwarders from full bodies.
 """
 from __future__ import annotations
 
@@ -18,18 +18,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 
-HIGH_FREQ_FILES = [
-    "OdfKit/Core/OdfDocumentFactory.cs",
-    "OdfKit/Core/OdfPackage.cs",
-    "OdfKit/Core/OdfDocument.cs",
-    "OdfKit/Compliance/OdfValidator.cs",
-    "OdfKit/Compliance/OdfExternalValidator.cs",
-    "OdfKit/Spreadsheet/OdsStreamWriter.cs",
-    "OdfKit/Spreadsheet/OdfTableSheet.RangeDepth.cs",
-    "OdfKit/Spreadsheet/SpreadsheetDocument.RangeDepth.cs",
-]
-
-# Match summary + declaration (method or constructor). Declaration may span lines until ) => or ) { or ) : this
+# Match summary + declaration (method or constructor).
 BLOCK_RE = re.compile(
     r"(?P<indent>[ \t]*)/// <summary>\n"
     r"(?P=indent)/// Convenience overload that uses default values for remaining parameters\.\n"
@@ -38,10 +27,8 @@ BLOCK_RE = re.compile(
     r"(?P=indent)(?P<decl>"
     r"(?:public|protected)(?:\s+static)?(?:\s+async)?(?:\s+partial)?\s+"
     r"(?:"
-    # constructor: TypeName(
     r"(?P<ctor>[A-Z]\w*)\s*\("
     r"|"
-    # method: ReturnType Name(
     r"(?:[\w.]+(?:<[^>\n]+>)?\[?\]?\??\s+)+(?P<method>\w+)\s*(?:<[^>\n]+>)?\s*\("
     r")"
     r"(?P<params>[\s\S]*?)"
@@ -60,7 +47,7 @@ PARAM_RE = re.compile(
 def param_names(params: str) -> list[str]:
     names: list[str] = []
     for part in params.split(","):
-        part = " ".join(part.split())  # collapse whitespace/newlines
+        part = " ".join(part.split())
         if not part:
             continue
         m = PARAM_RE.search(part)
@@ -90,7 +77,7 @@ def en_join(names: list[str]) -> str:
 
 
 def build_summary(indent: str, symbol: str, names: list[str], body_kind: str) -> str:
-    is_forward = body_kind == "=>" or body_kind == ":"
+    is_forward = body_kind in ("=>", ":")
     if not names:
         if is_forward:
             en = (
@@ -139,12 +126,30 @@ def rewrite_text(text: str) -> tuple[str, int]:
     return BLOCK_RE.subn(repl, text)
 
 
-def main() -> int:
+def iter_target_files(explicit: list[str]) -> list[Path]:
+    if explicit:
+        return [REPO / p for p in explicit]
+
+    roots = [REPO / "OdfKit"]
+    roots.extend(sorted(REPO.glob("OdfKit.Extensions.*")))
+    files: list[Path] = []
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.cs"):
+            s = str(path).replace("\\", "/")
+            if "/Generated/" in s or "/bin/" in s or "/obj/" in s:
+                continue
+            files.append(path)
+    return files
+
+
+def main(argv: list[str]) -> int:
+    targets = iter_target_files(argv[1:])
     total = 0
-    for rel in HIGH_FREQ_FILES:
-        path = REPO / rel
+    for path in targets:
         if not path.is_file():
-            print(f"SKIP missing {rel}", file=sys.stderr)
+            print(f"SKIP missing {path.relative_to(REPO)}", file=sys.stderr)
             continue
         raw = path.read_bytes()
         text = raw.decode("utf-8-sig")
@@ -152,7 +157,6 @@ def main() -> int:
         normalized = text.replace("\r\n", "\n")
         rewritten, n = rewrite_text(normalized)
         if n == 0:
-            print(f"OK   0  {rel}")
             continue
         if had_crlf:
             rewritten = rewritten.replace("\n", "\r\n")
@@ -162,10 +166,10 @@ def main() -> int:
             out = b"\xef\xbb\xbf" + out
         path.write_bytes(out)
         total += n
-        print(f"WROTE {n:3d}  {rel}")
+        print(f"WROTE {n:4d}  {path.relative_to(REPO).as_posix()}")
     print(f"TOTAL rewritten: {total}")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv))

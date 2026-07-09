@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public sealed class OdfTypedDomElementCoverage
 {
     /// <summary>
-    /// Executes the OdfTypedDomElementCoverage operation.
+    /// Performs odf typed dom element coverage.
     /// 初始化單一元素覆蓋專案。
     /// </summary>
     /// <param name="namespaceUri">元素命名空間 URI</param>

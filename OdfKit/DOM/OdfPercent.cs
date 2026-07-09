@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfPercent : IEquatable<OdfPercent>
 {
     /// <summary>
-    /// Executes the OdfPercent operation.
+    /// Performs odf percent.
     /// 以百分比 lexical form 建立 <see cref="OdfPercent"/>。
     /// </summary>
     /// <param name="value">百分比字串，例如 <c>50%</c>、<c>.5%</c> 或 <c>-25%</c></param>
@@ -39,7 +39,7 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     public decimal Percent { get; }
 
     /// <summary>
-    /// Executes the FromPercent operation.
+    /// Creates from percent.
     /// 從百分比數值建立 <see cref="OdfPercent"/>。
     /// </summary>
     /// <param name="percent">百分比數值，必須介於 -100 到 100 之間</param>
@@ -47,7 +47,7 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     public static OdfPercent FromPercent(decimal percent) => new(percent.ToString(CultureInfo.InvariantCulture) + "%");
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析 0 到 100 的百分比字串。
     /// </summary>
     /// <param name="value">百分比字串</param>
@@ -56,7 +56,7 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     public static bool TryParse(string? value, out OdfPercent percent) => TryParse(value, allowNegative: false, out percent);
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析可選擇是否允許負值的百分比字串。
     /// </summary>
     /// <param name="value">百分比字串</param>
@@ -76,14 +76,14 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始百分比字串。
     /// </summary>
     /// <returns>百分比字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個百分比。
     /// </summary>
     /// <param name="other">要比較的百分比</param>
@@ -91,21 +91,21 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     public bool Equals(OdfPercent other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfPercent other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個百分比是否相等。
     /// </summary>
     /// <param name="left">左側百分比</param>
@@ -114,7 +114,7 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     public static bool operator ==(OdfPercent left, OdfPercent right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個百分比是否不相等。
     /// </summary>
     /// <param name="left">左側百分比</param>

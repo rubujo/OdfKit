@@ -27,7 +27,7 @@ public partial class OdfNode
     private protected static int CloneRecursionDepth;
 
     /// <summary>
-    /// Executes the CloneNode operation.
+    /// Clones node.
     /// 複製當前節點。
     /// </summary>
     /// <param name="deep">是否進行深層複製（遞迴複製子節點）</param>
@@ -95,7 +95,7 @@ public partial class OdfNode
     }
 
     /// <summary>
-    /// Executes the ImportNode operation.
+    /// Imports node.
     /// 將一個節點從來源 <see cref="OdfPackage"/> 匯入至目的 <see cref="OdfPackage"/>，自動複製並移轉其所屬的媒體檔案與樣式關聯。
     /// </summary>
     /// <param name="sourceNode">要匯入的來源節點</param>

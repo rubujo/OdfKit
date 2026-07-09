@@ -113,8 +113,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     private readonly List<(string fieldName, bool ascending)> _sortInfos = [];
     private readonly List<(string fieldName, OdfPivotFilterOperator op, string value)> _filters = [];
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithColumnHeaders that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithColumnHeaders 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder WithColumnHeaders() => WithColumnHeaders(true);
 
@@ -129,8 +129,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of WithRowHeaders that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：WithRowHeaders 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder WithRowHeaders() => WithRowHeaders(true);
 
@@ -177,8 +177,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     public OdfPivotTableBuilder AddDataField(string fieldName) => AddDataField(fieldName, OdfPivotFunction.Sum);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of AddDataField that accepts fieldName and function.
+    /// AddDataField 完整多載：接受 fieldName 與 function。
     /// </summary>
     public OdfPivotTableBuilder AddDataField(string fieldName, OdfPivotFunction function)
     {
@@ -224,8 +224,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddSortInfo that accepts fieldName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 fieldName；其餘可選參數使用預設值並轉呼叫最長 AddSortInfo 多載。
     /// </summary>
     public OdfPivotTableBuilder AddSortInfo(string fieldName) => AddSortInfo(fieldName, true);
 

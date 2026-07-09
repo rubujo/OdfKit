@@ -28,8 +28,8 @@ public abstract partial class OdfDocument
     public virtual void Save() => Save((OdfSaveOptions?)null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Save that accepts options.
+    /// Save 完整多載：接受 options。
     /// </summary>
     public virtual void Save(OdfSaveOptions? options)
     {
@@ -45,8 +45,8 @@ public abstract partial class OdfDocument
     public void Save(string path) => Save(path, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Save that accepts path and options.
+    /// Save 完整多載：接受 path 與 options。
     /// </summary>
     public void Save(string path, OdfSaveOptions? options)
     {
@@ -67,7 +67,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SaveAsync operation.
+    /// Saves async.
     /// 非同步儲存文件至 ODF 封裝容器中。
     /// </summary>
     /// <returns>代表非同步作業的 Task 執行個體</returns>
@@ -78,14 +78,14 @@ public abstract partial class OdfDocument
     public virtual Task SaveAsync() => SaveAsync((OdfSaveOptions?)null, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 options；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public virtual Task SaveAsync(OdfSaveOptions? options) => SaveAsync(options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveAsync that accepts options and cancellationToken.
+    /// SaveAsync 完整多載：接受 options 與 cancellationToken。
     /// </summary>
     public virtual async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken)
     {
@@ -95,7 +95,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SaveAsync operation.
+    /// Saves async.
     /// 非同步將文件保存到指定檔案路徑。
     /// </summary>
     /// <returns>代表非同步儲存作業的工作</returns>
@@ -115,14 +115,14 @@ public abstract partial class OdfDocument
     public Task SaveAsync(string path, CancellationToken cancellationToken) => SaveAsync(path, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts path and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 options；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public Task SaveAsync(string path, OdfSaveOptions? options) => SaveAsync(path, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveAsync that accepts path, options, and cancellationToken.
+    /// SaveAsync 完整多載：接受 path、options 與 cancellationToken。
     /// </summary>
     public async Task SaveAsync(string path, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
@@ -147,7 +147,7 @@ public abstract partial class OdfDocument
     #region Web Streaming APIs
 
     /// <summary>
-    /// Executes the SaveToBytes operation.
+    /// Saves to bytes.
     /// 將文件儲存為 ODF 封裝位元組陣列。
     /// </summary>
     /// <returns>包含文件封裝內容的位元組陣列</returns>
@@ -159,14 +159,14 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SaveToStream operation.
+    /// Saves to stream.
     /// 將文件儲存至指定的資料流。
     /// </summary>
     public void SaveToStream(Stream destinationStream) => SaveToStream(destinationStream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveToStream that accepts destinationStream and options.
+    /// SaveToStream 完整多載：接受 destinationStream 與 options。
     /// </summary>
     public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
@@ -184,7 +184,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SaveAsync operation.
+    /// Saves async.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
     /// <returns>代表非同步儲存作業的工作</returns>
@@ -201,20 +201,20 @@ public abstract partial class OdfDocument
         SaveToStreamAsync(destinationStream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts destinationStream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 destinationStream 與 options；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveAsync that accepts destinationStream, options, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 destinationStream、options 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 SaveAsync 多載。
     /// </summary>
     public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken) =>
         SaveToStreamAsync(destinationStream, options, cancellationToken);
 
     /// <summary>
-    /// Executes the SaveToStreamAsync operation.
+    /// Saves to stream async.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
     /// <returns>代表非同步儲存作業的工作</returns>
@@ -235,14 +235,14 @@ public abstract partial class OdfDocument
         SaveToStreamAsync(destinationStream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SaveToStreamAsync that accepts destinationStream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 destinationStream 與 options；其餘可選參數使用預設值並轉呼叫最長 SaveToStreamAsync 多載。
     /// </summary>
     public Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveToStreamAsync that accepts destinationStream, options, and cancellationToken.
+    /// SaveToStreamAsync 完整多載：接受 destinationStream、options 與 cancellationToken。
     /// </summary>
     public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
@@ -349,7 +349,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the ClearTemplateUserContent operation.
+    /// Clears template user content.
     /// 清除範本實例化後的使用者內容，但保留格式與版面配置。
     /// </summary>
     /// <remarks>
@@ -361,7 +361,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the ClearParagraphTextContentRecursive operation.
+    /// Clears paragraph text content recursive.
     /// 遞迴清除指定節點底下所有 <c>text:p</c>／<c>text:span</c> 段落的文字內容，但保留節點結構
     /// </summary>
     /// <param name="node">要清除文字內容的根節點</param>
@@ -390,14 +390,14 @@ public abstract partial class OdfDocument
     #region Flat XML Conversion APIs
 
     /// <summary>
-    /// Executes the SaveAsFlatXml operation.
+    /// Saves as flat xml.
     /// 將文件儲存為單一 Flat XML 格式的檔案。
     /// </summary>
     public void SaveAsFlatXml(string path) => SaveAsFlatXml(path, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveAsFlatXml that accepts path and options.
+    /// SaveAsFlatXml 完整多載：接受 path 與 options。
     /// </summary>
     public void SaveAsFlatXml(string path, OdfSaveOptions? options)
     {
@@ -418,14 +418,14 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the SaveAsFlatXml operation.
+    /// Saves as flat xml.
     /// 將文件儲存為單一 Flat XML 格式並寫入指定的資料流。
     /// </summary>
     public void SaveAsFlatXml(Stream stream) => SaveAsFlatXml(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SaveAsFlatXml that accepts stream and options.
+    /// SaveAsFlatXml 完整多載：接受 stream 與 options。
     /// </summary>
     public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options)
     {
@@ -520,20 +520,20 @@ public abstract partial class OdfDocument
         return OdfDocumentFactory.CreateDocumentWrapper(package, targetKind);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConvertZipToFlatXml that accepts sourcePath and destinationPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sourcePath 與 destinationPath；其餘可選參數使用預設值並轉呼叫最長 ConvertZipToFlatXml 多載。
     /// </summary>
     public static void ConvertZipToFlatXml(string sourcePath, string destinationPath) => ConvertZipToFlatXml(sourcePath, destinationPath, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConvertZipToFlatXml that accepts sourcePath, destinationPath, and loadOptions; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sourcePath、destinationPath 與 loadOptions；其餘可選參數使用預設值並轉呼叫最長 ConvertZipToFlatXml 多載。
     /// </summary>
     public static void ConvertZipToFlatXml(string sourcePath, string destinationPath, OdfLoadOptions? loadOptions) => ConvertZipToFlatXml(sourcePath, destinationPath, loadOptions, null);
 
 
     /// <summary>
-    /// Executes the ConvertZipToFlatXml operation.
+    /// Converts zip to flat xml.
     /// 將一般 ZIP 封裝的 ODF 文件就地轉換為 Flat XML 格式。
     /// </summary>
     /// <param name="sourcePath">來源 ZIP 封裝文件路徑</param>
@@ -552,20 +552,20 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConvertFlatXmlToZip that accepts sourcePath and destinationPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sourcePath 與 destinationPath；其餘可選參數使用預設值並轉呼叫最長 ConvertFlatXmlToZip 多載。
     /// </summary>
     public static void ConvertFlatXmlToZip(string sourcePath, string destinationPath) => ConvertFlatXmlToZip(sourcePath, destinationPath, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ConvertFlatXmlToZip that accepts sourcePath, destinationPath, and loadOptions; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sourcePath、destinationPath 與 loadOptions；其餘可選參數使用預設值並轉呼叫最長 ConvertFlatXmlToZip 多載。
     /// </summary>
     public static void ConvertFlatXmlToZip(string sourcePath, string destinationPath, OdfLoadOptions? loadOptions) => ConvertFlatXmlToZip(sourcePath, destinationPath, loadOptions, null);
 
 
     /// <summary>
-    /// Executes the ConvertFlatXmlToZip operation.
+    /// Converts flat xml to zip.
     /// 將 Flat XML 格式的 ODF 文件就地轉換為一般 ZIP 封裝格式。
     /// </summary>
     /// <param name="sourcePath">來源 Flat XML 文件路徑</param>

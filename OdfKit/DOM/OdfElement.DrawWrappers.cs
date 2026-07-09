@@ -87,7 +87,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
-    /// Executes the Crop operation.
+    /// Performs crop.
     /// 設定此影像的裁切矩形。
     /// </summary>
     /// <remarks>
@@ -107,7 +107,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
-    /// Executes the ClearCrop operation.
+    /// Clears crop.
     /// 清除此影像的裁切設定。
     /// </summary>
     /// <returns>目前的影像元素，供鏈式呼叫使用</returns>
@@ -118,7 +118,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
-    /// Executes the SetEffects operation.
+    /// Sets effects.
     /// 設定此影像的繪圖效果。
     /// </summary>
     /// <param name="configure">用來設定影像效果的委派</param>
@@ -135,7 +135,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
-    /// Executes the SetImageSource operation.
+    /// Sets image source.
     /// 將圖片二進位資料寫入文件封裝並繫結至此 <c>draw:image</c>。
     /// </summary>
     /// <param name="bytes">圖片二進位資料</param>
@@ -176,7 +176,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
 public sealed class OdfImageEffectsBuilder(DrawImageElement image)
 {
     /// <summary>
-    /// Executes the Filter operation.
+    /// Performs filter.
     /// 設定影像濾鏡名稱。
     /// </summary>
     /// <param name="filterName">濾鏡名稱；傳入 null 時移除設定</param>
@@ -188,7 +188,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
-    /// Executes the SoftEdge operation.
+    /// Performs soft edge.
     /// 設定影像柔邊半徑。
     /// </summary>
     /// <param name="radius">柔邊半徑</param>
@@ -196,7 +196,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     public OdfImageEffectsBuilder SoftEdge(OdfLength radius) => Filter($"soft-edge({radius})");
 
     /// <summary>
-    /// Executes the Opacity operation.
+    /// Performs opacity.
     /// 設定影像不透明度。
     /// </summary>
     /// <param name="opacity">不透明度百分比</param>
@@ -208,7 +208,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
-    /// Executes the Luminance operation.
+    /// Performs luminance.
     /// 設定影像亮度調整。
     /// </summary>
     /// <param name="luminance">亮度百分比</param>
@@ -220,7 +220,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
-    /// Executes the Contrast operation.
+    /// Performs contrast.
     /// 設定影像對比調整。
     /// </summary>
     /// <param name="contrast">對比 lexical form；傳入 null 時移除設定</param>
@@ -232,7 +232,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
-    /// Executes the Gamma operation.
+    /// Performs gamma.
     /// 設定影像 gamma 調整。
     /// </summary>
     /// <param name="gamma">Gamma lexical form；傳入 null 時移除設定</param>
@@ -244,7 +244,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
-    /// Executes the CornerRadius operation.
+    /// Performs corner radius.
     /// 設定影像圓角半徑。
     /// </summary>
     /// <param name="radius">圓角半徑</param>
@@ -255,14 +255,14 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
         return this;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Shadow that accepts color, offsetX, and offsetY; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 color、offsetX 與 offsetY；其餘可選參數使用預設值並轉呼叫最長 Shadow 多載。
     /// </summary>
     public OdfImageEffectsBuilder Shadow(OdfColor color, OdfLength offsetX, OdfLength offsetY) => Shadow(color, offsetX, offsetY, null);
 
 
     /// <summary>
-    /// Executes the Shadow operation.
+    /// Performs shadow.
     /// 設定影像陰影效果。
     /// </summary>
     /// <param name="color">陰影色彩</param>
@@ -282,7 +282,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
 
 
     /// <summary>
-    /// Executes the ClearShadow operation.
+    /// Clears shadow.
     /// 清除影像陰影效果。
     /// </summary>
     /// <returns>目前的建構器</returns>
@@ -390,8 +390,8 @@ internal static class OdfTransformHelper
     private static readonly System.Text.RegularExpressions.Regex MatrixRegex = new(@"matrix\s*\(\s*([^)]+)\s*\)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of ParseTransform that accepts transformStr.
+    /// ParseTransform 完整多載：接受 transformStr。
     /// </summary>
     public static System.Numerics.Matrix3x2 ParseTransform(string? transformStr)
     {
@@ -476,8 +476,8 @@ internal static class OdfTransformHelper
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of FormatTransform that accepts matrix.
+    /// FormatTransform 完整多載：接受 matrix。
     /// </summary>
     public static string FormatTransform(System.Numerics.Matrix3x2 matrix)
     {

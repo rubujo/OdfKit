@@ -25,7 +25,7 @@ public class OdfMediaManager
     private int _fallbackImageCounter;
 
     /// <summary>
-    /// Executes the OdfMediaManager operation.
+    /// Performs odf media manager.
     /// 初始化 <see cref="OdfMediaManager"/> 類別的新執行個體。
     /// </summary>
     /// <param name="package">ODF 封裝執行個體</param>
@@ -59,14 +59,14 @@ public class OdfMediaManager
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImage that accepts imageBytes; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes；其餘可選參數使用預設值並轉呼叫最長 AddImage 多載。
     /// </summary>
     public string AddImage(byte[] imageBytes) => AddImage(imageBytes, null);
 
 
     /// <summary>
-    /// Executes the AddImage operation.
+    /// Adds image.
     /// 插入圖片二進位資料。若圖片內容已存在，則會自動重用現有路徑，實現自動重複資料刪除。
     /// </summary>
     /// <param name="imageBytes">圖片的二進位內容</param>
@@ -172,7 +172,7 @@ public class OdfMediaManager
     ];
 
     /// <summary>
-    /// Executes the DetectImageFormat operation.
+    /// Detects image format.
     /// 根據檔案的幻數（Magic Bytes）偵測圖片格式。
     /// </summary>
     /// <param name="bytes">圖片的二進位內容</param>

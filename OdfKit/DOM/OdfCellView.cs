@@ -74,7 +74,7 @@ public readonly struct OdfCellData
     public bool Boolean => _primitive.Boolean != 0;
 
     /// <summary>
-    /// Executes the DateTime operation.
+    /// Performs date time.
     /// 取得日期時間資料；僅當 <see cref="Kind"/> 為 <see cref="OdfCellDataKind.DateTime"/> 時有效。
     /// </summary>
     public DateTime DateTime => new(_primitive.Ticks);
@@ -97,20 +97,20 @@ public readonly struct OdfCellData
     /// </summary>
     public string? Formula => _formula;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Empty that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：Empty 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfCellData Empty() => Empty(null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Empty that accepts styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 styleName；其餘可選參數使用預設值並轉呼叫最長 Empty 多載。
     /// </summary>
     public static OdfCellData Empty(string? styleName) => Empty(styleName, null);
 
 
     /// <summary>
-    /// Executes the Empty operation.
+    /// Performs empty.
     /// 建立空白儲存格資料。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>
@@ -119,20 +119,20 @@ public readonly struct OdfCellData
     public static OdfCellData Empty(string? styleName, string? formula) => new(OdfCellDataKind.Empty, default, null, styleName, formula);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromNumber that accepts value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 FromNumber 多載。
     /// </summary>
     public static OdfCellData FromNumber(double value) => FromNumber(value, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromNumber that accepts value and styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value 與 styleName；其餘可選參數使用預設值並轉呼叫最長 FromNumber 多載。
     /// </summary>
     public static OdfCellData FromNumber(double value, string? styleName) => FromNumber(value, styleName, null);
 
 
     /// <summary>
-    /// Executes the FromNumber operation.
+    /// Creates from number.
     /// 建立數值儲存格資料。
     /// </summary>
     /// <param name="value">數值</param>
@@ -142,20 +142,20 @@ public readonly struct OdfCellData
     public static OdfCellData FromNumber(double value, string? styleName, string? formula) => new(OdfCellDataKind.Number, OdfCellPrimitiveData.FromNumber(value), null, styleName, formula);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromBoolean that accepts value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 FromBoolean 多載。
     /// </summary>
     public static OdfCellData FromBoolean(bool value) => FromBoolean(value, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromBoolean that accepts value and styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value 與 styleName；其餘可選參數使用預設值並轉呼叫最長 FromBoolean 多載。
     /// </summary>
     public static OdfCellData FromBoolean(bool value, string? styleName) => FromBoolean(value, styleName, null);
 
 
     /// <summary>
-    /// Executes the FromBoolean operation.
+    /// Creates from boolean.
     /// 建立布林儲存格資料。
     /// </summary>
     /// <param name="value">布林值</param>
@@ -165,20 +165,20 @@ public readonly struct OdfCellData
     public static OdfCellData FromBoolean(bool value, string? styleName, string? formula) => new(OdfCellDataKind.Boolean, OdfCellPrimitiveData.FromBoolean(value), null, styleName, formula);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromDateTime that accepts value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 FromDateTime 多載。
     /// </summary>
     public static OdfCellData FromDateTime(DateTime value) => FromDateTime(value, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromDateTime that accepts value and styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value 與 styleName；其餘可選參數使用預設值並轉呼叫最長 FromDateTime 多載。
     /// </summary>
     public static OdfCellData FromDateTime(DateTime value, string? styleName) => FromDateTime(value, styleName, null);
 
 
     /// <summary>
-    /// Executes the FromDateTime operation.
+    /// Creates from date time.
     /// 建立日期時間儲存格資料。
     /// </summary>
     /// <param name="value">日期時間</param>
@@ -188,20 +188,20 @@ public readonly struct OdfCellData
     public static OdfCellData FromDateTime(DateTime value, string? styleName, string? formula) => new(OdfCellDataKind.DateTime, OdfCellPrimitiveData.FromTicks(value.Ticks), null, styleName, formula);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromText that accepts value; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value；其餘可選參數使用預設值並轉呼叫最長 FromText 多載。
     /// </summary>
     public static OdfCellData FromText(string? value) => FromText(value, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FromText that accepts value and styleName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 value 與 styleName；其餘可選參數使用預設值並轉呼叫最長 FromText 多載。
     /// </summary>
     public static OdfCellData FromText(string? value, string? styleName) => FromText(value, styleName, null);
 
 
     /// <summary>
-    /// Executes the FromText operation.
+    /// Creates from text.
     /// 建立文字儲存格資料。
     /// </summary>
     /// <param name="value">文字值</param>

@@ -10,13 +10,13 @@ namespace OdfKit.DOM;
 public static partial class OdfNodeFactory
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateElement that accepts localName and namespaceUri; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 localName 與 namespaceUri；其餘可選參數使用預設值並轉呼叫最長 CreateElement 多載。
     /// </summary>
     public static OdfNode CreateElement(string localName, string namespaceUri) => CreateElement(localName, namespaceUri, null);
 
     /// <summary>
-    /// Executes the CreateElement operation.
+    /// Creates element.
     /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立 <see cref="OdfUnknownElement"/>。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>

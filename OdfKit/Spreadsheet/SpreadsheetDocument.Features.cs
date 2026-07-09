@@ -96,8 +96,8 @@ public partial class SpreadsheetDocument
     public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
         SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddNamedRange that accepts name and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 range；其餘可選參數使用預設值並轉呼叫最長 AddNamedRange 多載。
     /// </summary>
     public void AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
 
@@ -123,8 +123,8 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddNamedExpression that accepts name and expression; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 expression；其餘可選參數使用預設值並轉呼叫最長 AddNamedExpression 多載。
     /// </summary>
     public void AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
 
@@ -167,8 +167,8 @@ public partial class SpreadsheetDocument
         return new OdfDatabaseRange(dbRangeNode, this);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of CreateTable that accepts name and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 name 與 range；其餘可選參數使用預設值並轉呼叫最長 CreateTable 多載。
     /// </summary>
     public OdfSpreadsheetTable CreateTable(string name, OdfCellRange range) => CreateTable(name, range, null);
 
@@ -415,14 +415,14 @@ public partial class SpreadsheetDocument
         Package.WriteEntry($"{objectDir}content.xml", Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddChartFromRange that accepts sheetName, anchor, and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、anchor 與 range；其餘可選參數使用預設值並轉呼叫最長 AddChartFromRange 多載。
     /// </summary>
     public OdfNode AddChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range) => AddChartFromRange(sheetName, anchor, range, OdfChartPreset.Bar, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddChartFromRange that accepts sheetName, anchor, range, and preset; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、anchor、range 與 preset；其餘可選參數使用預設值並轉呼叫最長 AddChartFromRange 多載。
     /// </summary>
     public OdfNode AddChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range, OdfChartPreset preset) => AddChartFromRange(sheetName, anchor, range, preset, null);
 
@@ -452,8 +452,8 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of InsertChartFromRange that accepts sheetName, anchor, and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、anchor 與 range；其餘可選參數使用預設值並轉呼叫最長 InsertChartFromRange 多載。
     /// </summary>
     public OdfChartDocument InsertChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range) => InsertChartFromRange(sheetName, anchor, range, null);
 
@@ -562,14 +562,14 @@ public partial class SpreadsheetDocument
         return chart;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RefreshChartDataRange that accepts chart, sheetName, and range; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 chart、sheetName 與 range；其餘可選參數使用預設值並轉呼叫最長 RefreshChartDataRange 多載。
     /// </summary>
     public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range) => RefreshChartDataRange(chart, sheetName, range, true, true);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of RefreshChartDataRange that accepts chart, sheetName, range, and firstRowAsHeader; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 chart、sheetName、range 與 firstRowAsHeader；其餘可選參數使用預設值並轉呼叫最長 RefreshChartDataRange 多載。
     /// </summary>
     public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range, bool firstRowAsHeader) => RefreshChartDataRange(chart, sheetName, range, firstRowAsHeader, true);
 

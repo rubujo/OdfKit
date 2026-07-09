@@ -12,7 +12,7 @@ namespace OdfKit.Core;
 public static partial class OdfSigner
 {
     /// <summary>
-    /// Executes the Sign operation.
+    /// Performs the Sign operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援同僚聯署。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -23,7 +23,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the Sign operation.
+    /// Performs the Sign operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援自訂選項。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -43,8 +43,8 @@ public static partial class OdfSigner
     public static Task SignAsync(OdfPackage package, X509Certificate2 certificate) => SignAsync(package, certificate, new OdfSigningOptions { Level = XadesLevel.None }, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SignAsync that accepts package, certificate, and cancellationToken.
+    /// SignAsync 完整多載：接受 package、certificate 與 cancellationToken。
     /// </summary>
     public static Task SignAsync(
         OdfPackage package,
@@ -66,8 +66,8 @@ public static partial class OdfSigner
     public static Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options) => SignAsync(package, certificate, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of SignAsync that accepts package, certificate, options, and cancellationToken.
+    /// SignAsync 完整多載：接受 package、certificate、options 與 cancellationToken。
     /// </summary>
     public static Task SignAsync(
         OdfPackage package,
@@ -79,7 +79,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the VerifySignatures operation.
+    /// Verifies signatures.
     /// 驗證 ODF 封裝中的所有數位簽章。
     /// </summary>
     /// <param name="package">要驗證的 ODF 封裝</param>
@@ -98,7 +98,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the VerifySignatures operation.
+    /// Verifies signatures.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果。
     /// </summary>
     /// <returns>詳細的數位簽章驗證結果</returns>
@@ -109,8 +109,8 @@ public static partial class OdfSigner
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package) => VerifySignatures(package, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of VerifySignatures that accepts package and options.
+    /// VerifySignatures 完整多載：接受 package 與 options。
     /// </summary>
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options)
     {
@@ -118,7 +118,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the VerifySignaturesAsync operation.
+    /// Verifies signatures async.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
     /// </summary>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
@@ -141,14 +141,14 @@ public static partial class OdfSigner
         VerifySignaturesAsync(package, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of VerifySignaturesAsync that accepts package and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 package 與 options；其餘可選參數使用預設值並轉呼叫最長 VerifySignaturesAsync 多載。
     /// </summary>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options) => VerifySignaturesAsync(package, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of VerifySignaturesAsync that accepts package, options, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 package、options 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 VerifySignaturesAsync 多載。
     /// </summary>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfPackage package,

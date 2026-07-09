@@ -77,8 +77,8 @@ public partial class OdfImageDocument : OdfDocument
     public new static Task<OdfImageDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts path and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static async Task<OdfImageDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -92,8 +92,8 @@ public partial class OdfImageDocument : OdfDocument
     public new static OdfImageDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Full overload of Load that accepts stream and fileName.
+    /// Load 完整多載：接受 stream 與 fileName。
     /// </summary>
     public new static OdfImageDocument Load(Stream stream, string? fileName)
     {
@@ -117,14 +117,14 @@ public partial class OdfImageDocument : OdfDocument
     public new static Task<OdfImageDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of LoadAsync that accepts stream, fileName, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 LoadAsync 多載。
     /// </summary>
     public new static async Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -268,8 +268,8 @@ public partial class OdfImageDocument : OdfDocument
         return Package.ReadEntry(href!);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetImage that accepts imageBytes; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 imageBytes；其餘可選參數使用預設值並轉呼叫最長 SetImage 多載。
     /// </summary>
     public string SetImage(byte[] imageBytes) => SetImage(imageBytes, "image.png");
 
@@ -323,20 +323,20 @@ public partial class OdfImageDocument : OdfDocument
         return href;
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetImageLayout that accepts x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 SetImageLayout 多載。
     /// </summary>
     public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height) => SetImageLayout(x, y, width, height, null, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetImageLayout that accepts x, y, width, height, and name; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x、y、width、height 與 name；其餘可選參數使用預設值並轉呼叫最長 SetImageLayout 多載。
     /// </summary>
     public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? name) => SetImageLayout(x, y, width, height, name, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetImageLayout that accepts x, y, width, height, name, and title; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x、y、width、height、name 與 title；其餘可選參數使用預設值並轉呼叫最長 SetImageLayout 多載。
     /// </summary>
     public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? name, string? title) => SetImageLayout(x, y, width, height, name, title, null);
 

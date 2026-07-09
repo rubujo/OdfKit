@@ -20,13 +20,13 @@ namespace OdfKit.Csv;
 public static class OdfCsvExporter
 {
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExportToStream that accepts workbook and csvStream; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 workbook 與 csvStream；其餘可選參數使用預設值並轉呼叫最長 ExportToStream 多載。
     /// </summary>
     public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream) => ExportToStream(workbook, csvStream, null);
 
     /// <summary>
-    /// Executes the ExportToStream operation.
+    /// Exports to stream.
     /// 將指定工作表的資料匯出為 CSV 並寫入資料流。
     /// </summary>
     /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
@@ -71,14 +71,14 @@ public static class OdfCsvExporter
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ExportToFile that accepts workbook and csvPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 workbook 與 csvPath；其餘可選參數使用預設值並轉呼叫最長 ExportToFile 多載。
     /// </summary>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath) => ExportToFile(workbook, csvPath, null);
 
 
     /// <summary>
-    /// Executes the ExportToFile operation.
+    /// Exports to file.
     /// 將指定工作表的資料匯出為 CSV 檔案。
     /// </summary>
     /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>

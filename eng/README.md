@@ -39,7 +39,8 @@
 | `Test-OdfPolicy.ps1` | 執行 `Category=Policy` 測試，覆蓋巨集淨化、外部資源 policy、加密文件重新加密與相關安全邊界。 |
 | `Test-OdfTypedDomCoverage.ps1` | 執行 typed DOM 對 ODF schema 的覆蓋率報告與門檻檢查。 |
 | `Test-BilingualXmlDocs.ps1` | 靜態掃描公開／受保護 API 的雙語 XML 文件覆蓋率；預設 report mode。`-FailOnNewIssues` 以基線 `TOTAL=0`／`FILES=0` 阻止新增債務；`-FailOnIssues` 要求完全乾淨。 |
-| `Rewrite-ConvenienceSummaries.py` | 將高頻公開 API 的通用「便利多載」摘要改寫為含參數名的雙語差異化摘要（見腳本內 `HIGH_FREQ_FILES`）。 |
+| `Rewrite-ConvenienceSummaries.py` | 將手寫 API 通用「便利多載」摘要改寫為含方法／參數名的雙語差異化摘要（預設掃 `OdfKit`／`OdfKit.Extensions.*`，略過 Generated）。 |
+| `Rewrite-ExecuteOperationSummaries.py` | 將 `Executes the X operation` 占位摘要改寫為依方法名推導的雙語語意（保留已具領域說明的中文行）。 |
 | `Test-OneLineXmlSummary.ps1` | 掃描手寫 C# 是否含禁止的一行式 `<summary>`；`-FailOnIssues` 時失敗退出。 |
 | `Test-LocalizerKeyParity.ps1` | 檢查 12 語系 `OdfLocalizer.Exceptions.*.cs` 訊息鍵集合與 `en` 對等；`-FailOnIssues` 時失敗退出。 |
 | `Add-LocalizerKey.ps1` | 於 12 語系 `i18n/exceptions.*.json` 新增鍵並重產 C#（支援 `-WhatIf`）。 |

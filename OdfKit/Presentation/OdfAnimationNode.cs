@@ -116,8 +116,8 @@ public class OdfAnimationNode(OdfNode node)
         }
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddSequence that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddSequence 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAnimationNode AddSequence() => AddSequence(null);
 
@@ -140,8 +140,8 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddParallel that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：AddParallel 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAnimationNode AddParallel() => AddParallel(null);
 

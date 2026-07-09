@@ -27,7 +27,7 @@ public partial class OfficeChartElement
     }
 
     /// <summary>
-    /// Executes the AppendChart operation.
+    /// Appends chart.
     /// 在 <c>office:chart</c> 末尾新增圖表根節點。
     /// </summary>
     /// <returns>新增的 <c>chart:chart</c> 元素</returns>

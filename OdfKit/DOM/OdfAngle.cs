@@ -10,7 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfAngle : IEquatable<OdfAngle>
 {
     /// <summary>
-    /// Executes the OdfAngle operation.
+    /// Performs odf angle.
     /// 以角度 lexical form 建立 <see cref="OdfAngle"/>。
     /// </summary>
     /// <param name="value">角度字串，例如 <c>90</c> 或 <c>-45.5</c></param>
@@ -32,7 +32,7 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     public string Value { get; }
 
     /// <summary>
-    /// Executes the FromDegrees operation.
+    /// Creates from degrees.
     /// 從度數建立 <see cref="OdfAngle"/>。
     /// </summary>
     /// <param name="degrees">度數</param>
@@ -40,7 +40,7 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     public static OdfAngle FromDegrees(decimal degrees) => new(degrees.ToString(CultureInfo.InvariantCulture));
 
     /// <summary>
-    /// Executes the TryParse operation.
+    /// Performs the TryParse operation.
     /// 嘗試解析角度字串。
     /// </summary>
     /// <param name="value">角度字串</param>
@@ -59,7 +59,7 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     }
 
     /// <summary>
-    /// Executes the TryGetDegrees operation.
+    /// Tries to get degrees.
     /// 嘗試將目前 lexical form 解析為度數。
     /// </summary>
     /// <param name="degrees">成功時傳回度數</param>
@@ -70,14 +70,14 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     }
 
     /// <summary>
-    /// Executes the ToString operation.
+    /// Converts to string.
     /// 傳回原始角度字串。
     /// </summary>
     /// <returns>角度字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷目前值是否等於另一個角度。
     /// </summary>
     /// <param name="other">要比較的角度</param>
@@ -85,21 +85,21 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     public bool Equals(OdfAngle other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <summary>
-    /// Executes the Equals operation.
-    /// 執行 Equals 作業。
+    /// Performs equals.
+    /// 執行 Equals。
     /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfAngle other && Equals(other);
 
     /// <summary>
-    /// Executes the GetHashCode operation.
-    /// 執行 GetHashCode 作業。
+    /// Gets hash code.
+    /// 取得 Hash Code。
     /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個角度是否相等。
     /// </summary>
     /// <param name="left">左側角度</param>
@@ -108,7 +108,7 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     public static bool operator ==(OdfAngle left, OdfAngle right) => left.Equals(right);
 
     /// <summary>
-    /// Executes the Equals operation.
+    /// Performs equals.
     /// 判斷兩個角度是否不相等。
     /// </summary>
     /// <param name="left">左側角度</param>

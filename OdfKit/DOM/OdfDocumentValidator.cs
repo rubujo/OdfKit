@@ -13,7 +13,7 @@ namespace OdfKit.DOM;
 public static class OdfDocumentValidator
 {
     /// <summary>
-    /// Executes the Validate operation.
+    /// Performs the Validate operation.
     /// 驗證指定的 OdfDocument 拓撲結構，並傳回診斷報告。
     /// </summary>
     /// <param name="document">要驗證的 ODF 文件</param>

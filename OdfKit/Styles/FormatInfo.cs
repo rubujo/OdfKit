@@ -11,44 +11,44 @@ public readonly struct FormatInfo
     private static readonly DateTimeToken[] EmptyDateTimeTokens = [];
     private readonly DateTimeToken[]? _dateTimeTokens;
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：FormatInfo 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public FormatInfo() : this(FormatType.Number, 0, 1, false, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that accepts type; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type；其餘可選參數使用預設值並轉呼叫最長 FormatInfo 多載。
     /// </summary>
     public FormatInfo(FormatType type) : this(type, 0, 1, false, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that accepts type and decimalPlaces; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type 與 decimalPlaces；其餘可選參數使用預設值並轉呼叫最長 FormatInfo 多載。
     /// </summary>
     public FormatInfo(FormatType type, int decimalPlaces) : this(type, decimalPlaces, 1, false, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that accepts type, decimalPlaces, and minIntegerDigits; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type、decimalPlaces 與 minIntegerDigits；其餘可選參數使用預設值並轉呼叫最長 FormatInfo 多載。
     /// </summary>
     public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits) : this(type, decimalPlaces, minIntegerDigits, false, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that accepts type, decimalPlaces, minIntegerDigits, and grouping; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type、decimalPlaces、minIntegerDigits 與 grouping；其餘可選參數使用預設值並轉呼叫最長 FormatInfo 多載。
     /// </summary>
     public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits, bool grouping) : this(type, decimalPlaces, minIntegerDigits, grouping, null, null) { }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of FormatInfo that accepts type, decimalPlaces, minIntegerDigits, grouping, and currencySymbol; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 type、decimalPlaces、minIntegerDigits、grouping 與 currencySymbol；其餘可選參數使用預設值並轉呼叫最長 FormatInfo 多載。
     /// </summary>
     public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits, bool grouping, string? currencySymbol) : this(type, decimalPlaces, minIntegerDigits, grouping, currencySymbol, null) { }
 
 
     /// <summary>
-    /// Executes the FormatInfo operation.
+    /// Formats info.
     /// 初始化 <see cref="FormatInfo"/> 結構的新執行個體。
     /// </summary>
     /// <param name="type">格式類型</param>

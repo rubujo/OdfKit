@@ -26,8 +26,8 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     public List<AstNode> Arguments { get; } = arguments;
 
     /// <summary>
-    /// Executes the GetRanges operation.
-    /// 執行 GetRanges 作業。
+    /// Gets ranges.
+    /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
@@ -41,8 +41,8 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     }
 
     /// <summary>
-    /// Executes the Evaluate operation.
-    /// 執行 Evaluate 作業。
+    /// Performs evaluate.
+    /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
@@ -51,8 +51,8 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     }
 
     /// <summary>
-    /// Executes the Serialize operation.
-    /// 執行 Serialize 作業。
+    /// Performs serialize.
+    /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
     public override string Serialize()
@@ -80,22 +80,22 @@ public class ParenthesizedNode(AstNode inner) : AstNode
     public AstNode Inner => inner;
 
     /// <summary>
-    /// Executes the Evaluate operation.
-    /// 執行 Evaluate 作業。
+    /// Performs evaluate.
+    /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => inner.Evaluate(context);
 
     /// <summary>
-    /// Executes the GetRanges operation.
-    /// 執行 GetRanges 作業。
+    /// Gets ranges.
+    /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => inner.GetRanges(context);
 
     /// <summary>
-    /// Executes the Serialize operation.
-    /// 執行 Serialize 作業。
+    /// Performs serialize.
+    /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"({inner.Serialize()})";
@@ -115,15 +115,15 @@ public class NamedRangeNode(string name) : AstNode
     public string Name { get; } = name;
 
     /// <summary>
-    /// Executes the Evaluate operation.
-    /// 執行 Evaluate 作業。
+    /// Performs evaluate.
+    /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetNamedRangeOrExpressionValue(Name);
 
     /// <summary>
-    /// Executes the GetRanges operation.
-    /// 執行 GetRanges 作業。
+    /// Gets ranges.
+    /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
@@ -137,8 +137,8 @@ public class NamedRangeNode(string name) : AstNode
     }
 
     /// <summary>
-    /// Executes the Serialize operation.
-    /// 執行 Serialize 作業。
+    /// Performs serialize.
+    /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
     public override string Serialize() => Name;

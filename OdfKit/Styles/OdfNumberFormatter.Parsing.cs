@@ -22,7 +22,7 @@ public partial class OdfNumberFormatter
     private static readonly ConcurrentDictionary<string, FormatInfo> FormatInfoPool = new(StringComparer.Ordinal);
 
     /// <summary>
-    /// Executes the ResolveStandardFormat operation.
+    /// Resolves standard format.
     /// 解析標準格式。
     /// </summary>
     /// <param name="format">格式字串</param>
@@ -85,7 +85,7 @@ public partial class OdfNumberFormatter
     }
 
     /// <summary>
-    /// Executes the ParsePattern operation.
+    /// Parses pattern.
     /// 解析格式模式。
     /// </summary>
     /// <param name="pattern">格式模式字串</param>

@@ -21,8 +21,8 @@ public partial class OdfDatabaseDocument
     public OdfDatabaseQueryStatementInfo? FindQueryOrderStatement(string queryName) =>
         ReadQueryStatement(queryName, "order-statement");
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetQueryOrderStatement that accepts queryName and command; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 queryName 與 command；其餘可選參數使用預設值並轉呼叫最長 SetQueryOrderStatement 多載。
     /// </summary>
     public OdfNode SetQueryOrderStatement(string queryName, string command) => SetQueryOrderStatement(queryName, command, null);
 
@@ -53,8 +53,8 @@ public partial class OdfDatabaseDocument
     public OdfDatabaseQueryStatementInfo? FindQueryFilterStatement(string queryName) =>
         ReadQueryStatement(queryName, "filter-statement");
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of SetQueryFilterStatement that accepts queryName and command; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 queryName 與 command；其餘可選參數使用預設值並轉呼叫最長 SetQueryFilterStatement 多載。
     /// </summary>
     public OdfNode SetQueryFilterStatement(string queryName, string command) => SetQueryFilterStatement(queryName, command, null);
 

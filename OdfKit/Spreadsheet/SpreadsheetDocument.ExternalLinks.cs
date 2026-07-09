@@ -32,14 +32,14 @@ public partial class SpreadsheetDocument
         evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BeginFormulaEvaluationChannel that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：BeginFormulaEvaluationChannel 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel() => BeginFormulaEvaluationChannel(64, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BeginFormulaEvaluationChannel that accepts capacity; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 capacity；其餘可選參數使用預設值並轉呼叫最長 BeginFormulaEvaluationChannel 多載。
     /// </summary>
     public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity) => BeginFormulaEvaluationChannel(capacity, default);
 
@@ -65,8 +65,8 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Executes the Dispose operation.
-    /// 執行 Dispose 作業。
+    /// Releases unmanaged resources.
+    /// 釋放非受控資源。
     /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)

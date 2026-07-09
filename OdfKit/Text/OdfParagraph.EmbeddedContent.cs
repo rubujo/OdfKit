@@ -14,8 +14,8 @@ public partial class OdfParagraph
 {
     #region Embedded Content & Layout
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddImage that accepts packagePath, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 packagePath、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddImage 多載。
     /// </summary>
     public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height) => AddImage(packagePath, width, height, null);
 
@@ -30,14 +30,14 @@ public partial class OdfParagraph
     /// <param name="name">The image name. / 圖片名稱。</param>
     public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name) => Doc.AddImage(this, packagePath, width, height, name);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFloatingTextBox that accepts x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 AddFloatingTextBox 多載。
     /// </summary>
     public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddFloatingTextBox(x, y, width, height, OdfAnchorType.Paragraph, OdfTextWrap.Parallel);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AddFloatingTextBox that accepts x, y, width, height, and anchorType; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 x、y、width、height 與 anchorType；其餘可選參數使用預設值並轉呼叫最長 AddFloatingTextBox 多載。
     /// </summary>
     public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height, OdfAnchorType anchorType) => AddFloatingTextBox(x, y, width, height, anchorType, OdfTextWrap.Parallel);
 
@@ -155,14 +155,14 @@ public partial class OdfParagraph
     /// </summary>
     public void AddPageCountField() => Doc.AddPageCountField(this);
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BreakPageBefore that uses default values for all optional parameters and forwards to the full overload.
+    /// 便利多載：BreakPageBefore 的所有可選參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void BreakPageBefore() => BreakPageBefore(null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of BreakPageBefore that accepts masterPageName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 masterPageName；其餘可選參數使用預設值並轉呼叫最長 BreakPageBefore 多載。
     /// </summary>
     public void BreakPageBefore(string? masterPageName) => BreakPageBefore(masterPageName, null);
 

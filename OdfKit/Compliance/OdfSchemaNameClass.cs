@@ -41,7 +41,7 @@ public sealed class OdfSchemaNameClass(
     public bool IsExcept { get; } = isExcept;
 
     /// <summary>
-    /// Executes the Matches operation.
+    /// Performs matches.
     /// 傳回指定的命名空間限定名稱是否與此名稱類別相符。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
