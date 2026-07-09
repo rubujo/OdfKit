@@ -35,10 +35,12 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 
 ## 同步維護的大型資源表
 
-`OdfKit/Compliance/OdfLocalizer.Exceptions.cs` 是類產生式成品：它不是由單一
-工具每次完整重產，但必須作為同步資源表維護。新增或修改錯誤訊息時，需同時更新所有支援語言
+`OdfKit/Compliance/OdfLocalizer.Exceptions.cs` 為例外字典**入口**；各語系字串表拆於
+`OdfLocalizer.Exceptions.<culture>.cs`（類產生式／同步資源表，非 RNG 自動重產）。
+新增或修改錯誤訊息時，需同時更新所有支援語言
 （`en`, `zh-TW`, `de`, `fr`, `nl`, `nb`, `pt`, `it`, `sk`, `da`, `ms`, `ko`），並保留
 `OdfLocalizer` 的文化回退測試。不得只修改單一文化或在呼叫端硬編碼例外訊息。
+拆分準則見 [maintainability.md](../maintainability.md)。
 
 `OdfKit/Compliance/OdfLocalizer.ComplianceSuggestions.cs` 維護非例外的合規建議補充
 翻譯；新增內建 compliance rule 或 suggested-fix key 時，也必須讓 12 個支援語言

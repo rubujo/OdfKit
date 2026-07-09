@@ -70,3 +70,4 @@
 | [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
 | [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與受控轉換保真度的規格來源、不可複製來源與 golden 測試契約 |
 | [智慧財產與合規說明](ip-compliance.md) | 複合授權、AI 產製、clean-room、DCO、採用者盡職調查清單（非正式法律意見） |
+| [可維護性與複雜度債](maintainability.md) | Partial 準則、在地化拆分、產生碼、歷史腳本與後續債 |

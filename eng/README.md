@@ -7,8 +7,9 @@
 
 1. **常用維護腳本**（下表列出）：CI 與本機開發會持續呼叫，文件（`AGENTS.md`、各
    `docs/*.md`）會個別引用其中部分腳本。
-2. **歷史性一次性重構腳本**（`Split-*`／`Merge-*`／`Migrate-*`／`Rename-*`，共
-   102 個）：詳見下方「歷史重構腳本」段落，不建議重新執行。
+2. **歷史性一次性重構腳本**（`Split-*`／`Merge-*`／`Migrate-*`／`Rename-*`）：
+   已移至 [`historical-refactor/`](historical-refactor/README.md)，**預設不要重跑**。
+   Partial／在地化準則見 [docs/maintainability.md](../docs/maintainability.md)。
 
 ## 常用維護腳本
 
@@ -38,6 +39,7 @@
 | `Test-OdfPolicy.ps1` | 執行 `Category=Policy` 測試，覆蓋巨集淨化、外部資源 policy、加密文件重新加密與相關安全邊界。 |
 | `Test-OdfTypedDomCoverage.ps1` | 執行 typed DOM 對 ODF schema 的覆蓋率報告與門檻檢查。 |
 | `Test-BilingualXmlDocs.ps1` | 靜態掃描公開／受保護 API 的雙語 XML 文件覆蓋率；預設 report mode，`-FailOnNewIssues` 會以現行基線阻止新增債務。 |
+| `Test-OneLineXmlSummary.ps1` | 掃描手寫 C# 是否含禁止的一行式 `<summary>`；`-FailOnIssues` 時失敗退出。 |
 | `Test-OoxmlVisualGolden.ps1` | 執行 OOXML 轉換視覺 golden file 驗收。 |
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |
@@ -88,16 +90,8 @@
 
 ## 歷史重構腳本
 
-`Split-*.ps1`（拆分巨型型別為 partial）、`Merge-*.ps1`（合併過度細碎的 partial）、
-`Migrate-*.ps1`（遷移特定屬性存取/函式分派模式）、`Rename-*.ps1`（重命名 partial
-檔案）共 102 個腳本，是 god class 拆分計畫（對應 commit 歷史 `7b6f1f79`～`f5189e8d`
-等 Phase 1-21）執行過程中針對特定型別（如
-`OdfElement`、`DefaultFormulaEvaluator`、`OdfPackage`、`TextDocument` 等）產生的
-**一次性**腳本。
-
-這些腳本綁定當時的程式碼結構與檔案路徑，**不建議重新執行**；保留是為了維持重構過程的
-可稽核性。若需了解某個型別當年如何被拆分，可直接以檔名搜尋（例如
-`Split-OdfElementEnumParsersDPartials.ps1`）並對照 `git log` 找到對應提交。
-
-若日後需要對新的巨型型別做類似拆分，建議參考這些歷史腳本的手法，但應依目標型別重新
-撰寫腳本，而非修改或重跑舊腳本。
+`Split-*`／`Merge-*`／`Migrate-*`／`Rename-*` 已全部移至
+[`historical-refactor/`](historical-refactor/README.md)（約 102 個腳本）。
+它們是 god class 拆分計畫（commit 歷史 `7b6f1f79`～`f5189e8d` 等）的**一次性**產物，
+**預設不要重跑**。日常 partial 準則見 [docs/maintainability.md](../docs/maintainability.md)；
+診斷用 `Analyze-PartialSplits.ps1`／`List-LargeCsFiles.ps1`。

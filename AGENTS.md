@@ -63,6 +63,12 @@
 
 ### C. 效能與記憶體安全
 - **高效流式寫入**：`OdsStreamWriter`／`OdtStreamWriter` 必須採用串流／低常駐設計，避免將整份文件 DOM 常駐記憶體；熱路徑共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`。公開效能敘事以峰值工作集與可重現基準為準（見 `docs/performance-comparison.md`、`docs/performance-baselines.md`），不得再使用未加限定的「小於 1MB」口號。善用 `CommunityToolkit.HighPerformance` 或 `Span<T>` / `ReadOnlySpan<T>` 等低配置 API，並在熱路徑維持輸出正確性與 XML 字元合法性。
+
+### C2. 可維護性（複雜度債）
+- Partial 拆分、在地化字典、產生碼與歷史腳本準則見 [`docs/maintainability.md`](docs/maintainability.md)。
+- 新增例外訊息鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系。
+- 禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本；診斷用 `eng/Analyze-PartialSplits.ps1`。
+- 提交前可執行 `pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues` 防止一行式 `<summary>` 回流。
 - **XXE 與 DoS 防禦**：顯式設定 `XmlReaderSettings`，禁用外部 DTD 解析與 XML 實體展開，以杜絕 XXE 安全漏洞。
 - **Zip Slip 漏洞防禦**：對 ZIP 解壓的目標路徑進行嚴格的合法性檢查，防止目錄穿越攻擊。
 

@@ -26,6 +26,7 @@
 - **套件與發行**：8 個套件（`OdfKit` 核心 + 7 個 `OdfKit.Extensions.*`）雙 TFM（`net10.0` + `netstandard2.0`）NuGet 封裝，透過 GitHub Release 資產發佈（非 nuget.org）。
 - **串流寫入熱路徑（ODS／ODT）**：將批次原始 XML 組裝與字元防線抽至共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`（`OdfKit.Core`），`OdsStreamWriter` 與 `OdtStreamWriter` 段落／標題／清單／儲存格熱路徑共用；關閉 `XmlWriter.CheckCharacters` 後仍以 `Err_OdfStreamWriter_InvalidXmlCharacter` 快速失敗；補齊 ODS／ODT fast-path 與字元邊界測試。`docs/performance-comparison.md` 於 2026-07-09 重跑 ODS 百萬列對比（第 2 次：約 4.96 s／472 MB 配置／38 MB 峰值，與 MiniExcel 耗時接近持平）。
 - **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
+- **可維護性**：`OdfLocalizer.Exceptions` 按 12 語系拆檔；新增 `docs/maintainability.md`、產生碼目錄 README、`eng/Test-OneLineXmlSummary.ps1`；歷史 `Split-*`／`Merge-*` 等腳本移至 `eng/historical-refactor/`。
 
 ### 架構
 

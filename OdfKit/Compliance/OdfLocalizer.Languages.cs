@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 
 namespace OdfKit.Compliance;
-/// <summary>
-/// Provides the OdfLocalizer API.
-/// 提供 OdfLocalizer API。
-/// </summary>
 
+/// <summary>
+/// Registers culture-specific factories for compliance and diagnostic message dictionaries.
+/// 註冊合規與診斷訊息字典的語系工廠委派。
+/// </summary>
 public static partial class OdfLocalizer
 {
     static OdfLocalizer()
