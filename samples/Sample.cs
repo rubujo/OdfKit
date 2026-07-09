@@ -235,6 +235,12 @@ static void DemoSpreadsheetDocument(string outputDir)
     sheet.Cells["A4"].CellValue = "三月";
     sheet.Cells["B4"].CellValue = 310d;
 
+    // 1b. 富文字 options API（OdfRichTextRunOptions）
+    sheet.Cells["C1"].RichText
+        .Clear()
+        .Append("重點", new OdfRichTextRunOptions { Bold = true, Color = new OdfColor("#c00000") })
+        .Append(" 說明", new OdfRichTextRunOptions { Italic = true });
+
     // 2. 設定公式：計算銷售額的總和 (SUM)
     sheet.Cells["A5"].CellValue = "總計";
     sheet.Cells["B5"].Formula = "of:=SUM([.B2:.B4])";

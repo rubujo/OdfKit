@@ -50,6 +50,9 @@
    ```
 4. 執行完成後，範例將在 `samples/output/` 目錄下產生示範檔案與轉換結果。
 
+提交前／發版前的 corpus、LibreOffice、效能基線等可執行檢查，見
+[docs/product-quality-gates.md](../docs/product-quality-gates.md)。
+
 ### Smoke 模式
 
 若只想確認範例能編譯執行並產生核心 ODF 文件，可使用環境變數切換到 smoke
@@ -78,6 +81,8 @@ dotnet run samples/Sample.cs
    - 插入二進位 PNG 影像。
 2. **試算表 (ODS) 建立與公式**：
    - 建立試算表並新增多個工作表。
+   - 以 `OdfRichTextRunOptions` 示範儲存格富文字格式（options 風格 API）。
+   - `OdsStreamWriter` 以 `OdsRowWriteOptions` 示範列高／最佳列高。
    - 寫入數值、字串。
    - 實作 ODF 公式計算（如計算總和的 `SUM` 公式）。
    - 搜尋公式儲存格並輸出公式位址。

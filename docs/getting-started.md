@@ -36,7 +36,29 @@ dotnet test
 dotnet add YourApp.csproj reference path\to\OdfKit\OdfKit\OdfKit.csproj
 ```
 
-## 3. 選擇元件
+## 3. Options 風格公開 API（0.x）
+
+高頻「多個尾端可選參數」已改為 **options 物件**（尚未正式發布，不保留舊多載）：
+
+```csharp
+using OdfKit.Compliance;
+using OdfKit.Spreadsheet;
+
+// 串流寫入列選項
+writer.WriteStartRow(new OdsRowWriteOptions { Height = 18.5, UseOptimalHeight = true });
+
+// 儲存格富文字
+cell.RichText.Append("重點", new OdfRichTextRunOptions { Bold = true, Color = new OdfKit.DOM.OdfColor("#c00") });
+
+// 套件／Flat 驗證
+var report = OdfPackageValidator.Validate(
+    package,
+    new OdfValidationOptions { Profile = OdfComplianceProfiles.OasisOdf14Strict, FileName = "doc.odt" });
+```
+
+完整政策見 [public-api-optional-parameters.md](public-api-optional-parameters.md)；可執行品質檢查見 [product-quality-gates.md](product-quality-gates.md)。
+
+## 4. 選擇元件
 
 | 需求 | 建議元件 |
 |------|----------|
@@ -51,7 +73,7 @@ dotnet add YourApp.csproj reference path\to\OdfKit\OdfKit\OdfKit.csproj
 
 更完整的選型說明請見 [套件目錄與選型指南](package-catalog.md)。
 
-## 4. 第一個 ODF 文件
+## 5. 第一個 ODF 文件
 
 ### 建立 ODT
 
@@ -102,7 +124,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate report.odt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info report.odt
 ```
 
-## 5. 常見下一步
+## 6. 常見下一步
 
 | 下一步 | 先讀哪份文件 |
 |--------|--------------|

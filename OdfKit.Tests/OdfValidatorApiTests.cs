@@ -56,7 +56,7 @@ public class OdfValidatorApiTests
     public void ValidatorCanValidateFlatXmlStream()
     {
         using var stream = new MemoryStream();
-        OdfDocumentFactory.WriteFlatXml(stream, OdfDocumentKind.FlatSpreadsheet, leaveOpen: true);
+        OdfDocumentFactory.WriteFlatXml(stream, OdfDocumentKind.FlatSpreadsheet, new OdfFlatXmlWriteOptions { LeaveOpen = true });
         stream.Position = 0;
 
         OdfValidationReport report = OdfValidator.Validate(
@@ -79,7 +79,7 @@ public class OdfValidatorApiTests
     public void FlatOdf_SupplementalExtensions_ValidateWithExpectedKind(OdfDocumentKind expectedKind, string fileName)
     {
         using var stream = new MemoryStream();
-        OdfDocumentFactory.WriteFlatXml(stream, expectedKind, leaveOpen: true);
+        OdfDocumentFactory.WriteFlatXml(stream, expectedKind, new OdfFlatXmlWriteOptions { LeaveOpen = true });
         stream.Position = 0;
 
         OdfValidationReport report = OdfValidator.Validate(
@@ -127,7 +127,7 @@ public class OdfValidatorApiTests
     public void ValidatorStrictOptionsExposeOdf14StrictProfile()
     {
         using var stream = new MemoryStream();
-        OdfDocumentFactory.WriteFlatXml(stream, OdfDocumentKind.FlatText, leaveOpen: true);
+        OdfDocumentFactory.WriteFlatXml(stream, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { LeaveOpen = true });
         stream.Position = 0;
 
         OdfValidationReport report = OdfValidator.Validate(

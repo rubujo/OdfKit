@@ -71,28 +71,35 @@ public static class OdfSchemaRegistry
     }
 
     /// <summary>
-    /// Executes the RegisterSchema operation.
-    /// 註冊指定版本的產出結構描述中繼資料，直到傳回的範圍被釋放為止。
+    /// Registers a schema set with default registration options.
+    /// 以預設註冊選項註冊結構描述集。
     /// </summary>
-    /// <param name="schema">要註冊的結構描述集</param>
-    /// <param name="mergeWithExisting">是否與現有的結構描述合併</param>
-    /// <param name="overwriteExisting">是否覆寫已存在的定義</param>
-    /// <returns>用於控制註冊生命週期的 <see cref="IDisposable"/> 執行個體</returns>
-    public static IDisposable RegisterSchema(
-        OdfSchemaSet schema,
-        bool mergeWithExisting = true,
-        bool overwriteExisting = false)
+    /// <param name="schema">The schema set to register. / 要註冊的結構描述集。</param>
+    /// <returns>A disposable scope that restores the previous registration. / 釋放時還原先前註冊的範圍物件。</returns>
+    public static IDisposable RegisterSchema(OdfSchemaSet schema) =>
+        RegisterSchema(schema, OdfSchemaRegistrationOptions.Default);
+
+    /// <summary>
+    /// Registers a schema set using registration options.
+    /// 以註冊選項註冊結構描述集。
+    /// </summary>
+    /// <param name="schema">The schema set to register. / 要註冊的結構描述集。</param>
+    /// <param name="options">The registration options. / 註冊選項。</param>
+    /// <returns>A disposable scope that restores the previous registration. / 釋放時還原先前註冊的範圍物件。</returns>
+    public static IDisposable RegisterSchema(OdfSchemaSet schema, OdfSchemaRegistrationOptions options)
     {
         if (schema is null)
             throw new ArgumentNullException(nameof(schema));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
 
         lock (SyncRoot)
         {
             OdfSchemaSet? previous = RegisteredSchemas.TryGetValue(schema.Version, out OdfSchemaSet? existing)
                 ? existing
                 : null;
-            OdfSchemaSet registered = mergeWithExisting
-                ? GetSchemaNoLock(schema.Version).MergeWith(schema, overwriteExisting)
+            OdfSchemaSet registered = options.MergeWithExisting
+                ? GetSchemaNoLock(schema.Version).MergeWith(schema, options.OverwriteExisting)
                 : schema;
             RegisteredSchemas[schema.Version] = registered;
             return new RegistrationScope(schema.Version, previous);

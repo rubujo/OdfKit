@@ -16,22 +16,41 @@ namespace OdfKit.Compliance;
 public static class OdfFlatDocumentValidator
 {
     /// <summary>
-    /// Executes the Validate operation.
-    /// 驗證單一 XML ODF 文件串流是否符合根層級規則與選用的設定檔。
+    /// Validates a flat XML ODF document stream with default options.
+    /// 以預設選項驗證 Flat XML ODF 文件串流。
     /// </summary>
-    /// <param name="stream">文件串流</param>
-    /// <param name="fileName">檔案名稱</param>
-    /// <param name="profile">相容性設定檔</param>
-    /// <param name="culture">指定此問題生成時使用的文化特性，若為 null 則自動偵測</param>
-    /// <returns>驗證結果報告</returns>
-    public static OdfValidationReport Validate(
-        Stream stream,
-        string? fileName = null,
-        OdfComplianceProfile? profile = null,
-        CultureInfo? culture = null)
+    /// <param name="stream">The document stream. / 文件串流。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(Stream stream) =>
+        Validate(stream, OdfValidationOptions.Default);
+
+    /// <summary>
+    /// Validates a flat XML ODF document stream with a file name hint.
+    /// 以檔名提示驗證 Flat XML ODF 文件串流。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件串流。</param>
+    /// <param name="fileName">The file name used for format detection. / 用於格式偵測的檔案名稱。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(Stream stream, string? fileName) =>
+        Validate(stream, new OdfValidationOptions { FileName = fileName });
+
+    /// <summary>
+    /// Validates a flat XML ODF document stream using validation options.
+    /// 以驗證選項驗證 Flat XML ODF 文件串流。
+    /// </summary>
+    /// <param name="stream">The document stream. / 文件串流。</param>
+    /// <param name="options">The validation options. / 驗證選項。</param>
+    /// <returns>The validation report. / 驗證結果報告。</returns>
+    public static OdfValidationReport Validate(Stream stream, OdfValidationOptions options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
+        string? fileName = options.FileName;
+        OdfComplianceProfile? profile = options.Profile;
+        CultureInfo? culture = options.Culture;
 
         List<OdfValidationIssue> issues = [];
 

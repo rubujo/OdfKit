@@ -668,6 +668,12 @@ OdfKit.Compliance.OdfSchemaPatternValidationResult
 OdfKit.Compliance.OdfSchemaPatternValidationResult.IsMatch.get -> bool
 OdfKit.Compliance.OdfSchemaPatternValidationResult.Issues.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Compliance.OdfValidationIssue!>!
 OdfKit.Compliance.OdfSchemaPatternValidator
+OdfKit.Compliance.OdfSchemaRegistrationOptions
+OdfKit.Compliance.OdfSchemaRegistrationOptions.MergeWithExisting.get -> bool
+OdfKit.Compliance.OdfSchemaRegistrationOptions.MergeWithExisting.set -> void
+OdfKit.Compliance.OdfSchemaRegistrationOptions.OdfSchemaRegistrationOptions() -> void
+OdfKit.Compliance.OdfSchemaRegistrationOptions.OverwriteExisting.get -> bool
+OdfKit.Compliance.OdfSchemaRegistrationOptions.OverwriteExisting.set -> void
 OdfKit.Compliance.OdfSchemaRegistry
 OdfKit.Compliance.OdfSchemaSet
 OdfKit.Compliance.OdfSchemaSet.Attributes.get -> System.Collections.Generic.IReadOnlyDictionary<OdfKit.Compliance.OdfQualifiedName!, OdfKit.Compliance.OdfAttributeDefinition!>!
@@ -963,6 +969,12 @@ OdfKit.Core.OdfEncryptionInfo.StartKeyGenerationName.get -> string?
 OdfKit.Core.OdfEncryptionInfo.StartKeyGenerationName.set -> void
 OdfKit.Core.OdfEncryptionInfo.StartKeySize.get -> int?
 OdfKit.Core.OdfEncryptionInfo.StartKeySize.set -> void
+OdfKit.Core.OdfFlatXmlWriteOptions
+OdfKit.Core.OdfFlatXmlWriteOptions.LeaveOpen.get -> bool
+OdfKit.Core.OdfFlatXmlWriteOptions.LeaveOpen.set -> void
+OdfKit.Core.OdfFlatXmlWriteOptions.OdfFlatXmlWriteOptions() -> void
+OdfKit.Core.OdfFlatXmlWriteOptions.Version.get -> OdfKit.Compliance.OdfVersion
+OdfKit.Core.OdfFlatXmlWriteOptions.Version.set -> void
 OdfKit.Core.OdfJsonSerializerOptions
 OdfKit.Core.OdfKitDiagnostics
 OdfKit.Core.OdfLoadOptions
@@ -17570,7 +17582,9 @@ static OdfKit.Compliance.OdfExternalValidator.ValidateWithCommand(string! comman
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithCommandAsync(string! commandPath, string! filePath, int timeoutMilliseconds = 30000, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! filePath, string? jarPath = null, string? javaPath = null, int timeoutMilliseconds = 30000) -> OdfKit.Compliance.OdfExternalValidatorResult!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath = null, string? javaPath = null, int timeoutMilliseconds = 30000, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
-static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream, string? fileName = null, OdfKit.Compliance.OdfComplianceProfile? profile = null, System.Globalization.CultureInfo? culture = null) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream, OdfKit.Compliance.OdfValidationOptions! options) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream, string? fileName) -> OdfKit.Compliance.OdfValidationReport!
 static OdfKit.Compliance.OdfLocalizer.DefaultCulture.get -> System.Globalization.CultureInfo?
 static OdfKit.Compliance.OdfLocalizer.DefaultCulture.set -> void
 static OdfKit.Compliance.OdfLocalizer.GetMessage(string! messageKey) -> string!
@@ -17587,10 +17601,12 @@ static OdfKit.Compliance.OdfPracticalCompatibilityIssue.operator ==(OdfKit.Compl
 static OdfKit.Compliance.OdfPracticalCompatibilityValidator.Validate(OdfKit.Core.OdfDocument! document, OdfKit.Compliance.OdfPracticalCompatibilityProfile profile) -> OdfKit.Compliance.OdfPracticalCompatibilityReport!
 static OdfKit.Compliance.OdfPracticalCompatibilityValidator.Validate(OdfKit.Core.OdfDocument! document, OdfKit.Compliance.OdfPracticalCompatibilityProfile profile, OdfKit.Compliance.OdfPracticalCompatibilityOptions? options) -> OdfKit.Compliance.OdfPracticalCompatibilityReport!
 static OdfKit.Compliance.OdfSchemaPatternValidator.ValidateElement(System.Xml.Linq.XElement! element, OdfKit.Compliance.OdfSchemaSet! schema, string! patternName) -> OdfKit.Compliance.OdfSchemaPatternValidationResult!
+static OdfKit.Compliance.OdfSchemaRegistrationOptions.Default.get -> OdfKit.Compliance.OdfSchemaRegistrationOptions!
 static OdfKit.Compliance.OdfSchemaRegistry.GetSchema(OdfKit.Compliance.OdfVersion version) -> OdfKit.Compliance.OdfSchemaSet!
 static OdfKit.Compliance.OdfSchemaRegistry.Latest.get -> OdfKit.Compliance.OdfSchemaSet!
 static OdfKit.Compliance.OdfSchemaRegistry.Odf14.get -> OdfKit.Compliance.OdfSchemaSet!
-static OdfKit.Compliance.OdfSchemaRegistry.RegisterSchema(OdfKit.Compliance.OdfSchemaSet! schema, bool mergeWithExisting = true, bool overwriteExisting = false) -> System.IDisposable!
+static OdfKit.Compliance.OdfSchemaRegistry.RegisterSchema(OdfKit.Compliance.OdfSchemaSet! schema) -> System.IDisposable!
+static OdfKit.Compliance.OdfSchemaRegistry.RegisterSchema(OdfKit.Compliance.OdfSchemaSet! schema, OdfKit.Compliance.OdfSchemaRegistrationOptions! options) -> System.IDisposable!
 static OdfKit.Compliance.OdfValidationOptions.Default.get -> OdfKit.Compliance.OdfValidationOptions!
 static OdfKit.Compliance.OdfValidationOptions.Odf14Extended.get -> OdfKit.Compliance.OdfValidationOptions!
 static OdfKit.Compliance.OdfValidationOptions.Odf14Strict.get -> OdfKit.Compliance.OdfValidationOptions!
@@ -17664,7 +17680,8 @@ static OdfKit.Core.OdfDocumentFactory.LoadDocumentAsync(System.IO.Stream! stream
 static OdfKit.Core.OdfDocumentFactory.LoadDocumentAsync(System.IO.Stream! stream, OdfKit.Core.OdfLoadOptions? options, string? fileName, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Core.OdfDocument!>!
 static OdfKit.Core.OdfDocumentFactory.LoadDocumentAsync(System.IO.Stream! stream, string? fileName) -> System.Threading.Tasks.Task<OdfKit.Core.OdfDocument!>!
 static OdfKit.Core.OdfDocumentFactory.LoadDocumentAsync(System.IO.Stream! stream, string? fileName, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Core.OdfDocument!>!
-static OdfKit.Core.OdfDocumentFactory.WriteFlatXml(System.IO.Stream! stream, OdfKit.Compliance.OdfDocumentKind kind, OdfKit.Compliance.OdfVersion version = OdfKit.Compliance.OdfVersion.Odf14, bool leaveOpen = true) -> void
+static OdfKit.Core.OdfDocumentFactory.WriteFlatXml(System.IO.Stream! stream, OdfKit.Compliance.OdfDocumentKind kind) -> void
+static OdfKit.Core.OdfDocumentFactory.WriteFlatXml(System.IO.Stream! stream, OdfKit.Compliance.OdfDocumentKind kind, OdfKit.Core.OdfFlatXmlWriteOptions! options) -> void
 static OdfKit.Core.OdfEncryption.ByteArrayEquals(byte[]? a, byte[]? b) -> bool
 static OdfKit.Core.OdfEncryption.ComputeHash(byte[]! data, string! checksumType) -> byte[]!
 static OdfKit.Core.OdfEncryption.Decrypt(OdfKit.Core.OdfPackage! package, string! password) -> void
@@ -17673,6 +17690,7 @@ static OdfKit.Core.OdfEncryption.Encrypt(OdfKit.Core.OdfPackage! package, string
 static OdfKit.Core.OdfEncryption.Encrypt(OdfKit.Core.OdfPackage! package, string! password, OdfKit.Core.OdfEncryptionAlgorithm algorithm) -> void
 static OdfKit.Core.OdfEncryption.EncryptEntry(byte[]! plaintext, string! password, OdfKit.Core.OdfEncryptionAlgorithm algorithm, out byte[]! iv, out byte[]! salt, out byte[]! checksum, int iterationCount = 50000) -> byte[]!
 static OdfKit.Core.OdfEncryption.Pbkdf2(byte[]! password, byte[]! salt, int iterations, int keyLength, string! hashName) -> byte[]!
+static OdfKit.Core.OdfFlatXmlWriteOptions.Default.get -> OdfKit.Core.OdfFlatXmlWriteOptions!
 static OdfKit.Core.OdfJsonSerializerOptions.Compact.get -> System.Text.Json.JsonSerializerOptions!
 static OdfKit.Core.OdfJsonSerializerOptions.HumanReadable.get -> System.Text.Json.JsonSerializerOptions!
 static OdfKit.Core.OdfJsonSerializerOptions.Manifest.get -> System.Text.Json.JsonSerializerOptions!

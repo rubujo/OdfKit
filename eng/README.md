@@ -47,6 +47,8 @@
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |
 
+產品品質分層與發版前建議清單見 [docs/product-quality-gates.md](../docs/product-quality-gates.md)。
+
 ### 效能
 
 | 腳本 | 用途 |
@@ -78,6 +80,7 @@
 | `Build-AnalyzerReport.ps1` | 產生 OdfKit 建置 binlog 供 Analyzer Summary 剖析（本機診斷用）。 |
 | `Detect-TypeBoundaries.ps1` | 在指定檔案中以正規表達式找出符合的行號（通用搜尋輔助）。 |
 | `List-LargeCsFiles.ps1` | 列出 `OdfKit` 中超過指定行數門檻的最大 `.cs` 檔案，用於評估是否需要 god class 拆分。 |
+| `Expand-OptionalParameters.py` | 將「恰好一個」尾端可選參數的公開／保護方法展開為明確多載鏈（工程腳本，非執行時相依）。 |
 | `Generate-PublicApiBaseline.ps1` | 以 PublicApiAnalyzers RS0016 code fix 重產雙 TFM 的 `PublicAPI.Unshipped.txt`；建議加 `-Verify`。 |
 
 ### `eng/scripts/`

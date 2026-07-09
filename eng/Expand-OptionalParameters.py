@@ -413,8 +413,8 @@ def rebuild_expansion(
                 return None
             parts.append(
                 f"{indent}/// <summary>\n"
-                f"{indent}/// Additional public overload without optional parameters.\n"
-                f"{indent}/// 不含選用參數的公開多載。\n"
+                f"{indent}/// Convenience overload that uses default values for remaining parameters.\n"
+                f"{indent}/// 便利多載：其餘參數使用預設值並轉呼叫最長多載。\n"
                 f"{indent}/// </summary>\n"
                 f"{indent}{short_header} : this({forward}) {{ }}\n"
                 f"\n"
@@ -422,8 +422,8 @@ def rebuild_expansion(
         else:
             parts.append(
                 f"{indent}/// <summary>\n"
-                f"{indent}/// Additional public overload without optional parameters.\n"
-                f"{indent}/// 不含選用參數的公開多載。\n"
+                f"{indent}/// Convenience overload that uses default values for remaining parameters.\n"
+                f"{indent}/// 便利多載：其餘參數使用預設值並轉呼叫最長多載。\n"
                 f"{indent}/// </summary>\n"
                 f"{indent}{short_header} => {name}({forward});\n"
                 f"\n"

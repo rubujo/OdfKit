@@ -91,12 +91,12 @@ public static class OdfValidator
         options ??= OdfValidationOptions.Default;
         if (IsFlatXmlFileName(options.FileName))
         {
-            return OdfFlatDocumentValidator.Validate(stream, options.FileName, options.Profile);
+            return OdfFlatDocumentValidator.Validate(stream, options);
         }
 
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true, options.LoadOptions);
         return package.IsFlatXml
-            ? OdfFlatDocumentValidator.Validate(Rewind(stream), options.FileName, options.Profile)
+            ? OdfFlatDocumentValidator.Validate(Rewind(stream), options)
             : OdfPackageValidator.Validate(
                 package,
                 new OdfValidationOptions

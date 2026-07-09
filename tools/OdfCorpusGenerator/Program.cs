@@ -293,7 +293,7 @@ internal static class Program
         if (format.IsFlatXml)
         {
             using FileStream stream = File.Create(outputPath);
-            OdfDocumentFactory.WriteFlatXml(stream, format.Kind, version, leaveOpen: false);
+            OdfDocumentFactory.WriteFlatXml(stream, format.Kind, new OdfFlatXmlWriteOptions { Version = version, LeaveOpen = false });
             return;
         }
 

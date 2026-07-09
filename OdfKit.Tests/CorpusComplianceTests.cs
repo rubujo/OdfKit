@@ -386,7 +386,7 @@ namespace OdfKit.Tests
                 new[] { customElement },
                 Array.Empty<OdfAttributeDefinition>());
 
-            using (OdfSchemaRegistry.RegisterSchema(schema13, mergeWithExisting: true, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(schema13, new OdfSchemaRegistrationOptions { MergeWithExisting = true, OverwriteExisting = true }))
             using (MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content))
             using (OdfPackage package = OdfPackage.Open(ms))
             {
@@ -504,7 +504,7 @@ namespace OdfKit.Tests
         {
             string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:meta/><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings><office:styles/><office:body><office:text/></office:body></office:document>";
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(flatXml));
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
             LogReport("OasisOdf14Corpus_Positive_FlatDocument", report);
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
         }
@@ -517,13 +517,10 @@ namespace OdfKit.Tests
         public void OasisOdf14Corpus_Positive_AllFlatBodyKinds(OdfDocumentKind kind, string fileName)
         {
             using var ms = new MemoryStream();
-            OdfDocumentFactory.WriteFlatXml(ms, kind, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(ms, kind, new OdfFlatXmlWriteOptions { LeaveOpen = true });
             ms.Position = 0;
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(
-                ms,
-                fileName,
-                OdfComplianceProfiles.OasisOdf14Strict);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = fileName, Profile = OdfComplianceProfiles.OasisOdf14Strict });
 
             LogReport("OasisOdf14Corpus_Positive_AllFlatBodyKinds_" + kind, report);
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));

@@ -282,21 +282,27 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
-    /// Writes a minimal flat XML ODF document to the provided stream.
-    /// 將最小的扁平 XML ODF 文件寫入至提供的資料流中。
+    /// Writes a minimal flat XML ODF document with default write options.
+    /// 以預設寫入選項寫入最小 Flat XML ODF 文件。
     /// </summary>
-    /// <param name="stream">The stream to which the flat XML ODF document is written. / 寫入扁平 XML ODF 文件的資料流。</param>
-    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
-    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
-    /// <param name="leaveOpen">If <see langword="true"/>, keeps the stream open; otherwise <see langword="false"/>. / 若為 <see langword="true"/> ，則保持資料流開啟；否則為 <see langword="false"/>。</param>
-    public static void WriteFlatXml(
-        Stream stream,
-        OdfDocumentKind kind,
-        OdfVersion version = OdfVersion.Odf14,
-        bool leaveOpen = true)
+    /// <param name="stream">The destination stream. / 目的串流。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件種類。</param>
+    public static void WriteFlatXml(Stream stream, OdfDocumentKind kind) =>
+        WriteFlatXml(stream, kind, OdfFlatXmlWriteOptions.Default);
+
+    /// <summary>
+    /// Writes a minimal flat XML ODF document using write options.
+    /// 以寫入選項寫入最小 Flat XML ODF 文件。
+    /// </summary>
+    /// <param name="stream">The destination stream. / 目的串流。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件種類。</param>
+    /// <param name="options">The flat XML write options. / Flat XML 寫入選項。</param>
+    public static void WriteFlatXml(Stream stream, OdfDocumentKind kind, OdfFlatXmlWriteOptions options)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
 
         OdfDocumentKind flatKind = OdfDocumentKindDetector.ToFlatKind(kind);
         if (!OdfDocumentKindDetector.IsFlatKind(flatKind))
@@ -308,12 +314,12 @@ public static class OdfDocumentFactory
         {
             Encoding = new UTF8Encoding(false),
             Indent = false,
-            CloseOutput = !leaveOpen
+            CloseOutput = !options.LeaveOpen
         };
 
         using XmlWriter writer = XmlWriter.Create(stream, settings);
         string mimeType = GetMimeType(GetPackagedKind(flatKind));
-        string versionText = FormatVersion(version);
+        string versionText = FormatVersion(options.Version);
         string bodyElement = GetBodyElementName(flatKind);
 
         writer.WriteStartDocument();

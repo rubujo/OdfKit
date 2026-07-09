@@ -122,19 +122,13 @@ public partial class ComplianceTests
                          "<office:body><office:text/></office:body></office:document-content>";
         using MemoryStream ms = new(Encoding.UTF8.GetBytes(content));
 
-        OdfValidationReport reportDe = OdfFlatDocumentValidator.Validate(
-            ms,
-            "document.fodt",
-            OdfComplianceProfiles.DeGovernmentOdf);
+        OdfValidationReport reportDe = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.DeGovernmentOdf });
 
         // 德國 Profile 自動偵測德文，應包含德文 SuggestedFix。
         Assert.Contains(reportDe.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && (issue.SuggestedFix.Contains("Entfernen") || issue.SuggestedFix.Contains("Makros")));
 
         ms.Position = 0;
-        OdfValidationReport reportTw = OdfFlatDocumentValidator.Validate(
-            ms,
-            "document.fodt",
-            OdfComplianceProfiles.RocTaiwanOdfCns15251);
+        OdfValidationReport reportTw = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.RocTaiwanOdfCns15251 });
 
         // 臺灣 CNS 15251 Profile 自動偵測繁中，應包含繁中 SuggestedFix。
         Assert.Contains(reportTw.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && (issue.SuggestedFix.Contains("移除") || issue.SuggestedFix.Contains("巨集")));

@@ -129,7 +129,7 @@ namespace OdfKit.Tests
         public void OdfFlatXml_Fodt_RoundTrip()
         {
             using var ms = new MemoryStream();
-            OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatText, OdfVersion.Odf14, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
 
             ms.Position = 0;
             var report = OdfFlatDocumentValidator.Validate(ms, "document.fodt");
@@ -148,7 +148,7 @@ namespace OdfKit.Tests
         public void OdfFlatXml_Fods_RoundTrip()
         {
             using var ms = new MemoryStream();
-            OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatSpreadsheet, OdfVersion.Odf14, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatSpreadsheet, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
 
             ms.Position = 0;
             var report = OdfFlatDocumentValidator.Validate(ms, "workbook.fods");
@@ -476,7 +476,7 @@ namespace OdfKit.Tests
             flatXml.Save(ms);
             ms.Position = 0;
 
-            var report = OdfFlatDocumentValidator.Validate(ms, "document.txt", OdfComplianceProfiles.OasisOdf14Strict);
+            var report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.txt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
             // Extension is incorrect (.txt instead of .fodt), so it should report an issue (ODF1002) but successfully detect document kind
             Assert.Equal(OdfDocumentKind.FlatText, report.DocumentKind);
             Assert.Contains(report.Issues, i => i.RuleId == "ODF1002");
@@ -665,7 +665,7 @@ namespace OdfKit.Tests
             xmlWithForeignNamespace.Save(ms);
             ms.Position = 0;
 
-            var report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
+            var report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
             Assert.Contains(report.Issues, i => i.Severity == OdfIssueSeverity.Error && (i.RuleId.StartsWith("ODF") || i.RuleId == "DisallowInvalidOdfNamespaceExtensions"));
         }
 
@@ -778,10 +778,10 @@ namespace OdfKit.Tests
 
             // Write as flat xml
             using var flatMs = new MemoryStream();
-            OdfDocumentFactory.WriteFlatXml(flatMs, OdfDocumentKind.FlatText, OdfVersion.Odf14, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(flatMs, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
 
             flatMs.Position = 0;
-            var report = OdfFlatDocumentValidator.Validate(flatMs, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
+            var report = OdfFlatDocumentValidator.Validate(flatMs, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
             Assert.DoesNotContain(report.Issues, i => i.Severity == OdfIssueSeverity.Error);
         }
 
@@ -991,7 +991,7 @@ namespace OdfKit.Tests
         public void RealWorld_FlatXml_Document_Generator()
         {
             using var flatMs = new MemoryStream();
-            OdfDocumentFactory.WriteFlatXml(flatMs, OdfDocumentKind.FlatText, OdfVersion.Odf14, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(flatMs, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
 
             flatMs.Position = 0;
             var doc = XDocument.Load(flatMs);

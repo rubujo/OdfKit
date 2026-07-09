@@ -60,7 +60,9 @@ public void Foo(string s = "") { } // RS0026：多個皆可選
 |--------------|------------------|
 | `OdfRichTextRunOptions` | `OdfRichText.AddRun`／`OdfCellRichTextBuilder.Append` 格式參數 |
 | `OdsRowWriteOptions` | `OdsStreamWriter.WriteStartRow` 列高／樣式／最佳列高 |
-| `OdfValidationOptions` | `OdfPackageValidator.Validate` 設定檔／檔名／文化特性（並擴充 `Culture`） |
+| `OdfValidationOptions` | `OdfPackageValidator.Validate`／`OdfFlatDocumentValidator.Validate` 設定檔／檔名／文化特性 |
+| `OdfFlatXmlWriteOptions` | `OdfDocumentFactory.WriteFlatXml` 版本與 leaveOpen |
+| `OdfSchemaRegistrationOptions` | `OdfSchemaRegistry.RegisterSchema` 合併／覆寫 |
 
 0.x 尚未正式發布：上述表面**不**保留舊多可選多載相容層。
 

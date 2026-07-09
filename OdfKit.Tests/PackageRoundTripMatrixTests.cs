@@ -44,7 +44,7 @@ public class PackageRoundTripMatrixTests
         var stream = new MemoryStream();
         if (format.IsFlatXml)
         {
-            OdfDocumentFactory.WriteFlatXml(stream, format.Kind, leaveOpen: true);
+            OdfDocumentFactory.WriteFlatXml(stream, format.Kind, new OdfFlatXmlWriteOptions { LeaveOpen = true });
         }
         else
         {

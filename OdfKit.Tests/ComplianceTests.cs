@@ -904,7 +904,7 @@ namespace OdfKit.Tests
             }
 
             ms.Position = 0;
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             using (OdfPackage package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 OdfValidationReport registered = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
@@ -931,7 +931,7 @@ namespace OdfKit.Tests
             string invalidXml =
                 "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text /></office:body></office:document-content>";
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             {
                 using MemoryStream validStream = CreatePackage("application/vnd.oasis.opendocument.text", validXml);
                 using OdfPackage validPackage = OdfPackage.Open(validStream);
@@ -939,7 +939,7 @@ namespace OdfKit.Tests
 
                 Assert.True(validReport.IsValid, string.Join(", ", validReport.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             }
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             {
                 using MemoryStream invalidStream = CreatePackage("application/vnd.oasis.opendocument.text", invalidXml);
                 using OdfPackage invalidPackage = OdfPackage.Open(invalidStream);
@@ -963,7 +963,7 @@ namespace OdfKit.Tests
             string invalidXml =
                 "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text /></office:body></office:document-content>";
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             {
                 using MemoryStream validStream = CreatePackage("application/vnd.oasis.opendocument.text", validXml);
                 using OdfPackage validPackage = OdfPackage.Open(validStream);
@@ -972,7 +972,7 @@ namespace OdfKit.Tests
                 Assert.True(validReport.IsValid, string.Join(", ", validReport.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             }
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             {
                 using MemoryStream invalidStream = CreatePackage("application/vnd.oasis.opendocument.text", invalidXml);
                 using OdfPackage invalidPackage = OdfPackage.Open(invalidStream);
@@ -996,7 +996,7 @@ namespace OdfKit.Tests
             string stylesXml =
                 "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\" />";
 
-            using IDisposable registration = OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true);
+            using IDisposable registration = OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true });
             using MemoryStream stream = CreatePackage(
                 "application/vnd.oasis.opendocument.text",
                 contentXml,
@@ -1017,7 +1017,7 @@ namespace OdfKit.Tests
             string embeddedXml =
                 "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text /></office:body></office:document-content>";
 
-            using IDisposable registration = OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true);
+            using IDisposable registration = OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true });
             using MemoryStream stream = CreatePackage(
                 "application/vnd.oasis.opendocument.text",
                 contentXml,
@@ -1695,10 +1695,7 @@ namespace OdfKit.Tests
                 "1.4",
                 "spreadsheet");
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(
-                ms,
-                "workbook.fods",
-                OdfComplianceProfiles.OasisOdf14Extended);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "workbook.fods", Profile = OdfComplianceProfiles.OasisOdf14Extended });
 
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             Assert.Equal(OdfDocumentKind.FlatSpreadsheet, report.DocumentKind);
@@ -1732,10 +1729,7 @@ namespace OdfKit.Tests
                 "text");
             using var nonSeekable = new NonSeekableReadStream(ms);
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(
-                nonSeekable,
-                "document.fodt",
-                OdfComplianceProfiles.OasisOdf14Extended);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(nonSeekable, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Extended });
 
             Assert.Contains(report.Issues, issue =>
                 issue.RuleId == "ODF0304" &&
@@ -1779,10 +1773,7 @@ namespace OdfKit.Tests
                 "1.4",
                 "text");
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(
-                ms,
-                "document.xml",
-                OdfComplianceProfiles.OasisOdf14Strict);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.xml", Profile = OdfComplianceProfiles.OasisOdf14Strict });
 
             Assert.False(report.IsValid);
             Assert.Equal(OdfDocumentKind.FlatText, report.DocumentKind);
@@ -1814,7 +1805,7 @@ namespace OdfKit.Tests
                 "1.4",
                 "not-a-document-kind");
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
 
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF3002");
@@ -1828,7 +1819,7 @@ namespace OdfKit.Tests
                 "1.4",
                 "text");
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.IsoIec26300_2015);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.IsoIec26300_2015 });
 
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001");
@@ -1853,19 +1844,19 @@ namespace OdfKit.Tests
             OdfSchemaSet generated = CreateRootPatternSchema("document", "mimetype");
             OdfComplianceProfile profile = CreateSchemaPatternValidationProfile();
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             using (MemoryStream ms = CreateFlatDocument("application/vnd.oasis.opendocument.text", "1.4"))
             {
-                OdfValidationReport validReport = OdfFlatDocumentValidator.Validate(ms, "document.fodt", profile);
+                OdfValidationReport validReport = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = profile });
 
                 Assert.True(validReport.IsValid, string.Join(", ", validReport.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             }
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(
                 "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body /></office:document>")))
             {
-                OdfValidationReport invalidReport = OdfFlatDocumentValidator.Validate(ms, "document.fodt", profile);
+                OdfValidationReport invalidReport = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = profile });
 
                 Assert.False(invalidReport.IsValid);
                 Assert.Contains(invalidReport.Issues, issue =>
@@ -1881,19 +1872,19 @@ namespace OdfKit.Tests
             OdfSchemaSet generated = CreateStartPatternSchema("document", "mimetype");
             OdfComplianceProfile profile = CreateSchemaPatternValidationProfile();
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             using (MemoryStream ms = CreateFlatDocument("application/vnd.oasis.opendocument.text", "1.4"))
             {
-                OdfValidationReport validReport = OdfFlatDocumentValidator.Validate(ms, "document.fodt", profile);
+                OdfValidationReport validReport = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = profile });
 
                 Assert.True(validReport.IsValid, string.Join(", ", validReport.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             }
 
-            using (OdfSchemaRegistry.RegisterSchema(generated, overwriteExisting: true))
+            using (OdfSchemaRegistry.RegisterSchema(generated, new OdfSchemaRegistrationOptions { OverwriteExisting = true }))
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(
                 "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body /></office:document>")))
             {
-                OdfValidationReport invalidReport = OdfFlatDocumentValidator.Validate(ms, "document.fodt", profile);
+                OdfValidationReport invalidReport = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = profile });
 
                 Assert.False(invalidReport.IsValid);
                 Assert.Contains(invalidReport.Issues, issue =>
@@ -2058,7 +2049,7 @@ namespace OdfKit.Tests
             OdfDocumentFactory.WriteFlatXml(ms, kind);
 
             ms.Position = 0;
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, fileName, OdfComplianceProfiles.OasisOdf14Extended);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = fileName, Profile = OdfComplianceProfiles.OasisOdf14Extended });
 
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             Assert.Equal(kind, report.DocumentKind);
