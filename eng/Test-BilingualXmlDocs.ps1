@@ -1,8 +1,9 @@
 param(
     [switch]$FailOnIssues,
     [switch]$FailOnNewIssues,
-    [int]$BaselineIssueCount = 1984,
-    [int]$BaselineFileCount = 347
+    # v0.0.1 完滿基線：公開／受保護 API 雙語 missing 已清零；預設零容忍新增債務。
+    [int]$BaselineIssueCount = 0,
+    [int]$BaselineFileCount = 0
 )
 
 $ErrorActionPreference = 'Stop'

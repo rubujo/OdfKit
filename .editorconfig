@@ -130,17 +130,16 @@ dotnet_diagnostic.CA1307.severity = none
 
 # =============================================================================
 # Public API surface tracking (Microsoft.CodeAnalysis.PublicApiAnalyzers)
-# 業界慣例（.NET 執行階段／Azure SDK／Dapper 等）：RS0016/RS0017 以 error 阻擋
-# 表面漂移；RS0026/RS0027 為可選參數多載設計指引，既有 0.x 表面與生成 DOM 已
-# 大量使用 optional overloads，故降為 suggestion（不因 TreatWarningsAsErrors 擋 CI）。
-# 新增公開 API 仍應優先採用「單一最長可選參數多載」模式（見 Roslyn 文件）。
+# 業界慣例（.NET 執行階段／Azure SDK 等）：RS0016/RS0017 以 error 阻擋表面漂移。
+# 手寫公開 API：RS0026/RS0027 亦為 error（明確多載鏈或 options 物件；見
+# docs/public-api-optional-parameters.md）。生成 DOM／schema 目錄覆寫為 none。
 # =============================================================================
 [*.cs]
 dotnet_diagnostic.RS0016.severity = error
 dotnet_diagnostic.RS0017.severity = error
 dotnet_diagnostic.RS0026.severity = error
 dotnet_diagnostic.RS0027.severity = error
-# 生成 DOM／schema 包裝不強制可選參數設計指引
+# 生成 DOM／schema 包裝：由產生器保證形狀，不強制 RS0026/RS0027
 [OdfKit/DOM/Generated/**.cs]
 dotnet_diagnostic.RS0026.severity = none
 dotnet_diagnostic.RS0027.severity = none

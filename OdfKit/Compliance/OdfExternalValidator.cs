@@ -15,20 +15,20 @@ public static class OdfExternalValidator
     /// </summary>
     public const string OdfValidatorJarEnvironmentVariable = "ODFKIT_ODFVALIDATOR_JAR";
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidator that accepts filePath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidator 多載。
     /// </summary>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath) => ValidateWithOdfValidator(filePath, null, null, 30000);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidator that accepts filePath and jarPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath 與 jarPath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidator 多載。
     /// </summary>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath) => ValidateWithOdfValidator(filePath, jarPath, null, 30000);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidator that accepts filePath, jarPath, and javaPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath、jarPath 與 javaPath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidator 多載。
     /// </summary>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath, string? javaPath) => ValidateWithOdfValidator(filePath, jarPath, javaPath, 30000);
 
@@ -55,26 +55,26 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidatorAsync that accepts filePath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidatorAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath) => ValidateWithOdfValidatorAsync(filePath, null, null, 30000, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidatorAsync that accepts filePath and jarPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath 與 jarPath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidatorAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath) => ValidateWithOdfValidatorAsync(filePath, jarPath, null, 30000, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidatorAsync that accepts filePath, jarPath, and javaPath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath、jarPath 與 javaPath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidatorAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath) => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, 30000, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithOdfValidatorAsync that accepts filePath, jarPath, javaPath, and timeoutMilliseconds; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 filePath、jarPath、javaPath 與 timeoutMilliseconds；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidatorAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds) => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds, default);
 
@@ -122,8 +122,8 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithCommand that accepts commandPath and filePath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 commandPath 與 filePath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithCommand 多載。
     /// </summary>
     public static OdfExternalValidatorResult ValidateWithCommand(string commandPath, string filePath) => ValidateWithCommand(commandPath, filePath, 30000);
 
@@ -145,14 +145,14 @@ public static class OdfExternalValidator
         return ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds).GetAwaiter().GetResult();
     }
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithCommandAsync that accepts commandPath and filePath; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 commandPath 與 filePath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithCommandAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(string commandPath, string filePath) => ValidateWithCommandAsync(commandPath, filePath, 30000, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of ValidateWithCommandAsync that accepts commandPath, filePath, and timeoutMilliseconds; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 commandPath、filePath 與 timeoutMilliseconds；其餘可選參數使用預設值並轉呼叫最長 ValidateWithCommandAsync 多載。
     /// </summary>
     public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(string commandPath, string filePath, int timeoutMilliseconds) => ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds, default);
 

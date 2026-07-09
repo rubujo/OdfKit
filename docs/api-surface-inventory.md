@@ -75,16 +75,16 @@ rg -n "public .* Find[A-Z]|public .* Find\(" OdfKit\<domain> -g "*.cs"
 
 ## 文件掃描基線
 
-`eng/Test-BilingualXmlDocs.ps1` 預設為報告模式；若要阻止新增文件債，使用
-`-FailOnNewIssues` 與目前基線比對。最近一次靜態掃描結果：
+`eng/Test-BilingualXmlDocs.ps1` 預設為報告模式。v0.0.1 完滿後 **missing 雙語文件已清零**；
+`-FailOnNewIssues` 的預設基線為 `TOTAL=0`／`FILES=0`（零容忍新增債務）。
+`-FailOnIssues` 可於 CI 或專門文件批次要求完全乾淨。掃描器已排除產生的 DOM wrapper、
+`bin/`、`obj/`，並避免把 private / internal helper 型別中的 public 成員誤判為公開 API。
+
+最近一次靜態掃描：
 
 ```text
-TOTAL=1984; FILES=347
+No bilingual XML documentation issues found.
 ```
-
-這是後續文件批次的基線；`-FailOnIssues` 仍可用於要求零債務的專門文件批次。掃描器已排除
-產生的 DOM wrapper、`bin/`、`obj/`，並避免把 private / internal helper 型別中的 public
-成員誤判為公開 API。
 
 ## 下一批建議
 

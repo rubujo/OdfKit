@@ -27,12 +27,22 @@
 - **串流寫入熱路徑（ODS／ODT）**：將批次原始 XML 組裝與字元防線抽至共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`（`OdfKit.Core`），`OdsStreamWriter` 與 `OdtStreamWriter` 段落／標題／清單／儲存格熱路徑共用；關閉 `XmlWriter.CheckCharacters` 後仍以 `Err_OdfStreamWriter_InvalidXmlCharacter` 快速失敗；補齊 ODS／ODT fast-path 與字元邊界測試。`docs/performance-comparison.md` 於 2026-07-09 重跑 ODS 百萬列對比（第 2 次：約 4.96 s／472 MB 配置／38 MB 峰值，與 MiniExcel 耗時接近持平）。
 - **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
 - **可維護性**：`OdfLocalizer.Exceptions` 按 12 語系拆檔；新增 `docs/maintainability.md`、產生碼目錄 README、`eng/Test-OneLineXmlSummary.ps1`；歷史 `Split-*`／`Merge-*` 等腳本移至 `eng/historical-refactor/`；合併弱 partial（`OdfAnimation`、簽章 `Common`）並移除空殼 partial 根檔。
+- **公開 API 形狀與文件完滿基線（v0.0.1）**：
+  - 手寫公開 API 將 RS0026／RS0027 升為 **error**；生成 DOM／schema 目錄覆寫為 none，且禁止手改 `.g.cs`。
+  - 單一尾端可選參數改明確多載鏈；多可選高頻面改 **options 物件**（`OdfRichTextRunOptions`、`OdsRowWriteOptions`、`OdfValidationOptions`、`OdfFlatXmlWriteOptions`、`OdfSchemaRegistrationOptions`）；其餘展開為短多載轉呼叫（`Expand-OptionalParameters.py --dry-run` = 0）。0.x **不**保留舊多可選相容層。
+  - PublicApiAnalyzers 雙 TFM Unshipped 基線與 Package Validation；在地化 JSON 產線（12 語系 × 鍵對等閘門）。
+  - 雙語 XML **missing** 清零；`Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`。
+  - 高頻 API（`OdfDocumentFactory`、`OdfPackage`、`OdfDocument`、`OdfValidator`、`OdsStreamWriter` 等）便利多載摘要差異化（`eng/Rewrite-ConvenienceSummaries.py`）。
+  - 產品品質分層入口見 `docs/product-quality-gates.md`（提交前 A／corpus 與 policy 之 B／發版前 C）。
+  - God-class 採人機 KEEP 準則與協作者地圖（`docs/human-agent-maintainability.md`、`docs/architecture-collaborators.md`），禁止為行數機械切檔。
+  - 多版官方 schema（1.1～1.4）內建為**產品選擇**（封存／存量流通）；0.x **非目標**拆成可選 NuGet。
 
 ### 架構
 
-- 採用協作者抽取模式拆分上帝類別。
+- 採用協作者抽取模式拆分上帝類別；大型 façade 維持領域 partial／engine 邊界（見協作者地圖）。
 - 所有公開 `*Async` 方法統一帶 `CancellationToken cancellationToken = default`。
 - 測試套件依分層命名規則整理，移除歷史開發階段命名與重複測試檔。
+- 可選參數與 options 表面對齊 `docs/public-api-optional-parameters.md`；新增公開 API 須更新 PublicAPI 基線。
 
 ### 修正
 

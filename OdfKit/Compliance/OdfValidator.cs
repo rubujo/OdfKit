@@ -59,14 +59,14 @@ public static class OdfValidator
     public static OdfValidationReport Validate(Stream stream) => Validate(stream, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Validate that accepts stream and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Validate 多載。
     /// </summary>
     public static OdfValidationReport Validate(Stream stream, string? fileName) => Validate(stream, fileName, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Validate that accepts stream, fileName, and profile; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、fileName 與 profile；其餘可選參數使用預設值並轉呼叫最長 Validate 多載。
     /// </summary>
     public static OdfValidationReport Validate(
         Stream stream,
@@ -116,14 +116,14 @@ public static class OdfValidator
     public static OdfValidationReport Validate(OdfPackage package) => Validate(package, null, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Validate that accepts package and profile; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 package 與 profile；其餘可選參數使用預設值並轉呼叫最長 Validate 多載。
     /// </summary>
     public static OdfValidationReport Validate(OdfPackage package, OdfComplianceProfile? profile) => Validate(package, profile, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Validate that accepts package, profile, and fileName; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 package、profile 與 fileName；其餘可選參數使用預設值並轉呼叫最長 Validate 多載。
     /// </summary>
     public static OdfValidationReport Validate(
         OdfPackage package,

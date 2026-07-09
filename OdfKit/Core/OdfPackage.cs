@@ -229,8 +229,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Open(string path) => Open(path, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Open that accepts path and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 options；其餘可選參數使用預設值並轉呼叫最長 Open 多載。
     /// </summary>
     public static OdfPackage Open(string path, OdfLoadOptions? options)
     {
@@ -285,20 +285,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Open(Stream stream) => Open(stream, false, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Open that accepts stream and leaveOpen; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 leaveOpen；其餘可選參數使用預設值並轉呼叫最長 Open 多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, bool leaveOpen) => Open(stream, leaveOpen, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Open that accepts stream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 options；其餘可選參數使用預設值並轉呼叫最長 Open 多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, OdfLoadOptions? options) => Open(stream, false, options);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Open that accepts stream, leaveOpen, and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、leaveOpen 與 options；其餘可選參數使用預設值並轉呼叫最長 Open 多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, bool leaveOpen, OdfLoadOptions? options)
     {
@@ -346,14 +346,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(path, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts path and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 options；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(string path, OdfLoadOptions? options) => OpenAsync(path, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts path, options, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path、options 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         string path,
@@ -421,8 +421,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(stream, false, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts stream and leaveOpen; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 leaveOpen；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen) => OpenAsync(stream, leaveOpen, null, default);
 
@@ -438,20 +438,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(stream, leaveOpen, null, cancellationToken);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts stream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 options；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, OdfLoadOptions? options) => OpenAsync(stream, false, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts stream, leaveOpen, and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、leaveOpen 與 options；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen, OdfLoadOptions? options) => OpenAsync(stream, leaveOpen, options, default);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of OpenAsync that accepts stream, leaveOpen, options, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、leaveOpen、options 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 OpenAsync 多載。
     /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         Stream stream,
@@ -495,8 +495,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Create(string path) => Create(path, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Create that accepts path and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 path 與 options；其餘可選參數使用預設值並轉呼叫最長 Create 多載。
     /// </summary>
     public static OdfPackage Create(string path, OdfSaveOptions? options)
     {
@@ -512,20 +512,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Create(Stream stream) => Create(stream, false, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Create that accepts stream and leaveOpen; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 leaveOpen；其餘可選參數使用預設值並轉呼叫最長 Create 多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, bool leaveOpen) => Create(stream, leaveOpen, null);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Create that accepts stream and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream 與 options；其餘可選參數使用預設值並轉呼叫最長 Create 多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, OdfSaveOptions? options) => Create(stream, false, options);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of Create that accepts stream, leaveOpen, and options; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 stream、leaveOpen 與 options；其餘可選參數使用預設值並轉呼叫最長 Create 多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, bool leaveOpen, OdfSaveOptions? options)
     {

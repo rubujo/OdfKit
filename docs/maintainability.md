@@ -127,6 +127,9 @@
 | RS0026／RS0027 政策 | [public-api-optional-parameters.md](public-api-optional-parameters.md)；示範 `InsertRows`／`DeleteRows` |
 | 協作者地圖 | [architecture-collaborators.md](architecture-collaborators.md) |
 | 效能完滿基線 | `performance-comparison.md` 第 3 次跑分（2026-07-09） |
+| 單／多可選參數收斂 | 手寫 RS0026／27 為 error；`Expand-OptionalParameters.py` dry-run 0；高頻改 options |
+| 雙語 XML missing 清零 | `Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`（`-FailOnNewIssues` 零容忍） |
+| 高頻便利多載摘要差異化 | `eng/Rewrite-ConvenienceSummaries.py`（DocumentFactory／Package／Validator／OdsStreamWriter 等） |
 
 ### 大型結構現況（v0.0.1 完滿）
 
@@ -155,7 +158,9 @@ ODF 實務流通並非「全站只活在最新 1.4」：
 |------|------|
 | 1.0 API 凍結 | Unshipped → Shipped；搭配 `PackageValidationBaselineVersion` |
 | Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
-| 多可選參數公開 API | 高頻已遷 options（富文字／列寫入／套件驗證）；其餘依使用頻率續作 |
+| 其餘便利多載摘要 | 非高頻面仍可能為通用模板；改到該 API 時一併差異化 |
+| 占位式 `Executes the X` 摘要 | 手寫熱路徑逐步改為領域語意；Generated 不動 |
+| 產品 B／C 閘門常態化 | corpus／policy／效能回歸依 [product-quality-gates.md](product-quality-gates.md) 於發版前跑 |
 
 ## 7. 相關文件
 

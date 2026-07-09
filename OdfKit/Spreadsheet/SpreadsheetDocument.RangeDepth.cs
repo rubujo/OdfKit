@@ -59,8 +59,8 @@ public partial class SpreadsheetDocument
     public OdfCellRange AppendRows(string sheetName, IEnumerable<IEnumerable<object?>> rows) => AppendRows(sheetName, rows, 0);
 
     /// <summary>
-    /// Convenience overload that uses default values for remaining parameters.
-    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// Short overload of AppendRows that accepts sheetName and startColumn; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName 與 startColumn；其餘可選參數使用預設值並轉呼叫最長 AppendRows 多載。
     /// </summary>
     public OdfCellRange AppendRows(string sheetName, IEnumerable<IEnumerable<object?>> rows, int startColumn) =>
         RequireSheet(sheetName).AppendRows(rows, startColumn);

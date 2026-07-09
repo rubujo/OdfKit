@@ -20,6 +20,15 @@ dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release --framework net10.0 `
   --filter "FullyQualifiedName!~LibreOffice&FullyQualifiedName!~InteropCorpus&FullyQualifiedName!~OfficeGui"
 ```
 
+可選（文件／在地化變更時建議加上）：
+
+```powershell
+pwsh eng/Test-BilingualXmlDocs.ps1 -FailOnNewIssues
+pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
+pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
+```
+
 ## Corpus 與互通
 
 | 腳本 | 說明 |
@@ -67,6 +76,17 @@ dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release --framework net10.0 `
 - `OdfFlatXmlWriteOptions`／`OdfSchemaRegistrationOptions`
 
 細節見 [public-api-optional-parameters.md](public-api-optional-parameters.md)。
+
+## 最近本機閘門紀錄（v0.0.1 完滿）
+
+| 日期 | 層級 | 結果摘要 |
+|------|------|----------|
+| 2026-07-09 | A | `dotnet test` net10.0（排除 LibreOffice／InteropCorpus／OfficeGui）：通過 2082、略過 1、失敗 0 |
+| 2026-07-09 | B | `Test-OdfPolicy.ps1`：32 通過；`Test-OdfCorpus.ps1`：內建 corpus 通過（未設 `ODFKIT_PARITY_CORPUS_ROOT`，略過外部 corpus） |
+| 2026-07-09 | C | `Benchmark-Regression.ps1`：DomInsert 未超 +40% 容許（基準 123.9 µs／量測 159.6 µs） |
+| 2026-07-09 | 可維護 | 雙語 missing 0、一行 summary OK、Localizer 574 keys × 12、optional expand dry-run 0 |
+
+發版 tag 前建議再跑一次本表；LibreOffice／OOXML 視覺 golden 仍依環境選跑。
 
 ## 相關
 
