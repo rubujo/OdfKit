@@ -91,7 +91,7 @@ BenchmarkDotNet 預設的多次暖身 + 多次迭代統計工作，單一情境�
 | 記憶體 | 約 31.8 GB |
 | .NET SDK | `10.0.301` |
 | .NET 執行階段 | `.NET 10.0.9`（`X64 RyuJIT AVX2`） |
-| BenchmarkDotNet | `0.14.0` |
+| BenchmarkDotNet | `0.15.8` |
 | MiniExcel | `1.45.0`（`Apache-2.0`） |
 | ClosedXML | `0.105.0`（`MIT`） |
 
