@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 abstract OdfKit.Core.OdfDocument.GetDefaultContentXml() -> string!
 abstract OdfKit.Core.OdfDocument.GetDefaultStylesXml() -> string!
 abstract OdfKit.Core.OdfDocument.MergeContentNodes(OdfKit.Core.OdfDocument! sourceDoc, OdfKit.Core.OdfMergeOptions! options, System.Collections.Generic.Dictionary<string!, string!>! renameMap) -> void
@@ -10340,7 +10340,8 @@ OdfKit.DOM.TableTableElement.AppendRow() -> OdfKit.DOM.TableTableRowElement!
 OdfKit.DOM.TableTableElement.ColumnStructureChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.OdfElement!>!
 OdfKit.DOM.TableTableElement.CompressColdPages() -> void
 OdfKit.DOM.TableTableElement.CopyRows(int sourcePosition, int count, int targetPosition) -> void
-OdfKit.DOM.TableTableElement.DeleteRows(int position, int count = 1) -> void
+OdfKit.DOM.TableTableElement.DeleteRows(int position) -> void
+OdfKit.DOM.TableTableElement.DeleteRows(int position, int count) -> void
 OdfKit.DOM.TableTableElement.Dispose() -> void
 OdfKit.DOM.TableTableElement.EnsureTableColumns() -> OdfKit.DOM.TableTableColumnsElement!
 OdfKit.DOM.TableTableElement.EnumerateCellViews() -> OdfKit.DOM.TableTableElement.OdfCellViewEnumerable
@@ -10348,7 +10349,8 @@ OdfKit.DOM.TableTableElement.ImportData(System.Data.Common.DbDataReader! reader)
 OdfKit.DOM.TableTableElement.ImportData(System.Data.DataTable! table) -> void
 OdfKit.DOM.TableTableElement.ImportData<T>(System.Collections.Generic.IEnumerable<T>! collection) -> void
 OdfKit.DOM.TableTableElement.InsertColumnStructure<TElement>(TElement! element) -> TElement!
-OdfKit.DOM.TableTableElement.InsertRows(int position, int count = 1) -> void
+OdfKit.DOM.TableTableElement.InsertRows(int position) -> void
+OdfKit.DOM.TableTableElement.InsertRows(int position, int count) -> void
 OdfKit.DOM.TableTableElement.MaterializeSparseCells() -> void
 OdfKit.DOM.TableTableElement.MaxHotPages.get -> int
 OdfKit.DOM.TableTableElement.MaxHotPages.set -> void

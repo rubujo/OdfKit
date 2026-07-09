@@ -58,6 +58,10 @@ jobs:
         shell: pwsh
         run: ./eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
 
+      - name: Localizer JSON ↔ C# consistency
+        shell: pwsh
+        run: ./eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
+
       - name: PublicApi analyzers (OdfKit dual TFM)
         shell: pwsh
         env:

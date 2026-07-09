@@ -121,28 +121,25 @@
 | Public API 基線 | PublicApiAnalyzers 5.6.0 + 雙 TFM Unshipped 基線 |
 | Package Validation | 核心與 Extensions 啟用 `EnablePackageValidation` |
 | CI maintainability job | 合併衝突、一行 summary、鍵值對等、PublicApi 建置 |
-| 串流郵件合併拆分 | `OdfStreamingMailMerge` → 本體／Segments／ExpressionCache；移除「小於 1MB」口號 |
-| 在地化鍵腳手架 | `eng/Add-LocalizerKey.ps1` |
+| 串流郵件合併拆分 | `OdfStreamingMailMerge` → 本體／Segments／ExpressionCache |
+| 在地化 JSON 產線 | `Compliance/i18n/*.json` → `Generate-LocalizerExceptionsFromJson.ps1` |
+| 封存寫入／表格 DOM 拆分 | `OdfPackageArchiveWriter` Streams／FlatXml；`TableTableElement` Import／Sparse／CellViews |
+| RS0026／RS0027 政策 | [public-api-optional-parameters.md](public-api-optional-parameters.md)；示範 `InsertRows`／`DeleteRows` |
+| 協作者地圖 | [architecture-collaborators.md](architecture-collaborators.md) |
+| 效能完滿基線 | `performance-comparison.md` 第 3 次跑分（2026-07-09） |
 
-### 協作者抽取候選（手寫、跨檔總量偏大）
+### 大型結構現況（v0.0.1 完滿）
 
-| 型別／檔案 | 現況 | 建議 |
-|------------|------|------|
-| `OdfElement`／schema registry／generated | 規格面，已 KEEP | 勿機械合併；體積靠 schema 套件策略 |
-| `OdfTableSheet`、`OdfDocument`、`OdfPackage`、`TextDocument` | 已有 *Collaborators／功能區 partial | 新功能優先進既有邊界；超過 ~2000 再抽 engine |
-| `OdfStreamingMailMerge` | 已拆 Segments／ExpressionCache | 完成 |
-| `OdfElementContentModel.Table.cs`（~1.7k） | 單檔偏大、schema 驅動 | 僅在內容模型邊界清晰時再拆 |
-| `OdfPackageArchiveWriter`（~1k） | 已為 internal 協作者 | 可再拆 ZIP 標頭／payload 串流子型別（可選） |
+完整地圖見 [architecture-collaborators.md](architecture-collaborators.md)。生成 schema 體積屬**產品決策**（可選 nupkg），不在 0.0.1 強制拆套件。
 
-### 建議的後續債
+### 建議的後 0.0.1／1.0 債
 
 | 項目 | 說明 |
 |------|------|
-| 協作者抽取 | 上表候選；優先 `OdfElementContentModel.Table` 邊界審視 |
-| 在地化產線 | 自 JSON／resx 產生 `Exceptions.*.cs`（可選；現有腳手架已降低漏鍵風險） |
-| Schema 套件拆分 | 降低預設 nupkg 體積（產品決策） |
-| 1.0 API 凍結 | Unshipped → Shipped；可選參數多載（RS0026／RS0027）分批收斂 |
-| Baseline version validator | 有穩定 NuGet 發行後啟用 `PackageValidationBaselineVersion` |
+| Schema 可選套件 | 降低預設 nupkg 體積（產品決策） |
+| 1.0 API 凍結 | Unshipped → Shipped；手寫路徑 RS0026／RS0027 升 warning／error |
+| Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
+| 生成 DOM 可選參數形狀 | 改 `OdfSchemaGenerator` 後整批重產 |
 
 ## 7. 相關文件
 

@@ -69,16 +69,17 @@
 ### C2. 可維護性（複雜度債）
 完整準則見 [`docs/maintainability.md`](docs/maintainability.md)。Agent 必須遵守：
 - **Partial**：禁止機械切檔；診斷用 `eng/Analyze-PartialSplits.ps1`；禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本。
-- **在地化**：新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系；可用 `pwsh eng/Add-LocalizerKey.ps1` 一次腳手架，提交前執行 `pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`。非 en／zh-TW 語系不得長期只留英文佔位（新增後應潤飾）。
-- **公開 API 表面**（業界黃金標準，`Microsoft.CodeAnalysis.PublicApiAnalyzers`）：
-  - 核心套件以雙 TFM 基線追蹤：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
-  - **0.x** 期間新增／變更的公開 API 登錄於 **Unshipped**；**1.0** 發佈時再整批移入 Shipped。
-  - 變更公開表面後必須更新對應 TFM 的基線，或執行 `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify`。
-  - RS0016／RS0017 為 error；RS0026／RS0027（可選參數多載設計）為 suggestion（既有表面 grandfather，新 API 仍應優先採單一最長可選參數多載）。
+- **在地化**：訊息來源為 `OdfKit/Compliance/i18n/exceptions.<culture>.json`；以 `pwsh eng/Add-LocalizerKey.ps1` 或手改 JSON 後執行 `pwsh eng/Generate-LocalizerExceptionsFromJson.ps1` 產生 `OdfLocalizer.Exceptions.<culture>.cs`（**請勿手改產生檔**）。提交前：`Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`。非 en／zh-TW 不得長期只留英文佔位。
+- **公開 API 表面**（`Microsoft.CodeAnalysis.PublicApiAnalyzers`）：
+  - 雙 TFM 基線：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
+  - **0.x** 全量在 **Unshipped**；**1.0** 再移入 Shipped。
+  - 變更後更新基線或 `Generate-PublicApiBaseline.ps1 -Verify`。
+  - RS0016／RS0017 為 error；RS0026／RS0027 政策見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)（新 API 必須遵守；生成 DOM grandfather）。
   - 說明見 [`OdfKit/PublicAPI/README.md`](OdfKit/PublicAPI/README.md)。
-- **套件雙 TFM 相容性**（.NET Package Validation／ApiCompat）：可發佈套件已啟用 `EnablePackageValidation`；`dotnet pack`／`eng/Test-NuGetPack.ps1` 會檢查各 TFM 公開表面前向相容。若故意讓某 TFM 多出 API，須以官方 suppress 檔或條件編譯明確記錄理由，不得靜默關閉驗證。
-- **XML 摘要**：提交前可執行 `pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues` 防止一行式 `<summary>` 回流。
-- **產生碼**：`OdfKit/DOM/Generated` 與 schema provider `.g.cs` 不可手改；schema 重產後若公開表面變動，須重跑 Public API 基線腳本。
+- **套件雙 TFM 相容性**（Package Validation）：`EnablePackageValidation`；`Test-NuGetPack.ps1` 於 pack 時檢查。
+- **協作者／大型結構**：見 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md) 與 [`docs/maintainability.md`](docs/maintainability.md)；禁止機械 `historical-refactor/Split-*`。
+- **XML 摘要**：`Test-OneLineXmlSummary.ps1 -FailOnIssues`。
+- **產生碼**：`DOM/Generated` 與 schema provider `.g.cs` 不可手改；schema 重產後須重跑 Public API 基線。
 
 ### D. Git 提交規範 (Conventional Commits)
 - **規範標準**：嚴格遵循「慣例式提交 (Conventional Commits) v1.0.0」規範。
@@ -115,12 +116,14 @@
   ```powershell
   pwsh eng/Test-GpgSignatures.ps1
   ```
-- **新增在地化鍵腳手架**（一次寫入 12 語系，再潤飾非 en／zh-TW）：
+- **新增在地化鍵**（寫入 JSON 並重產 C#）：
   ```powershell
   pwsh eng/Add-LocalizerKey.ps1 -Key Err_Example_Failed -EnMessage "Failed: {0}." -ZhTwMessage "失敗：{0}。"
   ```
-- **語系鍵值對等**（新增 Err／Warn／Cli 鍵後必跑）：
+- **自 JSON 重產／驗證例外字典**：
   ```powershell
+  pwsh eng/Generate-LocalizerExceptionsFromJson.ps1
+  pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
   pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
   ```
 - **一行式 summary 閘門**：
@@ -130,6 +133,10 @@
 - **重產公開 API 基線**（大量表面變更或 schema 重產後）：
   ```powershell
   pwsh eng/Generate-PublicApiBaseline.ps1 -Verify
+  ```
+- **跨套件效能對比（更新 docs 數字前）**：
+  ```powershell
+  pwsh eng/Benchmark-Competitive.ps1
   ```
 - **NuGet 封裝與雙 TFM 相容性**（含 Package Validation）：
   ```powershell

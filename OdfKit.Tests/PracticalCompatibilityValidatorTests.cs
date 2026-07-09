@@ -103,7 +103,7 @@ public class PracticalCompatibilityValidatorTests
             document,
             OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf);
 
-        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues.Where(i => i.RuleId == "PRAC0301"));
+        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues, i => i.RuleId == "PRAC0301");
         Assert.Equal("content.xml", issue.PackagePath);
         Assert.Equal("True", issue.Details?["hasTextIndex"]);
         Assert.Equal("True", issue.Details?["hasTextSection"]);
@@ -195,7 +195,7 @@ public class PracticalCompatibilityValidatorTests
             chart,
             OdfPracticalCompatibilityProfile.PortableEditing);
 
-        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues.Where(i => i.RuleId == "PRAC0200"));
+        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues, i => i.RuleId == "PRAC0200");
         Assert.Equal(chart.DocumentKind, issue.DocumentKind);
         Assert.False(string.IsNullOrWhiteSpace(issue.Message));
         Assert.False(string.IsNullOrWhiteSpace(issue.Suggestion));

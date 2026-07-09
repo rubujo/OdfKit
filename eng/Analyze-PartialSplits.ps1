@@ -32,6 +32,8 @@ $keepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]:
     'OdfSchemaPatternContentMatcher'    # RELAX NG 內容模式子驗證器
     'OdfElementSchemaRegistry'     # schema 枚舉 token 註冊表（多領域 partial）
     'OdfStreamingMailMerge'        # 串流郵件合併：本體／Segments／ExpressionCache
+    'OdfPackageArchiveWriter'      # ZIP 寫入本體／Streams／FlatXml
+    'TableTableElement'            # 表格 content model：Structure／Import／Sparse／CellViews
 ) | ForEach-Object { [void]$keepTypes.Add($_) }
 
 # 已評估完成：雙／多檔拆分具實際邏輯邊界，永久保留（含原 REVIEW 升格）

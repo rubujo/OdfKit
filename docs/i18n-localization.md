@@ -87,7 +87,11 @@ OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
 |------|------|
 | `OdfKit/Compliance/OdfLocalizer.cs` | 訊息解析、格式化與文化回退 |
 | `OdfKit/Compliance/OdfLocalizer.Languages.cs` | 語言字典註冊與各語系內容 |
-| `OdfKit/Compliance/OdfLocalizer.Exceptions.cs` | 訊息鍵值與例外文字 |
+| `OdfKit/Compliance/i18n/exceptions.<culture>.json` | **例外／診斷訊息來源真相**（12 語系） |
+| `OdfKit/Compliance/OdfLocalizer.Exceptions.<culture>.cs` | 由 JSON **產生**的字典 partial（勿手改） |
+| `OdfKit/Compliance/OdfLocalizer.Exceptions.cs` | 例外字典入口（註冊 12 語系） |
+| `eng/Generate-LocalizerExceptionsFromJson.ps1` | JSON → C# 產生／`-VerifyOnly` |
+| `eng/Add-LocalizerKey.ps1` | 新增鍵腳手架（寫 JSON 並重產） |
 
 ## 7. 相關文件
 

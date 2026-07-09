@@ -1,26 +1,19 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    於 12 語系 OdfLocalizer.Exceptions.*.cs 同步新增一則訊息鍵（腳手架）。
+    於 12 語系 exceptions JSON 同步新增一則訊息鍵，並重產 C# 字典。
 .DESCRIPTION
-    業界在地化 DX 慣例：新增鍵時一次寫入所有語系表，避免只補 en／zh-TW。
-    其他語系預設填入 -EnMessage（可後續潤飾）；zh-TW 使用 -ZhTwMessage（若省略則同英文）。
+    v0.0.1 在地化產線：編輯 `OdfKit/Compliance/i18n/exceptions.*.json`，
+    再以 eng/Generate-LocalizerExceptionsFromJson.ps1 產生 .cs。
 
 .PARAMETER Key
-    訊息鍵，建議 Err_類別_簡稱／Warn_*／Cli_*／Diag_*。
+    訊息鍵（Err_*／Warn_*／Cli_*／Diag_*／Rule_*）。
 .PARAMETER EnMessage
-    英文訊息（可含 {0} 格式化預留位置）。
+    英文訊息。
 .PARAMETER ZhTwMessage
     正體中文（臺灣）訊息；省略時暫用英文。
 .EXAMPLE
-    pwsh eng/Add-LocalizerKey.ps1 `
-      -Key Err_OdfPackage_Example `
-      -EnMessage "Example failed: {0}." `
-      -ZhTwMessage "範例失敗：{0}。"
-
-.EXAMPLE
-    # 僅預覽（PowerShell 內建 -WhatIf，來自 SupportsShouldProcess）
-    pwsh eng/Add-LocalizerKey.ps1 -Key Err_OdfPackage_Example -EnMessage "x" -WhatIf
+    pwsh eng/Add-LocalizerKey.ps1 -Key Err_Example_Failed -EnMessage "Failed: {0}." -ZhTwMessage "失敗：{0}。"
 #>
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
@@ -36,16 +29,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$complianceDir = Join-Path $repoRoot 'OdfKit/Compliance'
+$i18nDir = Join-Path $repoRoot 'OdfKit/Compliance/i18n'
 $cultures = @('en', 'zh-TW', 'de', 'fr', 'nl', 'nb', 'pt', 'it', 'sk', 'da', 'ms', 'ko')
+$utf8Bom = New-Object System.Text.UTF8Encoding $true
 
 if ([string]::IsNullOrWhiteSpace($ZhTwMessage)) {
     $ZhTwMessage = $EnMessage
-}
-
-function Escape-CsString {
-    param([string]$Value)
-    return $Value.Replace('\', '\\').Replace('"', '\"')
 }
 
 function Get-MessageForCulture {
@@ -57,55 +46,72 @@ function Get-MessageForCulture {
     }
 }
 
-$utf8Bom = New-Object System.Text.UTF8Encoding $true
-$updated = 0
+function Read-OrderedJson {
+    param([string]$Path)
+    $raw = [System.IO.File]::ReadAllText($Path)
+    $obj = $raw | ConvertFrom-Json
+    $map = [ordered]@{}
+    foreach ($prop in $obj.PSObject.Properties) {
+        $map[$prop.Name] = [string]$prop.Value
+    }
+    return $map
+}
 
+function Write-OrderedJson {
+    param(
+        [string]$Path,
+        [System.Collections.Specialized.OrderedDictionary]$Map
+    )
+    $sb = [System.Text.StringBuilder]::new()
+    [void]$sb.AppendLine('{')
+    $keys = @($Map.Keys)
+    for ($i = 0; $i -lt $keys.Count; $i++) {
+        $k = $keys[$i]
+        $kJson = ConvertTo-Json -InputObject $k
+        $vJson = ConvertTo-Json -InputObject ([string]$Map[$k])
+        $comma = if ($i -lt $keys.Count - 1) { ',' } else { '' }
+        [void]$sb.AppendLine("  ${kJson}: ${vJson}${comma}")
+    }
+    [void]$sb.AppendLine('}')
+    [System.IO.File]::WriteAllText($Path, $sb.ToString(), $utf8Bom)
+}
+
+$updated = 0
 foreach ($culture in $cultures) {
-    $path = Join-Path $complianceDir "OdfLocalizer.Exceptions.$culture.cs"
-    if (-not (Test-Path -LiteralPath $path)) {
-        throw "缺少語系檔：$path"
+    $jsonPath = Join-Path $i18nDir "exceptions.$culture.json"
+    if (-not (Test-Path -LiteralPath $jsonPath)) {
+        throw "缺少 JSON：$jsonPath"
     }
 
-    $text = [System.IO.File]::ReadAllText($path)
-    if ($text -match [regex]::Escape("[`"$Key`"]")) {
-        Write-Host "SKIP  $culture（鍵已存在）"
+    $map = Read-OrderedJson -Path $jsonPath
+    if ($map.Contains($Key)) {
+        Write-Host "SKIP  $culture（鍵已存在於 JSON）"
         continue
     }
 
-    $message = Escape-CsString (Get-MessageForCulture -Culture $culture)
-    $entry = "            [`"$Key`"] = `"$message`","
-
-    # 插入於字典初始化區塊結尾（最後一個 ]; 之前的最後一個項目後）
-    # 以 map["culture"] = new(...) { ... }; 結構為準：找最後一個 "], 後接空白與 }; 的近鄰
-    $pattern = '(?ms)(map\["' + [regex]::Escape($culture) + '"\]\s*=\s*new[^{]*\{)(.*?)(\r?\n\s*\};)'
-    $m = [regex]::Match($text, $pattern)
-    if (-not $m.Success) {
-        throw "無法定位 $culture 字典初始化區塊：$path"
-    }
-
-    $body = $m.Groups[2].Value
-    if ($body.TrimEnd() -notmatch ',\s*$') {
-        # 確保前一列以逗號結尾（C# collection initializer 允許最後一項無逗號，但我們統一加）
-        $bodyTrim = $body.TrimEnd()
-        if ($bodyTrim.Length -gt 0 -and -not $bodyTrim.EndsWith(',')) {
-            $body = $bodyTrim + ',' + ($body.Substring($bodyTrim.Length))
-        }
-    }
-
-    $newBody = $body.TrimEnd() + "`r`n" + $entry + "`r`n"
-    $newText = $text.Substring(0, $m.Groups[2].Index) + $newBody + $text.Substring($m.Groups[2].Index + $m.Groups[2].Length)
-
-    if (-not $PSCmdlet.ShouldProcess($path, "Add key $Key")) {
+    if (-not $PSCmdlet.ShouldProcess($jsonPath, "Add key $Key")) {
         Write-Host "SKIP  $culture（-WhatIf 或未確認）"
         continue
     }
 
-    [System.IO.File]::WriteAllText($path, $newText, $utf8Bom)
-    Write-Host "OK    $culture"
+    $map[$Key] = Get-MessageForCulture -Culture $culture
+    Write-OrderedJson -Path $jsonPath -Map $map
+    Write-Host "OK    $culture JSON"
     $updated++
 }
 
-Write-Host ""
-Write-Host "完成：更新 $updated 個語系檔。建議接著執行："
-Write-Host "  pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues"
-Write-Host "  並將非 en／zh-TW 的訊息潤飾為目標語言（目前預設暫用英文）。"
+if ($updated -eq 0) {
+    Write-Host '無 JSON 變更（鍵可能已存在）。'
+    exit 0
+}
+
+if ($PSCmdlet.ShouldProcess('Generate-LocalizerExceptionsFromJson.ps1', 'Regenerate C# dictionaries')) {
+    & (Join-Path $PSScriptRoot 'Generate-LocalizerExceptionsFromJson.ps1')
+    if ($LASTEXITCODE -ne 0) {
+        throw "重產 C# 失敗（exit $LASTEXITCODE）。"
+    }
+}
+
+Write-Host ''
+Write-Host "完成：更新 $updated 個 JSON 並重產 C#。請潤飾非 en／zh-TW 後再提交。"
+Write-Host '  pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues'

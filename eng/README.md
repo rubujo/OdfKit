@@ -41,7 +41,8 @@
 | `Test-BilingualXmlDocs.ps1` | 靜態掃描公開／受保護 API 的雙語 XML 文件覆蓋率；預設 report mode，`-FailOnNewIssues` 會以現行基線阻止新增債務。 |
 | `Test-OneLineXmlSummary.ps1` | 掃描手寫 C# 是否含禁止的一行式 `<summary>`；`-FailOnIssues` 時失敗退出。 |
 | `Test-LocalizerKeyParity.ps1` | 檢查 12 語系 `OdfLocalizer.Exceptions.*.cs` 訊息鍵集合與 `en` 對等；`-FailOnIssues` 時失敗退出。 |
-| `Add-LocalizerKey.ps1` | 於 12 語系例外字典同步新增一則訊息鍵（腳手架；支援 `-WhatIf`）。 |
+| `Add-LocalizerKey.ps1` | 於 12 語系 `i18n/exceptions.*.json` 新增鍵並重產 C#（支援 `-WhatIf`）。 |
+| `Generate-LocalizerExceptionsFromJson.ps1` | 自 JSON 產生 `OdfLocalizer.Exceptions.<culture>.cs`；`-VerifyOnly` 檢查一致性。 |
 | `Test-OoxmlVisualGolden.ps1` | 執行 OOXML 轉換視覺 golden file 驗收。 |
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |

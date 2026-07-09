@@ -11,6 +11,7 @@
   - `Test-MergeConflictMarkers.ps1`
   - `Test-OneLineXmlSummary.ps1 -FailOnIssues`
   - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
+  - `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`（JSON ↔ C# 一致）
   - `dotnet build OdfKit`（`RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers）
 - `test` job 依賴 `maintainability`；`ubuntu-latest` 與 `windows-latest` 都必須執行。
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
