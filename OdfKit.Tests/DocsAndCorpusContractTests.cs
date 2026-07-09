@@ -519,6 +519,22 @@ public class DocsAndCorpusContractTests
         Assert.Contains("Partial", maintainability, StringComparison.Ordinal);
         Assert.Contains("PublicApiAnalyzers", maintainability, StringComparison.Ordinal);
         Assert.Contains("Test-LocalizerKeyParity", maintainability, StringComparison.Ordinal);
+        Assert.Contains("EnablePackageValidation", maintainability, StringComparison.Ordinal);
+
+        string agents = File.ReadAllText(Path.Combine(repoRoot, "AGENTS.md"));
+        string ciYml = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "ci.yml"));
+        string ciCd = File.ReadAllText(Path.Combine(repoRoot, "docs", "ci-cd.md"));
+        string packageProps = File.ReadAllText(Path.Combine(repoRoot, "eng", "OdfKit.Package.props"));
+        string odfKitCsproj = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "OdfKit.csproj"));
+
+        Assert.Contains("PublicApiAnalyzers", agents, StringComparison.Ordinal);
+        Assert.Contains("Test-LocalizerKeyParity", agents, StringComparison.Ordinal);
+        Assert.Contains("EnablePackageValidation", agents, StringComparison.Ordinal);
+        Assert.Contains("maintainability:", ciYml, StringComparison.Ordinal);
+        Assert.Contains("Test-LocalizerKeyParity.ps1", ciYml, StringComparison.Ordinal);
+        Assert.Contains("maintainability", ciCd, StringComparison.Ordinal);
+        Assert.Contains("EnablePackageValidation", packageProps, StringComparison.Ordinal);
+        Assert.Contains("EnablePackageValidation", odfKitCsproj, StringComparison.Ordinal);
         // 歷史 Split 腳本不得再留在 eng/ 根目錄（應在 historical-refactor/）。
         Assert.Empty(
             Directory.EnumerateFiles(Path.Combine(repoRoot, "eng"), "Split-*.ps1", SearchOption.TopDirectoryOnly));

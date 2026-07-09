@@ -72,6 +72,17 @@
 
 產生基線時可設 `ODFKIT_PUBLICAPI_BASELINE=1`，讓 RS0016／RS0017 暫不視為錯誤以便 code fix 寫檔。
 
+### 套件雙 TFM 相容性（Package Validation）
+
+| 項目 | 說明 |
+|------|------|
+| 屬性 | `EnablePackageValidation=true`（`OdfKit.csproj` 與 `eng/OdfKit.Package.props`） |
+| 時機 | `dotnet pack`／`eng/Test-NuGetPack.ps1`／`nuget-pack.yml` |
+| 檢查 | Compatible framework validator 等（netstandard2.0 ↔ net10.0 前向相容） |
+| 文件 | [Package validation overview](https://learn.microsoft.com/dotnet/fundamentals/package-validation/overview) |
+
+與 PublicApiAnalyzers 互補：後者追蹤**逐 TFM 表面變更**；前者確保**多 TFM 套件內**相容。
+
 ## 4. 產生碼（Generated）
 
 | 路徑 | 來源 | 規則 |
@@ -106,6 +117,8 @@
 | 弱 partial 合併 | 合併 `OdfAnimation`；移除空殼 matcher／registry 根檔；合併 `OdfSignatureVerifier.Common` |
 | REVIEW → KEEP | `TemplateBinder`、`OdsStreamReader`、`DrawingDocument`、`OdfTable` 升格 |
 | Public API 基線 | PublicApiAnalyzers 5.6.0 + 雙 TFM Unshipped 基線 |
+| Package Validation | 核心與 Extensions 啟用 `EnablePackageValidation` |
+| CI maintainability job | 合併衝突、一行 summary、鍵值對等、PublicApi 建置 |
 
 ### 建議的後續債
 
@@ -115,6 +128,7 @@
 | 在地化產線 | 自 JSON／resx 產生 `Exceptions.*.cs`（可選） |
 | Schema 套件拆分 | 降低預設 nupkg 體積（產品決策） |
 | 1.0 API 凍結 | Unshipped → Shipped；可選參數多載（RS0026／RS0027）分批收斂 |
+| Baseline version validator | 有穩定 NuGet 發行後啟用 `PackageValidationBaselineVersion` |
 
 ## 7. 相關文件
 

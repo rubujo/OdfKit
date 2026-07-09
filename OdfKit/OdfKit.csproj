@@ -34,6 +34,10 @@
          讓 RS0016/RS0017 暫不視為錯誤以便 code fix 寫入 Unshipped.txt。
          日常 CI 請勿設定；詳見 PublicAPI/README.md 與 eng/Generate-PublicApiBaseline.ps1。 -->
     <WarningsNotAsErrors Condition="'$(ODFKIT_PUBLICAPI_BASELINE)' == '1'">$(WarningsNotAsErrors);RS0016;RS0017</WarningsNotAsErrors>
+    <!-- 業界雙 TFM 套件相容性閘門（.NET Package Validation / ApiCompat）。
+         Pack 時檢查 netstandard2.0 與 net10.0 公開表面是否相容。
+         詳見 docs/maintainability.md 與 learn.microsoft.com package-validation。 -->
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">

@@ -43,7 +43,17 @@
 - 腳本會**暫時**將 `TargetFrameworks` 鎖成單一 TFM 再呼叫 `dotnet format analyzers`，避免多 TFM 只寫入第一個目標。  
 - 產生後請以 `-Verify` 或不帶 BASELINE 的 CI 建置確認通過。
 
+## 與 Package Validation 的關係
+
+| 工具 | 時機 | 重點 |
+|------|------|------|
+| PublicApiAnalyzers | 每次建置 | 是否**有意**新增／移除公開 API（基線 diff） |
+| `EnablePackageValidation` | `dotnet pack` | 多 TFM 套件內 netstandard2.0 ↔ net10.0 **是否前向相容** |
+
+兩者互補，皆為 .NET 函式庫業界黃金標準。詳見 [docs/maintainability.md](../../docs/maintainability.md)。
+
 ## 參考
 
 - [PublicApiAnalyzers.Help.md](https://github.com/dotnet/roslyn-analyzers/blob/main/src/PublicApiAnalyzers/PublicApiAnalyzers.Help.md)  
 - [Adding Optional Parameters in Public API](https://github.com/dotnet/roslyn/blob/main/docs/Adding%20Optional%20Parameters%20in%20Public%20API.md)  
+- [Package validation overview](https://learn.microsoft.com/dotnet/fundamentals/package-validation/overview)  

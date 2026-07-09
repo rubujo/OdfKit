@@ -42,7 +42,7 @@
   - 針對 ZIP 串流解析、XML 讀寫等底層操作，務必進行防禦性異常攔截與資源釋放。
   - 所有拋出的例外訊息一律禁止 Hard-coded 中文或英文。必須統一透過 `OdfLocalizer.GetMessage` 取得在地化錯誤訊息。
   - 當新增錯誤訊息時，其鍵值（Key）命名格式應遵循 `Err_[類別名稱]_[錯誤簡稱]`（以英文駝峰命名，簡述錯誤原因，例如 `Err_ChartDocument_NotHighOrderChart`），以提高人類可讀性與維護性。
-  - 所有錯誤訊息鍵值必須在 `OdfLocalizer.Exceptions.cs` 中註冊，並提供支援的所有語言（`en`, `zh-TW`, `de`, `fr`, `nl`, `nb`, `pt`, `it`, `sk`, `da`, `ms`, `ko`）之翻譯對照。
+  - 所有錯誤訊息鍵值必須在 `OdfLocalizer.Exceptions.<culture>.cs`（12 語系表）註冊，並由 `OdfLocalizer.Exceptions.cs` 入口彙整；鍵值集合必須與 `en` 完全對等（見下方 i18n 閘門）。
   - 翻譯與 XML 註解文字一律使用正體中文臺灣地區用語，並遵守「盤古之白」排版規範（如中文字元與半形英文/數字/符號之間主動加半形空格），且小心檢查句尾標點符號不贅餘。
 - **程式碼排版與格式化**：在提交任何變更前，必須執行安全格式化腳本 `eng/Format-Safe.ps1`，確保其完全符合 `.editorconfig` 規範。
   - **禁止**在方案根目錄直接執行 `dotnet format`（無專案範圍）：`OdfKit.Tests` 為雙 TFM（`net10.0` + `net8.0`），全方案格式化會觸發 IDE multi-target 合併失敗，將 `<<<<<<< TODO: 取消合併專案 …` 標記寫入 `.cs` 並導致 **CS8300**。
@@ -63,14 +63,22 @@
 
 ### C. 效能與記憶體安全
 - **高效流式寫入**：`OdsStreamWriter`／`OdtStreamWriter` 必須採用串流／低常駐設計，避免將整份文件 DOM 常駐記憶體；熱路徑共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`。公開效能敘事以峰值工作集與可重現基準為準（見 `docs/performance-comparison.md`、`docs/performance-baselines.md`），不得再使用未加限定的「小於 1MB」口號。善用 `CommunityToolkit.HighPerformance` 或 `Span<T>` / `ReadOnlySpan<T>` 等低配置 API，並在熱路徑維持輸出正確性與 XML 字元合法性。
-
-### C2. 可維護性（複雜度債）
-- Partial 拆分、在地化字典、產生碼與歷史腳本準則見 [`docs/maintainability.md`](docs/maintainability.md)。
-- 新增例外訊息鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系。
-- 禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本；診斷用 `eng/Analyze-PartialSplits.ps1`。
-- 提交前可執行 `pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues` 防止一行式 `<summary>` 回流。
 - **XXE 與 DoS 防禦**：顯式設定 `XmlReaderSettings`，禁用外部 DTD 解析與 XML 實體展開，以杜絕 XXE 安全漏洞。
 - **Zip Slip 漏洞防禦**：對 ZIP 解壓的目標路徑進行嚴格的合法性檢查，防止目錄穿越攻擊。
+
+### C2. 可維護性（複雜度債）
+完整準則見 [`docs/maintainability.md`](docs/maintainability.md)。Agent 必須遵守：
+- **Partial**：禁止機械切檔；診斷用 `eng/Analyze-PartialSplits.ps1`；禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本。
+- **在地化**：新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系；提交前執行 `pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`。
+- **公開 API 表面**（業界黃金標準，`Microsoft.CodeAnalysis.PublicApiAnalyzers`）：
+  - 核心套件以雙 TFM 基線追蹤：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
+  - **0.x** 期間新增／變更的公開 API 登錄於 **Unshipped**；**1.0** 發佈時再整批移入 Shipped。
+  - 變更公開表面後必須更新對應 TFM 的基線，或執行 `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify`。
+  - RS0016／RS0017 為 error；RS0026／RS0027（可選參數多載設計）為 suggestion（既有表面 grandfather，新 API 仍應優先採單一最長可選參數多載）。
+  - 說明見 [`OdfKit/PublicAPI/README.md`](OdfKit/PublicAPI/README.md)。
+- **套件雙 TFM 相容性**（.NET Package Validation／ApiCompat）：可發佈套件已啟用 `EnablePackageValidation`；`dotnet pack`／`eng/Test-NuGetPack.ps1` 會檢查各 TFM 公開表面前向相容。若故意讓某 TFM 多出 API，須以官方 suppress 檔或條件編譯明確記錄理由，不得靜默關閉驗證。
+- **XML 摘要**：提交前可執行 `pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues` 防止一行式 `<summary>` 回流。
+- **產生碼**：`OdfKit/DOM/Generated` 與 schema provider `.g.cs` 不可手改；schema 重產後若公開表面變動，須重跑 Public API 基線腳本。
 
 ### D. Git 提交規範 (Conventional Commits)
 - **規範標準**：嚴格遵循「慣例式提交 (Conventional Commits) v1.0.0」規範。
@@ -106,6 +114,22 @@
 - **稽核提交簽署金鑰**：
   ```powershell
   pwsh eng/Test-GpgSignatures.ps1
+  ```
+- **語系鍵值對等**（新增 Err／Warn／Cli 鍵後必跑）：
+  ```powershell
+  pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
+  ```
+- **一行式 summary 閘門**：
+  ```powershell
+  pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+  ```
+- **重產公開 API 基線**（大量表面變更或 schema 重產後）：
+  ```powershell
+  pwsh eng/Generate-PublicApiBaseline.ps1 -Verify
+  ```
+- **NuGet 封裝與雙 TFM 相容性**（含 Package Validation）：
+  ```powershell
+  pwsh eng/Test-NuGetPack.ps1
   ```
 - **測試套件分層與整理準則**：以 `TestCategories` trait、CI workflow 與對應測試檔為準。
 - **臨時計畫檔邊界**：任何 `*plan*.md` 或名稱含「計畫」的整理檔都只能作為短期工作暫存，不得被 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 或其它 Agent 規範引用為長期規則來源；完成後應移除。

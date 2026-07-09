@@ -13,5 +13,9 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Version>0.0.1</Version>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <!-- 業界雙 TFM 套件相容性閘門（.NET Package Validation / ApiCompat）：
+         Pack 時檢查各 TFM 公開表面是否前向相容，避免 netstandard2.0 消費者
+         無法對齊 net10.0 實作。詳見 docs/maintainability.md。 -->
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 </Project>

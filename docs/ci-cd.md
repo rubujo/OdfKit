@@ -7,7 +7,12 @@
 
 `.github/workflows/ci.yml` 是每次程式碼變更的快速回歸入口。
 
-- `ubuntu-latest` 與 `windows-latest` 都必須執行。
+- **`maintainability` job**（先跑、ubuntu）：靜態閘門，失敗則不啟動完整測試矩陣。
+  - `Test-MergeConflictMarkers.ps1`
+  - `Test-OneLineXmlSummary.ps1 -FailOnIssues`
+  - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
+  - `dotnet build OdfKit`（`RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers）
+- `test` job 依賴 `maintainability`；`ubuntu-latest` 與 `windows-latest` 都必須執行。
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
 - `net8.0` 與 `net10.0` 都必須執行 `Category=Smoke`，避免只有較新 TFM 有測試證據。
 - 建置與測試分成不同步驟；煙霧測試再依 docs、api、package-entries、
@@ -16,6 +21,7 @@
   分成不同步驟，避免單一 testhost 長時間承載整批測試時難以定位停滯。
 - 測試步驟有較短逾時，避免整個 job 黑箱卡到總逾時。
 - 測試輸出 TRX 與 blame 診斷檔，並以產物上傳。
+- 雙 TFM 套件相容性（`EnablePackageValidation`）由 `nuget-pack.yml`／`Test-NuGetPack.ps1` 在 pack 時把關。
 
 Windows 與 `net10.0` 曾在單一 `Category=Smoke` 批次或單一
 `PackageRoundTripTests` 批次中留下 `OdfKit.Tests.exe` 測試子行程，即使個別測試單跑可通過，

@@ -31,8 +31,44 @@ permissions:
   contents: read
 
 jobs:
+  # 靜態可維護性閘門：不依賴完整測試矩陣，失敗可快速回饋（業界 CI 慣例：fail-fast gates）。
+  maintainability:
+    name: Maintainability gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+
+      - name: Merge conflict markers
+        shell: pwsh
+        run: ./eng/Test-MergeConflictMarkers.ps1
+
+      - name: One-line XML summary ban
+        shell: pwsh
+        run: ./eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+
+      - name: Localizer key parity (12 cultures)
+        shell: pwsh
+        run: ./eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
+
+      - name: PublicApi analyzers (OdfKit dual TFM)
+        shell: pwsh
+        env:
+          CI: true
+        run: |
+          # 驗證 RS0016/RS0017 基線與雙 TFM 建置在 TreatWarningsAsErrors 下通過。
+          dotnet build OdfKit/OdfKit.csproj -c Release --nologo /p:RunAnalyzersDuringBuild=true
+
   test:
     name: Build & Test (${{ matrix.os }} - ${{ matrix.framework }})
+    needs: maintainability
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
