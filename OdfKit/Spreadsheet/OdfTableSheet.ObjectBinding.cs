@@ -14,6 +14,12 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingReport WriteObjects<T>(OdfCellAddress startAddress, IEnumerable<T> items) => WriteObjects(startAddress, items, null);
+
+    /// <summary>
     /// Writes public readable object properties into this worksheet.
     /// 將物件的可讀公開屬性寫入此工作表。
     /// </summary>
@@ -22,10 +28,7 @@ public partial class OdfTableSheet
     /// <param name="items">The object sequence to write. / 要寫入的物件序列。</param>
     /// <param name="options">The object binding options. / 物件繫結選項。</param>
     /// <returns>The object binding report. / 物件繫結報告。</returns>
-    public OdfObjectBindingReport WriteObjects<T>(
-        OdfCellAddress startAddress,
-        IEnumerable<T> items,
-        OdfObjectBindingOptions? options = null)
+    public OdfObjectBindingReport WriteObjects<T>(OdfCellAddress startAddress, IEnumerable<T> items, OdfObjectBindingOptions? options)
     {
         if (items is null)
         {
@@ -46,6 +49,13 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingReport AppendObjects<T>(IEnumerable<T> items) => AppendObjects(items, null);
+
+
+    /// <summary>
     /// Appends public readable object properties after the worksheet used range.
     /// 將物件的可讀公開屬性附加到工作表已使用範圍之後。
     /// </summary>
@@ -53,9 +63,7 @@ public partial class OdfTableSheet
     /// <param name="items">The object sequence to append. / 要附加的物件序列。</param>
     /// <param name="options">The object binding options. / 物件繫結選項。</param>
     /// <returns>The object binding report. / 物件繫結報告。</returns>
-    public OdfObjectBindingReport AppendObjects<T>(
-        IEnumerable<T> items,
-        OdfObjectBindingOptions? options = null)
+    public OdfObjectBindingReport AppendObjects<T>(IEnumerable<T> items, OdfObjectBindingOptions? options)
     {
         if (items is null)
         {
@@ -73,6 +81,13 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyList<T> ReadObjects<T>(OdfCellRange range) where T : new() => ReadObjects<T>(range, null);
+
+
+    /// <summary>
     /// Reads worksheet rows into objects using the header row as the property map.
     /// 使用標題列作為屬性對應，將工作表資料列讀成物件。
     /// </summary>
@@ -80,8 +95,7 @@ public partial class OdfTableSheet
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The object read options. / 物件讀取選項。</param>
     /// <returns>The materialized object list. / 具體化後的物件清單。</returns>
-    public IReadOnlyList<T> ReadObjects<T>(OdfCellRange range, OdfObjectReadOptions? options = null)
-        where T : new()
+    public IReadOnlyList<T> ReadObjects<T>(OdfCellRange range, OdfObjectReadOptions? options) where T : new()
     {
         options ??= new OdfObjectReadOptions();
         CultureInfo culture = options.CultureInfo ?? CultureInfo.InvariantCulture;
@@ -162,6 +176,13 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(OdfCellRange range) where T : new() => ValidateObjectBinding<T>(range, null);
+
+
+    /// <summary>
     /// Validates whether a spreadsheet range can be bound to the specified object type.
     /// 驗證試算表範圍是否可繫結至指定物件型別。
     /// </summary>
@@ -169,10 +190,7 @@ public partial class OdfTableSheet
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The validation options. / 驗證選項。</param>
     /// <returns>The validation report. / 驗證報告。</returns>
-    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(
-        OdfCellRange range,
-        OdfObjectReadOptions? options = null)
-        where T : new()
+    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(OdfCellRange range, OdfObjectReadOptions? options) where T : new()
     {
         options ??= new OdfObjectReadOptions();
         IReadOnlyList<OdfObjectColumn> columns = OdfObjectBindingEngine.GetWritableColumns<T>(options);
@@ -202,6 +220,7 @@ public partial class OdfTableSheet
         ValidateDataRows(layout, mappedColumns, options, report.Diagnostics);
         return report;
     }
+
 
     /// <summary>
     /// Updates existing object-bound rows by key without inserting new rows.

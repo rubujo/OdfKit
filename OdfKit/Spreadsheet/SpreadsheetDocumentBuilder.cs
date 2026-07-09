@@ -297,6 +297,18 @@ public sealed class OdfSheetBuilder
 
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSheetBuilder ImportRows<T>(IEnumerable<T> items, Func<T, object?[]> selector) => ImportRows(items, selector, 1, 1);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSheetBuilder ImportRows<T>(IEnumerable<T> items, Func<T, object?[]> selector, int startRow) => ImportRows(items, selector, startRow, 1);
+
 
     /// <summary>
     /// Imports row data.
@@ -308,11 +320,7 @@ public sealed class OdfSheetBuilder
     /// <param name="startRow">The numeric value. / 起始列，採 1 為基準</param>
     /// <param name="startColumn">The numeric value. / 起始欄，採 1 為基準</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder ImportRows<T>(
-        IEnumerable<T> items,
-        Func<T, object?[]> selector,
-        int startRow = 1,
-        int startColumn = 1)
+    public OdfSheetBuilder ImportRows<T>(IEnumerable<T> items, Func<T, object?[]> selector, int startRow, int startColumn)
     {
         if (items is null)
             throw new ArgumentNullException(nameof(items));
@@ -340,6 +348,19 @@ public sealed class OdfSheetBuilder
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSheetBuilder ImportTable<T>(IEnumerable<T> items, Func<T, object?[]> rowSelector, IEnumerable<string> headers) => ImportTable(items, rowSelector, headers, 1, 1);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSheetBuilder ImportTable<T>(IEnumerable<T> items, Func<T, object?[]> rowSelector, IEnumerable<string> headers, int startRow) => ImportTable(items, rowSelector, headers, startRow, 1);
+
+
+    /// <summary>
     /// Imports a table with a header row.
     /// 匯入含標題列的資料表。
     /// </summary>
@@ -350,12 +371,7 @@ public sealed class OdfSheetBuilder
     /// <param name="startRow">The numeric value. / 標題列起始列，採 1 為基準</param>
     /// <param name="startColumn">The numeric value. / 標題列起始欄，採 1 為基準</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder ImportTable<T>(
-        IEnumerable<T> items,
-        Func<T, object?[]> rowSelector,
-        IEnumerable<string> headers,
-        int startRow = 1,
-        int startColumn = 1)
+    public OdfSheetBuilder ImportTable<T>(IEnumerable<T> items, Func<T, object?[]> rowSelector, IEnumerable<string> headers, int startRow, int startColumn)
     {
         if (headers is null)
             throw new ArgumentNullException(nameof(headers));
@@ -373,6 +389,7 @@ public sealed class OdfSheetBuilder
 
         return ImportRows(items, rowSelector, startRow + 1, startColumn);
     }
+
 
     private void ApplyHeaderStyle(OdfCell cell)
     {

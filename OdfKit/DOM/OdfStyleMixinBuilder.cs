@@ -193,6 +193,12 @@ public sealed class OdfStyleMixinBuilder
 public static class OdfStyleMixinExtensions
 {
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static TElement ApplyStyle<TElement>(this TElement element, Action<OdfStyleMixinBuilder> configure) where TElement : OdfElement => ApplyStyle(element, configure, null);
+
+    /// <summary>
     /// Applies style.
     /// 對指定 typed DOM 元素套用 Fluent 樣式混合設定。
     /// </summary>
@@ -202,11 +208,7 @@ public static class OdfStyleMixinExtensions
     /// <param name="family">選用的 ODF 樣式家族；未指定時依元素推斷</param>
     /// <returns>原始元素，供鏈式呼叫使用</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="element"/> 或 <paramref name="configure"/> 為 <see langword="null"/> 時擲出</exception>
-    public static TElement ApplyStyle<TElement>(
-        this TElement element,
-        Action<OdfStyleMixinBuilder> configure,
-        string? family = null)
-        where TElement : OdfElement
+    public static TElement ApplyStyle<TElement>(this TElement element, Action<OdfStyleMixinBuilder> configure, string? family) where TElement : OdfElement
     {
         if (element is null)
         {
@@ -226,6 +228,13 @@ public static class OdfStyleMixinExtensions
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static TElement ConfigureStyle<TElement>(this TElement element, Action<OdfStyleMixinBuilder> configure) where TElement : OdfElement => ConfigureStyle(element, configure, null);
+
+
+    /// <summary>
     /// Performs configure style.
     /// 對指定 typed DOM 元素設定自動樣式。
     /// </summary>
@@ -239,14 +248,17 @@ public static class OdfStyleMixinExtensions
     /// 此方法是 <see cref="ApplyStyle{TElement}(TElement, Action{OdfStyleMixinBuilder}, string?)"/>
     /// 的計畫名入口，讓呼叫端可使用 <c>element.ConfigureStyle(...)</c> 設定享元自動樣式。
     /// </remarks>
-    public static TElement ConfigureStyle<TElement>(
-        this TElement element,
-        Action<OdfStyleMixinBuilder> configure,
-        string? family = null)
-        where TElement : OdfElement
+    public static TElement ConfigureStyle<TElement>(this TElement element, Action<OdfStyleMixinBuilder> configure, string? family) where TElement : OdfElement
     {
         return element.ApplyStyle(configure, family);
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static TElement CopyFormatFrom<TElement>(this TElement element, OdfElement source) where TElement : OdfElement => CopyFormatFrom(element, source, null);
+
 
     /// <summary>
     /// Copies format from.
@@ -263,11 +275,7 @@ public static class OdfStyleMixinExtensions
     /// <see cref="ConfigureStyle{TElement}(TElement, Action{OdfStyleMixinBuilder}, string?)"/>，
     /// 現有局部樣式管線會以該樣式作為父樣式建立新的自動樣式，避免修改來源元素。
     /// </remarks>
-    public static TElement CopyFormatFrom<TElement>(
-        this TElement element,
-        OdfElement source,
-        string? family = null)
-        where TElement : OdfElement
+    public static TElement CopyFormatFrom<TElement>(this TElement element, OdfElement source, string? family) where TElement : OdfElement
     {
         if (element is null)
         {
@@ -303,6 +311,7 @@ public static class OdfStyleMixinExtensions
         element.InvalidateStyle();
         return element;
     }
+
 
     private static string GetStyleAttributeNamespace(string family)
         => family switch

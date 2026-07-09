@@ -268,6 +268,67 @@ internal static class TextDocumentSearchReplaceEngine
         }
     }
 
+    /// <summary>
+    /// 依原始串接文字中的位置，由後向前套用多個互不重疊的替換，並保留未命中區段的節點結構。
+    /// </summary>
+    /// <param name="elementNode">包含文字子節點的元素。</param>
+    /// <param name="replacements">依起始位置遞增排列且互不重疊的替換。</param>
+    internal static void ReplaceTextRanges(
+        OdfNode elementNode,
+        IReadOnlyList<TextReplacement> replacements)
+    {
+        if (replacements.Count == 0)
+        {
+            return;
+        }
+
+        List<TextNodeSlice> slices = CollectTextNodeSlices(elementNode);
+        for (int replacementIndex = replacements.Count - 1; replacementIndex >= 0; replacementIndex--)
+        {
+            TextReplacement replacement = replacements[replacementIndex];
+            if (replacement.Length <= 0)
+            {
+                continue;
+            }
+
+            int endExclusive = replacement.Start + replacement.Length;
+            int startSliceIndex = FindSliceIndex(slices, replacement.Start);
+            int endSliceIndex = FindSliceIndex(slices, endExclusive - 1);
+            if (startSliceIndex < 0 || endSliceIndex < 0)
+            {
+                continue;
+            }
+
+            TextNodeSlice startSlice = slices[startSliceIndex];
+            TextNodeSlice endSlice = slices[endSliceIndex];
+            int startOffset = replacement.Start - startSlice.Start;
+            int endOffsetExclusive = endExclusive - endSlice.Start;
+            string startText = startSlice.Node.TextContent;
+            string endText = endSlice.Node.TextContent;
+            string prefix = startText.Substring(0, startOffset);
+            string suffix = endText.Substring(endOffsetExclusive);
+
+            if (startSlice.Node == endSlice.Node)
+            {
+                startSlice.Node.TextContent = prefix + replacement.Value + suffix;
+                continue;
+            }
+
+            startSlice.Node.TextContent = prefix + replacement.Value;
+            for (int removeIndex = startSliceIndex + 1; removeIndex <= endSliceIndex; removeIndex++)
+            {
+                OdfNode removeNode = slices[removeIndex].Node;
+                if (removeNode == endSlice.Node && suffix.Length > 0)
+                {
+                    removeNode.TextContent = suffix;
+                    continue;
+                }
+
+                removeNode.Parent?.RemoveChild(removeNode);
+            }
+        }
+    }
+
     private static int FindSliceIndex(IReadOnlyList<TextNodeSlice> slices, int position)
     {
         for (int i = 0; i < slices.Count; i++)
@@ -318,5 +379,20 @@ internal static class TextDocumentSearchReplaceEngine
         public string Text { get; } = text;
 
         public int Start { get; } = start;
+    }
+
+    /// <summary>
+    /// 描述串接文字中的單一位置替換。
+    /// </summary>
+    /// <param name="start">替換起始位置。</param>
+    /// <param name="length">要移除的原始文字長度。</param>
+    /// <param name="value">替換文字。</param>
+    internal readonly struct TextReplacement(int start, int length, string value)
+    {
+        internal int Start { get; } = start;
+
+        internal int Length { get; } = length;
+
+        internal string Value { get; } = value;
     }
 }

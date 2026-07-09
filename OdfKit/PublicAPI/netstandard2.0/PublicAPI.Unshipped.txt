@@ -15963,8 +15963,12 @@ OdfKit.Spreadsheet.OdfSheetBuilder.AddPivotTable(OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.OdfSheetBuilder.AddPivotTable(string! name, OdfKit.Spreadsheet.OdfCellRange sourceRange, OdfKit.Spreadsheet.OdfCellAddress targetCell, System.Action<OdfKit.Spreadsheet.OdfPivotTableBuilder!>! configure) -> OdfKit.Spreadsheet.OdfSheetBuilder!
 OdfKit.Spreadsheet.OdfSheetBuilder.AddPivotTable(string! name, string! sourceRange, string! targetCell, System.Action<OdfKit.Spreadsheet.OdfPivotTableBuilder!>! configure) -> OdfKit.Spreadsheet.OdfSheetBuilder!
 OdfKit.Spreadsheet.OdfSheetBuilder.FreezeAt(int row, int column) -> OdfKit.Spreadsheet.OdfSheetBuilder!
-OdfKit.Spreadsheet.OdfSheetBuilder.ImportRows<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! selector, int startRow = 1, int startColumn = 1) -> OdfKit.Spreadsheet.OdfSheetBuilder!
-OdfKit.Spreadsheet.OdfSheetBuilder.ImportTable<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! rowSelector, System.Collections.Generic.IEnumerable<string!>! headers, int startRow = 1, int startColumn = 1) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportRows<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! selector) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportRows<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! selector, int startRow) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportRows<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! selector, int startRow, int startColumn) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportTable<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! rowSelector, System.Collections.Generic.IEnumerable<string!>! headers) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportTable<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! rowSelector, System.Collections.Generic.IEnumerable<string!>! headers, int startRow) -> OdfKit.Spreadsheet.OdfSheetBuilder!
+OdfKit.Spreadsheet.OdfSheetBuilder.ImportTable<T>(System.Collections.Generic.IEnumerable<T>! items, System.Func<T, object?[]!>! rowSelector, System.Collections.Generic.IEnumerable<string!>! headers, int startRow, int startColumn) -> OdfKit.Spreadsheet.OdfSheetBuilder!
 OdfKit.Spreadsheet.OdfSheetBuilder.InsertChart(OdfKit.Spreadsheet.OdfCellRange dataRange, OdfKit.Spreadsheet.OdfChartType chartType) -> OdfKit.Spreadsheet.OdfSheetBuilder!
 OdfKit.Spreadsheet.OdfSheetBuilder.InsertChart(OdfKit.Spreadsheet.OdfCellRange dataRange, OdfKit.Spreadsheet.OdfChartType chartType, System.Action<OdfKit.Chart.OdfChartDocument!>? configure) -> OdfKit.Spreadsheet.OdfSheetBuilder!
 OdfKit.Spreadsheet.OdfSheetBuilder.InsertChart(string! dataRange, OdfKit.Spreadsheet.OdfChartType chartType) -> OdfKit.Spreadsheet.OdfSheetBuilder!
@@ -16132,7 +16136,8 @@ OdfKit.Spreadsheet.OdfTableSheet.AddNamedRange(string! name, OdfKit.Spreadsheet.
 OdfKit.Spreadsheet.OdfTableSheet.AddSparklineGroup(OdfKit.Spreadsheet.OdfCellRange? dataRange, OdfKit.Spreadsheet.OdfCellAddress hostCell) -> void
 OdfKit.Spreadsheet.OdfTableSheet.AddSparklineGroup(OdfKit.Spreadsheet.OdfCellRange? dataRange, OdfKit.Spreadsheet.OdfCellAddress hostCell, OdfKit.Spreadsheet.SparklineType type) -> void
 OdfKit.Spreadsheet.OdfTableSheet.AddValidationList(OdfKit.Spreadsheet.OdfCellRange range, string! name, params string![]! allowedValues) -> void
-OdfKit.Spreadsheet.OdfTableSheet.AppendObjects<T>(System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.OdfTableSheet.AppendObjects<T>(System.Collections.Generic.IEnumerable<T>! items) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.OdfTableSheet.AppendObjects<T>(System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.OdfTableSheet.AppendRows(System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows) -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.OdfTableSheet.AppendRows(System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows, int startColumn) -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.OdfTableSheet.AppendRows(System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows, int startColumn, OdfKit.Spreadsheet.OdfRangeWriteOptions? options) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
@@ -16202,7 +16207,8 @@ OdfKit.Spreadsheet.OdfTableSheet.Protect(string! password) -> void
 OdfKit.Spreadsheet.OdfTableSheet.PruneAndCollect() -> int
 OdfKit.Spreadsheet.OdfTableSheet.PruneAndCollect(bool collectGarbage) -> int
 OdfKit.Spreadsheet.OdfTableSheet.Ranges.get -> OdfKit.Spreadsheet.OdfRangeCollection!
-OdfKit.Spreadsheet.OdfTableSheet.ReadObjects<T>(OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options = null) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.OdfTableSheet.ReadObjects<T>(OdfKit.Spreadsheet.OdfCellRange range) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.OdfTableSheet.ReadObjects<T>(OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.OdfTableSheet.ReleaseFacadeCaches() -> void
 OdfKit.Spreadsheet.OdfTableSheet.RemoveColumnPageBreak(int afterCol) -> bool
 OdfKit.Spreadsheet.OdfTableSheet.RemoveRowPageBreak(int afterRow) -> bool
@@ -16245,12 +16251,14 @@ OdfKit.Spreadsheet.OdfTableSheet.UpdateRows(OdfKit.Spreadsheet.OdfCellRange rang
 OdfKit.Spreadsheet.OdfTableSheet.UpdateRows(OdfKit.Spreadsheet.OdfCellRange range, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows, OdfKit.Spreadsheet.OdfRangeWriteOptions? options) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
 OdfKit.Spreadsheet.OdfTableSheet.UpsertObjects<T>(OdfKit.Spreadsheet.OdfCellRange range, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectUpdateOptions! options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.OdfTableSheet.UsedCells.get -> System.Collections.Generic.IEnumerable<OdfKit.Spreadsheet.OdfCell!>!
-OdfKit.Spreadsheet.OdfTableSheet.ValidateObjectBinding<T>(OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
+OdfKit.Spreadsheet.OdfTableSheet.ValidateObjectBinding<T>(OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
+OdfKit.Spreadsheet.OdfTableSheet.ValidateObjectBinding<T>(OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
 OdfKit.Spreadsheet.OdfTableSheet.VerifyPassword(string! password) -> bool
 OdfKit.Spreadsheet.OdfTableSheet.ViewSplitPanes.get -> OdfKit.Spreadsheet.OdfSplitPanes
 OdfKit.Spreadsheet.OdfTableSheet.Visible.get -> bool
 OdfKit.Spreadsheet.OdfTableSheet.Visible.set -> void
-OdfKit.Spreadsheet.OdfTableSheet.WriteObjects<T>(OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.OdfTableSheet.WriteObjects<T>(OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.OdfTableSheet.WriteObjects<T>(OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.OdfTableSheet.WritingMode.get -> OdfKit.Styles.OdfWritingMode
 OdfKit.Spreadsheet.OdfTableSheet.WritingMode.set -> void
 OdfKit.Spreadsheet.OdfValidationAlertStyle
@@ -16363,7 +16371,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.AddNamedRange(string! name, OdfKit.Spread
 OdfKit.Spreadsheet.SpreadsheetDocument.AddSheet(string! name) -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.SpreadsheetDocument.AdoptSheet(OdfKit.Spreadsheet.OdfTableSheet! sheet) -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.SpreadsheetDocument.AdoptSheet(OdfKit.Spreadsheet.OdfTableSheet! sheet, string? newName) -> OdfKit.Spreadsheet.OdfTableSheet!
-OdfKit.Spreadsheet.SpreadsheetDocument.AppendObjects<T>(string! sheetName, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.AppendObjects<T>(string! sheetName, System.Collections.Generic.IEnumerable<T>! items) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.AppendObjects<T>(string! sheetName, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.AppendRows(string! sheetName, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows) -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.SpreadsheetDocument.AppendRows(string! sheetName, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows, int startColumn) -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.SpreadsheetDocument.AppendRows(string! sheetName, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows, int startColumn, OdfKit.Spreadsheet.OdfRangeWriteOptions? options) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
@@ -16400,7 +16409,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.GetUsedRange(string! sheetName) -> OdfKit
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfEmbeddedChartOptions? options) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.ProtectWorkbook(string! password) -> void
-OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options = null) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel) -> OdfKit.Chart.OdfChartDocument!
@@ -16423,11 +16433,13 @@ OdfKit.Spreadsheet.SpreadsheetDocument.UpdateEmbeddedChartSeries(OdfKit.Chart.Od
 OdfKit.Spreadsheet.SpreadsheetDocument.UpdateFormulas(System.Func<OdfKit.Spreadsheet.OdfFormulaCellInfo!, string?>! updater) -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.UpdateObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectUpdateOptions! options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.UpsertObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectUpdateOptions! options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
-OdfKit.Spreadsheet.SpreadsheetDocument.ValidateObjectBinding<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.ValidateObjectBinding<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.ValidateObjectBinding<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingValidationReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.VerifyWorkbookPassword(string! password) -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.WorkbookStructureProtected.get -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.Worksheets.get -> OdfKit.Spreadsheet.OdfWorksheetCollection!
-OdfKit.Spreadsheet.SpreadsheetDocument.WriteObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options = null) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.WriteObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.WriteObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.SpreadsheetDocumentBuilder
 OdfKit.Spreadsheet.SpreadsheetDocumentBuilder.AddSheet(string! name, System.Action<OdfKit.Spreadsheet.OdfSheetBuilder!>! configure) -> OdfKit.Spreadsheet.SpreadsheetDocumentBuilder!
 OdfKit.Spreadsheet.SpreadsheetDocumentBuilder.Build() -> OdfKit.Spreadsheet.SpreadsheetDocument!
@@ -18417,9 +18429,12 @@ static OdfKit.DOM.OdfPresentationTransitionType.SemiAutomatic.get -> OdfKit.DOM.
 static OdfKit.DOM.OdfScriptCode.operator !=(OdfKit.DOM.OdfScriptCode left, OdfKit.DOM.OdfScriptCode right) -> bool
 static OdfKit.DOM.OdfScriptCode.operator ==(OdfKit.DOM.OdfScriptCode left, OdfKit.DOM.OdfScriptCode right) -> bool
 static OdfKit.DOM.OdfScriptCode.TryParse(string? value, out OdfKit.DOM.OdfScriptCode scriptCode) -> bool
-static OdfKit.DOM.OdfStyleMixinExtensions.ApplyStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure, string? family = null) -> TElement!
-static OdfKit.DOM.OdfStyleMixinExtensions.ConfigureStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure, string? family = null) -> TElement!
-static OdfKit.DOM.OdfStyleMixinExtensions.CopyFormatFrom<TElement>(this TElement! element, OdfKit.DOM.OdfElement! source, string? family = null) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.ApplyStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.ApplyStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure, string? family) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.ConfigureStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.ConfigureStyle<TElement>(this TElement! element, System.Action<OdfKit.DOM.OdfStyleMixinBuilder!>! configure, string? family) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.CopyFormatFrom<TElement>(this TElement! element, OdfKit.DOM.OdfElement! source) -> TElement!
+static OdfKit.DOM.OdfStyleMixinExtensions.CopyFormatFrom<TElement>(this TElement! element, OdfKit.DOM.OdfElement! source, string? family) -> TElement!
 static OdfKit.DOM.OdfStyleName.operator !=(OdfKit.DOM.OdfStyleName left, OdfKit.DOM.OdfStyleName right) -> bool
 static OdfKit.DOM.OdfStyleName.operator ==(OdfKit.DOM.OdfStyleName left, OdfKit.DOM.OdfStyleName right) -> bool
 static OdfKit.DOM.OdfStyleName.TryParse(string? value, out OdfKit.DOM.OdfStyleName styleName) -> bool

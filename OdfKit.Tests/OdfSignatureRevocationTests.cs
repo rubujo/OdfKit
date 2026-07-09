@@ -360,6 +360,35 @@ public class OdfSignatureRevocationTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => verifyTask);
     }
 
+    /// <summary>
+    /// 驗證只有單一 CRL 分發點時，下載期間的外部取消仍會直接向呼叫端傳遞。
+    /// </summary>
+    [Fact]
+    public async Task ExternalCancellation_DuringSingleDownload_PropagatesOperationCanceledException()
+    {
+        byte[] cdp = BuildCdpExtension("http://crl.example.test/slow-only.crl");
+        var (root, leaf) = GenerateCertificateChain("RevRootSingle", "RevLeafSingle", cdp);
+        using var rootCert = root;
+        using var leafCert = leaf;
+
+        var handler = new MockHttpMessageHandler(async (_, ct) =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(30), ct);
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+        });
+        using var httpClient = new HttpClient(handler);
+        var options = new OdfSigningOptions { CheckRevocation = true, HttpClient = httpClient };
+        var singleResult = new OdfSingleSignatureValidationResult { IsRevocationValid = true };
+        var chainCerts = new List<X509Certificate2> { leafCert, rootCert };
+
+        using var cts = new CancellationTokenSource();
+        Task<bool> verifyTask = InvokeVerifyRevocationStatusAsync(
+            chainCerts, new List<byte[]>(), options, singleResult, cts.Token);
+        cts.CancelAfter(TimeSpan.FromMilliseconds(100));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => verifyTask);
+    }
+
     #endregion
 
     #region OdfSignatureCrlUtilities 直接單元測試

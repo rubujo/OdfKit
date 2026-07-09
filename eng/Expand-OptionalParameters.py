@@ -24,8 +24,9 @@ METHOD_HEADER_RE = re.compile(
     r"(?:public|protected)\s+"
     r"(?:(?:new|static|virtual|override|async|sealed|partial|unsafe|extern|abstract)\s+)*"
     r"(?:[\w.<>\[\]?, \n\r]+?\s+)?"
-    r"(?P<name>~?[\w]+)\s*"
+    r"(?P<name>~?[\w]+)(?P<type_params>\s*<[^>{}()]+>)?\s*"
     r"\((?P<params>(?:[^()\"']|\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|\([^()]*\))*)\)\s*"
+    r"(?:where\s+\w+\s*:\s*[^\{=]+?\s*)*"
     r"(?::\s*(?:base|this)\s*\((?:[^()\"']|\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|\([^()]*\))*\)\s*)?"
     r")"
     r"(?P<body_start>\{|=>)",
@@ -377,14 +378,30 @@ def rebuild_expansion(
     # (0.x has no published API compatibility requirement).
     if len(optional) < 1:
         return None
-    m = re.search(rf"\b{re.escape(name)}\s*\(", header)
+    m = re.search(
+        rf"\b{re.escape(name)}(?P<type_params>\s*<[^>{{}}()]+>)?\s*\(",
+        header,
+    )
     if not m:
         return None
-    end_paren = header.rfind(")")
+    type_params = m.group("type_params") or ""
+    start_paren = header.find("(", m.start())
+    depth = 0
+    end_paren = -1
+    for index in range(start_paren, len(header)):
+        if header[index] == "(":
+            depth += 1
+        elif header[index] == ")":
+            depth -= 1
+            if depth == 0:
+                end_paren = index
+                break
+    if end_paren < 0:
+        return None
     pre = header[: m.start()]
     post = header[end_paren + 1 :]
     full_params = ", ".join(p.without_default for p in params)
-    full_header = f"{pre}{name}({full_params}){post}".rstrip()
+    full_header = f"{pre}{name}{type_params}({full_params}){post}".rstrip()
     is_ctor = is_constructor_header(header, name)
     # Constructors with : base(...) / : this(...) already — only expand if post is empty or we keep post on full only
     if is_ctor and re.search(r":\s*(base|this)\s*\(", post):
@@ -401,7 +418,7 @@ def rebuild_expansion(
         plist = ", ".join(p.without_default for p in take)
         # short ctors never re-attach : base/this from the long form
         short_post = "" if is_ctor else post
-        short_header = oneline(f"{pre}{name}({plist}){short_post}")
+        short_header = oneline(f"{pre}{name}{type_params}({plist}){short_post}")
         # override on short overload is invalid when base only declares the long form
         short_header = strip_override_from_short(short_header)
         short_header = strip_async_from_short(short_header)
@@ -425,7 +442,7 @@ def rebuild_expansion(
                 f"{indent}/// Convenience overload that uses default values for remaining parameters.\n"
                 f"{indent}/// 便利多載：其餘參數使用預設值並轉呼叫最長多載。\n"
                 f"{indent}/// </summary>\n"
-                f"{indent}{short_header} => {name}({forward});\n"
+                f"{indent}{short_header} => {name}{type_params}({forward});\n"
                 f"\n"
             )
 

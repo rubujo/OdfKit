@@ -147,6 +147,7 @@ internal static partial class OdfSignatureVerifier
                         try
                         {
                             (byte[]? bytes, Exception? error) = await downloadTasks[i].ConfigureAwait(false);
+                            cancellationToken.ThrowIfCancellationRequested();
                             if (error != null)
                             {
                                 throw error;
@@ -175,6 +176,10 @@ internal static partial class OdfSignatureVerifier
                             {
                                 throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_FailedToParseDownloadedCrl"));
                             }
+                        }
+                        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                        {
+                            throw;
                         }
                         catch (Exception ex)
                         {

@@ -262,15 +262,21 @@ public static partial class TemplateBinder
         OdfTemplateBindReport report)
     {
         int changed = 0;
-        foreach (OdfNode target in new[] { node }.Concat(node.Descendants()).Where(IsBindableContentNode))
+        OdfNode[] targets = new[] { node }
+            .Concat(node.Descendants())
+            .Where(IsBindableContentNode)
+            .Where(target => !target.Descendants().Any(IsBindableContentNode))
+            .ToArray();
+        foreach (OdfNode target in targets)
         {
             string text = target.TextContent;
-            string replaced = ReplaceScalarTokens(text, values, options, report);
-            if (!string.Equals(text, replaced, StringComparison.Ordinal))
+            IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+                ResolveScalarTextReplacements(text, values, options, report);
+            if (replacements.Count > 0)
             {
                 if (!options.DryRun)
                 {
-                    target.TextContent = replaced;
+                    TextDocumentSearchReplaceEngine.ReplaceTextRanges(target, replacements);
                 }
 
                 changed++;
@@ -294,12 +300,13 @@ public static partial class TemplateBinder
                 child.NamespaceUri == OdfNamespaces.Text)
             {
                 string text = child.TextContent;
-                string replaced = ReplaceScalarTokens(text, values, options, report);
-                if (!string.Equals(text, replaced, StringComparison.Ordinal))
+                IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+                    ResolveScalarTextReplacements(text, values, options, report);
+                if (replacements.Count > 0)
                 {
                     if (!options.DryRun)
                     {
-                        child.TextContent = replaced;
+                        TextDocumentSearchReplaceEngine.ReplaceTextRanges(child, replacements);
                     }
 
                     changed++;
@@ -318,8 +325,10 @@ public static partial class TemplateBinder
         OdfTemplateBindOptions options,
         OdfTemplateBindReport report)
     {
-        foreach (OdfNode row in OdfTableSheetDomAccessEngine.GetRowsList(sheet.TableNode).ToArray())
+        OdfNode[] templateRows = OdfTableSheetDomAccessEngine.GetRowsList(sheet.TableNode).ToArray();
+        for (int rowIndex = templateRows.Length - 1; rowIndex >= 0; rowIndex--)
         {
+            OdfNode row = templateRows[rowIndex];
             if (!TryGetCollectionName(row.TextContent, out string? collectionName, report) || collectionName is null)
             {
                 continue;
@@ -345,6 +354,7 @@ public static partial class TemplateBinder
             OdfNode template = row.CloneNode(deep: true);
             OdfNode anchor = row;
             int itemIndex = 0;
+            bool structureChanged = false;
             foreach (object? item in items.Take(options.MaxCollectionItems))
             {
                 OdfNode target = itemIndex == 0 ? row : template.CloneNode(deep: true);
@@ -356,12 +366,22 @@ public static partial class TemplateBinder
                     {
                         parent.InsertAfter(target, anchor);
                         anchor = target;
+                        structureChanged = true;
                     }
                 }
 
                 report.ExpandedItemCount++;
                 report.ChangedNodeCount++;
                 itemIndex++;
+            }
+
+            if (itemIndex == 0 && !options.DryRun)
+            {
+                sheet.DeleteRows(rowIndex);
+            }
+            else if (structureChanged)
+            {
+                sheet.InvalidateAccessCache();
             }
         }
     }
@@ -488,41 +508,22 @@ public static partial class TemplateBinder
             targets = new[] { node }.Concat(targets);
         }
 
-        foreach (OdfNode target in targets.ToArray())
+        foreach (OdfNode target in targets
+            .Where(target => !target.Descendants().Any(IsBindableContentNode))
+            .ToArray())
         {
-            if (target.NodeType is not OdfNodeType.Text && target.NodeType is not OdfNodeType.Element)
-            {
-                continue;
-            }
-
             string text = target.TextContent;
-            string replaced = ReplacePlaceholderExpressions(text, expression =>
+            IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+                ResolveCollectionTextReplacements(
+                    text,
+                    collectionName,
+                    item,
+                    rootValues,
+                    options,
+                    report);
+            if (replacements.Count > 0 && !options.DryRun)
             {
-                string collectionPrefix = collectionName + "[].";
-                if (expression.StartsWith(collectionPrefix, StringComparison.Ordinal))
-                {
-                    AddHit(report, expression);
-                    report.ReplacementCount++;
-                    return ConvertValue(ResolvePath(item, expression.Substring(collectionPrefix.Length)));
-                }
-
-                if (ResolvePath(rootValues, expression) is object value)
-                {
-                    AddHit(report, expression);
-                    report.ReplacementCount++;
-                    return ConvertValue(value);
-                }
-
-                AddUnresolved(report, expression);
-                return ResolveUnknownPlaceholder(expression, options);
-            });
-
-            if (!string.Equals(text, replaced, StringComparison.Ordinal))
-            {
-                if (!options.DryRun)
-                {
-                    target.TextContent = replaced;
-                }
+                TextDocumentSearchReplaceEngine.ReplaceTextRanges(target, replacements);
             }
         }
     }
@@ -575,6 +576,121 @@ public static partial class TemplateBinder
             AddUnresolved(report, expression);
             return ResolveUnknownPlaceholder(expression, options);
         });
+    }
+
+    private static IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> ResolveScalarTextReplacements(
+        string text,
+        IReadOnlyDictionary<string, object?> values,
+        OdfTemplateBindOptions options,
+        OdfTemplateBindReport report)
+    {
+        List<TextDocumentSearchReplaceEngine.TextReplacement> replacements = [];
+        int index = 0;
+        while (index < text.Length)
+        {
+            int start = text.IndexOf("{{", index, StringComparison.Ordinal);
+            if (start < 0)
+            {
+                break;
+            }
+
+            int end = text.IndexOf("}}", start + 2, StringComparison.Ordinal);
+            if (end < 0)
+            {
+                break;
+            }
+
+            string expression = text.Substring(start + 2, end - start - 2).Trim();
+            string originalToken = text.Substring(start, end + 2 - start);
+            string replacement;
+            if (expression.StartsWith("Image:", StringComparison.Ordinal))
+            {
+                replacement = BuildToken(expression);
+            }
+            else if (ResolvePath(values, expression) is object value)
+            {
+                report.ReplacementCount++;
+                AddHit(report, expression);
+                replacement = ConvertValue(value);
+            }
+            else
+            {
+                AddUnresolved(report, expression);
+                replacement = ResolveUnknownPlaceholder(expression, options);
+            }
+
+            if (!string.Equals(originalToken, replacement, StringComparison.Ordinal))
+            {
+                replacements.Add(new TextDocumentSearchReplaceEngine.TextReplacement(
+                    start,
+                    originalToken.Length,
+                    replacement));
+            }
+
+            index = end + 2;
+        }
+
+        return replacements;
+    }
+
+    private static IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> ResolveCollectionTextReplacements(
+        string text,
+        string collectionName,
+        object? item,
+        IReadOnlyDictionary<string, object?> rootValues,
+        OdfTemplateBindOptions options,
+        OdfTemplateBindReport report)
+    {
+        List<TextDocumentSearchReplaceEngine.TextReplacement> replacements = [];
+        string collectionPrefix = collectionName + "[].";
+        int index = 0;
+        while (index < text.Length)
+        {
+            int start = text.IndexOf("{{", index, StringComparison.Ordinal);
+            if (start < 0)
+            {
+                break;
+            }
+
+            int end = text.IndexOf("}}", start + 2, StringComparison.Ordinal);
+            if (end < 0)
+            {
+                break;
+            }
+
+            string expression = text.Substring(start + 2, end - start - 2).Trim();
+            string originalToken = text.Substring(start, end + 2 - start);
+            string replacement;
+            if (expression.StartsWith(collectionPrefix, StringComparison.Ordinal))
+            {
+                AddHit(report, expression);
+                report.ReplacementCount++;
+                replacement = ConvertValue(ResolvePath(item, expression.Substring(collectionPrefix.Length)));
+            }
+            else if (ResolvePath(rootValues, expression) is object value)
+            {
+                AddHit(report, expression);
+                report.ReplacementCount++;
+                replacement = ConvertValue(value);
+            }
+            else
+            {
+                AddUnresolved(report, expression);
+                replacement = ResolveUnknownPlaceholder(expression, options);
+            }
+
+            if (!string.Equals(originalToken, replacement, StringComparison.Ordinal))
+            {
+                replacements.Add(new TextDocumentSearchReplaceEngine.TextReplacement(
+                    start,
+                    originalToken.Length,
+                    replacement));
+            }
+
+            index = end + 2;
+        }
+
+        return replacements;
     }
 
     private static string ReplacePlaceholderExpressions(string text, Func<string, string> replace)

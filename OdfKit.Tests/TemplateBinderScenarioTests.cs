@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Drawing;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
@@ -28,6 +29,42 @@ public class TemplateBinderScenarioTests
 
         Assert.Equal(1, count);
         Assert.Contains("Hello OdfKit", document.BodyTextRoot.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證跨越多個文字樣式節點的占位符可替換，且原有樣式與超連結結構不會被清除。
+    /// </summary>
+    [Fact]
+    public void Bind_ReplacesPlaceholderAcrossTextSpansWithoutFlatteningMarkup()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph();
+        OdfNode firstSpan = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
+        firstSpan.SetAttribute("style-name", OdfNamespaces.Text, "Strong", "text");
+        firstSpan.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "{{Na" });
+        OdfNode secondSpan = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
+        secondSpan.SetAttribute("style-name", OdfNamespaces.Text, "Accent", "text");
+        secondSpan.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "me}}" });
+        OdfNode link = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
+        link.SetAttribute("href", OdfNamespaces.XLink, "https://example.test/", "xlink");
+        link.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " link" });
+        paragraph.Node.AppendChild(firstSpan);
+        paragraph.Node.AppendChild(secondSpan);
+        paragraph.Node.AppendChild(link);
+
+        OdfTemplateBindReport report = TemplateBinder.Bind(
+            document,
+            new Dictionary<string, object?> { ["Name"] = "OdfKit" },
+            new OdfTemplateBindOptions());
+
+        Assert.Equal(1, report.ReplacementCount);
+        Assert.Equal("OdfKit link", paragraph.TextContent);
+        Assert.Contains(firstSpan, paragraph.Node.Children);
+        Assert.Contains(secondSpan, paragraph.Node.Children);
+        Assert.Contains(link, paragraph.Node.Children);
+        Assert.Equal("Strong", firstSpan.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.Equal("Accent", secondSpan.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.Equal("https://example.test/", link.GetAttribute("href", OdfNamespaces.XLink));
     }
 
     /// <summary>
@@ -109,6 +146,27 @@ public class TemplateBinderScenarioTests
         Assert.Equal("100", sheet.Cells["B1"].DisplayText);
         Assert.Equal("驗證", sheet.Cells["A2"].DisplayText);
         Assert.Equal("200", sheet.Cells["B2"].DisplayText);
+    }
+
+    /// <summary>
+    /// 驗證空集合會移除 ODS 模板列，且後續資料列會正確前移。
+    /// </summary>
+    [Fact]
+    public void Bind_EmptySpreadsheetCollection_RemovesTemplateRow()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "{{Items[].Name}}";
+        sheet.Cells["A2"].CellValue = "Tail";
+
+        OdfTemplateBindReport report = TemplateBinder.Bind(
+            document,
+            new Dictionary<string, object?> { ["Items"] = System.Array.Empty<object>() },
+            new OdfTemplateBindOptions());
+
+        Assert.Equal(0, report.ExpandedItemCount);
+        Assert.DoesNotContain("{{Items[]", sheet.TableNode.TextContent);
+        Assert.Equal("Tail", document.Worksheets["Data"].Cells["A1"].DisplayText);
     }
 
     /// <summary>

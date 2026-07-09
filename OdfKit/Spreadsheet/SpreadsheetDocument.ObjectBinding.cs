@@ -9,6 +9,12 @@ namespace OdfKit.Spreadsheet;
 public partial class SpreadsheetDocument
 {
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingReport WriteObjects<T>(string sheetName, OdfCellAddress startAddress, IEnumerable<T> items) => WriteObjects(sheetName, startAddress, items, null);
+
+    /// <summary>
     /// Writes public readable object properties into the specified worksheet.
     /// 將物件的可讀公開屬性寫入指定工作表。
     /// </summary>
@@ -18,12 +24,15 @@ public partial class SpreadsheetDocument
     /// <param name="items">The object sequence to write. / 要寫入的物件序列。</param>
     /// <param name="options">The object binding options. / 物件繫結選項。</param>
     /// <returns>The object binding report. / 物件繫結報告。</returns>
-    public OdfObjectBindingReport WriteObjects<T>(
-        string sheetName,
-        OdfCellAddress startAddress,
-        IEnumerable<T> items,
-        OdfObjectBindingOptions? options = null) =>
+    public OdfObjectBindingReport WriteObjects<T>(string sheetName, OdfCellAddress startAddress, IEnumerable<T> items, OdfObjectBindingOptions? options) =>
         RequireSheet(sheetName).WriteObjects(startAddress, items, options);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingReport AppendObjects<T>(string sheetName, IEnumerable<T> items) => AppendObjects(sheetName, items, null);
+
 
     /// <summary>
     /// Appends public readable object properties after the used range of the specified worksheet.
@@ -34,11 +43,15 @@ public partial class SpreadsheetDocument
     /// <param name="items">The object sequence to append. / 要附加的物件序列。</param>
     /// <param name="options">The object binding options. / 物件繫結選項。</param>
     /// <returns>The object binding report. / 物件繫結報告。</returns>
-    public OdfObjectBindingReport AppendObjects<T>(
-        string sheetName,
-        IEnumerable<T> items,
-        OdfObjectBindingOptions? options = null) =>
+    public OdfObjectBindingReport AppendObjects<T>(string sheetName, IEnumerable<T> items, OdfObjectBindingOptions? options) =>
         RequireSheet(sheetName).AppendObjects(items, options);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyList<T> ReadObjects<T>(string sheetName, OdfCellRange range) where T : new() => ReadObjects<T>(sheetName, range, null);
+
 
     /// <summary>
     /// Reads rows from the specified worksheet into objects using the header row as the property map.
@@ -49,12 +62,15 @@ public partial class SpreadsheetDocument
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The object read options. / 物件讀取選項。</param>
     /// <returns>The materialized object list. / 具體化後的物件清單。</returns>
-    public IReadOnlyList<T> ReadObjects<T>(
-        string sheetName,
-        OdfCellRange range,
-        OdfObjectReadOptions? options = null)
-        where T : new() =>
+    public IReadOnlyList<T> ReadObjects<T>(string sheetName, OdfCellRange range, OdfObjectReadOptions? options) where T : new() =>
         RequireSheet(sheetName).ReadObjects<T>(range, options);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(string sheetName, OdfCellRange range) where T : new() => ValidateObjectBinding<T>(sheetName, range, null);
+
 
     /// <summary>
     /// Validates whether a worksheet range can be bound to the specified object type.
@@ -65,12 +81,9 @@ public partial class SpreadsheetDocument
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The validation options. / 驗證選項。</param>
     /// <returns>The validation report. / 驗證報告。</returns>
-    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(
-        string sheetName,
-        OdfCellRange range,
-        OdfObjectReadOptions? options = null)
-        where T : new() =>
+    public OdfObjectBindingValidationReport ValidateObjectBinding<T>(string sheetName, OdfCellRange range, OdfObjectReadOptions? options) where T : new() =>
         RequireSheet(sheetName).ValidateObjectBinding<T>(range, options);
+
 
     /// <summary>
     /// Updates existing object-bound rows by key without inserting new rows.
