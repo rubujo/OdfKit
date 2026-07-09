@@ -12,6 +12,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Values - Line & Font
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri) => GetLineWidthAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLineWidthAttributeValue operation.
@@ -21,11 +27,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的線條寬度；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfLineWidth>(value, OdfLineWidth.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetLineWidthAttributeValue operation.
@@ -40,6 +47,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri) => GetLineModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLineModeAttributeValue operation.
@@ -49,11 +62,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的線條模式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfLineMode>(value, OdfElementSchemaRegistry.TryParseLineMode);
     }
+
 
     /// <summary>
     /// Executes the SetLineModeAttributeValue operation.
@@ -68,6 +82,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineMode(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri) => GetFontStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontStyleAttributeValue operation.
@@ -77,11 +97,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型樣式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStyle>(value, OdfElementSchemaRegistry.TryParseFontStyle);
     }
+
 
     /// <summary>
     /// Executes the SetFontStyleAttributeValue operation.
@@ -96,6 +117,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontStyle(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri) => GetFontVariantAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontVariantAttributeValue operation.
@@ -105,11 +132,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型變體；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontVariant>(value, OdfElementSchemaRegistry.TryParseFontVariant);
     }
+
 
     /// <summary>
     /// Executes the SetFontVariantAttributeValue operation.
@@ -124,6 +152,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontVariant(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri) => GetFontWeightAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontWeightAttributeValue operation.
@@ -133,11 +167,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型粗細；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontWeight>(value, OdfElementSchemaRegistry.TryParseFontWeight);
     }
+
 
     /// <summary>
     /// Executes the SetFontWeightAttributeValue operation.
@@ -152,6 +187,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontWeight(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri) => GetFontFamilyGenericAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontFamilyGenericAttributeValue operation.
@@ -161,11 +202,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的通用字型家族；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontFamilyGeneric>(value, OdfElementSchemaRegistry.TryParseFontFamilyGeneric);
     }
+
 
     /// <summary>
     /// Executes the SetFontFamilyGenericAttributeValue operation.
@@ -180,6 +222,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontFamilyGeneric(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri) => GetFontPitchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontPitchAttributeValue operation.
@@ -189,11 +237,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型間距；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontPitch>(value, OdfElementSchemaRegistry.TryParseFontPitch);
     }
+
 
     /// <summary>
     /// Executes the SetFontPitchAttributeValue operation.
@@ -208,6 +257,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontPitch(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri) => GetFontReliefAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontReliefAttributeValue operation.
@@ -217,11 +272,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型浮雕；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontRelief>(value, OdfElementSchemaRegistry.TryParseFontRelief);
     }
+
 
     /// <summary>
     /// Executes the SetFontReliefAttributeValue operation.
@@ -236,6 +292,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontRelief(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri) => GetFontStretchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFontStretchAttributeValue operation.
@@ -245,11 +307,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的字型伸縮；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStretch>(value, OdfElementSchemaRegistry.TryParseFontStretch);
     }
+
 
     /// <summary>
     /// Executes the SetFontStretchAttributeValue operation.

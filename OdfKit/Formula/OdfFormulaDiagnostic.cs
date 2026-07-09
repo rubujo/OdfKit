@@ -9,6 +9,12 @@ namespace OdfKit.Formula;
 public sealed class OdfFormulaDiagnostic
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity) : this(code, message, severity, null) { }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OdfFormulaDiagnostic"/> class.
     /// 初始化 <see cref="OdfFormulaDiagnostic"/> 類別的新執行個體。
     /// </summary>
@@ -16,13 +22,14 @@ public sealed class OdfFormulaDiagnostic
     /// <param name="message">The diagnostic message. / 診斷訊息。</param>
     /// <param name="severity">The diagnostic severity. / 診斷嚴重性。</param>
     /// <param name="position">The character position in the formula, or null when unavailable. / 公式中的字元位置，若無位置資訊則為 null。</param>
-    public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity, int? position = null)
+    public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity, int? position)
     {
         Code = code;
         Message = message;
         Severity = severity;
         Position = position;
     }
+
 
     /// <summary>
     /// Gets the diagnostic code.

@@ -24,6 +24,12 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height) => Add(imageBytes, width, height, null);
+
 
     /// <summary>
     /// Adds an image to a new paragraph.
@@ -34,13 +40,14 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     /// <param name="height">The image height. / 圖片高度。</param>
     /// <param name="name">The optional image name. / 選用的圖片名稱。</param>
     /// <returns>The newly added image. / 新增完成的圖片。</returns>
-    public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
+    public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height, string? name)
     {
         var media = new OdfMediaManager(_document.Package);
         string path = media.AddImage(imageBytes, name);
         OdfParagraph paragraph = _document.AddParagraph();
         return _document.AddImage(paragraph, path, width, height, name);
     }
+
 
     /// <summary>
     /// Gets the list of images in the document body.

@@ -19,6 +19,12 @@ public partial class OdfDatabaseDocument
         SetConnection(href);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNode AddParameterizedQuery(string name, string command, IEnumerable<OdfDatabaseQueryParameter> parameters) => AddParameterizedQuery(name, command, parameters, null);
+
 
     /// <summary>
     /// Adds a parameterized query description without executing SQL.
@@ -29,11 +35,7 @@ public partial class OdfDatabaseDocument
     /// <param name="parameters">The query parameter metadata. / 查詢參數中繼資料。</param>
     /// <param name="title">The optional display title. / 選用顯示標題。</param>
     /// <returns>The added query node. / 新增的查詢節點。</returns>
-    public OdfNode AddParameterizedQuery(
-        string name,
-        string command,
-        IEnumerable<OdfDatabaseQueryParameter> parameters,
-        string? title = null)
+    public OdfNode AddParameterizedQuery(string name, string command, IEnumerable<OdfDatabaseQueryParameter> parameters, string? title)
     {
         if (parameters is null)
         {
@@ -48,6 +50,7 @@ public partial class OdfDatabaseDocument
                     : parameter.Name + ":" + parameter.Type + " (" + parameter.Description + ")"));
         return AddQuery(name, command, title, description, escapeProcessing: true);
     }
+
 
     /// <summary>
     /// Adds a table schema description as a table representation command hint.

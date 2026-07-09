@@ -23,6 +23,12 @@ public sealed class OdfStyleMixinBuilder
             ? InferStyleFamily(element)
             : family!;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleMixinBuilder Bold() => Bold(true);
+
 
     /// <summary>
     /// Executes the Bold operation.
@@ -30,8 +36,14 @@ public sealed class OdfStyleMixinBuilder
     /// </summary>
     /// <param name="enabled">是否啟用粗體</param>
     /// <returns>目前的樣式設定器，供鏈式呼叫使用</returns>
-    public OdfStyleMixinBuilder Bold(bool enabled = true)
-        => SetTextProperty("font-weight", OdfNamespaces.Fo, enabled ? "bold" : "normal", "fo");
+    public OdfStyleMixinBuilder Bold(bool enabled) => SetTextProperty("font-weight", OdfNamespaces.Fo, enabled ? "bold" : "normal", "fo");
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleMixinBuilder Italic() => Italic(true);
+
 
     /// <summary>
     /// Executes the Italic operation.
@@ -39,8 +51,14 @@ public sealed class OdfStyleMixinBuilder
     /// </summary>
     /// <param name="enabled">是否啟用斜體</param>
     /// <returns>目前的樣式設定器，供鏈式呼叫使用</returns>
-    public OdfStyleMixinBuilder Italic(bool enabled = true)
-        => SetTextProperty("font-style", OdfNamespaces.Fo, enabled ? "italic" : "normal", "fo");
+    public OdfStyleMixinBuilder Italic(bool enabled) => SetTextProperty("font-style", OdfNamespaces.Fo, enabled ? "italic" : "normal", "fo");
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleMixinBuilder Underline() => Underline(true);
+
 
     /// <summary>
     /// Executes the Underline operation.
@@ -48,8 +66,8 @@ public sealed class OdfStyleMixinBuilder
     /// </summary>
     /// <param name="enabled">是否啟用底線</param>
     /// <returns>目前的樣式設定器，供鏈式呼叫使用</returns>
-    public OdfStyleMixinBuilder Underline(bool enabled = true)
-        => SetTextProperty("text-underline-style", OdfNamespaces.Style, enabled ? "solid" : "none", "style");
+    public OdfStyleMixinBuilder Underline(bool enabled) => SetTextProperty("text-underline-style", OdfNamespaces.Style, enabled ? "solid" : "none", "style");
+
 
     /// <summary>
     /// Executes the Color operation.

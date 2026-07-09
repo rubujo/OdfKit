@@ -375,6 +375,12 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         sb.Append(Row + 1);
         return sb.ToString();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string ToOdfString() => ToOdfString(false);
+
 
     /// <summary>
     /// Converts this cell address to an ODF-style string.
@@ -382,7 +388,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     /// </summary>
     /// <param name="includeBrackets">Whether to include brackets. / 是否包含中括號。</param>
     /// <returns>The ODF-style address string. / ODF 格式的位址字串。</returns>
-    public string ToOdfString(bool includeBrackets = false)
+    public string ToOdfString(bool includeBrackets)
     {
         var sb = new StringBuilder();
         if (includeBrackets)
@@ -415,6 +421,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             sb.Append("]");
         return sb.ToString();
     }
+
 
     private static string IndexToColumnName(int columnIndex)
     {

@@ -13,7 +13,13 @@ internal static class OdfRdfParser
     private const string RdfNamespace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private static readonly XNamespace RdfNs = RdfNamespace;
 
-    public static OdfRdfMetadata Parse(Stream stream, long maxCharsInDocument = 0)
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfRdfMetadata Parse(Stream stream) => Parse(stream, 0);
+
+    public static OdfRdfMetadata Parse(Stream stream, long maxCharsInDocument)
     {
         var metadata = new OdfRdfMetadata();
         var settings = new XmlReaderSettings
@@ -62,6 +68,7 @@ internal static class OdfRdfParser
         metadata.AcceptChanges();
         return metadata;
     }
+
 
     public static byte[] Serialize(OdfRdfMetadata metadata, bool indent)
     {

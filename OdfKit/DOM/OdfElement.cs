@@ -19,6 +19,12 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     : OdfNode(OdfNodeType.Element, localName, namespaceUri, prefix)
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string? GetAttributeValue(string localName, string namespaceUri) => GetAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
+    /// <summary>
     /// Gets an attribute value with version-aware schema lookup.
     /// 取得具有版本內容且結構定義說明的屬性值。
     /// </summary>
@@ -26,7 +32,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <param name="namespaceUri">The namespace URI of the attribute. / 屬性命名空間 URI。</param>
     /// <param name="version">The ODF version context. / ODF 版本內容。</param>
     /// <returns>The attribute value, or <see langword="null"/> if not found. / 屬性值；如果找不到，則為 <see langword="null"/>。</returns>
-    public string? GetAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public string? GetAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
         if (attrDef is null)
@@ -35,6 +41,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
         }
         return GetAttribute(localName, namespaceUri);
     }
+
 
     /// <summary>
     /// Sets an attribute value with version-aware schema lookup.

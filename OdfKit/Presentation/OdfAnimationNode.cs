@@ -115,6 +115,12 @@ public class OdfAnimationNode(OdfNode node)
             return list.AsReadOnly();
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfAnimationNode AddSequence() => AddSequence(null);
+
 
     /// <summary>
     /// Adds a sequential animation sequence.
@@ -122,7 +128,7 @@ public class OdfAnimationNode(OdfNode node)
     /// </summary>
     /// <param name="begin">The start-time attribute value. / 開始時間的屬性值。</param>
     /// <returns>The added sequential animation sequence node. / 新增的順序動畫序列節點。</returns>
-    public OdfAnimationNode AddSequence(string? begin = null)
+    public OdfAnimationNode AddSequence(string? begin)
     {
         OdfNode seq = new(OdfNodeType.Element, "seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
         if (begin is not null)
@@ -134,12 +140,19 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfAnimationNode AddParallel() => AddParallel(null);
+
+
+    /// <summary>
     /// Adds a parallel animation sequence.
     /// 新增一個並行動畫序列。
     /// </summary>
     /// <param name="begin">The start-time attribute value. / 開始時間的屬性值。</param>
     /// <returns>The added parallel animation sequence node. / 新增的並行動畫序列節點。</returns>
-    public OdfAnimationNode AddParallel(string? begin = null)
+    public OdfAnimationNode AddParallel(string? begin)
     {
         OdfNode par = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
         if (begin is not null)
@@ -149,6 +162,7 @@ public class OdfAnimationNode(OdfNode node)
         Node.AppendChild(par);
         return new OdfAnimationNode(par);
     }
+
 
     /// <summary>
     /// Adds an animation effect.

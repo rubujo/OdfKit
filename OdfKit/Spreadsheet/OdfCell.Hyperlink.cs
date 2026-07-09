@@ -15,6 +15,12 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfCell
 {
     #region Hyperlink, Rich Text & Annotation
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SetHyperlink(string url) => SetHyperlink(url, null);
+
 
     /// <summary>
     /// Sets the hyperlink of the cell.
@@ -22,7 +28,7 @@ public partial class OdfCell
     /// </summary>
     /// <param name="url">The hyperlink URL. / 超連結 URL。</param>
     /// <param name="displayText">The link display text; when <see langword="null"/>, the existing text content or URL itself is used. / 連結顯示文字；為 <see langword="null"/> 時使用現有文字內容或 URL 本身。</param>
-    public void SetHyperlink(string url, string? displayText = null)
+    public void SetHyperlink(string url, string? displayText)
     {
         string text = displayText ?? (string.IsNullOrEmpty(DisplayText) ? url : DisplayText);
 
@@ -43,6 +49,7 @@ public partial class OdfCell
         Node.AppendChild(pNode);
         ValueType = "string";
     }
+
 
     /// <summary>
     /// Gets the hyperlink URL of the cell, or <see langword="null"/> when no hyperlink exists.

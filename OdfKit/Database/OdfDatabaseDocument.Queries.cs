@@ -20,6 +20,12 @@ public partial class OdfDatabaseDocument
     /// <returns>The order statement summary, or <see langword="null"/> if not set. / 排序陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseQueryStatementInfo? FindQueryOrderStatement(string queryName) =>
         ReadQueryStatement(queryName, "order-statement");
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNode SetQueryOrderStatement(string queryName, string command) => SetQueryOrderStatement(queryName, command, null);
+
 
     /// <summary>
     /// Sets the order statement of the specified query (<c>db:order-statement</c>).
@@ -29,13 +35,14 @@ public partial class OdfDatabaseDocument
     /// <param name="command">The order command text (e.g. the content of an <c>ORDER BY</c> clause). / 排序命令文字（例如 <c>ORDER BY</c> 子句內容）。</param>
     /// <param name="applyCommand">The optional apply setting. / 選用的套用設定。</param>
     /// <returns>The added or updated order statement node. / 新增或更新後的排序陳述式節點。</returns>
-    public OdfNode SetQueryOrderStatement(string queryName, string command, bool? applyCommand = null) =>
+    public OdfNode SetQueryOrderStatement(string queryName, string command, bool? applyCommand) =>
         WriteQueryStatement(
             queryName,
             "order-statement",
             command,
             applyCommand,
             ("filter-statement", DatabaseNamespace), ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
+
 
     /// <summary>
     /// Finds the filter statement of the specified query (<c>db:filter-statement</c>).
@@ -45,6 +52,12 @@ public partial class OdfDatabaseDocument
     /// <returns>The filter statement summary, or <see langword="null"/> if not set. / 篩選陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseQueryStatementInfo? FindQueryFilterStatement(string queryName) =>
         ReadQueryStatement(queryName, "filter-statement");
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNode SetQueryFilterStatement(string queryName, string command) => SetQueryFilterStatement(queryName, command, null);
+
 
     /// <summary>
     /// Sets the filter statement of the specified query (<c>db:filter-statement</c>).
@@ -54,13 +67,14 @@ public partial class OdfDatabaseDocument
     /// <param name="command">The filter command text (e.g. the content of a <c>WHERE</c> clause). / 篩選命令文字（例如 <c>WHERE</c> 子句內容）。</param>
     /// <param name="applyCommand">The optional apply setting. / 選用的套用設定。</param>
     /// <returns>The added or updated filter statement node. / 新增或更新後的篩選陳述式節點。</returns>
-    public OdfNode SetQueryFilterStatement(string queryName, string command, bool? applyCommand = null) =>
+    public OdfNode SetQueryFilterStatement(string queryName, string command, bool? applyCommand) =>
         WriteQueryStatement(
             queryName,
             "filter-statement",
             command,
             applyCommand,
             ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
+
 
     /// <summary>
     /// Finds the updatable target table name of the specified query (<c>db:update-table</c>).

@@ -28,6 +28,12 @@ public partial class TextDocument
     /// <param name="bodyText">尾注本文內容</param>
     internal void AddEndnote(OdfParagraph paragraph, string citation, string bodyText) =>
         TextDocumentNotesEngine.AddEndnote(MutationContext, paragraph, citation, bodyText);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfAlphabeticalIndex AddAlphabeticalIndex() => AddAlphabeticalIndex("Alphabetical Index");
+
 
     /// <summary>
     /// Adds an alphabetical index to the end of the document body.
@@ -35,8 +41,15 @@ public partial class TextDocument
     /// </summary>
     /// <param name="title">The index title. / 索引標題。</param>
     /// <returns>The created alphabetical index object. / 建立的字母索引物件。</returns>
-    public OdfAlphabeticalIndex AddAlphabeticalIndex(string title = "Alphabetical Index") =>
+    public OdfAlphabeticalIndex AddAlphabeticalIndex(string title) =>
         TextDocumentNotesEngine.AddAlphabeticalIndex(this, MutationContext, title);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfBibliography AddBibliography() => AddBibliography("Bibliography");
+
 
     /// <summary>
     /// Adds a bibliography to the end of the document body.
@@ -44,8 +57,9 @@ public partial class TextDocument
     /// </summary>
     /// <param name="title">The bibliography title. / 文獻目錄標題。</param>
     /// <returns>The created bibliography object. / 建立的文獻目錄物件。</returns>
-    public OdfBibliography AddBibliography(string title = "Bibliography") =>
+    public OdfBibliography AddBibliography(string title) =>
         TextDocumentNotesEngine.AddBibliography(this, MutationContext, title);
+
 
     /// <summary>
     /// Gets the list of all indexes in the document.

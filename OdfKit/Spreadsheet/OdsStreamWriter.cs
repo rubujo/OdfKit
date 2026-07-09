@@ -70,6 +70,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             _ => "1.4"
         };
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdsStreamWriter(Stream outputStream) : this(outputStream, OdfVersion.Odf14) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdsStreamWriter"/> class.
@@ -78,7 +84,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <param name="outputStream">The target stream used to output the ODS document. / 用來輸出 ODS 文件的目標資料流。</param>
     /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="outputStream"/> is <see langword="null"/>. / 當 <paramref name="outputStream"/> 為 <see langword="null"/> 時擲出。</exception>
-    public OdsStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
+    public OdsStreamWriter(Stream outputStream, OdfVersion version)
     {
         _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
         _version = version;
@@ -130,6 +136,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         _writer.WriteStartElement("office", "body", OdfNamespaces.Office);
         _writer.WriteStartElement("office", "spreadsheet", OdfNamespaces.Office);
     }
+
 
     /// <summary>
     /// Starts writing a new worksheet.
@@ -193,6 +200,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         _activeSheetBuffer = sheet;
         _isSheetStarted = true;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void WriteColumn(OdfLength width) => WriteColumn(width, null);
+
 
     /// <summary>
     /// Writes a column definition.
@@ -201,7 +214,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <param name="width">The column width. / 資料欄寬度。</param>
     /// <param name="styleName">The style name; if <see langword="null"/>, one is generated automatically. / 樣式名稱，如果為 <see langword="null"/> 則自動產生。</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="styleName"/> contains a character that is not valid in XML 1.0. / 當 <paramref name="styleName"/> 含有 XML 1.0 不允許的字元時擲出。</exception>
-    public void WriteColumn(OdfLength width, string? styleName = null)
+    public void WriteColumn(OdfLength width, string? styleName)
     {
         if (_disposed)
             return;
@@ -217,6 +230,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
         _columnStyles.Add((name, width));
     }
+
 
     /// <summary>
     /// Starts writing a new data row.

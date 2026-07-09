@@ -43,6 +43,12 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// 取得此圖形是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
     /// </summary>
     public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(Node);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfShape MarkAsDecorative() => MarkAsDecorative(true);
+
 
     /// <summary>
     /// Marks this shape as decorative so assistive technologies should skip it.
@@ -50,7 +56,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// </summary>
     /// <param name="decorative">Whether to mark the shape as decorative. / 是否標記為裝飾性。</param>
     /// <returns>The current shape instance. / 目前圖形執行個體。</returns>
-    public OdfShape MarkAsDecorative(bool decorative = true)
+    public OdfShape MarkAsDecorative(bool decorative)
     {
         if (decorative)
         {
@@ -64,6 +70,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
         Node.RemoveAttribute("decorative", OdfNamespaces.LoExt);
         return this;
     }
+
 
     /// <summary>
     /// Creates an embedded table inside this shape frame.

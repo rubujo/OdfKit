@@ -15,13 +15,19 @@ namespace OdfKit.Drawing;
 public partial class OdfDrawPage
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds) => GroupShapes(shapeIds, null);
+
+    /// <summary>
     /// Merges the specified shapes into a new group.
     /// 將指定圖形合併為新群組。
     /// </summary>
     /// <param name="shapeIds">The collection of shape identifiers to group. / 要群組的圖形識別碼集合。</param>
     /// <param name="name">The optional group name. / 選用的群組名稱。</param>
     /// <returns>The newly created group instance. / 新建立的群組執行個體。</returns>
-    public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds, string? name = null)
+    public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds, string? name)
     {
         if (shapeIds is null)
             throw new ArgumentNullException(nameof(shapeIds));
@@ -42,6 +48,7 @@ public partial class OdfDrawPage
 
         return group;
     }
+
 
     private OdfNode? FindShapeNodeById(string shapeId)
     {

@@ -13,6 +13,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Values - Style, Form, Table & Media
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri) => GetStyleLineBreakAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleLineBreakAttributeValue operation.
@@ -22,11 +28,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的斷行規則；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleLineBreak>(value, OdfElementSchemaRegistry.TryParseStyleLineBreak);
     }
+
 
     /// <summary>
     /// Executes the SetStyleLineBreakAttributeValue operation.
@@ -41,6 +48,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleLineBreak(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri) => GetStyleRepeatAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleRepeatAttributeValue operation.
@@ -50,11 +63,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的背景重複；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleRepeat>(value, OdfElementSchemaRegistry.TryParseStyleRepeat);
     }
+
 
     /// <summary>
     /// Executes the SetStyleRepeatAttributeValue operation.
@@ -69,6 +83,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleRepeat(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri) => GetStyleDirectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleDirectionAttributeValue operation.
@@ -78,11 +98,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleDirection>(value, OdfElementSchemaRegistry.TryParseStyleDirection);
     }
+
 
     /// <summary>
     /// Executes the SetStyleDirectionAttributeValue operation.
@@ -97,6 +118,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleDirection(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri) => GetFormOrientationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFormOrientationAttributeValue operation.
@@ -106,11 +133,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表單方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFormOrientation>(value, OdfElementSchemaRegistry.TryParseFormOrientation);
     }
+
 
     /// <summary>
     /// Executes the SetFormOrientationAttributeValue operation.
@@ -125,6 +153,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFormOrientation(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri) => GetTableDirectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableDirectionAttributeValue operation.
@@ -134,11 +168,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableDirection>(value, OdfElementSchemaRegistry.TryParseTableDirection);
     }
+
 
     /// <summary>
     /// Executes the SetTableDirectionAttributeValue operation.
@@ -153,6 +188,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableDirection(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri) => GetTableOrientationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableOrientationAttributeValue operation.
@@ -162,11 +203,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格方位；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableOrientation>(value, OdfElementSchemaRegistry.TryParseTableOrientation);
     }
+
 
     /// <summary>
     /// Executes the SetTableOrientationAttributeValue operation.
@@ -181,6 +223,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableOrientation(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri) => GetStyleFamilyAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleFamilyAttributeValue operation.
@@ -190,11 +238,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式家族；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfStyleFamily>(value, OdfElementSchemaRegistry.TryParseStyleFamily);
     }
+
 
     /// <summary>
     /// Executes the SetStyleFamilyAttributeValue operation.
@@ -209,6 +258,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleFamily(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri) => GetOdfVersionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetOdfVersionAttributeValue operation.
@@ -218,11 +273,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 ODF 版本；若屬性不存在或不是已知版本則為 <see langword="null"/></returns>
-    public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetVersion(value);
     }
+
 
     /// <summary>
     /// Executes the SetOdfVersionAttributeValue operation.
@@ -237,6 +293,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementDomainAttributeAccess.FormatVersion(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri) => GetMediaTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetMediaTypeAttributeValue operation.
@@ -246,11 +308,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 MIME 類型；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfMediaType>(value, OdfMediaType.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetMediaTypeAttributeValue operation.

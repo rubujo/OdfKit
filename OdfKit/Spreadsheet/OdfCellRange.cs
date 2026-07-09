@@ -307,6 +307,12 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
 
         return $"{startStr}:{endStr}";
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string ToOdfString() => ToOdfString(false);
+
 
     /// <summary>
     /// Converts this range to an ODF-style string.
@@ -314,7 +320,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     /// </summary>
     /// <param name="includeBrackets">Whether to include brackets. / 是否包含中括號。</param>
     /// <returns>The ODF-style range representation string. / ODF 格式的範圍表示字串。</returns>
-    public string ToOdfString(bool includeBrackets = false)
+    public string ToOdfString(bool includeBrackets)
     {
         var sb = new StringBuilder();
         if (includeBrackets)
@@ -339,6 +345,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
             sb.Append("]");
         return sb.ToString();
     }
+
 
     /// <summary>
     /// Returns a string that represents the current object.

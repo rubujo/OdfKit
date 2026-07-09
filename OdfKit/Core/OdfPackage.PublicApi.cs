@@ -326,15 +326,22 @@ public sealed partial class OdfPackage
     {
         private byte[] _buffer;
         private int _written;
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
+        public SimpleBufferWriter() : this(256) { }
+
 
         /// <summary>
         /// Additional public overload without optional parameters.
         /// 不含選用參數的公開多載。
         /// </summary>
-        public SimpleBufferWriter(int initialCapacity = 256)
+        public SimpleBufferWriter(int initialCapacity)
         {
             _buffer = new byte[initialCapacity];
         }
+
 
         /// <summary>
         /// Additional public overload without optional parameters.
@@ -354,12 +361,18 @@ public sealed partial class OdfPackage
                 throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotAdvancePastBufferedLength"));
             _written += count;
         }
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
+        public Memory<byte> GetMemory() => GetMemory(0);
+
 
         /// <summary>
         /// Additional public overload without optional parameters.
         /// 不含選用參數的公開多載。
         /// </summary>
-        public Memory<byte> GetMemory(int sizeHint = 0)
+        public Memory<byte> GetMemory(int sizeHint)
         {
             EnsureCapacity(sizeHint);
             return _buffer.AsMemory(_written);
@@ -369,11 +382,19 @@ public sealed partial class OdfPackage
         /// Additional public overload without optional parameters.
         /// 不含選用參數的公開多載。
         /// </summary>
-        public Span<byte> GetSpan(int sizeHint = 0)
+        public Span<byte> GetSpan() => GetSpan(0);
+
+
+        /// <summary>
+        /// Additional public overload without optional parameters.
+        /// 不含選用參數的公開多載。
+        /// </summary>
+        public Span<byte> GetSpan(int sizeHint)
         {
             EnsureCapacity(sizeHint);
             return _buffer.AsSpan(_written);
         }
+
 
         private void EnsureCapacity(int sizeHint)
         {

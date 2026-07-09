@@ -39,13 +39,19 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
         ObjectDisposedException.ThrowIf(_disposed, this);
         return new Span<byte>(_pointer, _length);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public MemoryHandle Pin() => Pin(0);
+
 
     /// <summary>
     /// Executes the Pin operation.
     /// 執行 Pin 作業。
     /// </summary>
     /// <inheritdoc />
-    public override MemoryHandle Pin(int elementIndex = 0)
+    public override MemoryHandle Pin(int elementIndex)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if ((uint)elementIndex > (uint)_length)
@@ -53,6 +59,7 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
 
         return new MemoryHandle((byte*)_pointer + elementIndex);
     }
+
 
     /// <summary>
     /// Executes the Unpin operation.

@@ -24,6 +24,12 @@ public sealed class InlineTextBuilder
         _paragraphNode = paragraphNode ?? throw new ArgumentNullException(nameof(paragraphNode));
         _doc = doc ?? throw new ArgumentNullException(nameof(doc));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public InlineTextBuilder Bold() => Bold(true);
+
 
     /// <summary>
     /// Executes the Bold operation.
@@ -31,11 +37,18 @@ public sealed class InlineTextBuilder
     /// </summary>
     /// <param name="bold">是否為粗體，預設為 <see langword="true"/></param>
     /// <returns>當前建構器執行個體，支援鏈式呼叫</returns>
-    public InlineTextBuilder Bold(bool bold = true)
+    public InlineTextBuilder Bold(bool bold)
     {
         _bold = bold;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public InlineTextBuilder Italic() => Italic(true);
+
 
     /// <summary>
     /// Executes the Italic operation.
@@ -43,11 +56,18 @@ public sealed class InlineTextBuilder
     /// </summary>
     /// <param name="italic">是否為斜體，預設為 <see langword="true"/></param>
     /// <returns>當前建構器執行個體，支援鏈式呼叫</returns>
-    public InlineTextBuilder Italic(bool italic = true)
+    public InlineTextBuilder Italic(bool italic)
     {
         _italic = italic;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public InlineTextBuilder Underline() => Underline(true);
+
 
     /// <summary>
     /// Executes the Underline operation.
@@ -55,11 +75,12 @@ public sealed class InlineTextBuilder
     /// </summary>
     /// <param name="underline">是否具備下劃線，預設為 <see langword="true"/></param>
     /// <returns>當前建構器執行個體，支援鏈式呼叫</returns>
-    public InlineTextBuilder Underline(bool underline = true)
+    public InlineTextBuilder Underline(bool underline)
     {
         _underline = underline;
         return this;
     }
+
 
     /// <summary>
     /// Executes the Color operation.

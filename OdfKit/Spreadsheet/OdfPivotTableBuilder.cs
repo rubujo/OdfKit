@@ -112,24 +112,38 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     private readonly List<(string name, string orientation, string? function, string? formula)> _fields = [];
     private readonly List<(string fieldName, bool ascending)> _sortInfos = [];
     private readonly List<(string fieldName, OdfPivotFilterOperator op, string value)> _filters = [];
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPivotTableBuilder WithColumnHeaders() => WithColumnHeaders(true);
+
 
     /// <summary>
     /// Keeps source column header intent for fluent API compatibility without emitting nonstandard attributes.
     /// 保留來源欄標題意圖以相容 Fluent API，但不輸出非標準屬性。
     /// </summary>
-    public OdfPivotTableBuilder WithColumnHeaders(bool hasHeaders = true)
+    public OdfPivotTableBuilder WithColumnHeaders(bool hasHeaders)
     {
         return this;
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPivotTableBuilder WithRowHeaders() => WithRowHeaders(true);
+
+
+    /// <summary>
     /// Keeps source row header intent for fluent API compatibility without emitting nonstandard attributes.
     /// 保留來源列標題意圖以相容 Fluent API，但不輸出非標準屬性。
     /// </summary>
-    public OdfPivotTableBuilder WithRowHeaders(bool hasHeaders = true)
+    public OdfPivotTableBuilder WithRowHeaders(bool hasHeaders)
     {
         return this;
     }
+
 
     /// <summary>
     /// Adds a row field to the pivot table.
@@ -209,6 +223,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         _fields.Add((fieldName, "data", "formula", formula));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPivotTableBuilder AddSortInfo(string fieldName) => AddSortInfo(fieldName, true);
+
 
     /// <summary>
     /// Sets the sort direction for the specified field.
@@ -217,11 +237,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     /// <param name="fieldName">The sort field name. / 排序欄位名稱。</param>
     /// <param name="ascending">Whether sorting is ascending; the default is <see langword="true"/>. / 是否升冪排序，預設為 <see langword="true"/>。</param>
     /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
-    public OdfPivotTableBuilder AddSortInfo(string fieldName, bool ascending = true)
+    public OdfPivotTableBuilder AddSortInfo(string fieldName, bool ascending)
     {
         _sortInfos.Add((fieldName, ascending));
         return this;
     }
+
 
     /// <summary>
     /// Adds a field filter condition to the pivot table.

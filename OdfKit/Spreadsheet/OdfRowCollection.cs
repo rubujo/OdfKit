@@ -28,6 +28,12 @@ public sealed class OdfRowCollection
     /// <param name="index">The zero-based row index. / 採 0 為基準的列索引。</param>
     /// <returns>The specified row. / 指定列。</returns>
     public OdfSheetRow this[int index] => new(_sheet, index);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Group(int startRow, int endRow) => Group(startRow, endRow, false);
+
 
     /// <summary>
     /// Groups the specified row range so it can be expanded or collapsed.
@@ -36,10 +42,11 @@ public sealed class OdfRowCollection
     /// <param name="startRow">The zero-based start row index. / 採 0 為基準的起始列索引。</param>
     /// <param name="endRow">The zero-based inclusive end row index. / 採 0 為基準且包含在內的結束列索引。</param>
     /// <param name="collapsed">Whether the group is collapsed by default. / 是否預設為收合狀態。</param>
-    public void Group(int startRow, int endRow, bool collapsed = false)
+    public void Group(int startRow, int endRow, bool collapsed)
     {
         _sheet.GroupRows(startRow, endRow, collapsed);
     }
+
 
     /// <summary>
     /// Removes the group containing the specified row range and moves the rows back to the worksheet body.

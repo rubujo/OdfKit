@@ -16,6 +16,12 @@ namespace OdfKit.Spreadsheet;
 public partial class SpreadsheetDocument
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImage AddImageFrame(string sheetName, OdfCellAddress anchor, byte[] imageBytes, OdfLength width, OdfLength height) => AddImageFrame(sheetName, anchor, imageBytes, width, height, null);
+
+    /// <summary>
     /// Inserts an image frame at the specified cell position in a worksheet.
     /// 在指定工作表的儲存格位置插入影像框架。
     /// </summary>
@@ -26,7 +32,7 @@ public partial class SpreadsheetDocument
     /// <param name="height">The value to use. / 影像高度</param>
     /// <param name="name">The name or identifier. / 影像名稱</param>
     /// <returns>The result. / 代表新建立影像框架的 OdfImage 物件</returns>
-    public OdfImage AddImageFrame(string sheetName, OdfCellAddress anchor, byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
+    public OdfImage AddImageFrame(string sheetName, OdfCellAddress anchor, byte[] imageBytes, OdfLength width, OdfLength height, string? name)
     {
         if (string.IsNullOrEmpty(sheetName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_WorksheetCannotBeEmpty_4"), nameof(sheetName));
@@ -68,6 +74,7 @@ public partial class SpreadsheetDocument
 
         return new OdfImage(frameNode, imageNode, this);
     }
+
 
     /// <summary>
     /// Inserts a chart at the specified cell position in a worksheet with custom dimensions.

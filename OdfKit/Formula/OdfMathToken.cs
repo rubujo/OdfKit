@@ -327,6 +327,12 @@ public sealed class OdfMathToken
         RequireNotNull(denominator, nameof(denominator));
         return new OdfMathToken(OdfMathTokenKind.Fraction, string.Empty, numerator, denominator);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfMathToken Radical(OdfMathToken radicand) => Radical(radicand, null);
+
 
     /// <summary>
     /// Creates a MathML <c>msqrt</c> or <c>mroot</c> radical token.
@@ -335,11 +341,12 @@ public sealed class OdfMathToken
     /// <param name="radicand">The radicand token. / 被開方數 token。</param>
     /// <param name="index">The optional root index token; <see langword="null"/> means square root. / 選用的根指數 token；<see langword="null"/> 表示平方根。</param>
     /// <returns>A new <see cref="OdfMathToken"/>. / 新的 <see cref="OdfMathToken"/>。</returns>
-    public static OdfMathToken Radical(OdfMathToken radicand, OdfMathToken? index = null)
+    public static OdfMathToken Radical(OdfMathToken radicand, OdfMathToken? index)
     {
         RequireNotNull(radicand, nameof(radicand));
         return new OdfMathToken(OdfMathTokenKind.Radical, string.Empty, radicand, index);
     }
+
 
     /// <summary>
     /// Creates a MathML <c>mrow</c> row token.
@@ -416,6 +423,12 @@ public sealed class OdfMathToken
         RequireNotNull(inner, nameof(inner));
         return new OdfMathToken(OdfMathTokenKind.Fenced, $"{open}|{close}", inner, null);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfMathToken Style(OdfMathToken inner) => Style(inner, null);
+
 
     /// <summary>
     /// Creates a MathML <c>mstyle</c> style group token.
@@ -424,12 +437,13 @@ public sealed class OdfMathToken
     /// <param name="inner">The style group content token. / 樣式群組的內容 token。</param>
     /// <param name="displayStyle">The optional <c>displaystyle</c> setting. / 選用的 <c>displaystyle</c> 設定。</param>
     /// <returns>A new <see cref="OdfMathToken"/>. / 新的 <see cref="OdfMathToken"/>。</returns>
-    public static OdfMathToken Style(OdfMathToken inner, bool? displayStyle = null)
+    public static OdfMathToken Style(OdfMathToken inner, bool? displayStyle)
     {
         RequireNotNull(inner, nameof(inner));
         string text = displayStyle.HasValue ? (displayStyle.Value ? "true" : "false") : string.Empty;
         return new OdfMathToken(OdfMathTokenKind.Style, text, inner, null);
     }
+
 
     /// <summary>
     /// Creates a basic Content MathML <c>apply</c> semantic token.

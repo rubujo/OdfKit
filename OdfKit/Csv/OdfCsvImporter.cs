@@ -12,6 +12,12 @@ namespace OdfKit.Csv;
 public static class OdfCsvImporter
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static SpreadsheetDocument ImportFromStream(Stream csvStream) => ImportFromStream(csvStream, null);
+
+    /// <summary>
     /// Executes the ImportFromStream operation.
     /// 從資料流讀取 CSV 並建立新的 SpreadsheetDocument
     /// </summary>
@@ -19,7 +25,7 @@ public static class OdfCsvImporter
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     /// <returns>包含 CSV 資料的新 SpreadsheetDocument 執行個體</returns>
     /// <exception cref="ArgumentNullException">當 csvStream 為 null 時引發</exception>
-    public static SpreadsheetDocument ImportFromStream(Stream csvStream, OdfCsvOptions? options = null)
+    public static SpreadsheetDocument ImportFromStream(Stream csvStream, OdfCsvOptions? options)
     {
         if (csvStream is null)
             throw new ArgumentNullException(nameof(csvStream));
@@ -60,17 +66,25 @@ public static class OdfCsvImporter
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static SpreadsheetDocument ImportFromFile(string csvPath) => ImportFromFile(csvPath, null);
+
+
+    /// <summary>
     /// Executes the ImportFromFile operation.
     /// 從檔案路徑讀取 CSV 並建立新的 SpreadsheetDocument。
     /// </summary>
     /// <param name="csvPath">CSV 檔案路徑</param>
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     /// <returns>包含 CSV 資料的新 SpreadsheetDocument 執行個體</returns>
-    public static SpreadsheetDocument ImportFromFile(string csvPath, OdfCsvOptions? options = null)
+    public static SpreadsheetDocument ImportFromFile(string csvPath, OdfCsvOptions? options)
     {
         if (csvPath is null)
             throw new ArgumentNullException(nameof(csvPath));
         using var stream = File.OpenRead(csvPath);
         return ImportFromStream(stream, options);
     }
+
 }

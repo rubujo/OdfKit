@@ -45,6 +45,12 @@ public partial class OdfTableSheet
     /// <returns><see langword="true"/> if visible; otherwise <see langword="false"/>. / 若顯示則為 true，否則為 false。</returns>
     public bool IsColumnVisible(int col) =>
         OdfTableSheetVisibilityEngine.IsColumnVisible(MutationContext, col);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
+
 
     /// <summary>
     /// Adds a named range to this worksheet.
@@ -53,8 +59,9 @@ public partial class OdfTableSheet
     /// <param name="name">The named range's name. / 命名範圍的名稱。</param>
     /// <param name="range">The cell range. / 儲存格範圍。</param>
     /// <param name="baseCell">The base cell address. / 基準儲存格位址。</param>
-    public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null) =>
+    public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell) =>
         OdfTableSheetNamedRangeEngine.AddNamedRange(MutationContext, name, range, baseCell);
+
 
     /// <summary>
     /// Gets the named ranges in this worksheet.
@@ -62,6 +69,12 @@ public partial class OdfTableSheet
     /// </summary>
     public IReadOnlyList<OdfNamedRangeInfo> NamedRanges =>
         OdfTableSheetNamedRangeEngine.GetNamedRanges(MutationContext);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
+
 
     /// <summary>
     /// Adds a named expression to this worksheet.
@@ -70,8 +83,9 @@ public partial class OdfTableSheet
     /// <param name="name">The named expression's name. / 具名運算式的名稱。</param>
     /// <param name="expression">The formula expression string. / 公式運算式字串。</param>
     /// <param name="baseCell">The base cell address. / 基準儲存格位址。</param>
-    public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null) =>
+    public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell) =>
         OdfTableSheetNamedRangeEngine.AddNamedExpression(MutationContext, name, expression, baseCell);
+
 
     /// <summary>
     /// Gets the named expressions in this worksheet.

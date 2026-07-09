@@ -20,6 +20,12 @@ public static partial class OdfLocalizer
     /// 取得或設定全域預設的文化特性。若設定，將覆蓋執行緒預設語系。
     /// </summary>
     public static CultureInfo? DefaultCulture { get; set; }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static string GetSuggestedFix(string ruleId) => GetSuggestedFix(ruleId, null);
+
 
 
     /// <summary>
@@ -29,7 +35,7 @@ public static partial class OdfLocalizer
     /// <param name="ruleId">The unique identifier of the compliance rule. / 合規性規則的唯一識別碼。</param>
     /// <param name="culture">The specified culture; if null, the environment culture is auto-detected. / 指定的文化特性；若為 null 則自動偵測環境語系。</param>
     /// <returns>The suggested fix guidance string for the corresponding culture. / 對應語系的建議修復指引字串。</returns>
-    public static string GetSuggestedFix(string ruleId, CultureInfo? culture = null)
+    public static string GetSuggestedFix(string ruleId, CultureInfo? culture)
     {
         if (string.IsNullOrEmpty(ruleId))
         {
@@ -65,6 +71,7 @@ public static partial class OdfLocalizer
         // 3. 最終防線：才進入 BuildDefaultSuggestedFix 返回硬編碼英文
         return BuildDefaultSuggestedFix(ruleId);
     }
+
 
     /// <summary>
     /// Gets the localized error/warning message for the specified key (using the environment culture).

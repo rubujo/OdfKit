@@ -260,6 +260,12 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
         Node.AppendChild(shapeNode);
         return new OdfShape(shapeNode, Slide.Document);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h) => AddPicture(imageBytes, x, y, w, h, null);
+
 
     /// <summary>
     /// Adds an image to the notes page.
@@ -272,7 +278,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// <param name="h">The height. / 高度。</param>
     /// <param name="altText">The optional image alternative text. / 選用的圖片替代文字。</param>
     /// <returns>The added picture shape instance. / 新增的圖片圖形執行個體。</returns>
-    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
         frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
@@ -297,6 +303,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
         picture.AltText = altText;
         return picture;
     }
+
 
     private static OdfNode? FindTextBoxInNotes(OdfNode notesNode)
     {

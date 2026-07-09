@@ -40,6 +40,12 @@ public partial class OdfTableSheet
     public void AddConditionalFormat(OdfCellRange range, string conditionValue, string styleName) =>
         OdfTableSheetConditionalFormatEngine.AddConditionalFormat(
             MutationContext, range, conditionValue, styleName);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor) => AddColorScaleFormat(range, minColor, maxColor, null);
+
 
     /// <summary>
     /// Adds a two-color or three-color scale conditional format.
@@ -49,10 +55,16 @@ public partial class OdfTableSheet
     /// <param name="minColor">The numeric value. / 最小值對應色彩</param>
     /// <param name="maxColor">The numeric value. / 最大值對應色彩</param>
     /// <param name="midColor">The numeric value. / 中間值對應色彩（可選，設定時為三色色階）</param>
-    public void AddColorScaleFormat(OdfCellRange range,
-        OdfColor minColor, OdfColor maxColor, OdfColor? midColor = null) =>
+    public void AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor, OdfColor? midColor) =>
         OdfTableSheetConditionalFormatEngine.AddColorScaleFormat(
             MutationContext, range, minColor, maxColor, midColor);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddDataBarFormat(OdfCellRange range, OdfColor positiveColor) => AddDataBarFormat(range, positiveColor, null);
+
 
     /// <summary>
     /// Adds a data bar conditional format.
@@ -61,10 +73,16 @@ public partial class OdfTableSheet
     /// <param name="range">The cell range. / 套用範圍</param>
     /// <param name="positiveColor">The numeric value. / 正值橫條色彩</param>
     /// <param name="negativeColor">The numeric value. / 負值橫條色彩（可選）</param>
-    public void AddDataBarFormat(OdfCellRange range,
-        OdfColor positiveColor, OdfColor? negativeColor = null) =>
+    public void AddDataBarFormat(OdfCellRange range, OdfColor positiveColor, OdfColor? negativeColor) =>
         OdfTableSheetConditionalFormatEngine.AddDataBarFormat(
             MutationContext, range, positiveColor, negativeColor);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddDataBar(OdfCellRange range, OdfColor color) => AddDataBar(range, color, null);
+
 
     /// <summary>
     /// Adds a data bar conditional format.
@@ -73,8 +91,9 @@ public partial class OdfTableSheet
     /// <param name="range">The cell range. / 套用範圍</param>
     /// <param name="color">The numeric value. / 正值橫條色彩</param>
     /// <param name="negativeColor">The numeric value. / 負值橫條色彩（可選）</param>
-    public void AddDataBar(OdfCellRange range, OdfColor color, OdfColor? negativeColor = null) =>
+    public void AddDataBar(OdfCellRange range, OdfColor color, OdfColor? negativeColor) =>
         AddDataBarFormat(range, color, negativeColor);
+
 
     /// <summary>
     /// Adds an icon set conditional format.
@@ -93,6 +112,12 @@ public partial class OdfTableSheet
     /// <param name="iconSet">The value to use. / 圖示集類型</param>
     public void AddIconSet(OdfCellRange range, OdfIconSetType iconSet) =>
         AddIconSetFormat(range, iconSet);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell) => AddSparklineGroup(dataRange, hostCell, SparklineType.Line);
+
 
     /// <summary>
     /// Adds a LibreOffice calcext sparkline group to the worksheet.
@@ -102,7 +127,7 @@ public partial class OdfTableSheet
     /// <param name="hostCell">The cell address. / 顯示走勢圖的儲存格位址</param>
     /// <param name="type">The value to use. / 走勢圖類型，預設為折線</param>
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 dataRange 為 null 時拋出</exception>
-    public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell, SparklineType type = SparklineType.Line)
+    public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell, SparklineType type)
     {
         if (dataRange is null)
             throw new ArgumentNullException(nameof(dataRange));
@@ -110,6 +135,7 @@ public partial class OdfTableSheet
         OdfTableSheetConditionalFormatEngine.AddSparklineGroup(
             MutationContext, dataRange.Value, hostCell, type);
     }
+
 
     /// <summary>
     /// Adds a database range to this worksheet.

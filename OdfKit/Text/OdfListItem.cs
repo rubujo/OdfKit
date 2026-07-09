@@ -36,6 +36,12 @@ public class OdfListItem(OdfNode node, TextDocument doc)
                 Node.RemoveAttribute("start-value", OdfNamespaces.Text);
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfParagraph AddParagraph() => AddParagraph("");
+
 
     /// <summary>
     /// Adds a paragraph to the list item.
@@ -43,7 +49,7 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     /// </summary>
     /// <param name="text">The default paragraph content. / 段落的預設內文。</param>
     /// <returns>The created paragraph object. / 建立的段落物件。</returns>
-    public OdfParagraph AddParagraph(string text = "")
+    public OdfParagraph AddParagraph(string text)
     {
         var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         pNode.TextContent = text;
@@ -52,12 +58,19 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfList AddNestedList() => AddNestedList(null);
+
+
+    /// <summary>
     /// Adds a nested list to the list item.
     /// 在清單專案中新增巢狀清單。
     /// </summary>
     /// <param name="styleName">The nested list style name. / 專案清單樣式名稱。</param>
     /// <returns>The newly created nested list instance. / 新建立的巢狀清單執行個體。</returns>
-    public OdfList AddNestedList(string? styleName = null)
+    public OdfList AddNestedList(string? styleName)
     {
         var listNode = OdfNodeFactory.CreateElement("list", OdfNamespaces.Text, "text");
         if (styleName is not null)
@@ -67,6 +80,7 @@ public class OdfListItem(OdfNode node, TextDocument doc)
         Node.AppendChild(listNode);
         return new OdfList(listNode, _doc);
     }
+
 
     /// <summary>
     /// Gets the list of paragraphs within the list item.

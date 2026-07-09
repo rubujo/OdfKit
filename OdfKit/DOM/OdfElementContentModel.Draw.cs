@@ -44,6 +44,12 @@ public partial class DrawPageElement
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawFrameElement AppendFrame() => AppendFrame(null);
+
 
     /// <summary>
     /// Executes the AppendFrame operation.
@@ -51,7 +57,7 @@ public partial class DrawPageElement
     /// </summary>
     /// <param name="name">選用的框架名稱</param>
     /// <returns>新增的 <c>draw:frame</c> 元素</returns>
-    public DrawFrameElement AppendFrame(string? name = null)
+    public DrawFrameElement AppendFrame(string? name)
     {
         DrawFrameElement frame = AppendElement(new DrawFrameElement("draw"));
         if (name is not null)
@@ -63,12 +69,19 @@ public partial class DrawPageElement
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawRectElement AppendRectangle() => AppendRectangle(null);
+
+
+    /// <summary>
     /// Executes the AppendRectangle operation.
     /// 在 <c>draw:page</c> 末尾新增矩形。
     /// </summary>
     /// <param name="name">選用的形狀名稱</param>
     /// <returns>新增的 <c>draw:rect</c> 元素</returns>
-    public DrawRectElement AppendRectangle(string? name = null)
+    public DrawRectElement AppendRectangle(string? name)
     {
         DrawRectElement rectangle = AppendElement(new DrawRectElement("draw"));
         if (name is not null)
@@ -78,6 +91,7 @@ public partial class DrawPageElement
 
         return rectangle;
     }
+
 
     /// <summary>
     /// Executes the AppendNotes operation.

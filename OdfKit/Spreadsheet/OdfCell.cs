@@ -262,6 +262,12 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         DisplayText = val ? "TRUE" : "FALSE";
         _doc.NotifyFormulaRecalculationRequested();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SetValue(DateTime date) => SetValue(date, false);
+
 
     /// <summary>
     /// Sets the date and time value of the cell.
@@ -269,7 +275,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// </summary>
     /// <param name="date">The date and time value. / 日期時間。</param>
     /// <param name="useTimezoneNaive">Whether to ignore time zone conversion and use local time formatting. / 是否忽略時區轉換，使用本地時間格式。</param>
-    public void SetValue(DateTime date, bool useTimezoneNaive = false)
+    public void SetValue(DateTime date, bool useTimezoneNaive)
     {
         ValueType = "date";
         string isoDate;
@@ -289,6 +295,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         DisplayText = isoDate;
         _doc.NotifyFormulaRecalculationRequested();
     }
+
 
     /// <summary>
     /// Sets the text content of the cell.

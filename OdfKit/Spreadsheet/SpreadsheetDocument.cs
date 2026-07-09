@@ -50,6 +50,12 @@ public partial class SpreadsheetDocument : OdfDocument
     {
         return (SpreadsheetDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Spreadsheet);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template) => CreateFromTemplate(template, false);
+
 
     /// <summary>
     /// Creates a new spreadsheet document from the specified spreadsheet template.
@@ -58,10 +64,11 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="template">The spreadsheet template document. / 試算表範本文件。</param>
     /// <param name="clearUserContent">Whether to clear the data rows of each sheet in the template while keeping column widths and sheet structure. / 是否清除範本中各工作表的資料列，但保留欄寬與工作表結構。</param>
     /// <returns>The created <see cref="SpreadsheetDocument"/> instance. / 建立完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
-    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template, bool clearUserContent = false)
+    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template, bool clearUserContent)
     {
         return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet", clearUserContent);
     }
+
 
     /// <summary>
     /// Creates an equivalent ODS (ZIP package) spreadsheet document from a FODS flat XML spreadsheet document, with identical content.

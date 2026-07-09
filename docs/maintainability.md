@@ -155,7 +155,7 @@ ODF 實務流通並非「全站只活在最新 1.4」：
 |------|------|
 | 1.0 API 凍結 | Unshipped → Shipped；搭配 `PackageValidationBaselineVersion` |
 | Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
-| 其餘單一可選參數公開 API | 非 RS 強制；可依使用頻率改為明確多載鏈 |
+| 多可選參數公開 API | 允許單一方法保留尾端 `=`；高頻者可遷 options 物件 |
 
 ## 7. 相關文件
 

@@ -82,6 +82,12 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     {
         return _document.AddSheet(name);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableSheet Adopt(OdfTableSheet sheet) => Adopt(sheet, null);
+
 
     /// <summary>
     /// Adopts a worksheet from another document or the same document to the end of the collection.
@@ -91,10 +97,11 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     /// <param name="newName">The optional new worksheet name after adoption; when unspecified, the source name is preserved. / 採納後選用的新工作表名稱；未指定時保留來源名稱。</param>
     /// <returns>The adopted worksheet that belongs to this collection's owning document. / 採納完成且屬於此集合所屬文件的工作表。</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="sheet"/> is <see langword="null"/>. / 當 <paramref name="sheet"/> 為 <see langword="null"/> 時擲出。</exception>
-    public OdfTableSheet Adopt(OdfTableSheet sheet, string? newName = null)
+    public OdfTableSheet Adopt(OdfTableSheet sheet, string? newName)
     {
         return _document.AdoptSheet(sheet, newName);
     }
+
 
     /// <summary>
     /// Finds a worksheet with the specified name.

@@ -86,6 +86,12 @@ public partial class OdfTableSheet
     /// 取得此工作表中已使用的儲存格列舉。
     /// </summary>
     public IEnumerable<OdfCell> UsedCells => GetUsedCells();
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int PruneAndCollect() => PruneAndCollect(false);
+
 
     /// <summary>
     /// Prunes this worksheet from the spreadsheet DOM tree and releases its subtree references.
@@ -93,11 +99,12 @@ public partial class OdfTableSheet
     /// </summary>
     /// <param name="collectGarbage">Whether to request an optimized GC collection after pruning. / 是否在剪裁後要求執行一次最佳化 GC 收集。</param>
     /// <returns>The number of pruned nodes, including the worksheet node itself. / 已剪裁的節點數，包含工作表節點本身。</returns>
-    public int PruneAndCollect(bool collectGarbage = false)
+    public int PruneAndCollect(bool collectGarbage)
     {
         ReleaseFacadeCaches();
         return TableNode.PruneAndCollect(collectGarbage);
     }
+
 
     internal int FacadeCacheCount =>
         (_cells is null ? 0 : 1) +
@@ -295,6 +302,12 @@ public partial class OdfTableSheet
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void MergeCells(OdfCellRange range) => MergeCells(range, null);
+
 
     /// <summary>
     /// Merges the specified cell range and optionally applies an outer border.
@@ -302,7 +315,7 @@ public partial class OdfTableSheet
     /// </summary>
     /// <param name="range">The cell range. / 儲存格範圍。</param>
     /// <param name="outerBorder">The border format applied to the outside of the merged range. / 套用於合併範圍外部的外框線格式。</param>
-    public void MergeCells(OdfCellRange range, OdfBorder? outerBorder = null)
+    public void MergeCells(OdfCellRange range, OdfBorder? outerBorder)
     {
         int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
         int endRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
@@ -336,6 +349,7 @@ public partial class OdfTableSheet
             }
         }
     }
+
 
     /// <summary>
     /// Unmerges the specified cell range.

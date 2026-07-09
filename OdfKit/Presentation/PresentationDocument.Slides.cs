@@ -38,6 +38,12 @@ public partial class PresentationDocument
 
         return presentation;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSlide AddSlide() => AddSlide(null);
+
 
     /// <summary>
     /// Adds a slide.
@@ -45,7 +51,7 @@ public partial class PresentationDocument
     /// </summary>
     /// <param name="name">The slide name. / 投影片的名稱。</param>
     /// <returns>The added slide instance. / 新增的投影片執行個體。</returns>
-    public OdfSlide AddSlide(string? name = null)
+    public OdfSlide AddSlide(string? name)
     {
         var presentationNode = GetPresentationNode();
         var slideNode = new OdfNode(OdfNodeType.Element, "page", OdfNamespaces.Draw, "draw");
@@ -59,6 +65,7 @@ public partial class PresentationDocument
         _slides.Add(slide);
         return slide;
     }
+
 
     /// <summary>
     /// Clones the specified slide.

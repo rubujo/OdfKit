@@ -72,6 +72,12 @@ public partial class DrawingDocument : OdfDocument
     {
         return (DrawingDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Graphics);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template) => CreateFromTemplate(template, false);
+
 
     /// <summary>
     /// Creates a new drawing document from the specified graphics template document.
@@ -80,10 +86,11 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="template">The graphics template document. / 繪圖範本文件。</param>
     /// <param name="clearUserContent">Whether to clear the text content of each page in the template while keeping layout and shape structure. / 是否清除範本中各頁面的文字內容，但保留版面配置與形狀結構。</param>
     /// <returns>The created <see cref="DrawingDocument"/> instance. / 建立完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
-    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template, bool clearUserContent = false)
+    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template, bool clearUserContent)
     {
         return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics", clearUserContent);
     }
+
 
     /// <summary>
     /// Creates an equivalent ODG (ZIP package) drawing document from a FODG flat XML drawing document, with identical content.
@@ -213,6 +220,12 @@ public partial class DrawingDocument : OdfDocument
 
         return drawing;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPage AddPage() => AddPage(null);
+
 
     /// <summary>
     /// Adds a drawing page.
@@ -220,7 +233,7 @@ public partial class DrawingDocument : OdfDocument
     /// </summary>
     /// <param name="name">The page name. / 頁面名稱。</param>
     /// <returns>The newly added drawing page instance. / 新增的繪圖頁面執行個體。</returns>
-    public OdfDrawPage AddPage(string? name = null)
+    public OdfDrawPage AddPage(string? name)
     {
         var drawingNode = GetDrawingNode();
         var pageNode = OdfNodeFactory.CreateElement("page", OdfNamespaces.Draw, "draw");
@@ -235,6 +248,7 @@ public partial class DrawingDocument : OdfDocument
         _pages.Add(page);
         return page;
     }
+
 
     /// <summary>
     /// Adds a path shape to the drawing document (applied to the default first page).
@@ -265,6 +279,12 @@ public partial class DrawingDocument : OdfDocument
             AddPage();
         return Pages[0].AddPolygon(points);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
+
 
     /// <summary>
     /// Creates a connector linking a start shape and an end shape on the drawing document (applied to the default first page).
@@ -274,12 +294,13 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
     /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
     /// <returns>The newly added connector shape instance. / 新增的連接線圖形執行個體。</returns>
-    public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
+    public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType)
     {
         if (Pages.Count == 0)
             AddPage();
         return Pages[0].AddConnector(startShapeId, endShapeId, connectorType);
     }
+
 
     /// <summary>
     /// Adds a custom shape to the drawing document (applied to the default first page).

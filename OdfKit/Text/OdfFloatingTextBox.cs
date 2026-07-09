@@ -18,6 +18,12 @@ public sealed class OdfFloatingTextBox
         _textBoxNode = textBoxNode ?? throw new ArgumentNullException(nameof(textBoxNode));
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfParagraph AddParagraph() => AddParagraph("");
+
 
     /// <summary>
     /// Adds a paragraph to the text box.
@@ -25,11 +31,12 @@ public sealed class OdfFloatingTextBox
     /// </summary>
     /// <param name="text">The paragraph text. / 段落文字。</param>
     /// <returns>The newly created paragraph. / 新建立的段落。</returns>
-    public OdfParagraph AddParagraph(string text = "")
+    public OdfParagraph AddParagraph(string text)
     {
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         paragraphNode.TextContent = text;
         _textBoxNode.AppendChild(paragraphNode);
         return new OdfParagraph(paragraphNode, _document);
     }
+
 }

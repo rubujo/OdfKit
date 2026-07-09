@@ -547,12 +547,19 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
     /// 執行 Pin 作業。
     /// </summary>
 
-    public override System.Buffers.MemoryHandle Pin(int elementIndex = 0)
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public System.Buffers.MemoryHandle Pin() => Pin(0);
+
+    public override System.Buffers.MemoryHandle Pin(int elementIndex)
     {
         if (elementIndex < 0 || elementIndex > _length)
             throw new ArgumentOutOfRangeException(nameof(elementIndex));
         return new System.Buffers.MemoryHandle(_pointer + elementIndex);
     }
+
     /// <summary>
     /// Executes the Unpin operation.
     /// 執行 Unpin 作業。

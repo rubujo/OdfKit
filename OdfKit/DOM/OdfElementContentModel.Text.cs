@@ -25,6 +25,12 @@ public partial class OfficeTextElement
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextPElement AppendParagraph() => AppendParagraph("");
+
 
     /// <summary>
     /// Executes the AppendParagraph operation.
@@ -32,7 +38,7 @@ public partial class OfficeTextElement
     /// </summary>
     /// <param name="text">段落文字內容</param>
     /// <returns>新增的 <c>text:p</c> 元素</returns>
-    public TextPElement AppendParagraph(string text = "")
+    public TextPElement AppendParagraph(string text)
     {
         TextPElement paragraph = AppendElement(new TextPElement("text"));
         if (!string.IsNullOrEmpty(text))
@@ -44,13 +50,20 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextHElement AppendHeading(string text) => AppendHeading(text, 1);
+
+
+    /// <summary>
     /// Executes the AppendHeading operation.
     /// 在 <c>office:text</c> 末尾新增標題。
     /// </summary>
     /// <param name="text">標題文字內容</param>
     /// <param name="outlineLevel">大綱階層，預設為 1</param>
     /// <returns>新增的 <c>text:h</c> 元素</returns>
-    public TextHElement AppendHeading(string text, int outlineLevel = 1)
+    public TextHElement AppendHeading(string text, int outlineLevel)
     {
         TextHElement heading = AppendElement(new TextHElement("text"));
         heading.OutlineLevel = outlineLevel;
@@ -59,12 +72,19 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextListElement AppendList() => AppendList(null);
+
+
+    /// <summary>
     /// Executes the AppendList operation.
     /// 在 <c>office:text</c> 末尾新增專案清單。
     /// </summary>
     /// <param name="styleName">選用的清單樣式名稱</param>
     /// <returns>新增的 <c>text:list</c> 元素</returns>
-    public TextListElement AppendList(string? styleName = null)
+    public TextListElement AppendList(string? styleName)
     {
         TextListElement list = AppendElement(new TextListElement("text"));
         if (styleName is not null)
@@ -76,12 +96,19 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TableTableElement AppendTable() => AppendTable(null);
+
+
+    /// <summary>
     /// Executes the AppendTable operation.
     /// 在 <c>office:text</c> 末尾新增表格。
     /// </summary>
     /// <param name="name">選用的表格名稱</param>
     /// <returns>新增的 <c>table:table</c> 元素</returns>
-    public TableTableElement AppendTable(string? name = null)
+    public TableTableElement AppendTable(string? name)
     {
         TableTableElement table = AppendElement(new TableTableElement("table"));
         if (name is not null)
@@ -91,6 +118,7 @@ public partial class OfficeTextElement
 
         return table;
     }
+
 
     /// <summary>
     /// Executes the AppendSection operation.

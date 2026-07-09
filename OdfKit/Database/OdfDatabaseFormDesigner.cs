@@ -440,6 +440,12 @@ public sealed class OdfDatabaseFormDesigner
         AddDrawControl(id, x, y, width, height);
         return timeNode;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void SetControlEvent(OdfNode controlNode, string eventName, string macroName) => SetControlEvent(controlNode, eventName, macroName, "ooo:script");
+
 
     /// <summary>
     /// Binds an event listener to a control (<c>office:event-listeners</c>／<c>script:event-listener</c>).
@@ -451,7 +457,7 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="language">The macro language, defaulting to <c>ooo:script</c>. / 巨集語言，預設為 <c>ooo:script</c>。</param>
     /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
     /// <exception cref="ArgumentException">When <paramref name="eventName"/> or <paramref name="macroName"/> is blank. / 當 <paramref name="eventName"/> 或 <paramref name="macroName"/> 為空白時擲出。</exception>
-    public void SetControlEvent(OdfNode controlNode, string eventName, string macroName, string language = "ooo:script")
+    public void SetControlEvent(OdfNode controlNode, string eventName, string macroName, string language)
     {
         if (controlNode is null)
         {
@@ -495,6 +501,7 @@ public sealed class OdfDatabaseFormDesigner
         listener.SetAttribute("language", ScriptNs, language, "script");
         listener.SetAttribute("macro-name", ScriptNs, macroName, "script");
     }
+
 
     /// <summary>
     /// Sets whether a control is required (corresponding to <c>form:input-required</c>).

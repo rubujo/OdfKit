@@ -254,6 +254,12 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
         SetOptionalDrawAttribute("corner-radius", radius.ToString());
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImageEffectsBuilder Shadow(OdfColor color, OdfLength offsetX, OdfLength offsetY) => Shadow(color, offsetX, offsetY, null);
+
 
     /// <summary>
     /// Executes the Shadow operation.
@@ -264,7 +270,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     /// <param name="offsetY">Y 軸位移</param>
     /// <param name="opacity">選用的陰影不透明度</param>
     /// <returns>目前的建構器</returns>
-    public OdfImageEffectsBuilder Shadow(OdfColor color, OdfLength offsetX, OdfLength offsetY, OdfPercent? opacity = null)
+    public OdfImageEffectsBuilder Shadow(OdfColor color, OdfLength offsetX, OdfLength offsetY, OdfPercent? opacity)
     {
         SetOptionalDrawAttribute("shadow", "visible");
         SetOptionalDrawAttribute("shadow-color", color.ToString());
@@ -273,6 +279,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
         SetOptionalDrawAttribute("shadow-opacity", opacity?.ToString());
         return this;
     }
+
 
     /// <summary>
     /// Executes the ClearShadow operation.

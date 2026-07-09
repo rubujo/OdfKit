@@ -49,6 +49,12 @@ public class OdfList
                 Node.RemoveAttribute("continue-numbering", OdfNamespaces.Text);
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfListItem AddListItem() => AddListItem("");
+
 
     /// <summary>
     /// Adds a list item to the list.
@@ -56,7 +62,7 @@ public class OdfList
     /// </summary>
     /// <param name="text">The default paragraph text content of the item. / 專案預設段落文字內容。</param>
     /// <returns>The newly created list item instance. / 新建立的清單專案執行個體。</returns>
-    public OdfListItem AddListItem(string text = "")
+    public OdfListItem AddListItem(string text)
     {
         var itemNode = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
         Node.AppendChild(itemNode);
@@ -69,13 +75,20 @@ public class OdfList
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfListItem AddItem(string text) => AddItem(text, 1);
+
+
+    /// <summary>
     /// Executes the AddItem operation.
     /// 在指定層級新增清單專案（1-based）。層級 1 直接加入此清單；
     /// </summary>
     /// <param name="text">The item text content. / 專案文字內容。</param>
     /// <param name="level">The target level, starting from 1, with a maximum of 10. / 目標層級，從 1 開始，最大值為 10。</param>
     /// <returns>The newly created list item. / 新建立的清單專案。</returns>
-    public OdfListItem AddItem(string text, int level = 1)
+    public OdfListItem AddItem(string text, int level)
     {
         if (level < 1)
             level = 1;
@@ -112,6 +125,7 @@ public class OdfList
         return item;
     }
 
+
     private static OdfNode? FindLastListItem(OdfNode listNode)
     {
         OdfNode? last = null;
@@ -132,13 +146,19 @@ public class OdfList
         }
         return null;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void RestartNumbering() => RestartNumbering(1);
+
 
     /// <summary>
     /// Restarts the list's numbering.
     /// 重新開始清單的編號。
     /// </summary>
     /// <param name="startValue">The start value. / 開始數值。</param>
-    public void RestartNumbering(int startValue = 1)
+    public void RestartNumbering(int startValue)
     {
         ContinueNumbering = false;
         var firstItemNode = Node.Children.FirstOrDefault(c => c.LocalName == "list-item" && c.NamespaceUri == OdfNamespaces.Text);
@@ -148,6 +168,7 @@ public class OdfList
             item.StartValue = startValue;
         }
     }
+
 
     /// <summary>
     /// Sets the starting number of the list.

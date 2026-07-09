@@ -14,6 +14,12 @@ namespace OdfKit.Database;
 public partial class OdfDatabaseDocument
 {
     #region Add Operations
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNode AddTable(string name) => AddTable(name, null);
+
 
     /// <summary>
     /// Adds a table description.
@@ -22,7 +28,7 @@ public partial class OdfDatabaseDocument
     /// <param name="name">The table name. / 資料表名稱。</param>
     /// <param name="command">The optional table command or source name. / 選用的資料表命令或來源名稱。</param>
     /// <returns>The added table node. / 新增的資料表節點。</returns>
-    public OdfNode AddTable(string name, string? command = null)
+    public OdfNode AddTable(string name, string? command)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -45,6 +51,7 @@ public partial class OdfDatabaseDocument
         tableRepresentations.AppendChild(table);
         return table;
     }
+
 
     /// <summary>
     /// Adds a query description.

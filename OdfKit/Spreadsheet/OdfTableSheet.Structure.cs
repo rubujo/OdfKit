@@ -11,12 +11,18 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void InsertRows(int position) => InsertRows(position, 1);
+
+    /// <summary>
     /// Inserts rows at the specified position and records <c>table:insertion</c> when change tracking is enabled.
     /// 於指定位置插入列；若啟用追蹤修訂則記錄 <c>table:insertion</c>。
     /// </summary>
     /// <param name="position">The numeric value. / 以 0 為基準的插入列索引</param>
     /// <param name="count">The numeric value. / 要插入的列數</param>
-    public void InsertRows(int position, int count = 1)
+    public void InsertRows(int position, int count)
     {
         if (position < 0)
             throw new ArgumentOutOfRangeException(nameof(position));
@@ -42,12 +48,19 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void DeleteRows(int position) => DeleteRows(position, 1);
+
+
+    /// <summary>
     /// Deletes rows at the specified position and records <c>table:deletion</c> when change tracking is enabled.
     /// 刪除指定位置的列；若啟用追蹤修訂則記錄 <c>table:deletion</c>。
     /// </summary>
     /// <param name="position">The numeric value. / 以 0 為基準的起始列索引</param>
     /// <param name="count">The numeric value. / 要刪除的列數</param>
-    public void DeleteRows(int position, int count = 1)
+    public void DeleteRows(int position, int count)
     {
         if (position < 0)
             throw new ArgumentOutOfRangeException(nameof(position));
@@ -77,6 +90,7 @@ public partial class OdfTableSheet
                 deletedSnapshots);
         }
     }
+
 
     /// <summary>
     /// Copies the specified row range to the target position.
@@ -129,6 +143,12 @@ public partial class OdfTableSheet
 
         InvalidateAccessCache();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void InsertColumns(int position) => InsertColumns(position, 1);
+
 
     /// <summary>
     /// Inserts columns at the specified position and records <c>table:insertion</c> when change tracking is enabled.
@@ -136,7 +156,7 @@ public partial class OdfTableSheet
     /// </summary>
     /// <param name="position">The numeric value. / 以 0 為基準的插入欄索引</param>
     /// <param name="count">The numeric value. / 要插入的欄數</param>
-    public void InsertColumns(int position, int count = 1)
+    public void InsertColumns(int position, int count)
     {
         if (position < 0)
             throw new ArgumentOutOfRangeException(nameof(position));
@@ -158,12 +178,19 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void DeleteColumns(int position) => DeleteColumns(position, 1);
+
+
+    /// <summary>
     /// Deletes columns at the specified position and records <c>table:deletion</c> when change tracking is enabled.
     /// 刪除指定位置的欄；若啟用追蹤修訂則記錄 <c>table:deletion</c>。
     /// </summary>
     /// <param name="position">The numeric value. / 以 0 為基準的起始欄索引</param>
     /// <param name="count">The numeric value. / 要刪除的欄數</param>
-    public void DeleteColumns(int position, int count = 1)
+    public void DeleteColumns(int position, int count)
     {
         if (position < 0)
             throw new ArgumentOutOfRangeException(nameof(position));
@@ -184,6 +211,7 @@ public partial class OdfTableSheet
                 deletedSnapshots);
         }
     }
+
 
     /// <summary>
     /// Moves cell content from the source address to the target address and records <c>table:movement</c> when change tracking is enabled.

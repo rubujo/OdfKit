@@ -78,6 +78,12 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         Node.AppendChild(shapeNode);
         return new OdfShape(shapeNode, Document);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
+
 
     /// <summary>
     /// Adds a connector within the group.
@@ -87,10 +93,7 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
     /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
     /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
     /// <returns>The newly added connector shape instance. / 新增的連接線圖形執行個體。</returns>
-    public OdfShape AddConnector(
-        string startShapeId,
-        string endShapeId,
-        OdfConnectorType connectorType = OdfConnectorType.Standard)
+    public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType)
     {
         if (string.IsNullOrEmpty(startShapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawGroup_StartingCannotBeEmpty"), nameof(startShapeId));
@@ -115,6 +118,7 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         Node.AppendChild(connectorNode);
         return new OdfShape(connectorNode, Document);
     }
+
 
     private static OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {

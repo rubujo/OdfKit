@@ -189,6 +189,12 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 不含選用參數的公開多載。
     /// </summary>
     public void AddHeading(ReadOnlyMemory<char> text, int level) => AddHeading(text.Span, level);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void BeginList() => BeginList(null);
+
 
     /// <summary>
     /// Begins a list.
@@ -196,7 +202,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="styleName">The list style name. / 清單樣式名稱。</param>
     /// <exception cref="InvalidOperationException">Thrown when a list has already begun. / 當清單已經開始時擲出。</exception>
-    public void BeginList(string? styleName = null)
+    public void BeginList(string? styleName)
     {
         EnsureNotDisposed();
         if (_isListStarted)
@@ -213,6 +219,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
         _isListStarted = true;
     }
+
 
     /// <summary>
     /// Adds a list item.

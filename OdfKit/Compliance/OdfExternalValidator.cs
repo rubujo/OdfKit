@@ -86,6 +86,12 @@ public static class OdfExternalValidator
             timeoutMilliseconds,
             cancellationToken);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfExternalValidatorResult ValidateWithCommand(string commandPath, string filePath) => ValidateWithCommand(commandPath, filePath, 30000);
+
 
     /// <summary>
     /// Executes the ValidateWithCommand operation.
@@ -99,13 +105,11 @@ public static class OdfExternalValidator
     /// Prefer <see cref="ValidateWithCommandAsync(string, string, int, CancellationToken)"/> in server environments to avoid blocking request threads.
     /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="ValidateWithCommandAsync(string, string, int, CancellationToken)"/> 以避免阻塞要求執行緒。
     /// </remarks>
-    public static OdfExternalValidatorResult ValidateWithCommand(
-        string commandPath,
-        string filePath,
-        int timeoutMilliseconds = 30000)
+    public static OdfExternalValidatorResult ValidateWithCommand(string commandPath, string filePath, int timeoutMilliseconds)
     {
         return ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds).GetAwaiter().GetResult();
     }
+
 
     /// <summary>
     /// Executes the ValidateWithCommandAsync operation.

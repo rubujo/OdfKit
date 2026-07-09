@@ -131,6 +131,12 @@ public partial class OdfSlide
         return new OdfTextBox(frame, this);
     }
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfMediaObject AddVideo(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddVideo(packagePath, x, y, width, height, "video/mp4");
+
+    /// <summary>
     /// Adds a video object to the slide.
     /// 在投影片上新增影片物件。
     /// </summary>
@@ -141,16 +147,17 @@ public partial class OdfSlide
     /// <param name="height">The height. / 高度。</param>
     /// <param name="mimeType">The video MIME type. / 影片 MIME 類型。</param>
     /// <returns>The newly created media object. / 新建立的媒體物件。</returns>
-    public OdfMediaObject AddVideo(
-        string packagePath,
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string mimeType = "video/mp4")
+    public OdfMediaObject AddVideo(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string mimeType)
     {
         return AddMedia(packagePath, x, y, width, height, mimeType);
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfMediaObject AddAudio(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddAudio(packagePath, x, y, width, height, "audio/mpeg");
+
 
     /// <summary>
     /// Adds an audio object to the slide.
@@ -163,16 +170,11 @@ public partial class OdfSlide
     /// <param name="height">The height. / 高度。</param>
     /// <param name="mimeType">The audio MIME type. / 音訊 MIME 類型。</param>
     /// <returns>The newly created media object. / 新建立的媒體物件。</returns>
-    public OdfMediaObject AddAudio(
-        string packagePath,
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string mimeType = "audio/mpeg")
+    public OdfMediaObject AddAudio(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string mimeType)
     {
         return AddMedia(packagePath, x, y, width, height, mimeType);
     }
+
 
     private OdfMediaObject AddMedia(
         string packagePath,
@@ -281,6 +283,12 @@ public partial class OdfSlide
         AddDrawingObjectNode(shapeNode);
         return new OdfShape(shapeNode, this);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h) => AddPicture(imageBytes, x, y, w, h, null);
+
 
     /// <summary>
     /// Adds an image to the slide.
@@ -293,7 +301,7 @@ public partial class OdfSlide
     /// <param name="h">The height. / 高度。</param>
     /// <param name="altText">The optional image alternative text. / 選用的圖片替代文字。</param>
     /// <returns>The added picture shape instance. / 新增的圖片圖形執行個體。</returns>
-    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
 
@@ -312,6 +320,7 @@ public partial class OdfSlide
         picture.AltText = altText;
         return picture;
     }
+
 
     /// <summary>
     /// Sets the slide transition animation effect.

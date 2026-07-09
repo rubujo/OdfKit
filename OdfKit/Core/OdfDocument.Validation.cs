@@ -14,6 +14,12 @@ namespace OdfKit.Core;
 public abstract partial class OdfDocument
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfValidationReport Validate() => Validate(null);
+
+    /// <summary>
     /// Executes the Validate operation.
     /// 驗證目前文件（反映記憶體中尚未儲存的編輯內容）是否符合 ODF 規格。
     /// </summary>
@@ -23,13 +29,14 @@ public abstract partial class OdfDocument
     /// 此方法會先將目前 DOM 狀態序列化為記憶體中的暫存封裝（不影響原始 <see cref="Package"/>
     /// 或來源檔案），再交由 <see cref="OdfValidator"/> 驗證，因此可反映呼叫前所做的任何編輯。
     /// </remarks>
-    public OdfValidationReport Validate(OdfComplianceProfile? profile = null)
+    public OdfValidationReport Validate(OdfComplianceProfile? profile)
     {
         using MemoryStream snapshot = new();
         SaveToStream(snapshot);
         OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
         return MergeTopologyReport(packageReport);
     }
+
 
     /// <summary>
     /// Executes the ValidateAsync operation.

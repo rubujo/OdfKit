@@ -10,6 +10,12 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     #region Document Elements - Fields & Variables
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfParagraph AddParagraph() => AddParagraph("");
+
 
     /// <summary>
     /// Adds a paragraph to the end of the document body.
@@ -17,8 +23,15 @@ public partial class TextDocument
     /// </summary>
     /// <param name="text">The paragraph's text content. / 段落的文字內容。</param>
     /// <returns>The newly created paragraph instance. / 新建立的段落執行個體。</returns>
-    public OdfParagraph AddParagraph(string text = "") =>
+    public OdfParagraph AddParagraph(string text) =>
         TextDocumentFieldsEngine.AddParagraph(this, MutationContext, text);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfParagraphPrebindingWriter BeginParagraphPrebinding() => BeginParagraphPrebinding(null);
+
 
     /// <summary>
     /// Creates a batch paragraph writer pre-bound to the text body root node.
@@ -26,8 +39,9 @@ public partial class TextDocument
     /// </summary>
     /// <param name="styleName">The optional paragraph style name, applied to all paragraphs added through this writer. / 選用的段落樣式名稱，會套用至此寫入器新增的所有段落。</param>
     /// <returns>The pre-bound paragraph writer. / 預先綁定的段落寫入器。</returns>
-    public OdfParagraphPrebindingWriter BeginParagraphPrebinding(string? styleName = null) =>
+    public OdfParagraphPrebindingWriter BeginParagraphPrebinding(string? styleName) =>
         new(MutationContext, styleName);
+
 
     /// <summary>
     /// Adds a heading to the end of the document body.
@@ -38,6 +52,12 @@ public partial class TextDocument
     /// <returns>The newly created heading instance. / 新建立的標題執行個體。</returns>
     public OdfHeading AddHeading(string text, int outlineLevel) =>
         TextDocumentFieldsEngine.AddHeading(this, MutationContext, text, outlineLevel);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfList AddList() => AddList(null);
+
 
     /// <summary>
     /// Adds a list to the end of the document body.
@@ -45,8 +65,9 @@ public partial class TextDocument
     /// </summary>
     /// <param name="styleName">The list style name. / 專案清單樣式名稱。</param>
     /// <returns>The newly created list. / 新建立的清單專案。</returns>
-    public OdfList AddList(string? styleName = null) =>
+    public OdfList AddList(string? styleName) =>
         TextDocumentFieldsEngine.AddList(this, MutationContext, styleName);
+
 
     /// <summary>
     /// Creates a list with a multi-level style definition; the style is written to the <c>office:styles</c> section of styles.xml.

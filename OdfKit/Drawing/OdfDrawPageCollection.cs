@@ -38,6 +38,12 @@ public sealed class OdfDrawPageCollection : IReadOnlyList<OdfDrawPage>
     /// <param name="index">The zero-based page index. / 以 0 為基準的頁面索引。</param>
     /// <returns>The specified drawing page. / 指定的繪圖頁面。</returns>
     public OdfDrawPage this[int index] => _document.GetPagesSnapshot()[index];
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPage Add() => Add(null);
+
 
     /// <summary>
     /// Adds a drawing page.
@@ -45,10 +51,11 @@ public sealed class OdfDrawPageCollection : IReadOnlyList<OdfDrawPage>
     /// </summary>
     /// <param name="name">The optional page name. / 選用的頁面名稱。</param>
     /// <returns>The newly added drawing page. / 新增完成的繪圖頁面。</returns>
-    public OdfDrawPage Add(string? name = null)
+    public OdfDrawPage Add(string? name)
     {
         return _document.AddPage(name);
     }
+
 
     /// <summary>
     /// Gets an enumerator for the drawing pages.

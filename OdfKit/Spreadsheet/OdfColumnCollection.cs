@@ -28,6 +28,12 @@ public sealed class OdfColumnCollection
     /// <param name="index">The zero-based column index. / 採 0 為基準的欄索引。</param>
     /// <returns>The specified column. / 指定欄。</returns>
     public OdfSheetColumn this[int index] => new(_sheet, index);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void Group(int startColumn, int endColumn) => Group(startColumn, endColumn, false);
+
 
     /// <summary>
     /// Groups the specified column range so it can be expanded or collapsed.
@@ -36,10 +42,11 @@ public sealed class OdfColumnCollection
     /// <param name="startColumn">The zero-based start column index. / 採 0 為基準的起始欄索引。</param>
     /// <param name="endColumn">The zero-based inclusive end column index. / 採 0 為基準且包含在內的結束欄索引。</param>
     /// <param name="collapsed">Whether the group is collapsed by default. / 是否預設為收合狀態。</param>
-    public void Group(int startColumn, int endColumn, bool collapsed = false)
+    public void Group(int startColumn, int endColumn, bool collapsed)
     {
         _sheet.GroupColumns(startColumn, endColumn, collapsed);
     }
+
 
     /// <summary>
     /// Removes the group containing the specified column range and moves the columns back to the worksheet body.

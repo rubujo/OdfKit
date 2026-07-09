@@ -29,6 +29,12 @@ public partial class SpreadsheetDocument
         OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, table);
         return new OdfTableSheet(table, this);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableSheet AdoptSheet(OdfTableSheet sheet) => AdoptSheet(sheet, null);
+
 
     /// <summary>
     /// Adopts a worksheet from another document or the same document at the end of this workbook.
@@ -42,7 +48,7 @@ public partial class SpreadsheetDocument
     /// 此方法沿用 <see cref="OdfDocument.AdoptNode(OdfDocument, OdfNode)"/> 的低分配採納路徑，
     /// 會將來源工作表節點自原本活頁簿移除、遷移媒體參照，並更新節點文件所有權與命名空間前綴。
     /// </remarks>
-    public OdfTableSheet AdoptSheet(OdfTableSheet sheet, string? newName = null)
+    public OdfTableSheet AdoptSheet(OdfTableSheet sheet, string? newName)
     {
         if (sheet is null)
         {
@@ -58,6 +64,7 @@ public partial class SpreadsheetDocument
         OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, adopted);
         return new OdfTableSheet(adopted, this);
     }
+
 
     /// <summary>
     /// Finds the worksheet with the specified name.

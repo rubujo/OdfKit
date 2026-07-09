@@ -23,6 +23,12 @@ public partial class OdfNode
     {
         return ReleaseUnusedNodesCore();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int PruneAndCollect() => PruneAndCollect(false);
+
 
     /// <summary>
     /// Executes the PruneAndCollect operation.
@@ -34,7 +40,7 @@ public partial class OdfNode
     /// 此方法不會為了清理而具現化延遲載入的子樹；未解析的延遲 XML 緩衝區會直接解除參照。
     /// 呼叫後，此節點物件仍可被持有，但已不再代表原本的文件子樹。
     /// </remarks>
-    public int PruneAndCollect(bool collectGarbage = false)
+    public int PruneAndCollect(bool collectGarbage)
     {
         OdfStyleEngine? styleEngine = Document?.StyleEngine;
         Parent?.Children.Remove(this);
@@ -47,6 +53,7 @@ public partial class OdfNode
 
         return prunedCount;
     }
+
 
     private int ReleaseUnusedNodesCore()
     {

@@ -34,6 +34,12 @@ public partial class OdfNumberFormatter
         _stylesRoot = stylesRoot ?? throw new ArgumentNullException(nameof(stylesRoot));
         PopulateCacheFromExistingStyles();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string GetOrCreateNumberStyle(string dotNetFormat) => GetOrCreateNumberStyle(dotNetFormat, null);
+
 
     /// <summary>
     /// Executes the GetOrCreateNumberStyle operation.
@@ -42,7 +48,7 @@ public partial class OdfNumberFormatter
     /// <param name="dotNetFormat">.NET 格式字串</param>
     /// <param name="culture">地區設定資訊</param>
     /// <returns>註冊或建立的樣式名稱</returns>
-    public string GetOrCreateNumberStyle(string dotNetFormat, CultureInfo? culture = null)
+    public string GetOrCreateNumberStyle(string dotNetFormat, CultureInfo? culture)
     {
         var cult = culture ?? CultureInfo.InvariantCulture;
         string normalized = ResolveStandardFormat(dotNetFormat, cult);
@@ -91,6 +97,7 @@ public partial class OdfNumberFormatter
         _formatRequestCache[normalized] = generatedName;
         return generatedName;
     }
+
 
     /// <summary>
     /// Executes the GetNumberStyleNode operation.

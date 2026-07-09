@@ -189,6 +189,12 @@ public static partial class OdfEncryption
         if (!ByteArrayEquals(calculatedChecksum, info.Checksum))
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void Encrypt(OdfPackage package, string password) => Encrypt(package, password, OdfEncryptionAlgorithm.Aes256);
+
 
     /// <summary>
     /// Executes the Encrypt operation.
@@ -197,7 +203,7 @@ public static partial class OdfEncryption
     /// <param name="package">要加密的 ODF 封裝執行個體</param>
     /// <param name="password">加密密碼</param>
     /// <param name="algorithm">加密演算法，預設為 AES-256</param>
-    public static void Encrypt(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256)
+    public static void Encrypt(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm)
     {
         LastParallelEncryptedEntryCountForTests = 0;
         LastParallelEncryptionMaxDegreeForTests = 0;
@@ -238,6 +244,7 @@ public static partial class OdfEncryption
             entry.EncryptionInfo = info;
         }
     }
+
 
     private static void EncryptBuiltInEntries(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm)
     {

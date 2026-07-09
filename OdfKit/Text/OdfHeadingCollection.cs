@@ -23,6 +23,12 @@ public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfHeading Add(string text) => Add(text, 1);
+
 
     /// <summary>
     /// Adds a heading paragraph to the collection.
@@ -31,10 +37,11 @@ public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
     /// <param name="text">The heading text. / 標題文字。</param>
     /// <param name="outlineLevel">The outline level. / 大綱階層。</param>
     /// <returns>The newly added heading. / 新增完成的標題。</returns>
-    public OdfHeading Add(string text, int outlineLevel = 1)
+    public OdfHeading Add(string text, int outlineLevel)
     {
         return _document.AddHeading(text, outlineLevel);
     }
+
 
     /// <summary>
     /// Gets a summary list of the top-level headings in the document body.

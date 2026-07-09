@@ -455,6 +455,12 @@ public partial class OdfDrawPage
                 ("f2", "14510+?f0 "),
             }),
     };
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawGroup AddGroup() => AddGroup(null);
+
 
     /// <summary>
     /// Adds a group on the drawing page.
@@ -462,7 +468,7 @@ public partial class OdfDrawPage
     /// </summary>
     /// <param name="name">The optional group name. / 選用的群組名稱。</param>
     /// <returns>The newly added drawing group instance. / 新增的繪圖群組執行個體。</returns>
-    public OdfDrawGroup AddGroup(string? name = null)
+    public OdfDrawGroup AddGroup(string? name)
     {
         var groupNode = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
         var id = "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -476,6 +482,7 @@ public partial class OdfDrawPage
         Node.AppendChild(groupNode);
         return new OdfDrawGroup(groupNode, Document);
     }
+
 
     #endregion
 }

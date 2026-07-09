@@ -26,6 +26,12 @@ public partial class OfficeImageElement
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawFrameElement AppendImageFrame() => AppendImageFrame(null);
+
 
     /// <summary>
     /// Executes the AppendImageFrame operation.
@@ -33,7 +39,7 @@ public partial class OfficeImageElement
     /// </summary>
     /// <param name="name">選用的框架名稱</param>
     /// <returns>新增的 <c>draw:frame</c> 元素</returns>
-    public DrawFrameElement AppendImageFrame(string? name = null)
+    public DrawFrameElement AppendImageFrame(string? name)
     {
         DrawFrameElement frame = AppendElement(new DrawFrameElement("draw"));
         if (name is not null)
@@ -43,4 +49,5 @@ public partial class OfficeImageElement
 
         return frame;
     }
+
 }

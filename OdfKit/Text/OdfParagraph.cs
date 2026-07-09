@@ -290,13 +290,19 @@ public partial class OdfParagraph
         var node = OdfNodeFactory.CreateElement("line-break", OdfNamespaces.Text, "text");
         Node.AppendChild(node);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddSpace() => AddSpace(1);
+
 
     /// <summary>
     /// Adds the specified number of space entries in the paragraph.
     /// 在段落中新增指定數量的空格專案。
     /// </summary>
     /// <param name="count">The number of spaces. / 空格數量。</param>
-    public void AddSpace(int count = 1)
+    public void AddSpace(int count)
     {
         var node = OdfNodeFactory.CreateElement("s", OdfNamespaces.Text, "text");
         if (count > 1)
@@ -305,6 +311,7 @@ public partial class OdfParagraph
         }
         Node.AppendChild(node);
     }
+
 
     /// <summary>
     /// Deletes this paragraph.
@@ -394,6 +401,12 @@ public partial class OdfParagraph
     /// 在段落中新增章節欄位。
     /// </summary>
     public void AddChapterField() => Doc.AddChapterField(this);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddSequenceField(string name) => AddSequenceField(name, "1");
+
 
     /// <summary>
     /// Adds a sequence number field in the paragraph.
@@ -401,7 +414,8 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="name">The sequence field name. / 序號欄位名稱。</param>
     /// <param name="numFormat">The number format. / 編號格式。</param>
-    public void AddSequenceField(string name, string numFormat = "1") => Doc.AddSequenceField(this, name, numFormat);
+    public void AddSequenceField(string name, string numFormat) => Doc.AddSequenceField(this, name, numFormat);
+
 
     /// <summary>
     /// Adds a reference entry field in the paragraph.
@@ -409,6 +423,12 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="refName">The reference entry name. / 參考專案名稱。</param>
     public void AddReferenceField(string refName) => Doc.AddReferenceField(this, refName);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddSequenceRefField(string sequenceName) => AddSequenceRefField(sequenceName, "value");
+
 
     /// <summary>
     /// Adds a sequence cross-reference field in the paragraph.
@@ -416,8 +436,14 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="sequenceName">The sequence field name. / 序號欄位名稱。</param>
     /// <param name="referenceFormat">The reference format; defaults to "value". / 參照格式，預設為 "value"。</param>
-    public void AddSequenceRefField(string sequenceName, string referenceFormat = "value")
-        => Doc.AddSequenceRefField(this, sequenceName, referenceFormat);
+    public void AddSequenceRefField(string sequenceName, string referenceFormat) => Doc.AddSequenceRefField(this, sequenceName, referenceFormat);
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddBookmarkReferenceField(string bookmarkName) => AddBookmarkReferenceField(bookmarkName, "text");
+
 
     /// <summary>
     /// Adds a bookmark reference field in the paragraph.
@@ -425,7 +451,8 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="bookmarkName">The bookmark name. / 書籤名稱。</param>
     /// <param name="referenceFormat">The reference format; defaults to "text". / 參照格式，預設為 "text"。</param>
-    public void AddBookmarkReferenceField(string bookmarkName, string referenceFormat = "text") => Doc.AddBookmarkReferenceField(this, bookmarkName, referenceFormat);
+    public void AddBookmarkReferenceField(string bookmarkName, string referenceFormat) => Doc.AddBookmarkReferenceField(this, bookmarkName, referenceFormat);
+
 
     /// <summary>
     /// Sets a variable field value in the paragraph.
@@ -523,6 +550,12 @@ public partial class OdfParagraph
     /// <param name="url">The target URL. / 目標 URL。</param>
     /// <param name="text">The display text. / 顯示文字。</param>
     public void AddHyperlink(string url, string text) => Doc.AddHyperlink(this, url, text);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfListBuilder AppendList() => AppendList(null);
+
 
     /// <summary>
     /// Appends a list builder within the paragraph.
@@ -530,8 +563,8 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="styleName">The optional list style name. / 選用的清單樣式名稱。</param>
     /// <returns>The list builder. / 清單建構器。</returns>
-    public OdfListBuilder AppendList(string? styleName = null)
-        => new OdfListBuilder(Node, Doc, null, styleName);
+    public OdfListBuilder AppendList(string? styleName) => new OdfListBuilder(Node, Doc, null, styleName);
+
 
     /// <summary>
     /// Gets the paragraph's inline rich-text builder, supporting chained style configuration.

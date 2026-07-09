@@ -327,6 +327,12 @@ public static class OdfDocumentFactory
         writer.WriteEndElement();
         writer.WriteEndElement();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void InitializeMinimalPackage(OdfPackage package, OdfDocumentKind kind) => InitializeMinimalPackage(package, kind, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Populates the package with a minimal ODF entity of the specified document kind.
@@ -335,10 +341,7 @@ public static class OdfDocumentFactory
     /// <param name="package">The OdfPackage instance to initialize. / 要初始化的 OdfPackage 執行個體。</param>
     /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
     /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
-    public static void InitializeMinimalPackage(
-        OdfPackage package,
-        OdfDocumentKind kind,
-        OdfVersion version = OdfVersion.Odf14)
+    public static void InitializeMinimalPackage(OdfPackage package, OdfDocumentKind kind, OdfVersion version)
     {
         if (package is null)
             throw new ArgumentNullException(nameof(package));
@@ -355,6 +358,7 @@ public static class OdfDocumentFactory
         package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes(CreateMetaXml(versionText)), "text/xml");
         package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes(CreateSettingsXml(versionText)), "text/xml");
     }
+
 
     private static string CreateContentXml(OdfDocumentKind kind, string version)
     {

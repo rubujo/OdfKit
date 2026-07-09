@@ -440,6 +440,12 @@ public sealed class OdfSheetBuilder
         _sheet.FreezePanes(row - 1, column - 1);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
+
 
     /// <summary>
     /// Adds a worksheet-level named range.
@@ -449,11 +455,12 @@ public sealed class OdfSheetBuilder
     /// <param name="range">The cell range. / 儲存格範圍</param>
     /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
+    public OdfSheetBuilder AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell)
     {
         _sheet.AddNamedRange(name, EnsureSheetName(range), baseCell);
         return this;
     }
+
 
     /// <summary>
     /// Adds a worksheet-level named range.
@@ -464,6 +471,12 @@ public sealed class OdfSheetBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public OdfSheetBuilder AddNamedRange(string name, string range)
         => AddNamedRange(name, ParseRange(range));
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
+
 
     /// <summary>
     /// Adds a worksheet-level named expression.
@@ -473,11 +486,12 @@ public sealed class OdfSheetBuilder
     /// <param name="expression">The value to use. / 公式運算式字串</param>
     /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
+    public OdfSheetBuilder AddNamedExpression(string name, string expression, OdfCellAddress? baseCell)
     {
         _sheet.AddNamedExpression(name, expression, baseCell);
         return this;
     }
+
 
     /// <summary>
     /// Adds an embedded chart to the current worksheet.
@@ -640,6 +654,12 @@ public sealed class OdfSheetBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public OdfSheetBuilder AddConditionalFormat(string range, string conditionValue, string styleName)
         => AddConditionalFormat(ParseRange(range), conditionValue, styleName);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddDataBarFormat(OdfCellRange range, OdfColor positiveColor) => AddDataBarFormat(range, positiveColor, null);
+
 
     /// <summary>
     /// Adds a data bar conditional format.
@@ -649,11 +669,18 @@ public sealed class OdfSheetBuilder
     /// <param name="positiveColor">The numeric value. / 正值橫條色彩</param>
     /// <param name="negativeColor">The numeric value. / 負值橫條色彩</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder AddDataBarFormat(OdfCellRange range, OdfColor positiveColor, OdfColor? negativeColor = null)
+    public OdfSheetBuilder AddDataBarFormat(OdfCellRange range, OdfColor positiveColor, OdfColor? negativeColor)
     {
         _sheet.AddDataBarFormat(EnsureSheetName(range), positiveColor, negativeColor);
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSheetBuilder AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor) => AddColorScaleFormat(range, minColor, maxColor, null);
+
 
     /// <summary>
     /// Adds a color scale conditional format.
@@ -664,15 +691,12 @@ public sealed class OdfSheetBuilder
     /// <param name="maxColor">The numeric value. / 最大值對應色彩</param>
     /// <param name="midColor">The numeric value. / 中間值對應色彩</param>
     /// <returns>The result. / 目前 builder 執行個體</returns>
-    public OdfSheetBuilder AddColorScaleFormat(
-        OdfCellRange range,
-        OdfColor minColor,
-        OdfColor maxColor,
-        OdfColor? midColor = null)
+    public OdfSheetBuilder AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor, OdfColor? midColor)
     {
         _sheet.AddColorScaleFormat(EnsureSheetName(range), minColor, maxColor, midColor);
         return this;
     }
+
 
     /// <summary>
     /// Adds an icon set conditional format.

@@ -13,6 +13,12 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int OptimizeMedia(double maxDpi, int jpegQuality) => OptimizeMedia(maxDpi, jpegQuality, null);
+
+    /// <summary>
     /// Optimizes picture media in the document, synchronizing the package paths and <c>draw:image</c> references.
     /// 最佳化文件中的圖片媒體，並同步更新封裝路徑與 <c>draw:image</c> 參照。
     /// </summary>
@@ -21,7 +27,7 @@ public partial class TextDocument
     /// <param name="optimizer">The delegate that actually performs image resampling or transcoding; returning <see langword="null"/> keeps the original image. / 實際執行影像重採樣或轉碼的委派；回傳 <see langword="null"/> 時保留原圖。</param>
     /// <returns>The number of updated media items. / 已更新的媒體項目數量。</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="jpegQuality"/> is not between 1 and 100. / 當 <paramref name="jpegQuality"/> 不在 1 到 100 之間時擲出。</exception>
-    public int OptimizeMedia(double maxDpi, int jpegQuality, OdfMediaOptimizer? optimizer = null)
+    public int OptimizeMedia(double maxDpi, int jpegQuality, OdfMediaOptimizer? optimizer)
     {
         if (jpegQuality is < 1 or > 100)
         {
@@ -74,6 +80,7 @@ public partial class TextDocument
 
         return optimizedCount;
     }
+
 
     private IEnumerable<string> CollectReferencedImagePaths()
     {

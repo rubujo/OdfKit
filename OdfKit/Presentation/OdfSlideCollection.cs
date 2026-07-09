@@ -38,6 +38,12 @@ public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
     /// <param name="index">The zero-based slide index. / 採 0 為基準的投影片索引。</param>
     /// <returns>The specified slide. / 指定投影片。</returns>
     public OdfSlide this[int index] => _document.GetSlidesSnapshot()[index];
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSlide Add() => Add(null);
+
 
     /// <summary>
     /// Adds a slide.
@@ -45,10 +51,11 @@ public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
     /// </summary>
     /// <param name="name">The optional slide name. / 選用的投影片名稱。</param>
     /// <returns>The added slide. / 新增完成的投影片。</returns>
-    public OdfSlide Add(string? name = null)
+    public OdfSlide Add(string? name)
     {
         return _document.AddSlide(name);
     }
+
 
     /// <summary>
     /// Gets the slide enumerator.

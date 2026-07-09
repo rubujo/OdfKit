@@ -12,6 +12,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Values - Script, Table & Animation
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleScriptType? GetStyleScriptTypeAttributeValue(string localName, string namespaceUri) => GetStyleScriptTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleScriptTypeAttributeValue operation.
@@ -21,11 +27,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式文字系統類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleScriptType? GetStyleScriptTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleScriptType? GetStyleScriptTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleScriptType>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleScriptTypeAttributeValue operation.
@@ -40,6 +47,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字系統類型。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleTextEmphasize? GetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri) => GetStyleTextEmphasizeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleTextEmphasizeAttributeValue operation.
@@ -49,11 +62,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式文字強調標記；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleTextEmphasize? GetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleTextEmphasize? GetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextEmphasize>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleTextEmphasizeAttributeValue operation.
@@ -68,6 +82,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字強調標記。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNumberCalendar? GetNumberCalendarAttributeValue(string localName, string namespaceUri) => GetNumberCalendarAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetNumberCalendarAttributeValue operation.
@@ -77,11 +97,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的數字曆法；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfNumberCalendar? GetNumberCalendarAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfNumberCalendar? GetNumberCalendarAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfNumberCalendar>(value, OdfElementSchemaRegistry.TryParseNumberCalendar);
     }
+
 
     /// <summary>
     /// Executes the SetNumberCalendarAttributeValue operation.
@@ -96,6 +117,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatNumberCalendar(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableMemberType? GetTableMemberTypeAttributeValue(string localName, string namespaceUri) => GetTableMemberTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableMemberTypeAttributeValue operation.
@@ -105,11 +132,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格成員類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableMemberType? GetTableMemberTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableMemberType? GetTableMemberTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableMemberType>(value);
     }
+
 
     /// <summary>
     /// Executes the SetTableMemberTypeAttributeValue operation.
@@ -124,6 +152,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格成員類型。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableGroupedBy? GetTableGroupedByAttributeValue(string localName, string namespaceUri) => GetTableGroupedByAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableGroupedByAttributeValue operation.
@@ -133,11 +167,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格分組單位；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableGroupedBy? GetTableGroupedByAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableGroupedBy? GetTableGroupedByAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableGroupedBy>(value);
     }
+
 
     /// <summary>
     /// Executes the SetTableGroupedByAttributeValue operation.
@@ -152,6 +187,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格分組單位。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableSortMode? GetTableSortModeAttributeValue(string localName, string namespaceUri) => GetTableSortModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableSortModeAttributeValue operation.
@@ -161,11 +202,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格排序模式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableSortMode? GetTableSortModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableSortMode? GetTableSortModeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableSortMode>(value);
     }
+
 
     /// <summary>
     /// Executes the SetTableSortModeAttributeValue operation.
@@ -180,6 +222,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格排序模式。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableConditionSource? GetTableConditionSourceAttributeValue(string localName, string namespaceUri) => GetTableConditionSourceAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableConditionSourceAttributeValue operation.
@@ -189,11 +237,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格條件來源；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableConditionSource? GetTableConditionSourceAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableConditionSource? GetTableConditionSourceAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableConditionSource>(value);
     }
+
 
     /// <summary>
     /// Executes the SetTableConditionSourceAttributeValue operation.
@@ -208,6 +257,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格條件來源。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfAnimationColorInterpolation? GetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri) => GetAnimationColorInterpolationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetAnimationColorInterpolationAttributeValue operation.
@@ -217,11 +272,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的動畫色彩插值；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfAnimationColorInterpolation? GetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfAnimationColorInterpolation? GetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfAnimationColorInterpolation>(value);
     }
+
 
     /// <summary>
     /// Executes the SetAnimationColorInterpolationAttributeValue operation.
@@ -236,6 +292,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 動畫色彩插值。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfAnimationColorInterpolationDirection? GetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri) => GetAnimationColorInterpolationDirectionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetAnimationColorInterpolationDirectionAttributeValue operation.
@@ -245,11 +307,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的動畫色彩插值方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfAnimationColorInterpolationDirection? GetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfAnimationColorInterpolationDirection? GetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfAnimationColorInterpolationDirection>(value);
     }
+
 
     /// <summary>
     /// Executes the SetAnimationColorInterpolationDirectionAttributeValue operation.
@@ -264,6 +327,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 動畫色彩插值方向。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDatabaseIsNullable? GetDatabaseIsNullableAttributeValue(string localName, string namespaceUri) => GetDatabaseIsNullableAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDatabaseIsNullableAttributeValue operation.
@@ -273,11 +342,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的資料庫可空性；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfDatabaseIsNullable? GetDatabaseIsNullableAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfDatabaseIsNullable? GetDatabaseIsNullableAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseIsNullable>(value);
     }
+
 
     /// <summary>
     /// Executes the SetDatabaseIsNullableAttributeValue operation.
@@ -292,6 +362,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 資料庫可空性。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDatabaseDataSourceSettingType? GetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri) => GetDatabaseDataSourceSettingTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDatabaseDataSourceSettingTypeAttributeValue operation.
@@ -301,11 +377,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的資料庫資料來源設定型別；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfDatabaseDataSourceSettingType? GetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfDatabaseDataSourceSettingType? GetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseDataSourceSettingType>(value);
     }
+
 
     /// <summary>
     /// Executes the SetDatabaseDataSourceSettingTypeAttributeValue operation.

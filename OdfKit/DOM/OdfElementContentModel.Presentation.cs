@@ -27,6 +27,12 @@ public partial class OfficePresentationElement
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public DrawPageElement AppendPage() => AppendPage(null);
+
 
     /// <summary>
     /// Executes the AppendPage operation.
@@ -34,7 +40,7 @@ public partial class OfficePresentationElement
     /// </summary>
     /// <param name="name">選用的頁面名稱</param>
     /// <returns>新增的 <c>draw:page</c> 元素</returns>
-    public DrawPageElement AppendPage(string? name = null)
+    public DrawPageElement AppendPage(string? name)
     {
         DrawPageElement page = new("draw");
         if (name is not null)
@@ -44,6 +50,7 @@ public partial class OfficePresentationElement
 
         return InsertPresentationPage(page);
     }
+
 
     private DrawPageElement InsertPresentationPage(DrawPageElement page)
     {

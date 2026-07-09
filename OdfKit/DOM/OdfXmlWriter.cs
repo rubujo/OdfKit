@@ -12,6 +12,12 @@ namespace OdfKit.DOM;
 public static class OdfXmlWriter
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void Write(OdfNode rootNode, Stream stream) => Write(rootNode, stream, null);
+
+    /// <summary>
     /// Executes the Write operation.
     /// 將記憶體 DOM 節點樹序列化寫入 XML 檔案流。
     /// </summary>
@@ -19,7 +25,7 @@ public static class OdfXmlWriter
     /// <param name="stream">要寫入的輸出串流</param>
     /// <param name="options">儲存選項；如果為 <see langword="null"/>，則使用預設選項</param>
     /// <exception cref="ArgumentNullException">當 <paramref name="rootNode"/> 或 <paramref name="stream"/> 為 <see langword="null"/> 時擲出</exception>
-    public static void Write(OdfNode rootNode, Stream stream, OdfSaveOptions? options = null)
+    public static void Write(OdfNode rootNode, Stream stream, OdfSaveOptions? options)
     {
         if (rootNode is null)
             throw new ArgumentNullException(nameof(rootNode));
@@ -74,6 +80,7 @@ public static class OdfXmlWriter
             }
         }
     }
+
 
     internal static void WriteNode(
         OdfNode node,

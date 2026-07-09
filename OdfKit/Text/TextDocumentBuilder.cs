@@ -75,6 +75,12 @@ public sealed class TextDocumentBuilder
         _styles = OdfStyleSet.FromTheme(theme);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextDocumentBuilder AddHeading(string text) => AddHeading(text, 1);
+
 
     /// <summary>
     /// Adds a heading paragraph at the specified outline level.
@@ -83,12 +89,19 @@ public sealed class TextDocumentBuilder
     /// <param name="text">The heading text. / 標題文字。</param>
     /// <param name="level">The outline level. / 大綱階層。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddHeading(string text, int level = 1)
+    public TextDocumentBuilder AddHeading(string text, int level)
     {
         OdfParagraph heading = _document.Body.Headings.Add(text, level);
         ApplyHeadingStyle(_document, heading, _styles);
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextDocumentBuilder AddParagraph(string text) => AddParagraph(text, null);
+
 
     /// <summary>
     /// Adds a body paragraph to the document.
@@ -97,7 +110,7 @@ public sealed class TextDocumentBuilder
     /// <param name="text">The paragraph text. / 段落文字。</param>
     /// <param name="configure">The paragraph style configuration delegate. / 段落樣式設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddParagraph(string text, Action<TextRunFormattingBuilder>? configure = null)
+    public TextDocumentBuilder AddParagraph(string text, Action<TextRunFormattingBuilder>? configure)
     {
         OdfParagraph paragraph = _document.Body.Paragraphs.Add(text);
         ApplyBodyStyle(_document, paragraph, _styles);
@@ -110,6 +123,7 @@ public sealed class TextDocumentBuilder
 
         return this;
     }
+
 
     /// <summary>
     /// Adds a paragraph composed of multiple text runs.
@@ -204,6 +218,12 @@ public sealed class TextDocumentBuilder
         _document.InsertTableOfContents(title, outlineLevel);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextDocumentBuilder AddTable(int rows, int columns) => AddTable(rows, columns, null);
+
 
     /// <summary>
     /// Adds a text table.
@@ -213,13 +233,20 @@ public sealed class TextDocumentBuilder
     /// <param name="columns">The column count. / 欄數。</param>
     /// <param name="configure">The table configuration delegate. / 表格設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddTable(int rows, int columns, Action<TextTableBuilder>? configure = null)
+    public TextDocumentBuilder AddTable(int rows, int columns, Action<TextTableBuilder>? configure)
     {
         OdfTable table = _document.AddTable(rows, columns);
         configure?.Invoke(new TextTableBuilder(table));
         ApplyTableHeaderStyle(_document, table, columns, _styles);
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextDocumentBuilder AddSection(string name, int columnCount, OdfLength gap) => AddSection(name, columnCount, gap, null);
+
 
     /// <summary>
     /// Adds a multi-column section.
@@ -230,16 +257,13 @@ public sealed class TextDocumentBuilder
     /// <param name="gap">The column gap. / 欄間距。</param>
     /// <param name="configure">The section content configuration delegate. / 區段內容設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddSection(
-        string name,
-        int columnCount,
-        OdfLength gap,
-        Action<TextSectionBuilder>? configure = null)
+    public TextDocumentBuilder AddSection(string name, int columnCount, OdfLength gap, Action<TextSectionBuilder>? configure)
     {
         OdfSection section = _document.AddSection(name, columnCount, gap);
         configure?.Invoke(new TextSectionBuilder(_document, section));
         return this;
     }
+
 
     /// <summary>
     /// Configures the header and footer of the default page style.
@@ -619,6 +643,12 @@ public sealed class TextParagraphBuilder
         _paragraph.AddComment(new OdfComment(author, text));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height) => AddImage(imageBytes, width, height, null);
+
 
     /// <summary>
     /// Adds an image frame.
@@ -629,11 +659,12 @@ public sealed class TextParagraphBuilder
     /// <param name="height">The image height. / 圖片高度。</param>
     /// <param name="name">The image name. / 圖片名稱。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
+    public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height, string? name)
     {
         _document.AddImageFrame(_paragraph, imageBytes, width, height, name);
         return this;
     }
+
 
     /// <summary>
     /// Adds an embedded chart.
@@ -751,6 +782,12 @@ public sealed class TextSectionBuilder
         configure(new TextParagraphBuilder(_document, new OdfParagraph(paragraphNode, _document)));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextSectionBuilder AddHeading(string text) => AddHeading(text, 1);
+
 
     /// <summary>
     /// Adds a heading within the section.
@@ -759,7 +796,7 @@ public sealed class TextSectionBuilder
     /// <param name="text">The heading text. / 標題文字。</param>
     /// <param name="level">The outline level. / 大綱階層。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextSectionBuilder AddHeading(string text, int level = 1)
+    public TextSectionBuilder AddHeading(string text, int level)
     {
         var headingNode = OdfNodeFactory.CreateElement("h", OdfNamespaces.Text, "text");
         headingNode.SetAttribute("outline-level", OdfNamespaces.Text, Math.Max(1, level).ToString(CultureInfo.InvariantCulture), "text");
@@ -769,16 +806,24 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TextSectionBuilder Protected() => Protected(true);
+
+
+    /// <summary>
     /// Sets whether the section is read-only.
     /// 設定區段是否唯讀。
     /// </summary>
     /// <param name="isProtected">Whether it is read-only. / 是否唯讀。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextSectionBuilder Protected(bool isProtected = true)
+    public TextSectionBuilder Protected(bool isProtected)
     {
         _section.IsProtected = isProtected;
         return this;
     }
+
 }
 
 /// <summary>

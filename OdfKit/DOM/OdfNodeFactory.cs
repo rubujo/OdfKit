@@ -10,6 +10,12 @@ namespace OdfKit.DOM;
 public static partial class OdfNodeFactory
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfNode CreateElement(string localName, string namespaceUri) => CreateElement(localName, namespaceUri, null);
+
+    /// <summary>
     /// Executes the CreateElement operation.
     /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立 <see cref="OdfUnknownElement"/>。
     /// </summary>
@@ -17,7 +23,7 @@ public static partial class OdfNodeFactory
     /// <param name="namespaceUri">元素命名空間 URI</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <returns>所建立的 ODF 元素節點</returns>
-    public static OdfNode CreateElement(string localName, string namespaceUri, string? prefix = null)
+    public static OdfNode CreateElement(string localName, string namespaceUri, string? prefix)
     {
         var customElement = OdfWrapperRegistry.CreateElement(localName, namespaceUri, prefix);
         if (customElement is not null)
@@ -35,4 +41,5 @@ public static partial class OdfNodeFactory
         // 後備使用未知元素，保留第三方擴充並提供可辨識型別。
         return new OdfUnknownElement(localName, namespaceUri, prefix);
     }
+
 }

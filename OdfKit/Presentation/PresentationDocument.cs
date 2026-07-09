@@ -71,6 +71,12 @@ public partial class PresentationDocument : OdfDocument
     {
         return (PresentationDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Presentation);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template) => CreateFromTemplate(template, false);
+
 
     /// <summary>
     /// Creates a new presentation document from the specified presentation template.
@@ -79,10 +85,11 @@ public partial class PresentationDocument : OdfDocument
     /// <param name="template">The presentation template document. / 簡報範本文件。</param>
     /// <param name="clearUserContent">Whether to clear the text content of each slide in the template while keeping layout and shape structure. / 是否清除範本中各投影片的文字內容，但保留版面配置與形狀結構。</param>
     /// <returns>The created <see cref="PresentationDocument"/> instance. / 建立完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
-    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template, bool clearUserContent = false)
+    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template, bool clearUserContent)
     {
         return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation", clearUserContent);
     }
+
 
     /// <summary>
     /// Creates an equivalent ODP (ZIP package) presentation document from a FODP flat XML presentation document, with identical content.

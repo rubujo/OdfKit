@@ -33,6 +33,12 @@ public partial class OdfCell
         if (right.HasValue)
             SetStyleProperty("table-cell-properties", "border-right", OdfNamespaces.Fo, right.Value.ToString(), "fo");
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddConditionalFormatMap(string condition, string applyStyleName) => AddConditionalFormatMap(condition, applyStyleName, null);
+
 
     /// <summary>
     /// Adds a conditional formatting map rule.
@@ -41,7 +47,7 @@ public partial class OdfCell
     /// <param name="condition">The condition value, such as <c>cell-content()=1</c>. / 條件值，例如 <c>cell-content()=1</c>。</param>
     /// <param name="applyStyleName">The formatting style name to apply. / 要套用的格式樣式名稱。</param>
     /// <param name="baseCell">The base cell address. / 基準儲存格位址。</param>
-    public void AddConditionalFormatMap(string condition, string applyStyleName, OdfCellAddress? baseCell = null)
+    public void AddConditionalFormatMap(string condition, string applyStyleName, OdfCellAddress? baseCell)
     {
         var styleNode = _doc.StyleEngine.GetOrCreateLocalStyle(Node, "table-cell");
         var mapNode = new OdfNode(OdfNodeType.Element, "map", OdfNamespaces.Style, "style");
@@ -53,6 +59,7 @@ public partial class OdfCell
         }
         styleNode.AppendChild(mapNode);
     }
+
 
     /// <summary>
     /// Gets the display value formatted by the applied number format style, or <see cref="DisplayText"/> when no style definition exists.

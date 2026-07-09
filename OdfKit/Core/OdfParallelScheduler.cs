@@ -69,6 +69,12 @@ public static class OdfParallelScheduler
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static int GetEffectiveConcurrency() => GetEffectiveConcurrency(0);
+
 
     /// <summary>
     /// Executes the GetEffectiveConcurrency operation.
@@ -76,7 +82,7 @@ public static class OdfParallelScheduler
     /// </summary>
     /// <param name="requestedMaxConcurrency">呼叫端要求的最大平行度；小於 1 時自動依核心數與預留比例計算</param>
     /// <returns>實際平行度，至少為 1</returns>
-    public static int GetEffectiveConcurrency(int requestedMaxConcurrency = 0)
+    public static int GetEffectiveConcurrency(int requestedMaxConcurrency)
     {
         if (requestedMaxConcurrency > 0)
         {
@@ -88,6 +94,7 @@ public static class OdfParallelScheduler
         int reservedCores = (int)Math.Floor(processorCount * reservationRatio);
         return Math.Max(1, processorCount - reservedCores);
     }
+
 
     internal static void RunWithConfiguredThreadPriority(Action action)
     {

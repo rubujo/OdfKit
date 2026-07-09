@@ -86,6 +86,12 @@ public sealed class PresentationDocumentBuilder
         _layoutPreset = preset ?? throw new ArgumentNullException(nameof(preset));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public PresentationDocumentBuilder WithMasterPage(string name) => WithMasterPage(name, null);
+
 
     /// <summary>
     /// Creates the master page applied to subsequent slides by default.
@@ -94,7 +100,7 @@ public sealed class PresentationDocumentBuilder
     /// <param name="name">The master page name. / 母片名稱。</param>
     /// <param name="backgroundColor">The master page background color, such as <c>#FFFFFF</c>. / 母片背景色，例如 <c>#FFFFFF</c>。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public PresentationDocumentBuilder WithMasterPage(string name, string? backgroundColor = null)
+    public PresentationDocumentBuilder WithMasterPage(string name, string? backgroundColor)
     {
         _document.AddMasterPage(name, new OdfMasterPageDefinition
         {
@@ -103,6 +109,7 @@ public sealed class PresentationDocumentBuilder
         _defaultMasterPageName = name;
         return this;
     }
+
 
     /// <summary>
     /// Adds a slide and configures its content.
@@ -171,6 +178,12 @@ public sealed class PresentationDocumentBuilder
             configure?.Invoke(slide);
         });
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public PresentationDocumentBuilder AddTwoColumnSlide(string name, string title, IEnumerable<string> leftParagraphs, IEnumerable<string> rightParagraphs) => AddTwoColumnSlide(name, title, leftParagraphs, rightParagraphs, null);
+
 
     /// <summary>
     /// Adds a two-column content slide.
@@ -182,12 +195,7 @@ public sealed class PresentationDocumentBuilder
     /// <param name="rightParagraphs">The right-column paragraphs. / 右欄段落。</param>
     /// <param name="configure">The additional slide configuration delegate. / 其他投影片設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public PresentationDocumentBuilder AddTwoColumnSlide(
-        string name,
-        string title,
-        IEnumerable<string> leftParagraphs,
-        IEnumerable<string> rightParagraphs,
-        Action<OdfSlideBuilder>? configure = null)
+    public PresentationDocumentBuilder AddTwoColumnSlide(string name, string title, IEnumerable<string> leftParagraphs, IEnumerable<string> rightParagraphs, Action<OdfSlideBuilder>? configure)
     {
         return AddSlide(name, slide =>
         {
@@ -203,6 +211,13 @@ public sealed class PresentationDocumentBuilder
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public PresentationDocumentBuilder AddChartSlide(string name, string title) => AddChartSlide(name, title, null);
+
+
+    /// <summary>
     /// Adds a chart-layout slide.
     /// 新增圖表版面投影片。
     /// </summary>
@@ -210,10 +225,7 @@ public sealed class PresentationDocumentBuilder
     /// <param name="title">The title text. / 標題文字。</param>
     /// <param name="configure">The additional slide configuration delegate. / 其他投影片設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public PresentationDocumentBuilder AddChartSlide(
-        string name,
-        string title,
-        Action<OdfSlideBuilder>? configure = null)
+    public PresentationDocumentBuilder AddChartSlide(string name, string title, Action<OdfSlideBuilder>? configure)
     {
         return AddSlide(name, slide =>
         {
@@ -225,6 +237,7 @@ public sealed class PresentationDocumentBuilder
             configure?.Invoke(slide);
         });
     }
+
 
     /// <summary>
     /// Builds and returns the presentation document.
@@ -371,6 +384,12 @@ public sealed class OdfSlideBuilder
             OdfLength.FromCentimeters(heightCm));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSlideBuilder AddShape(OdfShapeType shapeType, double xCm, double yCm, double widthCm, double heightCm) => AddShape(shapeType, xCm, yCm, widthCm, heightCm, null);
+
 
     /// <summary>
     /// Adds a basic shape.
@@ -383,13 +402,7 @@ public sealed class OdfSlideBuilder
     /// <param name="heightCm">The height in centimeters. / 高度，單位為公分。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddShape(
-        OdfShapeType shapeType,
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfPresentationShapeBuilder>? configure = null)
+    public OdfSlideBuilder AddShape(OdfShapeType shapeType, double xCm, double yCm, double widthCm, double heightCm, Action<OdfPresentationShapeBuilder>? configure)
     {
         OdfShape shape = _slide.AddShape(
             shapeType,
@@ -401,6 +414,7 @@ public sealed class OdfSlideBuilder
         configure?.Invoke(new OdfPresentationShapeBuilder(shape));
         return this;
     }
+
 
     private void ApplyThemedShapeStyle(OdfShape shape)
     {
@@ -531,6 +545,12 @@ public sealed class OdfSlideBuilder
         _slide.SetSpeakerNotes(paragraphs);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSlideBuilder WithTransition(OdfTransitionType type) => WithTransition(type, 72);
+
 
     /// <summary>
     /// Sets the slide transition effect.
@@ -539,11 +559,12 @@ public sealed class OdfSlideBuilder
     /// <param name="type">The transition type. / 切換類型。</param>
     /// <param name="durationPoints">The duration in points. / 持續時間，單位為點。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder WithTransition(OdfTransitionType type, double durationPoints = 72)
+    public OdfSlideBuilder WithTransition(OdfTransitionType type, double durationPoints)
     {
         _slide.SetTransition(type, OdfLength.FromPoints(durationPoints));
         return this;
     }
+
 
     /// <summary>
     /// Adds an entrance animation to the specified shape.

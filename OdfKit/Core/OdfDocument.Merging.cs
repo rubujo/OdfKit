@@ -401,6 +401,12 @@ public abstract partial class OdfDocument
             node.NamespaceUri == OdfNamespaces.Style &&
             node.LocalName.EndsWith("-properties", StringComparison.Ordinal);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public virtual void AppendDocument(OdfDocument otherDoc) => AppendDocument(otherDoc, null);
+
 
     /// <summary>
     /// Executes the AppendDocument operation.
@@ -408,8 +414,8 @@ public abstract partial class OdfDocument
     /// </summary>
     /// <param name="otherDoc">要附加的來源文件</param>
     /// <param name="options">合併選項</param>
-    public virtual void AppendDocument(OdfDocument otherDoc, OdfMergeOptions? options = null)
-        => OdfDocumentMergeEngine.AppendDocument(MergeCollaborators, otherDoc, options ?? OdfMergeOptions.Default);
+    public virtual void AppendDocument(OdfDocument otherDoc, OdfMergeOptions? options) => OdfDocumentMergeEngine.AppendDocument(MergeCollaborators, otherDoc, options ?? OdfMergeOptions.Default);
+
 
 
     #endregion

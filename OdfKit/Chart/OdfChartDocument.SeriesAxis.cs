@@ -77,6 +77,12 @@ public partial class OdfChartDocument
         OdfNode paragraph = FindOrCreateChild(titleNode, "p", OdfNamespaces.Text, "text");
         paragraph.TextContent = title!;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNode AddSeries(string valuesCellRangeAddress) => AddSeries(valuesCellRangeAddress, null);
+
 
     /// <summary>
     /// Adds a placeholder data series node.
@@ -85,7 +91,7 @@ public partial class OdfChartDocument
     /// <param name="valuesCellRangeAddress">The data value cell range address. / 資料值儲存格範圍位址。</param>
     /// <param name="labelCellAddress">The optional label cell address. / 選用的標籤儲存格位址。</param>
     /// <returns>The newly added series node. / 新增的序列節點。</returns>
-    public OdfNode AddSeries(string valuesCellRangeAddress, string? labelCellAddress = null)
+    public OdfNode AddSeries(string valuesCellRangeAddress, string? labelCellAddress)
     {
         if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))
         {
@@ -103,6 +109,7 @@ public partial class OdfChartDocument
         plotArea.AppendChild(series);
         return series;
     }
+
 
     private OdfNode FindOrCreatePlotArea()
     {

@@ -25,6 +25,12 @@ public partial class OfficeSpreadsheetElement
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public TableTableElement AppendTable() => AppendTable(null);
+
 
     /// <summary>
     /// Executes the AppendTable operation.
@@ -32,7 +38,7 @@ public partial class OfficeSpreadsheetElement
     /// </summary>
     /// <param name="name">選用的表格名稱</param>
     /// <returns>新增的 <c>table:table</c> 元素</returns>
-    public TableTableElement AppendTable(string? name = null)
+    public TableTableElement AppendTable(string? name)
     {
         TableTableElement table = AppendElement(new TableTableElement("table"));
         if (name is not null)
@@ -42,4 +48,5 @@ public partial class OfficeSpreadsheetElement
 
         return table;
     }
+
 }

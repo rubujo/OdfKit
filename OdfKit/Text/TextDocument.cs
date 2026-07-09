@@ -57,6 +57,12 @@ public partial class TextDocument : OdfDocument
     {
         return (TextDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Text);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static TextDocument CreateFromTemplate(TextTemplateDocument template) => CreateFromTemplate(template, false);
+
 
     /// <summary>
     /// Creates a new text document from the specified text template.
@@ -65,10 +71,11 @@ public partial class TextDocument : OdfDocument
     /// <param name="template">The text template document. / 文字範本文件。</param>
     /// <param name="clearUserContent">Whether to clear user content such as paragraphs in the template while keeping styles and master pages. / 是否清除範本中的段落等使用者內容，但保留樣式與母片頁面。</param>
     /// <returns>The created <see cref="TextDocument"/> instance. / 建立完成的 <see cref="TextDocument"/> 執行個體。</returns>
-    public static TextDocument CreateFromTemplate(TextTemplateDocument template, bool clearUserContent = false)
+    public static TextDocument CreateFromTemplate(TextTemplateDocument template, bool clearUserContent)
     {
         return (TextDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text", clearUserContent);
     }
+
 
     /// <summary>
     /// Executes the ClearTemplateUserContent operation.
@@ -253,6 +260,12 @@ public partial class TextDocument : OdfDocument
 
         return $"Table{(tableCount + 1).ToString(CultureInfo.InvariantCulture)}";
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfListBuilder AppendList() => AppendList(null);
+
 
     /// <summary>
     /// Appends a list builder to the end of the text document body.
@@ -260,8 +273,8 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="styleName">The optional list style name. / 選用的清單樣式名稱。</param>
     /// <returns>The list builder. / 清單建構器。</returns>
-    public OdfListBuilder AppendList(string? styleName = null)
-        => new OdfListBuilder(BodyTextRoot, this, null, styleName);
+    public OdfListBuilder AppendList(string? styleName) => new OdfListBuilder(BodyTextRoot, this, null, styleName);
+
 
     #endregion
 
@@ -451,6 +464,12 @@ public partial class TextDocument : OdfDocument
 
         return null;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPageStyle AddPageStyle(string name) => AddPageStyle(name, null);
+
 
     /// <summary>
     /// Adds a named page style (master-page + page-layout), optionally configuring its settings.
@@ -458,7 +477,7 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="name">The master page style name (e.g. "Landscape"). / 主頁面樣式名稱（例如 "Landscape"）。</param>
     /// <param name="configure">The optional page setup configuration callback. / 可選的頁面設定回呼。</param>
-    public OdfPageStyle AddPageStyle(string name, Action<OdfPageSetup>? configure = null)
+    public OdfPageStyle AddPageStyle(string name, Action<OdfPageSetup>? configure)
     {
         string layoutName = $"MPL_{name}";
         var setup = new OdfPageSetup(this, name, layoutName);
@@ -466,6 +485,7 @@ public partial class TextDocument : OdfDocument
         configure?.Invoke(setup);
         return new OdfPageStyle(name);
     }
+
 
     /// <summary>
     /// Gets a summary list of headers and footers for all master page styles.
@@ -531,6 +551,12 @@ public partial class TextDocument : OdfDocument
         BodyTextRoot.AppendChild(section);
         return new OdfSection(section, this);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSection AddSubDocumentReference(string name, string subDocumentUri) => AddSubDocumentReference(name, subDocumentUri, false);
+
 
     /// <summary>
     /// Adds a section referencing an external sub-document at the end of the document body (used for master documents).
@@ -544,7 +570,7 @@ public partial class TextDocument : OdfDocument
     /// 即開啟主控文件時立即載入（<c>xlink:actuate="onLoad"</c>）。
     /// </param>
     /// <returns>The newly created section object. / 新建立的區段物件。</returns>
-    public OdfSection AddSubDocumentReference(string name, string subDocumentUri, bool loadOnRequest = false)
+    public OdfSection AddSubDocumentReference(string name, string subDocumentUri, bool loadOnRequest)
     {
         if (string.IsNullOrEmpty(name))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_SectionCannotBeEmpty"), nameof(name));
@@ -565,6 +591,7 @@ public partial class TextDocument : OdfDocument
 
         return new OdfSection(sectionNode, this);
     }
+
 
 
     #endregion
@@ -662,6 +689,12 @@ public partial class TextDocument : OdfDocument
     /// <returns>A merged <see cref="TextDocument"/> for each record; the caller is responsible for disposing them. / 每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose。</returns>
     public IReadOnlyList<TextDocument> MailMerge(IEnumerable<IReadOnlyDictionary<string, object?>> records)
         => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task StreamingMailMergeAsync(Stream outputStream, IDictionary<string, object?> dataSource) => StreamingMailMergeAsync(outputStream, dataSource, default);
+
 
     /// <summary>
     /// Performs a streaming, low-residency mail merge using the current text document as a template, writing the result to the target stream.
@@ -674,10 +707,7 @@ public partial class TextDocument : OdfDocument
     /// <remarks>
     /// 此方法會將目前文件儲存，並從其封裝包的底層資料流中以 SAX 流式讀寫重構輸出，不會載入完整 DOM 樹至記憶體中。
     /// </remarks>
-    public async Task StreamingMailMergeAsync(
-        Stream outputStream,
-        IDictionary<string, object?> dataSource,
-        CancellationToken cancellationToken = default)
+    public async Task StreamingMailMergeAsync(Stream outputStream, IDictionary<string, object?> dataSource, CancellationToken cancellationToken)
     {
         if (outputStream is null)
         {
@@ -700,6 +730,7 @@ public partial class TextDocument : OdfDocument
         // 呼叫流式郵件合併引擎執行套印
         await OdfStreamingMailMerge.ApplyTemplateAsync(tempMemoryStream, outputStream, dataSource, cancellationToken).ConfigureAwait(false);
     }
+
 
     /// <summary>
     /// Performs a streaming, low-residency mail merge using the current text document as a template, writing the result to the target stream.

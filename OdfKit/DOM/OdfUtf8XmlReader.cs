@@ -192,6 +192,12 @@ public ref struct OdfUtf8XmlReader
         _valueChunkPosition += count;
         return count;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int CopyValueTo(IBufferWriter<byte> writer) => CopyValueTo(writer, 81920);
+
 
     /// <summary>
     /// Executes the CopyValueTo operation.
@@ -202,7 +208,7 @@ public ref struct OdfUtf8XmlReader
     /// <returns>本次複製的位元組數；若目前不是文字值或已讀完則為 0</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="writer"/> 為 <see langword="null"/> 時擲出</exception>
     /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="chunkSize"/> 小於 1 時擲出</exception>
-    public int CopyValueTo(IBufferWriter<byte> writer, int chunkSize = 81920)
+    public int CopyValueTo(IBufferWriter<byte> writer, int chunkSize)
     {
         if (writer is null)
         {
@@ -227,6 +233,7 @@ public ref struct OdfUtf8XmlReader
 
         return total;
     }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ScanToByte(byte target)

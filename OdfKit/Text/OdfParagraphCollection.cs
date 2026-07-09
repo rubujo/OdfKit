@@ -23,6 +23,12 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfParagraph Add() => Add("");
+
 
     /// <summary>
     /// Adds a paragraph to the collection.
@@ -30,10 +36,11 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// </summary>
     /// <param name="text">The paragraph text. / 段落文字。</param>
     /// <returns>The newly added paragraph. / 新增完成的段落。</returns>
-    public OdfParagraph Add(string text = "")
+    public OdfParagraph Add(string text)
     {
         return _document.AddParagraph(text);
     }
+
 
     /// <summary>
     /// Gets a summary list of the top-level paragraphs in the document body.

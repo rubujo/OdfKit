@@ -42,6 +42,12 @@ public sealed class OdfTextFontFallbackOptions
     public bool DeclareDefaultCjkFallbackFonts { get; }
 
     internal IReadOnlyList<OdfFontFaceInfo> FontFaces { get; }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static OdfTextFontFallbackOptions Cns11643() => Cns11643(DefaultBaseFont);
+
 
     /// <summary>
     /// Creates options for CNS 11643 full-font-library fallback.
@@ -49,10 +55,11 @@ public sealed class OdfTextFontFallbackOptions
     /// </summary>
     /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
     /// <returns>The configured fallback options. / 已設定的遞補選項。</returns>
-    public static OdfTextFontFallbackOptions Cns11643(string? baseFont = DefaultBaseFont)
+    public static OdfTextFontFallbackOptions Cns11643(string? baseFont)
     {
         return new OdfTextFontFallbackOptions(baseFont, declareDefaultCjkFallbackFonts: true, OdfCjkFontFallbackEngine.DefaultFallbackFonts);
     }
+
 
     /// <summary>
     /// Creates options for Hanazono Mincho fallback.

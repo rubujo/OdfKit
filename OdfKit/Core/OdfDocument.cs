@@ -598,6 +598,12 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// 取得書籤管理器，提供安全讀寫與操作書籤的高階介面。
     /// </summary>
     public OdfBookmarkManager Bookmarks => new OdfBookmarkManager(this);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void ExportToPdf(Stream pdfStream) => ExportToPdf(pdfStream, null);
+
 
     /// <summary>
     /// Converts and exports the current document to PDF format.
@@ -605,7 +611,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="pdfStream">The target stream to which the PDF is written. / 要寫入 PDF 的目標資料流。</param>
     /// <param name="certificate">The certificate used to sign the PDF; if null, the PDF is not signed. / 用於簽章 PDF 的憑證；若為 null 則不簽章。</param>
-    public void ExportToPdf(Stream pdfStream, X509Certificate2? certificate = null)
+    public void ExportToPdf(Stream pdfStream, X509Certificate2? certificate)
     {
         if (pdfStream is null)
             throw new ArgumentNullException(nameof(pdfStream));
@@ -618,6 +624,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 
         renderer.ExportToPdf(this, pdfStream, certificate);
     }
+
 
     /// <summary>
     /// Searches the entire document's DOM tree for the specified text and replaces it with new text, preserving the text's formatting and style structure.

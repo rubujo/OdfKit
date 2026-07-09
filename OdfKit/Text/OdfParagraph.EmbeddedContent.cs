@@ -13,6 +13,12 @@ namespace OdfKit.Text;
 public partial class OdfParagraph
 {
     #region Embedded Content & Layout
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height) => AddImage(packagePath, width, height, null);
+
 
     /// <summary>
     /// Adds an image in the paragraph.
@@ -22,8 +28,8 @@ public partial class OdfParagraph
     /// <param name="width">The image width. / 圖片寬度。</param>
     /// <param name="height">The image height. / 圖片高度。</param>
     /// <param name="name">The image name. / 圖片名稱。</param>
-    public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name = null)
-        => Doc.AddImage(this, packagePath, width, height, name);
+    public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name) => Doc.AddImage(this, packagePath, width, height, name);
+
 
     /// <summary>
     /// Adds a floating text box in the paragraph.

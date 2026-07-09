@@ -125,6 +125,12 @@ public partial class OdfTableSheet
 
         return updatedCount;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int ReplaceFormulaText(string oldValue, string newValue) => ReplaceFormulaText(oldValue, newValue, StringComparison.Ordinal);
+
 
     /// <summary>
     /// Replaces the specified text in all formulas in this worksheet.
@@ -134,7 +140,7 @@ public partial class OdfTableSheet
     /// <param name="newValue">The value to use. / 替換後的文字</param>
     /// <param name="comparisonType">The value to use. / 文字比對方式</param>
     /// <returns>The result. / 實際變更的公式數量</returns>
-    public int ReplaceFormulaText(string oldValue, string newValue, StringComparison comparisonType = StringComparison.Ordinal)
+    public int ReplaceFormulaText(string oldValue, string newValue, StringComparison comparisonType)
     {
         if (oldValue is null)
             throw new ArgumentNullException(nameof(oldValue));
@@ -146,6 +152,7 @@ public partial class OdfTableSheet
                 ? ReplaceText(formulaCell.Formula, oldValue, newValue, comparisonType)
                 : null);
     }
+
 
     private static string ReplaceText(string text, string oldValue, string newValue, StringComparison comparisonType)
     {

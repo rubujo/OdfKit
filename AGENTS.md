@@ -74,7 +74,7 @@
   - 雙 TFM 基線：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
   - **0.x** 全量在 **Unshipped**；**1.0** 再移入 Shipped。
   - 變更後更新基線或 `Generate-PublicApiBaseline.ps1 -Verify`。
-  - RS0016／RS0017 為 error；RS0026／RS0027 手寫路徑為 error（生成 DOM／schema 目錄覆寫為 none）；政策見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)。
+  - RS0016／RS0017 為 error；RS0026／RS0027 手寫路徑為 error（生成 DOM／schema 目錄覆寫為 none）。恰好一個可選參數應改明確多載鏈（`eng/Expand-OptionalParameters.py`）；多可選參數可留在最長單一方法。政策見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)。
   - 說明見 [`OdfKit/PublicAPI/README.md`](OdfKit/PublicAPI/README.md)。
 - **套件雙 TFM 相容性**（Package Validation）：`EnablePackageValidation`；`Test-NuGetPack.ps1` 於 pack 時檢查。
 - **協作者／大型結構（人機平衡，非為拆而拆）**：見 [`docs/human-agent-maintainability.md`](docs/human-agent-maintainability.md) 與 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md)。拆分只為清楚領域邊界以利人類審閱與 Agent 限域修改；**禁止**因行數、token 或機械 KPI 而切檔；禁止重跑 `historical-refactor/Split-*`。

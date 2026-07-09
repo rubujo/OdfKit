@@ -76,6 +76,12 @@ public sealed class OdfListBuilder
 
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfListBuilder SubList() => SubList(null);
+
 
     /// <summary>
     /// Executes the SubList operation.
@@ -83,7 +89,7 @@ public sealed class OdfListBuilder
     /// </summary>
     /// <param name="styleName">子清單的樣式名稱，選填</param>
     /// <returns>代表子清單的建構器執行個體</returns>
-    public OdfListBuilder SubList(string? styleName = null)
+    public OdfListBuilder SubList(string? styleName)
     {
         if (_lastItemNode == null)
         {
@@ -94,6 +100,7 @@ public sealed class OdfListBuilder
 
         return new OdfListBuilder(_lastItemNode, _doc, this, styleName);
     }
+
 
     /// <summary>
     /// Executes the Up operation.

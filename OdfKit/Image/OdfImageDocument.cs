@@ -267,6 +267,12 @@ public partial class OdfImageDocument : OdfDocument
 
         return Package.ReadEntry(href!);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string SetImage(byte[] imageBytes) => SetImage(imageBytes, "image.png");
+
 
     /// <summary>
     /// Sets the main image of the ODI document.
@@ -275,7 +281,7 @@ public partial class OdfImageDocument : OdfDocument
     /// <param name="imageBytes">The image byte array. / 圖片位元組陣列。</param>
     /// <param name="preferredName">The optional preferred file name. / 選用的偏好檔名。</param>
     /// <returns>The path of the image within the ODF package. / 影像在 ODF 封裝中的路徑。</returns>
-    public string SetImage(byte[] imageBytes, string? preferredName = "image.png")
+    public string SetImage(byte[] imageBytes, string? preferredName)
     {
         OdfMediaManager mediaManager = new(Package);
         string href = mediaManager.AddImage(imageBytes, preferredName);
@@ -316,6 +322,7 @@ public partial class OdfImageDocument : OdfDocument
 
         return href;
     }
+
 
     /// <summary>
     /// Sets the layout and alternative text of the main image frame.

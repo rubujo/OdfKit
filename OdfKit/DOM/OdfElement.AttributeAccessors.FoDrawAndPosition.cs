@@ -12,6 +12,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Accessors - FO, Draw & Position
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri) => GetFoTextTransformAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFoTextTransformAttributeValue operation.
@@ -21,11 +27,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 FO 文字轉換；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextTransform>(value);
     }
+
 
     /// <summary>
     /// Executes the SetFoTextTransformAttributeValue operation.
@@ -40,6 +47,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF FO 文字轉換。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri) => GetFoTextAlignAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetFoTextAlignAttributeValue operation.
@@ -49,11 +62,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 FO 文字對齊；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextAlign>(value);
     }
+
 
     /// <summary>
     /// Executes the SetFoTextAlignAttributeValue operation.
@@ -68,6 +82,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF FO 文字對齊。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri) => GetStyleTextRotationScaleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleTextRotationScaleAttributeValue operation.
@@ -77,11 +97,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式文字旋轉縮放；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextRotationScale>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleTextRotationScaleAttributeValue operation.
@@ -96,6 +117,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字旋轉縮放。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri) => GetStyleTextCombineAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleTextCombineAttributeValue operation.
@@ -105,11 +132,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式文字組合；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextCombine>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleTextCombineAttributeValue operation.
@@ -124,6 +152,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字組合。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri) => GetDrawFillAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDrawFillAttributeValue operation.
@@ -133,11 +167,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的繪圖填滿；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFill>(value);
     }
+
 
     /// <summary>
     /// Executes the SetDrawFillAttributeValue operation.
@@ -152,6 +187,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖填滿。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri) => GetSmilFillAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetSmilFillAttributeValue operation.
@@ -161,11 +202,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 SMIL 動畫填滿；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfSmilFill>(value);
     }
+
 
     /// <summary>
     /// Executes the SetSmilFillAttributeValue operation.
@@ -180,6 +222,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF SMIL 動畫填滿。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri) => GetDrawFillImageRefPointAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDrawFillImageRefPointAttributeValue operation.
@@ -189,11 +237,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的繪圖填滿圖片參照點；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFillImageRefPoint>(value);
     }
+
 
     /// <summary>
     /// Executes the SetDrawFillImageRefPointAttributeValue operation.
@@ -208,6 +257,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖填滿圖片參照點。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri) => GetDrawColorModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDrawColorModeAttributeValue operation.
@@ -217,11 +272,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的繪圖色彩模式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawColorMode>(value);
     }
+
 
     /// <summary>
     /// Executes the SetDrawColorModeAttributeValue operation.
@@ -236,6 +292,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖色彩模式。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri) => GetStyleVerticalAlignAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleVerticalAlignAttributeValue operation.
@@ -245,11 +307,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式垂直對齊；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalAlign>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleVerticalAlignAttributeValue operation.
@@ -264,6 +327,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直對齊。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri) => GetStyleVerticalPosAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleVerticalPosAttributeValue operation.
@@ -273,11 +342,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式垂直位置；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalPos>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleVerticalPosAttributeValue operation.
@@ -292,6 +362,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直位置。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri) => GetStyleVerticalRelAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleVerticalRelAttributeValue operation.
@@ -301,11 +377,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式垂直相對基準；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalRel>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleVerticalRelAttributeValue operation.
@@ -320,6 +397,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直相對基準。"), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri) => GetStyleHorizontalPosAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetStyleHorizontalPosAttributeValue operation.
@@ -329,11 +412,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式水平位置；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleHorizontalPos>(value);
     }
+
 
     /// <summary>
     /// Executes the SetStyleHorizontalPosAttributeValue operation.

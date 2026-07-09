@@ -273,6 +273,12 @@ public sealed class OdfDrawPageBuilder
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
         _layoutPreset = layoutPreset ?? throw new ArgumentNullException(nameof(layoutPreset));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm) => AddRectangle(xCm, yCm, widthCm, heightCm, null);
+
 
     /// <summary>
     /// Adds a rectangle shape.
@@ -284,12 +290,7 @@ public sealed class OdfDrawPageBuilder
     /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawPageBuilder AddRectangle(
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawPageBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddShape(
             OdfShapeType.Rectangle,
@@ -303,6 +304,13 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddEllipse(double xCm, double yCm, double widthCm, double heightCm) => AddEllipse(xCm, yCm, widthCm, heightCm, null);
+
+
+    /// <summary>
     /// Adds an ellipse shape.
     /// 新增橢圓圖形。
     /// </summary>
@@ -312,12 +320,7 @@ public sealed class OdfDrawPageBuilder
     /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawPageBuilder AddEllipse(
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawPageBuilder AddEllipse(double xCm, double yCm, double widthCm, double heightCm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddShape(
             OdfShapeType.Ellipse,
@@ -329,6 +332,7 @@ public sealed class OdfDrawPageBuilder
         configure?.Invoke(new OdfDrawShapeBuilder(shape));
         return this;
     }
+
 
     /// <summary>
     /// Adds a flow-diagram node and its text according to the layout preset.
@@ -393,6 +397,12 @@ public sealed class OdfDrawPageBuilder
             text);
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddPath(string svgPathData, double xCm, double yCm, double widthCm, double heightCm) => AddPath(svgPathData, xCm, yCm, widthCm, heightCm, null);
+
 
     /// <summary>
     /// Adds an SVG path shape.
@@ -405,13 +415,7 @@ public sealed class OdfDrawPageBuilder
     /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawPageBuilder AddPath(
-        string svgPathData,
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawPageBuilder AddPath(string svgPathData, double xCm, double yCm, double widthCm, double heightCm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddPath(
             svgPathData,
@@ -425,6 +429,13 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddLine(double x1Cm, double y1Cm, double x2Cm, double y2Cm) => AddLine(x1Cm, y1Cm, x2Cm, y2Cm, null);
+
+
+    /// <summary>
     /// Adds a line segment.
     /// 新增線段。
     /// </summary>
@@ -434,12 +445,7 @@ public sealed class OdfDrawPageBuilder
     /// <param name="y2Cm">The end Y position in centimeters. / 終點 Y 位置（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawPageBuilder AddLine(
-        double x1Cm,
-        double y1Cm,
-        double x2Cm,
-        double y2Cm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawPageBuilder AddLine(double x1Cm, double y1Cm, double x2Cm, double y2Cm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _page.AddLine(
             OdfLength.FromCentimeters(x1Cm),
@@ -450,6 +456,7 @@ public sealed class OdfDrawPageBuilder
         configure?.Invoke(new OdfDrawShapeBuilder(shape));
         return this;
     }
+
 
     /// <summary>
     /// Adds a coordinate-based connector.
@@ -515,6 +522,12 @@ public sealed class OdfDrawPageBuilder
         configure?.Invoke(new OdfDrawShapeBuilder(shape));
         return this;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawPageBuilder AddImage(byte[] imageBytes, double xCm, double yCm, double widthCm, double heightCm) => AddImage(imageBytes, xCm, yCm, widthCm, heightCm, null);
+
 
     /// <summary>
     /// Adds an image.
@@ -527,13 +540,7 @@ public sealed class OdfDrawPageBuilder
     /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawPageBuilder AddImage(
-        byte[] imageBytes,
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawPageBuilder AddImage(byte[] imageBytes, double xCm, double yCm, double widthCm, double heightCm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfPicture picture = _page.AddPicture(
             imageBytes,
@@ -544,6 +551,7 @@ public sealed class OdfDrawPageBuilder
         configure?.Invoke(new OdfDrawShapeBuilder(picture));
         return this;
     }
+
 
     /// <summary>
     /// Adds a shape group.
@@ -705,6 +713,12 @@ public sealed class OdfDrawGroupBuilder
         _group = group ?? throw new ArgumentNullException(nameof(group));
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDrawGroupBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm) => AddRectangle(xCm, yCm, widthCm, heightCm, null);
+
 
     /// <summary>
     /// Adds a rectangle within the group.
@@ -716,12 +730,7 @@ public sealed class OdfDrawGroupBuilder
     /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
     /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfDrawGroupBuilder AddRectangle(
-        double xCm,
-        double yCm,
-        double widthCm,
-        double heightCm,
-        Action<OdfDrawShapeBuilder>? configure = null)
+    public OdfDrawGroupBuilder AddRectangle(double xCm, double yCm, double widthCm, double heightCm, Action<OdfDrawShapeBuilder>? configure)
     {
         OdfShape shape = _group.AddShape(
             OdfShapeType.Rectangle,
@@ -733,6 +742,7 @@ public sealed class OdfDrawGroupBuilder
         configure?.Invoke(new OdfDrawShapeBuilder(shape));
         return this;
     }
+
 
     /// <summary>
     /// Adds a text box within the group.

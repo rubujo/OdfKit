@@ -106,6 +106,12 @@ public sealed class OdfSchemaSet
     /// 取得具名 RELAX NG 模式樹，以定義名稱作為索引鍵。
     /// </summary>
     public IReadOnlyDictionary<string, OdfSchemaPatternDefinition> Patterns => _patterns;
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSchemaSet MergeWith(OdfSchemaSet additional) => MergeWith(additional, false);
+
 
     /// <summary>
     /// Executes the MergeWith operation.
@@ -114,7 +120,7 @@ public sealed class OdfSchemaSet
     /// <param name="additional">要合併的額外結構描述集</param>
     /// <param name="overwriteExisting">是否覆寫已存在的定義</param>
     /// <returns>合併後的全新 <see cref="OdfSchemaSet"/> 執行個體</returns>
-    public OdfSchemaSet MergeWith(OdfSchemaSet additional, bool overwriteExisting = false)
+    public OdfSchemaSet MergeWith(OdfSchemaSet additional, bool overwriteExisting)
     {
         if (additional is null)
             throw new ArgumentNullException(nameof(additional));
@@ -173,6 +179,7 @@ public sealed class OdfSchemaSet
             nameClasses,
             patterns.Values);
     }
+
 
     /// <summary>
     /// Executes the FindElement operation.

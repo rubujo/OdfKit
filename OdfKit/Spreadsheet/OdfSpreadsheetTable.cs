@@ -160,6 +160,12 @@ public sealed class OdfSpreadsheetTable
 
         _databaseRange.SetSort(rules.Select(rule => (rule.FieldNumber, rule.Ascending)).ToArray());
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void ApplySort(string columnName) => ApplySort(columnName, true);
+
 
     /// <summary>
     /// Applies a sort rule by resolving a header name.
@@ -167,7 +173,7 @@ public sealed class OdfSpreadsheetTable
     /// </summary>
     /// <param name="columnName">The header name. / 標題名稱。</param>
     /// <param name="ascending">Whether the sort order is ascending. / 是否遞增排序。</param>
-    public void ApplySort(string columnName, bool ascending = true)
+    public void ApplySort(string columnName, bool ascending)
     {
         int index = GetColumnIndex(columnName);
         if (index < 0)
@@ -177,6 +183,7 @@ public sealed class OdfSpreadsheetTable
 
         ApplySort(new OdfDatabaseSortRuleInfo(index, ascending));
     }
+
 
     /// <summary>
     /// Removes sort rules from the table metadata.

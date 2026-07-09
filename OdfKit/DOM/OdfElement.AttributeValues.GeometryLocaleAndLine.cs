@@ -11,6 +11,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Values - Geometry, Locale & Line
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfVector3D? GetVector3DAttributeValue(string localName, string namespaceUri) => GetVector3DAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetVector3DAttributeValue operation.
@@ -20,11 +26,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的三維向量；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfVector3D? GetVector3DAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfVector3D? GetVector3DAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfVector3D>(value, OdfVector3D.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetVector3DAttributeValue operation.
@@ -39,6 +46,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPoint3D? GetPoint3DAttributeValue(string localName, string namespaceUri) => GetPoint3DAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPoint3DAttributeValue operation.
@@ -48,11 +61,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的三維點；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfPoint3D? GetPoint3DAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPoint3D? GetPoint3DAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfPoint3D>(value, OdfPoint3D.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetPoint3DAttributeValue operation.
@@ -67,6 +81,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPointList? GetPointListAttributeValue(string localName, string namespaceUri) => GetPointListAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPointListAttributeValue operation.
@@ -76,11 +96,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的二維座標清單；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfPointList? GetPointListAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPointList? GetPointListAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfPointList>(value, OdfPointList.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetPointListAttributeValue operation.
@@ -95,6 +116,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfXmlName? GetXmlNameAttributeValue(string localName, string namespaceUri) => GetXmlNameAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetXmlNameAttributeValue operation.
@@ -104,11 +131,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 XML 名稱；若屬性不存在或不是有效 XML <c>NCName</c> 則為 <see langword="null"/></returns>
-    public OdfXmlName? GetXmlNameAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfXmlName? GetXmlNameAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfXmlName>(value, OdfXmlName.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetXmlNameAttributeValue operation.
@@ -123,6 +151,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLanguageCode? GetLanguageCodeAttributeValue(string localName, string namespaceUri) => GetLanguageCodeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLanguageCodeAttributeValue operation.
@@ -132,11 +166,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的語言代碼；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfLanguageCode? GetLanguageCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLanguageCode? GetLanguageCodeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfLanguageCode>(value, OdfLanguageCode.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetLanguageCodeAttributeValue operation.
@@ -151,6 +186,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfCountryCode? GetCountryCodeAttributeValue(string localName, string namespaceUri) => GetCountryCodeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetCountryCodeAttributeValue operation.
@@ -160,11 +201,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的國別代碼；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfCountryCode? GetCountryCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfCountryCode? GetCountryCodeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfCountryCode>(value, OdfCountryCode.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetCountryCodeAttributeValue operation.
@@ -179,6 +221,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfScriptCode? GetScriptCodeAttributeValue(string localName, string namespaceUri) => GetScriptCodeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetScriptCodeAttributeValue operation.
@@ -188,11 +236,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的文字系統代碼；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfScriptCode? GetScriptCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfScriptCode? GetScriptCodeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfScriptCode>(value, OdfScriptCode.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetScriptCodeAttributeValue operation.
@@ -207,6 +256,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLanguageTag? GetLanguageTagAttributeValue(string localName, string namespaceUri) => GetLanguageTagAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLanguageTagAttributeValue operation.
@@ -216,11 +271,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的語言標記；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfLanguageTag? GetLanguageTagAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLanguageTag? GetLanguageTagAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfLanguageTag>(value, OdfLanguageTag.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetLanguageTagAttributeValue operation.
@@ -235,6 +291,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNamespacedToken? GetNamespacedTokenAttributeValue(string localName, string namespaceUri) => GetNamespacedTokenAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetNamespacedTokenAttributeValue operation.
@@ -244,11 +306,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的命名空間 token；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfNamespacedToken? GetNamespacedTokenAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfNamespacedToken? GetNamespacedTokenAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfNamespacedToken>(value, OdfNamespacedToken.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetNamespacedTokenAttributeValue operation.
@@ -263,6 +326,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfCharacter? GetCharacterAttributeValue(string localName, string namespaceUri) => GetCharacterAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetCharacterAttributeValue operation.
@@ -272,11 +341,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的單一字元；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfCharacter? GetCharacterAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfCharacter? GetCharacterAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfCharacter>(value, OdfCharacter.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetCharacterAttributeValue operation.
@@ -291,6 +361,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextEncoding? GetTextEncodingAttributeValue(string localName, string namespaceUri) => GetTextEncodingAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTextEncodingAttributeValue operation.
@@ -300,11 +376,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的文字編碼名稱；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfTextEncoding? GetTextEncodingAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTextEncoding? GetTextEncodingAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfTextEncoding>(value, OdfTextEncoding.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetTextEncodingAttributeValue operation.
@@ -319,6 +396,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTargetFrameName? GetTargetFrameNameAttributeValue(string localName, string namespaceUri) => GetTargetFrameNameAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTargetFrameNameAttributeValue operation.
@@ -328,11 +411,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的目標框架名稱；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public OdfTargetFrameName? GetTargetFrameNameAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTargetFrameName? GetTargetFrameNameAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfTargetFrameName>(value, OdfTargetFrameName.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetTargetFrameNameAttributeValue operation.
@@ -347,6 +431,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri) => GetLineStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLineStyleAttributeValue operation.
@@ -356,11 +446,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的線條樣式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfLineStyle>(value, OdfElementSchemaRegistry.TryParseLineStyle);
     }
+
 
     /// <summary>
     /// Executes the SetLineStyleAttributeValue operation.
@@ -375,6 +466,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineStyle(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri) => GetLineTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetLineTypeAttributeValue operation.
@@ -384,11 +481,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的線條類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfLineType>(value, OdfElementSchemaRegistry.TryParseLineType);
     }
+
 
     /// <summary>
     /// Executes the SetLineTypeAttributeValue operation.

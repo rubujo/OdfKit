@@ -20,6 +20,12 @@ public sealed class OdfRdfMetadata
     public IReadOnlyList<OdfRdfTriple> Triples => _triples;
 
     internal bool IsDirty { get; private set; }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddTriple(string subject, string predicate, string objectValue) => AddTriple(subject, predicate, objectValue, true);
+
 
     /// <summary>
     /// Executes the AddTriple operation.
@@ -30,10 +36,11 @@ public sealed class OdfRdfMetadata
     /// <param name="objectValue">受詞值</param>
     /// <param name="isLiteral">受詞是否為 literal；若為 <see langword="false"/>，則視為資源 IRI</param>
     /// <exception cref="ArgumentException">當任一必要值為空白時拋出</exception>
-    public void AddTriple(string subject, string predicate, string objectValue, bool isLiteral = true)
+    public void AddTriple(string subject, string predicate, string objectValue, bool isLiteral)
     {
         AddTriple(new OdfRdfTriple(subject, predicate, objectValue, isLiteral));
     }
+
 
     /// <summary>
     /// Executes the AddTriple operation.
@@ -117,6 +124,12 @@ public sealed class OdfRdfMetadata
     {
         AddTriple(partSubject, OdfPkgRdfPredicates.MimeType, mimeType, isLiteral: true);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int SyncWithPackageEntries(IEnumerable<string> entryPaths, IReadOnlyDictionary<string, string> mediaTypes) => SyncWithPackageEntries(entryPaths, mediaTypes, null);
+
 
     /// <summary>
     /// Executes the SyncWithPackageEntries operation.
@@ -127,10 +140,7 @@ public sealed class OdfRdfMetadata
     /// <param name="documentSubject">文件主詞 IRI；為 <see langword="null"/> 時沿用既有 <c>pkg:hasPart</c> 主詞或空字串</param>
     /// <returns>新增或更新的 triple 數量</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="entryPaths"/> 或 <paramref name="mediaTypes"/> 為 <see langword="null"/> 時拋出</exception>
-    public int SyncWithPackageEntries(
-        IEnumerable<string> entryPaths,
-        IReadOnlyDictionary<string, string> mediaTypes,
-        string? documentSubject = null)
+    public int SyncWithPackageEntries(IEnumerable<string> entryPaths, IReadOnlyDictionary<string, string> mediaTypes, string? documentSubject)
     {
         if (entryPaths is null)
             throw new ArgumentNullException(nameof(entryPaths));
@@ -177,6 +187,7 @@ public sealed class OdfRdfMetadata
         return changed;
     }
 
+
     /// <summary>
     /// Executes the GetLinkedPartPaths operation.
     /// 取得指定文件主詞已連結的封裝組件路徑。
@@ -191,6 +202,12 @@ public sealed class OdfRdfMetadata
             .Distinct(StringComparer.Ordinal)
             .ToArray();
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int RemoveTriples(string subject) => RemoveTriples(subject, null);
+
 
     /// <summary>
     /// Executes the RemoveTriples operation.
@@ -199,7 +216,7 @@ public sealed class OdfRdfMetadata
     /// <param name="subject">主詞 IRI</param>
     /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時移除該主詞的全部 triples</param>
     /// <returns>移除的 triple 數量</returns>
-    public int RemoveTriples(string subject, string? predicate = null)
+    public int RemoveTriples(string subject, string? predicate)
     {
         int removed = _triples.RemoveAll(triple =>
             triple.Subject == subject &&
@@ -211,6 +228,7 @@ public sealed class OdfRdfMetadata
 
         return removed;
     }
+
 
     /// <summary>
     /// Executes the Clear operation.

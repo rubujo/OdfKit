@@ -24,18 +24,25 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     private readonly DefaultFormulaEvaluator _evaluator;
     private readonly OdfNode _contentRoot;
     private readonly OdfExternalLinkManager? _externalLinks;
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator) : this(contentRoot, evaluator, null) { }
+
 
     /// <summary>
     /// Additional public overload without optional parameters.
     /// 不含選用參數的公開多載。
     /// </summary>
-    public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator, OdfExternalLinkManager? externalLinks = null)
+    public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator, OdfExternalLinkManager? externalLinks)
     {
         _contentRoot = contentRoot;
         _evaluator = evaluator;
         _externalLinks = externalLinks;
         TraverseTable(contentRoot);
     }
+
 
     public Dictionary<OdfCellAddress, OdfNode> CellNodes => _cellNodes;
     public Dictionary<OdfCellAddress, string> CellFormulas => _cellFormulas;

@@ -23,6 +23,12 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfList Add() => Add(null);
+
 
     /// <summary>
     /// Adds a text list to the collection.
@@ -30,10 +36,11 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// </summary>
     /// <param name="styleName">The optional list style name. / 選用的清單樣式名稱。</param>
     /// <returns>The newly added list. / 新增完成的清單。</returns>
-    public OdfList Add(string? styleName = null)
+    public OdfList Add(string? styleName)
     {
         return _document.AddList(styleName);
     }
+
 
     /// <summary>
     /// Gets a summary list of the top-level lists in the document body.

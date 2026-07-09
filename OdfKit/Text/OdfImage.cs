@@ -55,6 +55,12 @@ public class OdfImage
     /// 取得此圖片是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
     /// </summary>
     public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(FrameNode);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImage MarkAsDecorative() => MarkAsDecorative(true);
+
 
     /// <summary>
     /// Marks this image as decorative so assistive technologies skip over it.
@@ -62,7 +68,7 @@ public class OdfImage
     /// </summary>
     /// <param name="decorative">Whether to mark it as decorative. / 是否標記為裝飾性。</param>
     /// <returns>The current image instance. / 目前圖片執行個體。</returns>
-    public OdfImage MarkAsDecorative(bool decorative = true)
+    public OdfImage MarkAsDecorative(bool decorative)
     {
         if (decorative)
         {
@@ -76,6 +82,7 @@ public class OdfImage
         FrameNode.RemoveAttribute("decorative", OdfNamespaces.LoExt);
         return this;
     }
+
 
     /// <summary>
     /// Gets or sets the image's name.

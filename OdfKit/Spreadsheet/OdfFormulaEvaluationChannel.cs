@@ -78,6 +78,12 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         Interlocked.Increment(ref _submittedCount);
         return true;
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public ValueTask EnqueueAsync() => EnqueueAsync(default);
+
 
     /// <summary>
     /// Asynchronously submits a formula recalculation request.
@@ -85,7 +91,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A <see cref="ValueTask"/> that represents the submit operation. / 代表送出作業的 <see cref="ValueTask"/>。</returns>
-    public async ValueTask EnqueueAsync(CancellationToken cancellationToken = default)
+    public async ValueTask EnqueueAsync(CancellationToken cancellationToken)
     {
         ThrowIfDisposed();
 #if NET10_0_OR_GREATER
@@ -100,13 +106,20 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public Task WaitForIdleAsync(TimeSpan timeout) => WaitForIdleAsync(timeout, default);
+
+
+    /// <summary>
     /// Waits until currently submitted recalculation requests are completed.
     /// 等待目前已送出的重算請求完成。
     /// </summary>
     /// <param name="timeout">The maximum wait time. / 最長等待時間。</param>
     /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>A task that represents the wait operation. / 代表等待作業的工作。</returns>
-    public async Task WaitForIdleAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
+    public async Task WaitForIdleAsync(TimeSpan timeout, CancellationToken cancellationToken)
     {
         DateTimeOffset deadline = DateTimeOffset.UtcNow + timeout;
         while (CompletedCount < SubmittedCount)
@@ -121,6 +134,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
             await Task.Delay(10, cancellationToken).ConfigureAwait(false);
         }
     }
+
 
     /// <summary>
     /// Executes the Dispose operation.

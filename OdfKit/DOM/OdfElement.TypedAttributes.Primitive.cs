@@ -21,6 +21,12 @@ public partial class OdfElement
     /// <returns>解析後的整數值</returns>
     public int GetInt32AttributeValue(string localName, string namespaceUri, int defaultValue = 0, OdfVersion version = OdfVersion.Odf14)
         => OdfElementPrimitiveAttributeAccess.GetInt32(GetAttributeValue(localName, namespaceUri, version), defaultValue);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public int? GetNullableInt32AttributeValue(string localName, string namespaceUri) => GetNullableInt32AttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetNullableInt32AttributeValue operation.
@@ -30,8 +36,8 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的整數值；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public int? GetNullableInt32AttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
-        => OdfElementPrimitiveAttributeAccess.GetNullableInt32(GetAttributeValue(localName, namespaceUri, version));
+    public int? GetNullableInt32AttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementPrimitiveAttributeAccess.GetNullableInt32(GetAttributeValue(localName, namespaceUri, version));
+
 
     /// <summary>
     /// Executes the SetInt32AttributeValue operation.
@@ -44,6 +50,12 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     public void SetInt32AttributeValue(string localName, string namespaceUri, int value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
         => SetAttributeValue(localName, namespaceUri, OdfElementPrimitiveAttributeAccess.FormatInt32(value), prefix, version);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public bool? GetBooleanAttributeValue(string localName, string namespaceUri) => GetBooleanAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetBooleanAttributeValue operation.
@@ -53,8 +65,8 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的布林值；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public bool? GetBooleanAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
-        => OdfElementPrimitiveAttributeAccess.GetBoolean(GetAttributeValue(localName, namespaceUri, version));
+    public bool? GetBooleanAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementPrimitiveAttributeAccess.GetBoolean(GetAttributeValue(localName, namespaceUri, version));
+
 
     /// <summary>
     /// Executes the SetBooleanAttributeValue operation.
@@ -67,6 +79,12 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     public void SetBooleanAttributeValue(string localName, string namespaceUri, bool value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
         => SetAttributeValue(localName, namespaceUri, OdfElementPrimitiveAttributeAccess.FormatBoolean(value), prefix, version);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public decimal? GetDecimalAttributeValue(string localName, string namespaceUri) => GetDecimalAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetDecimalAttributeValue operation.
@@ -76,8 +94,8 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的十進位數值；若屬性不存在或格式無效則為 <see langword="null"/></returns>
-    public decimal? GetDecimalAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
-        => OdfElementPrimitiveAttributeAccess.GetDecimal(GetAttributeValue(localName, namespaceUri, version));
+    public decimal? GetDecimalAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementPrimitiveAttributeAccess.GetDecimal(GetAttributeValue(localName, namespaceUri, version));
+
 
     /// <summary>
     /// Executes the SetDecimalAttributeValue operation.

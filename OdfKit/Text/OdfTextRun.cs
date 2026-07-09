@@ -259,6 +259,12 @@ public class OdfTextRun
     {
         _doc.DeleteNode(Node);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextRun WithBold() => WithBold(true);
+
 
     /// <summary>
     /// Sets whether this text run is bold.
@@ -266,11 +272,18 @@ public class OdfTextRun
     /// </summary>
     /// <param name="bold">Whether it is bold. / 是否粗體。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithBold(bool bold = true)
+    public OdfTextRun WithBold(bool bold)
     {
         IsBold = bold;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextRun WithItalic() => WithItalic(true);
+
 
     /// <summary>
     /// Sets whether this text run is italic.
@@ -278,11 +291,18 @@ public class OdfTextRun
     /// </summary>
     /// <param name="italic">Whether it is italic. / 是否斜體。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithItalic(bool italic = true)
+    public OdfTextRun WithItalic(bool italic)
     {
         IsItalic = italic;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextRun WithStrikethrough() => WithStrikethrough(true);
+
 
     /// <summary>
     /// Sets whether this text run has strikethrough.
@@ -290,11 +310,18 @@ public class OdfTextRun
     /// </summary>
     /// <param name="strikethrough">Whether it has strikethrough. / 是否加上刪除線。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithStrikethrough(bool strikethrough = true)
+    public OdfTextRun WithStrikethrough(bool strikethrough)
     {
         IsStrikethrough = strikethrough;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextRun WithSuperscript() => WithSuperscript(true);
+
 
     /// <summary>
     /// Sets whether this text run is superscript.
@@ -302,11 +329,18 @@ public class OdfTextRun
     /// </summary>
     /// <param name="superscript">Whether it is superscript. / 是否為上標。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithSuperscript(bool superscript = true)
+    public OdfTextRun WithSuperscript(bool superscript)
     {
         IsSuperscript = superscript;
         return this;
     }
+
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTextRun WithSubscript() => WithSubscript(true);
+
 
     /// <summary>
     /// Sets whether this text run is subscript.
@@ -314,11 +348,12 @@ public class OdfTextRun
     /// </summary>
     /// <param name="subscript">Whether it is subscript. / 是否為下標。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithSubscript(bool subscript = true)
+    public OdfTextRun WithSubscript(bool subscript)
     {
         IsSubscript = subscript;
         return this;
     }
+
 
     /// <summary>
     /// Sets this text run's Western, East Asian, and complex script font sizes.

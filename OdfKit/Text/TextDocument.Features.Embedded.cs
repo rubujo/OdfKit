@@ -14,6 +14,12 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height) => AddImageFrame(paragraph, imageBytes, width, height, null);
+
+    /// <summary>
     /// Adds an image frame in the specified paragraph.
     /// 在指定的段落中新增影像框架。
     /// </summary>
@@ -23,7 +29,7 @@ public partial class TextDocument
     /// <param name="height">The image height. / 影像高度。</param>
     /// <param name="name">The image name. / 影像名稱。</param>
     /// <returns>The OdfImage object representing the newly created image. / 代表新建影像的 OdfImage 物件。</returns>
-    public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
+    public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height, string? name)
     {
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
@@ -35,6 +41,7 @@ public partial class TextDocument
 
         return AddImage(paragraph, packagePath, width, height, name);
     }
+
 
     /// <summary>
     /// Inserts an embedded chart in the specified paragraph.

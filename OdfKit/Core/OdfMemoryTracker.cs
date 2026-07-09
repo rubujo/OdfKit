@@ -49,6 +49,12 @@ public static class OdfMemoryTracker
     /// 取得或設定高頻 boxing 估計次數警示門檻。
     /// </summary>
     public static long BoxingWarningThreshold { get; set; } = 10_000;
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void Track(IntPtr ptr, long size) => Track(ptr, size, null);
+
 
     /// <summary>
     /// Executes the Track operation.
@@ -57,7 +63,7 @@ public static class OdfMemoryTracker
     /// <param name="ptr">記憶體區塊指標</param>
     /// <param name="size">分配的大小 (位元組)</param>
     /// <param name="label">選用的標籤，用於說明分配目的</param>
-    public static void Track(IntPtr ptr, long size, string? label = null)
+    public static void Track(IntPtr ptr, long size, string? label)
     {
         if (ptr == IntPtr.Zero)
             return;
@@ -72,6 +78,7 @@ public static class OdfMemoryTracker
             ReportAllocationDiagnostics(size, totalBytes, Allocations.Count, info.Label);
         }
     }
+
 
     /// <summary>
     /// Executes the Untrack operation.
@@ -127,6 +134,12 @@ public static class OdfMemoryTracker
                 $"OdfKit 偵測到高頻 boxing 風險：{boxedValueCount} 次，情境：{context}。建議改用強型別值、Span 或 OdfCellData。");
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static bool CheckLeaks() => CheckLeaks(true);
+
 
     /// <summary>
     /// Executes the CheckLeaks operation.
@@ -134,7 +147,7 @@ public static class OdfMemoryTracker
     /// </summary>
     /// <param name="reportLeaks">是否列印洩漏報告</param>
     /// <returns>是否有洩漏</returns>
-    public static bool CheckLeaks(bool reportLeaks = true)
+    public static bool CheckLeaks(bool reportLeaks)
     {
         if (Allocations.IsEmpty)
             return false;
@@ -155,6 +168,7 @@ public static class OdfMemoryTracker
 
         return true;
     }
+
 
     internal static void ResetDiagnosticsForTests()
     {

@@ -58,6 +58,12 @@ public class OdfMediaManager
             }
         }
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public string AddImage(byte[] imageBytes) => AddImage(imageBytes, null);
+
 
     /// <summary>
     /// Executes the AddImage operation.
@@ -66,7 +72,7 @@ public class OdfMediaManager
     /// <param name="imageBytes">圖片的二進位內容</param>
     /// <param name="preferredName">偏好的檔名（若重複資料刪除未命中且未給定時會自動產生）</param>
     /// <returns>傳回該圖片在 ODF 封裝中的相對路徑（例如 "Pictures/image_hash.png" ）</returns>
-    public string AddImage(byte[] imageBytes, string? preferredName = null)
+    public string AddImage(byte[] imageBytes, string? preferredName)
     {
         if (imageBytes is null || imageBytes.Length == 0)
         {
@@ -120,6 +126,7 @@ public class OdfMediaManager
         OdfKitDiagnostics.Info($"插入新的圖片項目： {finalPath} ({mimeType})");
         return finalPath;
     }
+
 
     /// <summary>
     /// 依序比對的圖片格式簽章表，每一列以判斷式描述辨識條件，對應其 MIME 類型與副檔名。

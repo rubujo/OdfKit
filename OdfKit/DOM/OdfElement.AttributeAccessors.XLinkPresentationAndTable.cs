@@ -13,6 +13,12 @@ namespace OdfKit.DOM;
 public partial class OdfElement
 {
     #region Attribute Accessors - XLink, Presentation & Table
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfIriReference? GetIriReferenceAttributeValue(string localName, string namespaceUri) => GetIriReferenceAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetIriReferenceAttributeValue operation.
@@ -22,11 +28,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 IRI 參照；若屬性不存在或包含控制字元則為 <see langword="null"/></returns>
-    public OdfIriReference? GetIriReferenceAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfIriReference? GetIriReferenceAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfIriReference>(value, OdfIriReference.TryParse);
     }
+
 
     /// <summary>
     /// Executes the SetIriReferenceAttributeValue operation.
@@ -41,6 +48,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri) => GetXLinkTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetXLinkTypeAttributeValue operation.
@@ -50,11 +63,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 XLink 類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkType>(value, OdfElementSchemaRegistry.TryParseXLinkType);
     }
+
 
     /// <summary>
     /// Executes the SetXLinkTypeAttributeValue operation.
@@ -69,6 +83,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkType(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri) => GetXLinkShowAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetXLinkShowAttributeValue operation.
@@ -78,11 +98,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 XLink 顯示行為；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkShow>(value, OdfElementSchemaRegistry.TryParseXLinkShow);
     }
+
 
     /// <summary>
     /// Executes the SetXLinkShowAttributeValue operation.
@@ -97,6 +118,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkShow(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri) => GetXLinkActuateAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetXLinkActuateAttributeValue operation.
@@ -106,11 +133,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 XLink 觸發行為；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkActuate>(value, OdfElementSchemaRegistry.TryParseXLinkActuate);
     }
+
 
     /// <summary>
     /// Executes the SetXLinkActuateAttributeValue operation.
@@ -125,6 +153,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkActuate(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri) => GetNumberStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetNumberStyleAttributeValue operation.
@@ -134,11 +168,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的數字樣式長短；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfNumberStyle>(value, OdfElementSchemaRegistry.TryParseNumberStyle);
     }
+
 
     /// <summary>
     /// Executes the SetNumberStyleAttributeValue operation.
@@ -153,6 +188,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatNumberStyle(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri) => GetTableOrderAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableOrderAttributeValue operation.
@@ -162,11 +203,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格排序方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableOrder>(value, OdfElementSchemaRegistry.TryParseTableOrder);
     }
+
 
     /// <summary>
     /// Executes the SetTableOrderAttributeValue operation.
@@ -181,6 +223,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableOrder(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri) => GetTableTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetTableTypeAttributeValue operation.
@@ -190,11 +238,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的表格類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTableType>(value, OdfElementSchemaRegistry.TryParseTableType);
     }
+
 
     /// <summary>
     /// Executes the SetTableTypeAttributeValue operation.
@@ -209,6 +258,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableType(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPresentationEffect? GetPresentationEffectAttributeValue(string localName, string namespaceUri) => GetPresentationEffectAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPresentationEffectAttributeValue operation.
@@ -218,11 +273,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的簡報效果；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfPresentationEffect? GetPresentationEffectAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPresentationEffect? GetPresentationEffectAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationEffect>(value, OdfElementSchemaRegistry.TryParsePresentationEffect);
     }
+
 
     /// <summary>
     /// Executes the SetPresentationEffectAttributeValue operation.
@@ -237,6 +293,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationEffect(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPresentationSpeed? GetPresentationSpeedAttributeValue(string localName, string namespaceUri) => GetPresentationSpeedAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPresentationSpeedAttributeValue operation.
@@ -246,11 +308,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的簡報速度；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfPresentationSpeed? GetPresentationSpeedAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPresentationSpeed? GetPresentationSpeedAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationSpeed>(value, OdfElementSchemaRegistry.TryParsePresentationSpeed);
     }
+
 
     /// <summary>
     /// Executes the SetPresentationSpeedAttributeValue operation.
@@ -265,6 +328,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationSpeed(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPresentationAction? GetPresentationActionAttributeValue(string localName, string namespaceUri) => GetPresentationActionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPresentationActionAttributeValue operation.
@@ -274,11 +343,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的簡報動作；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfPresentationAction? GetPresentationActionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPresentationAction? GetPresentationActionAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationAction>(value, OdfElementSchemaRegistry.TryParsePresentationAction);
     }
+
 
     /// <summary>
     /// Executes the SetPresentationActionAttributeValue operation.
@@ -293,6 +363,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationAction(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPresentationTransitionType? GetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri) => GetPresentationTransitionTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPresentationTransitionTypeAttributeValue operation.
@@ -302,11 +378,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的簡報轉場類型；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfPresentationTransitionType? GetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPresentationTransitionType? GetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationTransitionType>(value, OdfElementSchemaRegistry.TryParsePresentationTransitionType);
     }
+
 
     /// <summary>
     /// Executes the SetPresentationTransitionTypeAttributeValue operation.
@@ -321,6 +398,12 @@ public partial class OdfElement
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationTransitionType(value), prefix, version);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfPresentationTransitionStyle? GetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri) => GetPresentationTransitionStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
+
 
     /// <summary>
     /// Executes the GetPresentationTransitionStyleAttributeValue operation.
@@ -330,11 +413,12 @@ public partial class OdfElement
     /// <param name="namespaceUri">屬性命名空間 URI</param>
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的簡報轉場樣式；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
-    public OdfPresentationTransitionStyle? GetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    public OdfPresentationTransitionStyle? GetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri, OdfVersion version)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationTransitionStyle>(value, OdfElementSchemaRegistry.TryParsePresentationTransitionStyle);
     }
+
 
     /// <summary>
     /// Executes the SetPresentationTransitionStyleAttributeValue operation.

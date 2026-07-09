@@ -19,6 +19,12 @@ public sealed class OdfCrc32Stream : Stream
 #else
     private uint _currentCrc = 0xFFFFFFFF;
 #endif
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfCrc32Stream(Stream underlyingStream) : this(underlyingStream, null) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfCrc32Stream"/> class.
@@ -26,11 +32,12 @@ public sealed class OdfCrc32Stream : Stream
     /// </summary>
     /// <param name="underlyingStream">The stream to wrap. / 要包裝的資料流。</param>
     /// <param name="expectedCrc">The optional expected CRC-32 value to verify at end of stream. / 選用的預期 CRC-32 值，會在讀取至結尾時驗證。</param>
-    public OdfCrc32Stream(Stream underlyingStream, uint? expectedCrc = null)
+    public OdfCrc32Stream(Stream underlyingStream, uint? expectedCrc)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
         _expectedCrc = expectedCrc;
     }
+
 
 #if NET10_0_OR_GREATER
     /// <summary>

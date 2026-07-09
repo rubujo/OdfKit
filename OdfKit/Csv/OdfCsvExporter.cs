@@ -20,6 +20,12 @@ namespace OdfKit.Csv;
 public static class OdfCsvExporter
 {
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream) => ExportToStream(workbook, csvStream, null);
+
+    /// <summary>
     /// Executes the ExportToStream operation.
     /// 將指定工作表的資料匯出為 CSV 並寫入資料流。
     /// </summary>
@@ -28,7 +34,7 @@ public static class OdfCsvExporter
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發</exception>
     /// <exception cref="ArgumentOutOfRangeException">當 ExportSheetIndex 超出範圍時引發</exception>
-    public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream, OdfCsvOptions? options = null)
+    public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream, OdfCsvOptions? options)
     {
         if (workbook is null)
             throw new ArgumentNullException(nameof(workbook));
@@ -65,19 +71,27 @@ public static class OdfCsvExporter
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public static void ExportToFile(SpreadsheetDocument workbook, string csvPath) => ExportToFile(workbook, csvPath, null);
+
+
+    /// <summary>
     /// Executes the ExportToFile operation.
     /// 將指定工作表的資料匯出為 CSV 檔案。
     /// </summary>
     /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
     /// <param name="csvPath">目標 CSV 檔案路徑</param>
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
-    public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options = null)
+    public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options)
     {
         if (csvPath is null)
             throw new ArgumentNullException(nameof(csvPath));
         using var stream = File.Create(csvPath);
         ExportToStream(workbook, stream, options);
     }
+
 
     private static Dictionary<(int Row, int Col), object> ScanCellValues(OdfTableSheet sheet, bool sanitizeFormulas)
     {

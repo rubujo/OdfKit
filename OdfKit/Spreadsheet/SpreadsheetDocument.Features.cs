@@ -95,6 +95,12 @@ public partial class SpreadsheetDocument
     /// </summary>
     public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
         SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
+
 
     /// <summary>
     /// Adds a named range.
@@ -103,7 +109,7 @@ public partial class SpreadsheetDocument
     /// <param name="name">The name or identifier. / 命名範圍的名稱</param>
     /// <param name="range">The cell range. / 儲存格範圍</param>
     /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
-    public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
+    public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell)
     {
         var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
         var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
@@ -117,13 +123,20 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public void AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
+
+
+    /// <summary>
     /// Adds a named expression.
     /// 新增具名運算式。
     /// </summary>
     /// <param name="name">The name or identifier. / 具名運算式的名稱</param>
     /// <param name="expression">The value to use. / 公式運算式字串</param>
     /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
-    public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
+    public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell)
     {
         var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
         var namedExpr = new OdfNode(OdfNodeType.Element, "named-expression", OdfNamespaces.Table, "table");
@@ -135,6 +148,7 @@ public partial class SpreadsheetDocument
         }
         namedExpressions.AppendChild(namedExpr);
     }
+
 
     /// <summary>
     /// Adds a database range.
@@ -152,6 +166,12 @@ public partial class SpreadsheetDocument
         databaseRanges.AppendChild(dbRangeNode);
         return new OdfDatabaseRange(dbRangeNode, this);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfSpreadsheetTable CreateTable(string name, OdfCellRange range) => CreateTable(name, range, null);
+
 
     /// <summary>
     /// Creates a practical spreadsheet table backed by an ODF database range.
@@ -161,10 +181,7 @@ public partial class SpreadsheetDocument
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The table options. / 表格選項。</param>
     /// <returns>The editable table facade. / 可編輯的表格 facade。</returns>
-    public OdfSpreadsheetTable CreateTable(
-        string name,
-        OdfCellRange range,
-        OdfSpreadsheetTableOptions? options = null)
+    public OdfSpreadsheetTable CreateTable(string name, OdfCellRange range, OdfSpreadsheetTableOptions? options)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -187,6 +204,7 @@ public partial class SpreadsheetDocument
 
         return new OdfSpreadsheetTable(databaseRange, this, options.FirstRowAsHeader);
     }
+
 
     /// <summary>
     /// Gets practical spreadsheet table summaries.
@@ -425,6 +443,12 @@ public partial class SpreadsheetDocument
         AddChart(sheetName, anchor, definition);
         return GetEmbeddedChartFrame(sheetName);
     }
+    /// <summary>
+    /// Additional public overload without optional parameters.
+    /// 不含選用參數的公開多載。
+    /// </summary>
+    public OdfChartDocument InsertChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range) => InsertChartFromRange(sheetName, anchor, range, null);
+
 
     /// <summary>
     /// Inserts an editable embedded chart bound to a worksheet range.
@@ -435,11 +459,7 @@ public partial class SpreadsheetDocument
     /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
     /// <param name="options">The embedded chart options. / 嵌入圖表選項。</param>
     /// <returns>The embedded chart document. / 嵌入的圖表文件。</returns>
-    public OdfChartDocument InsertChartFromRange(
-        string sheetName,
-        OdfCellAddress anchor,
-        OdfCellRange range,
-        OdfEmbeddedChartOptions? options = null)
+    public OdfChartDocument InsertChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range, OdfEmbeddedChartOptions? options)
     {
         if (string.IsNullOrEmpty(sheetName))
         {
@@ -533,6 +553,7 @@ public partial class SpreadsheetDocument
         chart.Save();
         return chart;
     }
+
 
     /// <summary>
     /// Refreshes an embedded chart data range.
