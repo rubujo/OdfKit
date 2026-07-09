@@ -516,6 +516,24 @@ public sealed class OdfSchemaTable
 public sealed class OdfSchemaColumn
 {
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaColumn(string name) : this(name, "VARCHAR", true, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaColumn(string name, string typeName) : this(name, typeName, true, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaColumn(string name, string typeName, bool isNullable) : this(name, typeName, isNullable, false) { }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OdfSchemaColumn"/> class.
     /// 初始化 <see cref="OdfSchemaColumn"/> 類別的新執行個體。
     /// </summary>
@@ -524,7 +542,7 @@ public sealed class OdfSchemaColumn
     /// <param name="isNullable">Whether null is allowed. / 是否允許為 null。</param>
     /// <param name="isAutoIncrement">Whether this is an auto-increment column. / 是否為自動遞增欄位。</param>
     /// <exception cref="ArgumentException">When <paramref name="name"/> is empty. / 當 <paramref name="name"/> 為空時擲出。</exception>
-    public OdfSchemaColumn(string name, string typeName = "VARCHAR", bool isNullable = true, bool isAutoIncrement = false)
+    public OdfSchemaColumn(string name, string typeName, bool isNullable, bool isAutoIncrement)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -535,6 +553,7 @@ public sealed class OdfSchemaColumn
         IsNullable = isNullable;
         IsAutoIncrement = isAutoIncrement;
     }
+
 
     /// <summary>
     /// Gets the column name.
@@ -664,6 +683,18 @@ public sealed class OdfSchemaPrimaryKey
 public sealed class OdfSchemaForeignKey
 {
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaForeignKey(string? name, string referencedTable, IEnumerable<OdfSchemaKeyMapping> keyColumns) : this(name, referencedTable, keyColumns, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaForeignKey(string? name, string referencedTable, IEnumerable<OdfSchemaKeyMapping> keyColumns, string? updateRule) : this(name, referencedTable, keyColumns, updateRule, null) { }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OdfSchemaForeignKey"/> class.
     /// 初始化 <see cref="OdfSchemaForeignKey"/> 類別的新執行個體。
     /// </summary>
@@ -674,12 +705,7 @@ public sealed class OdfSchemaForeignKey
     /// <param name="deleteRule">The delete rule. / 刪除規則。</param>
     /// <exception cref="ArgumentException">When <paramref name="referencedTable"/> is empty. / 當 <paramref name="referencedTable"/> 為空時擲出。</exception>
     /// <exception cref="ArgumentNullException">When <paramref name="keyColumns"/> is <see langword="null"/>. / 當 <paramref name="keyColumns"/> 為 <see langword="null"/> 時擲出。</exception>
-    public OdfSchemaForeignKey(
-        string? name,
-        string referencedTable,
-        IEnumerable<OdfSchemaKeyMapping> keyColumns,
-        string? updateRule = null,
-        string? deleteRule = null)
+    public OdfSchemaForeignKey(string? name, string referencedTable, IEnumerable<OdfSchemaKeyMapping> keyColumns, string? updateRule, string? deleteRule)
     {
         if (string.IsNullOrWhiteSpace(referencedTable))
         {
@@ -692,6 +718,7 @@ public sealed class OdfSchemaForeignKey
         UpdateRule = updateRule;
         DeleteRule = deleteRule;
     }
+
 
     /// <summary>
     /// Gets the foreign key constraint name.

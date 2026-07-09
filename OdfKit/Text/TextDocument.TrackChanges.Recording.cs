@@ -31,6 +31,24 @@ public partial class TextDocument
         get => TrackedChanges;
         set => TrackedChanges = value;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string RecordTrackedChange(string changeType) => RecordTrackedChange(changeType, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string RecordTrackedChange(string changeType, OdfNode? extraContent) => RecordTrackedChange(changeType, extraContent, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string RecordTrackedChange(string changeType, OdfNode? extraContent, string? originalStyleName) => RecordTrackedChange(changeType, extraContent, originalStyleName, null);
+
 
     /// <summary>
     /// Records change tracking information.
@@ -41,8 +59,27 @@ public partial class TextDocument
     /// <param name="originalStyleName">The original style name. / 原本的樣式名稱。</param>
     /// <param name="targetFamily">The target style family name. / 目標樣式系列名稱。</param>
     /// <returns>The generated change identifier. / 產生的修訂識別碼。</returns>
-    public string RecordTrackedChange(string changeType, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null) =>
+    public string RecordTrackedChange(string changeType, OdfNode? extraContent, string? originalStyleName, string? targetFamily) =>
         AddTrackedChange(changeType, "Author", DateTime.UtcNow, extraContent, originalStyleName, targetFamily);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddTrackedChange(string changeType, string creator, DateTime date) => AddTrackedChange(changeType, creator, date, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent) => AddTrackedChange(changeType, creator, date, extraContent, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent, string? originalStyleName) => AddTrackedChange(changeType, creator, date, extraContent, originalStyleName, null);
+
 
     /// <summary>
     /// Adds a tracked change record.
@@ -55,8 +92,9 @@ public partial class TextDocument
     /// <param name="originalStyleName">The original style name. / 原本的樣式名稱。</param>
     /// <param name="targetFamily">The target style family name. / 目標樣式系列名稱。</param>
     /// <returns>The generated change identifier. / 產生的修訂識別碼。</returns>
-    public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null) =>
+    public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent, string? originalStyleName, string? targetFamily) =>
         TextDocumentTrackChangesRecordingEngine.AddTrackedChange(MutationContext, changeType, creator, date, extraContent, originalStyleName, targetFamily);
+
 
     /// <summary>
     /// Accepts all tracked changes in the document.

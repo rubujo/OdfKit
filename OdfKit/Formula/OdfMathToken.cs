@@ -328,8 +328,8 @@ public sealed class OdfMathToken
         return new OdfMathToken(OdfMathTokenKind.Fraction, string.Empty, numerator, denominator);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfMathToken Radical(OdfMathToken radicand) => Radical(radicand, null);
 
@@ -409,6 +409,18 @@ public sealed class OdfMathToken
         RequireNotNull(over, nameof(over));
         return new OdfMathToken(OdfMathTokenKind.UnderOver, string.Empty, null, null, [baseToken, under, over]);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfMathToken Fenced(OdfMathToken inner) => Fenced(inner, "(", ")");
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfMathToken Fenced(OdfMathToken inner, string open) => Fenced(inner, open, ")");
+
 
     /// <summary>
     /// Creates a fenced group token serialized as <c>mrow</c> with leading and trailing <c>mo</c> delimiters.
@@ -418,14 +430,15 @@ public sealed class OdfMathToken
     /// <param name="open">The opening delimiter text; defaults to <c>(</c>. / 開括號文字，預設為 <c>(</c>。</param>
     /// <param name="close">The closing delimiter text; defaults to <c>)</c>. / 閉括號文字，預設為 <c>)</c>。</param>
     /// <returns>A new <see cref="OdfMathToken"/>. / 新的 <see cref="OdfMathToken"/>。</returns>
-    public static OdfMathToken Fenced(OdfMathToken inner, string open = "(", string close = ")")
+    public static OdfMathToken Fenced(OdfMathToken inner, string open, string close)
     {
         RequireNotNull(inner, nameof(inner));
         return new OdfMathToken(OdfMathTokenKind.Fenced, $"{open}|{close}", inner, null);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfMathToken Style(OdfMathToken inner) => Style(inner, null);
 

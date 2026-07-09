@@ -167,6 +167,18 @@ public partial class OdfParagraph
         get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-complex", OdfNamespaces.Style, "paragraph");
         set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-size-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFont(string westernFont) => SetFont(westernFont, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFont(string westernFont, string? asianFont) => SetFont(westernFont, asianFont, null);
+
 
     /// <summary>
     /// Sets the paragraph's font names.
@@ -175,12 +187,25 @@ public partial class OdfParagraph
     /// <param name="westernFont">The Western font name. / 西文字型名稱。</param>
     /// <param name="asianFont">The East Asian (CJK) font name. / 東亞（中日韓）字型名稱。</param>
     /// <param name="complexFont">The complex script font name. / 複雜文字字型名稱。</param>
-    public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
+    public void SetFont(string westernFont, string? asianFont, string? complexFont)
     {
         FontName = westernFont;
         FontNameAsian = asianFont ?? westernFont;
         FontNameComplex = complexFont ?? westernFont;
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontSize(string westernSize) => SetFontSize(westernSize, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontSize(string westernSize, string? asianSize) => SetFontSize(westernSize, asianSize, null);
+
 
     /// <summary>
     /// Sets the paragraph's font sizes.
@@ -189,12 +214,13 @@ public partial class OdfParagraph
     /// <param name="westernSize">The Western font size. / 西文字型大小。</param>
     /// <param name="asianSize">The East Asian font size. / 東亞字型大小。</param>
     /// <param name="complexSize">The complex script font size. / 複雜文字字型大小。</param>
-    public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
+    public void SetFontSize(string westernSize, string? asianSize, string? complexSize)
     {
         FontSize = westernSize;
         FontSizeAsian = asianSize ?? westernSize;
         FontSizeComplex = complexSize ?? westernSize;
     }
+
 
     /// <summary>
     /// Adds a text run at the end of the paragraph.
@@ -291,8 +317,8 @@ public partial class OdfParagraph
         Node.AppendChild(node);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddSpace() => AddSpace(1);
 
@@ -402,8 +428,8 @@ public partial class OdfParagraph
     /// </summary>
     public void AddChapterField() => Doc.AddChapterField(this);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddSequenceField(string name) => AddSequenceField(name, "1");
 
@@ -424,8 +450,8 @@ public partial class OdfParagraph
     /// <param name="refName">The reference entry name. / 參考專案名稱。</param>
     public void AddReferenceField(string refName) => Doc.AddReferenceField(this, refName);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddSequenceRefField(string sequenceName) => AddSequenceRefField(sequenceName, "value");
 
@@ -439,8 +465,8 @@ public partial class OdfParagraph
     public void AddSequenceRefField(string sequenceName, string referenceFormat) => Doc.AddSequenceRefField(this, sequenceName, referenceFormat);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddBookmarkReferenceField(string bookmarkName) => AddBookmarkReferenceField(bookmarkName, "text");
 
@@ -468,6 +494,18 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="name">The variable name. / 變數名稱。</param>
     public void AddVariableGetField(string name) => Doc.AddVariableGetField(this, name);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDatabaseDisplayField(string tableName, string columnName) => AddDatabaseDisplayField(tableName, columnName, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDatabaseDisplayField(string tableName, string columnName, string? tableType) => AddDatabaseDisplayField(tableName, columnName, tableType, null);
+
 
     /// <summary>
     /// Adds a database field display field (<c>text:database-display</c>) in the paragraph, used for mail merge or report content bound to a table column.
@@ -477,8 +515,27 @@ public partial class OdfParagraph
     /// <param name="columnName">The column name to display. / 要顯示的欄位名稱。</param>
     /// <param name="tableType">The data source type, either "table", "query", or "command". / 資料來源類型，可為 "table"、"query" 或 "command"。</param>
     /// <param name="databaseName">The database connection name. / 資料庫連線名稱。</param>
-    public void AddDatabaseDisplayField(string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
+    public void AddDatabaseDisplayField(string tableName, string columnName, string? tableType, string? databaseName) =>
         Doc.AddDatabaseDisplayField(this, tableName, columnName, tableType, databaseName);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDatabaseNextField(string tableName) => AddDatabaseNextField(tableName, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDatabaseNextField(string tableName, string? tableType) => AddDatabaseNextField(tableName, tableType, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDatabaseNextField(string tableName, string? tableType, string? databaseName) => AddDatabaseNextField(tableName, tableType, databaseName, null);
+
 
     /// <summary>
     /// Adds a database next record field (<c>text:database-next</c>) in the paragraph, used for advancing records in mail merge or reports.
@@ -488,8 +545,9 @@ public partial class OdfParagraph
     /// <param name="tableType">The data source type, either "table", "query", or "command". / 資料來源類型，可為 "table"、"query" 或 "command"。</param>
     /// <param name="databaseName">The database connection name. / 資料庫連線名稱。</param>
     /// <param name="condition">The condition expression evaluated before advancing. / 換行前的判斷條件式。</param>
-    public void AddDatabaseNextField(string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
+    public void AddDatabaseNextField(string tableName, string? tableType, string? databaseName, string? condition) =>
         Doc.AddDatabaseNextField(this, tableName, tableType, databaseName, condition);
+
 
     /// <summary>
     /// Inserts a footnote in the paragraph.
@@ -506,6 +564,18 @@ public partial class OdfParagraph
     /// <param name="citation">The endnote citation marker. / 尾注引用標記。</param>
     /// <param name="bodyText">The endnote body content. / 尾注本文內容。</param>
     public void AddEndnote(string citation, string bodyText) => Doc.AddEndnote(this, citation, bodyText);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue) => AddAlphabeticalIndexMark(stringValue, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1) => AddAlphabeticalIndexMark(stringValue, key1, null);
+
 
     /// <summary>
     /// Adds an alphabetical index mark in the paragraph.
@@ -514,8 +584,8 @@ public partial class OdfParagraph
     /// <param name="stringValue">The index string value. / 索引字串值。</param>
     /// <param name="key1">The primary key. / 主要鍵值。</param>
     /// <param name="key2">The secondary key. / 次要鍵值。</param>
-    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1 = null, string? key2 = null)
-        => Doc.AddAlphabeticalIndexMark(this, stringValue, key1, key2);
+    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1, string? key2) => Doc.AddAlphabeticalIndexMark(this, stringValue, key1, key2);
+
 
     /// <summary>
     /// Adds a bibliography mark in the paragraph.
@@ -551,8 +621,8 @@ public partial class OdfParagraph
     /// <param name="text">The display text. / 顯示文字。</param>
     public void AddHyperlink(string url, string text) => Doc.AddHyperlink(this, url, text);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfListBuilder AppendList() => AppendList(null);
 

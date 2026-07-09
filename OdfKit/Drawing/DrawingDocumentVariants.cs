@@ -48,8 +48,8 @@ public sealed class GraphicsTemplateDocument : DrawingDocument
     public static new Task<GraphicsTemplateDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new async Task<GraphicsTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -62,8 +62,8 @@ public sealed class GraphicsTemplateDocument : DrawingDocument
     public static new GraphicsTemplateDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new GraphicsTemplateDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -85,14 +85,14 @@ public sealed class GraphicsTemplateDocument : DrawingDocument
     public static new Task<GraphicsTemplateDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new Task<GraphicsTemplateDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new async Task<GraphicsTemplateDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -158,8 +158,8 @@ public sealed class FlatGraphicsDocument : DrawingDocument
     public static new Task<FlatGraphicsDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new async Task<FlatGraphicsDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -172,8 +172,8 @@ public sealed class FlatGraphicsDocument : DrawingDocument
     public static new FlatGraphicsDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new FlatGraphicsDocument Load(Stream stream, string? fileName) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -195,14 +195,14 @@ public sealed class FlatGraphicsDocument : DrawingDocument
     public static new Task<FlatGraphicsDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new Task<FlatGraphicsDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static new async Task<FlatGraphicsDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));

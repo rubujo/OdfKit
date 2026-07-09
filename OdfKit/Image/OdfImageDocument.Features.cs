@@ -18,6 +18,30 @@ public partial class OdfImageDocument
     /// </summary>
     public IReadOnlyList<OdfImageFrameInfo> GetImageFrames() =>
         OdfImageDocumentReadEngine.GetImageFrames(this);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddImageFrame(imageBytes, x, y, width, height, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName) => AddImageFrame(imageBytes, x, y, width, height, preferredName, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name) => AddImageFrame(imageBytes, x, y, width, height, preferredName, name, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name, string? title) => AddImageFrame(imageBytes, x, y, width, height, preferredName, name, title, null);
+
 
     /// <summary>
     /// Adds an image frame (without replacing existing frames).
@@ -33,16 +57,7 @@ public partial class OdfImageDocument
     /// <param name="title">The optional frame title. / 選用的框架標題。</param>
     /// <param name="description">The optional frame description. / 選用的框架描述。</param>
     /// <returns>The path of the image within the ODF package. / 影像在 ODF 封裝中的路徑。</returns>
-    public string AddImageFrame(
-        byte[] imageBytes,
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string? preferredName = null,
-        string? name = null,
-        string? title = null,
-        string? description = null)
+    public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name, string? title, string? description)
     {
         if (imageBytes is null)
         {
@@ -85,6 +100,7 @@ public partial class OdfImageDocument
         GetImageNode().AppendChild(frame);
         return href;
     }
+
 
     /// <summary>
     /// Batch-adds multiple image frames (without replacing existing frames).

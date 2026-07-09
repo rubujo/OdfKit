@@ -90,6 +90,36 @@ public partial class DrawingDocument
 
         return result;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names) => UpdateShapes(names, null, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x) => UpdateShapes(names, x, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y) => UpdateShapes(names, x, y, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y, OdfLength? width) => UpdateShapes(names, x, y, width, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height) => UpdateShapes(names, x, y, width, height, null);
+
 
     /// <summary>
     /// Updates drawing shapes by id or name.
@@ -102,13 +132,7 @@ public partial class DrawingDocument
     /// <param name="height">The optional height. / 選用的高度。</param>
     /// <param name="layerName">The optional layer name. / 選用的圖層名稱。</param>
     /// <returns>The batch update result. / 批次更新結果。</returns>
-    public OdfBatchUpdateResult UpdateShapes(
-        IEnumerable<string> names,
-        OdfLength? x = null,
-        OdfLength? y = null,
-        OdfLength? width = null,
-        OdfLength? height = null,
-        string? layerName = null)
+    public OdfBatchUpdateResult UpdateShapes(IEnumerable<string> names, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height, string? layerName)
     {
         if (names is null)
         {
@@ -145,6 +169,7 @@ public partial class DrawingDocument
 
         return result;
     }
+
 
     /// <summary>
     /// Updates drawing shapes by id or name.

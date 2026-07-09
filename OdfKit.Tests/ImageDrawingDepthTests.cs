@@ -138,7 +138,13 @@ public class ImageDrawingDepthTests
         shape.Id = "box";
 
         int changed = document.ReplaceTextInTextBoxes("{{Name}}", "OdfKit");
-        OdfBatchUpdateResult result = document.UpdateShapes(["box"], x: 2.Cm(), layerName: "Layer1");
+        OdfBatchUpdateResult result = document.UpdateShapes(
+            ["box"],
+            x: 2.Cm(),
+            y: null,
+            width: null,
+            height: null,
+            layerName: "Layer1");
 
         Assert.Equal(1, changed);
         Assert.Contains(document.Pages[0].TextBoxes, textBox => textBox.Text == "Hello OdfKit");

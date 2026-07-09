@@ -37,6 +37,24 @@ public partial class OdfChartDocument
 
         return lights;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddLight(string direction) => AddLight(direction, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddLight(string direction, string? diffuseColor) => AddLight(direction, diffuseColor, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddLight(string direction, string? diffuseColor, bool? enabled) => AddLight(direction, diffuseColor, enabled, null);
+
 
     /// <summary>
     /// Adds a 3D chart light source (<c>dr3d:light</c>).
@@ -47,7 +65,7 @@ public partial class OdfChartDocument
     /// <param name="enabled">The optional enabled state. / 選用的啟用狀態。</param>
     /// <param name="specular">The optional specular reflection enabled state. / 選用的反射光啟用狀態。</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="direction"/> is blank. / 當 <paramref name="direction"/> 為空白時擲出。</exception>
-    public void AddLight(string direction, string? diffuseColor = null, bool? enabled = null, bool? specular = null)
+    public void AddLight(string direction, string? diffuseColor, bool? enabled, bool? specular)
     {
         if (string.IsNullOrWhiteSpace(direction))
         {
@@ -73,6 +91,7 @@ public partial class OdfChartDocument
 
         FindOrCreatePlotArea().AppendChild(light);
     }
+
 
     /// <summary>
     /// Removes all 3D chart light sources from the plot area.

@@ -337,7 +337,7 @@ public class ManagedPptxConversionTests
             .AddEmbeddedTable(2, 2)
             .SetTemplateName("{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}")
             .SetCellText(0, 0, "Q1")
-            .SetCellTextStyle(0, 0, bold: true, underline: true, textPosition: "super", fontSize: "18pt", color: "#AA5500")
+            .SetCellTextStyle(0, 0, bold: true, italic: null, underline: true, strikethrough: null, textPosition: "super", fontSize: "18pt", color: "#AA5500")
             .SetCellBackgroundColor(0, 0, "#FFEE99")
             .SetCellBorder(0, 0, "0.75pt solid #336699")
             .SetCellText(0, 1, "Q2")
@@ -1337,6 +1337,7 @@ public class ManagedPptxConversionTests
             shape.Id,
             OdfAnimationEffect.Fade,
             OdfAnimationTrigger.OnClick,
+            delay: default,
             duration: TimeSpan.FromMilliseconds(300));
         sourceSlide.AddEntranceEffect(
             shape.Id,
@@ -1388,6 +1389,7 @@ public class ManagedPptxConversionTests
             shape.Id,
             OdfAnimationEffect.Fade,
             OdfAnimationTrigger.OnClick,
+            delay: default,
             duration: TimeSpan.FromMilliseconds(300));
         sourceSlide.AddEmphasisEffect(
             shape.Id,
@@ -1486,6 +1488,7 @@ public class ManagedPptxConversionTests
             textBox.Id,
             OdfAnimationEffect.Fade,
             OdfAnimationTrigger.OnClick,
+            delay: default,
             duration: TimeSpan.FromMilliseconds(600));
 
         using var pptxStream = new MemoryStream();
@@ -1531,6 +1534,7 @@ public class ManagedPptxConversionTests
             textBox.Id,
             OdfAnimationEffect.Fade,
             OdfAnimationTrigger.OnClick,
+            delay: default,
             duration: TimeSpan.FromMilliseconds(600));
 
         using var pptxStream = new MemoryStream();
@@ -2176,6 +2180,7 @@ public class ManagedPptxConversionTests
             textBox.Id,
             OdfAnimationEffect.Fade,
             OdfAnimationTrigger.OnClick,
+            delay: default,
             duration: TimeSpan.FromSeconds(1.5));
 
         slide.AddEntranceEffect(

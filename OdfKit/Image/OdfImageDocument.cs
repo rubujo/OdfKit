@@ -77,8 +77,8 @@ public partial class OdfImageDocument : OdfDocument
     public new static Task<OdfImageDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<OdfImageDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -92,8 +92,8 @@ public partial class OdfImageDocument : OdfDocument
     public new static OdfImageDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static OdfImageDocument Load(Stream stream, string? fileName)
     {
@@ -117,14 +117,14 @@ public partial class OdfImageDocument : OdfDocument
     public new static Task<OdfImageDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
@@ -268,8 +268,8 @@ public partial class OdfImageDocument : OdfDocument
         return Package.ReadEntry(href!);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public string SetImage(byte[] imageBytes) => SetImage(imageBytes, "image.png");
 
@@ -322,6 +322,24 @@ public partial class OdfImageDocument : OdfDocument
 
         return href;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height) => SetImageLayout(x, y, width, height, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? name) => SetImageLayout(x, y, width, height, name, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? name, string? title) => SetImageLayout(x, y, width, height, name, title, null);
+
 
 
     /// <summary>
@@ -335,14 +353,7 @@ public partial class OdfImageDocument : OdfDocument
     /// <param name="name">The optional frame name. / 選用的框架名稱。</param>
     /// <param name="title">The optional frame title. / 選用的框架標題。</param>
     /// <param name="description">The optional frame description. / 選用的框架描述。</param>
-    public void SetImageLayout(
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string? name = null,
-        string? title = null,
-        string? description = null)
+    public void SetImageLayout(OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? name, string? title, string? description)
     {
         OdfNode frame = EnsurePrimaryFrame();
         SetOptionalLength(frame, "x", x);
@@ -353,4 +364,5 @@ public partial class OdfImageDocument : OdfDocument
         SetOptionalChildText(frame, "title", OdfNamespaces.Svg, "svg", title);
         SetOptionalChildText(frame, "desc", OdfNamespaces.Svg, "svg", description);
     }
+
 }

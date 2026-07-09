@@ -51,8 +51,8 @@ public class DatabaseDocument : OdfDatabaseDocument
     public new static Task<DatabaseDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<DatabaseDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureDatabaseDocument(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -65,8 +65,8 @@ public class DatabaseDocument : OdfDatabaseDocument
     public new static DatabaseDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static DatabaseDocument Load(Stream stream, string? fileName)
     {
@@ -90,14 +90,14 @@ public class DatabaseDocument : OdfDatabaseDocument
     public new static Task<DatabaseDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<DatabaseDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<DatabaseDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureDatabaseDocument(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));

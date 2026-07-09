@@ -37,8 +37,8 @@ public class OdfListItem(OdfNode node, TextDocument doc)
         }
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraph AddParagraph() => AddParagraph("");
 
@@ -58,8 +58,8 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfList AddNestedList() => AddNestedList(null);
 

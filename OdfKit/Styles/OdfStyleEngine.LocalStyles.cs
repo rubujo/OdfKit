@@ -98,6 +98,18 @@ public partial class OdfStyleEngine
         elementNode.IsModified = true;
         return styleNode;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value) => SetLocalStyleProperty(elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, value, null, false);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value, string? propAttrPrefix) => SetLocalStyleProperty(elementNode, family, propElementLocalName, propAttrLocalName, propAttrNsUri, value, propAttrPrefix, false);
+
 
     /// <summary>
     /// Executes the SetLocalStyleProperty operation.
@@ -111,7 +123,7 @@ public partial class OdfStyleEngine
     /// <param name="value">要設定的值</param>
     /// <param name="propAttrPrefix">屬性屬性的前綴</param>
     /// <param name="deferSave">是否延遲執行自動樣式去重與存檔</param>
-    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value, string? propAttrPrefix = null, bool deferSave = false)
+    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value, string? propAttrPrefix, bool deferSave)
     {
         OnStyleChanging?.Invoke(elementNode, family);
         var styleNode = GetOrCreateLocalStyle(elementNode, family);
@@ -244,6 +256,7 @@ public partial class OdfStyleEngine
             DeduplicateAndSaveStyles();
         }
     }
+
 
     /// <summary>
     /// Executes the DeduplicateAndSaveStyles operation.

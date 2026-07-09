@@ -60,6 +60,18 @@ public class OdfAlphabeticalIndex : OdfIndex
         get => SourceNode?.GetAttribute("ignore-case", OdfNamespaces.Text) == "true";
         set => SourceNode?.SetAttribute("ignore-case", OdfNamespaces.Text, value ? "true" : "false", "text");
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void ConfigureSource() => ConfigureSource(false, false);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void ConfigureSource(bool commaSeparated) => ConfigureSource(commaSeparated, false);
+
 
     /// <summary>
     /// Configures the properties of the alphabetical index source.
@@ -67,12 +79,13 @@ public class OdfAlphabeticalIndex : OdfIndex
     /// </summary>
     /// <param name="commaSeparated">Whether to use comma separation. / 是否使用逗號分隔。</param>
     /// <param name="ignoreCase">Whether to ignore case. / 是否忽略大小寫。</param>
-    public void ConfigureSource(bool commaSeparated = false, bool ignoreCase = false)
+    public void ConfigureSource(bool commaSeparated, bool ignoreCase)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
         src.SetAttribute("comma-separated", OdfNamespaces.Text, commaSeparated ? "true" : "false", "text");
         src.SetAttribute("ignore-case", OdfNamespaces.Text, ignoreCase ? "true" : "false", "text");
     }
+
 
     /// <summary>
     /// Adds an entry template for the alphabetical index.

@@ -252,6 +252,7 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/generated.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
                 nameClasses: new[]
                 {
                     new OdfSchemaNameClass(
@@ -301,6 +302,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/generated.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: new[]
                 {
                     new OdfSchemaPatternDefinition(
@@ -315,6 +318,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2348,6 +2352,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/root-pattern.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: new[]
                 {
                     new OdfSchemaPatternDefinition(
@@ -2362,6 +2368,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: CreateRootChildren(rootLocalName, requiredAttributeLocalName))
                         })
                 });
@@ -2374,6 +2381,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/start-pattern.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: new[]
                 {
                     new OdfSchemaPatternDefinition(
@@ -2401,6 +2410,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: CreateRootChildren(rootLocalName, requiredAttributeLocalName))
                         })
                 });
@@ -2413,6 +2423,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/package-entry-patterns.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: new[]
                 {
                     new OdfSchemaPatternDefinition(
@@ -2427,6 +2439,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: CreateRootChildren("document-content", "mimetype"))
                         }),
                     new OdfSchemaPatternDefinition(
@@ -2441,6 +2454,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2504,6 +2518,7 @@ namespace OdfKit.Tests
                 string.Empty,
                 string.Empty,
                 string.Empty,
+                nameClasses: null,
                 children: new[]
                 {
                     new OdfSchemaPatternNode(
@@ -2514,6 +2529,7 @@ namespace OdfKit.Tests
                         string.Empty,
                         string.Empty,
                         string.Empty,
+                        nameClasses: null,
                         children: new[]
                         {
                             new OdfSchemaPatternNode(
@@ -2543,6 +2559,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/generated.rng"),
                 "generated",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: new[]
                 {
                     new OdfSchemaPatternDefinition(
@@ -2557,6 +2575,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2575,6 +2594,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -2613,6 +2633,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2671,6 +2692,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2699,6 +2721,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -2741,6 +2764,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2765,6 +2789,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2775,6 +2800,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -2800,6 +2826,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2810,6 +2837,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -2843,6 +2871,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2853,6 +2882,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -2886,6 +2916,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2896,6 +2927,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -2906,6 +2938,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -2940,6 +2973,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2964,6 +2998,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -2996,6 +3031,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3028,6 +3064,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3052,6 +3089,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3076,6 +3114,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3086,6 +3125,9 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         "integer",
                                         string.Empty,
+                                        nameClasses: null,
+                                        children: null,
+                                        dataParameters: null,
                                         dataTypeLibrary: "https://example.invalid/custom-datatypes")
                                 })
                         }),
@@ -3101,6 +3143,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3125,6 +3168,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3149,6 +3193,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3173,6 +3218,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3197,6 +3243,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3207,6 +3254,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3232,6 +3280,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3242,6 +3291,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3252,6 +3302,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3278,6 +3329,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3302,6 +3354,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3326,6 +3379,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3336,6 +3390,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3346,6 +3401,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3372,6 +3428,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3382,6 +3439,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3415,6 +3473,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3425,6 +3484,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3435,6 +3495,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3461,6 +3522,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3471,6 +3533,8 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         "integer",
                                         string.Empty,
+                                        nameClasses: null,
+                                        children: null,
                                         dataParameters: new[]
                                         {
                                             new KeyValuePair<string, string>("minInclusive", "1"),
@@ -3490,6 +3554,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3500,6 +3565,8 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         "decimal",
                                         string.Empty,
+                                        nameClasses: null,
+                                        children: null,
                                         dataParameters: new[]
                                         {
                                             new KeyValuePair<string, string>(
@@ -3523,6 +3590,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3533,6 +3601,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         "integer",
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3543,6 +3612,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3569,6 +3639,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3579,6 +3650,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3589,6 +3661,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 "positiveInteger",
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3599,6 +3672,7 @@ namespace OdfKit.Tests
                                                         string.Empty,
                                                         string.Empty,
                                                         string.Empty,
+                                                        nameClasses: null,
                                                         children: new[]
                                                         {
                                                             new OdfSchemaPatternNode(
@@ -3626,6 +3700,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3636,6 +3711,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3646,6 +3722,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -3656,6 +3733,7 @@ namespace OdfKit.Tests
                                                         string.Empty,
                                                         "integer",
                                                         string.Empty,
+                                                        nameClasses: null,
                                                         children: new[]
                                                         {
                                                             new OdfSchemaPatternNode(
@@ -3666,6 +3744,7 @@ namespace OdfKit.Tests
                                                                 string.Empty,
                                                                 string.Empty,
                                                                 string.Empty,
+                                                                nameClasses: null,
                                                                 children: new[]
                                                                 {
                                                                     new OdfSchemaPatternNode(
@@ -3694,6 +3773,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3718,6 +3798,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3728,6 +3809,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3753,6 +3835,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3763,6 +3846,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3788,6 +3872,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3812,6 +3897,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3836,6 +3922,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3846,6 +3933,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -3871,6 +3959,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3895,6 +3984,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3919,6 +4009,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3943,6 +4034,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3967,6 +4059,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -3991,6 +4084,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4015,6 +4109,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4039,6 +4134,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4063,6 +4159,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4087,6 +4184,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4097,6 +4195,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -4107,6 +4206,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -4133,6 +4233,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4143,6 +4244,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(
@@ -4153,6 +4255,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -4172,6 +4275,7 @@ namespace OdfKit.Tests
                                                 string.Empty,
                                                 string.Empty,
                                                 string.Empty,
+                                                nameClasses: null,
                                                 children: new[]
                                                 {
                                                     new OdfSchemaPatternNode(
@@ -4198,6 +4302,7 @@ namespace OdfKit.Tests
                                 string.Empty,
                                 string.Empty,
                                 string.Empty,
+                                nameClasses: null,
                                 children: new[]
                                 {
                                     new OdfSchemaPatternNode(
@@ -4208,6 +4313,7 @@ namespace OdfKit.Tests
                                         string.Empty,
                                         string.Empty,
                                         string.Empty,
+                                        nameClasses: null,
                                         children: new[]
                                         {
                                             new OdfSchemaPatternNode(

@@ -20,8 +20,8 @@ namespace OdfKit.Csv;
 public static class OdfCsvExporter
 {
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream) => ExportToStream(workbook, csvStream, null);
 
@@ -71,8 +71,8 @@ public static class OdfCsvExporter
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath) => ExportToFile(workbook, csvPath, null);
 

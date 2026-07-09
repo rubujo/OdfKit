@@ -12,8 +12,8 @@ public partial class OdfElement
 {
     #region Attribute Values - Text List & Reference
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextLabelFollowedBy? GetTextLabelFollowedByAttributeValue(string localName, string namespaceUri) => GetTextLabelFollowedByAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -31,6 +31,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextLabelFollowedBy>(value, OdfElementSchemaRegistry.TryParseTextLabelFollowedBy);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfTextLabelFollowedBy value) => SetTextLabelFollowedByAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfTextLabelFollowedBy value, string? prefix) => SetTextLabelFollowedByAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -42,13 +54,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字清單標籤後接設定</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfTextLabelFollowedBy value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfTextLabelFollowedBy value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextLabelFollowedBy(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextListLevelPositionMode? GetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri) => GetTextListLevelPositionModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -66,6 +79,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextListLevelPositionMode>(value, OdfElementSchemaRegistry.TryParseTextListLevelPositionMode);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfTextListLevelPositionMode value) => SetTextListLevelPositionModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfTextListLevelPositionMode value, string? prefix) => SetTextListLevelPositionModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -77,13 +102,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字清單層級定位模式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfTextListLevelPositionMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfTextListLevelPositionMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextListLevelPositionMode(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextIndexScope? GetTextIndexScopeAttributeValue(string localName, string namespaceUri) => GetTextIndexScopeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -101,6 +127,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextIndexScope>(value, OdfElementSchemaRegistry.TryParseTextIndexScope);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfTextIndexScope value) => SetTextIndexScopeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfTextIndexScope value, string? prefix) => SetTextIndexScopeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -112,13 +150,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字索引範圍</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfTextIndexScope value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfTextIndexScope value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextIndexScope(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextTableType? GetTextTableTypeAttributeValue(string localName, string namespaceUri) => GetTextTableTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -136,6 +175,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextTableType>(value, OdfElementSchemaRegistry.TryParseTextTableType);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfTextTableType value) => SetTextTableTypeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfTextTableType value, string? prefix) => SetTextTableTypeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -147,13 +198,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字資料表來源類型</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfTextTableType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfTextTableType value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextTableType(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextAnchorType? GetTextAnchorTypeAttributeValue(string localName, string namespaceUri) => GetTextAnchorTypeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -171,6 +223,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextAnchorType>(value, OdfElementSchemaRegistry.TryParseTextAnchorType);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfTextAnchorType value) => SetTextAnchorTypeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfTextAnchorType value, string? prefix) => SetTextAnchorTypeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -182,13 +246,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字錨定類型</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfTextAnchorType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfTextAnchorType value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextAnchorType(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextNoteClass? GetTextNoteClassAttributeValue(string localName, string namespaceUri) => GetTextNoteClassAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -206,6 +271,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextNoteClass>(value, OdfElementSchemaRegistry.TryParseTextNoteClass);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfTextNoteClass value) => SetTextNoteClassAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfTextNoteClass value, string? prefix) => SetTextNoteClassAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -217,13 +294,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字註解類別</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfTextNoteClass value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfTextNoteClass value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextNoteClass(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextSelectPage? GetTextSelectPageAttributeValue(string localName, string namespaceUri) => GetTextSelectPageAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -241,6 +319,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextSelectPage>(value, OdfElementSchemaRegistry.TryParseTextSelectPage);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfTextSelectPage value) => SetTextSelectPageAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfTextSelectPage value, string? prefix) => SetTextSelectPageAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -252,13 +342,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字頁面選取</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfTextSelectPage value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfTextSelectPage value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextSelectPage(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextReferenceFormat? GetTextReferenceFormatAttributeValue(string localName, string namespaceUri) => GetTextReferenceFormatAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -276,6 +367,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextReferenceFormat>(value, OdfElementSchemaRegistry.TryParseTextReferenceFormat);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value) => SetTextReferenceFormatAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value, string? prefix) => SetTextReferenceFormatAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -287,13 +390,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字參照格式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextReferenceFormat(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextStartNumberingAt? GetTextStartNumberingAtAttributeValue(string localName, string namespaceUri) => GetTextStartNumberingAtAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -311,6 +415,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextStartNumberingAt>(value, OdfElementSchemaRegistry.TryParseTextStartNumberingAt);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value) => SetTextStartNumberingAtAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value, string? prefix) => SetTextStartNumberingAtAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -322,13 +438,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字起始編號範圍</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextStartNumberingAt(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextFootnotesPosition? GetTextFootnotesPositionAttributeValue(string localName, string namespaceUri) => GetTextFootnotesPositionAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -346,6 +463,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfTextFootnotesPosition>(value, OdfElementSchemaRegistry.TryParseTextFootnotesPosition);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value) => SetTextFootnotesPositionAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value, string? prefix) => SetTextFootnotesPositionAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -357,10 +486,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的文字註腳位置</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextFootnotesPosition(value), prefix, version);
     }
+
 
 
     #endregion

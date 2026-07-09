@@ -87,8 +87,8 @@ public sealed class PresentationDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public PresentationDocumentBuilder WithMasterPage(string name) => WithMasterPage(name, null);
 
@@ -143,6 +143,18 @@ public sealed class PresentationDocumentBuilder
     {
         return AddSlide($"Slide {_slideCount + 1}", configure);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public PresentationDocumentBuilder AddTitleSlide(string name, string title) => AddTitleSlide(name, title, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public PresentationDocumentBuilder AddTitleSlide(string name, string title, string? subtitle) => AddTitleSlide(name, title, subtitle, null);
+
 
     /// <summary>
     /// Adds a title slide.
@@ -153,11 +165,7 @@ public sealed class PresentationDocumentBuilder
     /// <param name="subtitle">The subtitle text. / 副標題文字。</param>
     /// <param name="configure">The additional slide configuration delegate. / 其他投影片設定委派。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public PresentationDocumentBuilder AddTitleSlide(
-        string name,
-        string title,
-        string? subtitle = null,
-        Action<OdfSlideBuilder>? configure = null)
+    public PresentationDocumentBuilder AddTitleSlide(string name, string title, string? subtitle, Action<OdfSlideBuilder>? configure)
     {
         return AddSlide(name, slide =>
         {
@@ -178,9 +186,10 @@ public sealed class PresentationDocumentBuilder
             configure?.Invoke(slide);
         });
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public PresentationDocumentBuilder AddTwoColumnSlide(string name, string title, IEnumerable<string> leftParagraphs, IEnumerable<string> rightParagraphs) => AddTwoColumnSlide(name, title, leftParagraphs, rightParagraphs, null);
 
@@ -211,8 +220,8 @@ public sealed class PresentationDocumentBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public PresentationDocumentBuilder AddChartSlide(string name, string title) => AddChartSlide(name, title, null);
 
@@ -280,6 +289,30 @@ public sealed class OdfSlideBuilder
         _slide = slide ?? throw new ArgumentNullException(nameof(slide));
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitle(string text) => AddTitle(text, 1, 1, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitle(string text, double xCm) => AddTitle(text, xCm, 1, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitle(string text, double xCm, double yCm) => AddTitle(text, xCm, yCm, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitle(string text, double xCm, double yCm, double widthCm) => AddTitle(text, xCm, yCm, widthCm, 2);
+
 
     /// <summary>
     /// Adds a title text box.
@@ -291,12 +324,7 @@ public sealed class OdfSlideBuilder
     /// <param name="widthCm">The width in centimeters. / 寬度，單位為公分。</param>
     /// <param name="heightCm">The height in centimeters. / 高度，單位為公分。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddTitle(
-        string text,
-        double xCm = 1,
-        double yCm = 1,
-        double widthCm = 10,
-        double heightCm = 2)
+    public OdfSlideBuilder AddTitle(string text, double xCm, double yCm, double widthCm, double heightCm)
     {
         _slide.AddTextBox(
             OdfLength.FromCentimeters(xCm),
@@ -306,6 +334,7 @@ public sealed class OdfSlideBuilder
             text);
         return this;
     }
+
 
     /// <summary>
     /// Adds a text box.
@@ -385,8 +414,8 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSlideBuilder AddShape(OdfShapeType shapeType, double xCm, double yCm, double widthCm, double heightCm) => AddShape(shapeType, xCm, yCm, widthCm, heightCm, null);
 
@@ -458,6 +487,24 @@ public sealed class OdfSlideBuilder
         _slide.SetLayout(layout);
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect) => AddEmphasisEffect(shapeId, effect, 0.5, OdfAnimationTrigger.OnClick, 0);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, double durationSeconds) => AddEmphasisEffect(shapeId, effect, durationSeconds, OdfAnimationTrigger.OnClick, 0);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, double durationSeconds, OdfAnimationTrigger trigger) => AddEmphasisEffect(shapeId, effect, durationSeconds, trigger, 0);
+
 
     /// <summary>
     /// Adds a slide emphasis animation.
@@ -469,16 +516,24 @@ public sealed class OdfSlideBuilder
     /// <param name="trigger">The trigger mode. / 觸發方式。</param>
     /// <param name="delaySeconds">The delay in seconds. / 延遲秒數。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddEmphasisEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        double durationSeconds = 0.5,
-        OdfAnimationTrigger trigger = OdfAnimationTrigger.OnClick,
-        double delaySeconds = 0)
+    public OdfSlideBuilder AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, double durationSeconds, OdfAnimationTrigger trigger, double delaySeconds)
     {
         _slide.AddEmphasisEffect(shapeId, effect, TimeSpan.FromSeconds(durationSeconds), trigger, TimeSpan.FromSeconds(delaySeconds));
         return this;
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddExitEffect(string shapeId, OdfAnimationEffect effect) => AddExitEffect(shapeId, effect, OdfAnimationTrigger.AfterPrevious, 0);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddExitEffect(shapeId, effect, trigger, 0);
+
 
     /// <summary>
     /// Adds a slide exit animation.
@@ -489,15 +544,36 @@ public sealed class OdfSlideBuilder
     /// <param name="trigger">The trigger mode. / 觸發方式。</param>
     /// <param name="delaySeconds">The delay in seconds. / 延遲秒數。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddExitEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        OdfAnimationTrigger trigger = OdfAnimationTrigger.AfterPrevious,
-        double delaySeconds = 0)
+    public OdfSlideBuilder AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, double delaySeconds)
     {
         _slide.AddExitEffect(shapeId, effect, trigger, TimeSpan.FromSeconds(delaySeconds));
         return this;
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitlePlaceholder() => AddTitlePlaceholder(1, 1, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitlePlaceholder(double xCm) => AddTitlePlaceholder(xCm, 1, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitlePlaceholder(double xCm, double yCm) => AddTitlePlaceholder(xCm, yCm, 10, 2);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddTitlePlaceholder(double xCm, double yCm, double widthCm) => AddTitlePlaceholder(xCm, yCm, widthCm, 2);
+
     /// <summary>
     /// Adds a title placeholder.
     /// 新增標題預留位置。
@@ -507,11 +583,7 @@ public sealed class OdfSlideBuilder
     /// <param name="widthCm">The width in centimeters. / 寬度，單位為公分。</param>
     /// <param name="heightCm">The height in centimeters. / 高度，單位為公分。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddTitlePlaceholder(
-        double xCm = 1,
-        double yCm = 1,
-        double widthCm = 10,
-        double heightCm = 2)
+    public OdfSlideBuilder AddTitlePlaceholder(double xCm, double yCm, double widthCm, double heightCm)
     {
         _slide.AddPlaceholder(
             OdfPlaceholderType.Title,
@@ -521,6 +593,7 @@ public sealed class OdfSlideBuilder
             OdfLength.FromCentimeters(heightCm));
         return this;
     }
+
 
     /// <summary>
     /// Sets speaker notes text.
@@ -546,8 +619,8 @@ public sealed class OdfSlideBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSlideBuilder WithTransition(OdfTransitionType type) => WithTransition(type, 72);
 
@@ -564,6 +637,18 @@ public sealed class OdfSlideBuilder
         _slide.SetTransition(type, OdfLength.FromPoints(durationPoints));
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddEntranceEffect(string shapeId, OdfAnimationEffect effect) => AddEntranceEffect(shapeId, effect, OdfAnimationTrigger.OnClick, 0);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSlideBuilder AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddEntranceEffect(shapeId, effect, trigger, 0);
+
 
 
     /// <summary>
@@ -575,15 +660,12 @@ public sealed class OdfSlideBuilder
     /// <param name="trigger">The trigger mode. / 觸發方式。</param>
     /// <param name="delaySeconds">The delay in seconds. / 延遲秒數。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfSlideBuilder AddEntranceEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        OdfAnimationTrigger trigger = OdfAnimationTrigger.OnClick,
-        double delaySeconds = 0)
+    public OdfSlideBuilder AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, double delaySeconds)
     {
         _slide.AddEntranceEffect(shapeId, effect, trigger, TimeSpan.FromSeconds(delaySeconds));
         return this;
     }
+
 }
 
 /// <summary>

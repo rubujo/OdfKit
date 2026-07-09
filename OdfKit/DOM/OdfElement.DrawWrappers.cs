@@ -255,8 +255,8 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfImageEffectsBuilder Shadow(OdfColor color, OdfLength offsetX, OdfLength offsetY) => Shadow(color, offsetX, offsetY, null);
 
@@ -390,8 +390,8 @@ internal static class OdfTransformHelper
     private static readonly System.Text.RegularExpressions.Regex MatrixRegex = new(@"matrix\s*\(\s*([^)]+)\s*\)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static System.Numerics.Matrix3x2 ParseTransform(string? transformStr)
     {
@@ -476,8 +476,8 @@ internal static class OdfTransformHelper
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static string FormatTransform(System.Numerics.Matrix3x2 matrix)
     {

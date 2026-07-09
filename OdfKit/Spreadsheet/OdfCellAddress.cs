@@ -47,6 +47,30 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     /// 取得一個值，指出工作表名稱是否為絕對參照。
     /// </summary>
     public bool IsSheetAbsolute { get; }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfCellAddress(int row, int column) : this(row, column, null, false, false, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfCellAddress(int row, int column, string? sheetName) : this(row, column, sheetName, false, false, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfCellAddress(int row, int column, string? sheetName, bool isRowAbsolute) : this(row, column, sheetName, isRowAbsolute, false, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfCellAddress(int row, int column, string? sheetName, bool isRowAbsolute, bool isColumnAbsolute) : this(row, column, sheetName, isRowAbsolute, isColumnAbsolute, false) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfCellAddress"/> struct.
@@ -59,8 +83,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     /// <param name="isColumnAbsolute">Whether the column index is an absolute reference. / 欄索引是否為絕對參照。</param>
     /// <param name="isSheetAbsolute">Whether the sheet name is an absolute reference. / 工作表名稱是否為絕對參照。</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the row or column index is less than 0. / 當列索引或欄索引小於 0 時擲出。</exception>
-    public OdfCellAddress(int row, int column, string? sheetName = null,
-        bool isRowAbsolute = false, bool isColumnAbsolute = false, bool isSheetAbsolute = false)
+    public OdfCellAddress(int row, int column, string? sheetName, bool isRowAbsolute, bool isColumnAbsolute, bool isSheetAbsolute)
     {
         if (row < 0)
             throw new ArgumentOutOfRangeException(nameof(row), OdfLocalizer.GetMessage("Err_OdfCellAddress_RowIndexNonNegative"));
@@ -74,6 +97,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         IsColumnAbsolute = isColumnAbsolute;
         IsSheetAbsolute = isSheetAbsolute;
     }
+
 
     /// <summary>
     /// Indicates whether the current instance is equal to another instance of the same type.
@@ -376,8 +400,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         return sb.ToString();
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public string ToOdfString() => ToOdfString(false);
 

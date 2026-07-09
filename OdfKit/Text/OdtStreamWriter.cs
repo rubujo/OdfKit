@@ -36,8 +36,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public OdtStreamWriter(Stream outputStream) : this(outputStream, OdfVersion.Odf14, false) { }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdtStreamWriter(Stream outputStream, OdfVersion version) : this(outputStream, version, false) { }
 
@@ -78,8 +78,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public OdtStreamWriter(string path) : this(CreateFileStream(path), OdfVersion.Odf14, true) { }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdtStreamWriter(string path, OdfVersion version) : this(CreateFileStream(path), version, true) { }
 
@@ -90,8 +90,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(string text) => AddParagraph(text, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddParagraph(string text, string? styleName)
     {
@@ -108,8 +108,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(ReadOnlySpan<char> text) => AddParagraph(text, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddParagraph(ReadOnlySpan<char> text, string? styleName)
     {
@@ -124,8 +124,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddParagraph(ReadOnlyMemory<char> text) => AddParagraph(text.Span, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddParagraph(ReadOnlyMemory<char> text, string? styleName) => AddParagraph(text.Span, styleName);
 
@@ -138,8 +138,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(string text) => AddHeading(text, 1);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddHeading(string text, int level)
     {
@@ -162,8 +162,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(ReadOnlySpan<char> text) => AddHeading(text, 1);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddHeading(ReadOnlySpan<char> text, int level)
     {
@@ -185,13 +185,13 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     public void AddHeading(ReadOnlyMemory<char> text) => AddHeading(text.Span, 1);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddHeading(ReadOnlyMemory<char> text, int level) => AddHeading(text.Span, level);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void BeginList() => BeginList(null);
 

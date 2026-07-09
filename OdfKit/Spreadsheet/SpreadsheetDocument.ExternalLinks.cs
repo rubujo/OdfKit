@@ -31,6 +31,18 @@ public partial class SpreadsheetDocument
         var evaluator = new DefaultFormulaEvaluator();
         evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel() => BeginFormulaEvaluationChannel(64, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity) => BeginFormulaEvaluationChannel(capacity, default);
+
 
     /// <summary>
     /// Opens an asynchronous formula recalculation channel that queues subsequent cell value or formula changes for background recalculation.
@@ -39,12 +51,13 @@ public partial class SpreadsheetDocument
     /// <param name="capacity">The channel capacity. / 通道容量。</param>
     /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
     /// <returns>The started formula recalculation channel. / 已啟動的公式重算通道。</returns>
-    public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity = 64, CancellationToken cancellationToken = default)
+    public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity, CancellationToken cancellationToken)
     {
         _formulaEvaluationChannel?.Dispose();
         _formulaEvaluationChannel = new OdfFormulaEvaluationChannel(this, capacity, cancellationToken);
         return _formulaEvaluationChannel;
     }
+
 
     internal void NotifyFormulaRecalculationRequested()
     {

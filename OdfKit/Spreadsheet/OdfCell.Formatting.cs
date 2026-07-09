@@ -34,8 +34,8 @@ public partial class OdfCell
             SetStyleProperty("table-cell-properties", "border-right", OdfNamespaces.Fo, right.Value.ToString(), "fo");
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddConditionalFormatMap(string condition, string applyStyleName) => AddConditionalFormatMap(condition, applyStyleName, null);
 

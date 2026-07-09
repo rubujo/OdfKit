@@ -11,8 +11,8 @@ public partial class TextDocument
 {
     #region Document Elements - Fields & Variables
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraph AddParagraph() => AddParagraph("");
 
@@ -27,8 +27,8 @@ public partial class TextDocument
         TextDocumentFieldsEngine.AddParagraph(this, MutationContext, text);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfParagraphPrebindingWriter BeginParagraphPrebinding() => BeginParagraphPrebinding(null);
 
@@ -53,8 +53,8 @@ public partial class TextDocument
     public OdfHeading AddHeading(string text, int outlineLevel) =>
         TextDocumentFieldsEngine.AddHeading(this, MutationContext, text, outlineLevel);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfList AddList() => AddList(null);
 
@@ -78,6 +78,18 @@ public partial class TextDocument
     /// <returns>The newly created list, with the style name applied. / 新建立的清單（已套用樣式名稱）。</returns>
     public OdfList AddListWithStyle(string styleName, IReadOnlyList<OdfListLevelStyle> levels) =>
         TextDocumentFieldsEngine.AddListWithStyle(this, MutationContext, styleName, levels);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyDictionary<string, string> ExtractFields() => ExtractFields("[", "]");
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyDictionary<string, string> ExtractFields(string startDelimiter) => ExtractFields(startDelimiter, "]");
+
 
     /// <summary>
     /// Extracts template field values back out of the document, supporting text markers spanning <c>text:span</c> breaks, bookmark ranges, and ODF variable fields.
@@ -89,8 +101,21 @@ public partial class TextDocument
     /// <remarks>
     /// 文字標記格式為 <c>[Name]value[/Name]</c>。若同名欄位重複出現，會保留文件中第一個值。
     /// </remarks>
-    public IReadOnlyDictionary<string, string> ExtractFields(string startDelimiter = "[", string endDelimiter = "]") =>
+    public IReadOnlyDictionary<string, string> ExtractFields(string startDelimiter, string endDelimiter) =>
         TextDocumentFieldExtractionEngine.ExtractFieldValues(this, startDelimiter, endDelimiter);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos() => ExtractFieldInfos("[", "]");
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos(string startDelimiter) => ExtractFieldInfos(startDelimiter, "]");
+
 
     /// <summary>
     /// Extracts detailed template field data, including the field source, back out of the document.
@@ -99,8 +124,9 @@ public partial class TextDocument
     /// <param name="startDelimiter">The field start delimiter, defaulting to <c>[</c>. / 欄位起始分隔符號，預設為 <c>[</c>。</param>
     /// <param name="endDelimiter">The field end delimiter, defaulting to <c>]</c>. / 欄位結束分隔符號，預設為 <c>]</c>。</param>
     /// <returns>A dictionary of detailed field data indexed by field name. / 依欄位名稱索引的欄位詳細資料字典。</returns>
-    public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos(string startDelimiter = "[", string endDelimiter = "]") =>
+    public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos(string startDelimiter, string endDelimiter) =>
         TextDocumentFieldExtractionEngine.ExtractFields(this, startDelimiter, endDelimiter);
+
 
     /// <summary>
     /// 在指定的段落中新增日期欄位。

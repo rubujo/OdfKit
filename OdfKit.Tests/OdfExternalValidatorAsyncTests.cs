@@ -30,7 +30,7 @@ public class OdfExternalValidatorAsyncTests
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
-                await OdfExternalValidator.ValidateWithCommandAsync(commandPath, filePath, cancellationToken: cts.Token);
+                await OdfExternalValidator.ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds: 30000, cancellationToken: cts.Token);
             });
         }
         finally
@@ -53,6 +53,7 @@ public class OdfExternalValidatorAsyncTests
             OdfExternalValidatorResult result = await OdfExternalValidator.ValidateWithCommandAsync(
                 commandPath,
                 filePath,
+                timeoutMilliseconds: 30000,
                 cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(0, result.ExitCode);
@@ -190,7 +191,12 @@ public class OdfExternalValidatorAsyncTests
 
         await Assert.ThrowsAsync<FileNotFoundException>(async () =>
         {
-            await OdfExternalValidator.ValidateWithOdfValidatorAsync(nonexistentDocumentPath, jarPath: "dummy.jar", cancellationToken: TestContext.Current.CancellationToken);
+            await OdfExternalValidator.ValidateWithOdfValidatorAsync(
+                nonexistentDocumentPath,
+                jarPath: "dummy.jar",
+                javaPath: null,
+                timeoutMilliseconds: 30000,
+                cancellationToken: TestContext.Current.CancellationToken);
         });
     }
 

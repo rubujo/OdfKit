@@ -12,6 +12,30 @@ public sealed class OdfSchemaPatternNode
     private readonly IReadOnlyList<OdfSchemaNameClass> _nameClasses;
     private readonly IReadOnlyList<OdfSchemaPatternNode> _children;
     private readonly IReadOnlyList<OdfSchemaDatatypeParameter> _dataParameters;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, null, null, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, null, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternNode>? children) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, children, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternNode>? children, IEnumerable<KeyValuePair<string, string>>? dataParameters) : this(kind, occurrence, namespaceUri, localName, referenceName, dataType, value, nameClasses, children, dataParameters, null) { }
+
 
     /// <summary>
     /// Executes the OdfSchemaPatternNode operation.
@@ -28,18 +52,7 @@ public sealed class OdfSchemaPatternNode
     /// <param name="children">子模式節點集合</param>
     /// <param name="dataParameters">資料類型參數集合</param>
     /// <param name="dataTypeLibrary">資料類型程式庫 URI</param>
-    public OdfSchemaPatternNode(
-        OdfSchemaPatternNodeKind kind,
-        string occurrence,
-        string namespaceUri,
-        string localName,
-        string referenceName,
-        string dataType,
-        string value,
-        IEnumerable<OdfSchemaNameClass>? nameClasses = null,
-        IEnumerable<OdfSchemaPatternNode>? children = null,
-        IEnumerable<KeyValuePair<string, string>>? dataParameters = null,
-        string? dataTypeLibrary = null)
+    public OdfSchemaPatternNode(OdfSchemaPatternNodeKind kind, string occurrence, string namespaceUri, string localName, string referenceName, string dataType, string value, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternNode>? children, IEnumerable<KeyValuePair<string, string>>? dataParameters, string? dataTypeLibrary)
     {
         Kind = kind;
         Occurrence = string.IsNullOrWhiteSpace(occurrence) ? "exactlyOne" : occurrence;
@@ -62,6 +75,7 @@ public sealed class OdfSchemaPatternNode
 
         _dataParameters = parameters.AsReadOnly();
     }
+
 
     /// <summary>
     /// Gets the Kind value.

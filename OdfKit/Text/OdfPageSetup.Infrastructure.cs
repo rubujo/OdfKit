@@ -260,6 +260,18 @@ public partial class OdfPageSetup
         }
         return node;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddFontFace(string name, string fontFamily) => AddFontFace(name, fontFamily, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddFontFace(string name, string fontFamily, string? genericFamily) => AddFontFace(name, fontFamily, genericFamily, null);
+
 
     /// <summary>
     /// Adds a font declaration entry to the page setup.
@@ -269,7 +281,7 @@ public partial class OdfPageSetup
     /// <param name="fontFamily">The actual font name. / 實際的字型名稱。</param>
     /// <param name="genericFamily">The generic font family. / 泛用字型系列。</param>
     /// <param name="pitch">The font pitch mode. / 字距模式。</param>
-    public void AddFontFace(string name, string fontFamily, string? genericFamily = null, string? pitch = null)
+    public void AddFontFace(string name, string fontFamily, string? genericFamily, string? pitch)
     {
         void AddToDom(OdfNode domRoot)
         {
@@ -301,6 +313,7 @@ public partial class OdfPageSetup
         if (_doc.StylesDom is not null)
             AddToDom(_doc.StylesDom);
     }
+
 
     #endregion
 }

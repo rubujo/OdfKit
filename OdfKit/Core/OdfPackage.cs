@@ -229,8 +229,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Open(string path) => Open(path, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Open(string path, OdfLoadOptions? options)
     {
@@ -285,20 +285,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Open(Stream stream) => Open(stream, false, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, bool leaveOpen) => Open(stream, leaveOpen, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, OdfLoadOptions? options) => Open(stream, false, options);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Open(Stream stream, bool leaveOpen, OdfLoadOptions? options)
     {
@@ -346,14 +346,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(path, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(string path, OdfLoadOptions? options) => OpenAsync(path, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         string path,
@@ -421,8 +421,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(stream, false, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen) => OpenAsync(stream, leaveOpen, null, default);
 
@@ -438,20 +438,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OpenAsync(stream, leaveOpen, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, OdfLoadOptions? options) => OpenAsync(stream, false, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfPackage> OpenAsync(Stream stream, bool leaveOpen, OdfLoadOptions? options) => OpenAsync(stream, leaveOpen, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async Task<OdfPackage> OpenAsync(
         Stream stream,
@@ -495,8 +495,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Create(string path) => Create(path, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Create(string path, OdfSaveOptions? options)
     {
@@ -512,20 +512,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Create(Stream stream) => Create(stream, false, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, bool leaveOpen) => Create(stream, leaveOpen, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, OdfSaveOptions? options) => Create(stream, false, options);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage Create(Stream stream, bool leaveOpen, OdfSaveOptions? options)
     {

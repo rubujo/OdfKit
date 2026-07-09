@@ -79,8 +79,8 @@ public static class OdfDocumentFactory
     public static Task<OdfDocument> LoadDocumentAsync(string path) => LoadDocumentAsync(path, null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadDocumentAsync(string path, CancellationToken cancellationToken) => LoadDocumentAsync(path, null, cancellationToken);
 
@@ -92,8 +92,8 @@ public static class OdfDocumentFactory
     public static Task<OdfDocument> LoadDocumentAsync(string path, OdfLoadOptions? options) => LoadDocumentAsync(path, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async Task<OdfDocument> LoadDocumentAsync(
         string path,
@@ -115,14 +115,14 @@ public static class OdfDocumentFactory
     public static OdfDocument LoadDocument(Stream stream) => LoadDocument(stream, null, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfDocument LoadDocument(Stream stream, string? fileName) => LoadDocument(stream, null, fileName);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options) => LoadDocument(stream, options, null);
 
@@ -151,26 +151,26 @@ public static class OdfDocumentFactory
     public static Task<OdfDocument> LoadDocumentAsync(Stream stream) => LoadDocumentAsync(stream, null, null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadDocumentAsync(Stream stream, string? fileName) => LoadDocumentAsync(stream, null, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadDocumentAsync(Stream stream, string? fileName, CancellationToken cancellationToken) => LoadDocumentAsync(stream, null, fileName, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadDocumentAsync(Stream stream, OdfLoadOptions? options) => LoadDocumentAsync(stream, options, null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadDocumentAsync(Stream stream, OdfLoadOptions? options, string? fileName) => LoadDocumentAsync(stream, options, fileName, default);
 
@@ -216,20 +216,20 @@ public static class OdfDocumentFactory
         CreatePackage(stream, kind, OdfVersion.Odf14, leaveOpen, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind, OdfVersion version) => CreatePackage(stream, kind, version, false, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage CreatePackage(Stream stream, OdfDocumentKind kind, OdfVersion version, bool leaveOpen) => CreatePackage(stream, kind, version, leaveOpen, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage CreatePackage(
         Stream stream,
@@ -256,14 +256,14 @@ public static class OdfDocumentFactory
     public static OdfPackage CreatePackage(string path, OdfDocumentKind kind) => CreatePackage(path, kind, OdfVersion.Odf14, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage CreatePackage(string path, OdfDocumentKind kind, OdfVersion version) => CreatePackage(path, kind, version, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfPackage CreatePackage(
         string path,
@@ -334,8 +334,8 @@ public static class OdfDocumentFactory
         writer.WriteEndElement();
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static void InitializeMinimalPackage(OdfPackage package, OdfDocumentKind kind) => InitializeMinimalPackage(package, kind, OdfVersion.Odf14);
 

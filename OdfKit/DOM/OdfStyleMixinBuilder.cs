@@ -24,8 +24,8 @@ public sealed class OdfStyleMixinBuilder
             : family!;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleMixinBuilder Bold() => Bold(true);
 
@@ -39,8 +39,8 @@ public sealed class OdfStyleMixinBuilder
     public OdfStyleMixinBuilder Bold(bool enabled) => SetTextProperty("font-weight", OdfNamespaces.Fo, enabled ? "bold" : "normal", "fo");
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleMixinBuilder Italic() => Italic(true);
 
@@ -54,8 +54,8 @@ public sealed class OdfStyleMixinBuilder
     public OdfStyleMixinBuilder Italic(bool enabled) => SetTextProperty("font-style", OdfNamespaces.Fo, enabled ? "italic" : "normal", "fo");
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleMixinBuilder Underline() => Underline(true);
 

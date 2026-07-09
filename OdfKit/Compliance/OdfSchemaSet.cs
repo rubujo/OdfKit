@@ -14,6 +14,24 @@ public sealed class OdfSchemaSet
     private readonly IReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition> _attributes;
     private readonly IReadOnlyList<OdfSchemaNameClass> _nameClasses;
     private readonly IReadOnlyDictionary<string, OdfSchemaPatternDefinition> _patterns;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements) : this(version, sourceUrl, sourceDate, elements, null, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements, IEnumerable<OdfAttributeDefinition>? attributes) : this(version, sourceUrl, sourceDate, elements, attributes, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements, IEnumerable<OdfAttributeDefinition>? attributes, IEnumerable<OdfSchemaNameClass>? nameClasses) : this(version, sourceUrl, sourceDate, elements, attributes, nameClasses, null) { }
+
 
     /// <summary>
     /// Executes the OdfSchemaSet operation.
@@ -26,14 +44,7 @@ public sealed class OdfSchemaSet
     /// <param name="attributes">屬性定義集合</param>
     /// <param name="nameClasses">名稱類別集合</param>
     /// <param name="patterns">模式定義集合</param>
-    public OdfSchemaSet(
-        OdfVersion version,
-        Uri sourceUrl,
-        string sourceDate,
-        IEnumerable<OdfElementDefinition> elements,
-        IEnumerable<OdfAttributeDefinition>? attributes = null,
-        IEnumerable<OdfSchemaNameClass>? nameClasses = null,
-        IEnumerable<OdfSchemaPatternDefinition>? patterns = null)
+    public OdfSchemaSet(OdfVersion version, Uri sourceUrl, string sourceDate, IEnumerable<OdfElementDefinition> elements, IEnumerable<OdfAttributeDefinition>? attributes, IEnumerable<OdfSchemaNameClass>? nameClasses, IEnumerable<OdfSchemaPatternDefinition>? patterns)
     {
         Version = version;
         SourceUrl = sourceUrl ?? throw new ArgumentNullException(nameof(sourceUrl));
@@ -64,6 +75,7 @@ public sealed class OdfSchemaSet
 
         _patterns = new ReadOnlyDictionary<string, OdfSchemaPatternDefinition>(patternsByName);
     }
+
 
     /// <summary>
     /// Gets the Version value.
@@ -107,8 +119,8 @@ public sealed class OdfSchemaSet
     /// </summary>
     public IReadOnlyDictionary<string, OdfSchemaPatternDefinition> Patterns => _patterns;
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSchemaSet MergeWith(OdfSchemaSet additional) => MergeWith(additional, false);
 

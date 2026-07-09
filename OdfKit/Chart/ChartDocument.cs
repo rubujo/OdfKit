@@ -81,6 +81,30 @@ public class ChartDocument : OdfChartDocument
 
         return doc;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static ChartDocument FromTable(string sheetName, OdfCellRange range) => FromTable(sheetName, range, OdfChartPreset.Bar, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static ChartDocument FromTable(string sheetName, OdfCellRange range, OdfChartPreset preset) => FromTable(sheetName, range, preset, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static ChartDocument FromTable(string sheetName, OdfCellRange range, OdfChartPreset preset, string? title) => FromTable(sheetName, range, preset, title, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static ChartDocument FromTable(string sheetName, OdfCellRange range, OdfChartPreset preset, string? title, bool firstRowAsHeader) => FromTable(sheetName, range, preset, title, firstRowAsHeader, true);
+
 
     /// <summary>
     /// Creates a chart document from a spreadsheet-style table range and a practical preset.
@@ -93,13 +117,7 @@ public class ChartDocument : OdfChartDocument
     /// <param name="firstRowAsHeader">Whether the first row is treated as series labels. / 首列是否視為序列標籤。</param>
     /// <param name="firstColumnAsLabel">Whether the first column is treated as category labels. / 首欄是否視為分類標籤。</param>
     /// <returns>The created <see cref="ChartDocument"/>. / 建立完成的 <see cref="ChartDocument"/>。</returns>
-    public static ChartDocument FromTable(
-        string sheetName,
-        OdfCellRange range,
-        OdfChartPreset preset = OdfChartPreset.Bar,
-        string? title = null,
-        bool firstRowAsHeader = true,
-        bool firstColumnAsLabel = true)
+    public static ChartDocument FromTable(string sheetName, OdfCellRange range, OdfChartPreset preset, string? title, bool firstRowAsHeader, bool firstColumnAsLabel)
     {
         ChartDocument document = Builder()
             .WithPreset(preset)
@@ -109,6 +127,7 @@ public class ChartDocument : OdfChartDocument
 
         return document;
     }
+
 
     /// <summary>
     /// Creates a bubble chart document from explicit series requests.
@@ -169,8 +188,8 @@ public class ChartDocument : OdfChartDocument
     public new static Task<ChartDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<ChartDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
@@ -183,8 +202,8 @@ public class ChartDocument : OdfChartDocument
     public new static ChartDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static ChartDocument Load(Stream stream, string? fileName)
     {
@@ -208,14 +227,14 @@ public class ChartDocument : OdfChartDocument
     public new static Task<ChartDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<ChartDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static async Task<ChartDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));

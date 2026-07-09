@@ -10,6 +10,48 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     #region 圖表
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange) => InsertChart(dataRange, OdfChartType.Bar, null, null, null, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType) => InsertChart(dataRange, chartType, null, null, null, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x) => InsertChart(dataRange, chartType, x, null, null, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y) => InsertChart(dataRange, chartType, x, y, null, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width) => InsertChart(dataRange, chartType, x, y, width, null, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height) => InsertChart(dataRange, chartType, x, y, width, height, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height, bool firstRowAsHeader) => InsertChart(dataRange, chartType, x, y, width, height, firstRowAsHeader, true);
+
 
     /// <summary>
     /// Inserts a chart bound to cell range data into this worksheet.
@@ -29,15 +71,7 @@ public partial class OdfTableSheet
     /// 也可手動呼叫 <c>Save()</c> 以提早寫回封裝。
     /// 請勿對此物件呼叫 <c>Dispose()</c>（生命週期由父文件管理）。
     /// </returns>
-    public OdfChartDocument InsertChart(
-        OdfCellRange dataRange,
-        OdfChartType chartType = OdfChartType.Bar,
-        OdfLength? x = null,
-        OdfLength? y = null,
-        OdfLength? width = null,
-        OdfLength? height = null,
-        bool firstRowAsHeader = true,
-        bool firstColumnAsLabel = true) =>
+    public OdfChartDocument InsertChart(OdfCellRange dataRange, OdfChartType chartType, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height, bool firstRowAsHeader, bool firstColumnAsLabel) =>
         OdfTableSheetChartEngine.InsertChart(
             MutationContext,
             dataRange,
@@ -48,6 +82,7 @@ public partial class OdfTableSheet
             height,
             firstRowAsHeader,
             firstColumnAsLabel);
+
 
     #endregion
 }

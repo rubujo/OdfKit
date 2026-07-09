@@ -29,8 +29,8 @@ public sealed class OdfColumnCollection
     /// <returns>The specified column. / 指定欄。</returns>
     public OdfSheetColumn this[int index] => new(_sheet, index);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void Group(int startColumn, int endColumn) => Group(startColumn, endColumn, false);
 

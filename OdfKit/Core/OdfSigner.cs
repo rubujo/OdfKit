@@ -43,8 +43,8 @@ public static partial class OdfSigner
     public static Task SignAsync(OdfPackage package, X509Certificate2 certificate) => SignAsync(package, certificate, new OdfSigningOptions { Level = XadesLevel.None }, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task SignAsync(
         OdfPackage package,
@@ -66,8 +66,8 @@ public static partial class OdfSigner
     public static Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options) => SignAsync(package, certificate, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task SignAsync(
         OdfPackage package,
@@ -109,8 +109,8 @@ public static partial class OdfSigner
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package) => VerifySignatures(package, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options)
     {
@@ -141,14 +141,14 @@ public static partial class OdfSigner
         VerifySignaturesAsync(package, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options) => VerifySignaturesAsync(package, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfPackage package,

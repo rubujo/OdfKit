@@ -223,7 +223,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
         };
 
         await Assert.ThrowsAsync<ArgumentException>(
-            () => writer.WriteSheetsAsync(jobs, cancellationToken: TestContext.Current.CancellationToken));
+            () => writer.WriteSheetsAsync(jobs, maxConcurrency: 0, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]

@@ -133,6 +133,7 @@ public class FormControlTests
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.ListBox, "lst1", Cm1, Cm1, Cm4, Cm2,
+            label: "",
             listItems: ["A", "B", "C"]);
 
         var controls = doc.GetFormControls();

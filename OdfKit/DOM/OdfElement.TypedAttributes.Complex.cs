@@ -12,8 +12,8 @@ public partial class OdfElement
 {
     #region Typed Attribute Accessors - Complex
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public DateTime? GetDateTimeAttributeValue(string localName, string namespaceUri) => GetDateTimeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -27,6 +27,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的日期時間；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public DateTime? GetDateTimeAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetDateTime(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDateTimeAttributeValue(string localName, string namespaceUri, DateTime value) => SetDateTimeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDateTimeAttributeValue(string localName, string namespaceUri, DateTime value, string? prefix) => SetDateTimeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -38,11 +50,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的日期時間</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetDateTimeAttributeValue(string localName, string namespaceUri, DateTime value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDateTime(value), prefix, version);
+    public void SetDateTimeAttributeValue(string localName, string namespaceUri, DateTime value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDateTime(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTime? GetTimeAttributeValue(string localName, string namespaceUri) => GetTimeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -56,6 +68,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的時間；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfTime? GetTimeAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetTime(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTimeAttributeValue(string localName, string namespaceUri, OdfTime value) => SetTimeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTimeAttributeValue(string localName, string namespaceUri, OdfTime value, string? prefix) => SetTimeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -67,11 +91,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的時間</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTimeAttributeValue(string localName, string namespaceUri, OdfTime value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatTime(value), prefix, version);
+    public void SetTimeAttributeValue(string localName, string namespaceUri, OdfTime value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatTime(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfLength? GetLengthAttributeValue(string localName, string namespaceUri) => GetLengthAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -85,6 +109,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的長度；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfLength? GetLengthAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetLength(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLengthAttributeValue(string localName, string namespaceUri, OdfLength value) => SetLengthAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLengthAttributeValue(string localName, string namespaceUri, OdfLength value, string? prefix) => SetLengthAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -96,11 +132,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的長度</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetLengthAttributeValue(string localName, string namespaceUri, OdfLength value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatLength(value), prefix, version);
+    public void SetLengthAttributeValue(string localName, string namespaceUri, OdfLength value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatLength(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfBorderWidths? GetBorderWidthsAttributeValue(string localName, string namespaceUri) => GetBorderWidthsAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -114,6 +150,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的三段邊框線寬；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfBorderWidths? GetBorderWidthsAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetBorderWidths(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetBorderWidthsAttributeValue(string localName, string namespaceUri, OdfBorderWidths value) => SetBorderWidthsAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetBorderWidthsAttributeValue(string localName, string namespaceUri, OdfBorderWidths value, string? prefix) => SetBorderWidthsAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -125,11 +173,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的三段邊框線寬</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetBorderWidthsAttributeValue(string localName, string namespaceUri, OdfBorderWidths value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatBorderWidths(value), prefix, version);
+    public void SetBorderWidthsAttributeValue(string localName, string namespaceUri, OdfBorderWidths value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatBorderWidths(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfDuration? GetDurationAttributeValue(string localName, string namespaceUri) => GetDurationAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -143,6 +191,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的 duration；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfDuration? GetDurationAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetDuration(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDurationAttributeValue(string localName, string namespaceUri, OdfDuration value) => SetDurationAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDurationAttributeValue(string localName, string namespaceUri, OdfDuration value, string? prefix) => SetDurationAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -154,11 +214,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的 duration</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetDurationAttributeValue(string localName, string namespaceUri, OdfDuration value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDuration(value), prefix, version);
+    public void SetDurationAttributeValue(string localName, string namespaceUri, OdfDuration value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDuration(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAngle? GetAngleAttributeValue(string localName, string namespaceUri) => GetAngleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -172,6 +232,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的角度；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfAngle? GetAngleAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetAngle(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAngleAttributeValue(string localName, string namespaceUri, OdfAngle value) => SetAngleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAngleAttributeValue(string localName, string namespaceUri, OdfAngle value, string? prefix) => SetAngleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -183,11 +255,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的角度</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetAngleAttributeValue(string localName, string namespaceUri, OdfAngle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatAngle(value), prefix, version);
+    public void SetAngleAttributeValue(string localName, string namespaceUri, OdfAngle value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatAngle(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleName? GetStyleNameAttributeValue(string localName, string namespaceUri) => GetStyleNameAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -201,6 +273,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式名稱；若屬性不存在或不是有效 XML <c>NCName</c> 則為 <see langword="null"/></returns>
     public OdfStyleName? GetStyleNameAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetStyleName(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleNameAttributeValue(string localName, string namespaceUri, OdfStyleName value) => SetStyleNameAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleNameAttributeValue(string localName, string namespaceUri, OdfStyleName value, string? prefix) => SetStyleNameAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -212,11 +296,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式名稱</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleNameAttributeValue(string localName, string namespaceUri, OdfStyleName value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleName(value), prefix, version);
+    public void SetStyleNameAttributeValue(string localName, string namespaceUri, OdfStyleName value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleName(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleNameList? GetStyleNameListAttributeValue(string localName, string namespaceUri) => GetStyleNameListAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -230,6 +314,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的樣式名稱參照清單；若屬性不存在或不是有效清單則為 <see langword="null"/></returns>
     public OdfStyleNameList? GetStyleNameListAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetStyleNameList(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleNameListAttributeValue(string localName, string namespaceUri, OdfStyleNameList value) => SetStyleNameListAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleNameListAttributeValue(string localName, string namespaceUri, OdfStyleNameList value, string? prefix) => SetStyleNameListAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -241,11 +337,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式名稱參照清單</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleNameListAttributeValue(string localName, string namespaceUri, OdfStyleNameList value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleNameList(value), prefix, version);
+    public void SetStyleNameListAttributeValue(string localName, string namespaceUri, OdfStyleNameList value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleNameList(value), prefix, version);
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfColor? GetColorAttributeValue(string localName, string namespaceUri) => GetColorAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -259,6 +355,18 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容</param>
     /// <returns>解析後的色彩；若屬性不存在或不是 <c>#RRGGBB</c> 格式則為 <see langword="null"/></returns>
     public OdfColor? GetColorAttributeValue(string localName, string namespaceUri, OdfVersion version) => OdfElementComplexAttributeAccess.GetColor(GetAttributeValue(localName, namespaceUri, version));
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetColorAttributeValue(string localName, string namespaceUri, OdfColor value) => SetColorAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetColorAttributeValue(string localName, string namespaceUri, OdfColor value, string? prefix) => SetColorAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -270,8 +378,8 @@ public partial class OdfElement
     /// <param name="value">要寫入的色彩</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetColorAttributeValue(string localName, string namespaceUri, OdfColor value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatColor(value), prefix, version);
+    public void SetColorAttributeValue(string localName, string namespaceUri, OdfColor value, string? prefix, OdfVersion version) => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatColor(value), prefix, version);
+
 
     #endregion
 }

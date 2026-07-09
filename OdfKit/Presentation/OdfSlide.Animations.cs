@@ -13,6 +13,18 @@ namespace OdfKit.Presentation;
 public partial class OdfSlide
 {
     #region Slide Animations
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddEntranceEffect(shapeId, effect, trigger, default, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay) => AddEntranceEffect(shapeId, effect, trigger, delay, default);
+
 
     /// <summary>
     /// Adds an entrance animation to the specified shape.
@@ -24,12 +36,7 @@ public partial class OdfSlide
     /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
     /// <param name="duration">The animation duration; defaults to 0.5 seconds. / 動畫持續時間；預設為 0.5 秒。</param>
     /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddEntranceEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        OdfAnimationTrigger trigger,
-        TimeSpan delay = default,
-        TimeSpan duration = default)
+    public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay, TimeSpan duration)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
@@ -98,6 +105,19 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger) => AddExitEffect(shapeId, effect, trigger, default, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay) => AddExitEffect(shapeId, effect, trigger, delay, default);
+
+
+    /// <summary>
     /// Adds an exit animation to the specified shape.
     /// 為指定的圖形新增物件退場動畫。
     /// </summary>
@@ -107,12 +127,7 @@ public partial class OdfSlide
     /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
     /// <param name="duration">The animation duration; defaults to 0.5 seconds. / 動畫持續時間；預設為 0.5 秒。</param>
     /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddExitEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        OdfAnimationTrigger trigger,
-        TimeSpan delay = default,
-        TimeSpan duration = default)
+    public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay, TimeSpan duration)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
@@ -181,6 +196,25 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect) => AddEmphasisEffect(shapeId, effect, default, OdfAnimationTrigger.OnClick, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration) => AddEmphasisEffect(shapeId, effect, duration, OdfAnimationTrigger.OnClick, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration, OdfAnimationTrigger trigger) => AddEmphasisEffect(shapeId, effect, duration, trigger, default);
+
+
+    /// <summary>
     /// Adds an emphasis animation to the specified shape.
     /// 為指定的圖形新增物件強調動畫。
     /// </summary>
@@ -190,12 +224,7 @@ public partial class OdfSlide
     /// <param name="trigger">The animation trigger mode. / 動畫觸發方式。</param>
     /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
     /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddEmphasisEffect(
-        string shapeId,
-        OdfAnimationEffect effect,
-        TimeSpan duration = default,
-        OdfAnimationTrigger trigger = OdfAnimationTrigger.OnClick,
-        TimeSpan delay = default)
+    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration, OdfAnimationTrigger trigger, TimeSpan delay)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
@@ -232,6 +261,7 @@ public partial class OdfSlide
 
         return new OdfAnimation(effectPar, shapeId, effect, trigger);
     }
+
 
     private static OdfNode FindOrCreateStepParNode(OdfNode mainSeq, OdfAnimationTrigger trigger)
     {

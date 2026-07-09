@@ -22,8 +22,8 @@ public sealed partial class OdfPackage
     public void Save() => Save((OdfSaveOptions?)null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void Save(OdfSaveOptions? options)
     {
@@ -51,14 +51,14 @@ public sealed partial class OdfPackage
     public Task SaveAsync() => SaveAsync(null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task SaveAsync(CancellationToken cancellationToken) => SaveAsync(null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task SaveAsync(OdfSaveOptions? options) => SaveAsync(options, default);
 
@@ -99,8 +99,8 @@ public sealed partial class OdfPackage
     public void SaveToStream(Stream destinationStream) => SaveToStream(destinationStream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
@@ -128,8 +128,8 @@ public sealed partial class OdfPackage
     public void Save(IBufferWriter<byte> destination) => Save(destination, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options)
     {
@@ -148,14 +148,14 @@ public sealed partial class OdfPackage
     public Task SaveToStreamAsync(Stream destinationStream) => SaveToStreamAsync(destinationStream, null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken) => SaveToStreamAsync(destinationStream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options) => SaveToStreamAsync(destinationStream, options, default);
 

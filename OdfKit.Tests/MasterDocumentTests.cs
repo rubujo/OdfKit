@@ -172,7 +172,7 @@ public class MasterDocumentTests
             master.AddHeading("封面標題", 1);
             master.AddSubDocumentReference("Chapter1", "chapter1.odt");
 
-            using TextDocument merged = master.MergeSubDocuments(tempDir, subDocumentOutlineOffset: 1);
+            using TextDocument merged = master.MergeSubDocuments(tempDir, options: null, subDocumentOutlineOffset: 1);
             var headings = merged.Body.Headings.Items;
 
             var coverHeading = headings.Single(h => h.TextContent == "封面標題");

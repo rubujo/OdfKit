@@ -17,6 +17,36 @@ namespace OdfKit.Core;
 public static partial class OdfEncryption
 {
     #region Entry Encryption & Decryption
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, null, null, 3, 65536, 4);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, null, 3, 65536, 4);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, 3, 65536, 4);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, 65536, 4);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M) => DecryptEntry(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, argon2M, 4);
+
 
     /// <summary>
     /// Executes the DecryptEntry operation.
@@ -36,20 +66,7 @@ public static partial class OdfEncryption
     /// <param name="argon2M">Argon2id 的記憶體複雜度（單位為 KB，選填）</param>
     /// <param name="argon2P">Argon2id 的平行度/通道數（選填）</param>
     /// <returns>解密後的純文字資料位元組陣列</returns>
-    public static byte[] DecryptEntry(
-        byte[] ciphertext,
-        string password,
-        string algorithmUri,
-        string derivationName,
-        int keySize,
-        int iterationCount,
-        byte[] salt,
-        byte[] iv,
-        string? startKeyGenName = null,
-        string? kdfName = null,
-        int argon2T = 3,
-        int argon2M = 65536,
-        int argon2P = 4)
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M, int argon2P)
     {
         bool isArgon2 = string.Equals(kdfName, "argon2id", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(derivationName, Argon2idDerivationUri, StringComparison.OrdinalIgnoreCase);
@@ -195,6 +212,7 @@ public static partial class OdfEncryption
             return DecryptBlowfishCbc(ciphertext, derivedKey, iv);
         }
     }
+
 
     /// <summary>
     /// Executes the EncryptEntry operation.

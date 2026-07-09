@@ -19,8 +19,8 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     : OdfNode(OdfNodeType.Element, localName, namespaceUri, prefix)
 {
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public string? GetAttributeValue(string localName, string namespaceUri) => GetAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -41,6 +41,18 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
         }
         return GetAttribute(localName, namespaceUri);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAttributeValue(string localName, string namespaceUri, string value) => SetAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix) => SetAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -52,7 +64,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <param name="value">The attribute value. / 屬性值。</param>
     /// <param name="prefix">The optional namespace prefix. / 選用的命名空間前綴。</param>
     /// <param name="version">The ODF version context. / ODF 版本內容。</param>
-    public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix, OdfVersion version)
     {
         var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
         if (attrDef is null)
@@ -61,6 +73,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
         }
         SetAttribute(localName, namespaceUri, value, prefix);
     }
+
 
     /// <summary>
     /// Enumerates the direct child elements of this element, returning only the specified typed DOM element type.

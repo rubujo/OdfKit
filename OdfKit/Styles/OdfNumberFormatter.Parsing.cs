@@ -123,7 +123,7 @@ public partial class OdfNumberFormatter
         {
             type = IsTimeOnlyPattern(pattern) ? FormatType.Time : FormatType.Date;
             dateTimeTokens = ParseDateTimeTokens(pattern);
-            return new FormatInfo(type, currencySymbol: currencySymbol, dateTimeTokens: dateTimeTokens);
+            return new FormatInfo(type, 0, 1, false, currencySymbol, dateTimeTokens);
         }
         else
         {

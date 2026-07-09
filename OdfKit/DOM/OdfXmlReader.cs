@@ -30,8 +30,8 @@ public static class OdfXmlReader
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData) => Parse(xmlData, IntPtr.Zero, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, OdfLoadOptions? options) => Parse(xmlData, IntPtr.Zero, options);
 
@@ -42,8 +42,8 @@ public static class OdfXmlReader
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr) => Parse(xmlData, basePtr, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr, OdfLoadOptions? options)
     {
@@ -448,8 +448,8 @@ public static class OdfXmlReader
     public static OdfNode Parse(Stream stream) => Parse(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfNode Parse(Stream stream, OdfLoadOptions? options)
     {

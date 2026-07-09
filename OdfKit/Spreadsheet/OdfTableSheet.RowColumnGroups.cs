@@ -8,8 +8,8 @@ public partial class OdfTableSheet
 {
     #region 列欄群組
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void GroupRows(int startRow, int endRow) => GroupRows(startRow, endRow, false);
 
@@ -34,8 +34,8 @@ public partial class OdfTableSheet
     public void UngroupRows(int startRow, int endRow) =>
         OdfTableSheetRowColumnGroupEngine.UngroupRows(MutationContext, startRow, endRow);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void GroupColumns(int startCol, int endCol) => GroupColumns(startCol, endCol, false);
 

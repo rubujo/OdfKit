@@ -433,12 +433,36 @@ internal readonly record struct OdfInlineTextSegment(
 {
     public static OdfInlineTextSegment LineBreak { get; } = new(string.Empty, true, false, false, false, null, null);
 
-    public static OdfInlineTextSegment CreateText(
-        string text,
-        bool bold = false,
-        bool italic = false,
-        bool underline = false,
-        string? color = null,
-        string? fontFamily = null)
-        => new(text, false, bold, italic, underline, color, fontFamily);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfInlineTextSegment CreateText(string text) => CreateText(text, false, false, false, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfInlineTextSegment CreateText(string text, bool bold) => CreateText(text, bold, false, false, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic) => CreateText(text, bold, italic, false, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic, bool underline) => CreateText(text, bold, italic, underline, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic, bool underline, string? color) => CreateText(text, bold, italic, underline, color, null);
+
+    public static OdfInlineTextSegment CreateText(string text, bool bold, bool italic, bool underline, string? color, string? fontFamily) => new(text, false, bold, italic, underline, color, fontFamily);
+
 }

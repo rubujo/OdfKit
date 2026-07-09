@@ -16,8 +16,8 @@ public partial class OdfCell
 {
     #region Hyperlink, Rich Text & Annotation
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void SetHyperlink(string url) => SetHyperlink(url, null);
 
@@ -231,6 +231,18 @@ public partial class OdfCell
         }
         return null;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAnnotation(string text) => SetAnnotation(text, null, false);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetAnnotation(string text, string? author) => SetAnnotation(text, author, false);
+
 
     /// <summary>
     /// Sets the cell annotation and overwrites any existing annotation.
@@ -239,7 +251,7 @@ public partial class OdfCell
     /// <param name="text">The annotation content. / 批注內容。</param>
     /// <param name="author">The author name. / 作者名稱。</param>
     /// <param name="visible">Whether to display the annotation; the default is <see langword="false"/>. / 是否顯示；預設為 <see langword="false"/>。</param>
-    public void SetAnnotation(string text, string? author = null, bool visible = false)
+    public void SetAnnotation(string text, string? author, bool visible)
     {
         RemoveAnnotation();
         var ann = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
@@ -263,6 +275,7 @@ public partial class OdfCell
 
         Node.AppendChild(ann);
     }
+
 
     /// <summary>
     /// Removes the cell annotation.

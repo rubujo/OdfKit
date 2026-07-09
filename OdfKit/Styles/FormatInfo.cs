@@ -10,6 +10,42 @@ public readonly struct FormatInfo
 {
     private static readonly DateTimeToken[] EmptyDateTimeTokens = [];
     private readonly DateTimeToken[]? _dateTimeTokens;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo() : this(FormatType.Number, 0, 1, false, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo(FormatType type) : this(type, 0, 1, false, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo(FormatType type, int decimalPlaces) : this(type, decimalPlaces, 1, false, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits) : this(type, decimalPlaces, minIntegerDigits, false, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits, bool grouping) : this(type, decimalPlaces, minIntegerDigits, grouping, null, null) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits, bool grouping, string? currencySymbol) : this(type, decimalPlaces, minIntegerDigits, grouping, currencySymbol, null) { }
+
 
     /// <summary>
     /// Executes the FormatInfo operation.
@@ -21,13 +57,7 @@ public readonly struct FormatInfo
     /// <param name="grouping">指出是否使用千分位分組</param>
     /// <param name="currencySymbol">貨幣符號</param>
     /// <param name="dateTimeTokens">日期時間格式的語彙基元集合</param>
-    public FormatInfo(
-        FormatType type = FormatType.Number,
-        int decimalPlaces = 0,
-        int minIntegerDigits = 1,
-        bool grouping = false,
-        string? currencySymbol = null,
-        IReadOnlyList<DateTimeToken>? dateTimeTokens = null)
+    public FormatInfo(FormatType type, int decimalPlaces, int minIntegerDigits, bool grouping, string? currencySymbol, IReadOnlyList<DateTimeToken>? dateTimeTokens)
     {
         Type = type;
         DecimalPlaces = decimalPlaces;
@@ -48,6 +78,7 @@ public readonly struct FormatInfo
             }
         }
     }
+
 
     /// <summary>
     /// Gets the Type value.

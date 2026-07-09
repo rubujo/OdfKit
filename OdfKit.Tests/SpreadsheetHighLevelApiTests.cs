@@ -1128,7 +1128,7 @@ public class SpreadsheetHighLevelApiTests
         Assert.False(ann.Visible);
 
         // 2. 覆蓋批注
-        cell.SetAnnotation("新批注", visible: true);
+        cell.SetAnnotation("新批注", author: null, visible: true);
         ann = cell.FindAnnotation();
         Assert.Equal("新批注", ann!.Text);
         Assert.True(ann.Visible);

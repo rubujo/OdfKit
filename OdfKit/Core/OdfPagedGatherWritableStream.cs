@@ -39,6 +39,24 @@ public sealed class OdfPagedGatherWritableStream : Stream
     internal static int RentedPageCountForTests;
 
     internal static int ReturnedPageCountForTests;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfPagedGatherWritableStream(Stream underlyingStream) : this(underlyingStream, DefaultPageSize, DefaultPagesPerFlush, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize) : this(underlyingStream, pageSize, DefaultPagesPerFlush, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize, int pagesPerFlush) : this(underlyingStream, pageSize, pagesPerFlush, false) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfPagedGatherWritableStream"/> class.
@@ -50,11 +68,7 @@ public sealed class OdfPagedGatherWritableStream : Stream
     /// <param name="leaveOpen">A value indicating whether the underlying stream remains open after disposal. / 指出處置後是否保持底層資料流開啟。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="underlyingStream"/> is <see langword="null"/>. / 當 <paramref name="underlyingStream"/> 為 <see langword="null"/> 時擲出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="pageSize"/> or <paramref name="pagesPerFlush"/> is less than 1. / 當 <paramref name="pageSize"/> 或 <paramref name="pagesPerFlush"/> 小於 1 時擲出。</exception>
-    public OdfPagedGatherWritableStream(
-        Stream underlyingStream,
-        int pageSize = DefaultPageSize,
-        int pagesPerFlush = DefaultPagesPerFlush,
-        bool leaveOpen = false)
+    public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize, int pagesPerFlush, bool leaveOpen)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
         if (pageSize <= 0)
@@ -81,6 +95,7 @@ public sealed class OdfPagedGatherWritableStream : Stream
         }
 #endif
     }
+
 
     /// <summary>
     /// Provides the CanRead member.

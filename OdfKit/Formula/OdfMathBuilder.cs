@@ -214,6 +214,18 @@ public sealed class OdfMathBuilder
         _tokens.Add(OdfMathToken.Apply(operatorName, operandTokens));
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner) => Fenced(inner, "(", ")");
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner, string open) => Fenced(inner, open, ")");
+
 
     /// <summary>
     /// Appends a fenced group.
@@ -223,11 +235,12 @@ public sealed class OdfMathBuilder
     /// <param name="open">The opening delimiter text; defaults to <c>(</c>. / 開括號文字，預設為 <c>(</c>。</param>
     /// <param name="close">The closing delimiter text; defaults to <c>)</c>. / 閉括號文字，預設為 <c>)</c>。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner, string open = "(", string close = ")")
+    public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner, string open, string close)
     {
         _tokens.Add(OdfMathToken.Fenced(BuildSingle(inner), open, close));
         return this;
     }
+
 
     /// <summary>
     /// Appends a matrix (<c>mtable</c>).

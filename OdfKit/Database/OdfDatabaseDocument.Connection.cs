@@ -31,6 +31,30 @@ public partial class OdfDatabaseDocument
             ParseNullableBoolean(login.GetAttribute("is-password-required", DatabaseNamespace)),
             int.TryParse(login.GetAttribute("login-timeout", DatabaseNamespace), out int timeout) ? timeout : null);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetLogin() => SetLogin(null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetLogin(string? userName) => SetLogin(userName, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetLogin(string? userName, bool? useSystemUser) => SetLogin(userName, useSystemUser, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetLogin(string? userName, bool? useSystemUser, bool? isPasswordRequired) => SetLogin(userName, useSystemUser, isPasswordRequired, null);
+
 
     /// <summary>
     /// Sets the login settings of the data source connection.
@@ -41,11 +65,7 @@ public partial class OdfDatabaseDocument
     /// <param name="isPasswordRequired">The optional password-required setting. / 選用的密碼必填設定。</param>
     /// <param name="loginTimeout">The optional login timeout in seconds. / 選用的登入逾時秒數。</param>
     /// <returns>The added or updated login settings node. / 新增或更新後的登入設定節點。</returns>
-    public OdfNode SetLogin(
-        string? userName = null,
-        bool? useSystemUser = null,
-        bool? isPasswordRequired = null,
-        int? loginTimeout = null)
+    public OdfNode SetLogin(string? userName, bool? useSystemUser, bool? isPasswordRequired, int? loginTimeout)
     {
         OdfNode dataSource = FindOrCreateDataSource();
         OdfNode connectionData = FindOrCreateChild(dataSource, "connection-data", DatabaseNamespace, "db");
@@ -74,6 +94,7 @@ public partial class OdfDatabaseDocument
         return login;
     }
 
+
     /// <summary>
     /// Gets the driver settings of the current data source connection.
     /// 取得目前資料來源連線的驅動程式設定。
@@ -100,6 +121,36 @@ public partial class OdfDatabaseDocument
             driverSettings.GetAttribute("system-driver-settings", DatabaseNamespace),
             driverSettings.GetAttribute("base-dn", DatabaseNamespace));
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetDriverSettings() => SetDriverSettings(null, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetDriverSettings(bool? showDeleted) => SetDriverSettings(showDeleted, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine, bool? parameterNameSubstitution) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, parameterNameSubstitution, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine, bool? parameterNameSubstitution, string? systemDriverSettings) => SetDriverSettings(showDeleted, isFirstRowHeaderLine, parameterNameSubstitution, systemDriverSettings, null);
+
 
     /// <summary>
     /// Sets the driver settings of the data source connection.
@@ -111,12 +162,7 @@ public partial class OdfDatabaseDocument
     /// <param name="systemDriverSettings">The optional system driver settings string. / 選用的系統驅動程式設定字串。</param>
     /// <param name="baseDn">The optional LDAP base DN setting. / 選用的 LDAP base DN 設定。</param>
     /// <returns>The added or updated driver settings node. / 新增或更新後的驅動程式設定節點。</returns>
-    public OdfNode SetDriverSettings(
-        bool? showDeleted = null,
-        bool? isFirstRowHeaderLine = null,
-        bool? parameterNameSubstitution = null,
-        string? systemDriverSettings = null,
-        string? baseDn = null)
+    public OdfNode SetDriverSettings(bool? showDeleted, bool? isFirstRowHeaderLine, bool? parameterNameSubstitution, string? systemDriverSettings, string? baseDn)
     {
         OdfNode dataSource = FindOrCreateDataSource();
         OdfNode applicationSettings = FindOrCreateChild(dataSource, "application-connection-settings", DatabaseNamespace, "db");
@@ -149,4 +195,5 @@ public partial class OdfDatabaseDocument
 
         return driverSettings;
     }
+
 }

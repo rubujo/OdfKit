@@ -285,7 +285,7 @@ public sealed class SpreadsheetObjectBindingTests
             Width = 3.Cm()
         };
         map.Map(nameof(SalesRow.Customer), "Client", order: 1).Aliases.Add("Customer Name");
-        map.Map(nameof(SalesRow.Closed), ignore: true);
+        map.Map(nameof(SalesRow.Closed), header: null, order: null, ignore: true);
 
         OdfObjectBindingReport report = sheet.WriteObjects(
             new OdfCellAddress(0, 0, "Data"),

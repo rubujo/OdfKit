@@ -32,6 +32,8 @@ namespace OdfKit.Tests
                 new Uri("https://example.invalid/custom.rng"),
                 "2026-06-11",
                 Array.Empty<OdfElementDefinition>(),
+                attributes: null,
+                nameClasses: null,
                 patterns: patterns);
         }
 
@@ -168,16 +170,19 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Optional, "optional", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "p", "", "", "")
                             }),
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.ZeroOrMore, "zeroOrMore", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TableNs.NamespaceName, "table", "", "", "")
@@ -214,16 +219,19 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "is-valid", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "boolean", "")
                             }),
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "count", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "integer", "")
@@ -254,14 +262,18 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "ssn", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "string", "",
+                                    nameClasses: null,
+                                    children: null,
                                     dataParameters: new[]
                                     {
                                         new KeyValuePair<string, string>("pattern", @"^\d{3}-\d{2}-\d{4}$")
@@ -269,10 +281,13 @@ namespace OdfKit.Tests
                             }),
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "code", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "string", "",
+                                    nameClasses: null,
+                                    children: null,
                                     dataParameters: new[]
                                     {
                                         new KeyValuePair<string, string>("length", "5")
@@ -310,6 +325,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
@@ -347,10 +363,12 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Interleave, "exactlyOne", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "p", "", "", ""),
@@ -387,18 +405,22 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "num", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "integer", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(
                                             OdfSchemaPatternNodeKind.Except, "exactlyOne", "", "", "", "", "",
+                                            nameClasses: null,
                                             children: new[]
                                             {
                                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Value, "exactlyOne", "", "", "", "integer", "42")
@@ -540,19 +562,25 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Interleave, "exactlyOne", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Optional, "optional", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "a", "", "", "") }),
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Optional, "optional", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "b", "", "", "") }),
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Optional, "optional", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "c", "", "", "") }),
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Optional, "optional", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "d", "", "", "") })
                             })
                     })
@@ -582,14 +610,18 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "val", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "decimal", "",
+                                    nameClasses: null,
+                                    children: null,
                                     dataParameters: new[]
                                     {
                                         new KeyValuePair<string, string>("minInclusive", "999999999999999999.000000000000000001"),
@@ -617,10 +649,12 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "time", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "dateTime", "")
@@ -676,16 +710,19 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "base64", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "base64Binary", "")
                             }),
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "hex", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "hexBinary", "")
@@ -722,10 +759,12 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Choice, "exactlyOne", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
@@ -792,35 +831,45 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Interleave, "exactlyOne", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "p", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(
                                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "val", "", "", "",
+                                            nameClasses: null,
                                             children: new[]
                                             {
                                                 new OdfSchemaPatternNode(
                                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "string", "",
+                                                    nameClasses: null,
+                                                    children: null,
                                                     dataParameters: new[] { new KeyValuePair<string, string>("pattern", @"^[A-Z]{3}$") })
                                             })
                                     }),
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Element, "exactlyOne", TableNs.NamespaceName, "table", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(
                                             OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "rows", "", "", "",
+                                            nameClasses: null,
                                             children: new[]
                                             {
                                                 new OdfSchemaPatternNode(
                                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "integer", "",
+                                                    nameClasses: null,
+                                                    children: null,
                                                     dataParameters: new[]
                                                     {
                                                         new KeyValuePair<string, string>("minInclusive", "1"),
@@ -855,6 +904,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
@@ -868,14 +918,17 @@ namespace OdfKit.Tests
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "val", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(
                                             OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "integer", "",
+                                            nameClasses: null,
                                             children: new[]
                                             {
                                                 new OdfSchemaPatternNode(
                                                     OdfSchemaPatternNodeKind.Except, "exactlyOne", "", "", "", "", "",
+                                                    nameClasses: null,
                                                     children: new[]
                                                     {
                                                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Value, "exactlyOne", "", "", "", "integer", "99")
@@ -1058,14 +1111,17 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", TextNs.NamespaceName, "p", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Element, "exactlyOne", DrawNs.NamespaceName, "object", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "math", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "mrow", "", "")
@@ -1078,14 +1134,17 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mrow", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.ZeroOrMore, "zeroOrMore", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Choice, "exactlyOne", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "mi", "", ""),
@@ -1101,6 +1160,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mi", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "")
@@ -1111,6 +1171,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mo", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "")
@@ -1121,6 +1182,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mn", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "")
@@ -1132,14 +1194,17 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mrow", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.ZeroOrMore, "zeroOrMore", "", "", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Choice, "exactlyOne", "", "", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "mi", "", ""),
@@ -1154,6 +1219,7 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", mathmlNs.NamespaceName, "mfrac", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "mrow_inner", "", ""),
@@ -1183,20 +1249,26 @@ namespace OdfKit.Tests
             {
                 new OdfSchemaPatternNode(
                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "document-meta", "", "", "",
+                    nameClasses: null,
                     children: new[]
                     {
                         new OdfSchemaPatternNode(
                             OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "meta", "", "", "",
+                            nameClasses: null,
                             children: new[]
                             {
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", OdfNamespaces.Dc, "creator", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "") }),
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", OdfNamespaces.Dc, "date", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "") }),
                                 new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "editing-cycles", "", "", "",
+                                    nameClasses: null,
                                     children: new[] { new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Text, "exactlyOne", "", "", "", "", "") }),
                                 new OdfSchemaPatternNode(
                                     OdfSchemaPatternNodeKind.Element, "exactlyOne", OfficeNs.NamespaceName, "user-defined", "", "", "",
+                                    nameClasses: null,
                                     children: new[]
                                     {
                                         new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", OfficeNs.NamespaceName, "name", "", "", ""),

@@ -15,6 +15,18 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     #region Data Range Binding
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range) => SetDataRange(sheetName, range, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) => SetDataRange(sheetName, range, firstRowAsHeader, true);
+
 
     /// <summary>
     /// Binds the chart data source to a spreadsheet cell range.
@@ -24,8 +36,7 @@ public partial class OdfChartDocument
     /// <param name="range">The cell range. / 儲存格範圍。</param>
     /// <param name="firstRowAsHeader">Whether the first row is treated as the series header; defaults to true. / 首列作為序列標題（header），預設 true。</param>
     /// <param name="firstColumnAsLabel">Whether the first column is treated as the category label (X-axis); defaults to true. / 首欄作為分類標籤（X 軸），預設 true。</param>
-    public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range,
-        bool firstRowAsHeader = true, bool firstColumnAsLabel = true)
+    public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel)
     {
         if (string.IsNullOrEmpty(sheetName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_WorksheetCannotBeEmpty"), nameof(sheetName));
@@ -93,6 +104,7 @@ public partial class OdfChartDocument
             plotArea.AppendChild(series);
         }
     }
+
 
     /// <summary>
     /// Gets the spreadsheet cell range currently bound to the chart.

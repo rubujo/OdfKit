@@ -131,6 +131,18 @@ public sealed class OdfChartSeries
 
         return points;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDataPoint() => AddDataPoint(1, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void AddDataPoint(int repeated) => AddDataPoint(repeated, null);
+
 
     /// <summary>
     /// Adds a data point style override entry (<c>chart:data-point</c>).
@@ -139,7 +151,7 @@ public sealed class OdfChartSeries
     /// <param name="repeated">The number of consecutive data points this entry applies to; defaults to 1. / 此筆設定套用的連續資料點數量，預設為 1。</param>
     /// <param name="styleName">The applied style name; no style is written when <see langword="null"/>. / 套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式。</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="repeated"/> is less than 1. / 當 <paramref name="repeated"/> 小於 1 時擲出。</exception>
-    public void AddDataPoint(int repeated = 1, string? styleName = null)
+    public void AddDataPoint(int repeated, string? styleName)
     {
         if (repeated < 1)
         {
@@ -159,6 +171,7 @@ public sealed class OdfChartSeries
 
         _node.AppendChild(dataPoint);
     }
+
 
     /// <summary>
     /// Removes all data point style override entries from this series.

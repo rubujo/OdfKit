@@ -28,12 +28,24 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     internal static int RentedBufferCountForTests;
 
     internal static int ReturnedBufferCountForTests;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfDoubleBufferedWritableStream(Stream underlyingStream) : this(underlyingStream, 64 * 1024, false) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfDoubleBufferedWritableStream(Stream underlyingStream, int bufferSize) : this(underlyingStream, bufferSize, false) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfDoubleBufferedWritableStream"/> class.
     /// 初始化 <see cref="OdfDoubleBufferedWritableStream"/> 類別的新執行個體。
     /// </summary>
-    public OdfDoubleBufferedWritableStream(Stream underlyingStream, int bufferSize = 64 * 1024, bool leaveOpen = false)
+    public OdfDoubleBufferedWritableStream(Stream underlyingStream, int bufferSize, bool leaveOpen)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
         if (bufferSize <= 0)
@@ -47,6 +59,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
         _backBuffer = _bufferB;
         _leaveOpen = leaveOpen;
     }
+
 
     /// <summary>
     /// Provides the CanRead member.

@@ -116,8 +116,8 @@ public class OdfAnimationNode(OdfNode node)
         }
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAnimationNode AddSequence() => AddSequence(null);
 
@@ -140,8 +140,8 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfAnimationNode AddParallel() => AddParallel(null);
 

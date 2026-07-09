@@ -25,8 +25,8 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height) => Add(imageBytes, width, height, null);
 

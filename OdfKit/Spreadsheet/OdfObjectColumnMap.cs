@@ -14,6 +14,24 @@ public sealed class OdfObjectColumnMap
     /// 取得欄位對應集合。
     /// </summary>
     public IList<OdfObjectColumnMapping> Columns { get; } = new List<OdfObjectColumnMapping>();
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectColumnMapping Map(string propertyName) => Map(propertyName, null, null, false);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectColumnMapping Map(string propertyName, string? header) => Map(propertyName, header, null, false);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfObjectColumnMapping Map(string propertyName, string? header, int? order) => Map(propertyName, header, order, false);
+
 
     /// <summary>
     /// Adds or updates a property mapping.
@@ -24,7 +42,7 @@ public sealed class OdfObjectColumnMap
     /// <param name="order">The optional column order. / 選用欄位順序。</param>
     /// <param name="ignore">Whether the property is ignored. / 是否忽略此屬性。</param>
     /// <returns>The created mapping. / 已建立的對應。</returns>
-    public OdfObjectColumnMapping Map(string propertyName, string? header = null, int? order = null, bool ignore = false)
+    public OdfObjectColumnMapping Map(string propertyName, string? header, int? order, bool ignore)
     {
         OdfObjectColumnMapping? existing = Columns.FirstOrDefault(mapping => mapping.PropertyName == propertyName);
         if (existing is not null)
@@ -41,6 +59,7 @@ public sealed class OdfObjectColumnMap
         Columns.Add(mapping);
         return mapping;
     }
+
 
     internal OdfObjectColumnMapping? Find(string propertyName) =>
         Columns.FirstOrDefault(mapping => mapping.PropertyName == propertyName);

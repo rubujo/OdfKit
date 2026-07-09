@@ -7,6 +7,18 @@
 public sealed class OdfTextFontFallbackOptions
 {
     private const string DefaultBaseFont = "TW-Kai";
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfTextFontFallbackOptions() : this(DefaultBaseFont, true) { }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfTextFontFallbackOptions(string? baseFont) : this(baseFont, true) { }
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfTextFontFallbackOptions"/> class.
@@ -14,7 +26,7 @@ public sealed class OdfTextFontFallbackOptions
     /// </summary>
     /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
     /// <param name="declareDefaultCjkFallbackFonts">A value indicating whether default CJK font-face declarations are written. / 是否寫入預設 CJK font-face 宣告。</param>
-    public OdfTextFontFallbackOptions(string? baseFont = DefaultBaseFont, bool declareDefaultCjkFallbackFonts = true)
+    public OdfTextFontFallbackOptions(string? baseFont, bool declareDefaultCjkFallbackFonts)
         : this(
             baseFont,
             declareDefaultCjkFallbackFonts,
@@ -43,8 +55,8 @@ public sealed class OdfTextFontFallbackOptions
 
     internal IReadOnlyList<OdfFontFaceInfo> FontFaces { get; }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfTextFontFallbackOptions Cns11643() => Cns11643(DefaultBaseFont);
 

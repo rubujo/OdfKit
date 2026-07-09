@@ -167,7 +167,7 @@ public class DatabaseSchemaAndFormTests
 
         var detail = reportDoc.AddParagraph("金額：");
         detail.AddDatabaseDisplayField("Orders", "Amount");
-        detail.AddDatabaseNextField("Orders", condition: "true()");
+        detail.AddDatabaseNextField("Orders", tableType: null, databaseName: null, condition: "true()");
 
         var contentXml = SaveAndGetContentXml(reportDoc);
 

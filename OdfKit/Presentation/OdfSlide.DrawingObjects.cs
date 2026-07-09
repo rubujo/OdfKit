@@ -131,8 +131,8 @@ public partial class OdfSlide
         return new OdfTextBox(frame, this);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfMediaObject AddVideo(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddVideo(packagePath, x, y, width, height, "video/mp4");
 
@@ -153,8 +153,8 @@ public partial class OdfSlide
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfMediaObject AddAudio(string packagePath, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddAudio(packagePath, x, y, width, height, "audio/mpeg");
 
@@ -284,8 +284,8 @@ public partial class OdfSlide
         return new OdfShape(shapeNode, this);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h) => AddPicture(imageBytes, x, y, w, h, null);
 

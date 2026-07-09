@@ -59,14 +59,14 @@ public static class OdfValidator
     public static OdfValidationReport Validate(Stream stream) => Validate(stream, null, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfValidationReport Validate(Stream stream, string? fileName) => Validate(stream, fileName, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfValidationReport Validate(
         Stream stream,
@@ -116,14 +116,14 @@ public static class OdfValidator
     public static OdfValidationReport Validate(OdfPackage package) => Validate(package, null, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfValidationReport Validate(OdfPackage package, OdfComplianceProfile? profile) => Validate(package, profile, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfValidationReport Validate(
         OdfPackage package,

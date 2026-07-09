@@ -71,6 +71,48 @@ public sealed class OdfEmbeddedTable
         paragraph.TextContent = text;
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column) => SetCellTextStyle(row, column, null, null, null, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold) => SetCellTextStyle(row, column, bold, null, null, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic) => SetCellTextStyle(row, column, bold, italic, null, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline) => SetCellTextStyle(row, column, bold, italic, underline, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough, string? textPosition) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, textPosition, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough, string? textPosition, string? fontSize) => SetCellTextStyle(row, column, bold, italic, underline, strikethrough, textPosition, fontSize, null);
+
 
     /// <summary>
     /// Sets common text styling for the specified cell.
@@ -86,16 +128,7 @@ public sealed class OdfEmbeddedTable
     /// <param name="fontSize">The font size, such as <c>14pt</c>; <see langword="null"/> leaves it unchanged. / 字型大小，例如 <c>14pt</c>；傳入 <see langword="null"/> 表示不變更。</param>
     /// <param name="color">The text color, such as <c>#336699</c>; <see langword="null"/> leaves it unchanged. / 文字色彩，例如 <c>#336699</c>；傳入 <see langword="null"/> 表示不變更。</param>
     /// <returns>The current embedded table. / 目前嵌入表格。</returns>
-    public OdfEmbeddedTable SetCellTextStyle(
-        int row,
-        int column,
-        bool? bold = null,
-        bool? italic = null,
-        bool? underline = null,
-        bool? strikethrough = null,
-        string? textPosition = null,
-        string? fontSize = null,
-        string? color = null)
+    public OdfEmbeddedTable SetCellTextStyle(int row, int column, bool? bold, bool? italic, bool? underline, bool? strikethrough, string? textPosition, string? fontSize, string? color)
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
@@ -139,6 +172,7 @@ public sealed class OdfEmbeddedTable
 
         return this;
     }
+
 
     /// <summary>
     /// Sets the span of the specified cell and converts covered cells to <c>table:covered-table-cell</c>.

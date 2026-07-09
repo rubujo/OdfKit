@@ -14,8 +14,8 @@ namespace OdfKit.Core;
 public abstract partial class OdfDocument
 {
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfValidationReport Validate() => Validate(null);
 
@@ -36,6 +36,18 @@ public abstract partial class OdfDocument
         OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
         return MergeTopologyReport(packageReport);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public Task<OdfValidationReport> ValidateAsync() => ValidateAsync(null, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public Task<OdfValidationReport> ValidateAsync(OdfComplianceProfile? profile) => ValidateAsync(profile, default);
+
 
 
     /// <summary>
@@ -45,13 +57,14 @@ public abstract partial class OdfDocument
     /// <param name="profile">相容性設定檔；若為 <see langword="null"/> 則使用預設設定檔</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步驗證作業的工作，其結果為結構化驗證結果報告</returns>
-    public async Task<OdfValidationReport> ValidateAsync(OdfComplianceProfile? profile = null, CancellationToken cancellationToken = default)
+    public async Task<OdfValidationReport> ValidateAsync(OdfComplianceProfile? profile, CancellationToken cancellationToken)
     {
         using MemoryStream snapshot = new();
         await SaveToStreamAsync(snapshot, options: null, cancellationToken).ConfigureAwait(false);
         OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
         return MergeTopologyReport(packageReport);
     }
+
 
     private OdfValidationReport MergeTopologyReport(OdfValidationReport packageReport)
     {

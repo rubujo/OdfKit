@@ -50,8 +50,8 @@ public static class OdfMemoryTracker
     /// </summary>
     public static long BoxingWarningThreshold { get; set; } = 10_000;
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static void Track(IntPtr ptr, long size) => Track(ptr, size, null);
 
@@ -96,6 +96,24 @@ public static class OdfMemoryTracker
             OdfPerformanceTelemetry.RecordMemoryFree(info.Size);
         }
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static void ReportLoadProfile(long nodeCount) => ReportLoadProfile(nodeCount, null, 0, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static void ReportLoadProfile(long nodeCount, long? allocatedBytes) => ReportLoadProfile(nodeCount, allocatedBytes, 0, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static void ReportLoadProfile(long nodeCount, long? allocatedBytes, long boxedValueCount) => ReportLoadProfile(nodeCount, allocatedBytes, boxedValueCount, null);
+
 
     /// <summary>
     /// Executes the ReportLoadProfile operation.
@@ -105,11 +123,7 @@ public static class OdfMemoryTracker
     /// <param name="allocatedBytes">本次載入或操作估計配置的位元組數；未知時可為 <see langword="null"/></param>
     /// <param name="boxedValueCount">本次操作估計發生的 boxing 次數</param>
     /// <param name="label">選用的情境標籤</param>
-    public static void ReportLoadProfile(
-        long nodeCount,
-        long? allocatedBytes = null,
-        long boxedValueCount = 0,
-        string? label = null)
+    public static void ReportLoadProfile(long nodeCount, long? allocatedBytes, long boxedValueCount, string? label)
     {
         if (!DiagnosticsEnabled)
             return;
@@ -134,9 +148,10 @@ public static class OdfMemoryTracker
                 $"OdfKit 偵測到高頻 boxing 風險：{boxedValueCount} 次，情境：{context}。建議改用強型別值、Span 或 OdfCellData。");
         }
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static bool CheckLeaks() => CheckLeaks(true);
 

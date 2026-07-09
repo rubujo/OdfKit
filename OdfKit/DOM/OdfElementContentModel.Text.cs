@@ -26,8 +26,8 @@ public partial class OfficeTextElement
         }
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextPElement AppendParagraph() => AppendParagraph("");
 
@@ -50,8 +50,8 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextHElement AppendHeading(string text) => AppendHeading(text, 1);
 
@@ -72,8 +72,8 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextListElement AppendList() => AppendList(null);
 
@@ -96,8 +96,8 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TableTableElement AppendTable() => AppendTable(null);
 

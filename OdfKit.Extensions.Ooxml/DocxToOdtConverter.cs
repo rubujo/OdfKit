@@ -100,6 +100,7 @@ public static class DocxToOdtConverter
                 "format-change",
                 paragraphFormatChange.Author?.Value ?? "Author",
                 paragraphFormatChange.Date?.Value ?? DateTime.UtcNow,
+                extraContent: null,
                 originalStyleName: originalStyleName,
                 targetFamily: "paragraph");
             PrependChangeStart(odtParagraph.Node, paragraphFormatChangeId);
@@ -536,6 +537,7 @@ public static class DocxToOdtConverter
                 "format-change",
                 formatChange.Author?.Value ?? "Author",
                 formatChange.Date?.Value ?? DateTime.UtcNow,
+                extraContent: null,
                 originalStyleName: originalStyleName,
                 targetFamily: "text");
 

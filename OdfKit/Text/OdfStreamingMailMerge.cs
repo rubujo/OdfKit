@@ -30,8 +30,8 @@ public static partial class OdfStreamingMailMerge
     public static Task ApplyTemplateAsync(Stream templateStream, Stream outputStream, IDictionary<string, object?> data) => ApplyTemplateAsync(templateStream, outputStream, data, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async Task ApplyTemplateAsync(
         Stream templateStream,
@@ -91,8 +91,8 @@ public static partial class OdfStreamingMailMerge
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
@@ -121,8 +121,8 @@ public static partial class OdfStreamingMailMerge
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, IAsyncEnumerable<IDictionary<string, object?>> dataSequence) => ApplyBatchTemplateAsync(templateStream, outputStream, dataSequence, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
@@ -292,8 +292,8 @@ public static partial class OdfStreamingMailMerge
     public static Task ApplyBatchTemplateAsync(Stream templateStream, Stream outputStream, DbDataReader reader) => ApplyBatchTemplateAsync(templateStream, outputStream, reader, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,

@@ -71,8 +71,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         };
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdsStreamWriter(Stream outputStream) : this(outputStream, OdfVersion.Odf14) { }
 
@@ -201,8 +201,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         _isSheetStarted = true;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteColumn(OdfLength width) => WriteColumn(width, null);
 
@@ -286,8 +286,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public void WriteCell(string value) => WriteCell(value, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteCell(string value, string? styleName)
     {
@@ -322,8 +322,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public void WriteCell(ReadOnlySpan<char> value) => WriteCell(value, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteCell(ReadOnlySpan<char> value, string? styleName)
     {
@@ -357,8 +357,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public void WriteCell(ReadOnlyMemory<char> value) => WriteCell(value.Span, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteCell(ReadOnlyMemory<char> value, string? styleName) => WriteCell(value.Span, styleName);
 
@@ -370,8 +370,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public void WriteCell(double value) => WriteCell(value, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteCell(double value, string? styleName)
     {
@@ -466,8 +466,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public void WriteCell(bool value) => WriteCell(value, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteCell(bool value, string? styleName)
     {
@@ -548,14 +548,14 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public Task WriteCsvStreamAsync(Stream csvStream) => WriteCsvStreamAsync(csvStream, false, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task WriteCsvStreamAsync(Stream csvStream, bool firstRowAsHeader) => WriteCsvStreamAsync(csvStream, firstRowAsHeader, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public async Task WriteCsvStreamAsync(
         Stream csvStream,
@@ -622,14 +622,14 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     public Task WriteDataAsync(DbDataReader reader) => WriteDataAsync(reader, false, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task WriteDataAsync(DbDataReader reader, bool includeColumnNames) => WriteDataAsync(reader, includeColumnNames, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public async Task WriteDataAsync(
         DbDataReader reader,
@@ -821,6 +821,18 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private XmlWriter CurrentWriter => _activeSheetBuffer?.Writer ?? _writer;
 
     private OdfRawXmlWriter CurrentRawWriter => _activeSheetBuffer?.RawWriter ?? _rawWriter;
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public Task WriteSheetsAsync(IEnumerable<OdsSheetWriteJob> jobs) => WriteSheetsAsync(jobs, 0, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public Task WriteSheetsAsync(IEnumerable<OdsSheetWriteJob> jobs, int maxConcurrency) => WriteSheetsAsync(jobs, maxConcurrency, default);
+
 
     /// <summary>
     /// Generates XML fragments for multiple worksheets in parallel and writes them to the current ODS package in job list order.
@@ -832,10 +844,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <returns>A task that represents the asynchronous write operation. / 代表非同步寫入作業的工作。</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="jobs"/> is <see langword="null"/>. / 當 <paramref name="jobs"/> 為 <see langword="null"/> 時擲出。</exception>
     /// <exception cref="ObjectDisposedException">Thrown when the writer has been disposed. / 當寫入器已釋放時擲出。</exception>
-    public async Task WriteSheetsAsync(
-        IEnumerable<OdsSheetWriteJob> jobs,
-        int maxConcurrency = 0,
-        CancellationToken cancellationToken = default)
+    public async Task WriteSheetsAsync(IEnumerable<OdsSheetWriteJob> jobs, int maxConcurrency, CancellationToken cancellationToken)
     {
         if (jobs is null)
         {
@@ -916,6 +925,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
     }
 
+
     private void WriteBufferedSheets()
     {
         foreach (SheetBuffer sheet in _sheetBuffers)
@@ -955,8 +965,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         private bool _closed;
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public SheetBuffer(string sheetName)
         {
@@ -986,8 +996,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         public OdfRawXmlWriter RawWriter { get; }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public void Close()
         {
@@ -1043,8 +1053,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public void Dispose()
         {
@@ -1074,14 +1084,14 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         ToAsyncEnumerable(writeAction, OdfVersion.Odf14, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(Func<OdsStreamWriter, Task> writeAction, OdfVersion version) => ToAsyncEnumerable(writeAction, version, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
         Func<OdsStreamWriter, Task> writeAction,
@@ -1139,14 +1149,14 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         ToAsyncEnumerable(writeAction, OdfVersion.Odf14, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(Action<OdsStreamWriter> writeAction, OdfVersion version) => ToAsyncEnumerable(writeAction, version, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
         Action<OdsStreamWriter> writeAction,
@@ -1195,8 +1205,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         public override bool CanSeek => false;
         public override bool CanWrite => true;
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         public override long Position
@@ -1206,8 +1216,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public void Complete()
         {
@@ -1216,8 +1226,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public void Fault(Exception ex)
         {
@@ -1227,8 +1237,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -1241,8 +1251,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public async Task<byte[]?> ReadChunkAsync(CancellationToken cancellationToken)
         {
@@ -1267,23 +1277,23 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void Flush() { }
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }

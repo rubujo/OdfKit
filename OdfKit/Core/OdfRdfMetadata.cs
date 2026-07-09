@@ -21,8 +21,8 @@ public sealed class OdfRdfMetadata
 
     internal bool IsDirty { get; private set; }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddTriple(string subject, string predicate, string objectValue) => AddTriple(subject, predicate, objectValue, true);
 
@@ -55,6 +55,18 @@ public sealed class OdfRdfMetadata
         _triples.Add(triple);
         IsDirty = true;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyList<OdfRdfTriple> GetTriples() => GetTriples(null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public IReadOnlyList<OdfRdfTriple> GetTriples(string? subject) => GetTriples(subject, null);
+
 
     /// <summary>
     /// Gets RDF triples filtered by subject and predicate.
@@ -63,7 +75,7 @@ public sealed class OdfRdfMetadata
     /// <param name="subject">The subject IRI, or <see langword="null"/> to include all subjects. / 主詞 IRI；為 <see langword="null"/> 時不篩選主詞。</param>
     /// <param name="predicate">The predicate IRI, or <see langword="null"/> to include all predicates. / 述詞 IRI；為 <see langword="null"/> 時不篩選述詞。</param>
     /// <returns>The matching triples. / 符合條件的 triple 清單。</returns>
-    public IReadOnlyList<OdfRdfTriple> GetTriples(string? subject = null, string? predicate = null)
+    public IReadOnlyList<OdfRdfTriple> GetTriples(string? subject, string? predicate)
     {
         IEnumerable<OdfRdfTriple> query = _triples;
         if (subject is not null)
@@ -78,6 +90,7 @@ public sealed class OdfRdfMetadata
 
         return query.ToArray();
     }
+
 
     /// <summary>
     /// Executes the TryGetLiteral operation.
@@ -125,8 +138,8 @@ public sealed class OdfRdfMetadata
         AddTriple(partSubject, OdfPkgRdfPredicates.MimeType, mimeType, isLiteral: true);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public int SyncWithPackageEntries(IEnumerable<string> entryPaths, IReadOnlyDictionary<string, string> mediaTypes) => SyncWithPackageEntries(entryPaths, mediaTypes, null);
 
@@ -203,8 +216,8 @@ public sealed class OdfRdfMetadata
             .ToArray();
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public int RemoveTriples(string subject) => RemoveTriples(subject, null);
 

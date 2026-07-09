@@ -59,13 +59,13 @@ public class DrawingApiUsabilityTests
             .AddPage("主流程", page => page
                 .AddLayer("背景", isProtected: true)
                 .AddLayer("流程")
-                .AddFlowStep("load", "載入 ODF", 0, configure: shape => shape
+                .AddFlowStep("load", "載入 ODF", 0, OdfShapeType.Rectangle, shape => shape
                     .WithId("load")
                     .OnLayer("流程"))
                 .AddFlowStep("validate", "驗證封裝", 1, OdfShapeType.Ellipse, shape => shape
                     .WithId("validate")
                     .OnLayer("流程"))
-                .AddFlowStep("export", "輸出報告", 2, configure: shape => shape
+                .AddFlowStep("export", "輸出報告", 2, OdfShapeType.Rectangle, shape => shape
                     .WithId("export")
                     .OnLayer("流程"))
                 .AddConnector("load", "validate", OdfConnectorType.Straight)

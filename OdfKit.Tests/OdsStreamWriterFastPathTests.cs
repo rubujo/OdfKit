@@ -251,7 +251,7 @@ public class OdsStreamWriterFastPathTests
                     return Task.CompletedTask;
                 })
             };
-            await writer.WriteSheetsAsync(jobs, cancellationToken: TestContext.Current.CancellationToken);
+            await writer.WriteSheetsAsync(jobs, maxConcurrency: 0, cancellationToken: TestContext.Current.CancellationToken);
         }
 
         ms.Position = 0;

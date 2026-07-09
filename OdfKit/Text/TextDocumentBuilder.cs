@@ -76,8 +76,8 @@ public sealed class TextDocumentBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextDocumentBuilder AddHeading(string text) => AddHeading(text, 1);
 
@@ -97,8 +97,8 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextDocumentBuilder AddParagraph(string text) => AddParagraph(text, null);
 
@@ -140,6 +140,24 @@ public sealed class TextDocumentBuilder
         configure(new TextParagraphBuilder(_document, paragraph));
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public TextDocumentBuilder AddCoverPage(string title) => AddCoverPage(title, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public TextDocumentBuilder AddCoverPage(string title, string? subtitle) => AddCoverPage(title, subtitle, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public TextDocumentBuilder AddCoverPage(string title, string? subtitle, string? author) => AddCoverPage(title, subtitle, author, null);
+
 
     /// <summary>
     /// Adds a cover page with a title, optional subtitle, author, and date text, inserting a page break after the cover.
@@ -150,11 +168,7 @@ public sealed class TextDocumentBuilder
     /// <param name="author">The author or organization name. / 作者或組織名稱。</param>
     /// <param name="dateText">The date or period text. / 日期或期間文字。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddCoverPage(
-        string title,
-        string? subtitle = null,
-        string? author = null,
-        string? dateText = null)
+    public TextDocumentBuilder AddCoverPage(string title, string? subtitle, string? author, string? dateText)
     {
         if (title is null)
             throw new ArgumentNullException(nameof(title));
@@ -191,6 +205,7 @@ public sealed class TextDocumentBuilder
         return this;
     }
 
+
     /// <summary>
     /// Adds a list and configures its list items.
     /// 新增專案清單。
@@ -205,6 +220,18 @@ public sealed class TextDocumentBuilder
         configure(new TextListBuilder(list));
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public TextDocumentBuilder AddTableOfContents() => AddTableOfContents("目錄", 10);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public TextDocumentBuilder AddTableOfContents(string title) => AddTableOfContents(title, 10);
+
 
     /// <summary>
     /// Adds a table of contents and immediately updates its content.
@@ -213,14 +240,15 @@ public sealed class TextDocumentBuilder
     /// <param name="title">The table of contents title. / 目錄標題。</param>
     /// <param name="outlineLevel">The maximum outline level included in the table of contents. / 目錄大綱階層上限。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextDocumentBuilder AddTableOfContents(string title = "目錄", int outlineLevel = 10)
+    public TextDocumentBuilder AddTableOfContents(string title, int outlineLevel)
     {
         _document.InsertTableOfContents(title, outlineLevel);
         return this;
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextDocumentBuilder AddTable(int rows, int columns) => AddTable(rows, columns, null);
 
@@ -242,8 +270,8 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextDocumentBuilder AddSection(string name, int columnCount, OdfLength gap) => AddSection(name, columnCount, gap, null);
 
@@ -644,8 +672,8 @@ public sealed class TextParagraphBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height) => AddImage(imageBytes, width, height, null);
 
@@ -783,8 +811,8 @@ public sealed class TextSectionBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextSectionBuilder AddHeading(string text) => AddHeading(text, 1);
 
@@ -806,8 +834,8 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public TextSectionBuilder Protected() => Protected(true);
 

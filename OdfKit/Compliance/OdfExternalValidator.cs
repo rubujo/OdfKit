@@ -14,6 +14,24 @@ public static class OdfExternalValidator
     /// 取得 ODF Validator JAR 路徑的環境變數名稱。
     /// </summary>
     public const string OdfValidatorJarEnvironmentVariable = "ODFKIT_ODFVALIDATOR_JAR";
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath) => ValidateWithOdfValidator(filePath, null, null, 30000);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath) => ValidateWithOdfValidator(filePath, jarPath, null, 30000);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath, string? javaPath) => ValidateWithOdfValidator(filePath, jarPath, javaPath, 30000);
+
 
     /// <summary>
     /// Executes the ValidateWithOdfValidator operation.
@@ -31,14 +49,35 @@ public static class OdfExternalValidator
     /// Prefer <see cref="ValidateWithOdfValidatorAsync(string, string?, string?, int, CancellationToken)"/> in server environments to avoid blocking request threads.
     /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="ValidateWithOdfValidatorAsync(string, string?, string?, int, CancellationToken)"/> 以避免阻塞要求執行緒。
     /// </remarks>
-    public static OdfExternalValidatorResult ValidateWithOdfValidator(
-        string filePath,
-        string? jarPath = null,
-        string? javaPath = null,
-        int timeoutMilliseconds = 30000)
+    public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds)
     {
         return ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds).GetAwaiter().GetResult();
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath) => ValidateWithOdfValidatorAsync(filePath, null, null, 30000, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath) => ValidateWithOdfValidatorAsync(filePath, jarPath, null, 30000, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath) => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, 30000, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds) => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds, default);
+
 
     /// <summary>
     /// Executes the ValidateWithOdfValidatorAsync operation.
@@ -57,12 +96,7 @@ public static class OdfExternalValidator
     /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出</exception>
     /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出</exception>
     /// <exception cref="TimeoutException">當外部程序逾時時擲出</exception>
-    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(
-        string filePath,
-        string? jarPath = null,
-        string? javaPath = null,
-        int timeoutMilliseconds = 30000,
-        CancellationToken cancellationToken = default)
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileCannotBeEmpty_2"), nameof(filePath));
@@ -86,9 +120,10 @@ public static class OdfExternalValidator
             timeoutMilliseconds,
             cancellationToken);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfExternalValidatorResult ValidateWithCommand(string commandPath, string filePath) => ValidateWithCommand(commandPath, filePath, 30000);
 
@@ -109,6 +144,18 @@ public static class OdfExternalValidator
     {
         return ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds).GetAwaiter().GetResult();
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(string commandPath, string filePath) => ValidateWithCommandAsync(commandPath, filePath, 30000, default);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(string commandPath, string filePath, int timeoutMilliseconds) => ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds, default);
+
 
 
     /// <summary>
@@ -124,11 +171,7 @@ public static class OdfExternalValidator
     /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步驗證作業的工作，其結果為外部驗證器執行結果</returns>
-    public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(
-        string commandPath,
-        string filePath,
-        int timeoutMilliseconds = 30000,
-        CancellationToken cancellationToken = default)
+    public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(string commandPath, string filePath, int timeoutMilliseconds, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(commandPath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_ExternalCannotBeEmpty"), nameof(commandPath));
@@ -144,6 +187,7 @@ public static class OdfExternalValidator
 
         return RunProcessAsync(commandPath, [filePath], timeoutMilliseconds, cancellationToken);
     }
+
 
     private static async Task<OdfExternalValidatorResult> RunProcessAsync(
         string fileName,

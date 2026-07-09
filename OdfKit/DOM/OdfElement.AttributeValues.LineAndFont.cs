@@ -13,8 +13,8 @@ public partial class OdfElement
 {
     #region Attribute Values - Line & Font
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri) => GetLineWidthAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -32,6 +32,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementDomainAttributeAccess.GetNullable<OdfLineWidth>(value, OdfLineWidth.TryParse);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value) => SetLineWidthAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value, string? prefix) => SetLineWidthAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -43,13 +55,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的線條寬度</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetLineWidthAttributeValue(string localName, string namespaceUri, OdfLineWidth value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri) => GetLineModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -67,6 +80,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfLineMode>(value, OdfElementSchemaRegistry.TryParseLineMode);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value) => SetLineModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix) => SetLineModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -78,13 +103,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的線條模式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineMode(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri) => GetFontStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -102,6 +128,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStyle>(value, OdfElementSchemaRegistry.TryParseFontStyle);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value) => SetFontStyleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix) => SetFontStyleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -113,13 +151,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型樣式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontStyle(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri) => GetFontVariantAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -137,6 +176,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontVariant>(value, OdfElementSchemaRegistry.TryParseFontVariant);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value) => SetFontVariantAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix) => SetFontVariantAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -148,13 +199,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型變體</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontVariant(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri) => GetFontWeightAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -172,6 +224,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontWeight>(value, OdfElementSchemaRegistry.TryParseFontWeight);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value) => SetFontWeightAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix) => SetFontWeightAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -183,13 +247,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型粗細</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontWeight(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri) => GetFontFamilyGenericAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -207,6 +272,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontFamilyGeneric>(value, OdfElementSchemaRegistry.TryParseFontFamilyGeneric);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value) => SetFontFamilyGenericAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix) => SetFontFamilyGenericAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -218,13 +295,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的通用字型家族</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontFamilyGeneric(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri) => GetFontPitchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -242,6 +320,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontPitch>(value, OdfElementSchemaRegistry.TryParseFontPitch);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value) => SetFontPitchAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix) => SetFontPitchAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -253,13 +343,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型間距</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontPitch(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri) => GetFontReliefAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -277,6 +368,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontRelief>(value, OdfElementSchemaRegistry.TryParseFontRelief);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value) => SetFontReliefAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix) => SetFontReliefAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -288,13 +391,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型浮雕</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontRelief(value), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri) => GetFontStretchAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -312,6 +416,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetNullable<OdfFontStretch>(value, OdfElementSchemaRegistry.TryParseFontStretch);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value) => SetFontStretchAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix) => SetFontStretchAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -323,10 +439,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的字型伸縮</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontStretch(value), prefix, version);
     }
+
 
     #endregion
 }

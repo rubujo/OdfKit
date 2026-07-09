@@ -70,8 +70,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static Task<OdfDocument> LoadAsync(string path) => LoadAsync(path, cancellationToken: default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken);
@@ -97,8 +97,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options) => LoadAsync(path, options, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(path, options, cancellationToken);
@@ -111,8 +111,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static OdfDocument Load(Stream stream) => Load(stream, fileName: null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfDocument Load(Stream stream, string? fileName) => OdfDocumentFactory.LoadDocument(stream, fileName);
 
@@ -137,14 +137,14 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static Task<OdfDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, fileName: null, cancellationToken: cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken);
@@ -157,8 +157,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static OdfDocument Load(Stream stream, OdfLoadOptions? options) => Load(stream, options, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfDocument Load(Stream stream, OdfLoadOptions? options, string? fileName) =>
         OdfDocumentFactory.LoadDocument(stream, options, fileName);
@@ -171,14 +171,14 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options) => LoadAsync(stream, options, null, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName) => LoadAsync(stream, options, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, options, fileName, cancellationToken);
@@ -447,8 +447,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     private readonly struct CoreXmlLoadJob
     {
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public CoreXmlLoadJob(int index, string entryName, string defaultXml)
         {
@@ -599,8 +599,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     public OdfBookmarkManager Bookmarks => new OdfBookmarkManager(this);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void ExportToPdf(Stream pdfStream) => ExportToPdf(pdfStream, null);
 

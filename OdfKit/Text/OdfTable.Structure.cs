@@ -11,8 +11,8 @@ namespace OdfKit.Text;
 public partial class OdfTable
 {
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void InsertRows(int position) => InsertRows(position, 1);
 
@@ -45,8 +45,8 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void DeleteRows(int position) => DeleteRows(position, 1);
 
@@ -80,8 +80,8 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void InsertColumns(int position) => InsertColumns(position, 1);
 
@@ -115,8 +115,8 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void DeleteColumns(int position) => DeleteColumns(position, 1);
 

@@ -13,8 +13,8 @@ public partial class OdfElement
 {
     #region Attribute Values - Style & Presentation
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleHorizontalRel? GetStyleHorizontalRelAttributeValue(string localName, string namespaceUri) => GetStyleHorizontalRelAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -32,6 +32,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleHorizontalRel>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleHorizontalRelAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalRel value) => SetStyleHorizontalRelAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleHorizontalRelAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalRel value, string? prefix) => SetStyleHorizontalRelAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -43,13 +55,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式水平相對基準</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleHorizontalRelAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalRel value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetStyleHorizontalRelAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalRel value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式水平相對基準。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleWritingMode? GetStyleWritingModeAttributeValue(string localName, string namespaceUri) => GetStyleWritingModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -67,6 +80,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWritingMode>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWritingModeAttributeValue(string localName, string namespaceUri, OdfStyleWritingMode value) => SetStyleWritingModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWritingModeAttributeValue(string localName, string namespaceUri, OdfStyleWritingMode value, string? prefix) => SetStyleWritingModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -78,13 +103,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式書寫方向</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleWritingModeAttributeValue(string localName, string namespaceUri, OdfStyleWritingMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetStyleWritingModeAttributeValue(string localName, string namespaceUri, OdfStyleWritingMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式書寫方向。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleWrap? GetStyleWrapAttributeValue(string localName, string namespaceUri) => GetStyleWrapAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -102,6 +128,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWrap>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWrapAttributeValue(string localName, string namespaceUri, OdfStyleWrap value) => SetStyleWrapAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWrapAttributeValue(string localName, string namespaceUri, OdfStyleWrap value, string? prefix) => SetStyleWrapAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -113,13 +151,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式文繞圖</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleWrapAttributeValue(string localName, string namespaceUri, OdfStyleWrap value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetStyleWrapAttributeValue(string localName, string namespaceUri, OdfStyleWrap value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文繞圖。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleRunThrough? GetStyleRunThroughAttributeValue(string localName, string namespaceUri) => GetStyleRunThroughAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -137,6 +176,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleRunThrough>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleRunThroughAttributeValue(string localName, string namespaceUri, OdfStyleRunThrough value) => SetStyleRunThroughAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleRunThroughAttributeValue(string localName, string namespaceUri, OdfStyleRunThrough value, string? prefix) => SetStyleRunThroughAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -148,13 +199,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式穿越排列</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleRunThroughAttributeValue(string localName, string namespaceUri, OdfStyleRunThrough value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetStyleRunThroughAttributeValue(string localName, string namespaceUri, OdfStyleRunThrough value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式穿越排列。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfStyleWrapContourMode? GetStyleWrapContourModeAttributeValue(string localName, string namespaceUri) => GetStyleWrapContourModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -172,6 +224,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWrapContourMode>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWrapContourModeAttributeValue(string localName, string namespaceUri, OdfStyleWrapContourMode value) => SetStyleWrapContourModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetStyleWrapContourModeAttributeValue(string localName, string namespaceUri, OdfStyleWrapContourMode value, string? prefix) => SetStyleWrapContourModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -183,13 +247,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的樣式輪廓繞排模式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetStyleWrapContourModeAttributeValue(string localName, string namespaceUri, OdfStyleWrapContourMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetStyleWrapContourModeAttributeValue(string localName, string namespaceUri, OdfStyleWrapContourMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式輪廓繞排模式。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTableDisplayMemberMode? GetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri) => GetTableDisplayMemberModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -207,6 +272,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableDisplayMemberMode>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri, OdfTableDisplayMemberMode value) => SetTableDisplayMemberModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri, OdfTableDisplayMemberMode value, string? prefix) => SetTableDisplayMemberModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -218,13 +295,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的表格成員顯示方向</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri, OdfTableDisplayMemberMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri, OdfTableDisplayMemberMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格成員顯示方向。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTableLayoutMode? GetTableLayoutModeAttributeValue(string localName, string namespaceUri) => GetTableLayoutModeAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -242,6 +320,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableLayoutMode>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTableLayoutModeAttributeValue(string localName, string namespaceUri, OdfTableLayoutMode value) => SetTableLayoutModeAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetTableLayoutModeAttributeValue(string localName, string namespaceUri, OdfTableLayoutMode value, string? prefix) => SetTableLayoutModeAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -253,13 +343,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的表格版面配置模式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetTableLayoutModeAttributeValue(string localName, string namespaceUri, OdfTableLayoutMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetTableLayoutModeAttributeValue(string localName, string namespaceUri, OdfTableLayoutMode value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格版面配置模式。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfDatabaseRule? GetDatabaseRuleAttributeValue(string localName, string namespaceUri) => GetDatabaseRuleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -277,6 +368,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseRule>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDatabaseRuleAttributeValue(string localName, string namespaceUri, OdfDatabaseRule value) => SetDatabaseRuleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetDatabaseRuleAttributeValue(string localName, string namespaceUri, OdfDatabaseRule value, string? prefix) => SetDatabaseRuleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -288,13 +391,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的資料庫參照動作規則</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetDatabaseRuleAttributeValue(string localName, string namespaceUri, OdfDatabaseRule value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetDatabaseRuleAttributeValue(string localName, string namespaceUri, OdfDatabaseRule value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 資料庫參照動作規則。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPresentationPresetClass? GetPresentationPresetClassAttributeValue(string localName, string namespaceUri) => GetPresentationPresetClassAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -312,6 +416,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfPresentationPresetClass>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetPresentationPresetClassAttributeValue(string localName, string namespaceUri, OdfPresentationPresetClass value) => SetPresentationPresetClassAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetPresentationPresetClassAttributeValue(string localName, string namespaceUri, OdfPresentationPresetClass value, string? prefix) => SetPresentationPresetClassAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -323,13 +439,14 @@ public partial class OdfElement
     /// <param name="value">要寫入的簡報預設動畫類別</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetPresentationPresetClassAttributeValue(string localName, string namespaceUri, OdfPresentationPresetClass value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetPresentationPresetClassAttributeValue(string localName, string namespaceUri, OdfPresentationPresetClass value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 簡報預設動畫類別。"), prefix, version);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNumberTransliterationStyle? GetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri) => GetNumberTransliterationStyleAttributeValue(localName, namespaceUri, OdfVersion.Odf14);
 
@@ -347,6 +464,18 @@ public partial class OdfElement
         string? value = GetAttributeValue(localName, namespaceUri, version);
         return OdfElementEnumAttributeAccess.GetEnumToken<OdfNumberTransliterationStyle>(value);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri, OdfNumberTransliterationStyle value) => SetNumberTransliterationStyleAttributeValue(localName, namespaceUri, value, null, OdfVersion.Odf14);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri, OdfNumberTransliterationStyle value, string? prefix) => SetNumberTransliterationStyleAttributeValue(localName, namespaceUri, value, prefix, OdfVersion.Odf14);
+
 
 
     /// <summary>
@@ -358,10 +487,11 @@ public partial class OdfElement
     /// <param name="value">要寫入的數字音譯樣式</param>
     /// <param name="prefix">選用的命名空間前綴</param>
     /// <param name="version">ODF 版本內容</param>
-    public void SetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri, OdfNumberTransliterationStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    public void SetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri, OdfNumberTransliterationStyle value, string? prefix, OdfVersion version)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 數字音譯樣式。"), prefix, version);
     }
+
 
     #endregion
 }

@@ -188,6 +188,7 @@ public class SpreadsheetApiUsabilityTests
         using var workbook = SpreadsheetDocument.Create();
         OdfTableSheet sheet = workbook.Worksheets.Add("Data");
         await using OdfFormulaEvaluationChannel channel = workbook.BeginFormulaEvaluationChannel(
+            capacity: 64,
             cancellationToken: TestContext.Current.CancellationToken);
 
         sheet.Cells["A1"].CellValue = 10d;
@@ -556,6 +557,7 @@ public class SpreadsheetApiUsabilityTests
             {
                 await writer.WriteSheetsAsync(
                     jobs,
+                    maxConcurrency: 0,
                     cancellationToken: TestContext.Current.CancellationToken);
             }
 

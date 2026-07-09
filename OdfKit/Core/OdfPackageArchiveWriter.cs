@@ -143,7 +143,11 @@ internal static partial class OdfPackageArchiveWriter
             entry.Prefetch();
         }
 
-        using var bufferedTarget = new OdfPagedGatherWritableStream(targetStream, leaveOpen: true);
+        using var bufferedTarget = new OdfPagedGatherWritableStream(
+            targetStream,
+            pageSize: 4096,
+            pagesPerFlush: 16,
+            leaveOpen: true);
         using var zip = new ZipArchive(bufferedTarget, ZipArchiveMode.Create, true, Encoding.UTF8);
 
         if (ctx.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry))

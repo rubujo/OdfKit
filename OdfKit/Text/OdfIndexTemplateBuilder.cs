@@ -23,6 +23,18 @@ public class OdfIndexTemplateBuilder(OdfNode template)
         _template.AppendChild(OdfNodeFactory.CreateElement("index-entry-text", OdfNamespaces.Text, "text"));
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfIndexTemplateBuilder AddTabStop() => AddTabStop("right", '.');
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfIndexTemplateBuilder AddTabStop(string type) => AddTabStop(type, '.');
+
 
     /// <summary>
     /// Adds a tab stop entry to the template.
@@ -31,7 +43,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
     /// <param name="type">The tab type. / 定位類型。</param>
     /// <param name="leaderChar">The leader character. / 前置字元。</param>
     /// <returns>The current builder instance, to support chained calls. / 目前的建立器執行個體，以支援鏈結呼叫。</returns>
-    public OdfIndexTemplateBuilder AddTabStop(string type = "right", char leaderChar = '.')
+    public OdfIndexTemplateBuilder AddTabStop(string type, char leaderChar)
     {
         var tab = OdfNodeFactory.CreateElement("index-entry-tab-stop", OdfNamespaces.Text, "text");
         tab.SetAttribute("type", OdfNamespaces.Style, type, "style");
@@ -39,6 +51,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
         _template.AppendChild(tab);
         return this;
     }
+
 
     /// <summary>
     /// Adds a page number entry to the template.

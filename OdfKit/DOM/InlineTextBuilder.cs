@@ -25,8 +25,8 @@ public sealed class InlineTextBuilder
         _doc = doc ?? throw new ArgumentNullException(nameof(doc));
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Bold() => Bold(true);
 
@@ -44,8 +44,8 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Italic() => Italic(true);
 
@@ -63,8 +63,8 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public InlineTextBuilder Underline() => Underline(true);
 

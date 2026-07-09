@@ -11,6 +11,18 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     #region 表單控制項（Form Controls）
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFormControl AddFormControl(OdfControlType type, string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddFormControl(type, name, x, y, width, height, "", null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFormControl AddFormControl(OdfControlType type, string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string label) => AddFormControl(type, name, x, y, width, height, label, null);
+
 
     /// <summary>
     /// Adds a form control to the document (draw:frame + office:forms definition).
@@ -25,16 +37,9 @@ public partial class TextDocument
     /// <param name="label">The control's label text (checkbox, button) or default value (text field). / 控制項標籤文字（核取方塊、按鈕）或預設值（文字欄位）。</param>
     /// <param name="listItems">The drop-down list options (valid only for ListBox). / 下拉式清單選項（僅 ListBox 有效）。</param>
     /// <returns>An <see cref="OdfFormControl"/> object describing the new control. / 描述新控制項的 <see cref="OdfFormControl"/> 物件。</returns>
-    public OdfFormControl AddFormControl(
-        OdfControlType type,
-        string name,
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string label = "",
-        IReadOnlyList<string>? listItems = null) =>
+    public OdfFormControl AddFormControl(OdfControlType type, string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string label, IReadOnlyList<string>? listItems) =>
         TextDocumentFormControlsEngine.AddFormControl(MutationContext, type, name, x, y, width, height, label, listItems);
+
 
     /// <summary>
     /// Gets all form controls in the document.

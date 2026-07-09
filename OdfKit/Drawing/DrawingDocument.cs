@@ -73,8 +73,8 @@ public partial class DrawingDocument : OdfDocument
         return (DrawingDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Graphics);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template) => CreateFromTemplate(template, false);
 
@@ -129,8 +129,8 @@ public partial class DrawingDocument : OdfDocument
     public new static Task<DrawingDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(path, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", cancellationToken);
@@ -144,8 +144,8 @@ public partial class DrawingDocument : OdfDocument
     public new static DrawingDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static DrawingDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName);
@@ -167,14 +167,14 @@ public partial class DrawingDocument : OdfDocument
     public new static Task<DrawingDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName, cancellationToken);
@@ -221,8 +221,8 @@ public partial class DrawingDocument : OdfDocument
         return drawing;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfDrawPage AddPage() => AddPage(null);
 
@@ -280,8 +280,8 @@ public partial class DrawingDocument : OdfDocument
         return Pages[0].AddPolygon(points);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfShape AddConnector(string startShapeId, string endShapeId) => AddConnector(startShapeId, endShapeId, OdfConnectorType.Standard);
 

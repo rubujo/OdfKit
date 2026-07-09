@@ -41,8 +41,8 @@ public partial class OdfTableSheet
         OdfTableSheetConditionalFormatEngine.AddConditionalFormat(
             MutationContext, range, conditionValue, styleName);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor) => AddColorScaleFormat(range, minColor, maxColor, null);
 
@@ -60,8 +60,8 @@ public partial class OdfTableSheet
             MutationContext, range, minColor, maxColor, midColor);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddDataBarFormat(OdfCellRange range, OdfColor positiveColor) => AddDataBarFormat(range, positiveColor, null);
 
@@ -78,8 +78,8 @@ public partial class OdfTableSheet
             MutationContext, range, positiveColor, negativeColor);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddDataBar(OdfCellRange range, OdfColor color) => AddDataBar(range, color, null);
 
@@ -113,8 +113,8 @@ public partial class OdfTableSheet
     public void AddIconSet(OdfCellRange range, OdfIconSetType iconSet) =>
         AddIconSetFormat(range, iconSet);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell) => AddSparklineGroup(dataRange, hostCell, SparklineType.Line);
 

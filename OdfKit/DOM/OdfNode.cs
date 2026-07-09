@@ -95,8 +95,8 @@ public partial class OdfNode
     public OdfNode(OdfNodeType nodeType, string localName, string namespaceUri) : this(nodeType, localName, namespaceUri, null) { }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNode(OdfNodeType nodeType, string localName, string namespaceUri, string? prefix)
     {
@@ -114,8 +114,8 @@ public partial class OdfNode
     public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri) : this(nodeType, localName, namespaceUri.NamespaceName, null) { }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri, string? prefix)
         : this(nodeType, localName, namespaceUri.NamespaceName, prefix)
@@ -373,8 +373,8 @@ public partial class OdfNode
         private long _position;
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public OdfSequenceStream(params ReadOnlyMemory<byte>[] buffers)
         {
@@ -385,8 +385,8 @@ public partial class OdfNode
         public override bool CanSeek => false;
         public override bool CanWrite => false;
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         public override long Position
@@ -396,14 +396,14 @@ public partial class OdfNode
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void Flush() { }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -435,18 +435,18 @@ public partial class OdfNode
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
@@ -548,8 +548,8 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
     /// </summary>
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public System.Buffers.MemoryHandle Pin() => Pin(0);
 

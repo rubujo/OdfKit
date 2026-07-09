@@ -372,10 +372,10 @@ def rebuild_expansion(
 
     required = [p for p in params if p.default is None]
     optional = [p for p in params if p.default is not None]
-    # Multi-optional methods commonly rely on named middle-skipping.
-    # Expanding them without defaults breaks call sites; leave for options-object
-    # migrations. Only expand exactly one trailing optional (safe + high volume).
-    if len(optional) != 1:
+    # Expand any number of trailing optionals into explicit overload chains.
+    # Call sites that used named middle-skipping must pass explicit nulls / defaults
+    # (0.x has no published API compatibility requirement).
+    if len(optional) < 1:
         return None
     m = re.search(rf"\b{re.escape(name)}\s*\(", header)
     if not m:

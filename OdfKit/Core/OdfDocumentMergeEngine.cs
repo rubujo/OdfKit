@@ -33,7 +33,7 @@ internal static class OdfDocumentMergeEngine
 
     /// <summary>
     /// 僅合併樣式（不含內容節點），供需要自行控制內容節點合併順序的呼叫端
-    /// （例如 <see cref="OdfKit.Text.TextMasterDocument.MergeSubDocuments"/>）使用。
+    /// （例如 <see cref="OdfKit.Text.TextMasterDocument.MergeSubDocuments(string, OdfKit.Core.OdfMergeOptions?, int)"/>）使用。
     /// </summary>
     internal static void MergeStyles(
         OdfDocument.OdfDocumentMergeCollaborators dest,

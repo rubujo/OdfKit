@@ -10,8 +10,8 @@ namespace OdfKit.DOM;
 public static partial class OdfNodeFactory
 {
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static OdfNode CreateElement(string localName, string namespaceUri) => CreateElement(localName, namespaceUri, null);
 

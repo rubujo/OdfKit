@@ -20,8 +20,8 @@ public sealed class OdfCrc32Stream : Stream
     private uint _currentCrc = 0xFFFFFFFF;
 #endif
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfCrc32Stream(Stream underlyingStream) : this(underlyingStream, null) { }
 

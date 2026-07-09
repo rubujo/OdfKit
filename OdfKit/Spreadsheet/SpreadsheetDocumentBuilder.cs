@@ -220,8 +220,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddFormulaColumn(string columnName, string header, int firstDataRow, int lastDataRow, Func<int, string> formulaFactory) => AddFormulaColumn(columnName, header, firstDataRow, lastDataRow, formulaFactory, 1);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddFormulaColumn(
         string columnName,
@@ -261,8 +261,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddFormulaColumn(string columnName, string header, int firstDataRow, int lastDataRow, Func<int, string> formulaFactory, Func<int, object?> cachedValueFactory) => AddFormulaColumn(columnName, header, firstDataRow, lastDataRow, formulaFactory, cachedValueFactory, 1);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddFormulaColumn(
         string columnName,
@@ -441,8 +441,8 @@ public sealed class OdfSheetBuilder
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
 
@@ -472,8 +472,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddNamedRange(string name, string range)
         => AddNamedRange(name, ParseRange(range));
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
 
@@ -524,8 +524,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder InsertChart(OdfCellRange dataRange, OdfChartType chartType) => InsertChart(dataRange, chartType, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder InsertChart(
         OdfCellRange dataRange,
@@ -545,8 +545,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder InsertChart(string dataRange, OdfChartType chartType) => InsertChart(ParseRange(dataRange), chartType, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder InsertChart(
         string dataRange,
@@ -574,14 +574,14 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddDecimalValidation(OdfCellRange range, double minimum, double maximum) => AddDecimalValidation(range, minimum, maximum, null, null, OdfValidationAlertStyle.Stop);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddDecimalValidation(OdfCellRange range, double minimum, double maximum, string? errorTitle, string? errorMessage) => AddDecimalValidation(range, minimum, maximum, errorTitle, errorMessage, OdfValidationAlertStyle.Stop);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddDecimalValidation(
         OdfCellRange range,
@@ -612,14 +612,14 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddDecimalValidation(string range, double minimum, double maximum) => AddDecimalValidation(ParseRange(range), minimum, maximum, null, null, OdfValidationAlertStyle.Stop);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddDecimalValidation(string range, double minimum, double maximum, string? errorTitle, string? errorMessage) => AddDecimalValidation(ParseRange(range), minimum, maximum, errorTitle, errorMessage, OdfValidationAlertStyle.Stop);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddDecimalValidation(
         string range,
@@ -655,8 +655,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder AddConditionalFormat(string range, string conditionValue, string styleName)
         => AddConditionalFormat(ParseRange(range), conditionValue, styleName);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddDataBarFormat(OdfCellRange range, OdfColor positiveColor) => AddDataBarFormat(range, positiveColor, null);
 
@@ -676,8 +676,8 @@ public sealed class OdfSheetBuilder
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSheetBuilder AddColorScaleFormat(OdfCellRange range, OdfColor minColor, OdfColor maxColor) => AddColorScaleFormat(range, minColor, maxColor, null);
 

@@ -72,8 +72,8 @@ public partial class PresentationDocument : OdfDocument
         return (PresentationDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Presentation);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template) => CreateFromTemplate(template, false);
 
@@ -128,8 +128,8 @@ public partial class PresentationDocument : OdfDocument
     public new static Task<PresentationDocument> LoadAsync(string path) => LoadAsync(path, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(string path, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(path, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", cancellationToken);
@@ -143,8 +143,8 @@ public partial class PresentationDocument : OdfDocument
     public new static PresentationDocument Load(Stream stream) => Load(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static PresentationDocument Load(Stream stream, string? fileName) =>
         OdfDocumentVariantSupport.Load<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName);
@@ -166,14 +166,14 @@ public partial class PresentationDocument : OdfDocument
     public new static Task<PresentationDocument> LoadAsync(Stream stream, CancellationToken cancellationToken) => LoadAsync(stream, null, cancellationToken);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(Stream stream, string? fileName) => LoadAsync(stream, fileName, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public new static Task<PresentationDocument> LoadAsync(Stream stream, string? fileName, CancellationToken cancellationToken) =>
         OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName, cancellationToken);

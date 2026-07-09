@@ -151,6 +151,18 @@ public partial class OdfImageDocument
 
         return null;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public bool UpdateImageFrame(string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height) => UpdateImageFrame(name, x, y, width, height, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public bool UpdateImageFrame(string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? title) => UpdateImageFrame(name, x, y, width, height, title, null);
+
 
     /// <summary>
     /// Updates the layout and metadata of the image frame with the specified name.
@@ -164,14 +176,7 @@ public partial class OdfImageDocument
     /// <param name="title">The optional frame title. / 選用的框架標題。</param>
     /// <param name="description">The optional frame description. / 選用的框架描述。</param>
     /// <returns><see langword="true"/> if updated successfully; <see langword="false"/> if the frame is not found. / 若成功更新則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
-    public bool UpdateImageFrame(
-        string name,
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        string? title = null,
-        string? description = null)
+    public bool UpdateImageFrame(string name, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? title, string? description)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -192,6 +197,7 @@ public partial class OdfImageDocument
         SetOptionalChildText(frame, "desc", OdfNamespaces.Svg, "svg", description);
         return true;
     }
+
 
     /// <summary>
     /// Removes the image frame with the specified name.

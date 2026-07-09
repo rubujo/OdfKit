@@ -68,8 +68,8 @@ public sealed partial class OdfPackage
     public void Save(Stream stream) => Save(stream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void Save(Stream stream, OdfSaveOptions? options)
     {
@@ -98,8 +98,8 @@ public sealed partial class OdfPackage
     public void WriteEntry(string name, byte[] content) => WriteEntry(name, content, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteEntry(string name, byte[] content, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
@@ -111,8 +111,8 @@ public sealed partial class OdfPackage
     public void WriteEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void WriteEntry(string name, Stream contentStream, string? mediaType)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
@@ -124,8 +124,8 @@ public sealed partial class OdfPackage
     public void AddEntry(string name, byte[] content) => WriteEntry(name, content, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddEntry(string name, byte[] content, string? mediaType)
         => WriteEntry(name, content, mediaType);
@@ -137,8 +137,8 @@ public sealed partial class OdfPackage
     public void AddEntry(string name, Stream contentStream) => WriteEntry(name, contentStream, null);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddEntry(string name, Stream contentStream, string? mediaType)
         => WriteEntry(name, contentStream, mediaType);
@@ -327,15 +327,15 @@ public sealed partial class OdfPackage
         private byte[] _buffer;
         private int _written;
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public SimpleBufferWriter() : this(256) { }
 
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public SimpleBufferWriter(int initialCapacity)
         {
@@ -344,14 +344,14 @@ public sealed partial class OdfPackage
 
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public ReadOnlySpan<byte> WrittenReadOnlySpan => _buffer.AsSpan(0, _written);
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public void Advance(int count)
         {
@@ -362,15 +362,15 @@ public sealed partial class OdfPackage
             _written += count;
         }
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Memory<byte> GetMemory() => GetMemory(0);
 
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Memory<byte> GetMemory(int sizeHint)
         {
@@ -379,15 +379,15 @@ public sealed partial class OdfPackage
         }
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Span<byte> GetSpan() => GetSpan(0);
 
 
         /// <summary>
-        /// Additional public overload without optional parameters.
-        /// 不含選用參數的公開多載。
+        /// Convenience overload that uses default values for remaining parameters.
+        /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
         /// </summary>
         public Span<byte> GetSpan(int sizeHint)
         {
@@ -470,8 +470,8 @@ internal sealed class OdfPackageDebugEntry
     public ushort? CompressionMethod { get; }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public override string ToString()
         => $"{Path} ({MediaType}, {Size} bytes, Dirty: {Dirty})";

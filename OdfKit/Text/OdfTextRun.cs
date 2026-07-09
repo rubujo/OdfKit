@@ -70,6 +70,18 @@ public class OdfTextRun
         get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-size", OdfNamespaces.Fo, "text");
         set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFont(string westernFont) => SetFont(westernFont, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFont(string westernFont, string? asianFont) => SetFont(westernFont, asianFont, null);
+
 
     /// <summary>
     /// Sets the text run's font names.
@@ -78,12 +90,25 @@ public class OdfTextRun
     /// <param name="westernFont">The Western font name. / 西文字型名稱。</param>
     /// <param name="asianFont">The East Asian (CJK) font name. / 東亞（中日韓）字型名稱。</param>
     /// <param name="complexFont">The complex script font name. / 複雜文字字型名稱。</param>
-    public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
+    public void SetFont(string westernFont, string? asianFont, string? complexFont)
     {
         FontName = westernFont;
         FontNameAsian = asianFont ?? westernFont;
         FontNameComplex = complexFont ?? westernFont;
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontSize(string westernSize) => SetFontSize(westernSize, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFontSize(string westernSize, string? asianSize) => SetFontSize(westernSize, asianSize, null);
+
 
     /// <summary>
     /// Sets the text run's font sizes.
@@ -92,12 +117,13 @@ public class OdfTextRun
     /// <param name="westernSize">The Western font size. / 西文字型大小。</param>
     /// <param name="asianSize">The East Asian font size. / 東亞字型大小。</param>
     /// <param name="complexSize">The complex script font size. / 複雜文字字型大小。</param>
-    public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
+    public void SetFontSize(string westernSize, string? asianSize, string? complexSize)
     {
         FontSize = westernSize;
         FontSizeAsian = asianSize ?? westernSize;
         FontSizeComplex = complexSize ?? westernSize;
     }
+
 
     /// <summary>
     /// Gets or sets a value indicating whether the text run is bold.
@@ -260,8 +286,8 @@ public class OdfTextRun
         _doc.DeleteNode(Node);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithBold() => WithBold(true);
 
@@ -279,8 +305,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithItalic() => WithItalic(true);
 
@@ -298,8 +324,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithStrikethrough() => WithStrikethrough(true);
 
@@ -317,8 +343,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithSuperscript() => WithSuperscript(true);
 
@@ -336,8 +362,8 @@ public class OdfTextRun
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfTextRun WithSubscript() => WithSubscript(true);
 
@@ -366,6 +392,18 @@ public class OdfTextRun
         SetFontSize(size);
         return this;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfTextRun WithFontName(string westernFont) => WithFontName(westernFont, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfTextRun WithFontName(string westernFont, string? asianFont) => WithFontName(westernFont, asianFont, null);
+
 
     /// <summary>
     /// Sets this text run's font names.
@@ -375,11 +413,12 @@ public class OdfTextRun
     /// <param name="asianFont">The East Asian (CJK) font name; defaults to <paramref name="westernFont"/> if not specified. / 東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
     /// <param name="complexFont">The complex script font name; defaults to <paramref name="westernFont"/> if not specified. / 複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
     /// <returns>This text run instance. / 文字片段本身。</returns>
-    public OdfTextRun WithFontName(string westernFont, string? asianFont = null, string? complexFont = null)
+    public OdfTextRun WithFontName(string westernFont, string? asianFont, string? complexFont)
     {
         SetFont(westernFont, asianFont, complexFont);
         return this;
     }
+
 
     /// <summary>
     /// Sets this text run's font color.

@@ -113,8 +113,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     private readonly List<(string fieldName, bool ascending)> _sortInfos = [];
     private readonly List<(string fieldName, OdfPivotFilterOperator op, string value)> _filters = [];
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder WithColumnHeaders() => WithColumnHeaders(true);
 
@@ -129,8 +129,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder WithRowHeaders() => WithRowHeaders(true);
 
@@ -177,8 +177,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     public OdfPivotTableBuilder AddDataField(string fieldName) => AddDataField(fieldName, OdfPivotFunction.Sum);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder AddDataField(string fieldName, OdfPivotFunction function)
     {
@@ -224,8 +224,8 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         return this;
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfPivotTableBuilder AddSortInfo(string fieldName) => AddSortInfo(fieldName, true);
 

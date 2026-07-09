@@ -103,6 +103,18 @@ public partial class OdfTableSheet
     /// <param name="percent">The numeric value. / 縮放比例（百分比）</param>
     public void SetPrintScale(int percent) =>
         OdfTableSheetPrintSettingsEngine.SetPrintScale(MutationContext, percent);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFitToPage() => SetFitToPage(1, 0);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void SetFitToPage(int maxPagesWide) => SetFitToPage(maxPagesWide, 0);
+
 
     /// <summary>
     /// Sets scaling to fit within the specified page count.
@@ -110,8 +122,9 @@ public partial class OdfTableSheet
     /// </summary>
     /// <param name="maxPagesWide">The numeric value. / 最大橫向頁數（0 代表不限制）</param>
     /// <param name="maxPagesTall">The numeric value. / 最大縱向頁數（0 代表不限制）</param>
-    public void SetFitToPage(int maxPagesWide = 1, int maxPagesTall = 0) =>
+    public void SetFitToPage(int maxPagesWide, int maxPagesTall) =>
         OdfTableSheetPrintSettingsEngine.SetFitToPage(MutationContext, maxPagesWide, maxPagesTall);
+
 
     #endregion
 }

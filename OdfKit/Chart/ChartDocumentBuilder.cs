@@ -108,6 +108,18 @@ public sealed class ChartDocumentBuilder
         configure(styles);
         return WithStyles(styles);
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public ChartDocumentBuilder WithDataRange(string sheetName, OdfCellRange range) => WithDataRange(sheetName, range, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public ChartDocumentBuilder WithDataRange(string sheetName, OdfCellRange range, bool firstRowAsHeader) => WithDataRange(sheetName, range, firstRowAsHeader, true);
+
 
     /// <summary>
     /// Sets the chart data range.
@@ -118,16 +130,25 @@ public sealed class ChartDocumentBuilder
     /// <param name="firstRowAsHeader">Whether the first row is treated as a header row. / 首列是否視為標題列。</param>
     /// <param name="firstColumnAsLabel">Whether the first column is treated as a category label. / 首欄是否視為分類標籤。</param>
     /// <returns>The current builder. / 目前 builder。</returns>
-    public ChartDocumentBuilder WithDataRange(
-        string sheetName,
-        OdfCellRange range,
-        bool firstRowAsHeader = true,
-        bool firstColumnAsLabel = true)
+    public ChartDocumentBuilder WithDataRange(string sheetName, OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel)
     {
         _document.SetDataRange(sheetName, range, firstRowAsHeader, firstColumnAsLabel);
         ApplyStyleSetToAllSeries();
         return this;
     }
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public ChartDocumentBuilder WithLegend() => WithLegend("end", null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public ChartDocumentBuilder WithLegend(string? position) => WithLegend(position, null);
+
 
     /// <summary>
     /// Sets the legend layout.
@@ -136,12 +157,13 @@ public sealed class ChartDocumentBuilder
     /// <param name="position">The legend position; blank hides the legend. / 圖例位置；空白表示隱藏圖例。</param>
     /// <param name="alignment">The legend alignment. / 圖例對齊方式。</param>
     /// <returns>The current builder. / 目前 builder。</returns>
-    public ChartDocumentBuilder WithLegend(string? position = "end", string? alignment = null)
+    public ChartDocumentBuilder WithLegend(string? position, string? alignment)
     {
         _document.Legend.Position = position;
         _document.Legend.Alignment = alignment;
         return this;
     }
+
 
     /// <summary>
     /// Configures the axis for the specified dimension.

@@ -20,14 +20,14 @@ public partial class OdsStreamWriter
     public Task WriteDataAsync<T>(IEnumerable<T> source) => WriteDataAsync(source, false, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task WriteDataAsync<T>(IEnumerable<T> source, bool includeColumnNames) => WriteDataAsync(source, includeColumnNames, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public async Task WriteDataAsync<T>(
         IEnumerable<T> source,
@@ -48,14 +48,14 @@ public partial class OdsStreamWriter
     public Task WriteDataAsync<T>(IAsyncEnumerable<T> source) => WriteDataAsync(source, false, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public Task WriteDataAsync<T>(IAsyncEnumerable<T> source, bool includeColumnNames) => WriteDataAsync(source, includeColumnNames, default);
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public async Task WriteDataAsync<T>(
         IAsyncEnumerable<T> source,

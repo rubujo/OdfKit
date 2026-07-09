@@ -34,7 +34,7 @@ public void Foo(string s = "") { } // RS0026：多個皆可選
 |------|--------|------|
 | 手寫公開 API | **error**（`.editorconfig`） | 不得再引入 RS0026／RS0027 |
 | **恰好一個**尾端可選參數 | 已全面改明確鏈 | 以 `eng/Expand-OptionalParameters.py` 批次處理（約 300 方法；含 DOM 屬性 Get／Set 的 `version`／`prefix` 等） |
-| **兩個以上**尾端可選參數 | 優先 **options 物件** | 高頻 API 已示範：`OdfRichTextRunOptions`、`OdsRowWriteOptions`、`OdfValidationOptions`（`OdfPackageValidator.Validate`）。其餘（如 `OdfSchemaPatternNode` 建構）可暫留最長單一方法的 `=`；新 API 禁止再加「多可選位置參數」 |
+| **兩個以上**尾端可選參數 | 明確多載鏈或 **options 物件** | 高頻已用 options；其餘以 `Expand-OptionalParameters.py` 展開為短多載轉呼叫 + 最長無 `=`。新 API 禁止再加「多可選位置參數」 |
 | 生成 DOM（`DOM/Generated`） | **none**（目錄覆寫）；**禁止手改 `.g.cs`** | 產生器輸出 `Type()`／`Type(string? prefix)`／`Type(params OdfNode[])`，**無** `prefix = null` |
 | schema provider 產生碼 | **none**（`Compliance/Generated` 覆寫） | 非公開 API 形狀焦點 |
 
@@ -52,7 +52,7 @@ public void Foo(string s = "") { } // RS0026：多個皆可選
 
 ## 維護工具
 
-- `python eng/Expand-OptionalParameters.py`：僅展開**恰好一個**尾端可選參數的公開／保護方法（略過 primary ctor、`out`／`ref`、多可選參數）。
+- `python eng/Expand-OptionalParameters.py`：展開公開／保護方法上的尾端可選參數為明確多載鏈（略過 primary ctor、`out`／`ref`）。
 
 ## 高頻 options 物件（已落地）
 
@@ -68,8 +68,8 @@ public void Foo(string s = "") { } // RS0026：多個皆可選
 
 ## 1.0 展望
 
-- 其餘多可選參數 API 依使用頻率續遷 options 物件。  
-- 穩定版後搭配 `PackageValidationBaselineVersion` 防破壞性變更。
+- 穩定版後搭配 `PackageValidationBaselineVersion` 防破壞性變更。  
+- 高頻 options 物件可再依使用體驗微調屬性形狀。
 
 ## 相關
 

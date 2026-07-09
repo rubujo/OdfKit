@@ -14,8 +14,8 @@ public partial class OdfParagraph
 {
     #region Embedded Content & Layout
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height) => AddImage(packagePath, width, height, null);
 
@@ -29,6 +29,18 @@ public partial class OdfParagraph
     /// <param name="height">The image height. / 圖片高度。</param>
     /// <param name="name">The image name. / 圖片名稱。</param>
     public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name) => Doc.AddImage(this, packagePath, width, height, name);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height) => AddFloatingTextBox(x, y, width, height, OdfAnchorType.Paragraph, OdfTextWrap.Parallel);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height, OdfAnchorType anchorType) => AddFloatingTextBox(x, y, width, height, anchorType, OdfTextWrap.Parallel);
+
 
 
     /// <summary>
@@ -42,13 +54,7 @@ public partial class OdfParagraph
     /// <param name="anchorType">The anchor type. / 錨定類型。</param>
     /// <param name="wrap">The text wrap mode. / 文字環繞方式。</param>
     /// <returns>The newly created floating text box. / 新建立的浮動文字框。</returns>
-    public OdfFloatingTextBox AddFloatingTextBox(
-        OdfLength x,
-        OdfLength y,
-        OdfLength width,
-        OdfLength height,
-        OdfAnchorType anchorType = OdfAnchorType.Paragraph,
-        OdfTextWrap wrap = OdfTextWrap.Parallel)
+    public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height, OdfAnchorType anchorType, OdfTextWrap wrap)
     {
         var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
         frame.SetAttribute("name", OdfNamespaces.Draw, "TextBox_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
@@ -65,6 +71,7 @@ public partial class OdfParagraph
 
         return new OdfFloatingTextBox(textBox, Doc);
     }
+
 
     private static string ToAnchorTypeValue(OdfAnchorType anchorType) => anchorType switch
     {
@@ -147,6 +154,18 @@ public partial class OdfParagraph
     /// 在段落中新增總頁數欄位。
     /// </summary>
     public void AddPageCountField() => Doc.AddPageCountField(this);
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void BreakPageBefore() => BreakPageBefore(null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public void BreakPageBefore(string? masterPageName) => BreakPageBefore(masterPageName, null);
+
 
     /// <summary>
     /// Inserts a page break before this paragraph, optionally switching the page style.
@@ -154,7 +173,7 @@ public partial class OdfParagraph
     /// </summary>
     /// <param name="masterPageName">The master page style name to switch to; <see langword="null"/> means only inserting the page break. / 要切換的主頁面樣式名稱；null 表示只插入分頁。</param>
     /// <param name="pageNumber">The new starting page number; <see langword="null"/> means continuing. / 新頁碼起始值；null 表示繼續。</param>
-    public void BreakPageBefore(string? masterPageName = null, int? pageNumber = null)
+    public void BreakPageBefore(string? masterPageName, int? pageNumber)
     {
         if (!string.IsNullOrEmpty(masterPageName))
             Doc.StyleEngine.GetOrCreateLocalStyle(Node, "paragraph").SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName!, "style");
@@ -162,6 +181,7 @@ public partial class OdfParagraph
         if (pageNumber.HasValue)
             Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "page-number", OdfNamespaces.Style, pageNumber.Value.ToString(CultureInfo.InvariantCulture), "style");
     }
+
 
     #endregion
 }

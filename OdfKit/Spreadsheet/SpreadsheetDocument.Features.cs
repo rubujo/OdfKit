@@ -96,8 +96,8 @@ public partial class SpreadsheetDocument
     public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
         SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddNamedRange(string name, OdfCellRange range) => AddNamedRange(name, range, null);
 
@@ -123,8 +123,8 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public void AddNamedExpression(string name, string expression) => AddNamedExpression(name, expression, null);
 
@@ -167,8 +167,8 @@ public partial class SpreadsheetDocument
         return new OdfDatabaseRange(dbRangeNode, this);
     }
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfSpreadsheetTable CreateTable(string name, OdfCellRange range) => CreateTable(name, range, null);
 
@@ -414,6 +414,18 @@ public partial class SpreadsheetDocument
 
         Package.WriteEntry($"{objectDir}content.xml", Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range) => AddChartFromRange(sheetName, anchor, range, OdfChartPreset.Bar, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range, OdfChartPreset preset) => AddChartFromRange(sheetName, anchor, range, preset, null);
+
 
     /// <summary>
     /// Inserts a practical preset chart bound to a worksheet range.
@@ -425,12 +437,7 @@ public partial class SpreadsheetDocument
     /// <param name="preset">The chart preset. / 圖表預設。</param>
     /// <param name="title">The optional chart title. / 選用的圖表標題。</param>
     /// <returns>The created frame node. / 建立完成的框架節點。</returns>
-    public OdfNode AddChartFromRange(
-        string sheetName,
-        OdfCellAddress anchor,
-        OdfCellRange range,
-        OdfChartPreset preset = OdfChartPreset.Bar,
-        string? title = null)
+    public OdfNode AddChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range, OdfChartPreset preset, string? title)
     {
         var definition = new OdfChartDefinition
         {
@@ -443,9 +450,10 @@ public partial class SpreadsheetDocument
         AddChart(sheetName, anchor, definition);
         return GetEmbeddedChartFrame(sheetName);
     }
+
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfChartDocument InsertChartFromRange(string sheetName, OdfCellAddress anchor, OdfCellRange range) => InsertChartFromRange(sheetName, anchor, range, null);
 
@@ -553,6 +561,18 @@ public partial class SpreadsheetDocument
         chart.Save();
         return chart;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range) => RefreshChartDataRange(chart, sheetName, range, true, true);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range, bool firstRowAsHeader) => RefreshChartDataRange(chart, sheetName, range, firstRowAsHeader, true);
+
 
 
     /// <summary>
@@ -565,12 +585,7 @@ public partial class SpreadsheetDocument
     /// <param name="firstRowAsHeader">Whether the first row is treated as series labels. / 首列是否視為序列標籤。</param>
     /// <param name="firstColumnAsLabel">Whether the first column is treated as category labels. / 首欄是否視為分類標籤。</param>
     /// <returns>The updated embedded chart document. / 已更新的嵌入圖表文件。</returns>
-    public OdfChartDocument RefreshChartDataRange(
-        OdfChartDocument chart,
-        string sheetName,
-        OdfCellRange range,
-        bool firstRowAsHeader = true,
-        bool firstColumnAsLabel = true)
+    public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel)
     {
         if (chart is null)
         {
@@ -581,6 +596,7 @@ public partial class SpreadsheetDocument
         chart.Save();
         return chart;
     }
+
 
     /// <summary>
     /// Applies practical updates to embedded chart series.

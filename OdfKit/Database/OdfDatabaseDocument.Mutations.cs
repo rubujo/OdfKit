@@ -15,8 +15,8 @@ public partial class OdfDatabaseDocument
 {
     #region Add Operations
     /// <summary>
-    /// Additional public overload without optional parameters.
-    /// 不含選用參數的公開多載。
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public OdfNode AddTable(string name) => AddTable(name, null);
 
@@ -51,6 +51,24 @@ public partial class OdfDatabaseDocument
         tableRepresentations.AppendChild(table);
         return table;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddQuery(string name, string command) => AddQuery(name, command, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddQuery(string name, string command, string? title) => AddQuery(name, command, title, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddQuery(string name, string command, string? title, string? description) => AddQuery(name, command, title, description, null);
+
 
 
     /// <summary>
@@ -63,12 +81,7 @@ public partial class OdfDatabaseDocument
     /// <param name="description">The optional description text. / 選用的描述文字。</param>
     /// <param name="escapeProcessing">The optional SQL escape processing setting. / 選用的 SQL escape processing 設定。</param>
     /// <returns>The added query node. / 新增的查詢節點。</returns>
-    public OdfNode AddQuery(
-        string name,
-        string command,
-        string? title = null,
-        string? description = null,
-        bool? escapeProcessing = null)
+    public OdfNode AddQuery(string name, string command, string? title, string? description, bool? escapeProcessing)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -113,6 +126,7 @@ public partial class OdfDatabaseDocument
         queries.AppendChild(query);
         return query;
     }
+
 
     /// <summary>
     /// Adds a data source setting.
@@ -185,6 +199,30 @@ public partial class OdfDatabaseDocument
         settings.AppendChild(setting);
         return setting;
     }
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddForm(string name) => AddForm(name, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddForm(string name, string? href) => AddForm(name, href, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddForm(string name, string? href, string? title) => AddForm(name, href, title, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddForm(string name, string? href, string? title, string? description) => AddForm(name, href, title, description, null);
+
 
     /// <summary>
     /// Adds a form component description.
@@ -196,12 +234,7 @@ public partial class OdfDatabaseDocument
     /// <param name="description">The optional description text. / 選用的描述文字。</param>
     /// <param name="asTemplate">The optional template marker. / 選用的範本標記。</param>
     /// <returns>The added form component node. / 新增的表單元件節點。</returns>
-    public OdfNode AddForm(
-        string name,
-        string? href = null,
-        string? title = null,
-        string? description = null,
-        bool? asTemplate = null)
+    public OdfNode AddForm(string name, string? href, string? title, string? description, bool? asTemplate)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -243,6 +276,31 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddReport(string name) => AddReport(name, null, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddReport(string name, string? href) => AddReport(name, href, null, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddReport(string name, string? href, string? title) => AddReport(name, href, title, null, null);
+
+    /// <summary>
+    /// Convenience overload that uses default values for remaining parameters.
+    /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
+    /// </summary>
+    public OdfNode AddReport(string name, string? href, string? title, string? description) => AddReport(name, href, title, description, null);
+
+
+    /// <summary>
     /// Adds a report component description.
     /// 新增報表元件描述。
     /// </summary>
@@ -252,12 +310,7 @@ public partial class OdfDatabaseDocument
     /// <param name="description">The optional description text. / 選用的描述文字。</param>
     /// <param name="asTemplate">The optional template marker. / 選用的範本標記。</param>
     /// <returns>The added report component node. / 新增的報表元件節點。</returns>
-    public OdfNode AddReport(
-        string name,
-        string? href = null,
-        string? title = null,
-        string? description = null,
-        bool? asTemplate = null)
+    public OdfNode AddReport(string name, string? href, string? title, string? description, bool? asTemplate)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -297,6 +350,7 @@ public partial class OdfDatabaseDocument
         reports.AppendChild(component);
         return component;
     }
+
 
     #endregion
 
