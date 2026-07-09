@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationDimElement : OdfElement
     {
-        public PresentationDimElement(string? prefix = null) : base("dim", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationDimElement() : this((string?)null) { }
+
+        public PresentationDimElement(string? prefix) : base("dim", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationDimElement(params OdfNode[] children) : this()
         {

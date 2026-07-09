@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDataPilotFieldReferenceElement : OdfElement
     {
-        public TableDataPilotFieldReferenceElement(string? prefix = null) : base("data-pilot-field-reference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDataPilotFieldReferenceElement() : this((string?)null) { }
+
+        public TableDataPilotFieldReferenceElement(string? prefix) : base("data-pilot-field-reference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDataPilotFieldReferenceElement(params OdfNode[] children) : this()
         {

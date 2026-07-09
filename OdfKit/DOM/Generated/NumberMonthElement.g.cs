@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberMonthElement : OdfElement
     {
-        public NumberMonthElement(string? prefix = null) : base("month", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberMonthElement() : this((string?)null) { }
+
+        public NumberMonthElement(string? prefix) : base("month", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberMonthElement(params OdfNode[] children) : this()
         {

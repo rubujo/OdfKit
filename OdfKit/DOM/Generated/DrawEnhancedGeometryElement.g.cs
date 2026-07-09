@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawEnhancedGeometryElement : OdfElement
     {
-        public DrawEnhancedGeometryElement(string? prefix = null) : base("enhanced-geometry", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawEnhancedGeometryElement() : this((string?)null) { }
+
+        public DrawEnhancedGeometryElement(string? prefix) : base("enhanced-geometry", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawEnhancedGeometryElement(params OdfNode[] children) : this()
         {

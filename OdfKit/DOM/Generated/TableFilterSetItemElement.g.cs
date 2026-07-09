@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableFilterSetItemElement : OdfElement
     {
-        public TableFilterSetItemElement(string? prefix = null) : base("filter-set-item", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableFilterSetItemElement() : this((string?)null) { }
+
+        public TableFilterSetItemElement(string? prefix) : base("filter-set-item", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableFilterSetItemElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawPolylineElement : OdfElement
     {
-        public DrawPolylineElement(string? prefix = null) : base("polyline", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawPolylineElement() : this((string?)null) { }
+
+        public DrawPolylineElement(string? prefix) : base("polyline", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawPolylineElement(params OdfNode[] children) : this()
         {

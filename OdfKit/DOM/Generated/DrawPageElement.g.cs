@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawPageElement : OdfElement
     {
-        public DrawPageElement(string? prefix = null) : base("page", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawPageElement() : this((string?)null) { }
+
+        public DrawPageElement(string? prefix) : base("page", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawPageElement(params OdfNode[] children) : this()
         {

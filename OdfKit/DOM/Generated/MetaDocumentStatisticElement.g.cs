@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaDocumentStatisticElement : OdfElement
     {
-        public MetaDocumentStatisticElement(string? prefix = null) : base("document-statistic", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaDocumentStatisticElement() : this((string?)null) { }
+
+        public MetaDocumentStatisticElement(string? prefix) : base("document-statistic", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaDocumentStatisticElement(params OdfNode[] children) : this()
         {

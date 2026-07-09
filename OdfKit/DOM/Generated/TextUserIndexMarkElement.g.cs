@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextUserIndexMarkElement : OdfElement
     {
-        public TextUserIndexMarkElement(string? prefix = null) : base("user-index-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextUserIndexMarkElement() : this((string?)null) { }
+
+        public TextUserIndexMarkElement(string? prefix) : base("user-index-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextUserIndexMarkElement(params OdfNode[] children) : this()
         {

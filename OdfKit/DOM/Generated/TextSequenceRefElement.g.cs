@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSequenceRefElement : OdfElement
     {
-        public TextSequenceRefElement(string? prefix = null) : base("sequence-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSequenceRefElement() : this((string?)null) { }
+
+        public TextSequenceRefElement(string? prefix) : base("sequence-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSequenceRefElement(params OdfNode[] children) : this()
         {

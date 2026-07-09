@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexEntryPageNumberElement : OdfElement
     {
-        public TextIndexEntryPageNumberElement(string? prefix = null) : base("index-entry-page-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexEntryPageNumberElement() : this((string?)null) { }
+
+        public TextIndexEntryPageNumberElement(string? prefix) : base("index-entry-page-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexEntryPageNumberElement(params OdfNode[] children) : this()
         {

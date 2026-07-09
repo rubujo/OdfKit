@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleListLevelLabelAlignmentElement : OdfElement
     {
-        public StyleListLevelLabelAlignmentElement(string? prefix = null) : base("list-level-label-alignment", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleListLevelLabelAlignmentElement() : this((string?)null) { }
+
+        public StyleListLevelLabelAlignmentElement(string? prefix) : base("list-level-label-alignment", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleListLevelLabelAlignmentElement(params OdfNode[] children) : this()
         {

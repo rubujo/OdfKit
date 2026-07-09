@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDatabaseSourceQueryElement : OdfElement
     {
-        public TableDatabaseSourceQueryElement(string? prefix = null) : base("database-source-query", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDatabaseSourceQueryElement() : this((string?)null) { }
+
+        public TableDatabaseSourceQueryElement(string? prefix) : base("database-source-query", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDatabaseSourceQueryElement(params OdfNode[] children) : this()
         {

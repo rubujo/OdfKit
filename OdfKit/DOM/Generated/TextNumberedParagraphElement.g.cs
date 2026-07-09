@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextNumberedParagraphElement : OdfElement
     {
-        public TextNumberedParagraphElement(string? prefix = null) : base("numbered-paragraph", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextNumberedParagraphElement() : this((string?)null) { }
+
+        public TextNumberedParagraphElement(string? prefix) : base("numbered-paragraph", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextNumberedParagraphElement(params OdfNode[] children) : this()
         {

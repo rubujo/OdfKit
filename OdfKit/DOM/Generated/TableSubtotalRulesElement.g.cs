@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableSubtotalRulesElement : OdfElement
     {
-        public TableSubtotalRulesElement(string? prefix = null) : base("subtotal-rules", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableSubtotalRulesElement() : this((string?)null) { }
+
+        public TableSubtotalRulesElement(string? prefix) : base("subtotal-rules", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableSubtotalRulesElement(params OdfNode[] children) : this()
         {

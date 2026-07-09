@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderStreetElement : OdfElement
     {
-        public TextSenderStreetElement(string? prefix = null) : base("sender-street", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderStreetElement() : this((string?)null) { }
+
+        public TextSenderStreetElement(string? prefix) : base("sender-street", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderStreetElement(params OdfNode[] children) : this()
         {

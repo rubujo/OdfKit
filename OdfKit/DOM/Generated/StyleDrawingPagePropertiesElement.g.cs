@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleDrawingPagePropertiesElement : OdfElement
     {
-        public StyleDrawingPagePropertiesElement(string? prefix = null) : base("drawing-page-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleDrawingPagePropertiesElement() : this((string?)null) { }
+
+        public StyleDrawingPagePropertiesElement(string? prefix) : base("drawing-page-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleDrawingPagePropertiesElement(params OdfNode[] children) : this()
         {

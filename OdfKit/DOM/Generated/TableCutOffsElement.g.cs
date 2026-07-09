@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableCutOffsElement : OdfElement
     {
-        public TableCutOffsElement(string? prefix = null) : base("cut-offs", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableCutOffsElement() : this((string?)null) { }
+
+        public TableCutOffsElement(string? prefix) : base("cut-offs", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableCutOffsElement(params OdfNode[] children) : this()
         {

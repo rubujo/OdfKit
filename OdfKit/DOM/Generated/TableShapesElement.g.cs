@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableShapesElement : OdfElement
     {
-        public TableShapesElement(string? prefix = null) : base("shapes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableShapesElement() : this((string?)null) { }
+
+        public TableShapesElement(string? prefix) : base("shapes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableShapesElement(params OdfNode[] children) : this()
         {

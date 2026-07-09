@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberNumListFormatElement : OdfElement
     {
-        public NumberNumListFormatElement(string? prefix = null) : base("num-list-format", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberNumListFormatElement() : this((string?)null) { }
+
+        public NumberNumListFormatElement(string? prefix) : base("num-list-format", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberNumListFormatElement(params OdfNode[] children) : this()
         {

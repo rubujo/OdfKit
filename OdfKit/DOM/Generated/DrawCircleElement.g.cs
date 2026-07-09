@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawCircleElement : OdfElement
     {
-        public DrawCircleElement(string? prefix = null) : base("circle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawCircleElement() : this((string?)null) { }
+
+        public DrawCircleElement(string? prefix) : base("circle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawCircleElement(params OdfNode[] children) : this()
         {

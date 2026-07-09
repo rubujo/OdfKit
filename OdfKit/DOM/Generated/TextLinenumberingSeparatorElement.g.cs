@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextLinenumberingSeparatorElement : OdfElement
     {
-        public TextLinenumberingSeparatorElement(string? prefix = null) : base("linenumbering-separator", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextLinenumberingSeparatorElement() : this((string?)null) { }
+
+        public TextLinenumberingSeparatorElement(string? prefix) : base("linenumbering-separator", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextLinenumberingSeparatorElement(params OdfNode[] children) : this()
         {

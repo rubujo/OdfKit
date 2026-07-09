@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormFileElement : OdfElement
     {
-        public FormFileElement(string? prefix = null) : base("file", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormFileElement() : this((string?)null) { }
+
+        public FormFileElement(string? prefix) : base("file", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormFileElement(params OdfNode[] children) : this()
         {

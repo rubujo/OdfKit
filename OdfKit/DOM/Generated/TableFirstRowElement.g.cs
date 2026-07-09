@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableFirstRowElement : OdfElement
     {
-        public TableFirstRowElement(string? prefix = null) : base("first-row", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableFirstRowElement() : this((string?)null) { }
+
+        public TableFirstRowElement(string? prefix) : base("first-row", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableFirstRowElement(params OdfNode[] children) : this()
         {

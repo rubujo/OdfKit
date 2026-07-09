@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleTableCellPropertiesElement : OdfElement
     {
-        public StyleTableCellPropertiesElement(string? prefix = null) : base("table-cell-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleTableCellPropertiesElement() : this((string?)null) { }
+
+        public StyleTableCellPropertiesElement(string? prefix) : base("table-cell-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleTableCellPropertiesElement(params OdfNode[] children) : this()
         {

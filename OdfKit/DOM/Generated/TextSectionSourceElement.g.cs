@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSectionSourceElement : OdfElement
     {
-        public TextSectionSourceElement(string? prefix = null) : base("section-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSectionSourceElement() : this((string?)null) { }
+
+        public TextSectionSourceElement(string? prefix) : base("section-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSectionSourceElement(params OdfNode[] children) : this()
         {

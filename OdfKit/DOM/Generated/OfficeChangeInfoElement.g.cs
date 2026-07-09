@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeChangeInfoElement : OdfElement
     {
-        public OfficeChangeInfoElement(string? prefix = null) : base("change-info", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeChangeInfoElement() : this((string?)null) { }
+
+        public OfficeChangeInfoElement(string? prefix) : base("change-info", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeChangeInfoElement(params OdfNode[] children) : this()
         {

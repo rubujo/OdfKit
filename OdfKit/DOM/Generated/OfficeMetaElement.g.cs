@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeMetaElement : OdfElement
     {
-        public OfficeMetaElement(string? prefix = null) : base("meta", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeMetaElement() : this((string?)null) { }
+
+        public OfficeMetaElement(string? prefix) : base("meta", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeMetaElement(params OdfNode[] children) : this()
         {

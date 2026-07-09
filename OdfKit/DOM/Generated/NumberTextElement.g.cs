@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberTextElement : OdfElement
     {
-        public NumberTextElement(string? prefix = null) : base("text", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberTextElement() : this((string?)null) { }
+
+        public NumberTextElement(string? prefix) : base("text", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberTextElement(params OdfNode[] children) : this()
         {

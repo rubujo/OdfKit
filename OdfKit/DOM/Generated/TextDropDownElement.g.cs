@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDropDownElement : OdfElement
     {
-        public TextDropDownElement(string? prefix = null) : base("drop-down", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDropDownElement() : this((string?)null) { }
+
+        public TextDropDownElement(string? prefix) : base("drop-down", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDropDownElement(params OdfNode[] children) : this()
         {

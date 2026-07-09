@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTocMarkElement : OdfElement
     {
-        public TextTocMarkElement(string? prefix = null) : base("toc-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTocMarkElement() : this((string?)null) { }
+
+        public TextTocMarkElement(string? prefix) : base("toc-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTocMarkElement(params OdfNode[] children) : this()
         {

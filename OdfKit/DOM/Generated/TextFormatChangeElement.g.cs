@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextFormatChangeElement : OdfElement
     {
-        public TextFormatChangeElement(string? prefix = null) : base("format-change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextFormatChangeElement() : this((string?)null) { }
+
+        public TextFormatChangeElement(string? prefix) : base("format-change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextFormatChangeElement(params OdfNode[] children) : this()
         {

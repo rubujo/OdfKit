@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextPlaceholderElement : OdfElement
     {
-        public TextPlaceholderElement(string? prefix = null) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextPlaceholderElement() : this((string?)null) { }
+
+        public TextPlaceholderElement(string? prefix) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextPlaceholderElement(params OdfNode[] children) : this()
         {

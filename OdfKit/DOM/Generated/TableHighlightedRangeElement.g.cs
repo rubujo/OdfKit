@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableHighlightedRangeElement : OdfElement
     {
-        public TableHighlightedRangeElement(string? prefix = null) : base("highlighted-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableHighlightedRangeElement() : this((string?)null) { }
+
+        public TableHighlightedRangeElement(string? prefix) : base("highlighted-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableHighlightedRangeElement(params OdfNode[] children) : this()
         {

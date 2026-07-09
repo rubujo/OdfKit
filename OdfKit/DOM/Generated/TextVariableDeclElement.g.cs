@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextVariableDeclElement : OdfElement
     {
-        public TextVariableDeclElement(string? prefix = null) : base("variable-decl", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextVariableDeclElement() : this((string?)null) { }
+
+        public TextVariableDeclElement(string? prefix) : base("variable-decl", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextVariableDeclElement(params OdfNode[] children) : this()
         {

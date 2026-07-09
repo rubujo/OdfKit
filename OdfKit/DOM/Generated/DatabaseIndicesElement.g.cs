@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseIndicesElement : OdfElement
     {
-        public DatabaseIndicesElement(string? prefix = null) : base("indices", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseIndicesElement() : this((string?)null) { }
+
+        public DatabaseIndicesElement(string? prefix) : base("indices", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseIndicesElement(params OdfNode[] children) : this()
         {

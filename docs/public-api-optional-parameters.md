@@ -28,13 +28,14 @@ public void Foo(int a = 0) { }
 public void Foo(string s = "") { } // RS0026：多個皆可選
 ```
 
-## v0.0.1 收斂狀態
+## 收斂狀態
 
 | 範圍 | 嚴重度 | 說明 |
 |------|--------|------|
-| 手寫公開 API | **suggestion**（`.editorconfig`） | 新增 API **必須**遵守上方模式；既有多載以 PublicAPI 基線鎖定 |
-| 生成 DOM／schema（`DOM/Generated`、`Compliance/Generated`） | **none** | 產生器固定形狀；改產生器屬 schema 產線，不在 0.0.1 手改 `.g.cs` |
-| 已示範收斂 | `TableTableElement.InsertRows`／`DeleteRows` | 改為無預設最長多載 + 單參數委派多載，並更新 `PublicAPI.Unshipped.txt` |
+| 手寫公開 API | **suggestion**（`.editorconfig`） | 新增 API 必須遵守上方模式；既有多載分批收斂（明確多載轉呼叫） |
+| 生成 DOM（`DOM/Generated`） | 與手寫相同；**禁止手改 `.g.cs`** | 產生器輸出 `Type()`／`Type(string? prefix)`／`Type(params OdfNode[])`，**無** `prefix = null`；改 `DomWrappersCSharpWriter` 後 `pwsh eng/Generate-OdfSchemaProvider.ps1` 重產 |
+| schema provider 產生碼 | 不適用公開多載規則為主 | 非公開 API 形狀焦點 |
+| 示範收斂 | `TableTableElement.InsertRows`／`DeleteRows` | 無預設最長多載 + 短多載轉呼叫 |
 
 ## 新增公開 API 檢查清單
 

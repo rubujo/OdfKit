@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleGraphicPropertiesElement : OdfElement
     {
-        public StyleGraphicPropertiesElement(string? prefix = null) : base("graphic-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleGraphicPropertiesElement() : this((string?)null) { }
+
+        public StyleGraphicPropertiesElement(string? prefix) : base("graphic-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleGraphicPropertiesElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawMeasureElement : OdfElement
     {
-        public DrawMeasureElement(string? prefix = null) : base("measure", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawMeasureElement() : this((string?)null) { }
+
+        public DrawMeasureElement(string? prefix) : base("measure", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawMeasureElement(params OdfNode[] children) : this()
         {

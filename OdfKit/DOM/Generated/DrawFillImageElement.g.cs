@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawFillImageElement : OdfElement
     {
-        public DrawFillImageElement(string? prefix = null) : base("fill-image", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawFillImageElement() : this((string?)null) { }
+
+        public DrawFillImageElement(string? prefix) : base("fill-image", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawFillImageElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDependenciesElement : OdfElement
     {
-        public TableDependenciesElement(string? prefix = null) : base("dependencies", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDependenciesElement() : this((string?)null) { }
+
+        public TableDependenciesElement(string? prefix) : base("dependencies", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDependenciesElement(params OdfNode[] children) : this()
         {

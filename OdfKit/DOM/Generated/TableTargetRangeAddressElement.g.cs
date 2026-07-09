@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableTargetRangeAddressElement : OdfElement
     {
-        public TableTargetRangeAddressElement(string? prefix = null) : base("target-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableTargetRangeAddressElement() : this((string?)null) { }
+
+        public TableTargetRangeAddressElement(string? prefix) : base("target-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableTargetRangeAddressElement(params OdfNode[] children) : this()
         {

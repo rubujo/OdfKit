@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormImageFrameElement : OdfElement
     {
-        public FormImageFrameElement(string? prefix = null) : base("image-frame", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormImageFrameElement() : this((string?)null) { }
+
+        public FormImageFrameElement(string? prefix) : base("image-frame", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormImageFrameElement(params OdfNode[] children) : this()
         {

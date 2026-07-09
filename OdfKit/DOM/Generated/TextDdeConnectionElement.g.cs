@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDdeConnectionElement : OdfElement
     {
-        public TextDdeConnectionElement(string? prefix = null) : base("dde-connection", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDdeConnectionElement() : this((string?)null) { }
+
+        public TextDdeConnectionElement(string? prefix) : base("dde-connection", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDdeConnectionElement(params OdfNode[] children) : this()
         {

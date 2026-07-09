@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseQueryElement : OdfElement
     {
-        public DatabaseQueryElement(string? prefix = null) : base("query", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseQueryElement() : this((string?)null) { }
+
+        public DatabaseQueryElement(string? prefix) : base("query", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseQueryElement(params OdfNode[] children) : this()
         {

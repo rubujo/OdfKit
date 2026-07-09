@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextObjectIndexElement : OdfElement
     {
-        public TextObjectIndexElement(string? prefix = null) : base("object-index", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextObjectIndexElement() : this((string?)null) { }
+
+        public TextObjectIndexElement(string? prefix) : base("object-index", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextObjectIndexElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberSecondsElement : OdfElement
     {
-        public NumberSecondsElement(string? prefix = null) : base("seconds", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberSecondsElement() : this((string?)null) { }
+
+        public NumberSecondsElement(string? prefix) : base("seconds", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberSecondsElement(params OdfNode[] children) : this()
         {

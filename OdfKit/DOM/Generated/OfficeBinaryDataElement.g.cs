@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeBinaryDataElement : OdfElement
     {
-        public OfficeBinaryDataElement(string? prefix = null) : base("binary-data", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeBinaryDataElement() : this((string?)null) { }
+
+        public OfficeBinaryDataElement(string? prefix) : base("binary-data", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeBinaryDataElement(params OdfNode[] children) : this()
         {

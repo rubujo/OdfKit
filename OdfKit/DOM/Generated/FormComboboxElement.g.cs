@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormComboboxElement : OdfElement
     {
-        public FormComboboxElement(string? prefix = null) : base("combobox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormComboboxElement() : this((string?)null) { }
+
+        public FormComboboxElement(string? prefix) : base("combobox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormComboboxElement(params OdfNode[] children) : this()
         {

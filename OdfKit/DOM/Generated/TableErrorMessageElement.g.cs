@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableErrorMessageElement : OdfElement
     {
-        public TableErrorMessageElement(string? prefix = null) : base("error-message", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableErrorMessageElement() : this((string?)null) { }
+
+        public TableErrorMessageElement(string? prefix) : base("error-message", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableErrorMessageElement(params OdfNode[] children) : this()
         {

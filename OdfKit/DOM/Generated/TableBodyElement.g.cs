@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableBodyElement : OdfElement
     {
-        public TableBodyElement(string? prefix = null) : base("body", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableBodyElement() : this((string?)null) { }
+
+        public TableBodyElement(string? prefix) : base("body", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableBodyElement(params OdfNode[] children) : this()
         {

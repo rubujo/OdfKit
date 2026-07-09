@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationParamElement : OdfElement
     {
-        public AnimationParamElement(string? prefix = null) : base("param", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationParamElement() : this((string?)null) { }
+
+        public AnimationParamElement(string? prefix) : base("param", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationParamElement(params OdfNode[] children) : this()
         {

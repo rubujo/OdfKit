@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dExtrudeElement : OdfElement
     {
-        public Dr3dExtrudeElement(string? prefix = null) : base("extrude", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dExtrudeElement() : this((string?)null) { }
+
+        public Dr3dExtrudeElement(string? prefix) : base("extrude", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dExtrudeElement(params OdfNode[] children) : this()
         {

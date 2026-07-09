@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationEventListenerElement : OdfElement
     {
-        public PresentationEventListenerElement(string? prefix = null) : base("event-listener", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationEventListenerElement() : this((string?)null) { }
+
+        public PresentationEventListenerElement(string? prefix) : base("event-listener", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationEventListenerElement(params OdfNode[] children) : this()
         {

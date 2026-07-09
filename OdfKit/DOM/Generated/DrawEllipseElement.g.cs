@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawEllipseElement : OdfElement
     {
-        public DrawEllipseElement(string? prefix = null) : base("ellipse", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawEllipseElement() : this((string?)null) { }
+
+        public DrawEllipseElement(string? prefix) : base("ellipse", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawEllipseElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberBooleanElement : OdfElement
     {
-        public NumberBooleanElement(string? prefix = null) : base("boolean", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberBooleanElement() : this((string?)null) { }
+
+        public NumberBooleanElement(string? prefix) : base("boolean", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberBooleanElement(params OdfNode[] children) : this()
         {

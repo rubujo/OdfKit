@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeImageElement : OdfElement
     {
-        public OfficeImageElement(string? prefix = null) : base("image", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeImageElement() : this((string?)null) { }
+
+        public OfficeImageElement(string? prefix) : base("image", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeImageElement(params OdfNode[] children) : this()
         {

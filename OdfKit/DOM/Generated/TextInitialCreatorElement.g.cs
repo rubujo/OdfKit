@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextInitialCreatorElement : OdfElement
     {
-        public TextInitialCreatorElement(string? prefix = null) : base("initial-creator", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextInitialCreatorElement() : this((string?)null) { }
+
+        public TextInitialCreatorElement(string? prefix) : base("initial-creator", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextInitialCreatorElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableMovementElement : OdfElement
     {
-        public TableMovementElement(string? prefix = null) : base("movement", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableMovementElement() : this((string?)null) { }
+
+        public TableMovementElement(string? prefix) : base("movement", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableMovementElement(params OdfNode[] children) : this()
         {

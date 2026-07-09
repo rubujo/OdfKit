@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationSeqElement : OdfElement
     {
-        public AnimationSeqElement(string? prefix = null) : base("seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationSeqElement() : this((string?)null) { }
+
+        public AnimationSeqElement(string? prefix) : base("seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationSeqElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseReportsElement : OdfElement
     {
-        public DatabaseReportsElement(string? prefix = null) : base("reports", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseReportsElement() : this((string?)null) { }
+
+        public DatabaseReportsElement(string? prefix) : base("reports", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseReportsElement(params OdfNode[] children) : this()
         {

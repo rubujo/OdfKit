@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartAxisElement : OdfElement
     {
-        public ChartAxisElement(string? prefix = null) : base("axis", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartAxisElement() : this((string?)null) { }
+
+        public ChartAxisElement(string? prefix) : base("axis", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartAxisElement(params OdfNode[] children) : this()
         {

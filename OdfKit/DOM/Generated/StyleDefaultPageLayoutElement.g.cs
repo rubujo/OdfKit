@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleDefaultPageLayoutElement : OdfElement
     {
-        public StyleDefaultPageLayoutElement(string? prefix = null) : base("default-page-layout", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleDefaultPageLayoutElement() : this((string?)null) { }
+
+        public StyleDefaultPageLayoutElement(string? prefix) : base("default-page-layout", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleDefaultPageLayoutElement(params OdfNode[] children) : this()
         {

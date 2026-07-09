@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberEraElement : OdfElement
     {
-        public NumberEraElement(string? prefix = null) : base("era", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberEraElement() : this((string?)null) { }
+
+        public NumberEraElement(string? prefix) : base("era", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberEraElement(params OdfNode[] children) : this()
         {

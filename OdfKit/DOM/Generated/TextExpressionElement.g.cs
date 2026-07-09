@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextExpressionElement : OdfElement
     {
-        public TextExpressionElement(string? prefix = null) : base("expression", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextExpressionElement() : this((string?)null) { }
+
+        public TextExpressionElement(string? prefix) : base("expression", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextExpressionElement(params OdfNode[] children) : this()
         {

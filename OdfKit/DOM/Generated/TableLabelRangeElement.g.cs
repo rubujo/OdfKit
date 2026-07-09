@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableLabelRangeElement : OdfElement
     {
-        public TableLabelRangeElement(string? prefix = null) : base("label-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableLabelRangeElement() : this((string?)null) { }
+
+        public TableLabelRangeElement(string? prefix) : base("label-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableLabelRangeElement(params OdfNode[] children) : this()
         {

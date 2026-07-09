@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableChangeTrackTableCellElement : OdfElement
     {
-        public TableChangeTrackTableCellElement(string? prefix = null) : base("change-track-table-cell", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableChangeTrackTableCellElement() : this((string?)null) { }
+
+        public TableChangeTrackTableCellElement(string? prefix) : base("change-track-table-cell", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableChangeTrackTableCellElement(params OdfNode[] children) : this()
         {

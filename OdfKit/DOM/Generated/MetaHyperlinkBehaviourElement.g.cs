@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaHyperlinkBehaviourElement : OdfElement
     {
-        public MetaHyperlinkBehaviourElement(string? prefix = null) : base("hyperlink-behaviour", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaHyperlinkBehaviourElement() : this((string?)null) { }
+
+        public MetaHyperlinkBehaviourElement(string? prefix) : base("hyperlink-behaviour", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaHyperlinkBehaviourElement(params OdfNode[] children) : this()
         {

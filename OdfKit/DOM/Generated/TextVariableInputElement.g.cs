@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextVariableInputElement : OdfElement
     {
-        public TextVariableInputElement(string? prefix = null) : base("variable-input", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextVariableInputElement() : this((string?)null) { }
+
+        public TextVariableInputElement(string? prefix) : base("variable-input", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextVariableInputElement(params OdfNode[] children) : this()
         {

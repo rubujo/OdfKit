@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleListLevelPropertiesElement : OdfElement
     {
-        public StyleListLevelPropertiesElement(string? prefix = null) : base("list-level-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleListLevelPropertiesElement() : this((string?)null) { }
+
+        public StyleListLevelPropertiesElement(string? prefix) : base("list-level-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleListLevelPropertiesElement(params OdfNode[] children) : this()
         {

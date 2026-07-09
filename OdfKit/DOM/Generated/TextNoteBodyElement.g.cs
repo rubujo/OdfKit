@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextNoteBodyElement : OdfElement
     {
-        public TextNoteBodyElement(string? prefix = null) : base("note-body", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextNoteBodyElement() : this((string?)null) { }
+
+        public TextNoteBodyElement(string? prefix) : base("note-body", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextNoteBodyElement(params OdfNode[] children) : this()
         {

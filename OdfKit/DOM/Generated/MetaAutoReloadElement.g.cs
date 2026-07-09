@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaAutoReloadElement : OdfElement
     {
-        public MetaAutoReloadElement(string? prefix = null) : base("auto-reload", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaAutoReloadElement() : this((string?)null) { }
+
+        public MetaAutoReloadElement(string? prefix) : base("auto-reload", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaAutoReloadElement(params OdfNode[] children) : this()
         {

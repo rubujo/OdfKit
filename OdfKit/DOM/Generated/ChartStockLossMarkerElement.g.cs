@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartStockLossMarkerElement : OdfElement
     {
-        public ChartStockLossMarkerElement(string? prefix = null) : base("stock-loss-marker", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartStockLossMarkerElement() : this((string?)null) { }
+
+        public ChartStockLossMarkerElement(string? prefix) : base("stock-loss-marker", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartStockLossMarkerElement(params OdfNode[] children) : this()
         {

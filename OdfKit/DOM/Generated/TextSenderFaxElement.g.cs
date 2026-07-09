@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderFaxElement : OdfElement
     {
-        public TextSenderFaxElement(string? prefix = null) : base("sender-fax", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderFaxElement() : this((string?)null) { }
+
+        public TextSenderFaxElement(string? prefix) : base("sender-fax", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderFaxElement(params OdfNode[] children) : this()
         {

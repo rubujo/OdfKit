@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextListLevelStyleNumberElement : OdfElement
     {
-        public TextListLevelStyleNumberElement(string? prefix = null) : base("list-level-style-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextListLevelStyleNumberElement() : this((string?)null) { }
+
+        public TextListLevelStyleNumberElement(string? prefix) : base("list-level-style-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextListLevelStyleNumberElement(params OdfNode[] children) : this()
         {

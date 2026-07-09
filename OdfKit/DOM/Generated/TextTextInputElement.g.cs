@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTextInputElement : OdfElement
     {
-        public TextTextInputElement(string? prefix = null) : base("text-input", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTextInputElement() : this((string?)null) { }
+
+        public TextTextInputElement(string? prefix) : base("text-input", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTextInputElement(params OdfNode[] children) : this()
         {

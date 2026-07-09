@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderCityElement : OdfElement
     {
-        public TextSenderCityElement(string? prefix = null) : base("sender-city", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderCityElement() : this((string?)null) { }
+
+        public TextSenderCityElement(string? prefix) : base("sender-city", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderCityElement(params OdfNode[] children) : this()
         {

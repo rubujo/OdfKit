@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableCellContentDeletionElement : OdfElement
     {
-        public TableCellContentDeletionElement(string? prefix = null) : base("cell-content-deletion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableCellContentDeletionElement() : this((string?)null) { }
+
+        public TableCellContentDeletionElement(string? prefix) : base("cell-content-deletion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableCellContentDeletionElement(params OdfNode[] children) : this()
         {

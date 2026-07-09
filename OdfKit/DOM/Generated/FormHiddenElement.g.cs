@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormHiddenElement : OdfElement
     {
-        public FormHiddenElement(string? prefix = null) : base("hidden", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormHiddenElement() : this((string?)null) { }
+
+        public FormHiddenElement(string? prefix) : base("hidden", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormHiddenElement(params OdfNode[] children) : this()
         {

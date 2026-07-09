@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseCharacterSetElement : OdfElement
     {
-        public DatabaseCharacterSetElement(string? prefix = null) : base("character-set", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseCharacterSetElement() : this((string?)null) { }
+
+        public DatabaseCharacterSetElement(string? prefix) : base("character-set", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseCharacterSetElement(params OdfNode[] children) : this()
         {

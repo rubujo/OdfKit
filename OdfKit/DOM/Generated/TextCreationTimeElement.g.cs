@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextCreationTimeElement : OdfElement
     {
-        public TextCreationTimeElement(string? prefix = null) : base("creation-time", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextCreationTimeElement() : this((string?)null) { }
+
+        public TextCreationTimeElement(string? prefix) : base("creation-time", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextCreationTimeElement(params OdfNode[] children) : this()
         {

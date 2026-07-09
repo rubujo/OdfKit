@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleColumnsElement : OdfElement
     {
-        public StyleColumnsElement(string? prefix = null) : base("columns", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleColumnsElement() : this((string?)null) { }
+
+        public StyleColumnsElement(string? prefix) : base("columns", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleColumnsElement(params OdfNode[] children) : this()
         {

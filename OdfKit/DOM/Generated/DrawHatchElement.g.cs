@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawHatchElement : OdfElement
     {
-        public DrawHatchElement(string? prefix = null) : base("hatch", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawHatchElement() : this((string?)null) { }
+
+        public DrawHatchElement(string? prefix) : base("hatch", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawHatchElement(params OdfNode[] children) : this()
         {

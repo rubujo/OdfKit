@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextOutlineLevelStyleElement : OdfElement
     {
-        public TextOutlineLevelStyleElement(string? prefix = null) : base("outline-level-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextOutlineLevelStyleElement() : this((string?)null) { }
+
+        public TextOutlineLevelStyleElement(string? prefix) : base("outline-level-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextOutlineLevelStyleElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextChangeElement : OdfElement
     {
-        public TextChangeElement(string? prefix = null) : base("change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextChangeElement() : this((string?)null) { }
+
+        public TextChangeElement(string? prefix) : base("change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextChangeElement(params OdfNode[] children) : this()
         {

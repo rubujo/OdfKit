@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DcLanguageElement : OdfElement
     {
-        public DcLanguageElement(string? prefix = null) : base("language", "http://purl.org/dc/elements/1.1/", prefix) { }
+        public DcLanguageElement() : this((string?)null) { }
+
+        public DcLanguageElement(string? prefix) : base("language", "http://purl.org/dc/elements/1.1/", prefix) { }
 
         public DcLanguageElement(params OdfNode[] children) : this()
         {

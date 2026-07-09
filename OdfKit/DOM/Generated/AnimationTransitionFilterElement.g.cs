@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationTransitionFilterElement : OdfElement
     {
-        public AnimationTransitionFilterElement(string? prefix = null) : base("transitionFilter", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationTransitionFilterElement() : this((string?)null) { }
+
+        public AnimationTransitionFilterElement(string? prefix) : base("transitionFilter", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationTransitionFilterElement(params OdfNode[] children) : this()
         {

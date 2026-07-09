@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawFloatingFrameElement : OdfElement
     {
-        public DrawFloatingFrameElement(string? prefix = null) : base("floating-frame", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawFloatingFrameElement() : this((string?)null) { }
+
+        public DrawFloatingFrameElement(string? prefix) : base("floating-frame", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawFloatingFrameElement(params OdfNode[] children) : this()
         {

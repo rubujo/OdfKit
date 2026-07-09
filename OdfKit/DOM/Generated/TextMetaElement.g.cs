@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextMetaElement : OdfElement
     {
-        public TextMetaElement(string? prefix = null) : base("meta", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextMetaElement() : this((string?)null) { }
+
+        public TextMetaElement(string? prefix) : base("meta", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextMetaElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawRegularPolygonElement : OdfElement
     {
-        public DrawRegularPolygonElement(string? prefix = null) : base("regular-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawRegularPolygonElement() : this((string?)null) { }
+
+        public DrawRegularPolygonElement(string? prefix) : base("regular-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawRegularPolygonElement(params OdfNode[] children) : this()
         {

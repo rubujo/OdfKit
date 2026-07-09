@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawLayerSetElement : OdfElement
     {
-        public DrawLayerSetElement(string? prefix = null) : base("layer-set", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawLayerSetElement() : this((string?)null) { }
+
+        public DrawLayerSetElement(string? prefix) : base("layer-set", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawLayerSetElement(params OdfNode[] children) : this()
         {

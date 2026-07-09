@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaCreationDateElement : OdfElement
     {
-        public MetaCreationDateElement(string? prefix = null) : base("creation-date", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaCreationDateElement() : this((string?)null) { }
+
+        public MetaCreationDateElement(string? prefix) : base("creation-date", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaCreationDateElement(params OdfNode[] children) : this()
         {

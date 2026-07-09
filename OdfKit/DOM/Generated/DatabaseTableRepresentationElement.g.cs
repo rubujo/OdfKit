@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseTableRepresentationElement : OdfElement
     {
-        public DatabaseTableRepresentationElement(string? prefix = null) : base("table-representation", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseTableRepresentationElement() : this((string?)null) { }
+
+        public DatabaseTableRepresentationElement(string? prefix) : base("table-representation", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseTableRepresentationElement(params OdfNode[] children) : this()
         {

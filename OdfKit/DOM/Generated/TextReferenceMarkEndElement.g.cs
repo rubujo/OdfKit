@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextReferenceMarkEndElement : OdfElement
     {
-        public TextReferenceMarkEndElement(string? prefix = null) : base("reference-mark-end", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextReferenceMarkEndElement() : this((string?)null) { }
+
+        public TextReferenceMarkEndElement(string? prefix) : base("reference-mark-end", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextReferenceMarkEndElement(params OdfNode[] children) : this()
         {

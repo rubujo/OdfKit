@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDatabaseDisplayElement : OdfElement
     {
-        public TextDatabaseDisplayElement(string? prefix = null) : base("database-display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDatabaseDisplayElement() : this((string?)null) { }
+
+        public TextDatabaseDisplayElement(string? prefix) : base("database-display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDatabaseDisplayElement(params OdfNode[] children) : this()
         {

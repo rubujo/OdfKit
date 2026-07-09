@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationDateTimeDeclElement : OdfElement
     {
-        public PresentationDateTimeDeclElement(string? prefix = null) : base("date-time-decl", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationDateTimeDeclElement() : this((string?)null) { }
+
+        public PresentationDateTimeDeclElement(string? prefix) : base("date-time-decl", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationDateTimeDeclElement(params OdfNode[] children) : this()
         {

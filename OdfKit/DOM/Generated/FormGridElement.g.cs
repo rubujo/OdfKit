@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormGridElement : OdfElement
     {
-        public FormGridElement(string? prefix = null) : base("grid", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormGridElement() : this((string?)null) { }
+
+        public FormGridElement(string? prefix) : base("grid", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormGridElement(params OdfNode[] children) : this()
         {

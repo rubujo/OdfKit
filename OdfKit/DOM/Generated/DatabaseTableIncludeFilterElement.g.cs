@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseTableIncludeFilterElement : OdfElement
     {
-        public DatabaseTableIncludeFilterElement(string? prefix = null) : base("table-include-filter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseTableIncludeFilterElement() : this((string?)null) { }
+
+        public DatabaseTableIncludeFilterElement(string? prefix) : base("table-include-filter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseTableIncludeFilterElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextUserFieldDeclsElement : OdfElement
     {
-        public TextUserFieldDeclsElement(string? prefix = null) : base("user-field-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextUserFieldDeclsElement() : this((string?)null) { }
+
+        public TextUserFieldDeclsElement(string? prefix) : base("user-field-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextUserFieldDeclsElement(params OdfNode[] children) : this()
         {

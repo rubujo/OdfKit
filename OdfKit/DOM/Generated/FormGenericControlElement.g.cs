@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormGenericControlElement : OdfElement
     {
-        public FormGenericControlElement(string? prefix = null) : base("generic-control", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormGenericControlElement() : this((string?)null) { }
+
+        public FormGenericControlElement(string? prefix) : base("generic-control", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormGenericControlElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableCellContentChangeElement : OdfElement
     {
-        public TableCellContentChangeElement(string? prefix = null) : base("cell-content-change", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableCellContentChangeElement() : this((string?)null) { }
+
+        public TableCellContentChangeElement(string? prefix) : base("cell-content-change", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableCellContentChangeElement(params OdfNode[] children) : this()
         {

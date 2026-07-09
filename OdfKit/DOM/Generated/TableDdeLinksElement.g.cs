@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDdeLinksElement : OdfElement
     {
-        public TableDdeLinksElement(string? prefix = null) : base("dde-links", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDdeLinksElement() : this((string?)null) { }
+
+        public TableDdeLinksElement(string? prefix) : base("dde-links", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDdeLinksElement(params OdfNode[] children) : this()
         {

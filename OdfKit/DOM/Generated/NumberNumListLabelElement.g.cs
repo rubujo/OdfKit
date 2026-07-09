@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberNumListLabelElement : OdfElement
     {
-        public NumberNumListLabelElement(string? prefix = null) : base("num-list-label", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberNumListLabelElement() : this((string?)null) { }
+
+        public NumberNumListLabelElement(string? prefix) : base("num-list-label", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberNumListLabelElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableSortElement : OdfElement
     {
-        public TableSortElement(string? prefix = null) : base("sort", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableSortElement() : this((string?)null) { }
+
+        public TableSortElement(string? prefix) : base("sort", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableSortElement(params OdfNode[] children) : this()
         {

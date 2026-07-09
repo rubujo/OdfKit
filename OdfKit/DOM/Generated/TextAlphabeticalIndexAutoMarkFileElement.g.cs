@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextAlphabeticalIndexAutoMarkFileElement : OdfElement
     {
-        public TextAlphabeticalIndexAutoMarkFileElement(string? prefix = null) : base("alphabetical-index-auto-mark-file", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextAlphabeticalIndexAutoMarkFileElement() : this((string?)null) { }
+
+        public TextAlphabeticalIndexAutoMarkFileElement(string? prefix) : base("alphabetical-index-auto-mark-file", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextAlphabeticalIndexAutoMarkFileElement(params OdfNode[] children) : this()
         {

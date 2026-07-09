@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StylePageLayoutPropertiesElement : OdfElement
     {
-        public StylePageLayoutPropertiesElement(string? prefix = null) : base("page-layout-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StylePageLayoutPropertiesElement() : this((string?)null) { }
+
+        public StylePageLayoutPropertiesElement(string? prefix) : base("page-layout-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StylePageLayoutPropertiesElement(params OdfNode[] children) : this()
         {

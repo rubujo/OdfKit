@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleMapElement : OdfElement
     {
-        public StyleMapElement(string? prefix = null) : base("map", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleMapElement() : this((string?)null) { }
+
+        public StyleMapElement(string? prefix) : base("map", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleMapElement(params OdfNode[] children) : this()
         {

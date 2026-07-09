@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseFormsElement : OdfElement
     {
-        public DatabaseFormsElement(string? prefix = null) : base("forms", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseFormsElement() : this((string?)null) { }
+
+        public DatabaseFormsElement(string? prefix) : base("forms", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseFormsElement(params OdfNode[] children) : this()
         {

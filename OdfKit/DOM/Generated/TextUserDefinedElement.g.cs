@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextUserDefinedElement : OdfElement
     {
-        public TextUserDefinedElement(string? prefix = null) : base("user-defined", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextUserDefinedElement() : this((string?)null) { }
+
+        public TextUserDefinedElement(string? prefix) : base("user-defined", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextUserDefinedElement(params OdfNode[] children) : this()
         {

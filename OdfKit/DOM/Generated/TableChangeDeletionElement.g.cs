@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableChangeDeletionElement : OdfElement
     {
-        public TableChangeDeletionElement(string? prefix = null) : base("change-deletion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableChangeDeletionElement() : this((string?)null) { }
+
+        public TableChangeDeletionElement(string? prefix) : base("change-deletion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableChangeDeletionElement(params OdfNode[] children) : this()
         {

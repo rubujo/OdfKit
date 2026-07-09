@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormNumberElement : OdfElement
     {
-        public FormNumberElement(string? prefix = null) : base("number", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormNumberElement() : this((string?)null) { }
+
+        public FormNumberElement(string? prefix) : base("number", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormNumberElement(params OdfNode[] children) : this()
         {

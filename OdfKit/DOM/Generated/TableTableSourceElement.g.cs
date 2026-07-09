@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableTableSourceElement : OdfElement
     {
-        public TableTableSourceElement(string? prefix = null) : base("table-source", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableTableSourceElement() : this((string?)null) { }
+
+        public TableTableSourceElement(string? prefix) : base("table-source", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableTableSourceElement(params OdfNode[] children) : this()
         {

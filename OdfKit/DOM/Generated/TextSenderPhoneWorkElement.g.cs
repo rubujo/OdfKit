@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderPhoneWorkElement : OdfElement
     {
-        public TextSenderPhoneWorkElement(string? prefix = null) : base("sender-phone-work", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderPhoneWorkElement() : this((string?)null) { }
+
+        public TextSenderPhoneWorkElement(string? prefix) : base("sender-phone-work", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderPhoneWorkElement(params OdfNode[] children) : this()
         {

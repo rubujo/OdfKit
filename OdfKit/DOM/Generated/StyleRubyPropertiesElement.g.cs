@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleRubyPropertiesElement : OdfElement
     {
-        public StyleRubyPropertiesElement(string? prefix = null) : base("ruby-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleRubyPropertiesElement() : this((string?)null) { }
+
+        public StyleRubyPropertiesElement(string? prefix) : base("ruby-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleRubyPropertiesElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableTrackedChangesElement : OdfElement
     {
-        public TableTrackedChangesElement(string? prefix = null) : base("tracked-changes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableTrackedChangesElement() : this((string?)null) { }
+
+        public TableTrackedChangesElement(string? prefix) : base("tracked-changes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableTrackedChangesElement(params OdfNode[] children) : this()
         {

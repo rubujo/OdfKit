@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleBackgroundFillElement : OdfElement
     {
-        public StyleBackgroundFillElement(string? prefix = null) : base("background-fill", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleBackgroundFillElement() : this((string?)null) { }
+
+        public StyleBackgroundFillElement(string? prefix) : base("background-fill", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleBackgroundFillElement(params OdfNode[] children) : this()
         {

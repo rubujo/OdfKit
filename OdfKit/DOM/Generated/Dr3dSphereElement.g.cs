@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dSphereElement : OdfElement
     {
-        public Dr3dSphereElement(string? prefix = null) : base("sphere", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dSphereElement() : this((string?)null) { }
+
+        public Dr3dSphereElement(string? prefix) : base("sphere", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dSphereElement(params OdfNode[] children) : this()
         {

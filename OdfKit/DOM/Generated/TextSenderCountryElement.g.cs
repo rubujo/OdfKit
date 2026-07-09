@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderCountryElement : OdfElement
     {
-        public TextSenderCountryElement(string? prefix = null) : base("sender-country", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderCountryElement() : this((string?)null) { }
+
+        public TextSenderCountryElement(string? prefix) : base("sender-country", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderCountryElement(params OdfNode[] children) : this()
         {

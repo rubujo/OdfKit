@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableFilterAndElement : OdfElement
     {
-        public TableFilterAndElement(string? prefix = null) : base("filter-and", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableFilterAndElement() : this((string?)null) { }
+
+        public TableFilterAndElement(string? prefix) : base("filter-and", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableFilterAndElement(params OdfNode[] children) : this()
         {

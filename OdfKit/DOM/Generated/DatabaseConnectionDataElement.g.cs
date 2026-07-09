@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseConnectionDataElement : OdfElement
     {
-        public DatabaseConnectionDataElement(string? prefix = null) : base("connection-data", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseConnectionDataElement() : this((string?)null) { }
+
+        public DatabaseConnectionDataElement(string? prefix) : base("connection-data", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseConnectionDataElement(params OdfNode[] children) : this()
         {

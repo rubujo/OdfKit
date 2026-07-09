@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleHandoutMasterElement : OdfElement
     {
-        public StyleHandoutMasterElement(string? prefix = null) : base("handout-master", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleHandoutMasterElement() : this((string?)null) { }
+
+        public StyleHandoutMasterElement(string? prefix) : base("handout-master", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleHandoutMasterElement(params OdfNode[] children) : this()
         {

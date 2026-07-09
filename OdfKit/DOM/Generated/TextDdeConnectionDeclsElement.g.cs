@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDdeConnectionDeclsElement : OdfElement
     {
-        public TextDdeConnectionDeclsElement(string? prefix = null) : base("dde-connection-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDdeConnectionDeclsElement() : this((string?)null) { }
+
+        public TextDdeConnectionDeclsElement(string? prefix) : base("dde-connection-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDdeConnectionDeclsElement(params OdfNode[] children) : this()
         {

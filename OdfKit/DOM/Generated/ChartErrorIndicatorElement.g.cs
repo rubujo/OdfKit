@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartErrorIndicatorElement : OdfElement
     {
-        public ChartErrorIndicatorElement(string? prefix = null) : base("error-indicator", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartErrorIndicatorElement() : this((string?)null) { }
+
+        public ChartErrorIndicatorElement(string? prefix) : base("error-indicator", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartErrorIndicatorElement(params OdfNode[] children) : this()
         {

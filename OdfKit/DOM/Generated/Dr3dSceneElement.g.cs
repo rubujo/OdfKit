@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dSceneElement : OdfElement
     {
-        public Dr3dSceneElement(string? prefix = null) : base("scene", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dSceneElement() : this((string?)null) { }
+
+        public Dr3dSceneElement(string? prefix) : base("scene", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dSceneElement(params OdfNode[] children) : this()
         {

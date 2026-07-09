@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseFilterStatementElement : OdfElement
     {
-        public DatabaseFilterStatementElement(string? prefix = null) : base("filter-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseFilterStatementElement() : this((string?)null) { }
+
+        public DatabaseFilterStatementElement(string? prefix) : base("filter-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseFilterStatementElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleTableRowPropertiesElement : OdfElement
     {
-        public StyleTableRowPropertiesElement(string? prefix = null) : base("table-row-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleTableRowPropertiesElement() : this((string?)null) { }
+
+        public StyleTableRowPropertiesElement(string? prefix) : base("table-row-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleTableRowPropertiesElement(params OdfNode[] children) : this()
         {

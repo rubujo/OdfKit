@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleTabStopElement : OdfElement
     {
-        public StyleTabStopElement(string? prefix = null) : base("tab-stop", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleTabStopElement() : this((string?)null) { }
+
+        public StyleTabStopElement(string? prefix) : base("tab-stop", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleTabStopElement(params OdfNode[] children) : this()
         {

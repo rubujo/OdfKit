@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawGradientElement : OdfElement
     {
-        public DrawGradientElement(string? prefix = null) : base("gradient", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawGradientElement() : this((string?)null) { }
+
+        public DrawGradientElement(string? prefix) : base("gradient", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawGradientElement(params OdfNode[] children) : this()
         {

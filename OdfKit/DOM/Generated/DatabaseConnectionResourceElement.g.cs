@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseConnectionResourceElement : OdfElement
     {
-        public DatabaseConnectionResourceElement(string? prefix = null) : base("connection-resource", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseConnectionResourceElement() : this((string?)null) { }
+
+        public DatabaseConnectionResourceElement(string? prefix) : base("connection-resource", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseConnectionResourceElement(params OdfNode[] children) : this()
         {

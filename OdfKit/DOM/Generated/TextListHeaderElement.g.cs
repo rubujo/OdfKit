@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextListHeaderElement : OdfElement
     {
-        public TextListHeaderElement(string? prefix = null) : base("list-header", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextListHeaderElement() : this((string?)null) { }
+
+        public TextListHeaderElement(string? prefix) : base("list-header", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextListHeaderElement(params OdfNode[] children) : this()
         {

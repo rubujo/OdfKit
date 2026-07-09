@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDetectiveElement : OdfElement
     {
-        public TableDetectiveElement(string? prefix = null) : base("detective", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDetectiveElement() : this((string?)null) { }
+
+        public TableDetectiveElement(string? prefix) : base("detective", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDetectiveElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawAreaPolygonElement : OdfElement
     {
-        public DrawAreaPolygonElement(string? prefix = null) : base("area-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawAreaPolygonElement() : this((string?)null) { }
+
+        public DrawAreaPolygonElement(string? prefix) : base("area-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawAreaPolygonElement(params OdfNode[] children) : this()
         {

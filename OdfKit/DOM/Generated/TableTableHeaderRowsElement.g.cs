@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableTableHeaderRowsElement : OdfElement
     {
-        public TableTableHeaderRowsElement(string? prefix = null) : base("table-header-rows", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableTableHeaderRowsElement() : this((string?)null) { }
+
+        public TableTableHeaderRowsElement(string? prefix) : base("table-header-rows", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableTableHeaderRowsElement(params OdfNode[] children) : this()
         {

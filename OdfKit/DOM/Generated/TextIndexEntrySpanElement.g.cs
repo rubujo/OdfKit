@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexEntrySpanElement : OdfElement
     {
-        public TextIndexEntrySpanElement(string? prefix = null) : base("index-entry-span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexEntrySpanElement() : this((string?)null) { }
+
+        public TextIndexEntrySpanElement(string? prefix) : base("index-entry-span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexEntrySpanElement(params OdfNode[] children) : this()
         {

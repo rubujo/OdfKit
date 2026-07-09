@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableScenarioElement : OdfElement
     {
-        public TableScenarioElement(string? prefix = null) : base("scenario", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableScenarioElement() : this((string?)null) { }
+
+        public TableScenarioElement(string? prefix) : base("scenario", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableScenarioElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartStockRangeLineElement : OdfElement
     {
-        public ChartStockRangeLineElement(string? prefix = null) : base("stock-range-line", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartStockRangeLineElement() : this((string?)null) { }
+
+        public ChartStockRangeLineElement(string? prefix) : base("stock-range-line", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartStockRangeLineElement(params OdfNode[] children) : this()
         {

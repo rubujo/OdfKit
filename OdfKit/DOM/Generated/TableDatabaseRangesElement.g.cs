@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDatabaseRangesElement : OdfElement
     {
-        public TableDatabaseRangesElement(string? prefix = null) : base("database-ranges", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDatabaseRangesElement() : this((string?)null) { }
+
+        public TableDatabaseRangesElement(string? prefix) : base("database-ranges", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDatabaseRangesElement(params OdfNode[] children) : this()
         {

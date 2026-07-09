@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MathMLMathElement : OdfElement
     {
-        public MathMLMathElement(string? prefix = null) : base("math", "http://www.w3.org/1998/Math/MathML", prefix) { }
+        public MathMLMathElement() : this((string?)null) { }
+
+        public MathMLMathElement(string? prefix) : base("math", "http://www.w3.org/1998/Math/MathML", prefix) { }
 
         public MathMLMathElement(params OdfNode[] children) : this()
         {

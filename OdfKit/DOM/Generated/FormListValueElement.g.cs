@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormListValueElement : OdfElement
     {
-        public FormListValueElement(string? prefix = null) : base("list-value", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormListValueElement() : this((string?)null) { }
+
+        public FormListValueElement(string? prefix) : base("list-value", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormListValueElement(params OdfNode[] children) : this()
         {

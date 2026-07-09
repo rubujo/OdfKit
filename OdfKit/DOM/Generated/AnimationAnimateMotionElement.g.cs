@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationAnimateMotionElement : OdfElement
     {
-        public AnimationAnimateMotionElement(string? prefix = null) : base("animateMotion", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationAnimateMotionElement() : this((string?)null) { }
+
+        public AnimationAnimateMotionElement(string? prefix) : base("animateMotion", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationAnimateMotionElement(params OdfNode[] children) : this()
         {

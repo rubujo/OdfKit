@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleHeaderFooterPropertiesElement : OdfElement
     {
-        public StyleHeaderFooterPropertiesElement(string? prefix = null) : base("header-footer-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleHeaderFooterPropertiesElement() : this((string?)null) { }
+
+        public StyleHeaderFooterPropertiesElement(string? prefix) : base("header-footer-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleHeaderFooterPropertiesElement(params OdfNode[] children) : this()
         {

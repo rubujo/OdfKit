@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberDateStyleElement : OdfElement
     {
-        public NumberDateStyleElement(string? prefix = null) : base("date-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberDateStyleElement() : this((string?)null) { }
+
+        public NumberDateStyleElement(string? prefix) : base("date-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberDateStyleElement(params OdfNode[] children) : this()
         {

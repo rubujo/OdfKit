@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextEditingCyclesElement : OdfElement
     {
-        public TextEditingCyclesElement(string? prefix = null) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextEditingCyclesElement() : this((string?)null) { }
+
+        public TextEditingCyclesElement(string? prefix) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextEditingCyclesElement(params OdfNode[] children) : this()
         {

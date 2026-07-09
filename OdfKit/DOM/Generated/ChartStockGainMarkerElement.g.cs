@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartStockGainMarkerElement : OdfElement
     {
-        public ChartStockGainMarkerElement(string? prefix = null) : base("stock-gain-marker", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartStockGainMarkerElement() : this((string?)null) { }
+
+        public ChartStockGainMarkerElement(string? prefix) : base("stock-gain-marker", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartStockGainMarkerElement(params OdfNode[] children) : this()
         {

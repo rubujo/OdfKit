@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTemplateNameElement : OdfElement
     {
-        public TextTemplateNameElement(string? prefix = null) : base("template-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTemplateNameElement() : this((string?)null) { }
+
+        public TextTemplateNameElement(string? prefix) : base("template-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTemplateNameElement(params OdfNode[] children) : this()
         {

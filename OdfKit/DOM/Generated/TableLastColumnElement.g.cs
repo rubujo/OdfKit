@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableLastColumnElement : OdfElement
     {
-        public TableLastColumnElement(string? prefix = null) : base("last-column", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableLastColumnElement() : this((string?)null) { }
+
+        public TableLastColumnElement(string? prefix) : base("last-column", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableLastColumnElement(params OdfNode[] children) : this()
         {

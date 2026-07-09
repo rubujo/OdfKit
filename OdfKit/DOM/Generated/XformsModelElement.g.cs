@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class XformsModelElement : OdfElement
     {
-        public XformsModelElement(string? prefix = null) : base("model", "http://www.w3.org/2002/xforms", prefix) { }
+        public XformsModelElement() : this((string?)null) { }
+
+        public XformsModelElement(string? prefix) : base("model", "http://www.w3.org/2002/xforms", prefix) { }
 
         public XformsModelElement(params OdfNode[] children) : this()
         {

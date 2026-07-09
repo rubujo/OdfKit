@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableEvenColumnsElement : OdfElement
     {
-        public TableEvenColumnsElement(string? prefix = null) : base("even-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableEvenColumnsElement() : this((string?)null) { }
+
+        public TableEvenColumnsElement(string? prefix) : base("even-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableEvenColumnsElement(params OdfNode[] children) : this()
         {

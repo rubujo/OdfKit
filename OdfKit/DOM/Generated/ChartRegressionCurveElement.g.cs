@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartRegressionCurveElement : OdfElement
     {
-        public ChartRegressionCurveElement(string? prefix = null) : base("regression-curve", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartRegressionCurveElement() : this((string?)null) { }
+
+        public ChartRegressionCurveElement(string? prefix) : base("regression-curve", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartRegressionCurveElement(params OdfNode[] children) : this()
         {

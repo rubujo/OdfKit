@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTrackedChangesElement : OdfElement
     {
-        public TextTrackedChangesElement(string? prefix = null) : base("tracked-changes", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTrackedChangesElement() : this((string?)null) { }
+
+        public TextTrackedChangesElement(string? prefix) : base("tracked-changes", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTrackedChangesElement(params OdfNode[] children) : this()
         {

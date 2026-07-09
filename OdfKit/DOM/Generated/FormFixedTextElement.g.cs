@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormFixedTextElement : OdfElement
     {
-        public FormFixedTextElement(string? prefix = null) : base("fixed-text", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormFixedTextElement() : this((string?)null) { }
+
+        public FormFixedTextElement(string? prefix) : base("fixed-text", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormFixedTextElement(params OdfNode[] children) : this()
         {

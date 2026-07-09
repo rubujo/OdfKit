@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextChangedRegionElement : OdfElement
     {
-        public TextChangedRegionElement(string? prefix = null) : base("changed-region", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextChangedRegionElement() : this((string?)null) { }
+
+        public TextChangedRegionElement(string? prefix) : base("changed-region", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextChangedRegionElement(params OdfNode[] children) : this()
         {

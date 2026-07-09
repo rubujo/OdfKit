@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaEditingDurationElement : OdfElement
     {
-        public MetaEditingDurationElement(string? prefix = null) : base("editing-duration", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaEditingDurationElement() : this((string?)null) { }
+
+        public MetaEditingDurationElement(string? prefix) : base("editing-duration", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaEditingDurationElement(params OdfNode[] children) : this()
         {

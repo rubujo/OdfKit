@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableConsolidationElement : OdfElement
     {
-        public TableConsolidationElement(string? prefix = null) : base("consolidation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableConsolidationElement() : this((string?)null) { }
+
+        public TableConsolidationElement(string? prefix) : base("consolidation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableConsolidationElement(params OdfNode[] children) : this()
         {

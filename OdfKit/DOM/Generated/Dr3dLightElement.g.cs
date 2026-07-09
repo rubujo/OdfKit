@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dLightElement : OdfElement
     {
-        public Dr3dLightElement(string? prefix = null) : base("light", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dLightElement() : this((string?)null) { }
+
+        public Dr3dLightElement(string? prefix) : base("light", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dLightElement(params OdfNode[] children) : this()
         {

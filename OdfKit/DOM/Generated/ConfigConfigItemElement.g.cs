@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ConfigConfigItemElement : OdfElement
     {
-        public ConfigConfigItemElement(string? prefix = null) : base("config-item", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", prefix) { }
+        public ConfigConfigItemElement() : this((string?)null) { }
+
+        public ConfigConfigItemElement(string? prefix) : base("config-item", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", prefix) { }
 
         public ConfigConfigItemElement(params OdfNode[] children) : this()
         {

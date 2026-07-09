@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextModificationDateElement : OdfElement
     {
-        public TextModificationDateElement(string? prefix = null) : base("modification-date", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextModificationDateElement() : this((string?)null) { }
+
+        public TextModificationDateElement(string? prefix) : base("modification-date", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextModificationDateElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormListboxElement : OdfElement
     {
-        public FormListboxElement(string? prefix = null) : base("listbox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormListboxElement() : this((string?)null) { }
+
+        public FormListboxElement(string? prefix) : base("listbox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormListboxElement(params OdfNode[] children) : this()
         {

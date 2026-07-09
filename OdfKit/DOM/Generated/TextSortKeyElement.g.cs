@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSortKeyElement : OdfElement
     {
-        public TextSortKeyElement(string? prefix = null) : base("sort-key", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSortKeyElement() : this((string?)null) { }
+
+        public TextSortKeyElement(string? prefix) : base("sort-key", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSortKeyElement(params OdfNode[] children) : this()
         {

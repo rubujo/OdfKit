@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextLinenumberingConfigurationElement : OdfElement
     {
-        public TextLinenumberingConfigurationElement(string? prefix = null) : base("linenumbering-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextLinenumberingConfigurationElement() : this((string?)null) { }
+
+        public TextLinenumberingConfigurationElement(string? prefix) : base("linenumbering-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextLinenumberingConfigurationElement(params OdfNode[] children) : this()
         {

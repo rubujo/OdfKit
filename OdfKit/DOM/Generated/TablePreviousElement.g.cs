@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TablePreviousElement : OdfElement
     {
-        public TablePreviousElement(string? prefix = null) : base("previous", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TablePreviousElement() : this((string?)null) { }
+
+        public TablePreviousElement(string? prefix) : base("previous", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TablePreviousElement(params OdfNode[] children) : this()
         {

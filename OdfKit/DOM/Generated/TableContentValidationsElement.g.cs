@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableContentValidationsElement : OdfElement
     {
-        public TableContentValidationsElement(string? prefix = null) : base("content-validations", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableContentValidationsElement() : this((string?)null) { }
+
+        public TableContentValidationsElement(string? prefix) : base("content-validations", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableContentValidationsElement(params OdfNode[] children) : this()
         {

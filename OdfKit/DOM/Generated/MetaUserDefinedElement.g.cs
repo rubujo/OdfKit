@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaUserDefinedElement : OdfElement
     {
-        public MetaUserDefinedElement(string? prefix = null) : base("user-defined", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaUserDefinedElement() : this((string?)null) { }
+
+        public MetaUserDefinedElement(string? prefix) : base("user-defined", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaUserDefinedElement(params OdfNode[] children) : this()
         {

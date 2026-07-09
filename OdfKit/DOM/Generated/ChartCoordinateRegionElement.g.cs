@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartCoordinateRegionElement : OdfElement
     {
-        public ChartCoordinateRegionElement(string? prefix = null) : base("coordinate-region", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartCoordinateRegionElement() : this((string?)null) { }
+
+        public ChartCoordinateRegionElement(string? prefix) : base("coordinate-region", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartCoordinateRegionElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTableOfContentElement : OdfElement
     {
-        public TextTableOfContentElement(string? prefix = null) : base("table-of-content", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTableOfContentElement() : this((string?)null) { }
+
+        public TextTableOfContentElement(string? prefix) : base("table-of-content", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTableOfContentElement(params OdfNode[] children) : this()
         {

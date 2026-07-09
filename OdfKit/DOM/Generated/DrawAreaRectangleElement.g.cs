@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawAreaRectangleElement : OdfElement
     {
-        public DrawAreaRectangleElement(string? prefix = null) : base("area-rectangle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawAreaRectangleElement() : this((string?)null) { }
+
+        public DrawAreaRectangleElement(string? prefix) : base("area-rectangle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawAreaRectangleElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextAlphabeticalIndexSourceElement : OdfElement
     {
-        public TextAlphabeticalIndexSourceElement(string? prefix = null) : base("alphabetical-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextAlphabeticalIndexSourceElement() : this((string?)null) { }
+
+        public TextAlphabeticalIndexSourceElement(string? prefix) : base("alphabetical-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextAlphabeticalIndexSourceElement(params OdfNode[] children) : this()
         {

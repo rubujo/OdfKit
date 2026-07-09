@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderTitleElement : OdfElement
     {
-        public TextSenderTitleElement(string? prefix = null) : base("sender-title", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderTitleElement() : this((string?)null) { }
+
+        public TextSenderTitleElement(string? prefix) : base("sender-title", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderTitleElement(params OdfNode[] children) : this()
         {

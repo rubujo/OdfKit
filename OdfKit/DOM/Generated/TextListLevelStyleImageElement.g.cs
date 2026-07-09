@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextListLevelStyleImageElement : OdfElement
     {
-        public TextListLevelStyleImageElement(string? prefix = null) : base("list-level-style-image", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextListLevelStyleImageElement() : this((string?)null) { }
+
+        public TextListLevelStyleImageElement(string? prefix) : base("list-level-style-image", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextListLevelStyleImageElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseDriverSettingsElement : OdfElement
     {
-        public DatabaseDriverSettingsElement(string? prefix = null) : base("driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseDriverSettingsElement() : this((string?)null) { }
+
+        public DatabaseDriverSettingsElement(string? prefix) : base("driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseDriverSettingsElement(params OdfNode[] children) : this()
         {

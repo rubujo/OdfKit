@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextAuthorInitialsElement : OdfElement
     {
-        public TextAuthorInitialsElement(string? prefix = null) : base("author-initials", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextAuthorInitialsElement() : this((string?)null) { }
+
+        public TextAuthorInitialsElement(string? prefix) : base("author-initials", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextAuthorInitialsElement(params OdfNode[] children) : this()
         {

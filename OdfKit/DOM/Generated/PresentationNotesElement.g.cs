@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationNotesElement : OdfElement
     {
-        public PresentationNotesElement(string? prefix = null) : base("notes", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationNotesElement() : this((string?)null) { }
+
+        public PresentationNotesElement(string? prefix) : base("notes", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationNotesElement(params OdfNode[] children) : this()
         {

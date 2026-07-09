@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationHideShapeElement : OdfElement
     {
-        public PresentationHideShapeElement(string? prefix = null) : base("hide-shape", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationHideShapeElement() : this((string?)null) { }
+
+        public PresentationHideShapeElement(string? prefix) : base("hide-shape", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationHideShapeElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableMovementCutOffElement : OdfElement
     {
-        public TableMovementCutOffElement(string? prefix = null) : base("movement-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableMovementCutOffElement() : this((string?)null) { }
+
+        public TableMovementCutOffElement(string? prefix) : base("movement-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableMovementCutOffElement(params OdfNode[] children) : this()
         {

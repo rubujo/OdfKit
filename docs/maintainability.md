@@ -89,7 +89,7 @@
 
 | 路徑 | 來源 | 規則 |
 |------|------|------|
-| `OdfKit/DOM/Generated/*.g.cs` | `OdfSchemaGenerator` | **不可手改**；重產見 `eng/Generate-OdfSchemaProvider.ps1` |
+| `OdfKit/DOM/Generated/*.g.cs` | `OdfSchemaGenerator`（`dom-wrappers`） | **不可手改**；改產生器後以 `eng/Generate-OdfSchemaProvider.ps1` 重產 |
 | `OdfKit/Compliance/Generated/Odf*OfficialSchemaProvider.g.cs` | 同上 | 同上 |
 
 - 產生碼體積大是 **ODF 多版規格覆蓋與封存流通** 的代價；不應為了「看起來乾淨」或單純瘦身 nupkg 而刪減 schema 覆蓋。  

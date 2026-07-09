@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSoftPageBreakElement : OdfElement
     {
-        public TextSoftPageBreakElement(string? prefix = null) : base("soft-page-break", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSoftPageBreakElement() : this((string?)null) { }
+
+        public TextSoftPageBreakElement(string? prefix) : base("soft-page-break", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSoftPageBreakElement(params OdfNode[] children) : this()
         {

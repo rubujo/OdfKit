@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseTableExcludeFilterElement : OdfElement
     {
-        public DatabaseTableExcludeFilterElement(string? prefix = null) : base("table-exclude-filter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseTableExcludeFilterElement() : this((string?)null) { }
+
+        public DatabaseTableExcludeFilterElement(string? prefix) : base("table-exclude-filter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseTableExcludeFilterElement(params OdfNode[] children) : this()
         {

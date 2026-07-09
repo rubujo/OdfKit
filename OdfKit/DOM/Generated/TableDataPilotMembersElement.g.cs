@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDataPilotMembersElement : OdfElement
     {
-        public TableDataPilotMembersElement(string? prefix = null) : base("data-pilot-members", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDataPilotMembersElement() : this((string?)null) { }
+
+        public TableDataPilotMembersElement(string? prefix) : base("data-pilot-members", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDataPilotMembersElement(params OdfNode[] children) : this()
         {

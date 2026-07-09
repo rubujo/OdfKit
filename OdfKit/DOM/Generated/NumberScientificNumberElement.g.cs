@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberScientificNumberElement : OdfElement
     {
-        public NumberScientificNumberElement(string? prefix = null) : base("scientific-number", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberScientificNumberElement() : this((string?)null) { }
+
+        public NumberScientificNumberElement(string? prefix) : base("scientific-number", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberScientificNumberElement(params OdfNode[] children) : this()
         {

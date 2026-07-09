@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationHeaderElement : OdfElement
     {
-        public PresentationHeaderElement(string? prefix = null) : base("header", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationHeaderElement() : this((string?)null) { }
+
+        public PresentationHeaderElement(string? prefix) : base("header", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationHeaderElement(params OdfNode[] children) : this()
         {

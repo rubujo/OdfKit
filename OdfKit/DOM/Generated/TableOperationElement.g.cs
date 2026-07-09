@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableOperationElement : OdfElement
     {
-        public TableOperationElement(string? prefix = null) : base("operation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableOperationElement() : this((string?)null) { }
+
+        public TableOperationElement(string? prefix) : base("operation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableOperationElement(params OdfNode[] children) : this()
         {

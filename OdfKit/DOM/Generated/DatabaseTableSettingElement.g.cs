@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseTableSettingElement : OdfElement
     {
-        public DatabaseTableSettingElement(string? prefix = null) : base("table-setting", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseTableSettingElement() : this((string?)null) { }
+
+        public DatabaseTableSettingElement(string? prefix) : base("table-setting", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseTableSettingElement(params OdfNode[] children) : this()
         {

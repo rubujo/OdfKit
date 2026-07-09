@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDescElement : OdfElement
     {
-        public TableDescElement(string? prefix = null) : base("desc", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDescElement() : this((string?)null) { }
+
+        public TableDescElement(string? prefix) : base("desc", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDescElement(params OdfNode[] children) : this()
         {

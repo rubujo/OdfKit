@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTabElement : OdfElement
     {
-        public TextTabElement(string? prefix = null) : base("tab", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTabElement() : this((string?)null) { }
+
+        public TextTabElement(string? prefix) : base("tab", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTabElement(params OdfNode[] children) : this()
         {

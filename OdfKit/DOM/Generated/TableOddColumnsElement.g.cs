@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableOddColumnsElement : OdfElement
     {
-        public TableOddColumnsElement(string? prefix = null) : base("odd-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableOddColumnsElement() : this((string?)null) { }
+
+        public TableOddColumnsElement(string? prefix) : base("odd-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableOddColumnsElement(params OdfNode[] children) : this()
         {

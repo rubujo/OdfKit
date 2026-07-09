@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexEntryLinkStartElement : OdfElement
     {
-        public TextIndexEntryLinkStartElement(string? prefix = null) : base("index-entry-link-start", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexEntryLinkStartElement() : this((string?)null) { }
+
+        public TextIndexEntryLinkStartElement(string? prefix) : base("index-entry-link-start", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexEntryLinkStartElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextPrintDateElement : OdfElement
     {
-        public TextPrintDateElement(string? prefix = null) : base("print-date", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextPrintDateElement() : this((string?)null) { }
+
+        public TextPrintDateElement(string? prefix) : base("print-date", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextPrintDateElement(params OdfNode[] children) : this()
         {

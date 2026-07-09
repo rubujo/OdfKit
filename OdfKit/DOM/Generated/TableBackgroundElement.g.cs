@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableBackgroundElement : OdfElement
     {
-        public TableBackgroundElement(string? prefix = null) : base("background", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableBackgroundElement() : this((string?)null) { }
+
+        public TableBackgroundElement(string? prefix) : base("background", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableBackgroundElement(params OdfNode[] children) : this()
         {

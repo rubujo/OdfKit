@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationShowShapeElement : OdfElement
     {
-        public PresentationShowShapeElement(string? prefix = null) : base("show-shape", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationShowShapeElement() : this((string?)null) { }
+
+        public PresentationShowShapeElement(string? prefix) : base("show-shape", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationShowShapeElement(params OdfNode[] children) : this()
         {

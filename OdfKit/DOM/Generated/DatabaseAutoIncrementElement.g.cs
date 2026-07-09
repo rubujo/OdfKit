@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseAutoIncrementElement : OdfElement
     {
-        public DatabaseAutoIncrementElement(string? prefix = null) : base("auto-increment", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseAutoIncrementElement() : this((string?)null) { }
+
+        public DatabaseAutoIncrementElement(string? prefix) : base("auto-increment", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseAutoIncrementElement(params OdfNode[] children) : this()
         {

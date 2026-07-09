@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawControlElement : OdfElement
     {
-        public DrawControlElement(string? prefix = null) : base("control", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawControlElement() : this((string?)null) { }
+
+        public DrawControlElement(string? prefix) : base("control", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawControlElement(params OdfNode[] children) : this()
         {

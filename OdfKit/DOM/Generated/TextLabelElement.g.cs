@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextLabelElement : OdfElement
     {
-        public TextLabelElement(string? prefix = null) : base("label", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextLabelElement() : this((string?)null) { }
+
+        public TextLabelElement(string? prefix) : base("label", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextLabelElement(params OdfNode[] children) : this()
         {

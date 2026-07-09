@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextPageContinuationElement : OdfElement
     {
-        public TextPageContinuationElement(string? prefix = null) : base("page-continuation", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextPageContinuationElement() : this((string?)null) { }
+
+        public TextPageContinuationElement(string? prefix) : base("page-continuation", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextPageContinuationElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormFormattedTextElement : OdfElement
     {
-        public FormFormattedTextElement(string? prefix = null) : base("formatted-text", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormFormattedTextElement() : this((string?)null) { }
+
+        public FormFormattedTextElement(string? prefix) : base("formatted-text", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormFormattedTextElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleFootnoteSepElement : OdfElement
     {
-        public StyleFootnoteSepElement(string? prefix = null) : base("footnote-sep", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleFootnoteSepElement() : this((string?)null) { }
+
+        public StyleFootnoteSepElement(string? prefix) : base("footnote-sep", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleFootnoteSepElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormDateElement : OdfElement
     {
-        public FormDateElement(string? prefix = null) : base("date", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormDateElement() : this((string?)null) { }
+
+        public FormDateElement(string? prefix) : base("date", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormDateElement(params OdfNode[] children) : this()
         {

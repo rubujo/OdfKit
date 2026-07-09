@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDataPilotSubtotalElement : OdfElement
     {
-        public TableDataPilotSubtotalElement(string? prefix = null) : base("data-pilot-subtotal", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDataPilotSubtotalElement() : this((string?)null) { }
+
+        public TableDataPilotSubtotalElement(string? prefix) : base("data-pilot-subtotal", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDataPilotSubtotalElement(params OdfNode[] children) : this()
         {

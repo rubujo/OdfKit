@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberTimeStyleElement : OdfElement
     {
-        public NumberTimeStyleElement(string? prefix = null) : base("time-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberTimeStyleElement() : this((string?)null) { }
+
+        public NumberTimeStyleElement(string? prefix) : base("time-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberTimeStyleElement(params OdfNode[] children) : this()
         {

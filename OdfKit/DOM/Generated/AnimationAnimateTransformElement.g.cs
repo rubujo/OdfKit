@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationAnimateTransformElement : OdfElement
     {
-        public AnimationAnimateTransformElement(string? prefix = null) : base("animateTransform", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationAnimateTransformElement() : this((string?)null) { }
+
+        public AnimationAnimateTransformElement(string? prefix) : base("animateTransform", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationAnimateTransformElement(params OdfNode[] children) : this()
         {

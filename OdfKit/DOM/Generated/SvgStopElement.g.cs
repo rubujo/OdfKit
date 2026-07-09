@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class SvgStopElement : OdfElement
     {
-        public SvgStopElement(string? prefix = null) : base("stop", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+        public SvgStopElement() : this((string?)null) { }
+
+        public SvgStopElement(string? prefix) : base("stop", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
         public SvgStopElement(params OdfNode[] children) : this()
         {

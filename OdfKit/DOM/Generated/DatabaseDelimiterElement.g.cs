@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseDelimiterElement : OdfElement
     {
-        public DatabaseDelimiterElement(string? prefix = null) : base("delimiter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseDelimiterElement() : this((string?)null) { }
+
+        public DatabaseDelimiterElement(string? prefix) : base("delimiter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseDelimiterElement(params OdfNode[] children) : this()
         {

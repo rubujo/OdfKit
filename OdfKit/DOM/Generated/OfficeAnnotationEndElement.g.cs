@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeAnnotationEndElement : OdfElement
     {
-        public OfficeAnnotationEndElement(string? prefix = null) : base("annotation-end", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeAnnotationEndElement() : this((string?)null) { }
+
+        public OfficeAnnotationEndElement(string? prefix) : base("annotation-end", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeAnnotationEndElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextRubyElement : OdfElement
     {
-        public TextRubyElement(string? prefix = null) : base("ruby", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextRubyElement() : this((string?)null) { }
+
+        public TextRubyElement(string? prefix) : base("ruby", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextRubyElement(params OdfNode[] children) : this()
         {

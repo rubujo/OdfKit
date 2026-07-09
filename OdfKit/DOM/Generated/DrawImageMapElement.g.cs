@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawImageMapElement : OdfElement
     {
-        public DrawImageMapElement(string? prefix = null) : base("image-map", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawImageMapElement() : this((string?)null) { }
+
+        public DrawImageMapElement(string? prefix) : base("image-map", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawImageMapElement(params OdfNode[] children) : this()
         {

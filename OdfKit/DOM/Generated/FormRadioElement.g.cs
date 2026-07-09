@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormRadioElement : OdfElement
     {
-        public FormRadioElement(string? prefix = null) : base("radio", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormRadioElement() : this((string?)null) { }
+
+        public FormRadioElement(string? prefix) : base("radio", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormRadioElement(params OdfNode[] children) : this()
         {

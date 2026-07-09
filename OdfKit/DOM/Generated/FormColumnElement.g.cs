@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormColumnElement : OdfElement
     {
-        public FormColumnElement(string? prefix = null) : base("column", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormColumnElement() : this((string?)null) { }
+
+        public FormColumnElement(string? prefix) : base("column", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormColumnElement(params OdfNode[] children) : this()
         {

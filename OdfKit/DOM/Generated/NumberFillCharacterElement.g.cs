@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberFillCharacterElement : OdfElement
     {
-        public NumberFillCharacterElement(string? prefix = null) : base("fill-character", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberFillCharacterElement() : this((string?)null) { }
+
+        public NumberFillCharacterElement(string? prefix) : base("fill-character", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberFillCharacterElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseUpdateTableElement : OdfElement
     {
-        public DatabaseUpdateTableElement(string? prefix = null) : base("update-table", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseUpdateTableElement() : this((string?)null) { }
+
+        public DatabaseUpdateTableElement(string? prefix) : base("update-table", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseUpdateTableElement(params OdfNode[] children) : this()
         {

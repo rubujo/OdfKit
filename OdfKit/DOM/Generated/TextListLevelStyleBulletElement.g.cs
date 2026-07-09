@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextListLevelStyleBulletElement : OdfElement
     {
-        public TextListLevelStyleBulletElement(string? prefix = null) : base("list-level-style-bullet", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextListLevelStyleBulletElement() : this((string?)null) { }
+
+        public TextListLevelStyleBulletElement(string? prefix) : base("list-level-style-bullet", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextListLevelStyleBulletElement(params OdfNode[] children) : this()
         {

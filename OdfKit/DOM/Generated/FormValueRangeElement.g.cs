@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormValueRangeElement : OdfElement
     {
-        public FormValueRangeElement(string? prefix = null) : base("value-range", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormValueRangeElement() : this((string?)null) { }
+
+        public FormValueRangeElement(string? prefix) : base("value-range", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormValueRangeElement(params OdfNode[] children) : this()
         {

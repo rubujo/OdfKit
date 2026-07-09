@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaPrintedByElement : OdfElement
     {
-        public MetaPrintedByElement(string? prefix = null) : base("printed-by", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaPrintedByElement() : this((string?)null) { }
+
+        public MetaPrintedByElement(string? prefix) : base("printed-by", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaPrintedByElement(params OdfNode[] children) : this()
         {

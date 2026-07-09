@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDeletionsElement : OdfElement
     {
-        public TableDeletionsElement(string? prefix = null) : base("deletions", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDeletionsElement() : this((string?)null) { }
+
+        public TableDeletionsElement(string? prefix) : base("deletions", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDeletionsElement(params OdfNode[] children) : this()
         {

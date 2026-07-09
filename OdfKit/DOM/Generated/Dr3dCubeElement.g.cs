@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dCubeElement : OdfElement
     {
-        public Dr3dCubeElement(string? prefix = null) : base("cube", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dCubeElement() : this((string?)null) { }
+
+        public Dr3dCubeElement(string? prefix) : base("cube", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dCubeElement(params OdfNode[] children) : this()
         {

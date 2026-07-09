@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextNoteRefElement : OdfElement
     {
-        public TextNoteRefElement(string? prefix = null) : base("note-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextNoteRefElement() : this((string?)null) { }
+
+        public TextNoteRefElement(string? prefix) : base("note-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextNoteRefElement(params OdfNode[] children) : this()
         {

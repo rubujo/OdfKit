@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationSoundElement : OdfElement
     {
-        public PresentationSoundElement(string? prefix = null) : base("sound", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationSoundElement() : this((string?)null) { }
+
+        public PresentationSoundElement(string? prefix) : base("sound", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationSoundElement(params OdfNode[] children) : this()
         {

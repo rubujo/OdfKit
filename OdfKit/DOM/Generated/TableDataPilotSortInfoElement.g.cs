@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableDataPilotSortInfoElement : OdfElement
     {
-        public TableDataPilotSortInfoElement(string? prefix = null) : base("data-pilot-sort-info", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableDataPilotSortInfoElement() : this((string?)null) { }
+
+        public TableDataPilotSortInfoElement(string? prefix) : base("data-pilot-sort-info", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableDataPilotSortInfoElement(params OdfNode[] children) : this()
         {

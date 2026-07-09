@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationSetElement : OdfElement
     {
-        public AnimationSetElement(string? prefix = null) : base("set", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationSetElement() : this((string?)null) { }
+
+        public AnimationSetElement(string? prefix) : base("set", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationSetElement(params OdfNode[] children) : this()
         {

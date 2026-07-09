@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleFooterElement : OdfElement
     {
-        public StyleFooterElement(string? prefix = null) : base("footer", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleFooterElement() : this((string?)null) { }
+
+        public StyleFooterElement(string? prefix) : base("footer", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleFooterElement(params OdfNode[] children) : this()
         {

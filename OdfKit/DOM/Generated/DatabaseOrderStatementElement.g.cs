@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseOrderStatementElement : OdfElement
     {
-        public DatabaseOrderStatementElement(string? prefix = null) : base("order-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseOrderStatementElement() : this((string?)null) { }
+
+        public DatabaseOrderStatementElement(string? prefix) : base("order-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseOrderStatementElement(params OdfNode[] children) : this()
         {

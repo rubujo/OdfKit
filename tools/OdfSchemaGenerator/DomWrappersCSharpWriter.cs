@@ -217,7 +217,10 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine("    /// </summary>");
             writer.WriteLine($"    public partial class {className} : OdfElement");
             writer.WriteLine("    {");
-            writer.WriteLine($"        public {className}(string? prefix = null) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
+            // RS0026/RS0027：不使用可選參數；參數最少者轉呼叫明確 prefix 多載。
+            writer.WriteLine($"        public {className}() : this((string?)null) {{ }}");
+            writer.WriteLine();
+            writer.WriteLine($"        public {className}(string? prefix) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
             writer.WriteLine();
             writer.WriteLine($"        public {className}(params OdfNode[] children) : this()");
             writer.WriteLine("        {");

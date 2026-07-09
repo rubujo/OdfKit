@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormTextareaElement : OdfElement
     {
-        public FormTextareaElement(string? prefix = null) : base("textarea", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormTextareaElement() : this((string?)null) { }
+
+        public FormTextareaElement(string? prefix) : base("textarea", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormTextareaElement(params OdfNode[] children) : this()
         {

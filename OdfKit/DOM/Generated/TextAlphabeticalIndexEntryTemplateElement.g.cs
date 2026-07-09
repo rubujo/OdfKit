@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextAlphabeticalIndexEntryTemplateElement : OdfElement
     {
-        public TextAlphabeticalIndexEntryTemplateElement(string? prefix = null) : base("alphabetical-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextAlphabeticalIndexEntryTemplateElement() : this((string?)null) { }
+
+        public TextAlphabeticalIndexEntryTemplateElement(string? prefix) : base("alphabetical-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextAlphabeticalIndexEntryTemplateElement(params OdfNode[] children) : this()
         {

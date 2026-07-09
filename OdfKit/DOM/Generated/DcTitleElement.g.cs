@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DcTitleElement : OdfElement
     {
-        public DcTitleElement(string? prefix = null) : base("title", "http://purl.org/dc/elements/1.1/", prefix) { }
+        public DcTitleElement() : this((string?)null) { }
+
+        public DcTitleElement(string? prefix) : base("title", "http://purl.org/dc/elements/1.1/", prefix) { }
 
         public DcTitleElement(params OdfNode[] children) : this()
         {

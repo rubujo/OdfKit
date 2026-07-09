@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexSourceStyleElement : OdfElement
     {
-        public TextIndexSourceStyleElement(string? prefix = null) : base("index-source-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexSourceStyleElement() : this((string?)null) { }
+
+        public TextIndexSourceStyleElement(string? prefix) : base("index-source-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexSourceStyleElement(params OdfNode[] children) : this()
         {

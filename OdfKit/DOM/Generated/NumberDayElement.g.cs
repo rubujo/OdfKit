@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberDayElement : OdfElement
     {
-        public NumberDayElement(string? prefix = null) : base("day", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberDayElement() : this((string?)null) { }
+
+        public NumberDayElement(string? prefix) : base("day", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberDayElement(params OdfNode[] children) : this()
         {

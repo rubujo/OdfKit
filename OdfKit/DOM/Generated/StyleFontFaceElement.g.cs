@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleFontFaceElement : OdfElement
     {
-        public StyleFontFaceElement(string? prefix = null) : base("font-face", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleFontFaceElement() : this((string?)null) { }
+
+        public StyleFontFaceElement(string? prefix) : base("font-face", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleFontFaceElement(params OdfNode[] children) : this()
         {

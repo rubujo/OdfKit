@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseFileBasedDatabaseElement : OdfElement
     {
-        public DatabaseFileBasedDatabaseElement(string? prefix = null) : base("file-based-database", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseFileBasedDatabaseElement() : this((string?)null) { }
+
+        public DatabaseFileBasedDatabaseElement(string? prefix) : base("file-based-database", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseFileBasedDatabaseElement(params OdfNode[] children) : this()
         {

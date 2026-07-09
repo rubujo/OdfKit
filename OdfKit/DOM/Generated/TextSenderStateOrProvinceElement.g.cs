@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderStateOrProvinceElement : OdfElement
     {
-        public TextSenderStateOrProvinceElement(string? prefix = null) : base("sender-state-or-province", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderStateOrProvinceElement() : this((string?)null) { }
+
+        public TextSenderStateOrProvinceElement(string? prefix) : base("sender-state-or-province", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderStateOrProvinceElement(params OdfNode[] children) : this()
         {

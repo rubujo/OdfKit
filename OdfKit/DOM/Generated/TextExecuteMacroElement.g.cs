@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextExecuteMacroElement : OdfElement
     {
-        public TextExecuteMacroElement(string? prefix = null) : base("execute-macro", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextExecuteMacroElement() : this((string?)null) { }
+
+        public TextExecuteMacroElement(string? prefix) : base("execute-macro", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextExecuteMacroElement(params OdfNode[] children) : this()
         {

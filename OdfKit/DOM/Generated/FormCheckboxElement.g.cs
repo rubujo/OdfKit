@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormCheckboxElement : OdfElement
     {
-        public FormCheckboxElement(string? prefix = null) : base("checkbox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormCheckboxElement() : this((string?)null) { }
+
+        public FormCheckboxElement(string? prefix) : base("checkbox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormCheckboxElement(params OdfNode[] children) : this()
         {

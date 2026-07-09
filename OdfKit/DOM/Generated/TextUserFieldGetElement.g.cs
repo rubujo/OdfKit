@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextUserFieldGetElement : OdfElement
     {
-        public TextUserFieldGetElement(string? prefix = null) : base("user-field-get", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextUserFieldGetElement() : this((string?)null) { }
+
+        public TextUserFieldGetElement(string? prefix) : base("user-field-get", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextUserFieldGetElement(params OdfNode[] children) : this()
         {

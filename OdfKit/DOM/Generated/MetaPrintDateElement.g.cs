@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaPrintDateElement : OdfElement
     {
-        public MetaPrintDateElement(string? prefix = null) : base("print-date", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaPrintDateElement() : this((string?)null) { }
+
+        public MetaPrintDateElement(string? prefix) : base("print-date", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaPrintDateElement(params OdfNode[] children) : this()
         {

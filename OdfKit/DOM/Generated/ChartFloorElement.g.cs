@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartFloorElement : OdfElement
     {
-        public ChartFloorElement(string? prefix = null) : base("floor", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartFloorElement() : this((string?)null) { }
+
+        public ChartFloorElement(string? prefix) : base("floor", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartFloorElement(params OdfNode[] children) : this()
         {

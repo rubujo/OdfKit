@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseKeyElement : OdfElement
     {
-        public DatabaseKeyElement(string? prefix = null) : base("key", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseKeyElement() : this((string?)null) { }
+
+        public DatabaseKeyElement(string? prefix) : base("key", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseKeyElement(params OdfNode[] children) : this()
         {

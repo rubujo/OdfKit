@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaInitialCreatorElement : OdfElement
     {
-        public MetaInitialCreatorElement(string? prefix = null) : base("initial-creator", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaInitialCreatorElement() : this((string?)null) { }
+
+        public MetaInitialCreatorElement(string? prefix) : base("initial-creator", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaInitialCreatorElement(params OdfNode[] children) : this()
         {

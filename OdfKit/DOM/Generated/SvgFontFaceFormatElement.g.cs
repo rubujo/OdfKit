@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class SvgFontFaceFormatElement : OdfElement
     {
-        public SvgFontFaceFormatElement(string? prefix = null) : base("font-face-format", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+        public SvgFontFaceFormatElement() : this((string?)null) { }
+
+        public SvgFontFaceFormatElement(string? prefix) : base("font-face-format", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
         public SvgFontFaceFormatElement(params OdfNode[] children) : this()
         {

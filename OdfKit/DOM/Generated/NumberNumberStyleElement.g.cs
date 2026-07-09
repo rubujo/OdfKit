@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberNumberStyleElement : OdfElement
     {
-        public NumberNumberStyleElement(string? prefix = null) : base("number-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberNumberStyleElement() : this((string?)null) { }
+
+        public NumberNumberStyleElement(string? prefix) : base("number-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberNumberStyleElement(params OdfNode[] children) : this()
         {

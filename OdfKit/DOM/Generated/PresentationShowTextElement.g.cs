@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationShowTextElement : OdfElement
     {
-        public PresentationShowTextElement(string? prefix = null) : base("show-text", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationShowTextElement() : this((string?)null) { }
+
+        public PresentationShowTextElement(string? prefix) : base("show-text", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationShowTextElement(params OdfNode[] children) : this()
         {

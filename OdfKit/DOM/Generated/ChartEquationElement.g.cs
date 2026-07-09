@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartEquationElement : OdfElement
     {
-        public ChartEquationElement(string? prefix = null) : base("equation", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartEquationElement() : this((string?)null) { }
+
+        public ChartEquationElement(string? prefix) : base("equation", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartEquationElement(params OdfNode[] children) : this()
         {

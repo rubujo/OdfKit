@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextKeywordsElement : OdfElement
     {
-        public TextKeywordsElement(string? prefix = null) : base("keywords", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextKeywordsElement() : this((string?)null) { }
+
+        public TextKeywordsElement(string? prefix) : base("keywords", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextKeywordsElement(params OdfNode[] children) : this()
         {

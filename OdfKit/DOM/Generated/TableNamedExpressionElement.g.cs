@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableNamedExpressionElement : OdfElement
     {
-        public TableNamedExpressionElement(string? prefix = null) : base("named-expression", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableNamedExpressionElement() : this((string?)null) { }
+
+        public TableNamedExpressionElement(string? prefix) : base("named-expression", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableNamedExpressionElement(params OdfNode[] children) : this()
         {

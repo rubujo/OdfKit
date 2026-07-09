@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextInsertionElement : OdfElement
     {
-        public TextInsertionElement(string? prefix = null) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextInsertionElement() : this((string?)null) { }
+
+        public TextInsertionElement(string? prefix) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextInsertionElement(params OdfNode[] children) : this()
         {

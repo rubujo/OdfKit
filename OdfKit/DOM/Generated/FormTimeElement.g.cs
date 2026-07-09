@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormTimeElement : OdfElement
     {
-        public FormTimeElement(string? prefix = null) : base("time", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormTimeElement() : this((string?)null) { }
+
+        public FormTimeElement(string? prefix) : base("time", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormTimeElement(params OdfNode[] children) : this()
         {

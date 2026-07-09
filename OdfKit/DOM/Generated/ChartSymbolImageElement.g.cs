@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartSymbolImageElement : OdfElement
     {
-        public ChartSymbolImageElement(string? prefix = null) : base("symbol-image", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartSymbolImageElement() : this((string?)null) { }
+
+        public ChartSymbolImageElement(string? prefix) : base("symbol-image", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartSymbolImageElement(params OdfNode[] children) : this()
         {

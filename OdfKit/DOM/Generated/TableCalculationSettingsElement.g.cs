@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableCalculationSettingsElement : OdfElement
     {
-        public TableCalculationSettingsElement(string? prefix = null) : base("calculation-settings", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableCalculationSettingsElement() : this((string?)null) { }
+
+        public TableCalculationSettingsElement(string? prefix) : base("calculation-settings", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableCalculationSettingsElement(params OdfNode[] children) : this()
         {

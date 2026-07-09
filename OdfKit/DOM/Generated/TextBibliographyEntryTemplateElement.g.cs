@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextBibliographyEntryTemplateElement : OdfElement
     {
-        public TextBibliographyEntryTemplateElement(string? prefix = null) : base("bibliography-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextBibliographyEntryTemplateElement() : this((string?)null) { }
+
+        public TextBibliographyEntryTemplateElement(string? prefix) : base("bibliography-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextBibliographyEntryTemplateElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleSectionPropertiesElement : OdfElement
     {
-        public StyleSectionPropertiesElement(string? prefix = null) : base("section-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleSectionPropertiesElement() : this((string?)null) { }
+
+        public StyleSectionPropertiesElement(string? prefix) : base("section-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleSectionPropertiesElement(params OdfNode[] children) : this()
         {

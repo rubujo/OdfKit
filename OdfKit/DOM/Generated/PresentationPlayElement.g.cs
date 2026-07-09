@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationPlayElement : OdfElement
     {
-        public PresentationPlayElement(string? prefix = null) : base("play", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationPlayElement() : this((string?)null) { }
+
+        public PresentationPlayElement(string? prefix) : base("play", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationPlayElement(params OdfNode[] children) : this()
         {

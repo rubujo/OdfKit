@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseApplicationConnectionSettingsElement : OdfElement
     {
-        public DatabaseApplicationConnectionSettingsElement(string? prefix = null) : base("application-connection-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseApplicationConnectionSettingsElement() : this((string?)null) { }
+
+        public DatabaseApplicationConnectionSettingsElement(string? prefix) : base("application-connection-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseApplicationConnectionSettingsElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberFractionElement : OdfElement
     {
-        public NumberFractionElement(string? prefix = null) : base("fraction", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberFractionElement() : this((string?)null) { }
+
+        public NumberFractionElement(string? prefix) : base("fraction", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberFractionElement(params OdfNode[] children) : this()
         {

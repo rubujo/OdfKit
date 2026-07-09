@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderPositionElement : OdfElement
     {
-        public TextSenderPositionElement(string? prefix = null) : base("sender-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderPositionElement() : this((string?)null) { }
+
+        public TextSenderPositionElement(string? prefix) : base("sender-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderPositionElement(params OdfNode[] children) : this()
         {

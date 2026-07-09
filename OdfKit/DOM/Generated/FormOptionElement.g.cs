@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormOptionElement : OdfElement
     {
-        public FormOptionElement(string? prefix = null) : base("option", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormOptionElement() : this((string?)null) { }
+
+        public FormOptionElement(string? prefix) : base("option", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormOptionElement(params OdfNode[] children) : this()
         {

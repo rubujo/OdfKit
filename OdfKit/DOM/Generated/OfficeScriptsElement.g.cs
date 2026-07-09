@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeScriptsElement : OdfElement
     {
-        public OfficeScriptsElement(string? prefix = null) : base("scripts", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeScriptsElement() : this((string?)null) { }
+
+        public OfficeScriptsElement(string? prefix) : base("scripts", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeScriptsElement(params OdfNode[] children) : this()
         {

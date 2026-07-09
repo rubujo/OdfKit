@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartPlotAreaElement : OdfElement
     {
-        public ChartPlotAreaElement(string? prefix = null) : base("plot-area", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartPlotAreaElement() : this((string?)null) { }
+
+        public ChartPlotAreaElement(string? prefix) : base("plot-area", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartPlotAreaElement(params OdfNode[] children) : this()
         {

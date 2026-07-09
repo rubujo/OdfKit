@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextNotesConfigurationElement : OdfElement
     {
-        public TextNotesConfigurationElement(string? prefix = null) : base("notes-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextNotesConfigurationElement() : this((string?)null) { }
+
+        public TextNotesConfigurationElement(string? prefix) : base("notes-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextNotesConfigurationElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawGluePointElement : OdfElement
     {
-        public DrawGluePointElement(string? prefix = null) : base("glue-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawGluePointElement() : this((string?)null) { }
+
+        public DrawGluePointElement(string? prefix) : base("glue-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawGluePointElement(params OdfNode[] children) : this()
         {

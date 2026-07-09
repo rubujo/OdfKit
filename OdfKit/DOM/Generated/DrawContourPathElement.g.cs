@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawContourPathElement : OdfElement
     {
-        public DrawContourPathElement(string? prefix = null) : base("contour-path", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawContourPathElement() : this((string?)null) { }
+
+        public DrawContourPathElement(string? prefix) : base("contour-path", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawContourPathElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSubjectElement : OdfElement
     {
-        public TextSubjectElement(string? prefix = null) : base("subject", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSubjectElement() : this((string?)null) { }
+
+        public TextSubjectElement(string? prefix) : base("subject", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSubjectElement(params OdfNode[] children) : this()
         {

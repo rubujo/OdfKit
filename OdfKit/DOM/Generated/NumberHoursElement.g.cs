@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberHoursElement : OdfElement
     {
-        public NumberHoursElement(string? prefix = null) : base("hours", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberHoursElement() : this((string?)null) { }
+
+        public NumberHoursElement(string? prefix) : base("hours", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberHoursElement(params OdfNode[] children) : this()
         {

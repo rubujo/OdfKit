@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextBookmarkStartElement : OdfElement
     {
-        public TextBookmarkStartElement(string? prefix = null) : base("bookmark-start", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextBookmarkStartElement() : this((string?)null) { }
+
+        public TextBookmarkStartElement(string? prefix) : base("bookmark-start", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextBookmarkStartElement(params OdfNode[] children) : this()
         {

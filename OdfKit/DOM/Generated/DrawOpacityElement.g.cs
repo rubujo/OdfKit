@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawOpacityElement : OdfElement
     {
-        public DrawOpacityElement(string? prefix = null) : base("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawOpacityElement() : this((string?)null) { }
+
+        public DrawOpacityElement(string? prefix) : base("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawOpacityElement(params OdfNode[] children) : this()
         {

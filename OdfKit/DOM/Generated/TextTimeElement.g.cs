@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTimeElement : OdfElement
     {
-        public TextTimeElement(string? prefix = null) : base("time", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTimeElement() : this((string?)null) { }
+
+        public TextTimeElement(string? prefix) : base("time", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTimeElement(params OdfNode[] children) : this()
         {

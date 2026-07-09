@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexEntryTextElement : OdfElement
     {
-        public TextIndexEntryTextElement(string? prefix = null) : base("index-entry-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexEntryTextElement() : this((string?)null) { }
+
+        public TextIndexEntryTextElement(string? prefix) : base("index-entry-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexEntryTextElement(params OdfNode[] children) : this()
         {

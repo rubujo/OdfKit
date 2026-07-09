@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDatabaseRowNumberElement : OdfElement
     {
-        public TextDatabaseRowNumberElement(string? prefix = null) : base("database-row-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDatabaseRowNumberElement() : this((string?)null) { }
+
+        public TextDatabaseRowNumberElement(string? prefix) : base("database-row-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDatabaseRowNumberElement(params OdfNode[] children) : this()
         {

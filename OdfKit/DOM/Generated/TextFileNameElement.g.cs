@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextFileNameElement : OdfElement
     {
-        public TextFileNameElement(string? prefix = null) : base("file-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextFileNameElement() : this((string?)null) { }
+
+        public TextFileNameElement(string? prefix) : base("file-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextFileNameElement(params OdfNode[] children) : this()
         {

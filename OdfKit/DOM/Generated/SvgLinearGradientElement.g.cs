@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class SvgLinearGradientElement : OdfElement
     {
-        public SvgLinearGradientElement(string? prefix = null) : base("linearGradient", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+        public SvgLinearGradientElement() : this((string?)null) { }
+
+        public SvgLinearGradientElement(string? prefix) : base("linearGradient", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
         public SvgLinearGradientElement(params OdfNode[] children) : this()
         {

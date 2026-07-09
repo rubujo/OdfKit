@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableErrorMacroElement : OdfElement
     {
-        public TableErrorMacroElement(string? prefix = null) : base("error-macro", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableErrorMacroElement() : this((string?)null) { }
+
+        public TableErrorMacroElement(string? prefix) : base("error-macro", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableErrorMacroElement(params OdfNode[] children) : this()
         {

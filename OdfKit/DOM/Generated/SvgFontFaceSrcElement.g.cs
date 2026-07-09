@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class SvgFontFaceSrcElement : OdfElement
     {
-        public SvgFontFaceSrcElement(string? prefix = null) : base("font-face-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+        public SvgFontFaceSrcElement() : this((string?)null) { }
+
+        public SvgFontFaceSrcElement(string? prefix) : base("font-face-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
         public SvgFontFaceSrcElement(params OdfNode[] children) : this()
         {

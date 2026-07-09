@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ScriptEventListenerElement : OdfElement
     {
-        public ScriptEventListenerElement(string? prefix = null) : base("event-listener", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", prefix) { }
+        public ScriptEventListenerElement() : this((string?)null) { }
+
+        public ScriptEventListenerElement(string? prefix) : base("event-listener", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", prefix) { }
 
         public ScriptEventListenerElement(params OdfNode[] children) : this()
         {

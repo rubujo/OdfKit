@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberEmbeddedTextElement : OdfElement
     {
-        public NumberEmbeddedTextElement(string? prefix = null) : base("embedded-text", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberEmbeddedTextElement() : this((string?)null) { }
+
+        public NumberEmbeddedTextElement(string? prefix) : base("embedded-text", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberEmbeddedTextElement(params OdfNode[] children) : this()
         {

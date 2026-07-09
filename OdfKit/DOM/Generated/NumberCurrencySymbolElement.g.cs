@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberCurrencySymbolElement : OdfElement
     {
-        public NumberCurrencySymbolElement(string? prefix = null) : base("currency-symbol", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberCurrencySymbolElement() : this((string?)null) { }
+
+        public NumberCurrencySymbolElement(string? prefix) : base("currency-symbol", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberCurrencySymbolElement(params OdfNode[] children) : this()
         {

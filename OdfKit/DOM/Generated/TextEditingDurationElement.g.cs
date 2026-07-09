@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextEditingDurationElement : OdfElement
     {
-        public TextEditingDurationElement(string? prefix = null) : base("editing-duration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextEditingDurationElement() : this((string?)null) { }
+
+        public TextEditingDurationElement(string? prefix) : base("editing-duration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextEditingDurationElement(params OdfNode[] children) : this()
         {

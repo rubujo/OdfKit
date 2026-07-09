@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationPlaceholderElement : OdfElement
     {
-        public PresentationPlaceholderElement(string? prefix = null) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationPlaceholderElement() : this((string?)null) { }
+
+        public PresentationPlaceholderElement(string? prefix) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationPlaceholderElement(params OdfNode[] children) : this()
         {

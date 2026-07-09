@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationFooterElement : OdfElement
     {
-        public PresentationFooterElement(string? prefix = null) : base("footer", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationFooterElement() : this((string?)null) { }
+
+        public PresentationFooterElement(string? prefix) : base("footer", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationFooterElement(params OdfNode[] children) : this()
         {

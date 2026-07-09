@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextMeasureElement : OdfElement
     {
-        public TextMeasureElement(string? prefix = null) : base("measure", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextMeasureElement() : this((string?)null) { }
+
+        public TextMeasureElement(string? prefix) : base("measure", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextMeasureElement(params OdfNode[] children) : this()
         {

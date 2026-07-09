@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberDayOfWeekElement : OdfElement
     {
-        public NumberDayOfWeekElement(string? prefix = null) : base("day-of-week", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberDayOfWeekElement() : this((string?)null) { }
+
+        public NumberDayOfWeekElement(string? prefix) : base("day-of-week", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberDayOfWeekElement(params OdfNode[] children) : this()
         {

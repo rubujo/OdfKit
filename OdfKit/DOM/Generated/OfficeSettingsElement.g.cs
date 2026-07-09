@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeSettingsElement : OdfElement
     {
-        public OfficeSettingsElement(string? prefix = null) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeSettingsElement() : this((string?)null) { }
+
+        public OfficeSettingsElement(string? prefix) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeSettingsElement(params OdfNode[] children) : this()
         {

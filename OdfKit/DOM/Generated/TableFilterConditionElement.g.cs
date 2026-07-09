@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableFilterConditionElement : OdfElement
     {
-        public TableFilterConditionElement(string? prefix = null) : base("filter-condition", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableFilterConditionElement() : this((string?)null) { }
+
+        public TableFilterConditionElement(string? prefix) : base("filter-condition", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableFilterConditionElement(params OdfNode[] children) : this()
         {

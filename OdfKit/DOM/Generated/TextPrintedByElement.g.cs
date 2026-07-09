@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextPrintedByElement : OdfElement
     {
-        public TextPrintedByElement(string? prefix = null) : base("printed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextPrintedByElement() : this((string?)null) { }
+
+        public TextPrintedByElement(string? prefix) : base("printed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextPrintedByElement(params OdfNode[] children) : this()
         {

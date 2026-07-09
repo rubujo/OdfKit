@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextAlphabeticalIndexMarkElement : OdfElement
     {
-        public TextAlphabeticalIndexMarkElement(string? prefix = null) : base("alphabetical-index-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextAlphabeticalIndexMarkElement() : this((string?)null) { }
+
+        public TextAlphabeticalIndexMarkElement(string? prefix) : base("alphabetical-index-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextAlphabeticalIndexMarkElement(params OdfNode[] children) : this()
         {

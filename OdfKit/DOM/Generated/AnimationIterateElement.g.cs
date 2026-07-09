@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationIterateElement : OdfElement
     {
-        public AnimationIterateElement(string? prefix = null) : base("iterate", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationIterateElement() : this((string?)null) { }
+
+        public AnimationIterateElement(string? prefix) : base("iterate", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationIterateElement(params OdfNode[] children) : this()
         {

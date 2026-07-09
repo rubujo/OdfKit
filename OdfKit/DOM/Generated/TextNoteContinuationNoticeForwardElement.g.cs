@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextNoteContinuationNoticeForwardElement : OdfElement
     {
-        public TextNoteContinuationNoticeForwardElement(string? prefix = null) : base("note-continuation-notice-forward", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextNoteContinuationNoticeForwardElement() : this((string?)null) { }
+
+        public TextNoteContinuationNoticeForwardElement(string? prefix) : base("note-continuation-notice-forward", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextNoteContinuationNoticeForwardElement(params OdfNode[] children) : this()
         {

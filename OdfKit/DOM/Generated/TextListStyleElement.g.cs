@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextListStyleElement : OdfElement
     {
-        public TextListStyleElement(string? prefix = null) : base("list-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextListStyleElement() : this((string?)null) { }
+
+        public TextListStyleElement(string? prefix) : base("list-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextListStyleElement(params OdfNode[] children) : this()
         {

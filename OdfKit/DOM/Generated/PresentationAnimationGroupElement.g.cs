@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationAnimationGroupElement : OdfElement
     {
-        public PresentationAnimationGroupElement(string? prefix = null) : base("animation-group", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationAnimationGroupElement() : this((string?)null) { }
+
+        public PresentationAnimationGroupElement(string? prefix) : base("animation-group", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationAnimationGroupElement(params OdfNode[] children) : this()
         {

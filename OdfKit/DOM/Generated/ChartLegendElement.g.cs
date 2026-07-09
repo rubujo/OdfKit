@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartLegendElement : OdfElement
     {
-        public ChartLegendElement(string? prefix = null) : base("legend", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartLegendElement() : this((string?)null) { }
+
+        public ChartLegendElement(string? prefix) : base("legend", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartLegendElement(params OdfNode[] children) : this()
         {

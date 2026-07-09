@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawContourPolygonElement : OdfElement
     {
-        public DrawContourPolygonElement(string? prefix = null) : base("contour-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawContourPolygonElement() : this((string?)null) { }
+
+        public DrawContourPolygonElement(string? prefix) : base("contour-polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawContourPolygonElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeDdeSourceElement : OdfElement
     {
-        public OfficeDdeSourceElement(string? prefix = null) : base("dde-source", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeDdeSourceElement() : this((string?)null) { }
+
+        public OfficeDdeSourceElement(string? prefix) : base("dde-source", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeDdeSourceElement(params OdfNode[] children) : this()
         {

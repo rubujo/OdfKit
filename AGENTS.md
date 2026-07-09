@@ -77,9 +77,10 @@
   - RS0016／RS0017 為 error；RS0026／RS0027 政策見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)（新 API 必須遵守；生成 DOM grandfather）。
   - 說明見 [`OdfKit/PublicAPI/README.md`](OdfKit/PublicAPI/README.md)。
 - **套件雙 TFM 相容性**（Package Validation）：`EnablePackageValidation`；`Test-NuGetPack.ps1` 於 pack 時檢查。
-- **協作者／大型結構**：見 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md) 與 [`docs/maintainability.md`](docs/maintainability.md)；禁止機械 `historical-refactor/Split-*`。
+- **協作者／大型結構（人機平衡，非為拆而拆）**：見 [`docs/human-agent-maintainability.md`](docs/human-agent-maintainability.md) 與 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md)。拆分只為清楚領域邊界以利人類審閱與 Agent 限域修改；**禁止**因行數、token 或機械 KPI 而切檔；禁止重跑 `historical-refactor/Split-*`。
+- **公開 API 可選參數（RS0026／RS0027）**：同名公開多載不得有多個皆含可選參數；有可選參數者須為參數最多之多載。本專案偏好改為**明確多載轉呼叫**（無 `=` 預設）。生成 DOM 由 `OdfSchemaGenerator` 輸出無 optional prefix 形狀；手寫違規必須修。詳見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)。
 - **XML 摘要**：`Test-OneLineXmlSummary.ps1 -FailOnIssues`。
-- **產生碼**：`DOM/Generated` 與 schema provider `.g.cs` 不可手改；schema 重產後須重跑 Public API 基線。
+- **產生碼**：`DOM/Generated` 與 schema provider `.g.cs` 不可手改；改 ctor／多載形狀須改產生器後重產；schema 重產後須重跑 Public API 基線。
 - **Schema 與流通性（非目標）**：核心預設內建 ODF **1.1～1.4** 官方 schema 覆蓋，以支援存量檔、封存與跨 LO／舊版互通；**禁止**為瘦身 nupkg 或「看起來模組化」而將 schema 拆成可選套件或刪減多版覆蓋。體積代價以建置／分析器策略與文件說明吸收；詳見 [`docs/maintainability.md`](docs/maintainability.md)「Schema 與流通性」。
 
 ### D. Git 提交規範 (Conventional Commits)

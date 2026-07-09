@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIllustrationIndexElement : OdfElement
     {
-        public TextIllustrationIndexElement(string? prefix = null) : base("illustration-index", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIllustrationIndexElement() : this((string?)null) { }
+
+        public TextIllustrationIndexElement(string? prefix) : base("illustration-index", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIllustrationIndexElement(params OdfNode[] children) : this()
         {

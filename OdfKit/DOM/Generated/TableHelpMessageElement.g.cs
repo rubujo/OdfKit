@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableHelpMessageElement : OdfElement
     {
-        public TableHelpMessageElement(string? prefix = null) : base("help-message", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableHelpMessageElement() : this((string?)null) { }
+
+        public TableHelpMessageElement(string? prefix) : base("help-message", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableHelpMessageElement(params OdfNode[] children) : this()
         {

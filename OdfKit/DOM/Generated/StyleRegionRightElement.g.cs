@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleRegionRightElement : OdfElement
     {
-        public StyleRegionRightElement(string? prefix = null) : base("region-right", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleRegionRightElement() : this((string?)null) { }
+
+        public StyleRegionRightElement(string? prefix) : base("region-right", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleRegionRightElement(params OdfNode[] children) : this()
         {

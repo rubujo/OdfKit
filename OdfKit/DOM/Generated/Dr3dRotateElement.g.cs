@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class Dr3dRotateElement : OdfElement
     {
-        public Dr3dRotateElement(string? prefix = null) : base("rotate", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
+        public Dr3dRotateElement() : this((string?)null) { }
+
+        public Dr3dRotateElement(string? prefix) : base("rotate", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
         public Dr3dRotateElement(params OdfNode[] children) : this()
         {

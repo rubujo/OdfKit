@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableIterationElement : OdfElement
     {
-        public TableIterationElement(string? prefix = null) : base("iteration", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableIterationElement() : this((string?)null) { }
+
+        public TableIterationElement(string? prefix) : base("iteration", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableIterationElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableLastRowElement : OdfElement
     {
-        public TableLastRowElement(string? prefix = null) : base("last-row", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableLastRowElement() : this((string?)null) { }
+
+        public TableLastRowElement(string? prefix) : base("last-row", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableLastRowElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DcDateElement : OdfElement
     {
-        public DcDateElement(string? prefix = null) : base("date", "http://purl.org/dc/elements/1.1/", prefix) { }
+        public DcDateElement() : this((string?)null) { }
+
+        public DcDateElement(string? prefix) : base("date", "http://purl.org/dc/elements/1.1/", prefix) { }
 
         public DcDateElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberYearElement : OdfElement
     {
-        public NumberYearElement(string? prefix = null) : base("year", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberYearElement() : this((string?)null) { }
+
+        public NumberYearElement(string? prefix) : base("year", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberYearElement(params OdfNode[] children) : this()
         {

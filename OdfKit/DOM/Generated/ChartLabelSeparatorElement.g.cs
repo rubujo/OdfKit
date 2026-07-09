@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartLabelSeparatorElement : OdfElement
     {
-        public ChartLabelSeparatorElement(string? prefix = null) : base("label-separator", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartLabelSeparatorElement() : this((string?)null) { }
+
+        public ChartLabelSeparatorElement(string? prefix) : base("label-separator", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartLabelSeparatorElement(params OdfNode[] children) : this()
         {

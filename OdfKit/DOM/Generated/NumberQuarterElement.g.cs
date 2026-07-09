@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberQuarterElement : OdfElement
     {
-        public NumberQuarterElement(string? prefix = null) : base("quarter", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberQuarterElement() : this((string?)null) { }
+
+        public NumberQuarterElement(string? prefix) : base("quarter", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberQuarterElement(params OdfNode[] children) : this()
         {

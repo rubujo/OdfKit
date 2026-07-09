@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeStylesElement : OdfElement
     {
-        public OfficeStylesElement(string? prefix = null) : base("styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeStylesElement() : this((string?)null) { }
+
+        public OfficeStylesElement(string? prefix) : base("styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeStylesElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextLineBreakElement : OdfElement
     {
-        public TextLineBreakElement(string? prefix = null) : base("line-break", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextLineBreakElement() : this((string?)null) { }
+
+        public TextLineBreakElement(string? prefix) : base("line-break", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextLineBreakElement(params OdfNode[] children) : this()
         {

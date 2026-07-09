@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawPageThumbnailElement : OdfElement
     {
-        public DrawPageThumbnailElement(string? prefix = null) : base("page-thumbnail", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawPageThumbnailElement() : this((string?)null) { }
+
+        public DrawPageThumbnailElement(string? prefix) : base("page-thumbnail", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawPageThumbnailElement(params OdfNode[] children) : this()
         {

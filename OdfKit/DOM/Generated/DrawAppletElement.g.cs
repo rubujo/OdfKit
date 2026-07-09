@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawAppletElement : OdfElement
     {
-        public DrawAppletElement(string? prefix = null) : base("applet", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawAppletElement() : this((string?)null) { }
+
+        public DrawAppletElement(string? prefix) : base("applet", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawAppletElement(params OdfNode[] children) : this()
         {

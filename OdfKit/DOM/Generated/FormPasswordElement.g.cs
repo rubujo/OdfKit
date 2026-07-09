@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormPasswordElement : OdfElement
     {
-        public FormPasswordElement(string? prefix = null) : base("password", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormPasswordElement() : this((string?)null) { }
+
+        public FormPasswordElement(string? prefix) : base("password", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormPasswordElement(params OdfNode[] children) : this()
         {

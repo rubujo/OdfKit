@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaEditingCyclesElement : OdfElement
     {
-        public MetaEditingCyclesElement(string? prefix = null) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaEditingCyclesElement() : this((string?)null) { }
+
+        public MetaEditingCyclesElement(string? prefix) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaEditingCyclesElement(params OdfNode[] children) : this()
         {

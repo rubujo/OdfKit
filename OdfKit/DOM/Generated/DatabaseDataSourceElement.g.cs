@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseDataSourceElement : OdfElement
     {
-        public DatabaseDataSourceElement(string? prefix = null) : base("data-source", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseDataSourceElement() : this((string?)null) { }
+
+        public DatabaseDataSourceElement(string? prefix) : base("data-source", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseDataSourceElement(params OdfNode[] children) : this()
         {

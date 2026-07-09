@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawMarkerElement : OdfElement
     {
-        public DrawMarkerElement(string? prefix = null) : base("marker", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawMarkerElement() : this((string?)null) { }
+
+        public DrawMarkerElement(string? prefix) : base("marker", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawMarkerElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTableFormulaElement : OdfElement
     {
-        public TextTableFormulaElement(string? prefix = null) : base("table-formula", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTableFormulaElement() : this((string?)null) { }
+
+        public TextTableFormulaElement(string? prefix) : base("table-formula", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTableFormulaElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawTextBoxElement : OdfElement
     {
-        public DrawTextBoxElement(string? prefix = null) : base("text-box", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawTextBoxElement() : this((string?)null) { }
+
+        public DrawTextBoxElement(string? prefix) : base("text-box", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawTextBoxElement(params OdfNode[] children) : this()
         {

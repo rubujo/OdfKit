@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberAmPmElement : OdfElement
     {
-        public NumberAmPmElement(string? prefix = null) : base("am-pm", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberAmPmElement() : this((string?)null) { }
+
+        public NumberAmPmElement(string? prefix) : base("am-pm", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberAmPmElement(params OdfNode[] children) : this()
         {

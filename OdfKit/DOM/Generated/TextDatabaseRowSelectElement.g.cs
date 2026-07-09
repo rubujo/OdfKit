@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDatabaseRowSelectElement : OdfElement
     {
-        public TextDatabaseRowSelectElement(string? prefix = null) : base("database-row-select", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDatabaseRowSelectElement() : this((string?)null) { }
+
+        public TextDatabaseRowSelectElement(string? prefix) : base("database-row-select", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDatabaseRowSelectElement(params OdfNode[] children) : this()
         {

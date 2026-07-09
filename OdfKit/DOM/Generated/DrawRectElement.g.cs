@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawRectElement : OdfElement
     {
-        public DrawRectElement(string? prefix = null) : base("rect", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawRectElement() : this((string?)null) { }
+
+        public DrawRectElement(string? prefix) : base("rect", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawRectElement(params OdfNode[] children) : this()
         {

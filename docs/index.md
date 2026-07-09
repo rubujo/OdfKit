@@ -58,6 +58,7 @@
 | [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、逾時、煙霧測試與診斷產物規則 |
 | [可維護性與複雜度債](maintainability.md) | Partial、在地化 JSON 產線、Public API、Package Validation |
 | [協作者地圖](architecture-collaborators.md) | 大型領域根與 partial／engine 邊界（v0.0.1 完滿基線） |
+| [人機協作可維護性](human-agent-maintainability.md) | 人類／Agent 平衡；禁止為拆而拆 |
 | [公開 API 可選參數規範](public-api-optional-parameters.md) | RS0026／RS0027 政策與新增 API 檢查清單 |
 | [效能基準線](performance-baselines.md) | 基準測試回歸關卡、穩定量測設定檔與基準線報告產生方式 |
 | [效能對比報告](performance-comparison.md) | `OdsStreamWriter` 與 MiniExcel、ClosedXML 之跨套件串流寫入實測對比、方法論限制與授權裁定 |

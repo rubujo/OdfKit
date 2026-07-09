@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawPluginElement : OdfElement
     {
-        public DrawPluginElement(string? prefix = null) : base("plugin", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawPluginElement() : this((string?)null) { }
+
+        public DrawPluginElement(string? prefix) : base("plugin", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawPluginElement(params OdfNode[] children) : this()
         {

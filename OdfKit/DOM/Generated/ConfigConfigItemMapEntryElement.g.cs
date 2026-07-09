@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ConfigConfigItemMapEntryElement : OdfElement
     {
-        public ConfigConfigItemMapEntryElement(string? prefix = null) : base("config-item-map-entry", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", prefix) { }
+        public ConfigConfigItemMapEntryElement() : this((string?)null) { }
+
+        public ConfigConfigItemMapEntryElement(string? prefix) : base("config-item-map-entry", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", prefix) { }
 
         public ConfigConfigItemMapEntryElement(params OdfNode[] children) : this()
         {

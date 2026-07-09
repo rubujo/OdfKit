@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleDropCapElement : OdfElement
     {
-        public StyleDropCapElement(string? prefix = null) : base("drop-cap", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleDropCapElement() : this((string?)null) { }
+
+        public StyleDropCapElement(string? prefix) : base("drop-cap", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleDropCapElement(params OdfNode[] children) : this()
         {

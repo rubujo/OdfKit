@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DcCreatorElement : OdfElement
     {
-        public DcCreatorElement(string? prefix = null) : base("creator", "http://purl.org/dc/elements/1.1/", prefix) { }
+        public DcCreatorElement() : this((string?)null) { }
+
+        public DcCreatorElement(string? prefix) : base("creator", "http://purl.org/dc/elements/1.1/", prefix) { }
 
         public DcCreatorElement(params OdfNode[] children) : this()
         {

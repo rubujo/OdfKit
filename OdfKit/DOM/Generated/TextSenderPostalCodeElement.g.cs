@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderPostalCodeElement : OdfElement
     {
-        public TextSenderPostalCodeElement(string? prefix = null) : base("sender-postal-code", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderPostalCodeElement() : this((string?)null) { }
+
+        public TextSenderPostalCodeElement(string? prefix) : base("sender-postal-code", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderPostalCodeElement(params OdfNode[] children) : this()
         {

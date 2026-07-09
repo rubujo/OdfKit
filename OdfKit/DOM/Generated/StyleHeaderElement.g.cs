@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleHeaderElement : OdfElement
     {
-        public StyleHeaderElement(string? prefix = null) : base("header", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleHeaderElement() : this((string?)null) { }
+
+        public StyleHeaderElement(string? prefix) : base("header", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleHeaderElement(params OdfNode[] children) : this()
         {

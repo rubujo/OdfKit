@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextHiddenTextElement : OdfElement
     {
-        public TextHiddenTextElement(string? prefix = null) : base("hidden-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextHiddenTextElement() : this((string?)null) { }
+
+        public TextHiddenTextElement(string? prefix) : base("hidden-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextHiddenTextElement(params OdfNode[] children) : this()
         {

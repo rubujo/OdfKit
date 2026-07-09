@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableNullDateElement : OdfElement
     {
-        public TableNullDateElement(string? prefix = null) : base("null-date", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableNullDateElement() : this((string?)null) { }
+
+        public TableNullDateElement(string? prefix) : base("null-date", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableNullDateElement(params OdfNode[] children) : this()
         {

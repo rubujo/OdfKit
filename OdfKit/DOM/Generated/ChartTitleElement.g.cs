@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartTitleElement : OdfElement
     {
-        public ChartTitleElement(string? prefix = null) : base("title", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartTitleElement() : this((string?)null) { }
+
+        public ChartTitleElement(string? prefix) : base("title", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartTitleElement(params OdfNode[] children) : this()
         {

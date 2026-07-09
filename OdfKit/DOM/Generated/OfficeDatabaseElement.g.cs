@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeDatabaseElement : OdfElement
     {
-        public OfficeDatabaseElement(string? prefix = null) : base("database", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeDatabaseElement() : this((string?)null) { }
+
+        public OfficeDatabaseElement(string? prefix) : base("database", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeDatabaseElement(params OdfNode[] children) : this()
         {

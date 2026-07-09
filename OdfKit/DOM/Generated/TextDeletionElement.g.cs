@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextDeletionElement : OdfElement
     {
-        public TextDeletionElement(string? prefix = null) : base("deletion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextDeletionElement() : this((string?)null) { }
+
+        public TextDeletionElement(string? prefix) : base("deletion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextDeletionElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawStrokeDashElement : OdfElement
     {
-        public DrawStrokeDashElement(string? prefix = null) : base("stroke-dash", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawStrokeDashElement() : this((string?)null) { }
+
+        public DrawStrokeDashElement(string? prefix) : base("stroke-dash", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawStrokeDashElement(params OdfNode[] children) : this()
         {

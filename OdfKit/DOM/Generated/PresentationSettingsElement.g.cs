@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class PresentationSettingsElement : OdfElement
     {
-        public PresentationSettingsElement(string? prefix = null) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+        public PresentationSettingsElement() : this((string?)null) { }
+
+        public PresentationSettingsElement(string? prefix) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
         public PresentationSettingsElement(params OdfNode[] children) : this()
         {

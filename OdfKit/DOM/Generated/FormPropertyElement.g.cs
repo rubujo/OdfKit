@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormPropertyElement : OdfElement
     {
-        public FormPropertyElement(string? prefix = null) : base("property", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormPropertyElement() : this((string?)null) { }
+
+        public FormPropertyElement(string? prefix) : base("property", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormPropertyElement(params OdfNode[] children) : this()
         {

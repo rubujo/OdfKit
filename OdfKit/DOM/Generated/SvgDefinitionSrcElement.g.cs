@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class SvgDefinitionSrcElement : OdfElement
     {
-        public SvgDefinitionSrcElement(string? prefix = null) : base("definition-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+        public SvgDefinitionSrcElement() : this((string?)null) { }
+
+        public SvgDefinitionSrcElement(string? prefix) : base("definition-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
         public SvgDefinitionSrcElement(params OdfNode[] children) : this()
         {

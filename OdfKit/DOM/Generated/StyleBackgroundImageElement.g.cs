@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleBackgroundImageElement : OdfElement
     {
-        public StyleBackgroundImageElement(string? prefix = null) : base("background-image", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleBackgroundImageElement() : this((string?)null) { }
+
+        public StyleBackgroundImageElement(string? prefix) : base("background-image", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleBackgroundImageElement(params OdfNode[] children) : this()
         {

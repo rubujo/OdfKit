@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableInsertionElement : OdfElement
     {
-        public TableInsertionElement(string? prefix = null) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableInsertionElement() : this((string?)null) { }
+
+        public TableInsertionElement(string? prefix) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableInsertionElement(params OdfNode[] children) : this()
         {

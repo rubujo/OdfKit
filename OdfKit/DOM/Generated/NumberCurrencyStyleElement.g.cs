@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberCurrencyStyleElement : OdfElement
     {
-        public NumberCurrencyStyleElement(string? prefix = null) : base("currency-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberCurrencyStyleElement() : this((string?)null) { }
+
+        public NumberCurrencyStyleElement(string? prefix) : base("currency-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberCurrencyStyleElement(params OdfNode[] children) : this()
         {

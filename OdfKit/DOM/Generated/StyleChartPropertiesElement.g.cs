@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class StyleChartPropertiesElement : OdfElement
     {
-        public StyleChartPropertiesElement(string? prefix = null) : base("chart-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
+        public StyleChartPropertiesElement() : this((string?)null) { }
+
+        public StyleChartPropertiesElement(string? prefix) : base("chart-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
         public StyleChartPropertiesElement(params OdfNode[] children) : this()
         {

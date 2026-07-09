@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableSourceCellRangeElement : OdfElement
     {
-        public TableSourceCellRangeElement(string? prefix = null) : base("source-cell-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableSourceCellRangeElement() : this((string?)null) { }
+
+        public TableSourceCellRangeElement(string? prefix) : base("source-cell-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableSourceCellRangeElement(params OdfNode[] children) : this()
         {

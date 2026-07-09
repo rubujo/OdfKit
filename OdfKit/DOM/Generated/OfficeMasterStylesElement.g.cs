@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeMasterStylesElement : OdfElement
     {
-        public OfficeMasterStylesElement(string? prefix = null) : base("master-styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeMasterStylesElement() : this((string?)null) { }
+
+        public OfficeMasterStylesElement(string? prefix) : base("master-styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeMasterStylesElement(params OdfNode[] children) : this()
         {

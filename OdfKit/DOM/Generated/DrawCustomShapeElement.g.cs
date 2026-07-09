@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DrawCustomShapeElement : OdfElement
     {
-        public DrawCustomShapeElement(string? prefix = null) : base("custom-shape", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
+        public DrawCustomShapeElement() : this((string?)null) { }
+
+        public DrawCustomShapeElement(string? prefix) : base("custom-shape", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
         public DrawCustomShapeElement(params OdfNode[] children) : this()
         {

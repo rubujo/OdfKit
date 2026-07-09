@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationAnimateColorElement : OdfElement
     {
-        public AnimationAnimateColorElement(string? prefix = null) : base("animateColor", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationAnimateColorElement() : this((string?)null) { }
+
+        public AnimationAnimateColorElement(string? prefix) : base("animateColor", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationAnimateColorElement(params OdfNode[] children) : this()
         {

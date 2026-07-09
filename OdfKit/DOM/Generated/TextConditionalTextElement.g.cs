@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextConditionalTextElement : OdfElement
     {
-        public TextConditionalTextElement(string? prefix = null) : base("conditional-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextConditionalTextElement() : this((string?)null) { }
+
+        public TextConditionalTextElement(string? prefix) : base("conditional-text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextConditionalTextElement(params OdfNode[] children) : this()
         {

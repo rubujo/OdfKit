@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class ChartMeanValueElement : OdfElement
     {
-        public ChartMeanValueElement(string? prefix = null) : base("mean-value", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
+        public ChartMeanValueElement() : this((string?)null) { }
+
+        public ChartMeanValueElement(string? prefix) : base("mean-value", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
         public ChartMeanValueElement(params OdfNode[] children) : this()
         {

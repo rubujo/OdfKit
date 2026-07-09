@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseLoginElement : OdfElement
     {
-        public DatabaseLoginElement(string? prefix = null) : base("login", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseLoginElement() : this((string?)null) { }
+
+        public DatabaseLoginElement(string? prefix) : base("login", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseLoginElement(params OdfNode[] children) : this()
         {

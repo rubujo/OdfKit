@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextIndexEntryTabStopElement : OdfElement
     {
-        public TextIndexEntryTabStopElement(string? prefix = null) : base("index-entry-tab-stop", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextIndexEntryTabStopElement() : this((string?)null) { }
+
+        public TextIndexEntryTabStopElement(string? prefix) : base("index-entry-tab-stop", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextIndexEntryTabStopElement(params OdfNode[] children) : this()
         {

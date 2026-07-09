@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextVariableSetElement : OdfElement
     {
-        public TextVariableSetElement(string? prefix = null) : base("variable-set", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextVariableSetElement() : this((string?)null) { }
+
+        public TextVariableSetElement(string? prefix) : base("variable-set", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextVariableSetElement(params OdfNode[] children) : this()
         {

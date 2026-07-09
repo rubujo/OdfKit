@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextSenderEmailElement : OdfElement
     {
-        public TextSenderEmailElement(string? prefix = null) : base("sender-email", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextSenderEmailElement() : this((string?)null) { }
+
+        public TextSenderEmailElement(string? prefix) : base("sender-email", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextSenderEmailElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class AnimationAudioElement : OdfElement
     {
-        public AnimationAudioElement(string? prefix = null) : base("audio", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
+        public AnimationAudioElement() : this((string?)null) { }
+
+        public AnimationAudioElement(string? prefix) : base("audio", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
         public AnimationAudioElement(params OdfNode[] children) : this()
         {

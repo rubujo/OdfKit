@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextTableIndexSourceElement : OdfElement
     {
-        public TextTableIndexSourceElement(string? prefix = null) : base("table-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextTableIndexSourceElement() : this((string?)null) { }
+
+        public TextTableIndexSourceElement(string? prefix) : base("table-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextTableIndexSourceElement(params OdfNode[] children) : this()
         {

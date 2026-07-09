@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaTemplateElement : OdfElement
     {
-        public MetaTemplateElement(string? prefix = null) : base("template", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaTemplateElement() : this((string?)null) { }
+
+        public MetaTemplateElement(string? prefix) : base("template", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaTemplateElement(params OdfNode[] children) : this()
         {

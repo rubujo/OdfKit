@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableCellAddressElement : OdfElement
     {
-        public TableCellAddressElement(string? prefix = null) : base("cell-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableCellAddressElement() : this((string?)null) { }
+
+        public TableCellAddressElement(string? prefix) : base("cell-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableCellAddressElement(params OdfNode[] children) : this()
         {

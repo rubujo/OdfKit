@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class MetaGeneratorElement : OdfElement
     {
-        public MetaGeneratorElement(string? prefix = null) : base("generator", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+        public MetaGeneratorElement() : this((string?)null) { }
+
+        public MetaGeneratorElement(string? prefix) : base("generator", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
         public MetaGeneratorElement(params OdfNode[] children) : this()
         {

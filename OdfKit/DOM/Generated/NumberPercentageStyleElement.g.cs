@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class NumberPercentageStyleElement : OdfElement
     {
-        public NumberPercentageStyleElement(string? prefix = null) : base("percentage-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+        public NumberPercentageStyleElement() : this((string?)null) { }
+
+        public NumberPercentageStyleElement(string? prefix) : base("percentage-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
         public NumberPercentageStyleElement(params OdfNode[] children) : this()
         {

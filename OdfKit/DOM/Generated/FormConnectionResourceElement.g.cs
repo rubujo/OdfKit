@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class FormConnectionResourceElement : OdfElement
     {
-        public FormConnectionResourceElement(string? prefix = null) : base("connection-resource", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
+        public FormConnectionResourceElement() : this((string?)null) { }
+
+        public FormConnectionResourceElement(string? prefix) : base("connection-resource", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
         public FormConnectionResourceElement(params OdfNode[] children) : this()
         {

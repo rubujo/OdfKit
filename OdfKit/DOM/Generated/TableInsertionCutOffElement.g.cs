@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TableInsertionCutOffElement : OdfElement
     {
-        public TableInsertionCutOffElement(string? prefix = null) : base("insertion-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+        public TableInsertionCutOffElement() : this((string?)null) { }
+
+        public TableInsertionCutOffElement(string? prefix) : base("insertion-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
         public TableInsertionCutOffElement(params OdfNode[] children) : this()
         {

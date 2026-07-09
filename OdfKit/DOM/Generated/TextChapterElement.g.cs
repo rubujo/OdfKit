@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class TextChapterElement : OdfElement
     {
-        public TextChapterElement(string? prefix = null) : base("chapter", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+        public TextChapterElement() : this((string?)null) { }
+
+        public TextChapterElement(string? prefix) : base("chapter", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
         public TextChapterElement(params OdfNode[] children) : this()
         {

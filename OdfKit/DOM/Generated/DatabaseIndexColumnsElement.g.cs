@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class DatabaseIndexColumnsElement : OdfElement
     {
-        public DatabaseIndexColumnsElement(string? prefix = null) : base("index-columns", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+        public DatabaseIndexColumnsElement() : this((string?)null) { }
+
+        public DatabaseIndexColumnsElement(string? prefix) : base("index-columns", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
         public DatabaseIndexColumnsElement(params OdfNode[] children) : this()
         {

@@ -16,7 +16,9 @@ namespace OdfKit.DOM
     /// </summary>
     public partial class OfficeFontFaceDeclsElement : OdfElement
     {
-        public OfficeFontFaceDeclsElement(string? prefix = null) : base("font-face-decls", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+        public OfficeFontFaceDeclsElement() : this((string?)null) { }
+
+        public OfficeFontFaceDeclsElement(string? prefix) : base("font-face-decls", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
         public OfficeFontFaceDeclsElement(params OdfNode[] children) : this()
         {
