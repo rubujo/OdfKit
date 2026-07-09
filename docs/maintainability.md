@@ -47,11 +47,13 @@
 2. 禁止只改 `en` 或只改 `zh-TW`。  
 3. 禁止在呼叫端 hard-code 例外訊息。  
 4. 完整語意以 `en` 為準；其他語系可走 fallback，但**新鍵必須登錄**所有語系表（可先貼近英文再潤飾）。  
+5. 新增鍵請優先使用 `pwsh eng/Add-LocalizerKey.ps1`（一次寫入 12 語系），再潤飾 de／fr 等語言。  
 
 ### 鍵值對等閘門（業界最佳實踐）
 
 - **靜態鍵集合對等**：所有語系的訊息鍵清單必須與 `en` 相同（gettext／ICU／resx 閘門同理）。  
-- 腳本：`pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`  
+- 腳手架：`pwsh eng/Add-LocalizerKey.ps1 -Key … -EnMessage … -ZhTwMessage …`  
+- 對等檢查：`pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`  
 - 契約測試：`DocsAndCorpusContractTests.ExceptionDictionaryKeysAreParityAcrossCultures`  
 - 呼叫端解析測試：`LiteralLocalizerMessageKeysResolveForAllSupportedCultures`（執行期 GetMessage）
 
@@ -119,13 +121,25 @@
 | Public API 基線 | PublicApiAnalyzers 5.6.0 + 雙 TFM Unshipped 基線 |
 | Package Validation | 核心與 Extensions 啟用 `EnablePackageValidation` |
 | CI maintainability job | 合併衝突、一行 summary、鍵值對等、PublicApi 建置 |
+| 串流郵件合併拆分 | `OdfStreamingMailMerge` → 本體／Segments／ExpressionCache；移除「小於 1MB」口號 |
+| 在地化鍵腳手架 | `eng/Add-LocalizerKey.ps1` |
+
+### 協作者抽取候選（手寫、跨檔總量偏大）
+
+| 型別／檔案 | 現況 | 建議 |
+|------------|------|------|
+| `OdfElement`／schema registry／generated | 規格面，已 KEEP | 勿機械合併；體積靠 schema 套件策略 |
+| `OdfTableSheet`、`OdfDocument`、`OdfPackage`、`TextDocument` | 已有 *Collaborators／功能區 partial | 新功能優先進既有邊界；超過 ~2000 再抽 engine |
+| `OdfStreamingMailMerge` | 已拆 Segments／ExpressionCache | 完成 |
+| `OdfElementContentModel.Table.cs`（~1.7k） | 單檔偏大、schema 驅動 | 僅在內容模型邊界清晰時再拆 |
+| `OdfPackageArchiveWriter`（~1k） | 已為 internal 協作者 | 可再拆 ZIP 標頭／payload 串流子型別（可選） |
 
 ### 建議的後續債
 
 | 項目 | 說明 |
 |------|------|
-| 協作者抽取 | 對仍 >2000 行總量的領域根再抽 engine |
-| 在地化產線 | 自 JSON／resx 產生 `Exceptions.*.cs`（可選） |
+| 協作者抽取 | 上表候選；優先 `OdfElementContentModel.Table` 邊界審視 |
+| 在地化產線 | 自 JSON／resx 產生 `Exceptions.*.cs`（可選；現有腳手架已降低漏鍵風險） |
 | Schema 套件拆分 | 降低預設 nupkg 體積（產品決策） |
 | 1.0 API 凍結 | Unshipped → Shipped；可選參數多載（RS0026／RS0027）分批收斂 |
 | Baseline version validator | 有穩定 NuGet 發行後啟用 `PackageValidationBaselineVersion` |

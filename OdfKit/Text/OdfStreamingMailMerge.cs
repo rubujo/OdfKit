@@ -1,18 +1,16 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.IO.Compression;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Data.Common;
-using System.Buffers;
 
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -20,10 +18,10 @@ using OdfKit.Core;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides the OdfStreamingMailMerge API.
-/// 提供超低記憶體佔用（小於 1MB）的 SAX 流式郵件合併與範本套印引擎。
+/// Provides a SAX-style streaming mail-merge and template fill engine with low residency design.
+/// 提供以 SAX 風格串流為主、低常駐記憶體設計的郵件合併與範本套印引擎。
 /// </summary>
-public static class OdfStreamingMailMerge
+public static partial class OdfStreamingMailMerge
 {
     /// <summary>
     /// Asynchronously applies template data merging and writes the result to the target stream.
@@ -1234,180 +1232,4 @@ public static class OdfStreamingMailMerge
         return current;
     }
 
-    private abstract class TemplateSegment
-    {
-        public abstract Task WriteToAsync(Stream stream, IDictionary<string, object?> data, Dictionary<string, object?> localContext, CancellationToken cancellationToken);
-    }
-
-    private sealed class StaticSegment : TemplateSegment
-    {
-        private readonly byte[] _bytes;
-
-        public StaticSegment(byte[] bytes)
-        {
-            _bytes = bytes;
-        }
-
-        public override Task WriteToAsync(Stream stream, IDictionary<string, object?> data, Dictionary<string, object?> localContext, CancellationToken cancellationToken)
-        {
-            if (_bytes.Length == 0)
-                return Task.CompletedTask;
-            return stream.WriteAsync(_bytes, 0, _bytes.Length, cancellationToken);
-        }
-    }
-
-    private sealed class PlaceholderSegment : TemplateSegment
-    {
-        private readonly string _path;
-
-        public PlaceholderSegment(string path)
-        {
-            _path = path;
-        }
-
-        public override Task WriteToAsync(Stream stream, IDictionary<string, object?> data, Dictionary<string, object?> localContext, CancellationToken cancellationToken)
-        {
-            object? val = GetValueWithPath(data, _path, localContext);
-            if (val is null)
-                return Task.CompletedTask;
-
-            string text = val.ToString() ?? string.Empty;
-            if (string.IsNullOrEmpty(text))
-                return Task.CompletedTask;
-
-            WriteXmlEscapedUtf8(stream, text);
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class ForeachSegment : TemplateSegment
-    {
-        private readonly string _itemName;
-        private readonly string _collectionName;
-        private readonly List<TemplateSegment> _body;
-
-        public ForeachSegment(string itemName, string collectionName, List<TemplateSegment> body)
-        {
-            _itemName = itemName;
-            _collectionName = collectionName;
-            _body = body;
-        }
-
-        public override async Task WriteToAsync(Stream stream, IDictionary<string, object?> data, Dictionary<string, object?> localContext, CancellationToken cancellationToken)
-        {
-            object? colObj = null;
-            if (localContext.TryGetValue(_collectionName, out var localCol))
-            {
-                colObj = localCol;
-            }
-            else
-            {
-                colObj = MailMergeExpressionCache.GetValue(data, _collectionName);
-            }
-
-            if (colObj is IEnumerable enumerable && colObj is not string)
-            {
-                foreach (var item in enumerable)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (item is null)
-                        continue;
-
-                    var childContext = new Dictionary<string, object?>(localContext, StringComparer.OrdinalIgnoreCase);
-                    childContext[_itemName] = item;
-
-                    foreach (var segment in _body)
-                    {
-                        await segment.WriteToAsync(stream, data, childContext, cancellationToken).ConfigureAwait(false);
-                    }
-                }
-            }
-        }
-    }
-
-    private sealed class PrecompiledBatchTemplate
-    {
-        public List<TemplateSegment> HeaderSegments { get; }
-        public List<TemplateSegment> BodySegments { get; }
-        public List<TemplateSegment> FooterSegments { get; }
-
-        public PrecompiledBatchTemplate(List<TemplateSegment> header, List<TemplateSegment> body, List<TemplateSegment> footer)
-        {
-            HeaderSegments = header;
-            BodySegments = body;
-            FooterSegments = footer;
-        }
-    }
-
-    private sealed class XmlNodeInfo
-    {
-        public XmlNodeType NodeType { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string LocalName { get; set; } = string.Empty;
-        public string Prefix { get; set; } = string.Empty;
-        public string NamespaceUri { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-        public bool IsEmpty { get; set; }
-        public List<XmlAttributeInfo> Attributes { get; set; } = new();
-    }
-
-    private sealed class XmlAttributeInfo
-    {
-        public string Name { get; set; } = string.Empty;
-        public string LocalName { get; set; } = string.Empty;
-        public string Prefix { get; set; } = string.Empty;
-        public string NamespaceUri { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-    }
-
-    #region Reflection Free Expression Trees Cache
-
-    private static class MailMergeExpressionCache
-    {
-        private static readonly Dictionary<(Type, string), Func<object, object?>> _cache = new();
-        private static readonly object _lock = new();
-
-        public static object? GetValue(object item, string propertyName)
-        {
-            if (item is IDictionary<string, object?> dict)
-            {
-                return dict.TryGetValue(propertyName, out var val) ? val : null;
-            }
-
-            Type type = item.GetType();
-            Func<object, object?>? accessor;
-            lock (_lock)
-            {
-                if (!_cache.TryGetValue((type, propertyName), out accessor))
-                {
-                    PropertyInfo? prop = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                    if (prop is not null && prop.CanRead)
-                    {
-#if NET10_0_OR_GREATER
-                        if (!RuntimeFeature.IsDynamicCodeCompiled)
-                        {
-                            accessor = obj => prop.GetValue(obj);
-                        }
-                        else
-#endif
-                        {
-                            ParameterExpression param = Expression.Parameter(typeof(object), "obj");
-                            UnaryExpression castParam = Expression.Convert(param, type);
-                            MemberExpression member = Expression.Property(castParam, prop);
-                            UnaryExpression castResult = Expression.Convert(member, typeof(object));
-                            accessor = Expression.Lambda<Func<object, object?>>(castResult, param).Compile();
-                        }
-                    }
-                    else
-                    {
-                        accessor = static _ => null;
-                    }
-                    _cache[(type, propertyName)] = accessor;
-                }
-            }
-            return accessor(item);
-        }
-    }
-
-    #endregion
 }

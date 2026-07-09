@@ -638,8 +638,8 @@ public partial class TextDocument : OdfDocument
         => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
 
     /// <summary>
-    /// Performs a streaming, low-memory (under 1MB) mail merge using the current text document as a template, writing the result to the target stream.
-    /// 以流式、低記憶體佔用（小於 1MB）的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
+    /// Performs a streaming, low-residency mail merge using the current text document as a template, writing the result to the target stream.
+    /// 以串流、低常駐記憶體的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
     /// </summary>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
     /// <param name="dataSource">The merge data dictionary, whose keys correspond to merge field names in the template. / 套印資料字典，Key 對應範本中的合併欄位名稱。</param>
@@ -676,8 +676,8 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
-    /// Performs a streaming, low-memory (under 1MB) mail merge using the current text document as a template, writing the result to the target stream.
-    /// 以流式、低記憶體佔用（小於 1MB）的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
+    /// Performs a streaming, low-residency mail merge using the current text document as a template, writing the result to the target stream.
+    /// 以串流、低常駐記憶體的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
     /// </summary>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
     /// <param name="dataSource">The merge data dictionary, whose keys correspond to merge field names in the template. / 套印資料字典，Key 對應範本中的合併欄位名稱。</param>
@@ -691,8 +691,8 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
-    /// Performs a streaming, low-memory (under 1MB) mail merge by loading a template text document from the specified path, writing the result to the target stream.
-    /// 以流式、低記憶體佔用（小於 1MB）的方式，載入指定路徑的範本文字文件進行郵件合併，並將結果輸出至目標串流。
+    /// Performs a streaming, low-residency mail merge by loading a template text document from the specified path, writing the result to the target stream.
+    /// 以串流、低常駐記憶體的方式，載入指定路徑的範本文字文件進行郵件合併，並將結果輸出至目標串流。
     /// </summary>
     /// <param name="templatePath">The template text document path. / 範本文字文件路徑。</param>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>

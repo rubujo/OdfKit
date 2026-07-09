@@ -485,8 +485,12 @@ public class DocsAndCorpusContractTests
         string historicalReadme = File.ReadAllText(Path.Combine(repoRoot, "eng", "historical-refactor", "README.md"));
         string oneLineScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OneLineXmlSummary.ps1"));
         string keyParityScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-LocalizerKeyParity.ps1"));
+        string addLocalizerKeyScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Add-LocalizerKey.ps1"));
         string publicApiBaselineScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Generate-PublicApiBaseline.ps1"));
         string publicApiReadme = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "PublicAPI", "README.md"));
+        string mailMergeMain = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Text", "OdfStreamingMailMerge.cs"));
+        string mailMergeSegments = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Text", "OdfStreamingMailMerge.Segments.cs"));
+        string mailMergeCache = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Text", "OdfStreamingMailMerge.ExpressionCache.cs"));
 
         string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
         foreach (string culture in cultures)
@@ -514,11 +518,18 @@ public class DocsAndCorpusContractTests
         Assert.Contains("預設不要重跑", historicalReadme, StringComparison.Ordinal);
         Assert.Contains("FailOnIssues", oneLineScript, StringComparison.Ordinal);
         Assert.Contains("FailOnIssues", keyParityScript, StringComparison.Ordinal);
+        Assert.Contains("Add-LocalizerKey", addLocalizerKeyScript, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("OdfLocalizer.Exceptions", addLocalizerKeyScript, StringComparison.Ordinal);
         Assert.Contains("RS0016", publicApiBaselineScript, StringComparison.Ordinal);
         Assert.Contains("PublicApiAnalyzers", publicApiReadme, StringComparison.Ordinal);
+        Assert.Contains("partial class OdfStreamingMailMerge", mailMergeMain, StringComparison.Ordinal);
+        Assert.Contains("TemplateSegment", mailMergeSegments, StringComparison.Ordinal);
+        Assert.Contains("MailMergeExpressionCache", mailMergeCache, StringComparison.Ordinal);
+        Assert.DoesNotContain("小於 1MB", mailMergeMain, StringComparison.Ordinal);
         Assert.Contains("Partial", maintainability, StringComparison.Ordinal);
         Assert.Contains("PublicApiAnalyzers", maintainability, StringComparison.Ordinal);
         Assert.Contains("Test-LocalizerKeyParity", maintainability, StringComparison.Ordinal);
+        Assert.Contains("Add-LocalizerKey", maintainability, StringComparison.Ordinal);
         Assert.Contains("EnablePackageValidation", maintainability, StringComparison.Ordinal);
 
         string agents = File.ReadAllText(Path.Combine(repoRoot, "AGENTS.md"));
@@ -529,6 +540,7 @@ public class DocsAndCorpusContractTests
 
         Assert.Contains("PublicApiAnalyzers", agents, StringComparison.Ordinal);
         Assert.Contains("Test-LocalizerKeyParity", agents, StringComparison.Ordinal);
+        Assert.Contains("Add-LocalizerKey", agents, StringComparison.Ordinal);
         Assert.Contains("EnablePackageValidation", agents, StringComparison.Ordinal);
         Assert.Contains("maintainability:", ciYml, StringComparison.Ordinal);
         Assert.Contains("Test-LocalizerKeyParity.ps1", ciYml, StringComparison.Ordinal);

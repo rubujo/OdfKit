@@ -69,7 +69,7 @@
 ### C2. 可維護性（複雜度債）
 完整準則見 [`docs/maintainability.md`](docs/maintainability.md)。Agent 必須遵守：
 - **Partial**：禁止機械切檔；診斷用 `eng/Analyze-PartialSplits.ps1`；禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本。
-- **在地化**：新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系；提交前執行 `pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`。
+- **在地化**：新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，必須同步 `OdfLocalizer.Exceptions.<culture>.cs` 全部 12 語系；可用 `pwsh eng/Add-LocalizerKey.ps1` 一次腳手架，提交前執行 `pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues`。非 en／zh-TW 語系不得長期只留英文佔位（新增後應潤飾）。
 - **公開 API 表面**（業界黃金標準，`Microsoft.CodeAnalysis.PublicApiAnalyzers`）：
   - 核心套件以雙 TFM 基線追蹤：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
   - **0.x** 期間新增／變更的公開 API 登錄於 **Unshipped**；**1.0** 發佈時再整批移入 Shipped。
@@ -114,6 +114,10 @@
 - **稽核提交簽署金鑰**：
   ```powershell
   pwsh eng/Test-GpgSignatures.ps1
+  ```
+- **新增在地化鍵腳手架**（一次寫入 12 語系，再潤飾非 en／zh-TW）：
+  ```powershell
+  pwsh eng/Add-LocalizerKey.ps1 -Key Err_Example_Failed -EnMessage "Failed: {0}." -ZhTwMessage "失敗：{0}。"
   ```
 - **語系鍵值對等**（新增 Err／Warn／Cli 鍵後必跑）：
   ```powershell
