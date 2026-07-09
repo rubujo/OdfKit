@@ -7,6 +7,10 @@ using System.Collections.Generic;
 
 namespace OdfKit.Compliance;
 
+/// <summary>
+/// Provides culture-specific exception message dictionaries for localization.
+/// 提供在地化用的語系例外訊息字典。
+/// </summary>
 public static partial class OdfLocalizer
 {
     private static void AddExceptionDictionaryKo(Dictionary<string, Dictionary<string, string>> map)

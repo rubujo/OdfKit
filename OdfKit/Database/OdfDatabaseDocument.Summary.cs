@@ -1,5 +1,9 @@
 ﻿namespace OdfKit.Database;
 
+/// <summary>
+/// Provides summary inspection members for <see cref="OdfDatabaseDocument"/>.
+/// 提供 <see cref="OdfDatabaseDocument"/> 的摘要檢視成員。
+/// </summary>
 public partial class OdfDatabaseDocument
 {
     /// <summary>

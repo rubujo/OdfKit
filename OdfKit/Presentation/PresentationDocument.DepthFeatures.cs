@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 namespace OdfKit.Presentation;
 
+/// <summary>
+/// Provides depth-feature APIs for <see cref="PresentationDocument"/>.
+/// 提供 <see cref="PresentationDocument"/> 的深度功能 API。
+/// </summary>
 public partial class PresentationDocument
 {
     /// <summary>

@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
 
+/// <summary>
+/// Provides range depth APIs for <see cref="OdfTableSheet"/>.
+/// 提供 <see cref="OdfTableSheet"/> 的範圍深度 API。
+/// </summary>
 public partial class OdfTableSheet
 {
     /// <summary>

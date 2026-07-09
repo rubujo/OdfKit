@@ -2,6 +2,10 @@
 
 namespace OdfKit.Spreadsheet;
 
+/// <summary>
+/// Provides object-binding APIs for <see cref="SpreadsheetDocument"/>.
+/// 提供 <see cref="SpreadsheetDocument"/> 的物件繫結 API。
+/// </summary>
 public partial class SpreadsheetDocument
 {
     /// <summary>

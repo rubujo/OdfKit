@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
 
+/// <summary>
+/// Provides object-binding APIs for <see cref="OdfTableSheet"/>.
+/// 提供 <see cref="OdfTableSheet"/> 的物件繫結 API。
+/// </summary>
 public partial class OdfTableSheet
 {
     /// <summary>

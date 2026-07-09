@@ -8,6 +8,10 @@ using OdfKit.Styles;
 
 namespace OdfKit.Drawing;
 
+/// <summary>
+/// Provides depth-feature APIs for <see cref="DrawingDocument"/>.
+/// 提供 <see cref="DrawingDocument"/> 的深度功能 API。
+/// </summary>
 public partial class DrawingDocument
 {
     /// <summary>

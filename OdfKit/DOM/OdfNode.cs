@@ -543,16 +543,17 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
 
     public override Span<byte> GetSpan() => new Span<byte>(_pointer, _length);
     /// <summary>
-    /// Executes the Pin operation.
-    /// 執行 Pin 作業。
-    /// </summary>
-
-    /// <summary>
     /// Convenience overload that uses default values for remaining parameters.
     /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>
     public System.Buffers.MemoryHandle Pin() => Pin(0);
 
+    /// <summary>
+    /// Pins the unmanaged memory at the specified element index.
+    /// 在指定元素索引釘住非受控記憶體。
+    /// </summary>
+    /// <param name="elementIndex">The zero-based element index to pin. / 要釘住的以零為基底之元素索引。</param>
+    /// <returns>A memory handle for the pinned location. / 釘住位置的記憶體控制代碼。</returns>
     public override System.Buffers.MemoryHandle Pin(int elementIndex)
     {
         if (elementIndex < 0 || elementIndex > _length)

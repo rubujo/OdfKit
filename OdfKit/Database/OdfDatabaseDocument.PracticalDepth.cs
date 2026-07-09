@@ -6,6 +6,10 @@ using OdfKit.DOM;
 
 namespace OdfKit.Database;
 
+/// <summary>
+/// Provides practical depth APIs for <see cref="OdfDatabaseDocument"/>.
+/// 提供 <see cref="OdfDatabaseDocument"/> 的實務深度 API。
+/// </summary>
 public partial class OdfDatabaseDocument
 {
     /// <summary>

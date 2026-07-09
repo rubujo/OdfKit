@@ -5,6 +5,10 @@ using OdfKit.Compliance;
 
 namespace OdfKit.Image;
 
+/// <summary>
+/// Provides image inspection APIs for <see cref="OdfImageDocument"/>.
+/// 提供 <see cref="OdfImageDocument"/> 的圖片檢查 API。
+/// </summary>
 public partial class OdfImageDocument
 {
     /// <summary>

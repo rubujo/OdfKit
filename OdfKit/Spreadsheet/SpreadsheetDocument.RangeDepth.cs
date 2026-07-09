@@ -4,6 +4,10 @@ using OdfKit.Compliance;
 
 namespace OdfKit.Spreadsheet;
 
+/// <summary>
+/// Provides range depth APIs for <see cref="SpreadsheetDocument"/>.
+/// 提供 <see cref="SpreadsheetDocument"/> 的範圍深度 API。
+/// </summary>
 public partial class SpreadsheetDocument
 {
     /// <summary>
