@@ -17,13 +17,15 @@
   - LibreOffice headless 互通矩陣（26.x）、OOXML 視覺 golden file 比對。
 - **協作格式**：ODT ↔ JSON operations 雙向轉換（對標 ODF Toolkit CLI，`OdfKit.Extensions.Collaboration`）。
 - **RDF／中繼資料**：`manifest.rdf` triple CRUD 與 SPARQL 查詢橋接（`OdfKit.Extensions.Rdf`）。
-- **效能**：`OdsStreamWriter` 串流寫入記憶體佔用 < 1MB；公式剖析採 `ref struct` + `ReadOnlySpan<char>` 零配置設計；XML 標籤字串池化；ZIP 載入 `ArrayPool` 緩衝。
+- **效能**：`OdsStreamWriter` 以串流寫入降低常駐記憶體（公開跨套件對比見 `docs/performance-comparison.md`；勿與 GC 累積配置量混淆）；公式剖析採 `ref struct` + `ReadOnlySpan<char>` 低配置設計；XML 標籤字串池化；ZIP 載入 `ArrayPool` 緩衝。
 - **泛型物件序列匯出**：新增 `ObjectDataReader<T>`（將任意 `IEnumerable<T>`／`IAsyncEnumerable<T>` 轉接為 `DbDataReader`）與對應的 `OdsStreamWriter.WriteDataAsync<T>` 多載，可將任意物件序列（例如 Entity Framework Core `IQueryable<T>.AsNoTracking().Select(...).AsAsyncEnumerable()` 查詢投影）低記憶體串流匯出成 ODS，亦可與 `SqlBulkCopy` 等外部 `DbDataReader` 消費者互通；核心不因此新增任何外部 ORM 或資料庫套件相依。
 - **實務相容性檢查器**：新增 `OdfPracticalCompatibilityValidator`，依 `OdfPracticalCompatibilityProfile`（LibreOffice 現行版本、Microsoft Office ODF、跨辦公軟體可攜編輯）掃描封裝、內容、內嵌圖表與影像，回報 `OdfPracticalCompatibilityReport`／`OdfPracticalCompatibilityIssue` 常見跨工具編輯風險（含 Microsoft Word ODT 復原風險提示）。
 - **圖表深度 API**：新增 `OdfChartPreset` 任務導向預設（長條、折線、圓餅、面積、散佈等）、泡泡圖與股價圖系列（`OdfBubbleChartSeriesInfo`／`OdfBubbleChartSeriesRequest`、`OdfStockChartSeriesInfo`／`OdfStockChartSeriesRequest`）與 `OdfChart3DOptions`（投影模式、角度偏移、雙面光照、光源清單），補齊圖表建立與樣式高階 API 深度。
 - **TemplateBinder 情境強化**：擴充文字、試算表、簡報、影像與繪圖等文件類型的占位符繫結情境涵蓋範圍，並補上對應 cookbook 範例。
 - **ODF 1.4 coverage 追蹤**：新增 `OdfCoverageRoadmapTests` 等測試鎖定 ODF 1.4 規格覆蓋路線圖與 typed DOM audit 入口，明確區分規格覆蓋、package lifecycle、high-level facade 與 interop behavior 四個追蹤層次。
 - **套件與發行**：8 個套件（`OdfKit` 核心 + 7 個 `OdfKit.Extensions.*`）雙 TFM（`net10.0` + `netstandard2.0`）NuGet 封裝，透過 GitHub Release 資產發佈（非 nuget.org）。
+- **串流寫入熱路徑（ODS／ODT）**：將批次原始 XML 組裝與字元防線抽至共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`（`OdfKit.Core`），`OdsStreamWriter` 與 `OdtStreamWriter` 段落／標題／清單／儲存格熱路徑共用；關閉 `XmlWriter.CheckCharacters` 後仍以 `Err_OdfStreamWriter_InvalidXmlCharacter` 快速失敗；補齊 ODS／ODT fast-path 與字元邊界測試。`docs/performance-comparison.md` 於 2026-07-09 重跑 ODS 百萬列對比（第 2 次：約 4.96 s／472 MB 配置／38 MB 峰值，與 MiniExcel 耗時接近持平）。
+- **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
 
 ### 架構
 

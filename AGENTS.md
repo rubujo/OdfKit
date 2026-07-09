@@ -31,6 +31,7 @@
   - 手寫之公開（Public）與受保護（Protected） API 必須具備完整的**雙語**（英文＋正體中文）XML 說明文件，不得隨意使用 `#pragma warning disable 1591` 壓制。此規則僅適用於公開／受保護成員的 XML 文件；private／internal 成員與一般程式碼內行內註解維持下方純正體中文規則，不需雙語化。
   - 雙語格式慣例：
     - `<summary>`／`<remarks>` 等多行區塊：英文摘要獨立一行在前（精簡、符合 .NET API 文件慣例的描述句，非逐字翻譯，句尾加英文句號），正體中文摘要獨立一行在後。
+    - **禁止**一行式 `<summary>`（例如 `/// <summary>…</summary>` 寫在同一行）。`<summary>` 與 `</summary>` 必須各自獨佔一行，內容置於兩者之間的獨立 `///` 行；internal／private 成員的純中文 XML 摘要亦同，不得使用一行式。
     - `<param>`／`<returns>`／`<exception>`／`<typeparam>` 等單行區塊：同一行內，英文說明在前、以` / `分隔、正體中文說明在後（例如 `/// <param name="path">The file path to load. / 要載入的檔案路徑。</param>`）。
     - 既有僅含正體中文之公開 API XML 文件，於下次修改該成員時補上英文摘要即可，不要求一次性全面回填；大規模回填依個別遷移計畫批次處理。
   - 所有 XML 文件與程式碼說明中的正體中文部分，一律翻譯且使用正體中文臺灣地區用語，僅在必要時可保留英文專用術語或原文；新增之英文摘要句不受下方「盤古之白」排版規範約束（該規範僅適用中文段落本身與其鄰接的半形字元）。
@@ -61,7 +62,7 @@
   - 必須安全處理 `DateTime.MinValue` 與 `DateTime.MaxValue` 的邊界值，防止時區轉換位移導致程式崩潰。
 
 ### C. 效能與記憶體安全
-- **高效流式寫入**：`OdsStreamWriter` 必須採用超低記憶體設計，確保在導出大數據時，記憶體佔用小於 1MB。善用 `CommunityToolkit.HighPerformance` 或 `Span<T>` / `ReadOnlySpan<T>` 等無分配 API。
+- **高效流式寫入**：`OdsStreamWriter`／`OdtStreamWriter` 必須採用串流／低常駐設計，避免將整份文件 DOM 常駐記憶體；熱路徑共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`。公開效能敘事以峰值工作集與可重現基準為準（見 `docs/performance-comparison.md`、`docs/performance-baselines.md`），不得再使用未加限定的「小於 1MB」口號。善用 `CommunityToolkit.HighPerformance` 或 `Span<T>` / `ReadOnlySpan<T>` 等低配置 API，並在熱路徑維持輸出正確性與 XML 字元合法性。
 - **XXE 與 DoS 防禦**：顯式設定 `XmlReaderSettings`，禁用外部 DTD 解析與 XML 實體展開，以杜絕 XXE 安全漏洞。
 - **Zip Slip 漏洞防禦**：對 ZIP 解壓的目標路徑進行嚴格的合法性檢查，防止目錄穿越攻擊。
 

@@ -396,6 +396,27 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證智慧財產與合規說明文件存在，並由文件中心與 provenance 入口交叉連結。
+    /// </summary>
+    [Fact]
+    public void IpComplianceDocIsLinkedFromDocsIndexAndProvenance()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string ipCompliance = File.ReadAllText(Path.Combine(repoRoot, "docs", "ip-compliance.md"));
+        string docsIndex = File.ReadAllText(Path.Combine(repoRoot, "docs", "index.md"));
+        string provenance = File.ReadAllText(Path.Combine(repoRoot, "docs", "provenance", "README.md"));
+        string readme = File.ReadAllText(Path.Combine(repoRoot, "README.md"));
+
+        Assert.Contains("CC0-1.0", ipCompliance, StringComparison.Ordinal);
+        Assert.Contains("THIRD-PARTY-NOTICES", ipCompliance, StringComparison.Ordinal);
+        Assert.Contains("clean-room", ipCompliance, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("ip-compliance.md", docsIndex, StringComparison.Ordinal);
+        Assert.Contains("ip-compliance.md", provenance, StringComparison.Ordinal);
+        Assert.Contains("docs/ip-compliance.md", readme, StringComparison.Ordinal);
+        Assert.Contains("何時使用", readme, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus CLI 訊息已覆蓋全部支援語言，且非英文文化不是英文佔位。
     /// </summary>
     [Fact]

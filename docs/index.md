@@ -7,7 +7,7 @@
 
 | 如果您要… | 建議先讀 | 再延伸閱讀 |
 |-----------|----------|------------|
-| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md) |
+| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md)、[智慧財產與合規說明](ip-compliance.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
@@ -69,3 +69,4 @@
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
 | [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
 | [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與受控轉換保真度的規格來源、不可複製來源與 golden 測試契約 |
+| [智慧財產與合規說明](ip-compliance.md) | 複合授權、AI 產製、clean-room、DCO、採用者盡職調查清單（非正式法律意見） |

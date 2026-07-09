@@ -125,17 +125,37 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 - 版本、交付與安裝參考已整理於
   [docs/version-delivery.md](docs/version-delivery.md)。
 
+## 何時使用／何時不使用
+
+| 適合 | 較不適合 |
+|------|----------|
+| 需以 **ODF 為主格式** 建立、編輯、驗證或批次匯出（含 ODS 串流） | 客戶只要 XLSX／DOCX、無 ODF 政策要求 → 優先 ClosedXML、MiniExcel、Open XML SDK 等 |
+| 伺服器／容器需 **純受控**、不安裝 LibreOffice 即可處理 ODF 封裝 | 需要 **高保真物理分頁、列印金標 PDF** → 使用 LibreOffice 後端或商用渲染庫 |
+| 需要 package 級 round-trip、foreign 內容保留、profile／corpus 驗證閘門 | 需要 **完整試算表重算／樞紐引擎** 或企業級 **侵權賠償契約** → 見 non-goals 與商用套件 |
+| 開源可審計（CC0 + 第三方 NOTICE） | 需要 nuget.org 上長期 `1.x` 穩定承諾與 SLA → 目前仍為 `0.x`，請鎖定 commit／Release |
+
+功能邊界與非目標見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
+[UDX 非功能性目標](docs/udx-non-goals.md)。效能數字見
+[效能對比報告](docs/performance-comparison.md)（跨格式參考，非服務等級承諾）。
+
 ## 已知限制
 
 - 高階 API 覆蓋度依格式不同而不同；請以
   [ODF 格式支援矩陣](docs/odf-format-support.md) 與測試證據為準。
+  矩陣中的 `complete` 代表文件定義的**最低完成標準**，不代表每一種格式的完整深度語意模型。
 - Template、master 與 Flat XML 變體已具專屬 typed 文件類別與常用變體功能；
   但其高階語意 API 仍以對應主格式為主，完整變體專屬物件模型不屬於目前承諾範圍。
 - `OdfKit.Extensions.Rendering` 需本機 LibreOffice 或相容程序後端，
   不屬於核心 OdfKit 的純受控路徑。
+- 目前主要交付為 GitHub 原始碼與 Release 資產，**尚未發佈至 nuget.org**。
 
-## 授權
+## 授權與合規
 
-OdfKit 專案採用
+OdfKit 專案原創程式碼採用
 [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。
-第三方相依套件維持各自授權；詳見 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+第三方相依套件維持各自授權；再散布時請保留必要聲明，詳見
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
+複合授權、AI 產製聲明、clean-room 原則、貢獻者 DCO 與採用者盡職調查清單見
+[智慧財產與合規說明](docs/ip-compliance.md) 與
+[provenance](docs/provenance/README.md)。本專案**不是** OASIS 或 LibreOffice 官方產品。
