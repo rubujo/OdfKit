@@ -33,7 +33,7 @@ $keepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]:
     'OdfElementSchemaRegistry'     # schema 枚舉 token 註冊表（多領域 partial）
 ) | ForEach-Object { [void]$keepTypes.Add($_) }
 
-# 已評估完成：雙檔拆分具實際邏輯邊界，永久保留
+# 已評估完成：雙／多檔拆分具實際邏輯邊界，永久保留（含原 REVIEW 升格）
 $validatedDualKeepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 @(
     'OdfFormulaDocument'
@@ -45,6 +45,11 @@ $validatedDualKeepTypes = [System.Collections.Generic.HashSet[string]]::new([Str
     'OdfChartDocument'
     'OdfDrawPage'
     'OdfMailMergeEngine'
+    # 以下為 2026-07 可維護性批次：人工審核後升格 KEEP（勿機械合併）
+    'TemplateBinder'      # 繫結引擎本體 vs 欄位／範圍解析（TemplateBinder.Binding.cs）
+    'OdsStreamReader'     # 串流讀取狀態機 vs 儲存格／列事件（OdsStreamReader.Cells.cs）
+    'DrawingDocument'     # 繪圖文件根 vs Features／Shapes 功能區
+    'OdfTable'            # 表格模型根 vs Structure（列欄結構操作）
 ) | ForEach-Object { [void]$validatedDualKeepTypes.Add($_) }
 
 function Get-PartialTypeName {

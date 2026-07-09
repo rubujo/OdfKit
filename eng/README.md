@@ -40,6 +40,7 @@
 | `Test-OdfTypedDomCoverage.ps1` | 執行 typed DOM 對 ODF schema 的覆蓋率報告與門檻檢查。 |
 | `Test-BilingualXmlDocs.ps1` | 靜態掃描公開／受保護 API 的雙語 XML 文件覆蓋率；預設 report mode，`-FailOnNewIssues` 會以現行基線阻止新增債務。 |
 | `Test-OneLineXmlSummary.ps1` | 掃描手寫 C# 是否含禁止的一行式 `<summary>`；`-FailOnIssues` 時失敗退出。 |
+| `Test-LocalizerKeyParity.ps1` | 檢查 12 語系 `OdfLocalizer.Exceptions.*.cs` 訊息鍵集合與 `en` 對等；`-FailOnIssues` 時失敗退出。 |
 | `Test-OoxmlVisualGolden.ps1` | 執行 OOXML 轉換視覺 golden file 驗收。 |
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |
@@ -75,6 +76,7 @@
 | `Build-AnalyzerReport.ps1` | 產生 OdfKit 建置 binlog 供 Analyzer Summary 剖析（本機診斷用）。 |
 | `Detect-TypeBoundaries.ps1` | 在指定檔案中以正規表達式找出符合的行號（通用搜尋輔助）。 |
 | `List-LargeCsFiles.ps1` | 列出 `OdfKit` 中超過指定行數門檻的最大 `.cs` 檔案，用於評估是否需要 god class 拆分。 |
+| `Generate-PublicApiBaseline.ps1` | 以 PublicApiAnalyzers RS0016 code fix 重產雙 TFM 的 `PublicAPI.Unshipped.txt`；建議加 `-Verify`。 |
 
 ### `eng/scripts/`
 

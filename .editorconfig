@@ -127,3 +127,23 @@ dotnet_diagnostic.CA1304.severity = none
 # searching for user-provided literal text, where the current
 # culture-sensitive comparison is the expected behavior.
 dotnet_diagnostic.CA1307.severity = none
+
+# =============================================================================
+# Public API surface tracking (Microsoft.CodeAnalysis.PublicApiAnalyzers)
+# 業界慣例（.NET 執行階段／Azure SDK／Dapper 等）：RS0016/RS0017 以 error 阻擋
+# 表面漂移；RS0026/RS0027 為可選參數多載設計指引，既有 0.x 表面與生成 DOM 已
+# 大量使用 optional overloads，故降為 suggestion（不因 TreatWarningsAsErrors 擋 CI）。
+# 新增公開 API 仍應優先採用「單一最長可選參數多載」模式（見 Roslyn 文件）。
+# =============================================================================
+[*.cs]
+dotnet_diagnostic.RS0016.severity = error
+dotnet_diagnostic.RS0017.severity = error
+dotnet_diagnostic.RS0026.severity = suggestion
+dotnet_diagnostic.RS0027.severity = suggestion
+# 生成 DOM／schema 包裝不強制可選參數設計指引
+[OdfKit/DOM/Generated/**.cs]
+dotnet_diagnostic.RS0026.severity = none
+dotnet_diagnostic.RS0027.severity = none
+[OdfKit/Compliance/Generated/**.cs]
+dotnet_diagnostic.RS0026.severity = none
+dotnet_diagnostic.RS0027.severity = none

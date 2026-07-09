@@ -484,6 +484,9 @@ public class DocsAndCorpusContractTests
         string engReadme = File.ReadAllText(Path.Combine(repoRoot, "eng", "README.md"));
         string historicalReadme = File.ReadAllText(Path.Combine(repoRoot, "eng", "historical-refactor", "README.md"));
         string oneLineScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OneLineXmlSummary.ps1"));
+        string keyParityScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-LocalizerKeyParity.ps1"));
+        string publicApiBaselineScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Generate-PublicApiBaseline.ps1"));
+        string publicApiReadme = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "PublicAPI", "README.md"));
 
         string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
         foreach (string culture in cultures)
@@ -492,14 +495,85 @@ public class DocsAndCorpusContractTests
             Assert.True(File.Exists(path), "缺少語系例外字典：" + culture);
         }
 
+        string[] publicApiTfms = ["net10.0", "netstandard2.0"];
+        foreach (string tfm in publicApiTfms)
+        {
+            string shipped = Path.Combine(repoRoot, "OdfKit", "PublicAPI", tfm, "PublicAPI.Shipped.txt");
+            string unshipped = Path.Combine(repoRoot, "OdfKit", "PublicAPI", tfm, "PublicAPI.Unshipped.txt");
+            Assert.True(File.Exists(shipped), "缺少 PublicAPI.Shipped.txt：" + tfm);
+            Assert.True(File.Exists(unshipped), "缺少 PublicAPI.Unshipped.txt：" + tfm);
+            Assert.True(
+                File.ReadAllLines(unshipped).Length > 100,
+                "PublicAPI.Unshipped.txt 基線過短：" + tfm);
+        }
+
         Assert.Contains("maintainability.md", docsIndex, StringComparison.Ordinal);
         Assert.Contains("historical-refactor", engReadme, StringComparison.Ordinal);
+        Assert.Contains("Test-LocalizerKeyParity.ps1", engReadme, StringComparison.Ordinal);
+        Assert.Contains("Generate-PublicApiBaseline.ps1", engReadme, StringComparison.Ordinal);
         Assert.Contains("預設不要重跑", historicalReadme, StringComparison.Ordinal);
         Assert.Contains("FailOnIssues", oneLineScript, StringComparison.Ordinal);
+        Assert.Contains("FailOnIssues", keyParityScript, StringComparison.Ordinal);
+        Assert.Contains("RS0016", publicApiBaselineScript, StringComparison.Ordinal);
+        Assert.Contains("PublicApiAnalyzers", publicApiReadme, StringComparison.Ordinal);
         Assert.Contains("Partial", maintainability, StringComparison.Ordinal);
+        Assert.Contains("PublicApiAnalyzers", maintainability, StringComparison.Ordinal);
+        Assert.Contains("Test-LocalizerKeyParity", maintainability, StringComparison.Ordinal);
         // 歷史 Split 腳本不得再留在 eng/ 根目錄（應在 historical-refactor/）。
         Assert.Empty(
             Directory.EnumerateFiles(Path.Combine(repoRoot, "eng"), "Split-*.ps1", SearchOption.TopDirectoryOnly));
+    }
+
+    /// <summary>
+    /// 驗證 12 語系例外字典的訊息鍵集合與 en 完全對等（i18n 鍵值對等閘門）。
+    /// </summary>
+    [Fact]
+    public void ExceptionDictionaryKeysAreParityAcrossCultures()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        var keyPattern = new Regex(
+            "\\[\"((?:Err|Warn|Cli|Diag|Rule)_[^\"]+)\"\\]",
+            RegexOptions.Compiled);
+
+        Dictionary<string, HashSet<string>> keysByCulture = new(StringComparer.Ordinal);
+        foreach (string culture in cultures)
+        {
+            string path = Path.Combine(repoRoot, "OdfKit", "Compliance", "OdfLocalizer.Exceptions." + culture + ".cs");
+            string text = File.ReadAllText(path);
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (Match match in keyPattern.Matches(text))
+            {
+                keys.Add(match.Groups[1].Value);
+            }
+
+            Assert.NotEmpty(keys);
+            keysByCulture[culture] = keys;
+        }
+
+        HashSet<string> baseline = keysByCulture["en"];
+        foreach (string culture in cultures)
+        {
+            if (culture == "en")
+            {
+                continue;
+            }
+
+            HashSet<string> current = keysByCulture[culture];
+            List<string> missing = baseline
+                .Where(key => !current.Contains(key))
+                .OrderBy(key => key, StringComparer.Ordinal)
+                .ToList();
+            List<string> extra = current
+                .Where(key => !baseline.Contains(key))
+                .OrderBy(key => key, StringComparer.Ordinal)
+                .ToList();
+
+            Assert.True(
+                missing.Count == 0 && extra.Count == 0,
+                "語系 " + culture + " 與 en 鍵值不對等。缺少：" + string.Join(", ", missing.Take(10)) +
+                "；多餘：" + string.Join(", ", extra.Take(10)));
+        }
     }
 
     /// <summary>
