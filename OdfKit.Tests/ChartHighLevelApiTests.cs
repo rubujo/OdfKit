@@ -289,12 +289,14 @@ public class ChartHighLevelApiTests
         chartDoc.SetDataRange("Sheet1", range);
 
         Assert.Null(chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table));
-        OdfNode series = Assert.Single(chartDoc.ChartNode.Descendants()
-            .Where(node => node.LocalName == "series" && node.NamespaceUri == OdfNamespaces.Chart));
+        OdfNode series = Assert.Single(
+            chartDoc.ChartNode.Descendants(),
+            node => node.LocalName == "series" && node.NamespaceUri == OdfNamespaces.Chart);
         Assert.Equal("Sheet1.$B$2:.$B$5", series.GetAttribute("values-cell-range-address", OdfNamespaces.Chart));
         Assert.Equal("Sheet1.$B$1", series.GetAttribute("label-cell-address", OdfNamespaces.Chart));
-        OdfNode categories = Assert.Single(chartDoc.ChartNode.Descendants()
-            .Where(node => node.LocalName == "categories" && node.NamespaceUri == OdfNamespaces.Chart));
+        OdfNode categories = Assert.Single(
+            chartDoc.ChartNode.Descendants(),
+            node => node.LocalName == "categories" && node.NamespaceUri == OdfNamespaces.Chart);
         Assert.Equal("Sheet1.$A$2:.$A$5", categories.GetAttribute("cell-range-address", OdfNamespaces.Table));
     }
 
