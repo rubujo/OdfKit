@@ -18,7 +18,7 @@ try {
     )
     if (-not $ReuseSiteTemplate) {
         foreach ($project in $projects) {
-            dotnet build $project -c Release -f net10.0 --no-restore /p:ODFKIT_PUBLICAPI_BASELINE=1
+            dotnet build $project -c Release -f net10.0 /p:ODFKIT_PUBLICAPI_BASELINE=1
             if ($LASTEXITCODE) { throw "API 文件組件建置失敗：$project" }
         }
         Remove-Item -Recurse -Force api-docs/api, artifacts/api-site-template -ErrorAction SilentlyContinue
