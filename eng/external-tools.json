@@ -1,0 +1,12 @@
+{
+  "odfValidator": {
+    "source": "maven-central",
+    "cacheRevision": "1",
+    "version": "0.13.0",
+    "fileName": "odfvalidator-0.13.0-jar-with-dependencies.jar",
+    "uri": "https://repo1.maven.org/maven2/org/odftoolkit/odfvalidator/0.13.0/odfvalidator-0.13.0-jar-with-dependencies.jar",
+    "sha256": "5684feec5cbdcd5783998978c096ac9ccea53a454e2d6ae803ce482d2336d1dc",
+    "minimumJavaVersion": "11",
+    "supportedOdfVersions": ["1.0", "1.1", "1.2", "1.3", "1.4"]
+  }
+}

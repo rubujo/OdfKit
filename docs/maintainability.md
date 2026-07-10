@@ -105,7 +105,7 @@
 - 契約測試：`DocsAndCorpusContractTests` 與 `eng/Test-BilingualXmlDocs.ps1`。  
 - 一行式 summary 靜態閘門：`eng/Test-OneLineXmlSummary.ps1`。
 
-## 6. 進度與後續債
+## 6. 持續完滿與維護項目
 
 ### 已完成（摘要）
 
@@ -147,20 +147,23 @@ ODF 實務流通並非「全站只活在最新 1.4」：
 
 | 政策 | 說明 |
 |------|------|
-| **0.x 非目標** | 為瘦身而將 schema 拆成 `OdfKit.Schema.Odf12` 等可選 NuGet，或預設「僅 1.4」。 |
+| **永久非目標** | 為瘦身而將 schema 拆成 `OdfKit.Schema.Odf12` 等可選 NuGet，或預設「僅 1.4」。 |
 | **禁止** | 以「為拆而拆／看起來比較模組化」為由刪減多版覆蓋。 |
 | **允許的洩壓** | 建置／分析器策略（本機關 CA、關 trim 分析）、執行期依文件版本選 provider、文件誠實說明包體。 |
 | **何時才重談拆包** | 僅當有**實測體積痛點**且有使用者開啟檔的版本分佈證據，並能證明不傷害封存／互通敘事時；預設答案仍是不拆。 |
 
-### 建議的後 0.0.1／1.0 債
+### 版本無關的維護政策
 
 | 項目 | 說明 |
 |------|------|
-| 1.0 API 凍結 | Unshipped → Shipped；搭配 `PackageValidationBaselineVersion` |
-| Baseline version validator | 發行 0.0.1 後啟用 `PackageValidationBaselineVersion` |
-| 摘要語意精修 | 批次改寫後少數方法名推導仍偏簡；改到該 API 時補領域中英文 |
+| PublicAPI 檔案政策 | 依目前 `0.x` analyzer 慣例維持 Unshipped；這是工具配置，不表示 API 或功能未完成 |
+| 歷史套件基準 | 只有建立實際交付快照且需要跨快照驗證時才設定 `PackageValidationBaselineVersion`，不作為完滿前提 |
+| 摘要語意維護 | 修改任何 API 時，同步確認領域中英文摘要精確；不得保留新產生的占位摘要 |
 | Generated DOM 摘要 | 由產生器維護；禁止手改 `.g.cs` |
-| 產品 B／C 閘門常態化 | corpus／policy／效能回歸依 [product-quality-gates.md](product-quality-gates.md) 於發版前跑 |
+| 產品閘門 | corpus／policy／typed DOM／pack 隨 PR 與 main 執行；外部互通與效能由專用排程持續執行 |
+
+上述項目是持續維護方法，不是留給未來版本的必要債務。契約內缺口必須在同一變更中修復；
+可選增強與永久非目標則不得描述成 `v0.0.1` 尚未完成。
 
 ## 7. 相關文件
 

@@ -39,6 +39,7 @@
 | [API 表面分層](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
 | [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
 | [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |
+| [API Reference](reference/index.md) | Spreadsheet、Chart、Template 與 Interop 的 options、report 與能力邊界 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [渲染後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
@@ -65,6 +66,8 @@
 | [效能對比報告](performance-comparison.md) | `OdsStreamWriter` 與 MiniExcel、ClosedXML 之跨套件串流寫入實測對比、方法論限制與授權裁定 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 | [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |
+| [ODF 1.4 規格覆蓋契約](odf14-coverage-contract.md) | Schema、package lifecycle、高階 facade 與互通行為的持續完滿定義 |
+| [ODF 1.4 覆蓋狀態](odf14-coverage-status.md) | 目前 coverage 摘要與持續驗收入口 |
 
 ## 其他治理文件
 

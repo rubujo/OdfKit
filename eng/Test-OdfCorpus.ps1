@@ -6,7 +6,10 @@ param(
     [string]$ExternalRoot = $env:ODFKIT_PARITY_CORPUS_ROOT,
     [string]$ExternalManifest = "",
     [string]$BaselineJar = $env:ODFKIT_ODFVALIDATOR_JAR,
-    [string]$BaselineExceptions = ""
+    [string]$BaselineExceptions = "",
+    [string]$InternalBaselineJar = "",
+    [string[]]$InternalBaselineVersions = @("1.1", "1.2", "1.3", "1.4"),
+    [switch]$InternalBaselinePackageOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,6 +27,40 @@ function Invoke-NativeCommand {
     if ($LASTEXITCODE -ne 0) {
         throw "命令失敗（exit code $LASTEXITCODE）：$FilePath $($ArgumentList -join ' ')"
     }
+}
+
+function New-VersionFilteredManifest {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ManifestPath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Versions,
+
+        [switch]$PackageOnly
+    )
+
+    $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+    $fixtures = @($manifest.fixtures | Where-Object { $Versions -contains $_.version })
+    if ($PackageOnly) {
+        $packageExtensions = @(
+            ".odb", ".odc", ".odf", ".odg", ".odi", ".odm", ".odp", ".ods", ".odt",
+            ".otc", ".otf", ".otg", ".oth", ".oti", ".otp", ".ots", ".ott"
+        )
+        $fixtures = @($fixtures | Where-Object {
+            $packageExtensions -contains [System.IO.Path]::GetExtension($_.path).ToLowerInvariant()
+        })
+    }
+    if ($fixtures.Count -eq 0) {
+        throw "Corpus manifest does not contain fixtures for ODF version(s): $($Versions -join ', ')"
+    }
+
+    $temporaryPath = Join-Path ([System.IO.Path]::GetTempPath()) `
+        ("odfkit-corpus-" + [Guid]::NewGuid().ToString("N") + ".json")
+    [pscustomobject]@{ fixtures = $fixtures } |
+        ConvertTo-Json -Depth 20 |
+        Set-Content -LiteralPath $temporaryPath -Encoding utf8
+    return $temporaryPath
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
@@ -46,6 +83,35 @@ try {
     )
 
     Invoke-NativeCommand "dotnet" ($commonArgs + @($InternalManifest, "--format", "json"))
+
+    if (-not [string]::IsNullOrWhiteSpace($InternalBaselineJar)) {
+        if (-not (Test-Path -LiteralPath $InternalBaselineJar -PathType Leaf)) {
+            throw "Internal baseline JAR not found: $InternalBaselineJar"
+        }
+
+        $filteredManifest = New-VersionFilteredManifest `
+            -ManifestPath $InternalManifest `
+            -Versions $InternalBaselineVersions `
+            -PackageOnly:$InternalBaselinePackageOnly
+        try {
+            $internalRoot = Split-Path -Parent (Resolve-Path -LiteralPath $InternalManifest)
+            $baselineArgs = @(
+                $filteredManifest,
+                "--root",
+                $internalRoot,
+                "--format",
+                "json",
+                "--baseline",
+                "odf-validator",
+                "--baseline-jar",
+                $InternalBaselineJar
+            )
+            Invoke-NativeCommand "dotnet" ($commonArgs + $baselineArgs)
+        }
+        finally {
+            Remove-Item -LiteralPath $filteredManifest -Force -ErrorAction SilentlyContinue
+        }
+    }
 
     if (-not [string]::IsNullOrWhiteSpace($ExternalRoot)) {
         $manifestPath = if ([string]::IsNullOrWhiteSpace($ExternalManifest)) {

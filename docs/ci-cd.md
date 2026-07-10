@@ -42,6 +42,7 @@ testhost 收尾不穩。
 | 工作流程 | 目的 | 是否自動跑 |
 |----------|------|------------|
 | `odf-corpus.yml` | repo 內 ODF corpus 與可選外部 corpus 驗證 | PR / main |
+| `odf-external-baseline.yml` | 以固定版本 ODF Validator 對標 packaged ODF RELAX NG 分類 | PR / main / 手動 |
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | Native AOT / trim smoke | PR / main |
@@ -50,9 +51,26 @@ testhost 收尾不穩。
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
 | `github-release.yml` | tag 驅動的發佈流程 | tag |
 
+發行 workflow 只負責交付快照，不是 `v0.0.1` 完滿條件。完滿狀態由每個 `main` 提交的必要
+CI 與專用排程證據持續維持；不得把契約內缺口延後到下一個 tag。
+
 LibreOffice、Microsoft Office COM 與 PDF 像素級比對屬外部環境驗收，必須由專用工作流程
 或本機腳本明確啟用，不得混入主 CI 的煙霧測試。LibreOffice 互通由排程工作流程持續驗證；
 Microsoft Office COM 與像素級比對仍依可用環境手動執行。
+
+外部 ODF Validator baseline 與快速 corpus job 分離。工作流程從
+`eng/external-tools.json` 讀取固定版本、Maven Central URL 與 SHA-256，cache key 同時包含
+來源、cache revision、版本與完整雜湊，且不設定 `restore-keys`。無論 cache 是否命中，
+`eng/Install-OdfValidator.ps1` 都會重新計算 JAR 的 SHA-256；已存在但不符時立即終止，不用
+重新下載掩蓋錯誤。確認 cache 項目異常後，必須明確遞增 `cacheRevision` 取得新 key。
+cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路徑。CI 不快取 corpus 驗證輸出、
+暫存 manifest 或測試結果，因此舊結果不會被誤當成本次驗證證據。
+
+ODF Validator 0.13.0 artifact 的標籤原始碼內建 ODF 1.0～1.4 document、manifest 與 dsig
+schema。外部 baseline 會從 repo corpus 挑選版本為 1.1～1.4 的所有 ZIP package 文件；目前
+提交的 package fixtures 為 ODF 1.4，並另跑一組真實 JAR 正／負 package canary。該 CLI 的檔案入口以 ZIP package loader 開啟文件，不用它處理
+`.fodt` 等 flat ODF；flat ODF 仍由 OdfKit 內建的各版本官方 RELAX NG 衍生驗證與 corpus
+gate 負責。這是輸入模型邊界，不是 baseline exception。
 
 ## 逾時與診斷
 

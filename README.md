@@ -120,8 +120,8 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 
 - 目前主要交付管道為 **GitHub 原始碼** 與 **GitHub Release** 資產，
   **未發佈至 nuget.org**。
-- OdfKit 目前仍屬 `0.x` 階段；相容性承諾與破壞性變更將記錄於
-  [CHANGELOG](CHANGELOG.md)。
+- OdfKit 以 `v0.0.1` 持續維護；版本號不表示必要功能會留待未來版本補完。
+  相容性承諾與破壞性變更記錄於 [CHANGELOG](CHANGELOG.md)。
 - 版本、交付與安裝參考已整理於
   [docs/version-delivery.md](docs/version-delivery.md)。
 
@@ -132,7 +132,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 | 需以 **ODF 為主格式** 建立、編輯、驗證或批次匯出（含 ODS 串流） | 客戶只要 XLSX／DOCX、無 ODF 政策要求 → 優先 ClosedXML、MiniExcel、Open XML SDK 等 |
 | 伺服器／容器需 **純受控**、不安裝 LibreOffice 即可處理 ODF 封裝 | 需要 **高保真物理分頁、列印金標 PDF** → 使用 LibreOffice 後端或商用渲染庫 |
 | 需要 package 級 round-trip、foreign 內容保留、profile／corpus 驗證閘門 | 需要 **完整試算表重算／樞紐引擎** 或企業級 **侵權賠償契約** → 見 non-goals 與商用套件 |
-| 開源可審計（CC0 + 第三方 NOTICE） | 需要 nuget.org 上長期 `1.x` 穩定承諾與 SLA → 目前仍為 `0.x`，請鎖定 commit／Release |
+| 開源可審計（CC0 + 第三方 NOTICE） | 需要 nuget.org 套件、商業 SLA 或不可變交付快照 → 請鎖定 commit／Release，或採用商業套件 |
 
 功能邊界與非目標見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
 [UDX 非功能性目標](docs/udx-non-goals.md)。效能數字見

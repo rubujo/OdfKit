@@ -28,8 +28,8 @@ ODF 1.4（2025-12 OASIS Standard）四份正式規格文本逐章稽核結論見
 |---|---|---|---|---|
 | Package API | `OdfPackage` | ODF Toolkit package handling | complete | 可開啟、建立、保存 ZIP / Flat XML，並保留 unknown entries。 |
 | 文件工廠 | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 24 種主要 extension 可最小 create / load / save / validate / round-trip。 |
-| Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | complete | `validate-corpus` 可執行 manifest 並比對 expected classification、kind 與 version；已包含官方 1.1/1.2/1.3/1.4 真實 RNG 驗證並已於 CI 中執行。 |
-| 外部 baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | complete | 可選執行 ODF Validator JAR；`validate` 與 `validate-corpus` 都會把未文件化 baseline mismatch 視為失敗，並支援 documented exception manifest。 |
+| Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator 的分類與診斷工作流 | complete | 內建 package、官方 RNG 衍生 schema metadata／pattern 與 profile gate；`validate-corpus` 可比對 expected classification、kind 與 version。核心不是可載入任意 RNG 的通用 validator。 |
+| 外部 baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | complete | 獨立 CI 以固定版本與 SHA-256 對標 repo 內版本屬於 ODF 1.1～1.4 的所有 package fixtures；`validate` 與 `validate-corpus` 都會把未文件化 baseline mismatch 視為失敗，並支援 documented exception manifest。 |
 | Typed DOM | generated DOM wrappers、`OdfNodeFactory`、`OdfTypedDomCoverage`、typed attribute helpers、schema-specific child collections | ODFDOM | complete | 以 CLI `typed-dom-coverage`、`eng/Test-OdfTypedDomCoverage.ps1` 與 CI artifact 追蹤 child relation coverage；generated wrappers 已包含常用 datatype typed property、2,000+ schema-specific child collection property，且 repo 內已有完整型別與符合 ODFDOM-style sample traversal 的測試。 |
 | Simple high-level API | Text / Spreadsheet / Presentation / Drawing facade | ODF Toolkit Simple API | complete | ODT / ODS / ODP / ODG 常見建立、讀取（如 presentation page、MathML formula object 支援）、複雜樣式、公式、加密、樞紐分析表與條件格式有直接外觀層，並具備完整 `[Fact]`／`[Theory]` 測試套件驗證。 |
 | Corpus | generated、positive、negative、unknown、security corpus | ODF Validator sample corpus | complete | repo 內已有封裝與 flat 主要格式的可執行 manifest 範本，包含 ODF 1.1/1.2/1.3/1.4 及負向驗證；大型或第三方 corpus 可用 `validate-corpus` 搭配外部路徑執行。 |
@@ -37,7 +37,18 @@ ODF 1.4（2025-12 OASIS Standard）四份正式規格文本逐章稽核結論見
 
 ## 外部 baseline 執行
 
-核心 OdfKit 不依賴 Java。外部 ODF Validator 僅在明確啟用時執行。
+核心 OdfKit 不依賴 Java。主 CI 不載入 Java；獨立的 `odf-external-baseline.yml` 會固定使用
+ODF Validator 0.13.0 與 Java 11，對 repo 內版本屬於 ODF 1.1～1.4 的所有 ZIP package
+fixtures 執行 RELAX NG 分類對標，並跑真實 JAR 的正／負 package canary。目前提交的 package
+fixtures 為 ODF 1.4。該 artifact 的標籤原始碼已內建
+ODF 1.0～1.4 document、manifest 與 dsig schema。因 CLI 入口使用 ZIP package loader，flat
+ODF 仍由 OdfKit 內建的各版本官方 schema gate 驗證，不建立偽 baseline exception。
+
+外部工具的供應鏈資料集中於 `eng/external-tools.json`。CI cache key 包含 Maven Central
+來源、cache revision、版本與完整 SHA-256，沒有寬鬆 fallback key；
+`eng/Install-OdfValidator.ps1` 在 cache 命中後仍驗證內容雜湊，已存在但不符時立即失敗，
+cache miss 才以暫存檔下載、驗證後移入正式路徑。異常 cache 需調查後明確遞增
+`cacheRevision`，不可靜默覆寫。cache 只保存 JAR，不保存驗證輸出或暫存 corpus manifest。
 
 ```powershell
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt `

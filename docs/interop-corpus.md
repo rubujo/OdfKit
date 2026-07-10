@@ -54,13 +54,20 @@
 ## ODF Toolkit 對標 corpus
 
 - OdfKit 允許用外部 ODF Validator 作為選用 baseline。
-- 一般 CI 不要求 Java 或 ODF Validator JAR；設定 `ODFKIT_ODFVALIDATOR_JAR` 或 CLI `--baseline-jar` 後才執行外部比對。
+- 主 CI 不要求 Java 或 ODF Validator JAR；獨立的 `odf-external-baseline.yml` 會在 PR、main
+  與手動觸發時，以固定 SHA-256 的 ODF Validator 0.13.0 對 repo 內版本屬於 ODF 1.1～1.4
+  的所有 package fixtures 執行外部比對與正／負 canary；目前提交的 package fixtures 為
+  ODF 1.4。本機與自備 corpus 仍可用 `ODFKIT_ODFVALIDATOR_JAR` 或 CLI
+  `--baseline-jar` 明確啟用。
 - 分類不一致必須透過 `--baseline-exceptions` 指定的 JSON manifest 記錄為 documented exception，否則視為對標失敗。
 - baseline exception manifest 不能有重複項目，也不能引用外部 corpus manifest 之外的 fixture。
 - 外部 corpus manifest 可用 `validate-corpus` 執行，並以 fixture 的 `expected`、`kind` 與 `version` 欄位作為完成線。
 - 外部 / 官方 fixture 必須提供 `sourceUri`，generated 或 OdfKit 自有樣本才可省略。
 - `validate-corpus --metadata-only` 可在樣本尚未下載時檢查外部 manifest 與 baseline exception 中繼資料。
 - `eng/Test-OdfCorpus.ps1` 對外部 corpus 會先執行 metadata-only gate，再執行 fixture 驗證與可選 ODF Validator baseline。
+- `eng/Test-OdfCorpus.ps1 -InternalBaselineJar` 會以版本篩選後的暫存 manifest 對 repo corpus
+  執行 baseline；CI 再加上 `-InternalBaselinePackageOnly`，避免用 ZIP package loader 開啟
+  flat ODF。預設版本為 1.1～1.4。
 - `validate-corpus` 會拒絕逃出 corpus root 的 fixture 路徑、重複 fixture id / path 與未知 round-trip 策略。
 - `eng/Test-OdfCorpus.ps1` 與 GitHub Actions `ODF corpus` 工作流程會固定驗證內建 corpus；設定 `ODFKIT_PARITY_CORPUS_ROOT` 時可同時驗證外部 corpus。
 - `eng/Initialize-OdfExternalCorpus.ps1` 可建立外部 corpus manifest 與 baseline exception 範本。

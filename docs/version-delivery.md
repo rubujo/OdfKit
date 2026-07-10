@@ -10,15 +10,19 @@
 | 套件資產 | GitHub Release |
 | 公開套件倉庫 | 目前 **未發佈至 nuget.org** |
 
-## 2. 版本與相容性資訊
+## 2. 版本身分與相容性資訊
 
 | 面向 | 內容 |
 |------|------|
-| SDK 版本階段 | 目前為 `0.x` |
+| SDK 版本身分 | `v0.0.1` 持續維護；版本號不代表等待未來版本補完必要能力 |
 | 權威版本來源 | `eng/OdfKit.Package.props` 與各 Release 標籤 |
 | 版本變更紀錄 | [CHANGELOG](../CHANGELOG.md) |
 | 目標框架 | 核心與擴充套件：`net10.0;netstandard2.0`；CLI / 測試：`net10.0;net8.0` |
 | 功能相容性基準 | [ODF 格式支援矩陣](odf-format-support.md) 與測試證據 |
+
+`v0.0.1` 是持續完滿的產品身分，不是不可變快照。公開 API 在正式交付前仍可直接修正；每次
+變更必須同步更新 PublicAPI 基線、測試、文件、範例與 CHANGELOG。GitHub tag／Release 若存在，
+只表示特定提交的交付快照，不決定目前 `main` 是否完滿。
 
 ## 3. 安裝模式
 

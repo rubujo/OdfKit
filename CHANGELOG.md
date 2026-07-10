@@ -2,13 +2,16 @@
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
 
-## [0.0.1] - 未發行（GitHub Release 資產，非 nuget.org）
+## [0.0.1] - 持續維護
+
+`v0.0.1` 是持續完滿的產品身分，不以升版作為補齊必要功能、文件或品質債務的手段。
+GitHub Release 資產若建立，只代表特定提交的交付快照；目前未發佈至 nuget.org。
 
 ### 新增
 
 - **核心 ODF 支援**：24 種主要 ODF extension（ODT/ODS/ODP/ODG 及其範本、母片、Flat XML、次格式變體）之偵測、建立、載入、保存、驗證與來回讀寫。
 - **四主格式高階 API**：ODT、ODS、ODP、ODG 已達 `complete` 分級，涵蓋常用建立、編輯、樣式、公式、加密、追蹤修訂、條件格式、樞紐分析表等場景。
-- **規範可信度**：ODF 1.1/1.2/1.3/1.4 官方 RELAX NG schema 驗證、profile 規則（OASIS Strict/Extended、ISO/IEC 26300、EU、ROC Taiwan）、266 筆 corpus fixtures。
+- **規範可信度**：ODF 1.1/1.2/1.3/1.4 官方 RELAX NG 衍生的版本化 schema metadata／pattern 驗證、profile 規則（OASIS Strict/Extended、ISO/IEC 26300、EU、ROC Taiwan）、266 筆 corpus fixtures，以及由獨立 CI 以固定版本與 SHA-256 執行的外部 ODF Validator baseline。
 - **安全性**：PBKDF2（≤ 50,000 次迭代）、Argon2id、OpenPGP（RSA/ElGamal/ECDH X25519 與傳統曲線）加密；XAdES 數位簽章與時間戳記驗證；XXE／Zip Slip／OOM DoS 防禦。
 - **轉換與互通**：
   - OOXML：ODT↔DOCX、ODS↔XLSX（含具名段落／字元樣式、公式、圖表）。
@@ -22,7 +25,7 @@
 - **實務相容性檢查器**：新增 `OdfPracticalCompatibilityValidator`，依 `OdfPracticalCompatibilityProfile`（LibreOffice 現行版本、Microsoft Office ODF、跨辦公軟體可攜編輯）掃描封裝、內容、內嵌圖表與影像，回報 `OdfPracticalCompatibilityReport`／`OdfPracticalCompatibilityIssue` 常見跨工具編輯風險（含 Microsoft Word ODT 復原風險提示）。
 - **圖表深度 API**：新增 `OdfChartPreset` 任務導向預設（長條、折線、圓餅、面積、散佈等）、泡泡圖與股價圖系列（`OdfBubbleChartSeriesInfo`／`OdfBubbleChartSeriesRequest`、`OdfStockChartSeriesInfo`／`OdfStockChartSeriesRequest`）與 `OdfChart3DOptions`（投影模式、角度偏移、雙面光照、光源清單），補齊圖表建立與樣式高階 API 深度。
 - **TemplateBinder 情境強化**：擴充文字、試算表、簡報、影像與繪圖等文件類型的占位符繫結情境涵蓋範圍，並補上對應 cookbook 範例。
-- **ODF 1.4 coverage 追蹤**：新增 `OdfCoverageRoadmapTests` 等測試鎖定 ODF 1.4 規格覆蓋路線圖與 typed DOM audit 入口，明確區分規格覆蓋、package lifecycle、high-level facade 與 interop behavior 四個追蹤層次。
+- **ODF 1.4 coverage 契約**：新增 `OdfCoverageContractTests` 等測試鎖定 ODF 1.4 規格覆蓋契約與 typed DOM audit 入口，明確區分規格覆蓋、package lifecycle、high-level facade 與 interop behavior 四個持續追蹤層次。
 - **套件與發行**：8 個套件（`OdfKit` 核心 + 7 個 `OdfKit.Extensions.*`）雙 TFM（`net10.0` + `netstandard2.0`）NuGet 封裝，透過 GitHub Release 資產發佈（非 nuget.org）。
 - **串流寫入熱路徑（ODS／ODT）**：將批次原始 XML 組裝與字元防線抽至共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`（`OdfKit.Core`），`OdsStreamWriter` 與 `OdtStreamWriter` 段落／標題／清單／儲存格熱路徑共用；關閉 `XmlWriter.CheckCharacters` 後仍以 `Err_OdfStreamWriter_InvalidXmlCharacter` 快速失敗；補齊 ODS／ODT fast-path 與字元邊界測試。`docs/performance-comparison.md` 於 2026-07-09 重跑 ODS 百萬列對比（第 2 次：約 4.96 s／472 MB 配置／38 MB 峰值，與 MiniExcel 耗時接近持平）。
 - **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
@@ -33,9 +36,9 @@
   - PublicApiAnalyzers 雙 TFM Unshipped 基線與 Package Validation；在地化 JSON 產線（12 語系 × 鍵對等閘門）。
   - 雙語 XML **missing** 清零；`Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`。
   - 高頻 API（`OdfDocumentFactory`、`OdfPackage`、`OdfDocument`、`OdfValidator`、`OdsStreamWriter` 等）便利多載摘要差異化（`eng/Rewrite-ConvenienceSummaries.py`）。
-  - 產品品質分層入口見 `docs/product-quality-gates.md`（提交前 A／corpus 與 policy 之 B／發版前 C）。
+  - 產品品質分層入口見 `docs/product-quality-gates.md`（提交前 A／PR 與 main 之 B／外部環境與穩定量測之 C）。
   - God-class 採人機 KEEP 準則與協作者地圖（`docs/human-agent-maintainability.md`、`docs/architecture-collaborators.md`），禁止為行數機械切檔。
-  - 多版官方 schema（1.1～1.4）內建為**產品選擇**（封存／存量流通）；0.x **非目標**拆成可選 NuGet。
+  - 多版官方 schema（1.1～1.4）內建為**產品選擇**（封存／存量流通）；為瘦身拆成可選 NuGet 是版本無關的**永久非目標**。
 
 ### 架構
 
