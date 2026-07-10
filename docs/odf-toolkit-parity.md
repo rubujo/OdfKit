@@ -44,6 +44,11 @@ fixtures 為 ODF 1.4。該 artifact 的標籤原始碼已內建
 ODF 1.0～1.4 document、manifest 與 dsig schema。因 CLI 入口使用 ZIP package loader，flat
 ODF 仍由 OdfKit 內建的各版本官方 schema gate 驗證，不建立偽 baseline exception。
 
+完整 package corpus parity 目前定位為 audit：差異保留於 CI step log 與 job summary，且不
+自動產生 allowlist。真實 JAR 正／負 canary 是阻擋 gate，用來保證下載、Java 執行、有效文件
+接受與無效文件拒絕的整條路徑。完整 audit 歸零後，才能移除 `continue-on-error` 將其提升為
+阻擋 gate。
+
 外部工具的供應鏈資料集中於 `eng/external-tools.json`。CI cache key 包含 Maven Central
 來源、cache revision、版本與完整 SHA-256，沒有寬鬆 fallback key；
 `eng/Install-OdfValidator.ps1` 在 cache 命中後仍驗證內容雜湊，已存在但不符時立即失敗，

@@ -68,7 +68,11 @@ cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路
 
 ODF Validator 0.13.0 artifact 的標籤原始碼內建 ODF 1.0～1.4 document、manifest 與 dsig
 schema。外部 baseline 會從 repo corpus 挑選版本為 1.1～1.4 的所有 ZIP package 文件；目前
-提交的 package fixtures 為 ODF 1.4，並另跑一組真實 JAR 正／負 package canary。該 CLI 的檔案入口以 ZIP package loader 開啟文件，不用它處理
+提交的 package fixtures 為 ODF 1.4，並另跑一組真實 JAR 正／負 package canary。完整 corpus
+比對前先以阻擋 step 完成建置與內部 corpus 驗證；完整外部比對則是 audit：分類差異保留在
+step log 與 job summary，但不自動建立 baseline exception；
+真實 JAR 正／負 canary 才是阻擋工作流程的 gate。待完整 audit 無差異後，才可將它提升為
+阻擋 gate。該 CLI 的檔案入口以 ZIP package loader 開啟文件，不用它處理
 `.fodt` 等 flat ODF；flat ODF 仍由 OdfKit 內建的各版本官方 RELAX NG 衍生驗證與 corpus
 gate 負責。這是輸入模型邊界，不是 baseline exception。
 

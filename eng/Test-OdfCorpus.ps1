@@ -9,7 +9,9 @@ param(
     [string]$BaselineExceptions = "",
     [string]$InternalBaselineJar = "",
     [string[]]$InternalBaselineVersions = @("1.1", "1.2", "1.3", "1.4"),
-    [switch]$InternalBaselinePackageOnly
+    [switch]$InternalBaselinePackageOnly,
+    [switch]$SkipBuild,
+    [switch]$SkipInternalValidation
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,13 +45,7 @@ function New-VersionFilteredManifest {
     $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
     $fixtures = @($manifest.fixtures | Where-Object { $Versions -contains $_.version })
     if ($PackageOnly) {
-        $packageExtensions = @(
-            ".odb", ".odc", ".odf", ".odg", ".odi", ".odm", ".odp", ".ods", ".odt",
-            ".otc", ".otf", ".otg", ".oth", ".oti", ".otp", ".ots", ".ott"
-        )
-        $fixtures = @($fixtures | Where-Object {
-            $packageExtensions -contains [System.IO.Path]::GetExtension($_.path).ToLowerInvariant()
-        })
+        $fixtures = @($fixtures | Where-Object { -not $_.kind.StartsWith("Flat", [StringComparison]::Ordinal) })
     }
     if ($fixtures.Count -eq 0) {
         throw "Corpus manifest does not contain fixtures for ODF version(s): $($Versions -join ', ')"
@@ -66,8 +62,10 @@ function New-VersionFilteredManifest {
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
-    Invoke-NativeCommand "dotnet" @("restore")
-    Invoke-NativeCommand "dotnet" @("build", "-c", $Configuration, "--no-restore")
+    if (-not $SkipBuild) {
+        Invoke-NativeCommand "dotnet" @("restore")
+        Invoke-NativeCommand "dotnet" @("build", "-c", $Configuration, "--no-restore")
+    }
 
     $commonArgs = @(
         "run",
@@ -82,7 +80,9 @@ try {
         "validate-corpus"
     )
 
-    Invoke-NativeCommand "dotnet" ($commonArgs + @($InternalManifest, "--format", "json"))
+    if (-not $SkipInternalValidation) {
+        Invoke-NativeCommand "dotnet" ($commonArgs + @($InternalManifest, "--format", "json"))
+    }
 
     if (-not [string]::IsNullOrWhiteSpace($InternalBaselineJar)) {
         if (-not (Test-Path -LiteralPath $InternalBaselineJar -PathType Leaf)) {

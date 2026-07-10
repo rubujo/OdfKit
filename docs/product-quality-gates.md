@@ -46,6 +46,10 @@ pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 
 - [corpus-manifest.md](corpus-manifest.md)
 - [odf-official-corpus-sources.md](odf-official-corpus-sources.md)
+
+外部 ODF Validator 工作流程先以阻擋 step 執行內建 corpus，再以完整 package corpus 產生
+非阻擋 parity audit，最後以真實 JAR 正／負 canary 作為外部工具鏈 gate。Audit 差異必須保留
+於 log 與 job summary，不得自動產生 baseline exception；差異歸零後再提升為阻擋 gate。
 - [ci-cd.md](ci-cd.md)
 
 ## 效能基線

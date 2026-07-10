@@ -120,6 +120,10 @@ public class OdfCoverageContractTests
         Assert.Contains("InternalBaselinePackageOnly", corpusScript);
         Assert.Contains("-InternalBaselineVersions '1.1', '1.2', '1.3', '1.4'", workflow);
         Assert.Contains("ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments", workflow);
+        Assert.Contains("continue-on-error: true", workflow);
+        Assert.Contains("no automatic baseline exceptions were created", workflow);
+        Assert.Contains("-SkipBuild", workflow);
+        Assert.Contains("-SkipInternalValidation", workflow);
     }
 
     /// <summary>

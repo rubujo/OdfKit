@@ -135,7 +135,9 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus man
 版本篩選 manifest；預設版本集合為 ODF 1.1～1.4。CI 的
 `.github/workflows/odf-external-baseline.yml` 固定使用 package-only 模式，因為 ODF Validator
 CLI 以 package loader 開啟文件；flat ODF 由 OdfKit 內建的版本化 RELAX NG gate 驗證。
-需要改變版本集合時使用 `-InternalBaselineVersions`。
+package-only 依 manifest 的 `kind` 是否以 `Flat` 開頭判斷，不依可能重疊的副檔名推測；例如
+`.odf` 可能是 ZIP formula package，也可能是 `FlatFormula`。需要改變版本集合時使用
+`-InternalBaselineVersions`。
 
 `validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
