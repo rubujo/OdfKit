@@ -92,8 +92,8 @@ public class OdfCoverageContractTests
     }
 
     /// <summary>
-    /// Verifies that the external ODF Validator workflow uses an immutable, hash-verified tool cache.
-    /// 驗證外部 ODF Validator 工作流程使用不可變且經雜湊驗證的工具快取。
+    /// Verifies that the external RELAX NG workflow uses immutable, hash-verified tool caches and blocking parity gates.
+    /// 驗證外部 RELAX NG 工作流程使用不可變且經雜湊驗證的工具快取與阻擋式對標閘門。
     /// </summary>
     [Fact]
     public void ExternalValidatorCi_UsesImmutableVerifiedCache()
@@ -102,26 +102,44 @@ public class OdfCoverageContractTests
         string manifestPath = Path.Combine(repoRoot, "eng", "external-tools.json");
         using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
         JsonElement validator = manifest.RootElement.GetProperty("odfValidator");
+        JsonElement jing = manifest.RootElement.GetProperty("jing");
         string sha256 = validator.GetProperty("sha256").GetString()!;
+        string jingSha256 = jing.GetProperty("sha256").GetString()!;
         string workflow = File.ReadAllText(
             Path.Combine(repoRoot, ".github", "workflows", "odf-external-baseline.yml"));
         string installer = File.ReadAllText(Path.Combine(repoRoot, "eng", "Install-OdfValidator.ps1"));
+        string jingInstaller = File.ReadAllText(Path.Combine(repoRoot, "eng", "Install-Jing.ps1"));
+        string jingBaseline = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OdfRelaxNgBaseline.ps1"));
         string corpusScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OdfCorpus.ps1"));
 
         Assert.Equal("0.13.0", validator.GetProperty("version").GetString());
         Assert.Equal(64, sha256.Length);
+        Assert.Equal("20241231", jing.GetProperty("version").GetString());
+        Assert.Equal(64, jingSha256.Length);
         Assert.Contains("steps.validator.outputs.source", workflow);
         Assert.Contains("steps.validator.outputs.cache_revision", workflow);
         Assert.Contains("steps.validator.outputs.version", workflow);
         Assert.Contains("steps.validator.outputs.sha256", workflow);
+        Assert.Contains("steps.jing.outputs.source", workflow);
+        Assert.Contains("steps.jing.outputs.cache_revision", workflow);
+        Assert.Contains("steps.jing.outputs.version", workflow);
+        Assert.Contains("steps.jing.outputs.sha256", workflow);
         Assert.DoesNotContain("restore-keys", workflow);
         Assert.Contains("Get-FileHash", installer);
+        Assert.Contains("Get-FileHash", jingInstaller);
+        Assert.Contains("binFiles", jingInstaller);
+        Assert.Contains("System.IO.Compression.ZipFile", jingBaseline);
+        Assert.Contains("OpenDocument-schema-v1.1.rng", jingBaseline);
+        Assert.Contains("OpenDocument-v1.4-schema.rng", jingBaseline);
         Assert.Contains("InternalBaselineVersions", corpusScript);
+        Assert.Contains("InternalBaselineExcludedKinds", corpusScript);
         Assert.Contains("InternalBaselinePackageOnly", corpusScript);
         Assert.Contains("-InternalBaselineVersions '1.1', '1.2', '1.3', '1.4'", workflow);
+        Assert.Contains("-InternalBaselineExcludedKinds 'Database', 'Formula', 'FormulaTemplate'", workflow);
+        Assert.Contains("Test-OdfRelaxNgBaseline.ps1", workflow);
+        Assert.Contains("OdfCorpusGenerator", workflow);
         Assert.Contains("ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments", workflow);
-        Assert.Contains("continue-on-error: true", workflow);
-        Assert.Contains("no automatic baseline exceptions were created", workflow);
+        Assert.DoesNotContain("continue-on-error", workflow);
         Assert.Contains("-SkipBuild", workflow);
         Assert.Contains("-SkipInternalValidation", workflow);
     }

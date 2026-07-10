@@ -8,5 +8,21 @@
     "sha256": "5684feec5cbdcd5783998978c096ac9ccea53a454e2d6ae803ce482d2336d1dc",
     "minimumJavaVersion": "11",
     "supportedOdfVersions": ["1.0", "1.1", "1.2", "1.3", "1.4"]
+  },
+  "jing": {
+    "source": "github-release",
+    "cacheRevision": "1",
+    "version": "20241231",
+    "archiveFileName": "jing-20241231.zip",
+    "uri": "https://github.com/relaxng/jing-trang/releases/download/V20241231/jing-20241231.zip",
+    "sha256": "d11a765f9106e398e01d66aaffb629beb1da21f8a716299e2930a751130bfad2",
+    "minimumJavaVersion": "11",
+    "binFiles": {
+      "jing.jar": "ea5e9026244d977e607d8b52212d6871498ece51939f9c49d0e7a77aad91133a",
+      "isorelax.jar": "171034ff98f1c480bc84029f7a0f5fc57a25adeaf691112a5a251345b81fc5ce",
+      "saxon9.jar": "e9de165ca1bb8234a2f9fc364909b113937417a7f1f23bc9d55066465b7c57b3",
+      "xercesImpl.jar": "6ae540a7c85c814ac64bea48016b3a6f45c95d4765f547fcc0053dc36c94ed5c",
+      "xml-apis.jar": "d404aa881eb9c5f7a4fb546e84ea11506cd417a72b5972e88eff17f43f9f8a64"
+    }
   }
 }

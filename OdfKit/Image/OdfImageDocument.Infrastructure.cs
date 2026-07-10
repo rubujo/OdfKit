@@ -39,7 +39,7 @@ public partial class OdfImageDocument
             "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" " +
             "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
             "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
-            "<office:body><office:image /></office:body>" +
+            "<office:body><office:image><draw:frame /></office:image></office:body>" +
             "</office:document-content>";
     }
 

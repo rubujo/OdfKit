@@ -301,7 +301,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
                "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
                "<office:body>" +
                "<office:chart>" +
-               "<chart:chart chart:class=\"line\" />" +
+               "<chart:chart chart:class=\"chart:line\"><chart:plot-area /></chart:chart>" +
                "</office:chart>" +
                "</office:body>" +
                "</office:document-content>";

@@ -146,18 +146,11 @@ public partial class SpreadsheetDocument
             _ => "chart:bar"
         };
 
-        string dataRangeStr = chart.DataRange.ToOdfString(false);
-
         var sb = new StringBuilder();
         sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         sb.Append("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.3\">");
         sb.Append("<office:body><office:chart>");
-        sb.Append($"<chart:chart chart:class=\"{chartClass}\" table:cell-range-address=\"{dataRangeStr}\"");
-        if (chart.HasLegend)
-        {
-            sb.Append(" chart:legend-position=\"end\"");
-        }
-        sb.Append(">");
+        sb.Append($"<chart:chart chart:class=\"{chartClass}\">");
 
         if (!string.IsNullOrEmpty(chart.Title))
         {
@@ -166,7 +159,14 @@ public partial class SpreadsheetDocument
             sb.Append("</text:p></chart:title>");
         }
 
+        if (chart.HasLegend)
+        {
+            sb.Append("<chart:legend chart:legend-position=\"end\"/>");
+        }
+
         sb.Append("<chart:plot-area chart:data-source-has-labels=\"both\">");
+        sb.Append("<chart:axis chart:dimension=\"x\" chart:name=\"primary-x\"/>");
+        sb.Append("<chart:axis chart:dimension=\"y\" chart:name=\"primary-y\"/>");
 
         OdfCellRange range = chart.DataRange;
         int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
@@ -190,14 +190,7 @@ public partial class SpreadsheetDocument
             sb.Append("\"/></chart:series>");
         }
 
-        sb.Append("<chart:axis chart:dimension=\"x\" chart:name=\"primary-x\"/>");
-        sb.Append("<chart:axis chart:dimension=\"y\" chart:name=\"primary-y\"/>");
         sb.Append("</chart:plot-area>");
-
-        if (chart.HasLegend)
-        {
-            sb.Append("<chart:legend chart:legend-position=\"end\"/>");
-        }
 
         sb.Append("</chart:chart></office:chart></office:body></office:document-content>");
 

@@ -42,7 +42,7 @@ testhost 收尾不穩。
 | 工作流程 | 目的 | 是否自動跑 |
 |----------|------|------------|
 | `odf-corpus.yml` | repo 內 ODF corpus 與可選外部 corpus 驗證 | PR / main |
-| `odf-external-baseline.yml` | 以固定版本 ODF Validator 對標 packaged ODF RELAX NG 分類 | PR / main / 手動 |
+| `odf-external-baseline.yml` | 以固定版本 Jing 與 ODF Validator 驗證完整 RELAX NG／package 對標 | PR / main / 手動 |
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | Native AOT / trim smoke | PR / main |
@@ -58,23 +58,19 @@ LibreOffice、Microsoft Office COM 與 PDF 像素級比對屬外部環境驗收�
 或本機腳本明確啟用，不得混入主 CI 的煙霧測試。LibreOffice 互通由排程工作流程持續驗證；
 Microsoft Office COM 與像素級比對仍依可用環境手動執行。
 
-外部 ODF Validator baseline 與快速 corpus job 分離。工作流程從
-`eng/external-tools.json` 讀取固定版本、Maven Central URL 與 SHA-256，cache key 同時包含
-來源、cache revision、版本與完整雜湊，且不設定 `restore-keys`。無論 cache 是否命中，
-`eng/Install-OdfValidator.ps1` 都會重新計算 JAR 的 SHA-256；已存在但不符時立即終止，不用
+外部 RELAX NG baseline 與快速 corpus job 分離。工作流程從
+`eng/external-tools.json` 讀取 Jing 與 ODF Validator 的固定版本、來源 URL 與 SHA-256；各自的
+cache key 同時包含來源、cache revision、版本與完整雜湊，且不設定 `restore-keys`。無論 cache
+是否命中，安裝腳本都會重新計算 archive 與 JAR 的 SHA-256；已存在但不符時立即終止，不用
 重新下載掩蓋錯誤。確認 cache 項目異常後，必須明確遞增 `cacheRevision` 取得新 key。
 cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路徑。CI 不快取 corpus 驗證輸出、
 暫存 manifest 或測試結果，因此舊結果不會被誤當成本次驗證證據。
 
-ODF Validator 0.13.0 artifact 的標籤原始碼內建 ODF 1.0～1.4 document、manifest 與 dsig
-schema。外部 baseline 會從 repo corpus 挑選版本為 1.1～1.4 的所有 ZIP package 文件；目前
-提交的 package fixtures 為 ODF 1.4，並另跑一組真實 JAR 正／負 package canary。完整 corpus
-比對前先以阻擋 step 完成建置與內部 corpus 驗證；完整外部比對則是 audit：分類差異保留在
-step log 與 job summary，但不自動建立 baseline exception；
-真實 JAR 正／負 canary 才是阻擋工作流程的 gate。待完整 audit 無差異後，才可將它提升為
-阻擋 gate。該 CLI 的檔案入口以 ZIP package loader 開啟文件，不用它處理
-`.fodt` 等 flat ODF；flat ODF 仍由 OdfKit 內建的各版本官方 RELAX NG 衍生驗證與 corpus
-gate 負責。這是輸入模型邊界，不是 baseline exception。
+Jing 20241231 會直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證全部 flat 文件，以及 ZIP
+package 的 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml`。ODF Validator 0.13.0
+另對適用的 ZIP package 執行容器／分類對標與正負 canary。Database 因該版本拒絕其合法
+mimetype，Formula／FormulaTemplate 因該版本在 ODF 1.4 觸發上游 NPE，僅從 ODF Validator
+集合排除，仍由 Jing 與內部 package gate 阻擋。兩條外部 baseline 都是阻擋 gate。
 
 ## 逾時與診斷
 

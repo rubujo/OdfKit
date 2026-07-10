@@ -6,9 +6,14 @@ on:
       - 'OdfKit/**'
       - 'tools/OdfKit.Cli/**'
       - 'OdfKit.Tests/OdfExternalValidatorAsyncTests.cs'
+      - 'OdfKit.Tests/OdfCoverageContractTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
+      - 'eng/Install-Jing.ps1'
+      - 'eng/Test-OdfRelaxNgBaseline.ps1'
       - 'eng/Test-OdfCorpus.ps1'
+      - 'tools/OdfCorpusGenerator/**'
+      - 'tools/OdfSchemaGenerator/schemas/**'
       - 'eng/external-tools.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-external-baseline.yml'
@@ -19,9 +24,14 @@ on:
       - 'OdfKit/**'
       - 'tools/OdfKit.Cli/**'
       - 'OdfKit.Tests/OdfExternalValidatorAsyncTests.cs'
+      - 'OdfKit.Tests/OdfCoverageContractTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
+      - 'eng/Install-Jing.ps1'
+      - 'eng/Test-OdfRelaxNgBaseline.ps1'
       - 'eng/Test-OdfCorpus.ps1'
+      - 'tools/OdfCorpusGenerator/**'
+      - 'tools/OdfSchemaGenerator/schemas/**'
       - 'eng/external-tools.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-external-baseline.yml'
@@ -59,6 +69,19 @@ jobs:
           "java_version=$($tool.minimumJavaVersion)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
           "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Read pinned Jing metadata
+        id: jing
+        shell: pwsh
+        run: |
+          $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).jing
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE `
+            "odfkit/jing/$($tool.source)/r$($tool.cacheRevision)/$($tool.version)/$($tool.sha256)"
+          "source=$($tool.source)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "cache_revision=$($tool.cacheRevision)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "version=$($tool.version)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$($tool.sha256)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -79,18 +102,50 @@ jobs:
             -DestinationRoot '${{ steps.validator.outputs.cache_root }}'
           "jar_path=$jarPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Cache pinned Jing
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.jing.outputs.cache_root }}
+          key: jing-${{ runner.os }}-${{ steps.jing.outputs.source }}-r${{ steps.jing.outputs.cache_revision }}-${{ steps.jing.outputs.version }}-${{ steps.jing.outputs.sha256 }}
+
+      - name: Install and verify Jing
+        id: install-jing
+        shell: pwsh
+        run: |
+          $jarPath = ./eng/Install-Jing.ps1 `
+            -DestinationRoot '${{ steps.jing.outputs.cache_root }}'
+          "jar_path=$jarPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Validate internal ODF corpus
         shell: pwsh
         run: ./eng/Test-OdfCorpus.ps1
 
-      - name: Audit full supported ODF package corpus
-        id: full-audit
-        continue-on-error: true
+      - name: Regenerate corpus from current source
+        shell: pwsh
+        run: |
+          dotnet run --project tools/OdfCorpusGenerator `
+            --framework net10.0 `
+            --configuration Release `
+            --no-build `
+            -- $env:GITHUB_WORKSPACE
+
+      - name: Validate regenerated internal ODF corpus
+        shell: pwsh
+        run: ./eng/Test-OdfCorpus.ps1 -SkipBuild
+
+      - name: Validate complete RELAX NG baseline with Jing
+        shell: pwsh
+        run: |
+          ./eng/Test-OdfRelaxNgBaseline.ps1 `
+            -JingJar '${{ steps.install-jing.outputs.jar_path }}'
+
+      - name: Validate applicable ODF package parity
         shell: pwsh
         run: |
           ./eng/Test-OdfCorpus.ps1 `
             -InternalBaselineJar '${{ steps.install.outputs.jar_path }}' `
             -InternalBaselineVersions '1.1', '1.2', '1.3', '1.4' `
+            -InternalBaselineExcludedKinds 'Database', 'Formula', 'FormulaTemplate' `
             -InternalBaselinePackageOnly `
             -SkipBuild `
             -SkipInternalValidation
@@ -107,19 +162,3 @@ jobs:
             --no-build `
             --no-restore `
             --filter 'FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments'
-
-      - name: Summarize full baseline audit
-        if: always()
-        shell: pwsh
-        run: |
-          if ('${{ steps.full-audit.outcome }}' -eq 'success') {
-            'Full ODF package parity audit passed.' |
-              Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          }
-          else {
-            Write-Warning 'Full ODF package parity audit found classification differences. See the audit step log.'
-            $summary = 'Full ODF package parity audit found classification differences. ' +
-              'The real JAR positive/negative canary remains the blocking gate; ' +
-              'no automatic baseline exceptions were created.'
-            $summary | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          }

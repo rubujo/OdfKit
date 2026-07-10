@@ -9,6 +9,7 @@ param(
     [string]$BaselineExceptions = "",
     [string]$InternalBaselineJar = "",
     [string[]]$InternalBaselineVersions = @("1.1", "1.2", "1.3", "1.4"),
+    [string[]]$InternalBaselineExcludedKinds = @(),
     [switch]$InternalBaselinePackageOnly,
     [switch]$SkipBuild,
     [switch]$SkipInternalValidation
@@ -39,6 +40,8 @@ function New-VersionFilteredManifest {
         [Parameter(Mandatory = $true)]
         [string[]]$Versions,
 
+        [string[]]$ExcludedKinds = @(),
+
         [switch]$PackageOnly
     )
 
@@ -46,6 +49,11 @@ function New-VersionFilteredManifest {
     $fixtures = @($manifest.fixtures | Where-Object { $Versions -contains $_.version })
     if ($PackageOnly) {
         $fixtures = @($fixtures | Where-Object { -not $_.kind.StartsWith("Flat", [StringComparison]::Ordinal) })
+    }
+    if ($ExcludedKinds.Count -gt 0) {
+        $fixtures = @($fixtures | Where-Object {
+            -not ($ExcludedKinds -contains [string]$_.kind)
+        })
     }
     if ($fixtures.Count -eq 0) {
         throw "Corpus manifest does not contain fixtures for ODF version(s): $($Versions -join ', ')"
@@ -92,6 +100,7 @@ try {
         $filteredManifest = New-VersionFilteredManifest `
             -ManifestPath $InternalManifest `
             -Versions $InternalBaselineVersions `
+            -ExcludedKinds $InternalBaselineExcludedKinds `
             -PackageOnly:$InternalBaselinePackageOnly
         try {
             $internalRoot = Split-Path -Parent (Resolve-Path -LiteralPath $InternalManifest)

@@ -37,7 +37,9 @@ public partial class OdfDatabaseDocument
             "xmlns:db=\"urn:oasis:names:tc:opendocument:xmlns:database:1.0\" " +
             "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
             "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
-            "<office:body><office:database /></office:body>" +
+            "<office:body><office:database><db:data-source><db:connection-data>" +
+            "<db:connection-resource xlink:type=\"simple\" xlink:href=\"\" />" +
+            "</db:connection-data></db:data-source></office:database></office:body>" +
             "</office:document-content>";
     }
 

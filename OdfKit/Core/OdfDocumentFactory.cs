@@ -329,6 +329,7 @@ public static class OdfDocumentFactory
         writer.WriteAttributeString("office", "version", OdfNamespaces.Office, versionText);
         writer.WriteStartElement("office", "body", OdfNamespaces.Office);
         writer.WriteStartElement("office", bodyElement, OdfNamespaces.Office);
+        writer.WriteRaw(GetMinimalBodyContentXml(flatKind));
         writer.WriteEndElement();
         writer.WriteEndElement();
         writer.WriteEndElement();
@@ -373,8 +374,23 @@ public static class OdfDocumentFactory
             CommonNamespaceAttributes +
             " office:version=\"" + version + "\"><office:body><office:" +
             bodyElement +
-            " /></office:body></office:document-content>";
+            ">" + GetMinimalBodyContentXml(kind) + "</office:" + bodyElement +
+            "></office:body></office:document-content>";
     }
+
+    private static string GetMinimalBodyContentXml(OdfDocumentKind kind) => kind switch
+    {
+        OdfDocumentKind.Chart or OdfDocumentKind.ChartTemplate or OdfDocumentKind.FlatChart =>
+            "<chart:chart chart:class=\"chart:line\"><chart:plot-area /></chart:chart>",
+        OdfDocumentKind.Formula or OdfDocumentKind.FormulaTemplate or OdfDocumentKind.FlatFormula =>
+            "<math:math xmlns:math=\"http://www.w3.org/1998/Math/MathML\" />",
+        OdfDocumentKind.Image or OdfDocumentKind.ImageTemplate or OdfDocumentKind.FlatImage =>
+            "<draw:frame />",
+        OdfDocumentKind.Database =>
+            "<db:data-source><db:connection-data><db:connection-resource xlink:type=\"simple\" xlink:href=\"\" />" +
+            "</db:connection-data></db:data-source>",
+        _ => string.Empty
+    };
 
     private static string CreateStylesXml(string version, OdfDocumentKind kind)
     {
@@ -490,6 +506,7 @@ public static class OdfDocumentFactory
         writer.WriteAttributeString("xmlns", "svg", null, OdfNamespaces.Svg);
         writer.WriteAttributeString("xmlns", "chart", null, OdfNamespaces.Chart);
         writer.WriteAttributeString("xmlns", "config", null, OdfNamespaces.Config);
+        writer.WriteAttributeString("xmlns", "db", null, OdfNamespaces.Database);
     }
 
     private const string CommonNamespaceAttributes =
@@ -506,7 +523,8 @@ public static class OdfDocumentFactory
         " xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\"" +
         " xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\"" +
         " xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\"" +
-        " xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\"";
+        " xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\"" +
+        " xmlns:db=\"urn:oasis:names:tc:opendocument:xmlns:database:1.0\"";
 
     private static OdfDocumentKind DetectDocumentKind(OdfPackage package, string? fileName)
     {

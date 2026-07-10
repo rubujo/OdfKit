@@ -37,23 +37,18 @@ ODF 1.4（2025-12 OASIS Standard）四份正式規格文本逐章稽核結論見
 
 ## 外部 baseline 執行
 
-核心 OdfKit 不依賴 Java。主 CI 不載入 Java；獨立的 `odf-external-baseline.yml` 會固定使用
-ODF Validator 0.13.0 與 Java 11，對 repo 內版本屬於 ODF 1.1～1.4 的所有 ZIP package
-fixtures 執行 RELAX NG 分類對標，並跑真實 JAR 的正／負 package canary。目前提交的 package
-fixtures 為 ODF 1.4。該 artifact 的標籤原始碼已內建
-ODF 1.0～1.4 document、manifest 與 dsig schema。因 CLI 入口使用 ZIP package loader，flat
-ODF 仍由 OdfKit 內建的各版本官方 schema gate 驗證，不建立偽 baseline exception。
+核心 OdfKit 不依賴 Java。獨立的 `odf-external-baseline.yml` 固定使用 Jing 20241231、
+ODF Validator 0.13.0 與 Java 11。Jing 直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證全部
+flat 文件與 package XML streams；ODF Validator 則對適用的 ZIP package 執行分類對標，並跑
+真實 JAR 正／負 package canary。Database 與 Formula／FormulaTemplate 的 ODF Validator 0.13.0
+上游限制不會變成 allowlist：它們只從該工具集合排除，仍由 Jing 與內部 package gate 覆蓋。
+兩條外部 baseline 都是阻擋 gate。
 
-完整 package corpus parity 目前定位為 audit：差異保留於 CI step log 與 job summary，且不
-自動產生 allowlist。真實 JAR 正／負 canary 是阻擋 gate，用來保證下載、Java 執行、有效文件
-接受與無效文件拒絕的整條路徑。完整 audit 歸零後，才能移除 `continue-on-error` 將其提升為
-阻擋 gate。
-
-外部工具的供應鏈資料集中於 `eng/external-tools.json`。CI cache key 包含 Maven Central
-來源、cache revision、版本與完整 SHA-256，沒有寬鬆 fallback key；
-`eng/Install-OdfValidator.ps1` 在 cache 命中後仍驗證內容雜湊，已存在但不符時立即失敗，
+外部工具的供應鏈資料集中於 `eng/external-tools.json`。每個 CI cache key 都包含工具來源、
+cache revision、版本與完整 SHA-256，沒有寬鬆 fallback key；安裝腳本在 cache 命中後仍驗證
+archive 與每個必要 JAR 的內容雜湊，已存在但不符時立即失敗，
 cache miss 才以暫存檔下載、驗證後移入正式路徑。異常 cache 需調查後明確遞增
-`cacheRevision`，不可靜默覆寫。cache 只保存 JAR，不保存驗證輸出或暫存 corpus manifest。
+`cacheRevision`，不可靜默覆寫。cache 只保存工具，不保存驗證輸出或暫存 corpus manifest。
 
 ```powershell
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt `
