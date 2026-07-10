@@ -63,6 +63,7 @@
 | [公開 API 可選參數規範](public-api-optional-parameters.md) | RS0026／RS0027 政策與新增 API 檢查清單 |
 | [產品品質閘門](product-quality-gates.md) | Corpus／LibreOffice／OOXML／效能基線與 sample 可執行檢查入口 |
 | [效能基準線](performance-baselines.md) | 基準測試回歸關卡、穩定量測設定檔與基準線報告產生方式 |
+| [三格式標準效能基準](performance-standard-documents.md) | ODS、ODT、ODP 標準工作負載、checksum 與量測政策 |
 | [效能對比報告](performance-comparison.md) | `OdsStreamWriter` 與 MiniExcel、ClosedXML 之跨套件串流寫入實測對比、方法論限制與授權裁定 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 | [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |

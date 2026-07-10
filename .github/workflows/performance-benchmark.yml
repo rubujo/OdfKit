@@ -12,7 +12,7 @@ jobs:
   benchmark-regression:
     name: Benchmark Regression
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -26,3 +26,16 @@ jobs:
       - name: Run benchmark regression
         shell: pwsh
         run: ./eng/Benchmark-Regression.ps1 -Configuration Release
+
+      - name: Measure standard ODS ODT ODP workloads
+        shell: pwsh
+        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release
+
+      - name: Upload standard document measurements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: standard-document-performance
+          path: artifacts/performance/standard-documents.json
+          if-no-files-found: warn
+          retention-days: 30

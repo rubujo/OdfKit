@@ -59,6 +59,8 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 | 封裝 / DOM | `DomInsertBenchmarks`、`DomTextContentBenchmarks`、`OdfPackageLoadBenchmarks` | DOM 變更、文字內容存取、封裝載入 |
 | 試算表串流 | `OdsStreamWriterBenchmarks`、`OdfTableSheetCellAccessBenchmarks` | 大量列寫入、儲存格存取快取 |
 | 文件來回讀寫 | `OdtRoundTripBenchmarks` | 建立、儲存、載入大型 ODT |
+| 三格式標準 | `StandardOdsBenchmarks`、`StandardOdtBenchmarks`、`StandardOdpBenchmarks` | ODS／ODT／ODP 標準讀寫、DOM 與語意檢查碼 |
+| 共通封裝 | `StandardPackageOpenBenchmarks` | 分離 ZIP 封裝開啟與文件模型成本 |
 | 公式 | `FormulaParseBenchmarks` | 公式剖析配置量與延遲 |
 | 協作 | `CollaborationOperationBenchmarks` | TDF JSON operation 剖析與重播 |
 
@@ -68,3 +70,4 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 - 同一台機器上比較同一個 filter、同一個量測設定檔、同一個電源模式。
 - 對微型基準測試結果保持保守；若 BenchmarkDotNet 提示 minimum iteration time 過短，請提高 `-IterationTime` 或資料量。
 - CI 適合跑煙霧測試與回歸關卡，不適合以單一本機毫秒數作為跨平台硬門檻。
+- 三格式標準工作負載與獨立子行程報告方法見 [ODS、ODT、ODP 標準效能基準](performance-standard-documents.md)。

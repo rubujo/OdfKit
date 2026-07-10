@@ -18,6 +18,16 @@ internal static class Program
             return CompetitiveStreamWriteManualRunner.RunSingleScenario(args[1], args[2]);
         }
 
+        if (args.Length > 0 && string.Equals(args[0], "--manual-standard", StringComparison.OrdinalIgnoreCase))
+        {
+            return StandardPerformanceManualRunner.RunOrchestrator();
+        }
+
+        if (args.Length >= 3 && string.Equals(args[0], "--run-standard-single", StringComparison.OrdinalIgnoreCase))
+        {
+            return StandardPerformanceManualRunner.RunSingleScenario(args[1], args[2]);
+        }
+
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         return 0;
     }

@@ -22,6 +22,13 @@ dotnet run -c Release --project OdfKit.Benchmarks -- --filter *CollaborationOper
 
 `OdtRoundTripBenchmarks` 覆蓋大型 ODT 建立、儲存與載入。
 
+## ODS、ODT、ODP 標準基準測試
+
+`StandardOdsBenchmarks`、`StandardOdtBenchmarks`、`StandardOdpBenchmarks` 分別代表大量表格資料、
+長篇結構化文字與複合簡報物件。`StandardPackageOpenBenchmarks` 另行量測 ZIP 封裝開啟成本。
+完整規模、checksum 與獨立子行程報告方法見
+[三格式標準效能基準](../docs/performance-standard-documents.md)。
+
 ## 試算表儲存格存取基準測試
 
 `OdfTableSheetCellAccessBenchmarks` 覆蓋 `OdfTableSheet.GetCell` 逐格填值情境（例如以巢狀
