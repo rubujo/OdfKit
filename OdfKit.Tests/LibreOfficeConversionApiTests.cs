@@ -13,6 +13,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 [Trait(TestCategories.Kind, TestCategories.Interop)]
+[Collection("SequentialRenderingTests")]
 public class LibreOfficeConversionApiTests
 {
     [Theory]
@@ -121,6 +122,31 @@ public class LibreOfficeConversionApiTests
         {
             Environment.SetEnvironmentVariable("ODFKIT_SOFFICE_PATH", originalOdfKit);
             Environment.SetEnvironmentVariable("LIBREOFFICE_PATH", originalLibreOffice);
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void PortablePathResolverFindsExecutableWithoutEnvironmentMutation()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "OdfKit_PortableLO_" + Guid.NewGuid().ToString("N"));
+        string programDir = Path.Combine(root, "App", "libreoffice", "program");
+        string sofficePath = Path.Combine(programDir, "soffice.com");
+
+        try
+        {
+            Directory.CreateDirectory(programDir);
+            File.WriteAllText(sofficePath, string.Empty);
+
+            string? resolved = LibreOfficeRenderer.ResolvePortableLibreOfficePath([root]);
+
+            Assert.Equal(sofficePath, resolved);
+        }
+        finally
+        {
             if (Directory.Exists(root))
             {
                 Directory.Delete(root, true);

@@ -50,6 +50,10 @@ jobs:
         shell: pwsh
         run: ./eng/Test-MergeConflictMarkers.ps1
 
+      - name: Environment variable isolation
+        shell: pwsh
+        run: ./eng/Test-EnvironmentVariableIsolation.ps1
+
       - name: One-line XML summary ban
         shell: pwsh
         run: ./eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
@@ -69,6 +73,49 @@ jobs:
         run: |
           # 驗證 RS0016/RS0017 基線與雙 TFM 建置在 TreatWarningsAsErrors 下通過。
           dotnet build OdfKit/OdfKit.csproj -c Release --nologo /p:RunAnalyzersDuringBuild=true
+
+  full-regression:
+    name: Full regression (${{ matrix.framework }})
+    needs: maintainability
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [net8.0, net10.0]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+
+      - name: Run complete test suite
+        shell: pwsh
+        run: |
+          $resultsDir = 'artifacts/test-results/full-${{ matrix.framework }}'
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --logger "trx;LogFileName=full-${{ matrix.framework }}.trx" `
+            --blame-hang `
+            --blame-hang-timeout 10m `
+            --blame-hang-dump-type none
+
+      - name: Upload full regression diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: full-regression-${{ matrix.framework }}
+          path: artifacts/test-results/full-${{ matrix.framework }}/
+          if-no-files-found: ignore
+          retention-days: 7
 
   test:
     name: Build & Test (${{ matrix.os }} - ${{ matrix.framework }})

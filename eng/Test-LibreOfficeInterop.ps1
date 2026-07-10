@@ -15,6 +15,8 @@
     若找不到 LibreOffice 26.x 則以 exit 1 結束。
 .PARAMETER NoBuild
     略過建置，直接執行測試。
+.PARAMETER DetectOnly
+    僅執行 LibreOffice 路徑與版本探測，不設定測試環境變數或執行測試。
 #>
 [CmdletBinding()]
 param(
@@ -22,7 +24,8 @@ param(
     [string]$Framework = "net8.0",
     [string]$SofficePath = "",
     [switch]$RequireLibreOffice,
-    [switch]$NoBuild
+    [switch]$NoBuild,
+    [switch]$DetectOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -47,14 +50,11 @@ function Resolve-SofficeExecutable {
 
     $names = @("soffice.com", "soffice.exe", "soffice")
     foreach ($name in $names) {
-        $direct = Join-Path $Candidate $name
-        if (Test-Path -LiteralPath $direct) {
-            return (Resolve-Path -LiteralPath $direct).Path
-        }
-
-        $nested = Join-Path $Candidate "program/$name"
-        if (Test-Path -LiteralPath $nested) {
-            return (Resolve-Path -LiteralPath $nested).Path
+        foreach ($relativePath in @($name, "program/$name", "App/libreoffice/program/$name")) {
+            $executable = Join-Path $Candidate $relativePath
+            if (Test-Path -LiteralPath $executable) {
+                return (Resolve-Path -LiteralPath $executable).Path
+            }
         }
     }
 
@@ -79,6 +79,41 @@ function Get-SofficeVersionText {
     return ($process.StandardOutput.ReadToEnd() + $process.StandardError.ReadToEnd())
 }
 
+function Get-PortableLibreOfficeCandidates {
+    $candidates = New-Object System.Collections.Generic.List[string]
+
+    foreach ($envName in @("PortableApps.comPlatformRoot", "PortableAppsPlatformRoot")) {
+        $platformRoot = [Environment]::GetEnvironmentVariable($envName)
+        if (-not [string]::IsNullOrWhiteSpace($platformRoot)) {
+            [void]$candidates.Add((Join-Path $platformRoot "PortableApps/LibreOfficePortable"))
+        }
+    }
+
+    foreach ($basePath in @($env:USERPROFILE, $env:LOCALAPPDATA)) {
+        if (-not [string]::IsNullOrWhiteSpace($basePath)) {
+            [void]$candidates.Add((Join-Path $basePath "PortableApps/LibreOfficePortable"))
+        }
+    }
+
+    foreach ($drive in Get-PSDrive -PSProvider FileSystem) {
+        if ([string]::IsNullOrWhiteSpace($drive.Root)) {
+            continue
+        }
+
+        [void]$candidates.Add((Join-Path $drive.Root "PortableApps/LibreOfficePortable"))
+        $portableRoot = Join-Path $drive.Root "Portable"
+        if (-not (Test-Path -LiteralPath $portableRoot -PathType Container)) {
+            continue
+        }
+
+        foreach ($platformDirectory in Get-ChildItem -LiteralPath $portableRoot -Directory -Filter "*AppsPlatform" -ErrorAction SilentlyContinue) {
+            [void]$candidates.Add((Join-Path $platformDirectory.FullName "PortableApps/LibreOfficePortable"))
+        }
+    }
+
+    return $candidates
+}
+
 function Find-LibreOffice26Soffice {
     $candidates = New-Object System.Collections.Generic.List[string]
 
@@ -91,6 +126,10 @@ function Find-LibreOffice26Soffice {
         if (-not [string]::IsNullOrWhiteSpace($value)) {
             [void]$candidates.Add($value)
         }
+    }
+
+    foreach ($portableCandidate in Get-PortableLibreOfficeCandidates) {
+        [void]$candidates.Add($portableCandidate)
     }
 
     if ($IsWindows) {
@@ -142,6 +181,10 @@ try {
 
     Write-Host "使用 LibreOffice：$($soffice.Path)"
     Write-Host "版本：$($soffice.Version)"
+
+    if ($DetectOnly) {
+        return
+    }
 
     $previousSofficePath = $env:ODFKIT_SOFFICE_PATH
     $previousRunFlag = $env:ODFKIT_RUN_LIBREOFFICE_INTEROP

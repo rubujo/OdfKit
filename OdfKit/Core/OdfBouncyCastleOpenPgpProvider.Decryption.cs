@@ -142,7 +142,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         PgpSecretKey? key = bundle.GetSecretKey(pkeskKeyId);
         if (key is null)
             throw new InvalidOperationException(
-                $"在私鑰環中找不到 Key ID 0x{pkeskKeyId:X16} 的私鑰。");
+                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound", pkeskKeyId));
         return key;
     }
 

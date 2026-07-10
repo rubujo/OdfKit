@@ -27,7 +27,7 @@ public partial class SpreadsheetDocument
         var table = new TableTableElement("table");
         table.SetAttribute("name", OdfNamespaces.Table, name, "table");
         OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, table);
-        return new OdfTableSheet(table, this);
+        return GetOrCreateSheetFacade(table);
     }
     /// <summary>
     /// Short overload of AdoptSheet that accepts sheet; remaining optional parameters use defaults and forward to the full overload.
@@ -62,7 +62,12 @@ public partial class SpreadsheetDocument
         }
 
         OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, adopted);
-        return new OdfTableSheet(adopted, this);
+        if (!ReferenceEquals(sheet.Document, this))
+        {
+            sheet.Document.ReleaseSheetFacade(sheet.TableNode, sheet);
+        }
+
+        return GetOrCreateSheetFacade(adopted);
     }
 
 
@@ -79,7 +84,7 @@ public partial class SpreadsheetDocument
             if (child.LocalName == "table" && child.NamespaceUri == OdfNamespaces.Table &&
                 child.GetAttribute("name", OdfNamespaces.Table) == name)
             {
-                return new OdfTableSheet(child, this);
+                return GetOrCreateSheetFacade(child);
             }
         }
         return null;
@@ -97,7 +102,7 @@ public partial class SpreadsheetDocument
         {
             if (child.LocalName == "table" && child.NamespaceUri == OdfNamespaces.Table)
             {
-                list.Add(new OdfTableSheet(child, this));
+                list.Add(GetOrCreateSheetFacade(child));
             }
         }
         return list;

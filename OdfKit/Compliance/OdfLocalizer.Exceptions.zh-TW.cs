@@ -591,6 +591,12 @@ public static partial class OdfLocalizer
             ["Rule_SuggestedFix_RequireForeignExtensionIsolation"] = "請將擴充功能置於非 ODF 命名空間中，並確保它們是可移除的。",
             ["Rule_SuggestedFix_RequireSafeExternalResourcePolicy"] = "請使用內嵌資源，或確保外部參照符合部署原則。",
             ["Rule_SuggestedFix_default"] = "請根據驗證訊息修正文件內容。",
+            ["Err_OdfPackageEntry_ReadFailed"] = "讀取封裝項目「{0}」失敗：{1}",
+            ["Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable"] = ".NET 執行階段 {0} 未提供必要的 Reference 內部欄位；必須更新簽章相容性因應措施。",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"] = "密語提供者傳回 null；未受密語保護的金鑰應傳回 Array.Empty<char>()。",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "私密金鑰環中找不到 Key ID 0x{0:X16} 的私密金鑰。",
+            ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "序列化復原期間關閉 XML 元素時發生次要錯誤：{0}",
+            ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "檢查磁碟機「{0}」中的 LibreOffice Portable 失敗：{1}",
         };
     }
 }

@@ -572,5 +572,11 @@
   "Rule_SuggestedFix_ODF1000": "Overte, či verzia dokumentu zodpovedá vybranému profilu zhody.",
   "Rule_SuggestedFix_RequireForeignExtensionIsolation": "Umiestnite rozšírenia do menných priestorov mimo ODF a uistite sa, že sú odstrániteľné.",
   "Rule_SuggestedFix_RequireSafeExternalResourcePolicy": "Použite vložené prostriedky alebo sa uistite, že externé odkazy sú v súlade s pravidlami nasadenia.",
-  "Rule_SuggestedFix_default": "Opravte obsah dokumentu na základe správ o overení."
+  "Rule_SuggestedFix_default": "Opravte obsah dokumentu na základe správ o overení.",
+  "Err_OdfPackageEntry_ReadFailed": "Nepodarilo sa prečítať položku balíka '{0}': {1}",
+  "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable": "Požadované interné polia Reference nie sú dostupné v runtime .NET {0}; riešenie kompatibility podpisu sa musí aktualizovať.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "Poskytovateľ hesla vrátil null; pre nechránený kľúč vráťte Array.Empty<char>().",
+  "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "V zväzku tajných kľúčov sa nenašiel súkromný kľúč s Key ID 0x{0:X16}.",
+  "Diag_OdfXmlWriter_SalvageCloseFailed": "Pri zatváraní prvkov XML počas obnovy serializácie sa vyskytla sekundárna chyba: {0}",
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Nepodarilo sa skontrolovať jednotku '{0}' na LibreOffice Portable: {1}"
 }

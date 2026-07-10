@@ -9,7 +9,7 @@ namespace OdfKit.Benchmarks;
 [MemoryDiagnoser]
 public class OdsStreamWriterBenchmarks
 {
-    private const int RowCount = 10_000;
+    private const int RowCount = 200_000;
     private MemoryStream _outputStream = null!;
 
     [GlobalSetup]

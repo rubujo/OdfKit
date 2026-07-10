@@ -20,6 +20,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")
 $outDir = Join-Path $repoRoot "artifacts/nuget"
 $expectedTfms = @("net10.0", "netstandard2.0")
+$previousNugetPackages = $env:NUGET_PACKAGES
 
 $expectedPackages = @(
     @{ Id = "OdfKit"; Assembly = "OdfKit.dll"; RequireSnupkg = $true },
@@ -79,6 +80,7 @@ try {
             }
 
             $dependencies = $nuspecXml.package.metadata.dependencies.group.dependency + $nuspecXml.package.metadata.dependencies.dependency
+            $dependencyIds = @($dependencies | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.id })
             foreach ($dependency in $dependencies) {
                 if ($null -eq $dependency) {
                     continue
@@ -88,6 +90,14 @@ try {
                 $dependencyVersion = [string]$dependency.version
                 if ($dependencyVersion -match '-' -and $allowedPrereleaseDependencies -notcontains $dependencyId) {
                     throw "套件 $($pkg.Id) 含未允許的 prerelease 相依：$dependencyId $dependencyVersion"
+                }
+            }
+
+            if ($pkg.Id -eq "OdfKit.Extensions.Imaging") {
+                foreach ($nativeDependency in @("SkiaSharp.NativeAssets.Linux", "SkiaSharp.NativeAssets.Win32")) {
+                    if ($dependencyIds -notcontains $nativeDependency) {
+                        throw "套件 $($pkg.Id) 缺少跨平台原生相依：$nativeDependency"
+                    }
                 }
             }
         }
@@ -113,14 +123,47 @@ try {
     dotnet new console -n NuGetConsumerSmoke -o $smokeDir -f net8.0 --force
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet add $smokeDir package OdfKit --version $packageVersion --source $outDir
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    $env:NUGET_PACKAGES = Join-Path $smokeDir ".packages"
+    @"
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="odfkit-local" value="$outDir" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+  </packageSources>
+</configuration>
+"@ | Set-Content -LiteralPath (Join-Path $smokeDir "NuGet.Config") -Encoding utf8
+
+    foreach ($pkg in $expectedPackages) {
+        dotnet add $smokeDir package $pkg.Id --version $packageVersion
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
 
     @"
 using OdfKit.Text;
+using OdfKit.Collaboration;
+using OdfKit.Conversion;
+using OdfKit.Export;
+using OdfKit.Extensions.Imaging;
+using OdfKit.Extensions.Rdf;
+using OdfKit.Extensions.Rendering;
 
 using var doc = TextDocument.Create();
 doc.AddParagraph("NuGet smoke");
+_ = new OdfHtmlExportOptions();
+_ = typeof(OdfToXlsxConverter);
+_ = new OdfPdfRenderer();
+_ = typeof(LocalProcessBackend);
+_ = OdfRdfGraphUris.ResolveSubjectUri("content.xml");
+_ = new OdtOperationCompatibilityOptions();
+
+var measured = OdfTextMeasurer.MeasureWidth("OdfKit", "Arial", 12);
+if (measured.ToCentimeters() <= 0)
+{
+    throw new InvalidOperationException("Imaging native runtime smoke failed.");
+}
+
 Console.WriteLine("ok");
 "@ | Set-Content -LiteralPath (Join-Path $smokeDir "Program.cs") -Encoding utf8
 
@@ -134,5 +177,6 @@ Console.WriteLine("ok");
     Write-Host "REL-1 NuGet 封裝驗收通過。"
 }
 finally {
+    $env:NUGET_PACKAGES = $previousNugetPackages
     Pop-Location
 }

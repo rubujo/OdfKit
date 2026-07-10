@@ -591,6 +591,12 @@ public static partial class OdfLocalizer
             ["Rule_SuggestedFix_RequireForeignExtensionIsolation"] = "Plaats extensies in niet-ODF-naamruimten en zorg ervoor dat ze verwijderbaar zijn.",
             ["Rule_SuggestedFix_RequireSafeExternalResourcePolicy"] = "Gebruik ingebedde bronnen of zorg ervoor dat externe verwijzingen voldoen al het implementatiebeleid.",
             ["Rule_SuggestedFix_default"] = "Corrigeer de documentinhoud op basis van validatieberichten.",
+            ["Err_OdfPackageEntry_ReadFailed"] = "Kan pakketitem '{0}' niet lezen: {1}",
+            ["Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable"] = "De vereiste interne Reference-velden zijn niet beschikbaar in .NET-runtime {0}; de compatibiliteitsoplossing voor ondertekening moet worden bijgewerkt.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"] = "De wachtwoordprovider heeft null geretourneerd; retourneer Array.Empty<char>() voor een onbeveiligde sleutel.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Er is geen privésleutel met Key ID 0x{0:X16} gevonden in de geheime sleutelring.",
+            ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Er is een secundaire fout opgetreden bij het sluiten van XML-elementen tijdens serialisatieherstel: {0}",
+            ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan station '{0}' niet controleren op LibreOffice Portable: {1}",
         };
     }
 }

@@ -591,6 +591,12 @@ public static partial class OdfLocalizer
             ["Rule_SuggestedFix_RequireForeignExtensionIsolation"] = "Letakkan pelanjutan dalam ruang nama bukan ODF dan pastikan ia boleh dikeluarkan.",
             ["Rule_SuggestedFix_RequireSafeExternalResourcePolicy"] = "Gunakan sumber terbenam atau pastikan rujukan luaran mematuhi dasar pelaksanaan.",
             ["Rule_SuggestedFix_default"] = "Betulkan kandungan dokumen berdasarkan mesej pengesahan.",
+            ["Err_OdfPackageEntry_ReadFailed"] = "Gagal membaca entri pakej '{0}': {1}",
+            ["Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable"] = "Medan dalaman Reference yang diperlukan tidak tersedia dalam masa jalan .NET {0}; penyelesaian keserasian tandatangan mesti dikemas kini.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"] = "Penyedia frasa laluan mengembalikan null; kembalikan Array.Empty<char>() untuk kunci tanpa perlindungan.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Tiada kunci peribadi dengan Key ID 0x{0:X16} ditemui dalam gelang kunci rahsia.",
+            ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Ralat sekunder berlaku semasa menutup elemen XML ketika pemulihan pensirian: {0}",
+            ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Gagal memeriksa pemacu '{0}' untuk LibreOffice Portable: {1}",
         };
     }
 }

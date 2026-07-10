@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -136,9 +137,9 @@ internal static class OdfSignatureX509Utilities
 
         if (refTargetField == null || refTargetTypeField == null)
         {
-            throw new CryptographicException(
-                "Failed to locate required internal fields (_refTarget / _refTargetType) in Reference. " +
-                $"This reflection-based workaround may need updating for the current .NET runtime ({Environment.Version}).");
+            throw new CryptographicException(OdfLocalizer.GetMessage(
+                "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable",
+                Environment.Version));
         }
 
         refTargetField.SetValue(reference, stream);

@@ -254,7 +254,7 @@ internal class OdfPackageEntry : IDisposable
             }
             catch (Exception ex)
             {
-                throw new InvalidDataException($"[{Name}] {ex.Message}", ex);
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_ReadFailed", Name, ex.Message), ex);
             }
             return;
         }
@@ -283,7 +283,7 @@ internal class OdfPackageEntry : IDisposable
                 }
                 catch (InvalidDataException ex)
                 {
-                    throw new InvalidDataException($"[{Name}] {ex.Message}", ex);
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_ReadFailed", Name, ex.Message), ex);
                 }
             }
             return;
@@ -328,7 +328,7 @@ internal class OdfPackageEntry : IDisposable
             }
             catch (Exception ex)
             {
-                throw new InvalidDataException($"[{Name}] {ex.Message}", ex);
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_ReadFailed", Name, ex.Message), ex);
             }
         }
 

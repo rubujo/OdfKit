@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -457,6 +458,12 @@ public class LibreOfficeRenderer
             return configured!;
         }
 
+        string? portable = ResolvePortableLibreOfficePath();
+        if (!string.IsNullOrEmpty(portable))
+        {
+            return portable!;
+        }
+
 #if !NETSTANDARD2_0
         if (OperatingSystem.IsWindows())
         {
@@ -557,6 +564,88 @@ public class LibreOfficeRenderer
         foreach (string variable in new[] { "ODFKIT_SOFFICE_PATH", "LIBREOFFICE_PATH" })
         {
             foreach (string candidate in ExpandLibreOfficeCandidate(Environment.GetEnvironmentVariable(variable)))
+            {
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ResolvePortableLibreOfficePath()
+    {
+#if NET5_0_OR_GREATER
+        if (!OperatingSystem.IsWindows())
+#else
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+#endif
+        {
+            return null;
+        }
+
+        var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string variable in new[] { "PortableApps.comPlatformRoot", "PortableAppsPlatformRoot" })
+        {
+            string? platformRoot = Environment.GetEnvironmentVariable(variable);
+            if (!string.IsNullOrWhiteSpace(platformRoot))
+            {
+                roots.Add(Path.Combine(platformRoot!, "PortableApps", "LibreOfficePortable"));
+            }
+        }
+
+        foreach (string basePath in new[]
+        {
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        })
+        {
+            if (!string.IsNullOrWhiteSpace(basePath))
+            {
+                roots.Add(Path.Combine(basePath, "PortableApps", "LibreOfficePortable"));
+            }
+        }
+
+        foreach (DriveInfo drive in DriveInfo.GetDrives())
+        {
+            try
+            {
+                if (!drive.IsReady)
+                {
+                    continue;
+                }
+
+                roots.Add(Path.Combine(drive.RootDirectory.FullName, "PortableApps", "LibreOfficePortable"));
+                string portableRoot = Path.Combine(drive.RootDirectory.FullName, "Portable");
+                if (!Directory.Exists(portableRoot))
+                {
+                    continue;
+                }
+
+                foreach (string platformDirectory in Directory.EnumerateDirectories(portableRoot, "*AppsPlatform", SearchOption.TopDirectoryOnly))
+                {
+                    roots.Add(Path.Combine(platformDirectory, "PortableApps", "LibreOfficePortable"));
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_LibreOfficeRenderer_PortableDiscoveryFailed", drive.Name, ex.Message), ex);
+            }
+        }
+
+        return ResolvePortableLibreOfficePath(roots);
+    }
+
+    /// <summary>
+    /// 解析候選 LibreOffice Portable 根目錄中的 soffice 執行檔。
+    /// </summary>
+    internal static string? ResolvePortableLibreOfficePath(IEnumerable<string> roots)
+    {
+        foreach (string root in roots)
+        {
+            foreach (string candidate in ExpandLibreOfficeCandidate(root))
             {
                 if (File.Exists(candidate))
                 {

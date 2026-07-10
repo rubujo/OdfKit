@@ -102,7 +102,9 @@ public partial class OdfTableSheet
     public int PruneAndCollect(bool collectGarbage)
     {
         ReleaseFacadeCaches();
-        return TableNode.PruneAndCollect(collectGarbage);
+        int prunedCount = TableNode.PruneAndCollect(collectGarbage);
+        _doc.ReleaseSheetFacade(TableNode, this);
+        return prunedCount;
     }
 
 

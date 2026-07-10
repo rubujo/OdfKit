@@ -6,6 +6,14 @@
       "toleranceRatio": 0.4,
       "unit": "us",
       "note": "2000 列 InsertAfter，Release，2026-06-18 本機 BenchmarkDotNet"
+    },
+    "OdsStreamWriterBenchmarks.WriteRows": {
+      "meanNanoseconds": 211100000,
+      "toleranceRatio": 0.4,
+      "allocatedBytes": 15225324,
+      "allocationToleranceRatio": 0.15,
+      "unit": "ms",
+      "note": "200000 列雙欄 ODS 串流寫入，3 次暖機與 8 次量測，Release，2026-07-10 本機 BenchmarkDotNet"
     }
   }
 }

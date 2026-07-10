@@ -572,5 +572,11 @@
   "Rule_SuggestedFix_ODF1000": "Überprüfen Sie, ob die Dokumentversion mit dem ausgewählten Konformitätsprofil übereinstimmt.",
   "Rule_SuggestedFix_RequireForeignExtensionIsolation": "Platzieren Sie Erweiterungen in Nicht-ODF-Namensräumen und stellen Sie sicher, dass sie entfernbar sind.",
   "Rule_SuggestedFix_RequireSafeExternalResourcePolicy": "Verwenden Sie eingebettete Ressourcen oder stellen Sie sicher, dass externe Referenzen den Bereitstellungsrichtlinien entsprechen.",
-  "Rule_SuggestedFix_default": "Korrigieren Sie den Dokumentinhalt basierend auf den Validierungsnachrichten."
+  "Rule_SuggestedFix_default": "Korrigieren Sie den Dokumentinhalt basierend auf den Validierungsnachrichten.",
+  "Err_OdfPackageEntry_ReadFailed": "Der Paketeintrag '{0}' konnte nicht gelesen werden: {1}",
+  "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable": "Die erforderlichen internen Reference-Felder sind in der .NET-Laufzeit {0} nicht verfügbar; die Signatur-Kompatibilitätslösung muss aktualisiert werden.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "Der Kennwortanbieter hat null zurückgegeben; geben Sie für einen ungeschützten Schlüssel Array.Empty<char>() zurück.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "Im geheimen Schlüsselbund wurde kein privater Schlüssel mit der Key ID 0x{0:X16} gefunden.",
+  "Diag_OdfXmlWriter_SalvageCloseFailed": "Beim Schließen von XML-Elementen während der Serialisierungswiederherstellung ist ein sekundärer Fehler aufgetreten: {0}",
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Das Laufwerk '{0}' konnte nicht auf LibreOffice Portable geprüft werden: {1}"
 }

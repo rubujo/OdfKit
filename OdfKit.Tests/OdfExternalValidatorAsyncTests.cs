@@ -13,6 +13,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證外部 ODF 驗證器非同步管線的 CancellationToken 協作取消行為。
 /// </summary>
+[Collection("SequentialRenderingTests")]
 public class OdfExternalValidatorAsyncTests
 {
     /// <summary>

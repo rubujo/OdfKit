@@ -107,8 +107,8 @@ if ($updated -eq 0) {
 
 if ($PSCmdlet.ShouldProcess('Generate-LocalizerExceptionsFromJson.ps1', 'Regenerate C# dictionaries')) {
     & (Join-Path $PSScriptRoot 'Generate-LocalizerExceptionsFromJson.ps1')
-    if ($LASTEXITCODE -ne 0) {
-        throw "重產 C# 失敗（exit $LASTEXITCODE）。"
+    if (-not $?) {
+        throw "重產 C# 失敗。"
     }
 }
 

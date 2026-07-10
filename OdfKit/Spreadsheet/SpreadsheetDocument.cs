@@ -21,6 +21,7 @@ namespace OdfKit.Spreadsheet;
 public partial class SpreadsheetDocument : OdfDocument
 {
     private OdfWorksheetCollection? _worksheets;
+    private readonly Dictionary<OdfNode, OdfTableSheet> _sheetFacades = [];
 
     /// <summary>
     /// 取得活頁簿中所有工作表的根節點。
@@ -210,6 +211,32 @@ public partial class SpreadsheetDocument : OdfDocument
     {
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         SheetsRoot = FindOrCreateChild(body, "spreadsheet", OdfNamespaces.Office, "office");
+    }
+
+    /// <summary>
+    /// 取得指定工作表節點在此文件中唯一的高階 facade。
+    /// </summary>
+    internal OdfTableSheet GetOrCreateSheetFacade(OdfNode tableNode)
+    {
+        if (!_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? sheet))
+        {
+            sheet = new OdfTableSheet(tableNode, this);
+            _sheetFacades.Add(tableNode, sheet);
+        }
+
+        return sheet;
+    }
+
+    /// <summary>
+    /// 解除已離開此文件 DOM 的工作表 facade 註冊。
+    /// </summary>
+    internal void ReleaseSheetFacade(OdfNode tableNode, OdfTableSheet sheet)
+    {
+        if (_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? registered) &&
+            ReferenceEquals(registered, sheet))
+        {
+            _sheetFacades.Remove(tableNode);
+        }
     }
 
     internal OdfNode GetOrCreateSettingsItemSet(string name)

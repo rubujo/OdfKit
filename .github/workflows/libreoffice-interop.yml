@@ -1,0 +1,60 @@
+name: LibreOffice interoperability
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '43 2 * * 3'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: libreoffice-interop
+  cancel-in-progress: false
+
+env:
+  LIBREOFFICE_VERSION: 26.2.4
+
+jobs:
+  libreoffice-interop:
+    name: LibreOffice ${{ matrix.framework }} interoperability
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [net8.0, net10.0]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+
+      - name: Install current LibreOffice release
+        shell: pwsh
+        run: |
+          $fileName = "LibreOffice_$env:LIBREOFFICE_VERSION`_Win_x86-64.msi"
+          $uri = "https://download.documentfoundation.org/libreoffice/stable/$env:LIBREOFFICE_VERSION/win/x86_64/$fileName"
+          $msi = Join-Path $env:RUNNER_TEMP $fileName
+          Invoke-WebRequest -Uri $uri -OutFile $msi
+          $signature = Get-AuthenticodeSignature -FilePath $msi
+          if ($signature.Status -ne 'Valid') {
+            throw "LibreOffice installer signature is not valid: $($signature.Status)."
+          }
+          $process = Start-Process msiexec.exe -ArgumentList @('/i', $msi, '/qn', '/norestart') -Wait -PassThru
+          if ($process.ExitCode -notin @(0, 3010)) {
+            throw "LibreOffice installer failed with exit code $($process.ExitCode)."
+          }
+
+      - name: Run real LibreOffice interoperability tests
+        shell: pwsh
+        run: |
+          ./eng/Test-LibreOfficeInterop.ps1 `
+            -Configuration Release `
+            -Framework ${{ matrix.framework }} `
+            -RequireLibreOffice

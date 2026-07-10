@@ -572,5 +572,11 @@
   "Rule_SuggestedFix_ODF1000": "Vérifiez que la version du document correspond au profil de conformité sélectionné.",
   "Rule_SuggestedFix_RequireForeignExtensionIsolation": "Placez les extensions dans des espaces de noms non-ODF et assurez-vous qu'elles sont supprimables.",
   "Rule_SuggestedFix_RequireSafeExternalResourcePolicy": "Utilisez des ressources intégrées ou assurez-vous que les références externes sont conformes à la stratégie de déploiement.",
-  "Rule_SuggestedFix_default": "Corrigez le contenu du document en fonction des messages de validation."
+  "Rule_SuggestedFix_default": "Corrigez le contenu du document en fonction des messages de validation.",
+  "Err_OdfPackageEntry_ReadFailed": "Échec de la lecture de l'entrée de paquet « {0} » : {1}",
+  "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable": "Les champs internes Reference requis ne sont pas disponibles dans le runtime .NET {0} ; la solution de compatibilité de signature doit être mise à jour.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "Le fournisseur de phrase secrète a renvoyé null ; renvoyez Array.Empty<char>() pour une clé non protégée.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "Aucune clé privée avec l'identifiant 0x{0:X16} n'a été trouvée dans le trousseau de clés secrètes.",
+  "Diag_OdfXmlWriter_SalvageCloseFailed": "Une erreur secondaire s'est produite lors de la fermeture des éléments XML pendant la récupération de la sérialisation : {0}",
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Échec de l'analyse du lecteur « {0} » pour LibreOffice Portable : {1}"
 }

@@ -28,6 +28,8 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $repoRoot 'OdfKit/OdfKit.csproj'
 $publicApiRoot = Join-Path $repoRoot 'OdfKit/PublicAPI'
+$previousBaselineMode = $env:ODFKIT_PUBLICAPI_BASELINE
+$previousCi = $env:CI
 
 if (-not (Test-Path $project)) {
     throw "找不到專案：$project"
@@ -85,17 +87,23 @@ try {
 }
 finally {
     [System.IO.File]::WriteAllText($project, $csprojOriginal, $utf8Bom)
-    Remove-Item Env:ODFKIT_PUBLICAPI_BASELINE -ErrorAction SilentlyContinue
+    $env:ODFKIT_PUBLICAPI_BASELINE = $previousBaselineMode
+    $env:CI = $previousCi
 }
 
 if ($Verify) {
-    Write-Host '驗證建置（無 BASELINE 模式，CI analyzer 開啟）…'
-    $env:CI = 'true'
-    & dotnet build $project -c $Configuration --nologo /p:RunAnalyzersDuringBuild=true
-    if ($LASTEXITCODE -ne 0) {
-        throw "驗證建置失敗。若僅剩 RS0026／RS0027，請確認 .editorconfig 已將其設為 suggestion。"
+    try {
+        Write-Host '驗證建置（無 BASELINE 模式，CI analyzer 開啟）…'
+        $env:CI = 'true'
+        & dotnet build $project -c $Configuration --nologo /p:RunAnalyzersDuringBuild=true
+        if ($LASTEXITCODE -ne 0) {
+            throw "驗證建置失敗。若僅剩 RS0026／RS0027，請確認 .editorconfig 已將其設為 suggestion。"
+        }
+        Write-Host '驗證建置通過。'
     }
-    Write-Host '驗證建置通過。'
+    finally {
+        $env:CI = $previousCi
+    }
 }
 
 Write-Host '完成。請檢視 OdfKit/PublicAPI/*/PublicAPI.Unshipped.txt 後提交。'

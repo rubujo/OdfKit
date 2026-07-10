@@ -4,11 +4,13 @@
 
 ## 目前回歸關卡
 
-`eng/Benchmark-Regression.ps1` 會執行 `DomInsertBenchmarks.SequentialInsertAfter` 並與 `eng/baselines/performance-baselines.json` 比對。
+`eng/Benchmark-Regression.ps1` 會執行 `DomInsertBenchmarks.SequentialInsertAfter` 與
+`OdsStreamWriterBenchmarks.WriteRows`，並與 `eng/baselines/performance-baselines.json` 比對。
 
 | 基準測試 | 基準線平均值 | 容許範圍 | 用途 |
 |-----------|---------------|-----------|------|
 | `DomInsertBenchmarks.SequentialInsertAfter` | `123.9 us` | `+40%` | 偵測 DOM 循序插入效能的重大回歸 |
+| `OdsStreamWriterBenchmarks.WriteRows` | 以 `eng/baselines/performance-baselines.json` 為準 | 時間 `+40%`、配置量 `+15%` | 保護 200,000 列雙欄 ODS 串流寫入的時間與配置量 |
 
 執行：
 

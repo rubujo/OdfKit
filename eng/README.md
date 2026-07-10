@@ -29,6 +29,9 @@
 
 ### 測試與驗證
 
+環境變數隔離由 eng/Test-EnvironmentVariableIsolation.ps1 檢查；所有指令碼與測試程式
+必須只使用 process scope，並在 finally 中還原原值。
+
 | 腳本 | 用途 |
 |------|------|
 | `Test-GpgSignatures.ps1` | 驗證此 repo 所有提交皆為有效 GPG 簽署，且僅使用 repo 專屬金鑰。 |

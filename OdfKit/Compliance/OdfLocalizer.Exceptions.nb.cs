@@ -591,6 +591,12 @@ public static partial class OdfLocalizer
             ["Rule_SuggestedFix_RequireForeignExtensionIsolation"] = "Plasser utvidelser i ikke-ODF-navnerom og sørg for at de kan fjernes.",
             ["Rule_SuggestedFix_RequireSafeExternalResourcePolicy"] = "Bruk innebygde ressurser eller sørg for at eksterne referanser er i samsvar med distribusjonsretningslinjene.",
             ["Rule_SuggestedFix_default"] = "Korriger dokumentinnholdet basert på valideringsmeldinger.",
+            ["Err_OdfPackageEntry_ReadFailed"] = "Kan ikke lese pakkeoppføringen '{0}': {1}",
+            ["Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable"] = "De nødvendige interne Reference-feltene er ikke tilgjengelige i .NET-kjøretid {0}; kompatibilitetsløsningen for signering må oppdateres.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"] = "Passordleverandøren returnerte null; returner Array.Empty<char>() for en ubeskyttet nøkkel.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Ingen privat nøkkel med Key ID 0x{0:X16} ble funnet i den hemmelige nøkkelringen.",
+            ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Det oppstod en sekundær feil ved lukking av XML-elementer under serialiseringsgjenoppretting: {0}",
+            ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan ikke undersøke stasjonen '{0}' etter LibreOffice Portable: {1}",
         };
     }
 }

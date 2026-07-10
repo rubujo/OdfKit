@@ -572,5 +572,11 @@
   "Rule_SuggestedFix_ODF1000": "Verify that the document version matches the selected compliance profile.",
   "Rule_SuggestedFix_RequireForeignExtensionIsolation": "Place extensions in non-ODF namespaces and ensure they are removable.",
   "Rule_SuggestedFix_RequireSafeExternalResourcePolicy": "Use embedded resources or ensure external references comply with deployment policy.",
-  "Rule_SuggestedFix_default": "Correct the document content based on validation messages."
+  "Rule_SuggestedFix_default": "Correct the document content based on validation messages.",
+  "Err_OdfPackageEntry_ReadFailed": "Failed to read package entry '{0}': {1}",
+  "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable": "Required internal Reference fields are unavailable in .NET runtime {0}; the signing compatibility workaround must be updated.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "The passphrase provider returned null; return Array.Empty<char>() for an unprotected key.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "No private key with Key ID 0x{0:X16} was found in the secret key ring.",
+  "Diag_OdfXmlWriter_SalvageCloseFailed": "A secondary error occurred while closing XML elements during serialization recovery: {0}",
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Failed to inspect drive '{0}' for LibreOffice Portable: {1}"
 }

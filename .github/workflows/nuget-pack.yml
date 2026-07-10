@@ -34,8 +34,13 @@ permissions:
 
 jobs:
   validate-nuget-pack:
-    runs-on: windows-latest
-    timeout-minutes: 15
+    name: Validate package and consumers (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v7

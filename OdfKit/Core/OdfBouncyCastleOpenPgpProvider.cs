@@ -126,7 +126,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
         char[] passphrase = _passphraseProvider(pkeskKeyId)
             ?? throw new ArgumentException(
-                "密語提供者回傳了 null；應回傳空陣列 (Array.Empty<char>()) 表示無密語保護。",
+                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
                 nameof(_passphraseProvider));
         PgpPrivateKey privateKey;
         try

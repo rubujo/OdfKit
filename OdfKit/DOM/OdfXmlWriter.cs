@@ -1,6 +1,7 @@
 ﻿using System.Security;
 using System.Text;
 using System.Xml;
+using OdfKit.Compliance;
 using OdfKit.Core;
 
 namespace OdfKit.DOM;
@@ -73,7 +74,7 @@ public static class OdfXmlWriter
                 }
                 catch (Exception salvageEx)
                 {
-                    OdfKitDiagnostics.Warn($"XML 序列化救援關閉標籤時發生次要錯誤：{salvageEx.Message}", salvageEx);
+                    OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfXmlWriter_SalvageCloseFailed", salvageEx.Message), salvageEx);
                 }
 
                 throw;
@@ -92,8 +93,10 @@ public static class OdfXmlWriter
     {
         if (depth > OdfXmlReader.MaxElementDepth)
         {
-            throw new SecurityException(
-                $"XML element nesting depth limit exceeded during serialization ({depth} > {OdfXmlReader.MaxElementDepth}).");
+            throw new SecurityException(OdfLocalizer.GetMessage(
+                "Err_OdfXmlReader_XmlElementNestingDepth",
+                depth,
+                OdfXmlReader.MaxElementDepth));
         }
 
         if (node.NodeType == OdfNodeType.Comment)

@@ -13,6 +13,8 @@
   - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
   - `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`（JSON ↔ C# 一致）
   - `dotnet build OdfKit`（`RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers）
+- `full-regression` job 依賴 `maintainability`，在 Ubuntu 對 `net8.0` 與 `net10.0`
+  執行完整測試套件並上傳 TRX；它是每次 PR 與 main push 的必要回歸證據。
 - `test` job 依賴 `maintainability`；`ubuntu-latest` 與 `windows-latest` 都必須執行。
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
 - `net8.0` 與 `net10.0` 都必須執行 `Category=Smoke`，避免只有較新 TFM 有測試證據。
@@ -43,12 +45,14 @@ testhost 收尾不穩。
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | Native AOT / trim smoke | PR / main |
-| `nuget-pack.yml` | NuGet 封裝與 net8.0 consumer smoke | PR / main |
-| `performance-benchmark.yml` | 效能回歸基準測試 | 手動 |
+| `nuget-pack.yml` | 八個 NuGet 套件的雙平台 consumer smoke，包含 Imaging native runtime | PR / main |
+| `performance-benchmark.yml` | DOM 與 ODS 串流效能／配置量回歸基準 | 每週 / 手動 |
+| `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
 | `github-release.yml` | tag 驅動的發佈流程 | tag |
 
 LibreOffice、Microsoft Office COM 與 PDF 像素級比對屬外部環境驗收，必須由專用工作流程
-或本機腳本明確啟用，不得混入主 CI 的煙霧測試。
+或本機腳本明確啟用，不得混入主 CI 的煙霧測試。LibreOffice 互通由排程工作流程持續驗證；
+Microsoft Office COM 與像素級比對仍依可用環境手動執行。
 
 ## 逾時與診斷
 

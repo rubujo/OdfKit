@@ -572,5 +572,11 @@
   "Rule_SuggestedFix_ODF1000": "Verifique se a versão do documento corresponde ao perfil de conformidade selecionado.",
   "Rule_SuggestedFix_RequireForeignExtensionIsolation": "Coloque extensões em namespaces não-ODF e garanta que sejam removíveis.",
   "Rule_SuggestedFix_RequireSafeExternalResourcePolicy": "Use recursos incorporados ou garanta que as referências externas estejam em conformidade com a política de implantação.",
-  "Rule_SuggestedFix_default": "Corrija o conteúdo do documento com base nas mensagens de validação."
+  "Rule_SuggestedFix_default": "Corrija o conteúdo do documento com base nas mensagens de validação.",
+  "Err_OdfPackageEntry_ReadFailed": "Falha ao ler a entrada do pacote '{0}': {1}",
+  "Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable": "Os campos internos Reference necessários não estão disponíveis no runtime .NET {0}; a solução de compatibilidade de assinatura deve ser atualizada.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "O fornecedor de frase secreta retornou null; retorne Array.Empty<char>() para uma chave não protegida.",
+  "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "Nenhuma chave privada com Key ID 0x{0:X16} foi encontrada no chaveiro secreto.",
+  "Diag_OdfXmlWriter_SalvageCloseFailed": "Ocorreu um erro secundário ao fechar elementos XML durante a recuperação da serialização: {0}",
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Falha ao verificar a unidade '{0}' para LibreOffice Portable: {1}"
 }

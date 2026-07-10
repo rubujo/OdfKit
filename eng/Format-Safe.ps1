@@ -80,4 +80,7 @@ if ($IncludeTests) {
 & (Join-Path $PSScriptRoot 'Test-MergeConflictMarkers.ps1') -Root $root
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+& (Join-Path $PSScriptRoot 'Test-EnvironmentVariableIsolation.ps1') -Root $root
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 Write-Host 'Format-Safe 完成。'

@@ -591,6 +591,12 @@ public static partial class OdfLocalizer
             ["Rule_SuggestedFix_RequireForeignExtensionIsolation"] = "확장 프로그램을 ODF가 아닌 네임스페이스에 배치하고 제거할 수 있는지 확인하십시오.",
             ["Rule_SuggestedFix_RequireSafeExternalResourcePolicy"] = "포함된 리소스를 사용하거나 외부 참조가 배포 정책을 준수하는지 확인하십시오.",
             ["Rule_SuggestedFix_default"] = "유효성 검사 메시지에 따라 문서 내용을 수정하십시오.",
+            ["Err_OdfPackageEntry_ReadFailed"] = "패키지 항목 '{0}'을(를) 읽지 못했습니다: {1}",
+            ["Err_OdfSignatureX509Utilities_ReferenceInternalsUnavailable"] = ".NET 런타임 {0}에서 필요한 내부 Reference 필드를 사용할 수 없습니다. 서명 호환성 해결 방법을 업데이트해야 합니다.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"] = "암호 구문 공급자가 null을 반환했습니다. 보호되지 않은 키에는 Array.Empty<char>()를 반환하십시오.",
+            ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "비밀 키 링에서 Key ID 0x{0:X16}인 개인 키를 찾을 수 없습니다.",
+            ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "직렬화 복구 중 XML 요소를 닫는 과정에서 보조 오류가 발생했습니다: {0}",
+            ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "드라이브 '{0}'에서 LibreOffice Portable을 확인하지 못했습니다: {1}",
         };
     }
 }

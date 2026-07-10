@@ -782,6 +782,43 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證同一份文件中的工作表節點只會建立一個高階 facade。
+    /// </summary>
+    [Fact]
+    public void SheetLookupReturnsStableFacadeIdentity()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet added = document.AddSheet("Data");
+
+        OdfTableSheet found = document.FindSheet("Data")!;
+        OdfTableSheet listed = Assert.Single(document.GetSheets());
+        OdfTableSheet indexed = document.Worksheets[0];
+
+        Assert.Same(added, found);
+        Assert.Same(added, listed);
+        Assert.Same(added, indexed);
+    }
+
+    /// <summary>
+    /// 驗證透過不同查詢入口交錯修改同一工作表時不會讀到已脫離 DOM 的快取節點。
+    /// </summary>
+    [Fact]
+    public void SheetAliasesShareStructuralCacheInvalidation()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet original = document.AddSheet("Data");
+        original.Cells["A1"].CellValue = "第一列";
+        original.Cells["A2"].CellValue = "第二列";
+
+        _ = original.Cells["A1"].CellValue;
+        OdfTableSheet alias = document.FindSheet("Data")!;
+        alias.DeleteRows(0);
+
+        Assert.Same(original, alias);
+        Assert.Equal("第二列", original.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
     /// 驗證工作表 facade 快取可在不剪裁 DOM 的情況下主動釋放，後續仍可重新存取資料。
     /// </summary>
     [Fact]
