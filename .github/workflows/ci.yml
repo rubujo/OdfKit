@@ -98,9 +98,15 @@ jobs:
         shell: pwsh
         run: |
           $resultsDir = 'artifacts/test-results/full-${{ matrix.framework }}'
+          dotnet build OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }}
+
           dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
             -c Release `
             -f ${{ matrix.framework }} `
+            --no-build `
+            --no-restore `
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --logger "trx;LogFileName=full-${{ matrix.framework }}.trx" `
