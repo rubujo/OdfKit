@@ -113,6 +113,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         {
             Encoding = new UTF8Encoding(false),
             Indent = false, // 最小化大小
+            NewLineChars = "\r\n",
             // 關閉 XmlWriter 內建逐字元檢查以降低大量資料寫入時的熱迴圈成本；
             // 使用者提供的文字與屬性值改由 OdfXmlCharacterGuard 在寫入前做輕量的
             // XML 1.0 合法性驗證，維持「非法字元快速失敗」的既有語意。
@@ -979,6 +980,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                 {
                     Encoding = new UTF8Encoding(false),
                     Indent = false,
+                    NewLineChars = "\r\n",
                     ConformanceLevel = ConformanceLevel.Fragment,
                     CheckCharacters = false
                 });

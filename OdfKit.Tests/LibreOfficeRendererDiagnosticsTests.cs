@@ -205,29 +205,36 @@ namespace OdfKit.Tests
                 Timeout = TimeSpan.FromSeconds(5)
             };
 
-            // Using an invalid file path format (containing invalid characters on Windows)
-            string invalidOutPath = Path.Combine(Path.GetTempPath(), "Invalid|?\\*Path.pdf");
-
-            string? sandboxDir = await CaptureSandboxDirAsync(() =>
+            // 以既有檔案充當父目錄，確保所有支援的平台都會拒絕建立輸出目錄。
+            string blockingPath = Path.Combine(Path.GetTempPath(), "OdfKit_InvalidOutputParent_" + Guid.NewGuid().ToString("N"));
+            File.WriteAllText(blockingPath, string.Empty);
+            try
             {
-                Assert.Throws<IOException>(() => renderer.Convert(doc, invalidOutPath, "pdf"));
-            });
+                string invalidOutPath = Path.Combine(blockingPath, "output.pdf");
+                string? sandboxDir = await CaptureSandboxDirAsync(() =>
+                {
+                    Assert.Throws<IOException>(() => renderer.Convert(doc, invalidOutPath, "pdf"));
+                });
 
-            Assert.NotNull(sandboxDir);
+                Assert.NotNull(sandboxDir);
 
-            // Wait a brief moment for OS release
-            await Task.Delay(200, TestContext.Current.CancellationToken);
+                // 稍候作業系統釋放資源，再驗證沙箱目錄已清理。
+                await Task.Delay(200, TestContext.Current.CancellationToken);
 
-            // Verify that the sandbox directory was cleaned up and not leaked
-            bool isLeaked = Directory.Exists(sandboxDir);
-            if (isLeaked)
-            {
-                try
-                { Directory.Delete(sandboxDir, true); }
-                catch { }
+                bool isLeaked = Directory.Exists(sandboxDir);
+                if (isLeaked)
+                {
+                    try
+                    { Directory.Delete(sandboxDir, true); }
+                    catch { }
+                }
+
+                Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on invalid output path failure.");
             }
-
-            Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on invalid output path failure.");
+            finally
+            {
+                File.Delete(blockingPath);
+            }
         }
 
         [Fact]

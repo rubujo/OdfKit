@@ -406,6 +406,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     {
         Encoding = new UTF8Encoding(false),
         Indent = false,
+        NewLineChars = "\r\n",
         // 關閉內建逐字元檢查；使用者文字／樣式名稱改由 OdfXmlCharacterGuard 驗證。
         CheckCharacters = false
     };
