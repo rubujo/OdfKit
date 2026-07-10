@@ -224,7 +224,11 @@ public static class OdfToXlsxConverter
             string dataRange = (string?)chart.Attribute(tableNs + "cell-range-address") ?? string.Empty;
             if (string.IsNullOrEmpty(dataRange))
             {
-                return null;
+                dataRange = DeriveChartDataRange(chart, chartNs, tableNs) ?? string.Empty;
+                if (string.IsNullOrEmpty(dataRange))
+                {
+                    return null;
+                }
             }
 
             string title = chart.Descendants(chartNs + "title")
@@ -257,6 +261,40 @@ public static class OdfToXlsxConverter
         {
             OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfToXlsxConverter_ChartExportSkipped", ex.Message), ex);
             return null;
+        }
+    }
+
+    private static string? DeriveChartDataRange(XElement chart, XNamespace chartNs, XNamespace tableNs)
+    {
+        List<OdfCellRange> ranges = [];
+        foreach (XElement element in chart.DescendantsAndSelf())
+        {
+            AddChartRange((string?)element.Attribute(chartNs + "values-cell-range-address"), ranges);
+            AddChartRange((string?)element.Attribute(chartNs + "label-cell-address"), ranges);
+            if (element.Name == chartNs + "categories" || element.Name == chartNs + "domain")
+            {
+                AddChartRange((string?)element.Attribute(tableNs + "cell-range-address"), ranges);
+            }
+        }
+
+        if (ranges.Count == 0)
+        {
+            return null;
+        }
+
+        string? sheetName = ranges[0].StartAddress.SheetName ?? ranges[0].EndAddress.SheetName;
+        int minRow = ranges.Min(range => Math.Min(range.StartAddress.Row, range.EndAddress.Row));
+        int minColumn = ranges.Min(range => Math.Min(range.StartAddress.Column, range.EndAddress.Column));
+        int maxRow = ranges.Max(range => Math.Max(range.StartAddress.Row, range.EndAddress.Row));
+        int maxColumn = ranges.Max(range => Math.Max(range.StartAddress.Column, range.EndAddress.Column));
+        return new OdfCellRange(minRow, minColumn, maxRow, maxColumn, sheetName).ToOdfString(false);
+    }
+
+    private static void AddChartRange(string? address, List<OdfCellRange> ranges)
+    {
+        if (!string.IsNullOrWhiteSpace(address) && OdfCellRange.TryParse(address!, out OdfCellRange range))
+        {
+            ranges.Add(range);
         }
     }
 

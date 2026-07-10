@@ -37,10 +37,16 @@ public class ChartHighLevelApiTests
         Assert.Equal("chart:line", chartDoc.ChartClass);
         Assert.Equal("銷售趨勢圖", chartDoc.ChartTitle);
         Assert.Equal("end", chartDoc.LegendPosition);
+        Assert.Equal(
+            ["title", "legend", "plot-area"],
+            chartDoc.ChartNode.Children
+                .Where(static child => child.NodeType is OdfNodeType.Element)
+                .Select(static child => child.LocalName));
 
-        // 驗證 XML 屬性
-        string? cellRange = chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
-        Assert.Equal("LocalTable.A1:.B5", cellRange);
+        // 圖表來源範圍應由合法的 series／categories 屬性表達，不寫入 chart:chart 非法屬性。
+        Assert.Null(chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table));
+        Assert.Equal("LocalTable", chartDoc.GetDataRange().SheetName);
+        Assert.Equal(definition.DataRange, chartDoc.GetDataRange().Range);
 
         // 驗證 GetChartDefinition
         var readDef = chartDoc.GetChartDefinition();
@@ -272,18 +278,24 @@ public class ChartHighLevelApiTests
     // ── V-1: SetDataRange / GetDataRange / InsertChart ──────────────────────
 
     /// <summary>
-    /// 驗證 SetDataRange 正確設定 chart:chart 的 table:cell-range-address 屬性。
+    /// 驗證 SetDataRange 使用 ODF 1.4 合法的 series 與 categories 範圍屬性。
     /// </summary>
     [Fact]
-    public void SetDataRange_SetsChartCellRangeAttribute()
+    public void SetDataRange_SetsSchemaValidSeriesAndCategoryRanges()
     {
         using var chartDoc = OdfChartDocument.Create();
         var range = new OdfCellRange(0, 0, 4, 1);
 
         chartDoc.SetDataRange("Sheet1", range);
 
-        string? attr = chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
-        Assert.Equal("Sheet1.$A$1:.$B$5", attr);
+        Assert.Null(chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table));
+        OdfNode series = Assert.Single(chartDoc.ChartNode.Descendants()
+            .Where(node => node.LocalName == "series" && node.NamespaceUri == OdfNamespaces.Chart));
+        Assert.Equal("Sheet1.$B$2:.$B$5", series.GetAttribute("values-cell-range-address", OdfNamespaces.Chart));
+        Assert.Equal("Sheet1.$B$1", series.GetAttribute("label-cell-address", OdfNamespaces.Chart));
+        OdfNode categories = Assert.Single(chartDoc.ChartNode.Descendants()
+            .Where(node => node.LocalName == "categories" && node.NamespaceUri == OdfNamespaces.Chart));
+        Assert.Equal("Sheet1.$A$2:.$A$5", categories.GetAttribute("cell-range-address", OdfNamespaces.Table));
     }
 
     /// <summary>
@@ -409,10 +421,11 @@ public class ChartHighLevelApiTests
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
 
-        // 驗證 cell-range-address 正確寫入 content.xml
-        Assert.Contains("Data.$A$1:.$C$3", xml);
-        // 驗證 chart:series
-        Assert.Contains("chart:series", xml);
+        // 驗證資料來源由 ODF schema 合法的序列與 domain 屬性表達。
+        Assert.DoesNotContain("<chart:chart chart:class=\"chart:bar\" table:cell-range-address=", xml);
+        Assert.Contains("chart:label-cell-address=\"Data.$B$1\"", xml);
+        Assert.Contains("chart:values-cell-range-address=\"Data.$B$2:.$B$3\"", xml);
+        Assert.Contains("table:cell-range-address=\"Data.$A$2:.$A$3\"", xml);
     }
 
     /// <summary>

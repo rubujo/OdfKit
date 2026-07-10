@@ -67,7 +67,13 @@ public partial class OdfImageDocument
         OdfMediaManager mediaManager = new(Package);
         string href = mediaManager.AddImage(imageBytes, preferredName ?? "image.png");
 
-        OdfNode frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+        OdfNode imageRoot = GetImageNode();
+        OdfNode? emptyPlaceholder = FindPrimaryFrame(imageRoot);
+        OdfNode frame = emptyPlaceholder is not null &&
+            emptyPlaceholder.Children.Count == 0 &&
+            emptyPlaceholder.Attributes.Count == 0
+                ? emptyPlaceholder
+                : OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
@@ -97,7 +103,10 @@ public partial class OdfImageDocument
         image.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         image.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
         frame.AppendChild(image);
-        GetImageNode().AppendChild(frame);
+        if (frame.Parent is null)
+        {
+            imageRoot.AppendChild(frame);
+        }
         return href;
     }
 

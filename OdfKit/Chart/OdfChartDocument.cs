@@ -143,7 +143,28 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
         set
         {
             OdfNode chart = GetChartNode();
-            OdfNode title = FindOrCreateChild(chart, "title", OdfNamespaces.Chart, "chart");
+            OdfNode? title = FindChildElement(chart, "title", OdfNamespaces.Chart);
+            if (title is null)
+            {
+                title = OdfNodeFactory.CreateElement("title", OdfNamespaces.Chart, "chart");
+                OdfNode? followingChild = FindFirstChartChild(
+                    chart,
+                    "subtitle",
+                    "footer",
+                    "legend",
+                    "plot-area",
+                    "wall",
+                    "floor");
+                if (followingChild is null)
+                {
+                    chart.AppendChild(title);
+                }
+                else
+                {
+                    chart.InsertBefore(title, followingChild);
+                }
+            }
+
             OdfNode paragraph = FindOrCreateChild(title, "p", OdfNamespaces.Text, "text");
             paragraph.TextContent = value ?? string.Empty;
         }
@@ -374,7 +395,43 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
 
     internal OdfNode? FindLegendNode() => FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
 
-    internal OdfNode EnsureLegendNode() => FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+    internal OdfNode EnsureLegendNode()
+    {
+        OdfNode chart = GetChartNode();
+        OdfNode? legend = FindChildElement(chart, "legend", OdfNamespaces.Chart);
+        if (legend is not null)
+        {
+            return legend;
+        }
+
+        legend = OdfNodeFactory.CreateElement("legend", OdfNamespaces.Chart, "chart");
+        OdfNode? followingChild = FindFirstChartChild(chart, "plot-area", "wall", "floor");
+        if (followingChild is null)
+        {
+            chart.AppendChild(legend);
+        }
+        else
+        {
+            chart.InsertBefore(legend, followingChild);
+        }
+
+        return legend;
+    }
+
+    private static OdfNode? FindFirstChartChild(OdfNode chart, params string[] localNames)
+    {
+        foreach (OdfNode child in chart.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.NamespaceUri == OdfNamespaces.Chart &&
+                Array.IndexOf(localNames, child.LocalName) >= 0)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
 
     internal void RemoveLegendNode()
     {

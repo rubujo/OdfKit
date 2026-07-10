@@ -1711,7 +1711,10 @@ public class OoxmlConversionTests
 
         Assert.Contains("chart:class=\"chart:line\"", chartXml);
         Assert.Contains("反向圖表", chartXml);
-        Assert.Contains("table:cell-range-address=\"Data.A1:.B3\"", chartXml);
+        Assert.DoesNotContain("<chart:chart chart:class=\"chart:line\" table:cell-range-address=", chartXml);
+        Assert.Contains("chart:label-cell-address=\"Data.B1\"", chartXml);
+        Assert.Contains("chart:values-cell-range-address=\"Data.B2:Data.B3\"", chartXml);
+        Assert.Contains("table:cell-range-address=\"Data.A2:Data.A3\"", chartXml);
     }
 
     /// <summary>

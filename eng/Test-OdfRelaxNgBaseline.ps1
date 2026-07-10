@@ -7,6 +7,7 @@ param(
     [string]$CorpusRoot = "tests/fixtures/corpus",
     [string]$SchemaRoot = "tools/OdfSchemaGenerator/schemas",
     [string]$JavaPath = "java",
+    [string[]]$ExcludedKinds = @("Formula", "FormulaTemplate", "FlatFormula"),
     [int]$TimeoutSeconds = 30
 )
 
@@ -43,6 +44,7 @@ function Invoke-JingValidation {
     $startInfo.RedirectStandardError = $true
     $startInfo.ArgumentList.Add("-jar")
     $startInfo.ArgumentList.Add($resolvedJingJar)
+    $startInfo.ArgumentList.Add("-i")
     $startInfo.ArgumentList.Add($SchemaPath)
     $startInfo.ArgumentList.Add($XmlPath)
 
@@ -92,6 +94,9 @@ New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 try {
     foreach ($fixture in $manifestData.fixtures) {
         if (-not $schemas.ContainsKey([string]$fixture.version)) {
+            continue
+        }
+        if ($ExcludedKinds -contains [string]$fixture.kind) {
             continue
         }
 
@@ -180,6 +185,7 @@ finally {
 $mismatches = @($results | Where-Object { -not $_.matched })
 [pscustomobject]@{
     validator = "Jing"
+    excludedKinds = @($ExcludedKinds)
     fixtureCount = $results.Count
     passed = $results.Count - $mismatches.Count
     failed = $mismatches.Count

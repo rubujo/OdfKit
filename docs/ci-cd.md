@@ -66,11 +66,13 @@ cache key 同時包含來源、cache revision、版本與完整雜湊，且不�
 cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路徑。CI 不快取 corpus 驗證輸出、
 暫存 manifest 或測試結果，因此舊結果不會被誤當成本次驗證證據。
 
-Jing 20241231 會直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證全部 flat 文件，以及 ZIP
-package 的 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml`。ODF Validator 0.13.0
+Jing 20241231 會直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證該 schema 適用的 flat 文件，
+以及 ZIP package 的 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml`。通用 schema
+未定義 `office:formula`，所以 Formula／FormulaTemplate／FlatFormula 由 Jing 報告明列排除，
+並保留在內部 package gate。ODF Validator 0.13.0
 另對適用的 ZIP package 執行容器／分類對標與正負 canary。Database 因該版本拒絕其合法
 mimetype，Formula／FormulaTemplate 因該版本在 ODF 1.4 觸發上游 NPE，僅從 ODF Validator
-集合排除，仍由 Jing 與內部 package gate 阻擋。兩條外部 baseline 都是阻擋 gate。
+集合排除。兩條外部 baseline 都是阻擋 gate。
 
 ## 逾時與診斷
 

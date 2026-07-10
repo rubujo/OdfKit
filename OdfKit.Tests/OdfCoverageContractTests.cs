@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using OdfKit.DOM;
 using Xunit;
@@ -129,6 +129,8 @@ public class OdfCoverageContractTests
         Assert.Contains("Get-FileHash", jingInstaller);
         Assert.Contains("binFiles", jingInstaller);
         Assert.Contains("System.IO.Compression.ZipFile", jingBaseline);
+        Assert.Contains("ArgumentList.Add(\"-i\")", jingBaseline);
+        Assert.Contains("FormulaTemplate\", \"FlatFormula", jingBaseline);
         Assert.Contains("OpenDocument-schema-v1.1.rng", jingBaseline);
         Assert.Contains("OpenDocument-v1.4-schema.rng", jingBaseline);
         Assert.Contains("InternalBaselineVersions", corpusScript);

@@ -38,10 +38,12 @@ ODF 1.4（2025-12 OASIS Standard）四份正式規格文本逐章稽核結論見
 ## 外部 baseline 執行
 
 核心 OdfKit 不依賴 Java。獨立的 `odf-external-baseline.yml` 固定使用 Jing 20241231、
-ODF Validator 0.13.0 與 Java 11。Jing 直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證全部
-flat 文件與 package XML streams；ODF Validator 則對適用的 ZIP package 執行分類對標，並跑
+ODF Validator 0.13.0 與 Java 11。Jing 直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證該
+通用 schema 適用的 flat 文件與 package XML streams；Formula／FormulaTemplate／FlatFormula
+因使用 schema 未定義的 `office:formula` 表示法而由報告明列排除，仍由內部 package gate
+覆蓋。ODF Validator 則對適用的 ZIP package 執行分類對標，並跑
 真實 JAR 正／負 package canary。Database 與 Formula／FormulaTemplate 的 ODF Validator 0.13.0
-上游限制不會變成 allowlist：它們只從該工具集合排除，仍由 Jing 與內部 package gate 覆蓋。
+上游限制不會變成 allowlist：它們只從該工具集合排除；Database 仍由 Jing 覆蓋。
 兩條外部 baseline 都是阻擋 gate。
 
 外部工具的供應鏈資料集中於 `eng/external-tools.json`。每個 CI cache key 都包含工具來源、

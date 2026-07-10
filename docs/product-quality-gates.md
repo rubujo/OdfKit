@@ -34,7 +34,7 @@ pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 | 腳本 | 說明 |
 |------|------|
 | `pwsh eng/Test-OdfCorpus.ps1` | 內建 corpus（`tests/fixtures/corpus/manifest.json`）；可設 `ODFKIT_PARITY_CORPUS_ROOT` 併跑外部 corpus |
-| `pwsh eng/Test-OdfRelaxNgBaseline.ps1 -JingJar <jar>` | 以 Jing 與 OASIS ODF 1.1～1.4 schema 驗證全部 flat 與 package XML streams |
+| `pwsh eng/Test-OdfRelaxNgBaseline.ps1 -JingJar <jar>` | 以 Jing 與 OASIS ODF 1.1～1.4 schema 驗證通用 schema 適用的 flat 與 package XML streams，並在報告明列公式格式排除集合 |
 | `pwsh eng/Test-OdfCorpus.ps1 -InternalBaselineJar <jar> -InternalBaselinePackageOnly` | 以外部 ODF Validator 對適用的 ODF 1.1～1.4 package fixtures 執行分類對標；CI 使用固定 SHA-256 工具快取 |
 | `pwsh eng/Initialize-OdfExternalCorpus.ps1 -OutputRoot <path>` | 初始化外部 corpus 目錄與 manifest 範本 |
 | `pwsh eng/Test-LibreOfficeInterop.ps1` | LibreOffice headless 實機互通（需本機安裝 soffice） |
@@ -48,8 +48,8 @@ pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 - [corpus-manifest.md](corpus-manifest.md)
 - [odf-official-corpus-sources.md](odf-official-corpus-sources.md)
 
-外部 baseline 工作流程先執行並重新產生內建 corpus，再以 Jing 阻擋全部 flat／package XML
-RELAX NG 差異，並以 ODF Validator 阻擋適用 package 的分類差異；真實 JAR 正／負 canary
+外部 baseline 工作流程先執行並重新產生內建 corpus，再以 Jing 阻擋通用 ODF schema 適用的
+flat／package XML RELAX NG 差異，並以 ODF Validator 阻擋適用 package 的分類差異；真實 JAR 正／負 canary
 持續驗證外部工具鏈。所有 cache 都是精確雜湊 key，且不保存驗證結果。
 - [ci-cd.md](ci-cd.md)
 

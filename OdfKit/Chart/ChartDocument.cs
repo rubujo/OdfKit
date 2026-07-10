@@ -75,8 +75,10 @@ public class ChartDocument : OdfChartDocument
 
         if (chartDefinition.DataRange != default)
         {
-            string dataRangeStr = chartDefinition.DataRange.ToOdfString(false);
-            doc.ChartNode.SetAttribute("cell-range-address", OdfNamespaces.Table, dataRangeStr, "table");
+            string sheetName = chartDefinition.DataRange.StartAddress.SheetName ??
+                chartDefinition.DataRange.EndAddress.SheetName ??
+                "LocalTable";
+            doc.SetDataRange(sheetName, chartDefinition.DataRange);
         }
 
         return doc;

@@ -135,8 +135,10 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus man
 外部工具已確認不適用的種類。腳本會在系統暫存目錄建立短生命週期的
 版本篩選 manifest；預設版本集合為 ODF 1.1～1.4。CI 的
 `.github/workflows/odf-external-baseline.yml` 固定使用 package-only 模式，因為 ODF Validator
-CLI 以 package loader 開啟文件；獨立的 `Test-OdfRelaxNgBaseline.ps1` 則以 Jing 驗證全部 flat
-文件與 package XML streams。
+CLI 以 package loader 開啟文件；獨立的 `Test-OdfRelaxNgBaseline.ps1` 則以 Jing 驗證通用
+OASIS ODF schema 適用的 flat 文件與 package XML streams。`Formula`、`FormulaTemplate` 與
+`FlatFormula` 使用該 schema 未定義的 `office:formula` 表示法，因此由腳本明列排除並保留在
+內部 package gate；報告會輸出實際排除集合。
 package-only 依 manifest 的 `kind` 是否以 `Flat` 開頭判斷，不依可能重疊的副檔名推測；例如
 `.odf` 可能是 ZIP formula package，也可能是 `FlatFormula`。需要改變版本集合時使用
 `-InternalBaselineVersions`。
