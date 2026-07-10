@@ -597,6 +597,7 @@ public static partial class OdfLocalizer
             ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "V zväzku tajných kľúčov sa nenašiel súkromný kľúč s Key ID 0x{0:X16}.",
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Pri zatváraní prvkov XML počas obnovy serializácie sa vyskytla sekundárna chyba: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Nepodarilo sa skontrolovať jednotku '{0}' na LibreOffice Portable: {1}",
+            ["Err_StreamReader_ResourceLimitExceeded"] = "Bol prekročený limit prostriedkov streamovacieho readera ({0} > {1}).",
         };
     }
 }

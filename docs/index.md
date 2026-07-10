@@ -40,6 +40,7 @@
 | [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
 | [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |
 | [API Reference](reference/index.md) | Spreadsheet、Chart、Template 與 Interop 的 options、report 與能力邊界 |
+| [串流讀取安全限制](security-limits.md) | ODS／ODT Reader 的資源預算、資料流所有權與信任邊界 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [渲染後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |

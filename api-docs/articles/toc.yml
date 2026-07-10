@@ -1,0 +1,12 @@
+- name: 首頁
+  href: index.md
+- name: API
+  href: xref:OdfKit.Spreadsheet.OdsStreamReader
+- name: 授權與合規
+  href: https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md
+- name: 授權
+  href: license.md
+- name: 安全限制
+  href: https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md
+- name: 證據索引
+  href: https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md

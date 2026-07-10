@@ -40,6 +40,8 @@ Logs/
 [Tt]emp/
 TestResults/
 BenchmarkDotNet.Artifacts/
+api/
+api-docs/api/
 agent-tools/
 terminals/
 

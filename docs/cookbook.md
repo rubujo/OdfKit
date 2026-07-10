@@ -756,7 +756,7 @@ await bulkCopy.WriteToServerAsync(reader);
 
 | 場景 | 建議路徑 | 記憶體特性 |
 | --- | --- | --- |
-| 只需要把 ODS 內容匯出成 CSV、灌入資料庫、或做逐列彙總，不需要修改原始檔案 | `OdsStreamReader`（實作 `DbDataReader`，SAX 風格逐列讀取） | 恆定，不隨檔案大小成長；不建立 DOM |
+| 只需要把 ODS 內容匯出成 CSV、灌入資料庫、或做逐列彙總，不需要修改原始檔案 | `OdsStreamReader`（實作 `DbDataReader`，SAX 風格逐列讀取） | 不建立完整 DOM；仍配置目前列、儲存格文字及 ZIP／XML 緩衝，並受 Reader options 限制 |
 | 需要載入既有 ODS、修改儲存格/樣式/公式後存回 | `SpreadsheetDocument.Load(...)` / `OdfDocument.Load(...)` DOM 路徑 | 見下方說明 |
 
 `OdsStreamReader` 的用法見前面〈匯出任意物件序列或 EF Core 查詢結果〉一節的

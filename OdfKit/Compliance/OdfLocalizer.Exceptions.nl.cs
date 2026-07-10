@@ -597,6 +597,7 @@ public static partial class OdfLocalizer
             ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Er is geen privésleutel met Key ID 0x{0:X16} gevonden in de geheime sleutelring.",
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Er is een secundaire fout opgetreden bij het sluiten van XML-elementen tijdens serialisatieherstel: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan station '{0}' niet controleren op LibreOffice Portable: {1}",
+            ["Err_StreamReader_ResourceLimitExceeded"] = "De resourcelimiet van de streaming-reader is overschreden ({0} > {1}).",
         };
     }
 }

@@ -5,6 +5,18 @@
 
 ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
 
+## 三種獨立能力承諾
+
+本矩陣的歷史狀態不得單獨解讀為「完整支援」。新的可稽核宣稱拆成三個互不推導的維度：
+
+- `PackageFidelity`：封裝偵測、載入、保存、驗證與未知內容保存。
+- `SemanticApiDepth`：高階 API 能理解及修改的文件語意深度。
+- `InteropEvidence`：schema、corpus 與外部辦公軟體的實測證據。
+
+機器可讀 claim、限制與證據路徑見 [`claims.json`](claims.json) 及
+[能力宣稱與證據索引](evidence-index.md)。Package round-trip 成功不能推導為完整語意支援；
+特定版本互通成功也不能推導為所有辦公套件或像素級一致。
+
 ## 狀態標記
 
 ### 封裝與驗證層

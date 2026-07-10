@@ -597,6 +597,7 @@ public static partial class OdfLocalizer
             ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Aucune clé privée avec l'identifiant 0x{0:X16} n'a été trouvée dans le trousseau de clés secrètes.",
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Une erreur secondaire s'est produite lors de la fermeture des éléments XML pendant la récupération de la sérialisation : {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Échec de l'analyse du lecteur « {0} » pour LibreOffice Portable : {1}",
+            ["Err_StreamReader_ResourceLimitExceeded"] = "La limite de ressources du lecteur en continu a été dépassée ({0} > {1}).",
         };
     }
 }

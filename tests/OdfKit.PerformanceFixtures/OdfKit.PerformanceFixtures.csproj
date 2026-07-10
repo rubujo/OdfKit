@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>OdfKit.PerformanceFixtures</AssemblyName>
+    <RootNamespace>OdfKit.Benchmarks</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\OdfKit.Benchmarks\StandardPerformanceWorkloads.cs" Link="StandardPerformanceWorkloads.cs" />
+    <ProjectReference Include="..\..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+</Project>

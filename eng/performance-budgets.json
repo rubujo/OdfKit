@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "status": "collecting",
+  "requiredSamples": 3,
+  "allocationRegressionPercent": 20,
+  "advisoryRegressionPercent": 30,
+  "scenarios": {}
+}

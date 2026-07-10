@@ -103,10 +103,10 @@ public class SpreadsheetTests
     }
 
     /// <summary>
-    /// 驗證越界欄位索引回傳 null（不拋出例外）。
+    /// 驗證越界欄位索引遵循 DbDataReader 契約回傳 DBNull。
     /// </summary>
     [Fact]
-    public void OdsStreamReader_GetValue_OutOfRange_ReturnsNull()
+    public void OdsStreamReader_GetValue_OutOfRange_ReturnsDbNull()
     {
         using var doc = SpreadsheetDocument.Create();
         doc.Worksheets.Add("Sheet1").Cells["A1"].CellValue = "單格";
@@ -118,8 +118,8 @@ public class SpreadsheetTests
         using var reader = new OdsStreamReader(ms);
         reader.Read();
 
-        Assert.Null(reader.GetValue(-1));
-        Assert.Null(reader.GetValue(100));
+        Assert.Equal(DBNull.Value, reader.GetValue(-1));
+        Assert.Equal(DBNull.Value, reader.GetValue(100));
     }
 
     /// <summary>
@@ -143,7 +143,7 @@ public class SpreadsheetTests
         // A(0)、B(1=null)、C(2) — 共 3 個欄位
         Assert.Equal(3, reader.FieldCount);
         Assert.Equal("A", reader.GetValue(0));
-        Assert.Null(reader.GetValue(1));
+        Assert.Equal(DBNull.Value, reader.GetValue(1));
         Assert.Equal("C", reader.GetValue(2));
     }
 
@@ -184,5 +184,77 @@ public class SpreadsheetTests
         }
 
         Assert.Equal(RowCount, count);
+    }
+
+    /// <summary>
+    /// 驗證 Reader options 會阻擋超出資料行上限的輸入。
+    /// </summary>
+    [Fact]
+    public void OdsStreamReader_ColumnLimit_RejectsOversizedRow()
+    {
+        using var document = SpreadsheetDocument.Create();
+        var sheet = document.Worksheets.Add("Sheet1");
+        sheet.Cells["A1"].CellValue = "A";
+        sheet.Cells["B1"].CellValue = "B";
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var reader = new OdsStreamReader(stream, new OdsStreamReaderOptions { MaxColumns = 1 });
+        Assert.Throws<InvalidDataException>(() => reader.Read());
+    }
+
+    /// <summary>
+    /// 驗證結構化儲存格 API 保留值類型與語意值。
+    /// </summary>
+    [Fact]
+    public void OdsStreamReader_GetCell_ReturnsStructuredValue()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.Worksheets.Add("Sheet1").Cells["A1"].CellValue = 42d;
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var reader = new OdsStreamReader(stream);
+        Assert.True(reader.Read());
+        OdsCellValue cell = reader.GetCell(0);
+        Assert.Equal(OdsCellValueKind.Number, cell.Kind);
+        Assert.Equal(42d, cell.Value);
+    }
+
+    /// <summary>
+    /// 驗證非同步 Reader 可逐列讀取並遵守取消權杖。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamReader_ReadAsync_ReadsAndCancels()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.Worksheets.Add("Sheet1").Cells["A1"].CellValue = "async";
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using var reader = new OdsStreamReader(stream);
+
+        Assert.True(await reader.ReadAsync(TestContext.Current.CancellationToken));
+        Assert.Equal("async", reader.GetValue(0));
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => reader.ReadAsync(cancellation.Token));
+    }
+
+    /// <summary>
+    /// 驗證 ODS Writer 可非同步沖洗目前 XML entry。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_FlushAsync_Completes()
+    {
+        using var stream = new MemoryStream();
+        await using var writer = new OdsStreamWriter(stream);
+        writer.WriteStartSheet("Sheet1");
+        writer.WriteStartRow();
+        writer.WriteCell("value");
+        writer.WriteEndRow();
+        await writer.FlushAsync(TestContext.Current.CancellationToken);
     }
 }

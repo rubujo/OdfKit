@@ -16279,6 +16279,23 @@ OdfKit.Spreadsheet.OdfWorksheetCollection.GetEnumerator() -> System.Collections.
 OdfKit.Spreadsheet.OdfWorksheetCollection.OdfWorksheetCollection(OdfKit.Spreadsheet.SpreadsheetDocument! document) -> void
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[int index].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[string! name].get -> OdfKit.Spreadsheet.OdfTableSheet!
+OdfKit.Spreadsheet.OdsCellValue
+OdfKit.Spreadsheet.OdsCellValue.Currency.get -> string?
+OdfKit.Spreadsheet.OdsCellValue.DisplayText.get -> string?
+OdfKit.Spreadsheet.OdsCellValue.Formula.get -> string?
+OdfKit.Spreadsheet.OdsCellValue.Kind.get -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValue.RawValueType.get -> string?
+OdfKit.Spreadsheet.OdsCellValue.Value.get -> object?
+OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Boolean = 5 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Currency = 4 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Date = 6 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Empty = 0 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Number = 2 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Percentage = 3 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.String = 1 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Time = 7 -> OdfKit.Spreadsheet.OdsCellValueKind
+OdfKit.Spreadsheet.OdsCellValueKind.Unknown = 8 -> OdfKit.Spreadsheet.OdsCellValueKind
 OdfKit.Spreadsheet.OdsRowWriteOptions
 OdfKit.Spreadsheet.OdsRowWriteOptions.Height.get -> double?
 OdfKit.Spreadsheet.OdsRowWriteOptions.Height.set -> void
@@ -16298,14 +16315,34 @@ OdfKit.Spreadsheet.OdsSheetWriter.WriteCell(string! value) -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteEndRow() -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteStartRow() -> void
 OdfKit.Spreadsheet.OdsStreamReader
+OdfKit.Spreadsheet.OdsStreamReader.GetCell(int ordinal) -> OdfKit.Spreadsheet.OdsCellValue!
 OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(string! path) -> void
+OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(string! path, OdfKit.Spreadsheet.OdsStreamReaderOptions! options) -> void
 OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(System.IO.Stream! stream) -> void
+OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(System.IO.Stream! stream, OdfKit.Spreadsheet.OdsStreamReaderOptions! options) -> void
 OdfKit.Spreadsheet.OdsStreamReader.RowIndex.get -> int
 OdfKit.Spreadsheet.OdsStreamReader.SelectSheet(int sheetIndex) -> void
 OdfKit.Spreadsheet.OdsStreamReader.SheetNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Spreadsheet.OdsStreamReaderOptions
+OdfKit.Spreadsheet.OdsStreamReaderOptions.LeaveOpen.get -> bool
+OdfKit.Spreadsheet.OdsStreamReaderOptions.LeaveOpen.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxCellTextCharacters.get -> int
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxCellTextCharacters.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxColumns.get -> int
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxColumns.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRepeatedColumns.get -> int
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRepeatedColumns.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRepeatedRows.get -> int
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRepeatedRows.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRows.get -> int
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxRows.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxXmlCharactersInDocument.get -> long
+OdfKit.Spreadsheet.OdsStreamReaderOptions.MaxXmlCharactersInDocument.set -> void
+OdfKit.Spreadsheet.OdsStreamReaderOptions.OdsStreamReaderOptions() -> void
 OdfKit.Spreadsheet.OdsStreamWriter
 OdfKit.Spreadsheet.OdsStreamWriter.Dispose() -> void
 OdfKit.Spreadsheet.OdsStreamWriter.DisposeAsync() -> System.Threading.Tasks.ValueTask
+OdfKit.Spreadsheet.OdsStreamWriter.FlushAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 OdfKit.Spreadsheet.OdsStreamWriter.OdsStreamWriter(System.IO.Stream! outputStream) -> void
 OdfKit.Spreadsheet.OdsStreamWriter.OdsStreamWriter(System.IO.Stream! outputStream, OdfKit.Compliance.OdfVersion version) -> void
 OdfKit.Spreadsheet.OdsStreamWriter.SwitchToSheet(string! sheetName) -> void
@@ -17387,10 +17424,23 @@ OdfKit.Text.OdtStreamReader.Dispose() -> void
 OdfKit.Text.OdtStreamReader.HeadingLevel.get -> int
 OdfKit.Text.OdtStreamReader.NodeType.get -> OdfKit.Text.OdtNodeType
 OdfKit.Text.OdtStreamReader.OdtStreamReader(string! path) -> void
+OdfKit.Text.OdtStreamReader.OdtStreamReader(string! path, OdfKit.Text.OdtStreamReaderOptions! options) -> void
 OdfKit.Text.OdtStreamReader.OdtStreamReader(System.IO.Stream! stream) -> void
+OdfKit.Text.OdtStreamReader.OdtStreamReader(System.IO.Stream! stream, OdfKit.Text.OdtStreamReaderOptions! options) -> void
 OdfKit.Text.OdtStreamReader.Read() -> bool
+OdfKit.Text.OdtStreamReader.ReadAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<bool>!
 OdfKit.Text.OdtStreamReader.StyleName.get -> string?
 OdfKit.Text.OdtStreamReader.Text.get -> string!
+OdfKit.Text.OdtStreamReaderOptions
+OdfKit.Text.OdtStreamReaderOptions.LeaveOpen.get -> bool
+OdfKit.Text.OdtStreamReaderOptions.LeaveOpen.set -> void
+OdfKit.Text.OdtStreamReaderOptions.MaxNodes.get -> int
+OdfKit.Text.OdtStreamReaderOptions.MaxNodes.set -> void
+OdfKit.Text.OdtStreamReaderOptions.MaxNodeTextCharacters.get -> int
+OdfKit.Text.OdtStreamReaderOptions.MaxNodeTextCharacters.set -> void
+OdfKit.Text.OdtStreamReaderOptions.MaxXmlCharactersInDocument.get -> long
+OdfKit.Text.OdtStreamReaderOptions.MaxXmlCharactersInDocument.set -> void
+OdfKit.Text.OdtStreamReaderOptions.OdtStreamReaderOptions() -> void
 OdfKit.Text.OdtStreamWriter
 OdfKit.Text.OdtStreamWriter.AddHeading(string! text) -> void
 OdfKit.Text.OdtStreamWriter.AddHeading(string! text, int level) -> void
@@ -17410,6 +17460,7 @@ OdfKit.Text.OdtStreamWriter.AddParagraph(System.ReadOnlySpan<char> text) -> void
 OdfKit.Text.OdtStreamWriter.AddParagraph(System.ReadOnlySpan<char> text, string? styleName) -> void
 OdfKit.Text.OdtStreamWriter.BeginList() -> void
 OdfKit.Text.OdtStreamWriter.BeginList(string? styleName) -> void
+OdfKit.Text.OdtStreamWriter.CompleteAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 OdfKit.Text.OdtStreamWriter.Dispose() -> void
 OdfKit.Text.OdtStreamWriter.DisposeAsync() -> System.Threading.Tasks.ValueTask
 OdfKit.Text.OdtStreamWriter.EndList() -> void
@@ -17931,6 +17982,7 @@ override OdfKit.Spreadsheet.OdsStreamReader.IsClosed.get -> bool
 override OdfKit.Spreadsheet.OdsStreamReader.IsDBNull(int ordinal) -> bool
 override OdfKit.Spreadsheet.OdsStreamReader.NextResult() -> bool
 override OdfKit.Spreadsheet.OdsStreamReader.Read() -> bool
+override OdfKit.Spreadsheet.OdsStreamReader.ReadAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<bool>!
 override OdfKit.Spreadsheet.OdsStreamReader.RecordsAffected.get -> int
 override OdfKit.Spreadsheet.OdsStreamReader.this[int ordinal].get -> object!
 override OdfKit.Spreadsheet.OdsStreamReader.this[string! name].get -> object!

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "claims": [
+    {
+      "id": "ODS-PACKAGE-001",
+      "format": "ODS",
+      "dimension": "PackageFidelity",
+      "level": "complete",
+      "evidence": ["OdfKit.Tests/SpreadsheetHighLevelApiTests.cs", "OdfKit.Tests/ComplianceTests.cs"],
+      "limitations": "Package round-trip does not imply formula recalculation or full spreadsheet semantics."
+    },
+    {
+      "id": "ODS-SEMANTIC-001",
+      "format": "ODS",
+      "dimension": "SemanticApiDepth",
+      "level": "common-workflows",
+      "evidence": ["OdfKit.Tests/SpreadsheetTests.cs", "OdfKit.Tests/SpreadsheetApiUsabilityTests.cs"],
+      "limitations": "The streaming reader exposes stored values and formulas but does not recalculate formulas."
+    },
+    {
+      "id": "ODT-SEMANTIC-001",
+      "format": "ODT",
+      "dimension": "SemanticApiDepth",
+      "level": "common-workflows",
+      "evidence": ["OdfKit.Tests/TextHighLevelApiTests.cs", "OdfKit.Tests/TextApiUsabilityTests.cs"],
+      "limitations": "OdfKit is not a page-layout or rendering engine."
+    },
+    {
+      "id": "ODP-SEMANTIC-001",
+      "format": "ODP",
+      "dimension": "SemanticApiDepth",
+      "level": "common-workflows",
+      "evidence": ["OdfKit.Tests/PresentationHighLevelApiTests.cs", "OdfKit.Tests/PresentationBoundaryTests.cs"],
+      "limitations": "ODP uses a DOM/package workload; no streaming slide API is claimed."
+    },
+    {
+      "id": "ODF-INTEROP-001",
+      "format": "ODF",
+      "dimension": "InteropEvidence",
+      "level": "tested",
+      "evidence": ["OdfKit.Tests/LibreOfficeInteropTests.cs", ".github/workflows/libreoffice-interop.yml"],
+      "limitations": "A tested LibreOffice version does not guarantee pixel-identical output in every office suite."
+    }
+  ]
+}

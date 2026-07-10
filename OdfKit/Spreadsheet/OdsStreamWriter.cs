@@ -117,7 +117,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             // 關閉 XmlWriter 內建逐字元檢查以降低大量資料寫入時的熱迴圈成本；
             // 使用者提供的文字與屬性值改由 OdfXmlCharacterGuard 在寫入前做輕量的
             // XML 1.0 合法性驗證，維持「非法字元快速失敗」的既有語意。
-            CheckCharacters = false
+            CheckCharacters = false,
+            Async = true
         };
         _writer = XmlWriter.Create(_contentEntryStream, settings);
         // 熱迴圈（工作表／資料列／儲存格）改由原始 XML 組裝器批次寫入，
@@ -749,10 +750,32 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// 非同步釋放 <see cref="OdsStreamWriter"/> 類別所使用的資源。
     /// </summary>
     /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation. / 代表非同步處置作業的 <see cref="ValueTask"/>。</returns>
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        if (_disposed)
+            return;
+        await FlushAsync(CancellationToken.None).ConfigureAwait(false);
         Dispose();
-        return default;
+    }
+
+    /// <summary>
+    /// Asynchronously flushes buffered worksheet XML to the current package entry.
+    /// 非同步將已緩衝的工作表 XML 沖洗至目前封裝項目。
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task representing the flush operation. / 代表沖洗作業的工作。</returns>
+    /// <remarks>
+    /// Package finalization remains synchronous because <see cref="ZipArchive"/> exposes only synchronous disposal.
+    /// 封裝最終化仍為同步作業，因為 <see cref="ZipArchive"/> 僅提供同步處置。
+    /// </remarks>
+    public async Task FlushAsync(CancellationToken cancellationToken)
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(OdsStreamWriter));
+        cancellationToken.ThrowIfCancellationRequested();
+        CurrentRawWriter.FlushToTarget();
+        await CurrentWriter.FlushAsync().ConfigureAwait(false);
+        await _contentEntryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -982,7 +1005,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                     Indent = false,
                     NewLineChars = "\r\n",
                     ConformanceLevel = ConformanceLevel.Fragment,
-                    CheckCharacters = false
+                    CheckCharacters = false,
+                    Async = true
                 });
             Writer.WriteStartElement("table", "table", OdfNamespaces.Table);
             Writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);

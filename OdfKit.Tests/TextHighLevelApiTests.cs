@@ -1237,6 +1237,43 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 ODT 流式讀取器使用真正非同步 XML 走訪並遵守取消權杖。
+    /// </summary>
+    [Fact]
+    public async Task OdtStreamReaderReadAsyncReadsAndCancels()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdtStreamWriter(stream))
+            writer.AddParagraph("async text");
+        stream.Position = 0;
+        using var reader = new OdtStreamReader(stream);
+
+        Assert.True(await reader.ReadAsync(TestContext.Current.CancellationToken));
+        Assert.Equal("async text", reader.Text);
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => reader.ReadAsync(cancellation.Token));
+    }
+
+    /// <summary>
+    /// 驗證 ODT Writer 可非同步完成 XML 與封裝輸出。
+    /// </summary>
+    [Fact]
+    public async Task OdtStreamWriterCompleteAsyncWritesValidPackage()
+    {
+        using var stream = new MemoryStream();
+        await using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddParagraph("completed");
+            await writer.CompleteAsync(TestContext.Current.CancellationToken);
+        }
+        stream.Position = 0;
+        using var reader = new OdtStreamReader(stream);
+        Assert.True(reader.Read());
+        Assert.Equal("completed", reader.Text);
+    }
+
+    /// <summary>
     /// 驗證 ODT 流式讀取器讀取 table:table-cell 時會使用 table:style-name。
     /// </summary>
     [Fact]

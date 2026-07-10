@@ -40,7 +40,7 @@
     <ProjectReference Include="..\tools\OdfKit.Cli\OdfKit.Cli.csproj" />
     <ProjectReference Include="..\tools\OdfSchemaGenerator\OdfSchemaGenerator.csproj" />
     <ProjectReference Include="MockSoffice\MockSoffice.csproj" ReferenceOutputAssembly="false" OutputItemType="None" Private="false" />
-    <ProjectReference Include="..\OdfKit.Benchmarks\OdfKit.Benchmarks.csproj" Condition="'$(TargetFramework)' == 'net10.0'" />
+    <ProjectReference Include="..\tests\OdfKit.PerformanceFixtures\OdfKit.PerformanceFixtures.csproj" Condition="'$(TargetFramework)' == 'net10.0'" />
   </ItemGroup>
 
   <Target Name="CopyMockSoffice" AfterTargets="Build">

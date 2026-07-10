@@ -65,7 +65,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// </summary>
     /// <param name="ordinal">The zero-based column index. / 採零起始的資料行索引。</param>
     /// <returns><see langword="true"/> if the column is null; otherwise, <see langword="false"/>. / 若資料行為 <see langword="null"/> 則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
-    public override bool IsDBNull(int ordinal) => GetValue(ordinal) is null;
+    public override bool IsDBNull(int ordinal) => GetValue(ordinal) is DBNull;
 
     /// <summary>
     /// Gets the name of the specified column.

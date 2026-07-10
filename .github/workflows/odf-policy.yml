@@ -6,6 +6,8 @@ on:
       - 'OdfKit/**'
       - 'OdfKit.Tests/**'
       - 'eng/Test-OdfPolicy.ps1'
+      - 'eng/Test-EvidenceClaims.ps1'
+      - 'docs/claims.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   push:
@@ -15,6 +17,8 @@ on:
       - 'OdfKit/**'
       - 'OdfKit.Tests/**'
       - 'eng/Test-OdfPolicy.ps1'
+      - 'eng/Test-EvidenceClaims.ps1'
+      - 'docs/claims.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   workflow_dispatch:
@@ -40,3 +44,7 @@ jobs:
       - name: Run ODF policy tests
         shell: pwsh
         run: ./eng/Test-OdfPolicy.ps1
+
+      - name: Validate evidence claims
+        shell: pwsh
+        run: ./eng/Test-EvidenceClaims.ps1

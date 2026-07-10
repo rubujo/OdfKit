@@ -358,16 +358,46 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         }
 
-        FinalizeContentAndArchive();
+        await CompleteAsync(CancellationToken.None).ConfigureAwait(false);
+    }
 
+    /// <summary>
+    /// Asynchronously flushes document content and completes the ODT package while observing cancellation before ZIP finalization.
+    /// 非同步沖洗文件內容並完成 ODT 封裝，且在 ZIP 最終化前回應取消要求。
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task representing package completion. / 代表封裝完成作業的工作。</returns>
+    /// <remarks>
+    /// The final ZIP central-directory commit is synchronous because <see cref="ZipArchive"/> exposes only synchronous disposal.
+    /// 最後的 ZIP 中央目錄提交為同步作業，因為 <see cref="ZipArchive"/> 僅提供同步處置。
+    /// </remarks>
+    public async Task CompleteAsync(CancellationToken cancellationToken)
+    {
+        if (_disposed)
+            return;
+        cancellationToken.ThrowIfCancellationRequested();
+        _disposed = true;
+        if (_isListStarted)
+        {
+            _rawWriter.WriteEndElement("text:list");
+            _isListStarted = false;
+        }
+        _rawWriter.FlushToTarget();
+        _rawWriter.Dispose();
+        _writer.WriteEndElement();
+        _writer.WriteEndElement();
+        _writer.WriteEndElement();
+        _writer.WriteEndDocument();
+        await _writer.FlushAsync().ConfigureAwait(false);
+        await _contentEntryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        _writer.Dispose();
+        _contentEntryStream.Dispose();
+        _zip.Dispose();
         if (_ownedStream is IAsyncDisposable asyncDisposable)
-        {
             await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-        }
         else
-        {
             _ownedStream?.Dispose();
-        }
     }
 
     private void FinalizeContentAndArchive()
@@ -408,7 +438,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
         Indent = false,
         NewLineChars = "\r\n",
         // 關閉內建逐字元檢查；使用者文字／樣式名稱改由 OdfXmlCharacterGuard 驗證。
-        CheckCharacters = false
+        CheckCharacters = false,
+        Async = true
     };
 
     private void WriteMimeType()

@@ -63,16 +63,18 @@ internal static class StandardPerformanceManualRunner
         var stopwatch = Stopwatch.StartNew();
         (byte[] bytes, ulong checksum) = RunScenario(scenario, preparedInput);
         stopwatch.Stop();
+        long allocated = GC.GetTotalAllocatedBytes(precise: true) - allocatedBefore;
+        using Process process = Process.GetCurrentProcess();
+        process.Refresh();
+        long measuredPeakWorkingSet = process.PeakWorkingSet64;
         if (checksum == 0)
         {
             checksum = CalculateOutputChecksum(scenario, bytes);
         }
-        long allocated = GC.GetTotalAllocatedBytes(precise: true) - allocatedBefore;
         (long packageBytes, long xmlBytes) = StandardPerformanceWorkloads.GetPackageSizes(bytes);
-        using Process process = Process.GetCurrentProcess();
-        process.Refresh();
-        var result = new StandardPerformanceResult(scenario, stopwatch.Elapsed.TotalMilliseconds, allocated,
-            process.PeakWorkingSet64, packageBytes, xmlBytes, checksum);
+        var result = new StandardPerformanceResult(1, scenario, stopwatch.Elapsed.TotalMilliseconds, allocated,
+            measuredPeakWorkingSet, packageBytes, xmlBytes, checksum, Environment.Version.ToString(),
+            Environment.OSVersion.ToString(), Environment.ProcessorCount);
         File.WriteAllText(resultPath, JsonSerializer.Serialize(result));
         return 0;
     }
@@ -164,5 +166,6 @@ internal static class StandardPerformanceManualRunner
     private static byte[] RequireInput(byte[]? input) => input ?? throw new InvalidOperationException("Prepared benchmark input is missing.");
 }
 
-internal sealed record StandardPerformanceResult(string Scenario, double ElapsedMilliseconds, long AllocatedBytes,
-    long PeakWorkingSetBytes, long PackageBytes, long XmlBytes, ulong Checksum);
+internal sealed record StandardPerformanceResult(int SchemaVersion, string Scenario, double ElapsedMilliseconds,
+    long AllocatedBytes, long PeakWorkingSetBytes, long PackageBytes, long XmlBytes, ulong Checksum,
+    string RuntimeVersion, string OperatingSystem, int ProcessorCount);

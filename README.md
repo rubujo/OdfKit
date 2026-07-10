@@ -25,6 +25,7 @@ Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF �
 | 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`typed-dom-coverage`、`convert-flat`、`convert-csv` 與 `pack` |
 
 完整支援範圍請見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
+[能力宣稱與證據索引](docs/evidence-index.md)、
 [ODF Profile 來源](docs/odf-profile-sources.md)、
 [LibreOffice 互通矩陣](docs/libreoffice-interop-matrix.md) 與
 [i18n 與在地化](docs/i18n-localization.md)。

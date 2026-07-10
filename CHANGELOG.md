@@ -2,6 +2,13 @@
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
 
+## 尚未發佈
+
+- 新增 ODS／ODT 串流 Reader 資源限制選項與真正非同步讀取；repeat、列欄、節點及文字超限時改為失敗，不再靜默截斷。
+- 修正 `OdsStreamReader.GetValue` 的 `DbDataReader` 語意：空值回傳 `DBNull.Value`，公式儲存格回傳已儲存快取值；新增 `GetCell` 保留公式、值類型、貨幣及顯示文字。這是 1.0 前的刻意破壞性修正。
+- ODS／ODT Writer 新增非同步 flush／complete 路徑；ZIP 中央目錄提交因 BCL `ZipArchive` 限制仍為同步步驟。
+- 新增效能預算、能力 claims、證據索引及 12 語系 GitHub Pages API reference 建置流程。
+
 ## [0.0.1] - 持續維護
 
 `v0.0.1` 是持續完滿的產品身分，不以升版作為補齊必要功能、文件或品質債務的手段。

@@ -1,0 +1,27 @@
+{
+  "metadata": [
+    {
+      "src": [
+        { "src": "..", "files": ["OdfKit/bin/Release/net10.0/OdfKit.dll", "OdfKit.Extensions.Collaboration/bin/Release/net10.0/OdfKit.Extensions.Collaboration.dll", "OdfKit.Extensions.Html/bin/Release/net10.0/OdfKit.Extensions.Html.dll", "OdfKit.Extensions.Imaging/bin/Release/net10.0/OdfKit.Extensions.Imaging.dll", "OdfKit.Extensions.Ooxml/bin/Release/net10.0/OdfKit.Extensions.Ooxml.dll", "OdfKit.Extensions.Pdf/bin/Release/net10.0/OdfKit.Extensions.Pdf.dll", "OdfKit.Extensions.Rdf/bin/Release/net10.0/OdfKit.Extensions.Rdf.dll", "OdfKit.Extensions.Rendering/bin/Release/net10.0/OdfKit.Extensions.Rendering.dll"] }
+      ],
+      "properties": { "TargetFramework": "net10.0", "Configuration": "Release" },
+      "filter": "filterConfig.yml",
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": ["api/**.yml", "api/index.md"] },
+      { "files": ["articles/**.md", "articles/**/toc.yml"] }
+    ],
+    "globalMetadata": {
+      "_appName": "OdfKit API Reference",
+      "_appTitle": "OdfKit API Reference",
+      "_enableSearch": true,
+      "_lang": "zh-TW"
+    },
+    "template": ["default"],
+    "dest": "../artifacts/api-site-template",
+    "xref": []
+  }
+}

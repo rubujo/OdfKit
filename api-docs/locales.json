@@ -1,0 +1,6 @@
+{
+  "default": "zh-TW",
+  "locales": ["zh-TW", "en", "da", "de", "fr", "it", "ko", "ms", "nb", "nl", "pt", "sk"],
+  "contentFallback": "en+zh-TW",
+  "displayNames": { "zh-TW": "正體中文（臺灣）", "en": "English", "da": "Dansk", "de": "Deutsch", "fr": "Français", "it": "Italiano", "ko": "한국어", "ms": "Bahasa Melayu", "nb": "Norsk bokmål", "nl": "Nederlands", "pt": "Português", "sk": "Slovenčina" }
+}

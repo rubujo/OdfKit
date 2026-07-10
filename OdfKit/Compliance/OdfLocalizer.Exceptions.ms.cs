@@ -597,6 +597,7 @@ public static partial class OdfLocalizer
             ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "Tiada kunci peribadi dengan Key ID 0x{0:X16} ditemui dalam gelang kunci rahsia.",
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Ralat sekunder berlaku semasa menutup elemen XML ketika pemulihan pensirian: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Gagal memeriksa pemacu '{0}' untuk LibreOffice Portable: {1}",
+            ["Err_StreamReader_ResourceLimitExceeded"] = "Had sumber pembaca penstriman telah dilebihi ({0} > {1}).",
         };
     }
 }

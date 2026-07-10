@@ -578,5 +578,6 @@
   "Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull": "Der Kennwortanbieter hat null zurückgegeben; geben Sie für einen ungeschützten Schlüssel Array.Empty<char>() zurück.",
   "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "Im geheimen Schlüsselbund wurde kein privater Schlüssel mit der Key ID 0x{0:X16} gefunden.",
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Beim Schließen von XML-Elementen während der Serialisierungswiederherstellung ist ein sekundärer Fehler aufgetreten: {0}",
-  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Das Laufwerk '{0}' konnte nicht auf LibreOffice Portable geprüft werden: {1}"
+  "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Das Laufwerk '{0}' konnte nicht auf LibreOffice Portable geprüft werden: {1}",
+  "Err_StreamReader_ResourceLimitExceeded": "Das Ressourcenlimit des Streaming-Readers wurde überschritten ({0} > {1})."
 }

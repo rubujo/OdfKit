@@ -597,6 +597,7 @@ public static partial class OdfLocalizer
             ["Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound"] = "비밀 키 링에서 Key ID 0x{0:X16}인 개인 키를 찾을 수 없습니다.",
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "직렬화 복구 중 XML 요소를 닫는 과정에서 보조 오류가 발생했습니다: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "드라이브 '{0}'에서 LibreOffice Portable을 확인하지 못했습니다: {1}",
+            ["Err_StreamReader_ResourceLimitExceeded"] = "스트리밍 reader 리소스 제한을 초과했습니다({0} > {1}).",
         };
     }
 }
