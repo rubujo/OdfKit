@@ -87,7 +87,16 @@ dotnet restore -p:RestoreAdditionalProjectSources="$PWD/.nuget/odfkit"
 
 ## 5. CI 驗證
 
-`/.github/workflows/nuget-pack.yml` 使用 `actions/checkout@v7`，並透過共用複合 action `./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v5` 與 `actions/cache@v6`）安裝 .NET SDK，於 PR 與 `main` 執行 `Test-NuGetPack.ps1`。
+`/.github/workflows/nuget-pack.yml` 於 PR 與 `main` 先在 Ubuntu 封裝一次並產生
+`SHA256SUMS`，再透過短期 artifact 將相同的 `.nupkg`／`.snupkg` 快照分送至 Linux x64、
+Windows x64、Windows ARM64 與 macOS ARM64。各 runner 會先驗證 SHA-256，再執行八套件
+consumer smoke 與 Imaging native runtime smoke，避免各平台重新封裝出不同內容。
+
+工作流程使用 `actions/checkout@v7`、`actions/upload-artifact@v7` 與
+`actions/download-artifact@v8`，並透過共用複合 action
+`./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v5` 與
+`actions/cache@v6`）安裝 .NET SDK。artifact 只保留一天；NuGet restore cache 依作業系統與
+相依檔雜湊分區，不依 CPU 架構或 RID 重複建立。
 
 ## 版本策略
 

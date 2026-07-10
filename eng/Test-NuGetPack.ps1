@@ -6,11 +6,20 @@
     建置組態，預設 Release。
 .PARAMETER SkipPack
     略過封裝，使用既有 artifacts/nuget。
+.PARAMETER SkipConsumerSmoke
+    略過消費端煙霧測試，只驗證封裝契約。
+.PARAMETER GenerateHashManifest
+    為封裝產物建立 SHA256SUMS manifest。
+.PARAMETER VerifyHashManifest
+    在使用既有封裝前驗證 SHA256SUMS manifest。
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
-    [switch]$SkipPack
+    [switch]$SkipPack,
+    [switch]$SkipConsumerSmoke,
+    [switch]$GenerateHashManifest,
+    [switch]$VerifyHashManifest
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,6 +28,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")
 $outDir = Join-Path $repoRoot "artifacts/nuget"
+$hashManifestPath = Join-Path $outDir "SHA256SUMS"
 $expectedTfms = @("net10.0", "netstandard2.0")
 $previousNugetPackages = $env:NUGET_PACKAGES
 
@@ -37,11 +47,79 @@ $allowedPrereleaseDependencies = @(
     "CSharpMath"
 )
 
+function Get-NuGetPackageFiles {
+    return @(Get-ChildItem -LiteralPath $outDir -File |
+        Where-Object { $_.Extension -in @(".nupkg", ".snupkg") } |
+        Sort-Object Name)
+}
+
+function Write-NuGetPackageHashManifest {
+    $packageFiles = Get-NuGetPackageFiles
+    if ($packageFiles.Count -eq 0) {
+        throw "沒有可建立雜湊 manifest 的 NuGet 封裝。"
+    }
+
+    $lines = foreach ($packageFile in $packageFiles) {
+        $hash = (Get-FileHash -LiteralPath $packageFile.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+        "$hash  $($packageFile.Name)"
+    }
+    $lines | Set-Content -LiteralPath $hashManifestPath -Encoding utf8
+    Write-Host "OK：已建立 NuGet SHA-256 manifest：$hashManifestPath"
+}
+
+function Test-NuGetPackageHashManifest {
+    if (-not (Test-Path -LiteralPath $hashManifestPath -PathType Leaf)) {
+        throw "缺少 NuGet SHA-256 manifest：$hashManifestPath"
+    }
+
+    $manifestNames = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($line in Get-Content -LiteralPath $hashManifestPath) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+        if ($line -notmatch '^(?<hash>[0-9a-fA-F]{64})  (?<name>[^\\/]+\.(?:nupkg|snupkg))$') {
+            throw "無效的 NuGet SHA-256 manifest 行：$line"
+        }
+
+        $fileName = $Matches.name
+        $expectedHash = $Matches.hash
+        if (-not $manifestNames.Add($fileName)) {
+            throw "NuGet SHA-256 manifest 含重複檔名：$fileName"
+        }
+
+        $packagePath = Join-Path $outDir $fileName
+        if (-not (Test-Path -LiteralPath $packagePath -PathType Leaf)) {
+            throw "NuGet SHA-256 manifest 指向不存在的檔案：$fileName"
+        }
+
+        $actualHash = (Get-FileHash -LiteralPath $packagePath -Algorithm SHA256).Hash
+        if (-not [string]::Equals($actualHash, $expectedHash, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "NuGet 封裝 SHA-256 不符：$fileName"
+        }
+    }
+
+    $packageNames = @(Get-NuGetPackageFiles | ForEach-Object { $_.Name })
+    if ($manifestNames.Count -ne $packageNames.Count) {
+        throw "NuGet SHA-256 manifest 與封裝檔案數量不一致。"
+    }
+    foreach ($packageName in $packageNames) {
+        if (-not $manifestNames.Contains($packageName)) {
+            throw "NuGet SHA-256 manifest 未涵蓋封裝：$packageName"
+        }
+    }
+
+    Write-Host "OK：NuGet SHA-256 manifest 驗證通過。"
+}
+
 Push-Location $repoRoot
 try {
     if (-not $SkipPack) {
         & (Join-Path $PSScriptRoot "Pack-NuGet.ps1") -Configuration $Configuration
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+
+    if ($VerifyHashManifest) {
+        Test-NuGetPackageHashManifest
     }
 
     foreach ($pkg in $expectedPackages) {
@@ -94,7 +172,10 @@ try {
             }
 
             if ($pkg.Id -eq "OdfKit.Extensions.Imaging") {
-                foreach ($nativeDependency in @("SkiaSharp.NativeAssets.Linux", "SkiaSharp.NativeAssets.Win32")) {
+                foreach ($nativeDependency in @(
+                    "SkiaSharp.NativeAssets.Linux",
+                    "SkiaSharp.NativeAssets.Win32",
+                    "SkiaSharp.NativeAssets.macOS")) {
                     if ($dependencyIds -notcontains $nativeDependency) {
                         throw "套件 $($pkg.Id) 缺少跨平台原生相依：$nativeDependency"
                     }
@@ -115,7 +196,23 @@ try {
         Write-Host "OK：$($pkg.Id) 雙 TFM 結構"
     }
 
-    $smokeDir = Join-Path $repoRoot "artifacts/nuget-consumer-smoke"
+    if ($GenerateHashManifest) {
+        Write-NuGetPackageHashManifest
+    }
+
+    if ($SkipConsumerSmoke) {
+        Write-Host "REL-1 NuGet 封裝契約驗收通過；已略過消費端煙霧測試。"
+        return
+    }
+
+    $artifactsRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts"))
+    $smokeDir = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "nuget-consumer-smoke"))
+    $artifactsPrefix = $artifactsRoot.TrimEnd(
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $smokeDir.StartsWith($artifactsPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "拒絕清理 artifacts 之外的消費端煙霧目錄：$smokeDir"
+    }
     if (Test-Path -LiteralPath $smokeDir) {
         Remove-Item -LiteralPath $smokeDir -Recurse -Force
     }
@@ -148,6 +245,7 @@ using OdfKit.Export;
 using OdfKit.Extensions.Imaging;
 using OdfKit.Extensions.Rdf;
 using OdfKit.Extensions.Rendering;
+using System.Runtime.InteropServices;
 
 using var doc = TextDocument.Create();
 doc.AddParagraph("NuGet smoke");
@@ -164,6 +262,7 @@ if (measured.ToCentimeters() <= 0)
     throw new InvalidOperationException("Imaging native runtime smoke failed.");
 }
 
+Console.WriteLine($"runtime={RuntimeInformation.RuntimeIdentifier}; os-arch={RuntimeInformation.OSArchitecture}; process-arch={RuntimeInformation.ProcessArchitecture}");
 Console.WriteLine("ok");
 "@ | Set-Content -LiteralPath (Join-Path $smokeDir "Program.cs") -Encoding utf8
 

@@ -4,6 +4,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
+/// Verifies dual-targeting and package metadata for publishable NuGet projects.
 /// 驗證可發佈 NuGet 專案之雙 TFM 與套件中繼資料（REL-1）。
 /// </summary>
 public class NuGetPackagingTests
@@ -19,6 +20,7 @@ public class NuGetPackagingTests
         ("OdfKit.Extensions.Pdf", "OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj"),
         ("OdfKit.Extensions.Rendering", "OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj"),
         ("OdfKit.Extensions.Rdf", "OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj"),
+        ("OdfKit.Extensions.Collaboration", "OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj"),
     ];
 
     /// <summary>
@@ -45,6 +47,61 @@ public class NuGetPackagingTests
         Assert.Equal("OdfKit", ReadProperty("OdfKit/OdfKit.csproj", "PackageId"));
         Assert.Equal("CC0-1.0", ReadProperty("OdfKit/OdfKit.csproj", "PackageLicenseExpression"));
         Assert.Equal("README.md", ReadProperty("OdfKit/OdfKit.csproj", "PackageReadmeFile"));
+    }
+
+    /// <summary>
+    /// Verifies that the Imaging package explicitly carries native assets for Linux, Windows, and macOS.
+    /// 驗證 Imaging 套件明確攜帶 Linux、Windows 與 macOS 原生資產相依。
+    /// </summary>
+    [Fact]
+    public void ImagingPackage_DeclaresAllDesktopNativeAssets()
+    {
+        string projectPath = Path.Combine(
+            RepoRoot,
+            "OdfKit.Extensions.Imaging",
+            "OdfKit.Extensions.Imaging.csproj");
+        XDocument document = XDocument.Load(projectPath);
+        XNamespace msbuild = document.Root!.Name.Namespace;
+        string[] packageIds = document
+            .Descendants(msbuild + "PackageReference")
+            .Select(static element => (string?)element.Attribute("Include"))
+            .Where(static id => id is not null)
+            .Cast<string>()
+            .ToArray();
+
+        Assert.Contains("SkiaSharp.NativeAssets.Linux", packageIds);
+        Assert.Contains("SkiaSharp.NativeAssets.Win32", packageIds);
+        Assert.Contains("SkiaSharp.NativeAssets.macOS", packageIds);
+    }
+
+    /// <summary>
+    /// Verifies that NuGet CI packs once and tests the same immutable snapshot on four desktop runners.
+    /// 驗證 NuGet CI 僅封裝一次，並在四種桌面 runner 測試同一份不可變快照。
+    /// </summary>
+    [Fact]
+    public void NuGetWorkflow_UsesSinglePackAndFourPlatformConsumerMatrix()
+    {
+        string workflow = File.ReadAllText(Path.Combine(RepoRoot, ".github", "workflows", "nuget-pack.yml"));
+        string setupAction = File.ReadAllText(
+            Path.Combine(RepoRoot, ".github", "actions", "setup-dotnet-odfkit", "action.yml"));
+        string packScript = File.ReadAllText(Path.Combine(RepoRoot, "eng", "Test-NuGetPack.ps1"));
+
+        Assert.Contains("pack-contract:", workflow, StringComparison.Ordinal);
+        Assert.Contains("needs: pack-contract", workflow, StringComparison.Ordinal);
+        Assert.Contains("runner: ubuntu-latest", workflow, StringComparison.Ordinal);
+        Assert.Contains("runner: windows-latest", workflow, StringComparison.Ordinal);
+        Assert.Contains("runner: windows-11-arm", workflow, StringComparison.Ordinal);
+        Assert.Contains("runner: macos-15", workflow, StringComparison.Ordinal);
+        Assert.Contains("actions/upload-artifact@v7", workflow, StringComparison.Ordinal);
+        Assert.Contains("actions/download-artifact@v8", workflow, StringComparison.Ordinal);
+        Assert.Contains("-GenerateHashManifest", workflow, StringComparison.Ordinal);
+        Assert.Contains("-VerifyHashManifest", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
+        Assert.Contains("key: nuget-${{ runner.os }}-", setupAction, StringComparison.Ordinal);
+        Assert.DoesNotContain("runner.arch", setupAction, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("matrix.rid", setupAction, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SHA256SUMS", packScript, StringComparison.Ordinal);
+        Assert.Contains("RuntimeInformation.OSArchitecture", packScript, StringComparison.Ordinal);
     }
 
     public static TheoryData<string, string> PackableProjectPaths()

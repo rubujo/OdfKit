@@ -33,14 +33,10 @@ permissions:
   contents: read
 
 jobs:
-  validate-nuget-pack:
-    name: Validate package and consumers (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+  pack-contract:
+    name: Pack and validate package contract
+    runs-on: ubuntu-latest
     timeout-minutes: 25
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -52,6 +48,61 @@ jobs:
             10.0.x
             8.0.x
 
-      - name: Validate NuGet pack structure and consumer smoke
+      - name: Pack and validate NuGet contract
         shell: pwsh
-        run: ./eng/Test-NuGetPack.ps1 -Configuration Release
+        run: |
+          ./eng/Test-NuGetPack.ps1 `
+            -Configuration Release `
+            -SkipConsumerSmoke `
+            -GenerateHashManifest
+
+      - name: Upload immutable NuGet snapshot
+        uses: actions/upload-artifact@v7
+        with:
+          name: odfkit-nuget-${{ github.sha }}
+          path: artifacts/nuget/*
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  validate-nuget-consumers:
+    name: Validate consumer (${{ matrix.name }})
+    needs: pack-contract
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-latest
+          - name: Windows x64
+            runner: windows-latest
+          - name: Windows ARM64
+            runner: windows-11-arm
+          - name: macOS ARM64
+            runner: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+
+      - name: Download NuGet snapshot
+        uses: actions/download-artifact@v8
+        with:
+          name: odfkit-nuget-${{ github.sha }}
+          path: artifacts/nuget
+
+      - name: Verify snapshot and run native consumer smoke
+        shell: pwsh
+        run: |
+          ./eng/Test-NuGetPack.ps1 `
+            -Configuration Release `
+            -SkipPack `
+            -VerifyHashManifest

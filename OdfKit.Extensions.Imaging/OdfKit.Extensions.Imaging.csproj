@@ -29,5 +29,6 @@
     <!-- 封裝內容必須由消費端 RID 決定，而非由執行 dotnet pack 的主機決定。 -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.150.0" />
     <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="4.150.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="4.150.0" />
   </ItemGroup>
 </Project>

@@ -39,8 +39,23 @@
 | 消費端執行環境 | 建議參照 TFM | 驗證狀態 |
 |----------------|-------------|----------|
 | .NET 10 | `net10.0` | ✅ 主要開發與測試目標 |
-| .NET 8 LTS | `netstandard2.0` 或依情境使用 `net10.0` 產物 | ✅ CLI / 測試專案覆蓋 `net8.0`；程式庫雙 TFM 建置 |
+| .NET 8 LTS | `netstandard2.0` | ✅ CLI / 測試專案覆蓋 `net8.0`；程式庫雙 TFM 建置 |
 | .NET Standard 2.0 相容專案（含 .NET Framework 4.6.1+） | `netstandard2.0` | ✅ 程式庫雙 TFM 建置；消費端煙霧見 `eng/Test-NuGetPack.ps1` |
+
+### 桌面作業系統與架構
+
+| 作業系統與架構 | CI 驗證方式 | Imaging 原生資產契約 |
+|----------------|-------------|----------------------|
+| Linux x64 | GitHub-hosted `ubuntu-latest` 實機 consumer smoke | `SkiaSharp.NativeAssets.Linux` |
+| Windows x64 | GitHub-hosted `windows-latest` 實機 consumer smoke | `SkiaSharp.NativeAssets.Win32` |
+| Windows ARM64 | GitHub-hosted `windows-11-arm` 實機 consumer smoke | `SkiaSharp.NativeAssets.Win32` |
+| macOS ARM64 | GitHub-hosted `macos-15` 實機 consumer smoke | `SkiaSharp.NativeAssets.macOS` |
+| macOS x64 | 可由 `osx-x64` RID restore／publish；未列入每次 PR 實機矩陣 | `SkiaSharp.NativeAssets.macOS` |
+
+上述四個實機 consumer job 使用同一次 Ubuntu 封裝產生的 artifact，並在執行前驗證
+`SHA256SUMS`，因此驗證的是同一份候選套件，而不是各 runner 各自產生的封裝。核心與純
+managed 擴充套件不綁定特定 CPU 架構；Imaging 套件則明確宣告 Linux、Windows 與 macOS
+原生資產相依，由消費端 RID 選取對應檔案。
 
 ## 4. 發佈與安裝策略
 
@@ -77,6 +92,7 @@ pwsh eng/Test-NuGetPack.ps1 -Configuration Release
 
 ## 7. 已知限制
 
-- 部分擴充套件依賴原生或重型第三方套件；部署前應評估其平台與授權需求。
+- 部分擴充套件依賴原生或重型第三方套件；部署前應評估其平台與授權需求。macOS x64
+  目前有 RID restore／publish 契約，但不在每次 PR 的 GitHub-hosted 實機矩陣內。
 - `OdfKit.Extensions.Rendering` 需外部 LibreOffice 或相容程序後端，詳見
   [Rendering 後端部署](rendering-backend-deployment.md)。
