@@ -1,26 +1,43 @@
 # OdfKit 專案 Agent 開發規範 (AGENTS.md)
 
-本檔案為所有參與此專案之 AI 開發 Agent（如 Codex、Claude Code、GitHub Copilot、Antigravity、Grok Build 等）的**單一事實來源 (Single Source of Truth)**。
+本檔案為所有參與此專案之 AI 開發 Agent 的**單一事實來源 (Single Source of Truth)**。規範以工作成果與專案不變量為核心，不依賴特定供應商、產品、模型家族或推理模式。
 
 ---
 
-## 1. 專案背景與技術棧
+## 1. Agent 工作契約
+
+### A. 任務授權
+
+- **回答、解釋、審查、診斷或規劃**：讀取相關檔案並提出有證據的結論；除非使用者同時要求實作，否則不得修改檔案。
+- **實作、修正、重構或建置**：完成要求範圍內的本機變更，並執行與風險相稱的非破壞性驗證，不需為預期的唯讀操作、範圍內編輯或測試另行詢問。
+- **需要確認的動作**：外部寫入、發布、推送、購買、破壞性操作，以及實質擴大任務範圍前，必須取得使用者明確授權。
+- **最小必要範圍**：保留使用者既有變更；不得修改無關檔案，也不得為追求行數、形式一致或機械指標而擴大重構。
+
+### B. 完成條件與停止規則
+
+變更型任務必須符合下列條件後才算完成：
+
+- 使用者要求的行為已實現，且未破壞本文件所列專案不變量。
+- 已執行最相關的格式化、建置、測試及專案閘門；若無法執行，必須說明原因與下一個最佳驗證方式。
+- 已檢查變更差異，確認沒有非預期檔案、產生碼手動修改或合併衝突標記。
+- 最終回覆須說明完成內容、驗證結果及仍存在的風險或阻礙。
+- 已有足夠證據回答核心要求時即停止；只有必要事實仍缺漏、驗證失敗或使用者要求完整調查時才繼續查找。
+
+當必要需求不明且不同選擇會實質改變結果時，只詢問最小必要資訊；若可從專案內容安全推斷，應明示假設並繼續執行。
+
+---
+
+## 2. 專案背景與技術棧
+
 - **專案名稱**：OdfKit
 - **程式語言**：C# / .NET
-- **目標架構**：核心 `OdfKit` 及全部 `OdfKit.Extensions.*` 擴充套件為 `net10.0` 與 `netstandard2.0`（雙平台編譯）；`OdfKit.Tests` 與 `tools/OdfKit.Cli` 為 `net10.0` 與 `net8.0`（雙 TFM，非 netstandard2.0）；`tools/OdfSchemaGenerator` 與 `OdfKit.Tests/MockSoffice` 僅為 `net8.0`；`OdfKit.Benchmarks`、`tools/OdfCorpusGenerator`、`tools/OdfKit.TrimSmoke` 僅為 `net10.0`。詳細版本請以各專案之 `.csproj` 為準。
-- **核心第三方相依套件**（詳細版本參見專案檔，如 `OdfKit.csproj`；`PDFsharp` 等格式擴充套件相依僅存在於對應的 `OdfKit.Extensions.*` 專案，不屬於核心套件）：
-  - `BouncyCastle.Cryptography` (採用 MIT 授權)
-  - `CommunityToolkit.HighPerformance` (採用 MIT 授權)
-  - `CSharpMath` (採用 MIT 授權)
-  - `System.Security.Cryptography.Xml` (採用 MIT 授權)
-  - `System.Security.Cryptography.Pkcs` (採用 MIT 授權)
-  - `Sylvan.Data.Csv` (採用 MIT 授權)
-  - 另有依 TFM 條件引入之 BCL 套件（如 `net10.0` 限定的 `System.Numerics.Tensors`、`System.IO.Hashing`，與 `netstandard2.0` 之 polyfill 套件），詳見 `OdfKit.csproj`。
+- **目標架構**：核心與擴充套件採多目標框架；實際 TFM、條件式相依套件與版本一律以各 `.csproj` 為準。修改跨 TFM 共用程式碼時，必須驗證所有受影響目標。
+- **相依套件**：核心與格式擴充套件的相依範圍以各 `.csproj` 為準，不得因文件中的歷史清單推斷目前相依關係。
 - **授權協議**：**CC0-1.0 Universal** (專案原創程式碼屬公有領域；第三方套件維持其原 MIT 授權)。
 
 ---
 
-## 2. 核心架構與編碼規則
+## 3. 核心架構與編碼規則
 在修改或擴充此程式庫時，所有 Agent 必須嚴格遵守以下設計約束：
 
 ### A. 程式碼風格與完整性
@@ -42,8 +59,7 @@
   - 針對 ZIP 串流解析、XML 讀寫等底層操作，務必進行防禦性異常攔截與資源釋放。
   - 所有拋出的例外訊息一律禁止 Hard-coded 中文或英文。必須統一透過 `OdfLocalizer.GetMessage` 取得在地化錯誤訊息。
   - 當新增錯誤訊息時，其鍵值（Key）命名格式應遵循 `Err_[類別名稱]_[錯誤簡稱]`（以英文駝峰命名，簡述錯誤原因，例如 `Err_ChartDocument_NotHighOrderChart`），以提高人類可讀性與維護性。
-  - 所有錯誤訊息鍵值必須在 `OdfLocalizer.Exceptions.<culture>.cs`（12 語系表）註冊，並由 `OdfLocalizer.Exceptions.cs` 入口彙整；鍵值集合必須與 `en` 完全對等（見下方 i18n 閘門）。
-  - 翻譯與 XML 註解文字一律使用正體中文臺灣地區用語，並遵守「盤古之白」排版規範（如中文字元與半形英文/數字/符號之間主動加半形空格），且小心檢查句尾標點符號不贅餘。
+  - 所有錯誤訊息鍵值必須加入 `OdfKit/Compliance/i18n/exceptions.<culture>.json`；各語系鍵值集合必須與 `en` 完全對等。`OdfLocalizer.Exceptions.<culture>.cs` 是由工具產生的輸出，不得手動修改。
 - **程式碼排版與格式化**：在提交任何變更前，必須執行安全格式化腳本 `eng/Format-Safe.ps1`，確保其完全符合 `.editorconfig` 規範。
   - **禁止**在方案根目錄直接執行 `dotnet format`（無專案範圍）：`OdfKit.Tests` 為雙 TFM（`net10.0` + `net8.0`），全方案格式化會觸發 IDE multi-target 合併失敗，將 `<<<<<<< TODO: 取消合併專案 …` 標記寫入 `.cs` 並導致 **CS8300**。
   - 格式化後必須通過 `eng/Test-MergeConflictMarkers.ps1`（已內建於 `Format-Safe.ps1`）。
@@ -69,7 +85,7 @@
 ### C2. 可維護性（複雜度債）
 完整準則見 [`docs/maintainability.md`](docs/maintainability.md)。Agent 必須遵守：
 - **Partial**：禁止機械切檔；診斷用 `eng/Analyze-PartialSplits.ps1`；禁止重跑 `eng/historical-refactor/Split-*` 等一次性腳本。
-- **在地化**：訊息來源為 `OdfKit/Compliance/i18n/exceptions.<culture>.json`；以 `pwsh eng/Add-LocalizerKey.ps1` 或手改 JSON 後執行 `pwsh eng/Generate-LocalizerExceptionsFromJson.ps1` 產生 `OdfLocalizer.Exceptions.<culture>.cs`（**請勿手改產生檔**）。提交前：`Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`。非 en／zh-TW 不得長期只留英文佔位。
+- **在地化**：以 `pwsh eng/Add-LocalizerKey.ps1` 或手動編輯來源 JSON，再執行 `pwsh eng/Generate-LocalizerExceptionsFromJson.ps1`；提交前執行 `Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`。非 en／zh-TW 不得長期只留英文佔位。
 - **公開 API 表面**（`Microsoft.CodeAnalysis.PublicApiAnalyzers`）：
   - 雙 TFM 基線：`OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt`。
   - **0.x** 全量在 **Unshipped**；**1.0** 再移入 Shipped。
@@ -78,7 +94,6 @@
   - 說明見 [`OdfKit/PublicAPI/README.md`](OdfKit/PublicAPI/README.md)。
 - **套件雙 TFM 相容性**（Package Validation）：`EnablePackageValidation`；`Test-NuGetPack.ps1` 於 pack 時檢查。
 - **協作者／大型結構（人機平衡，非為拆而拆）**：見 [`docs/human-agent-maintainability.md`](docs/human-agent-maintainability.md) 與 [`docs/architecture-collaborators.md`](docs/architecture-collaborators.md)。拆分只為清楚領域邊界以利人類審閱與 Agent 限域修改；**禁止**因行數、token 或機械 KPI 而切檔；禁止重跑 `historical-refactor/Split-*`。
-- **公開 API 可選參數（RS0026／RS0027）**：同名公開多載不得有多個皆含可選參數；有可選參數者須為參數最多之多載。本專案偏好改為**明確多載轉呼叫**（無 `=` 預設）。生成 DOM 由 `OdfSchemaGenerator` 輸出無 optional prefix 形狀；手寫違規必須修。詳見 [`docs/public-api-optional-parameters.md`](docs/public-api-optional-parameters.md)。
 - **XML 摘要**：`Test-OneLineXmlSummary.ps1 -FailOnIssues`。
 - **產生碼**：`DOM/Generated` 與 schema provider `.g.cs` 不可手改；改 ctor／多載形狀須改產生器後重產；schema 重產後須重跑 Public API 基線。
 - **Schema 與流通性（非目標）**：核心預設內建 ODF **1.1～1.4** 官方 schema 覆蓋，以支援存量檔、封存與跨 LO／舊版互通；**禁止**為瘦身 nupkg 或「看起來模組化」而將 schema 拆成可選套件或刪減多版覆蓋。體積代價以建置／分析器策略與文件說明吸收；詳見 [`docs/maintainability.md`](docs/maintainability.md)「Schema 與流通性」。
@@ -93,7 +108,20 @@
 
 ---
 
-## 3. 開發常用指令
+## 4. 驗證矩陣與常用指令
+
+依實際修改範圍執行最小但充分的驗證；不得以完整測試成本較高為由略過可執行的針對性驗證。
+
+| 修改類型 | 最低驗證 |
+| --- | --- |
+| 僅函式庫程式碼 | `pwsh eng/Format-Safe.ps1`，並建置或測試受影響專案與 TFM |
+| 包含測試程式碼 | `pwsh eng/Format-Safe.ps1 -IncludeTests`，並至少建置對應的測試 TFM |
+| 在地化 | `Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly` |
+| 公開 API 或 schema | `Generate-PublicApiBaseline.ps1 -Verify` |
+| XML 文件 | `Test-OneLineXmlSummary.ps1 -FailOnIssues` |
+| 封裝或跨套件 TFM 相容性 | `Test-NuGetPack.ps1` |
+| 效能文件數值 | `Benchmark-Competitive.ps1` |
+
 - **建置專案**：
   ```powershell
   dotnet build
@@ -149,5 +177,9 @@
 
 ---
 
-## 4. 規範擴充與維護
-若要針對特定工具（如 Claude Code 的 `CLAUDE.md` 或 GitHub Copilot 的 `.github/copilot-instructions.md`）配置專屬規則，必須採用**墊片指向 (Shim)** 的方式，直接連結至本 [`AGENTS.md`](AGENTS.md) 檔案，嚴禁複製與同步重複的文本內容。
+## 5. 跨 Agent 與模型相容性
+
+- 本文件只定義可觀察的工作成果、授權邊界、專案不變量與驗證要求，不要求特定模型揭露內部推理，也不依賴特定 Agent 的專有工具名稱或提示語法。
+- Codex、Claude Code、GitHub Copilot 及其它 Agent 若支援專案規範檔，應直接讀取本文件。若工具需要專屬入口檔，必須採用**墊片指向 (Shim)** 連結至本 [`AGENTS.md`](AGENTS.md)，不得複製規範全文。
+- 模型能力不足以可靠完成任務時，應縮小工作範圍、提高驗證強度或交由能力較高的模型處理；不得降低安全、正確性或驗證標準。
+- 新增規則前，先確認是否會改變 Agent 行為；不重複模型已可靠執行的一般流程，也不加入只適用單一模型的性格、冗長度或推理指示。
