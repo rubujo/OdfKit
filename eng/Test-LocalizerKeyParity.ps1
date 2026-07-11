@@ -96,14 +96,16 @@ foreach ($culture in $cultures) {
     }
 }
 
-$provisionalSources = @{
+# 歷史上部分語系曾以另一語系整批暫存；此檢查只偵測大量完全相同的殘留內容，
+# 並非衡量兩種語言的文字相似度。
+$provisionalCopySources = @{
     'ja' = 'zh-TW'
     'es' = 'pt'
     'cs' = 'sk'
     'pl' = 'sk'
 }
-foreach ($culture in $provisionalSources.Keys) {
-    $sourceCulture = $provisionalSources[$culture]
+foreach ($culture in $provisionalCopySources.Keys) {
+    $sourceCulture = $provisionalCopySources[$culture]
     $identicalCount = @($baseline | Where-Object {
         $messages[$culture].ContainsKey($_) -and
         $messages[$sourceCulture].ContainsKey($_) -and

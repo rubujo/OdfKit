@@ -57,8 +57,8 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
-    /// Updates the target range of the matching conditional format while preserving its rule and unknown content.
-    /// 更新相符條件格式的目標範圍，並保留其規則與未知內容。
+    /// Updates the target range of the first conditional format with the same semantic values while preserving its rule and unknown content.
+    /// 更新第一個具有相同語意值之條件格式的目標範圍，並保留其規則與未知內容。
     /// </summary>
     /// <param name="format">The current format summary. / 目前的格式摘要。</param>
     /// <param name="range">The replacement target range. / 取代用目標範圍。</param>

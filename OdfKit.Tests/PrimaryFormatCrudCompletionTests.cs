@@ -253,6 +253,7 @@ public class PrimaryFormatCrudCompletionTests
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
         sheet.AddConditionalFormat(new OdfCellRange(0, 0, 2, 0), "cell-content()>5", "Good");
+        sheet.AddConditionalFormat(new OdfCellRange(0, 0, 2, 0), "cell-content()>5", "Good");
         sheet.AddDataBarFormat(new OdfCellRange(0, 1, 2, 1), new OdfColor("#4472C4"));
         sheet.AddSparklineGroup(
             new OdfCellRange(0, 0, 0, 2, "Data"),
@@ -272,13 +273,14 @@ public class PrimaryFormatCrudCompletionTests
         OdfConditionalFormatInfo condition = sheet.FindConditionalFormat(
             candidate => candidate.Kind == OdfConditionalFormatKind.Condition)!;
         Assert.True(sheet.UpdateConditionalFormatRange(condition, new OdfCellRange(3, 0, 4, 0, "Data")));
-        Assert.False(sheet.UpdateConditionalFormatRange(condition, new OdfCellRange(5, 0, 5, 0, "Data")));
+        Assert.Contains(sheet.ConditionalFormats, candidate =>
+            candidate.TargetRangeAddress == condition.TargetRangeAddress);
         OdfConditionalFormatInfo updatedCondition = sheet.FindConditionalFormat(
             candidate => candidate.Kind == OdfConditionalFormatKind.Condition)!;
         Assert.NotEqual(condition.TargetRangeAddress, updatedCondition.TargetRangeAddress);
         Assert.True(sheet.RemoveConditionalFormat(updatedCondition));
         Assert.False(sheet.RemoveConditionalFormat(updatedCondition));
-        Assert.Equal(1, sheet.ClearConditionalFormats());
+        Assert.Equal(2, sheet.ClearConditionalFormats());
         Assert.Empty(sheet.ConditionalFormats);
 
         OdfSparklineGroupInfo lineGroup = sheet.FindSparklineGroup(
@@ -705,6 +707,9 @@ public class PrimaryFormatCrudCompletionTests
         paragraph.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
 
         Assert.NotNull(document.FindBookmark("BookmarkOne"));
+        Assert.Equal(0, document.RenameBookmark("MissingBookmark", "UnusedName"));
+        Assert.Equal(0, document.RenameBookmark("BookmarkOne", " "));
+        Assert.Equal(0, document.RenameBookmark("BookmarkOne", "BookmarkOne"));
         Assert.Equal(2, document.RenameBookmark("BookmarkOne", "BookmarkRenamed"));
         Assert.Null(document.FindBookmark("BookmarkOne"));
         Assert.NotNull(document.FindBookmark("BookmarkRenamed"));

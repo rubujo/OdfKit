@@ -209,7 +209,7 @@ public partial class TextDocument
     /// </summary>
     /// <param name="currentName">The current exact name. / 目前的精確名稱。</param>
     /// <param name="newName">The replacement name. / 取代用名稱。</param>
-    /// <returns>The number of changed markers and references. / 已變更的標記與參照數量。</returns>
+    /// <returns>The number of changed markers and references; zero when the current bookmark does not exist, the replacement name is blank, or the replacement name already exists. / 已變更的標記與參照數量；目前書籤不存在、取代名稱為空白，或取代名稱已存在時為零。</returns>
     public int RenameBookmark(string currentName, string newName)
     {
         if (string.IsNullOrWhiteSpace(newName) || FindBookmark(newName) is not null)
