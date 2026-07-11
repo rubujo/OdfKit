@@ -1,7 +1,8 @@
 # OdfKit i18n 與在地化
 
 本文件說明 OdfKit 目前的 i18n 與在地化機制，包含訊息來源、語系選擇、
-回退規則與已支援語言。
+回退規則與已支援語言。API 文件站台（GitHub Pages）的 12 語系入口屬另一套
+機制，見 [api-docs-site.md](api-docs-site.md)。
 
 ## 1. 機制概觀
 

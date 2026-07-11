@@ -108,6 +108,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 | 選型 | [套件目錄與選型指南](docs/package-catalog.md) | 核心套件、擴充套件、工具與情境對照 |
 | 導入 | [快速開始](docs/getting-started.md) | 安裝模式、第一個文件、CLI、下一步 |
 | SDK 路徑 | [核心 SDK 快速開始](docs/core-quickstart.md)、[API 表面分層](docs/api-surface-layers.md) | 核心純受控路徑、API 分層與新增 API 放置準則 |
+| API Reference | [線上 API 文件](https://rubujo.github.io/OdfKit/)（[站台結構說明](docs/api-docs-site.md)） | 12 語系入口、可搜尋的公開 API reference |
 | 相容性 | [NuGet 相容矩陣](docs/nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | 功能邊界 | [ODF 格式支援矩陣](docs/odf-format-support.md) | 支援狀態、測試證據、已知缺口 |
 | 規則與語系 | [ODF Profile 來源](docs/odf-profile-sources.md)、[i18n 與在地化](docs/i18n-localization.md) | 內建 Profile、語系字典與訊息回退 |

@@ -8,6 +8,7 @@
 - 修正 `OdsStreamReader.GetValue` 的 `DbDataReader` 語意：空值回傳 `DBNull.Value`，公式儲存格回傳已儲存快取值；新增 `GetCell` 保留公式、值類型、貨幣及顯示文字。這是 1.0 前的刻意破壞性修正。
 - ODS／ODT Writer 新增非同步 flush／complete 路徑；ZIP 中央目錄提交因 BCL `ZipArchive` 限制仍為同步步驟。
 - 新增效能預算、能力 claims、證據索引及 12 語系 GitHub Pages API reference 建置流程。
+- API 文件站台重構為 DocFX 站內多語系結構（根層導覽與首頁、12 語系入口改為站內內容頁）：修復模板 logo 全站 404、搜尋框不可見與語系入口孤立問題；移除指向未渲染 `OdfKit.DOM.*` 頁面的失效連結；建置腳本新增語系契約驗證與站內連結健檢閘門（見 `docs/api-docs-site.md`）。
 
 ## [0.0.1] - 持續維護
 
