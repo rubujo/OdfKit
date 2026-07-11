@@ -1,0 +1,16 @@
+- name: Strona główna
+  href: index.md
+- name: Przewodnik użycia i dowodów
+  href: guide.md
+- name: Dokumentacja API [en + zh-TW]
+  uid: OdfKit
+- name: Licencja
+  href: articles/license.md
+- name: AI i własność intelektualna
+  href: project-docs/ip-compliance.md
+- name: Informacje o stronach trzecich
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Limity bezpieczeństwa
+  href: project-docs/security-limits.md
+- name: Indeks dowodów
+  href: project-docs/evidence-index.md

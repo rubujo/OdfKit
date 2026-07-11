@@ -23,15 +23,20 @@ each locale also provides a localized usage, compliance, security, and evidence 
 | --- | --- |
 | 正體中文（臺灣） | [zh-TW](zh-TW/index.md) |
 | English | [en](en/index.md) |
+| Čeština | [cs](cs/index.md) |
 | Dansk | [da](da/index.md) |
 | Deutsch | [de](de/index.md) |
+| Español | [es](es/index.md) |
 | Français | [fr](fr/index.md) |
 | Italiano | [it](it/index.md) |
+| 日本語 | [ja](ja/index.md) |
 | 한국어 | [ko](ko/index.md) |
 | Bahasa Melayu | [ms](ms/index.md) |
 | Norsk bokmål | [nb](nb/index.md) |
 | Nederlands | [nl](nl/index.md) |
+| Polski | [pl](pl/index.md) |
 | Português | [pt](pt/index.md) |
+| Português (Brasil) | [pt-BR](pt-BR/index.md) |
 | Slovenčina | [sk](sk/index.md) |
 
 > **AI 產製聲明 / AI disclosure**

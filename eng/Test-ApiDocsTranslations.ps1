@@ -20,13 +20,20 @@ function Add-Issue([string]$Locale, [string]$Document, [string]$Status, [string]
     $issues.Add([pscustomobject]@{ locale = $Locale; document = $Document; status = $Status; message = $Message })
 }
 
+function Get-CanonicalContentHash([string]$Path) {
+    $content = [IO.File]::ReadAllText($Path)
+    $normalized = $content.Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($normalized)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+}
+
 foreach ($document in $manifest.documents) {
     $sourcePath = Join-Path $root $document.source
     if (-not (Test-Path -LiteralPath $sourcePath)) {
         Add-Issue $manifest.canonicalLocale $document.id 'missing-source' "缺少權威來源 $($document.source)。"
         continue
     }
-    $actualHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $actualHash = Get-CanonicalContentHash -Path $sourcePath
     if ($actualHash -ne $document.sourceSha256) {
         Add-Issue $manifest.canonicalLocale $document.id 'source-changed' "權威來源雜湊已變更；manifest=$($document.sourceSha256)，actual=$actualHash。"
     }

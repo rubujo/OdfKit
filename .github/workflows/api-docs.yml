@@ -30,7 +30,7 @@ jobs:
       - name: Test translation contract
         shell: pwsh
         run: ./eng/Test-ApiDocsTranslations.Tests.ps1
-      - name: Build 12-locale API site
+      - name: Build 17-locale API site
         shell: pwsh
         run: ./eng/Build-ApiDocs.ps1
       - name: Configure Pages

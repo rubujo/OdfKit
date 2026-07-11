@@ -1,0 +1,16 @@
+- name: Domů
+  href: index.md
+- name: Průvodce použitím a důkazy
+  href: guide.md
+- name: Referenční dokumentace API [en + zh-TW]
+  uid: OdfKit
+- name: Licence
+  href: articles/license.md
+- name: AI a duševní vlastnictví
+  href: project-docs/ip-compliance.md
+- name: Oznámení třetích stran
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Bezpečnostní limity
+  href: project-docs/security-limits.md
+- name: Rejstřík důkazů
+  href: project-docs/evidence-index.md

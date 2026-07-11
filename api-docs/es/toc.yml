@@ -1,0 +1,16 @@
+- name: Inicio
+  href: index.md
+- name: Guía de uso y evidencias
+  href: guide.md
+- name: Referencia de la API [en + zh-TW]
+  uid: OdfKit
+- name: Licencia
+  href: articles/license.md
+- name: IA y propiedad intelectual
+  href: project-docs/ip-compliance.md
+- name: Avisos de terceros
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Límites de seguridad
+  href: project-docs/security-limits.md
+- name: Índice de evidencias
+  href: project-docs/evidence-index.md

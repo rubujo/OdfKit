@@ -1,6 +1,6 @@
 {
   "default": "zh-TW",
-  "locales": ["zh-TW", "en", "da", "de", "fr", "it", "ko", "ms", "nb", "nl", "pt", "sk"],
+  "locales": ["zh-TW", "en", "cs", "da", "de", "es", "fr", "it", "ja", "ko", "ms", "nb", "nl", "pl", "pt", "pt-BR", "sk"],
   "contentFallback": "en+zh-TW",
-  "displayNames": { "zh-TW": "正體中文（臺灣）", "en": "English", "da": "Dansk", "de": "Deutsch", "fr": "Français", "it": "Italiano", "ko": "한국어", "ms": "Bahasa Melayu", "nb": "Norsk bokmål", "nl": "Nederlands", "pt": "Português", "sk": "Slovenčina" }
+  "displayNames": { "zh-TW": "正體中文（臺灣）", "en": "English", "cs": "Čeština", "da": "Dansk", "de": "Deutsch", "es": "Español", "fr": "Français", "it": "Italiano", "ja": "日本語", "ko": "한국어", "ms": "Bahasa Melayu", "nb": "Norsk bokmål", "nl": "Nederlands", "pl": "Polski", "pt": "Português", "pt-BR": "Português (Brasil)", "sk": "Slovenčina" }
 }

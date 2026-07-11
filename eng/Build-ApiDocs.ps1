@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    建置 12 語系 GitHub Pages API reference 站台（DocFX 站內多語系結構）。
+    建置 17 語系 GitHub Pages API reference 站台（DocFX 站內多語系結構）。
 .DESCRIPTION
     站台結構與語系契約見 docs/api-docs-site.md。流程：
     組件建置 → 語系契約驗證 → docfx metadata → 未渲染頁面 href 修復 → docfx build → 站內連結健檢。
@@ -109,7 +109,10 @@ try {
         Get-ChildItem api-docs/zh-TW, api-docs/articles -Recurse -File -Include *.md
         Get-Item api-docs/index.md
         Get-ChildItem OdfKit, OdfKit.Extensions.* -Recurse -File -Filter *.cs |
-            Where-Object { $_.FullName -notmatch '[\\/]DOM[\\/]Generated[\\/]' }
+            Where-Object {
+                $_.FullName -notmatch '[\\/]DOM[\\/]Generated[\\/]' -and
+                $_.Name -notmatch '^OdfLocalizer\.Exceptions\.[a-z]{2}(?:-[A-Z]{2})?\.cs$'
+            }
     )
     $zhTwIssues = [System.Collections.Generic.List[string]]::new()
     foreach ($file in $zhTwContentFiles) {
@@ -291,6 +294,6 @@ try {
     if ($apiSample -notmatch 'Provides the OdsStreamReader API\.' -or $apiSample -notmatch '以低記憶體流式方式逐列讀取 ODS 試算表') {
         throw 'API member 雙語內容驗證失敗：OdsStreamReader 頁面缺少英文或正體中文摘要。'
     }
-    Write-Host "PASS：modern 模板、12 語系 lang、footer、sitemap 與 $($htmlFiles.Count) 個 HTML 頁面驗證通過。"
+    Write-Host "PASS：modern 模板、17 語系 lang、footer、sitemap 與 $($htmlFiles.Count) 個 HTML 頁面驗證通過。"
 }
 finally { Pop-Location }

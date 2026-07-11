@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "canonicalLocale": "zh-TW",
-  "locales": ["zh-TW", "en", "da", "de", "fr", "it", "ko", "ms", "nb", "nl", "pt", "sk"],
+  "locales": ["zh-TW", "en", "cs", "da", "de", "es", "fr", "it", "ja", "ko", "ms", "nb", "nl", "pl", "pt", "pt-BR", "sk"],
   "documents": [
     {
       "id": "license",
@@ -34,7 +34,7 @@
     {
       "id": "third-party-notices",
       "source": "THIRD-PARTY-NOTICES.md",
-      "sourceSha256": "40d9519692d33bb5d10885c6e4ec81aafd0e92fbefc747d354231955062fb3a1",
+      "sourceSha256": "eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3",
       "destination": "api-docs/{locale}/project-docs/THIRD-PARTY-NOTICES.md",
       "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
     }

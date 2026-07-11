@@ -30,6 +30,23 @@ try {
     Copy-TestRepository
     if (-not (Get-TestResult).valid) { throw '正向翻譯 fixture 應通過。' }
 
+    $sourcePaths = @(
+        'api-docs/articles/license.md',
+        'docs/ip-compliance.md',
+        'docs/security-limits.md',
+        'docs/evidence-index.md',
+        'THIRD-PARTY-NOTICES.md'
+    )
+    foreach ($lineEnding in @("`r`n", "`n")) {
+        Copy-TestRepository
+        foreach ($relativePath in $sourcePaths) {
+            $path = Join-Path $testRoot $relativePath
+            $content = [IO.File]::ReadAllText($path) -replace "`r`n|`r|`n", $lineEnding
+            [IO.File]::WriteAllText($path, $content, [Text.UTF8Encoding]::new($false))
+        }
+        if (-not (Get-TestResult).valid) { throw '權威來源雜湊不應受 LF／CRLF 影響。' }
+    }
+
     Remove-Item "$testRoot/api-docs/en/articles/license.md"
     Assert-Status 'missing'
 

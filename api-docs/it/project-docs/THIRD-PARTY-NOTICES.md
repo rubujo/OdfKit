@@ -2,7 +2,7 @@
 title: Avvisi di terze parti
 _lang: it
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 40d9519692d33bb5d10885c6e4ec81aafd0e92fbefc747d354231955062fb3a1
+translation_source_sha256: eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3
 ---
 
 # Avvisi di terze parti

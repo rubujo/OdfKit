@@ -469,7 +469,7 @@ public class DocsAndCorpusContractTests
 
         foreach (string key in keys)
         {
-            Assert.Equal(12, Regex.Matches(localizer, "\\[\"" + Regex.Escape(key) + "\"\\]").Count);
+            Assert.Equal(17, Regex.Matches(localizer, "\\[\"" + Regex.Escape(key) + "\"\\]").Count);
         }
 
         Assert.Contains("Die baseline exception baseline", localizer, StringComparison.Ordinal);
@@ -585,13 +585,13 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證 12 語系例外字典的訊息鍵集合與 en 完全對等（i18n 鍵值對等閘門）。
+    /// 驗證 17 語系例外字典的訊息鍵集合與 en 完全對等（i18n 鍵值對等閘門）。
     /// </summary>
     [Fact]
     public void ExceptionDictionaryKeysAreParityAcrossCultures()
     {
         string repoRoot = FindRepositoryRoot();
-        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko", "ja", "es", "cs", "pl", "pt-BR"];
         var keyPattern = new Regex(
             "\\[\"((?:Err|Warn|Cli|Diag|Rule)_[^\"]+)\"\\]",
             RegexOptions.Compiled);

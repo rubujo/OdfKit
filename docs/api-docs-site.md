@@ -1,4 +1,4 @@
-# API 文件站台（12 語系 GitHub Pages）
+# API 文件站台（17 語系 GitHub Pages）
 
 本文件定義 `api-docs/` 站台的結構、語系契約與品質閘門。站台由
 [`eng/Build-ApiDocs.ps1`](../eng/Build-ApiDocs.ps1) 建置、
@@ -20,7 +20,7 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
 - **以 DocFX 原生能力為界**：使用 `default`＋`modern`、content mapping、TOC、
   `fileMetadata`、`globalMetadata` 與 Markdown；不建立自製多語系引擎、JavaScript 語系
   切換器、`hreflang` 注入或模板 partial。
-- **根路徑是語言選擇頁**：根首頁保留 12 語系入口，不設定 `redirect_url` 強制導向
+- **根路徑是語言選擇頁**：根首頁保留 17 語系入口，不設定 `redirect_url` 強制導向
   `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
 - **權威來源與受控譯文**：正體中文正式文件直接以 DocFX file mapping 納入；其餘 11 語系的
   譯文提交至 `api-docs/<locale>/`，並以來源 SHA-256、必要 token 與 CI 契約防止漂移。
@@ -39,9 +39,9 @@ api-docs/
   locales.json        # 語系目錄（單一事實來源：default、locales、displayNames）
   index.md            # 站台首頁：語言總表 + API 入口（根層必須存在，否則模板 logo 連結 404）
   toc.yml             # 根層雙語導覽列
-  <locale>/index.md   # 12 語系入口頁，front matter 設 _lang
-  <locale>/guide.md   # 12 語系的使用、合規、安全與證據指南
-  <locale>/toc.yml    # 12 語系各自的 DocFX 導覽
+  <locale>/index.md   # 17 語系入口頁，front matter 設 _lang
+  <locale>/guide.md   # 17 語系的使用、合規、安全與證據指南
+  <locale>/toc.yml    # 17 語系各自的 DocFX 導覽
   <locale>/articles/  # 授權譯文（zh-TW 使用共用權威頁）
   <locale>/project-docs/ # IP、安全、證據及第三方聲明譯文
   articles/           # 站台說明、授權等共用文章
@@ -64,7 +64,7 @@ api-docs/
   6. `docfx.json` 的 `fileMetadata._lang` 與 front matter `_lang` 一致。
   7. 語系 TOC 以 DocFX `uid: OdfKit` 指向 API，不得使用 `href: xref:*`；
   8. API 入口標示實際內容語系，正式譯文具備來源路徑與 SHA-256 metadata；
-  9. `Test-ApiDocsTranslations.ps1` 驗證 55 份譯文、必要 token 與導覽沒有漂移。
+  9. `Test-ApiDocsTranslations.ps1` 驗證 80 份譯文、必要 token 與導覽沒有漂移。
 - 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md`、`guide.md` 與 `toc.yml`
   （front matter `_lang`）→ 在根層 `index.md` 語言表與 `docfx.json` content 增列。
   缺一步建置即失敗。
@@ -82,9 +82,9 @@ api-docs/
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
 | 原始資源與 xref | 禁止內部 `.md` 連結、`project-docs/` 非核准資源及 modern 輸出殘留的 `xref:*`。 |
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
-| modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 12 語系 HTML `lang`。 |
+| modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
 | 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
-| 翻譯契約 | 驗證 55 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
+| 翻譯契約 | 驗證 80 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
 
 ## 5. 本機建置與預覽
 
@@ -97,7 +97,7 @@ dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
 
 ## 6. 已知限制
 
-- DocFX modern 模板 UI 字串（Search、Namespace 等）不納入 12 語系翻譯承諾。
+- DocFX modern 模板 UI 字串（Search、Namespace 等）不納入 17 語系翻譯承諾。
 - 站台不自動輸出 `hreflang` alternates；語系入口以根層語言總表互連。
 - 單一 DocFX 站共用 API reference；非英文／正體中文語系只翻譯概念頁與 TOC，
   不宣稱 API member 已完整翻譯。

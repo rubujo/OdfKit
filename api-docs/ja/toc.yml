@@ -1,0 +1,16 @@
+- name: ホーム
+  href: index.md
+- name: 使用方法と根拠のガイド
+  href: guide.md
+- name: API リファレンス [en + zh-TW]
+  uid: OdfKit
+- name: ライセンス
+  href: articles/license.md
+- name: AI と知的財産
+  href: project-docs/ip-compliance.md
+- name: 第三者通知
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: セキュリティ制限
+  href: project-docs/security-limits.md
+- name: 根拠の索引
+  href: project-docs/evidence-index.md

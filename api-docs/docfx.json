@@ -14,7 +14,7 @@
       { "files": ["toc.yml", "index.md"] },
       { "files": ["api/**.yml"] },
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
-      { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pt/**.{md,yml}", "sk/**.{md,yml}"] },
+      { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },
       { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md"], "dest": "project-docs" },
       { "src": "..", "files": ["THIRD-PARTY-NOTICES.md"], "dest": "project-docs" }
     ],
@@ -30,15 +30,20 @@
       "_lang": {
         "zh-TW/**": "zh-TW",
         "en/**": "en",
+        "cs/**": "cs",
         "da/**": "da",
         "de/**": "de",
+        "es/**": "es",
         "fr/**": "fr",
         "it/**": "it",
+        "ja/**": "ja",
         "ko/**": "ko",
         "ms/**": "ms",
         "nb/**": "nb",
         "nl/**": "nl",
+        "pl/**": "pl",
         "pt/**": "pt",
+        "pt-BR/**": "pt-BR",
         "sk/**": "sk"
       }
     },
