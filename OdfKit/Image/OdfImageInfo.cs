@@ -8,7 +8,7 @@ namespace OdfKit.Image;
 /// </summary>
 /// <param name="path">The path of the image within the ODF package. / 影像在 ODF 封裝中的路徑。</param>
 /// <param name="mediaType">The media type of the image. / 影像媒體類型。</param>
-/// <param name="size">The byte size of the image entry. / 影像專案位元組大小。</param>
+/// <param name="size">The byte size of the image entry. / 影像項目的位元組大小。</param>
 public sealed class OdfImageInfo(string path, string mediaType, long size)
 {
     /// <summary>
@@ -25,7 +25,7 @@ public sealed class OdfImageInfo(string path, string mediaType, long size)
 
     /// <summary>
     /// Gets the byte size of the image entry.
-    /// 取得影像專案位元組大小。
+    /// 取得影像項目的位元組大小。
     /// </summary>
     public long Size { get; } = size;
 }

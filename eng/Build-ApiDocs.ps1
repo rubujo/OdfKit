@@ -47,6 +47,39 @@ try {
     }
     Write-Host "PASS：$($catalog.locales.Count) 語系契約驗證通過。"
 
+    # 正體中文（臺灣）用語閘門：概念頁與手寫 C# 註解會直接進入 API 網站，
+    # 因此禁止已知的簡體字、陸用詞與曾發生過的 entry／slide 誤譯。
+    $zhTwForbiddenTerms = @(
+        '单元格',
+        '封裝專案',
+        'ZIP 專案',
+        '影像專案',
+        '幻燈片',
+        '保存',
+        '支持'
+    )
+    $zhTwContentFiles = @(
+        Get-ChildItem api-docs/zh-TW, api-docs/articles -Recurse -File -Include *.md
+        Get-Item api-docs/index.md
+        Get-ChildItem OdfKit, OdfKit.Extensions.* -Recurse -File -Filter *.cs |
+            Where-Object { $_.FullName -notmatch '[\\/]DOM[\\/]Generated[\\/]' }
+    )
+    $zhTwIssues = [System.Collections.Generic.List[string]]::new()
+    foreach ($file in $zhTwContentFiles) {
+        $content = [IO.File]::ReadAllText($file.FullName)
+        foreach ($term in $zhTwForbiddenTerms) {
+            if ($content.Contains($term, [StringComparison]::Ordinal)) {
+                $relativePath = [IO.Path]::GetRelativePath($root, $file.FullName)
+                $zhTwIssues.Add("$relativePath：$term")
+            }
+        }
+    }
+    if ($zhTwIssues.Count) {
+        $zhTwIssues | ForEach-Object { Write-Host "  不符合臺灣用語：$_" }
+        throw "正體中文（臺灣）用語檢查失敗：$($zhTwIssues.Count) 個檔案／詞彙組合。"
+    }
+    Write-Host 'PASS：正體中文（臺灣）網站與手寫程式碼註解用語檢查通過。'
+
     if (-not $SkipProjectBuild) {
         $projects = @(
             'OdfKit/OdfKit.csproj',

@@ -4,7 +4,7 @@ using System.IO;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 解析封裝專案的 MIME 媒體類型。
+/// 解析封裝項目的 MIME 媒體類型。
 /// </summary>
 internal static class OdfPackageMediaTypeResolver
 {

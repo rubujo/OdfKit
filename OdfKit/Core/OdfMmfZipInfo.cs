@@ -8,7 +8,7 @@ using System.Text;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 表示記憶體映射檔案（Memory - Mapped File）中 ZIP 專案的二進位區段與描述資訊。
+/// 表示記憶體對應檔案（Memory-Mapped File）中 ZIP 項目的二進位區段與描述資訊。
 /// </summary>
 internal sealed class OdfMmfEntryInfo
 {

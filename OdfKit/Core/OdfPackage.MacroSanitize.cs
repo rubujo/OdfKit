@@ -45,7 +45,7 @@ public sealed partial class OdfPackage
 
     /// <summary>
     /// Performs sanitize entry name.
-    /// 淨化與驗證 ZIP 專案名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
+    /// 清理並驗證 ZIP 項目名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
     /// </summary>
     /// <param name="name">原始專案名稱</param>
     /// <returns>淨化後的標準專案名稱</returns>

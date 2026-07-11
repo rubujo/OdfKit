@@ -13,9 +13,9 @@ internal static class OdfSignerConstants
     internal const string SignaturePath = "META-INF/documentsignatures.xml";
 
     /// <summary>
-    /// 判斷指定的封裝專案是否需要被納入簽章涵蓋範圍（簽章時應簽署、驗證時應要求涵蓋）。
+    /// 判斷指定的封裝項目是否需要納入簽章涵蓋範圍（簽章時應簽署、驗證時應要求涵蓋）。
     /// </summary>
-    /// <param name="normalizedEntryName">已正規化（使用 '/' 分隔且無前導斜線）的封裝專案名稱</param>
+    /// <param name="normalizedEntryName">已正規化（使用 '/' 分隔且無前導斜線）的封裝項目名稱</param>
     /// <returns>若需要涵蓋，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     internal static bool IsCoverableEntry(string normalizedEntryName)
     {

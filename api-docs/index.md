@@ -10,7 +10,7 @@ OdfKit is a pure managed C#/.NET OpenDocument Format SDK. The API content on thi
 generated from the public assemblies and the bilingual (English + Traditional Chinese) XML
 documentation.
 
-- [開啟 API Reference / Open the API reference](xref:OdfKit)
+- [開啟 API 參考文件 / Open the API reference](xref:OdfKit)
 - [站台說明與合規聲明 / Site notes and compliance](articles/index.md)
 
 ## 語言 / Languages
@@ -39,7 +39,8 @@ each locale also provides a localized usage, compliance, security, and evidence 
 > This project content is written, organized, or produced with AI tools.
 
 網站原創內容與 OdfKit 原創程式碼採 CC0-1.0 Universal；第三方內容維持各自授權。OdfKit 並非
-OASIS、TDF、LibreOffice 或 Apache 的官方專案，不提供 SLA 或商業 indemnity。
+OASIS、The Document Foundation、LibreOffice 或 Apache 的官方專案，亦未受其認證或背書；
+本專案不提供服務等級協定（SLA）或商業賠償保障。
 Original OdfKit content is CC0-1.0. Third-party content retains its own license. This is not
 an official OASIS, TDF, LibreOffice, or Apache project. No SLA or commercial indemnity is
 provided.

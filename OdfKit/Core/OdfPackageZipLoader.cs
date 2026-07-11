@@ -14,7 +14,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF ZIP 封裝專案載入器（內部協作者）。
+/// ODF ZIP 封裝項目載入器（內部協作者）。
 /// </summary>
 internal static class OdfPackageZipLoader
 {

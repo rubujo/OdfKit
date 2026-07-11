@@ -462,7 +462,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSchemaPatternDefinition_PatternCannotBeEmpty"] = "模式名稱不能為空。",
             ["Err_OdfSchemaPatternValidator_PatternCannotBeEmpty"] = "模式名稱不能為空。",
             ["Err_OdfScriptCode_ScriptCode18"] = "文字系統代碼必須是 1 到 8 個英文字母或數字。",
-            ["Err_OdfShape_AnimationOnlySupportedPresentation"] = "僅演示幻燈片支援動畫。",
+            ["Err_OdfShape_AnimationOnlySupportedPresentation"] = "僅簡報投影片支援動畫。",
             ["Err_OdfShape_OnlyConnectionLineGraphics"] = "僅連接線圖形可設定路由頂點。",
             ["Err_OdfSignatureCrlUtilities_UnableParseCrlContent"] = "無法解析 CRL 內容。",
             ["Err_OdfSignatureCrlUtilities_UnableParseCrlContent_2"] = "無法解析 CRL 內容。",

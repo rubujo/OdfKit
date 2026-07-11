@@ -96,7 +96,7 @@ public abstract partial class OdfDocument
 
     /// <summary>
     /// Saves async.
-    /// 非同步將文件保存到指定檔案路徑。
+    /// 非同步將文件儲存至指定檔案路徑。
     /// </summary>
     /// <returns>代表非同步儲存作業的工作</returns>
     /// <remarks>

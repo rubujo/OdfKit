@@ -49,7 +49,7 @@ public sealed class OdfFormulaDependencyGraph
             _dependencies.Remove(cell);
         }
 
-        // 2. 解析公式並擷取所有相依單元格與範圍
+        // 2. 解析公式並擷取所有相依儲存格與範圍
         var depsSet = new HashSet<OdfCellAddress>();
         if (!string.IsNullOrEmpty(formula))
         {

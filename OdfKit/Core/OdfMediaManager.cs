@@ -20,7 +20,7 @@ public class OdfMediaManager
     public const string PicturesEntryPrefix = "Pictures/";
 
     private readonly OdfPackage _package;
-    // 將 SHA-256 圖片雜湊對應至其 ZIP 專案路徑（例如 "Pictures/image_hash.png" ）的字典
+    // 將 SHA-256 圖片雜湊對應至其 ZIP 項目路徑（例如 "Pictures/image_hash.png"）的字典
     private readonly Dictionary<string, string> _imageHashRegistry = new(StringComparer.Ordinal);
     private int _fallbackImageCounter;
 

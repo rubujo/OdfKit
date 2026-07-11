@@ -76,7 +76,7 @@ public static partial class OdfLocalizer
         ["RequireDeutschlandStackCompatibility"] = "修正文件內容與擴充，以符合德國 Deutschland-Stack 辦公軟體相容性規範。",
         ["RequireGovernmentToolCompatibility"] = "修正文件內容，以符合中華民國政府 ODF 文件應用工具相容性規範。",
         ["RequireTraditionalChineseMetadataSupport"] = "修正 Traditional Chinese 相關之中介資料、語系標記與字型名稱設定。",
-        ["PreserveCjkLayoutFeatures"] = "確保 CJK 直排佈局、Ruby 旁註、稿紙格線與字型替代設定正確保存。",
+        ["PreserveCjkLayoutFeatures"] = "確保 CJK 直排版面配置、Ruby 旁註、稿紙格線與字型替代設定正確儲存。",
         ["RequireMachineReadableMetadata"] = "加入機器可讀之標題、語言、日期、作者與文件類型等中介資料。",
         ["RequireAccessibilityMetadata"] = "為圖片加入 svg:title/svg:desc 替代文字，或為表格加入 table:table-header-rows 等無障礙中介資料。",
         ["RequireOpenStandardDocumentFormat"] = "確保可編輯文件基於公開可實作之開放標準格式。",
@@ -105,7 +105,7 @@ public static partial class OdfLocalizer
         ["ODF1000"] = "確認文件版本與選取的相容性設定檔一致。",
         ["ODF1001"] = "確認文件版本與選取的相容性設定檔一致。",
         ["Diag_OdfFormulaSupport_ParseFailed"] = "公式無法剖析：{0}",
-        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "預設評估器尚未支援函式 {0}，保存時應保留原公式。",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "預設評估器尚未支援函式 {0}，儲存時應保留原公式。",
         ["Diag_OdfFormulaSupport_UnknownCharacter"] = "公式包含無法識別的字元：'{0}'。",
         ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "不支援的 OpenPGP 公鑰演算法：{0}。目前支援 RSA、ElGamal 與 ECDH。"
     };

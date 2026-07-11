@@ -46,7 +46,7 @@ public class OdfSaveOptions
 {
     /// <summary>
     /// Gets or sets the ZIP compression level used for package entries.
-    /// 取得或設定封裝專案使用的 ZIP 壓縮等級。
+    /// 取得或設定封裝項目使用的 ZIP 壓縮等級。
     /// </summary>
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
 
@@ -78,7 +78,7 @@ public class OdfSaveOptions
     /// </summary>
     /// <remarks>
     /// When enabled, ZIP entry timestamps are pinned so unchanged content produces repeatable binary hashes.
-    /// 啟用時，所有 ZIP 封裝專案的 LastWriteTime 會固定，讓內容不變時產生可重複的二進位雜湊值。
+    /// 啟用時，所有 ZIP 封裝項目的 LastWriteTime 會固定，讓內容不變時產生可重複的二進位雜湊值。
     /// </remarks>
     public bool Deterministic { get; set; } = false;
 
@@ -134,7 +134,7 @@ public class OdfSaveOptions
 
     /// <summary>
     /// Gets or sets the cryptography provider used to encrypt package entries.
-    /// 取得或設定用於加密封裝專案的密碼學提供者。
+    /// 取得或設定用於加密封裝項目的密碼學提供者。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 

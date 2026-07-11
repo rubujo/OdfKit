@@ -7,7 +7,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// 將試算表外部連結快取保存至 <c>settings.xml</c> 的內部協作者。
+/// 將試算表外部連結快取儲存至 <c>settings.xml</c> 的內部協作者。
 /// </summary>
 internal static class OdfExternalLinkPersistenceEngine
 {

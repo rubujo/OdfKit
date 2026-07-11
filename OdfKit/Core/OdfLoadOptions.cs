@@ -32,7 +32,7 @@ public class OdfLoadOptions
 
     /// <summary>
     /// Gets or sets the maximum uncompressed byte count allowed for a single package entry.
-    /// 取得或設定單一封裝專案解壓後允許的最大位元組數。
+    /// 取得或設定單一封裝項目解壓縮後允許的最大位元組數。
     /// </summary>
     public long MaxEntrySize { get; set; } = 500 * 1024 * 1024;
 
@@ -70,7 +70,7 @@ public class OdfLoadOptions
 
     /// <summary>
     /// Gets or sets the cryptography provider used to decrypt encrypted package entries.
-    /// 取得或設定用於解密加密封裝專案的密碼學提供者。
+    /// 取得或設定用於解密加密封裝項目的密碼學提供者。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 

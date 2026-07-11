@@ -88,7 +88,7 @@ public static class OdfHybridPdfHelper
             if (ef is null)
                 continue;
 
-            // /F 鍵保存了實際的內嵌資料流物件
+            // /F 鍵儲存實際的內嵌資料流物件
             var fItem = ef.Elements["/F"];
             var fRef = fItem as PdfReference;
             var streamDict = (fRef is not null ? fRef.Value : fItem) as PdfDictionary;

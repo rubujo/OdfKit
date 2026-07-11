@@ -146,9 +146,9 @@ public sealed class OdfRdfMetadata
 
     /// <summary>
     /// Performs sync with package entries.
-    /// 依目前封裝專案同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
+    /// 依目前封裝項目同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> 三元組。
     /// </summary>
-    /// <param name="entryPaths">封裝專案路徑集合</param>
+    /// <param name="entryPaths">封裝項目路徑集合</param>
     /// <param name="mediaTypes">專案路徑對應的 MIME 類型對照表</param>
     /// <param name="documentSubject">文件主詞 IRI；為 <see langword="null"/> 時沿用既有 <c>pkg:hasPart</c> 主詞或空字串</param>
     /// <returns>新增或更新的 triple 數量</returns>

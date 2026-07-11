@@ -8,7 +8,7 @@ namespace OdfKit.Formula;
 
 /// <summary>
 /// Implements persistence and merge infrastructure for formula documents.
-/// 提供 <see cref="OdfFormulaDocument"/> 的保存與合併基礎結構。
+/// 提供 <see cref="OdfFormulaDocument"/> 的儲存與合併基礎結構。
 /// </summary>
 public partial class OdfFormulaDocument
 {

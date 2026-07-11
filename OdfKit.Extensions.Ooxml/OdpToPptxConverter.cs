@@ -534,7 +534,7 @@ public static class OdpToPptxConverter
     }
 
     /// <summary>
-    /// 建立包含背景樣式參考的幻燈片版面配置與母片（Slide Master 與 Layout）。
+    /// 建立包含背景樣式參照的投影片版面配置與母片（Slide Master 與 Layout）。
     /// </summary>
     private static SlideLayoutPart CreateLayout(
         PresentationPart presentationPart,

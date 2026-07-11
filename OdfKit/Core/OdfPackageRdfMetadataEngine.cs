@@ -14,7 +14,7 @@ internal static class OdfPackageRdfMetadataEngine
     internal const string RdfMetadataPath = "META-INF/manifest.rdf";
 
     /// <summary>
-    /// 從封裝專案載入 RDF metadata。
+    /// 從封裝項目載入 RDF 中繼資料。
     /// </summary>
     internal static OdfRdfMetadata Load(OdfPackage.OdfPackageLoadCollaborators ctx)
     {
@@ -34,7 +34,7 @@ internal static class OdfPackageRdfMetadataEngine
     }
 
     /// <summary>
-    /// 將已變更的 RDF metadata 序列化回封裝專案。
+    /// 將已變更的 RDF 中繼資料序列化回封裝項目。
     /// </summary>
     internal static void Save(OdfPackage.OdfPackageSaveCollaborators ctx)
     {

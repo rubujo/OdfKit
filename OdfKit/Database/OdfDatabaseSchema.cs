@@ -83,7 +83,7 @@ public sealed class OdfDatabaseSchema
 
     /// <summary>
     /// Synchronizes the current schema state back to the database document.
-    /// 將目前的 Schema 狀態同步保存回資料庫文件中。
+    /// 將目前的結構描述狀態同步儲存回資料庫文件中。
     /// </summary>
     public void Save()
     {

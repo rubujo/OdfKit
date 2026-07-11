@@ -50,7 +50,7 @@ public static partial class OdfEncryption
 
     /// <summary>
     /// Decrypts entry.
-    /// 解密單一封裝專案。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
+    /// 解密單一封裝項目。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
     /// </summary>
     /// <param name="ciphertext">加密的密文資料位元組陣列</param>
     /// <param name="password">解密密碼</param>
@@ -216,7 +216,7 @@ public static partial class OdfEncryption
 
     /// <summary>
     /// Encrypts entry.
-    /// 加密單一封裝專案。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
+    /// 加密單一封裝項目。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
     /// </summary>
     /// <param name="plaintext">待加密的純文字資料位元組陣列</param>
     /// <param name="password">加密密碼</param>

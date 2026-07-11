@@ -219,12 +219,12 @@ public enum OdfPolicyAuthorityLevel
     Compatibility,
 
     /// <summary>
-    /// 推薦規範，由相關政策指導方針所支持。
+    /// 建議規範，由相關政策指引所支援。
     /// </summary>
     Recommended,
 
     /// <summary>
-    /// 標準規範，由正式標準或具約束力的法律要求支持。
+    /// 標準規範，由正式標準或具約束力的法律要求支援。
     /// </summary>
     Normative
 }
@@ -236,17 +236,17 @@ public enum OdfPolicyAuthorityLevel
 public enum OdfProfileVerificationStatus
 {
     /// <summary>
-    /// 規範由直接驗證的官方來源支持。
+    /// 規範由直接驗證的官方來源支援。
     /// </summary>
     VerifiedOfficial,
 
     /// <summary>
-    /// 規範由官方但間接的來源支持。
+    /// 規範由官方但間接的來源支援。
     /// </summary>
     OfficialButIndirect,
 
     /// <summary>
-    /// 規範需要有效的官方來源支持才能轉為標準規範。
+    /// 規範需要有效的官方來源支援，才能轉為標準規範。
     /// </summary>
     NeedsActiveSource,
 

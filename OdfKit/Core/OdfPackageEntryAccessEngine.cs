@@ -8,7 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF 封裝專案讀寫引擎（內部協作者）。
+/// ODF 封裝項目讀寫引擎（內部協作者）。
 /// </summary>
 internal static class OdfPackageEntryAccessEngine
 {

@@ -22,7 +22,7 @@ internal static partial class OdfPackageArchiveWriter
     private static int _lastFastPathCancellationCheckCount;
 
     /// <summary>
-    /// 將封裝專案寫入目標串流（ZIP 或 Flat XML）。
+    /// 將封裝項目寫入目標串流（ZIP 或 Flat XML）。
     /// </summary>
     internal static void WriteToArchive(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)
     {
@@ -104,7 +104,7 @@ internal static partial class OdfPackageArchiveWriter
     }
 
     /// <summary>
-    /// 將封裝專案非同步寫入目標串流（ZIP 或 Flat XML），支援協作式取消。
+    /// 將封裝項目非同步寫入目標串流（ZIP 或 Flat XML），支援協作式取消。
     /// </summary>
     internal static async Task WriteToArchiveAsync(
         OdfPackage.OdfPackageSaveCollaborators ctx,

@@ -5,7 +5,7 @@ namespace OdfKit.Core;
 
 /// <summary>
 /// Describes the encryption metadata attached to an encrypted ODF package entry.
-/// 描述加密 ODF 封裝專案附帶的加密中繼資料。
+/// 描述加密 ODF 封裝項目附帶的加密中繼資料。
 /// </summary>
 public sealed class OdfEncryptionInfo
 {
