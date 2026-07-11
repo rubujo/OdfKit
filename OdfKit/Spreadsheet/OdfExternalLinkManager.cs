@@ -24,6 +24,46 @@ public sealed class OdfExternalLinkManager
     public void ClearCache() => _cellCache.Clear();
 
     /// <summary>
+    /// Gets a stable snapshot of all cached external cell values.
+    /// 取得所有外部儲存格快取值的穩定快照。
+    /// </summary>
+    /// <returns>The cached value snapshot. / 快取值快照。</returns>
+    public IReadOnlyList<OdfExternalCellCacheInfo> GetCachedValues()
+    {
+        var values = new List<OdfExternalCellCacheInfo>(_cellCache.Count);
+        foreach (KeyValuePair<ExternalCellKey, object?> pair in _cellCache)
+        {
+            values.Add(new OdfExternalCellCacheInfo(
+                pair.Key.DocumentId,
+                pair.Key.SheetName,
+                new OdfCellAddress(pair.Key.Row, pair.Key.Column),
+                pair.Value));
+        }
+
+        values.Sort(CompareCachedValues);
+        return values.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Finds a cached external cell value.
+    /// 尋找外部儲存格快取值。
+    /// </summary>
+    /// <param name="documentId">The external document identifier. / 外部文件識別碼。</param>
+    /// <param name="sheetName">The external worksheet name. / 外部工作表名稱。</param>
+    /// <param name="address">The external cell address. / 外部儲存格位址。</param>
+    /// <returns>The cached value information, or <see langword="null"/>. / 快取值資訊；若不存在則為 <see langword="null"/>。</returns>
+    public OdfExternalCellCacheInfo? FindCachedValue(
+        string documentId,
+        string sheetName,
+        OdfCellAddress address)
+    {
+        var key = new ExternalCellKey(documentId, sheetName, address.Row, address.Column);
+        return _cellCache.TryGetValue(key, out object? value)
+            ? new OdfExternalCellCacheInfo(documentId, sheetName, address, value)
+            : null;
+    }
+
+    /// <summary>
     /// Sets a cached external cell value.
     /// 設定外部儲存格快取值。
     /// </summary>
@@ -34,6 +74,29 @@ public sealed class OdfExternalLinkManager
     public void SetCachedValue(string documentId, string sheetName, OdfCellAddress address, object? value)
     {
         _cellCache[new ExternalCellKey(documentId, sheetName, address.Row, address.Column)] = value;
+    }
+
+    /// <summary>
+    /// Removes a cached external cell value.
+    /// 移除外部儲存格快取值。
+    /// </summary>
+    /// <param name="documentId">The external document identifier. / 外部文件識別碼。</param>
+    /// <param name="sheetName">The external worksheet name. / 外部工作表名稱。</param>
+    /// <param name="address">The external cell address. / 外部儲存格位址。</param>
+    /// <returns><see langword="true"/> if the value was removed; otherwise <see langword="false"/>. / 若已移除值則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveCachedValue(string documentId, string sheetName, OdfCellAddress address) =>
+        _cellCache.Remove(new ExternalCellKey(documentId, sheetName, address.Row, address.Column));
+
+    /// <summary>
+    /// Clears cached external cell values and returns the number removed.
+    /// 清除外部儲存格快取值，並傳回移除數量。
+    /// </summary>
+    /// <returns>The number of removed values. / 已移除的值數量。</returns>
+    public int ClearCachedValues()
+    {
+        int count = _cellCache.Count;
+        _cellCache.Clear();
+        return count;
     }
 
     internal IEnumerable<CachedCell> GetCachedCells()
@@ -124,6 +187,20 @@ public sealed class OdfExternalLinkManager
         documentId = Unquote(sheetToken.Substring(0, markerIndex));
         sheetName = Unquote(sheetToken.Substring(markerIndex + markerLength));
         return documentId.Length > 0 && sheetName.Length > 0;
+    }
+
+    private static int CompareCachedValues(OdfExternalCellCacheInfo left, OdfExternalCellCacheInfo right)
+    {
+        int result = StringComparer.OrdinalIgnoreCase.Compare(left.DocumentId, right.DocumentId);
+        if (result != 0)
+            return result;
+
+        result = StringComparer.OrdinalIgnoreCase.Compare(left.SheetName, right.SheetName);
+        if (result != 0)
+            return result;
+
+        result = left.Address.Row.CompareTo(right.Address.Row);
+        return result != 0 ? result : left.Address.Column.CompareTo(right.Address.Column);
     }
 
     private static string Unquote(string value)

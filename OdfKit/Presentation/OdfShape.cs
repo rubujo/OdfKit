@@ -102,7 +102,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
         }
 
         Node.AppendChild(table);
-        return new OdfEmbeddedTable(table, Document);
+        return new OdfEmbeddedTable(table, Document, Node);
     }
 
     /// <summary>
@@ -131,6 +131,122 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
             Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "fill", OdfNamespaces.Draw, "solid", "draw");
             Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "fill-color", OdfNamespaces.Draw, value ?? string.Empty, "draw");
         }
+    }
+
+    /// <summary>
+    /// Gets or sets the named gradient used to fill this shape.
+    /// 取得或設定用於填滿此圖形的具名稱漸層。
+    /// </summary>
+    public string? FillGradientName
+    {
+        get => Document.StyleEngine.GetStyleProperty(
+            Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty,
+            "fill-gradient-name",
+            OdfNamespaces.Draw,
+            "graphic");
+        set
+        {
+            Document.StyleEngine.SetLocalStyleProperty(
+                Node,
+                "graphic",
+                "graphic-properties",
+                "fill-gradient-name",
+                OdfNamespaces.Draw,
+                value,
+                "draw");
+            if (value is not null)
+            {
+                Document.StyleEngine.SetLocalStyleProperty(
+                    Node,
+                    "graphic",
+                    "graphic-properties",
+                    "fill",
+                    OdfNamespaces.Draw,
+                    "gradient",
+                    "draw");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the named marker at the start of this shape's line.
+    /// 取得或設定此圖形線段起點的具名稱標記。
+    /// </summary>
+    public string? MarkerStartName
+    {
+        get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "marker-start", OdfNamespaces.Draw, "graphic");
+        set => Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "marker-start", OdfNamespaces.Draw, value, "draw");
+    }
+
+    /// <summary>
+    /// Gets or sets the named marker at the end of this shape's line.
+    /// 取得或設定此圖形線段終點的具名稱標記。
+    /// </summary>
+    public string? MarkerEndName
+    {
+        get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "marker-end", OdfNamespaces.Draw, "graphic");
+        set => Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "marker-end", OdfNamespaces.Draw, value, "draw");
+    }
+
+    /// <summary>
+    /// Gets or sets the rectangular clip expression, such as <c>rect(1cm, 5cm, 4cm, 1cm)</c>.
+    /// 取得或設定矩形裁切運算式，例如 <c>rect(1cm, 5cm, 4cm, 1cm)</c>。
+    /// </summary>
+    public string? ClipRectangle
+    {
+        get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "clip", OdfNamespaces.Fo, "graphic");
+        set => Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "clip", OdfNamespaces.Fo, value, "fo");
+    }
+
+    /// <summary>
+    /// Gets the SVG path data of the shape contour clip.
+    /// 取得圖形輪廓裁切的 SVG 路徑資料。
+    /// </summary>
+    public string? ClipPathData => FindContourPath()?.GetAttribute("d", OdfNamespaces.Svg);
+
+    /// <summary>
+    /// Sets an SVG contour path used to clip this shape.
+    /// 設定用於裁切此圖形的 SVG 輪廓路徑。
+    /// </summary>
+    /// <param name="pathData">The SVG path data. / SVG 路徑資料。</param>
+    /// <param name="viewBox">The SVG view box. / SVG 檢視方塊。</param>
+    /// <returns>The current shape. / 目前圖形。</returns>
+    public OdfShape SetClipPath(string pathData, string viewBox)
+    {
+        OdfNode? contour = FindContourPath();
+        if (contour is null)
+        {
+            contour = new OdfNode(OdfNodeType.Element, "contour-path", OdfNamespaces.Draw, "draw");
+            Node.AppendChild(contour);
+        }
+        contour.SetAttribute("d", OdfNamespaces.Svg, pathData, "svg");
+        contour.SetAttribute("viewBox", OdfNamespaces.Svg, viewBox, "svg");
+        return this;
+    }
+
+    /// <summary>
+    /// Removes the SVG contour path clip while preserving other shape content.
+    /// 移除 SVG 輪廓路徑裁切，同時保留其他圖形內容。
+    /// </summary>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool ClearClipPath()
+    {
+        OdfNode? contour = FindContourPath();
+        return contour is not null && Node.RemoveChild(contour);
+    }
+
+    private OdfNode? FindContourPath()
+    {
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "contour-path" &&
+                child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                return child;
+            }
+        }
+        return null;
     }
 
     /// <summary>

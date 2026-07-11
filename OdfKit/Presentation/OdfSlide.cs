@@ -172,6 +172,35 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Finds the existing slide notes page without creating one.
+    /// 尋找現有投影片備忘錄頁面，且不會建立新頁面。
+    /// </summary>
+    /// <returns>The notes page, or <see langword="null"/> if none exists. / 備忘錄頁面；若不存在則為 <see langword="null"/>。</returns>
+    public OdfNotesPage? FindSpeakerNotesPage()
+    {
+        OdfNode? notesNode = Node.FindChildElement("notes", OdfNamespaces.Presentation);
+        return notesNode is null ? null : new OdfNotesPage(notesNode, this);
+    }
+
+    /// <summary>
+    /// Removes the slide notes page.
+    /// 移除投影片備忘錄頁面。
+    /// </summary>
+    /// <returns><see langword="true"/> if the page was removed; otherwise <see langword="false"/>. / 若已移除頁面則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveSpeakerNotesPage()
+    {
+        OdfNode? notesNode = Node.FindChildElement("notes", OdfNamespaces.Presentation);
+        return notesNode is not null && Node.RemoveChild(notesNode);
+    }
+
+    /// <summary>
+    /// Clears speaker-note paragraphs while preserving other notes-page content.
+    /// 清除主講人備忘錄段落，同時保留其他備忘錄頁面內容。
+    /// </summary>
+    /// <returns>The number of removed paragraphs. / 已移除的段落數量。</returns>
+    public int ClearSpeakerNotes() => FindSpeakerNotesPage()?.ClearSpeakerNotes() ?? 0;
+
+    /// <summary>
     /// Gets or sets the slide speaker notes text.
     /// 取得或設定投影片備忘錄文字。
     /// </summary>
@@ -353,6 +382,142 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         node => new OdfPicture(node, this));
 
     /// <summary>
+    /// Gets the media objects on the slide.
+    /// 取得投影片上的媒體物件清單。
+    /// </summary>
+    public IReadOnlyList<OdfMediaObject> MediaObjects => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            ContainsDescendant(node, "plugin", OdfNamespaces.Draw),
+        node => new OdfMediaObject(node, this));
+
+    /// <summary>
+    /// Gets the embedded tables on the slide.
+    /// 取得投影片上的嵌入表格清單。
+    /// </summary>
+    public IReadOnlyList<OdfEmbeddedTable> EmbeddedTables => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            ContainsDescendant(node, "table", OdfNamespaces.Table),
+        node => new OdfEmbeddedTable(FindDescendant(node, "table", OdfNamespaces.Table)!, Document, node));
+
+    /// <summary>
+    /// Adds an embedded table to the slide.
+    /// 新增嵌入表格至投影片。
+    /// </summary>
+    /// <param name="rows">The row count. / 列數。</param>
+    /// <param name="columns">The column count. / 欄數。</param>
+    /// <param name="x">The X-axis coordinate. / X 軸座標。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標。</param>
+    /// <param name="width">The width. / 寬度。</param>
+    /// <param name="height">The height. / 高度。</param>
+    /// <returns>The newly created embedded table. / 新建立的嵌入表格。</returns>
+    public OdfEmbeddedTable AddTable(
+        int rows,
+        int columns,
+        OdfKit.Styles.OdfLength x,
+        OdfKit.Styles.OdfLength y,
+        OdfKit.Styles.OdfLength width,
+        OdfKit.Styles.OdfLength height)
+    {
+        OdfNode frame = CreateDrawingFrame(x, y, width, height);
+        AddDrawingObjectNode(frame);
+        return new OdfShape(frame, this).AddEmbeddedTable(rows, columns);
+    }
+
+    /// <summary>
+    /// Finds an embedded table by its containing drawing object identifier.
+    /// 依外層繪圖物件識別碼尋找嵌入表格。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns>The matching table, or <see langword="null"/>. / 相符的表格；若不存在則為 <see langword="null"/>。</returns>
+    public OdfEmbeddedTable? FindEmbeddedTable(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        foreach (OdfEmbeddedTable table in EmbeddedTables)
+        {
+            if (string.Equals(table.Id, id, StringComparison.Ordinal))
+                return table;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes an embedded table and its containing drawing object.
+    /// 移除嵌入表格及其外層繪圖物件。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveEmbeddedTable(string id) =>
+        FindEmbeddedTable(id) is not null && RemoveDrawingObject(id);
+
+    /// <summary>
+    /// Removes all embedded tables and their containing drawing objects.
+    /// 移除所有嵌入表格及其外層繪圖物件。
+    /// </summary>
+    /// <returns>The number of removed embedded tables. / 已移除的嵌入表格數量。</returns>
+    public int ClearEmbeddedTables()
+    {
+        List<OdfEmbeddedTable> tables = [.. EmbeddedTables];
+        int removed = 0;
+        foreach (OdfEmbeddedTable table in tables)
+        {
+            if (RemoveEmbeddedTable(table.Id))
+                removed++;
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Finds a media object by its drawing identifier.
+    /// 依繪圖識別碼尋找媒體物件。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns>The matching media object, or <see langword="null"/>. / 相符的媒體物件；若不存在則為 <see langword="null"/>。</returns>
+    public OdfMediaObject? FindMediaObject(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        foreach (OdfMediaObject media in MediaObjects)
+        {
+            if (string.Equals(media.Id, id, StringComparison.Ordinal))
+                return media;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes a media object and its dependent animation effects.
+    /// 移除媒體物件及其相依動畫效果。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveMediaObject(string id) =>
+        FindMediaObject(id) is not null && RemoveDrawingObject(id);
+
+    /// <summary>
+    /// Removes all media objects and their dependent animation effects.
+    /// 移除所有媒體物件及其相依動畫效果。
+    /// </summary>
+    /// <returns>The number of removed media objects. / 已移除的媒體物件數量。</returns>
+    public int ClearMediaObjects()
+    {
+        List<OdfMediaObject> mediaObjects = [.. MediaObjects];
+        int removed = 0;
+        foreach (OdfMediaObject media in mediaObjects)
+        {
+            if (RemoveMediaObject(media.Id))
+                removed++;
+        }
+
+        return removed;
+    }
+
+    /// <summary>
     /// Gets the general shapes on the slide.
     /// 取得投影片上的一般圖形清單。
     /// </summary>
@@ -360,6 +525,139 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         node => node.NamespaceUri == OdfNamespaces.Draw &&
             node.LocalName is "rect" or "ellipse" or "custom-shape" or "line" or "connector" or "polyline",
         node => new OdfShape(node, this));
+
+    /// <summary>
+    /// Gets the connectors on the slide.
+    /// 取得投影片上的連接線清單。
+    /// </summary>
+    public IReadOnlyList<OdfShape> Connectors => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw && node.LocalName == "connector",
+        node => new OdfShape(node, this));
+
+    /// <summary>
+    /// Gets the drawing groups on the slide.
+    /// 取得投影片上的繪圖群組清單。
+    /// </summary>
+    public IReadOnlyList<OdfKit.Drawing.OdfDrawGroup> Groups => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw && node.LocalName == "g",
+        node => new OdfKit.Drawing.OdfDrawGroup(node, Document));
+
+    /// <summary>
+    /// Adds a drawing group to the slide.
+    /// 新增繪圖群組至投影片。
+    /// </summary>
+    /// <param name="name">The optional group name. / 選用的群組名稱。</param>
+    /// <returns>The newly created group. / 新建立的群組。</returns>
+    public OdfKit.Drawing.OdfDrawGroup AddGroup(string? name)
+    {
+        var groupNode = new OdfNode(OdfNodeType.Element, "g", OdfNamespaces.Draw, "draw");
+        string id = "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        groupNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        groupNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
+        if (!string.IsNullOrEmpty(name))
+            groupNode.SetAttribute("name", OdfNamespaces.Draw, name!, "draw");
+        AddDrawingObjectNode(groupNode);
+        return new OdfKit.Drawing.OdfDrawGroup(groupNode, Document);
+    }
+
+    /// <summary>
+    /// Adds an unnamed drawing group to the slide.
+    /// 新增未命名的繪圖群組至投影片。
+    /// </summary>
+    /// <returns>The newly created group. / 新建立的群組。</returns>
+    public OdfKit.Drawing.OdfDrawGroup AddGroup() => AddGroup(null);
+
+    /// <summary>
+    /// Finds a drawing group by its identifier.
+    /// 依識別碼尋找繪圖群組。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns>The matching group, or <see langword="null"/>. / 相符的群組；若不存在則為 <see langword="null"/>。</returns>
+    public OdfKit.Drawing.OdfDrawGroup? FindGroup(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        foreach (OdfKit.Drawing.OdfDrawGroup group in Groups)
+        {
+            if (string.Equals(group.Id, id, StringComparison.Ordinal))
+                return group;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes a drawing group and its dependent animation effects.
+    /// 移除繪圖群組及其相依動畫效果。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveGroup(string id) => FindGroup(id) is not null && RemoveDrawingObject(id);
+
+    /// <summary>
+    /// Removes all drawing groups and their dependent animation effects.
+    /// 移除所有繪圖群組及其相依動畫效果。
+    /// </summary>
+    /// <returns>The number of removed groups. / 已移除的群組數量。</returns>
+    public int ClearGroups()
+    {
+        List<OdfKit.Drawing.OdfDrawGroup> groups = [.. Groups];
+        int removed = 0;
+        foreach (OdfKit.Drawing.OdfDrawGroup group in groups)
+        {
+            if (RemoveGroup(group.Id))
+                removed++;
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Finds a connector by its drawing identifier.
+    /// 依繪圖識別碼尋找連接線。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns>The matching connector, or <see langword="null"/>. / 相符的連接線；若不存在則為 <see langword="null"/>。</returns>
+    public OdfShape? FindConnector(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        foreach (OdfShape connector in Connectors)
+        {
+            if (string.Equals(connector.Id, id, StringComparison.Ordinal))
+                return connector;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes a connector and its dependent animation effects.
+    /// 移除連接線及其相依動畫效果。
+    /// </summary>
+    /// <param name="id">The exact drawing identifier. / 精確的繪圖識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveConnector(string id) => FindConnector(id) is not null && RemoveDrawingObject(id);
+
+    /// <summary>
+    /// Removes all connectors and their dependent animation effects.
+    /// 移除所有連接線及其相依動畫效果。
+    /// </summary>
+    /// <returns>The number of removed connectors. / 已移除的連接線數量。</returns>
+    public int ClearConnectors()
+    {
+        List<OdfShape> connectors = [.. Connectors];
+        int removed = 0;
+        foreach (OdfShape connector in connectors)
+        {
+            if (RemoveConnector(connector.Id))
+                removed++;
+        }
+
+        return removed;
+    }
 
     /// <summary>
     /// Finds a top-level drawing object by its draw or XML identifier.

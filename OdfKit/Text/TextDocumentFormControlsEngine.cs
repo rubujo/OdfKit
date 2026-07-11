@@ -13,6 +13,14 @@ namespace OdfKit.Text;
 /// </summary>
 internal static class TextDocumentFormControlsEngine
 {
+    private static readonly HashSet<string> SupportedControlNames = new(StringComparer.Ordinal)
+    {
+        "text",
+        "checkbox",
+        "listbox",
+        "button",
+    };
+
     internal static OdfFormControl AddFormControl(
         TextDocumentMutationContext context,
         OdfControlType type,
@@ -105,7 +113,7 @@ internal static class TextDocumentFormControlsEngine
 
             foreach (OdfNode ctrl in formNode.Children)
             {
-                if (ctrl.NamespaceUri != OdfNamespaces.Form)
+                if (ctrl.NamespaceUri != OdfNamespaces.Form || !SupportedControlNames.Contains(ctrl.LocalName))
                     continue;
 
                 OdfControlType type = ctrl.LocalName switch
@@ -127,20 +135,176 @@ internal static class TextDocumentFormControlsEngine
                     }
                 }
 
+                string name = ctrl.GetAttribute("name", OdfNamespaces.Form) ?? string.Empty;
+                OdfNode? frame = FindControlFrame(bodyTextRoot, name);
                 result.Add(new OdfFormControl
                 {
                     ControlType = type,
-                    Name = ctrl.GetAttribute("name", OdfNamespaces.Form) ?? string.Empty,
+                    Name = name,
                     Label = ctrl.GetAttribute("label", OdfNamespaces.Form) ?? string.Empty,
                     Value = ctrl.GetAttribute("value", OdfNamespaces.Form),
                     IsChecked = ctrl.GetAttribute("current-state", OdfNamespaces.Form) == "checked",
                     ListItems = items,
+                    X = ParseLength(frame?.GetAttribute("x", OdfNamespaces.Svg)),
+                    Y = ParseLength(frame?.GetAttribute("y", OdfNamespaces.Svg)),
+                    Width = ParseLength(frame?.GetAttribute("width", OdfNamespaces.Svg)),
+                    Height = ParseLength(frame?.GetAttribute("height", OdfNamespaces.Svg)),
                 });
             }
         }
 
         return result;
     }
+
+    internal static bool UpdateFormControl(
+        OdfNode bodyTextRoot,
+        string name,
+        string label,
+        string? value,
+        bool isChecked,
+        IReadOnlyList<string>? listItems)
+    {
+        OdfNode? control = FindControlNode(bodyTextRoot, name);
+        if (control is null)
+            return false;
+
+        SetOptionalAttribute(control, "label", label);
+        SetOptionalAttribute(control, "value", value);
+        if (control.LocalName == "checkbox")
+            control.SetAttribute("current-state", OdfNamespaces.Form, isChecked ? "checked" : "unchecked", "form");
+
+        if (control.LocalName == "listbox" && listItems is not null)
+        {
+            foreach (OdfNode child in new List<OdfNode>(control.Children))
+            {
+                if (child.LocalName == "option" && child.NamespaceUri == OdfNamespaces.Form)
+                    control.RemoveChild(child);
+            }
+            foreach (string item in listItems)
+            {
+                var option = new OdfNode(OdfNodeType.Element, "option", OdfNamespaces.Form, "form");
+                option.SetAttribute("label", OdfNamespaces.Form, item, "form");
+                control.AppendChild(option);
+            }
+        }
+        return true;
+    }
+
+    internal static bool RemoveFormControl(OdfNode bodyTextRoot, string name)
+    {
+        OdfNode? control = FindControlNode(bodyTextRoot, name);
+        if (control?.Parent is null)
+            return false;
+
+        OdfNode form = control.Parent;
+        form.RemoveChild(control);
+        RemoveControlFrames(bodyTextRoot, name);
+        if (form.Children.Count == 0)
+        {
+            OdfNode? forms = form.Parent;
+            forms?.RemoveChild(form);
+            if (forms is not null && forms.Children.Count == 0)
+                forms.Parent?.RemoveChild(forms);
+        }
+        return true;
+    }
+
+    internal static int ClearFormControls(OdfNode bodyTextRoot)
+    {
+        IReadOnlyList<OdfFormControl> controls = GetFormControls(bodyTextRoot);
+        int removed = 0;
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        foreach (OdfFormControl control in controls)
+        {
+            if (names.Add(control.Name) && RemoveFormControl(bodyTextRoot, control.Name))
+                removed++;
+        }
+        return removed;
+    }
+
+    private static OdfNode? FindControlNode(OdfNode bodyTextRoot, string name)
+    {
+        OdfNode? forms = FindFormsNode(bodyTextRoot);
+        if (forms is null)
+            return null;
+        foreach (OdfNode form in forms.Children)
+        {
+            foreach (OdfNode control in form.Children)
+            {
+                if (control.NamespaceUri == OdfNamespaces.Form &&
+                    SupportedControlNames.Contains(control.LocalName) &&
+                    string.Equals(control.GetAttribute("name", OdfNamespaces.Form), name, StringComparison.Ordinal))
+                {
+                    return control;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static OdfNode? FindControlFrame(OdfNode root, string name)
+    {
+        foreach (OdfNode child in root.Children)
+        {
+            if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                foreach (OdfNode descendant in child.Descendants())
+                {
+                    if (descendant.LocalName == "control" &&
+                        descendant.NamespaceUri == OdfNamespaces.Draw &&
+                        string.Equals(descendant.GetAttribute("control", OdfNamespaces.Draw), name, StringComparison.Ordinal))
+                    {
+                        return child;
+                    }
+                }
+            }
+            OdfNode? nested = FindControlFrame(child, name);
+            if (nested is not null)
+                return nested;
+        }
+        return null;
+    }
+
+    private static void RemoveControlFrames(OdfNode root, string name)
+    {
+        var removals = new List<OdfNode>();
+        foreach (OdfNode child in root.Children)
+        {
+            if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw && FrameReferencesControl(child, name))
+                removals.Add(child);
+            else
+                RemoveControlFrames(child, name);
+        }
+        foreach (OdfNode frame in removals)
+        {
+            OdfNode? parent = frame.Parent;
+            parent?.RemoveChild(frame);
+            if (parent is not null && parent.LocalName == "p" && parent.NamespaceUri == OdfNamespaces.Text && parent.Children.Count == 0)
+                parent.Parent?.RemoveChild(parent);
+        }
+    }
+
+    private static bool FrameReferencesControl(OdfNode frame, string name)
+    {
+        foreach (OdfNode node in frame.Descendants())
+        {
+            if (node.LocalName == "control" && node.NamespaceUri == OdfNamespaces.Draw &&
+                string.Equals(node.GetAttribute("control", OdfNamespaces.Draw), name, StringComparison.Ordinal))
+                return true;
+        }
+        return false;
+    }
+
+    private static void SetOptionalAttribute(OdfNode node, string localName, string? value)
+    {
+        if (value is null)
+            node.RemoveAttribute(localName, OdfNamespaces.Form);
+        else
+            node.SetAttribute(localName, OdfNamespaces.Form, value, "form");
+    }
+
+    private static OdfLength ParseLength(string? value) =>
+        OdfLength.TryParse(value, out OdfLength length) ? length : default;
 
     private static OdfNode FindOrCreateFormsNode(OdfNode bodyTextRoot)
     {

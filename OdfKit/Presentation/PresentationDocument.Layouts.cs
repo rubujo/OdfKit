@@ -271,5 +271,33 @@ public partial class PresentationDocument
         }
     }
 
+    /// <summary>
+    /// Finds the existing presentation handout page without creating one.
+    /// 尋找現有簡報講義頁面，且不會建立新頁面。
+    /// </summary>
+    /// <returns>The handout page, or <see langword="null"/> if none exists. / 講義頁面；若不存在則為 <see langword="null"/>。</returns>
+    public OdfHandoutPage? FindHandoutPage()
+    {
+        OdfNode? masterStyles = FindChildElement(StylesRoot, "master-styles", OdfNamespaces.Office);
+        OdfNode? handoutNode = masterStyles is null
+            ? null
+            : FindChildElement(masterStyles, "handout", OdfNamespaces.Presentation);
+        return handoutNode is null ? null : new OdfHandoutPage(handoutNode, this);
+    }
+
+    /// <summary>
+    /// Removes the presentation handout page.
+    /// 移除簡報講義頁面。
+    /// </summary>
+    /// <returns><see langword="true"/> if the page was removed; otherwise <see langword="false"/>. / 若已移除頁面則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveHandoutPage()
+    {
+        OdfNode? masterStyles = FindChildElement(StylesRoot, "master-styles", OdfNamespaces.Office);
+        OdfNode? handoutNode = masterStyles is null
+            ? null
+            : FindChildElement(masterStyles, "handout", OdfNamespaces.Presentation);
+        return handoutNode is not null && masterStyles!.RemoveChild(handoutNode);
+    }
+
     #endregion
 }

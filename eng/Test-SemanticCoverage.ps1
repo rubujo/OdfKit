@@ -7,7 +7,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $manifestPath = Join-Path $root 'docs/semantic-coverage.json'
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 
-if ($manifest.schemaVersion -ne 1) { throw '不支援的 semantic coverage schemaVersion。' }
+if ($manifest.schemaVersion -ne 2) { throw '不支援的 semantic coverage schemaVersion。' }
 if ($manifest.odfVersion -ne '1.4') { throw 'semantic coverage 必須以 ODF 1.4 為主模型。' }
 if ($manifest.legacyVersionPolicy -ne 'normalize-to-1.4-preserve-unknown') {
     throw 'semantic coverage 的舊版本相容政策無效。'
@@ -38,7 +38,11 @@ foreach ($family in @($manifest.families)) {
     $ids[$family.id] = $true
     if ($family.format -notin $requiredFormats) { throw "語意族群格式無效：$($family.id)" }
     if ($family.status -ne 'complete') { throw "語意族群尚未完成：$($family.id)" }
-    if (@($family.topics).Count -eq 0) { throw "語意族群缺少 topics：$($family.id)" }
+    $familyTopics = @($family.topics)
+    if ($familyTopics.Count -eq 0) { throw "語意族群缺少 topics：$($family.id)" }
+    if (@($familyTopics | Select-Object -Unique).Count -ne $familyTopics.Count) {
+        throw "語意族群 topics 重複：$($family.id)"
+    }
     if (@($family.specification).Count -eq 0) { throw "語意族群缺少規格來源：$($family.id)" }
     if ([string]::IsNullOrWhiteSpace($family.limitations)) { throw "語意族群缺少限制：$($family.id)" }
 
@@ -49,6 +53,11 @@ foreach ($family in @($manifest.families)) {
     }
 
     $coveredOperations = @{}
+    $topicOperations = @{}
+    foreach ($topic in $familyTopics) {
+        if ([string]::IsNullOrWhiteSpace($topic)) { throw "語意族群 topic 無效：$($family.id)" }
+        $topicOperations[$topic] = @{}
+    }
     foreach ($evidence in @($family.operationEvidence)) {
         if ([string]::IsNullOrWhiteSpace($evidence.test) -or [string]::IsNullOrWhiteSpace($evidence.symbol)) {
             throw "語意族群操作證據缺少 test 或 symbol：$($family.id)"
@@ -61,16 +70,36 @@ foreach ($family in @($manifest.families)) {
         if (-not $testSource.Contains($evidence.symbol, [StringComparison]::Ordinal)) {
             throw "語意族群操作測試符號不存在：$($family.id) -> $($evidence.symbol)"
         }
+        $evidenceTopics = @($evidence.topics)
+        if ($evidenceTopics.Count -eq 0) {
+            throw "語意族群操作證據缺少 topics：$($family.id) -> $($evidence.symbol)"
+        }
+        foreach ($topic in $evidenceTopics) {
+            if ($topic -notin $familyTopics) {
+                throw "語意族群操作證據 topic 無效：$($family.id) -> $topic"
+            }
+        }
         foreach ($operation in @($evidence.operations)) {
             if ($operation -notin $requiredOperations) {
                 throw "語意族群操作證據無效：$($family.id) -> $operation"
             }
             $coveredOperations[$operation] = $true
+            foreach ($topic in $evidenceTopics) {
+                $topicOperations[$topic][$operation] = $true
+            }
         }
     }
     foreach ($operation in $requiredOperations) {
         if (-not $coveredOperations.ContainsKey($operation)) {
             throw "語意族群缺少逐操作測試證據：$($family.id) -> $operation"
+        }
+    }
+    foreach ($topic in $familyTopics) {
+        foreach ($operation in $requiredOperations) {
+            if ($family.operations.$operation -ne 'not-applicable' -and
+                -not $topicOperations[$topic].ContainsKey($operation)) {
+                throw "語意 topic 缺少逐操作測試證據：$($family.id) -> $topic -> $operation"
+            }
         }
     }
 

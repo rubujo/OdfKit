@@ -26,7 +26,7 @@ public class SemanticCoverageContractTests
         using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
         JsonElement manifest = document.RootElement;
 
-        Assert.Equal(1, manifest.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(2, manifest.GetProperty("schemaVersion").GetInt32());
         Assert.Equal("1.4", manifest.GetProperty("odfVersion").GetString());
         Assert.Equal(
             "normalize-to-1.4-preserve-unknown",
@@ -54,7 +54,11 @@ public class SemanticCoverageContractTests
         foreach (JsonElement family in families)
         {
             Assert.Equal("complete", family.GetProperty("status").GetString());
-            Assert.NotEmpty(family.GetProperty("topics").EnumerateArray());
+            string[] familyTopics =
+                [.. family.GetProperty("topics").EnumerateArray().Select(topic => topic.GetString()!)];
+            Assert.NotEmpty(familyTopics);
+            Assert.Equal(familyTopics.Length, familyTopics.Distinct(StringComparer.Ordinal).Count());
+            Assert.DoesNotContain(familyTopics, string.IsNullOrWhiteSpace);
             Assert.NotEmpty(family.GetProperty("specification").EnumerateArray());
             Assert.False(string.IsNullOrWhiteSpace(family.GetProperty("limitations").GetString()));
 
@@ -81,19 +85,46 @@ public class SemanticCoverageContractTests
             }
 
             HashSet<string> coveredOperations = [];
+            Dictionary<string, HashSet<string>> topicOperations = familyTopics.ToDictionary(
+                topic => topic,
+                _ => new HashSet<string>(StringComparer.Ordinal),
+                StringComparer.Ordinal);
             foreach (JsonElement evidence in family.GetProperty("operationEvidence").EnumerateArray())
             {
                 string testPath = evidence.GetProperty("test").GetString()!;
                 string symbol = evidence.GetProperty("symbol").GetString()!;
                 string source = File.ReadAllText(Path.Combine(root, testPath));
                 Assert.Contains(symbol, source, StringComparison.Ordinal);
+                string[] evidenceTopics =
+                    [.. evidence.GetProperty("topics").EnumerateArray().Select(topic => topic.GetString()!)];
+                Assert.NotEmpty(evidenceTopics);
+                foreach (string topic in evidenceTopics)
+                {
+                    Assert.Contains(topic, familyTopics);
+                }
+
                 foreach (JsonElement operation in evidence.GetProperty("operations").EnumerateArray())
                 {
-                    coveredOperations.Add(operation.GetString()!);
+                    string operationName = operation.GetString()!;
+                    Assert.Contains(operationName, RequiredOperations);
+                    coveredOperations.Add(operationName);
+                    foreach (string topic in evidenceTopics)
+                    {
+                        topicOperations[topic].Add(operationName);
+                    }
                 }
             }
 
             Assert.Equal(RequiredOperations.Order(), coveredOperations.Order());
+            foreach (string topic in familyTopics)
+            {
+                string[] applicableOperations =
+                [
+                    .. RequiredOperations.Where(
+                        operation => operations.GetProperty(operation).GetString() != "not-applicable"),
+                ];
+                Assert.Equal(applicableOperations.Order(), topicOperations[topic].Order());
+            }
         }
     }
 

@@ -74,7 +74,16 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
             throw new ArgumentNullException(nameof(paragraphs));
 
         OdfNode textBox = GetOrCreateSpeakerNotesTextBox();
-        textBox.Children.Clear();
+        foreach (OdfNode child in new List<OdfNode>(textBox.Children))
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                textBox.RemoveChild(child);
+            }
+        }
+
         foreach (string? paragraphText in paragraphs)
         {
             OdfNode paragraph = new(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
@@ -90,6 +99,32 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
         }
 
         return this;
+    }
+
+    /// <summary>
+    /// Clears speaker-note paragraphs while preserving unknown content in the notes text box.
+    /// 清除主講人備忘錄段落，同時保留備忘錄文字方塊內的未知內容。
+    /// </summary>
+    /// <returns>The number of removed paragraphs. / 已移除的段落數量。</returns>
+    public int ClearSpeakerNotes()
+    {
+        OdfNode? textBox = FindTextBoxInNotes(Node);
+        if (textBox is null)
+            return 0;
+
+        int removed = 0;
+        foreach (OdfNode child in new List<OdfNode>(textBox.Children))
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text &&
+                textBox.RemoveChild(child))
+            {
+                removed++;
+            }
+        }
+
+        return removed;
     }
 
     private OdfNode GetOrCreateSpeakerNotesTextBox()

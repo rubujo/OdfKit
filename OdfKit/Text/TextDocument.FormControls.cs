@@ -49,5 +49,56 @@ public partial class TextDocument
     public IReadOnlyList<OdfFormControl> GetFormControls() =>
         TextDocumentFormControlsEngine.GetFormControls(BodyTextRoot);
 
+    /// <summary>
+    /// Finds a form control by its exact name.
+    /// 依精確名稱尋找表單控制項。
+    /// </summary>
+    /// <param name="name">The exact control name. / 精確的控制項名稱。</param>
+    /// <returns>The matching control snapshot, or <see langword="null"/>. / 相符的控制項快照；若不存在則為 <see langword="null"/>。</returns>
+    public OdfFormControl? FindFormControl(string name)
+    {
+        foreach (OdfFormControl control in GetFormControls())
+        {
+            if (string.Equals(control.Name, name, System.StringComparison.Ordinal))
+                return control;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Updates the known properties of an existing form control.
+    /// 更新現有表單控制項的已知屬性。
+    /// </summary>
+    /// <param name="name">The exact control name. / 精確的控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="value">The control value, or <see langword="null"/> to remove it. / 控制項值；若要移除則為 <see langword="null"/>。</param>
+    /// <param name="isChecked">Whether a checkbox is checked. / 核取方塊是否已勾選。</param>
+    /// <param name="listItems">Replacement list items, or <see langword="null"/> to preserve them. / 替換清單項目；若要保留則為 <see langword="null"/>。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdateFormControl(
+        string name,
+        string label,
+        string? value,
+        bool isChecked,
+        IReadOnlyList<string>? listItems) =>
+        TextDocumentFormControlsEngine.UpdateFormControl(BodyTextRoot, name, label, value, isChecked, listItems);
+
+    /// <summary>
+    /// Removes a form control definition and every drawing reference to it.
+    /// 移除表單控制項定義及所有指向它的繪圖參照。
+    /// </summary>
+    /// <param name="name">The exact control name. / 精確的控制項名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveFormControl(string name) =>
+        TextDocumentFormControlsEngine.RemoveFormControl(BodyTextRoot, name);
+
+    /// <summary>
+    /// Removes all supported form controls and their drawing references.
+    /// 移除所有支援的表單控制項及其繪圖參照。
+    /// </summary>
+    /// <returns>The number of removed controls. / 已移除的控制項數量。</returns>
+    public int ClearFormControls() =>
+        TextDocumentFormControlsEngine.ClearFormControls(BodyTextRoot);
+
     #endregion
 }

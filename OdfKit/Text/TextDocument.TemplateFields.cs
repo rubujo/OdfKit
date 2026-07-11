@@ -49,6 +49,22 @@ public partial class TextDocument
     }
 
     /// <summary>
+    /// Finds a user-field declaration by its exact name.
+    /// 依精確名稱尋找使用者欄位宣告。
+    /// </summary>
+    /// <param name="name">The exact field name. / 精確的欄位名稱。</param>
+    /// <returns>The matching declaration, or <see langword="null"/>. / 相符的宣告；若不存在則為 <see langword="null"/>。</returns>
+    public OdfUserFieldDeclarationInfo? FindUserFieldDeclaration(string name)
+    {
+        foreach (OdfUserFieldDeclarationInfo declaration in GetUserFieldDeclarations())
+        {
+            if (string.Equals(declaration.Name, name, StringComparison.Ordinal))
+                return declaration;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Adds or updates a user field (template variable) declaration.
     /// 新增或更新一個使用者欄位（範本變數）宣告。
     /// </summary>
@@ -106,6 +122,50 @@ public partial class TextDocument
         string valueType = decl.GetAttribute("value-type", OdfNamespaces.Office) ?? "string";
         WriteUserFieldValue(decl, valueType, value ?? string.Empty);
         return true;
+    }
+
+    /// <summary>
+    /// Removes a user-field declaration by name.
+    /// 依名稱移除使用者欄位宣告。
+    /// </summary>
+    /// <param name="name">The exact field name. / 精確的欄位名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveUserFieldDeclaration(string name)
+    {
+        OdfNode? declarations = BodyTextRoot.FindChildElement("user-field-decls", OdfNamespaces.Text);
+        OdfNode? declaration = declarations is null ? null : FindUserFieldDecl(declarations, name);
+        if (declaration is null || declarations is null)
+            return false;
+        declarations.RemoveChild(declaration);
+        if (declarations.Children.Count == 0)
+            BodyTextRoot.RemoveChild(declarations);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all user-field declarations while preserving unknown declaration-container content.
+    /// 移除所有使用者欄位宣告，同時保留宣告容器中的未知內容。
+    /// </summary>
+    /// <returns>The number of removed declarations. / 已移除的宣告數量。</returns>
+    public int ClearUserFieldDeclarations()
+    {
+        OdfNode? declarations = BodyTextRoot.FindChildElement("user-field-decls", OdfNamespaces.Text);
+        if (declarations is null)
+            return 0;
+        int removed = 0;
+        foreach (OdfNode child in new List<OdfNode>(declarations.Children))
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "user-field-decl" &&
+                child.NamespaceUri == OdfNamespaces.Text &&
+                declarations.RemoveChild(child))
+            {
+                removed++;
+            }
+        }
+        if (declarations.Children.Count == 0)
+            BodyTextRoot.RemoveChild(declarations);
+        return removed;
     }
 
     private OdfNode FindOrCreateUserFieldDecls()

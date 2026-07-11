@@ -197,7 +197,7 @@ public partial class OdfSlide
         frame.AppendChild(plugin);
         AddDrawingObjectNode(frame);
 
-        return new OdfMediaObject(packagePath, mimeType);
+        return new OdfMediaObject(frame, this);
     }
 
     /// <summary>
@@ -254,6 +254,31 @@ public partial class OdfSlide
 
         AddDrawingObjectNode(shapeNode);
         return new OdfShape(shapeNode, this);
+    }
+
+    /// <summary>
+    /// Adds a connector between two drawing objects.
+    /// 在兩個繪圖物件之間新增連接線。
+    /// </summary>
+    /// <param name="startShapeId">The starting object identifier. / 起點物件識別碼。</param>
+    /// <param name="endShapeId">The ending object identifier. / 終點物件識別碼。</param>
+    /// <returns>The newly created connector shape. / 新建立的連接線圖形。</returns>
+    public OdfShape AddConnector(string startShapeId, string endShapeId)
+    {
+        if (string.IsNullOrEmpty(startShapeId))
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_StartingCannotBeEmpty"), nameof(startShapeId));
+        if (string.IsNullOrEmpty(endShapeId))
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_EndCannotBeEmpty"), nameof(endShapeId));
+
+        var connector = new OdfNode(OdfNodeType.Element, "connector", OdfNamespaces.Draw, "draw");
+        string id = "con_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        connector.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        connector.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
+        connector.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
+        connector.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
+        connector.SetAttribute("type", OdfNamespaces.Draw, "standard", "draw");
+        AddDrawingObjectNode(connector);
+        return new OdfShape(connector, this);
     }
 
     /// <summary>
@@ -438,6 +463,25 @@ public partial class OdfSlide
         }
 
         return false;
+    }
+
+    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+
+            OdfNode? descendant = FindDescendant(child, localName, namespaceUri);
+            if (descendant is not null)
+                return descendant;
+        }
+
+        return null;
     }
 
     private void AddDrawingObjectNode(OdfNode drawingNode)

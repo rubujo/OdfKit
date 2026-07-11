@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -14,11 +15,45 @@ public sealed class OdfEmbeddedTable
 {
     private readonly OdfNode _tableNode;
     private readonly OdfDocument _document;
+    private readonly OdfNode? _containerNode;
 
-    internal OdfEmbeddedTable(OdfNode tableNode, OdfDocument document)
+    internal OdfEmbeddedTable(OdfNode tableNode, OdfDocument document, OdfNode? containerNode = null)
     {
         _tableNode = tableNode ?? throw new ArgumentNullException(nameof(tableNode));
         _document = document ?? throw new ArgumentNullException(nameof(document));
+        _containerNode = containerNode;
+    }
+
+    internal OdfNode TableNode => _tableNode;
+
+    /// <summary>
+    /// Gets the identifier of the containing drawing object.
+    /// 取得外層繪圖物件的識別碼。
+    /// </summary>
+    public string Id =>
+        _containerNode?.GetAttribute("id", OdfNamespaces.Draw) ??
+        _containerNode?.GetAttribute("id", OdfNamespaces.Xml) ??
+        string.Empty;
+
+    /// <summary>
+    /// Gets the number of table rows.
+    /// 取得表格列數。
+    /// </summary>
+    public int RowCount => GetRows().Count;
+
+    /// <summary>
+    /// Gets the greatest number of cells in any table row.
+    /// 取得任一表格列中的最大儲存格數量。
+    /// </summary>
+    public int ColumnCount
+    {
+        get
+        {
+            int maximum = 0;
+            foreach (OdfNode row in GetRows())
+                maximum = Math.Max(maximum, GetCells(row).Count);
+            return maximum;
+        }
     }
 
     /// <summary>
@@ -71,6 +106,15 @@ public sealed class OdfEmbeddedTable
         paragraph.TextContent = text;
         return this;
     }
+
+    /// <summary>
+    /// Gets the text of the specified cell.
+    /// 取得指定儲存格的文字。
+    /// </summary>
+    /// <param name="row">The zero-based row index. / 採 0 為基準的列索引。</param>
+    /// <param name="column">The zero-based column index. / 採 0 為基準的欄索引。</param>
+    /// <returns>The cell text. / 儲存格文字。</returns>
+    public string GetCellText(int row, int column) => GetCell(row, column).TextContent;
     /// <summary>
     /// Short overload of SetCellTextStyle that accepts row and column; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 row 與 column；其餘可選參數使用預設值並轉呼叫最長 SetCellTextStyle 多載。
@@ -401,13 +445,47 @@ public sealed class OdfEmbeddedTable
             throw new ArgumentOutOfRangeException(nameof(row));
         if (column < 0)
             throw new ArgumentOutOfRangeException(nameof(column));
-        if (row >= _tableNode.Children.Count)
+        List<OdfNode> rows = GetRows();
+        if (row >= rows.Count)
             throw new ArgumentOutOfRangeException(nameof(row));
 
-        OdfNode rowNode = _tableNode.Children[row];
-        if (column >= rowNode.Children.Count)
+        OdfNode rowNode = rows[row];
+        List<OdfNode> cells = GetCells(rowNode);
+        if (column >= cells.Count)
             throw new ArgumentOutOfRangeException(nameof(column));
-        return rowNode.Children[column];
+        return cells[column];
+    }
+
+    private List<OdfNode> GetRows()
+    {
+        var rows = new List<OdfNode>();
+        foreach (OdfNode child in _tableNode.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "table-row" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                rows.Add(child);
+            }
+        }
+
+        return rows;
+    }
+
+    private static List<OdfNode> GetCells(OdfNode row)
+    {
+        var cells = new List<OdfNode>();
+        foreach (OdfNode child in row.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                child.LocalName is "table-cell" or "covered-table-cell")
+            {
+                cells.Add(child);
+            }
+        }
+
+        return cells;
     }
 
     private void ReplaceCell(int row, int column, OdfNode replacement)

@@ -1003,6 +1003,59 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// Verifies external-link caches support symmetric CRUD and preserve unknown settings content.
+    /// 驗證外部連結快取支援對稱 CRUD，並保留未知設定內容。
+    /// </summary>
+    [Fact]
+    public void ExternalLinkCachedValues_CrudAndUnknownContentRoundTrip()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfExternalLinkManager links = document.ExternalLinks;
+        var firstAddress = new OdfCellAddress(0, 0);
+        var secondAddress = new OdfCellAddress(1, 2);
+        links.SetCachedValue("file:///b.ods", "Data", secondAddress, null);
+        links.SetCachedValue("file:///a.ods", "Sheet1", firstAddress, 41d);
+
+        OdfNode documentSettings = OdfDocumentSettingsEngine.FindOrCreateSettingsNode(
+            document.SettingsDom,
+            "ooo:document-settings");
+        var map = new OdfNode(OdfNodeType.Element, "config-item-map-indexed", OdfNamespaces.Config, "config");
+        map.SetAttribute("name", OdfNamespaces.Config, "OdfKitExternalLinks", "config");
+        const string foreignNamespace = "urn:odfkit:test:external-link-foreign";
+        map.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+        documentSettings.AppendChild(map);
+
+        IReadOnlyList<OdfExternalCellCacheInfo> snapshot = links.GetCachedValues();
+        Assert.Equal(2, snapshot.Count);
+        Assert.Equal("file:///a.ods", snapshot[0].DocumentId);
+        Assert.Equal(41d, links.FindCachedValue("file:///a.ods", "Sheet1", firstAddress)!.Value);
+        Assert.Null(links.FindCachedValue("file:///missing.ods", "Sheet1", firstAddress));
+        Assert.True(links.RemoveCachedValue("file:///a.ods", "Sheet1", firstAddress));
+        Assert.False(links.RemoveCachedValue("file:///a.ods", "Sheet1", firstAddress));
+        links.SetCachedValue("file:///a.ods", "Sheet1", firstAddress, 42d);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, fileName: "external-cache.ods");
+        Assert.Equal(2, reloaded.ExternalLinks.GetCachedValues().Count);
+        Assert.Equal(42d, reloaded.ExternalLinks.FindCachedValue("file:///a.ods", "Sheet1", firstAddress)!.Value);
+        Assert.Null(reloaded.ExternalLinks.FindCachedValue("file:///b.ods", "Data", secondAddress)!.Value);
+        Assert.Contains(
+            reloaded.SettingsDom.Descendants(),
+            node => node.LocalName == "extension" && node.NamespaceUri == foreignNamespace);
+
+        Assert.Equal(2, reloaded.ExternalLinks.ClearCachedValues());
+        Assert.Equal(0, reloaded.ExternalLinks.ClearCachedValues());
+        using var clearedStream = new MemoryStream();
+        reloaded.SaveToStream(clearedStream);
+        using SpreadsheetDocument cleared = SpreadsheetDocument.Load(clearedStream, fileName: "external-cache-cleared.ods");
+        Assert.Empty(cleared.ExternalLinks.GetCachedValues());
+        Assert.Contains(
+            cleared.SettingsDom.Descendants(),
+            node => node.LocalName == "extension" && node.NamespaceUri == foreignNamespace);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetPrintAreas"/> 可讀回各工作表列印範圍。
     /// </summary>
     [Fact]

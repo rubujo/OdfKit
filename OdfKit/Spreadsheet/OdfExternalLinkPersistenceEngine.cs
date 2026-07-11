@@ -56,20 +56,29 @@ internal static class OdfExternalLinkPersistenceEngine
     {
         var cachedCells = new List<OdfExternalLinkManager.CachedCell>(manager.GetCachedCells());
         OdfNode docSettings = OdfDocumentSettingsEngine.FindOrCreateSettingsNode(settingsDom, DocumentSettingsName);
-        OdfNode? previousMap = FindConfigChild(docSettings, "config-item-map-indexed", ExternalLinksMapName);
-        if (previousMap is not null)
+        OdfNode? map = FindConfigChild(docSettings, "config-item-map-indexed", ExternalLinksMapName);
+        if (map is not null)
         {
-            docSettings.RemoveChild(previousMap);
+            foreach (OdfNode child in new List<OdfNode>(map.Children))
+            {
+                if (IsManagedEntry(child))
+                    map.RemoveChild(child);
+            }
         }
 
         if (cachedCells.Count == 0)
         {
+            if (map is not null && map.Children.Count == 0)
+                docSettings.RemoveChild(map);
             return;
         }
 
-        var map = new OdfNode(OdfNodeType.Element, "config-item-map-indexed", OdfNamespaces.Config, "config");
-        map.SetAttribute("name", OdfNamespaces.Config, ExternalLinksMapName, "config");
-        docSettings.AppendChild(map);
+        if (map is null)
+        {
+            map = new OdfNode(OdfNodeType.Element, "config-item-map-indexed", OdfNamespaces.Config, "config");
+            map.SetAttribute("name", OdfNamespaces.Config, ExternalLinksMapName, "config");
+            docSettings.AppendChild(map);
+        }
 
         foreach (OdfExternalLinkManager.CachedCell cell in cachedCells)
         {
@@ -85,6 +94,14 @@ internal static class OdfExternalLinkPersistenceEngine
             WriteConfigItem(entry, "Value", "string", valueText);
         }
     }
+
+    private static bool IsManagedEntry(OdfNode entry) =>
+        entry.LocalName == "config-item-map-entry" &&
+        entry.NamespaceUri == OdfNamespaces.Config &&
+        FindConfigItemValue(entry, "DocumentId") is not null &&
+        FindConfigItemValue(entry, "SheetName") is not null &&
+        FindConfigItemValue(entry, "Row") is not null &&
+        FindConfigItemValue(entry, "Column") is not null;
 
     private static OdfNode? FindConfigChild(OdfNode parent, string localName, string name)
     {

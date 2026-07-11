@@ -90,6 +90,16 @@ public abstract partial class OdfDocument
 
     internal void TrackEmbeddedDocumentForPersistence(OdfDocument document) => TrackEmbeddedDocument(document);
 
+    internal void UntrackEmbeddedDocuments(string subPath)
+    {
+        string normalized = subPath.Replace('\\', '/').Trim().TrimStart('.').Trim('/');
+        _trackedEmbeddedDocuments.RemoveAll(
+            document => string.Equals(
+                document.SubPath.Replace('\\', '/').Trim().TrimStart('.').Trim('/'),
+                normalized,
+                StringComparison.Ordinal));
+    }
+
     private void FlushTrackedEmbeddedDocumentsCore(OdfSaveOptions options)
     {
         if (_isFlushingTrackedEmbeddedDocuments || _trackedEmbeddedDocuments.Count == 0)

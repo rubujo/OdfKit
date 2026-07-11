@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Chart;
+using OdfKit.Core;
+using OdfKit.DOM;
 
 using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
@@ -52,4 +55,129 @@ public partial class SpreadsheetDocument
 
         return GetEmbeddedDocument<OdfChartDocument>(normalized);
     }
+
+    /// <summary>
+    /// Finds an embedded chart by its subpackage path.
+    /// 依子封裝路徑尋找嵌入圖表。
+    /// </summary>
+    /// <param name="objectPath">The embedded chart subpackage path. / 嵌入圖表子封裝路徑。</param>
+    /// <returns>The chart summary when found; otherwise, <see langword="null"/>. / 找到時為圖表摘要；否則為 <see langword="null"/>。</returns>
+    public OdfEmbeddedChartInfo? FindEmbeddedChart(string objectPath)
+    {
+        if (string.IsNullOrWhiteSpace(objectPath))
+            return null;
+
+        string normalized = NormalizeEmbeddedChartPath(objectPath);
+        foreach (OdfEmbeddedChartInfo chart in GetEmbeddedCharts())
+        {
+            if (string.Equals(NormalizeEmbeddedChartPath(chart.ObjectPath), normalized, StringComparison.Ordinal))
+                return chart;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Removes an embedded chart and its package subdocument.
+    /// 移除嵌入圖表及其封裝子文件。
+    /// </summary>
+    /// <param name="chartInfo">The embedded chart summary to remove. / 要移除的嵌入圖表摘要。</param>
+    /// <returns><see langword="true"/> if the chart was removed; otherwise, <see langword="false"/>. / 若已移除圖表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveEmbeddedChart(OdfEmbeddedChartInfo chartInfo)
+    {
+        if (chartInfo is null)
+            throw new ArgumentNullException(nameof(chartInfo));
+
+        return RemoveEmbeddedChart(chartInfo.ObjectPath);
+    }
+
+    /// <summary>
+    /// Removes an embedded chart by subpackage path and cleans all package relations.
+    /// 依子封裝路徑移除嵌入圖表，並清理所有封裝關聯。
+    /// </summary>
+    /// <param name="objectPath">The embedded chart subpackage path. / 嵌入圖表子封裝路徑。</param>
+    /// <returns><see langword="true"/> if the chart was removed; otherwise, <see langword="false"/>. / 若已移除圖表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveEmbeddedChart(string objectPath)
+    {
+        if (string.IsNullOrWhiteSpace(objectPath))
+            return false;
+
+        string normalized = NormalizeEmbeddedChartPath(objectPath);
+        bool removed = false;
+        foreach (OdfTableSheet sheet in Worksheets)
+        {
+            OdfNode? shapes = OdfTableSheetDomHelper.FindChildElement(sheet.TableNode, "shapes", OdfNamespaces.Table);
+            if (shapes is null)
+                continue;
+
+            var frames = new List<OdfNode>();
+            foreach (OdfNode frame in shapes.Children)
+            {
+                if (frame.LocalName != "frame" || frame.NamespaceUri != OdfNamespaces.Draw)
+                    continue;
+                foreach (OdfNode child in frame.Children)
+                {
+                    if (child.LocalName == "object" &&
+                        child.NamespaceUri == OdfNamespaces.Draw &&
+                        string.Equals(
+                            NormalizeEmbeddedChartPath(child.GetAttribute("href", OdfNamespaces.XLink) ?? string.Empty),
+                            normalized,
+                            StringComparison.Ordinal))
+                    {
+                        frames.Add(frame);
+                        break;
+                    }
+                }
+            }
+
+            foreach (OdfNode frame in frames)
+                removed |= shapes.RemoveChild(frame);
+            if (shapes.Children.Count == 0)
+                sheet.TableNode.RemoveChild(shapes);
+        }
+
+        if (!removed)
+            return false;
+
+        UntrackEmbeddedDocuments(normalized);
+        RemoveEmbeddedChartPackage(normalized);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all embedded charts and their package subdocuments.
+    /// 移除所有嵌入圖表及其封裝子文件。
+    /// </summary>
+    /// <returns>The number of removed embedded charts. / 已移除的嵌入圖表數量。</returns>
+    public int ClearEmbeddedCharts()
+    {
+        var objectPaths = new HashSet<string>(StringComparer.Ordinal);
+        foreach (OdfEmbeddedChartInfo chart in GetEmbeddedCharts())
+            objectPaths.Add(NormalizeEmbeddedChartPath(chart.ObjectPath));
+
+        int removed = 0;
+        foreach (string objectPath in objectPaths)
+        {
+            if (RemoveEmbeddedChart(objectPath))
+                removed++;
+        }
+        return removed;
+    }
+
+    private void RemoveEmbeddedChartPackage(string objectPath)
+    {
+        string prefix = objectPath + "/";
+        var entries = new List<string>();
+        foreach (string entry in Package.Entries.Keys)
+        {
+            if (entry.StartsWith(prefix, StringComparison.Ordinal))
+                entries.Add(entry);
+        }
+        foreach (string entry in entries)
+            Package.RemoveEntry(entry);
+        Package.RemoveEntry(prefix);
+        Package.SaveManifestToEntries();
+    }
+
+    private static string NormalizeEmbeddedChartPath(string objectPath) =>
+        objectPath.Replace('\\', '/').Trim().TrimStart('.').Trim('/');
 }
