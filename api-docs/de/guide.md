@@ -22,8 +22,8 @@ Bei nicht vertrauenswürdigen Dateien sollten Reader- und Paket-Ressourcengrenze
 Aussagen werden in `PackageFidelity`, `SemanticApiDepth` und `InteropEvidence` getrennt; keine Dimension beweist eine andere. Veröffentlichte Leistungswerte müssen Commit, Runtime, Umgebung und reproduzierbare Methode nennen. Die Leistungsbudgets befinden sich noch in der Erfassungsphase.
 
 - [API-Referenz öffnen [en + zh-TW]](xref:OdfKit)
-- [Aussagen und Nachweise [zh-TW]](../../docs/evidence-index.md)
-- [Sicherheitsgrenzen [zh-TW]](../../docs/security-limits.md)
-- [Geistiges Eigentum und Compliance [zh-TW]](../../docs/ip-compliance.md)
-- [Lizenz [zh-TW]](../articles/license.md)
-- [Hinweise zu Drittanbietern [zh-TW]](../../THIRD-PARTY-NOTICES.md)
+- [Aussagen und Nachweise](project-docs/evidence-index.md)
+- [Sicherheitsgrenzen](project-docs/security-limits.md)
+- [Geistiges Eigentum und Compliance](project-docs/ip-compliance.md)
+- [Lizenz](articles/license.md)
+- [Hinweise zu Drittanbietern](project-docs/THIRD-PARTY-NOTICES.md)

@@ -2,10 +2,10 @@ name: API documentation
 
 on:
   pull_request:
-    paths: ['OdfKit/**', 'OdfKit.Extensions.*/**', 'api-docs/**', 'docs/**', 'eng/Build-ApiDocs.ps1', '.github/workflows/api-docs.yml']
+    paths: ['OdfKit/**', 'OdfKit.Extensions.*/**', 'api-docs/**', 'docs/**', 'THIRD-PARTY-NOTICES.md', 'eng/Build-ApiDocs.ps1', 'eng/Test-ApiDocsTranslations*.ps1', '.github/workflows/api-docs.yml']
   push:
     branches: [main]
-    paths: ['OdfKit/**', 'OdfKit.Extensions.*/**', 'api-docs/**', 'docs/**', 'eng/Build-ApiDocs.ps1', '.github/workflows/api-docs.yml']
+    paths: ['OdfKit/**', 'OdfKit.Extensions.*/**', 'api-docs/**', 'docs/**', 'THIRD-PARTY-NOTICES.md', 'eng/Build-ApiDocs.ps1', 'eng/Test-ApiDocsTranslations*.ps1', '.github/workflows/api-docs.yml']
   workflow_dispatch:
 
 permissions:
@@ -27,6 +27,9 @@ jobs:
       - uses: ./.github/actions/setup-dotnet-odfkit
         with:
           dotnet-versions: 10.0.x
+      - name: Test translation contract
+        shell: pwsh
+        run: ./eng/Test-ApiDocsTranslations.Tests.ps1
       - name: Build 12-locale API site
         shell: pwsh
         run: ./eng/Build-ApiDocs.ps1

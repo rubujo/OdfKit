@@ -22,10 +22,10 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
   切換器、`hreflang` 注入或模板 partial。
 - **根路徑是語言選擇頁**：根首頁保留 12 語系入口，不設定 `redirect_url` 強制導向
   `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
-- **權威文件不複製**：智慧財產、安全、證據與第三方聲明直接以 DocFX file mapping
-  納入 repo 正式來源，避免網站副本漂移。
-- **目的語系必須明示**：共用 API 入口標示 `[en + zh-TW]`；指向單一正體中文權威頁的
-  跨語系連結標示 `[zh-TW]`。全站 navbar 維持雙語，不模擬語系 session。
+- **權威來源與受控譯文**：正體中文正式文件直接以 DocFX file mapping 納入；其餘 11 語系的
+  譯文提交至 `api-docs/<locale>/`，並以來源 SHA-256、必要 token 與 CI 契約防止漂移。
+- **目的語系必須明示**：共用 API 入口標示 `[en + zh-TW]`；各語系正式文件連向同語系譯文，
+  並在頁內揭露正體中文權威來源。全站 navbar 維持雙語，不模擬語系 session。
 - **不公開原始維護檔**：`project-docs/` 僅發布四個權威 HTML 頁面。權威頁所引用的
   次級 repo 文件與機器可讀 manifest 連到 GitHub `blob/main` 渲染頁，不複製成
   Pages 的 `.md` 或 `.json` 資源。
@@ -42,12 +42,16 @@ api-docs/
   <locale>/index.md   # 12 語系入口頁，front matter 設 _lang
   <locale>/guide.md   # 12 語系的使用、合規、安全與證據指南
   <locale>/toc.yml    # 12 語系各自的 DocFX 導覽
+  <locale>/articles/  # 授權譯文（zh-TW 使用共用權威頁）
+  <locale>/project-docs/ # IP、安全、證據及第三方聲明譯文
   articles/           # 站台說明、授權等共用文章
+  translations.json  # 權威來源、目的路徑、來源雜湊與不可翻譯 token
   api/                # docfx metadata 產物（git 忽略，勿手改）
 ```
 
-`docs/ip-compliance.md`、`docs/security-limits.md`、`docs/evidence-index.md` 與根目錄
-`THIRD-PARTY-NOTICES.md` 會建置到 `project-docs/`；來源檔仍是單一事實來源。
+`docs/ip-compliance.md`、`docs/security-limits.md`、`docs/evidence-index.md`、根目錄
+`THIRD-PARTY-NOTICES.md` 與 `api-docs/articles/license.md` 是 `zh-TW` 唯一權威來源。其他語系
+譯文的工作流程見 `api-docs/TRANSLATING.md`。
 
 ## 3. 語系契約
 
@@ -56,10 +60,11 @@ api-docs/
   2. 根層 `index.md` 連到每個語系入口；
   3. 入口頁連到同語系指南與共用 API reference；
   4. 指南包含能力三維度、CC0、AI 產製、安全、互通邊界及證據入口；
-  5. 指南與 TOC 連到站內授權、IP、第三方、安全及證據頁；
+  5. 指南與 TOC 連到同語系的授權、IP、第三方、安全及證據頁；
   6. `docfx.json` 的 `fileMetadata._lang` 與 front matter `_lang` 一致。
   7. 語系 TOC 以 DocFX `uid: OdfKit` 指向 API，不得使用 `href: xref:*`；
-  8. API 與跨語系正式頁面入口均標示實際內容語系。
+  8. API 入口標示實際內容語系，正式譯文具備來源路徑與 SHA-256 metadata；
+  9. `Test-ApiDocsTranslations.ps1` 驗證 55 份譯文、必要 token 與導覽沒有漂移。
 - 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md`、`guide.md` 與 `toc.yml`
   （front matter `_lang`）→ 在根層 `index.md` 語言表與 `docfx.json` content 增列。
   缺一步建置即失敗。
@@ -79,6 +84,7 @@ api-docs/
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
 | modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 12 語系 HTML `lang`。 |
 | 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
+| 翻譯契約 | 驗證 55 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
 
 ## 5. 本機建置與預覽
 
@@ -96,6 +102,7 @@ dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
 - 單一 DocFX 站共用 API reference；非英文／正體中文語系只翻譯概念頁與 TOC，
   不宣稱 API member 已完整翻譯。
 - DocFX 不保存讀者的語系狀態；navbar 維持全站共用雙語。跨語系目的地以
-  `[en + zh-TW]` 或 `[zh-TW]` 明示，不加入自製 JavaScript 動態切換。
+  `[en + zh-TW]` 明示，不加入自製 JavaScript 動態切換。Footer 連回語言選擇頁，正式文件由
+  各語系 TOC 導覽。
 - 舊版站台（`reference/` 前綴與站外語系落地頁）的 URL 已隨結構重整移除，
   不提供轉址。

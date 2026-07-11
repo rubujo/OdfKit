@@ -4,13 +4,13 @@
   href: guide.md
 - name: Referencia API [en + zh-TW]
   uid: OdfKit
-- name: Licencia [zh-TW]
-  href: ../articles/license.md
-- name: AI a duševné vlastníctvo [zh-TW]
-  href: ../../docs/ip-compliance.md
-- name: Oznámenia tretích strán [zh-TW]
-  href: ../../THIRD-PARTY-NOTICES.md
-- name: Bezpečnostné limity [zh-TW]
-  href: ../../docs/security-limits.md
-- name: Register dôkazov [zh-TW]
-  href: ../../docs/evidence-index.md
+- name: Licencia
+  href: articles/license.md
+- name: AI a duševné vlastníctvo
+  href: project-docs/ip-compliance.md
+- name: Oznámenia tretích strán
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Bezpečnostné limity
+  href: project-docs/security-limits.md
+- name: Register dôkazov
+  href: project-docs/evidence-index.md

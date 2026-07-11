@@ -33,19 +33,15 @@ try {
     }
     Write-Host "PASS：DocFX 固定版本 $expectedDocfxVersion。"
 
+    & pwsh eng/Test-ApiDocsTranslations.ps1 -FailOnIssues
+    if ($LASTEXITCODE) { throw 'DocFX 正式文件翻譯契約驗證失敗。' }
+
     # 語系契約驗證：locales.json 是語系目錄的單一事實來源，每個語系必須有站內入口頁，
     # 且根層 index.md 必須連到每個語系（否則語系入口無法被發現）。
     $catalog = Get-Content api-docs/locales.json -Raw | ConvertFrom-Json
     $rootIndex = Get-Content api-docs/index.md -Raw
     $docfxJson = Get-Content api-docs/docfx.json -Raw
     $docfxConfig = $docfxJson | ConvertFrom-Json
-    $requiredSharedLinks = @(
-        '../articles/license.md',
-        '../../docs/ip-compliance.md',
-        '../../THIRD-PARTY-NOTICES.md',
-        '../../docs/security-limits.md',
-        '../../docs/evidence-index.md'
-    )
     foreach ($locale in $catalog.locales) {
         $localePath = "api-docs/$locale/index.md"
         $guidePath = "api-docs/$locale/guide.md"
@@ -56,6 +52,11 @@ try {
         $localeContent = Get-Content $localePath -Raw
         $guideContent = Get-Content $guidePath -Raw
         $tocContent = Get-Content $tocPath -Raw
+        $requiredOfficialLinks = if ($locale -eq 'zh-TW') {
+            @('../articles/license.md', '../../docs/ip-compliance.md', '../../THIRD-PARTY-NOTICES.md', '../../docs/security-limits.md', '../../docs/evidence-index.md')
+        } else {
+            @('articles/license.md', 'project-docs/ip-compliance.md', 'project-docs/THIRD-PARTY-NOTICES.md', 'project-docs/security-limits.md', 'project-docs/evidence-index.md')
+        }
         if ($localeContent -notmatch "(?m)^_lang:\s*$([regex]::Escape($locale))\s*$") { throw "$localePath 缺少正確的 _lang metadata。" }
         if ($localeContent -notmatch [regex]::Escape('(xref:OdfKit)')) { throw "$localePath 缺少 API reference 入口。" }
         if ($localeContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$localePath 的 API 入口缺少內容語系標示。" }
@@ -65,7 +66,7 @@ try {
         foreach ($required in @('PackageFidelity', 'SemanticApiDepth', 'InteropEvidence', 'CC0-1.0', 'xref:OdfKit')) {
             if ($guideContent -notmatch [regex]::Escape($required)) { throw "$guidePath 缺少必要內容：$required。" }
         }
-        foreach ($requiredLink in $requiredSharedLinks) {
+        foreach ($requiredLink in $requiredOfficialLinks) {
             if ($guideContent -notmatch [regex]::Escape($requiredLink)) { throw "$guidePath 缺少正式聲明連結：$requiredLink。" }
             if ($tocContent -notmatch [regex]::Escape($requiredLink)) { throw "$tocPath 缺少正式聲明連結：$requiredLink。" }
         }
@@ -73,13 +74,6 @@ try {
         if ($tocContent -notmatch '(?m)^\s*uid:\s*OdfKit\s*$') { throw "$tocPath 缺少以 uid 指定的共用 API reference 入口。" }
         if ($tocContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$tocPath 的 API 入口缺少內容語系標示。" }
         if ($guideContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$guidePath 的 API 入口缺少內容語系標示。" }
-        if ($locale -ne 'zh-TW') {
-            $guideZhTwLabels = [regex]::Matches($guideContent, [regex]::Escape('[zh-TW]')).Count
-            $tocZhTwLabels = [regex]::Matches($tocContent, [regex]::Escape('[zh-TW]')).Count
-            if ($guideZhTwLabels -lt $requiredSharedLinks.Count -or $tocZhTwLabels -lt $requiredSharedLinks.Count) {
-                throw "$locale 的指南或 TOC 未明示共用正式頁面使用 zh-TW。"
-            }
-        }
         if ($locale -notin @('en', 'zh-TW') -and $localeContent -match 'Open the API reference|Site notes and compliance|Other languages|This project content is written|Original OdfKit content') {
             throw "$localePath 仍含英文 placeholder，尚未完成本地化。"
         }
@@ -95,11 +89,8 @@ try {
     foreach ($mapping in @('ip-compliance.md', 'security-limits.md', 'evidence-index.md', 'THIRD-PARTY-NOTICES.md')) {
         if ($docfxJson -notmatch [regex]::Escape($mapping)) { throw "DocFX content mapping 缺少權威文件：$mapping。" }
     }
-    foreach ($footerTarget in @('articles/license.html', 'project-docs/ip-compliance.html', 'project-docs/THIRD-PARTY-NOTICES.html', 'project-docs/security-limits.html', 'project-docs/evidence-index.html')) {
-        if ($docfxConfig.build.globalMetadata._appFooter -notmatch [regex]::Escape("/OdfKit/$footerTarget")) { throw "modern footer 缺少入口：$footerTarget。" }
-    }
-    if ([regex]::Matches($docfxConfig.build.globalMetadata._appFooter, [regex]::Escape('[zh-TW]')).Count -lt 5) {
-        throw 'modern footer 的正式頁面入口必須明示 zh-TW。'
+    if ($docfxConfig.build.globalMetadata._appFooter -notmatch [regex]::Escape('/OdfKit/index.html')) {
+        throw 'modern footer 缺少語言選擇頁入口。'
     }
     Write-Host "PASS：$($catalog.locales.Count) 語系契約驗證通過。"
 
@@ -271,14 +262,22 @@ try {
     $contentHtmlFiles = @($htmlFiles | Where-Object { $_.Name -ne 'toc.html' })
     foreach ($page in $contentHtmlFiles) {
         $html = [IO.File]::ReadAllText($page.FullName)
-        foreach ($footerTarget in @('/OdfKit/articles/license.html', '/OdfKit/project-docs/ip-compliance.html', '/OdfKit/project-docs/THIRD-PARTY-NOTICES.html', '/OdfKit/project-docs/security-limits.html', '/OdfKit/project-docs/evidence-index.html')) {
-            if ($html -notmatch [regex]::Escape($footerTarget)) {
-                throw "modern footer 驗證失敗：$($page.FullName.Substring($siteDir.Length + 1)) 缺少 $footerTarget。"
-            }
+        if ($html -notmatch [regex]::Escape('/OdfKit/index.html')) {
+            throw "modern footer 驗證失敗：$($page.FullName.Substring($siteDir.Length + 1)) 缺少語言選擇頁。"
         }
     }
     foreach ($locale in $catalog.locales) {
-        foreach ($pageName in @('index.html', 'guide.html')) {
+        $localizedPages = @('index.html', 'guide.html')
+        if ($locale -ne 'zh-TW') {
+            $localizedPages += @(
+                'articles/license.html',
+                'project-docs/ip-compliance.html',
+                'project-docs/THIRD-PARTY-NOTICES.html',
+                'project-docs/security-limits.html',
+                'project-docs/evidence-index.html'
+            )
+        }
+        foreach ($pageName in $localizedPages) {
             $pagePath = Join-Path $siteDir "$locale/$pageName"
             $html = [IO.File]::ReadAllText($pagePath)
             $langPattern = '<html[^>]+lang=["'']{0}["'']' -f [regex]::Escape($locale)

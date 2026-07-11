@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "canonicalLocale": "zh-TW",
+  "locales": ["zh-TW", "en", "da", "de", "fr", "it", "ko", "ms", "nb", "nl", "pt", "sk"],
+  "documents": [
+    {
+      "id": "license",
+      "source": "api-docs/articles/license.md",
+      "sourceSha256": "2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2",
+      "destination": "api-docs/{locale}/articles/license.md",
+      "requiredTokens": ["CC0-1.0 Universal", "LICENSE", "THIRD-PARTY-NOTICES"]
+    },
+    {
+      "id": "ip-compliance",
+      "source": "docs/ip-compliance.md",
+      "sourceSha256": "cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967",
+      "destination": "api-docs/{locale}/project-docs/ip-compliance.md",
+      "requiredTokens": ["CC0-1.0 Universal", "Affirmer", "indemnity", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md"]
+    },
+    {
+      "id": "security-limits",
+      "source": "docs/security-limits.md",
+      "sourceSha256": "d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05",
+      "destination": "api-docs/{locale}/project-docs/security-limits.md",
+      "requiredTokens": ["OdsStreamReader", "OdtStreamReader", "64 MiB", "1,048,576", "16,384", "16 MiB", "1,000,000", "LeaveOpen", "MaxXmlCharactersInDocument = 0", "CPU DoS"]
+    },
+    {
+      "id": "evidence-index",
+      "source": "docs/evidence-index.md",
+      "sourceSha256": "c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142",
+      "destination": "api-docs/{locale}/project-docs/evidence-index.md",
+      "requiredTokens": ["ODS-PACKAGE-001", "ODS-SEMANTIC-001", "ODT-SEMANTIC-001", "ODP-SEMANTIC-001", "ODG-SEMANTIC-001", "ODF-INTEROP-001", "PackageFidelity", "SemanticApiDepth", "InteropEvidence", "claims.json", "semantic-coverage.json"]
+    },
+    {
+      "id": "third-party-notices",
+      "source": "THIRD-PARTY-NOTICES.md",
+      "sourceSha256": "40d9519692d33bb5d10885c6e4ec81aafd0e92fbefc747d354231955062fb3a1",
+      "destination": "api-docs/{locale}/project-docs/THIRD-PARTY-NOTICES.md",
+      "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
+    }
+  ]
+}

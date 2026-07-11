@@ -4,13 +4,13 @@
   href: guide.md
 - name: API-referanse [en + zh-TW]
   uid: OdfKit
-- name: Lisens [zh-TW]
-  href: ../articles/license.md
-- name: KI og immaterielle rettigheter [zh-TW]
-  href: ../../docs/ip-compliance.md
-- name: Tredjepartsmerknader [zh-TW]
-  href: ../../THIRD-PARTY-NOTICES.md
-- name: Sikkerhetsgrenser [zh-TW]
-  href: ../../docs/security-limits.md
-- name: Evidensindeks [zh-TW]
-  href: ../../docs/evidence-index.md
+- name: Lisens
+  href: articles/license.md
+- name: KI og immaterielle rettigheter
+  href: project-docs/ip-compliance.md
+- name: Tredjepartsmerknader
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Sikkerhetsgrenser
+  href: project-docs/security-limits.md
+- name: Evidensindeks
+  href: project-docs/evidence-index.md

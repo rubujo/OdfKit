@@ -4,13 +4,13 @@
   href: guide.md
 - name: API-referentie [en + zh-TW]
   uid: OdfKit
-- name: Licentie [zh-TW]
-  href: ../articles/license.md
-- name: AI en intellectueel eigendom [zh-TW]
-  href: ../../docs/ip-compliance.md
-- name: Kennisgevingen van derden [zh-TW]
-  href: ../../THIRD-PARTY-NOTICES.md
-- name: Beveiligingsgrenzen [zh-TW]
-  href: ../../docs/security-limits.md
-- name: Bewijsindex [zh-TW]
-  href: ../../docs/evidence-index.md
+- name: Licentie
+  href: articles/license.md
+- name: AI en intellectueel eigendom
+  href: project-docs/ip-compliance.md
+- name: Kennisgevingen van derden
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Beveiligingsgrenzen
+  href: project-docs/security-limits.md
+- name: Bewijsindex
+  href: project-docs/evidence-index.md

@@ -22,8 +22,8 @@ Keep reader and package resource limits enabled for untrusted files, and run val
 Claims are separated into `PackageFidelity`, `SemanticApiDepth`, and `InteropEvidence`; one dimension cannot prove another. Published performance results must identify the commit, runtime, environment, and reproducible method. Performance budgets remain in the fixed-sample collection phase.
 
 - [Open the API reference [en + zh-TW]](xref:OdfKit)
-- [Claims and evidence index [zh-TW]](../../docs/evidence-index.md)
-- [Security limits [zh-TW]](../../docs/security-limits.md)
-- [Intellectual property and compliance [zh-TW]](../../docs/ip-compliance.md)
-- [License [zh-TW]](../articles/license.md)
-- [Third-party notices [zh-TW]](../../THIRD-PARTY-NOTICES.md)
+- [Claims and evidence index](project-docs/evidence-index.md)
+- [Security limits](project-docs/security-limits.md)
+- [Intellectual property and compliance](project-docs/ip-compliance.md)
+- [License](articles/license.md)
+- [Third-party notices](project-docs/THIRD-PARTY-NOTICES.md)

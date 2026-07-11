@@ -22,8 +22,8 @@ Laat resourcegrenzen voor reader en package ingeschakeld bij niet-vertrouwde bes
 Claims zijn gescheiden in `PackageFidelity`, `SemanticApiDepth` en `InteropEvidence`; één dimensie bewijst de andere niet. Gepubliceerde prestatieresultaten moeten commit, runtime, omgeving en reproduceerbare methode noemen. De prestatiebudgetten bevinden zich nog in de verzamelingsfase.
 
 - [API-referentie openen [en + zh-TW]](xref:OdfKit)
-- [Claims- en bewijsindex [zh-TW]](../../docs/evidence-index.md)
-- [Beveiligingsgrenzen [zh-TW]](../../docs/security-limits.md)
-- [Intellectueel eigendom en naleving [zh-TW]](../../docs/ip-compliance.md)
-- [Licentie [zh-TW]](../articles/license.md)
-- [Kennisgevingen van derden [zh-TW]](../../THIRD-PARTY-NOTICES.md)
+- [Claims- en bewijsindex](project-docs/evidence-index.md)
+- [Beveiligingsgrenzen](project-docs/security-limits.md)
+- [Intellectueel eigendom en naleving](project-docs/ip-compliance.md)
+- [Licentie](articles/license.md)
+- [Kennisgevingen van derden](project-docs/THIRD-PARTY-NOTICES.md)

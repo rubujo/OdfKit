@@ -4,13 +4,13 @@
   href: guide.md
 - name: Rujukan API [en + zh-TW]
   uid: OdfKit
-- name: Lesen [zh-TW]
-  href: ../articles/license.md
-- name: AI dan harta intelek [zh-TW]
-  href: ../../docs/ip-compliance.md
-- name: Notis pihak ketiga [zh-TW]
-  href: ../../THIRD-PARTY-NOTICES.md
-- name: Had keselamatan [zh-TW]
-  href: ../../docs/security-limits.md
-- name: Indeks bukti [zh-TW]
-  href: ../../docs/evidence-index.md
+- name: Lesen
+  href: articles/license.md
+- name: AI dan harta intelek
+  href: project-docs/ip-compliance.md
+- name: Notis pihak ketiga
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: Had keselamatan
+  href: project-docs/security-limits.md
+- name: Indeks bukti
+  href: project-docs/evidence-index.md

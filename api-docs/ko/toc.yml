@@ -4,13 +4,13 @@
   href: guide.md
 - name: API 참조 [en + zh-TW]
   uid: OdfKit
-- name: 라이선스 [zh-TW]
-  href: ../articles/license.md
-- name: AI 및 지식재산권 [zh-TW]
-  href: ../../docs/ip-compliance.md
-- name: 제3자 고지 [zh-TW]
-  href: ../../THIRD-PARTY-NOTICES.md
-- name: 보안 제한 [zh-TW]
-  href: ../../docs/security-limits.md
-- name: 증거 색인 [zh-TW]
-  href: ../../docs/evidence-index.md
+- name: 라이선스
+  href: articles/license.md
+- name: AI 및 지식재산권
+  href: project-docs/ip-compliance.md
+- name: 제3자 고지
+  href: project-docs/THIRD-PARTY-NOTICES.md
+- name: 보안 제한
+  href: project-docs/security-limits.md
+- name: 증거 색인
+  href: project-docs/evidence-index.md
