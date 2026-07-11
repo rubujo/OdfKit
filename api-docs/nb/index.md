@@ -9,7 +9,7 @@ Språk: **Norsk bokmål**
 
 API-medlemsinnholdet er for øyeblikket tilgjengelig på engelsk og tradisjonell kinesisk (Taiwan).
 
-- [Åpne API-referansen](xref:OdfKit)
+- [Åpne API-referansen [en + zh-TW]](xref:OdfKit)
 - [Veiledning for bruk, samsvar, sikkerhet og dokumentasjon](guide.md)
 - [Andre språk](../index.md)
 

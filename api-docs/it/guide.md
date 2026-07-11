@@ -21,9 +21,9 @@ Per file non attendibili, mantenere attivi i limiti di risorse di reader e packa
 
 Le dichiarazioni sono suddivise in `PackageFidelity`, `SemanticApiDepth` e `InteropEvidence`; una dimensione non dimostra le altre. I risultati prestazionali pubblicati devono indicare commit, runtime, ambiente e metodo riproducibile. I budget prestazionali sono ancora nella fase di raccolta.
 
-- [Apri il riferimento API](xref:OdfKit)
-- [Indice delle dichiarazioni e prove](../../docs/evidence-index.md)
-- [Limiti di sicurezza](../../docs/security-limits.md)
-- [Proprietà intellettuale e conformità](../../docs/ip-compliance.md)
-- [Licenza](../articles/license.md)
-- [Avvisi di terze parti](../../THIRD-PARTY-NOTICES.md)
+- [Apri il riferimento API [en + zh-TW]](xref:OdfKit)
+- [Indice delle dichiarazioni e prove [zh-TW]](../../docs/evidence-index.md)
+- [Limiti di sicurezza [zh-TW]](../../docs/security-limits.md)
+- [Proprietà intellettuale e conformità [zh-TW]](../../docs/ip-compliance.md)
+- [Licenza [zh-TW]](../articles/license.md)
+- [Avvisi di terze parti [zh-TW]](../../THIRD-PARTY-NOTICES.md)

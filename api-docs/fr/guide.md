@@ -21,9 +21,9 @@ Conservez les limites de ressources des readers et des packages pour les fichier
 
 Les affirmations sont séparées en `PackageFidelity`, `SemanticApiDepth` et `InteropEvidence` ; une dimension ne prouve pas les autres. Les résultats de performance publiés doivent préciser le commit, le runtime, l'environnement et la méthode reproductible. Les budgets de performance sont encore en phase de collecte.
 
-- [Ouvrir la référence API](xref:OdfKit)
-- [Index des affirmations et preuves](../../docs/evidence-index.md)
-- [Limites de sécurité](../../docs/security-limits.md)
-- [Propriété intellectuelle et conformité](../../docs/ip-compliance.md)
-- [Licence](../articles/license.md)
-- [Avis relatifs aux tiers](../../THIRD-PARTY-NOTICES.md)
+- [Ouvrir la référence API [en + zh-TW]](xref:OdfKit)
+- [Index des affirmations et preuves [zh-TW]](../../docs/evidence-index.md)
+- [Limites de sécurité [zh-TW]](../../docs/security-limits.md)
+- [Propriété intellectuelle et conformité [zh-TW]](../../docs/ip-compliance.md)
+- [Licence [zh-TW]](../articles/license.md)
+- [Avis relatifs aux tiers [zh-TW]](../../THIRD-PARTY-NOTICES.md)

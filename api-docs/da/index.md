@@ -9,7 +9,7 @@ Sprog: **Dansk**
 
 API-medlemsindholdet leveres i øjeblikket på engelsk og traditionelt kinesisk (Taiwan).
 
-- [Åbn API-referencen](xref:OdfKit)
+- [Åbn API-referencen [en + zh-TW]](xref:OdfKit)
 - [Vejledning om brug, overholdelse, sikkerhed og evidens](guide.md)
 - [Andre sprog](../index.md)
 

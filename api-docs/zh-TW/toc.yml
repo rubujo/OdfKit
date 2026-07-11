@@ -2,8 +2,8 @@
   href: index.md
 - name: 使用與證據指南
   href: guide.md
-- name: API 參考文件
-  href: xref:OdfKit
+- name: API 參考文件 [en + zh-TW]
+  uid: OdfKit
 - name: 授權
   href: ../articles/license.md
 - name: AI 與智慧財產

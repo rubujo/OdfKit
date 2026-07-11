@@ -9,7 +9,7 @@ Jazyk: **Slovenčina**
 
 Obsah členov API je momentálne k dispozícii v angličtine a tradičnej čínštine (Taiwan).
 
-- [Otvoriť referenciu API](xref:OdfKit)
+- [Otvoriť referenciu API [en + zh-TW]](xref:OdfKit)
 - [Príručka používania, súladu, bezpečnosti a dôkazov](guide.md)
 - [Ďalšie jazyky](../index.md)
 

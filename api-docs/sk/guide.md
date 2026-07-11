@@ -21,9 +21,9 @@ Pri nedôveryhodných súboroch ponechajte zapnuté limity prostriedkov readera 
 
 Tvrdenia sú rozdelené na `PackageFidelity`, `SemanticApiDepth` a `InteropEvidence`; jedna dimenzia nedokazuje ostatné. Zverejnené výsledky výkonu musia uvádzať commit, runtime, prostredie a reprodukovateľnú metódu. Výkonnostné rozpočty sú stále vo fáze zberu vzoriek.
 
-- [Otvoriť referenciu API](xref:OdfKit)
-- [Index tvrdení a dôkazov](../../docs/evidence-index.md)
-- [Bezpečnostné limity](../../docs/security-limits.md)
-- [Duševné vlastníctvo a súlad](../../docs/ip-compliance.md)
-- [Licencia](../articles/license.md)
-- [Oznámenia tretích strán](../../THIRD-PARTY-NOTICES.md)
+- [Otvoriť referenciu API [en + zh-TW]](xref:OdfKit)
+- [Index tvrdení a dôkazov [zh-TW]](../../docs/evidence-index.md)
+- [Bezpečnostné limity [zh-TW]](../../docs/security-limits.md)
+- [Duševné vlastníctvo a súlad [zh-TW]](../../docs/ip-compliance.md)
+- [Licencia [zh-TW]](../articles/license.md)
+- [Oznámenia tretích strán [zh-TW]](../../THIRD-PARTY-NOTICES.md)

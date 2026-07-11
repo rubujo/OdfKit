@@ -18,16 +18,13 @@
       { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md"], "dest": "project-docs" },
       { "src": "..", "files": ["THIRD-PARTY-NOTICES.md"], "dest": "project-docs" }
     ],
-    "resource": [
-      { "src": "../docs", "files": ["claims.json", "corpus-manifest.md", "foreign-extension-policy.md", "odf-format-support.md", "odf-toolkit-parity.md", "provenance/clean-room-source-index.md", "provenance/README.md", "udx-non-goals.md", "version-delivery.md"], "dest": "project-docs" }
-    ],
     "globalMetadata": {
       "_appName": "OdfKit API Reference",
       "_appTitle": "OdfKit API Reference",
       "_enableSearch": true,
       "_disableContribution": true,
       "_lang": "zh-TW",
-      "_appFooter": "OdfKit · <a href=\"/OdfKit/articles/license.html\">授權 / License</a> · <a href=\"/OdfKit/project-docs/ip-compliance.html\">AI 與智慧財產 / AI &amp; IP</a> · <a href=\"/OdfKit/project-docs/THIRD-PARTY-NOTICES.html\">第三方聲明 / Third-party</a> · <a href=\"/OdfKit/project-docs/security-limits.html\">安全 / Security</a> · <a href=\"/OdfKit/project-docs/evidence-index.html\">證據 / Evidence</a>"
+      "_appFooter": "OdfKit · <a href=\"/OdfKit/articles/license.html\">授權 / License [zh-TW]</a> · <a href=\"/OdfKit/project-docs/ip-compliance.html\">AI 與智慧財產 / AI &amp; IP [zh-TW]</a> · <a href=\"/OdfKit/project-docs/THIRD-PARTY-NOTICES.html\">第三方聲明 / Third-party [zh-TW]</a> · <a href=\"/OdfKit/project-docs/security-limits.html\">安全 / Security [zh-TW]</a> · <a href=\"/OdfKit/project-docs/evidence-index.html\">證據 / Evidence [zh-TW]</a>"
     },
     "fileMetadata": {
       "_lang": {

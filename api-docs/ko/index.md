@@ -9,7 +9,7 @@ _lang: ko
 
 API 멤버 문서는 현재 영어와 정체 중국어(대만)로 제공됩니다.
 
-- [API 참조 열기](xref:OdfKit)
+- [API 참조 열기 [en + zh-TW]](xref:OdfKit)
 - [사용, 규정 준수, 보안 및 증거 안내](guide.md)
 - [다른 언어](../index.md)
 

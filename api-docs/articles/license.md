@@ -4,6 +4,8 @@ title: 授權
 
 # 授權
 
+> 內容語系：正體中文（臺灣）（`zh-TW`）。
+
 OdfKit 原創程式碼與網站原創文件採
 [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。完整法律文字以
 [儲存庫根目錄 LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) 為準。

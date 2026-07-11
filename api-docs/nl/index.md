@@ -9,7 +9,7 @@ Taal: **Nederlands**
 
 API-inhoud is momenteel beschikbaar in het Engels en traditioneel Chinees (Taiwan).
 
-- [API-referentie openen](xref:OdfKit)
+- [API-referentie openen [en + zh-TW]](xref:OdfKit)
 - [Handleiding voor gebruik, naleving, beveiliging en bewijs](guide.md)
 - [Andere talen](../index.md)
 

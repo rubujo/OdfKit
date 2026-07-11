@@ -21,9 +21,9 @@ Behold ressursgrensene for reader og package for filer du ikke stoler på, og br
 
 Påstander deles i `PackageFidelity`, `SemanticApiDepth` og `InteropEvidence`; én dimensjon beviser ikke en annen. Publiserte ytelsesresultater må angi commit, runtime, miljø og reproduserbar metode. Ytelsesbudsjettene er fortsatt i innsamlingsfasen.
 
-- [Åpne API-referansen](xref:OdfKit)
-- [Påstands- og dokumentasjonsindeks](../../docs/evidence-index.md)
-- [Sikkerhetsgrenser](../../docs/security-limits.md)
-- [Immaterielle rettigheter og samsvar](../../docs/ip-compliance.md)
-- [Lisens](../articles/license.md)
-- [Tredjepartsmerknader](../../THIRD-PARTY-NOTICES.md)
+- [Åpne API-referansen [en + zh-TW]](xref:OdfKit)
+- [Påstands- og dokumentasjonsindeks [zh-TW]](../../docs/evidence-index.md)
+- [Sikkerhetsgrenser [zh-TW]](../../docs/security-limits.md)
+- [Immaterielle rettigheter og samsvar [zh-TW]](../../docs/ip-compliance.md)
+- [Lisens [zh-TW]](../articles/license.md)
+- [Tredjepartsmerknader [zh-TW]](../../THIRD-PARTY-NOTICES.md)

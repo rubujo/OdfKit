@@ -1,6 +1,6 @@
 - name: 語言 / Languages
   href: index.md
-- name: API
+- name: API [en + zh-TW]
   href: api/
 - name: 專案文件 / Project docs
   href: articles/

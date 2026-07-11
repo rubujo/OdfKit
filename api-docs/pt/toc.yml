@@ -2,15 +2,15 @@
   href: index.md
 - name: Guia de utilização e evidências
   href: guide.md
-- name: Referência da API
-  href: xref:OdfKit
-- name: Licença
+- name: Referência da API [en + zh-TW]
+  uid: OdfKit
+- name: Licença [zh-TW]
   href: ../articles/license.md
-- name: IA e propriedade intelectual
+- name: IA e propriedade intelectual [zh-TW]
   href: ../../docs/ip-compliance.md
-- name: Avisos de terceiros
+- name: Avisos de terceiros [zh-TW]
   href: ../../THIRD-PARTY-NOTICES.md
-- name: Limites de segurança
+- name: Limites de segurança [zh-TW]
   href: ../../docs/security-limits.md
-- name: Índice de evidências
+- name: Índice de evidências [zh-TW]
   href: ../../docs/evidence-index.md

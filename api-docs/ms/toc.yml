@@ -2,15 +2,15 @@
   href: index.md
 - name: Panduan penggunaan dan bukti
   href: guide.md
-- name: Rujukan API
-  href: xref:OdfKit
-- name: Lesen
+- name: Rujukan API [en + zh-TW]
+  uid: OdfKit
+- name: Lesen [zh-TW]
   href: ../articles/license.md
-- name: AI dan harta intelek
+- name: AI dan harta intelek [zh-TW]
   href: ../../docs/ip-compliance.md
-- name: Notis pihak ketiga
+- name: Notis pihak ketiga [zh-TW]
   href: ../../THIRD-PARTY-NOTICES.md
-- name: Had keselamatan
+- name: Had keselamatan [zh-TW]
   href: ../../docs/security-limits.md
-- name: Indeks bukti
+- name: Indeks bukti [zh-TW]
   href: ../../docs/evidence-index.md

@@ -9,7 +9,7 @@ Language: **English**
 
 API member content is currently provided in English and Traditional Chinese (Taiwan).
 
-- [Open the API reference](xref:OdfKit)
+- [Open the API reference [en + zh-TW]](xref:OdfKit)
 - [Usage, compliance, security, and evidence guide](guide.md)
 - [Other languages](../index.md)
 

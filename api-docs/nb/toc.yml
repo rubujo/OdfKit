@@ -2,15 +2,15 @@
   href: index.md
 - name: Bruks- og evidensveiledning
   href: guide.md
-- name: API-referanse
-  href: xref:OdfKit
-- name: Lisens
+- name: API-referanse [en + zh-TW]
+  uid: OdfKit
+- name: Lisens [zh-TW]
   href: ../articles/license.md
-- name: KI og immaterielle rettigheter
+- name: KI og immaterielle rettigheter [zh-TW]
   href: ../../docs/ip-compliance.md
-- name: Tredjepartsmerknader
+- name: Tredjepartsmerknader [zh-TW]
   href: ../../THIRD-PARTY-NOTICES.md
-- name: Sikkerhetsgrenser
+- name: Sikkerhetsgrenser [zh-TW]
   href: ../../docs/security-limits.md
-- name: Evidensindeks
+- name: Evidensindeks [zh-TW]
   href: ../../docs/evidence-index.md

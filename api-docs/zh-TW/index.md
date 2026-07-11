@@ -9,7 +9,7 @@ _lang: zh-TW
 
 API 成員內容目前以英文與正體中文（臺灣）提供。
 
-- [開啟 API 參考文件](xref:OdfKit)
+- [開啟 API 參考文件 [en + zh-TW]](xref:OdfKit)
 - [使用、合規、安全與證據指南](guide.md)
 - [其他語言](../index.md)
 

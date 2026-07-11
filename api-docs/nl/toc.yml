@@ -2,15 +2,15 @@
   href: index.md
 - name: Gebruiks- en bewijsgids
   href: guide.md
-- name: API-referentie
-  href: xref:OdfKit
-- name: Licentie
+- name: API-referentie [en + zh-TW]
+  uid: OdfKit
+- name: Licentie [zh-TW]
   href: ../articles/license.md
-- name: AI en intellectueel eigendom
+- name: AI en intellectueel eigendom [zh-TW]
   href: ../../docs/ip-compliance.md
-- name: Kennisgevingen van derden
+- name: Kennisgevingen van derden [zh-TW]
   href: ../../THIRD-PARTY-NOTICES.md
-- name: Beveiligingsgrenzen
+- name: Beveiligingsgrenzen [zh-TW]
   href: ../../docs/security-limits.md
-- name: Bewijsindex
+- name: Bewijsindex [zh-TW]
   href: ../../docs/evidence-index.md

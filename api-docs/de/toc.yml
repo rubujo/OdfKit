@@ -2,15 +2,15 @@
   href: index.md
 - name: Nutzungs- und Nachweisleitfaden
   href: guide.md
-- name: API-Referenz
-  href: xref:OdfKit
-- name: Lizenz
+- name: API-Referenz [en + zh-TW]
+  uid: OdfKit
+- name: Lizenz [zh-TW]
   href: ../articles/license.md
-- name: KI und geistiges Eigentum
+- name: KI und geistiges Eigentum [zh-TW]
   href: ../../docs/ip-compliance.md
-- name: Hinweise zu Drittanbietern
+- name: Hinweise zu Drittanbietern [zh-TW]
   href: ../../THIRD-PARTY-NOTICES.md
-- name: Sicherheitsgrenzen
+- name: Sicherheitsgrenzen [zh-TW]
   href: ../../docs/security-limits.md
-- name: Nachweisindex
+- name: Nachweisindex [zh-TW]
   href: ../../docs/evidence-index.md

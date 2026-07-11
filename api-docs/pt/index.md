@@ -9,7 +9,7 @@ Idioma: **Português**
 
 O conteúdo dos membros da API está atualmente disponível em inglês e chinês tradicional (Taiwan).
 
-- [Abrir a referência da API](xref:OdfKit)
+- [Abrir a referência da API [en + zh-TW]](xref:OdfKit)
 - [Guia de utilização, conformidade, segurança e evidências](guide.md)
 - [Outros idiomas](../index.md)
 

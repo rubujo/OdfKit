@@ -21,9 +21,9 @@ OdfKit의 독창적인 코드와 사이트 문서는 CC0-1.0 Universal을 사용
 
 주장은 `PackageFidelity`, `SemanticApiDepth`, `InteropEvidence`로 분리되며 한 차원이 다른 차원을 증명하지 않습니다. 공개 성능 결과에는 commit, runtime, 환경 및 재현 가능한 방법이 포함되어야 합니다. 성능 예산은 아직 고정 샘플 수집 단계입니다.
 
-- [API 참조 열기](xref:OdfKit)
-- [주장 및 증거 색인](../../docs/evidence-index.md)
-- [보안 제한](../../docs/security-limits.md)
-- [지식재산권 및 규정 준수](../../docs/ip-compliance.md)
-- [라이선스](../articles/license.md)
-- [제3자 고지](../../THIRD-PARTY-NOTICES.md)
+- [API 참조 열기 [en + zh-TW]](xref:OdfKit)
+- [주장 및 증거 색인 [zh-TW]](../../docs/evidence-index.md)
+- [보안 제한 [zh-TW]](../../docs/security-limits.md)
+- [지식재산권 및 규정 준수 [zh-TW]](../../docs/ip-compliance.md)
+- [라이선스 [zh-TW]](../articles/license.md)
+- [제3자 고지 [zh-TW]](../../THIRD-PARTY-NOTICES.md)

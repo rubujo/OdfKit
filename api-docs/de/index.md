@@ -9,7 +9,7 @@ Sprache: **Deutsch**
 
 API-Inhalte stehen derzeit auf Englisch und traditionellem Chinesisch (Taiwan) zur Verfügung.
 
-- [API-Referenz öffnen](xref:OdfKit)
+- [API-Referenz öffnen [en + zh-TW]](xref:OdfKit)
 - [Leitfaden zu Nutzung, Compliance, Sicherheit und Nachweisen](guide.md)
 - [Weitere Sprachen](../index.md)
 

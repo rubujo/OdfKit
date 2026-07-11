@@ -1,9 +1,12 @@
 # 智慧財產與合規說明（IP Compliance）
 
+> 內容語系：正體中文（臺灣）（`zh-TW`）。
+
 本文件供**採用者法遵／採購盡職調查**與**貢獻者**使用。它不是律師意見，也不能替代管轄地法律諮詢。
 
-相關來源稽核見 [provenance/README.md](provenance/README.md) 與
-[clean-room-source-index.md](provenance/clean-room-source-index.md)。
+相關來源稽核見
+[provenance/README.md](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md) 與
+[clean-room-source-index.md](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/clean-room-source-index.md)。
 
 ## 1. 授權模型（複合授權）
 
@@ -17,7 +20,7 @@
 **重要：** 分發含 OdfKit 及其相依的應用程式或套件時，必須同時滿足：
 
 1. 專案 `LICENSE`（CC0）對原創碼的效力；以及  
-2. [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md) 所列第三方授權義務。
+2. [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md) 所列第三方授權義務。
 
 不可對外宣稱「整包產物皆為公有領域」。
 
@@ -30,7 +33,7 @@
 ## 3. Clean-room 與禁止來源
 
 高風險模組（OpenFormula 評估、schema pattern 驗證、OpenPGP 加密、JSON Collaboration、受控格式轉換等）的權威來源、允許行為與**不可複製來源**列於
-[clean-room-source-index.md](provenance/clean-room-source-index.md)。
+[clean-room-source-index.md](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/clean-room-source-index.md)。
 
 摘要原則：
 
@@ -61,9 +64,9 @@
 | 項目 | 建議動作 |
 |------|----------|
 | 授權 | 閱讀 `LICENSE` 與 `THIRD-PARTY-NOTICES.md`；SBOM／授權掃描納入 CI |
-| 版本 | 目前為 `0.x`；相容性承諾見 `CHANGELOG` 與 [version-delivery.md](version-delivery.md) |
-| 功能邊界 | 以 [odf-format-support.md](odf-format-support.md) 與測試證據為準，勿僅依賴行銷用語 |
-| 非目標 | 見 [udx-non-goals.md](udx-non-goals.md)（完整排版引擎、樞紐重算等） |
+| 版本 | 目前為 `0.x`；相容性承諾見 `CHANGELOG` 與 [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
+| 功能邊界 | 以 [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) 與測試證據為準，勿僅依賴行銷用語 |
+| 非目標 | 見 [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md)（完整排版引擎、樞紐重算等） |
 | 安全 | 使用 `OdfLoadOptions` 資源上限；對不可信輸入跑 `Validate`／sanitize |
 | 來源 | 審閱 `docs/provenance/`；必要時對高風險目錄做與上游的相似掃描 |
 | 支援 | 開源專案無 SLA；關鍵系統應有備援與自行維運計畫 |
@@ -76,9 +79,9 @@
 
 ## 8. 相關文件
 
-- [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md)  
-- [provenance/README.md](provenance/README.md)  
-- [Clean-room 來源索引](provenance/clean-room-source-index.md)  
-- [ODF Toolkit 對標線](odf-toolkit-parity.md)  
-- [Foreign 擴充政策](foreign-extension-policy.md)  
-- [Corpus Manifest 規則](corpus-manifest.md)  
+- [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)
+- [provenance/README.md](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md)
+- [Clean-room 來源索引](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/clean-room-source-index.md)
+- [ODF Toolkit 對標線](https://github.com/rubujo/OdfKit/blob/main/docs/odf-toolkit-parity.md)
+- [Foreign 擴充政策](https://github.com/rubujo/OdfKit/blob/main/docs/foreign-extension-policy.md)
+- [Corpus Manifest 規則](https://github.com/rubujo/OdfKit/blob/main/docs/corpus-manifest.md)

@@ -24,6 +24,11 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
   `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
 - **權威文件不複製**：智慧財產、安全、證據與第三方聲明直接以 DocFX file mapping
   納入 repo 正式來源，避免網站副本漂移。
+- **目的語系必須明示**：共用 API 入口標示 `[en + zh-TW]`；指向單一正體中文權威頁的
+  跨語系連結標示 `[zh-TW]`。全站 navbar 維持雙語，不模擬語系 session。
+- **不公開原始維護檔**：`project-docs/` 僅發布四個權威 HTML 頁面。權威頁所引用的
+  次級 repo 文件與機器可讀 manifest 連到 GitHub `blob/main` 渲染頁，不複製成
+  Pages 的 `.md` 或 `.json` 資源。
 
 ## 2. 站台結構
 
@@ -53,6 +58,8 @@ api-docs/
   4. 指南包含能力三維度、CC0、AI 產製、安全、互通邊界及證據入口；
   5. 指南與 TOC 連到站內授權、IP、第三方、安全及證據頁；
   6. `docfx.json` 的 `fileMetadata._lang` 與 front matter `_lang` 一致。
+  7. 語系 TOC 以 DocFX `uid: OdfKit` 指向 API，不得使用 `href: xref:*`；
+  8. API 與跨語系正式頁面入口均標示實際內容語系。
 - 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md`、`guide.md` 與 `toc.yml`
   （front matter `_lang`）→ 在根層 `index.md` 語言表與 `docfx.json` content 增列。
   缺一步建置即失敗。
@@ -68,6 +75,7 @@ api-docs/
 | 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出本地 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
 | `--warningsAsErrors` | DocFX build 警告視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
+| 原始資源與 xref | 禁止內部 `.md` 連結、`project-docs/` 非核准資源及 modern 輸出殘留的 `xref:*`。 |
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
 | modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 12 語系 HTML `lang`。 |
 | 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
@@ -87,5 +95,7 @@ dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
 - 站台不自動輸出 `hreflang` alternates；語系入口以根層語言總表互連。
 - 單一 DocFX 站共用 API reference；非英文／正體中文語系只翻譯概念頁與 TOC，
   不宣稱 API member 已完整翻譯。
+- DocFX 不保存讀者的語系狀態；navbar 維持全站共用雙語。跨語系目的地以
+  `[en + zh-TW]` 或 `[zh-TW]` 明示，不加入自製 JavaScript 動態切換。
 - 舊版站台（`reference/` 前綴與站外語系落地頁）的 URL 已隨結構重整移除，
   不提供轉址。

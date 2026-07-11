@@ -10,7 +10,7 @@ OdfKit is a pure managed C#/.NET OpenDocument Format SDK. The API content on thi
 generated from the public assemblies and the bilingual (English + Traditional Chinese) XML
 documentation.
 
-- [開啟 API 參考文件 / Open the API reference](xref:OdfKit)
+- [開啟 API 參考文件 / Open the API reference [en + zh-TW]](xref:OdfKit)
 - [站台說明與合規聲明 / Site notes and compliance](articles/index.md)
 
 ## 語言 / Languages

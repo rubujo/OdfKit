@@ -9,7 +9,7 @@ Bahasa: **Bahasa Melayu**
 
 Kandungan ahli API kini disediakan dalam bahasa Inggeris dan bahasa Cina Tradisional (Taiwan).
 
-- [Buka rujukan API](xref:OdfKit)
+- [Buka rujukan API [en + zh-TW]](xref:OdfKit)
 - [Panduan penggunaan, pematuhan, keselamatan dan bukti](guide.md)
 - [Bahasa lain](../index.md)
 

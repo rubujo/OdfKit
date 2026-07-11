@@ -58,6 +58,7 @@ try {
         $tocContent = Get-Content $tocPath -Raw
         if ($localeContent -notmatch "(?m)^_lang:\s*$([regex]::Escape($locale))\s*$") { throw "$localePath 缺少正確的 _lang metadata。" }
         if ($localeContent -notmatch [regex]::Escape('(xref:OdfKit)')) { throw "$localePath 缺少 API reference 入口。" }
+        if ($localeContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$localePath 的 API 入口缺少內容語系標示。" }
         if ($localeContent -notmatch [regex]::Escape('(guide.md)')) { throw "$localePath 缺少語系指南連結。" }
         if ($localeContent -notmatch 'CC0-1\.0' -or $localeContent -notmatch '\b(AI|KI|IA)\b') { throw "$localePath 缺少授權或 AI 產製聲明。" }
         if ($guideContent -notmatch "(?m)^_lang:\s*$([regex]::Escape($locale))\s*$") { throw "$guidePath 缺少正確的 _lang metadata。" }
@@ -68,7 +69,17 @@ try {
             if ($guideContent -notmatch [regex]::Escape($requiredLink)) { throw "$guidePath 缺少正式聲明連結：$requiredLink。" }
             if ($tocContent -notmatch [regex]::Escape($requiredLink)) { throw "$tocPath 缺少正式聲明連結：$requiredLink。" }
         }
-        if ($tocContent -notmatch 'xref:OdfKit') { throw "$tocPath 缺少共用 API reference 入口。" }
+        if ($tocContent -match '(?m)^\s*href:\s*xref:') { throw "$tocPath 不得以 href: xref:* 指向 API；請使用 DocFX uid。" }
+        if ($tocContent -notmatch '(?m)^\s*uid:\s*OdfKit\s*$') { throw "$tocPath 缺少以 uid 指定的共用 API reference 入口。" }
+        if ($tocContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$tocPath 的 API 入口缺少內容語系標示。" }
+        if ($guideContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$guidePath 的 API 入口缺少內容語系標示。" }
+        if ($locale -ne 'zh-TW') {
+            $guideZhTwLabels = [regex]::Matches($guideContent, [regex]::Escape('[zh-TW]')).Count
+            $tocZhTwLabels = [regex]::Matches($tocContent, [regex]::Escape('[zh-TW]')).Count
+            if ($guideZhTwLabels -lt $requiredSharedLinks.Count -or $tocZhTwLabels -lt $requiredSharedLinks.Count) {
+                throw "$locale 的指南或 TOC 未明示共用正式頁面使用 zh-TW。"
+            }
+        }
         if ($locale -notin @('en', 'zh-TW') -and $localeContent -match 'Open the API reference|Site notes and compliance|Other languages|This project content is written|Original OdfKit content') {
             throw "$localePath 仍含英文 placeholder，尚未完成本地化。"
         }
@@ -78,12 +89,17 @@ try {
         if ($fileMetadataLocale -ne $locale) { throw "api-docs/docfx.json 的 fileMetadata._lang 缺少或錯誤：$locale。" }
     }
     if ($rootIndex -match '(?m)^redirect_url\s*:') { throw '根首頁不得設定 redirect_url；必須保留語言選擇頁。' }
+    $rootToc = Get-Content api-docs/toc.yml -Raw
+    if ($rootToc -notmatch [regex]::Escape('API [en + zh-TW]')) { throw '根 navbar 的 API 入口缺少內容語系標示。' }
     if (@($docfxConfig.build.template) -notcontains 'modern') { throw 'DocFX 必須使用官方 modern 模板。' }
     foreach ($mapping in @('ip-compliance.md', 'security-limits.md', 'evidence-index.md', 'THIRD-PARTY-NOTICES.md')) {
         if ($docfxJson -notmatch [regex]::Escape($mapping)) { throw "DocFX content mapping 缺少權威文件：$mapping。" }
     }
     foreach ($footerTarget in @('articles/license.html', 'project-docs/ip-compliance.html', 'project-docs/THIRD-PARTY-NOTICES.html', 'project-docs/security-limits.html', 'project-docs/evidence-index.html')) {
         if ($docfxConfig.build.globalMetadata._appFooter -notmatch [regex]::Escape("/OdfKit/$footerTarget")) { throw "modern footer 缺少入口：$footerTarget。" }
+    }
+    if ([regex]::Matches($docfxConfig.build.globalMetadata._appFooter, [regex]::Escape('[zh-TW]')).Count -lt 5) {
+        throw 'modern footer 的正式頁面入口必須明示 zh-TW。'
     }
     Write-Host "PASS：$($catalog.locales.Count) 語系契約驗證通過。"
 
@@ -173,7 +189,9 @@ try {
     if ($LASTEXITCODE) { throw 'DocFX build 失敗。' }
 
     # 站內連結健檢：掃描全站 HTML 的相對 href／src，任何指向不存在檔案的連結都視為失敗。
+    # Pages 不得以內部連結直接公開 Markdown；次級 repo 文件必須連到 GitHub 渲染頁。
     $broken = [System.Collections.Generic.List[string]]::new()
+    $rawMarkdownLinks = [System.Collections.Generic.List[string]]::new()
     $checkedLinks = 0
     Get-ChildItem $siteDir -Recurse -Filter *.html | ForEach-Object {
         $page = $_
@@ -181,6 +199,10 @@ try {
         foreach ($m in [regex]::Matches($html, '(?:href|src)="([^"#]+?)(?:#[^"]*)?"')) {
             $url = $m.Groups[1].Value
             if ($url -eq '' -or $url -match '^(https?:|mailto:|javascript:|data:)') { continue }
+            if ($url -match '(?i)\.md(?:$|[?#])') {
+                $rawMarkdownLinks.Add("$($page.FullName.Substring($siteDir.Length + 1)) -> $url")
+                continue
+            }
             $unescaped = [Uri]::UnescapeDataString($url)
             if ($unescaped.StartsWith('/OdfKit/', [StringComparison]::Ordinal)) {
                 $candidate = Join-Path $siteDir $unescaped.Substring('/OdfKit/'.Length)
@@ -194,6 +216,10 @@ try {
                 $broken.Add("$($page.FullName.Substring($siteDir.Length + 1)) -> $url")
             }
         }
+    }
+    if ($rawMarkdownLinks.Count) {
+        $rawMarkdownLinks | Select-Object -First 20 | ForEach-Object { Write-Host "  原始 Markdown：$_" }
+        throw "網站仍有 $($rawMarkdownLinks.Count) 條內部連結直接指向 Markdown。"
     }
     if ($broken.Count) {
         $broken | Select-Object -First 20 | ForEach-Object { Write-Host "  失效：$_" }
@@ -211,6 +237,34 @@ try {
     )
     foreach ($requiredOutput in $requiredOutputs) {
         if (-not (Test-Path (Join-Path $siteDir $requiredOutput))) { throw "API 網站缺少必要輸出：$requiredOutput。" }
+    }
+    $allowedProjectDocs = @(
+        'THIRD-PARTY-NOTICES.html',
+        'evidence-index.html',
+        'ip-compliance.html',
+        'security-limits.html'
+    )
+    $projectDocsDirectory = Join-Path $siteDir 'project-docs'
+    $unexpectedProjectDocs = @(
+        Get-ChildItem $projectDocsDirectory -Recurse -File |
+            Where-Object { $_.Name -notin $allowedProjectDocs }
+    )
+    if ($unexpectedProjectDocs.Count) {
+        $unexpectedProjectDocs | ForEach-Object { Write-Host "  未核准資源：$($_.FullName.Substring($siteDir.Length + 1))" }
+        throw 'project-docs 只能發布四個權威 HTML 頁面。'
+    }
+    $unresolvedXrefs = [System.Collections.Generic.List[string]]::new()
+    Get-ChildItem $siteDir -Recurse -File |
+        Where-Object { $_.Extension -in @('.html', '.json', '.js', '.yml') } |
+        ForEach-Object {
+            $content = [IO.File]::ReadAllText($_.FullName)
+            if ($content -match 'href=["'']xref:|(?m)^\s*href:\s*xref:|xref:OdfKit(?:["'']|\s|$)') {
+                $unresolvedXrefs.Add($_.FullName.Substring($siteDir.Length + 1))
+            }
+        }
+    if ($unresolvedXrefs.Count) {
+        $unresolvedXrefs | Select-Object -First 20 | ForEach-Object { Write-Host "  未解析 xref：$_" }
+        throw "modern 模板輸出仍含未解析 xref：$($unresolvedXrefs.Count) 個檔案。"
     }
     $htmlFiles = @(Get-ChildItem $siteDir -Recurse -Filter *.html)
     if ($htmlFiles.Count -lt 596) { throw "API 網站頁數異常：$($htmlFiles.Count) < 596。" }

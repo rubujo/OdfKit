@@ -1,5 +1,7 @@
 # 串流讀取安全限制
 
+> 內容語系：正體中文（臺灣）（`zh-TW`）。
+
 `OdsStreamReader` 與 `OdtStreamReader` 不建立完整文件 DOM，但仍會配置目前資料列、
 節點文字、ZIP 解壓及 XML Reader 所需的緩衝。低常駐設計不等於不受輸入大小影響。
 
