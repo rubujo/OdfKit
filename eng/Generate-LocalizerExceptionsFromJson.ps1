@@ -6,7 +6,7 @@
     v0.0.1 在地化產線：`OdfKit/Compliance/i18n/exceptions.<culture>.json` 為訊息
     字串的單一來源真相；本腳本產生對應 C# 字典 partial，供執行期載入。
 
-    產生後會驗證 12 語系鍵集合與 en 對等。
+    產生後會驗證 17 語系鍵集合與 en 對等。
 
 .PARAMETER VerifyOnly
     只檢查既有 .cs 是否與 JSON 一致（不寫檔）；不一致時以非零結束。
@@ -20,7 +20,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $i18nDir = Join-Path $repoRoot 'OdfKit/Compliance/i18n'
 $complianceDir = Join-Path $repoRoot 'OdfKit/Compliance'
-$cultures = @('en', 'zh-TW', 'de', 'fr', 'nl', 'nb', 'pt', 'it', 'sk', 'da', 'ms', 'ko')
+$cultures = @('en', 'zh-TW', 'da', 'de', 'fr', 'it', 'ko', 'ms', 'nb', 'nl', 'pt', 'sk', 'ja', 'es', 'cs', 'pl', 'pt-BR')
 
 function Get-MethodName {
     param([string]$Culture)
@@ -153,4 +153,4 @@ if ($mismatch -gt 0) {
 }
 
 $modeText = if ($VerifyOnly) { '且與 .cs 一致' } else { '，已寫入 .cs' }
-Write-Host "PASS：12 語系 JSON 鍵對等$modeText（$($baseline.Count) keys）。"
+Write-Host "PASS：17 語系 JSON 鍵對等$modeText（$($baseline.Count) keys）。"

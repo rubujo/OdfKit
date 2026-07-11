@@ -81,16 +81,38 @@ public partial class ComplianceTests
     }
 
     [Fact]
-    public void LocalizerCorrectlyFallsBackToDefaultEnglishForUnregisteredCulture()
+    public void LocalizerResolvesNewCulturesAndParentFallbacks()
     {
         var jaFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("ja-JP"));
-        Assert.Contains("alternative text", jaFix);
+        Assert.Contains("代替テキスト", jaFix);
+
+        var esFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("es-MX"));
+        Assert.Contains("texto alternativo", esFix);
+
+        var csFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("cs-CZ"));
+        Assert.Contains("alternativní text", csFix);
+
+        var plFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("pl-PL"));
+        Assert.Contains("tekst alternatywny", plFix);
+
+        var ptBrFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("pt-BR"));
+        Assert.Contains("texto alternativo", ptBrFix);
+
+        var ptPtFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("pt-PT"));
+        Assert.Contains("texto alternativo", ptPtFix);
+    }
+
+    [Fact]
+    public void LocalizerFallsBackToEnglishForUnregisteredCulture()
+    {
+        var fix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("tr-TR"));
+        Assert.Contains("alternative text", fix);
     }
 
     [Fact]
     public void BuiltInComplianceSuggestedFixesResolveForAllSupportedCultures()
     {
-        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko", "ja", "es", "cs", "pl", "pt-BR"];
         var ruleIds = new System.Collections.Generic.SortedSet<string>(StringComparer.Ordinal);
         foreach (OdfComplianceProfile profile in OdfComplianceProfiles.BuiltIn)
         {

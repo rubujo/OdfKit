@@ -11,7 +11,7 @@ public static partial class OdfLocalizer
 {
     static OdfLocalizer()
     {
-        // 註冊 12 種語言的字典工廠委派 (Lazy Loading)
+        // 註冊 17 種語言的字典工廠委派 (Lazy Loading)
         FactoryRegistrations["en"] = CreateEnDictionary;
         FactoryRegistrations["zh-TW"] = CreateZhTwDictionary;
         FactoryRegistrations["de"] = CreateDeDictionary;
@@ -24,6 +24,11 @@ public static partial class OdfLocalizer
         FactoryRegistrations["da"] = CreateDaDictionary;
         FactoryRegistrations["ms"] = CreateMsDictionary;
         FactoryRegistrations["ko"] = CreateKoDictionary;
+        FactoryRegistrations["ja"] = CreateJaDictionary;
+        FactoryRegistrations["es"] = CreateEsDictionary;
+        FactoryRegistrations["cs"] = CreateCsDictionary;
+        FactoryRegistrations["pl"] = CreatePlDictionary;
+        FactoryRegistrations["pt-BR"] = CreatePtBrDictionary;
     }
 
     private static Dictionary<string, string> CreateEnDictionary() => new(StringComparer.Ordinal)
@@ -172,14 +177,14 @@ public static partial class OdfLocalizer
     private static Dictionary<string, string> CreatePtDictionary() => new(StringComparer.Ordinal)
     {
         ["RequireIso26300Odf12Compatibility"] = "Corrija a estrutura do documento para manter a compatibilidade com ISO/IEC 26300:2015 (ODF 1.2).",
-        ["RequireAccessibilityMetadata"] = "Adicione texto alternativo (svg:title ou svg:desc) para imagens, ou cabeçalhos para tabelas.",
+        ["RequireAccessibilityMetadata"] = "Adicione texto alternativo (svg:title ou svg:desc) às imagens ou cabeçalhos às tabelas.",
         ["RequireForeignExtensionIsolation"] = "Coloque as extensões em namespaces não-ODF e garanta que sejam removíveis.",
-        ["DisallowMacroByDefault"] = "Remova macros, scripts e ouvintes de eventos, ou altere a política de segurança.",
+        ["DisallowMacroByDefault"] = "Remova macros, scripts e processadores de eventos ou altere a política de segurança.",
         ["ODF0001"] = "Adicione uma entrada mimetype válida.",
         ["ODF0100"] = "Adicione META-INF/manifest.xml e descreva o conteúdo do pacote.",
         ["Diag_OdfFormulaSupport_ParseFailed"] = "A fórmula não pôde ser analisada: {0}",
-        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "O avaliador padrão não oferece suporte à função {0}; preserve a fórmula original ao salvar.",
-        ["Diag_OdfFormulaSupport_UnknownCharacter"] = "A fórmula contém um caractere não reconhecido: '{0}'.",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "O avaliador predefinido não suporta a função {0}; preserve a fórmula original ao guardar.",
+        ["Diag_OdfFormulaSupport_UnknownCharacter"] = "A fórmula contém um caráter não reconhecido: '{0}'.",
         ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Algoritmo de chave pública OpenPGP não suportado: {0}. Atualmente suportado: RSA, ElGamal e ECDH."
     };
 
@@ -247,4 +252,55 @@ public static partial class OdfLocalizer
         ["Diag_OdfFormulaSupport_UnknownCharacter"] = "수식에 인식할 수 없는 문자가 포함되어 있습니다: '{0}'.",
         ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "지원되지 않는 OpenPGP 공개 키 알고리즘: {0}. 현재 지원: RSA, ElGamal 및 ECDH."
     };
+
+    private static Dictionary<string, string> CreateJaDictionary() => CreateLocalizedSuggestedFixDictionary(
+        "ISO/IEC 26300 の ODF 基準との互換性を維持するように、ドキュメント構造を修正してください。",
+        "画像に代替テキストを追加するか、表に見出し行を追加してください。",
+        "マクロ、スクリプト、イベントリスナーを削除するか、許可するポリシーを使用してください。",
+        "有効な mimetype エントリを追加してください。",
+        "META-INF/manifest.xml を追加し、パッケージ内容を記述してください。");
+
+    private static Dictionary<string, string> CreateEsDictionary() => CreateLocalizedSuggestedFixDictionary(
+        "Corrija la estructura del documento para mantener la compatibilidad con la referencia ODF de ISO/IEC 26300.",
+        "Añada texto alternativo a las imágenes o filas de encabezado a las tablas.",
+        "Elimine las macros, los scripts y los controladores de eventos, o use una directiva que permita macros.",
+        "Añada una entrada mimetype válida.",
+        "Añada META-INF/manifest.xml y describa el contenido del paquete.");
+
+    private static Dictionary<string, string> CreateCsDictionary() => CreateLocalizedSuggestedFixDictionary(
+        "Opravte strukturu dokumentu tak, aby zůstala kompatibilní se základem ODF normy ISO/IEC 26300.",
+        "Přidejte k obrázkům alternativní text nebo k tabulkám řádky záhlaví.",
+        "Odstraňte makra, skripty a obsluhy událostí nebo použijte zásadu, která makra povoluje.",
+        "Přidejte platnou položku mimetype.",
+        "Přidejte META-INF/manifest.xml a popište obsah balíčku.");
+
+    private static Dictionary<string, string> CreatePlDictionary() => CreateLocalizedSuggestedFixDictionary(
+        "Popraw strukturę dokumentu, aby zachować zgodność z bazowym formatem ODF normy ISO/IEC 26300.",
+        "Dodaj tekst alternatywny do obrazów lub wiersze nagłówkowe do tabel.",
+        "Usuń makra, skrypty i procedury obsługi zdarzeń albo użyj zasad zezwalających na makra.",
+        "Dodaj prawidłowy wpis mimetype.",
+        "Dodaj META-INF/manifest.xml i opisz zawartość pakietu.");
+
+    private static Dictionary<string, string> CreatePtBrDictionary() => CreateLocalizedSuggestedFixDictionary(
+        "Corrija a estrutura do documento para manter a compatibilidade com a base ODF da ISO/IEC 26300.",
+        "Adicione texto alternativo às imagens ou linhas de cabeçalho às tabelas.",
+        "Remova macros, scripts e manipuladores de eventos ou use uma política que permita macros.",
+        "Adicione uma entrada mimetype válida.",
+        "Adicione META-INF/manifest.xml e descreva o conteúdo do pacote.");
+
+    private static Dictionary<string, string> CreateLocalizedSuggestedFixDictionary(
+        string isoCompatibility,
+        string accessibility,
+        string macroPolicy,
+        string mimetype,
+        string manifest) => new(StringComparer.Ordinal)
+        {
+            ["RequireIso26300Odf10Compatibility"] = isoCompatibility,
+            ["RequireIso26300Odf12Compatibility"] = isoCompatibility,
+            ["RequireIso26300Odf13Compatibility"] = isoCompatibility,
+            ["RequireAccessibilityMetadata"] = accessibility,
+            ["DisallowMacroByDefault"] = macroPolicy,
+            ["ODF0001"] = mimetype,
+            ["ODF0100"] = manifest
+        };
 }

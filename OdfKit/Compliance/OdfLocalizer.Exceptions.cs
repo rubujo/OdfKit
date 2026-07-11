@@ -28,6 +28,11 @@ public static partial class OdfLocalizer
         AddExceptionDictionaryDa(map);
         AddExceptionDictionaryMs(map);
         AddExceptionDictionaryKo(map);
+        AddExceptionDictionaryJa(map);
+        AddExceptionDictionaryEs(map);
+        AddExceptionDictionaryCs(map);
+        AddExceptionDictionaryPl(map);
+        AddExceptionDictionaryPtBr(map);
         return map;
     }
 }

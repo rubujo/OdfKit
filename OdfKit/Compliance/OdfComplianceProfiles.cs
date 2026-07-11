@@ -406,7 +406,7 @@ public static class OdfComplianceProfiles
             Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error),
             Rule("DisallowMacroByDefault", "Government exchange profiles should reject macro and script content by default.", OdfIssueSeverity.Warning)
         ],
-        new CultureInfo("pt"));
+        new CultureInfo("pt-BR"));
 
     /// <summary>
     /// Gets the US NARA electronic records transfer guidance compatibility profile.

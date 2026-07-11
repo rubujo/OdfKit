@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    檢查 OdfLocalizer 例外字典在 12 語系之間的鍵值集合對等。
+    檢查 OdfLocalizer 例外字典在 17 語系之間的鍵值、佔位符與翻譯品質。
 .DESCRIPTION
     業界在地化最佳實踐（gettext／ICU／.NET resx 閘門同理）：所有語系必須擁有相同的
     訊息鍵清單，禁止「只補 en／zh-TW」。以 en 為基準，比對其餘語系是否缺鍵或多餘鍵。
@@ -17,7 +17,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $complianceDir = Join-Path $repoRoot 'OdfKit/Compliance'
-$cultures = @('en', 'zh-TW', 'de', 'fr', 'nl', 'nb', 'pt', 'it', 'sk', 'da', 'ms', 'ko')
+$cultures = @('en', 'zh-TW', 'da', 'de', 'fr', 'it', 'ko', 'ms', 'nb', 'nl', 'pt', 'sk', 'ja', 'es', 'cs', 'pl', 'pt-BR')
 # 僅擷取訊息鍵（Err_／Warn_／Cli_／Diag_／Rule_），略過 map["en"] 等文化代碼鍵。
 $keyPattern = [regex]'\["((?:Err|Warn|Cli|Diag|Rule)_[^"]+)"\]'
 
@@ -31,13 +31,31 @@ function Get-LocalizerKeys {
     return $set
 }
 
+function Get-LocalizerMessages {
+    param([string]$Path)
+    $text = [System.IO.File]::ReadAllText($Path)
+    $messages = @{}
+    $entryPattern = [regex]'\["((?:Err|Warn|Cli|Diag|Rule)_[^"]+)"\]\s*=\s*"((?:\\.|[^"\\])*)"'
+    foreach ($match in $entryPattern.Matches($text)) {
+        $messages[$match.Groups[1].Value] = [regex]::Unescape($match.Groups[2].Value)
+    }
+    return $messages
+}
+
+function Get-Placeholders {
+    param([string]$Message)
+    return @([regex]::Matches($Message, '(?<!\{)\{\d+(?:,[^}:]+)?(?:\:[^}]+)?\}(?!\})') | ForEach-Object Value | Sort-Object)
+}
+
 $sets = @{}
+$messages = @{}
 foreach ($culture in $cultures) {
     $path = Join-Path $complianceDir "OdfLocalizer.Exceptions.$culture.cs"
     if (-not (Test-Path -LiteralPath $path)) {
         throw "缺少語系例外字典：$path"
     }
     $sets[$culture] = Get-LocalizerKeys -Path $path
+    $messages[$culture] = Get-LocalizerMessages -Path $path
     Write-Host ("{0,-6} {1} keys" -f $culture, $sets[$culture].Count)
 }
 
@@ -60,10 +78,44 @@ foreach ($culture in $cultures) {
             $issues.Add("[$culture] 多餘鍵（en 無此鍵）：$key")
         }
     }
+    foreach ($key in ($baseline | Sort-Object)) {
+        if (-not $messages[$culture].ContainsKey($key)) { continue }
+        $value = $messages[$culture][$key]
+        if ([string]::IsNullOrWhiteSpace($value) -or $value -eq $key) {
+            $issues.Add("[$culture] 翻譯為空或等於鍵：$key")
+            continue
+        }
+        $expected = @(Get-Placeholders -Message $messages['en'][$key]) -join '|'
+        $actual = @(Get-Placeholders -Message $value) -join '|'
+        if ($expected -ne $actual) {
+            $issues.Add("[$culture] 佔位符不一致：$key（en=$expected，actual=$actual）")
+        }
+        if ($culture -ne 'en' -and $value -ceq $messages['en'][$key]) {
+            $issues.Add("[$culture] 未核准的純英文複製：$key")
+        }
+    }
+}
+
+$provisionalSources = @{
+    'ja' = 'zh-TW'
+    'es' = 'pt'
+    'cs' = 'sk'
+    'pl' = 'sk'
+}
+foreach ($culture in $provisionalSources.Keys) {
+    $sourceCulture = $provisionalSources[$culture]
+    $identicalCount = @($baseline | Where-Object {
+        $messages[$culture].ContainsKey($_) -and
+        $messages[$sourceCulture].ContainsKey($_) -and
+        $messages[$culture][$_] -ceq $messages[$sourceCulture][$_]
+    }).Count
+    if ($identicalCount -gt [Math]::Floor($baseline.Count / 4)) {
+        $issues.Add("[$culture] 與暫存來源 $sourceCulture 仍有 $identicalCount 則完全相同，疑似未完成翻譯。")
+    }
 }
 
 if ($issues.Count -eq 0) {
-    Write-Host "PASS：12 語系訊息鍵與 en 完全對等（$($baseline.Count) keys）。"
+    Write-Host "PASS：17 語系訊息鍵、佔位符與翻譯品質通過（$($baseline.Count) keys）。"
     exit 0
 }
 

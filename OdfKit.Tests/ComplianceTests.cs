@@ -64,6 +64,8 @@ namespace OdfKit.Tests
             Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.UsNaraOdf.VerificationStatus);
             Assert.True(OdfComplianceProfiles.NlGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
             Assert.False(OdfComplianceProfiles.NlGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf14));
+            Assert.Equal("pt-BR", OdfComplianceProfiles.BrGovernmentOdf.TargetCulture?.Name);
+            Assert.Equal("pt", OdfComplianceProfiles.PtGovernmentOdf.TargetCulture?.Name);
         }
 
         [Fact]

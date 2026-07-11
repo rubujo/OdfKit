@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    於 12 語系 exceptions JSON 同步新增一則訊息鍵，並重產 C# 字典。
+    於 17 語系 exceptions JSON 同步新增一則訊息鍵，並重產 C# 字典。
 .DESCRIPTION
     v0.0.1 在地化產線：編輯 `OdfKit/Compliance/i18n/exceptions.*.json`，
     再以 eng/Generate-LocalizerExceptionsFromJson.ps1 產生 .cs。
@@ -12,6 +12,16 @@
     英文訊息。
 .PARAMETER ZhTwMessage
     正體中文（臺灣）訊息；省略時暫用英文。
+.PARAMETER JaMessage
+    日文訊息。
+.PARAMETER EsMessage
+    西班牙文訊息。
+.PARAMETER CsMessage
+    捷克文訊息。
+.PARAMETER PlMessage
+    波蘭文訊息。
+.PARAMETER PtBrMessage
+    巴西葡萄牙文訊息。
 .EXAMPLE
     pwsh eng/Add-LocalizerKey.ps1 -Key Err_Example_Failed -EnMessage "Failed: {0}." -ZhTwMessage "失敗：{0}。"
 #>
@@ -24,13 +34,28 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$EnMessage,
 
-    [string]$ZhTwMessage
+    [string]$ZhTwMessage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$JaMessage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$EsMessage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$CsMessage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$PlMessage,
+
+    [Parameter(Mandatory = $true)]
+    [string]$PtBrMessage
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $i18nDir = Join-Path $repoRoot 'OdfKit/Compliance/i18n'
-$cultures = @('en', 'zh-TW', 'de', 'fr', 'nl', 'nb', 'pt', 'it', 'sk', 'da', 'ms', 'ko')
+$cultures = @('en', 'zh-TW', 'da', 'de', 'fr', 'it', 'ko', 'ms', 'nb', 'nl', 'pt', 'sk', 'ja', 'es', 'cs', 'pl', 'pt-BR')
 $utf8Bom = New-Object System.Text.UTF8Encoding $true
 
 if ([string]::IsNullOrWhiteSpace($ZhTwMessage)) {
@@ -42,6 +67,11 @@ function Get-MessageForCulture {
     switch ($Culture) {
         'en' { return $EnMessage }
         'zh-TW' { return $ZhTwMessage }
+        'ja' { return $JaMessage }
+        'es' { return $EsMessage }
+        'cs' { return $CsMessage }
+        'pl' { return $PlMessage }
+        'pt-BR' { return $PtBrMessage }
         default { return $EnMessage }
     }
 }

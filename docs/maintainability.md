@@ -36,18 +36,18 @@
 |------|------|
 | `OdfLocalizer.cs` | 查找、快取、文化回退 |
 | `OdfLocalizer.Languages.cs` | 合規建議等較短語系工廠 |
-| `OdfLocalizer.Exceptions.cs` | 例外字典**入口**（註冊 12 語系） |
+| `OdfLocalizer.Exceptions.cs` | 例外字典**入口**（註冊 17 語系） |
 | `OdfLocalizer.Exceptions.<culture>.cs` | **單一語系**例外／診斷字串表 |
 | `OdfLocalizer.ComplianceSuggestions.cs` | 合規建議補充 |
 | `OdfLocalizer.ExtensionDiagnostics.cs` | Extensions 診斷 |
 
 ### 更新規則
 
-1. 新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，**12 語系同步**（`en`、`zh-TW`、`de`、`fr`、`nl`、`nb`、`pt`、`it`、`sk`、`da`、`ms`、`ko`）。  
+1. 新增 `Err_*`／`Warn_*`／`Cli_*` 等鍵時，**17 語系同步**（`en`、`zh-TW`、`da`、`de`、`fr`、`it`、`ko`、`ms`、`nb`、`nl`、`pt`、`sk`、`ja`、`es`、`cs`、`pl`、`pt-BR`）。
 2. 禁止只改 `en` 或只改 `zh-TW`。  
 3. 禁止在呼叫端 hard-code 例外訊息。  
 4. 完整語意以 `en` 為準；其他語系可走 fallback，但**新鍵必須登錄**所有語系表（可先貼近英文再潤飾）。  
-5. 新增鍵請優先使用 `pwsh eng/Add-LocalizerKey.ps1`（一次寫入 12 語系），再潤飾 de／fr 等語言。  
+5. 新增鍵請優先使用 `pwsh eng/Add-LocalizerKey.ps1`（一次寫入 17 語系），再潤飾各語言。
 
 ### 鍵值對等閘門（業界最佳實踐）
 
