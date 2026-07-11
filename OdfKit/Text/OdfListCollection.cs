@@ -66,6 +66,59 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     }
 
     /// <summary>
+    /// Finds the first top-level list that satisfies the predicate.
+    /// 查找第一個符合條件的最上層清單。
+    /// </summary>
+    /// <param name="predicate">The list predicate. / 清單條件。</param>
+    /// <returns>The matching list, or <see langword="null"/> when no match exists. / 符合的清單；若找不到則為 <see langword="null"/>。</returns>
+    public OdfList? Find(Predicate<OdfList> predicate)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        foreach (OdfList list in Items)
+        {
+            if (predicate(list))
+            {
+                return list;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the specified top-level list.
+    /// 移除指定的最上層清單。
+    /// </summary>
+    /// <param name="list">The list to remove. / 要移除的清單。</param>
+    /// <returns><see langword="true"/> if the list was removed; otherwise, <see langword="false"/>. / 若已移除清單則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool Remove(OdfList list)
+    {
+        if (list is null)
+        {
+            throw new ArgumentNullException(nameof(list));
+        }
+
+        return ReferenceEquals(list.Node.Parent, _document.BodyTextRoot) &&
+            _document.BodyTextRoot.RemoveChild(list.Node);
+    }
+
+    /// <summary>
+    /// Removes all top-level lists while preserving other body content.
+    /// 移除所有最上層清單，並保留其他本文內容。
+    /// </summary>
+    public void Clear()
+    {
+        foreach (OdfList list in Items)
+        {
+            _document.BodyTextRoot.RemoveChild(list.Node);
+        }
+    }
+
+    /// <summary>
     /// Gets an enumerator over the lists, for use with LINQ queries.
     /// 取得清單列舉器，供 LINQ 查詢使用。
     /// </summary>

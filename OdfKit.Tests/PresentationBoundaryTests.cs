@@ -300,7 +300,7 @@ namespace OdfKit.Tests
 
                 // Clone, delete, move on empty document should throw
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.CloneSlide(0));
-                Assert.Throws<ArgumentOutOfRangeException>(() => doc.DeleteSlide(0));
+                Assert.Throws<ArgumentOutOfRangeException>(() => doc.RemoveSlide(0));
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.MoveSlide(0, 0));
 
                 var slide1 = doc.AddSlide("First");
@@ -311,8 +311,8 @@ namespace OdfKit.Tests
                 // Invalid index boundary checks
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.CloneSlide(-1));
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.CloneSlide(2));
-                Assert.Throws<ArgumentOutOfRangeException>(() => doc.DeleteSlide(-1));
-                Assert.Throws<ArgumentOutOfRangeException>(() => doc.DeleteSlide(2));
+                Assert.Throws<ArgumentOutOfRangeException>(() => doc.RemoveSlide(-1));
+                Assert.Throws<ArgumentOutOfRangeException>(() => doc.RemoveSlide(2));
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.MoveSlide(-1, 1));
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.MoveSlide(0, -1));
                 Assert.Throws<ArgumentOutOfRangeException>(() => doc.MoveSlide(0, 2));
@@ -330,9 +330,14 @@ namespace OdfKit.Tests
                 var cloned = doc.CloneSlide(1); // clone "First"
                 Assert.Equal("First_Clone", cloned.Name);
                 Assert.Equal(3, doc.Slides.Count);
+                Assert.Same(cloned, doc.Slides.Find("First_Clone"));
+                Assert.True(doc.Slides.Remove(cloned));
+                Assert.False(doc.Slides.Remove(cloned));
+                Assert.Equal(2, doc.Slides.Count);
 
-                // Delete slide
-                doc.DeleteSlide(2);
+                // Remove slide by collection index
+                doc.CloneSlide(1);
+                doc.Slides.RemoveAt(2);
                 Assert.Equal(2, doc.Slides.Count);
                 Assert.Equal("Second", doc.Slides[0].Name);
                 Assert.Equal("First", doc.Slides[1].Name);

@@ -14090,6 +14090,8 @@ OdfKit.Drawing.DrawingDocument.GetTextBoxes() -> System.Collections.Generic.IRea
 OdfKit.Drawing.DrawingDocument.MoveAfter(string! name, string! referenceName) -> bool
 OdfKit.Drawing.DrawingDocument.MoveBefore(string! name, string! referenceName) -> bool
 OdfKit.Drawing.DrawingDocument.Pages.get -> OdfKit.Drawing.OdfDrawPageCollection!
+OdfKit.Drawing.DrawingDocument.RemovePage(int pageIndex) -> void
+OdfKit.Drawing.DrawingDocument.RemovePage(OdfKit.Drawing.OdfDrawPage! page) -> bool
 OdfKit.Drawing.DrawingDocument.ReplaceTextInTextBoxes(string! search, string! replacement) -> int
 OdfKit.Drawing.DrawingDocument.SendToBack(string! name) -> bool
 OdfKit.Drawing.DrawingDocument.UpdatePictures(System.Collections.Generic.IEnumerable<OdfKit.Presentation.OdfPictureUpdateRequest!>! requests) -> OdfKit.OdfBatchUpdateResult!
@@ -14180,6 +14182,7 @@ OdfKit.Drawing.OdfDrawPage.AddShape(OdfKit.Presentation.OdfShapeType shapeType, 
 OdfKit.Drawing.OdfDrawPage.AddTextBox(OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength w, OdfKit.Styles.OdfLength h, string! text) -> OdfKit.Presentation.OdfTextBox!
 OdfKit.Drawing.OdfDrawPage.AddTextBox(OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength w, OdfKit.Styles.OdfLength h, string! text, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> OdfKit.Presentation.OdfTextBox!
 OdfKit.Drawing.OdfDrawPage.Document.get -> OdfKit.Drawing.DrawingDocument!
+OdfKit.Drawing.OdfDrawPage.FindShape(string! id) -> OdfKit.Presentation.OdfShape?
 OdfKit.Drawing.OdfDrawPage.GetConnectors() -> System.Collections.Generic.IReadOnlyList<OdfKit.Drawing.OdfConnectorInfo!>!
 OdfKit.Drawing.OdfDrawPage.GetCustomShapes() -> System.Collections.Generic.IReadOnlyList<OdfKit.Drawing.OdfCustomShapeInfo!>!
 OdfKit.Drawing.OdfDrawPage.GetGroups() -> System.Collections.Generic.IReadOnlyList<OdfKit.Drawing.OdfGroupInfo!>!
@@ -14198,6 +14201,7 @@ OdfKit.Drawing.OdfDrawPage.Name.set -> void
 OdfKit.Drawing.OdfDrawPage.Node.get -> OdfKit.DOM.OdfNode!
 OdfKit.Drawing.OdfDrawPage.OdfDrawPage(OdfKit.DOM.OdfNode! node, OdfKit.Drawing.DrawingDocument! doc) -> void
 OdfKit.Drawing.OdfDrawPage.Pictures.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Presentation.OdfPicture!>!
+OdfKit.Drawing.OdfDrawPage.RemoveShape(string! id) -> bool
 OdfKit.Drawing.OdfDrawPage.Shapes.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Presentation.OdfShape!>!
 OdfKit.Drawing.OdfDrawPage.TextBoxes.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Presentation.OdfTextBox!>!
 OdfKit.Drawing.OdfDrawPageBuilder
@@ -14229,8 +14233,11 @@ OdfKit.Drawing.OdfDrawPageCollection
 OdfKit.Drawing.OdfDrawPageCollection.Add() -> OdfKit.Drawing.OdfDrawPage!
 OdfKit.Drawing.OdfDrawPageCollection.Add(string? name) -> OdfKit.Drawing.OdfDrawPage!
 OdfKit.Drawing.OdfDrawPageCollection.Count.get -> int
+OdfKit.Drawing.OdfDrawPageCollection.Find(string! name) -> OdfKit.Drawing.OdfDrawPage?
 OdfKit.Drawing.OdfDrawPageCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Drawing.OdfDrawPage!>!
 OdfKit.Drawing.OdfDrawPageCollection.OdfDrawPageCollection(OdfKit.Drawing.DrawingDocument! document) -> void
+OdfKit.Drawing.OdfDrawPageCollection.Remove(OdfKit.Drawing.OdfDrawPage! page) -> bool
+OdfKit.Drawing.OdfDrawPageCollection.RemoveAt(int index) -> void
 OdfKit.Drawing.OdfDrawPageCollection.this[int index].get -> OdfKit.Drawing.OdfDrawPage!
 OdfKit.Drawing.OdfDrawPictureInfo
 OdfKit.Drawing.OdfDrawPictureInfo.Height.get -> string?
@@ -15202,8 +15209,11 @@ OdfKit.Presentation.OdfSlideCollection
 OdfKit.Presentation.OdfSlideCollection.Add() -> OdfKit.Presentation.OdfSlide!
 OdfKit.Presentation.OdfSlideCollection.Add(string? name) -> OdfKit.Presentation.OdfSlide!
 OdfKit.Presentation.OdfSlideCollection.Count.get -> int
+OdfKit.Presentation.OdfSlideCollection.Find(string! name) -> OdfKit.Presentation.OdfSlide?
 OdfKit.Presentation.OdfSlideCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Presentation.OdfSlide!>!
 OdfKit.Presentation.OdfSlideCollection.OdfSlideCollection(OdfKit.Presentation.PresentationDocument! document) -> void
+OdfKit.Presentation.OdfSlideCollection.Remove(OdfKit.Presentation.OdfSlide! slide) -> bool
+OdfKit.Presentation.OdfSlideCollection.RemoveAt(int index) -> void
 OdfKit.Presentation.OdfSlideCollection.this[int index].get -> OdfKit.Presentation.OdfSlide!
 OdfKit.Presentation.OdfSlideLayoutInfo
 OdfKit.Presentation.OdfSlideLayoutInfo.Layout.get -> OdfKit.Presentation.OdfPresentationLayout
@@ -15258,7 +15268,6 @@ OdfKit.Presentation.PresentationDocument.ApplyPresentationPageLayout(int slideIn
 OdfKit.Presentation.PresentationDocument.BringToFront(string! name) -> bool
 OdfKit.Presentation.PresentationDocument.CloneSlide(int sourceSlideIndex) -> OdfKit.Presentation.OdfSlide!
 OdfKit.Presentation.PresentationDocument.CreatePresentationPageLayout(string! name) -> OdfKit.Presentation.OdfPresentationPageLayout!
-OdfKit.Presentation.PresentationDocument.DeleteSlide(int slideIndex) -> void
 OdfKit.Presentation.PresentationDocument.FindChildElement(OdfKit.DOM.OdfNode! parent, string! localName, string! nsUri) -> OdfKit.DOM.OdfNode?
 OdfKit.Presentation.PresentationDocument.FindPresentationPageLayout(string! name) -> OdfKit.Presentation.OdfPresentationPageLayout?
 OdfKit.Presentation.PresentationDocument.GetAnimations() -> System.Collections.Generic.IReadOnlyList<OdfKit.Presentation.OdfSlideAnimationInfo!>!
@@ -15282,6 +15291,8 @@ OdfKit.Presentation.PresentationDocument.MoveBefore(string! name, string! refere
 OdfKit.Presentation.PresentationDocument.MoveSlide(int fromIndex, int toIndex) -> void
 OdfKit.Presentation.PresentationDocument.PresentationDocument() -> void
 OdfKit.Presentation.PresentationDocument.PresentationDocument(OdfKit.Core.OdfPackage! package) -> void
+OdfKit.Presentation.PresentationDocument.RemoveSlide(int slideIndex) -> void
+OdfKit.Presentation.PresentationDocument.RemoveSlide(OdfKit.Presentation.OdfSlide! slide) -> bool
 OdfKit.Presentation.PresentationDocument.ReplaceTextInTextBoxes(string! search, string! replacement) -> int
 OdfKit.Presentation.PresentationDocument.SendToBack(string! name) -> bool
 OdfKit.Presentation.PresentationDocument.SetLayout(int slideIndex, OdfKit.Presentation.OdfPresentationLayout layout) -> void
@@ -16146,6 +16157,8 @@ OdfKit.Spreadsheet.OdfTableSheet.AutoFilter(OdfKit.Spreadsheet.OdfCellRange rang
 OdfKit.Spreadsheet.OdfTableSheet.AutoFilter(string! range) -> OdfKit.Spreadsheet.OdfDatabaseRange!
 OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidth(int col) -> void
 OdfKit.Spreadsheet.OdfTableSheet.Cells.get -> OdfKit.Spreadsheet.OdfCellCollection!
+OdfKit.Spreadsheet.OdfTableSheet.ClearNamedExpressions() -> int
+OdfKit.Spreadsheet.OdfTableSheet.ClearNamedRanges() -> int
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintArea() -> void
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintTitleColumns() -> void
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintTitleRows() -> void
@@ -16158,6 +16171,8 @@ OdfKit.Spreadsheet.OdfTableSheet.DeleteColumns(int position) -> void
 OdfKit.Spreadsheet.OdfTableSheet.DeleteColumns(int position, int count) -> void
 OdfKit.Spreadsheet.OdfTableSheet.DeleteRows(int position) -> void
 OdfKit.Spreadsheet.OdfTableSheet.DeleteRows(int position, int count) -> void
+OdfKit.Spreadsheet.OdfTableSheet.FindNamedExpression(string! name) -> OdfKit.Spreadsheet.OdfNamedExpressionInfo?
+OdfKit.Spreadsheet.OdfTableSheet.FindNamedRange(string! name) -> OdfKit.Spreadsheet.OdfNamedRangeInfo?
 OdfKit.Spreadsheet.OdfTableSheet.FreezePanes(int frozenRows, int frozenColumns) -> void
 OdfKit.Spreadsheet.OdfTableSheet.FrozenPanes.get -> OdfKit.Spreadsheet.OdfFrozenPanes
 OdfKit.Spreadsheet.OdfTableSheet.GetCell(int row, int col) -> OdfKit.Spreadsheet.OdfCell!
@@ -16211,6 +16226,8 @@ OdfKit.Spreadsheet.OdfTableSheet.ReadObjects<T>(OdfKit.Spreadsheet.OdfCellRange 
 OdfKit.Spreadsheet.OdfTableSheet.ReadObjects<T>(OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.OdfTableSheet.ReleaseFacadeCaches() -> void
 OdfKit.Spreadsheet.OdfTableSheet.RemoveColumnPageBreak(int afterCol) -> bool
+OdfKit.Spreadsheet.OdfTableSheet.RemoveNamedExpression(string! name) -> bool
+OdfKit.Spreadsheet.OdfTableSheet.RemoveNamedRange(string! name) -> bool
 OdfKit.Spreadsheet.OdfTableSheet.RemoveRowPageBreak(int afterRow) -> bool
 OdfKit.Spreadsheet.OdfTableSheet.ReplaceFormulaText(string! oldValue, string! newValue) -> int
 OdfKit.Spreadsheet.OdfTableSheet.ReplaceFormulaText(string! oldValue, string! newValue, System.StringComparison comparisonType) -> int
@@ -16277,8 +16294,10 @@ OdfKit.Spreadsheet.OdfWorksheetCollection.Count.get -> int
 OdfKit.Spreadsheet.OdfWorksheetCollection.Find(string! name) -> OdfKit.Spreadsheet.OdfTableSheet?
 OdfKit.Spreadsheet.OdfWorksheetCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Spreadsheet.OdfTableSheet!>!
 OdfKit.Spreadsheet.OdfWorksheetCollection.OdfWorksheetCollection(OdfKit.Spreadsheet.SpreadsheetDocument! document) -> void
+OdfKit.Spreadsheet.OdfWorksheetCollection.Remove(OdfKit.Spreadsheet.OdfTableSheet! sheet) -> bool
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[int index].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[string! name].get -> OdfKit.Spreadsheet.OdfTableSheet!
+OdfKit.Spreadsheet.OdfWorksheetCollection.TryRemove(string! name, out System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfFormulaCellInfo!>! blockingReferences) -> bool
 OdfKit.Spreadsheet.OdsCellValue
 OdfKit.Spreadsheet.OdsCellValue.Currency.get -> string?
 OdfKit.Spreadsheet.OdsCellValue.DisplayText.get -> string?
@@ -16417,10 +16436,12 @@ OdfKit.Spreadsheet.SpreadsheetDocument.BeginFormulaEvaluationChannel() -> OdfKit
 OdfKit.Spreadsheet.SpreadsheetDocument.BeginFormulaEvaluationChannel(int capacity) -> OdfKit.Spreadsheet.OdfFormulaEvaluationChannel!
 OdfKit.Spreadsheet.SpreadsheetDocument.BeginFormulaEvaluationChannel(int capacity, System.Threading.CancellationToken cancellationToken) -> OdfKit.Spreadsheet.OdfFormulaEvaluationChannel!
 OdfKit.Spreadsheet.SpreadsheetDocument.CalculationSettings.get -> OdfKit.Spreadsheet.OdfSpreadsheetCalculationSettings!
+OdfKit.Spreadsheet.SpreadsheetDocument.ClearDatabaseRanges() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfSpreadsheetTableOptions? options) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.EvaluateFormulas() -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.ExternalLinks.get -> OdfKit.Spreadsheet.OdfExternalLinkManager!
+OdfKit.Spreadsheet.SpreadsheetDocument.FindDatabaseRange(string! name) -> OdfKit.Spreadsheet.OdfDatabaseRange?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindSheet(string! name) -> OdfKit.Spreadsheet.OdfTableSheet?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindTable(string! name) -> OdfKit.Spreadsheet.OdfSpreadsheetTable?
 OdfKit.Spreadsheet.SpreadsheetDocument.GetConditionalFormats() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfConditionalFormatInfo!>!
@@ -16437,6 +16458,7 @@ OdfKit.Spreadsheet.SpreadsheetDocument.GetNamedExpressions() -> System.Collectio
 OdfKit.Spreadsheet.SpreadsheetDocument.GetNamedRanges() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfNamedRangeInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetPivotTables() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetPrintAreas() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfSheetPrintAreaInfo!>!
+OdfKit.Spreadsheet.SpreadsheetDocument.GetSheetReferences(string! sheetName) -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfFormulaCellInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetSheets() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfTableSheet!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetSparklineGroups() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfSparklineGroupInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetSplitPanes() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfSheetSplitPanesInfo!>!
@@ -16453,6 +16475,9 @@ OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfCha
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RejectAllChanges() -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.RejectChange(string! changeId) -> void
+OdfKit.Spreadsheet.SpreadsheetDocument.RemoveDatabaseRange(OdfKit.Spreadsheet.OdfDatabaseRange! range) -> bool
+OdfKit.Spreadsheet.SpreadsheetDocument.RemoveDatabaseRange(string! name) -> bool
+OdfKit.Spreadsheet.SpreadsheetDocument.RemoveSheet(OdfKit.Spreadsheet.OdfTableSheet! sheet) -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.ReplaceFormulaText(string! oldValue, string! newValue) -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ReplaceFormulaText(string! oldValue, string! newValue, System.StringComparison comparisonType) -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ResizeTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> bool
@@ -16466,6 +16491,7 @@ OdfKit.Spreadsheet.SpreadsheetDocument.SpreadsheetDocument(OdfKit.Core.OdfPackag
 OdfKit.Spreadsheet.SpreadsheetDocument.TrackedChanges.get -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.TrackedChanges.set -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.TryGetFormula(string! sheetName, string! address, out string! formula) -> bool
+OdfKit.Spreadsheet.SpreadsheetDocument.TryRemoveSheet(string! sheetName, out System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfFormulaCellInfo!>! blockingReferences) -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.UpdateEmbeddedChartSeries(OdfKit.Chart.OdfChartDocument! chart, System.Collections.Generic.IEnumerable<OdfKit.Spreadsheet.OdfEmbeddedChartSeriesUpdate!>! updates) -> OdfKit.OdfBatchUpdateResult!
 OdfKit.Spreadsheet.SpreadsheetDocument.UpdateFormulas(System.Func<OdfKit.Spreadsheet.OdfFormulaCellInfo!, string?>! updater) -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.UpdateObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, System.Collections.Generic.IEnumerable<T>! items, OdfKit.Spreadsheet.OdfObjectUpdateOptions! options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
@@ -16859,9 +16885,12 @@ OdfKit.Text.OdfHeading.OutlineLevel.set -> void
 OdfKit.Text.OdfHeadingCollection
 OdfKit.Text.OdfHeadingCollection.Add(string! text) -> OdfKit.Text.OdfHeading!
 OdfKit.Text.OdfHeadingCollection.Add(string! text, int outlineLevel) -> OdfKit.Text.OdfHeading!
+OdfKit.Text.OdfHeadingCollection.Clear() -> void
+OdfKit.Text.OdfHeadingCollection.Find(System.Predicate<OdfKit.Text.OdfHeading!>! predicate) -> OdfKit.Text.OdfHeading?
 OdfKit.Text.OdfHeadingCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Text.OdfHeading!>!
 OdfKit.Text.OdfHeadingCollection.Items.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfHeading!>!
 OdfKit.Text.OdfHeadingCollection.OdfHeadingCollection(OdfKit.Text.TextDocument! document) -> void
+OdfKit.Text.OdfHeadingCollection.Remove(OdfKit.Text.OdfHeading! heading) -> bool
 OdfKit.Text.OdfHyperlinkInfo
 OdfKit.Text.OdfHyperlinkInfo.DisplayText.get -> string!
 OdfKit.Text.OdfHyperlinkInfo.OdfHyperlinkInfo(string! url, string! displayText) -> void
@@ -16965,9 +16994,12 @@ OdfKit.Text.OdfList.StyleName.set -> void
 OdfKit.Text.OdfListCollection
 OdfKit.Text.OdfListCollection.Add() -> OdfKit.Text.OdfList!
 OdfKit.Text.OdfListCollection.Add(string? styleName) -> OdfKit.Text.OdfList!
+OdfKit.Text.OdfListCollection.Clear() -> void
+OdfKit.Text.OdfListCollection.Find(System.Predicate<OdfKit.Text.OdfList!>! predicate) -> OdfKit.Text.OdfList?
 OdfKit.Text.OdfListCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Text.OdfList!>!
 OdfKit.Text.OdfListCollection.Items.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfList!>!
 OdfKit.Text.OdfListCollection.OdfListCollection(OdfKit.Text.TextDocument! document) -> void
+OdfKit.Text.OdfListCollection.Remove(OdfKit.Text.OdfList! list) -> bool
 OdfKit.Text.OdfListItem
 OdfKit.Text.OdfListItem.AddNestedList() -> OdfKit.Text.OdfList!
 OdfKit.Text.OdfListItem.AddNestedList(string? styleName) -> OdfKit.Text.OdfList!
@@ -17215,9 +17247,12 @@ OdfKit.Text.OdfParagraph.WritingMode.set -> void
 OdfKit.Text.OdfParagraphCollection
 OdfKit.Text.OdfParagraphCollection.Add() -> OdfKit.Text.OdfParagraph!
 OdfKit.Text.OdfParagraphCollection.Add(string! text) -> OdfKit.Text.OdfParagraph!
+OdfKit.Text.OdfParagraphCollection.Clear() -> void
+OdfKit.Text.OdfParagraphCollection.Find(System.Predicate<OdfKit.Text.OdfParagraph!>! predicate) -> OdfKit.Text.OdfParagraph?
 OdfKit.Text.OdfParagraphCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Text.OdfParagraph!>!
 OdfKit.Text.OdfParagraphCollection.Items.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfParagraph!>!
 OdfKit.Text.OdfParagraphCollection.OdfParagraphCollection(OdfKit.Text.TextDocument! document) -> void
+OdfKit.Text.OdfParagraphCollection.Remove(OdfKit.Text.OdfParagraph! paragraph) -> bool
 OdfKit.Text.OdfParagraphPrebindingWriter
 OdfKit.Text.OdfParagraphPrebindingWriter.Add(string! text) -> OdfKit.Text.OdfParagraphPrebindingWriter!
 OdfKit.Text.OdfParagraphPrebindingWriter.Count.get -> int
@@ -17272,6 +17307,8 @@ OdfKit.Text.OdfTable.InsertColumns(int position, int count) -> void
 OdfKit.Text.OdfTable.InsertRows(int position) -> void
 OdfKit.Text.OdfTable.InsertRows(int position, int count) -> void
 OdfKit.Text.OdfTable.MergeCells(int startRow, int startCol, int rowSpan, int colSpan) -> void
+OdfKit.Text.OdfTable.Name.get -> string?
+OdfKit.Text.OdfTable.Name.set -> void
 OdfKit.Text.OdfTable.OdfTable(OdfKit.DOM.OdfNode! node, int rows, int cols, OdfKit.Text.TextDocument! doc) -> void
 OdfKit.Text.OdfTable.SetCellStyle(int row, int col, string! styleName) -> void
 OdfKit.Text.OdfTable.SetColumnWidth(int col, OdfKit.Styles.OdfLength width) -> void
@@ -17383,9 +17420,12 @@ OdfKit.Text.OdfTextRun.WithSuperscript(bool superscript) -> OdfKit.Text.OdfTextR
 OdfKit.Text.OdfTextRun.WithTextTransform(string! transform) -> OdfKit.Text.OdfTextRun!
 OdfKit.Text.OdfTextTableCollection
 OdfKit.Text.OdfTextTableCollection.Add(int rows, int columns) -> OdfKit.Text.OdfTable!
+OdfKit.Text.OdfTextTableCollection.Clear() -> void
+OdfKit.Text.OdfTextTableCollection.Find(string! name) -> OdfKit.Text.OdfTextTableInfo?
 OdfKit.Text.OdfTextTableCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Text.OdfTextTableInfo!>!
 OdfKit.Text.OdfTextTableCollection.Items.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfTextTableInfo!>!
 OdfKit.Text.OdfTextTableCollection.OdfTextTableCollection(OdfKit.Text.TextDocument! document) -> void
+OdfKit.Text.OdfTextTableCollection.Remove(OdfKit.Text.OdfTextTableInfo! table) -> bool
 OdfKit.Text.OdfTextTableInfo
 OdfKit.Text.OdfTextTableInfo.ColumnCount.get -> int
 OdfKit.Text.OdfTextTableInfo.Name.get -> string?

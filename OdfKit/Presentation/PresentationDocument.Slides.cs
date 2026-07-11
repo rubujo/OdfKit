@@ -101,12 +101,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
-    /// Deletes the specified slide.
-    /// 刪除指定的投影片。
+    /// Removes the slide at the specified index.
+    /// 移除指定索引的投影片。
     /// </summary>
     /// <param name="slideIndex">The slide index. / 投影片的索引位置。</param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時拋出。</exception>
-    public void DeleteSlide(int slideIndex)
+    public void RemoveSlide(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= _slides.Count)
         {
@@ -117,6 +117,28 @@ public partial class PresentationDocument
         var presentationNode = GetPresentationNode();
         presentationNode.RemoveChild(slide.Node);
         _slides.RemoveAt(slideIndex);
+    }
+
+    /// <summary>
+    /// Removes the specified slide when it belongs to this document.
+    /// 當指定投影片屬於此文件時將其移除。
+    /// </summary>
+    /// <param name="slide">The slide to remove. / 要移除的投影片。</param>
+    /// <returns><see langword="true"/> if the slide was removed; otherwise, <see langword="false"/>. / 若已移除投影片則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveSlide(OdfSlide slide)
+    {
+        if (slide is null)
+        {
+            throw new ArgumentNullException(nameof(slide));
+        }
+        int index = _slides.IndexOf(slide);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        RemoveSlide(index);
+        return true;
     }
 
     /// <summary>

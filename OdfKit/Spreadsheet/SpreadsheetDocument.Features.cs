@@ -166,6 +166,91 @@ public partial class SpreadsheetDocument
         databaseRanges.AppendChild(dbRangeNode);
         return new OdfDatabaseRange(dbRangeNode, this);
     }
+
+    /// <summary>
+    /// Finds an editable database range by its exact name.
+    /// 依精確名稱尋找可編輯的資料庫範圍。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns>The matching database range, or <see langword="null"/>. / 相符的資料庫範圍；若不存在則為 <see langword="null"/>。</returns>
+    public OdfDatabaseRange? FindDatabaseRange(string name)
+    {
+        OdfNode? node = FindDatabaseRangeNode(name);
+        return node is null ? null : new OdfDatabaseRange(node, this);
+    }
+
+    /// <summary>
+    /// Removes a database range by its exact name without removing a same-named range expression.
+    /// 依精確名稱移除資料庫範圍，但不移除同名的命名範圍運算式。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveDatabaseRange(string name)
+    {
+        OdfNode? node = FindDatabaseRangeNode(name);
+        if (node?.Parent is null)
+        {
+            return false;
+        }
+
+        node.Parent.RemoveChild(node);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes the specified database range when it belongs to this document.
+    /// 在指定資料庫範圍屬於此文件時將其移除。
+    /// </summary>
+    /// <param name="range">The database range facade. / 資料庫範圍 facade。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveDatabaseRange(OdfDatabaseRange range)
+    {
+        if (range is null)
+        {
+            throw new ArgumentNullException(nameof(range));
+        }
+        OdfNode? node = FindDatabaseRangeNode(range.Name);
+        if (node is null || !ReferenceEquals(node, range.Node) || node.Parent is null)
+        {
+            return false;
+        }
+
+        node.Parent.RemoveChild(node);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all database ranges while preserving named ranges and unknown content in the container.
+    /// 移除所有資料庫範圍，並保留容器中的命名範圍及未知內容。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearDatabaseRanges()
+    {
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot, "database-ranges", OdfNamespaces.Table);
+        if (container is null)
+        {
+            return 0;
+        }
+
+        List<OdfNode> ranges = [];
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "database-range" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                ranges.Add(child);
+            }
+        }
+
+        foreach (OdfNode range in ranges)
+        {
+            container.RemoveChild(range);
+        }
+
+        return ranges.Count;
+    }
     /// <summary>
     /// Short overload of CreateTable that accepts name and range; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 name 與 range；其餘可選參數使用預設值並轉呼叫最長 CreateTable 多載。

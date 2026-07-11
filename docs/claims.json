@@ -13,25 +13,33 @@
       "id": "ODS-SEMANTIC-001",
       "format": "ODS",
       "dimension": "SemanticApiDepth",
-      "level": "common-workflows",
-      "evidence": ["OdfKit.Tests/SpreadsheetTests.cs", "OdfKit.Tests/SpreadsheetApiUsabilityTests.cs"],
+      "level": "semantic-facade-complete",
+      "evidence": ["OdfKit.Tests/SpreadsheetTests.cs", "OdfKit.Tests/SpreadsheetApiUsabilityTests.cs", "docs/semantic-coverage.json"],
       "limitations": "The streaming reader exposes stored values and formulas but does not recalculate formulas."
     },
     {
       "id": "ODT-SEMANTIC-001",
       "format": "ODT",
       "dimension": "SemanticApiDepth",
-      "level": "common-workflows",
-      "evidence": ["OdfKit.Tests/TextHighLevelApiTests.cs", "OdfKit.Tests/TextApiUsabilityTests.cs"],
+      "level": "semantic-facade-complete",
+      "evidence": ["OdfKit.Tests/TextHighLevelApiTests.cs", "OdfKit.Tests/TextApiUsabilityTests.cs", "docs/semantic-coverage.json"],
       "limitations": "OdfKit is not a page-layout or rendering engine."
     },
     {
       "id": "ODP-SEMANTIC-001",
       "format": "ODP",
       "dimension": "SemanticApiDepth",
-      "level": "common-workflows",
-      "evidence": ["OdfKit.Tests/PresentationHighLevelApiTests.cs", "OdfKit.Tests/PresentationBoundaryTests.cs"],
+      "level": "semantic-facade-complete",
+      "evidence": ["OdfKit.Tests/PresentationHighLevelApiTests.cs", "OdfKit.Tests/PresentationBoundaryTests.cs", "docs/semantic-coverage.json"],
       "limitations": "ODP uses a DOM/package workload; no streaming slide API is claimed."
+    },
+    {
+      "id": "ODG-SEMANTIC-001",
+      "format": "ODG",
+      "dimension": "SemanticApiDepth",
+      "level": "semantic-facade-complete",
+      "evidence": ["OdfKit.Tests/DrawingHighLevelApiTests.cs", "OdfKit.Tests/DrawingApiUsabilityTests.cs", "docs/semantic-coverage.json"],
+      "limitations": "OdfKit does not synthesize SmartArt layouts or provide a pixel rendering engine."
     },
     {
       "id": "ODF-INTEROP-001",

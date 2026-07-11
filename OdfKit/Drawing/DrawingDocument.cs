@@ -249,6 +249,46 @@ public partial class DrawingDocument : OdfDocument
         return page;
     }
 
+    /// <summary>
+    /// Removes the drawing page at the specified index.
+    /// 移除指定索引的繪圖頁面。
+    /// </summary>
+    /// <param name="pageIndex">The zero-based page index. / 採 0 為基準的頁面索引。</param>
+    /// <exception cref="ArgumentOutOfRangeException">The page index is outside the collection. / 頁面索引超出集合範圍。</exception>
+    public void RemovePage(int pageIndex)
+    {
+        if (pageIndex < 0 || pageIndex >= _pages.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageIndex));
+        }
+
+        OdfDrawPage page = _pages[pageIndex];
+        GetDrawingNode().RemoveChild(page.Node);
+        _pages.RemoveAt(pageIndex);
+    }
+
+    /// <summary>
+    /// Removes the specified drawing page when it belongs to this document.
+    /// 當指定繪圖頁面屬於此文件時將其移除。
+    /// </summary>
+    /// <param name="page">The drawing page to remove. / 要移除的繪圖頁面。</param>
+    /// <returns><see langword="true"/> if the page was removed; otherwise, <see langword="false"/>. / 若已移除頁面則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemovePage(OdfDrawPage page)
+    {
+        if (page is null)
+        {
+            throw new ArgumentNullException(nameof(page));
+        }
+        int index = _pages.IndexOf(page);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        RemovePage(index);
+        return true;
+    }
+
 
     /// <summary>
     /// Adds a path shape to the drawing document (applied to the default first page).

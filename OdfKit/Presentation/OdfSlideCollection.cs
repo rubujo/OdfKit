@@ -56,6 +56,37 @@ public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
         return _document.AddSlide(name);
     }
 
+    /// <summary>
+    /// Finds a slide by name.
+    /// 依名稱查找投影片。
+    /// </summary>
+    /// <param name="name">The slide name. / 投影片名稱。</param>
+    /// <returns>The matching slide, or <see langword="null"/> when no match exists. / 符合的投影片；若找不到則為 <see langword="null"/>。</returns>
+    public OdfSlide? Find(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(null, nameof(name));
+        }
+        return _document.GetSlidesSnapshot().FirstOrDefault(
+            slide => string.Equals(slide.Name, name, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Removes the specified slide from this collection.
+    /// 從此集合移除指定投影片。
+    /// </summary>
+    /// <param name="slide">The slide to remove. / 要移除的投影片。</param>
+    /// <returns><see langword="true"/> if the slide was removed; otherwise, <see langword="false"/>. / 若已移除投影片則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool Remove(OdfSlide slide) => _document.RemoveSlide(slide);
+
+    /// <summary>
+    /// Removes the slide at the specified index.
+    /// 移除指定索引的投影片。
+    /// </summary>
+    /// <param name="index">The zero-based slide index. / 採 0 為基準的投影片索引。</param>
+    public void RemoveAt(int index) => _document.RemoveSlide(index);
+
 
     /// <summary>
     /// Gets the slide enumerator.

@@ -25,6 +25,26 @@ public partial class OdfTable
     private readonly Dictionary<OdfNode, List<OdfNode>> _cellNodeCacheByRow = [];
 
     /// <summary>
+    /// Gets or sets the table name.
+    /// 取得或設定表格名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => Node.GetAttribute("name", OdfNamespaces.Table);
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Node.RemoveAttribute("name", OdfNamespaces.Table);
+            }
+            else
+            {
+                Node.SetAttribute("name", OdfNamespaces.Table, value!, "table");
+            }
+        }
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OdfTable"/> class.
     /// 初始化 <see cref="OdfTable"/> 類別的新執行個體。
     /// </summary>

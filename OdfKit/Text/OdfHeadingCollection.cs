@@ -67,6 +67,59 @@ public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
     }
 
     /// <summary>
+    /// Finds the first top-level heading that satisfies the predicate.
+    /// 查找第一個符合條件的最上層標題。
+    /// </summary>
+    /// <param name="predicate">The heading predicate. / 標題條件。</param>
+    /// <returns>The matching heading, or <see langword="null"/> when no match exists. / 符合的標題；若找不到則為 <see langword="null"/>。</returns>
+    public OdfHeading? Find(Predicate<OdfHeading> predicate)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        foreach (OdfHeading heading in Items)
+        {
+            if (predicate(heading))
+            {
+                return heading;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the specified top-level heading.
+    /// 移除指定的最上層標題。
+    /// </summary>
+    /// <param name="heading">The heading to remove. / 要移除的標題。</param>
+    /// <returns><see langword="true"/> if the heading was removed; otherwise, <see langword="false"/>. / 若已移除標題則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool Remove(OdfHeading heading)
+    {
+        if (heading is null)
+        {
+            throw new ArgumentNullException(nameof(heading));
+        }
+
+        return ReferenceEquals(heading.Node.Parent, _document.BodyTextRoot) &&
+            _document.BodyTextRoot.RemoveChild(heading.Node);
+    }
+
+    /// <summary>
+    /// Removes all top-level headings while preserving other body content.
+    /// 移除所有最上層標題，並保留其他本文內容。
+    /// </summary>
+    public void Clear()
+    {
+        foreach (OdfHeading heading in Items)
+        {
+            _document.BodyTextRoot.RemoveChild(heading.Node);
+        }
+    }
+
+    /// <summary>
     /// Gets an enumerator over the headings, for use with LINQ queries.
     /// 取得標題列舉器，供 LINQ 查詢使用。
     /// </summary>

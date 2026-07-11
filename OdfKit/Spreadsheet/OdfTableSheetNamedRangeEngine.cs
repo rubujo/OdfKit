@@ -48,6 +48,20 @@ internal static class OdfTableSheetNamedRangeEngine
         return ranges.AsReadOnly();
     }
 
+    internal static OdfNamedRangeInfo? FindNamedRange(OdfTableSheetMutationContext context, string name) =>
+        FindNamedItem(context, "named-range", name) is { } node
+            ? new OdfNamedRangeInfo(
+                node.GetAttribute("name", OdfNamespaces.Table) ?? string.Empty,
+                node.GetAttribute("cell-range-address", OdfNamespaces.Table) ?? string.Empty,
+                node.GetAttribute("base-cell-address", OdfNamespaces.Table))
+            : null;
+
+    internal static bool RemoveNamedRange(OdfTableSheetMutationContext context, string name) =>
+        RemoveNamedItem(context, "named-range", name);
+
+    internal static int ClearNamedRanges(OdfTableSheetMutationContext context) =>
+        ClearNamedItems(context, "named-range");
+
     internal static void AddNamedExpression(
         OdfTableSheetMutationContext context,
         string name,
@@ -85,5 +99,73 @@ internal static class OdfTableSheetNamedRangeEngine
             }
         }
         return expressions.AsReadOnly();
+    }
+
+    internal static OdfNamedExpressionInfo? FindNamedExpression(OdfTableSheetMutationContext context, string name) =>
+        FindNamedItem(context, "named-expression", name) is { } node
+            ? new OdfNamedExpressionInfo(
+                node.GetAttribute("name", OdfNamespaces.Table) ?? string.Empty,
+                node.GetAttribute("expression", OdfNamespaces.Table) ?? string.Empty,
+                node.GetAttribute("base-cell-address", OdfNamespaces.Table))
+            : null;
+
+    internal static bool RemoveNamedExpression(OdfTableSheetMutationContext context, string name) =>
+        RemoveNamedItem(context, "named-expression", name);
+
+    internal static int ClearNamedExpressions(OdfTableSheetMutationContext context) =>
+        ClearNamedItems(context, "named-expression");
+
+    private static OdfNode? FindNamedItem(OdfTableSheetMutationContext context, string localName, string name)
+    {
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "named-expressions", OdfNamespaces.Table);
+        if (container is null)
+            return null;
+
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Table), name, System.StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool RemoveNamedItem(OdfTableSheetMutationContext context, string localName, string name)
+    {
+        OdfNode? node = FindNamedItem(context, localName, name);
+        if (node?.Parent is null)
+            return false;
+
+        node.Parent.RemoveChild(node);
+        return true;
+    }
+
+    private static int ClearNamedItems(OdfTableSheetMutationContext context, string localName)
+    {
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "named-expressions", OdfNamespaces.Table);
+        if (container is null)
+            return 0;
+
+        List<OdfNode> matches = [];
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                matches.Add(child);
+            }
+        }
+
+        foreach (OdfNode match in matches)
+            container.RemoveChild(match);
+        return matches.Count;
     }
 }

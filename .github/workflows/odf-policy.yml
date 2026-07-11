@@ -7,7 +7,9 @@ on:
       - 'OdfKit.Tests/**'
       - 'eng/Test-OdfPolicy.ps1'
       - 'eng/Test-EvidenceClaims.ps1'
+      - 'eng/Test-SemanticCoverage.ps1'
       - 'docs/claims.json'
+      - 'docs/semantic-coverage.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   push:
@@ -18,7 +20,9 @@ on:
       - 'OdfKit.Tests/**'
       - 'eng/Test-OdfPolicy.ps1'
       - 'eng/Test-EvidenceClaims.ps1'
+      - 'eng/Test-SemanticCoverage.ps1'
       - 'docs/claims.json'
+      - 'docs/semantic-coverage.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   workflow_dispatch:
@@ -48,3 +52,7 @@ jobs:
       - name: Validate evidence claims
         shell: pwsh
         run: ./eng/Test-EvidenceClaims.ps1
+
+      - name: Validate semantic API coverage
+        shell: pwsh
+        run: ./eng/Test-SemanticCoverage.ps1

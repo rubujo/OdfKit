@@ -115,6 +115,24 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     }
 
     /// <summary>
+    /// Removes a worksheet when no formula outside it references the worksheet.
+    /// 當沒有外部公式參照時移除工作表。
+    /// </summary>
+    /// <param name="sheet">The worksheet to remove. / 要移除的工作表。</param>
+    /// <returns><see langword="true"/> if the worksheet was removed; otherwise, <see langword="false"/>. / 若已移除工作表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool Remove(OdfTableSheet sheet) => _document.RemoveSheet(sheet);
+
+    /// <summary>
+    /// Attempts to remove a worksheet by name without leaving formula references dangling.
+    /// 嘗試依名稱移除工作表，且不留下懸空的公式參照。
+    /// </summary>
+    /// <param name="name">The worksheet name. / 工作表名稱。</param>
+    /// <param name="blockingReferences">Formula cells that prevented removal. / 阻擋移除的公式儲存格。</param>
+    /// <returns><see langword="true"/> if the worksheet was removed; otherwise, <see langword="false"/>. / 若已移除工作表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool TryRemove(string name, out IReadOnlyList<OdfFormulaCellInfo> blockingReferences) =>
+        _document.TryRemoveSheet(name, out blockingReferences);
+
+    /// <summary>
     /// Gets the worksheet enumerator.
     /// 取得工作表列舉器。
     /// </summary>

@@ -109,6 +109,86 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets formula cells outside the specified worksheet that reference it.
+    /// 取得指定工作表之外參照該工作表的公式儲存格。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <returns>The blocking formula references. / 會阻擋移除的公式參照。</returns>
+    public IReadOnlyList<OdfFormulaCellInfo> GetSheetReferences(string sheetName)
+    {
+        if (string.IsNullOrWhiteSpace(sheetName))
+        {
+            throw new ArgumentException(null, nameof(sheetName));
+        }
+
+        List<OdfFormulaCellInfo> references = [];
+        foreach (OdfFormulaCellInfo formulaCell in GetFormulaCells())
+        {
+            if (!string.Equals(formulaCell.SheetName, sheetName, StringComparison.Ordinal) &&
+                FormulaReferencesSheet(formulaCell.Formula, sheetName))
+            {
+                references.Add(formulaCell);
+            }
+        }
+
+        return references.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Attempts to remove a worksheet without leaving formula references dangling.
+    /// 嘗試移除工作表，且不留下懸空的公式參照。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="blockingReferences">Formula cells that prevented removal. / 阻擋移除的公式儲存格。</param>
+    /// <returns><see langword="true"/> if the worksheet was removed; otherwise, <see langword="false"/>. / 若已移除工作表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool TryRemoveSheet(string sheetName, out IReadOnlyList<OdfFormulaCellInfo> blockingReferences)
+    {
+        OdfTableSheet? sheet = FindSheet(sheetName);
+        if (sheet is null)
+        {
+            blockingReferences = Array.Empty<OdfFormulaCellInfo>();
+            return false;
+        }
+
+        blockingReferences = GetSheetReferences(sheetName);
+        if (blockingReferences.Count > 0)
+        {
+            return false;
+        }
+
+        SheetsRoot.RemoveChild(sheet.TableNode);
+        ReleaseSheetFacade(sheet.TableNode, sheet);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes a worksheet when no formula outside it references the worksheet.
+    /// 當沒有外部公式參照時移除工作表。
+    /// </summary>
+    /// <param name="sheet">The worksheet to remove. / 要移除的工作表。</param>
+    /// <returns><see langword="true"/> if the worksheet was removed; otherwise, <see langword="false"/>. / 若已移除工作表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveSheet(OdfTableSheet sheet)
+    {
+        if (sheet is null)
+        {
+            throw new ArgumentNullException(nameof(sheet));
+        }
+
+        return ReferenceEquals(sheet.Document, this) &&
+            TryRemoveSheet(sheet.Name, out _);
+    }
+
+    private static bool FormulaReferencesSheet(string formula, string sheetName)
+    {
+        string escapedName = sheetName.Replace("'", "''");
+        string quotedPrefix = $"'{escapedName}'.";
+        return formula.Contains($"[{quotedPrefix}", StringComparison.Ordinal) ||
+            formula.Contains($"[${quotedPrefix}", StringComparison.Ordinal) ||
+            formula.Contains($"[{sheetName}.", StringComparison.Ordinal) ||
+            formula.Contains($"[${sheetName}.", StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Gets a value indicating whether the workbook structure is protected.
     /// 取得一個值，指出活頁簿結構是否受到保護。
     /// </summary>

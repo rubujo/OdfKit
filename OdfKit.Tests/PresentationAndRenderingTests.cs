@@ -553,7 +553,7 @@ namespace OdfKit.Tests
                 doc.MoveSlide(0, 2); // First Slide moved to index 2
 
                 // Delete slide
-                doc.DeleteSlide(3); // Delete the 4th slide
+                doc.RemoveSlide(3); // Remove the 4th slide
 
                 doc.Save();
             }

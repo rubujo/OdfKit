@@ -586,4 +586,61 @@ public class DrawingHighLevelApiTests
         Assert.NotNull(geometryNode);
         Assert.Equal("smiley", geometryNode.GetAttribute("type", OdfNamespaces.Draw));
     }
+
+    /// <summary>
+    /// 驗證繪圖頁面集合可查找、移除並在儲存後保持結果。
+    /// </summary>
+    [Fact]
+    public void PageCollection_FindRemoveAndRoundTrip()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage first = document.Pages.Add("第一頁");
+        document.Pages.Add("第二頁");
+
+        Assert.Same(first, document.Pages.Find("第一頁"));
+        Assert.True(document.Pages.Remove(first));
+        Assert.False(document.Pages.Remove(first));
+        Assert.Single(document.Pages);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "pages.odg");
+        Assert.Single(reloaded.Pages);
+        Assert.Equal("第二頁", reloaded.Pages[0].Name);
+    }
+
+    /// <summary>
+    /// 驗證移除圖形時會一併移除參照該圖形的連接線。
+    /// </summary>
+    [Fact]
+    public void RemoveShape_RemovesReferencingConnectorsAndRoundTrips()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("關聯頁");
+        OdfShape first = page.AddShape(OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"), OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"), OdfLength.Parse("2cm"));
+        OdfShape second = page.AddShape(OdfShapeType.Rectangle,
+            OdfLength.Parse("5cm"), OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"), OdfLength.Parse("2cm"));
+        string firstId = first.Node.GetAttribute("id", OdfNamespaces.Draw)!;
+        string secondId = second.Node.GetAttribute("id", OdfNamespaces.Draw)!;
+        page.AddConnector(firstId, secondId, OdfConnectorType.Standard);
+
+        Assert.NotNull(page.FindShape(firstId));
+        Assert.True(page.RemoveShape(firstId));
+        Assert.Null(page.FindShape(firstId));
+        Assert.Empty(page.GetConnectors());
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "shapes.odg");
+        Assert.Null(reloaded.Pages[0].FindShape(firstId));
+        Assert.NotNull(reloaded.Pages[0].FindShape(secondId));
+        Assert.Empty(reloaded.Pages[0].GetConnectors());
+    }
 }

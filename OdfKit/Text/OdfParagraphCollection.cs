@@ -66,6 +66,59 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     }
 
     /// <summary>
+    /// Finds the first top-level paragraph that satisfies the predicate.
+    /// 查找第一個符合條件的最上層段落。
+    /// </summary>
+    /// <param name="predicate">The paragraph predicate. / 段落條件。</param>
+    /// <returns>The matching paragraph, or <see langword="null"/> when no match exists. / 符合的段落；若找不到則為 <see langword="null"/>。</returns>
+    public OdfParagraph? Find(Predicate<OdfParagraph> predicate)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        foreach (OdfParagraph paragraph in Items)
+        {
+            if (predicate(paragraph))
+            {
+                return paragraph;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the specified top-level paragraph.
+    /// 移除指定的最上層段落。
+    /// </summary>
+    /// <param name="paragraph">The paragraph to remove. / 要移除的段落。</param>
+    /// <returns><see langword="true"/> if the paragraph was removed; otherwise, <see langword="false"/>. / 若已移除段落則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool Remove(OdfParagraph paragraph)
+    {
+        if (paragraph is null)
+        {
+            throw new ArgumentNullException(nameof(paragraph));
+        }
+
+        return ReferenceEquals(paragraph.Node.Parent, _document.BodyTextRoot) &&
+            _document.BodyTextRoot.RemoveChild(paragraph.Node);
+    }
+
+    /// <summary>
+    /// Removes all top-level paragraphs while preserving other body content.
+    /// 移除所有最上層段落，並保留其他本文內容。
+    /// </summary>
+    public void Clear()
+    {
+        foreach (OdfParagraph paragraph in Items)
+        {
+            _document.BodyTextRoot.RemoveChild(paragraph.Node);
+        }
+    }
+
+    /// <summary>
     /// Gets an enumerator over the paragraphs, for use with LINQ queries.
     /// 取得段落列舉器，供 LINQ 查詢使用。
     /// </summary>

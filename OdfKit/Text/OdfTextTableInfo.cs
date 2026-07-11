@@ -10,8 +10,9 @@ namespace OdfKit.Text;
 /// </summary>
 public sealed class OdfTextTableInfo
 {
-    private OdfTextTableInfo(string? name, int rowCount, int columnCount)
+    private OdfTextTableInfo(OdfNode node, string? name, int rowCount, int columnCount)
     {
+        Node = node;
         Name = name;
         RowCount = rowCount;
         ColumnCount = columnCount;
@@ -34,6 +35,8 @@ public sealed class OdfTextTableInfo
     /// 取得表格最大欄數。
     /// </summary>
     public int ColumnCount { get; }
+
+    internal OdfNode Node { get; }
 
     internal static OdfTextTableInfo FromNode(OdfNode tableNode)
     {
@@ -63,6 +66,6 @@ public sealed class OdfTextTableInfo
             columnCount = Math.Max(columnCount, cells);
         }
 
-        return new OdfTextTableInfo(tableNode.GetAttribute("name", OdfNamespaces.Table), rowCount, columnCount);
+        return new OdfTextTableInfo(tableNode, tableNode.GetAttribute("name", OdfNamespaces.Table), rowCount, columnCount);
     }
 }

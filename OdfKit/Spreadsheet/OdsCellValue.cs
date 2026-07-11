@@ -62,32 +62,38 @@ public sealed class OdsCellValue
     }
 
     /// <summary>
-    /// Gets the semantic value kind. / 取得語意值類型。
+    /// Gets the semantic value kind.
+    /// 取得語意值類型。
     /// </summary>
     public OdsCellValueKind Kind { get; }
 
     /// <summary>
-    /// Gets the semantic or cached formula value. / 取得語意值或公式快取值。
+    /// Gets the semantic or cached formula value.
+    /// 取得語意值或公式快取值。
     /// </summary>
     public object? Value { get; }
 
     /// <summary>
-    /// Gets the original formula expression. / 取得原始公式運算式。
+    /// Gets the original formula expression.
+    /// 取得原始公式運算式。
     /// </summary>
     public string? Formula { get; }
 
     /// <summary>
-    /// Gets the ISO currency code when available. / 取得可用的 ISO 貨幣代碼。
+    /// Gets the ISO currency code when available.
+    /// 取得可用的 ISO 貨幣代碼。
     /// </summary>
     public string? Currency { get; }
 
     /// <summary>
-    /// Gets the extracted display text. / 取得擷取後的顯示文字。
+    /// Gets the extracted display text.
+    /// 取得擷取後的顯示文字。
     /// </summary>
     public string? DisplayText { get; }
 
     /// <summary>
-    /// Gets the original ODF value-type token. / 取得原始 ODF value-type 詞彙。
+    /// Gets the original ODF value-type token.
+    /// 取得原始 ODF value-type 詞彙。
     /// </summary>
     public string? RawValueType { get; }
 }

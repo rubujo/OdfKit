@@ -69,6 +69,32 @@ public partial class OdfTableSheet
     /// </summary>
     public IReadOnlyList<OdfNamedRangeInfo> NamedRanges =>
         OdfTableSheetNamedRangeEngine.GetNamedRanges(MutationContext);
+
+    /// <summary>
+    /// Finds a named range in this worksheet by its exact name.
+    /// 依精確名稱尋找此工作表中的命名範圍。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns>The matching range, or <see langword="null"/>. / 相符的範圍；若不存在則為 <see langword="null"/>。</returns>
+    public OdfNamedRangeInfo? FindNamedRange(string name) =>
+        OdfTableSheetNamedRangeEngine.FindNamedRange(MutationContext, name);
+
+    /// <summary>
+    /// Removes a named range from this worksheet.
+    /// 從此工作表移除命名範圍。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveNamedRange(string name) =>
+        OdfTableSheetNamedRangeEngine.RemoveNamedRange(MutationContext, name);
+
+    /// <summary>
+    /// Removes all named ranges from this worksheet while preserving named expressions and unknown content.
+    /// 移除此工作表中的所有命名範圍，並保留具名運算式與未知內容。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearNamedRanges() =>
+        OdfTableSheetNamedRangeEngine.ClearNamedRanges(MutationContext);
     /// <summary>
     /// Short overload of AddNamedExpression that accepts name and expression; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 name 與 expression；其餘可選參數使用預設值並轉呼叫最長 AddNamedExpression 多載。
@@ -93,6 +119,32 @@ public partial class OdfTableSheet
     /// </summary>
     public IReadOnlyList<OdfNamedExpressionInfo> NamedExpressions =>
         OdfTableSheetNamedRangeEngine.GetNamedExpressions(MutationContext);
+
+    /// <summary>
+    /// Finds a named expression in this worksheet by its exact name.
+    /// 依精確名稱尋找此工作表中的具名運算式。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns>The matching expression, or <see langword="null"/>. / 相符的運算式；若不存在則為 <see langword="null"/>。</returns>
+    public OdfNamedExpressionInfo? FindNamedExpression(string name) =>
+        OdfTableSheetNamedRangeEngine.FindNamedExpression(MutationContext, name);
+
+    /// <summary>
+    /// Removes a named expression from this worksheet.
+    /// 從此工作表移除具名運算式。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveNamedExpression(string name) =>
+        OdfTableSheetNamedRangeEngine.RemoveNamedExpression(MutationContext, name);
+
+    /// <summary>
+    /// Removes all named expressions from this worksheet while preserving named ranges and unknown content.
+    /// 移除此工作表中的所有具名運算式，並保留命名範圍與未知內容。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearNamedExpressions() =>
+        OdfTableSheetNamedRangeEngine.ClearNamedExpressions(MutationContext);
 
     #endregion
 }
