@@ -1,0 +1,16 @@
+- name: Home
+  href: index.md
+- name: Usage and evidence guide
+  href: guide.md
+- name: API reference
+  href: xref:OdfKit
+- name: License
+  href: ../articles/license.md
+- name: AI and intellectual property
+  href: ../../docs/ip-compliance.md
+- name: Third-party notices
+  href: ../../THIRD-PARTY-NOTICES.md
+- name: Security limits
+  href: ../../docs/security-limits.md
+- name: Evidence index
+  href: ../../docs/evidence-index.md

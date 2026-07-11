@@ -1,0 +1,16 @@
+- name: Domov
+  href: index.md
+- name: Príručka používania a dôkazov
+  href: guide.md
+- name: Referencia API
+  href: xref:OdfKit
+- name: Licencia
+  href: ../articles/license.md
+- name: AI a duševné vlastníctvo
+  href: ../../docs/ip-compliance.md
+- name: Oznámenia tretích strán
+  href: ../../THIRD-PARTY-NOTICES.md
+- name: Bezpečnostné limity
+  href: ../../docs/security-limits.md
+- name: Register dôkazov
+  href: ../../docs/evidence-index.md

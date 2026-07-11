@@ -22,6 +22,8 @@ Conservez les limites de ressources des readers et des packages pour les fichier
 Les affirmations sont séparées en `PackageFidelity`, `SemanticApiDepth` et `InteropEvidence` ; une dimension ne prouve pas les autres. Les résultats de performance publiés doivent préciser le commit, le runtime, l'environnement et la méthode reproductible. Les budgets de performance sont encore en phase de collecte.
 
 - [Ouvrir la référence API](xref:OdfKit)
-- [Index des affirmations et preuves](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Limites de sécurité](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Propriété intellectuelle et conformité](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Index des affirmations et preuves](../../docs/evidence-index.md)
+- [Limites de sécurité](../../docs/security-limits.md)
+- [Propriété intellectuelle et conformité](../../docs/ip-compliance.md)
+- [Licence](../articles/license.md)
+- [Avis relatifs aux tiers](../../THIRD-PARTY-NOTICES.md)

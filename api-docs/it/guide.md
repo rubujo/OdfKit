@@ -22,6 +22,8 @@ Per file non attendibili, mantenere attivi i limiti di risorse di reader e packa
 Le dichiarazioni sono suddivise in `PackageFidelity`, `SemanticApiDepth` e `InteropEvidence`; una dimensione non dimostra le altre. I risultati prestazionali pubblicati devono indicare commit, runtime, ambiente e metodo riproducibile. I budget prestazionali sono ancora nella fase di raccolta.
 
 - [Apri il riferimento API](xref:OdfKit)
-- [Indice delle dichiarazioni e prove](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Limiti di sicurezza](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Proprietà intellettuale e conformità](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Indice delle dichiarazioni e prove](../../docs/evidence-index.md)
+- [Limiti di sicurezza](../../docs/security-limits.md)
+- [Proprietà intellettuale e conformità](../../docs/ip-compliance.md)
+- [Licenza](../articles/license.md)
+- [Avvisi di terze parti](../../THIRD-PARTY-NOTICES.md)

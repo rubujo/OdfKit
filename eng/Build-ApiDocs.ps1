@@ -10,27 +10,52 @@
     略過 dotnet tool restore（本機反覆執行時使用）。
 .PARAMETER SkipProjectBuild
     略過八個組件的 dotnet build（組件輸出已存在且未變更時使用）。
+.PARAMETER OutputDirectory
+    網站輸出目錄；預設為 Pages workflow 使用的 artifacts/api-site。
 #>
 [CmdletBinding()]
-param([switch]$NoRestore, [switch]$SkipProjectBuild)
+param(
+    [switch]$NoRestore,
+    [switch]$SkipProjectBuild,
+    [string]$OutputDirectory = 'artifacts/api-site'
+)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Push-Location $root
 try {
     if (-not $NoRestore) { dotnet tool restore; if ($LASTEXITCODE) { throw 'DocFX tool restore 失敗。' } }
 
+    $toolManifest = Get-Content .config/dotnet-tools.json -Raw | ConvertFrom-Json
+    $expectedDocfxVersion = $toolManifest.tools.docfx.version
+    $actualDocfxVersion = (& dotnet docfx --version 2>&1 | Out-String).Trim()
+    if ($LASTEXITCODE -or $actualDocfxVersion -notmatch "^$([regex]::Escape($expectedDocfxVersion))(\+|$)") {
+        throw "DocFX 版本不符：預期 $expectedDocfxVersion，實際輸出為 '$actualDocfxVersion'。"
+    }
+    Write-Host "PASS：DocFX 固定版本 $expectedDocfxVersion。"
+
     # 語系契約驗證：locales.json 是語系目錄的單一事實來源，每個語系必須有站內入口頁，
     # 且根層 index.md 必須連到每個語系（否則語系入口無法被發現）。
     $catalog = Get-Content api-docs/locales.json -Raw | ConvertFrom-Json
     $rootIndex = Get-Content api-docs/index.md -Raw
     $docfxJson = Get-Content api-docs/docfx.json -Raw
+    $docfxConfig = $docfxJson | ConvertFrom-Json
+    $requiredSharedLinks = @(
+        '../articles/license.md',
+        '../../docs/ip-compliance.md',
+        '../../THIRD-PARTY-NOTICES.md',
+        '../../docs/security-limits.md',
+        '../../docs/evidence-index.md'
+    )
     foreach ($locale in $catalog.locales) {
         $localePath = "api-docs/$locale/index.md"
         $guidePath = "api-docs/$locale/guide.md"
+        $tocPath = "api-docs/$locale/toc.yml"
         if (-not (Test-Path $localePath)) { throw "缺少語系入口頁 $localePath（locales.json 已宣告 $locale）。" }
         if (-not (Test-Path $guidePath)) { throw "缺少語系指南 $guidePath（不能只有入口頁）。" }
+        if (-not (Test-Path $tocPath)) { throw "缺少語系導覽 $tocPath。" }
         $localeContent = Get-Content $localePath -Raw
         $guideContent = Get-Content $guidePath -Raw
+        $tocContent = Get-Content $tocPath -Raw
         if ($localeContent -notmatch "(?m)^_lang:\s*$([regex]::Escape($locale))\s*$") { throw "$localePath 缺少正確的 _lang metadata。" }
         if ($localeContent -notmatch [regex]::Escape('(xref:OdfKit)')) { throw "$localePath 缺少 API reference 入口。" }
         if ($localeContent -notmatch [regex]::Escape('(guide.md)')) { throw "$localePath 缺少語系指南連結。" }
@@ -39,11 +64,26 @@ try {
         foreach ($required in @('PackageFidelity', 'SemanticApiDepth', 'InteropEvidence', 'CC0-1.0', 'xref:OdfKit')) {
             if ($guideContent -notmatch [regex]::Escape($required)) { throw "$guidePath 缺少必要內容：$required。" }
         }
+        foreach ($requiredLink in $requiredSharedLinks) {
+            if ($guideContent -notmatch [regex]::Escape($requiredLink)) { throw "$guidePath 缺少正式聲明連結：$requiredLink。" }
+            if ($tocContent -notmatch [regex]::Escape($requiredLink)) { throw "$tocPath 缺少正式聲明連結：$requiredLink。" }
+        }
+        if ($tocContent -notmatch 'xref:OdfKit') { throw "$tocPath 缺少共用 API reference 入口。" }
         if ($locale -notin @('en', 'zh-TW') -and $localeContent -match 'Open the API reference|Site notes and compliance|Other languages|This project content is written|Original OdfKit content') {
             throw "$localePath 仍含英文 placeholder，尚未完成本地化。"
         }
         if ($rootIndex -notmatch [regex]::Escape("$locale/index.md")) { throw "api-docs/index.md 缺少語系連結：$locale。" }
-        if ($docfxJson -notmatch [regex]::Escape("$locale/**.md")) { throw "api-docs/docfx.json 的 build.content 缺少語系文件集合：$locale/**.md。" }
+        if ($docfxJson -notmatch [regex]::Escape("$locale/**.{md,yml}")) { throw "api-docs/docfx.json 的 build.content 缺少語系文件集合：$locale/**.{md,yml}。" }
+        $fileMetadataLocale = $docfxConfig.build.fileMetadata._lang.PSObject.Properties["$locale/**"].Value
+        if ($fileMetadataLocale -ne $locale) { throw "api-docs/docfx.json 的 fileMetadata._lang 缺少或錯誤：$locale。" }
+    }
+    if ($rootIndex -match '(?m)^redirect_url\s*:') { throw '根首頁不得設定 redirect_url；必須保留語言選擇頁。' }
+    if (@($docfxConfig.build.template) -notcontains 'modern') { throw 'DocFX 必須使用官方 modern 模板。' }
+    foreach ($mapping in @('ip-compliance.md', 'security-limits.md', 'evidence-index.md', 'THIRD-PARTY-NOTICES.md')) {
+        if ($docfxJson -notmatch [regex]::Escape($mapping)) { throw "DocFX content mapping 缺少權威文件：$mapping。" }
+    }
+    foreach ($footerTarget in @('articles/license.html', 'project-docs/ip-compliance.html', 'project-docs/THIRD-PARTY-NOTICES.html', 'project-docs/security-limits.html', 'project-docs/evidence-index.html')) {
+        if ($docfxConfig.build.globalMetadata._appFooter -notmatch [regex]::Escape("/OdfKit/$footerTarget")) { throw "modern footer 缺少入口：$footerTarget。" }
     }
     Write-Host "PASS：$($catalog.locales.Count) 語系契約驗證通過。"
 
@@ -122,13 +162,17 @@ try {
     }
     Write-Host "已移除 $strippedHrefs 個指向未渲染頁面的本地 href。"
 
-    Remove-Item -Recurse -Force artifacts/api-site -ErrorAction Ignore
-    if (Test-Path artifacts/api-site) { throw '無法清除 artifacts/api-site（檔案被鎖定或無刪除權限），請關閉占用程式或以足夠權限清除後重試。' }
-    dotnet docfx build api-docs/docfx.json --warningsAsErrors --maxParallelism 1
+    $siteDir = [IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
+    $rootPrefix = $root.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    if (-not $siteDir.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "OutputDirectory 必須位於專案工作區內：$siteDir。"
+    }
+    Remove-Item -Recurse -Force $siteDir -ErrorAction Ignore
+    if (Test-Path $siteDir) { throw "無法清除 $siteDir（檔案被鎖定或無刪除權限），請關閉占用程式或改用 -OutputDirectory。" }
+    dotnet docfx build api-docs/docfx.json --warningsAsErrors --maxParallelism 1 --output $siteDir
     if ($LASTEXITCODE) { throw 'DocFX build 失敗。' }
 
     # 站內連結健檢：掃描全站 HTML 的相對 href／src，任何指向不存在檔案的連結都視為失敗。
-    $siteDir = Join-Path $root 'artifacts/api-site'
     $broken = [System.Collections.Generic.List[string]]::new()
     $checkedLinks = 0
     Get-ChildItem $siteDir -Recurse -Filter *.html | ForEach-Object {
@@ -138,7 +182,12 @@ try {
             $url = $m.Groups[1].Value
             if ($url -eq '' -or $url -match '^(https?:|mailto:|javascript:|data:)') { continue }
             $unescaped = [Uri]::UnescapeDataString($url)
-            $candidate = Join-Path $page.DirectoryName ($unescaped.Replace('/', [IO.Path]::DirectorySeparatorChar))
+            if ($unescaped.StartsWith('/OdfKit/', [StringComparison]::Ordinal)) {
+                $candidate = Join-Path $siteDir $unescaped.Substring('/OdfKit/'.Length)
+            }
+            else {
+                $candidate = Join-Path $page.DirectoryName ($unescaped.Replace('/', [IO.Path]::DirectorySeparatorChar))
+            }
             $resolved = [IO.Path]::GetFullPath($candidate)
             $checkedLinks++
             if (-not (Test-Path $resolved) -and -not (Test-Path (Join-Path $resolved 'index.html'))) {
@@ -151,5 +200,44 @@ try {
         throw "站內連結健檢失敗：$($broken.Count) 條連結指向不存在的檔案（共檢查 $checkedLinks 條）。"
     }
     Write-Host "PASS：站內連結健檢通過（$checkedLinks 條相對連結，0 失效）。"
+
+    $requiredOutputs = @(
+        'project-docs/ip-compliance.html',
+        'project-docs/security-limits.html',
+        'project-docs/evidence-index.html',
+        'project-docs/THIRD-PARTY-NOTICES.html',
+        'sitemap.xml',
+        'index.json'
+    )
+    foreach ($requiredOutput in $requiredOutputs) {
+        if (-not (Test-Path (Join-Path $siteDir $requiredOutput))) { throw "API 網站缺少必要輸出：$requiredOutput。" }
+    }
+    $htmlFiles = @(Get-ChildItem $siteDir -Recurse -Filter *.html)
+    if ($htmlFiles.Count -lt 596) { throw "API 網站頁數異常：$($htmlFiles.Count) < 596。" }
+    $contentHtmlFiles = @($htmlFiles | Where-Object { $_.Name -ne 'toc.html' })
+    foreach ($page in $contentHtmlFiles) {
+        $html = [IO.File]::ReadAllText($page.FullName)
+        foreach ($footerTarget in @('/OdfKit/articles/license.html', '/OdfKit/project-docs/ip-compliance.html', '/OdfKit/project-docs/THIRD-PARTY-NOTICES.html', '/OdfKit/project-docs/security-limits.html', '/OdfKit/project-docs/evidence-index.html')) {
+            if ($html -notmatch [regex]::Escape($footerTarget)) {
+                throw "modern footer 驗證失敗：$($page.FullName.Substring($siteDir.Length + 1)) 缺少 $footerTarget。"
+            }
+        }
+    }
+    foreach ($locale in $catalog.locales) {
+        foreach ($pageName in @('index.html', 'guide.html')) {
+            $pagePath = Join-Path $siteDir "$locale/$pageName"
+            $html = [IO.File]::ReadAllText($pagePath)
+            $langPattern = '<html[^>]+lang=["'']{0}["'']' -f [regex]::Escape($locale)
+            if ($html -notmatch $langPattern) {
+                throw "$locale/$pageName 的 HTML lang 不正確。"
+            }
+        }
+    }
+    $apiSamplePath = Join-Path $siteDir 'api/OdfKit.Spreadsheet.OdsStreamReader.html'
+    $apiSample = [IO.File]::ReadAllText($apiSamplePath)
+    if ($apiSample -notmatch 'Provides the OdsStreamReader API\.' -or $apiSample -notmatch '以低記憶體流式方式逐列讀取 ODS 試算表') {
+        throw 'API member 雙語內容驗證失敗：OdsStreamReader 頁面缺少英文或正體中文摘要。'
+    }
+    Write-Host "PASS：modern 模板、12 語系 lang、footer、sitemap 與 $($htmlFiles.Count) 個 HTML 頁面驗證通過。"
 }
 finally { Pop-Location }

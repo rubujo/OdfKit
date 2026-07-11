@@ -22,6 +22,8 @@ Laat resourcegrenzen voor reader en package ingeschakeld bij niet-vertrouwde bes
 Claims zijn gescheiden in `PackageFidelity`, `SemanticApiDepth` en `InteropEvidence`; één dimensie bewijst de andere niet. Gepubliceerde prestatieresultaten moeten commit, runtime, omgeving en reproduceerbare methode noemen. De prestatiebudgetten bevinden zich nog in de verzamelingsfase.
 
 - [API-referentie openen](xref:OdfKit)
-- [Claims- en bewijsindex](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Beveiligingsgrenzen](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Intellectueel eigendom en naleving](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Claims- en bewijsindex](../../docs/evidence-index.md)
+- [Beveiligingsgrenzen](../../docs/security-limits.md)
+- [Intellectueel eigendom en naleving](../../docs/ip-compliance.md)
+- [Licentie](../articles/license.md)
+- [Kennisgevingen van derden](../../THIRD-PARTY-NOTICES.md)

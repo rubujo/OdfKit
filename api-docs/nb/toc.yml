@@ -1,0 +1,16 @@
+- name: Hjem
+  href: index.md
+- name: Bruks- og evidensveiledning
+  href: guide.md
+- name: API-referanse
+  href: xref:OdfKit
+- name: Lisens
+  href: ../articles/license.md
+- name: KI og immaterielle rettigheter
+  href: ../../docs/ip-compliance.md
+- name: Tredjepartsmerknader
+  href: ../../THIRD-PARTY-NOTICES.md
+- name: Sikkerhetsgrenser
+  href: ../../docs/security-limits.md
+- name: Evidensindeks
+  href: ../../docs/evidence-index.md

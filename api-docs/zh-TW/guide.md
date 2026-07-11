@@ -22,6 +22,8 @@ OdfKit 原創程式碼與網站原創文件採 CC0-1.0 Universal。第三方套�
 能力分為 `PackageFidelity`、`SemanticApiDepth` 與 `InteropEvidence`，三者不能互相推導。效能數字必須附上提交版本、執行環境、測試環境與可重現方法；目前效能預算仍在累積固定樣本。
 
 - [開啟 API 參考文件](xref:OdfKit)
-- [能力宣稱與證據索引](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [安全限制](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [智慧財產與合規](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [能力宣稱與證據索引](../../docs/evidence-index.md)
+- [安全限制](../../docs/security-limits.md)
+- [智慧財產與合規](../../docs/ip-compliance.md)
+- [授權](../articles/license.md)
+- [第三方聲明](../../THIRD-PARTY-NOTICES.md)

@@ -22,6 +22,8 @@ Keep reader and package resource limits enabled for untrusted files, and run val
 Claims are separated into `PackageFidelity`, `SemanticApiDepth`, and `InteropEvidence`; one dimension cannot prove another. Published performance results must identify the commit, runtime, environment, and reproducible method. Performance budgets remain in the fixed-sample collection phase.
 
 - [Open the API reference](xref:OdfKit)
-- [Claims and evidence index](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Security limits](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Intellectual property and compliance](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Claims and evidence index](../../docs/evidence-index.md)
+- [Security limits](../../docs/security-limits.md)
+- [Intellectual property and compliance](../../docs/ip-compliance.md)
+- [License](../articles/license.md)
+- [Third-party notices](../../THIRD-PARTY-NOTICES.md)

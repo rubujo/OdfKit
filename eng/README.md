@@ -48,7 +48,7 @@
 | `Test-LocalizerKeyParity.ps1` | 檢查 12 語系 `OdfLocalizer.Exceptions.*.cs` 訊息鍵集合與 `en` 對等；`-FailOnIssues` 時失敗退出。 |
 | `Add-LocalizerKey.ps1` | 於 12 語系 `i18n/exceptions.*.json` 新增鍵並重產 C#（支援 `-WhatIf`）。 |
 | `Generate-LocalizerExceptionsFromJson.ps1` | 自 JSON 產生 `OdfLocalizer.Exceptions.<culture>.cs`；`-VerifyOnly` 檢查一致性。 |
-| `Build-ApiDocs.ps1` | 建置 12 語系 GitHub Pages API reference 站台（DocFX），內建語系契約驗證、未渲染頁面 href 修復與站內連結健檢，見 [api-docs-site.md](../docs/api-docs-site.md)。 |
+| `Build-ApiDocs.ps1` | 建置 12 語系 GitHub Pages API reference 站台（DocFX modern），內建固定版本、語系 TOC、權威文件、footer、未渲染頁面 href、sitemap 與站內連結驗證；可用 `-OutputDirectory` 指定工作區內的替代輸出，見 [api-docs-site.md](../docs/api-docs-site.md)。 |
 | `Test-OoxmlVisualGolden.ps1` | 執行 OOXML 轉換視覺 golden file 驗收。 |
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |

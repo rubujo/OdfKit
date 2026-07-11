@@ -22,6 +22,8 @@ Behold ressursgrensene for reader og package for filer du ikke stoler på, og br
 Påstander deles i `PackageFidelity`, `SemanticApiDepth` og `InteropEvidence`; én dimensjon beviser ikke en annen. Publiserte ytelsesresultater må angi commit, runtime, miljø og reproduserbar metode. Ytelsesbudsjettene er fortsatt i innsamlingsfasen.
 
 - [Åpne API-referansen](xref:OdfKit)
-- [Påstands- og dokumentasjonsindeks](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Sikkerhetsgrenser](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Immaterielle rettigheter og samsvar](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Påstands- og dokumentasjonsindeks](../../docs/evidence-index.md)
+- [Sikkerhetsgrenser](../../docs/security-limits.md)
+- [Immaterielle rettigheter og samsvar](../../docs/ip-compliance.md)
+- [Lisens](../articles/license.md)
+- [Tredjepartsmerknader](../../THIRD-PARTY-NOTICES.md)

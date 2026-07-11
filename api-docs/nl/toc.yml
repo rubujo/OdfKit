@@ -1,0 +1,16 @@
+- name: Startpagina
+  href: index.md
+- name: Gebruiks- en bewijsgids
+  href: guide.md
+- name: API-referentie
+  href: xref:OdfKit
+- name: Licentie
+  href: ../articles/license.md
+- name: AI en intellectueel eigendom
+  href: ../../docs/ip-compliance.md
+- name: Kennisgevingen van derden
+  href: ../../THIRD-PARTY-NOTICES.md
+- name: Beveiligingsgrenzen
+  href: ../../docs/security-limits.md
+- name: Bewijsindex
+  href: ../../docs/evidence-index.md

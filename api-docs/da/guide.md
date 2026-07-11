@@ -22,6 +22,8 @@ Behold Reader- og package-ressourcegrænser for filer, der ikke er tillid til, o
 Påstande opdeles i `PackageFidelity`, `SemanticApiDepth` og `InteropEvidence`; én dimension beviser ikke en anden. Offentliggjorte ydelsestal skal angive commit, runtime, miljø og reproducerbar metode. Ydelsesbudgetterne er fortsat i indsamlingsfasen.
 
 - [Åbn API-referencen](xref:OdfKit)
-- [Påstande og evidens](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Sikkerhedsgrænser](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Immaterielle rettigheder og overholdelse](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Påstande og evidens](../../docs/evidence-index.md)
+- [Sikkerhedsgrænser](../../docs/security-limits.md)
+- [Immaterielle rettigheder og overholdelse](../../docs/ip-compliance.md)
+- [Licens](../articles/license.md)
+- [Tredjepartsmeddelelser](../../THIRD-PARTY-NOTICES.md)

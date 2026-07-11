@@ -5,7 +5,7 @@ title: OdfKit API 參考文件
 # OdfKit API 參考文件
 
 OdfKit 是純受控 C#／.NET 的 OpenDocument Format SDK。本網站的 API 內容由公開組件及 XML
-文件自動產生；功能深度與互通性請以[證據索引](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)為準。
+文件自動產生；功能深度與互通性請以[證據索引](../../docs/evidence-index.md)為準。
 
 第一版網站不逐頁呈現大量由結構描述產生的 `OdfKit.DOM` 包裝型別；其公開表面仍由雙目標
 框架（TFM）公開 API 基準與具型別 DOM 涵蓋率閘門追蹤。網站聚焦於手寫核心 API 與公開擴充套件。
@@ -21,6 +21,7 @@ OdfKit 並非 OASIS、The Document Foundation、LibreOffice、Apache 或其他�
 認證或背書專案。驗證、往返儲存與特定版本互通測試不代表所有辦公套件皆能像素級一致。
 
 - [API](xref:OdfKit.Spreadsheet.OdsStreamReader)
-- [智慧財產與合規](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
-- [安全限制](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [第三方聲明](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)
+- [智慧財產與合規](../../docs/ip-compliance.md)
+- [安全限制](../../docs/security-limits.md)
+- [證據索引](../../docs/evidence-index.md)
+- [第三方聲明](../../THIRD-PARTY-NOTICES.md)

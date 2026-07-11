@@ -17,35 +17,43 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
   不宣稱所有 API 成員已翻譯。
 - **禁止站外手工 HTML**：所有頁面（含語系入口）一律是 DocFX 內容頁，
   確保共用導覽列、搜尋與模板；不得再以腳本產生站外 HTML 落地頁。
+- **以 DocFX 原生能力為界**：使用 `default`＋`modern`、content mapping、TOC、
+  `fileMetadata`、`globalMetadata` 與 Markdown；不建立自製多語系引擎、JavaScript 語系
+  切換器、`hreflang` 注入或模板 partial。
+- **根路徑是語言選擇頁**：根首頁保留 12 語系入口，不設定 `redirect_url` 強制導向
+  `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
+- **權威文件不複製**：智慧財產、安全、證據與第三方聲明直接以 DocFX file mapping
+  納入 repo 正式來源，避免網站副本漂移。
 
 ## 2. 站台結構
 
 ```text
 api-docs/
-  docfx.json          # metadata + build 設定；dest 為 ../artifacts/api-site
+  docfx.json          # metadata + build 設定；output 為 ../artifacts/api-site
   filterConfig.yml    # 排除 schema-generated OdfKit.DOM wrapper
   locales.json        # 語系目錄（單一事實來源：default、locales、displayNames）
   index.md            # 站台首頁：語言總表 + API 入口（根層必須存在，否則模板 logo 連結 404）
-  toc.yml             # 根層導覽列（必須存在，否則 default 模板不顯示搜尋框）
+  toc.yml             # 根層雙語導覽列
   <locale>/index.md   # 12 語系入口頁，front matter 設 _lang
   <locale>/guide.md   # 12 語系的使用、合規、安全與證據指南
+  <locale>/toc.yml    # 12 語系各自的 DocFX 導覽
   articles/           # 站台說明、授權等共用文章
   api/                # docfx metadata 產物（git 忽略，勿手改）
 ```
 
-> **為什麼根層 `toc.yml` 與 `index.md` 是硬需求**：DocFX default 模板的搜尋框預設隱藏，
-> 只在成功載入根層導覽 TOC 後才顯示（`docfx.js` 的 `loadNavbar()` → `showSearch()`）；
-> 模板 logo 固定連到站台根 `index.html`。缺任一者即造成搜尋不可見與全站 404 連結。
+`docs/ip-compliance.md`、`docs/security-limits.md`、`docs/evidence-index.md` 與根目錄
+`THIRD-PARTY-NOTICES.md` 會建置到 `project-docs/`；來源檔仍是單一事實來源。
 
 ## 3. 語系契約
 
 - `locales.json` 是語系集合的單一事實來源；`Build-ApiDocs.ps1` 建置時驗證：
-  1. 每個語系存在 `api-docs/<locale>/index.md` 與 `guide.md`；
+  1. 每個語系存在 `api-docs/<locale>/index.md`、`guide.md` 與 `toc.yml`；
   2. 根層 `index.md` 連到每個語系入口；
   3. 入口頁連到同語系指南與共用 API reference；
   4. 指南包含能力三維度、CC0、AI 產製、安全、互通邊界及證據入口；
-  5. `docfx.json` 的 `build.content` 以語系目錄 glob 收錄兩頁及後續內容。
-- 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md` 與 `guide.md`
+  5. 指南與 TOC 連到站內授權、IP、第三方、安全及證據頁；
+  6. `docfx.json` 的 `fileMetadata._lang` 與 front matter `_lang` 一致。
+- 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md`、`guide.md` 與 `toc.yml`
   （front matter `_lang`）→ 在根層 `index.md` 語言表與 `docfx.json` content 增列。
   缺一步建置即失敗。
 - 語系入口與指南必須使用該語系撰寫；固定內容包含 API 範圍、內容回退揭露、
@@ -60,19 +68,24 @@ api-docs/
 | 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出本地 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
 | `--warningsAsErrors` | DocFX build 警告視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
+| DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
+| modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 12 語系 HTML `lang`。 |
+| 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
 
 ## 5. 本機建置與預覽
 
 ```powershell
 pwsh eng/Build-ApiDocs.ps1                    # 完整建置（含八個組件）
 pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild  # 組件未變更時的快速重建
+pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild -OutputDirectory artifacts/api-site-check
 dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
 ```
 
 ## 6. 已知限制
 
-- DocFX default 模板 UI 字串（Search、Namespace 等）為英文寫死，語系入口頁的頁面外框
-  維持英文；與內容回退政策一致。
+- DocFX modern 模板 UI 字串（Search、Namespace 等）不納入 12 語系翻譯承諾。
 - 站台不自動輸出 `hreflang` alternates；語系入口以根層語言總表互連。
+- 單一 DocFX 站共用 API reference；非英文／正體中文語系只翻譯概念頁與 TOC，
+  不宣稱 API member 已完整翻譯。
 - 舊版站台（`reference/` 前綴與站外語系落地頁）的 URL 已隨結構重整移除，
   不提供轉址。

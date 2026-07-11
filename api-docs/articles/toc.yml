@@ -3,10 +3,12 @@
 - name: API
   href: xref:OdfKit.Spreadsheet.OdsStreamReader
 - name: 授權與合規
-  href: https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md
+  href: ../../docs/ip-compliance.md
 - name: 授權
   href: license.md
 - name: 安全限制
-  href: https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md
+  href: ../../docs/security-limits.md
 - name: 證據索引
-  href: https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md
+  href: ../../docs/evidence-index.md
+- name: 第三方聲明
+  href: ../../THIRD-PARTY-NOTICES.md

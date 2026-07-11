@@ -22,6 +22,8 @@ Kekalkan had sumber reader dan package bagi fail yang tidak dipercayai, serta ja
 Tuntutan dipisahkan kepada `PackageFidelity`, `SemanticApiDepth` dan `InteropEvidence`; satu dimensi tidak membuktikan dimensi lain. Keputusan prestasi yang diterbitkan mesti menyatakan commit, runtime, persekitaran dan kaedah yang boleh dihasilkan semula. Belanjawan prestasi masih dalam fasa pengumpulan sampel tetap.
 
 - [Buka rujukan API](xref:OdfKit)
-- [Indeks tuntutan dan bukti](https://github.com/rubujo/OdfKit/blob/main/docs/evidence-index.md)
-- [Had keselamatan](https://github.com/rubujo/OdfKit/blob/main/docs/security-limits.md)
-- [Harta intelek dan pematuhan](https://github.com/rubujo/OdfKit/blob/main/docs/ip-compliance.md)
+- [Indeks tuntutan dan bukti](../../docs/evidence-index.md)
+- [Had keselamatan](../../docs/security-limits.md)
+- [Harta intelek dan pematuhan](../../docs/ip-compliance.md)
+- [Lesen](../articles/license.md)
+- [Notis pihak ketiga](../../THIRD-PARTY-NOTICES.md)
