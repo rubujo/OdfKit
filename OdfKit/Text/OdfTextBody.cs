@@ -78,4 +78,53 @@ public sealed class OdfTextBody
             return sections;
         }
     }
+
+    /// <summary>
+    /// Finds the first section with the exact name.
+    /// 尋找第一個具有精確名稱的區段。
+    /// </summary>
+    /// <param name="name">The exact section name. / 區段的精確名稱。</param>
+    /// <returns>The matching section, or <see langword="null"/>. / 相符的區段；若不存在則為 <see langword="null"/>。</returns>
+    public OdfSection? FindSection(string name)
+    {
+        foreach (OdfSection section in Sections)
+        {
+            if (string.Equals(section.Name, name, StringComparison.Ordinal))
+                return section;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the specified section from this document.
+    /// 從此文件移除指定區段。
+    /// </summary>
+    /// <param name="section">The section to remove. / 要移除的區段。</param>
+    /// <returns><see langword="true"/> if the section was removed; otherwise <see langword="false"/>. / 若已移除區段則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveSection(OdfSection section)
+    {
+        if (section is null)
+            throw new ArgumentNullException(nameof(section));
+        OdfNode? parent = section.Node.Parent;
+        return parent is not null && parent.RemoveChild(section.Node);
+    }
+
+    /// <summary>
+    /// Removes all sections from the document and returns the number removed.
+    /// 移除文件中的所有區段，並傳回移除數量。
+    /// </summary>
+    /// <returns>The number of removed sections. / 已移除的區段數量。</returns>
+    public int ClearSections()
+    {
+        IReadOnlyList<OdfSection> sections = Sections;
+        int removed = 0;
+        foreach (OdfSection section in sections)
+        {
+            if (RemoveSection(section))
+                removed++;
+        }
+
+        return removed;
+    }
 }

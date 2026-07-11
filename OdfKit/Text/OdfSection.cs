@@ -25,6 +25,16 @@ public class OdfSection
     private readonly TextDocument _doc;
 
     /// <summary>
+    /// Gets or sets the section name.
+    /// 取得或設定區段名稱。
+    /// </summary>
+    public string Name
+    {
+        get => Node.GetAttribute("name", OdfNamespaces.Text) ?? string.Empty;
+        set => Node.SetAttribute("name", OdfNamespaces.Text, value, "text");
+    }
+
+    /// <summary>
     /// Gets or sets the writing mode of this section.
     /// 取得或設定此區段的書寫模式。
     /// </summary>

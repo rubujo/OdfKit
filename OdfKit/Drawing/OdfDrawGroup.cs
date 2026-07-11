@@ -16,6 +16,71 @@ namespace OdfKit.Drawing;
 public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node, doc)
 {
     /// <summary>
+    /// Gets the direct drawing-object children in this group.
+    /// 取得此群組中的直接繪圖物件子項目。
+    /// </summary>
+    public System.Collections.Generic.IReadOnlyList<OdfShape> Children
+    {
+        get
+        {
+            System.Collections.Generic.List<OdfShape> children = [];
+            foreach (OdfNode child in Node.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+                    children.Add(new OdfShape(child, Document));
+            }
+            return children.AsReadOnly();
+        }
+    }
+
+    /// <summary>
+    /// Finds a descendant drawing object by its draw or XML identifier.
+    /// 依 draw 或 XML 識別碼尋找子孫繪圖物件。
+    /// </summary>
+    /// <param name="id">The exact object identifier. / 物件的精確識別碼。</param>
+    /// <returns>The matching object, or <see langword="null"/>. / 相符的物件；若不存在則為 <see langword="null"/>。</returns>
+    public OdfShape? FindShape(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+        OdfNode? found = FindShapeNode(Node, id);
+        return found is null ? null : new OdfShape(found, Document);
+    }
+
+    /// <summary>
+    /// Removes a descendant drawing object and connectors in this group that reference it.
+    /// 移除子孫繪圖物件，以及此群組中引用該物件的連接線。
+    /// </summary>
+    /// <param name="id">The exact object identifier. / 物件的精確識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveShape(string id)
+    {
+        OdfNode? found = FindShapeNode(Node, id);
+        if (found?.Parent is null)
+            return false;
+        found.Parent.RemoveChild(found);
+        RemoveReferencingConnectors(Node, id);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all direct drawing-object children from this group.
+    /// 移除此群組中的所有直接繪圖物件子項目。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int Clear()
+    {
+        System.Collections.Generic.List<OdfNode> children = [];
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+                children.Add(child);
+        }
+        foreach (OdfNode child in children)
+            Node.RemoveChild(child);
+        return children.Count;
+    }
+    /// <summary>
     /// Gets or sets the group name.
     /// 取得或設定群組名稱。
     /// </summary>
@@ -129,6 +194,36 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         frame.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
         return frame;
+    }
+
+    private static OdfNode? FindShapeNode(OdfNode root, string id)
+    {
+        foreach (OdfNode child in root.Children)
+        {
+            string? childId = child.GetAttribute("id", OdfNamespaces.Draw) ?? child.GetAttribute("id", OdfNamespaces.Xml);
+            if (string.Equals(childId, id, StringComparison.Ordinal))
+                return child;
+            OdfNode? descendant = FindShapeNode(child, id);
+            if (descendant is not null)
+                return descendant;
+        }
+        return null;
+    }
+
+    private static void RemoveReferencingConnectors(OdfNode root, string id)
+    {
+        System.Collections.Generic.List<OdfNode> removals = [];
+        foreach (OdfNode child in root.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Draw && child.LocalName == "connector" &&
+                (string.Equals(child.GetAttribute("start-shape", OdfNamespaces.Draw), id, StringComparison.Ordinal) ||
+                 string.Equals(child.GetAttribute("end-shape", OdfNamespaces.Draw), id, StringComparison.Ordinal)))
+                removals.Add(child);
+            else
+                RemoveReferencingConnectors(child, id);
+        }
+        foreach (OdfNode removal in removals)
+            root.RemoveChild(removal);
     }
 }
 

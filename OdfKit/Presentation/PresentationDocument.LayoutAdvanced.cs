@@ -31,6 +31,85 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets slides that reference the named presentation page layout.
+    /// 取得引用指定簡報頁面版面配置的投影片。
+    /// </summary>
+    /// <param name="name">The exact layout name. / 版面配置的精確名稱。</param>
+    /// <returns>The referencing slides. / 引用該版面配置的投影片。</returns>
+    public IReadOnlyList<OdfSlide> GetPresentationPageLayoutReferences(string name)
+    {
+        List<OdfSlide> references = [];
+        foreach (OdfSlide slide in Slides)
+        {
+            if (string.Equals(slide.PresentationPageLayoutName, name, StringComparison.Ordinal))
+                references.Add(slide);
+        }
+        return references.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Renames a presentation page layout and updates every referencing slide.
+    /// 重新命名簡報頁面版面配置，並更新所有引用投影片。
+    /// </summary>
+    /// <param name="currentName">The current exact name. / 目前的精確名稱。</param>
+    /// <param name="newName">The replacement name. / 取代用名稱。</param>
+    /// <returns><see langword="true"/> if renamed; otherwise <see langword="false"/>. / 若已重新命名則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RenamePresentationPageLayout(string currentName, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName) || FindPresentationPageLayout(newName) is not null)
+            return false;
+        OdfPresentationPageLayout? layout = FindPresentationPageLayout(currentName);
+        if (layout is null)
+            return false;
+
+        layout.Name = newName;
+        foreach (OdfSlide slide in GetPresentationPageLayoutReferences(currentName))
+            slide.PresentationPageLayoutName = newName;
+        return true;
+    }
+
+    /// <summary>
+    /// Attempts to remove an unreferenced presentation page layout.
+    /// 嘗試移除未被引用的簡報頁面版面配置。
+    /// </summary>
+    /// <param name="name">The exact layout name. / 版面配置的精確名稱。</param>
+    /// <param name="references">The blocking slide references. / 造成阻擋的投影片引用。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool TryRemovePresentationPageLayout(string name, out IReadOnlyList<OdfSlide> references)
+    {
+        references = GetPresentationPageLayoutReferences(name);
+        if (references.Count > 0)
+            return false;
+        OdfPresentationPageLayout? layout = FindPresentationPageLayout(name);
+        if (layout?.Node.Parent is null)
+            return false;
+        layout.Node.Parent.RemoveChild(layout.Node);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes a presentation page layout after redirecting all referencing slides to a replacement layout.
+    /// 將所有引用投影片重新導向取代版面配置後，移除指定版面配置。
+    /// </summary>
+    /// <param name="name">The exact layout name to remove. / 要移除的版面配置精確名稱。</param>
+    /// <param name="replacementName">The exact replacement layout name. / 取代版面配置的精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemovePresentationPageLayout(string name, string replacementName)
+    {
+        if (string.Equals(name, replacementName, StringComparison.Ordinal) ||
+            FindPresentationPageLayout(replacementName) is null)
+            return false;
+        OdfPresentationPageLayout? layout = FindPresentationPageLayout(name);
+        if (layout?.Node.Parent is null)
+            return false;
+
+        foreach (OdfSlide slide in GetPresentationPageLayoutReferences(name))
+            slide.PresentationPageLayoutName = replacementName;
+        layout.Node.Parent.RemoveChild(layout.Node);
+        return true;
+    }
+
+    /// <summary>
     /// Applies the named presentation page layout to a slide and instantiates placeholders from its template.
     /// 將指定名稱的投影片版面配置套用至投影片，並依範本實例化預留位置。
     /// </summary>

@@ -89,6 +89,253 @@ internal static class OdfTableSheetConditionalFormatEngine
 
         return groups.AsReadOnly();
     }
+
+    internal static OdfConditionalFormatInfo? FindConditionalFormat(
+        OdfTableSheetMutationContext context,
+        Predicate<OdfConditionalFormatInfo> predicate)
+    {
+        foreach (OdfConditionalFormatInfo format in GetConditionalFormats(context))
+        {
+            if (predicate(format))
+                return format;
+        }
+
+        return null;
+    }
+
+    internal static bool RemoveConditionalFormat(
+        OdfTableSheetMutationContext context,
+        OdfConditionalFormatInfo format)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "conditional-formats", calcextNs);
+        if (container is null)
+            return false;
+
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName is not "conditional-format" ||
+                child.NamespaceUri != calcextNs)
+                continue;
+
+            string targetRange = child.GetAttribute("target-range-address", calcextNs) ?? string.Empty;
+            OdfConditionalFormatInfo? candidate = TryParseConditionalFormat(child, targetRange, calcextNs);
+            if (candidate is not null && ConditionalFormatsEqual(candidate, format))
+            {
+                container.RemoveChild(child);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    internal static bool UpdateConditionalFormatRange(
+        OdfTableSheetMutationContext context,
+        OdfConditionalFormatInfo format,
+        OdfCellRange range)
+    {
+        OdfNode? node = FindConditionalFormatNode(context, format);
+        if (node is null)
+            return false;
+
+        node.SetAttribute(
+            "target-range-address",
+            OdfNamespaces.CalcExt,
+            BuildConditionalRangeAddr(context.SheetName, range),
+            "calcext");
+        return true;
+    }
+
+    internal static int ClearConditionalFormats(OdfTableSheetMutationContext context) =>
+        ClearChildren(context.TableNode, "conditional-formats", "conditional-format");
+
+    internal static OdfSparklineGroupInfo? FindSparklineGroup(
+        OdfTableSheetMutationContext context,
+        Predicate<OdfSparklineGroupInfo> predicate)
+    {
+        foreach (OdfSparklineGroupInfo group in GetSparklineGroups(context))
+        {
+            if (predicate(group))
+                return group;
+        }
+
+        return null;
+    }
+
+    internal static bool RemoveSparklineGroup(
+        OdfTableSheetMutationContext context,
+        OdfSparklineGroupInfo group)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "sparkline-groups", calcextNs);
+        if (container is null)
+            return false;
+
+        IReadOnlyList<OdfSparklineGroupInfo> groups = GetSparklineGroups(context);
+        int semanticIndex = -1;
+        for (int i = 0; i < groups.Count; i++)
+        {
+            if (SparklineGroupsEqual(groups[i], group))
+            {
+                semanticIndex = i;
+                break;
+            }
+        }
+        if (semanticIndex < 0)
+            return false;
+
+        int currentIndex = 0;
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "sparkline-group" &&
+                child.NamespaceUri == calcextNs)
+            {
+                if (currentIndex == semanticIndex)
+                {
+                    container.RemoveChild(child);
+                    return true;
+                }
+                currentIndex++;
+            }
+        }
+
+        return false;
+    }
+
+    internal static bool UpdateSparklineGroupType(
+        OdfTableSheetMutationContext context,
+        OdfSparklineGroupInfo group,
+        SparklineType type)
+    {
+        OdfNode? node = FindSparklineGroupNode(context, group);
+        if (node is null)
+            return false;
+
+        node.SetAttribute("type", OdfNamespaces.CalcExt, SparklineTypeToString(type), "calcext");
+        return true;
+    }
+
+    internal static int ClearSparklineGroups(OdfTableSheetMutationContext context) =>
+        ClearChildren(context.TableNode, "sparkline-groups", "sparkline-group");
+
+    private static int ClearChildren(OdfNode tableNode, string containerName, string childName)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(tableNode, containerName, calcextNs);
+        if (container is null)
+            return 0;
+
+        List<OdfNode> matches = [];
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == childName &&
+                child.NamespaceUri == calcextNs)
+            {
+                matches.Add(child);
+            }
+        }
+        foreach (OdfNode match in matches)
+            container.RemoveChild(match);
+        return matches.Count;
+    }
+
+    private static OdfNode? FindConditionalFormatNode(
+        OdfTableSheetMutationContext context,
+        OdfConditionalFormatInfo format)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "conditional-formats", calcextNs);
+        if (container is null)
+            return null;
+
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName is not "conditional-format" ||
+                child.NamespaceUri != calcextNs)
+                continue;
+
+            string targetRange = child.GetAttribute("target-range-address", calcextNs) ?? string.Empty;
+            OdfConditionalFormatInfo? candidate = TryParseConditionalFormat(child, targetRange, calcextNs);
+            if (candidate is not null && ConditionalFormatsEqual(candidate, format))
+                return child;
+        }
+
+        return null;
+    }
+
+    private static OdfNode? FindSparklineGroupNode(
+        OdfTableSheetMutationContext context,
+        OdfSparklineGroupInfo group)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "sparkline-groups", calcextNs);
+        if (container is null)
+            return null;
+
+        IReadOnlyList<OdfSparklineGroupInfo> groups = GetSparklineGroups(context);
+        int semanticIndex = -1;
+        for (int i = 0; i < groups.Count; i++)
+        {
+            if (SparklineGroupsEqual(groups[i], group))
+            {
+                semanticIndex = i;
+                break;
+            }
+        }
+        if (semanticIndex < 0)
+            return null;
+
+        int currentIndex = 0;
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "sparkline-group" &&
+                child.NamespaceUri == calcextNs)
+            {
+                if (currentIndex == semanticIndex)
+                    return child;
+                currentIndex++;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool ConditionalFormatsEqual(OdfConditionalFormatInfo left, OdfConditionalFormatInfo right) =>
+        left.Kind == right.Kind &&
+        string.Equals(left.TargetRangeAddress, right.TargetRangeAddress, StringComparison.Ordinal) &&
+        string.Equals(left.ConditionValue, right.ConditionValue, StringComparison.Ordinal) &&
+        string.Equals(left.StyleName, right.StyleName, StringComparison.Ordinal) &&
+        left.MinColor == right.MinColor &&
+        left.MaxColor == right.MaxColor &&
+        left.MidColor == right.MidColor &&
+        left.PositiveColor == right.PositiveColor &&
+        left.NegativeColor == right.NegativeColor &&
+        string.Equals(left.IconSetTypeName, right.IconSetTypeName, StringComparison.Ordinal);
+
+    private static bool SparklineGroupsEqual(OdfSparklineGroupInfo left, OdfSparklineGroupInfo right)
+    {
+        if (left.Type != right.Type || left.Sparklines.Count != right.Sparklines.Count)
+            return false;
+
+        for (int i = 0; i < left.Sparklines.Count; i++)
+        {
+            if (!string.Equals(left.Sparklines[i].DataRangeRef, right.Sparklines[i].DataRangeRef, StringComparison.Ordinal) ||
+                !string.Equals(left.Sparklines[i].HostCellRef, right.Sparklines[i].HostCellRef, StringComparison.Ordinal))
+                return false;
+        }
+
+        return true;
+    }
     /// <summary>
     /// 新增條件格式。
     /// </summary>

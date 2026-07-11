@@ -281,6 +281,60 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Finds the first placeholder of the requested type.
+    /// 尋找第一個指定類型的預留位置。
+    /// </summary>
+    /// <param name="type">The placeholder type. / 預留位置類型。</param>
+    /// <returns>The matching placeholder, or <see langword="null"/>. / 相符的預留位置；若不存在則為 <see langword="null"/>。</returns>
+    public OdfPlaceholder? FindPlaceholder(OdfPlaceholderType type)
+    {
+        foreach (OdfPlaceholder placeholder in Placeholders)
+        {
+            if (placeholder.PlaceholderType == type)
+                return placeholder;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the specified placeholder and dependent animation effects.
+    /// 移除指定預留位置及其相依動畫效果。
+    /// </summary>
+    /// <param name="placeholder">The placeholder to remove. / 要移除的預留位置。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemovePlaceholder(OdfPlaceholder placeholder)
+    {
+        if (placeholder is null)
+            throw new ArgumentNullException(nameof(placeholder));
+        if (!ReferenceEquals(placeholder.Slide, this) || placeholder.Node.Parent != Node)
+            return false;
+
+        string? id = GetIdentifier(placeholder.Node);
+        Node.RemoveChild(placeholder.Node);
+        if (!string.IsNullOrEmpty(id))
+            RemoveDependentNodes(Node, id!);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all placeholders and their dependent animation effects.
+    /// 移除所有預留位置及其相依動畫效果。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearPlaceholders()
+    {
+        List<OdfPlaceholder> placeholders = [.. Placeholders];
+        int removed = 0;
+        foreach (OdfPlaceholder placeholder in placeholders)
+        {
+            if (RemovePlaceholder(placeholder))
+                removed++;
+        }
+        return removed;
+    }
+
+    /// <summary>
     /// Gets the text boxes on the slide.
     /// 取得投影片上的文字方塊清單。
     /// </summary>
@@ -306,4 +360,100 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         node => node.NamespaceUri == OdfNamespaces.Draw &&
             node.LocalName is "rect" or "ellipse" or "custom-shape" or "line" or "connector" or "polyline",
         node => new OdfShape(node, this));
+
+    /// <summary>
+    /// Finds a top-level drawing object by its draw or XML identifier.
+    /// 依 draw 或 XML 識別碼尋找最上層繪圖物件。
+    /// </summary>
+    /// <param name="id">The exact object identifier. / 物件的精確識別碼。</param>
+    /// <returns>The matching object, or <see langword="null"/>. / 相符的物件；若不存在則為 <see langword="null"/>。</returns>
+    public OdfShape? FindDrawingObject(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.NamespaceUri == OdfNamespaces.Draw &&
+                HasIdentifier(child, id))
+            {
+                return new OdfShape(child, this);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes a top-level drawing object and dependent connectors and animation effects.
+    /// 移除最上層繪圖物件，以及依賴該物件的連接線與動畫效果。
+    /// </summary>
+    /// <param name="id">The exact object identifier. / 物件的精確識別碼。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveDrawingObject(string id)
+    {
+        OdfShape? shape = FindDrawingObject(id);
+        if (shape?.Node.Parent is null)
+            return false;
+
+        shape.Node.Parent.RemoveChild(shape.Node);
+        RemoveDependentNodes(Node, id);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all top-level drawing objects and their dependent animation effects while preserving notes and unknown content.
+    /// 移除所有最上層繪圖物件與其相依動畫效果，並保留備忘稿與未知內容。
+    /// </summary>
+    /// <returns>The number of removed top-level drawing objects. / 已移除的最上層繪圖物件數量。</returns>
+    public int ClearDrawingObjects()
+    {
+        List<(OdfNode Node, string? Id)> objects = [];
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                objects.Add((child, GetIdentifier(child)));
+            }
+        }
+
+        foreach ((OdfNode node, _) in objects)
+            Node.RemoveChild(node);
+        foreach ((_, string? id) in objects)
+        {
+            if (!string.IsNullOrEmpty(id))
+                RemoveDependentNodes(Node, id!);
+        }
+        return objects.Count;
+    }
+
+    private static bool HasIdentifier(OdfNode node, string id) =>
+        string.Equals(node.GetAttribute("id", OdfNamespaces.Draw), id, StringComparison.Ordinal) ||
+        string.Equals(node.GetAttribute("id", OdfNamespaces.Xml), id, StringComparison.Ordinal);
+
+    private static string? GetIdentifier(OdfNode node) =>
+        node.GetAttribute("id", OdfNamespaces.Draw) ?? node.GetAttribute("id", OdfNamespaces.Xml);
+
+    private static void RemoveDependentNodes(OdfNode root, string id)
+    {
+        const string smilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+        List<OdfNode> removals = [];
+        foreach (OdfNode child in root.Children)
+        {
+            bool connectorReference = child.NamespaceUri == OdfNamespaces.Draw &&
+                child.LocalName == "connector" &&
+                (string.Equals(child.GetAttribute("start-shape", OdfNamespaces.Draw), id, StringComparison.Ordinal) ||
+                 string.Equals(child.GetAttribute("end-shape", OdfNamespaces.Draw), id, StringComparison.Ordinal));
+            bool animationReference = string.Equals(
+                child.GetAttribute("targetElement", smilNs), id, StringComparison.Ordinal);
+            if (connectorReference || animationReference)
+                removals.Add(child);
+            else
+                RemoveDependentNodes(child, id);
+        }
+
+        foreach (OdfNode removal in removals)
+            root.RemoveChild(removal);
+    }
 }

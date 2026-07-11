@@ -328,5 +328,95 @@ public partial class OdfSlide
     public IReadOnlyList<OdfAnimationInfo> GetAnimations() =>
         OdfSlideAnimationReadEngine.GetAnimations(this);
 
+    /// <summary>
+    /// Finds the first animation effect that matches the predicate.
+    /// 尋找第一個符合述詞的動畫效果。
+    /// </summary>
+    /// <param name="predicate">The matching predicate. / 比對述詞。</param>
+    /// <returns>The matching animation summary, or <see langword="null"/>. / 相符的動畫摘要；若不存在則為 <see langword="null"/>。</returns>
+    public OdfAnimationInfo? FindAnimation(Predicate<OdfAnimationInfo> predicate)
+    {
+        if (predicate is null)
+            throw new ArgumentNullException(nameof(predicate));
+        foreach (OdfAnimationInfo animation in GetAnimations())
+        {
+            if (predicate(animation))
+                return animation;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Removes all animation effects that target the specified drawing-object identifier.
+    /// 移除所有以指定繪圖物件識別碼為目標的動畫效果。
+    /// </summary>
+    /// <param name="targetElementId">The exact target identifier. / 目標的精確識別碼。</param>
+    /// <returns>The number of removed effects. / 已移除的效果數量。</returns>
+    public int RemoveAnimations(string targetElementId)
+    {
+        if (string.IsNullOrWhiteSpace(targetElementId))
+            return 0;
+
+        int count = 0;
+        foreach (OdfAnimationInfo animation in GetAnimations())
+        {
+            if (string.Equals(animation.TargetElementId, targetElementId, StringComparison.Ordinal))
+                count++;
+        }
+        if (count > 0)
+            RemoveAnimationNodes(AnimationRoot.Node, targetElementId);
+        return count;
+    }
+
+    /// <summary>
+    /// Removes all recognized animation effects while preserving unknown timing content.
+    /// 移除所有已辨識的動畫效果，並保留未知的時間軸內容。
+    /// </summary>
+    /// <returns>The number of removed effects. / 已移除的效果數量。</returns>
+    public int ClearAnimations()
+    {
+        IReadOnlyList<OdfAnimationInfo> animations = GetAnimations();
+        HashSet<string> targets = new(StringComparer.Ordinal);
+        foreach (OdfAnimationInfo animation in animations)
+            targets.Add(animation.TargetElementId);
+        foreach (string target in targets)
+            RemoveAnimationNodes(AnimationRoot.Node, target);
+        return animations.Count;
+    }
+
+    private static void RemoveAnimationNodes(OdfNode root, string targetElementId)
+    {
+        const string animNs = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0";
+        const string smilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+        List<OdfNode> removals = [];
+        foreach (OdfNode child in root.Children)
+        {
+            bool directTarget = child.NamespaceUri == animNs &&
+                string.Equals(child.GetAttribute("targetElement", smilNs), targetElementId, StringComparison.Ordinal);
+            bool effectContainer = child.NamespaceUri == animNs &&
+                child.LocalName == "par" &&
+                child.GetAttribute("preset-class", OdfNamespaces.Presentation) is not null &&
+                ContainsAnimationTarget(child, targetElementId, smilNs);
+            if (directTarget || effectContainer)
+                removals.Add(child);
+            else
+                RemoveAnimationNodes(child, targetElementId);
+        }
+        foreach (OdfNode removal in removals)
+            root.RemoveChild(removal);
+    }
+
+    private static bool ContainsAnimationTarget(OdfNode node, string targetElementId, string smilNs)
+    {
+        if (string.Equals(node.GetAttribute("targetElement", smilNs), targetElementId, StringComparison.Ordinal))
+            return true;
+        foreach (OdfNode child in node.Children)
+        {
+            if (ContainsAnimationTarget(child, targetElementId, smilNs))
+                return true;
+        }
+        return false;
+    }
+
     #endregion
 }

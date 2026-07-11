@@ -31,6 +31,102 @@ public partial class OdfTableSheet
         OdfTableSheetConditionalFormatEngine.GetSparklineGroups(MutationContext);
 
     /// <summary>
+    /// Finds the first conditional format that matches the predicate.
+    /// 尋找第一個符合述詞的條件格式。
+    /// </summary>
+    /// <param name="predicate">The matching predicate. / 比對述詞。</param>
+    /// <returns>The matching format, or <see langword="null"/>. / 相符的格式；若不存在則為 <see langword="null"/>。</returns>
+    public OdfConditionalFormatInfo? FindConditionalFormat(Predicate<OdfConditionalFormatInfo> predicate)
+    {
+        if (predicate is null)
+            throw new ArgumentNullException(nameof(predicate));
+        return OdfTableSheetConditionalFormatEngine.FindConditionalFormat(MutationContext, predicate);
+    }
+
+    /// <summary>
+    /// Removes the first conditional format with the same semantic values as the supplied summary.
+    /// 移除第一個與指定摘要具有相同語意值的條件格式。
+    /// </summary>
+    /// <param name="format">The format summary. / 格式摘要。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveConditionalFormat(OdfConditionalFormatInfo format)
+    {
+        if (format is null)
+            throw new ArgumentNullException(nameof(format));
+        return OdfTableSheetConditionalFormatEngine.RemoveConditionalFormat(MutationContext, format);
+    }
+
+    /// <summary>
+    /// Updates the target range of the matching conditional format while preserving its rule and unknown content.
+    /// 更新相符條件格式的目標範圍，並保留其規則與未知內容。
+    /// </summary>
+    /// <param name="format">The current format summary. / 目前的格式摘要。</param>
+    /// <param name="range">The replacement target range. / 取代用目標範圍。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdateConditionalFormatRange(OdfConditionalFormatInfo format, OdfCellRange range)
+    {
+        if (format is null)
+            throw new ArgumentNullException(nameof(format));
+        return OdfTableSheetConditionalFormatEngine.UpdateConditionalFormatRange(MutationContext, format, range);
+    }
+
+    /// <summary>
+    /// Removes all conditional formats while preserving unknown content in the container.
+    /// 移除所有條件格式，並保留容器中的未知內容。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearConditionalFormats() =>
+        OdfTableSheetConditionalFormatEngine.ClearConditionalFormats(MutationContext);
+
+    /// <summary>
+    /// Finds the first sparkline group that matches the predicate.
+    /// 尋找第一個符合述詞的走勢圖群組。
+    /// </summary>
+    /// <param name="predicate">The matching predicate. / 比對述詞。</param>
+    /// <returns>The matching group, or <see langword="null"/>. / 相符的群組；若不存在則為 <see langword="null"/>。</returns>
+    public OdfSparklineGroupInfo? FindSparklineGroup(Predicate<OdfSparklineGroupInfo> predicate)
+    {
+        if (predicate is null)
+            throw new ArgumentNullException(nameof(predicate));
+        return OdfTableSheetConditionalFormatEngine.FindSparklineGroup(MutationContext, predicate);
+    }
+
+    /// <summary>
+    /// Removes the first sparkline group with the same semantic values as the supplied summary.
+    /// 移除第一個與指定摘要具有相同語意值的走勢圖群組。
+    /// </summary>
+    /// <param name="group">The sparkline group summary. / 走勢圖群組摘要。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveSparklineGroup(OdfSparklineGroupInfo group)
+    {
+        if (group is null)
+            throw new ArgumentNullException(nameof(group));
+        return OdfTableSheetConditionalFormatEngine.RemoveSparklineGroup(MutationContext, group);
+    }
+
+    /// <summary>
+    /// Updates the type of the matching sparkline group while preserving its sparkline references and unknown content.
+    /// 更新相符走勢圖群組的類型，並保留其走勢圖引用與未知內容。
+    /// </summary>
+    /// <param name="group">The current group summary. / 目前的群組摘要。</param>
+    /// <param name="type">The replacement sparkline type. / 取代用走勢圖類型。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdateSparklineGroupType(OdfSparklineGroupInfo group, SparklineType type)
+    {
+        if (group is null)
+            throw new ArgumentNullException(nameof(group));
+        return OdfTableSheetConditionalFormatEngine.UpdateSparklineGroupType(MutationContext, group, type);
+    }
+
+    /// <summary>
+    /// Removes all sparkline groups while preserving unknown content in the container.
+    /// 移除所有走勢圖群組，並保留容器中的未知內容。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearSparklineGroups() =>
+        OdfTableSheetConditionalFormatEngine.ClearSparklineGroups(MutationContext);
+
+    /// <summary>
     /// Adds a conditional format.
     /// 新增條件格式。
     /// </summary>

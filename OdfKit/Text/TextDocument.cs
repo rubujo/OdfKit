@@ -648,6 +648,48 @@ public partial class TextDocument : OdfDocument
     public IReadOnlyList<OdfCommentInfo> GetCommentInfos() =>
         TextDocumentCommentReadEngine.GetCommentInfos(BodyTextRoot);
 
+    /// <summary>
+    /// Finds a top-level comment by its exact name.
+    /// 依精確名稱尋找最上層註解。
+    /// </summary>
+    /// <param name="name">The exact comment name. / 註解的精確名稱。</param>
+    /// <returns>The matching comment, or <see langword="null"/>. / 相符的註解；若不存在則為 <see langword="null"/>。</returns>
+    public OdfComment? FindComment(string name)
+    {
+        foreach (OdfComment comment in GetComments())
+        {
+            if (string.Equals(comment.Name, name, StringComparison.Ordinal))
+                return comment;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Updates a comment's author and text while preserving its date, replies, and unknown annotation content.
+    /// 更新註解的作者與文字，並保留日期、回覆及未知註解內容。
+    /// </summary>
+    /// <param name="name">The exact comment name. / 註解的精確名稱。</param>
+    /// <param name="author">The replacement author. / 取代用作者。</param>
+    /// <param name="text">The replacement text. / 取代用文字。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdateComment(string name, string author, string text)
+    {
+        if (author is null)
+            throw new ArgumentNullException(nameof(author));
+        if (text is null)
+            throw new ArgumentNullException(nameof(text));
+        return TextDocumentCommentsEngine.UpdateComment(BodyTextRoot, name, author, text);
+    }
+
+    /// <summary>
+    /// Removes a comment, its annotation-end marker, and all descendant replies.
+    /// 移除註解、其 annotation-end 標記及所有子孫回覆。
+    /// </summary>
+    /// <param name="name">The exact comment name. / 註解的精確名稱。</param>
+    /// <returns>The number of removed annotation nodes and end markers. / 已移除的註解節點與結束標記數量。</returns>
+    public int RemoveComment(string name) =>
+        TextDocumentCommentsEngine.RemoveComment(BodyTextRoot, name);
+
 
     #endregion
 

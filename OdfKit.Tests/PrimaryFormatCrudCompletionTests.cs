@@ -178,6 +178,675 @@ public class PrimaryFormatCrudCompletionTests
     }
 
     /// <summary>
+    /// Verifies data validation removal detaches cell references and preserves unknown container content through round-trip.
+    /// 驗證移除資料驗證時會解除儲存格引用，並在 round-trip 後保留容器中的未知內容。
+    /// </summary>
+    [Fact]
+    public void OdsDataValidations_FindRemoveClearAndRoundTrip()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        document.AddDataValidation("Data", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 0, 0, 0, "Data"),
+            Condition = OdfValidationCondition.IntegerBetween,
+            Formula1 = "1",
+            Formula2 = "10",
+            ErrorMessage = "Out of range",
+        });
+        document.AddDataValidation("Data", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 1, 0, 1, "Data"),
+            Condition = OdfValidationCondition.DecimalBetween,
+            Formula1 = "0",
+            Formula2 = "1",
+        });
+
+        const string foreignNamespace = "urn:odfkit:test:validation-foreign";
+        OdfNode validations = FindDescendant(document.ContentRoot, "content-validations", OdfNamespaces.Table)!;
+        validations.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        OdfDataValidationInfo first = document.FindDataValidation("val_1")!;
+        Assert.Single(first.AppliedRanges);
+        Assert.True(document.UpdateDataValidation("val_2", "Data", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 2, 0, 2, "Data"),
+            Condition = OdfValidationCondition.TextLengthBetween,
+            Formula1 = "2",
+            Formula2 = "20",
+            ErrorMessage = "Invalid length",
+            ErrorTitle = "Length",
+            AlertStyle = OdfValidationAlertStyle.Warning,
+        }));
+        Assert.False(document.UpdateDataValidation("missing", "Data", new OdfDataValidation()));
+        Assert.Null(sheet.Cells[0, 1].Node.GetAttribute("content-validation-name", OdfNamespaces.Table));
+        Assert.Equal("val_2", sheet.Cells[0, 2].Node.GetAttribute("content-validation-name", OdfNamespaces.Table));
+        OdfDataValidationInfo updated = document.FindDataValidation("val_2")!;
+        Assert.Equal("Length", updated.ErrorTitle);
+        Assert.Equal("warning", updated.AlertStyle);
+        Assert.True(updated.TryGetCondition(out OdfValidationCondition updatedCondition));
+        Assert.Equal(OdfValidationCondition.TextLengthBetween, updatedCondition);
+        Assert.True(document.RemoveDataValidation("val_1"));
+        Assert.False(document.RemoveDataValidation("val_1"));
+        Assert.Null(sheet.Cells[0, 0].Node.GetAttribute("content-validation-name", OdfNamespaces.Table));
+        Assert.Equal("val_2", sheet.Cells[0, 2].Node.GetAttribute("content-validation-name", OdfNamespaces.Table));
+        Assert.Equal(1, document.ClearDataValidations());
+        Assert.Empty(document.GetDataValidations());
+        Assert.Null(sheet.Cells[0, 2].Node.GetAttribute("content-validation-name", OdfNamespaces.Table));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, "validations.ods");
+        Assert.Empty(reloaded.GetDataValidations());
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies conditional formats and sparkline groups support semantic lookup, removal, selective clear, and round-trip.
+    /// 驗證條件格式與走勢圖群組支援語意查找、移除、選擇性清除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdsConditionalFormatsAndSparklines_FindRemoveClearAndRoundTrip()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.AddConditionalFormat(new OdfCellRange(0, 0, 2, 0), "cell-content()>5", "Good");
+        sheet.AddDataBarFormat(new OdfCellRange(0, 1, 2, 1), new OdfColor("#4472C4"));
+        sheet.AddSparklineGroup(
+            new OdfCellRange(0, 0, 0, 2, "Data"),
+            new OdfCellAddress(0, 3, "Data"),
+            SparklineType.Line);
+        sheet.AddSparklineGroup(
+            new OdfCellRange(1, 0, 1, 2, "Data"),
+            new OdfCellAddress(1, 3, "Data"),
+            SparklineType.Column);
+
+        const string foreignNamespace = "urn:odfkit:test:calcext-foreign";
+        OdfNode formats = FindDescendant(sheet.TableNode, "conditional-formats", OdfNamespaces.CalcExt)!;
+        OdfNode groups = FindDescendant(sheet.TableNode, "sparkline-groups", OdfNamespaces.CalcExt)!;
+        formats.AppendChild(new OdfNode(OdfNodeType.Element, "format-extension", foreignNamespace, "foreign"));
+        groups.AppendChild(new OdfNode(OdfNodeType.Element, "sparkline-extension", foreignNamespace, "foreign"));
+
+        OdfConditionalFormatInfo condition = sheet.FindConditionalFormat(
+            candidate => candidate.Kind == OdfConditionalFormatKind.Condition)!;
+        Assert.True(sheet.UpdateConditionalFormatRange(condition, new OdfCellRange(3, 0, 4, 0, "Data")));
+        Assert.False(sheet.UpdateConditionalFormatRange(condition, new OdfCellRange(5, 0, 5, 0, "Data")));
+        OdfConditionalFormatInfo updatedCondition = sheet.FindConditionalFormat(
+            candidate => candidate.Kind == OdfConditionalFormatKind.Condition)!;
+        Assert.NotEqual(condition.TargetRangeAddress, updatedCondition.TargetRangeAddress);
+        Assert.True(sheet.RemoveConditionalFormat(updatedCondition));
+        Assert.False(sheet.RemoveConditionalFormat(updatedCondition));
+        Assert.Equal(1, sheet.ClearConditionalFormats());
+        Assert.Empty(sheet.ConditionalFormats);
+
+        OdfSparklineGroupInfo lineGroup = sheet.FindSparklineGroup(
+            candidate => candidate.Type == SparklineType.Line)!;
+        Assert.True(sheet.UpdateSparklineGroupType(lineGroup, SparklineType.WinLoss));
+        Assert.False(sheet.UpdateSparklineGroupType(lineGroup, SparklineType.Column));
+        OdfSparklineGroupInfo updatedGroup = sheet.FindSparklineGroup(
+            candidate => candidate.Type == SparklineType.WinLoss)!;
+        Assert.True(sheet.RemoveSparklineGroup(updatedGroup));
+        Assert.False(sheet.RemoveSparklineGroup(updatedGroup));
+        Assert.Equal(1, sheet.ClearSparklineGroups());
+        Assert.Empty(sheet.SparklineGroups);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, "calcext.ods");
+        Assert.Empty(reloaded.Worksheets[0].ConditionalFormats);
+        Assert.Empty(reloaded.Worksheets[0].SparklineGroups);
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "format-extension", foreignNamespace));
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "sparkline-extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies pivot definitions support lookup, range updates, selective removal, and round-trip without recalculation.
+    /// 驗證樞紐分析表定義支援查找、範圍更新、選擇性移除及不重算的 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdsPivotDefinitions_FindUpdateRemoveClearAndRoundTrip()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.Cells["D1"].CellValue = "cached-output";
+        sheet.CreatePivotTable(
+            "PivotOne",
+            new OdfCellRange(0, 0, 4, 1, "Data"),
+            new OdfCellAddress(0, 3, "Data"),
+            pivot => pivot.AddRowField("Category").AddDataField("Amount"));
+        sheet.CreatePivotTable(
+            "PivotTwo",
+            new OdfCellRange(0, 0, 4, 1, "Data"),
+            new OdfCellAddress(6, 3, "Data"),
+            pivot => pivot.AddRowField("Category"));
+
+        const string foreignNamespace = "urn:odfkit:test:pivot-foreign";
+        OdfNode pivots = FindDescendant(document.ContentRoot, "data-pilot-tables", OdfNamespaces.Table)!;
+        pivots.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.Equal("Data", document.FindPivotTable("PivotOne")!.SheetName);
+        Assert.True(document.UpdatePivotTableRanges(
+            "PivotOne",
+            new OdfCellRange(1, 0, 5, 1, "Data"),
+            new OdfCellRange(1, 3, 3, 4, "Data")));
+        Assert.False(document.UpdatePivotTableRanges(
+            "Missing",
+            new OdfCellRange(0, 0, 0, 0, "Data"),
+            new OdfCellRange(0, 0, 0, 0, "Data")));
+        Assert.Equal(
+            new OdfCellRange(1, 0, 5, 1, "Data").ToOdfString(false),
+            document.FindPivotTable("PivotOne")!.SourceRangeAddress);
+        Assert.True(document.RemovePivotTable("PivotTwo"));
+        Assert.False(document.RemovePivotTable("PivotTwo"));
+        Assert.Equal(1, document.ClearPivotTables());
+        Assert.Empty(document.GetPivotTables());
+        Assert.Equal("cached-output", sheet.Cells["D1"].DisplayText);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, "pivots.ods");
+        Assert.Empty(reloaded.GetPivotTables());
+        Assert.Equal("cached-output", reloaded.Worksheets[0].Cells["D1"].DisplayText);
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies slide drawing-object removal cleans dependent animations and preserves non-drawing content through round-trip.
+    /// 驗證移除投影片繪圖物件時會清理相依動畫，並在 round-trip 後保留非繪圖內容。
+    /// </summary>
+    [Fact]
+    public void OdpDrawingObjects_FindRemoveClearAndRoundTrip()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        OdfSlide slide = document.Slides.Add("Objects");
+        OdfShape animated = slide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("3cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        slide.AddEntranceEffect(animated.Id, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick);
+        slide.AddTextBox(
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("4cm"),
+            OdfKit.Styles.OdfLength.Parse("5cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"),
+            "remove later");
+        slide.SetSpeakerNotes(["preserved note"]);
+
+        Assert.NotNull(slide.FindDrawingObject(animated.Id));
+        Assert.True(slide.RemoveDrawingObject(animated.Id));
+        Assert.False(slide.RemoveDrawingObject(animated.Id));
+        Assert.Empty(slide.GetAnimations());
+        Assert.Equal(1, slide.ClearDrawingObjects());
+        Assert.Empty(slide.TextBoxes);
+        Assert.Contains("preserved note", slide.SpeakerNoteParagraphs);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using PresentationDocument reloaded = PresentationDocument.Load(stream, "objects.odp");
+        OdfSlide reloadedSlide = reloaded.Slides[0];
+        Assert.Empty(reloadedSlide.Shapes);
+        Assert.Empty(reloadedSlide.TextBoxes);
+        Assert.Empty(reloadedSlide.GetAnimations());
+        Assert.Contains("preserved note", reloadedSlide.SpeakerNoteParagraphs);
+    }
+
+    /// <summary>
+    /// Verifies slide placeholders support lookup, identity-safe removal, clear, and dependent animation cleanup.
+    /// 驗證投影片預留位置支援查找、識別安全移除、清除及相依動畫清理。
+    /// </summary>
+    [Fact]
+    public void OdpPlaceholders_FindRemoveClearAndRoundTrip()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        OdfSlide slide = document.Slides.Add("Placeholders");
+        OdfPlaceholder title = slide.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("8cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        slide.AddPlaceholder(
+            OdfPlaceholderType.Subtitle,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("4cm"),
+            OdfKit.Styles.OdfLength.Parse("8cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        slide.AddEntranceEffect(title.Id, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick);
+
+        Assert.Same(title.Node, slide.FindPlaceholder(OdfPlaceholderType.Title)!.Node);
+        Assert.True(slide.RemovePlaceholder(title));
+        Assert.False(slide.RemovePlaceholder(title));
+        Assert.Empty(slide.GetAnimations());
+        Assert.Equal(1, slide.ClearPlaceholders());
+        Assert.Empty(slide.Placeholders);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using PresentationDocument reloaded = PresentationDocument.Load(stream, "placeholders.odp");
+        Assert.Empty(reloaded.Slides[0].Placeholders);
+        Assert.Empty(reloaded.Slides[0].GetAnimations());
+    }
+
+    /// <summary>
+    /// Verifies animation timelines support lookup, target-scoped removal, selective clear, and round-trip.
+    /// 驗證動畫時間軸支援查找、目標範圍移除、選擇性清除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdpAnimations_FindRemoveClearAndRoundTrip()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        OdfSlide slide = document.Slides.Add("Animations");
+        OdfShape first = slide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("3cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        OdfShape second = slide.AddShape(
+            OdfShapeType.Ellipse,
+            OdfKit.Styles.OdfLength.Parse("5cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("3cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        slide.AddEntranceEffect(first.Id, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick);
+        slide.AddExitEffect(first.Id, OdfAnimationEffect.FlyIn, OdfAnimationTrigger.AfterPrevious);
+        slide.AddEmphasisEffect(second.Id, OdfAnimationEffect.Zoom);
+
+        const string foreignNamespace = "urn:odfkit:test:animation-foreign";
+        slide.AnimationRoot.Node.AppendChild(
+            new OdfNode(OdfNodeType.Element, "timeline-extension", foreignNamespace, "foreign"));
+
+        Assert.Equal(first.Id, slide.FindAnimation(candidate => candidate.Kind == OdfAnimationKind.Entrance)!.TargetElementId);
+        Assert.Equal(2, slide.RemoveAnimations(first.Id));
+        Assert.Equal(0, slide.RemoveAnimations(first.Id));
+        Assert.Single(slide.GetAnimations());
+        Assert.Equal(1, slide.ClearAnimations());
+        Assert.Empty(slide.GetAnimations());
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using PresentationDocument reloaded = PresentationDocument.Load(stream, "animations.odp");
+        Assert.Empty(reloaded.Slides[0].GetAnimations());
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "timeline-extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies master-page rename and removal automatically maintain slide references through round-trip.
+    /// 驗證母片重新命名與移除會自動維護投影片引用，並可通過 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdpMasterPages_RenameRemoveAndMaintainReferences()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        document.AddMasterPage("PrimaryMaster", new OdfMasterPageDefinition());
+        document.AddMasterPage("ReplacementMaster", new OdfMasterPageDefinition());
+        OdfSlide slide = document.Slides.Add("MasterRef");
+        slide.MasterPageName = "PrimaryMaster";
+
+        Assert.Single(document.GetMasterPageReferences("PrimaryMaster"));
+        Assert.False(document.TryRemoveMasterPage("PrimaryMaster", out IReadOnlyList<OdfSlide> blockers));
+        Assert.Same(slide, Assert.Single(blockers));
+        Assert.True(document.RenameMasterPage("PrimaryMaster", "RenamedMaster"));
+        Assert.False(document.RenameMasterPage("RenamedMaster", "ReplacementMaster"));
+        Assert.Equal("RenamedMaster", slide.MasterPageName);
+        Assert.NotNull(document.FindMasterPage("RenamedMaster"));
+        Assert.True(document.RemoveMasterPage("RenamedMaster", "ReplacementMaster"));
+        Assert.False(document.RemoveMasterPage("RenamedMaster", "ReplacementMaster"));
+        Assert.Equal("ReplacementMaster", slide.MasterPageName);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using PresentationDocument reloaded = PresentationDocument.Load(stream, "masters.odp");
+        Assert.Null(reloaded.FindMasterPage("RenamedMaster"));
+        Assert.NotNull(reloaded.FindMasterPage("ReplacementMaster"));
+        Assert.Equal("ReplacementMaster", reloaded.Slides[0].MasterPageName);
+    }
+
+    /// <summary>
+    /// Verifies layout rename and removal automatically maintain slide references through round-trip.
+    /// 驗證版面配置重新命名與移除會自動維護投影片引用，並可通過 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdpLayouts_RenameRemoveAndMaintainReferences()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        document.CreatePresentationPageLayout("PrimaryLayout");
+        document.CreatePresentationPageLayout("ReplacementLayout");
+        OdfSlide slide = document.Slides.Add("LayoutRef");
+        slide.PresentationPageLayoutName = "PrimaryLayout";
+
+        Assert.Single(document.GetPresentationPageLayoutReferences("PrimaryLayout"));
+        Assert.False(document.TryRemovePresentationPageLayout(
+            "PrimaryLayout", out IReadOnlyList<OdfSlide> blockers));
+        Assert.Same(slide, Assert.Single(blockers));
+        Assert.True(document.RenamePresentationPageLayout("PrimaryLayout", "RenamedLayout"));
+        Assert.False(document.RenamePresentationPageLayout("RenamedLayout", "ReplacementLayout"));
+        Assert.Equal("RenamedLayout", slide.PresentationPageLayoutName);
+        Assert.True(document.RemovePresentationPageLayout("RenamedLayout", "ReplacementLayout"));
+        Assert.False(document.RemovePresentationPageLayout("RenamedLayout", "ReplacementLayout"));
+        Assert.Equal("ReplacementLayout", slide.PresentationPageLayoutName);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using PresentationDocument reloaded = PresentationDocument.Load(stream, "layouts.odp");
+        Assert.Null(reloaded.FindPresentationPageLayout("RenamedLayout"));
+        Assert.NotNull(reloaded.FindPresentationPageLayout("ReplacementLayout"));
+        Assert.Equal("ReplacementLayout", reloaded.Slides[0].PresentationPageLayoutName);
+    }
+
+    /// <summary>
+    /// Verifies ODG drawing objects support identifier-based z-order changes, selective clear, and round-trip.
+    /// 驗證 ODG 繪圖物件支援依識別碼調整堆疊順序、選擇性清除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdgShapes_ZOrderClearAndRoundTrip()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.Pages.Add("Objects");
+        OdfShape first = page.AddShape(OdfShapeType.Rectangle, OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        page.AddShape(OdfShapeType.Ellipse, OdfKit.Styles.OdfLength.Parse("4cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        OdfShape third = page.AddShape(OdfShapeType.Rectangle, OdfKit.Styles.OdfLength.Parse("7cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        const string foreignNamespace = "urn:odfkit:test:odg-foreign";
+        page.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.True(page.SendToBack(third.Id));
+        Assert.Equal(third.Id, GetDrawingObjectIds(page)[0]);
+        Assert.True(page.BringToFront(first.Id));
+        Assert.Equal(first.Id, GetDrawingObjectIds(page)[^1]);
+        Assert.False(page.BringToFront("missing"));
+        Assert.Equal(3, page.ClearShapes());
+        Assert.Empty(page.Shapes);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "z-order.odg");
+        Assert.Empty(reloaded.Pages[0].Shapes);
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies ODG layer rename and removal maintain shape assignments through round-trip.
+    /// 驗證 ODG 圖層重新命名與移除會維護圖形指派，並可通過 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdgLayers_RenameRemoveAndMaintainAssignments()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.Pages.Add("Layers");
+        OdfNode layerSet = new(OdfNodeType.Element, "layer-set", OdfNamespaces.Draw, "draw");
+        OdfNode primary = new(OdfNodeType.Element, "layer", OdfNamespaces.Draw, "draw");
+        primary.SetAttribute("name", OdfNamespaces.Draw, "Primary", "draw");
+        OdfNode replacement = new(OdfNodeType.Element, "layer", OdfNamespaces.Draw, "draw");
+        replacement.SetAttribute("name", OdfNamespaces.Draw, "Replacement", "draw");
+        layerSet.AppendChild(primary);
+        layerSet.AppendChild(replacement);
+        page.Node.AppendChild(layerSet);
+        OdfShape shape = page.AddShape(OdfShapeType.Rectangle, OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        shape.Node.SetAttribute("layer", OdfNamespaces.Draw, "Primary", "draw");
+
+        Assert.NotNull(page.FindLayer("Primary"));
+        Assert.True(page.RenameLayer("Primary", "Renamed"));
+        Assert.Equal("Renamed", shape.Node.GetAttribute("layer", OdfNamespaces.Draw));
+        Assert.True(page.RemoveLayer("Renamed", "Replacement"));
+        Assert.False(page.RemoveLayer("Renamed", "Replacement"));
+        Assert.Equal("Replacement", shape.Node.GetAttribute("layer", OdfNamespaces.Draw));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "layers.odg");
+        Assert.Null(reloaded.Pages[0].FindLayer("Renamed"));
+        Assert.NotNull(reloaded.Pages[0].FindLayer("Replacement"));
+        Assert.Equal("Replacement", Assert.Single(reloaded.Pages[0].GetShapeLayerAssignments()).LayerName);
+    }
+
+    /// <summary>
+    /// Verifies loaded and newly created ODG groups share symmetric child CRUD behavior.
+    /// 驗證載入既有與新建的 ODG 群組共用對稱的子物件 CRUD 行為。
+    /// </summary>
+    [Fact]
+    public void OdgGroups_FindRemoveClearAndRoundTrip()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.Pages.Add("Groups");
+        OdfDrawGroup group = page.AddGroup("Flow");
+        OdfShape start = group.AddShape(OdfShapeType.Rectangle, OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        OdfShape end = group.AddShape(OdfShapeType.Ellipse, OdfKit.Styles.OdfLength.Parse("5cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("2cm"));
+        group.AddConnector(start.Id, end.Id);
+
+        Assert.NotNull(group.FindShape(start.Id));
+        Assert.True(group.RemoveShape(start.Id));
+        Assert.False(group.RemoveShape(start.Id));
+        Assert.DoesNotContain(group.Children, child => child.LocalName == "connector");
+        Assert.Equal(1, group.Clear());
+        Assert.Empty(group.Children);
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "groups.odg");
+        OdfGroupInfo info = Assert.Single(reloaded.Pages[0].GetGroups());
+        OdfShape loadedGroupShape = reloaded.Pages[0].FindShape(info.Id)!;
+        var loadedGroup = new OdfDrawGroup(loadedGroupShape.Node, reloaded);
+        Assert.Empty(loadedGroup.Children);
+    }
+
+    /// <summary>
+    /// Verifies existing ODG path, polygon, custom geometry, and transform data can be updated and round-tripped.
+    /// 驗證既有 ODG 路徑、多邊形、自訂幾何與 transform 資料可更新並通過 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdgGeometry_UpdateAndRoundTrip()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.Pages.Add("Geometry");
+        OdfShape path = page.AddPath("M 0 0 L 10 10", OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("3cm"), OdfKit.Styles.OdfLength.Parse("3cm"));
+        OdfShape polygon = page.AddPolygon([
+            (OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("1cm")),
+            (OdfKit.Styles.OdfLength.Parse("3cm"), OdfKit.Styles.OdfLength.Parse("1cm")),
+            (OdfKit.Styles.OdfLength.Parse("2cm"), OdfKit.Styles.OdfLength.Parse("3cm")),
+        ]);
+        OdfShape custom = page.AddCustomShape("smiley", OdfKit.Styles.OdfLength.Parse("5cm"), OdfKit.Styles.OdfLength.Parse("1cm"), OdfKit.Styles.OdfLength.Parse("3cm"), OdfKit.Styles.OdfLength.Parse("3cm"));
+
+        Assert.True(page.UpdatePathData(path.Id, "M 0 0 C 10 0 10 10 20 20"));
+        Assert.True(page.UpdatePolygonPoints(polygon.Id, "0,0 1000,0 1000,1000 0,1000"));
+        Assert.True(page.UpdateCustomGeometryType(custom.Id, "diamond"));
+        Assert.True(page.SetTransform(custom.Id, "rotate (0.5)"));
+        Assert.False(page.UpdatePathData(custom.Id, "M 0 0"));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using DrawingDocument reloaded = DrawingDocument.Load(stream, "geometry.odg");
+        OdfDrawPage loaded = reloaded.Pages[0];
+        Assert.Equal("M 0 0 C 10 0 10 10 20 20", Assert.Single(loaded.GetPaths()).SvgPathData);
+        Assert.Equal("0,0 1000,0 1000,1000 0,1000", Assert.Single(loaded.GetPolygons()).Points);
+        Assert.Equal("diamond", Assert.Single(loaded.GetCustomShapes()).GeometryType);
+        Assert.Equal("rotate (0.5)", loaded.FindShape(custom.Id)!.Node.GetAttribute("transform", OdfNamespaces.Draw));
+    }
+
+    /// <summary>
+    /// Verifies bookmark and reference-mark rename and removal maintain dependent fields through round-trip.
+    /// 驗證書籤與參考標記重新命名及移除會維護相依欄位，並可通過 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdtBookmarksAndReferenceMarks_MaintainReferencesAndRoundTrip()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.Body.Paragraphs.Add("References");
+        paragraph.AddBookmark("BookmarkOne");
+        paragraph.AddBookmarkReferenceField("BookmarkOne");
+        paragraph.AddReferenceMark("ReferenceOne");
+        paragraph.AddReferenceField("ReferenceOne");
+        const string foreignNamespace = "urn:odfkit:test:text-reference-foreign";
+        paragraph.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.NotNull(document.FindBookmark("BookmarkOne"));
+        Assert.Equal(2, document.RenameBookmark("BookmarkOne", "BookmarkRenamed"));
+        Assert.Null(document.FindBookmark("BookmarkOne"));
+        Assert.NotNull(document.FindBookmark("BookmarkRenamed"));
+        Assert.NotNull(document.FindReferenceMark("ReferenceOne"));
+        Assert.Equal(2, document.RenameReferenceMark("ReferenceOne", "ReferenceRenamed"));
+        Assert.Equal(2, document.RemoveBookmark("BookmarkRenamed"));
+        Assert.Equal(2, document.RemoveReferenceMark("ReferenceRenamed"));
+        Assert.Empty(document.GetBookmarks());
+        Assert.Empty(document.GetReferenceMarks());
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(stream, "references.odt");
+        Assert.Empty(reloaded.GetBookmarks());
+        Assert.Empty(reloaded.GetReferenceMarks());
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "extension", foreignNamespace));
+    }
+
+    /// <summary>
+    /// Verifies ODT comments support lookup, in-place update, reply-aware removal, and round-trip.
+    /// 驗證 ODT 註解支援查找、就地更新、理解回覆的移除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdtComments_FindUpdateRemoveAndRoundTrip()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.Body.Paragraphs.Add("Commented");
+        var comment = new OdfComment("Alice", "Original", DateTime.UtcNow, "comment-one");
+        comment.AddReply(new OdfComment("Bob", "Reply", DateTime.UtcNow, "comment-reply"));
+        paragraph.AddComment(comment);
+        const string foreignNamespace = "urn:odfkit:test:comment-foreign";
+        OdfNode annotation = FindDescendant(document.ContentRoot, "annotation", OdfNamespaces.Office)!;
+        annotation.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.Equal("Alice", document.FindComment("comment-one")!.Author);
+        Assert.True(document.UpdateComment("comment-one", "Carol", "Updated\nSecond line"));
+        Assert.False(document.UpdateComment("missing", "Nobody", "Missing"));
+
+        using var firstStream = new MemoryStream();
+        document.Save();
+        document.Package.Save(firstStream);
+        firstStream.Position = 0;
+        using TextDocument updated = TextDocument.Load(firstStream, "comments.odt");
+        OdfComment loadedComment = updated.FindComment("comment-one")!;
+        Assert.Equal("Carol", loadedComment.Author);
+        Assert.Equal("Updated\nSecond line", loadedComment.Text);
+        Assert.Single(loadedComment.Replies);
+        Assert.NotNull(FindDescendant(updated.ContentRoot, "extension", foreignNamespace));
+        Assert.True(updated.RemoveComment("comment-one") >= 2);
+        Assert.Null(updated.FindComment("comment-one"));
+
+        using var secondStream = new MemoryStream();
+        updated.Save();
+        updated.Package.Save(secondStream);
+        secondStream.Position = 0;
+        using TextDocument removed = TextDocument.Load(secondStream, "comments-removed.odt");
+        Assert.Empty(removed.GetComments());
+    }
+
+    /// <summary>
+    /// Verifies footnotes and endnotes support lookup, in-place update, selective clear, removal, and round-trip.
+    /// 驗證腳注與尾注支援查找、就地更新、選擇性清除、移除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdtNotes_FindUpdateRemoveClearAndRoundTrip()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.Body.Paragraphs.Add("Notes");
+        paragraph.AddFootnote("1", "Footnote body");
+        paragraph.AddEndnote("i", "Endnote body");
+        OdfFootnoteInfo footnote = Assert.Single(document.GetFootnotes());
+        OdfFootnoteInfo endnote = Assert.Single(document.GetEndnotes());
+        const string foreignNamespace = "urn:odfkit:test:note-foreign";
+        OdfNode noteNode = FindDescendant(document.ContentRoot, "note", OdfNamespaces.Text)!;
+        noteNode.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.NotNull(document.FindFootnote(footnote.Id));
+        Assert.NotNull(document.FindEndnote(endnote.Id));
+        Assert.True(document.UpdateFootnote(footnote.Id, "2", "Updated footnote"));
+        Assert.True(document.UpdateEndnote(endnote.Id, "ii", "Updated endnote"));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(stream, "notes.odt");
+        Assert.Equal("Updated footnote", reloaded.FindFootnote(footnote.Id)!.BodyText);
+        Assert.Equal("Updated endnote", reloaded.FindEndnote(endnote.Id)!.BodyText);
+        Assert.NotNull(FindDescendant(reloaded.ContentRoot, "extension", foreignNamespace));
+        Assert.Equal(1, reloaded.ClearEndnotes());
+        Assert.True(reloaded.RemoveFootnote(footnote.Id));
+        Assert.False(reloaded.RemoveFootnote(footnote.Id));
+        Assert.Empty(reloaded.GetFootnotes());
+        Assert.Empty(reloaded.GetEndnotes());
+    }
+
+    /// <summary>
+    /// Verifies sections and indexes support lookup, rename, identity-safe removal, clear, and round-trip.
+    /// 驗證區段與索引支援查找、重新命名、依身分安全移除、清除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdtSectionsAndIndexes_CompleteLifecycleAndRoundTrip()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfSection firstSection = document.AddSection("First", 2, OdfKit.Styles.OdfLength.Parse("0.5cm"));
+        _ = document.AddSection("Second", 1, OdfKit.Styles.OdfLength.Parse("0cm"));
+        OdfAlphabeticalIndex firstIndex = document.AddAlphabeticalIndex("Terms");
+        _ = document.AddBibliography("Sources");
+        const string foreignNamespace = "urn:odfkit:test:lifecycle-foreign";
+        firstSection.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+        firstIndex.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        Assert.Same(firstSection.Node, document.Body.FindSection("First")!.Node);
+        firstSection.Name = "Renamed";
+        firstIndex.Name = "Renamed Terms";
+        Assert.Null(document.Body.FindSection("First"));
+        Assert.NotNull(document.Body.FindSection("Renamed"));
+        Assert.Null(document.FindIndex("Terms"));
+        Assert.NotNull(document.FindIndex("Renamed Terms"));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(stream, "sections-indexes.odt");
+        OdfSection loadedSection = reloaded.Body.FindSection("Renamed")!;
+        OdfIndex loadedIndex = reloaded.FindIndex("Renamed Terms")!;
+        Assert.NotNull(FindDescendant(loadedSection.Node, "extension", foreignNamespace));
+        Assert.NotNull(FindDescendant(loadedIndex.Node, "extension", foreignNamespace));
+        Assert.True(reloaded.Body.RemoveSection(loadedSection));
+        Assert.False(reloaded.Body.RemoveSection(loadedSection));
+        Assert.True(reloaded.RemoveIndex(loadedIndex));
+        Assert.False(reloaded.RemoveIndex(loadedIndex));
+        Assert.Equal(1, reloaded.Body.ClearSections());
+        Assert.Equal(1, reloaded.ClearIndexes());
+        Assert.Empty(reloaded.Body.Sections);
+        Assert.Empty(reloaded.GetIndexes());
+    }
+
+    /// <summary>
     /// Verifies ODF 1.1 through 1.3 primary documents use the same high-level model and preserve foreign content.
     /// 驗證 ODF 1.1～1.3 主要文件使用相同高階模型，並保留 foreign content。
     /// </summary>
@@ -276,5 +945,23 @@ public class PrimaryFormatCrudCompletionTests
         }
 
         return null;
+    }
+
+    private static IReadOnlyList<string> GetDrawingObjectIds(OdfDrawPage page)
+    {
+        List<string> ids = [];
+        foreach (OdfNode child in page.Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.NamespaceUri == OdfNamespaces.Draw &&
+                child.LocalName != "layer-set")
+            {
+                string? id = child.GetAttribute("id", OdfNamespaces.Draw) ??
+                    child.GetAttribute("id", OdfNamespaces.Xml);
+                if (!string.IsNullOrEmpty(id))
+                    ids.Add(id!);
+            }
+        }
+        return ids.AsReadOnly();
     }
 }

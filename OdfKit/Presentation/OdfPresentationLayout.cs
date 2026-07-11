@@ -101,6 +101,101 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Finds a master page by its exact name.
+    /// 依精確名稱尋找投影片母片。
+    /// </summary>
+    /// <param name="name">The exact master-page name. / 母片的精確名稱。</param>
+    /// <returns>The matching master page, or <see langword="null"/>. / 相符的母片；若不存在則為 <see langword="null"/>。</returns>
+    public OdfMasterPage? FindMasterPage(string name)
+    {
+        foreach (OdfMasterPage masterPage in GetMasterPages())
+        {
+            if (string.Equals(masterPage.Name, name, StringComparison.Ordinal))
+                return masterPage;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the slides that reference the specified master page.
+    /// 取得引用指定母片的投影片。
+    /// </summary>
+    /// <param name="name">The exact master-page name. / 母片的精確名稱。</param>
+    /// <returns>The referencing slides. / 引用該母片的投影片。</returns>
+    public IReadOnlyList<OdfSlide> GetMasterPageReferences(string name)
+    {
+        List<OdfSlide> references = [];
+        foreach (OdfSlide slide in Slides)
+        {
+            if (string.Equals(slide.MasterPageName, name, StringComparison.Ordinal))
+                references.Add(slide);
+        }
+        return references.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Renames a master page and updates every referencing slide.
+    /// 重新命名母片，並更新所有引用該母片的投影片。
+    /// </summary>
+    /// <param name="currentName">The current exact name. / 目前的精確名稱。</param>
+    /// <param name="newName">The replacement name. / 取代用名稱。</param>
+    /// <returns><see langword="true"/> if renamed; otherwise <see langword="false"/>. / 若已重新命名則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RenameMasterPage(string currentName, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName) || FindMasterPage(newName) is not null)
+            return false;
+        OdfMasterPage? masterPage = FindMasterPage(currentName);
+        if (masterPage is null)
+            return false;
+
+        masterPage.Name = newName;
+        foreach (OdfSlide slide in GetMasterPageReferences(currentName))
+            slide.MasterPageName = newName;
+        return true;
+    }
+
+    /// <summary>
+    /// Attempts to remove an unreferenced master page.
+    /// 嘗試移除未被引用的母片。
+    /// </summary>
+    /// <param name="name">The exact master-page name. / 母片的精確名稱。</param>
+    /// <param name="references">The blocking slide references. / 造成阻擋的投影片引用。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool TryRemoveMasterPage(string name, out IReadOnlyList<OdfSlide> references)
+    {
+        references = GetMasterPageReferences(name);
+        if (references.Count > 0)
+            return false;
+        OdfMasterPage? masterPage = FindMasterPage(name);
+        if (masterPage?.Node.Parent is null)
+            return false;
+        masterPage.Node.Parent.RemoveChild(masterPage.Node);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes a master page after redirecting all referencing slides to a replacement master page.
+    /// 將所有引用投影片重新導向取代母片後，移除指定母片。
+    /// </summary>
+    /// <param name="name">The exact master-page name to remove. / 要移除的母片精確名稱。</param>
+    /// <param name="replacementName">The exact replacement master-page name. / 取代母片的精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveMasterPage(string name, string replacementName)
+    {
+        if (string.Equals(name, replacementName, StringComparison.Ordinal) ||
+            FindMasterPage(replacementName) is null)
+            return false;
+        OdfMasterPage? masterPage = FindMasterPage(name);
+        if (masterPage?.Node.Parent is null)
+            return false;
+
+        foreach (OdfSlide slide in GetMasterPageReferences(name))
+            slide.MasterPageName = replacementName;
+        masterPage.Node.Parent.RemoveChild(masterPage.Node);
+        return true;
+    }
+
+    /// <summary>
     /// Adds a slide master page to the presentation.
     /// 在簡報中新增一個投影片母片。
     /// </summary>

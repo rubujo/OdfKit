@@ -27,6 +27,216 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentDataValidationReadEngine.GetDataValidations(this);
 
     /// <summary>
+    /// Finds a data validation rule by its exact name.
+    /// 依精確名稱尋找資料驗證規則。
+    /// </summary>
+    /// <param name="name">The exact rule name. / 規則的精確名稱。</param>
+    /// <returns>The matching rule summary, or <see langword="null"/>. / 相符的規則摘要；若不存在則為 <see langword="null"/>。</returns>
+    public OdfDataValidationInfo? FindDataValidation(string name)
+    {
+        foreach (OdfDataValidationInfo validation in GetDataValidations())
+        {
+            if (string.Equals(validation.Name, name, StringComparison.Ordinal))
+            {
+                return validation;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes a data validation rule and detaches it from every referencing cell.
+    /// 移除資料驗證規則，並解除所有引用儲存格的關聯。
+    /// </summary>
+    /// <param name="name">The exact rule name. / 規則的精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemoveDataValidation(string name)
+    {
+        OdfNode? node = FindDataValidationNode(name);
+        if (node?.Parent is null)
+        {
+            return false;
+        }
+
+        DetachDataValidation(name);
+        node.Parent.RemoveChild(node);
+        return true;
+    }
+
+    /// <summary>
+    /// Updates a data validation rule in place and reapplies it to the requested worksheet range.
+    /// 就地更新資料驗證規則，並將其重新套用至指定工作表範圍。
+    /// </summary>
+    /// <param name="name">The exact existing rule name. / 既有規則的精確名稱。</param>
+    /// <param name="sheetName">The target worksheet name. / 目標工作表名稱。</param>
+    /// <param name="validation">The replacement definition and range. / 取代用定義與範圍。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdateDataValidation(string name, string sheetName, OdfDataValidation validation)
+    {
+        if (validation is null)
+        {
+            throw new ArgumentNullException(nameof(validation));
+        }
+
+        OdfNode? node = FindDataValidationNode(name);
+        if (node is null)
+        {
+            return false;
+        }
+
+        OdfTableSheet? sheet = FindSheet(sheetName);
+        if (sheet is null)
+        {
+            throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
+        }
+
+        string condition = validation.Condition switch
+        {
+            OdfValidationCondition.DecimalBetween => $"of:cell-content-is-decimal-number() and cell-content-is-between({validation.Formula1},{validation.Formula2})",
+            OdfValidationCondition.TextLengthBetween => $"of:cell-content-text-length-is-between({validation.Formula1},{validation.Formula2})",
+            _ => $"of:cell-content-is-whole-number() and cell-content-is-between({validation.Formula1},{validation.Formula2})"
+        };
+        node.SetAttribute("condition", OdfNamespaces.Table, condition, "table");
+        node.SetAttribute("base-cell-address", OdfNamespaces.Table, $"{sheetName}.A1", "table");
+
+        List<OdfNode> oldMessages = [];
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "error-message" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                oldMessages.Add(child);
+            }
+        }
+        foreach (OdfNode oldMessage in oldMessages)
+        {
+            node.RemoveChild(oldMessage);
+        }
+
+        if (!string.IsNullOrEmpty(validation.ErrorMessage))
+        {
+            var errorNode = new OdfNode(OdfNodeType.Element, "error-message", OdfNamespaces.Table, "table");
+            if (!string.IsNullOrEmpty(validation.ErrorTitle))
+            {
+                errorNode.SetAttribute("title", OdfNamespaces.Table, validation.ErrorTitle, "table");
+            }
+            string messageType = validation.AlertStyle switch
+            {
+                OdfValidationAlertStyle.Warning => "warning",
+                OdfValidationAlertStyle.Information => "information",
+                _ => "stop"
+            };
+            errorNode.SetAttribute("message-type", OdfNamespaces.Table, messageType, "table");
+            errorNode.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+            {
+                TextContent = validation.ErrorMessage,
+            });
+            node.AppendChild(errorNode);
+        }
+
+        DetachDataValidation(name);
+        int minRow = Math.Min(validation.ApplyTo.StartAddress.Row, validation.ApplyTo.EndAddress.Row);
+        int maxRow = Math.Max(validation.ApplyTo.StartAddress.Row, validation.ApplyTo.EndAddress.Row);
+        int minColumn = Math.Min(validation.ApplyTo.StartAddress.Column, validation.ApplyTo.EndAddress.Column);
+        int maxColumn = Math.Max(validation.ApplyTo.StartAddress.Column, validation.ApplyTo.EndAddress.Column);
+        for (int row = minRow; row <= maxRow; row++)
+        {
+            for (int column = minColumn; column <= maxColumn; column++)
+            {
+                sheet.Cells[row, column].Node.SetAttribute(
+                    "content-validation-name", OdfNamespaces.Table, name, "table");
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all data validation rules and detaches every referencing cell while preserving unknown container content.
+    /// 移除所有資料驗證規則並解除全部引用儲存格的關聯，同時保留容器中的未知內容。
+    /// </summary>
+    /// <returns>The number of removed rules. / 已移除的規則數量。</returns>
+    public int ClearDataValidations()
+    {
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot, "content-validations", OdfNamespaces.Table);
+        if (container is null)
+        {
+            return 0;
+        }
+
+        List<OdfNode> rules = [];
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "content-validation" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                rules.Add(child);
+            }
+        }
+
+        foreach (OdfNode rule in rules)
+        {
+            string? name = rule.GetAttribute("name", OdfNamespaces.Table);
+            if (!string.IsNullOrEmpty(name))
+            {
+                DetachDataValidation(name!);
+            }
+            container.RemoveChild(rule);
+        }
+
+        return rules.Count;
+    }
+
+    private OdfNode? FindDataValidationNode(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot, "content-validations", OdfNamespaces.Table);
+        if (container is null)
+        {
+            return null;
+        }
+
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "content-validation" &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Table), name, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private void DetachDataValidation(string name)
+    {
+        foreach (OdfTableSheet sheet in Worksheets)
+        {
+            foreach ((OdfNode cellNode, _, _) in OdfTableSheetDomAccessEngine.EnumerateExistingCells(sheet.TableNode))
+            {
+                if (string.Equals(
+                    cellNode.GetAttribute("content-validation-name", OdfNamespaces.Table),
+                    name,
+                    StringComparison.Ordinal))
+                {
+                    cellNode.RemoveAttribute("content-validation-name", OdfNamespaces.Table);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets summaries for all embedded charts in the spreadsheet.
     /// 取得試算表中所有嵌入圖表的摘要清單。
     /// </summary>
@@ -81,6 +291,121 @@ public partial class SpreadsheetDocument
     /// </summary>
     public IReadOnlyList<OdfPivotTableInfo> GetPivotTables() =>
         SpreadsheetDocumentPivotTableReadEngine.GetPivotTables(this);
+
+    /// <summary>
+    /// Finds a pivot table definition by its exact name.
+    /// 依精確名稱尋找樞紐分析表定義。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns>The matching definition, or <see langword="null"/>. / 相符的定義；若不存在則為 <see langword="null"/>。</returns>
+    public OdfPivotTableInfo? FindPivotTable(string name)
+    {
+        foreach (OdfPivotTableInfo table in GetPivotTables())
+        {
+            if (string.Equals(table.Name, name, StringComparison.Ordinal))
+                return table;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Updates the source and target ranges of a pivot table definition without recalculating its output.
+    /// 更新樞紐分析表定義的來源與目標範圍，但不重新計算其輸出。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <param name="sourceRange">The replacement source range. / 取代用來源範圍。</param>
+    /// <param name="targetRange">The replacement target range. / 取代用目標範圍。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool UpdatePivotTableRanges(string name, OdfCellRange sourceRange, OdfCellRange targetRange)
+    {
+        OdfNode? node = FindPivotTableNode(name);
+        if (node is null)
+            return false;
+
+        node.SetAttribute("target-range-address", OdfNamespaces.Table, targetRange.ToOdfString(false), "table");
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "source-cell-range" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                child.SetAttribute("cell-range-address", OdfNamespaces.Table, sourceRange.ToOdfString(false), "table");
+                return true;
+            }
+        }
+
+        var source = new OdfNode(OdfNodeType.Element, "source-cell-range", OdfNamespaces.Table, "table");
+        source.SetAttribute("cell-range-address", OdfNamespaces.Table, sourceRange.ToOdfString(false), "table");
+        node.AppendChild(source);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes a pivot table definition without clearing cached worksheet output cells.
+    /// 移除樞紐分析表定義，但不清除工作表中的快取輸出儲存格。
+    /// </summary>
+    /// <param name="name">The exact name. / 精確名稱。</param>
+    /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public bool RemovePivotTable(string name)
+    {
+        OdfNode? node = FindPivotTableNode(name);
+        if (node?.Parent is null)
+            return false;
+        node.Parent.RemoveChild(node);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all pivot table definitions while preserving unknown container content and cached worksheet output cells.
+    /// 移除所有樞紐分析表定義，並保留容器中的未知內容與工作表快取輸出儲存格。
+    /// </summary>
+    /// <returns>The number removed. / 移除數量。</returns>
+    public int ClearPivotTables()
+    {
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot, "data-pilot-tables", OdfNamespaces.Table);
+        if (container is null)
+            return 0;
+
+        List<OdfNode> tables = [];
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-pilot-table" &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                tables.Add(child);
+            }
+        }
+        foreach (OdfNode table in tables)
+            container.RemoveChild(table);
+        return tables.Count;
+    }
+
+    private OdfNode? FindPivotTableNode(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return null;
+
+        OdfNode? container = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot, "data-pilot-tables", OdfNamespaces.Table);
+        if (container is null)
+            return null;
+
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-pilot-table" &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Table), name, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Gets summaries for all worksheets in the spreadsheet that define frozen panes.
