@@ -1433,6 +1433,35 @@ public class CliTests : IDisposable
     }
 
     /// <summary>
+    /// 驗證 baseline 逾時參數必須為正整數。
+    /// </summary>
+    [Fact]
+    public void ValidateBaselineTimeoutRequiresPositiveInteger()
+    {
+        string path = CreateTempPath(".odt");
+        try
+        {
+            CreateTextDocument(path, "invalid timeout");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate", path, "--baseline-timeout-ms", "0"],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("--baseline-timeout-ms positive-integer", error.ToString());
+        }
+        finally
+        {
+            TryDelete(path);
+        }
+    }
+
+    /// <summary>
     /// 驗證 convert-csv 可在 ODS 與 CSV 之間轉換。
     /// </summary>
     [Fact]

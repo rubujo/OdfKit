@@ -474,8 +474,8 @@ public static class OdfKitCli
     {
         output.WriteLine(OdfLocalizer.GetMessage("Cli_UsageGeneral"));
         output.WriteLine(OdfLocalizer.GetMessage("Cli_CommandsHeader"));
-        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
-        output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--metadata-only] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
+        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-timeout-ms milliseconds] [--baseline-exceptions path]");
+        output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--metadata-only] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-timeout-ms milliseconds] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|blowfish]");
         output.WriteLine("  typed-dom-coverage [--format text|json]");
@@ -497,6 +497,7 @@ public static class OdfKitCli
         ValidateBaselineKind baseline = ValidateBaselineKind.None;
         string? baselineJarPath = null;
         string? baselineCommandPath = null;
+        int baselineTimeoutMilliseconds = 30000;
         string? baselineExceptionsPath = null;
 
         for (int i = 1; i < args.Length; i++)
@@ -561,6 +562,12 @@ public static class OdfKitCli
                     }
                     baseline = ValidateBaselineKind.Command;
                     break;
+                case "--baseline-timeout-ms":
+                    if (!TryReadPositiveInt32(args, ref i, error, "--baseline-timeout-ms", out baselineTimeoutMilliseconds))
+                    {
+                        return false;
+                    }
+                    break;
                 case "--baseline-exceptions":
                     if (!TryReadValue(args, ref i, error, "--baseline-exceptions", out baselineExceptionsPath))
                     {
@@ -613,6 +620,7 @@ public static class OdfKitCli
             baseline,
             baselineJarPath,
             baselineCommandPath,
+            baselineTimeoutMilliseconds,
             baselineExceptionsPath);
         return true;
     }
@@ -628,6 +636,7 @@ public static class OdfKitCli
         ValidateBaselineKind baseline = ValidateBaselineKind.None;
         string? baselineJarPath = null;
         string? baselineCommandPath = null;
+        int baselineTimeoutMilliseconds = 30000;
         string? baselineExceptionsPath = null;
 
         for (int i = 1; i < args.Length; i++)
@@ -676,6 +685,12 @@ public static class OdfKitCli
                         return false;
                     }
                     baseline = ValidateBaselineKind.Command;
+                    break;
+                case "--baseline-timeout-ms":
+                    if (!TryReadPositiveInt32(args, ref i, error, "--baseline-timeout-ms", out baselineTimeoutMilliseconds))
+                    {
+                        return false;
+                    }
                     break;
                 case "--baseline-exceptions":
                     if (!TryReadValue(args, ref i, error, "--baseline-exceptions", out baselineExceptionsPath))
@@ -738,6 +753,7 @@ public static class OdfKitCli
             baseline,
             baselineJarPath,
             baselineCommandPath,
+            baselineTimeoutMilliseconds,
             baselineExceptionsPath);
         return true;
     }
@@ -1045,6 +1061,25 @@ public static class OdfKitCli
         return false;
     }
 
+    private static bool TryReadPositiveInt32(
+        string[] args,
+        ref int index,
+        TextWriter error,
+        string option,
+        out int value)
+    {
+        value = 0;
+        if (!TryReadValue(args, ref index, error, option, out string? text) ||
+            !int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out value) ||
+            value <= 0)
+        {
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageWithCmd", option + " positive-integer"));
+            return false;
+        }
+
+        return true;
+    }
+
     private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateBaselineOptions options)
     {
         if (options.Baseline == ValidateBaselineKind.None)
@@ -1054,10 +1089,15 @@ public static class OdfKitCli
 
         OdfExternalValidatorResult result = options.Baseline switch
         {
-            ValidateBaselineKind.OdfValidator => OdfExternalValidator.ValidateWithOdfValidator(file, options.BaselineJarPath),
+            ValidateBaselineKind.OdfValidator => OdfExternalValidator.ValidateWithOdfValidator(
+                file,
+                options.BaselineJarPath,
+                javaPath: null,
+                timeoutMilliseconds: options.TimeoutMilliseconds),
             ValidateBaselineKind.Command => OdfExternalValidator.ValidateWithCommand(
                 options.BaselineCommandPath ?? throw new ArgumentException(OdfLocalizer.GetMessage("Cli_UsageWithCmd", "--baseline-command path")),
-                file),
+                file,
+                options.TimeoutMilliseconds),
             _ => throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Cli_SupportedBaselines"))
         };
 
@@ -1417,7 +1457,8 @@ public static class OdfKitCli
     private sealed record ValidateBaselineOptions(
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
-        string? BaselineCommandPath);
+        string? BaselineCommandPath,
+        int TimeoutMilliseconds);
 
     private sealed record ValidateOptions(
         string Path,
@@ -1429,9 +1470,10 @@ public static class OdfKitCli
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
         string? BaselineCommandPath,
+        int BaselineTimeoutMilliseconds,
         string? BaselineExceptionsPath)
     {
-        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath);
+        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath, BaselineTimeoutMilliseconds);
     }
 
     private sealed record ValidateCorpusOptions(
@@ -1443,9 +1485,10 @@ public static class OdfKitCli
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
         string? BaselineCommandPath,
+        int BaselineTimeoutMilliseconds,
         string? BaselineExceptionsPath)
     {
-        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath);
+        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath, BaselineTimeoutMilliseconds);
     }
 
     private sealed record SanitizeOptions(

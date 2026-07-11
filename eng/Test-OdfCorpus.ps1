@@ -8,6 +8,8 @@ param(
     [string]$BaselineJar = $env:ODFKIT_ODFVALIDATOR_JAR,
     [string]$BaselineExceptions = "",
     [string]$InternalBaselineJar = "",
+    [ValidateRange(1, [int]::MaxValue)]
+    [int]$InternalBaselineTimeoutMilliseconds = 120000,
     [string[]]$InternalBaselineVersions = @("1.1", "1.2", "1.3", "1.4"),
     [string[]]$InternalBaselineExcludedKinds = @(),
     [switch]$InternalBaselinePackageOnly,
@@ -113,7 +115,9 @@ try {
                 "--baseline",
                 "odf-validator",
                 "--baseline-jar",
-                $InternalBaselineJar
+                $InternalBaselineJar,
+                "--baseline-timeout-ms",
+                $InternalBaselineTimeoutMilliseconds.ToString([Globalization.CultureInfo]::InvariantCulture)
             )
             Invoke-NativeCommand "dotnet" ($commonArgs + $baselineArgs)
         }
