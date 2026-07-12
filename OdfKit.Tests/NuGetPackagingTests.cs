@@ -97,8 +97,7 @@ public class NuGetPackagingTests
         Assert.Contains("-GenerateHashManifest", workflow, StringComparison.Ordinal);
         Assert.Contains("VerifyHashManifest = $true", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
-        Assert.Contains("key: nuget-${{ runner.os }}-", setupAction, StringComparison.Ordinal);
-        Assert.DoesNotContain("runner.arch", setupAction, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("key: nuget-${{ runner.os }}-${{ runner.arch }}-", setupAction, StringComparison.Ordinal);
         Assert.DoesNotContain("matrix.rid", setupAction, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("SHA256SUMS", packScript, StringComparison.Ordinal);
         Assert.Contains("RuntimeInformation.OSArchitecture", packScript, StringComparison.Ordinal);
