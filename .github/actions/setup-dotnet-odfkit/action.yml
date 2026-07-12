@@ -16,6 +16,34 @@ runs:
         "NUGET_PACKAGES=$($env:GITHUB_WORKSPACE)/.nuget/packages" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
         New-Item -ItemType Directory -Path "$($env:GITHUB_WORKSPACE)/.nuget/packages" -Force | Out-Null
 
+    - name: Compute NuGet package version fingerprint
+      id: nuget-fingerprint
+      shell: pwsh
+      run: |
+        # 快取鍵只應該在「真的會改變還原結果」時才變動，cache 才能盡可能被共用而非
+        # 一直被拋棄重建。本 repo 沒有 Directory.Packages.props／packages.lock.json，
+        # 套件版本直接寫在各 csproj 的 PackageReference Version 屬性裡，所以改對
+        # *那些屬性* 取指紋，而不是對整個 csproj 檔案內容取雜湊（hashFiles('**/*.csproj')
+        # 舊寫法）——後者只要新增/移除 ProjectReference、調整 TargetFramework 等與
+        # 套件版本完全無關的異動也會整把換 key，逼出一份內容幾乎相同的新 cache
+        # （曾同時看到新舊兩份近 1.2GB 的 Windows NuGet cache 並存）。
+        # eng/OdfKit.Package.props 是 pack/publish 中繼資料（授權、作者、OdfKit 自身
+        # 套件版本），與「要還原哪些相依套件」無關，故不再納入指紋來源。
+        $versionLines = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj -File |
+            Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' } |
+            ForEach-Object {
+                Select-String -Path $_.FullName -Pattern '<PackageReference\s+[^>]*Include="([^"]+)"[^>]*Version="([^"]+)"' -AllMatches |
+                    ForEach-Object { $_.Matches } |
+                    ForEach-Object { "$($_.Groups[1].Value)=$($_.Groups[2].Value)" }
+            } |
+            Sort-Object -Unique
+
+        $fingerprintSource = $versionLines -join "`n"
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($fingerprintSource)
+        $hashBytes = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+        $hex = ($hashBytes | ForEach-Object { $_.ToString('x2') }) -join ''
+        "fingerprint=$hex" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
     - name: Cache NuGet packages
       uses: actions/cache@v6
       with:
@@ -25,7 +53,7 @@ runs:
         # 保留一份幾乎相同的完整快取（曾多達 8 組），很快就超過 repo 層級的
         # 10 GB Actions 快取總量上限，導致舊快取被提前逐出、還原命中率下降。
         # 統一鍵值後所有 workflow 共用同一份快取，總量大幅降低。
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/eng/OdfKit.Package.props', '**/Directory.Packages.props') }}
+        key: nuget-${{ runner.os }}-${{ steps.nuget-fingerprint.outputs.fingerprint }}
         restore-keys: |
           nuget-${{ runner.os }}-
 
