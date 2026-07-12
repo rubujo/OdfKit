@@ -415,11 +415,43 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentFrozenPanesReadEngine.GetFrozenPanes(this);
 
     /// <summary>
+    /// Finds frozen pane settings for a worksheet.
+    /// 尋找工作表的凍結窗格設定。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <returns>The frozen pane summary when configured; otherwise, <see langword="null"/>. / 已設定時為凍結窗格摘要；否則為 <see langword="null"/>。</returns>
+    public OdfSheetFrozenPanesInfo? FindFrozenPanes(string sheetName)
+    {
+        foreach (OdfSheetFrozenPanesInfo panes in GetFrozenPanes())
+        {
+            if (string.Equals(panes.SheetName, sheetName, StringComparison.Ordinal))
+                return panes;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Gets summaries for all worksheets in the spreadsheet that define split panes.
     /// 取得試算表中所有已設定分割窗格的工作表摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
         SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
+
+    /// <summary>
+    /// Finds split pane settings for a worksheet.
+    /// 尋找工作表的分割窗格設定。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <returns>The split pane summary when configured; otherwise, <see langword="null"/>. / 已設定時為分割窗格摘要；否則為 <see langword="null"/>。</returns>
+    public OdfSheetSplitPanesInfo? FindSplitPanes(string sheetName)
+    {
+        foreach (OdfSheetSplitPanesInfo panes in GetSplitPanes())
+        {
+            if (string.Equals(panes.SheetName, sheetName, StringComparison.Ordinal))
+                return panes;
+        }
+        return null;
+    }
     /// <summary>
     /// Short overload of AddNamedRange that accepts name and range; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 name 與 range；其餘可選參數使用預設值並轉呼叫最長 AddNamedRange 多載。

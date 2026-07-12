@@ -26,6 +26,8 @@ ODT、ODS、ODP 與 ODG 高階 API 的語意來源以 OASIS ODF 1.4 規格為主
    以跳過測試或空白說明掩蓋。
 4. `eng/Test-SemanticCoverage.ps1` 會阻擋缺少來源、證據、限制或未完成操作的
    語意族群。
+5. `semantic-api-provenance.json` 逐族群記錄規格來源、fixture 來源、黑箱觀察與
+   實作邊界；其族群集合必須與 semantic coverage manifest 完全一致。
 
 完整 coverage manifest 是可稽核完成狀態的單一事實來源；README 或支援矩陣的
 文字宣稱不得高於該 manifest。

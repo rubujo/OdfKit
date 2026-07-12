@@ -231,6 +231,55 @@ public class PrimaryFormatCrudCompletionTests
     }
 
     /// <summary>
+    /// Verifies frozen and split panes support find, replacement, clearing, and round-trip.
+    /// 驗證凍結與分割窗格支援查找、取代、清除及 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdsFrozenAndSplitPanes_CompleteLifecycleAndRoundTrip()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet frozenSheet = document.Worksheets.Add("Frozen");
+        OdfTableSheet splitSheet = document.Worksheets.Add("Split");
+        frozenSheet.FreezePanes(1, 2);
+        splitSheet.SplitPanes(3, 4);
+        frozenSheet.FreezePanes(2, 1);
+        splitSheet.SplitPanes(4, 2);
+        const string foreignNamespace = "urn:odfkit:test:view-foreign";
+        document.SettingsDom.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
+
+        OdfSheetFrozenPanesInfo frozen = document.FindFrozenPanes("Frozen")!;
+        OdfSheetSplitPanesInfo split = document.FindSplitPanes("Split")!;
+        Assert.Equal(2, frozen.FrozenPanes.Rows);
+        Assert.Equal(1, frozen.FrozenPanes.Columns);
+        Assert.Equal(4, split.SplitPanes.Rows);
+        Assert.Equal(2, split.SplitPanes.Columns);
+        Assert.Null(document.FindFrozenPanes("Missing"));
+        Assert.Null(document.FindSplitPanes("Missing"));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, "views.ods");
+        Assert.NotNull(reloaded.FindFrozenPanes("Frozen"));
+        Assert.NotNull(reloaded.FindSplitPanes("Split"));
+        Assert.True(reloaded.FindSheet("Frozen")!.ClearFrozenPanes());
+        Assert.False(reloaded.FindSheet("Frozen")!.ClearFrozenPanes());
+        Assert.True(reloaded.FindSheet("Split")!.ClearSplitPanes());
+        Assert.False(reloaded.FindSheet("Split")!.ClearSplitPanes());
+        Assert.Empty(reloaded.GetFrozenPanes());
+        Assert.Empty(reloaded.GetSplitPanes());
+        Assert.NotNull(FindDescendant(reloaded.SettingsDom, "extension", foreignNamespace));
+
+        using var clearedStream = new MemoryStream();
+        reloaded.SaveToStream(clearedStream);
+        clearedStream.Position = 0;
+        using SpreadsheetDocument cleared = SpreadsheetDocument.Load(clearedStream, "views-cleared.ods");
+        Assert.Empty(cleared.GetFrozenPanes());
+        Assert.Empty(cleared.GetSplitPanes());
+        Assert.NotNull(FindDescendant(cleared.SettingsDom, "extension", foreignNamespace));
+    }
+
+    /// <summary>
     /// Verifies data validation removal detaches cell references and preserves unknown container content through round-trip.
     /// 驗證移除資料驗證時會解除儲存格引用，並在 round-trip 後保留容器中的未知內容。
     /// </summary>
@@ -660,6 +709,50 @@ public class PrimaryFormatCrudCompletionTests
     }
 
     /// <summary>
+    /// Verifies ODP and ODG shapes resolve inherited graphic styles after round-trip.
+    /// 驗證 ODP 與 ODG 圖形在 round-trip 後可解析繼承的圖形樣式。
+    /// </summary>
+    [Fact]
+    public void OdpAndOdgGraphicStyleInheritance_RoundTrips()
+    {
+        using PresentationDocument presentation = PresentationDocument.Create();
+        OdfSlide slide = presentation.Slides.Add("Styles");
+        OdfShape presentationShape = slide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        AddInheritedGraphicStyle(presentation, "PresentationParent", "PresentationChild", "#336699");
+        presentationShape.Node.SetAttribute("style-name", OdfNamespaces.Draw, "PresentationChild", "draw");
+        Assert.Equal("#336699", presentationShape.FillColor);
+
+        using DrawingDocument drawing = DrawingDocument.Create();
+        OdfDrawPage page = drawing.Pages.Add("Styles");
+        OdfShape drawingShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("1cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"),
+            OdfKit.Styles.OdfLength.Parse("2cm"));
+        AddInheritedGraphicStyle(drawing, "DrawingParent", "DrawingChild", "#993366");
+        drawingShape.Node.SetAttribute("style-name", OdfNamespaces.Draw, "DrawingChild", "draw");
+        Assert.Equal("#993366", drawingShape.FillColor);
+
+        using var presentationStream = new MemoryStream();
+        presentation.SaveToStream(presentationStream);
+        presentationStream.Position = 0;
+        using PresentationDocument reloadedPresentation = PresentationDocument.Load(presentationStream, "styles.odp");
+        Assert.Equal("#336699", Assert.Single(reloadedPresentation.Slides[0].Shapes).FillColor);
+
+        using var drawingStream = new MemoryStream();
+        drawing.SaveToStream(drawingStream);
+        drawingStream.Position = 0;
+        using DrawingDocument reloadedDrawing = DrawingDocument.Load(drawingStream, "styles.odg");
+        Assert.Equal("#993366", Assert.Single(reloadedDrawing.Pages[0].Shapes).FillColor);
+    }
+
+    /// <summary>
     /// Verifies ODG drawing objects support identifier-based z-order changes, selective clear, and round-trip.
     /// 驗證 ODG 繪圖物件支援依識別碼調整堆疊順序、選擇性清除及 round-trip。
     /// </summary>
@@ -924,6 +1017,7 @@ public class PrimaryFormatCrudCompletionTests
         OdfSection firstSection = document.AddSection("First", 2, OdfKit.Styles.OdfLength.Parse("0.5cm"));
         _ = document.AddSection("Second", 1, OdfKit.Styles.OdfLength.Parse("0cm"));
         OdfAlphabeticalIndex firstIndex = document.AddAlphabeticalIndex("Terms");
+        _ = document.AddTableOfContents("Contents");
         _ = document.AddBibliography("Sources");
         const string foreignNamespace = "urn:odfkit:test:lifecycle-foreign";
         firstSection.Node.AppendChild(new OdfNode(OdfNodeType.Element, "extension", foreignNamespace, "foreign"));
@@ -951,7 +1045,7 @@ public class PrimaryFormatCrudCompletionTests
         Assert.True(reloaded.RemoveIndex(loadedIndex));
         Assert.False(reloaded.RemoveIndex(loadedIndex));
         Assert.Equal(1, reloaded.Body.ClearSections());
-        Assert.Equal(1, reloaded.ClearIndexes());
+        Assert.Equal(2, reloaded.ClearIndexes());
         Assert.Empty(reloaded.Body.Sections);
         Assert.Empty(reloaded.GetIndexes());
     }
@@ -1592,6 +1686,44 @@ public class PrimaryFormatCrudCompletionTests
         }
 
         return null;
+    }
+
+    private static void AddInheritedGraphicStyle(
+        OdfDocument document,
+        string parentName,
+        string childName,
+        string fillColor)
+    {
+        OdfNode? automaticStyles = FindDescendant(
+            document.ContentRoot,
+            "automatic-styles",
+            OdfNamespaces.Office);
+        if (automaticStyles is null)
+        {
+            automaticStyles = new OdfNode(
+                OdfNodeType.Element,
+                "automatic-styles",
+                OdfNamespaces.Office,
+                "office");
+            OdfNode? body = FindDescendant(document.ContentRoot, "body", OdfNamespaces.Office);
+            if (body is not null && body.Parent == document.ContentRoot)
+                document.ContentRoot.InsertBefore(automaticStyles, body);
+            else
+                document.ContentRoot.AppendChild(automaticStyles);
+        }
+        var parent = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+        parent.SetAttribute("name", OdfNamespaces.Style, parentName, "style");
+        parent.SetAttribute("family", OdfNamespaces.Style, "graphic", "style");
+        var properties = new OdfNode(OdfNodeType.Element, "graphic-properties", OdfNamespaces.Style, "style");
+        properties.SetAttribute("fill-color", OdfNamespaces.Draw, fillColor, "draw");
+        parent.AppendChild(properties);
+        var child = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+        child.SetAttribute("name", OdfNamespaces.Style, childName, "style");
+        child.SetAttribute("family", OdfNamespaces.Style, "graphic", "style");
+        child.SetAttribute("parent-style-name", OdfNamespaces.Style, parentName, "style");
+        automaticStyles.AppendChild(parent);
+        automaticStyles.AppendChild(child);
+        document.StyleEngine.RebuildStyleIndex();
     }
 
     private static IReadOnlyList<string> GetDrawingObjectIds(OdfDrawPage page)

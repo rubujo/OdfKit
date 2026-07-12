@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "policy": "clean-room-specification-and-observation-only",
+  "forbiddenSources": [
+    "commercial SDK source code or decompiled output",
+    "third-party implementation source code used as a translation basis",
+    "unlicensed corpus or vendor output committed as golden files"
+  ],
+  "families": [
+    {
+      "id": "ODT-CONTENT",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 5, 16 and 20"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "tests/fixtures/corpus/generated/complex/complex-annual-report.odt"],
+      "behaviorObservations": ["LibreOffice and Word behavior is observed only through public document I/O tests."],
+      "implementationBoundary": "Implemented from OASIS semantics and self-generated fixtures without competitor source access."
+    },
+    {
+      "id": "ODT-REFERENCES",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 6.3, 6.4, 8 and 9"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/TextHighLevelApiTests.cs"],
+      "behaviorObservations": ["Reference repair is verified from package XML and public office round-trip behavior."],
+      "implementationBoundary": "Reference semantics are implemented from OASIS definitions and independently authored tests."
+    },
+    {
+      "id": "ODT-AUTOMATION",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 6, 10, 13 and 14"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/MailMergeGenericApiTests.cs"],
+      "behaviorObservations": ["Fields, forms, changes and embedded objects are compared by public XML and package behavior."],
+      "implementationBoundary": "Automation APIs use neutral requirements and self-authored fixtures only."
+    },
+    {
+      "id": "ODS-DATA",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clause 9", "OASIS ODF 1.4 Part 4"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "tests/fixtures/corpus/generated/complex/complex-financial-model.ods"],
+      "behaviorObservations": ["Excel and LibreOffice behavior is treated as black-box interoperability evidence."],
+      "implementationBoundary": "Workbook and formula-reference behavior is implemented independently from the ODF specifications."
+    },
+    {
+      "id": "ODS-ANALYSIS",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 9.4, 9.5, 9.6 and 11"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/SpreadsheetHighLevelApiTests.cs"],
+      "behaviorObservations": ["Office applications are observed through open, save and reload behavior without inspecting their implementations."],
+      "implementationBoundary": "Analysis definitions preserve syntax and cached data without copying calculation engines."
+    },
+    {
+      "id": "ODS-LAYOUT",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 9, 16 and 20"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/SpreadsheetTrackedChangesTests.cs"],
+      "behaviorObservations": ["View and print behavior is compared through saved ODF settings and office output."],
+      "implementationBoundary": "Layout semantics are implemented from schema ordering and public application behavior."
+    },
+    {
+      "id": "ODP-STRUCTURE",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10, 16 and 20"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "tests/fixtures/corpus/generated/complex/complex-business-deck.odp"],
+      "behaviorObservations": ["PowerPoint and LibreOffice are used only as black-box readers and writers."],
+      "implementationBoundary": "Master, layout and slide relations are implemented from ODF identifiers and references."
+    },
+    {
+      "id": "ODP-CONTENT",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10 and 19"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/PresentationDepthApiTests.cs"],
+      "behaviorObservations": ["Content interoperability is compared through package structure and semantic summaries."],
+      "implementationBoundary": "Content facades are independently designed around ODF drawing and presentation semantics."
+    },
+    {
+      "id": "ODP-TIMING",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10.4 and 19"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/PresentationHighLevelApiTests.cs"],
+      "behaviorObservations": ["Animation behavior is observed as public SMIL XML and office round-trip output."],
+      "implementationBoundary": "Timing APIs model ODF and SMIL structures without proprietary animation code."
+    },
+    {
+      "id": "ODG-STRUCTURE",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10, 16 and 20"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "tests/fixtures/corpus/generated/complex/complex-flow-diagram.odg"],
+      "behaviorObservations": ["ODG behavior is observed through LibreOffice-supported public conversion paths."],
+      "implementationBoundary": "Page, layer and z-order behavior follows ODF relationships and self-authored fixtures."
+    },
+    {
+      "id": "ODG-GEOMETRY",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10 and 19"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/DrawingHighLevelApiTests.cs"],
+      "behaviorObservations": ["Geometry is compared by ODF path data, transforms and reference-safe round-trips."],
+      "implementationBoundary": "Geometry parsing and mutation are independently implemented from SVG and ODF syntax."
+    },
+    {
+      "id": "ODG-APPEARANCE",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 10, 16, 19 and 20"],
+      "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/DrawingApiUsabilityTests.cs"],
+      "behaviorObservations": ["Appearance resources are compared through package XML and supported office conversions."],
+      "implementationBoundary": "Gradients, markers, clips and media relations are implemented from public ODF semantics."
+    }
+  ]
+}

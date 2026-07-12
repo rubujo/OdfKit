@@ -11,7 +11,13 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
     dotnet restore
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed with exit code $LASTEXITCODE."
+    }
     dotnet build -c $Configuration --no-restore
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet build failed with exit code $LASTEXITCODE."
+    }
 
     $resolvedOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     $outputDirectory = Split-Path -Parent $resolvedOutputPath
@@ -27,6 +33,9 @@ try {
         -- `
         typed-dom-coverage `
         --format json
+    if ($LASTEXITCODE -ne 0) {
+        throw "typed-dom-coverage failed with exit code $LASTEXITCODE."
+    }
 
     $report | Set-Content -LiteralPath $resolvedOutputPath -Encoding UTF8
     $json = Get-Content -LiteralPath $resolvedOutputPath -Raw | ConvertFrom-Json

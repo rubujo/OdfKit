@@ -55,6 +55,22 @@ public partial class OdfTableSheet
         OdfTableSheetViewEngine.GetSplitPanes(MutationContext);
 
     /// <summary>
+    /// Clears frozen pane settings from this worksheet.
+    /// 清除此工作表的凍結窗格設定。
+    /// </summary>
+    /// <returns><see langword="true"/> if frozen pane settings were cleared; otherwise, <see langword="false"/>. / 若已清除凍結窗格設定則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool ClearFrozenPanes() =>
+        OdfTableSheetViewEngine.ClearFrozenPanes(MutationContext);
+
+    /// <summary>
+    /// Clears split pane settings from this worksheet.
+    /// 清除此工作表的分割窗格設定。
+    /// </summary>
+    /// <returns><see langword="true"/> if split pane settings were cleared; otherwise, <see langword="false"/>. / 若已清除分割窗格設定則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool ClearSplitPanes() =>
+        OdfTableSheetViewEngine.ClearSplitPanes(MutationContext);
+
+    /// <summary>
     /// Adds list-based data validation and applies it to the specified range.
     /// 新增清單型資料驗證，並套用到指定範圍。
     /// </summary>

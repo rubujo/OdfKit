@@ -44,6 +44,19 @@ public class SemanticCoverageContractTests
             legacySymbol,
             File.ReadAllText(Path.Combine(root, legacyTestPath)),
             StringComparison.Ordinal);
+        JsonElement mutationEvidence = manifest.GetProperty("mutationEvidence");
+        string mutationTestPath = mutationEvidence.GetProperty("test").GetString()!;
+        string mutationTestSource = File.ReadAllText(Path.Combine(root, mutationTestPath));
+        string[] mutationSymbols =
+            [.. mutationEvidence.GetProperty("randomOperationSequences").EnumerateArray().Select(item => item.GetString()!)];
+        Assert.Equal(4, mutationSymbols.Length);
+        foreach (string mutationSymbol in mutationSymbols)
+        {
+            Assert.Contains(mutationSymbol, mutationTestSource, StringComparison.Ordinal);
+        }
+        Assert.True(mutationEvidence.GetProperty("repeatedSaveLoad").GetBoolean());
+        Assert.True(File.Exists(Path.Combine(root, mutationEvidence.GetProperty("corpusDifferentialScript").GetString()!)));
+        Assert.True(File.Exists(Path.Combine(root, mutationEvidence.GetProperty("corpusManifest").GetString()!)));
 
         JsonElement[] families = [.. manifest.GetProperty("families").EnumerateArray()];
         foreach (string format in RequiredFormats)
@@ -89,6 +102,7 @@ public class SemanticCoverageContractTests
                 topic => topic,
                 _ => new HashSet<string>(StringComparer.Ordinal),
                 StringComparer.Ordinal);
+            HashSet<string> focusedTopics = [];
             foreach (JsonElement evidence in family.GetProperty("operationEvidence").EnumerateArray())
             {
                 string testPath = evidence.GetProperty("test").GetString()!;
@@ -101,6 +115,10 @@ public class SemanticCoverageContractTests
                 foreach (string topic in evidenceTopics)
                 {
                     Assert.Contains(topic, familyTopics);
+                    if (familyTopics.Length == 1 || evidenceTopics.Length < familyTopics.Length)
+                    {
+                        focusedTopics.Add(topic);
+                    }
                 }
 
                 foreach (JsonElement operation in evidence.GetProperty("operations").EnumerateArray())
@@ -118,12 +136,37 @@ public class SemanticCoverageContractTests
             Assert.Equal(RequiredOperations.Order(), coveredOperations.Order());
             foreach (string topic in familyTopics)
             {
+                Assert.Contains(topic, focusedTopics);
                 string[] applicableOperations =
                 [
                     .. RequiredOperations.Where(
                         operation => operations.GetProperty(operation).GetString() != "not-applicable"),
                 ];
                 Assert.Equal(applicableOperations.Order(), topicOperations[topic].Order());
+            }
+        }
+
+        string provenancePath = Path.Combine(root, "docs", "provenance", "semantic-api-provenance.json");
+        using JsonDocument provenanceDocument = JsonDocument.Parse(File.ReadAllText(provenancePath));
+        JsonElement provenance = provenanceDocument.RootElement;
+        Assert.Equal(1, provenance.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(
+            "clean-room-specification-and-observation-only",
+            provenance.GetProperty("policy").GetString());
+        Assert.NotEmpty(provenance.GetProperty("forbiddenSources").EnumerateArray());
+        JsonElement[] provenanceFamilies = [.. provenance.GetProperty("families").EnumerateArray()];
+        Assert.Equal(
+            families.Select(family => family.GetProperty("id").GetString()).Order(),
+            provenanceFamilies.Select(family => family.GetProperty("id").GetString()).Order());
+        foreach (JsonElement record in provenanceFamilies)
+        {
+            Assert.NotEmpty(record.GetProperty("specificationSources").EnumerateArray());
+            Assert.NotEmpty(record.GetProperty("fixtureSources").EnumerateArray());
+            Assert.NotEmpty(record.GetProperty("behaviorObservations").EnumerateArray());
+            Assert.False(string.IsNullOrWhiteSpace(record.GetProperty("implementationBoundary").GetString()));
+            foreach (JsonElement fixture in record.GetProperty("fixtureSources").EnumerateArray())
+            {
+                Assert.True(File.Exists(Path.Combine(root, fixture.GetString()!)));
             }
         }
     }

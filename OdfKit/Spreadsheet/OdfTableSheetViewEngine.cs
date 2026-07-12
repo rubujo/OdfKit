@@ -55,6 +55,28 @@ internal static class OdfTableSheetViewEngine
         return new OdfSplitPanes(splitRows, splitColumns);
     }
 
+    internal static bool ClearFrozenPanes(OdfTableSheetMutationContext context)
+    {
+        OdfFrozenPanes panes = GetFrozenPanes(context);
+        if (panes.Rows == 0 && panes.Columns == 0)
+            return false;
+
+        context.TableNode.RemoveAttribute("frozen-rows", OdfNamespaces.Table);
+        context.TableNode.RemoveAttribute("frozen-columns", OdfNamespaces.Table);
+        ApplySplitConfig(context, 0, 0, freezeMode: true);
+        return true;
+    }
+
+    internal static bool ClearSplitPanes(OdfTableSheetMutationContext context)
+    {
+        OdfSplitPanes panes = GetSplitPanes(context);
+        if (panes.Rows == 0 && panes.Columns == 0)
+            return false;
+
+        ApplySplitConfig(context, 0, 0, freezeMode: false);
+        return true;
+    }
+
     private static int ReadSplitAxis(OdfNode sheetEntry, string modeName, string positionName)
     {
         string? mode = ReadConfigItemValue(sheetEntry, modeName);

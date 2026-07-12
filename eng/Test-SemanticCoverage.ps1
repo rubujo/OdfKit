@@ -6,6 +6,8 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $manifestPath = Join-Path $root 'docs/semantic-coverage.json'
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+$provenancePath = Join-Path $root 'docs/provenance/semantic-api-provenance.json'
+$provenance = Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json
 
 if ($manifest.schemaVersion -ne 2) { throw '不支援的 semantic coverage schemaVersion。' }
 if ($manifest.odfVersion -ne '1.4') { throw 'semantic coverage 必須以 ODF 1.4 為主模型。' }
@@ -27,6 +29,25 @@ if (-not (Test-Path -LiteralPath $legacyTestPath)) {
 $legacyTestSource = Get-Content -LiteralPath $legacyTestPath -Raw
 if (-not $legacyTestSource.Contains($legacyEvidence.symbol, [StringComparison]::Ordinal)) {
     throw 'semantic coverage 舊版本測試符號不存在。'
+}
+
+$mutationEvidence = $manifest.mutationEvidence
+$mutationTestPath = Join-Path $root $mutationEvidence.test
+if (-not (Test-Path -LiteralPath $mutationTestPath) -or
+    -not $mutationEvidence.repeatedSaveLoad -or
+    -not (Test-Path -LiteralPath (Join-Path $root $mutationEvidence.corpusDifferentialScript)) -or
+    -not (Test-Path -LiteralPath (Join-Path $root $mutationEvidence.corpusManifest))) {
+    throw 'semantic coverage mutation evidence 不完整。'
+}
+$mutationTestSource = Get-Content -LiteralPath $mutationTestPath -Raw
+$mutationSymbols = @($mutationEvidence.randomOperationSequences)
+if ($mutationSymbols.Count -ne 4) {
+    throw 'semantic coverage mutation evidence 必須覆蓋四種主要格式。'
+}
+foreach ($symbol in $mutationSymbols) {
+    if (-not $mutationTestSource.Contains($symbol, [StringComparison]::Ordinal)) {
+        throw "semantic coverage mutation 測試符號不存在：$symbol"
+    }
 }
 
 $requiredFormats = @('ODT', 'ODS', 'ODP', 'ODG')
@@ -54,6 +75,7 @@ foreach ($family in @($manifest.families)) {
 
     $coveredOperations = @{}
     $topicOperations = @{}
+    $focusedTopics = @{}
     foreach ($topic in $familyTopics) {
         if ([string]::IsNullOrWhiteSpace($topic)) { throw "語意族群 topic 無效：$($family.id)" }
         $topicOperations[$topic] = @{}
@@ -78,6 +100,9 @@ foreach ($family in @($manifest.families)) {
             if ($topic -notin $familyTopics) {
                 throw "語意族群操作證據 topic 無效：$($family.id) -> $topic"
             }
+            if ($familyTopics.Count -eq 1 -or $evidenceTopics.Count -lt $familyTopics.Count) {
+                $focusedTopics[$topic] = $true
+            }
         }
         foreach ($operation in @($evidence.operations)) {
             if ($operation -notin $requiredOperations) {
@@ -95,6 +120,9 @@ foreach ($family in @($manifest.families)) {
         }
     }
     foreach ($topic in $familyTopics) {
+        if (-not $focusedTopics.ContainsKey($topic)) {
+            throw "語意 topic 缺少聚焦測試證據：$($family.id) -> $topic"
+        }
         foreach ($operation in $requiredOperations) {
             if ($family.operations.$operation -ne 'not-applicable' -and
                 -not $topicOperations[$topic].ContainsKey($operation)) {
@@ -117,6 +145,32 @@ foreach ($family in @($manifest.families)) {
 foreach ($format in $requiredFormats) {
     if (@($manifest.families | Where-Object format -eq $format).Count -eq 0) {
         throw "semantic coverage 缺少格式：$format"
+    }
+}
+
+if ($provenance.schemaVersion -ne 1 -or
+    $provenance.policy -ne 'clean-room-specification-and-observation-only') {
+    throw 'semantic API provenance 契約無效。'
+}
+if (@($provenance.forbiddenSources).Count -eq 0) {
+    throw 'semantic API provenance 缺少禁止來源。'
+}
+$provenanceIds = @($provenance.families | ForEach-Object id | Sort-Object)
+$manifestIds = @($manifest.families | ForEach-Object id | Sort-Object)
+if (($provenanceIds -join ',') -ne ($manifestIds -join ',')) {
+    throw 'semantic API provenance 與 coverage manifest 的族群集合不一致。'
+}
+foreach ($record in @($provenance.families)) {
+    if (@($record.specificationSources).Count -eq 0 -or
+        @($record.fixtureSources).Count -eq 0 -or
+        @($record.behaviorObservations).Count -eq 0 -or
+        [string]::IsNullOrWhiteSpace($record.implementationBoundary)) {
+        throw "semantic API provenance 記錄不完整：$($record.id)"
+    }
+    foreach ($fixture in @($record.fixtureSources)) {
+        if (-not (Test-Path -LiteralPath (Join-Path $root $fixture))) {
+            throw "semantic API provenance fixture 不存在：$($record.id) -> $fixture"
+        }
     }
 }
 

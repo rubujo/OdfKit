@@ -16273,12 +16273,14 @@ OdfKit.Spreadsheet.OdfTableSheet.AutoFilter(string! range) -> OdfKit.Spreadsheet
 OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidth(int col) -> void
 OdfKit.Spreadsheet.OdfTableSheet.Cells.get -> OdfKit.Spreadsheet.OdfCellCollection!
 OdfKit.Spreadsheet.OdfTableSheet.ClearConditionalFormats() -> int
+OdfKit.Spreadsheet.OdfTableSheet.ClearFrozenPanes() -> bool
 OdfKit.Spreadsheet.OdfTableSheet.ClearNamedExpressions() -> int
 OdfKit.Spreadsheet.OdfTableSheet.ClearNamedRanges() -> int
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintArea() -> void
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintTitleColumns() -> void
 OdfKit.Spreadsheet.OdfTableSheet.ClearPrintTitleRows() -> void
 OdfKit.Spreadsheet.OdfTableSheet.ClearSparklineGroups() -> int
+OdfKit.Spreadsheet.OdfTableSheet.ClearSplitPanes() -> bool
 OdfKit.Spreadsheet.OdfTableSheet.Columns.get -> OdfKit.Spreadsheet.OdfColumnCollection!
 OdfKit.Spreadsheet.OdfTableSheet.ConditionalFormats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfConditionalFormatInfo!>!
 OdfKit.Spreadsheet.OdfTableSheet.CopyRows(int sourcePosition, int count, int targetPosition) -> void
@@ -16570,8 +16572,10 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ExternalLinks.get -> OdfKit.Spreadsheet.O
 OdfKit.Spreadsheet.SpreadsheetDocument.FindDatabaseRange(string! name) -> OdfKit.Spreadsheet.OdfDatabaseRange?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindDataValidation(string! name) -> OdfKit.Spreadsheet.OdfDataValidationInfo?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindEmbeddedChart(string! objectPath) -> OdfKit.Spreadsheet.OdfEmbeddedChartInfo?
+OdfKit.Spreadsheet.SpreadsheetDocument.FindFrozenPanes(string! sheetName) -> OdfKit.Spreadsheet.OdfSheetFrozenPanesInfo?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindPivotTable(string! name) -> OdfKit.Spreadsheet.OdfPivotTableInfo?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindSheet(string! name) -> OdfKit.Spreadsheet.OdfTableSheet?
+OdfKit.Spreadsheet.SpreadsheetDocument.FindSplitPanes(string! sheetName) -> OdfKit.Spreadsheet.OdfSheetSplitPanesInfo?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindTable(string! name) -> OdfKit.Spreadsheet.OdfSpreadsheetTable?
 OdfKit.Spreadsheet.SpreadsheetDocument.GetConditionalFormats() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfConditionalFormatInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetDatabaseRanges() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfDatabaseRangeInfo!>!

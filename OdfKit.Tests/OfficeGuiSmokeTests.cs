@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -180,6 +183,218 @@ public sealed class OfficeGuiSmokeTests
         }
     }
 
+    /// <summary>
+    /// Verifies Excel can modify, save as ODS, reopen, and produce an OdfKit-readable document.
+    /// 驗證 Excel 可修改、另存為 ODS、重新開啟，並產生 OdfKit 可讀取的文件。
+    /// </summary>
+    [Fact]
+    public void Excel_ModifiesSavesAndReloadsRepresentativeOds()
+    {
+        Type excelType = FindOfficeComType("Excel.Application", "找不到 Microsoft Excel COM，略過 Excel GUI 修改驗收。");
+        string sourcePath = ResolveFixturePath("complex-financial-model.ods");
+        string tempRoot = CreateTempDirectory("OdfKitOfficeExcel");
+        string inputPath = Path.Combine(tempRoot, "input.ods");
+        string outputPath = Path.Combine(tempRoot, "saved.ods");
+        File.Copy(sourcePath, inputPath, overwrite: true);
+
+        dynamic? excel = null;
+        dynamic? workbooks = null;
+        dynamic? workbook = null;
+        dynamic? worksheets = null;
+        dynamic? worksheet = null;
+        dynamic? markerCell = null;
+        try
+        {
+            excel = Activator.CreateInstance(excelType);
+            if (excel is null)
+                Assert.Skip("無法啟動 Microsoft Excel，略過 Excel GUI 修改驗收。");
+            excel.Visible = false;
+            excel.DisplayAlerts = false;
+            workbooks = excel.Workbooks;
+            workbook = workbooks.Open(inputPath, 0, false);
+            worksheets = workbook.Worksheets;
+            worksheet = worksheets.Item[1];
+            markerCell = worksheet.Range("A2");
+            markerCell.Value2 = "OdfKit-Excel-Edit-Marker";
+            workbook.SaveAs(outputPath, 60);
+            workbook.Close(false);
+            ReleaseComObject(workbook);
+            workbook = workbooks.Open(outputPath, 0, true);
+            worksheets = workbook.Worksheets;
+            worksheet = worksheets.Item[1];
+            markerCell = worksheet.Range("A2");
+            Assert.Equal("OdfKit-Excel-Edit-Marker", Convert.ToString(markerCell.Value2));
+
+            using SpreadsheetDocument loaded = SpreadsheetDocument.Load(outputPath);
+            Assert.Equal("OdfKit-Excel-Edit-Marker", loaded.Worksheets[0].Cells[1, 0].DisplayText);
+        }
+        catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+        {
+            Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft Excel COM，略過 Excel GUI 修改驗收。");
+        }
+        finally
+        {
+            try
+            {
+                workbook?.Close(false);
+            }
+            finally
+            {
+                excel?.Quit();
+                ReleaseComObject(markerCell);
+                ReleaseComObject(worksheet);
+                ReleaseComObject(worksheets);
+                ReleaseComObject(workbook);
+                ReleaseComObject(workbooks);
+                ReleaseComObject(excel);
+                CollectComReferences();
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verifies Word can modify, save as ODT, reopen, and produce an OdfKit-readable document.
+    /// 驗證 Word 可修改、另存為 ODT、重新開啟，並產生 OdfKit 可讀取的文件。
+    /// </summary>
+    [Fact]
+    public void Word_ModifiesSavesAndReloadsRepresentativeOdt()
+    {
+        Type wordType = FindOfficeComType("Word.Application", "找不到 Microsoft Word COM，略過 Word GUI 修改驗收。");
+        string sourcePath = ResolveFixturePath("complex-annual-report.odt");
+        string tempRoot = CreateTempDirectory("OdfKitOfficeWord");
+        string inputPath = Path.Combine(tempRoot, "input.odt");
+        string outputPath = Path.Combine(tempRoot, "saved.odt");
+        File.Copy(sourcePath, inputPath, overwrite: true);
+
+        dynamic? word = null;
+        dynamic? documents = null;
+        dynamic? document = null;
+        dynamic? content = null;
+        try
+        {
+            word = Activator.CreateInstance(wordType);
+            if (word is null)
+                Assert.Skip("無法啟動 Microsoft Word，略過 Word GUI 修改驗收。");
+            word.Visible = false;
+            word.DisplayAlerts = 0;
+            documents = word.Documents;
+            document = documents.Open(
+                FileName: inputPath,
+                ReadOnly: false,
+                AddToRecentFiles: false,
+                Visible: false,
+                OpenAndRepair: true,
+                NoEncodingDialog: true);
+            content = document.Content;
+            content.InsertAfter("\r\nOdfKit-Word-Edit-Marker");
+            document.SaveAs2(outputPath, 23);
+            document.Close(false);
+            ReleaseComObject(content);
+            ReleaseComObject(document);
+            document = documents.Open(
+                FileName: outputPath,
+                ReadOnly: true,
+                AddToRecentFiles: false,
+                Visible: false,
+                OpenAndRepair: true,
+                NoEncodingDialog: true);
+            content = document.Content;
+            Assert.Contains("OdfKit-Word-Edit-Marker", Convert.ToString(content.Text) ?? string.Empty, StringComparison.Ordinal);
+
+            using TextDocument loaded = TextDocument.Load(outputPath);
+            Assert.Contains("OdfKit-Word-Edit-Marker", loaded.ContentRoot.TextContent, StringComparison.Ordinal);
+        }
+        catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+        {
+            Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft Word COM，略過 Word GUI 修改驗收。");
+        }
+        finally
+        {
+            try
+            {
+                document?.Close(false);
+            }
+            finally
+            {
+                word?.Quit(false);
+                ReleaseComObject(content);
+                ReleaseComObject(document);
+                ReleaseComObject(documents);
+                ReleaseComObject(word);
+                CollectComReferences();
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verifies PowerPoint can modify, save as ODP, reopen, and produce an OdfKit-readable document.
+    /// 驗證 PowerPoint 可修改、另存為 ODP、重新開啟，並產生 OdfKit 可讀取的文件。
+    /// </summary>
+    [Fact]
+    public void PowerPoint_ModifiesSavesAndReloadsRepresentativeOdp()
+    {
+        Type powerPointType = FindOfficeComType("PowerPoint.Application", "找不到 Microsoft PowerPoint COM，略過 PowerPoint GUI 修改驗收。");
+        string sourcePath = ResolveFixturePath("complex-business-deck.odp");
+        string tempRoot = CreateTempDirectory("OdfKitOfficePowerPoint");
+        string inputPath = Path.Combine(tempRoot, "input.odp");
+        string outputPath = Path.Combine(tempRoot, "saved.odp");
+        File.Copy(sourcePath, inputPath, overwrite: true);
+
+        dynamic? powerPoint = null;
+        dynamic? presentations = null;
+        dynamic? presentation = null;
+        dynamic? slides = null;
+        dynamic? addedSlide = null;
+        dynamic? textBox = null;
+        try
+        {
+            powerPoint = Activator.CreateInstance(powerPointType);
+            if (powerPoint is null)
+                Assert.Skip("無法啟動 Microsoft PowerPoint，略過 PowerPoint GUI 修改驗收。");
+            presentations = powerPoint.Presentations;
+            presentation = presentations.Open(inputPath, 0, 0, 0);
+            slides = presentation.Slides;
+            int expectedCount = (int)slides.Count + 1;
+            addedSlide = slides.Add(expectedCount, 12);
+            textBox = addedSlide.Shapes.AddTextbox(1, 20f, 20f, 500f, 50f);
+            textBox.TextFrame.TextRange.Text = "OdfKit-PowerPoint-Edit-Marker";
+            presentation.SaveAs(outputPath, 35);
+            presentation.Close();
+            ReleaseComObject(presentation);
+            presentation = presentations.Open(outputPath, -1, 0, 0);
+            slides = presentation.Slides;
+            Assert.Equal(expectedCount, (int)slides.Count);
+
+            using PresentationDocument loaded = PresentationDocument.Load(outputPath);
+            Assert.Equal(expectedCount, loaded.Slides.Count);
+        }
+        catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+        {
+            Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft PowerPoint COM，略過 PowerPoint GUI 修改驗收。");
+        }
+        finally
+        {
+            try
+            {
+                presentation?.Close();
+            }
+            finally
+            {
+                powerPoint?.Quit();
+                ReleaseComObject(textBox);
+                ReleaseComObject(addedSlide);
+                ReleaseComObject(slides);
+                ReleaseComObject(presentation);
+                ReleaseComObject(presentations);
+                ReleaseComObject(powerPoint);
+                CollectComReferences();
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
     private static Type FindOfficeComType(string progId, string skipMessage)
     {
         if (!OperatingSystem.IsWindows())
@@ -219,6 +434,13 @@ public sealed class OfficeGuiSmokeTests
 
         Assert.Skip("找不到代表性 ODF fixture，略過 Office GUI 煙霧驗收。");
         return string.Empty;
+    }
+
+    private static string CreateTempDirectory(string prefix)
+    {
+        string path = Path.Combine(Path.GetTempPath(), prefix + "_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(path);
+        return path;
     }
 
     private static void ReleaseComObject(object? instance)
