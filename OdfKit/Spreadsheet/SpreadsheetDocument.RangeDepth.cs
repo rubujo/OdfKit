@@ -11,6 +11,40 @@ namespace OdfKit.Spreadsheet;
 public partial class SpreadsheetDocument
 {
     /// <summary>
+    /// Sets one cell value using a worksheet name and A1 address.
+    /// 使用工作表名稱與 A1 位址設定單一儲存格值。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="address">The A1 cell address. / A1 儲存格位址。</param>
+    /// <param name="value">The value to write. / 要寫入的值。</param>
+    /// <returns>The range write report. / 範圍寫入報告。</returns>
+    public OdfRangeWriteReport SetValue(string sheetName, string address, object? value) =>
+        RequireSheet(sheetName).SetValues(OdfCellAddress.ParseExcel(address), new object?[,] { { value } }, OdfRangeWriteOptions.Default);
+
+    /// <summary>
+    /// Sets a rectangular value block using a worksheet name and A1 start address.
+    /// 使用工作表名稱與 A1 起始位址設定矩形資料區塊。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="startAddress">The top-left A1 address. / 左上角 A1 位址。</param>
+    /// <param name="values">The rectangular values. / 矩形資料值。</param>
+    /// <returns>The range write report. / 範圍寫入報告。</returns>
+    public OdfRangeWriteReport SetRangeValues(string sheetName, string startAddress, object?[,] values) =>
+        RequireSheet(sheetName).SetValues(OdfCellAddress.ParseExcel(startAddress), values, OdfRangeWriteOptions.Default);
+
+    /// <summary>
+    /// Sets a rectangular value block using typed write options.
+    /// 使用具型別寫入選項設定矩形資料區塊。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="startAddress">The top-left A1 address. / 左上角 A1 位址。</param>
+    /// <param name="values">The rectangular values. / 矩形資料值。</param>
+    /// <param name="options">The typed range write options. / 具型別範圍寫入選項。</param>
+    /// <returns>The range write report. / 範圍寫入報告。</returns>
+    public OdfRangeWriteReport SetRangeValues(string sheetName, string startAddress, object?[,] values, OdfRangeWriteOptions? options) =>
+        RequireSheet(sheetName).SetValues(OdfCellAddress.ParseExcel(startAddress), values, options);
+
+    /// <summary>
     /// Sets a rectangular block of values in the specified worksheet.
     /// 在指定工作表設定一個矩形資料區塊。
     /// </summary>

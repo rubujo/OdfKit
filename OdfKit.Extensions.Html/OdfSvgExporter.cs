@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -18,6 +20,34 @@ namespace OdfKit.Export;
 /// </summary>
 public static class OdfSvgExporter
 {
+    /// <summary>
+    /// Exports SVG to a caller-owned stream.
+    /// 將 SVG 匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static OdfExportReport ExportToStream(DrawingDocument document, Stream destination, OdfSvgExportOptions? options) =>
+        OdfManagedExportWriter.Write(destination, Export(document, options), OdfExportFormat.Svg, "managed-svg");
+
+    /// <summary>
+    /// Exports SVG asynchronously to a caller-owned stream.
+    /// 將 SVG 非同步匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToStreamAsync(DrawingDocument document, Stream destination, OdfSvgExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WriteAsync(destination, Export(document, options), OdfExportFormat.Svg, "managed-svg", cancellationToken);
+
+    /// <summary>
+    /// Exports SVG to a file path.
+    /// 將 SVG 匯出至檔案路徑。
+    /// </summary>
+    public static OdfExportReport ExportToPath(DrawingDocument document, string path, OdfSvgExportOptions? options) =>
+        OdfManagedExportWriter.WritePath(path, Export(document, options), OdfExportFormat.Svg, "managed-svg");
+
+    /// <summary>
+    /// Exports SVG asynchronously to a file path.
+    /// 將 SVG 非同步匯出至檔案路徑。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToPathAsync(DrawingDocument document, string path, OdfSvgExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WritePathAsync(path, Export(document, options), OdfExportFormat.Svg, "managed-svg", cancellationToken);
+
     /// <summary>
     /// Exports the specified drawing page as SVG markup.
     /// 將指定繪圖文件匯出為 SVG 字串。

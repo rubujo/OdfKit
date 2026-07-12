@@ -14226,8 +14226,10 @@ OdfKit.Drawing.OdfDrawPage.AddPolyline(System.Collections.Generic.IEnumerable<Sy
 OdfKit.Drawing.OdfDrawPage.AddShape(OdfKit.Presentation.OdfShapeType shapeType, OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength w, OdfKit.Styles.OdfLength h) -> OdfKit.Presentation.OdfShape!
 OdfKit.Drawing.OdfDrawPage.AddTextBox(OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength w, OdfKit.Styles.OdfLength h, string! text) -> OdfKit.Presentation.OdfTextBox!
 OdfKit.Drawing.OdfDrawPage.AddTextBox(OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength w, OdfKit.Styles.OdfLength h, string! text, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> OdfKit.Presentation.OdfTextBox!
+OdfKit.Drawing.OdfDrawPage.AlignShapes(System.Collections.Generic.IEnumerable<string!>! shapeIds, OdfKit.Drawing.OdfShapeAlignment alignment) -> OdfKit.Drawing.OdfShapeLayoutResult!
 OdfKit.Drawing.OdfDrawPage.BringToFront(string! id) -> bool
 OdfKit.Drawing.OdfDrawPage.ClearShapes() -> int
+OdfKit.Drawing.OdfDrawPage.DistributeShapes(System.Collections.Generic.IEnumerable<string!>! shapeIds, OdfKit.Drawing.OdfShapeDistribution distribution) -> OdfKit.Drawing.OdfShapeLayoutResult!
 OdfKit.Drawing.OdfDrawPage.Document.get -> OdfKit.Drawing.DrawingDocument!
 OdfKit.Drawing.OdfDrawPage.FindLayer(string! name) -> OdfKit.Drawing.OdfLayerInfo?
 OdfKit.Drawing.OdfDrawPage.FindShape(string! id) -> OdfKit.Presentation.OdfShape?
@@ -14411,6 +14413,22 @@ OdfKit.Drawing.OdfPolygonInfo.TryGetY(out OdfKit.Styles.OdfLength length) -> boo
 OdfKit.Drawing.OdfPolygonInfo.Width.get -> string?
 OdfKit.Drawing.OdfPolygonInfo.X.get -> string?
 OdfKit.Drawing.OdfPolygonInfo.Y.get -> string?
+OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Bottom = 5 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Center = 1 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Left = 0 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Middle = 4 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Right = 2 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeAlignment.Top = 3 -> OdfKit.Drawing.OdfShapeAlignment
+OdfKit.Drawing.OdfShapeDistribution
+OdfKit.Drawing.OdfShapeDistribution.Horizontal = 0 -> OdfKit.Drawing.OdfShapeDistribution
+OdfKit.Drawing.OdfShapeDistribution.Vertical = 1 -> OdfKit.Drawing.OdfShapeDistribution
+OdfKit.Drawing.OdfShapeLayoutResult
+OdfKit.Drawing.OdfShapeLayoutResult.InvalidGeometryShapeIds.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Drawing.OdfShapeLayoutResult.MissingShapeIds.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Drawing.OdfShapeLayoutResult.OdfShapeLayoutResult() -> void
+OdfKit.Drawing.OdfShapeLayoutResult.UpdatedCount.get -> int
+OdfKit.Drawing.OdfShapeLayoutResult.UpdatedShapeIds.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Drawing.OdfSvgPathBounds
 OdfKit.Drawing.OdfSvgPathBounds.Height.get -> double
 OdfKit.Drawing.OdfSvgPathBounds.MaxX.get -> double
@@ -14421,6 +14439,19 @@ OdfKit.Drawing.OdfSvgPathBounds.OdfSvgPathBounds() -> void
 OdfKit.Drawing.OdfSvgPathBounds.OdfSvgPathBounds(double minX, double minY, double maxX, double maxY) -> void
 OdfKit.Drawing.OdfSvgPathBounds.Width.get -> double
 OdfKit.Drawing.OdfSvgPathDataParser
+OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportFormat.Html = 0 -> OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportFormat.Markdown = 1 -> OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportFormat.Pdf = 3 -> OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportFormat.Svg = 2 -> OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportReport
+OdfKit.Export.OdfExportReport.Backend.get -> string!
+OdfKit.Export.OdfExportReport.BytesWritten.get -> long
+OdfKit.Export.OdfExportReport.BytesWritten.set -> void
+OdfKit.Export.OdfExportReport.DiagnosticCodes.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Export.OdfExportReport.Format.get -> OdfKit.Export.OdfExportFormat
+OdfKit.Export.OdfExportReport.HasDiagnostics.get -> bool
+OdfKit.Export.OdfExportReport.OdfExportReport(OdfKit.Export.OdfExportFormat format, string! backend) -> void
 OdfKit.Forms.OdfControlType
 OdfKit.Forms.OdfControlType.Button = 3 -> OdfKit.Forms.OdfControlType
 OdfKit.Forms.OdfControlType.CheckBox = 1 -> OdfKit.Forms.OdfControlType
@@ -15276,6 +15307,7 @@ OdfKit.Presentation.OdfSlide.RemovePlaceholder(OdfKit.Presentation.OdfPlaceholde
 OdfKit.Presentation.OdfSlide.RemoveSpeakerNotesPage() -> bool
 OdfKit.Presentation.OdfSlide.SetLayout(OdfKit.Presentation.OdfPresentationLayout layout) -> void
 OdfKit.Presentation.OdfSlide.SetMasterPage(string! masterPageName) -> void
+OdfKit.Presentation.OdfSlide.SetPlaceholderText(OdfKit.Presentation.OdfPlaceholderType placeholderType, string? text) -> OdfKit.Presentation.OdpPlaceholderUpdateResult!
 OdfKit.Presentation.OdfSlide.SetSpeakerNotes(System.Collections.Generic.IEnumerable<string!>! paragraphs) -> OdfKit.Presentation.OdfSlide!
 OdfKit.Presentation.OdfSlide.SetTransition(OdfKit.Presentation.OdfTransitionType type, OdfKit.Styles.OdfLength duration) -> void
 OdfKit.Presentation.OdfSlide.SetTransition(OdfKit.Presentation.OdfTransitionType type, OdfKit.Styles.OdfLength duration, OdfKit.Presentation.OdfTransitionSpeed speed) -> void
@@ -15382,6 +15414,12 @@ OdfKit.Presentation.OdfTransitionType.Push = 1 -> OdfKit.Presentation.OdfTransit
 OdfKit.Presentation.OdfTransitionType.Split = 4 -> OdfKit.Presentation.OdfTransitionType
 OdfKit.Presentation.OdfTransitionType.Wipe = 2 -> OdfKit.Presentation.OdfTransitionType
 OdfKit.Presentation.OdfTransitionType.Zoom = 3 -> OdfKit.Presentation.OdfTransitionType
+OdfKit.Presentation.OdpPlaceholderUpdateResult
+OdfKit.Presentation.OdpPlaceholderUpdateResult.AmbiguousPlaceholderTypes.get -> System.Collections.Generic.IList<OdfKit.Presentation.OdfPlaceholderType>!
+OdfKit.Presentation.OdpPlaceholderUpdateResult.MissingPlaceholderTypes.get -> System.Collections.Generic.IList<OdfKit.Presentation.OdfPlaceholderType>!
+OdfKit.Presentation.OdpPlaceholderUpdateResult.OdpPlaceholderUpdateResult() -> void
+OdfKit.Presentation.OdpPlaceholderUpdateResult.UpdatedCount.get -> int
+OdfKit.Presentation.OdpPlaceholderUpdateResult.UpdatedCount.set -> void
 OdfKit.Presentation.PresentationDocument
 OdfKit.Presentation.PresentationDocument.AddMasterPage(string! name, OdfKit.Presentation.OdfMasterPageDefinition! def) -> OdfKit.Styles.OdfMasterPage!
 OdfKit.Presentation.PresentationDocument.AddMasterPage(string! name, string! pageLayoutName) -> void
@@ -15556,6 +15594,8 @@ OdfKit.Spreadsheet.OdfCellRangeSelection.AddConditionalFormat(string! condition,
 OdfKit.Spreadsheet.OdfCellRangeSelection.AddFilter(string! name, params (int fieldNumber, string! op, string! value)[]! conditions) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.AddValidationList(string! name, params string![]! allowedValues) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.AutoFilter() -> OdfKit.Spreadsheet.OdfCellRangeSelection!
+OdfKit.Spreadsheet.OdfCellRangeSelection.Background(string! color) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
+OdfKit.Spreadsheet.OdfCellRangeSelection.Bold() -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.Borders.get -> OdfKit.Spreadsheet.OdfRangeBorderProxy!
 OdfKit.Spreadsheet.OdfCellRangeSelection.HorizontalAlignment.get -> string?
 OdfKit.Spreadsheet.OdfCellRangeSelection.HorizontalAlignment.set -> void
@@ -15565,6 +15605,7 @@ OdfKit.Spreadsheet.OdfCellRangeSelection.NameAs(string! name) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Protect(string! password) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Range.get -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.OdfCellRangeSelection.Sort(params (int fieldNumber, bool ascending)[]! rules) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
+OdfKit.Spreadsheet.OdfCellRangeSelection.Style(System.Action<OdfKit.Styles.OdfCellStyleProxy!>! configure) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.TryUnprotect(string! password) -> bool
 OdfKit.Spreadsheet.OdfCellRangeSelection.Unmerge() -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Unprotect() -> void
@@ -16627,11 +16668,15 @@ OdfKit.Spreadsheet.SpreadsheetDocument.GetSplitPanes() -> System.Collections.Gen
 OdfKit.Spreadsheet.SpreadsheetDocument.GetTables() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfSpreadsheetTableInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetTrackedChanges() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfSpreadsheetTrackedChangeInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetUsedRange(string! sheetName) -> OdfKit.Spreadsheet.OdfCellRange?
+OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecords<T>(string! sheetName, string! startAddress, System.Collections.Generic.IEnumerable<T>! records) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecords<T>(string! sheetName, string! startAddress, System.Collections.Generic.IEnumerable<T>! records, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfEmbeddedChartOptions? options) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.ProtectWorkbook(string! password) -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecords<T>(string! sheetName, string! range) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecords<T>(string! sheetName, string! range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel) -> OdfKit.Chart.OdfChartDocument!
@@ -16649,6 +16694,9 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ReplaceFormulaText(string! oldValue, stri
 OdfKit.Spreadsheet.SpreadsheetDocument.ResizeTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.SetFormula(string! sheetName, string! address, string! formula) -> OdfKit.Spreadsheet.OdfCell!
 OdfKit.Spreadsheet.SpreadsheetDocument.SetFormula(string! sheetName, string! address, string! formula, object? cachedValue) -> OdfKit.Spreadsheet.OdfCell!
+OdfKit.Spreadsheet.SpreadsheetDocument.SetRangeValues(string! sheetName, string! startAddress, object?[,]! values) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.SetRangeValues(string! sheetName, string! startAddress, object?[,]! values, OdfKit.Spreadsheet.OdfRangeWriteOptions? options) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.SetValue(string! sheetName, string! address, object? value) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.SetValues(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, object?[,]! values) -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.SpreadsheetDocument.SetValues(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, object?[,]! values, OdfKit.Spreadsheet.OdfRangeWriteOptions? options) -> OdfKit.Spreadsheet.OdfRangeWriteReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.SetValues(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress startAddress, System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<object?>!>! rows) -> OdfKit.Spreadsheet.OdfCellRange
@@ -17563,6 +17611,23 @@ OdfKit.Text.OdfTextImageCollection.Add(byte[]! imageBytes, OdfKit.Styles.OdfLeng
 OdfKit.Text.OdfTextImageCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<OdfKit.Text.OdfImage!>!
 OdfKit.Text.OdfTextImageCollection.Items.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfImage!>!
 OdfKit.Text.OdfTextImageCollection.OdfTextImageCollection(OdfKit.Text.TextDocument! document) -> void
+OdfKit.Text.OdfTextMatch
+OdfKit.Text.OdfTextMatch.Index.get -> int
+OdfKit.Text.OdfTextMatch.Length.get -> int
+OdfKit.Text.OdfTextMatch.OdfTextMatch(int index, int length, string! value) -> void
+OdfKit.Text.OdfTextMatch.Value.get -> string!
+OdfKit.Text.OdfTextQueryOptions
+OdfKit.Text.OdfTextQueryOptions.MatchCase.get -> bool
+OdfKit.Text.OdfTextQueryOptions.MatchCase.set -> void
+OdfKit.Text.OdfTextQueryOptions.MaxResults.get -> int
+OdfKit.Text.OdfTextQueryOptions.MaxResults.set -> void
+OdfKit.Text.OdfTextQueryOptions.OdfTextQueryOptions() -> void
+OdfKit.Text.OdfTextQueryOptions.WholeWord.get -> bool
+OdfKit.Text.OdfTextQueryOptions.WholeWord.set -> void
+OdfKit.Text.OdfTextReplaceResult
+OdfKit.Text.OdfTextReplaceResult.Matches.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfTextMatch!>!
+OdfKit.Text.OdfTextReplaceResult.OdfTextReplaceResult(System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfTextMatch!>! matches) -> void
+OdfKit.Text.OdfTextReplaceResult.ReplacementCount.get -> int
 OdfKit.Text.OdfTextRun
 OdfKit.Text.OdfTextRun.BackgroundColor.get -> string?
 OdfKit.Text.OdfTextRun.BackgroundColor.set -> void
@@ -17662,6 +17727,15 @@ OdfKit.Text.OdfUserFieldDeclarationInfo.Name.get -> string!
 OdfKit.Text.OdfUserFieldDeclarationInfo.OdfUserFieldDeclarationInfo(string! name, string! valueType, string? value) -> void
 OdfKit.Text.OdfUserFieldDeclarationInfo.Value.get -> string?
 OdfKit.Text.OdfUserFieldDeclarationInfo.ValueType.get -> string!
+OdfKit.Text.OdtMutationReport
+OdfKit.Text.OdtMutationReport.AmbiguousTargets.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Text.OdtMutationReport.Changed.get -> bool
+OdfKit.Text.OdtMutationReport.CreatedPackagePaths.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Text.OdtMutationReport.MissingTargets.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Text.OdtMutationReport.OdtMutationReport(string! operation) -> void
+OdfKit.Text.OdtMutationReport.Operation.get -> string!
+OdfKit.Text.OdtMutationReport.UpdatedCount.get -> int
+OdfKit.Text.OdtMutationReport.UpdatedCount.set -> void
 OdfKit.Text.OdtNodeType
 OdfKit.Text.OdtNodeType.Heading = 1 -> OdfKit.Text.OdtNodeType
 OdfKit.Text.OdtNodeType.ListItem = 2 -> OdfKit.Text.OdtNodeType
@@ -17756,6 +17830,8 @@ OdfKit.Text.TextDocument.AddTrackedChange(string! changeType, string! creator, S
 OdfKit.Text.TextDocument.AddTrackedChange(string! changeType, string! creator, System.DateTime date, OdfKit.DOM.OdfNode? extraContent, string? originalStyleName) -> string!
 OdfKit.Text.TextDocument.AddTrackedChange(string! changeType, string! creator, System.DateTime date, OdfKit.DOM.OdfNode? extraContent, string? originalStyleName, string? targetFamily) -> string!
 OdfKit.Text.TextDocument.AddUserFieldDeclaration(string! name, string! valueType, string! value) -> void
+OdfKit.Text.TextDocument.AppendDocument(OdfKit.Core.OdfDocument! otherDocument) -> OdfKit.Text.OdtMutationReport!
+OdfKit.Text.TextDocument.AppendDocument(OdfKit.Core.OdfDocument! otherDocument, OdfKit.Core.OdfMergeOptions? options) -> OdfKit.Text.OdtMutationReport!
 OdfKit.Text.TextDocument.AppendList() -> OdfKit.DOM.OdfListBuilder!
 OdfKit.Text.TextDocument.AppendList(string? styleName) -> OdfKit.DOM.OdfListBuilder!
 OdfKit.Text.TextDocument.ApplyCjkFontFallback() -> void
@@ -17777,6 +17853,7 @@ OdfKit.Text.TextDocument.ExtractFieldInfos(string! startDelimiter, string! endDe
 OdfKit.Text.TextDocument.ExtractFields() -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 OdfKit.Text.TextDocument.ExtractFields(string! startDelimiter) -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 OdfKit.Text.TextDocument.ExtractFields(string! startDelimiter, string! endDelimiter) -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+OdfKit.Text.TextDocument.FillTemplate(System.Collections.Generic.IReadOnlyDictionary<string!, object?>! values) -> OdfKit.OdfTemplateBindReport!
 OdfKit.Text.TextDocument.FindBookmark(string! name) -> OdfKit.Text.OdfBookmarkInfo?
 OdfKit.Text.TextDocument.FindComment(string! name) -> OdfKit.Text.OdfComment?
 OdfKit.Text.TextDocument.FindEndnote(string! id) -> OdfKit.Text.OdfFootnoteInfo?
@@ -17785,6 +17862,8 @@ OdfKit.Text.TextDocument.FindFormControl(string! name) -> OdfKit.Forms.OdfFormCo
 OdfKit.Text.TextDocument.FindFormulaObject(string! identifier) -> OdfKit.Text.OdfFormulaObject?
 OdfKit.Text.TextDocument.FindIndex(string! name) -> OdfKit.Text.OdfIndex?
 OdfKit.Text.TextDocument.FindReferenceMark(string! name) -> OdfKit.Text.OdfReferenceMarkInfo?
+OdfKit.Text.TextDocument.FindText(string! search) -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfTextMatch!>!
+OdfKit.Text.TextDocument.FindText(string! search, OdfKit.Text.OdfTextQueryOptions? options) -> System.Collections.Generic.IReadOnlyList<OdfKit.Text.OdfTextMatch!>!
 OdfKit.Text.TextDocument.FindTextField(OdfKit.Text.OdfTextFieldKind kind) -> OdfKit.Text.OdfTextField?
 OdfKit.Text.TextDocument.FindTextField(OdfKit.Text.OdfTextFieldKind kind, string? identifier) -> OdfKit.Text.OdfTextField?
 OdfKit.Text.TextDocument.FindUserFieldDeclaration(string! name) -> OdfKit.Text.OdfUserFieldDeclarationInfo?
@@ -17839,10 +17918,13 @@ OdfKit.Text.TextDocument.RemoveTextField(OdfKit.Text.OdfTextField! field) -> boo
 OdfKit.Text.TextDocument.RemoveUserFieldDeclaration(string! name) -> bool
 OdfKit.Text.TextDocument.RenameBookmark(string! currentName, string! newName) -> int
 OdfKit.Text.TextDocument.RenameReferenceMark(string! currentName, string! newName) -> int
-OdfKit.Text.TextDocument.ReplaceText(string! search, string! replacement) -> void
+OdfKit.Text.TextDocument.ReplaceImage(string! imageName, byte[]! imageBytes) -> OdfKit.Text.OdtMutationReport!
+OdfKit.Text.TextDocument.ReplaceText(string! search, string! replacement) -> OdfKit.Text.OdfTextReplaceResult!
 OdfKit.Text.TextDocument.ReplaceText(string! search, string! replacement, System.Action<OdfKit.Text.OdfTextRun!>? styleAction) -> void
 OdfKit.Text.TextDocument.ReplaceText(System.Text.RegularExpressions.Regex! regex, string! replacement) -> void
 OdfKit.Text.TextDocument.ReplaceText(System.Text.RegularExpressions.Regex! regex, string! replacement, System.Action<OdfKit.Text.OdfTextRun!>? styleAction) -> void
+OdfKit.Text.TextDocument.SetBookmarkText(string! bookmarkName, string? text) -> OdfKit.Text.OdtMutationReport!
+OdfKit.Text.TextDocument.SetFieldValue(string! fieldName, string? value) -> OdfKit.Text.OdtMutationReport!
 OdfKit.Text.TextDocument.SetUserFieldValue(string! name, string! value) -> bool
 OdfKit.Text.TextDocument.ShiftHeadingOutlineLevels(int offset) -> void
 OdfKit.Text.TextDocument.StreamingMailMerge(System.IO.Stream! outputStream, System.Collections.Generic.IDictionary<string!, object?>! dataSource) -> void
@@ -19211,6 +19293,7 @@ static OdfKit.Text.OdfStreamingMailMerge.ApplyTemplateAsync(System.IO.Stream! te
 static OdfKit.Text.OdfStreamingMailMerge.ApplyTemplateAsync(System.IO.Stream! templateStream, System.IO.Stream! outputStream, System.Collections.Generic.IDictionary<string!, object?>! data, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 static OdfKit.Text.OdfSubDocumentReference.operator !=(OdfKit.Text.OdfSubDocumentReference? left, OdfKit.Text.OdfSubDocumentReference? right) -> bool
 static OdfKit.Text.OdfSubDocumentReference.operator ==(OdfKit.Text.OdfSubDocumentReference? left, OdfKit.Text.OdfSubDocumentReference? right) -> bool
+static OdfKit.Text.OdfTextQueryOptions.Default.get -> OdfKit.Text.OdfTextQueryOptions!
 static OdfKit.Text.TextDocument.Builder() -> OdfKit.Text.TextDocumentBuilder!
 static OdfKit.Text.TextDocument.Create() -> OdfKit.Text.TextDocument!
 static OdfKit.Text.TextDocument.CreateFromFlatDocument(OdfKit.Text.FlatTextDocument! document) -> OdfKit.Text.TextDocument!

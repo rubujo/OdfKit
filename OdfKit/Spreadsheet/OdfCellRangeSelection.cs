@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
 
@@ -11,6 +12,46 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public sealed class OdfCellRangeSelection
 {
+    /// <summary>
+    /// Applies a fluent cell style configuration to every cell in the range.
+    /// 將 fluent 儲存格樣式設定套用至範圍內的每個儲存格。
+    /// </summary>
+    /// <param name="configure">The cell style configuration. / 儲存格樣式設定。</param>
+    /// <returns>The current range selection. / 目前的範圍選取。</returns>
+    public OdfCellRangeSelection Style(Action<OdfCellStyleProxy> configure)
+    {
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
+        foreach (OdfCell cell in EnumerateCells())
+            configure(cell.Style);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets bold text for every cell in the range.
+    /// 設定範圍內每個儲存格的粗體文字。
+    /// </summary>
+    /// <returns>The current range selection. / 目前的範圍選取。</returns>
+    public OdfCellRangeSelection Bold()
+    {
+        foreach (OdfCell cell in EnumerateCells())
+            cell.Style.Font.IsBold = true;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the background color for every cell in the range.
+    /// 設定範圍內每個儲存格的背景色彩。
+    /// </summary>
+    /// <param name="color">The ODF color token. / ODF 色彩詞彙。</param>
+    /// <returns>The current range selection. / 目前的範圍選取。</returns>
+    public OdfCellRangeSelection Background(string color)
+    {
+        foreach (OdfCell cell in EnumerateCells())
+            cell.Style.Fill.Color = color;
+        return this;
+    }
+
     private readonly OdfTableSheet _sheet;
     private OdfRangeBorderProxy? _borders;
 

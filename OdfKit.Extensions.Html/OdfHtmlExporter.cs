@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -16,6 +19,34 @@ namespace OdfKit.Export;
 /// </remarks>
 public static class OdfHtmlExporter
 {
+    /// <summary>
+    /// Exports HTML to a caller-owned stream.
+    /// 將 HTML 匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static OdfExportReport ExportToStream(TextDocument document, Stream destination, OdfHtmlExportOptions? options) =>
+        OdfManagedExportWriter.Write(destination, Export(document, options), OdfExportFormat.Html, "managed-html");
+
+    /// <summary>
+    /// Exports HTML asynchronously to a caller-owned stream.
+    /// 將 HTML 非同步匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToStreamAsync(TextDocument document, Stream destination, OdfHtmlExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WriteAsync(destination, Export(document, options), OdfExportFormat.Html, "managed-html", cancellationToken);
+
+    /// <summary>
+    /// Exports HTML to a file path.
+    /// 將 HTML 匯出至檔案路徑。
+    /// </summary>
+    public static OdfExportReport ExportToPath(TextDocument document, string path, OdfHtmlExportOptions? options) =>
+        OdfManagedExportWriter.WritePath(path, Export(document, options), OdfExportFormat.Html, "managed-html");
+
+    /// <summary>
+    /// Exports HTML asynchronously to a file path.
+    /// 將 HTML 非同步匯出至檔案路徑。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToPathAsync(TextDocument document, string path, OdfHtmlExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WritePathAsync(path, Export(document, options), OdfExportFormat.Html, "managed-html", cancellationToken);
+
     private const string DefaultCss =
         "body{font-family:sans-serif;line-height:1.6;margin:2rem;}" +
         "h1,h2,h3,h4,h5,h6{margin-top:1.2em;margin-bottom:0.4em;}" +

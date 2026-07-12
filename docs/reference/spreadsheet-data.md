@@ -1,5 +1,27 @@
 # Spreadsheet 資料工作流
 
+## Task-oriented 快速入口
+
+一般儲存格、範圍與記錄工作使用 A1 位址，並直接取得領域 report：
+
+```csharp
+OdfRangeWriteReport cell = workbook.SetValue("Data", "A1", 42);
+OdfRangeWriteReport range = workbook.SetRangeValues("Data", "A2", values);
+OdfObjectBindingReport imported = workbook.ImportRecords("Data", "A5", records);
+```
+
+讀回記錄同樣不需自行解析 cell 或 header：
+
+```csharp
+IReadOnlyList<SalesRow> rows = workbook.ReadRecords<SalesRow>("Data", "A5:D100");
+```
+
+範圍樣式會自動建立並去重 automatic style，不需自行管理 `CS1`、`N1` 等名稱：
+
+```csharp
+sheet.Ranges["A1:D20"].Bold().Background("#FFF2CC");
+```
+
 `SpreadsheetDocument` 與 `OdfTableSheet` 都提供物件資料繫結入口。文件層多載以工作表名稱定位，
 工作表層多載直接操作目前 facade；兩者共用相同 options 與 report 契約。
 

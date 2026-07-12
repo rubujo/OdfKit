@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Chart;
@@ -17,6 +18,57 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class TextApiUsabilityTests
 {
+    /// <summary>
+    /// 驗證書籤、欄位、圖片與文件附加 task API 回傳 ODT 領域報告。
+    /// </summary>
+    [Fact]
+    public void BookmarkFieldImageAndAppendTaskApisReturnOdtReports()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("Before ");
+        paragraph.AddBookmark("Target");
+        document.AddUserFieldDeclaration("Status", "string", "Old");
+        document.Body.Images.Add(CreatePngBytes(), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), "Logo");
+        using TextDocument appendix = TextDocument.Create();
+        appendix.AddParagraph("Appendix");
+
+        OdtMutationReport bookmark = document.SetBookmarkText("Target", "Bookmarked");
+        OdtMutationReport field = document.SetFieldValue("Status", "Ready");
+        OdtMutationReport image = document.ReplaceImage("Logo", CreatePngBytes());
+        OdtMutationReport appended = document.AppendDocument(appendix);
+
+        Assert.True(bookmark.Changed);
+        Assert.True(field.Changed);
+        Assert.True(image.Changed);
+        Assert.NotEmpty(image.CreatedPackagePaths);
+        Assert.True(appended.Changed);
+        Assert.Equal("Bookmarked", document.Bookmarks["Target"].Value);
+        Assert.Equal("Ready", document.FindUserFieldDeclaration("Status")!.Value);
+        Assert.Contains("Appendix", document.BodyTextRoot.TextContent, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證文字 task API 提供具型別查詢、結構化取代結果與範本繫結報告。
+    /// </summary>
+    [Fact]
+    public void FindReplaceAndFillTemplateUseTaskOrientedResults()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("Alpha alpha alphabet {{Name}}");
+
+        var options = new OdfTextQueryOptions { MatchCase = false, WholeWord = true };
+        OdfTextMatch[] matches = document.FindText("alpha", options).ToArray();
+        OdfTextReplaceResult replacement = document.ReplaceText("Alpha", "Beta");
+        OdfTemplateBindReport binding = document.FillTemplate(
+            new Dictionary<string, object?> { ["Name"] = "OdfKit" });
+
+        Assert.Equal(2, matches.Length);
+        Assert.Equal(0, matches[0].Index);
+        Assert.Equal(1, replacement.ReplacementCount);
+        Assert.True(binding.ChangedNodeCount > 0);
+        Assert.Contains("Beta alpha alphabet OdfKit", document.BodyTextRoot.TextContent, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// 驗證可用 Body facade 建立常見 ODT 內容並 round-trip。
     /// </summary>

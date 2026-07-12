@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
@@ -23,6 +25,63 @@ namespace OdfKit.Export;
 /// </summary>
 public static class OdfPdfExporter
 {
+    /// <summary>
+    /// Exports PDF to a caller-owned stream and returns a report.
+    /// 將 PDF 匯出至呼叫端擁有的資料流並回傳報告。
+    /// </summary>
+    public static OdfExportReport ExportToStream(TextDocument document, Stream destination)
+    {
+        long start = destination.CanSeek ? destination.Position : 0;
+        Export(document, destination);
+        long written = destination.CanSeek ? destination.Position - start : 0;
+        return new OdfExportReport(OdfExportFormat.Pdf, "managed-pdf") { BytesWritten = written };
+    }
+
+    /// <summary>
+    /// Exports PDF to a file path and returns a report.
+    /// 將 PDF 匯出至檔案路徑並回傳報告。
+    /// </summary>
+    public static OdfExportReport ExportToPath(TextDocument document, string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException(null, nameof(path));
+        string? directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+        using FileStream stream = File.Create(path);
+        return ExportToStream(document, stream);
+    }
+
+    /// <summary>
+    /// Renders PDF and asynchronously copies it to a caller-owned stream.
+    /// 產生 PDF，並非同步複製至呼叫端擁有的資料流。
+    /// </summary>
+    public static async Task<OdfExportReport> ExportToStreamAsync(TextDocument document, Stream destination, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var buffer = new MemoryStream();
+        Export(document, buffer);
+        cancellationToken.ThrowIfCancellationRequested();
+        buffer.Position = 0;
+        await buffer.CopyToAsync(destination, 81920, cancellationToken).ConfigureAwait(false);
+        return new OdfExportReport(OdfExportFormat.Pdf, "managed-pdf") { BytesWritten = buffer.Length };
+    }
+
+    /// <summary>
+    /// Renders PDF and asynchronously writes it to a file path.
+    /// 產生 PDF，並非同步寫入檔案路徑。
+    /// </summary>
+    public static async Task<OdfExportReport> ExportToPathAsync(TextDocument document, string path, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException(null, nameof(path));
+        string? directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+        using FileStream stream = File.Create(path);
+        return await ExportToStreamAsync(document, stream, cancellationToken).ConfigureAwait(false);
+    }
+
     static OdfPdfExporter()
     {
         try

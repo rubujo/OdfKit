@@ -1,6 +1,9 @@
 ﻿using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -13,6 +16,34 @@ namespace OdfKit.Export;
 /// </summary>
 public static class OdfMarkdownExporter
 {
+    /// <summary>
+    /// Exports Markdown to a caller-owned stream.
+    /// 將 Markdown 匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static OdfExportReport ExportToStream(TextDocument document, Stream destination, OdfMarkdownExportOptions? options) =>
+        OdfManagedExportWriter.Write(destination, Export(document, options), OdfExportFormat.Markdown, "managed-markdown");
+
+    /// <summary>
+    /// Exports Markdown asynchronously to a caller-owned stream.
+    /// 將 Markdown 非同步匯出至呼叫端擁有的資料流。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToStreamAsync(TextDocument document, Stream destination, OdfMarkdownExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WriteAsync(destination, Export(document, options), OdfExportFormat.Markdown, "managed-markdown", cancellationToken);
+
+    /// <summary>
+    /// Exports Markdown to a file path.
+    /// 將 Markdown 匯出至檔案路徑。
+    /// </summary>
+    public static OdfExportReport ExportToPath(TextDocument document, string path, OdfMarkdownExportOptions? options) =>
+        OdfManagedExportWriter.WritePath(path, Export(document, options), OdfExportFormat.Markdown, "managed-markdown");
+
+    /// <summary>
+    /// Exports Markdown asynchronously to a file path.
+    /// 將 Markdown 非同步匯出至檔案路徑。
+    /// </summary>
+    public static Task<OdfExportReport> ExportToPathAsync(TextDocument document, string path, OdfMarkdownExportOptions? options, CancellationToken cancellationToken) =>
+        OdfManagedExportWriter.WritePathAsync(path, Export(document, options), OdfExportFormat.Markdown, "managed-markdown", cancellationToken);
+
     /// <summary>
     /// Exports the specified text document as Markdown.
     /// 將 TextDocument 匯出為 Markdown 字串。

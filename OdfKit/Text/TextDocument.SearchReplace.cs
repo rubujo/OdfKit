@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace OdfKit.Text;
@@ -15,7 +16,60 @@ public partial class TextDocument
     /// Searches for the specified text and replaces it with new text.
     /// 搜尋指定文字並替換為新文字。
     /// </summary>
-    public new void ReplaceText(string search, string replacement) => ReplaceText(search, replacement, null);
+    public new OdfTextReplaceResult ReplaceText(string search, string replacement)
+    {
+        IReadOnlyList<OdfTextMatch> matches = FindText(search);
+        base.ReplaceText(search, replacement);
+        return new OdfTextReplaceResult(matches);
+    }
+
+    /// <summary>
+    /// Finds exact text without exposing XML selectors.
+    /// 尋找精確文字，且不暴露 XML selector。
+    /// </summary>
+    /// <param name="search">The text to find. / 要尋找的文字。</param>
+    /// <returns>The matching text locations. / 符合的文字位置。</returns>
+    public IReadOnlyList<OdfTextMatch> FindText(string search) => FindText(search, OdfTextQueryOptions.Default);
+
+    /// <summary>
+    /// Finds text using typed query options without exposing XML selectors.
+    /// 使用具型別查詢選項尋找文字，且不暴露 XML selector。
+    /// </summary>
+    /// <param name="search">The text to find. / 要尋找的文字。</param>
+    /// <param name="options">The typed query options. / 具型別查詢選項。</param>
+    /// <returns>The matching text locations. / 符合的文字位置。</returns>
+    public IReadOnlyList<OdfTextMatch> FindText(string search, OdfTextQueryOptions? options)
+    {
+        if (string.IsNullOrEmpty(search))
+            throw new ArgumentException(null, nameof(search));
+        options ??= OdfTextQueryOptions.Default;
+        if (options.MaxResults < 0)
+            throw new ArgumentOutOfRangeException(nameof(options));
+
+        string text = BodyTextRoot.TextContent;
+        var matches = new List<OdfTextMatch>();
+        StringComparison comparison = options.MatchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        int startIndex = 0;
+        while (matches.Count < options.MaxResults)
+        {
+            int index = text.IndexOf(search, startIndex, comparison);
+            if (index < 0)
+                break;
+            if (!options.WholeWord || IsWholeWord(text, index, search.Length))
+                matches.Add(new OdfTextMatch(index, search.Length, text.Substring(index, search.Length)));
+            startIndex = index + search.Length;
+        }
+        return matches;
+    }
+
+    /// <summary>
+    /// Fills typed placeholders in this text document.
+    /// 填入此文字文件中的具型別占位符。
+    /// </summary>
+    /// <param name="values">The placeholder values. / 占位符值。</param>
+    /// <returns>The template binding report. / 範本繫結報告。</returns>
+    public OdfTemplateBindReport FillTemplate(IReadOnlyDictionary<string, object?> values) =>
+        TemplateBinder.Bind(this, values, OdfTemplateBindOptions.Default);
 
     /// <summary>
     /// Full overload of ReplaceText that accepts search, replacement, and styleAction.
@@ -45,6 +99,16 @@ public partial class TextDocument
     /// </summary>
     public void ReplaceText(Regex regex, string replacement, Action<OdfTextRun>? styleAction) =>
         TextDocumentSearchReplaceEngine.ReplaceText(this, regex, replacement, styleAction);
+
+    private static bool IsWholeWord(string text, int index, int length)
+    {
+        bool leftBoundary = index == 0 || !IsWordCharacter(text[index - 1]);
+        int endIndex = index + length;
+        bool rightBoundary = endIndex == text.Length || !IsWordCharacter(text[endIndex]);
+        return leftBoundary && rightBoundary;
+    }
+
+    private static bool IsWordCharacter(char value) => char.IsLetterOrDigit(value) || value == '_';
 
     #endregion
 }

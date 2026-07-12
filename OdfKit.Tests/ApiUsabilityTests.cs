@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
@@ -14,6 +16,65 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class ApiUsabilityTests
 {
+    /// <summary>
+    /// 驗證 API 人體工學清單中的每個工作流都有可追溯證據。
+    /// </summary>
+    [Fact]
+    public void ApiUsabilityManifestHasTraceableWorkflowEvidence()
+    {
+        string root = FindRepositoryRoot();
+        string manifestPath = Path.Combine(root, "docs", "api-usability.json");
+        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+
+        JsonElement rootElement = manifest.RootElement;
+        Assert.Equal(1, rootElement.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(3, rootElement.GetProperty("statementBudget").GetInt32());
+
+        JsonElement[] workflows = rootElement.GetProperty("workflows").EnumerateArray().ToArray();
+        Assert.True(workflows.Length >= 16);
+        Assert.Equal(workflows.Length, workflows.Select(item => item.GetProperty("id").GetString()).Distinct(StringComparer.Ordinal).Count());
+        Assert.Contains(workflows, item => item.GetProperty("format").GetString() == "ODT");
+        Assert.Contains(workflows, item => item.GetProperty("format").GetString() == "ODS");
+        Assert.Contains(workflows, item => item.GetProperty("format").GetString() == "ODP");
+        Assert.Contains(workflows, item => item.GetProperty("format").GetString() == "ODG");
+
+        foreach (JsonElement workflow in workflows)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(workflow.GetProperty("limitations").GetString()));
+            AssertPathsExist(root, workflow, "implementation");
+            AssertPathsExist(root, workflow, "tests");
+            AssertPathsExist(root, workflow, "samples");
+        }
+    }
+
+    private static void AssertPathsExist(string root, JsonElement workflow, string propertyName)
+    {
+        JsonElement[] paths = workflow.GetProperty(propertyName).EnumerateArray().ToArray();
+        Assert.NotEmpty(paths);
+        foreach (JsonElement path in paths)
+        {
+            string relativePath = Assert.IsType<string>(path.GetString());
+            Assert.True(File.Exists(Path.Combine(root, relativePath.Replace('/', Path.DirectorySeparatorChar))),
+                $"{workflow.GetProperty("id").GetString()} references missing {propertyName} path '{relativePath}'.");
+        }
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        string? current = AppContext.BaseDirectory;
+        while (current is not null)
+        {
+            if (File.Exists(Path.Combine(current, "OdfKit.slnx")))
+            {
+                return current;
+            }
+
+            current = Directory.GetParent(current)?.FullName;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the OdfKit repository root.");
+    }
+
     /// <summary>
     /// 驗證使用少量程式碼即可建立含兩個段落的 ODT。
     /// </summary>

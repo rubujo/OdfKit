@@ -51,6 +51,7 @@ public class CliTests : IDisposable
         Assert.Contains("typed-dom-coverage", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
         Assert.Contains("convert-csv", output.ToString());
+        Assert.Contains("set-cell", output.ToString());
         Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
     }
@@ -1496,6 +1497,33 @@ public class CliTests : IDisposable
             TryDelete(odsPath);
             TryDelete(csvPath);
             TryDelete(roundTripPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 set-cell 透過工作導向 API 更新指定的 A1 儲存格。
+    /// </summary>
+    [Fact]
+    public void SetCellUpdatesRequestedAddress()
+    {
+        string sourcePath = CreateTempPath(".ods");
+        string outputPath = CreateTempPath(".ods");
+        try
+        {
+            using (SpreadsheetDocument workbook = SpreadsheetDocument.Create())
+            {
+                workbook.Worksheets.Add("Data");
+                workbook.Save(sourcePath);
+            }
+
+            AssertCommand(["set-cell", sourcePath, "Data", "B3", "Ready", outputPath], 0, "cell: B3");
+            using SpreadsheetDocument loaded = SpreadsheetDocument.Load(outputPath);
+            Assert.Equal("Ready", loaded.Worksheets["Data"].Cells["B3"].CellValue);
+        }
+        finally
+        {
+            TryDelete(sourcePath);
+            TryDelete(outputPath);
         }
     }
 

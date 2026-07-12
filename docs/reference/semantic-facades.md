@@ -27,6 +27,31 @@
 `OdfSaveOptions.VersionCompatibilityReportHandler`。foreign namespace 不會被誤判為
 標準版本損失，也不會因降版而遭刪除。
 
+## 高頻工作範例
+
+文字查詢、取代與範本填入不需接觸 DOM，並回傳可檢查的領域結果：
+
+```csharp
+IReadOnlyList<OdfTextMatch> matches = document.FindText("alpha", new OdfTextQueryOptions { MatchCase = false });
+OdfTextReplaceResult replaced = document.ReplaceText("alpha", "beta");
+OdfTemplateBindReport bound = document.FillTemplate(values);
+```
+
+繪圖對齊、等距分布及群組維持 page 領域邊界；缺少的識別碼與不完整幾何會寫入結果，
+不需要呼叫端手動處理 `svg:x`、`svg:y` 或 group XML：
+
+```csharp
+OdfShapeLayoutResult aligned = page.AlignShapes(["title", "body"], OdfShapeAlignment.Left);
+OdfShapeLayoutResult distributed = page.DistributeShapes(ids, OdfShapeDistribution.Vertical);
+OdfDrawGroup group = page.GroupShapes(ids, "內容群組");
+```
+
+簡報預留位置使用具型別的 `OdfPlaceholderType`，並回報 missing／ambiguous 類型：
+
+```csharp
+OdpPlaceholderUpdateResult title = slide.SetPlaceholderText(OdfPlaceholderType.Title, "Quarterly report");
+```
+
 ## 能力與非目標
 
 12 個語意族群及每個 topic 的 `Create`、`Get`、`Find`、`Set`、`Update`、`Remove`、

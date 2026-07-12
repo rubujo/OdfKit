@@ -202,6 +202,11 @@ static void DemoTextDocument(string outputDir)
     byte[] imageBytes = CreatePngBytes();
     document.Body.Images.Add(imageBytes, "3cm", "3cm", "OdfKitLogo");
 
+    // 以工作導向 API 搜尋並取代文字，結果同時提供命中數與診斷資訊。
+    document.Body.Paragraphs.Add("Task API marker");
+    OdfTextReplaceResult replaceResult = document.ReplaceText("Task API marker", "Task API ready");
+    Console.WriteLine($"   高階文字取代完成： {replaceResult.ReplacementCount} 筆。");
+
     string outputPath = Path.Combine(outputDir, "output_text.odt");
     document.Save(outputPath);
     Console.WriteLine($"   已儲存文字文件至： {outputPath} ");
@@ -284,6 +289,14 @@ static void DemoSpreadsheetDocument(string outputDir)
     workbook.AutoCalculate = true;
     workbook.LinkUpdateMode = 1;
 
+    // 以 A1 起點批次寫入二維資料，再共用 fluent range style。
+    OdfRangeWriteReport rangeReport = workbook.SetRangeValues(
+        "銷售數據",
+        "D1",
+        new object?[,] { { "狀態" }, { "Ready" } });
+    sheet.Ranges["D1:D2"].Bold().Background("#FFF2CC");
+    Console.WriteLine($"   高階範圍寫入完成： {rangeReport.WrittenCellCount} 格。");
+
     // 10. 搜尋公式儲存格，示範公式編輯輔助 API 可回報工作表與位址
     foreach (OdfFormulaCellInfo formulaCell in workbook.GetFormulaCells())
     {
@@ -361,6 +374,16 @@ static string DemoPresentationDocument(string outputDir)
     // 設定轉場特效與講者備忘錄
     extraSlide.SpeakerNotes = " 介紹 ODP 與多種幾何形狀繪製功能 ";
     extraSlide.SetTransition(OdfTransitionType.Zoom, OdfLength.FromPoints(36));
+
+    // 使用預留位置 task API，無須直接操作簡報 XML。
+    extraSlide.AddPlaceholder(
+        OdfPlaceholderType.Subtitle,
+        OdfLength.FromCentimeters(1),
+        OdfLength.FromCentimeters(8),
+        OdfLength.FromCentimeters(10),
+        OdfLength.FromCentimeters(1));
+    OdpPlaceholderUpdateResult placeholderResult = extraSlide.SetPlaceholderText(OdfPlaceholderType.Subtitle, "高階 API 已就緒");
+    Console.WriteLine($"   已更新 {placeholderResult.UpdatedCount} 個簡報預留位置。");
 
     string outputPath = Path.Combine(outputDir, "output_presentation.odp");
     deck.Save(outputPath);
@@ -631,17 +654,13 @@ static void DemoExtensions(string outputDir)
 
     // 匯出成 PDF (使用 OdfKit.Extensions.Pdf 提供的 OdfPdfExporter)
     string pdfPath = Path.Combine(outputDir, "output_pdf.pdf");
-    using (var pdfStream = new FileStream(pdfPath, FileMode.Create, FileAccess.Write))
-    {
-        OdfPdfExporter.Export(tempDoc, pdfStream);
-    }
-    Console.WriteLine($"   已成功將 ODT 匯出至 PDF 檔案： {pdfPath} ");
+    OdfExportReport pdfReport = OdfPdfExporter.ExportToPath(tempDoc, pdfPath);
+    Console.WriteLine($"   已成功將 ODT 匯出至 PDF 檔案： {pdfPath} ({pdfReport.BytesWritten} bytes) ");
 
     // 匯出成 HTML (使用 OdfKit.Extensions.Html 提供的 OdfHtmlExporter)
     string htmlPath = Path.Combine(outputDir, "output_html.html");
-    string htmlContent = OdfHtmlExporter.Export(tempDoc);
-    File.WriteAllText(htmlPath, htmlContent, Encoding.UTF8);
-    Console.WriteLine($"   已成功將 ODT 匯出至 HTML 網頁： {htmlPath} ");
+    OdfExportReport htmlReport = OdfHtmlExporter.ExportToPath(tempDoc, htmlPath, null);
+    Console.WriteLine($"   已成功將 ODT 匯出至 HTML 網頁： {htmlPath} ({htmlReport.BytesWritten} bytes) ");
 
     // 1. 建立臨時試算表以供轉換與影像渲染示範
     using var tempWorkbook = SpreadsheetDocument.Create();

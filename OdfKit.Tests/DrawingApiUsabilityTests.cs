@@ -19,6 +19,30 @@ namespace OdfKit.Tests;
 public class DrawingApiUsabilityTests
 {
     /// <summary>
+    /// 驗證繪圖 task API 可對齊及等距分布圖形，並回報遺失識別碼。
+    /// </summary>
+    [Fact]
+    public void AlignAndDistributeShapesReturnStructuredResults()
+    {
+        using DrawingDocument drawing = DrawingDocument.Create();
+        OdfDrawPage page = drawing.Pages.Add("Canvas");
+        OdfShape first = page.AddShape(OdfShapeType.Rectangle, OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1));
+        OdfShape second = page.AddShape(OdfShapeType.Rectangle, OdfLength.FromCentimeters(5), OdfLength.FromCentimeters(3), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1));
+        OdfShape third = page.AddShape(OdfShapeType.Rectangle, OdfLength.FromCentimeters(11), OdfLength.FromCentimeters(5), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1));
+        first.Id = "first";
+        second.Id = "second";
+        third.Id = "third";
+
+        OdfShapeLayoutResult aligned = page.AlignShapes(["first", "second", "missing"], OdfShapeAlignment.Top);
+        OdfShapeLayoutResult distributed = page.DistributeShapes(["first", "second", "third"], OdfShapeDistribution.Horizontal);
+
+        Assert.Single(aligned.MissingShapeIds, "missing");
+        Assert.Single(aligned.UpdatedShapeIds, "second");
+        Assert.Single(distributed.UpdatedShapeIds, "second");
+        Assert.Equal("6cm", page.FindShape("second")!.Node.GetAttribute("x", OdfNamespaces.Svg));
+    }
+
+    /// <summary>
     /// 驗證繪圖 Fluent builder 可建立頁面、圖形與文字方塊。
     /// </summary>
     [Fact]

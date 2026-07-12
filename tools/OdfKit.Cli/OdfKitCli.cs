@@ -12,6 +12,7 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Cli;
 
 /// <summary>
+/// Provides command parsing and execution for the OdfKit command-line tool.
 /// 提供 OdfKit 命令列工具的命令解析與執行流程。
 /// </summary>
 public static class OdfKitCli
@@ -19,12 +20,13 @@ public static class OdfKitCli
     private static JsonSerializerOptions JsonOptions => OdfJsonSerializerOptions.HumanReadable;
 
     /// <summary>
+    /// Runs the command-line tool.
     /// 執行命令列工具。
     /// </summary>
-    /// <param name="args">命令列引數</param>
-    /// <param name="output">標準輸出寫入器</param>
-    /// <param name="error">標準錯誤寫入器</param>
-    /// <returns>程序結束碼，0 表示成功</returns>
+    /// <param name="args">The command-line arguments. / 命令列引數。</param>
+    /// <param name="output">The standard output writer. / 標準輸出寫入器。</param>
+    /// <param name="error">The standard error writer. / 標準錯誤寫入器。</param>
+    /// <returns>The process exit code; zero indicates success. / 程序結束碼；零表示成功。</returns>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
         if (args is null)
@@ -52,6 +54,7 @@ public static class OdfKitCli
                 "typed-dom-coverage" => TypedDomCoverage(args, output, error),
                 "convert-flat" => ConvertFlat(args, output, error),
                 "convert-csv" => ConvertCsv(args, output, error),
+                "set-cell" => SetCell(args, output, error),
                 "pack" => Pack(args, output, error),
                 _ => UnknownCommand(args[0], error)
             };
@@ -374,6 +377,30 @@ public static class OdfKitCli
         string.Equals(extension, ".fods", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(extension, ".ots", StringComparison.OrdinalIgnoreCase);
 
+    private static int SetCell(string[] args, TextWriter output, TextWriter error)
+    {
+        if (!RequireArity(args, 6, "set-cell input.ods sheet A1 value output.ods", error))
+        {
+            return 2;
+        }
+
+        if (!File.Exists(args[1]))
+        {
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", args[1]));
+            return 2;
+        }
+
+        using SpreadsheetDocument workbook = LoadSpreadsheetForCsvExport(args[1]);
+        OdfRangeWriteReport result = workbook.SetValue(args[2], args[3], args[4]);
+        workbook.Save(args[5]);
+        output.WriteLine("wrote: " + args[5]);
+        output.WriteLine("sheet: " + args[2]);
+        output.WriteLine("cell: " + args[3].ToUpperInvariant());
+        output.WriteLine("range: " + result.Range.ToExcelString());
+        output.WriteLine("diagnostics: " + result.Warnings.Count.ToString(CultureInfo.InvariantCulture));
+        return 0;
+    }
+
     private static int Pack(string[] args, TextWriter output, TextWriter error)
     {
         if (!RequireArity(args, 3, "pack input.fodt output.odt", error))
@@ -481,6 +508,7 @@ public static class OdfKitCli
         output.WriteLine("  typed-dom-coverage [--format text|json]");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  convert-csv input.ods output.csv [--delimiter ,] [--sheet 0] [--sheet-name Sheet1]");
+        output.WriteLine("  set-cell input.ods sheet A1 value output.ods");
         output.WriteLine("  pack input.fodt output.odt");
         output.WriteLine("  metadata file.odt");
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -22,6 +23,36 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class SpreadsheetApiUsabilityTests
 {
+    /// <summary>
+    /// 驗證儲存格、範圍及記錄 task API 使用 A1 位址並回傳領域報告。
+    /// </summary>
+    [Fact]
+    public void CellRangeAndRecordTaskApisReturnDomainReports()
+    {
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("Data");
+
+        OdfRangeWriteReport single = workbook.SetValue("Data", "A1", 42d);
+        OdfRangeWriteReport range = workbook.SetRangeValues("Data", "A2", new object?[,] { { "x", 1d }, { "y", 2d } });
+        workbook.Worksheets["Data"].Ranges["A2:B3"]
+            .Bold()
+            .Background("#FFF2CC");
+        OdfObjectBindingReport imported = workbook.ImportRecords("Data", "A5", new[]
+        {
+            new MutableProduct { Name = "Pen", Stock = 3 },
+            new MutableProduct { Name = "Book", Stock = 4 },
+        });
+        IReadOnlyList<MutableProduct> records = workbook.ReadRecords<MutableProduct>("Data", "A5:B7");
+
+        Assert.Equal(1, single.WrittenCellCount);
+        Assert.Equal(4, range.WrittenCellCount);
+        Assert.Equal(workbook.Worksheets["Data"].GetCell("A2").StyleName, workbook.Worksheets["Data"].GetCell("B3").StyleName);
+        Assert.Equal(2, imported.RowCount);
+        Assert.Collection(records,
+            item => Assert.Equal(("Pen", 3), (item.Name, item.Stock)),
+            item => Assert.Equal(("Book", 4), (item.Name, item.Stock)));
+    }
+
     /// <summary>
     /// 驗證可用工作表與儲存格索引建立、保存並重新載入 ODS。
     /// </summary>
@@ -1052,4 +1083,11 @@ public class SpreadsheetApiUsabilityTests
     private sealed record ProductRow(string Name, double Price, int Stock);
 
     private sealed record FinancialRow(string Month, double Revenue, double Cost);
+
+    private sealed class MutableProduct
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public int Stock { get; set; }
+    }
 }

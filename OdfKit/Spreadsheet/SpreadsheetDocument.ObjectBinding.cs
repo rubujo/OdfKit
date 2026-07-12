@@ -9,6 +9,54 @@ namespace OdfKit.Spreadsheet;
 public partial class SpreadsheetDocument
 {
     /// <summary>
+    /// Imports records into a worksheet using public readable members.
+    /// 使用可讀公開成員將記錄匯入工作表。
+    /// </summary>
+    /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="startAddress">The top-left A1 address. / 左上角 A1 位址。</param>
+    /// <param name="records">The records to import. / 要匯入的記錄。</param>
+    /// <returns>The object binding report. / 物件繫結報告。</returns>
+    public OdfObjectBindingReport ImportRecords<T>(string sheetName, string startAddress, IEnumerable<T> records) =>
+        WriteObjects(sheetName, OdfCellAddress.ParseExcel(startAddress), records, null);
+
+    /// <summary>
+    /// Imports records into a worksheet using typed binding options.
+    /// 使用具型別繫結選項將記錄匯入工作表。
+    /// </summary>
+    /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="startAddress">The top-left A1 address. / 左上角 A1 位址。</param>
+    /// <param name="records">The records to import. / 要匯入的記錄。</param>
+    /// <param name="options">The typed binding options. / 具型別繫結選項。</param>
+    /// <returns>The object binding report. / 物件繫結報告。</returns>
+    public OdfObjectBindingReport ImportRecords<T>(string sheetName, string startAddress, IEnumerable<T> records, OdfObjectBindingOptions? options) =>
+        WriteObjects(sheetName, OdfCellAddress.ParseExcel(startAddress), records, options);
+
+    /// <summary>
+    /// Reads worksheet rows into records using an A1 range.
+    /// 使用 A1 範圍將工作表資料列讀成記錄。
+    /// </summary>
+    /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="range">The A1 source range. / A1 來源範圍。</param>
+    /// <returns>The materialized records. / 具體化後的記錄。</returns>
+    public IReadOnlyList<T> ReadRecords<T>(string sheetName, string range) where T : new() =>
+        ReadObjects<T>(sheetName, OdfCellRange.ParseExcel(range), null);
+
+    /// <summary>
+    /// Reads worksheet rows into records using typed read options.
+    /// 使用具型別讀取選項將工作表資料列讀成記錄。
+    /// </summary>
+    /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="range">The A1 source range. / A1 來源範圍。</param>
+    /// <param name="options">The typed read options. / 具型別讀取選項。</param>
+    /// <returns>The materialized records. / 具體化後的記錄。</returns>
+    public IReadOnlyList<T> ReadRecords<T>(string sheetName, string range, OdfObjectReadOptions? options) where T : new() =>
+        ReadObjects<T>(sheetName, OdfCellRange.ParseExcel(range), options);
+
+    /// <summary>
     /// Convenience overload that uses default values for remaining parameters.
     /// 便利多載：其餘參數使用預設值並轉呼叫最長多載。
     /// </summary>

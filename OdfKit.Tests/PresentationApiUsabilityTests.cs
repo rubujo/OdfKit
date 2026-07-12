@@ -18,6 +18,24 @@ namespace OdfKit.Tests;
 public class PresentationApiUsabilityTests
 {
     /// <summary>
+    /// 驗證預留位置 task API 可設定文字並回報遺失或重複類型。
+    /// </summary>
+    [Fact]
+    public void SetPlaceholderTextReturnsStructuredResult()
+    {
+        using PresentationDocument deck = PresentationDocument.Create();
+        OdfSlide slide = deck.AddSlide("Opening");
+        slide.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(10), OdfLength.FromCentimeters(2));
+
+        OdpPlaceholderUpdateResult updated = slide.SetPlaceholderText(OdfPlaceholderType.Title, "Quarterly report");
+        OdpPlaceholderUpdateResult missing = slide.SetPlaceholderText(OdfPlaceholderType.Subtitle, "Missing");
+
+        Assert.Equal(1, updated.UpdatedCount);
+        Assert.Single(missing.MissingPlaceholderTypes, OdfPlaceholderType.Subtitle);
+        Assert.Equal("Quarterly report", slide.FindPlaceholder(OdfPlaceholderType.Title)!.Node.TextContent);
+    }
+
+    /// <summary>
     /// 驗證簡報 Fluent builder 可建立中繼資料、投影片與切換效果。
     /// </summary>
     [Fact]
