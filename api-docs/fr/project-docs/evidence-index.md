@@ -2,7 +2,7 @@
 title: Index des déclarations de capacité et des preuves
 _lang: fr
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # Index des déclarations de capacité et des preuves
@@ -14,12 +14,12 @@ Cet index sépare trois dimensions qui ne s’impliquent pas mutuellement. La so
 
 | Claim | Format | Dimension | Niveau | Limitation |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | Un aller-retour du paquet n’implique ni recalcul des formules ni sémantique complète du tableur. |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | Lit les valeurs et formules enregistrées sans recalculer les formules. |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | Aucun moteur de mise en page ou de rendu. |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | Charge de travail DOM/paquet, sans API de diapositives en continu. |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | Ni disposition SmartArt ni rendu au pixel près. |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | Une version testée de LibreOffice ne garantit pas un résultat identique au pixel dans toutes les suites. |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | Un aller-retour du paquet n’implique ni recalcul des formules ni sémantique complète du tableur. |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | Lit les valeurs et formules enregistrées sans recalculer les formules. |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | Aucun moteur de mise en page ou de rendu. |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | Charge de travail DOM/paquet, sans API de diapositives en continu. |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | Ni disposition SmartArt ni rendu au pixel près. |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | Une version testée de LibreOffice ne garantit pas un résultat identique au pixel dans toutes les suites. |
 
 `PackageFidelity` concerne le traitement sûr du paquet, `SemanticApiDepth` la compréhension et la
 modification de la sémantique, et `InteropEvidence` les logiciels et versions testés. Aucune dimension ne

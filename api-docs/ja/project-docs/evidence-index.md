@@ -2,7 +2,7 @@
 title: 機能に関する表明と根拠の索引
 _lang: ja
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # 機能に関する表明と根拠の索引
@@ -15,12 +15,12 @@ translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d
 
 | 表明 | 形式 | 次元 | レベル | 制限事項の概要 |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | パッケージを往復して読み書きできることは、数式の再計算やスプレッドシートの完全なセマンティクスを意味しません。 |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | 保存済みの値と数式を読み取りますが、数式は再計算しません。 |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | レイアウトエンジンやレンダリングエンジンは提供しません。 |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | ODP は DOM およびパッケージとして読み込まれます。ストリーミングスライド API の提供は表明していません。 |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | SmartArt のレイアウトエンジンやピクセル単位のレンダリングエンジンは実装していません。 |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | 特定バージョンの LibreOffice による実測は、すべてのオフィススイートでピクセル単位の結果が一致することを意味しません。 |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | パッケージを往復して読み書きできることは、数式の再計算やスプレッドシートの完全なセマンティクスを意味しません。 |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | 保存済みの値と数式を読み取りますが、数式は再計算しません。 |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | レイアウトエンジンやレンダリングエンジンは提供しません。 |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | ODP は DOM およびパッケージとして読み込まれます。ストリーミングスライド API の提供は表明していません。 |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | SmartArt のレイアウトエンジンやピクセル単位のレンダリングエンジンは実装していません。 |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | 特定バージョンの LibreOffice による実測は、すべてのオフィススイートでピクセル単位の結果が一致することを意味しません。 |
 
 `PackageFidelity` はパッケージを安全に処理できるかだけを示します。`SemanticApiDepth` は API が
 ドキュメントのセマンティクスをどこまで理解して変更できるかを示します。`InteropEvidence` は、
@@ -35,7 +35,7 @@ translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md)
 を参照してください。
 
-Semantic coverage schema v3 ではさらに、各トピックについて `Create`、`Get`、`Find`、
+Semantic coverage schema v4 ではさらに、各トピックについて `Create`、`Get`、`Find`、
 `Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、`Interop` の証拠を、仕様、実装、テスト、
 制限事項、clean-room provenance と関連付けて示す必要があります。各 family には、既存文書、
 未知コンテンツの保持、ODF 1.1～1.3、ダウングレード診断、不正入力について機械的に検証された

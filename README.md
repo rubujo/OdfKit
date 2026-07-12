@@ -144,7 +144,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 
 - 高階 API 覆蓋度依格式不同而不同；請以
   [ODF 格式支援矩陣](docs/odf-format-support.md) 與測試證據為準。
-  矩陣中的 `complete` 代表文件定義的**最低完成標準**，不代表每一種格式的完整深度語意模型。
+  矩陣中的 `workflow-verified` 代表文件列出的工作流程已有測試證據，不代表每一種格式的完整深度語意模型。
 - Template、master 與 Flat XML 變體已具專屬 typed 文件類別與常用變體功能；
   但其高階語意 API 仍以對應主格式為主，完整變體專屬物件模型不屬於目前承諾範圍。
 - `OdfKit.Extensions.Rendering` 需本機 LibreOffice 或相容程序後端，

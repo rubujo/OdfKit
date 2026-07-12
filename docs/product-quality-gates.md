@@ -93,7 +93,7 @@ flat／package XML RELAX NG 差異，並以 ODF Validator 阻擋適用 package �
 | 日期 | 層級 | 結果摘要 |
 |------|------|----------|
 | 2026-07-12 | A | `dotnet test`：net10.0 通過 2160、net8.0 通過 2156；兩者各略過 1、失敗 0 |
-| 2026-07-12 | B | semantic schema v3 12 families；corpus 266／266；8 套件、net8 與 net48 CLR consumer 通過 |
+| 2026-07-12 | B | semantic schema v4 12 families；corpus 266／266；8 套件、net8 與 net48 CLR consumer 通過 |
 | 2026-07-12 | C | DomInsert 160.1 µs；ODS stream 156.7 ms／14.58 MB，均未超效能回歸門檻 |
 | 2026-07-12 | C | LibreOffice Portable 26.2.1.2：net10.0 真機互通 34／34 通過、0 略過、0 失敗 |
 | 2026-07-12 | 可維護 | 雙語 missing 0、一行 summary、typed DOM、Public API 雙 TFM 與 trim 15 roots 通過 |

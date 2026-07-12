@@ -9,7 +9,7 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $provenancePath = Join-Path $root 'docs/provenance/semantic-api-provenance.json'
 $provenance = Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json
 
-if ($manifest.schemaVersion -ne 3) { throw '不支援的 semantic coverage schemaVersion。' }
+if ($manifest.schemaVersion -ne 4) { throw '不支援的 semantic coverage schemaVersion。' }
 if ($manifest.odfVersion -ne '1.4') { throw 'semantic coverage 必須以 ODF 1.4 為主模型。' }
 if ($manifest.legacyVersionPolicy -ne 'normalize-to-1.4-preserve-unknown') {
     throw 'semantic coverage 的舊版本相容政策無效。'
@@ -78,7 +78,9 @@ foreach ($family in @($manifest.families)) {
     if ($ids.ContainsKey($family.id)) { throw "語意族群 id 重複：$($family.id)" }
     $ids[$family.id] = $true
     if ($family.format -notin $requiredFormats) { throw "語意族群格式無效：$($family.id)" }
-    if ($family.status -ne 'complete') { throw "語意族群尚未完成：$($family.id)" }
+    if ($null -ne $family.PSObject.Properties['status']) {
+        throw "語意族群不得使用聚合 status：$($family.id)"
+    }
     foreach ($dimension in $requiredQualityDimensions) {
         $covered = @($qualityEvidence | Where-Object {
             $_.dimension -eq $dimension -and $family.format -in @($_.formats)
@@ -97,8 +99,8 @@ foreach ($family in @($manifest.families)) {
 
     foreach ($operation in $requiredOperations) {
         $status = $family.operations.$operation
-        $allowed = if ($operation -eq 'Interop') { @('tested', 'not-applicable') } else { @('complete', 'not-applicable') }
-        if ($status -notin $allowed) { throw "語意族群操作未完成：$($family.id) -> $operation" }
+        $allowed = if ($operation -eq 'Interop') { @('interop-tested', 'not-applicable') } else { @('verified', 'not-applicable') }
+        if ($status -notin $allowed) { throw "語意族群操作狀態無效：$($family.id) -> $operation" }
     }
 
     $coveredOperations = @{}

@@ -2,7 +2,7 @@
 title: Indeks over kapacitetspåstande og evidens
 _lang: da
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # Indeks over kapacitetspåstande og evidens
@@ -14,19 +14,19 @@ De tre dimensioner indebærer ikke hinanden. Maskinlæsbar kilde er
 
 | Claim | Format | Dimensjon | Nivå | Begrænsning |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | Pakkeroundtrip indebærer ikke formelgenberegning eller fuld regnearkssemantik. |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | Læser gemte værdier og formler, men genberegner ikke igen. |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | Ingen sidelayout- eller renderingsmotor. |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | DOM-/pakkearbejde; ingen streaming-API for dias. |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | Ingen SmartArt-layout eller pixelrendering. |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | Én testet LibreOffice-version garanterer ikke pixelidentitet i alle kontorpakker. |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | Pakkeroundtrip indebærer ikke formelgenberegning eller fuld regnearkssemantik. |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | Læser gemte værdier og formler, men genberegner ikke igen. |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | Ingen sidelayout- eller renderingsmotor. |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | DOM-/pakkearbejde; ingen streaming-API for dias. |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | Ingen SmartArt-layout eller pixelrendering. |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | Én testet LibreOffice-version garanterer ikke pixelidentitet i alle kontorpakker. |
 
 `PackageFidelity` gælder pakken, `SemanticApiDepth` dokumentsemantik og `InteropEvidence` testede programmer
 og versioner. Ingen dimension erstatter en anden. Dekningskilden er
 [`semantic-coverage.json`](https://github.com/rubujo/OdfKit/blob/main/docs/semantic-coverage.json), kontrolleret
 af `eng/Test-SemanticCoverage.ps1`.
 
-Semantic coverage schema v3 kræver desuden, at hvert emne har evidens for `Create`, `Get`, `Find`,
+Semantic coverage schema v4 kræver desuden, at hvert emne har evidens for `Create`, `Get`, `Find`,
 `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` og `Interop`, knyttet til specifikationer,
 implementering, test, begrænsninger og clean-room-proveniens. Hver familie skal også have
 maskinverificeret evidens for eksisterende dokumenter, bevarelse af ukendt indhold, ODF 1.1–1.3,

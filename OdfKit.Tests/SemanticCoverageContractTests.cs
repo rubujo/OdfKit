@@ -4,8 +4,8 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
-/// Verifies the auditable semantic API completion contract.
-/// 驗證可稽核的語意 API 完成契約。
+/// Verifies the auditable semantic API evidence contract.
+/// 驗證可稽核的語意 API 證據契約。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class SemanticCoverageContractTests
@@ -17,8 +17,8 @@ public class SemanticCoverageContractTests
         ["ExistingDocument", "UnknownContentPreservation", "LegacyVersions", "DowngradeDiagnostics", "InvalidInput"];
 
     /// <summary>
-    /// Verifies every primary format has complete semantic families and evidence.
-    /// 驗證每個主要格式都具備完成的語意族群與證據。
+    /// Verifies every primary format has evidence-backed semantic families and operations.
+    /// 驗證每個主要格式都具備證據支撐的語意族群與操作。
     /// </summary>
     [Fact]
     public void Manifest_CoversEveryPrimaryFormatAndOperation()
@@ -28,7 +28,7 @@ public class SemanticCoverageContractTests
         using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
         JsonElement manifest = document.RootElement;
 
-        Assert.Equal(3, manifest.GetProperty("schemaVersion").GetInt32());
+        Assert.True(IsSchemaVersionSupported(manifest.GetProperty("schemaVersion").GetInt32()));
         Assert.Equal("1.4", manifest.GetProperty("odfVersion").GetString());
         Assert.Equal(
             "normalize-to-1.4-preserve-unknown",
@@ -93,7 +93,7 @@ public class SemanticCoverageContractTests
                             .Any(format => format.GetString() == familyFormat));
             }
 
-            Assert.Equal("complete", family.GetProperty("status").GetString());
+            Assert.False(family.TryGetProperty("status", out _));
             string[] familyTopics =
                 [.. family.GetProperty("topics").EnumerateArray().Select(topic => topic.GetString()!)];
             Assert.NotEmpty(familyTopics);
@@ -106,10 +106,9 @@ public class SemanticCoverageContractTests
             foreach (string operation in RequiredOperations)
             {
                 string? status = operations.GetProperty(operation).GetString();
-                string[] allowedStatuses = operation == "Interop"
-                    ? ["tested", "not-applicable"]
-                    : ["complete", "not-applicable"];
-                Assert.Contains(status, allowedStatuses);
+                Assert.True(
+                    IsOperationStatusAllowed(operation, status),
+                    $"Invalid operation status: {operation} -> {status}");
             }
 
             foreach (string evidenceGroup in new[] { "implementation", "tests", "interop" })
@@ -202,6 +201,48 @@ public class SemanticCoverageContractTests
                 Assert.True(File.Exists(Path.Combine(root, fixture.GetString()!)));
             }
         }
+    }
+
+    /// <summary>
+    /// Rejects legacy and cross-dimension semantic operation statuses.
+    /// 拒絕舊版及跨維度的語意操作狀態。
+    /// </summary>
+    /// <param name="operation">The operation name. / 操作名稱。</param>
+    /// <param name="status">The status value. / 狀態值。</param>
+    [Theory]
+    [InlineData("Create", "complete")]
+    [InlineData("Create", "tested")]
+    [InlineData("Create", "interop-tested")]
+    [InlineData("Interop", "complete")]
+    [InlineData("Interop", "tested")]
+    [InlineData("Interop", "verified")]
+    public void OperationStatusContract_RejectsLegacyAndCrossDimensionValues(string operation, string status)
+    {
+        Assert.False(IsOperationStatusAllowed(operation, status));
+    }
+
+    /// <summary>
+    /// Rejects legacy semantic coverage schema versions.
+    /// 拒絕舊版 semantic coverage schema 版本。
+    /// </summary>
+    /// <param name="schemaVersion">The schema version. / Schema 版本。</param>
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void SchemaVersionContract_RejectsLegacyVersions(int schemaVersion)
+    {
+        Assert.False(IsSchemaVersionSupported(schemaVersion));
+    }
+
+    private static bool IsSchemaVersionSupported(int schemaVersion) => schemaVersion == 4;
+
+    private static bool IsOperationStatusAllowed(string operation, string? status)
+    {
+        string[] allowedStatuses = operation == "Interop"
+            ? ["interop-tested", "not-applicable"]
+            : ["verified", "not-applicable"];
+        return allowedStatuses.Contains(status, StringComparer.Ordinal);
     }
 
     private static string FindRepositoryRoot()

@@ -2,7 +2,7 @@
 title: Indeks deklaracji możliwości i dowodów
 _lang: pl
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # Indeks deklaracji możliwości i dowodów
@@ -15,12 +15,12 @@ sprawdza identyfikatory deklaracji, ścieżki dowodów i opisy ograniczeń.
 
 | Deklaracja | Format | Wymiar | Poziom | Podsumowanie ograniczenia |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | Odczyt i zapis pakietu w obie strony nie oznacza ponownego obliczania formuł ani pełnej semantyki arkusza kalkulacyjnego. |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | Odczytuje zapisane wartości i formuły, ale nie oblicza ich ponownie. |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | Nie udostępnia mechanizmu układu ani renderowania. |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | ODP jest ładowany jako DOM i pakiet; nie deklarujemy strumieniowego interfejsu API slajdów. |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | Nie implementuje układu SmartArt ani renderowania na poziomie pikseli. |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | Testy z określoną wersją LibreOffice nie gwarantują zgodności pikseli we wszystkich pakietach biurowych. |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | Odczyt i zapis pakietu w obie strony nie oznacza ponownego obliczania formuł ani pełnej semantyki arkusza kalkulacyjnego. |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | Odczytuje zapisane wartości i formuły, ale nie oblicza ich ponownie. |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | Nie udostępnia mechanizmu układu ani renderowania. |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | ODP jest ładowany jako DOM i pakiet; nie deklarujemy strumieniowego interfejsu API slajdów. |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | Nie implementuje układu SmartArt ani renderowania na poziomie pikseli. |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | Testy z określoną wersją LibreOffice nie gwarantują zgodności pikseli we wszystkich pakietach biurowych. |
 
 `PackageFidelity` odpowiada jedynie na pytanie, czy pakiet można bezpiecznie przetworzyć. `SemanticApiDepth`
 określa, jaką część semantyki dokumentu interfejs API potrafi zrozumieć i zmienić. `InteropEvidence` wskazuje

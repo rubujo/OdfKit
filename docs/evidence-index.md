@@ -8,12 +8,12 @@ claim ID、證據路徑與限制說明。
 
 | Claim | 格式 | 維度 | 層級 | 限制摘要 |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | 封裝來回讀寫不代表公式重算或完整試算表語意。 |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | 讀取已儲存值與公式，不重算公式。 |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | 不提供排版或渲染引擎。 |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | ODP 為 DOM／封裝負載，不宣稱串流投影片 API。 |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | 不實作 SmartArt 佈局或像素級渲染引擎。 |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | 特定 LibreOffice／Microsoft Office 版本實測不代表所有套件像素一致。 |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | 封裝來回讀寫不代表公式重算或完整試算表語意。 |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | 讀取已儲存值與公式，不重算公式。 |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | 不提供排版或渲染引擎。 |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | ODP 為 DOM／封裝負載，不宣稱串流投影片 API。 |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | 不實作 SmartArt 佈局或像素級渲染引擎。 |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | 特定 LibreOffice／Microsoft Office 版本實測不代表所有套件像素一致。 |
 
 `PackageFidelity` 只回答封裝能否安全處理；`SemanticApiDepth` 回答 API 能理解及修改多少文件
 語意；`InteropEvidence` 回答哪些外部軟體與版本曾被實測。任何單一維度的最高層級都不能替代
@@ -24,7 +24,7 @@ claim ID、證據路徑與限制說明。
 `eng/Test-SemanticCoverage.ps1` 在 CI 阻擋不完整宣稱。Clean-room 來源邊界見
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md)。
 
-Semantic coverage schema v3 進一步要求每個 topic 都具備 `Create`、`Get`、`Find`、
+Semantic coverage schema v4 進一步要求每個 topic 都具備 `Create`、`Get`、`Find`、
 `Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、`Interop` 證據，並連結規格、實作、
 測試、限制及 clean-room provenance；每個 family 另須由機器驗證既有文件、未知內容保留、
 ODF 1.1～1.3、降版診斷與非法輸入證據。高階 API 破壞性命名與生命週期調整見

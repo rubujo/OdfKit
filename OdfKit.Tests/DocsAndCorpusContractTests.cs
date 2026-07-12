@@ -18,6 +18,57 @@ namespace OdfKit.Tests;
 public class DocsAndCorpusContractTests
 {
     /// <summary>
+    /// Verifies evidence claims use schema v2 and dimension-specific levels.
+    /// 驗證證據宣稱使用 schema v2 與各維度專屬層級。
+    /// </summary>
+    [Fact]
+    public void EvidenceClaims_UseDimensionSpecificVerifiedLevels()
+    {
+        string repoRoot = FindRepositoryRoot();
+        using JsonDocument document = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(repoRoot, "docs", "claims.json")));
+        JsonElement manifest = document.RootElement;
+
+        Assert.True(IsEvidenceClaimsSchemaVersionSupported(manifest.GetProperty("schemaVersion").GetInt32()));
+        foreach (JsonElement claim in manifest.GetProperty("claims").EnumerateArray())
+        {
+            string dimension = claim.GetProperty("dimension").GetString()!;
+            string level = claim.GetProperty("level").GetString()!;
+            Assert.True(
+                IsEvidenceClaimLevelAllowed(dimension, level),
+                $"Invalid evidence claim level: {dimension} -> {level}");
+        }
+    }
+
+    /// <summary>
+    /// Rejects legacy and cross-dimension evidence claim levels.
+    /// 拒絕舊版及跨維度的證據宣稱層級。
+    /// </summary>
+    /// <param name="dimension">The evidence dimension. / 證據維度。</param>
+    /// <param name="level">The evidence level. / 證據層級。</param>
+    [Theory]
+    [InlineData("PackageFidelity", "complete")]
+    [InlineData("PackageFidelity", "semantic-contract-verified")]
+    [InlineData("SemanticApiDepth", "semantic-facade-complete")]
+    [InlineData("SemanticApiDepth", "round-trip-verified")]
+    [InlineData("InteropEvidence", "tested")]
+    [InlineData("InteropEvidence", "semantic-contract-verified")]
+    public void EvidenceClaimLevelContract_RejectsLegacyAndCrossDimensionValues(string dimension, string level)
+    {
+        Assert.False(IsEvidenceClaimLevelAllowed(dimension, level));
+    }
+
+    /// <summary>
+    /// Rejects the legacy evidence claims schema version.
+    /// 拒絕舊版證據宣稱 schema 版本。
+    /// </summary>
+    [Fact]
+    public void EvidenceClaimsSchemaVersionContract_RejectsLegacyVersion()
+    {
+        Assert.False(IsEvidenceClaimsSchemaVersionSupported(1));
+    }
+
+    /// <summary>
     /// 驗證 parity 文件列出外部 validator 啟用方式與 mismatch 規則。
     /// </summary>
     [Fact]
@@ -40,6 +91,19 @@ public class DocsAndCorpusContractTests
         Assert.Contains("MathML formula object", parity, StringComparison.Ordinal);
         Assert.Contains("odf-official-corpus-sources.md", parity, StringComparison.Ordinal);
     }
+
+    private static bool IsEvidenceClaimLevelAllowed(string dimension, string level)
+    {
+        return dimension switch
+        {
+            "PackageFidelity" => level == "round-trip-verified",
+            "SemanticApiDepth" => level == "semantic-contract-verified",
+            "InteropEvidence" => level == "interop-tested",
+            _ => false,
+        };
+    }
+
+    private static bool IsEvidenceClaimsSchemaVersionSupported(int schemaVersion) => schemaVersion == 2;
 
     /// <summary>
     /// 驗證官方 corpus 來源文件宣告 baseline 來源與命名邊界。
@@ -1074,12 +1138,12 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證 <c>docs/odf-format-support.md</c> 主矩陣表中，每一列標示為 <c>complete</c> 的
+    /// 驗證 <c>docs/odf-format-support.md</c> 主矩陣表中，每一列標示為 <c>workflow-verified</c> 的
     /// High-level API 欄位，其 Test evidence 欄位皆非空，避免文件狀態與測試證據脫節
     /// （Workstream A 文件契約檢查；僅檢查證據欄位存在，不驗證測試實際內容）。
     /// </summary>
     [Fact]
-    public void FormatSupportMatrix_CompleteRowsDeclareNonEmptyTestEvidence()
+    public void FormatSupportMatrix_VerifiedWorkflowRowsDeclareNonEmptyTestEvidence()
     {
         string repoRoot = FindRepositoryRoot();
         string[] lines = File.ReadAllLines(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
@@ -1114,11 +1178,11 @@ public class DocsAndCorpusContractTests
 
         foreach ((string extension, string highLevelApi, string testEvidence) in rows)
         {
-            if (string.Equals(highLevelApi, "complete", StringComparison.Ordinal))
+            if (string.Equals(highLevelApi, "workflow-verified", StringComparison.Ordinal))
             {
                 Assert.False(
                     string.IsNullOrWhiteSpace(testEvidence),
-                    $"{extension} 的 High-level API 標示為 complete，但 Test evidence 欄位為空。");
+                    $"{extension} 的 High-level API 標示為 workflow-verified，但 Test evidence 欄位為空。");
             }
         }
     }

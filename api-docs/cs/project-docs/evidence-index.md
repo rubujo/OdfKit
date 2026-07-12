@@ -2,7 +2,7 @@
 title: Rejstřík tvrzení o schopnostech a důkazů
 _lang: cs
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # Rejstřík tvrzení o schopnostech a důkazů
@@ -15,12 +15,12 @@ tvrzení, cesty k důkazům a popisy omezení.
 
 | Tvrzení | Formát | Rozměr | Úroveň | Shrnutí omezení |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | Zpětné načtení a zápis balíčku neznamená přepočet vzorců ani úplnou sémantiku tabulkového procesoru. |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | Čte uložené hodnoty a vzorce, ale vzorce nepřepočítává. |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | Neposkytuje modul rozložení ani vykreslování. |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | ODP se načítá jako DOM a balíček; netvrdíme, že existuje proudové API pro snímky. |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | Neimplementuje rozložení SmartArt ani vykreslování na úrovni pixelů. |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | Testování s konkrétní verzí LibreOffice nezaručuje shodu pixelů ve všech kancelářských sadách. |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | Zpětné načtení a zápis balíčku neznamená přepočet vzorců ani úplnou sémantiku tabulkového procesoru. |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | Čte uložené hodnoty a vzorce, ale vzorce nepřepočítává. |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | Neposkytuje modul rozložení ani vykreslování. |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | ODP se načítá jako DOM a balíček; netvrdíme, že existuje proudové API pro snímky. |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | Neimplementuje rozložení SmartArt ani vykreslování na úrovni pixelů. |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | Testování s konkrétní verzí LibreOffice nezaručuje shodu pixelů ve všech kancelářských sadách. |
 
 `PackageFidelity` odpovídá pouze na otázku, zda lze balíček bezpečně zpracovat. `SemanticApiDepth` určuje,
 jakou část sémantiky dokumentu dokáže API pochopit a měnit. `InteropEvidence` uvádí skutečně testovaný externí

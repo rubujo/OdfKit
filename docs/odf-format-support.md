@@ -21,7 +21,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 ### 封裝與驗證層
 
-- `complete`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
+- `verified`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
 - `validated`：已有驗證或偵測測試證據，但高階 API 仍可能有限。
 - `package-level`：可建立、載入、保存與驗證最小封裝，但高階語意 API 尚未完整。
 - `partial`：已有部分高階模型或來回讀寫能力，但仍有明確缺口。
@@ -29,20 +29,20 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 ### 高階 API 層
 
-- `complete`：滿足本文件採用的 5 項完成標準——(1) 公開高階 API 可完成該格式常見
+- `workflow-verified`：滿足本文件採用的 5 項完成標準——(1) 公開高階 API 可完成該格式常見
   工作流程、(2) 有專屬測試、(3) 有來回讀寫／邊界／互通證據（含誠實記錄的上游限制）、
   (4) `Validate()`／`ValidateAsync()` 可用且測試覆蓋正向與負向案例、(5) 文件已同步。
-  截至 2026-06-24，全部 24 個 extension 均已達成此分級（詳見下方「全格式 complete 最低能力
+  截至 2026-06-24，全部 24 個 extension 均已達成此分級（詳見下方「全格式 workflow-verified 最低能力
   矩陣」）。日常辦公自動化不需下沉 DOM。
 - `usable`／`usable-variant`：歷史分級，目前矩陣中已無格式使用；保留定義供未來新格式或
   迴歸情況參考——`usable` 指常用建立／編輯 API 可用但有明確語意缺口；`usable-variant` 指具
   專屬 typed 文件類別但語意 API 仍完全繼承基底格式。
 - `package-only`：僅封裝層來回讀寫；高階語意模型尚未專屬化或仍共用基底 wrapper。
 
-**重要說明（避免過度宣稱）**：對 ODT、ODS、ODP、ODG，`complete` 另受
-[`semantic-coverage.json`](semantic-coverage.json) schema v3 約束；12 個 family 的每個 topic
+**重要說明（避免過度宣稱）**：對 ODT、ODS、ODP、ODG，`workflow-verified` 另受
+[`semantic-coverage.json`](semantic-coverage.json) schema v4 約束；12 個 family 的每個 topic
 都必須連結 `Create`、`Get`、`Find`、`Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、
-`Interop`、規格、實作、測試、限制與 clean-room provenance。其他格式的 `complete` 仍只表示
+`Interop`、規格、實作、測試、限制與 clean-room provenance。其他格式的 `workflow-verified` 仍只表示
 滿足本文件 5 項通用完成標準，不推導為相同的深度語意 facade。物理分頁、像素級渲染、完整公式
 與 pivot 重算、SmartArt 佈局、Office 專屬效果模擬及完整協同演算法，均為明列非目標。
 Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
@@ -84,35 +84,35 @@ CNS 11643 官方語意相容或認證。
 
 | 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | complete | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `MasterDocumentTests`, `LibreOfficeInteropTests` |
-| `.oth` | `application/vnd.oasis.opendocument.text-web` | `TextWeb` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `TextWebDocumentTests`, `HtmlExportTests`, `LibreOfficeInteropTests` |
-| `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | complete | `SpreadsheetApiUsabilityTests`, `SpreadsheetHighLevelApiTests`, `ChartHighLevelApiTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
-| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | complete | `PresentationApiUsabilityTests`, `PresentationHighLevelApiTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
-| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | complete | `DrawingApiUsabilityTests`, `DrawingHighLevelApiTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | complete | `ChartHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.otc` | `application/vnd.oasis.opendocument.chart-template` | `ChartTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | complete | `FormulaHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.otf` | `application/vnd.oasis.opendocument.formula-template` | `FormulaTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | complete | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.oti` | `application/vnd.oasis.opendocument.image-template` | `ImageTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odb` | `application/vnd.oasis.opendocument.base` | `Database` | complete | complete | complete | complete | validated | complete | complete | `DatabaseHighLevelApiTests`, `DatabaseSchemaAndFormTests`, `DatabaseBoundaryTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `LibreOfficeInteropTests` |
-| `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, `CorpusComplianceTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, corpus manifest, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, `CorpusComplianceTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | verified | verified | verified | verified | validated | verified | workflow-verified | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `MasterDocumentTests`, `LibreOfficeInteropTests` |
+| `.oth` | `application/vnd.oasis.opendocument.text-web` | `TextWeb` | verified | verified | verified | verified | validated | verified | workflow-verified | `ComplianceTests`, `PackageRoundTripTests`, `TextWebDocumentTests`, `HtmlExportTests`, `LibreOfficeInteropTests` |
+| `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | verified | verified | verified | verified | validated | verified | workflow-verified | `SpreadsheetApiUsabilityTests`, `SpreadsheetHighLevelApiTests`, `ChartHighLevelApiTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
+| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | verified | verified | verified | verified | validated | verified | workflow-verified | `PresentationApiUsabilityTests`, `PresentationHighLevelApiTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
+| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | verified | verified | verified | verified | validated | verified | workflow-verified | `DrawingApiUsabilityTests`, `DrawingHighLevelApiTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | verified | verified | verified | verified | validated | verified | workflow-verified | `ChartHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otc` | `application/vnd.oasis.opendocument.chart-template` | `ChartTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `ComplianceTests`, `PackageRoundTripTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | verified | verified | verified | verified | validated | verified | workflow-verified | `FormulaHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otf` | `application/vnd.oasis.opendocument.formula-template` | `FormulaTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `ComplianceTests`, `PackageRoundTripTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | verified | verified | verified | verified | validated | verified | workflow-verified | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.oti` | `application/vnd.oasis.opendocument.image-template` | `ImageTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `ComplianceTests`, `PackageRoundTripTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odb` | `application/vnd.oasis.opendocument.base` | `Database` | verified | verified | verified | verified | validated | verified | workflow-verified | `DatabaseHighLevelApiTests`, `DatabaseSchemaAndFormTests`, `DatabaseBoundaryTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `LibreOfficeInteropTests` |
+| `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | verified | verified | verified | verified | validated | verified | workflow-verified | `PackageRoundTripTests`, `CorpusComplianceTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | verified | verified | verified | verified | validated | verified | workflow-verified | `PackageRoundTripTests`, corpus manifest, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | verified | verified | verified | verified | validated | verified | workflow-verified | `PackageRoundTripTests`, `CorpusComplianceTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
 
-## 全格式 complete 最低能力矩陣（Workstream A）
+## 全格式 workflow-verified 最低能力矩陣（Workstream A）
 
 依本文件定義的 5 項完成標準逐格式列出條件是否滿足，作為上方矩陣
-`complete` 分級的可稽核依據。圖例：✅ 滿足；✅\* 滿足，但互通證據為「已實機驗證並誠實
+`workflow-verified` 分級的可稽核依據。圖例：✅ 滿足；✅\* 滿足，但互通證據為「已實機驗證並誠實
 記錄上游應用程式限制」而非綠燈通過（依使用者決策，至少一個驗收案例即符合本矩陣互通欄位要求，
 不要求每案必須通過）。
 
@@ -152,14 +152,14 @@ CNS 11643 官方語意相容或認證。
 
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
-- ODT、ODS、ODP、ODG 高階 API 已達 semantic facade `complete`：schema v3 manifest 對每個
+- ODT、ODS、ODP、ODG 高階 API 已達 `semantic-contract-verified`：schema v4 manifest 對每個
   topic 驗證完整生命週期，並逐 family 驗證既有文件、重複保存載入、未知內容保留、
   ODF 1.1～1.3 映射、結構化降版診斷、非法輸入、隨機 mutation、
   corpus differential 與外部辦公軟體互通證據；使用者工作流不需下沉裸 DOM。明列非目標不屬於
   此分級的未完成項目。
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體（VAR-1 ✅）：具專屬 typed 文件類別與
   `Create`/`Load` 入口；內容編輯語意 API 繼承四主格式基底類別。2026-06-24 依 5 項完成標準
-  標準重新檢視後已升級為 `complete`，詳見下方各 Batch 說明。
+  標準重新檢視後已升級為 `workflow-verified`，詳見下方各 Batch 說明。
 - `.ott`／`.ots`／`.otp`／`.otg`（Batch 1 第一波，2026-06-23）：新增雙向範本生命週期工作流——
   `TextDocument.CreateFromTemplate`／`SpreadsheetDocument.CreateFromTemplate`／
   `PresentationDocument.CreateFromTemplate`／`DrawingDocument.CreateFromTemplate`（範本→文件，
@@ -170,7 +170,7 @@ CNS 11643 官方語意相容或認證。
   2026-06-23 完成時依「範本內容編輯仍沿用基底格式語意 API，尚未有範本專屬深度內容模型」為
   理由維持 `usable-variant`；2026-06-24 依 5 項完成標準（高階 API、
   專屬測試、round-trip／boundary／interop 證據、`Validate()` 正負向、文件同步）重新檢視，
-  確認上述條件已全部滿足，**升級為 `complete`**。
+  確認上述條件已全部滿足，**升級為 `workflow-verified`**。
 - 文件級 `OdfDocument.Validate(OdfComplianceProfile?)` / `ValidateAsync(...)` 已新增（Workstream E
   ✅，2026-06-23／24）：所有文件種類現皆可直接呼叫實例方法驗證目前（含尚未儲存的編輯）記憶體
   狀態，內部委派既有 `OdfValidator` 靜態進入點與 `OdfValidationReport` 結構化結果。因定義於
@@ -194,7 +194,7 @@ CNS 11643 官方語意相容或認證。
   邊界測試，並新增 `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsNativeFlatXmlDocuments`——
   以 OdfKit **直接產生**（非由 ZIP 轉換而來）的原生 FODT／FODS／FODP／FODG 檔案實機驗證
   LibreOffice 26.x 可直接開啟，證明 Flat XML 與 ZIP 封裝的高階工作流對 LibreOffice 而言互通等價。
-  2026-06-24 依 5 項完成標準重新檢視，**升級為 `complete`**（理由與範本變體相同：
+  2026-06-24 依 5 項完成標準重新檢視，**升級為 `workflow-verified`**（理由與範本變體相同：
   上述 5 項條件已全部滿足；內容編輯仍沿用基底格式語意 API、未有 Flat 專屬深度
   內容模型，但這不在最低完成標準之內）。
 - `.odm`（Batch 2 第一項，2026-06-23）：子文件 CRUD、條件式載入、合併為單一文件、大綱階層
@@ -213,7 +213,7 @@ CNS 11643 官方語意相容或認證。
   OTH 文件，不需任何轉接層，滿足「與 HTML／export 行為一致性」要求。新增實機 LibreOffice
   互通驗收——已確認 LibreOffice 將 .oth 識別為「Writer/Web document」並使用
   `writerweb8_writer` 篩選器轉換為 ODT（`LibreOfficeHeadless_LoadsWebTemplateDocument`）。
-  2026-06-24 依 5 項完成標準重新檢視，**升級為 `complete`**（內容模型本身與 ODT 相同、
+  2026-06-24 依 5 項完成標準重新檢視，**升級為 `workflow-verified`**（內容模型本身與 ODT 相同、
   未有專屬深度內容模型，但這不在最低完成標準之內）。
 - `.odc`／`.otc`／`.fodc`（Batch 3，2026-06-23）：現況調查發現既有圖表實作已遠比文件先前
   描述的「摘要層」深入——`OdfChartDocument` 早已具備軸線（對數刻度、範圍、反向、網格）、
@@ -242,7 +242,7 @@ CNS 11643 官方語意相容或認證。
     的驗收佐證嵌入式圖表（ODF Chart 設計上唯一的真實使用情境）的互通性。
   - 2026-06-23 完成時依「仍缺 Legend 統一可編輯模型與 fluent builder API」為理由維持
     `usable`／`usable-variant`；2026-06-24 依 5 項完成標準重新檢視，
-    確認已全部滿足，**升級為 `complete`**。後續深度工作已補齊 Legend 物件模型、
+    確認已全部滿足，**升級為 `workflow-verified`**。後續深度工作已補齊 Legend 物件模型、
     `ChartDocument.Builder()`、序列樣式 builder 與資料標籤 preset（`OdfChartDataLabelPreset`／
     `WithDataLabels`），目前剩餘 Chart 追蹤重點轉為更完整的跨格式 fidelity 與高階樣式
     preset，而不是基礎 builder 缺口。
@@ -278,7 +278,7 @@ CNS 11643 官方語意相容或認證。
   - 2026-06-23 完成時依「仍缺公式語意編輯 helper（例如『尋找分數→取得分子→
     更新分子』這類查詢－修改－更新 API）」為理由維持 `usable`／`usable-variant`；
     2026-06-24 依 5 項完成標準重新檢視，確認已全部滿足，**升級為
-    `complete`**。2026-06-28 已補齊 `OdfMathToken.FindFirst`／`GetAll`／`WithChild`／
+    `workflow-verified`**。2026-06-28 已補齊 `OdfMathToken.FindFirst`／`GetAll`／`WithChild`／
     `ReplaceFirst` 與 `OdfFormulaDocument.ReplaceFirst`，最小「尋找→取得→更新」語意編輯 helper
     有程式與 `FormulaHighLevelApiTests` 證據；2026-06-29 已補齊分數／根號／上下標／矩陣的具名
     符號級存取與替換 API（`Numerator`／`Denominator`／`Radicand`／`RootIndex`／`Exponent`／
@@ -307,14 +307,14 @@ CNS 11643 官方語意相容或認證。
     測試涵蓋 ODI／OTI／FODI 三者的封裝結構驗證（先前僅涵蓋 ODI）。
   - 2026-06-23 完成時依「Template／Flat 變體內容編輯仍沿用基底格式語意 API，未有專屬深度
     內容模型」為理由維持 `usable`／`usable-variant`；2026-06-24 依 5 項完成標準
-    重新檢視，確認已全部滿足，**升級為 `complete`**（理由與 Chart／Formula
+    重新檢視，確認已全部滿足，**升級為 `workflow-verified`**（理由與 Chart／Formula
     相同：深度內容模型差異不在最低完成標準之內）。
 - `.odb`（Batch 6，2026-06-23）：現況調查確認 Database 已具備資料來源、查詢、表單與報表等
   常見工作流能力，
   並無比照 Chart（Legend 物件模型與資料標籤 preset）那樣明確追蹤的延伸項目；
   Formula 的最小語意編輯 helper 已另有程式與測試證據，
-  經評估後依使用者先前確認的「ODB complete 標準採真實可用工作流為準」決策，**升級為
-  `complete`**。主文件建議使用短名 facade `DatabaseDocument`；既有
+  經評估後依使用者先前確認的「ODB workflow-verified 標準採真實可用工作流為準」決策，**升級為
+  `workflow-verified`**。主文件建議使用短名 facade `DatabaseDocument`；既有
   `OdfDatabaseDocument` 入口仍保留相容性：
   - **資料來源**：連線 href、登入（`DatabaseDocument.GetLogin`／`SetLogin`）、驅動程式設定
     （`GetDriverSettings`／`SetDriverSettings`）。
@@ -347,11 +347,11 @@ CNS 11643 官方語意相容或認證。
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
-- `.odc`、`.odf`、`.odi`（曾標為 `usable`，2026-06-24 已升級為 `complete`，詳見下方
+- `.odc`、`.odf`、`.odi`（曾標為 `usable`，2026-06-24 已升級為 `workflow-verified`，詳見下方
   Batch 3-5 說明）：已有摘要與常用編輯 API，`SecondaryFormatApiScenarioTests` 已背書連線／
   圖表軸／公式 token／多框架影像等場景；完整深度語意模型（例如 ODC chart style 物件模型）
-  仍屬不在 `complete` 最低標準內的延伸工作。`.odb` 已於
-  Batch 6（2026-06-23）升級為 `complete`，詳見下方說明。
+  仍屬不在 `workflow-verified` 最低標準內的延伸工作。`.odb` 已於
+  Batch 6（2026-06-23）升級為 `workflow-verified`，詳見下方說明。
 - 次要格式與變體高階物件模型補完工作（原 Batch 1-6 + 測試補強，已於 2026-06-23 全數完成並移除
   追蹤文件）：ODC／ODB／ODI／ODF 公式四項次要格式高階物件模型，以及範本變數系統
   （`text:user-field-decls`）、範本清除使用者資料、範本區段唯讀標記、ODM 主控文件子文件

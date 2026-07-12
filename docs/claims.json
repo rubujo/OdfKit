@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "claims": [
     {
       "id": "ODS-PACKAGE-001",
       "format": "ODS",
       "dimension": "PackageFidelity",
-      "level": "complete",
+      "level": "round-trip-verified",
       "evidence": ["OdfKit.Tests/SpreadsheetHighLevelApiTests.cs", "OdfKit.Tests/ComplianceTests.cs"],
       "limitations": "Package round-trip does not imply formula recalculation or full spreadsheet semantics."
     },
@@ -13,7 +13,7 @@
       "id": "ODS-SEMANTIC-001",
       "format": "ODS",
       "dimension": "SemanticApiDepth",
-      "level": "semantic-facade-complete",
+      "level": "semantic-contract-verified",
       "evidence": ["OdfKit.Tests/SpreadsheetTests.cs", "OdfKit.Tests/SpreadsheetApiUsabilityTests.cs", "docs/semantic-coverage.json"],
       "limitations": "The streaming reader exposes stored values and formulas but does not recalculate formulas."
     },
@@ -21,7 +21,7 @@
       "id": "ODT-SEMANTIC-001",
       "format": "ODT",
       "dimension": "SemanticApiDepth",
-      "level": "semantic-facade-complete",
+      "level": "semantic-contract-verified",
       "evidence": ["OdfKit.Tests/TextHighLevelApiTests.cs", "OdfKit.Tests/TextApiUsabilityTests.cs", "docs/semantic-coverage.json"],
       "limitations": "OdfKit is not a page-layout or rendering engine."
     },
@@ -29,7 +29,7 @@
       "id": "ODP-SEMANTIC-001",
       "format": "ODP",
       "dimension": "SemanticApiDepth",
-      "level": "semantic-facade-complete",
+      "level": "semantic-contract-verified",
       "evidence": ["OdfKit.Tests/PresentationHighLevelApiTests.cs", "OdfKit.Tests/PresentationBoundaryTests.cs", "docs/semantic-coverage.json"],
       "limitations": "ODP uses a DOM/package workload; no streaming slide API is claimed."
     },
@@ -37,7 +37,7 @@
       "id": "ODG-SEMANTIC-001",
       "format": "ODG",
       "dimension": "SemanticApiDepth",
-      "level": "semantic-facade-complete",
+      "level": "semantic-contract-verified",
       "evidence": ["OdfKit.Tests/DrawingHighLevelApiTests.cs", "OdfKit.Tests/DrawingApiUsabilityTests.cs", "docs/semantic-coverage.json"],
       "limitations": "OdfKit does not synthesize SmartArt layouts or provide a pixel rendering engine."
     },
@@ -45,7 +45,7 @@
       "id": "ODF-INTEROP-001",
       "format": "ODF",
       "dimension": "InteropEvidence",
-      "level": "tested",
+      "level": "interop-tested",
       "evidence": ["OdfKit.Tests/LibreOfficeInteropTests.cs", "OdfKit.Tests/OfficeGuiSmokeTests.cs", "eng/Test-OdfRelaxNgBaseline.ps1", "eng/Test-OdfCorpus.ps1", ".github/workflows/libreoffice-interop.yml"],
       "limitations": "Tested LibreOffice and Microsoft Office versions do not guarantee pixel-identical output in every office suite."
     }

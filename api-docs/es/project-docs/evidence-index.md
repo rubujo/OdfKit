@@ -2,7 +2,7 @@
 title: Índice de declaraciones de capacidad y evidencias
 _lang: es
 translation_source: docs/evidence-index.md
-translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
+translation_source_sha256: 931370015f608c7efcf929a70e06c14f533aa58a4869d98b67f6a62debd20b9e
 ---
 
 # Índice de declaraciones de capacidad y evidencias
@@ -15,12 +15,12 @@ continua comprueba los identificadores de las declaraciones, las rutas de las ev
 
 | Declaración | Formato | Dimensión | Nivel | Resumen de la limitación |
 |---|---|---|---|---|
-| `ODS-PACKAGE-001` | ODS | PackageFidelity | complete | La lectura y escritura de ida y vuelta del paquete no implica volver a calcular fórmulas ni disponer de toda la semántica de una hoja de cálculo. |
-| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-facade-complete | Lee los valores y las fórmulas almacenados, pero no vuelve a calcular las fórmulas. |
-| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-facade-complete | No proporciona un motor de maquetación ni de renderización. |
-| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-facade-complete | ODP es una carga DOM y de paquete; no se declara una API de diapositivas en flujo. |
-| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-facade-complete | No implementa un motor de diseño SmartArt ni de renderización a nivel de píxel. |
-| `ODF-INTEROP-001` | ODF | InteropEvidence | tested | Las pruebas con una versión concreta de LibreOffice no implican una representación idéntica en píxeles en todas las suites. |
+| `ODS-PACKAGE-001` | ODS | PackageFidelity | round-trip-verified | La lectura y escritura de ida y vuelta del paquete no implica volver a calcular fórmulas ni disponer de toda la semántica de una hoja de cálculo. |
+| `ODS-SEMANTIC-001` | ODS | SemanticApiDepth | semantic-contract-verified | Lee los valores y las fórmulas almacenados, pero no vuelve a calcular las fórmulas. |
+| `ODT-SEMANTIC-001` | ODT | SemanticApiDepth | semantic-contract-verified | No proporciona un motor de maquetación ni de renderización. |
+| `ODP-SEMANTIC-001` | ODP | SemanticApiDepth | semantic-contract-verified | ODP es una carga DOM y de paquete; no se declara una API de diapositivas en flujo. |
+| `ODG-SEMANTIC-001` | ODG | SemanticApiDepth | semantic-contract-verified | No implementa un motor de diseño SmartArt ni de renderización a nivel de píxel. |
+| `ODF-INTEROP-001` | ODF | InteropEvidence | interop-tested | Las pruebas con una versión concreta de LibreOffice no implican una representación idéntica en píxeles en todas las suites. |
 
 `PackageFidelity` solo indica si el paquete se puede procesar de forma segura; `SemanticApiDepth` indica
 qué parte de la semántica del documento puede comprender y modificar la API; `InteropEvidence` indica qué
