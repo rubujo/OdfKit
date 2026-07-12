@@ -53,9 +53,16 @@ runs:
         # 保留一份幾乎相同的完整快取（曾多達 8 組），很快就超過 repo 層級的
         # 10 GB Actions 快取總量上限，導致舊快取被提前逐出、還原命中率下降。
         # 統一鍵值後所有 workflow 共用同一份快取，總量大幅降低。
-        key: nuget-${{ runner.os }}-${{ steps.nuget-fingerprint.outputs.fingerprint }}
+        #
+        # 鍵值同時區分 runner.os 與 runner.arch：runner.os 只分作業系統，不分
+        # CPU 架構——nuget-pack.yml 的 validate-nuget-consumers 矩陣同時有
+        # windows-latest（x64）與 windows-11-arm（ARM64），兩者 runner.os 皆為
+        # Windows，若不額外區分架構，這個做 native/AOT consumer smoke 測試、
+        # 可能觸發 RID-specific 還原（例如 win-x64 與 win-arm64 各自不同的
+        # runtime pack）的 job 會讓兩種架構共用同一格 cache、互相踩到對方存的內容。
+        key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ steps.nuget-fingerprint.outputs.fingerprint }}
         restore-keys: |
-          nuget-${{ runner.os }}-
+          nuget-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
