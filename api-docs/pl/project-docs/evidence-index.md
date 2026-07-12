@@ -2,7 +2,7 @@
 title: Indeks deklaracji możliwości i dowodów
 _lang: pl
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Indeks deklaracji możliwości i dowodów
@@ -33,3 +33,11 @@ dowodów interoperacyjności i ograniczeń czterech głównych formatów jest
 `eng/Test-SemanticCoverage.ps1` blokuje w CI niepełne deklaracje. Granice źródeł zastosowanego procesu
 clean-room opisano w
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md).
+
+Schemat pokrycia semantycznego v3 wymaga ponadto, aby każdy temat miał dowody dla `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` i `Interop`, powiązane ze specyfikacjami,
+implementacją, testami, ograniczeniami i pochodzeniem clean-room. Każda rodzina musi także mieć
+maszynowo zweryfikowane dowody dotyczące istniejących dokumentów, zachowania nieznanej zawartości,
+ODF 1.1–1.3, diagnostyki obniżenia wersji i nieprawidłowych danych wejściowych. Zobacz
+[przewodnik migracji](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md) oraz
+[dokumentację fasad semantycznych czterech formatów](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

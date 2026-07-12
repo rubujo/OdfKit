@@ -27,7 +27,7 @@
     {
       "id": "evidence-index",
       "source": "docs/evidence-index.md",
-      "sourceSha256": "c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142",
+      "sourceSha256": "d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2",
       "destination": "api-docs/{locale}/project-docs/evidence-index.md",
       "requiredTokens": ["ODS-PACKAGE-001", "ODS-SEMANTIC-001", "ODT-SEMANTIC-001", "ODP-SEMANTIC-001", "ODG-SEMANTIC-001", "ODF-INTEROP-001", "PackageFidelity", "SemanticApiDepth", "InteropEvidence", "claims.json", "semantic-coverage.json"]
     },

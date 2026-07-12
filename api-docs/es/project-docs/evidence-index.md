@@ -2,7 +2,7 @@
 title: Índice de declaraciones de capacidad y evidencias
 _lang: es
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Índice de declaraciones de capacidad y evidencias
@@ -33,3 +33,10 @@ formatos principales es
 `eng/Test-SemanticCoverage.ps1` impide en la integración continua las declaraciones incompletas. Consulte
 los límites de las fuentes de sala limpia en
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md).
+
+El esquema v3 de cobertura semántica exige además que cada tema tenga evidencias de `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` e `Interop`, vinculadas con especificaciones,
+implementación, pruebas, limitaciones y procedencia de sala limpia. Cada familia también debe tener
+evidencias verificadas por máquina para documentos existentes, conservación de contenido desconocido,
+ODF 1.1–1.3, diagnósticos de degradación y entradas no válidas. Consulte la [guía de migración](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+y la [referencia de fachadas semánticas de los cuatro formatos](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

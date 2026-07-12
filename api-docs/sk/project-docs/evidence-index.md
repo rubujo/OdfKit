@@ -2,7 +2,7 @@
 title: Register tvrdení o schopnostiach a dôkazov
 _lang: sk
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Register tvrdení o schopnostiach a dôkazov
@@ -25,3 +25,10 @@ Tri rozmery sa navzájom neimplikujú. Strojovo čitateľným zdrojom je
 programy a verzie. Žiadny rozmer nenahrádza iný. Jediným zdrojom pokrytia je
 [`semantic-coverage.json`](https://github.com/rubujo/OdfKit/blob/main/docs/semantic-coverage.json), ktorý v CI
 overuje `eng/Test-SemanticCoverage.ps1`.
+
+Schéma sémantického pokrytia v3 navyše vyžaduje, aby každá téma mala dôkazy pre `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` a `Interop`, prepojené so špecifikáciami,
+implementáciou, testami, obmedzeniami a pôvodom clean-room. Každá skupina musí mať aj strojovo
+overené dôkazy pre existujúce dokumenty, zachovanie neznámeho obsahu, ODF 1.1–1.3, diagnostiku
+zníženia verzie a neplatné vstupy. Pozrite si [migračnú príručku](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+a [referenciu sémantických fasád štyroch formátov](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

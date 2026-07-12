@@ -2,7 +2,7 @@
 title: 기능 주장 및 증거 색인
 _lang: ko
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # 기능 주장 및 증거 색인
@@ -26,3 +26,10 @@ translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c1
 대체하지 않습니다. 의미 범위의 단일 원본은
 [`semantic-coverage.json`](https://github.com/rubujo/OdfKit/blob/main/docs/semantic-coverage.json)이며
 CI에서 `eng/Test-SemanticCoverage.ps1`로 검증합니다.
+
+Semantic coverage schema v3는 각 주제에 대해 `Create`, `Get`, `Find`, `Set`, `Update`,
+`Remove`, `Clear`, `RoundTrip`, `Interop` 증거를 사양, 구현, 테스트, 제한 사항 및 clean-room
+출처와 연결하도록 추가로 요구합니다. 각 family에는 기존 문서, 알 수 없는 콘텐츠 보존,
+ODF 1.1–1.3, 다운그레이드 진단 및 잘못된 입력에 대한 기계 검증 증거도 필요합니다.
+[마이그레이션 가이드](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)와
+[네 가지 형식의 semantic facade 참조](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md)를 참조하십시오.

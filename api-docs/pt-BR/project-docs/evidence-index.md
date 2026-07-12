@@ -2,7 +2,7 @@
 title: Índice de afirmações de capacidade e evidências
 _lang: pt-BR
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Índice de afirmações de capacidade e evidências
@@ -33,3 +33,10 @@ os testes, as evidências de interoperabilidade e as limitações dos quatro for
 `eng/Test-SemanticCoverage.ps1` bloqueia afirmações incompletas no CI. Os limites das fontes do processo
 clean-room estão descritos em
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md).
+
+O schema v3 de cobertura semântica também exige que cada tópico tenha evidências para `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` e `Interop`, vinculadas às especificações,
+implementação, testes, limitações e proveniência clean-room. Cada família também deve ter evidências
+verificadas por máquina para documentos existentes, preservação de conteúdo desconhecido, ODF 1.1–1.3,
+diagnósticos de downgrade e entradas inválidas. Consulte o [guia de migração](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+e a [referência das fachadas semânticas dos quatro formatos](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

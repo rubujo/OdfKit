@@ -2,7 +2,7 @@
 title: Capability claims and evidence index
 _lang: en
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Capability claims and evidence index
@@ -33,3 +33,10 @@ implementation, tests, interoperability evidence, and limitations is
 enforces it through `eng/Test-SemanticCoverage.ps1`. See
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md)
 for clean-room source boundaries.
+
+Semantic coverage schema v3 additionally requires every topic to have evidence for `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip`, and `Interop`, linked to specifications,
+implementation, tests, limitations, and clean-room provenance. Every family must also have
+machine-verified evidence for existing documents, unknown-content preservation, ODF 1.1–1.3,
+downgrade diagnostics, and invalid input. See the [migration guide](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+and the [four-format semantic facade reference](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

@@ -28,5 +28,5 @@ Semantic coverage schema v3 進一步要求每個 topic 都具備 `Create`、`Ge
 `Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、`Interop` 證據，並連結規格、實作、
 測試、限制及 clean-room provenance；每個 family 另須由機器驗證既有文件、未知內容保留、
 ODF 1.1～1.3、降版診斷與非法輸入證據。高階 API 破壞性命名與生命週期調整見
-[遷移指南](migration-high-level-api.md)，使用者工作流見
-[四主格式語意 facade reference](reference/semantic-facades.md)。
+[遷移指南](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)，使用者工作流見
+[四主格式語意 facade reference](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md)。

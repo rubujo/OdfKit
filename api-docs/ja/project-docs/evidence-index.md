@@ -2,7 +2,7 @@
 title: 機能に関する表明と根拠の索引
 _lang: ja
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # 機能に関する表明と根拠の索引
@@ -34,3 +34,10 @@ translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c1
 境界については、
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md)
 を参照してください。
+
+Semantic coverage schema v3 ではさらに、各トピックについて `Create`、`Get`、`Find`、
+`Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、`Interop` の証拠を、仕様、実装、テスト、
+制限事項、clean-room provenance と関連付けて示す必要があります。各 family には、既存文書、
+未知コンテンツの保持、ODF 1.1～1.3、ダウングレード診断、不正入力について機械的に検証された
+証拠も必要です。[移行ガイド](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)および
+[4 形式の semantic facade リファレンス](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md)を参照してください。

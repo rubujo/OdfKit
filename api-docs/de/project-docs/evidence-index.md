@@ -2,7 +2,7 @@
 title: Index der Fähigkeitsaussagen und Nachweise
 _lang: de
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Index der Fähigkeitsaussagen und Nachweise
@@ -25,3 +25,10 @@ Der Index trennt drei Dimensionen, die einander nicht implizieren. Maschinenlesb
 Dokumentsemantik und `InteropEvidence` getestete externe Programme und Versionen. Keine Dimension ersetzt
 eine andere. [`semantic-coverage.json`](https://github.com/rubujo/OdfKit/blob/main/docs/semantic-coverage.json)
 ist die maßgebliche Quelle für semantische Abdeckung; `eng/Test-SemanticCoverage.ps1` prüft sie in CI.
+
+Das Semantic-Coverage-Schema v3 verlangt zusätzlich für jedes Thema Nachweise zu `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` und `Interop`, verknüpft mit Spezifikationen,
+Implementierung, Tests, Einschränkungen und Clean-Room-Provenienz. Jede Familie benötigt außerdem
+maschinengeprüfte Nachweise für bestehende Dokumente, den Erhalt unbekannter Inhalte, ODF 1.1–1.3,
+Downgrade-Diagnosen und ungültige Eingaben. Siehe [Migrationsleitfaden](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+und [Referenz der semantischen Fassaden für vier Formate](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

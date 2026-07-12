@@ -2,7 +2,7 @@
 title: Rejstřík tvrzení o schopnostech a důkazů
 _lang: cs
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Rejstřík tvrzení o schopnostech a důkazů
@@ -32,3 +32,10 @@ interoperability a omezení čtyř hlavních formátů je
 `eng/Test-SemanticCoverage.ps1` v CI blokuje neúplná tvrzení. Hranice zdrojů použitého postupu clean-room
 jsou popsány v
 [`provenance/semantic-api-clean-room.md`](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/semantic-api-clean-room.md).
+
+Schema sémantického pokrytí v3 navíc vyžaduje, aby každé téma mělo důkazy pro `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` a `Interop`, propojené se specifikacemi,
+implementací, testy, omezeními a původem clean-room. Každá skupina musí mít také strojově ověřené
+důkazy pro existující dokumenty, zachování neznámého obsahu, ODF 1.1–1.3, diagnostiku downgradu
+a neplatné vstupy. Viz [migrační příručka](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+a [reference sémantických fasád čtyř formátů](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).

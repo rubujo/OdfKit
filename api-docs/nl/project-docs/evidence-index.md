@@ -2,7 +2,7 @@
 title: Index van capaciteitsclaims en bewijs
 _lang: nl
 translation_source: docs/evidence-index.md
-translation_source_sha256: c2b80895e2b7508134a51346e99f39437b7a2c88f2ebc9375f1c11bc8ea3a142
+translation_source_sha256: d99bcf07e600d948fde4bf3629b9b2781999ba303ec05c568075d83bd48762a2
 ---
 
 # Index van capaciteitsclaims en bewijs
@@ -25,3 +25,10 @@ De drie dimensies impliceren elkaar niet. De machineleesbare bron is
 geteste programma’s en versies. Geen dimensie vervangt een andere. De enige bron voor dekking is
 [`semantic-coverage.json`](https://github.com/rubujo/OdfKit/blob/main/docs/semantic-coverage.json), door
 `eng/Test-SemanticCoverage.ps1` in CI gecontroleerd.
+
+Semantic coverage schema v3 vereist bovendien voor elk onderwerp bewijs voor `Create`, `Get`,
+`Find`, `Set`, `Update`, `Remove`, `Clear`, `RoundTrip` en `Interop`, gekoppeld aan specificaties,
+implementatie, tests, beperkingen en clean-room-herkomst. Elke familie moet ook machinaal
+geverifieerd bewijs hebben voor bestaande documenten, behoud van onbekende inhoud, ODF 1.1–1.3,
+downgradediagnostiek en ongeldige invoer. Zie de [migratiehandleiding](https://github.com/rubujo/OdfKit/blob/main/docs/migration-high-level-api.md)
+en de [referentie voor semantische façades van vier formaten](https://github.com/rubujo/OdfKit/blob/main/docs/reference/semantic-facades.md).
