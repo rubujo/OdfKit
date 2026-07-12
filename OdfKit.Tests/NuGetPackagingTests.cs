@@ -95,13 +95,53 @@ public class NuGetPackagingTests
         Assert.Contains("actions/upload-artifact@v7", workflow, StringComparison.Ordinal);
         Assert.Contains("actions/download-artifact@v8", workflow, StringComparison.Ordinal);
         Assert.Contains("-GenerateHashManifest", workflow, StringComparison.Ordinal);
-        Assert.Contains("-VerifyHashManifest", workflow, StringComparison.Ordinal);
+        Assert.Contains("VerifyHashManifest = $true", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
         Assert.Contains("key: nuget-${{ runner.os }}-", setupAction, StringComparison.Ordinal);
         Assert.DoesNotContain("runner.arch", setupAction, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("matrix.rid", setupAction, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("SHA256SUMS", packScript, StringComparison.Ordinal);
         Assert.Contains("RuntimeInformation.OSArchitecture", packScript, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Verifies the Windows x64 package gate runs the net48 consumer against all published packages.
+    /// 驗證 Windows x64 套件閘門會以 net48 consumer 執行全部可發佈套件。
+    /// </summary>
+    [Fact]
+    public void NetFramework48Consumer_IsIntegratedWithPackageGateAndWorkflow()
+    {
+        string projectPath = Path.Combine(
+            RepoRoot,
+            "tests",
+            "OdfKit.NetFramework48Smoke",
+            "OdfKit.NetFramework48Smoke.csproj");
+        XDocument project = XDocument.Load(projectPath);
+        XNamespace msbuild = project.Root!.Name.Namespace;
+        string? targetFramework = project
+            .Descendants(msbuild + "TargetFramework")
+            .Select(static element => element.Value)
+            .SingleOrDefault();
+        string[] packageIds = project
+            .Descendants(msbuild + "PackageReference")
+            .Select(static element => (string?)element.Attribute("Include"))
+            .Where(static id => id is not null)
+            .Cast<string>()
+            .ToArray();
+
+        Assert.Equal("net48", targetFramework);
+        foreach ((string packageId, _) in PackableProjects)
+        {
+            Assert.Contains(packageId, packageIds);
+        }
+
+        string smokeScript = File.ReadAllText(Path.Combine(RepoRoot, "eng", "Test-NetFramework48Smoke.ps1"));
+        string packScript = File.ReadAllText(Path.Combine(RepoRoot, "eng", "Test-NuGetPack.ps1"));
+        string workflow = File.ReadAllText(Path.Combine(RepoRoot, ".github", "workflows", "nuget-pack.yml"));
+        Assert.Contains("UseLocalPackages=true", smokeScript, StringComparison.Ordinal);
+        Assert.Contains("Test-NetFramework48Smoke.ps1", packScript, StringComparison.Ordinal);
+        Assert.Contains("net48: true", workflow, StringComparison.Ordinal);
+        Assert.Contains("matrix.net48", workflow, StringComparison.Ordinal);
     }
 
     public static TheoryData<string, string> PackableProjectPaths()

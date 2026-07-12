@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Text;
 using Xunit;
 
@@ -79,6 +80,92 @@ public class OdfSaveOptionsVersionTests
         Assert.All(
             zip.Entries.Where(entry => entry.Length > 0),
             entry => Assert.Equal(expectedTimestamp, entry.LastWriteTime.DateTime));
+    }
+
+    /// <summary>
+    /// Verifies a safe downgrade produces an empty structured report during save.
+    /// 驗證安全降版會在儲存期間產生不含問題的結構化報告。
+    /// </summary>
+    [Fact]
+    public void VersionCompatibilityReport_SafeDowngradeIsReportedDuringSave()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("ODF 1.3 safe content");
+        OdfVersionCompatibilityReport? callbackReport = null;
+
+        using var saved = new MemoryStream();
+        document.SaveToStream(
+            saved,
+            new OdfSaveOptions
+            {
+                ForceVersion = OdfVersion.Odf13,
+                VersionCompatibilityReportHandler = report => callbackReport = report
+            });
+
+        Assert.NotNull(callbackReport);
+        Assert.True(callbackReport.IsSafe);
+        Assert.Empty(callbackReport.Issues);
+        Assert.Same(callbackReport, document.LastVersionCompatibilityReport);
+    }
+
+    /// <summary>
+    /// Verifies ODF 1.4-only elements and attributes produce structured downgrade diagnostics without deleting content.
+    /// 驗證僅限 ODF 1.4 的元素與屬性會產生結構化降版診斷，且不會刪除內容。
+    /// </summary>
+    [Fact]
+    public void VersionCompatibilityReport_ReportsUnsupportedSemanticsAndPreservesThem()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfUnknownElement odf14Element = new("num-list-format", OdfNamespaces.Number, "number");
+        document.BodyTextRoot.AppendChild(odf14Element);
+        odf14Element.SetAttribute("decorative", OdfNamespaces.Draw, "true", "draw");
+        odf14Element.AppendChild(new OdfUnknownElement("payload", "urn:example:foreign", "ext"));
+
+        OdfVersionCompatibilityReport report = document.AnalyzeVersionCompatibility(OdfVersion.Odf13);
+
+        Assert.False(report.IsSafe);
+        Assert.Contains(
+            report.Issues,
+            issue => issue.Kind == OdfVersionCompatibilityIssueKind.ElementNotSupported &&
+                issue.LocalName == "num-list-format");
+        Assert.Contains(
+            report.Issues,
+            issue => issue.Kind == OdfVersionCompatibilityIssueKind.AttributeNotSupported &&
+                issue.LocalName == "decorative");
+        Assert.DoesNotContain(report.Issues, issue => issue.NamespaceUri == "urn:example:foreign");
+
+        using var saved = new MemoryStream();
+        document.SaveToStream(saved, new OdfSaveOptions { ForceVersion = OdfVersion.Odf13 });
+        saved.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(saved, "downgraded.odt");
+        Assert.Contains(
+            reloaded.BodyTextRoot.Descendants(),
+            node => node.LocalName == "num-list-format" && node.NamespaceUri == OdfNamespaces.Number);
+        Assert.NotNull(document.LastVersionCompatibilityReport);
+        Assert.False(document.LastVersionCompatibilityReport.IsSafe);
+    }
+
+    /// <summary>
+    /// Verifies structured downgrade diagnostics cover all four primary document formats.
+    /// 驗證結構化降版診斷涵蓋四種主要文件格式。
+    /// </summary>
+    [Theory]
+    [InlineData(OdfDocumentKind.Text)]
+    [InlineData(OdfDocumentKind.Spreadsheet)]
+    [InlineData(OdfDocumentKind.Presentation)]
+    [InlineData(OdfDocumentKind.Graphics)]
+    public void VersionCompatibilityReport_CoversEveryPrimaryFormat(OdfDocumentKind kind)
+    {
+        using OdfDocument document = OdfDocument.Create(kind);
+        document.ContentDom.AppendChild(
+            new OdfUnknownElement("num-list-format", OdfNamespaces.Number, "number"));
+
+        OdfVersionCompatibilityReport report = document.AnalyzeVersionCompatibility(OdfVersion.Odf13);
+
+        Assert.Contains(
+            report.Issues,
+            issue => issue.Kind == OdfVersionCompatibilityIssueKind.ElementNotSupported &&
+                issue.LocalName == "num-list-format");
     }
 
     private static MemoryStream CreateTextPackage(OdfVersion version)

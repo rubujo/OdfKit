@@ -43,6 +43,12 @@ public abstract partial class OdfDocument
 
         internal OdfVersion? TargetVersion => _document.TargetVersion;
 
+        internal OdfVersionCompatibilityReport AnalyzeVersionCompatibility(OdfVersion targetVersion) =>
+            _document.AnalyzeVersionCompatibility(targetVersion);
+
+        internal void SetLastVersionCompatibilityReport(OdfVersionCompatibilityReport? report) =>
+            _document.SetLastVersionCompatibilityReport(report);
+
         internal OdfExternalLinkManager? FormulaExternalLinks => _document.GetFormulaExternalLinksForPersistence();
 
         internal void FlushTrackedEmbeddedDocuments(OdfSaveOptions options) =>

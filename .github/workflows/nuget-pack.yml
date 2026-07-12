@@ -9,6 +9,8 @@ on:
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
+      - 'eng/Test-NetFramework48Smoke.ps1'
+      - 'tests/OdfKit.NetFramework48Smoke/**'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/nuget-pack.yml'
   push:
@@ -21,6 +23,8 @@ on:
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
+      - 'eng/Test-NetFramework48Smoke.ps1'
+      - 'tests/OdfKit.NetFramework48Smoke/**'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/nuget-pack.yml'
   workflow_dispatch:
@@ -76,12 +80,16 @@ jobs:
         include:
           - name: Linux x64
             runner: ubuntu-latest
+            net48: false
           - name: Windows x64
             runner: windows-latest
+            net48: true
           - name: Windows ARM64
             runner: windows-11-arm
+            net48: false
           - name: macOS ARM64
             runner: macos-15
+            net48: false
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -102,7 +110,12 @@ jobs:
       - name: Verify snapshot and run native consumer smoke
         shell: pwsh
         run: |
-          ./eng/Test-NuGetPack.ps1 `
-            -Configuration Release `
-            -SkipPack `
-            -VerifyHashManifest
+          $parameters = @{
+            Configuration = 'Release'
+            SkipPack = $true
+            VerifyHashManifest = $true
+          }
+          if ('${{ matrix.net48 }}' -ne 'true') {
+            $parameters.SkipNetFrameworkSmoke = $true
+          }
+          ./eng/Test-NuGetPack.ps1 @parameters

@@ -89,6 +89,18 @@ public class OdfSaveOptions
     public OdfVersion? ForceVersion { get; set; }
 
     /// <summary>
+    /// Gets or sets a callback that receives structured diagnostics before a version-targeted save.
+    /// 取得或設定回呼，以在指定版本儲存前接收結構化診斷。
+    /// </summary>
+    /// <remarks>
+    /// The callback receives an empty report when the conversion is safe. The document also retains the report in
+    /// <see cref="OdfDocument.LastVersionCompatibilityReport"/> after the save pipeline runs.
+    /// 若轉換安全，回呼仍會收到不含問題的報告；儲存管線執行後，文件也會將報告保留於
+    /// <see cref="OdfDocument.LastVersionCompatibilityReport"/>。
+    /// </remarks>
+    public Action<OdfVersionCompatibilityReport>? VersionCompatibilityReportHandler { get; set; }
+
+    /// <summary>
     /// Gets or sets the temporary directory used by atomic save operations.
     /// 取得或設定原子化儲存作業使用的暫存目錄。
     /// </summary>

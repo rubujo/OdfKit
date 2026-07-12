@@ -11,7 +11,7 @@
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
-| 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
+| 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [高階 API 遷移指南](migration-high-level-api.md)、[GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md)、[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) |
 | 維護 CI/CD 與驗證分層 | [CI/CD 驗證設計](ci-cd.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[Corpus Manifest 規則](corpus-manifest.md) |
 
@@ -40,6 +40,7 @@
 | [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
 | [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |
 | [API Reference](reference/index.md) | Spreadsheet、Chart、Template 與 Interop 的 options、report 與能力邊界 |
+| [高階 API 遷移指南](migration-high-level-api.md) | 從早期 0.0.1 草稿遷移至四主格式一致生命週期契約 |
 | [串流讀取安全限制](security-limits.md) | ODS／ODT Reader 的資源預算、資料流所有權與信任邊界 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |

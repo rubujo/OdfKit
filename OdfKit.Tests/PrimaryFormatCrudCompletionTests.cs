@@ -13,6 +13,7 @@ namespace OdfKit.Tests;
 /// Verifies symmetric high-level CRUD workflows for the primary ODF formats.
 /// 驗證主要 ODF 格式的對稱高階 CRUD 工作流程。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class PrimaryFormatCrudCompletionTests
 {
     /// <summary>

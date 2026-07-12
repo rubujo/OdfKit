@@ -302,6 +302,12 @@ public sealed class OfficeGuiSmokeTests
             content = document.Content;
             Assert.Contains("OdfKit-Word-Edit-Marker", Convert.ToString(content.Text) ?? string.Empty, StringComparison.Ordinal);
 
+            document.Close(false);
+            ReleaseComObject(content);
+            ReleaseComObject(document);
+            content = null;
+            document = null;
+
             using TextDocument loaded = TextDocument.Load(outputPath);
             Assert.Contains("OdfKit-Word-Edit-Marker", loaded.ContentRoot.TextContent, StringComparison.Ordinal);
         }

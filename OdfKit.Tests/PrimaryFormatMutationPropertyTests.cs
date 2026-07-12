@@ -1,4 +1,4 @@
-using OdfKit.Drawing;
+﻿using OdfKit.Drawing;
 using OdfKit.Core;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;

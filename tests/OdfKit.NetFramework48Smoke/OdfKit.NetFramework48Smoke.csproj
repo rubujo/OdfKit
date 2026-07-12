@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <UseLocalPackages Condition="'$(UseLocalPackages)' == ''">false</UseLocalPackages>
+    <OdfKitPackageVersion Condition="'$(OdfKitPackageVersion)' == ''">0.0.1</OdfKitPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalPackages)' == 'true'">
+    <PackageReference Include="OdfKit" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Collaboration" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Html" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Imaging" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Ooxml" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Pdf" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Rdf" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.Extensions.Rendering" Version="$(OdfKitPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalPackages)' != 'true'">
+    <ProjectReference Include="..\..\OdfKit\OdfKit.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Collaboration\OdfKit.Extensions.Collaboration.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Html\OdfKit.Extensions.Html.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Imaging\OdfKit.Extensions.Imaging.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Ooxml\OdfKit.Extensions.Ooxml.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Pdf\OdfKit.Extensions.Pdf.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Rdf\OdfKit.Extensions.Rdf.csproj" />
+    <ProjectReference Include="..\..\OdfKit.Extensions.Rendering\OdfKit.Extensions.Rendering.csproj" />
+  </ItemGroup>
+
+</Project>

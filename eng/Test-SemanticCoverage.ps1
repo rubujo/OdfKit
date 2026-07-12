@@ -9,7 +9,7 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $provenancePath = Join-Path $root 'docs/provenance/semantic-api-provenance.json'
 $provenance = Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json
 
-if ($manifest.schemaVersion -ne 2) { throw '不支援的 semantic coverage schemaVersion。' }
+if ($manifest.schemaVersion -ne 3) { throw '不支援的 semantic coverage schemaVersion。' }
 if ($manifest.odfVersion -ne '1.4') { throw 'semantic coverage 必須以 ODF 1.4 為主模型。' }
 if ($manifest.legacyVersionPolicy -ne 'normalize-to-1.4-preserve-unknown') {
     throw 'semantic coverage 的舊版本相容政策無效。'
@@ -52,6 +52,26 @@ foreach ($symbol in $mutationSymbols) {
 
 $requiredFormats = @('ODT', 'ODS', 'ODP', 'ODG')
 $requiredOperations = @('Create', 'Get', 'Find', 'Set', 'Update', 'Remove', 'Clear', 'RoundTrip', 'Interop')
+$requiredQualityDimensions = @('ExistingDocument', 'UnknownContentPreservation', 'LegacyVersions', 'DowngradeDiagnostics', 'InvalidInput')
+$qualityEvidence = @($manifest.qualityEvidence)
+foreach ($evidence in $qualityEvidence) {
+    if ($evidence.dimension -notin $requiredQualityDimensions) {
+        throw "semantic coverage 品質證據維度無效：$($evidence.dimension)"
+    }
+    $formats = @($evidence.formats)
+    if ($formats.Count -eq 0 -or @($formats | Where-Object { $_ -notin $requiredFormats }).Count -gt 0) {
+        throw "semantic coverage 品質證據格式無效：$($evidence.dimension)"
+    }
+    $testPath = Join-Path $root $evidence.test
+    if (-not (Test-Path -LiteralPath $testPath)) {
+        throw "semantic coverage 品質證據測試不存在：$($evidence.test)"
+    }
+    $testSource = Get-Content -LiteralPath $testPath -Raw
+    if (-not $testSource.Contains($evidence.symbol, [StringComparison]::Ordinal)) {
+        throw "semantic coverage 品質證據測試符號不存在：$($evidence.symbol)"
+    }
+}
+
 $ids = @{}
 foreach ($family in @($manifest.families)) {
     if ([string]::IsNullOrWhiteSpace($family.id)) { throw '語意族群缺少 id。' }
@@ -59,6 +79,14 @@ foreach ($family in @($manifest.families)) {
     $ids[$family.id] = $true
     if ($family.format -notin $requiredFormats) { throw "語意族群格式無效：$($family.id)" }
     if ($family.status -ne 'complete') { throw "語意族群尚未完成：$($family.id)" }
+    foreach ($dimension in $requiredQualityDimensions) {
+        $covered = @($qualityEvidence | Where-Object {
+            $_.dimension -eq $dimension -and $family.format -in @($_.formats)
+        }).Count -gt 0
+        if (-not $covered) {
+            throw "語意族群缺少品質證據：$($family.id) -> $dimension"
+        }
+    }
     $familyTopics = @($family.topics)
     if ($familyTopics.Count -eq 0) { throw "語意族群缺少 topics：$($family.id)" }
     if (@($familyTopics | Select-Object -Unique).Count -ne $familyTopics.Count) {
@@ -76,6 +104,7 @@ foreach ($family in @($manifest.families)) {
     $coveredOperations = @{}
     $topicOperations = @{}
     $focusedTopics = @{}
+    $interopPaths = @($family.interop)
     foreach ($topic in $familyTopics) {
         if ([string]::IsNullOrWhiteSpace($topic)) { throw "語意族群 topic 無效：$($family.id)" }
         $topicOperations[$topic] = @{}
@@ -109,6 +138,9 @@ foreach ($family in @($manifest.families)) {
                 throw "語意族群操作證據無效：$($family.id) -> $operation"
             }
             $coveredOperations[$operation] = $true
+            if ($operation -eq 'Interop' -and $evidence.test -notin $interopPaths) {
+                throw "語意族群 Interop 證據不是外部互通測試：$($family.id) -> $($evidence.test)"
+            }
             foreach ($topic in $evidenceTopics) {
                 $topicOperations[$topic][$operation] = $true
             }

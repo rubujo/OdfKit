@@ -287,7 +287,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "preserve-unknown",
-      "sha256": "cb1ab1f9c217c6434f627d47d5b18ffc80bad86e03fdccb684cdda46ef64b1f5",
+      "sha256": "5840a38a9558a3ebc4df3e544190c17c508192dedf4046e064a01ab779ba5bf3",
       "notes": "Schema-clean complex builder corpus fixture generated from the annual report cookbook scenario."
     },
     {
@@ -300,7 +300,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "preserve-unknown",
-      "sha256": "7b2d65448904347c92116a4e6e879181b7a177e4646706f0276c3b6b3187ec59",
+      "sha256": "280498e03b2fb82ffbbaf3cac8cceedcda1042d7d1bb54ff484a9921ff8f4bc0",
       "notes": "Schema-clean complex builder corpus fixture generated from the financial model cookbook scenario."
     },
     {
@@ -313,7 +313,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "preserve-unknown",
-      "sha256": "6ef8eb888e5e14411c516bda76f4b04f7a2b593001d70fcc87aa845c4d7453f7",
+      "sha256": "a02a0c6cb6286631e66b28c35b7adbd1a26e95abf39285e3c27e2d6cd6ce1c26",
       "notes": "Schema-clean complex builder corpus fixture generated from the flow diagram cookbook scenario."
     },
     {

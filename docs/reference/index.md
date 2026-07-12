@@ -9,6 +9,7 @@
 | Chart | [圖表工作流](charts.md) | `InsertChartFromRange`、`GetEmbeddedChartDocument`、`OdfChartDocument` |
 | Template | [模板繫結工作流](templates.md) | `TemplateBinder.Bind`、`OdfTemplateBindOptions`、`OdfTemplateBindReport` |
 | Interop | [互通與風險工作流](interop.md) | `OdfPracticalCompatibilityValidator`、LibreOffice backend、validation profiles |
+| ODT／ODS／ODP／ODG | [四主格式語意 Facade](semantic-facades.md) | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument` |
 
 ## 文件契約
 

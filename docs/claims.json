@@ -46,8 +46,8 @@
       "format": "ODF",
       "dimension": "InteropEvidence",
       "level": "tested",
-      "evidence": ["OdfKit.Tests/LibreOfficeInteropTests.cs", ".github/workflows/libreoffice-interop.yml"],
-      "limitations": "A tested LibreOffice version does not guarantee pixel-identical output in every office suite."
+      "evidence": ["OdfKit.Tests/LibreOfficeInteropTests.cs", "OdfKit.Tests/OfficeGuiSmokeTests.cs", "eng/Test-OdfRelaxNgBaseline.ps1", "eng/Test-OdfCorpus.ps1", ".github/workflows/libreoffice-interop.yml"],
+      "limitations": "Tested LibreOffice and Microsoft Office versions do not guarantee pixel-identical output in every office suite."
     }
   ]
 }

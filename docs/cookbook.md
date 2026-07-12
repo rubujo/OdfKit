@@ -4,6 +4,19 @@
 
 ## 複雜文件場景總覽
 
+四主格式高階 API 採相同的集合生命週期：用 `Get*` 取得集合、`Find*` 查找單項、
+`Remove*` 移除指定項目，並以 `Clear*` 清空集合。載入既有文件後使用相同 facade，
+不需要切換到另一套 reader 物件模型。完整契約與破壞性遷移方式見
+[四主格式語意 facade reference](reference/semantic-facades.md)及
+[高階 API 遷移指南](migration-high-level-api.md)。
+
+| 格式 | 代表性完整生命週期 |
+| --- | --- |
+| ODT | `FindFormControl`、`RemoveFormControl`、`ClearFormControls` |
+| ODS | `FindEmbeddedChart`、`RemoveEmbeddedChart`、`ClearEmbeddedCharts` |
+| ODP | slide、notes、media、table、shape、connector 與 group 的 typed CRUD |
+| ODG | `FindGradient`、`RenameGradient`、`RemoveGradient`、`ClearGradients` |
+
 OdfKit 的高階 API 目標是讓 C# / .NET 開發者用少量程式碼建立中高複雜度 ODF 文件；
 目前建議以既有外觀層與 builder 混用，而不是直接操作 ZIP 或 XML：
 

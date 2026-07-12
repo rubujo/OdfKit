@@ -39,11 +39,14 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   專屬 typed 文件類別但語意 API 仍完全繼承基底格式。
 - `package-only`：僅封裝層來回讀寫；高階語意模型尚未專屬化或仍共用基底 wrapper。
 
-**重要說明（避免過度宣稱）**：`complete` 分級僅代表滿足本文件定義的最低完成標準，**不**代表
-已達成各格式族可能延伸出的完整深度語意模型（例如 Chart 的 Legend 統一可編輯模型與
-fluent builder API、Formula 的完整符號級編輯模型）。這些屬於更大規模、獨立追蹤的延伸工作；
+**重要說明（避免過度宣稱）**：對 ODT、ODS、ODP、ODG，`complete` 另受
+[`semantic-coverage.json`](semantic-coverage.json) schema v3 約束；12 個 family 的每個 topic
+都必須連結 `Create`、`Get`、`Find`、`Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、
+`Interop`、規格、實作、測試、限制與 clean-room provenance。其他格式的 `complete` 仍只表示
+滿足本文件 5 項通用完成標準，不推導為相同的深度語意 facade。物理分頁、像素級渲染、完整公式
+與 pivot 重算、SmartArt 佈局、Office 專屬效果模擬及完整協同演算法，均為明列非目標。
 Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
-語意編輯 helper。
+語意編輯 helper；這項既有完成聲明不等同於完整公式重算引擎。
 
 凡標示為「真機」的互通證據，均指已有 `LibreOfficeInteropTests` 與
 `eng/Test-LibreOfficeInterop.ps1` 驗收路徑；一般 `dotnet test` 不會自動啟動真實
@@ -145,11 +148,15 @@ CNS 11643 官方語意相容或認證。
 與負向覆蓋見 `OdfValidatorApiTests.DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed`
 與 `DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile`。
 
-## 目前缺口
+## 深度狀態與限制
 
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
-- ODT、ODS、ODP、ODG 高階 API 已升為 `complete`（Wave 2 DEPTH 目標 ✅）：常用讀寫 API 與 `FourFormatApiScenarioTests` 進階寫入場景已背書；仍非全功能辦公套件物件模型（例如 ODS 樞紐表重算見 non-goals、圖表 chart style 物件模型仍屬 DEPTH-2 延伸）。
+- ODT、ODS、ODP、ODG 高階 API 已達 semantic facade `complete`：schema v3 manifest 對每個
+  topic 驗證完整生命週期，並逐 family 驗證既有文件、重複保存載入、未知內容保留、
+  ODF 1.1～1.3 映射、結構化降版診斷、非法輸入、隨機 mutation、
+  corpus differential 與外部辦公軟體互通證據；使用者工作流不需下沉裸 DOM。明列非目標不屬於
+  此分級的未完成項目。
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體（VAR-1 ✅）：具專屬 typed 文件類別與
   `Create`/`Load` 入口；內容編輯語意 API 繼承四主格式基底類別。2026-06-24 依 5 項完成標準
   標準重新檢視後已升級為 `complete`，詳見下方各 Batch 說明。

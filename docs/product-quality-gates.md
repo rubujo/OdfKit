@@ -40,6 +40,7 @@ pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 | `pwsh eng/Test-LibreOfficeInterop.ps1` | LibreOffice headless 實機互通（需本機安裝 soffice） |
 | `pwsh eng/Test-OoxmlVisualGolden.ps1` | OOXML 轉換視覺 golden |
 | `pwsh eng/Test-OdfPolicy.ps1` | 巨集淨化、外部資源 policy、加密邊界等 |
+| `pwsh eng/Test-NetFramework48Smoke.ps1` | Windows CLR 4.x 上執行四主格式與全部可封裝 extensions 的 net48 consumer smoke；pack 閘門會改用本地 nupkg |
 | `pwsh eng/Test-RenderingBackends.ps1` | Rendering 擴充單元測試 |
 | `pwsh eng/Test-OfficeGuiSmoke.ps1` | 可選 GUI 煙霧（環境依賴較重） |
 
@@ -91,6 +92,11 @@ flat／package XML RELAX NG 差異，並以 ODF Validator 阻擋適用 package �
 
 | 日期 | 層級 | 結果摘要 |
 |------|------|----------|
+| 2026-07-12 | A | `dotnet test`：net10.0 通過 2160、net8.0 通過 2156；兩者各略過 1、失敗 0 |
+| 2026-07-12 | B | semantic schema v3 12 families；corpus 266／266；8 套件、net8 與 net48 CLR consumer 通過 |
+| 2026-07-12 | C | DomInsert 160.1 µs；ODS stream 156.7 ms／14.58 MB，均未超效能回歸門檻 |
+| 2026-07-12 | C | LibreOffice Portable 26.2.1.2：net10.0 真機互通 34／34 通過、0 略過、0 失敗 |
+| 2026-07-12 | 可維護 | 雙語 missing 0、一行 summary、typed DOM、Public API 雙 TFM 與 trim 15 roots 通過 |
 | 2026-07-09 | A | `dotnet test` net10.0（排除 LibreOffice／InteropCorpus／OfficeGui）：通過 2082、略過 1、失敗 0 |
 | 2026-07-09 | B | `Test-OdfPolicy.ps1`：32 通過；`Test-OdfCorpus.ps1`：內建 corpus 通過（未設 `ODFKIT_PARITY_CORPUS_ROOT`，略過外部 corpus） |
 | 2026-07-09 | C | `Benchmark-Regression.ps1`：DomInsert 未超 +40% 容許（基準 123.9 µs／量測 159.6 µs） |

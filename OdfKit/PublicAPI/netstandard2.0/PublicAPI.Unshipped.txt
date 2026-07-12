@@ -778,6 +778,31 @@ OdfKit.Compliance.OdfVersion.Odf12 = 3 -> OdfKit.Compliance.OdfVersion
 OdfKit.Compliance.OdfVersion.Odf13 = 4 -> OdfKit.Compliance.OdfVersion
 OdfKit.Compliance.OdfVersion.Odf14 = 5 -> OdfKit.Compliance.OdfVersion
 OdfKit.Compliance.OdfVersion.Unknown = 0 -> OdfKit.Compliance.OdfVersion
+OdfKit.Compliance.OdfVersionCompatibilityIssue
+OdfKit.Compliance.OdfVersionCompatibilityIssue.<Clone>$() -> OdfKit.Compliance.OdfVersionCompatibilityIssue!
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Deconstruct(out OdfKit.Compliance.OdfVersionCompatibilityIssueKind Kind, out string! NamespaceUri, out string! LocalName, out string! Path, out OdfKit.Compliance.OdfVersion SourceVersion, out OdfKit.Compliance.OdfVersion TargetVersion) -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Equals(OdfKit.Compliance.OdfVersionCompatibilityIssue? other) -> bool
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Kind.get -> OdfKit.Compliance.OdfVersionCompatibilityIssueKind
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Kind.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.LocalName.get -> string!
+OdfKit.Compliance.OdfVersionCompatibilityIssue.LocalName.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.NamespaceUri.get -> string!
+OdfKit.Compliance.OdfVersionCompatibilityIssue.NamespaceUri.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.OdfVersionCompatibilityIssue(OdfKit.Compliance.OdfVersionCompatibilityIssueKind Kind, string! NamespaceUri, string! LocalName, string! Path, OdfKit.Compliance.OdfVersion SourceVersion, OdfKit.Compliance.OdfVersion TargetVersion) -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Path.get -> string!
+OdfKit.Compliance.OdfVersionCompatibilityIssue.Path.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.SourceVersion.get -> OdfKit.Compliance.OdfVersion
+OdfKit.Compliance.OdfVersionCompatibilityIssue.SourceVersion.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssue.TargetVersion.get -> OdfKit.Compliance.OdfVersion
+OdfKit.Compliance.OdfVersionCompatibilityIssue.TargetVersion.init -> void
+OdfKit.Compliance.OdfVersionCompatibilityIssueKind
+OdfKit.Compliance.OdfVersionCompatibilityIssueKind.AttributeNotSupported = 1 -> OdfKit.Compliance.OdfVersionCompatibilityIssueKind
+OdfKit.Compliance.OdfVersionCompatibilityIssueKind.ElementNotSupported = 0 -> OdfKit.Compliance.OdfVersionCompatibilityIssueKind
+OdfKit.Compliance.OdfVersionCompatibilityReport
+OdfKit.Compliance.OdfVersionCompatibilityReport.IsSafe.get -> bool
+OdfKit.Compliance.OdfVersionCompatibilityReport.Issues.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Compliance.OdfVersionCompatibilityIssue!>!
+OdfKit.Compliance.OdfVersionCompatibilityReport.SourceVersion.get -> OdfKit.Compliance.OdfVersion
+OdfKit.Compliance.OdfVersionCompatibilityReport.TargetVersion.get -> OdfKit.Compliance.OdfVersion
 OdfKit.Compliance.OdfVersionRange
 OdfKit.Compliance.OdfVersionRange.Contains(OdfKit.Compliance.OdfVersion version) -> bool
 OdfKit.Compliance.OdfVersionRange.Maximum.get -> OdfKit.Compliance.OdfVersion
@@ -839,6 +864,7 @@ OdfKit.Core.OdfDirectIoWritableStream
 OdfKit.Core.OdfDirectIoWritableStream.OdfDirectIoWritableStream(string! filePath) -> void
 OdfKit.Core.OdfDocument
 OdfKit.Core.OdfDocument.AddMasterPage(string! name) -> OdfKit.Styles.OdfMasterPage!
+OdfKit.Core.OdfDocument.AnalyzeVersionCompatibility(OdfKit.Compliance.OdfVersion targetVersion) -> OdfKit.Compliance.OdfVersionCompatibilityReport!
 OdfKit.Core.OdfDocument.AutoCalculate.get -> bool
 OdfKit.Core.OdfDocument.AutoCalculate.set -> void
 OdfKit.Core.OdfDocument.BeginUpdate() -> System.IDisposable!
@@ -878,6 +904,7 @@ OdfKit.Core.OdfDocument.IsTemplate.get -> bool
 OdfKit.Core.OdfDocument.IsUpdateActive.get -> bool
 OdfKit.Core.OdfDocument.Language.get -> string?
 OdfKit.Core.OdfDocument.Language.set -> void
+OdfKit.Core.OdfDocument.LastVersionCompatibilityReport.get -> OdfKit.Compliance.OdfVersionCompatibilityReport?
 OdfKit.Core.OdfDocument.LinkUpdateMode.get -> int
 OdfKit.Core.OdfDocument.LinkUpdateMode.set -> void
 OdfKit.Core.OdfDocument.ModificationDate.get -> System.DateTime?
@@ -1203,6 +1230,8 @@ OdfKit.Core.OdfSaveOptions.PruneUnusedMedia.get -> bool
 OdfKit.Core.OdfSaveOptions.PruneUnusedMedia.set -> void
 OdfKit.Core.OdfSaveOptions.TemporaryDirectory.get -> string?
 OdfKit.Core.OdfSaveOptions.TemporaryDirectory.set -> void
+OdfKit.Core.OdfSaveOptions.VersionCompatibilityReportHandler.get -> System.Action<OdfKit.Compliance.OdfVersionCompatibilityReport!>?
+OdfKit.Core.OdfSaveOptions.VersionCompatibilityReportHandler.set -> void
 OdfKit.Core.OdfSignatureLevel
 OdfKit.Core.OdfSignatureLevel.None = 0 -> OdfKit.Core.OdfSignatureLevel
 OdfKit.Core.OdfSignatureLevel.XadesA = 4 -> OdfKit.Core.OdfSignatureLevel
@@ -17939,6 +17968,9 @@ override OdfKit.Compliance.OdfPracticalCompatibilityIssue.ToString() -> string!
 override OdfKit.Compliance.OdfQualifiedName.Equals(object? obj) -> bool
 override OdfKit.Compliance.OdfQualifiedName.GetHashCode() -> int
 override OdfKit.Compliance.OdfQualifiedName.ToString() -> string!
+override OdfKit.Compliance.OdfVersionCompatibilityIssue.Equals(object? obj) -> bool
+override OdfKit.Compliance.OdfVersionCompatibilityIssue.GetHashCode() -> int
+override OdfKit.Compliance.OdfVersionCompatibilityIssue.ToString() -> string!
 override OdfKit.Core.OdfCrc32Stream.CanRead.get -> bool
 override OdfKit.Core.OdfCrc32Stream.CanSeek.get -> bool
 override OdfKit.Core.OdfCrc32Stream.CanWrite.get -> bool
@@ -18439,6 +18471,8 @@ static OdfKit.Compliance.OdfValidator.Validate(System.IO.Stream! stream) -> OdfK
 static OdfKit.Compliance.OdfValidator.Validate(System.IO.Stream! stream, OdfKit.Compliance.OdfValidationOptions? options) -> OdfKit.Compliance.OdfValidationReport!
 static OdfKit.Compliance.OdfValidator.Validate(System.IO.Stream! stream, string? fileName) -> OdfKit.Compliance.OdfValidationReport!
 static OdfKit.Compliance.OdfValidator.Validate(System.IO.Stream! stream, string? fileName, OdfKit.Compliance.OdfComplianceProfile? profile) -> OdfKit.Compliance.OdfValidationReport!
+static OdfKit.Compliance.OdfVersionCompatibilityIssue.operator !=(OdfKit.Compliance.OdfVersionCompatibilityIssue? left, OdfKit.Compliance.OdfVersionCompatibilityIssue? right) -> bool
+static OdfKit.Compliance.OdfVersionCompatibilityIssue.operator ==(OdfKit.Compliance.OdfVersionCompatibilityIssue? left, OdfKit.Compliance.OdfVersionCompatibilityIssue? right) -> bool
 static OdfKit.Compliance.OdfVersionRange.AllKnown.get -> OdfKit.Compliance.OdfVersionRange!
 static OdfKit.Compliance.OdfVersionRange.Exact(OdfKit.Compliance.OdfVersion version) -> OdfKit.Compliance.OdfVersionRange!
 static OdfKit.Core.ComputedStyle.Resolve(OdfKit.DOM.OdfElement! element) -> OdfKit.Core.ComputedStyle!

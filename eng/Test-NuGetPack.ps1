@@ -8,6 +8,8 @@
     略過封裝，使用既有 artifacts/nuget。
 .PARAMETER SkipConsumerSmoke
     略過消費端煙霧測試，只驗證封裝契約。
+.PARAMETER SkipNetFrameworkSmoke
+    略過 Windows net48 CLR 消費端煙霧；用於非 x64 Windows runner。
 .PARAMETER GenerateHashManifest
     為封裝產物建立 SHA256SUMS manifest。
 .PARAMETER VerifyHashManifest
@@ -18,6 +20,7 @@ param(
     [string]$Configuration = "Release",
     [switch]$SkipPack,
     [switch]$SkipConsumerSmoke,
+    [switch]$SkipNetFrameworkSmoke,
     [switch]$GenerateHashManifest,
     [switch]$VerifyHashManifest
 )
@@ -271,6 +274,17 @@ Console.WriteLine("ok");
 
     dotnet run --project $smokeDir -c $Configuration --no-build
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    if ($IsWindows -and -not $SkipNetFrameworkSmoke) {
+        & (Join-Path $PSScriptRoot "Test-NetFramework48Smoke.ps1") `
+            -Configuration $Configuration `
+            -PackageDirectory $outDir `
+            -PackageVersion $packageVersion
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+    else {
+        Write-Host "非 Windows x64 net48 runner，略過 net48 CLR consumer smoke。"
+    }
 
     Write-Host ""
     Write-Host "REL-1 NuGet 封裝驗收通過。"

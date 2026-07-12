@@ -4,6 +4,9 @@
 
 ## 尚未發佈
 
+- 完成 ODT／ODS／ODP／ODG 高階 facade 的一致 CRUD 生命週期契約，加入逐 topic semantic coverage、隨機 mutation、重複保存載入、clean-room provenance 與 Office 修改另存驗證；同步更新 Public API 基線及破壞性重整遷移指南。
+- 新增 `net48` Windows CLR consumer smoke，從本地 NuGet 套件驗證四主格式 round-trip、binding redirect、native imaging 與 7 個 extensions 最小執行入口。
+- 新增 `OdfVersionCompatibilityReport` 與 `AnalyzeVersionCompatibility`，在 ODF 1.4 語意降版至 1.1～1.3 前後提供元素／屬性、命名空間及 DOM 路徑的結構化診斷；保存仍保留無法映射與 foreign namespace 內容，不捏造等價語意。
 - 新增 ODS／ODT 串流 Reader 資源限制選項與真正非同步讀取；repeat、列欄、節點及文字超限時改為失敗，不再靜默截斷。
 - 修正 `OdsStreamReader.GetValue` 的 `DbDataReader` 語意：空值回傳 `DBNull.Value`，公式儲存格回傳已儲存快取值；新增 `GetCell` 保留公式、值類型、貨幣及顯示文字。這是 1.0 前的刻意破壞性修正。
 - ODS／ODT Writer 新增非同步 flush／complete 路徑；ZIP 中央目錄提交因 BCL `ZipArchive` 限制仍為同步步驟。

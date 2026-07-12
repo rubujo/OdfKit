@@ -21,6 +21,7 @@ internal static class OdfDocumentPersistenceEngine
         ctx.Package.FormulaExternalLinksForSave = ctx.FormulaExternalLinks;
         OdfFontResolver.EmbedFontSubsets(ctx.Package, ctx.ContentDom, ctx.StylesDom);
         OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
+        ReportVersionCompatibility(ctx, options);
         ApplySaveVersionOptions(ctx, options);
         WriteAllDomEntries(ctx, options);
         PruneUnusedMedia(ctx, options);
@@ -74,6 +75,22 @@ internal static class OdfDocumentPersistenceEngine
         SetDocumentRootVersion(ctx.StylesDom, version);
         SetDocumentRootVersion(ctx.MetaDom, version);
         SetDocumentRootVersion(ctx.SettingsDom, version);
+    }
+
+    private static void ReportVersionCompatibility(
+        OdfDocument.OdfDocumentPersistenceCollaborators ctx,
+        OdfSaveOptions options)
+    {
+        OdfVersion? effectiveVersion = options.ForceVersion ?? ctx.TargetVersion;
+        if (effectiveVersion is not OdfVersion targetVersion)
+        {
+            ctx.SetLastVersionCompatibilityReport(null);
+            return;
+        }
+
+        OdfVersionCompatibilityReport report = ctx.AnalyzeVersionCompatibility(targetVersion);
+        ctx.SetLastVersionCompatibilityReport(report);
+        options.VersionCompatibilityReportHandler?.Invoke(report);
     }
 
     private static void SetDocumentRootVersion(OdfNode node, string version)

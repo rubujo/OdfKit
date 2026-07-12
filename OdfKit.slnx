@@ -24,4 +24,5 @@
   <Project Path="tools/OdfKit.Cli/OdfKit.Cli.csproj" />
   <Project Path="tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj" />
   <Project Path="tools/OdfCorpusGenerator/OdfCorpusGenerator.csproj" />
+  <Project Path="tests/OdfKit.NetFramework48Smoke/OdfKit.NetFramework48Smoke.csproj" />
 </Solution>

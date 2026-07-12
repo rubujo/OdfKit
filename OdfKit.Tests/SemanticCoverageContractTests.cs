@@ -13,6 +13,8 @@ public class SemanticCoverageContractTests
     private static readonly string[] RequiredFormats = ["ODT", "ODS", "ODP", "ODG"];
     private static readonly string[] RequiredOperations =
         ["Create", "Get", "Find", "Set", "Update", "Remove", "Clear", "RoundTrip", "Interop"];
+    private static readonly string[] RequiredQualityDimensions =
+        ["ExistingDocument", "UnknownContentPreservation", "LegacyVersions", "DowngradeDiagnostics", "InvalidInput"];
 
     /// <summary>
     /// Verifies every primary format has complete semantic families and evidence.
@@ -26,7 +28,7 @@ public class SemanticCoverageContractTests
         using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
         JsonElement manifest = document.RootElement;
 
-        Assert.Equal(2, manifest.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal(3, manifest.GetProperty("schemaVersion").GetInt32());
         Assert.Equal("1.4", manifest.GetProperty("odfVersion").GetString());
         Assert.Equal(
             "normalize-to-1.4-preserve-unknown",
@@ -59,6 +61,21 @@ public class SemanticCoverageContractTests
         Assert.True(File.Exists(Path.Combine(root, mutationEvidence.GetProperty("corpusManifest").GetString()!)));
 
         JsonElement[] families = [.. manifest.GetProperty("families").EnumerateArray()];
+        JsonElement[] qualityEvidence = [.. manifest.GetProperty("qualityEvidence").EnumerateArray()];
+        foreach (JsonElement evidence in qualityEvidence)
+        {
+            string dimension = evidence.GetProperty("dimension").GetString()!;
+            Assert.Contains(dimension, RequiredQualityDimensions);
+            string testPath = evidence.GetProperty("test").GetString()!;
+            string symbol = evidence.GetProperty("symbol").GetString()!;
+            string testSource = File.ReadAllText(Path.Combine(root, testPath));
+            Assert.Contains(symbol, testSource, StringComparison.Ordinal);
+            string[] formats =
+                [.. evidence.GetProperty("formats").EnumerateArray().Select(format => format.GetString()!)];
+            Assert.NotEmpty(formats);
+            Assert.All(formats, format => Assert.Contains(format, RequiredFormats));
+        }
+
         foreach (string format in RequiredFormats)
         {
             Assert.Contains(families, family => family.GetProperty("format").GetString() == format);
@@ -66,6 +83,16 @@ public class SemanticCoverageContractTests
 
         foreach (JsonElement family in families)
         {
+            string familyFormat = family.GetProperty("format").GetString()!;
+            foreach (string dimension in RequiredQualityDimensions)
+            {
+                Assert.Contains(
+                    qualityEvidence,
+                    evidence => evidence.GetProperty("dimension").GetString() == dimension &&
+                        evidence.GetProperty("formats").EnumerateArray()
+                            .Any(format => format.GetString() == familyFormat));
+            }
+
             Assert.Equal("complete", family.GetProperty("status").GetString());
             string[] familyTopics =
                 [.. family.GetProperty("topics").EnumerateArray().Select(topic => topic.GetString()!)];
@@ -103,6 +130,8 @@ public class SemanticCoverageContractTests
                 _ => new HashSet<string>(StringComparer.Ordinal),
                 StringComparer.Ordinal);
             HashSet<string> focusedTopics = [];
+            string[] interopPaths =
+                [.. family.GetProperty("interop").EnumerateArray().Select(path => path.GetString()!)];
             foreach (JsonElement evidence in family.GetProperty("operationEvidence").EnumerateArray())
             {
                 string testPath = evidence.GetProperty("test").GetString()!;
@@ -125,6 +154,10 @@ public class SemanticCoverageContractTests
                 {
                     string operationName = operation.GetString()!;
                     Assert.Contains(operationName, RequiredOperations);
+                    if (operationName == "Interop")
+                    {
+                        Assert.Contains(testPath, interopPaths);
+                    }
                     coveredOperations.Add(operationName);
                     foreach (string topic in evidenceTopics)
                     {

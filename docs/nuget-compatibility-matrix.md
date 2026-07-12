@@ -40,7 +40,8 @@
 |----------------|-------------|----------|
 | .NET 10 | `net10.0` | ✅ 主要開發與測試目標 |
 | .NET 8 LTS | `netstandard2.0` | ✅ CLI / 測試專案覆蓋 `net8.0`；程式庫雙 TFM 建置 |
-| .NET Standard 2.0 相容專案（含 .NET Framework 4.6.1+） | `netstandard2.0` | ✅ 程式庫雙 TFM 建置；消費端煙霧見 `eng/Test-NuGetPack.ps1` |
+| .NET Framework 4.8 | `netstandard2.0` | ✅ `OdfKit.NetFramework48Smoke` 以本地 nupkg 在 CLR 4.x 執行四主格式 round-trip 與 7 個 extensions 最小入口 |
+| 其他 .NET Standard 2.0 相容專案 | `netstandard2.0` | ⚠️ 提供相容資產；低於 .NET Framework 4.8 的 CLR 尚未列為實機執行門檻 |
 
 ### 桌面作業系統與架構
 
