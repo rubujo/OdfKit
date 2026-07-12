@@ -75,13 +75,15 @@ public partial class SpreadsheetDocument
     /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
     /// <param name="startAddress">The top-left A1 address. / 左上角 A1 位址。</param>
     /// <param name="records">The asynchronous record source. / 非同步記錄來源。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>The object binding report. / 物件繫結報告。</returns>
-    public Task<OdfObjectBindingReport> ImportRecordsAsync<T>(
-        string sheetName,
-        string startAddress,
-        IAsyncEnumerable<T> records,
-        CancellationToken cancellationToken = default) =>
+    public Task<OdfObjectBindingReport> ImportRecordsAsync<T>(string sheetName, string startAddress, IAsyncEnumerable<T> records) =>
+        ImportRecordsAsync(sheetName, startAddress, records, null, default);
+
+    /// <summary>
+    /// Short overload of ImportRecordsAsync that accepts sheetName, startAddress, records, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、startAddress、records 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 ImportRecordsAsync 多載。
+    /// </summary>
+    public Task<OdfObjectBindingReport> ImportRecordsAsync<T>(string sheetName, string startAddress, IAsyncEnumerable<T> records, CancellationToken cancellationToken) =>
         ImportRecordsAsync(sheetName, startAddress, records, null, cancellationToken);
 
     /// <summary>
@@ -101,7 +103,7 @@ public partial class SpreadsheetDocument
         string startAddress,
         IAsyncEnumerable<T> records,
         OdfObjectBindingOptions? options,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         if (records is null)
             throw new ArgumentNullException(nameof(records));
@@ -128,12 +130,15 @@ public partial class SpreadsheetDocument
     /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
     /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
     /// <param name="range">The A1 source range. / A1 來源範圍。</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>The materialized records, yielded asynchronously. / 具體化後的記錄，以非同步方式產生。</returns>
-    public IAsyncEnumerable<T> ReadRecordsAsync<T>(
-        string sheetName,
-        string range,
-        CancellationToken cancellationToken = default) where T : new() =>
+    public IAsyncEnumerable<T> ReadRecordsAsync<T>(string sheetName, string range) where T : new() =>
+        ReadRecordsAsync<T>(sheetName, range, null, default);
+
+    /// <summary>
+    /// Short overload of ReadRecordsAsync that accepts sheetName, range, and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 sheetName、range 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 ReadRecordsAsync 多載。
+    /// </summary>
+    public IAsyncEnumerable<T> ReadRecordsAsync<T>(string sheetName, string range, CancellationToken cancellationToken) where T : new() =>
         ReadRecordsAsync<T>(sheetName, range, null, cancellationToken);
 
     /// <summary>
@@ -150,7 +155,7 @@ public partial class SpreadsheetDocument
         string sheetName,
         string range,
         OdfObjectReadOptions? options,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : new()
+        [EnumeratorCancellation] CancellationToken cancellationToken) where T : new()
     {
         cancellationToken.ThrowIfCancellationRequested();
         IReadOnlyList<T> records = ReadRecords<T>(sheetName, range, options);

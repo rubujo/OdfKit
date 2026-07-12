@@ -35,7 +35,7 @@ public class SampleSmokeTests
 
         try
         {
-            string runOutput = RunSample(repoRoot, outputDir);
+            string runOutput = RunSample(repoRoot, outputDir, artifactsDir: Path.Combine(tempRoot, "artifacts"));
             Assert.Contains("所有示範文件已成功建立", runOutput, StringComparison.Ordinal);
 
             (string FileName, OdfDocumentKind Kind)[] expected =
@@ -100,6 +100,7 @@ public class SampleSmokeTests
             string runOutput = RunSample(
                 repoRoot,
                 outputDir,
+                artifactsDir: Path.Combine(tempRoot, "artifacts"),
                 hostPollution: new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["TargetFramework"] = "net8.0",
@@ -119,6 +120,7 @@ public class SampleSmokeTests
     private static string RunSample(
         string repoRoot,
         string outputDir,
+        string artifactsDir,
         IReadOnlyDictionary<string, string>? hostPollution = null)
     {
         var startInfo = new ProcessStartInfo
@@ -135,6 +137,14 @@ public class SampleSmokeTests
         // 命令列屬性優先於環境變數，作為淨化後的第二道防線。
         startInfo.ArgumentList.Add("-f");
         startInfo.ArgumentList.Add("net10.0");
+        // dotnet run 對 file-based app 的預設建置成品位置是依來源檔絕對路徑雜湊出的固定目錄
+        // （%TEMP%\dotnet\runfile\Sample-<hash>\），與呼叫端行程無關。多 TFM dotnet test 會讓
+        // net10.0／net8.0 兩個測試宿主行程同時各自執行本測試，兩者都指向 samples/Sample.cs、
+        // 雜湊出同一個目錄，進而互踩鎖定該目錄下的建置快取檔（例如 build-start.cache）。
+        // 明確指定每次測試呼叫專屬（GUID 命名）的 --artifacts-path，讓每個行程各自獨立，徹底
+        // 避免共用快取目錄的競爭，而不是靠重跑或關閉平行測試繞過。
+        startInfo.ArgumentList.Add("--artifacts-path");
+        startInfo.ArgumentList.Add(artifactsDir);
         startInfo.ArgumentList.Add("-p:RunAnalyzersDuringBuild=false");
         startInfo.ArgumentList.Add("-p:UseSharedCompilation=false");
 
