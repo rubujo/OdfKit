@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit;
 
@@ -67,4 +70,22 @@ public sealed class OdfTemplateBindReport
     /// 取得是否所有占位符皆已解析。
     /// </summary>
     public bool IsComplete => UnresolvedPlaceholders.Count == 0 && Warnings.Count == 0;
+
+    /// <summary>
+    /// Gets <see cref="UnresolvedPlaceholderDetails"/>, <see cref="ExpandedCollections"/> and
+    /// <see cref="Warnings"/> merged into strongly typed diagnostics.
+    /// 取得合併 <see cref="UnresolvedPlaceholderDetails"/>、<see cref="ExpandedCollections"/>
+    /// 與 <see cref="Warnings"/> 而成的強型別診斷。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        UnresolvedPlaceholderDetails
+            .Select(detail => new OdfDiagnostic(
+                "UnresolvedPlaceholder",
+                OdfIssueSeverity.Warning,
+                detail.Expression,
+                objectId: detail.DocumentKind,
+                location: detail.LocationHint))
+            .Concat(OdfDiagnostic.FromStrings(ExpandedCollections, "ExpandedCollection", OdfIssueSeverity.Info))
+            .Concat(OdfDiagnostic.FromStrings(Warnings, "Warning", OdfIssueSeverity.Warning))
+            .ToList();
 }

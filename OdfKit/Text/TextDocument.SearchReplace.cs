@@ -18,8 +18,12 @@ public partial class TextDocument
     /// </summary>
     public new OdfTextReplaceResult ReplaceText(string search, string replacement)
     {
-        IReadOnlyList<OdfTextMatch> matches = FindText(search);
-        base.ReplaceText(search, replacement);
+        if (string.IsNullOrEmpty(search))
+            throw new ArgumentException(null, nameof(search));
+
+        // 尋找與取代共用單次文件走訪（見 TextDocumentSearchReplaceEngine.ScanParagraphs），
+        // 不再先組完整文件字串找一次、又各自逐段落取代一次。
+        List<OdfTextMatch> matches = TextDocumentSearchReplaceEngine.FindAndReplaceText(this, search, replacement);
         return new OdfTextReplaceResult(matches);
     }
 
@@ -46,20 +50,8 @@ public partial class TextDocument
         if (options.MaxResults < 0)
             throw new ArgumentOutOfRangeException(nameof(options));
 
-        string text = BodyTextRoot.TextContent;
-        var matches = new List<OdfTextMatch>();
-        StringComparison comparison = options.MatchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-        int startIndex = 0;
-        while (matches.Count < options.MaxResults)
-        {
-            int index = text.IndexOf(search, startIndex, comparison);
-            if (index < 0)
-                break;
-            if (!options.WholeWord || IsWholeWord(text, index, search.Length))
-                matches.Add(new OdfTextMatch(index, search.Length, text.Substring(index, search.Length)));
-            startIndex = index + search.Length;
-        }
-        return matches;
+        // 逐段落／標題單次走訪，不再組完整文件字串（見 TextDocumentSearchReplaceEngine.ScanParagraphs）。
+        return TextDocumentSearchReplaceEngine.FindText(this, search, options);
     }
 
     /// <summary>
@@ -99,16 +91,6 @@ public partial class TextDocument
     /// </summary>
     public void ReplaceText(Regex regex, string replacement, Action<OdfTextRun>? styleAction) =>
         TextDocumentSearchReplaceEngine.ReplaceText(this, regex, replacement, styleAction);
-
-    private static bool IsWholeWord(string text, int index, int length)
-    {
-        bool leftBoundary = index == 0 || !IsWordCharacter(text[index - 1]);
-        int endIndex = index + length;
-        bool rightBoundary = endIndex == text.Length || !IsWordCharacter(text[endIndex]);
-        return leftBoundary && rightBoundary;
-    }
-
-    private static bool IsWordCharacter(char value) => char.IsLetterOrDigit(value) || value == '_';
 
     #endregion
 }

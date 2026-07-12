@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.Extensions.Collaboration\OdfKit.Extensions.Collaboration.csproj" />
+    <ProjectReference Include="..\OdfKit.Extensions.Html\OdfKit.Extensions.Html.csproj" />
+    <ProjectReference Include="..\OdfKit.Extensions.Pdf\OdfKit.Extensions.Pdf.csproj" />
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\tests\OdfKit.PerformanceFixtures\OdfKit.PerformanceFixtures.csproj" />
   </ItemGroup>

@@ -34,6 +34,26 @@ $definitions = @(
         Key = "OdsStreamWriterBenchmarks.WriteRows"
         Filter = "*OdsStreamWriterBenchmarks*"
         Method = "WriteRows"
+    },
+    [PSCustomObject]@{
+        Key = "StandardOdtBenchmarks.WriteStreaming"
+        Filter = "*StandardOdtBenchmarks*"
+        Method = "WriteStreaming"
+    },
+    [PSCustomObject]@{
+        Key = "StandardPackageOpenBenchmarks.OpenOdt"
+        Filter = "*StandardPackageOpenBenchmarks*"
+        Method = "OpenOdt"
+    },
+    [PSCustomObject]@{
+        Key = "CollaborationOperationBenchmarks.Replay_10kTextOperations"
+        Filter = "*CollaborationOperationBenchmarks*"
+        Method = "Replay_10kTextOperations"
+    },
+    [PSCustomObject]@{
+        Key = "FindReplaceBenchmarks.ReplaceText"
+        Filter = "*FindReplaceBenchmarks*"
+        Method = "ReplaceText"
     }
 )
 

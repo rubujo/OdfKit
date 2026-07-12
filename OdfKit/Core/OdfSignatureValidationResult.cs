@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -99,5 +101,25 @@ public sealed class OdfSingleSignatureValidationResult
     /// 取得已執行驗證步驟的追蹤記錄。
     /// </summary>
     public List<string> ValidationSteps { get; } = [];
+
+    /// <summary>
+    /// Gets <see cref="ErrorCode"/>/<see cref="ErrorMessage"/> (when present) and
+    /// <see cref="Warnings"/> merged into strongly typed diagnostics
+    /// (<see cref="CheckedReferences"/> and <see cref="ValidationSteps"/> are execution trails,
+    /// not diagnostics, and are intentionally excluded).
+    /// 取得合併 <see cref="ErrorCode"/>／<see cref="ErrorMessage"/>（若存在）與
+    /// <see cref="Warnings"/> 而成的強型別診斷（<see cref="CheckedReferences"/> 與
+    /// <see cref="ValidationSteps"/> 屬於執行追蹤記錄而非診斷，故刻意不納入）。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics
+    {
+        get
+        {
+            IEnumerable<OdfDiagnostic> errors = ErrorMessage is null
+                ? []
+                : [new OdfDiagnostic(ErrorCode ?? "SignatureError", OdfIssueSeverity.Error, ErrorMessage)];
+            return errors.Concat(OdfDiagnostic.FromStrings(Warnings, "Warning", OdfIssueSeverity.Warning)).ToList();
+        }
+    }
 }
 

@@ -54,6 +54,53 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 ImportRecordsAsync／ReadRecordsAsync 可消費非同步來源、逐筆非同步產生記錄，
+    /// 且支援取消。
+    /// </summary>
+    [Fact]
+    public async Task ImportAndReadRecordsAsyncConsumeAndProduceAsyncSequences()
+    {
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("Data");
+
+        OdfObjectBindingReport imported = await workbook.ImportRecordsAsync(
+            "Data",
+            "A1",
+            ToAsyncEnumerable(
+                new MutableProduct { Name = "Pen", Stock = 3 },
+                new MutableProduct { Name = "Book", Stock = 4 }),
+            TestContext.Current.CancellationToken);
+        Assert.Equal(2, imported.RowCount);
+
+        var records = new List<MutableProduct>();
+        await foreach (MutableProduct record in workbook.ReadRecordsAsync<MutableProduct>(
+            "Data", "A1:B3", TestContext.Current.CancellationToken))
+        {
+            records.Add(record);
+        }
+
+        Assert.Collection(records,
+            item => Assert.Equal(("Pen", 3), (item.Name, item.Stock)),
+            item => Assert.Equal(("Book", 4), (item.Name, item.Stock)));
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await workbook.ImportRecordsAsync("Data", "D1", ToAsyncEnumerable(new MutableProduct()), cts.Token);
+        });
+    }
+
+    private static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(params T[] items)
+    {
+        foreach (T item in items)
+        {
+            await Task.Yield();
+            yield return item;
+        }
+    }
+
+    /// <summary>
     /// 驗證可用工作表與儲存格索引建立、保存並重新載入 ODS。
     /// </summary>
     [Fact]

@@ -31,9 +31,11 @@ public static class OdfPdfExporter
     /// </summary>
     public static OdfExportReport ExportToStream(TextDocument document, Stream destination)
     {
-        long start = destination.CanSeek ? destination.Position : 0;
+        // 以 Length（而非 Position）計算寫入位元組數：PDFsharp 的 PdfDocument.Save 在寫完後
+        // 可能將資料流游標移回起點（方便呼叫端立即讀回），若改用 Position 相減會誤算為 0。
+        long start = destination.CanSeek ? destination.Length : 0;
         Export(document, destination);
-        long written = destination.CanSeek ? destination.Position - start : 0;
+        long written = destination.CanSeek ? destination.Length - start : 0;
         return new OdfExportReport(OdfExportFormat.Pdf, "managed-pdf") { BytesWritten = written };
     }
 
@@ -59,12 +61,15 @@ public static class OdfPdfExporter
     public static async Task<OdfExportReport> ExportToStreamAsync(TextDocument document, Stream destination, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        using var buffer = new MemoryStream();
-        Export(document, buffer);
-        cancellationToken.ThrowIfCancellationRequested();
-        buffer.Position = 0;
-        await buffer.CopyToAsync(destination, 81920, cancellationToken).ConfigureAwait(false);
-        return new OdfExportReport(OdfExportFormat.Pdf, "managed-pdf") { BytesWritten = buffer.Length };
+
+        // 直接對目的地資料流序列化（與同步版 ExportToStream 相同路徑），省去先寫入中繼
+        // MemoryStream 再整體 CopyToAsync 的雙重緩衝。PDFsharp 的 PdfDocument.Save 本身
+        // 仍需先解析完整物件圖／xref 表才能序列化（第三方庫的整體序列化限制，無法避免），
+        // 此處僅消除 OdfKit 自行外加的第二層緩衝。
+        long start = destination.CanSeek ? destination.Length : 0;
+        await Task.Run(() => Export(document, destination), cancellationToken).ConfigureAwait(false);
+        long written = destination.CanSeek ? destination.Length - start : 0;
+        return new OdfExportReport(OdfExportFormat.Pdf, "managed-pdf") { BytesWritten = written };
     }
 
     /// <summary>

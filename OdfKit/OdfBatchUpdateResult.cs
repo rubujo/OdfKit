@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit;
 
@@ -43,4 +46,19 @@ public sealed class OdfBatchUpdateResult
     /// 取得套用更新時產生的非致命警告。
     /// </summary>
     public IList<string> Warnings { get; } = new List<string>();
+
+    /// <summary>
+    /// Gets <see cref="MissingNames"/>, <see cref="AmbiguousNames"/> and <see cref="Warnings"/>
+    /// merged into strongly typed diagnostics (<see cref="UpdatedNames"/> and
+    /// <see cref="UnchangedNames"/> describe successful outcomes, not diagnostics, and are
+    /// intentionally excluded).
+    /// 取得合併 <see cref="MissingNames"/>、<see cref="AmbiguousNames"/> 與 <see cref="Warnings"/>
+    /// 而成的強型別診斷（<see cref="UpdatedNames"/> 與 <see cref="UnchangedNames"/> 描述的是成功結果
+    /// 而非診斷，故刻意不納入）。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        OdfDiagnostic.FromStrings(MissingNames, "MissingName", OdfIssueSeverity.Error)
+            .Concat(OdfDiagnostic.FromStrings(AmbiguousNames, "AmbiguousName", OdfIssueSeverity.Error))
+            .Concat(OdfDiagnostic.FromStrings(Warnings, "Warning", OdfIssueSeverity.Warning))
+            .ToList();
 }

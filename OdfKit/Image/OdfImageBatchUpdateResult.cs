@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Image;
 
@@ -19,4 +21,11 @@ public sealed class OdfImageBatchUpdateResult
     /// 取得要求更新但找不到的框架名稱。
     /// </summary>
     public IList<string> MissingNames { get; } = new List<string>();
+
+    /// <summary>
+    /// Gets <see cref="MissingNames"/> as strongly typed diagnostics.
+    /// 取得 <see cref="MissingNames"/> 的強型別診斷檢視。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        OdfDiagnostic.FromStrings(MissingNames, "MissingName", OdfIssueSeverity.Error);
 }

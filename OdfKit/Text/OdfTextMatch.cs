@@ -1,29 +1,72 @@
-﻿namespace OdfKit.Text;
+namespace OdfKit.Text;
 
 /// <summary>
 /// Describes one task-oriented text search match.
 /// 描述一筆任務導向文字搜尋結果。
 /// </summary>
-/// <param name="index">The zero-based text index. / 從零開始的文字索引。</param>
-/// <param name="length">The matched text length. / 符合文字的長度。</param>
-/// <param name="value">The matched text. / 符合的文字。</param>
-public sealed class OdfTextMatch(int index, int length, string value)
+public sealed class OdfTextMatch
 {
+    /// <summary>
+    /// Creates a match with only a document-relative offset (no stable paragraph handle).
+    /// 建立僅具文件相對 offset（無穩定段落 handle）的符合項目。
+    /// </summary>
+    /// <param name="index">The zero-based text index. / 從零開始的文字索引。</param>
+    /// <param name="length">The matched text length. / 符合文字的長度。</param>
+    /// <param name="value">The matched text. / 符合的文字。</param>
+    public OdfTextMatch(int index, int length, string value)
+    {
+        Index = index;
+        Length = length;
+        Value = value;
+    }
+
+    /// <summary>
+    /// Creates a match that also carries a stable paragraph range handle.
+    /// 建立同時攜帶穩定段落 range handle 的符合項目。
+    /// </summary>
+    /// <param name="index">The zero-based text index. / 從零開始的文字索引。</param>
+    /// <param name="length">The matched text length. / 符合文字的長度。</param>
+    /// <param name="value">The matched text. / 符合的文字。</param>
+    /// <param name="paragraph">The paragraph containing this match. / 包含此符合項目的段落。</param>
+    /// <param name="paragraphOffset">The offset within the paragraph's own text. / 在段落自身文字中的 offset。</param>
+    internal OdfTextMatch(int index, int length, string value, OdfParagraph paragraph, int paragraphOffset)
+        : this(index, length, value)
+    {
+        Paragraph = paragraph;
+        ParagraphOffset = paragraphOffset;
+    }
+
     /// <summary>
     /// Gets the zero-based text index.
     /// 取得從零開始的文字索引。
     /// </summary>
-    public int Index { get; } = index;
+    public int Index { get; }
 
     /// <summary>
     /// Gets the matched text length.
     /// 取得符合文字的長度。
     /// </summary>
-    public int Length { get; } = length;
+    public int Length { get; }
 
     /// <summary>
     /// Gets the matched text.
     /// 取得符合的文字。
     /// </summary>
-    public string Value { get; } = value;
+    public string Value { get; }
+
+    /// <summary>
+    /// Gets the paragraph containing this match — a stable range handle beyond the plain
+    /// document-relative <see cref="Index"/> offset. Null when the match was not produced by a
+    /// paragraph-aware search (e.g. constructed directly by external code).
+    /// 取得包含此符合項目的段落——比單純的文件相對 <see cref="Index"/> offset 更穩定的 range
+    /// handle。若此符合項目非由段落感知搜尋產生（例如由外部程式碼直接建構），則為 null。
+    /// </summary>
+    public OdfParagraph? Paragraph { get; }
+
+    /// <summary>
+    /// Gets the zero-based offset of this match within the paragraph's own concatenated text,
+    /// as opposed to <see cref="Index"/> which is relative to the whole document.
+    /// 取得此符合項目在段落自身串接文字中的從零開始 offset，相對於文件相對的 <see cref="Index"/>。
+    /// </summary>
+    public int ParagraphOffset { get; }
 }

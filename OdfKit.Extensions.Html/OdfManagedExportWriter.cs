@@ -12,9 +12,18 @@ internal static class OdfManagedExportWriter
     {
         if (destination is null)
             throw new ArgumentNullException(nameof(destination));
-        byte[] bytes = new UTF8Encoding(false).GetBytes(content);
-        destination.Write(bytes, 0, bytes.Length);
-        return new OdfExportReport(format, backend) { BytesWritten = bytes.Length };
+
+        // Writes the already-built string directly through a StreamWriter instead of first
+        // allocating a full UTF-8 byte[] copy of it — avoids holding two full-size buffers
+        // (string + byte[]) in memory at once for large exports.
+        var encoding = new UTF8Encoding(false);
+        using (var writer = new StreamWriter(destination, encoding, 4096, leaveOpen: true))
+        {
+            writer.Write(content);
+            writer.Flush();
+        }
+
+        return new OdfExportReport(format, backend) { BytesWritten = encoding.GetByteCount(content) };
     }
 
     internal static async Task<OdfExportReport> WriteAsync(
@@ -26,9 +35,21 @@ internal static class OdfManagedExportWriter
     {
         if (destination is null)
             throw new ArgumentNullException(nameof(destination));
-        byte[] bytes = new UTF8Encoding(false).GetBytes(content);
-        await destination.WriteAsync(bytes, 0, bytes.Length, cancellationToken).ConfigureAwait(false);
-        return new OdfExportReport(format, backend) { BytesWritten = bytes.Length };
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var encoding = new UTF8Encoding(false);
+        var writer = new StreamWriter(destination, encoding, 4096, leaveOpen: true);
+        try
+        {
+            await writer.WriteAsync(content).ConfigureAwait(false);
+            await writer.FlushAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+
+        return new OdfExportReport(format, backend) { BytesWritten = encoding.GetByteCount(content) };
     }
 
     internal static OdfExportReport WritePath(string path, string content, OdfExportFormat format, string backend)

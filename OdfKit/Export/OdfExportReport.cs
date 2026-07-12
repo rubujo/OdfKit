@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Export;
 
@@ -67,4 +69,11 @@ public sealed class OdfExportReport(OdfExportFormat format, string backend)
     /// 取得是否產生診斷。
     /// </summary>
     public bool HasDiagnostics => DiagnosticCodes.Count > 0;
+
+    /// <summary>
+    /// Gets <see cref="DiagnosticCodes"/> as strongly typed diagnostics.
+    /// 取得 <see cref="DiagnosticCodes"/> 的強型別診斷檢視。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        OdfDiagnostic.FromStrings(DiagnosticCodes, "ExportDiagnostic", OdfIssueSeverity.Warning);
 }

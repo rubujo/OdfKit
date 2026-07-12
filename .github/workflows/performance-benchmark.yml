@@ -10,8 +10,12 @@ permissions:
 
 jobs:
   benchmark-regression:
-    name: Benchmark Regression
-    runs-on: windows-latest
+    name: Benchmark Regression (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     steps:
       - name: Checkout
@@ -23,6 +27,8 @@ jobs:
           dotnet-versions: |
             10.0.x
 
+      # windows-latest／ubuntu-latest 皆為硬閘門（超過容忍度即失敗）；跨平台計時雜訊較大，
+      # 容忍度沿用既有值，若日後累積數據顯示 Linux 雜訊需要更寬容忍度再個別調整。
       - name: Run benchmark regression
         shell: pwsh
         run: ./eng/Benchmark-Regression.ps1 -Configuration Release
@@ -35,7 +41,42 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: standard-document-performance
+          name: standard-document-performance-${{ matrix.os }}
+          path: artifacts/performance/standard-documents.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  benchmark-regression-macos:
+    name: Benchmark Regression (macos-latest, informational)
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+
+      # macOS 目前僅量測、不閘門：CI 尚無 macOS 基準線數據可比對，先以 continue-on-error 上傳
+      # 量測結果，累積數據後再視情況升級為硬閘門，避免第一輪就因缺乏基準產生誤報。
+      - name: Run benchmark regression (informational, non-blocking)
+        shell: pwsh
+        continue-on-error: true
+        run: ./eng/Benchmark-Regression.ps1 -Configuration Release
+
+      - name: Measure standard ODS ODT ODP workloads
+        shell: pwsh
+        continue-on-error: true
+        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release
+
+      - name: Upload standard document measurements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: standard-document-performance-macos-latest
           path: artifacts/performance/standard-documents.json
           if-no-files-found: warn
           retention-days: 30

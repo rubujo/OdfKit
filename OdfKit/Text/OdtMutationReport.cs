@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Text;
 
@@ -44,4 +47,16 @@ public sealed class OdtMutationReport(string operation)
     /// 取得作業是否已變更文件。
     /// </summary>
     public bool Changed => UpdatedCount > 0;
+
+    /// <summary>
+    /// Gets <see cref="MissingTargets"/> and <see cref="AmbiguousTargets"/> merged into strongly
+    /// typed diagnostics (<see cref="CreatedPackagePaths"/> describes a successful outcome, not a
+    /// diagnostic, and is intentionally excluded).
+    /// 取得合併 <see cref="MissingTargets"/> 與 <see cref="AmbiguousTargets"/> 而成的強型別診斷
+    /// （<see cref="CreatedPackagePaths"/> 描述的是成功結果而非診斷，故刻意不納入）。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        OdfDiagnostic.FromStrings(MissingTargets, "MissingTarget", OdfIssueSeverity.Error)
+            .Concat(OdfDiagnostic.FromStrings(AmbiguousTargets, "AmbiguousTarget", OdfIssueSeverity.Error))
+            .ToList();
 }

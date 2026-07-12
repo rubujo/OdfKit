@@ -174,9 +174,13 @@ internal static class TextDocumentSearchReplaceEngine
         while (stack.Count > 0)
         {
             OdfNode current = stack.Pop();
+
+            // "h"（標題）與 "p" 同為段落層級節點，比照 TextDocumentFieldExtractionEngine 的
+            // EnumerateParagraphLikeNodes 慣例一併納入，避免標題內文字被 FindText 找到卻無法被
+            // ReplaceText 實際取代的既有不一致。
             if (current.NodeType == OdfNodeType.Element &&
-                current.LocalName == "p" &&
-                current.NamespaceUri == OdfNamespaces.Text)
+                current.NamespaceUri == OdfNamespaces.Text &&
+                current.LocalName is "p" or "h")
             {
                 yield return current;
             }
@@ -187,6 +191,97 @@ internal static class TextDocumentSearchReplaceEngine
             }
         }
     }
+
+    /// <summary>
+    /// 對文件所有段落／標題做單次走訪，找出符合的文字位置（可選擇同時就地取代）。
+    /// FindText 與 ReplaceText(string,string) 共用此邏輯，避免各自重複走訪整份文件。
+    /// </summary>
+    private static List<OdfTextMatch> ScanParagraphs(
+        TextDocument document,
+        string search,
+        OdfTextQueryOptions options,
+        bool replaceWith,
+        string? replacement)
+    {
+        var matches = new List<OdfTextMatch>();
+        StringComparison comparison = options.MatchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        int documentOffset = 0;
+
+        // 走訪 ContentDom（而非僅 BodyTextRoot）以涵蓋所有段落／標題節點，與既有
+        // OdfDocument.ReplaceText（base 版本）的走訪範圍一致，避免縮小既有取代／尋找涵蓋範圍。
+        foreach (OdfNode paragraphNode in EnumerateParagraphNodes(document.ContentDom))
+        {
+            if (!replaceWith && matches.Count >= options.MaxResults)
+            {
+                break;
+            }
+
+            List<TextNodeSlice> slices = CollectTextNodeSlices(paragraphNode);
+            if (slices.Count == 0)
+            {
+                continue;
+            }
+
+            string paragraphText = string.Concat(slices.Select(slice => slice.Text));
+            bool paragraphHasMatch = false;
+            int startIndex = 0;
+            OdfParagraph? paragraph = null;
+            while (replaceWith || matches.Count < options.MaxResults)
+            {
+                int index = paragraphText.IndexOf(search, startIndex, comparison);
+                if (index < 0)
+                {
+                    break;
+                }
+
+                if (!options.WholeWord || IsWholeWord(paragraphText, index, search.Length))
+                {
+                    paragraph ??= new OdfParagraph(paragraphNode, document);
+                    matches.Add(new OdfTextMatch(
+                        documentOffset + index,
+                        search.Length,
+                        paragraphText.Substring(index, search.Length),
+                        paragraph,
+                        index));
+                    paragraphHasMatch = true;
+                }
+
+                startIndex = index + search.Length;
+            }
+
+            if (replaceWith && paragraphHasMatch)
+            {
+                ReplaceTextInParagraph(paragraphNode, search, replacement!);
+            }
+
+            documentOffset += paragraphText.Length;
+        }
+
+        return matches;
+    }
+
+    /// <summary>
+    /// 使用具型別查詢選項尋找文字，單次走訪整份文件（不組完整字串）。
+    /// </summary>
+    internal static List<OdfTextMatch> FindText(TextDocument document, string search, OdfTextQueryOptions options) =>
+        ScanParagraphs(document, search, options, replaceWith: false, replacement: null);
+
+    /// <summary>
+    /// 單次走訪整份文件同時尋找並取代文字，回傳所有符合項目（取代與尋找共用同一次走訪，
+    /// 不再各自重複掃描）。
+    /// </summary>
+    internal static List<OdfTextMatch> FindAndReplaceText(TextDocument document, string search, string replacement) =>
+        ScanParagraphs(document, search, OdfTextQueryOptions.Default, replaceWith: true, replacement: replacement);
+
+    private static bool IsWholeWord(string text, int index, int length)
+    {
+        bool leftBoundary = index == 0 || !IsWordCharacter(text[index - 1]);
+        int endIndex = index + length;
+        bool rightBoundary = endIndex == text.Length || !IsWordCharacter(text[endIndex]);
+        return leftBoundary && rightBoundary;
+    }
+
+    private static bool IsWordCharacter(char value) => char.IsLetterOrDigit(value) || value == '_';
 
     internal static void ReplaceTextInParagraph(
         OdfNode paragraphNode,

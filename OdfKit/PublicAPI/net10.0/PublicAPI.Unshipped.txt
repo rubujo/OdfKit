@@ -848,6 +848,14 @@ OdfKit.Core.OdfCrc32Stream
 OdfKit.Core.OdfCrc32Stream.Crc32.get -> uint
 OdfKit.Core.OdfCrc32Stream.OdfCrc32Stream(System.IO.Stream! underlyingStream) -> void
 OdfKit.Core.OdfCrc32Stream.OdfCrc32Stream(System.IO.Stream! underlyingStream, uint? expectedCrc) -> void
+OdfKit.Core.OdfDiagnostic
+OdfKit.Core.OdfDiagnostic.Code.get -> string!
+OdfKit.Core.OdfDiagnostic.Location.get -> string?
+OdfKit.Core.OdfDiagnostic.Message.get -> string!
+OdfKit.Core.OdfDiagnostic.ObjectId.get -> string?
+OdfKit.Core.OdfDiagnostic.OdfDiagnostic(string! code, OdfKit.Compliance.OdfIssueSeverity severity, string! message, string? packagePath = null, string? objectId = null, string? location = null) -> void
+OdfKit.Core.OdfDiagnostic.PackagePath.get -> string?
+OdfKit.Core.OdfDiagnostic.Severity.get -> OdfKit.Compliance.OdfIssueSeverity
 OdfKit.Core.OdfDiagnosticsEventArgs
 OdfKit.Core.OdfDiagnosticsEventArgs.Exception.get -> System.Exception?
 OdfKit.Core.OdfDiagnosticsEventArgs.Level.get -> OdfKit.Core.OdfDiagnosticsLevel
@@ -1262,6 +1270,7 @@ OdfKit.Core.OdfSigningOptions.TsaUrl.get -> string?
 OdfKit.Core.OdfSigningOptions.TsaUrl.set -> void
 OdfKit.Core.OdfSingleSignatureValidationResult
 OdfKit.Core.OdfSingleSignatureValidationResult.Certificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2?
+OdfKit.Core.OdfSingleSignatureValidationResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Core.OdfSingleSignatureValidationResult.CheckedReferences.get -> System.Collections.Generic.List<string!>!
 OdfKit.Core.OdfSingleSignatureValidationResult.ErrorCode.get -> string?
 OdfKit.Core.OdfSingleSignatureValidationResult.ErrorMessage.get -> string?
@@ -14424,6 +14433,7 @@ OdfKit.Drawing.OdfShapeDistribution
 OdfKit.Drawing.OdfShapeDistribution.Horizontal = 0 -> OdfKit.Drawing.OdfShapeDistribution
 OdfKit.Drawing.OdfShapeDistribution.Vertical = 1 -> OdfKit.Drawing.OdfShapeDistribution
 OdfKit.Drawing.OdfShapeLayoutResult
+OdfKit.Drawing.OdfShapeLayoutResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Drawing.OdfShapeLayoutResult.InvalidGeometryShapeIds.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Drawing.OdfShapeLayoutResult.MissingShapeIds.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Drawing.OdfShapeLayoutResult.OdfShapeLayoutResult() -> void
@@ -14449,6 +14459,7 @@ OdfKit.Export.OdfExportReport.Backend.get -> string!
 OdfKit.Export.OdfExportReport.BytesWritten.get -> long
 OdfKit.Export.OdfExportReport.BytesWritten.set -> void
 OdfKit.Export.OdfExportReport.DiagnosticCodes.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Export.OdfExportReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Export.OdfExportReport.Format.get -> OdfKit.Export.OdfExportFormat
 OdfKit.Export.OdfExportReport.HasDiagnostics.get -> bool
 OdfKit.Export.OdfExportReport.OdfExportReport(OdfKit.Export.OdfExportFormat format, string! backend) -> void
@@ -14739,6 +14750,7 @@ OdfKit.Image.ImageDocument.ImageDocument(OdfKit.Core.OdfPackage! package) -> voi
 OdfKit.Image.ImageTemplateDocument
 OdfKit.Image.ImageTemplateDocument.ImageTemplateDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Image.OdfImageBatchUpdateResult
+OdfKit.Image.OdfImageBatchUpdateResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Image.OdfImageBatchUpdateResult.MissingNames.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Image.OdfImageBatchUpdateResult.OdfImageBatchUpdateResult() -> void
 OdfKit.Image.OdfImageBatchUpdateResult.UpdatedCount.get -> int
@@ -14888,6 +14900,7 @@ OdfKit.Image.OdfImageNormalizationRequest.RecommendedName.get -> string?
 OdfKit.Image.OdfImageNormalizationRequest.RecommendedName.init -> void
 OdfKit.OdfBatchUpdateResult
 OdfKit.OdfBatchUpdateResult.AmbiguousNames.get -> System.Collections.Generic.IList<string!>!
+OdfKit.OdfBatchUpdateResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.OdfBatchUpdateResult.MissingNames.get -> System.Collections.Generic.IList<string!>!
 OdfKit.OdfBatchUpdateResult.OdfBatchUpdateResult() -> void
 OdfKit.OdfBatchUpdateResult.UnchangedNames.get -> System.Collections.Generic.IList<string!>!
@@ -14914,6 +14927,7 @@ OdfKit.OdfTemplateBindOptions.UnknownPlaceholderPolicy.set -> void
 OdfKit.OdfTemplateBindReport
 OdfKit.OdfTemplateBindReport.ChangedNodeCount.get -> int
 OdfKit.OdfTemplateBindReport.ChangedNodeCount.set -> void
+OdfKit.OdfTemplateBindReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.OdfTemplateBindReport.ExpandedCollections.get -> System.Collections.Generic.IList<string!>!
 OdfKit.OdfTemplateBindReport.ExpandedItemCount.get -> int
 OdfKit.OdfTemplateBindReport.ExpandedItemCount.set -> void
@@ -16081,6 +16095,7 @@ OdfKit.Spreadsheet.OdfRangeWriteOptions.ShiftFormulas.set -> void
 OdfKit.Spreadsheet.OdfRangeWriteReport
 OdfKit.Spreadsheet.OdfRangeWriteReport.ClearedCellCount.get -> int
 OdfKit.Spreadsheet.OdfRangeWriteReport.ClearedCellCount.set -> void
+OdfKit.Spreadsheet.OdfRangeWriteReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Spreadsheet.OdfRangeWriteReport.OdfRangeWriteReport() -> void
 OdfKit.Spreadsheet.OdfRangeWriteReport.Range.get -> OdfKit.Spreadsheet.OdfCellRange
 OdfKit.Spreadsheet.OdfRangeWriteReport.Range.set -> void
@@ -16670,6 +16685,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.GetTrackedChanges() -> System.Collections
 OdfKit.Spreadsheet.SpreadsheetDocument.GetUsedRange(string! sheetName) -> OdfKit.Spreadsheet.OdfCellRange?
 OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecords<T>(string! sheetName, string! startAddress, System.Collections.Generic.IEnumerable<T>! records) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
 OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecords<T>(string! sheetName, string! startAddress, System.Collections.Generic.IEnumerable<T>! records, OdfKit.Spreadsheet.OdfObjectBindingOptions? options) -> OdfKit.Spreadsheet.OdfObjectBindingReport!
+OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecordsAsync<T>(string! sheetName, string! startAddress, System.Collections.Generic.IAsyncEnumerable<T>! records, OdfKit.Spreadsheet.OdfObjectBindingOptions? options, System.Threading.CancellationToken cancellationToken = default) -> System.Threading.Tasks.Task<OdfKit.Spreadsheet.OdfObjectBindingReport!>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ImportRecordsAsync<T>(string! sheetName, string! startAddress, System.Collections.Generic.IAsyncEnumerable<T>! records, System.Threading.CancellationToken cancellationToken = default) -> System.Threading.Tasks.Task<OdfKit.Spreadsheet.OdfObjectBindingReport!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.InsertChartFromRange(string! sheetName, OdfKit.Spreadsheet.OdfCellAddress anchor, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfEmbeddedChartOptions? options) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.ProtectWorkbook(string! password) -> void
@@ -16677,6 +16694,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.
 OdfKit.Spreadsheet.SpreadsheetDocument.ReadObjects<T>(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecords<T>(string! sheetName, string! range) -> System.Collections.Generic.IReadOnlyList<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecords<T>(string! sheetName, string! range, OdfKit.Spreadsheet.OdfObjectReadOptions? options) -> System.Collections.Generic.IReadOnlyList<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecordsAsync<T>(string! sheetName, string! range, OdfKit.Spreadsheet.OdfObjectReadOptions? options, System.Threading.CancellationToken cancellationToken = default) -> System.Collections.Generic.IAsyncEnumerable<T>!
+OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecordsAsync<T>(string! sheetName, string! range, System.Threading.CancellationToken cancellationToken = default) -> System.Collections.Generic.IAsyncEnumerable<T>!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel) -> OdfKit.Chart.OdfChartDocument!
@@ -17615,6 +17634,8 @@ OdfKit.Text.OdfTextMatch
 OdfKit.Text.OdfTextMatch.Index.get -> int
 OdfKit.Text.OdfTextMatch.Length.get -> int
 OdfKit.Text.OdfTextMatch.OdfTextMatch(int index, int length, string! value) -> void
+OdfKit.Text.OdfTextMatch.Paragraph.get -> OdfKit.Text.OdfParagraph?
+OdfKit.Text.OdfTextMatch.ParagraphOffset.get -> int
 OdfKit.Text.OdfTextMatch.Value.get -> string!
 OdfKit.Text.OdfTextQueryOptions
 OdfKit.Text.OdfTextQueryOptions.MatchCase.get -> bool
@@ -17730,6 +17751,7 @@ OdfKit.Text.OdfUserFieldDeclarationInfo.ValueType.get -> string!
 OdfKit.Text.OdtMutationReport
 OdfKit.Text.OdtMutationReport.AmbiguousTargets.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Text.OdtMutationReport.Changed.get -> bool
+OdfKit.Text.OdtMutationReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Text.OdtMutationReport.CreatedPackagePaths.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Text.OdtMutationReport.MissingTargets.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Text.OdtMutationReport.OdtMutationReport(string! operation) -> void

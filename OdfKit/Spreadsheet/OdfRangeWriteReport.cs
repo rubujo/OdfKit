@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
 
@@ -37,4 +39,11 @@ public sealed class OdfRangeWriteReport
     /// 取得寫入作業產生的警告。
     /// </summary>
     public IList<string> Warnings { get; } = new List<string>();
+
+    /// <summary>
+    /// Gets <see cref="Warnings"/> as strongly typed diagnostics.
+    /// 取得 <see cref="Warnings"/> 的強型別診斷檢視。
+    /// </summary>
+    public IReadOnlyList<OdfDiagnostic> Diagnostics =>
+        OdfDiagnostic.FromStrings(Warnings, "Warning", OdfIssueSeverity.Warning);
 }
