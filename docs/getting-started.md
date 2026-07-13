@@ -22,7 +22,7 @@ CLI 驗證與下一步閱讀建議。
 適合需要追蹤最新主幹、客製化功能或直接使用 `ProjectReference` 的團隊。
 
 ```powershell
-git clone https://github.com/OdfKit/OdfKit.git
+git clone https://github.com/rubujo/OdfKit.git
 cd OdfKit
 dotnet build
 dotnet test

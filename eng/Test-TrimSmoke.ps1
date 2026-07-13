@@ -4,12 +4,14 @@
     建置並執行 OdfKit trimming 煙霧測試（PERF-5e）。
 .DESCRIPTION
     先以 eng/Ensure-OdfKitBuilt.ps1 確保 OdfKit net10.0 已建置（僅單一 TFM，避免 netstandard2.0 連帶編譯）。
-    再以 PublishTrimmed + SelfContained 發佈 TrimSmoke；-r win-x64 僅在 publish 階段指定，避免日常 build 強制 RID 重編。
+    再以 PublishTrimmed + SelfContained 發佈 TrimSmoke；RID 僅在 publish 階段指定，避免日常 build 強制 RID 重編。
     裁剪分析警告僅輸出供審查，不視為失敗。
 .PARAMETER Configuration
     建置組態，預設 Release。
 .PARAMETER PublishAot
     以 Native AOT 發佈並執行原生可執行檔；任何發佈或執行錯誤皆視為失敗。
+.PARAMETER RuntimeIdentifier
+    發佈目標 RID；預設使用目前執行環境的 RID。
 .PARAMETER ForceRebuildOdfKit
     強制重編 OdfKit net10.0。
 #>
@@ -17,6 +19,7 @@
 param(
     [string]$Configuration = "Release",
     [switch]$PublishAot,
+    [string]$RuntimeIdentifier = [System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier,
     [switch]$ForceRebuildOdfKit
 )
 
@@ -25,10 +28,14 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $repoRoot "tools/OdfKit.TrimSmoke/OdfKit.TrimSmoke.csproj"
 $ensureScript = Join-Path $repoRoot "eng/Ensure-OdfKitBuilt.ps1"
+$RuntimeIdentifier = $RuntimeIdentifier.Trim()
+if ([string]::IsNullOrWhiteSpace($RuntimeIdentifier)) {
+    throw "RuntimeIdentifier 不可為空白。"
+}
 $publishDir = if ($PublishAot) {
-    Join-Path $repoRoot "artifacts/trim-smoke-aot"
+    Join-Path $repoRoot "artifacts/trim-smoke-aot-$RuntimeIdentifier"
 } else {
-    Join-Path $repoRoot "artifacts/trim-smoke"
+    Join-Path $repoRoot "artifacts/trim-smoke-$RuntimeIdentifier"
 }
 
 Push-Location $repoRoot
@@ -42,9 +49,9 @@ try {
     }
 
     $modeLabel = if ($PublishAot) { "PublishTrimmed + NativeAOT" } else { "PublishTrimmed" }
-    Write-Host "$modeLabel 發佈 TrimSmoke ($Configuration / win-x64)…"
+    Write-Host "$modeLabel 發佈 TrimSmoke ($Configuration / $RuntimeIdentifier)…"
 
-    $restoreArgs = @("restore", $project, "-r", "win-x64")
+    $restoreArgs = @("restore", $project, "-r", $RuntimeIdentifier)
     if ($PublishAot) {
         $restoreArgs += "/p:PublishAot=true"
     }
@@ -57,7 +64,7 @@ try {
         "publish", $project,
         "-c", $Configuration,
         "-f", "net10.0",
-        "-r", "win-x64",
+        "-r", $RuntimeIdentifier,
         "-o", $publishDir,
         "--no-restore",
         "-p:RunAnalyzers=false"
@@ -83,7 +90,12 @@ try {
         throw "TrimSmoke 建置失敗，結束碼 $LASTEXITCODE"
     }
 
-    $exeName = if ($IsWindows) { "OdfKit.TrimSmoke.exe" } else { "OdfKit.TrimSmoke" }
+    $exeName = if ($RuntimeIdentifier.StartsWith("win-", [System.StringComparison]::OrdinalIgnoreCase)) {
+        "OdfKit.TrimSmoke.exe"
+    }
+    else {
+        "OdfKit.TrimSmoke"
+    }
     $exe = Join-Path $publishDir $exeName
     if (-not (Test-Path $exe)) {
         throw "找不到裁剪後執行檔：$exe"

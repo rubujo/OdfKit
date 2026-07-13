@@ -13,11 +13,6 @@
     <NoWarn>$(NoWarn);IL2104</NoWarn>
   </PropertyGroup>
 
-  <!-- PublishTrimmed 需要 RID；僅 publish 管線套用，避免 dotnet build 連帶要求 OdfKit 產出 win-x64 參考組件。 -->
-  <PropertyGroup Condition="'$(GenerateRuntimeConfigurationFiles)' == 'true' OR '$(PublishDir)' != ''">
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(PublishAot)' == 'true'">
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>

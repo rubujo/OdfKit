@@ -426,6 +426,10 @@ public class DocsAndCorpusContractTests
         Assert.Contains("eng/Test-TrimSmoke.ps1", workflow, StringComparison.Ordinal);
         Assert.Contains("workflow_dispatch", workflow, StringComparison.Ordinal);
         Assert.Contains("-PublishAot", workflow, StringComparison.Ordinal);
+        Assert.Contains("win-x64", workflow, StringComparison.Ordinal);
+        Assert.Contains("linux-x64", workflow, StringComparison.Ordinal);
+        Assert.Contains("osx-arm64", workflow, StringComparison.Ordinal);
+        Assert.Contains("RuntimeIdentifier", script, StringComparison.Ordinal);
         Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", toolsReadme, StringComparison.Ordinal);
         Assert.Contains("SmokeOpenPgpRoundTrip", File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "Program.cs")), StringComparison.Ordinal);
         Assert.DoesNotContain("<TrimmerRootAssembly Include=\"BouncyCastle.Cryptography\" />", trimProject, StringComparison.Ordinal);

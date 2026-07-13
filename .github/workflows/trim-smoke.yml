@@ -28,8 +28,18 @@ permissions:
 
 jobs:
   validate-trim-smoke:
-    name: Native AOT Trim Smoke
-    runs-on: windows-latest
+    name: Native AOT Trim Smoke (${{ matrix.rid }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-arm64
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -43,4 +53,4 @@ jobs:
 
       - name: Run trim smoke (blocking)
         shell: pwsh
-        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release -PublishAot
+        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release -PublishAot -RuntimeIdentifier ${{ matrix.rid }}

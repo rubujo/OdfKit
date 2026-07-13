@@ -107,8 +107,9 @@ dotnet run --project tools/OdfKit.TrimSmoke
 ```
 
 標準驗證使用 `eng/Test-TrimSmoke.ps1`，它會以 `PublishTrimmed` 發佈並執行裁剪後的
-`OdfKit.TrimSmoke.exe`。加上 `-PublishAot` 會產生並執行 `win-x64` 原生執行檔；CI 將此
-模式列為阻擋式閘門，並實際驗證 BouncyCastle OpenPGP RSA Session Key 加解密往返。
+`OdfKit.TrimSmoke` 原生執行檔。加上 `-PublishAot` 會依目前平台 RID 產生並執行原生程式；
+CI 對 `win-x64`、`linux-x64` 與 `osx-arm64` 列為阻擋式閘門，並實際驗證
+BouncyCastle OpenPGP RSA Session Key 加解密往返。亦可用 `-RuntimeIdentifier` 明確指定 RID。
 
 成功時會輸出類似：
 
