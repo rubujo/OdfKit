@@ -1,17 +1,33 @@
 ---
-title: Had keselamatan pembaca penstriman
+title: Had keselamatan pemuatan dan pembaca penstriman
 _lang: ms
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Had keselamatan pembaca penstriman
+# Had keselamatan pemuatan dan pembaca penstriman
 
 > Terjemahan maklumat; jika terdapat perbezaan, sumber zh-TW yang berwibawa mengatasi terjemahan.
 
-`OdsStreamReader` dan `OdtStreamReader` tidak membina DOM dokumen penuh, tetapi memperuntukkan penimbal
+Pemuatan pakej dan `OdsStreamReader`/`OdtStreamReader` memproses input ZIP/XML yang tidak dipercayai. Pembaca tidak membina DOM dokumen penuh, tetapi memperuntukkan penimbal
 untuk baris semasa, teks nod, penyahmampatan ZIP dan pembaca XML. Reka bentuk memori rendah tidak
 menghapuskan kesan saiz input.
+
+## Had pakej teras
+
+`OdfDocument.Load`, facade `Load` mengikut format dan `OdfPackage.Open` berkongsi belanjawan sumber `OdfLoadOptions`.
+
+| Had | Lalai | Tujuan perlindungan |
+|---|---:|---|
+| Entri ZIP | 5,000 | Mencegah kehabisan CPU dan memori akibat banyak entri kecil |
+| Saiz nyahmampat satu entri | 500 MiB | Mengehadkan pengembangan satu entri ZIP |
+| Jumlah saiz nyahmampat | 1 GiB | Mengehadkan jumlah pengembangan pakej |
+| Saiz input mentah tidak boleh dicari | 1 GiB | Mengehadkan penimbalan sebelum pengembangan ZIP |
+| Aksara dalam satu dokumen XML | 64 MiB | Mengehadkan kos penghuraian XML dan pembinaan DOM |
+
+Empat had ZIP mesti positif; sifar atau nilai negatif segera menghasilkan `ArgumentOutOfRangeException`. Hanya `MaxXmlCharactersInDocument = 0` mematikan had XML. Semua XML Reader mesti melarang DTD dan resolver luaran. Laluan baharu mesti menggunakan `OdfLoadOptions`; untuk dasar kandungan gunakan `OdfPackageValidator`, `SanitizeMacros`, pengesahan tandatangan atau `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Had pembaca penstriman
 
 | Pembaca | Had | Lalai |
 |---|---|---:|
@@ -31,3 +47,5 @@ strim entri XML dan pembaca ZIP ditutup tetapi strim terluar pemanggil kekal ter
 Kekalkan had bagi dokumen tidak dipercayai serta sahkan pakej dan skema. Had yang lebih tinggi meningkatkan
 risiko memori dan CPU DoS. `MaxXmlCharactersInDocument = 0` hanya mematikan had aksara XML. Had, pengesahan
 dan sanitasi mengurangkan risiko tetapi tidak menjamin keselamatan mutlak.
+
+Options Reader ODS dan ODT mengesahkan peraturan semasa sifat ditetapkan: had XML menerima sifar, manakala had baris, lajur, repeat, nod dan teks mesti melebihi sifar.

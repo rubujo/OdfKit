@@ -1,17 +1,33 @@
 ---
-title: Bezpečnostné limity streamovacích čítačiek
+title: Bezpečnostné limity načítania a streamovacích čítačiek
 _lang: sk
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Bezpečnostné limity streamovacích čítačiek
+# Bezpečnostné limity načítania a streamovacích čítačiek
 
 > Informatívny preklad; pri rozdiele má prednosť autoritatívny zdroj zh-TW.
 
-`OdsStreamReader` a `OdtStreamReader` nevytvárajú úplný DOM dokumentu, ale prideľujú vyrovnávacie pamäte
+Načítanie balíka a `OdsStreamReader`/`OdtStreamReader` spracúvajú nedôveryhodný vstup ZIP/XML. Čítačky nevytvárajú úplný DOM dokumentu, ale prideľujú vyrovnávacie pamäte
 pre aktuálny riadok, text uzlov, dekompresiu ZIP a čítačku XML. Nízka rezidentná pamäť neodstraňuje vplyv
 veľkosti vstupu.
+
+## Limity základného balíka
+
+`OdfDocument.Load`, fasády `Load` jednotlivých formátov a `OdfPackage.Open` zdieľajú rozpočty `OdfLoadOptions`.
+
+| Limit | Predvolená hodnota | Účel ochrany |
+|---|---:|---|
+| Položky ZIP | 5,000 | Bráni vyčerpaniu CPU a pamäte mnohými malými položkami |
+| Rozbalená veľkosť jednej položky | 500 MiB | Obmedzuje rozbalenie jednej položky ZIP |
+| Celková rozbalená veľkosť | 1 GiB | Obmedzuje celkové rozbalenie balíka |
+| Veľkosť neskenovateľného vstupu | 1 GiB | Obmedzuje vyrovnávaciu pamäť pred rozbalením ZIP |
+| Znaky v jednom dokumente XML | 64 MiB | Obmedzuje spracovanie XML a vytvorenie DOM |
+
+Štyri limity ZIP musia byť kladné; nula alebo záporné hodnoty okamžite vyvolajú `ArgumentOutOfRangeException`. Iba `MaxXmlCharactersInDocument = 0` vypne limit XML. Všetky XML čítačky musia zakázať externé DTD a resolvery. Nové cesty musia použiť `OdfLoadOptions`; pre zásady obsahu použite `OdfPackageValidator`, `SanitizeMacros`, overenie podpisu alebo `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limity streamovacích čítačiek
 
 | Čítačka | Limit | Predvolená hodnota |
 |---|---|---:|
@@ -31,3 +47,5 @@ XML a čítačka ZIP, ale vonkajší prúd volajúceho zostane otvorený.
 Pre nedôveryhodné dokumenty ponechajte limity a overte balík aj schému. Vyššie limity zvyšujú riziko pamäte
 a CPU DoS. `MaxXmlCharactersInDocument = 0` vypína iba limit znakov XML. Limity, validácia a sanitizácia
 znižujú riziko, ale nezaručujú absolútnu bezpečnosť.
+
+Možnosti čítačiek ODS a ODT overujú pravidlá pri priradení vlastností: limit XML povoľuje nulu, ale limity riadkov, stĺpcov, repeat, uzlov a textu musia byť väčšie než nula.

@@ -1,16 +1,32 @@
 ---
-title: Limites de segurança dos leitores de fluxo
+title: Limites de segurança do carregamento e dos leitores de fluxo
 _lang: pt
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Limites de segurança dos leitores de fluxo
+# Limites de segurança do carregamento e dos leitores de fluxo
 
 > Tradução informativa; em caso de divergência, prevalece a fonte zh-TW.
 
-`OdsStreamReader` e `OdtStreamReader` não criam o DOM completo, mas alocam buffers para a linha atual,
+O carregamento de pacotes e `OdsStreamReader`/`OdtStreamReader` processam entradas ZIP/XML não fiáveis. Os leitores não criam o DOM completo, mas alocam buffers para a linha atual,
 texto dos nós, descompressão ZIP e leitor XML. Baixa residência não elimina o efeito do tamanho da entrada.
+
+## Limites do pacote principal
+
+`OdfDocument.Load`, as fachadas `Load` e `OdfPackage.Open` partilham os orçamentos de `OdfLoadOptions`.
+
+| Limite | Predefinição | Proteção |
+|---|---:|---|
+| Entradas ZIP | 5,000 | Evita esgotar CPU e memória com muitas entradas pequenas |
+| Tamanho descomprimido de uma entrada | 500 MiB | Limita a expansão de uma entrada ZIP |
+| Tamanho descomprimido total | 1 GiB | Limita a expansão total do pacote |
+| Entrada bruta não pesquisável | 1 GiB | Limita o buffer antes da expansão ZIP |
+| Caracteres num documento XML | 64 MiB | Limita a análise XML e a criação do DOM |
+
+Os quatro limites ZIP têm de ser positivos; zero ou valores negativos geram imediatamente `ArgumentOutOfRangeException`. Apenas `MaxXmlCharactersInDocument = 0` desativa o limite XML. Todos os leitores XML devem proibir DTD e resolvers externos. Novos caminhos devem reutilizar `OdfLoadOptions`; para políticas de conteúdo use `OdfPackageValidator`, `SanitizeMacros`, validação de assinaturas ou `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limites dos leitores de fluxo
 
 | Leitor | Limite | Predefinição |
 |---|---|---:|
@@ -30,3 +46,5 @@ são fechados, mas o fluxo exterior do chamador permanece aberto.
 Mantenha os limites para documentos não fiáveis e valide pacote e esquema. Aumentá-los eleva riscos de
 memória e CPU DoS. `MaxXmlCharactersInDocument = 0` desativa apenas o limite XML. Limites, validação e
 sanitização reduzem riscos, mas não garantem segurança absoluta.
+
+As opções dos leitores ODS e ODT validam as regras ao atribuir propriedades: o limite XML aceita zero, enquanto os limites de linhas, colunas, repeat, nós e texto devem ser superiores a zero.

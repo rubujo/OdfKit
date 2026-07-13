@@ -1,16 +1,32 @@
 ---
-title: Beveiligingslimieten voor streaming readers
+title: Beveiligingslimieten voor laden en streaming readers
 _lang: nl
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Beveiligingslimieten voor streaming readers
+# Beveiligingslimieten voor laden en streaming readers
 
 > Informatieve vertaling; bij verschillen geldt de gezaghebbende zh-TW-bron.
 
-`OdsStreamReader` en `OdtStreamReader` bouwen geen volledig DOM, maar reserveren buffers voor de huidige
+Pakketladen en `OdsStreamReader`/`OdtStreamReader` verwerken niet-vertrouwde ZIP/XML-invoer. De readers bouwen geen volledig DOM, maar reserveren buffers voor de huidige
 rij, knooptekst, ZIP-decompressie en XML-reader. Laag resident geheugen maakt invoergrootte niet irrelevant.
+
+## Limieten voor het kernpakket
+
+`OdfDocument.Load`, formaatspecifieke `Load`-facades en `OdfPackage.Open` delen de resourcebudgetten van `OdfLoadOptions`.
+
+| Limiet | Standaard | Beschermingsdoel |
+|---|---:|---|
+| ZIP-items | 5,000 | Voorkomt uitputting van CPU en geheugen door veel kleine items |
+| Uitgepakte grootte van één item | 500 MiB | Begrens de expansie van één ZIP-item |
+| Totale uitgepakte grootte | 1 GiB | Begrens de totale expansie van het pakket |
+| Ruwe niet-zoekbare invoergrootte | 1 GiB | Begrens buffering vóór ZIP-expansie |
+| Tekens in één XML-document | 64 MiB | Begrens XML-verwerking en DOM-opbouw |
+
+De vier ZIP-limieten moeten positief zijn; nul of negatieve waarden veroorzaken direct `ArgumentOutOfRangeException`. Alleen `MaxXmlCharactersInDocument = 0` schakelt de XML-limiet uit. Alle XML-readers moeten externe DTD's en resolvers verbieden. Nieuwe laadpaden moeten `OdfLoadOptions` gebruiken; gebruik voor inhoudsbeleid `OdfPackageValidator`, `SanitizeMacros`, handtekeningvalidatie of `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limieten voor streaming readers
 
 | Reader | Limiet | Standaard |
 |---|---|---:|
@@ -30,3 +46,5 @@ sluiten XML-entry en ZIP-reader, maar blijft de buitenste stream van de aanroepe
 Behoud limieten voor niet-vertrouwde documenten en valideer pakket en schema. Hogere limieten vergroten
 geheugen- en CPU DoS-risico. `MaxXmlCharactersInDocument = 0` schakelt alleen de XML-tekenlimiet uit.
 Limieten, validatie en opschoning beperken risico maar garanderen geen absolute veiligheid.
+
+ODS- en ODT-readeropties valideren de regels bij toewijzing: de XML-limiet accepteert nul, terwijl limieten voor rijen, kolommen, repeat, knopen en tekst groter dan nul moeten zijn.

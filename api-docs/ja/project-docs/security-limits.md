@@ -1,19 +1,33 @@
 ---
-title: ストリーミングリーダーのセキュリティ制限
+title: 読み込みとストリーミングリーダーのセキュリティ制限
 _lang: ja
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# ストリーミングリーダーのセキュリティ制限
+# 読み込みとストリーミングリーダーのセキュリティ制限
 
 > この翻訳は参考情報です。内容に相違がある場合は、正体字中国語 (`zh-TW`) の原文が優先されます。
 
-`OdsStreamReader` と `OdtStreamReader` はドキュメント全体の DOM を作成しませんが、現在の行、
+パッケージ読み込みと `OdsStreamReader`／`OdtStreamReader` は信頼できない ZIP／XML 入力を処理します。Reader はドキュメント全体の DOM を作成しませんが、現在の行、
 ノードのテキスト、ZIP の展開、および XML Reader に必要なバッファーは割り当てます。常駐メモリを
 抑える設計であっても、入力サイズの影響を受けないわけではありません。
 
-## 既定の制限
+## コアパッケージの制限
+
+`OdfDocument.Load`、各形式の `Load` facade、および `OdfPackage.Open` は `OdfLoadOptions` のリソース予算を共有します。
+
+| 制限 | 既定値 | 保護目的 |
+|---|---:|---|
+| ZIP エントリ数 | 5,000 | 多数の小さなエントリによる CPU とメモリの枯渇を防止 |
+| 1 エントリの展開サイズ | 500 MiB | 1 つの ZIP エントリの展開量を制限 |
+| パッケージ全体の展開サイズ | 1 GiB | 全エントリの合計展開量を制限 |
+| シーク不能な生入力サイズ | 1 GiB | ZIP 展開前のバッファー量を制限 |
+| 1 XML 文書の文字数 | 64 MiB | XML 解析と DOM 構築のコストを制限 |
+
+4 つの ZIP 制限は正の値が必要です。0 または負の値は直ちに `ArgumentOutOfRangeException` を発生させます。`MaxXmlCharactersInDocument = 0` のみが XML 文字数制限を無効化します。すべての XML Reader は外部 DTD と resolver を禁止する必要があります。新しい読み込み経路は `OdfLoadOptions` を再利用し、内容ポリシーには `OdfPackageValidator`、`SanitizeMacros`、署名検証、または `pwsh eng/Test-OdfPolicy.ps1` を使用してください。
+
+## ストリーミングリーダーの制限
 
 | Reader | 制限 | 既定値 |
 |---|---|---:|
@@ -43,6 +57,8 @@ XML エントリのストリームと ZIP Reader は閉じられますが、呼�
 ただし、XML またはテキストの上限を引き上げると、メモリおよび CPU DoS のリスクも増加します。
 `MaxXmlCharactersInDocument = 0` が無効にするのは XML 文字数の制限だけであり、Reader のその他の
 制限は引き続き有効です。
+
+ODS／ODT Reader の options はプロパティ設定時に同じ規則を検証します。XML 制限は 0 を許可しますが、行、列、repeat、ノード、テキストの制限は 0 より大きい必要があります。
 
 セキュリティ制限、検証、およびサニタイズはリスクを軽減するための措置であり、悪意のあるドキュメントに
 対する絶対的な安全性を保証するものではありません。

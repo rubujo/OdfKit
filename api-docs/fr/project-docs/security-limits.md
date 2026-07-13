@@ -1,17 +1,33 @@
 ---
-title: Limites de sécurité des lecteurs en continu
+title: Limites de sécurité du chargement et des lecteurs en continu
 _lang: fr
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Limites de sécurité des lecteurs en continu
+# Limites de sécurité du chargement et des lecteurs en continu
 
 > Traduction informative : en cas de divergence, la source zh-TW fait foi.
 
-`OdsStreamReader` et `OdtStreamReader` ne construisent pas le DOM complet, mais allouent des tampons pour
+Le chargement des paquets et `OdsStreamReader`/`OdtStreamReader` traitent des entrées ZIP/XML non fiables. Les lecteurs ne construisent pas le DOM complet, mais allouent des tampons pour
 la ligne courante, le texte des nœuds, la décompression ZIP et le lecteur XML. Une faible mémoire
 résidente ne rend pas l’utilisation des ressources indépendante de la taille d’entrée.
+
+## Limites du paquet principal
+
+`OdfDocument.Load`, les façades `Load` et `OdfPackage.Open` partagent les budgets de `OdfLoadOptions`.
+
+| Limite | Valeur par défaut | Protection |
+|---|---:|---|
+| Entrées ZIP | 5,000 | Évite l’épuisement du processeur et de la mémoire par de nombreuses petites entrées |
+| Taille décompressée d’une entrée | 500 MiB | Limite l’expansion d’une entrée ZIP |
+| Taille décompressée totale | 1 GiB | Limite l’expansion totale du paquet |
+| Entrée brute non recherchable | 1 GiB | Limite la mise en mémoire tampon avant l’expansion ZIP |
+| Caractères d’un document XML | 64 MiB | Limite l’analyse XML et la construction du DOM |
+
+Les quatre limites ZIP doivent être positives ; zéro ou une valeur négative déclenche immédiatement `ArgumentOutOfRangeException`. Seul `MaxXmlCharactersInDocument = 0` désactive la limite XML. Tous les lecteurs XML doivent interdire les DTD et resolvers externes. Les nouveaux chemins doivent réutiliser `OdfLoadOptions` ; pour les règles de contenu, utilisez `OdfPackageValidator`, `SanitizeMacros`, la validation des signatures ou `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limites des lecteurs en continu
 
 | Lecteur | Limite | Valeur par défaut |
 |---|---|---:|
@@ -34,3 +50,5 @@ Conservez les limites par défaut pour les documents non fiables et validez d’
 Augmenter les limites XML ou de texte accroît aussi les risques mémoire et CPU DoS.
 `MaxXmlCharactersInDocument = 0` ne désactive que la limite de caractères XML. Les limites, la validation
 et l’assainissement réduisent les risques sans garantir une sécurité absolue contre les documents malveillants.
+
+Les options des lecteurs ODS et ODT valident les règles lors de l’affectation : la limite XML accepte zéro, tandis que les limites de lignes, colonnes, repeat, nœuds et texte doivent être supérieures à zéro.

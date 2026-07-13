@@ -1,20 +1,36 @@
 ---
-title: Streaming reader security limits
+title: Loading and streaming reader security limits
 _lang: en
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Streaming reader security limits
+# Loading and streaming reader security limits
 
 > Translation notice: this page is an English translation of the authoritative Traditional Chinese
 > (Taiwan) document. If the texts differ, the authoritative source prevails.
 
-`OdsStreamReader` and `OdtStreamReader` do not build a complete document DOM, but they still allocate
+Core package loading and `OdsStreamReader`/`OdtStreamReader` process untrusted ZIP/XML input. The readers do not build a complete document DOM, but they still allocate
 buffers for the current row, node text, ZIP decompression, and the XML reader. A low-residency design
 does not make resource use independent of input size.
 
-## Default limits
+## Core package limits
+
+`OdfDocument.Load`, format-specific `Load` facades, and direct `OdfPackage.Open` calls share the `OdfLoadOptions` resource budgets.
+
+| Limit | Default | Protection goal |
+|---|---:|---|
+| ZIP entries | 5,000 | Prevent CPU and memory exhaustion from many tiny entries |
+| Uncompressed size of one entry | 500 MiB | Bound expansion of one ZIP entry |
+| Total uncompressed package size | 1 GiB | Bound aggregate expansion across entries |
+| Raw non-seekable input size | 1 GiB | Bound buffering before ZIP expansion |
+| Characters in one XML document | 64 MiB | Bound XML parsing and DOM construction costs |
+
+Entry count, entry size, total expansion, and raw package size must be positive. Zero or negative values immediately throw `ArgumentOutOfRangeException`. Only `MaxXmlCharactersInDocument = 0` disables the XML character limit; negative values remain invalid.
+
+All core XML readers must prohibit external DTDs and resolvers. New loading paths must reuse `OdfLoadOptions` or provide equivalent documented budgets. These loading limits are resource defenses, not document-content policy; use `OdfPackageValidator`, `SanitizeMacros`, signature validation, or `pwsh eng/Test-OdfPolicy.ps1` for policy enforcement.
+
+## Streaming reader limits
 
 | Reader | Limit | Default |
 |---|---|---:|
@@ -42,6 +58,8 @@ Keep the default limits for untrusted documents and perform package and schema v
 Individual limits may be raised for trusted documents that genuinely require it; increasing XML or
 text limits also increases memory and CPU DoS risk. `MaxXmlCharactersInDocument = 0` disables only the
 XML character limit; all other reader limits remain active.
+
+ODS and ODT reader options validate the same rules when properties are assigned: the XML limit accepts zero but rejects negative values, while row, column, repeat, node, and text limits must all be greater than zero.
 
 Security limits, validation, and sanitization reduce risk but do not guarantee absolute safety from
 malicious documents.

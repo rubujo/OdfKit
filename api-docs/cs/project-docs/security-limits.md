@@ -1,19 +1,35 @@
 ---
-title: Bezpečnostní limity proudových čteček
+title: Bezpečnostní limity načítání a proudových čteček
 _lang: cs
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Bezpečnostní limity proudových čteček
+# Bezpečnostní limity načítání a proudových čteček
 
 > Tento překlad je pouze informativní; v případě rozdílu má přednost zdroj v tradiční čínštině (`zh-TW`).
 
-`OdsStreamReader` a `OdtStreamReader` nevytvářejí úplný DOM dokumentu, ale přidělují vyrovnávací paměti pro
+Načítání základního balíčku a `OdsStreamReader`/`OdtStreamReader` zpracovávají nedůvěryhodný vstup ZIP/XML. Čtečky nevytvářejí úplný DOM dokumentu, ale přidělují vyrovnávací paměti pro
 aktuální řádek, text uzlů, dekompresi ZIP a XML Reader. Návrh s nízkými nároky na trvalou paměť neodstraňuje
 vliv velikosti vstupu.
 
-## Výchozí limity
+## Limity základního balíčku
+
+`OdfDocument.Load`, fasády `Load` jednotlivých formátů a přímé volání `OdfPackage.Open` sdílejí rozpočty prostředků `OdfLoadOptions`.
+
+| Limit | Výchozí hodnota | Účel ochrany |
+|---|---:|---|
+| Počet položek ZIP | 5,000 | Brání vyčerpání CPU a paměti mnoha malými položkami |
+| Rozbalená velikost jedné položky | 500 MiB | Omezuje rozbalení jedné položky ZIP |
+| Celková rozbalená velikost balíčku | 1 GiB | Omezuje souhrnné rozbalení položek |
+| Velikost původního nevyhledávatelného vstupu | 1 GiB | Omezuje vyrovnávací paměť před rozbalením ZIP |
+| Znaky v jednom dokumentu XML | 64 MiB | Omezuje náklady na zpracování XML a vytvoření DOM |
+
+Počet položek, velikost položky, celkové rozbalení a velikost původního balíčku musí být kladné. Nula nebo záporná hodnota okamžitě vyvolá `ArgumentOutOfRangeException`. Pouze `MaxXmlCharactersInDocument = 0` vypne limit znaků XML; záporné hodnoty zůstávají neplatné.
+
+Všechny základní XML Readery musí zakázat externí DTD a resolvery. Nové cesty načítání musí používat `OdfLoadOptions` nebo rovnocenné zdokumentované rozpočty. Tyto limity chrání prostředky, nikoli obsah dokumentu; zásady vynucujte pomocí `OdfPackageValidator`, `SanitizeMacros`, ověření podpisu nebo `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limity proudových čteček
 
 | Reader | Limit | Výchozí hodnota |
 |---|---|---:|
@@ -41,6 +57,8 @@ Pro nedůvěryhodné dokumenty ponechte výchozí limity a nejprve proveďte ov�
 limity lze zvýšit pro důvěryhodné velké dokumenty, které je skutečně nutné zpracovat. Zvýšením limitů XML
 nebo textu se však zároveň zvyšuje riziko útoku na paměť a CPU DoS. `MaxXmlCharactersInDocument = 0`
 vypne pouze limit počtu znaků XML; ostatní limity Readeru zůstávají účinné.
+
+Možnosti Readerů ODS a ODT ověřují stejná pravidla již při nastavení vlastnosti: limit XML přijímá nulu, ale odmítá záporné hodnoty; limity řádků, sloupců, repeat, uzlů a textu musí být větší než nula.
 
 Bezpečnostní limity, ověřování a čištění snižují riziko, ale nepředstavují záruku absolutní bezpečnosti vůči
 škodlivým dokumentům.

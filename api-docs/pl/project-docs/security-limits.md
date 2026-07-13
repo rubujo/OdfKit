@@ -1,19 +1,33 @@
 ---
-title: Limity bezpieczeństwa czytników strumieniowych
+title: Limity bezpieczeństwa ładowania i czytników strumieniowych
 _lang: pl
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Limity bezpieczeństwa czytników strumieniowych
+# Limity bezpieczeństwa ładowania i czytników strumieniowych
 
 > To tłumaczenie ma charakter informacyjny; w razie rozbieżności pierwszeństwo ma źródło w języku chińskim tradycyjnym (`zh-TW`).
 
-`OdsStreamReader` i `OdtStreamReader` nie tworzą pełnego modelu DOM dokumentu, ale przydzielają bufory dla
+Ładowanie pakietów oraz `OdsStreamReader`/`OdtStreamReader` przetwarzają niezaufane dane ZIP/XML. Czytniki nie tworzą pełnego modelu DOM dokumentu, ale przydzielają bufory dla
 bieżącego wiersza, tekstu węzłów, dekompresji ZIP i XML Reader. Konstrukcja o niskim użyciu pamięci
 rezydentnej nie eliminuje wpływu rozmiaru danych wejściowych.
 
-## Limity domyślne
+## Limity pakietu podstawowego
+
+`OdfDocument.Load`, fasady `Load` poszczególnych formatów i `OdfPackage.Open` współdzielą budżety `OdfLoadOptions`.
+
+| Limit | Wartość domyślna | Cel ochrony |
+|---|---:|---|
+| Wpisy ZIP | 5,000 | Zapobiega wyczerpaniu CPU i pamięci przez wiele małych wpisów |
+| Rozpakowany rozmiar jednego wpisu | 500 MiB | Ogranicza rozwinięcie jednego wpisu ZIP |
+| Łączny rozpakowany rozmiar | 1 GiB | Ogranicza łączne rozwinięcie pakietu |
+| Surowy rozmiar danych bez wyszukiwania | 1 GiB | Ogranicza buforowanie przed rozwinięciem ZIP |
+| Znaki w jednym dokumencie XML | 64 MiB | Ogranicza analizę XML i budowę DOM |
+
+Cztery limity ZIP muszą być dodatnie; zero lub wartości ujemne natychmiast powodują `ArgumentOutOfRangeException`. Tylko `MaxXmlCharactersInDocument = 0` wyłącza limit XML. Wszystkie XML Readery muszą blokować zewnętrzne DTD i resolvery. Nowe ścieżki muszą używać `OdfLoadOptions`; zasady treści realizuj przez `OdfPackageValidator`, `SanitizeMacros`, walidację podpisu lub `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Limity czytników strumieniowych
 
 | Reader | Limit | Wartość domyślna |
 |---|---|---:|
@@ -42,6 +56,8 @@ Dla niezaufanych dokumentów zachowaj limity domyślne i najpierw wykonaj walida
 zwiększyć poszczególne limity dla zaufanych dużych dokumentów, które rzeczywiście trzeba przetworzyć, ale
 zwiększenie limitów XML lub tekstu podnosi także ryzyko ataku na pamięć i CPU DoS.
 `MaxXmlCharactersInDocument = 0` wyłącza tylko limit znaków XML; pozostałe limity Readeru nadal obowiązują.
+
+Opcje Readerów ODS i ODT sprawdzają reguły przy przypisaniu: limit XML dopuszcza zero, a limity wierszy, kolumn, repeat, węzłów i tekstu muszą być większe od zera.
 
 Limity bezpieczeństwa, walidacja i oczyszczanie zmniejszają ryzyko, ale nie gwarantują całkowitego
 bezpieczeństwa wobec złośliwych dokumentów.

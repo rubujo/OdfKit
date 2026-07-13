@@ -1,17 +1,35 @@
 ---
-title: Sicherheitsgrenzen der Streaming-Reader
+title: Sicherheitsgrenzen für Laden und Streaming-Reader
 _lang: de
 translation_source: docs/security-limits.md
-translation_source_sha256: d39a797850c3029188edd8e376c71dfc55d69060d40c33f74f07341376cbce05
+translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
 ---
 
-# Sicherheitsgrenzen der Streaming-Reader
+# Sicherheitsgrenzen für Laden und Streaming-Reader
 
 > Diese Übersetzung dient nur zur Information; bei Abweichungen gilt die maßgebliche zh-TW-Quelle.
 
-`OdsStreamReader` und `OdtStreamReader` erstellen kein vollständiges Dokument-DOM, benötigen aber
+Das Laden von Kernpaketen und `OdsStreamReader`/`OdtStreamReader` verarbeiten nicht vertrauenswürdige ZIP/XML-Eingaben. Die Reader erstellen kein vollständiges Dokument-DOM, benötigen aber
 Puffer für aktuelle Zeilen, Knotentext, ZIP-Dekomprimierung und den XML-Reader. Geringer Speicherbedarf
 bedeutet nicht, dass die Eingabegröße ohne Einfluss bleibt.
+
+## Grenzen für Kernpakete
+
+`OdfDocument.Load`, formatspezifische `Load`-Fassaden und direkte Aufrufe von `OdfPackage.Open` verwenden gemeinsam die Ressourcenbudgets von `OdfLoadOptions`.
+
+| Grenze | Standardwert | Schutzzweck |
+|---|---:|---|
+| ZIP-Einträge | 5,000 | Verhindert CPU- und Speichererschöpfung durch viele kleine Einträge |
+| Entpackte Größe eines Eintrags | 500 MiB | Begrenzt die Expansion eines ZIP-Eintrags |
+| Gesamte entpackte Paketgröße | 1 GiB | Begrenzt die gesamte Expansion aller Einträge |
+| Rohgröße nicht durchsuchbarer Eingaben | 1 GiB | Begrenzt die Pufferung vor der ZIP-Expansion |
+| Zeichen in einem XML-Dokument | 64 MiB | Begrenzt XML-Verarbeitung und DOM-Aufbau |
+
+Eintragsanzahl, Eintragsgröße, Gesamtexpansion und rohe Paketgröße müssen positiv sein. Null oder negative Werte lösen sofort `ArgumentOutOfRangeException` aus. Nur `MaxXmlCharactersInDocument = 0` deaktiviert die XML-Zeichengrenze; negative Werte bleiben ungültig.
+
+Alle XML-Reader des Kerns müssen externe DTDs und Resolver verbieten. Neue Ladepfade müssen `OdfLoadOptions` oder gleichwertige dokumentierte Budgets verwenden. Diese Grenzen schützen Ressourcen, nicht den Dokumentinhalt; verwenden Sie für Richtlinien `OdfPackageValidator`, `SanitizeMacros`, Signaturprüfung oder `pwsh eng/Test-OdfPolicy.ps1`.
+
+## Grenzen der Streaming-Reader
 
 | Reader | Grenze | Standardwert |
 |---|---|---:|
@@ -34,3 +52,5 @@ Behalten Sie für nicht vertrauenswürdige Dokumente die Standardgrenzen bei und
 Schema. Höhere XML- oder Textgrenzen erhöhen auch Speicher- und CPU DoS-Risiken.
 `MaxXmlCharactersInDocument = 0` deaktiviert nur die XML-Zeichengrenze. Grenzen, Validierung und
 Bereinigung verringern Risiken, garantieren aber keine absolute Sicherheit vor bösartigen Dokumenten.
+
+ODS- und ODT-Reader-Optionen prüfen dieselben Regeln bereits beim Zuweisen der Eigenschaften: Die XML-Grenze akzeptiert null, lehnt negative Werte jedoch ab; Zeilen-, Spalten-, repeat-, Knoten- und Textgrenzen müssen größer als null sein.
