@@ -18,6 +18,11 @@ public static class OdfHybridPdfHelper
     private const string OdfRelationName = "OdfKitHybridOdf";
 
     /// <summary>
+    /// XMP 中繼資料 XML 讀取字元上限（與核心 <c>OdfLoadOptions.MaxXmlCharactersInDocument</c> 預設值一致）。
+    /// </summary>
+    private const long MaxXmpXmlCharactersInDocument = 64 * 1024 * 1024;
+
+    /// <summary>
     /// Extracts an embedded ODF package from a hybrid PDF.
     /// 從混合 PDF 檔案中提取並讀取隱藏的 ODF 檔案。
     /// </summary>
@@ -263,7 +268,12 @@ public static class OdfHybridPdfHelper
 
             // 載入至 XmlDocument
             var xmlDoc = new Xml.XmlDocument();
-            var xmlSettings = new Xml.XmlReaderSettings { DtdProcessing = Xml.DtdProcessing.Prohibit, XmlResolver = null };
+            var xmlSettings = new Xml.XmlReaderSettings
+            {
+                DtdProcessing = Xml.DtdProcessing.Prohibit,
+                XmlResolver = null,
+                MaxCharactersInDocument = MaxXmpXmlCharactersInDocument
+            };
             using (var reader = Xml.XmlReader.Create(new StringReader(xmpText), xmlSettings))
             {
                 xmlDoc.Load(reader);

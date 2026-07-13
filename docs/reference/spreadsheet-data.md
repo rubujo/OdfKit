@@ -16,6 +16,20 @@ OdfObjectBindingReport imported = workbook.ImportRecords("Data", "A5", records);
 IReadOnlyList<SalesRow> rows = workbook.ReadRecords<SalesRow>("Data", "A5:D100");
 ```
 
+資料來源為 `IAsyncEnumerable<T>`（例如 EF Core 查詢投影的 `AsAsyncEnumerable()`）時，改用
+非同步入口逐筆處理，不需先累積為清單：
+
+```csharp
+OdfObjectBindingReport imported = await workbook.ImportRecordsAsync("Data", "A5", records, cancellationToken);
+
+await foreach (SalesRow row in workbook.ReadRecordsAsync<SalesRow>("Data", "A5:D100", cancellationToken))
+{
+    Process(row);
+}
+```
+
+非同步多載與同步版共用相同的 `OdfObjectColumnMap`、`OdfObjectReadOptions` 與 report 契約。
+
 範圍樣式會自動建立並去重 automatic style，不需自行管理 `CS1`、`N1` 等名稱：
 
 ```csharp

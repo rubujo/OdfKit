@@ -164,7 +164,10 @@ internal static class OdfPackageFlatXmlLoader
         {
             NameTable = OdfXmlNameTable.Create(),
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            MaxCharactersInDocument = ctx.LoadOptions.MaxXmlCharactersInDocument > 0
+                ? ctx.LoadOptions.MaxXmlCharactersInDocument
+                : 0
         }))
         {
             doc = XDocument.Load(cleanReader);

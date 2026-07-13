@@ -66,7 +66,7 @@ public static partial class OdfStreamingMailMerge
                 using Stream srcStream = entry.Open();
                 using Stream destStream = newEntry.Open();
 
-                await ProcessXmlTemplateAsync(srcStream, destStream, data, cancellationToken).ConfigureAwait(false);
+                await ProcessXmlTemplateAsync(srcStream, destStream, data, loadOptions, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -198,11 +198,12 @@ public static partial class OdfStreamingMailMerge
                             srcStream,
                             destStream,
                             rows,
+                            loadOptions,
                             cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
-                        await ProcessXmlTemplateAsync(srcStream, destStream, firstData, cancellationToken).ConfigureAwait(false);
+                        await ProcessXmlTemplateAsync(srcStream, destStream, firstData, loadOptions, cancellationToken).ConfigureAwait(false);
                     }
                 }
                 else
@@ -880,12 +881,16 @@ public static partial class OdfStreamingMailMerge
         Stream sourceXml,
         Stream destXml,
         IDictionary<string, object?> data,
+        OdfLoadOptions loadOptions,
         CancellationToken cancellationToken)
     {
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            MaxCharactersInDocument = loadOptions.MaxXmlCharactersInDocument > 0
+                ? loadOptions.MaxXmlCharactersInDocument
+                : 0
         };
         using var reader = XmlReader.Create(sourceXml, settings);
 
@@ -904,12 +909,16 @@ public static partial class OdfStreamingMailMerge
         Stream sourceXml,
         Stream destXml,
         IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
+        OdfLoadOptions loadOptions,
         CancellationToken cancellationToken)
     {
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            MaxCharactersInDocument = loadOptions.MaxXmlCharactersInDocument > 0
+                ? loadOptions.MaxXmlCharactersInDocument
+                : 0
         };
         using var reader = XmlReader.Create(sourceXml, settings);
 

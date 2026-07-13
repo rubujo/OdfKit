@@ -52,7 +52,14 @@ internal static class OdfSignatureSigner
 
         var doc = new XmlDocument();
         XmlElement root;
-        var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = package.LoadOptions.MaxXmlCharactersInDocument > 0
+                ? package.LoadOptions.MaxXmlCharactersInDocument
+                : 0
+        };
 
         if (package.HasEntry(OdfSignerConstants.SignaturePath))
         {

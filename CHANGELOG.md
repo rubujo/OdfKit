@@ -4,6 +4,8 @@
 
 ## 尚未發佈
 
+- 完成第二階段 API 人體工學與效能精修：新增 `OdfDiagnostic` 統一診斷模型（八個 report 類別加掛強型別 `Diagnostics` 檢視，見 `docs/reference/diagnostics.md`）、`ImportRecordsAsync`／`ReadRecordsAsync` 非同步物件繫結、`OdfTextMatch.Paragraph`／`ParagraphOffset` 段落定位資訊與搜尋取代單次 traversal 重構、HTML／PDF 匯出低緩衝寫入；同步擴大效能基準與 CI 迴歸閘門（find/replace、物件繫結、export 記憶體）。
+- 補齊少數 XML 讀取點的 `MaxCharactersInDocument` 上限（Flat XML 二次解析、串流套印範本、簽章檔載入、混合 PDF XMP 中繼資料），使 XXE／DoS 防禦姿態全庫一致。
 - 完成 ODT／ODS／ODP／ODG 高階 facade 的一致 CRUD 生命週期契約，加入逐 topic semantic coverage、隨機 mutation、重複保存載入、clean-room provenance 與 Office 修改另存驗證；同步更新 Public API 基線及破壞性重整遷移指南。
 - 新增 `net48` Windows CLR consumer smoke，從本地 NuGet 套件驗證四主格式 round-trip、binding redirect、native imaging 與 7 個 extensions 最小執行入口。
 - 新增 `OdfVersionCompatibilityReport` 與 `AnalyzeVersionCompatibility`，在 ODF 1.4 語意降版至 1.1～1.3 前後提供元素／屬性、命名空間及 DOM 路徑的結構化診斷；保存仍保留無法映射與 foreign namespace 內容，不捏造等價語意。

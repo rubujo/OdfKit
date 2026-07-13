@@ -1,4 +1,4 @@
-namespace OdfKit.Text;
+﻿namespace OdfKit.Text;
 
 /// <summary>
 /// Describes one task-oriented text search match.
