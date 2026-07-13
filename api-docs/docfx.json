@@ -11,7 +11,7 @@
   ],
   "build": {
     "content": [
-      { "files": ["toc.yml", "index.md"] },
+      { "files": ["toc.yml", "index.md", "404.md"] },
       { "files": ["api/**.yml"] },
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
       { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },

@@ -38,6 +38,7 @@ api-docs/
   filterConfig.yml    # 排除 schema-generated OdfKit.DOM wrapper
   locales.json        # 語系目錄（單一事實來源：default、locales、displayNames）
   index.md            # 站台首頁：語言總表 + API 入口（根層必須存在，否則模板 logo 連結 404）
+  404.md              # 自訂 404 頁（DocFX 內容頁；建置後注入 <base>，內文連結一律絕對路徑）
   toc.yml             # 根層雙語導覽列
   <locale>/index.md   # 17 語系入口頁，front matter 設 _lang
   <locale>/guide.md   # 17 語系的使用、合規、安全與證據指南
@@ -84,6 +85,7 @@ api-docs/
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
 | modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
 | 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
+| 404 頁面 | 驗證 `404.html` 存在、已注入站台根 `<base>`（GitHub Pages 於任意深度缺失路徑回傳其內容，相對資源需以站台根解析）且不進入 sitemap。 |
 | 翻譯契約 | 驗證 80 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
 
 ## 5. 本機建置與預覽
@@ -105,4 +107,4 @@ dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
   `[en + zh-TW]` 明示，不加入自製 JavaScript 動態切換。Footer 連回語言選擇頁，正式文件由
   各語系 TOC 導覽。
 - 舊版站台（`reference/` 前綴與站外語系落地頁）的 URL 已隨結構重整移除，
-  不提供轉址。
+  不提供轉址；缺失路徑由站內 404 頁面接住，導回語言選擇頁與 API 入口。

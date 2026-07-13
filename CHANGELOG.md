@@ -15,6 +15,7 @@
 - 新增效能預算、能力 claims、證據索引及 12 語系 GitHub Pages API reference 建置流程。
 - API 文件站台重構為 DocFX 站內多語系結構（根層導覽與首頁、12 語系入口改為站內內容頁）：修復模板 logo 全站 404、搜尋框不可見與語系入口孤立問題；移除指向未渲染 `OdfKit.DOM.*` 頁面的失效連結；建置腳本新增語系契約驗證與站內連結健檢閘門（見 `docs/api-docs-site.md`）。
 - API 文件站升級至 DocFX 2.78.5 modern 模板，加入 12 語系原生 TOC、站內權威聲明、sitemap、共用 footer 及 modern 輸出驗證。
+- API 文件站新增自訂 404 頁（DocFX 內容頁）：建置時注入站台根 `<base>` 使任意深度缺失路徑下樣式與導覽正常、自 sitemap 移除 404 條目，並新增對應建置閘門。
 
 ## [0.0.1] - 持續維護
 

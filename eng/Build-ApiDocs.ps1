@@ -182,6 +182,25 @@ try {
     dotnet docfx build api-docs/docfx.json --warningsAsErrors --maxParallelism 1 --output $siteDir
     if ($LASTEXITCODE) { throw 'DocFX build 失敗。' }
 
+    # 404 頁面後處理：GitHub Pages 會在任意深度的缺失路徑下回傳 404.html 內容，
+    # 模板的相對資源與導覽連結在深層路徑會失效，必須注入 <base> 使其一律以站台根解析；
+    # 404 頁也不得進入 sitemap，避免搜尋引擎索引錯誤頁。
+    $notFoundPath = Join-Path $siteDir '404.html'
+    if (-not (Test-Path $notFoundPath)) { throw 'API 網站缺少 404.html（api-docs/404.md 未建置）。' }
+    $notFoundBaseUrl = $docfxConfig.build.sitemap.baseUrl
+    $notFoundHtml = [IO.File]::ReadAllText($notFoundPath)
+    if ($notFoundHtml -notmatch '<base\s') {
+        $notFoundHtml = [regex]::Replace($notFoundHtml, '<head(\s[^>]*)?>', ('$0<base href="{0}">' -f $notFoundBaseUrl), 'IgnoreCase', [TimeSpan]::FromSeconds(5))
+        [IO.File]::WriteAllText($notFoundPath, $notFoundHtml)
+    }
+    if ($notFoundHtml -notmatch [regex]::Escape("<base href=""$notFoundBaseUrl"">")) { throw '404.html 缺少站台根 <base> 注入。' }
+    $sitemapPath = Join-Path $siteDir 'sitemap.xml'
+    $sitemapXml = [IO.File]::ReadAllText($sitemapPath)
+    $sitemapXml = [regex]::Replace($sitemapXml, '<url>(?:(?!</url>).)*?404\.html(?:(?!</url>).)*?</url>\s*', '', 'Singleline')
+    [IO.File]::WriteAllText($sitemapPath, $sitemapXml)
+    if ($sitemapXml -match '404\.html') { throw 'sitemap.xml 不得包含 404 頁面。' }
+    Write-Host 'PASS：404.html 已注入 <base> 並自 sitemap 移除。'
+
     # 站內連結健檢：掃描全站 HTML 的相對 href／src，任何指向不存在檔案的連結都視為失敗。
     # Pages 不得以內部連結直接公開 Markdown；次級 repo 文件必須連到 GitHub 渲染頁。
     $broken = [System.Collections.Generic.List[string]]::new()
@@ -227,7 +246,8 @@ try {
         'project-docs/evidence-index.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
         'sitemap.xml',
-        'index.json'
+        'index.json',
+        '404.html'
     )
     foreach ($requiredOutput in $requiredOutputs) {
         if (-not (Test-Path (Join-Path $siteDir $requiredOutput))) { throw "API 網站缺少必要輸出：$requiredOutput。" }
