@@ -60,7 +60,10 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
 
             try
             {
-                return DecryptAes256Cbc(ciphertext, sessionKey, info.InitialisationVector);
+                byte[] plaintext = DecryptAes256Cbc(ciphertext, sessionKey, info.InitialisationVector);
+                if (!ChecksumMatchesOrUnverifiable(plaintext, info))
+                    continue;
+                return plaintext;
             }
             catch (CryptographicException)
             {
@@ -73,6 +76,26 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
         }
 
         throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfOpenPgpCryptographyProvider_OpenpgpDecryptionFailedUnable"));
+    }
+
+    /// <summary>
+    /// 驗證解密結果是否符合 <see cref="OdfEncryptionInfo"/> 宣告的總和檢查碼。錯誤的 session key
+    /// 約有 1/256 機率仍湊出合法 PKCS7 padding，僅靠 unpadding 失敗不足以判定金鑰錯誤；
+    /// 未宣告或不支援的檢查碼類型不在此層否決，交由封裝層驗證。
+    /// </summary>
+    private static bool ChecksumMatchesOrUnverifiable(byte[] plaintext, OdfEncryptionInfo info)
+    {
+        if (info.Checksum is null || info.Checksum.Length == 0 || string.IsNullOrWhiteSpace(info.ChecksumType))
+            return true;
+
+        try
+        {
+            return OdfEncryption.ByteArrayEquals(OdfEncryption.ComputeHash(plaintext, info.ChecksumType), info.Checksum);
+        }
+        catch (NotSupportedException)
+        {
+            return true;
+        }
     }
 
     /// <summary>
