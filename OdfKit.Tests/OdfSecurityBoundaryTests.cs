@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Spreadsheet;
 using OdfKit.Text;
 using Xunit;
 
@@ -22,6 +23,50 @@ public class OdfSecurityBoundaryTests
     private static readonly XNamespace TextNs = OdfNamespaces.Text;
     private static readonly XNamespace XLinkNs = OdfNamespaces.XLink;
     private static readonly XNamespace CustomNs = "urn:odfkit:test:foreign";
+
+    /// <summary>
+    /// Verifies package resource budgets reject ambiguous non-positive values while the XML budget permits an explicit zero.
+    /// 驗證封裝資源預算拒絕語意模糊的非正值，而 XML 預算允許明確的 0。
+    /// </summary>
+    [Fact]
+    public void LoadOptionsRejectInvalidResourceBudgets()
+    {
+        var options = new OdfLoadOptions();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.MaxZipEntries = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.MaxEntrySize = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.MaxTotalUncompressedSize = -1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.MaxPackageSize = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.MaxXmlCharactersInDocument = -1);
+
+        options.MaxXmlCharactersInDocument = 0;
+        Assert.Equal(0, options.MaxXmlCharactersInDocument);
+    }
+
+    /// <summary>
+    /// Verifies ODS and ODT streaming options enforce the same immediate resource-budget semantics.
+    /// 驗證 ODS 與 ODT 串流選項採用相同的即時資源預算語意。
+    /// </summary>
+    [Fact]
+    public void StreamReaderOptionsRejectInvalidResourceBudgets()
+    {
+        var ods = new OdsStreamReaderOptions();
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxXmlCharactersInDocument = -1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxRows = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxColumns = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxRepeatedRows = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxRepeatedColumns = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ods.MaxCellTextCharacters = 0);
+        ods.MaxXmlCharactersInDocument = 0;
+        Assert.Equal(0, ods.MaxXmlCharactersInDocument);
+
+        var odt = new OdtStreamReaderOptions();
+        Assert.Throws<ArgumentOutOfRangeException>(() => odt.MaxXmlCharactersInDocument = -1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => odt.MaxNodes = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => odt.MaxNodeTextCharacters = 0);
+        odt.MaxXmlCharactersInDocument = 0;
+        Assert.Equal(0, odt.MaxXmlCharactersInDocument);
+    }
 
     /// <summary>
     /// 驗證未編輯內容時，單純封裝保存會保留既有文件簽章專案。

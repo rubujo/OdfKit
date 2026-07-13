@@ -25,9 +25,14 @@ dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release --framework net10.0 `
 ```powershell
 pwsh eng/Test-BilingualXmlDocs.ps1 -FailOnNewIssues
 pwsh eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+pwsh eng/Test-MarkdownLinks.ps1
+pwsh eng/Test-XmlReaderSecurity.ps1
 pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
 pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 ```
+
+Markdown 連結閘門同時驗證本機檔案、GitHub-style heading fragment、重複標題編號與顯式
+HTML anchor；外部 HTTP 連結不在此離線閘門的責任範圍。
 
 ## Corpus 與互通
 
@@ -63,6 +68,7 @@ flat／package XML RELAX NG 差異，並以 ODF Validator 阻擋適用 package �
 | `pwsh eng/Benchmark-Stable.ps1` | 較長 stable profile |
 | `pwsh eng/Benchmark-BaselineReport.ps1` | 產生 Markdown 效能報告 |
 | `pwsh eng/Benchmark-Competitive.ps1` | 競爭對比量測（若適用） |
+| `pwsh eng/Test-PerformanceBudgets.ps1` | 驗證預算狀態；提供 `-SamplePath` 時另驗證標準樣本 metadata 與九情境完整性 |
 
 效能熱路徑變更必須執行 `Benchmark-Regression.ps1`；排程 workflow 持續提供穩定量測證據。
 效能環境波動可透過 artifact 與人工複核處理，但不得把明確超標永久設為 `continue-on-error`。

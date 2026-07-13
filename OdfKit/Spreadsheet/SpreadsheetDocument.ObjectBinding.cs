@@ -61,15 +61,8 @@ public partial class SpreadsheetDocument
         ReadObjects<T>(sheetName, OdfCellRange.ParseExcel(range), options);
 
     /// <summary>
-    /// Imports records from an asynchronous source into a worksheet using public readable members.
-    /// This is a cancellation- and async-source-friendly convenience wrapper — the worksheet is an
-    /// in-memory DOM, so unlike <see cref="OdsStreamWriter.WriteDataAsync{T}(System.Collections.Generic.IAsyncEnumerable{T})"/>
-    /// it does not reduce peak memory for very large record counts; use the <see cref="OdsStreamWriter"/>
-    /// L3 streaming API for that.
-    /// 從非同步來源匯入記錄至工作表，使用可讀公開成員。這是提供取消與非同步來源便利性的包裝
-    /// （便於串接 Entity Framework Core 等 <c>IAsyncEnumerable&lt;T&gt;</c> 來源），因為工作表本身是
-    /// 記憶體內 DOM，並不會像 <see cref="OdsStreamWriter.WriteDataAsync{T}(System.Collections.Generic.IAsyncEnumerable{T})"/>
-    /// 那樣降低大量記錄的峰值記憶體；真正需要低記憶體大量匯入時請改用 <see cref="OdsStreamWriter"/> L3 串流 API。
+    /// Imports asynchronous records into an in-memory worksheet using readable public members.
+    /// 使用可讀公開成員，將非同步記錄匯入記憶體內的工作表。
     /// </summary>
     /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
     /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
@@ -119,13 +112,8 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Reads worksheet rows into records asynchronously using an A1 range. Because the worksheet is
-    /// an in-memory DOM, the read itself completes synchronously before the first item is yielded —
-    /// this overload exists for cancellation and for composing with async LINQ pipelines, not for
-    /// reduced memory usage.
-    /// 使用 A1 範圍非同步將工作表資料列讀成記錄。因為工作表本身是記憶體內 DOM，實際讀取會在產生
-    /// 第一筆項目前就同步完成——此多載的目的是提供取消支援與方便串接非同步 LINQ 管線，而非降低
-    /// 記憶體用量。
+    /// Reads an A1 worksheet range into an asynchronous record sequence.
+    /// 將 A1 工作表範圍讀取為非同步記錄序列。
     /// </summary>
     /// <typeparam name="T">The record type. / 記錄型別。</typeparam>
     /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>

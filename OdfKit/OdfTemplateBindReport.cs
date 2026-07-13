@@ -72,10 +72,8 @@ public sealed class OdfTemplateBindReport
     public bool IsComplete => UnresolvedPlaceholders.Count == 0 && Warnings.Count == 0;
 
     /// <summary>
-    /// Gets <see cref="UnresolvedPlaceholderDetails"/>, <see cref="ExpandedCollections"/> and
-    /// <see cref="Warnings"/> merged into strongly typed diagnostics.
-    /// 取得合併 <see cref="UnresolvedPlaceholderDetails"/>、<see cref="ExpandedCollections"/>
-    /// 與 <see cref="Warnings"/> 而成的強型別診斷。
+    /// Gets unresolved placeholders, expanded collections, and warnings as strongly typed diagnostics.
+    /// 取得未解析占位符、展開集合與警告項目的強型別診斷。
     /// </summary>
     public IReadOnlyList<OdfDiagnostic> Diagnostics =>
         UnresolvedPlaceholderDetails

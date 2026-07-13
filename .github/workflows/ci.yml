@@ -9,7 +9,9 @@ on:
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.Tests/**'
       - 'eng/**'
-      - 'docs/ci-cd.md'
+      - 'docs/**'
+      - 'README.md'
+      - 'AGENTS.md'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/ci.yml'
   pull_request:
@@ -18,7 +20,9 @@ on:
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.Tests/**'
       - 'eng/**'
-      - 'docs/ci-cd.md'
+      - 'docs/**'
+      - 'README.md'
+      - 'AGENTS.md'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
@@ -57,6 +61,43 @@ jobs:
       - name: One-line XML summary ban
         shell: pwsh
         run: ./eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+
+      - name: Markdown local links
+        shell: pwsh
+        run: ./eng/Test-MarkdownLinks.ps1
+
+      - name: XML reader security settings
+        shell: pwsh
+        run: ./eng/Test-XmlReaderSecurity.ps1
+
+      - name: Performance budget contract
+        shell: pwsh
+        run: |
+          ./eng/Test-PerformanceBudgets.ps1 -SamplePath eng/testdata/performance-sample.schema-v2.json
+          ./eng/New-PerformanceBudgetCandidate.ps1 `
+            -SamplePath @(
+              'eng/testdata/performance-sample.schema-v2.json',
+              'eng/testdata/performance-sample-2.schema-v2.json',
+              'eng/testdata/performance-sample-3.schema-v2.json'
+            ) `
+            -OutputPath artifacts/performance/performance-budget-candidate.test.json
+          ./eng/Test-PerformanceBudgets.ps1 `
+            -CandidatePath artifacts/performance/performance-budget-candidate.test.json
+          ./eng/Test-PerformanceBudgets.ps1 `
+            -BudgetPath eng/testdata/performance-budgets.active.json `
+            -SamplePath eng/testdata/performance-sample-2.schema-v2.json
+          ./eng/Test-PerformanceBudgets.ps1 `
+            -BudgetPath eng/testdata/performance-budgets.active-advisory.json `
+            -SamplePath eng/testdata/performance-sample-3.schema-v2.json
+          try {
+            ./eng/Test-PerformanceBudgets.ps1 `
+              -BudgetPath eng/testdata/performance-budgets.active.json `
+              -SamplePath eng/testdata/performance-sample-3.schema-v2.json
+            throw '未拒絕配置量回歸。'
+          }
+          catch {
+            if ($_.Exception.Message -notlike '*配置量回歸*') { throw }
+          }
 
       - name: Localizer key parity (12 cultures)
         shell: pwsh

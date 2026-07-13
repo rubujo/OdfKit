@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 namespace OdfKit.Drawing;
 
+/// <summary>
+/// Provides task-oriented drawing page layout operations.
+/// 提供任務導向的繪圖頁面配置作業。
+/// </summary>
 public partial class OdfDrawPage
 {
     /// <summary>

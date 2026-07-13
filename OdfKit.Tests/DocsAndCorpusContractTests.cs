@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using OdfKit.Cli;
 using OdfKit.Compliance;
+using OdfKit.Core;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -17,6 +18,29 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class DocsAndCorpusContractTests
 {
+    /// <summary>
+    /// Verifies the documented package resource budgets match the public loading defaults.
+    /// 驗證文件所載封裝資源預算符合公開載入預設值。
+    /// </summary>
+    [Fact]
+    public void SecurityLimitsDocumentMatchesLoadOptionDefaults()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string securityLimits = File.ReadAllText(Path.Combine(repoRoot, "docs", "security-limits.md"));
+        var options = new OdfLoadOptions();
+
+        Assert.Equal(5000, options.MaxZipEntries);
+        Assert.Equal(500L * 1024 * 1024, options.MaxEntrySize);
+        Assert.Equal(1024L * 1024 * 1024, options.MaxTotalUncompressedSize);
+        Assert.Equal(1024L * 1024 * 1024, options.MaxPackageSize);
+        Assert.Equal(64L * 1024 * 1024, options.MaxXmlCharactersInDocument);
+        Assert.Contains("| ZIP 項目數 | 5,000 |", securityLimits, StringComparison.Ordinal);
+        Assert.Contains("| 單一項目解壓縮大小 | 500 MiB |", securityLimits, StringComparison.Ordinal);
+        Assert.Contains("| 全封裝解壓縮總量 | 1 GiB |", securityLimits, StringComparison.Ordinal);
+        Assert.Contains("| 不可搜尋輸入原始大小 | 1 GiB |", securityLimits, StringComparison.Ordinal);
+        Assert.Contains("| 單一 XML 文件字元數 | 64 MiB |", securityLimits, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// Verifies evidence claims use schema v2 and dimension-specific levels.
     /// 驗證證據宣稱使用 schema v2 與各維度專屬層級。

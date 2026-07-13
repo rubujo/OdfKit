@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "metadata": {
+    "commitSha": "2222222222222222222222222222222222222222",
+    "measuredAtUtc": "2026-01-02T00:00:00.0000000+00:00",
+    "workflowRunId": "contract-fixture-2",
+    "workflowRunAttempt": "1",
+    "runnerOs": "fixture",
+    "runnerArchitecture": "X64",
+    "runtimeVersion": "10.0.0-fixture",
+    "processorDescription": "Fixture CPU",
+    "artifactName": "standard-document-performance-fixture"
+  },
+  "measurements": [
+    { "SchemaVersion": 1, "Scenario": "OdsStreamWrite", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdsStreamRead", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdsDomRoundTrip", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdtStreamWrite", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdtStreamRead", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdtDomRoundTrip", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdpStructureWrite", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdpStructureRead", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 },
+    { "SchemaVersion": 1, "Scenario": "OdpMediaRoundTrip", "ElapsedMilliseconds": 2, "AllocatedBytes": 2, "PeakWorkingSetBytes": 2, "PackageBytes": 2, "XmlBytes": 2, "Checksum": 2 }
+  ]
+}

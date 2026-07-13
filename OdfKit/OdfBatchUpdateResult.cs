@@ -48,13 +48,8 @@ public sealed class OdfBatchUpdateResult
     public IList<string> Warnings { get; } = new List<string>();
 
     /// <summary>
-    /// Gets <see cref="MissingNames"/>, <see cref="AmbiguousNames"/> and <see cref="Warnings"/>
-    /// merged into strongly typed diagnostics (<see cref="UpdatedNames"/> and
-    /// <see cref="UnchangedNames"/> describe successful outcomes, not diagnostics, and are
-    /// intentionally excluded).
-    /// 取得合併 <see cref="MissingNames"/>、<see cref="AmbiguousNames"/> 與 <see cref="Warnings"/>
-    /// 而成的強型別診斷（<see cref="UpdatedNames"/> 與 <see cref="UnchangedNames"/> 描述的是成功結果
-    /// 而非診斷，故刻意不納入）。
+    /// Gets missing, ambiguous, and warning entries as strongly typed diagnostics.
+    /// 取得找不到、語意不明與警告項目的強型別診斷。
     /// </summary>
     public IReadOnlyList<OdfDiagnostic> Diagnostics =>
         OdfDiagnostic.FromStrings(MissingNames, "MissingName", OdfIssueSeverity.Error)

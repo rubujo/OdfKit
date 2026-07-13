@@ -25,6 +25,8 @@ ODS 串流讀取目前沿用 64 MiB XML 字元安全上限，因此標準讀取�
   取得穩態耗時與 GC 配置量。
 - `eng/Benchmark-StandardDocuments.ps1` 讓大型情境各自在獨立子行程執行，輸出完整冷啟動
   成本、配置量、峰值工作集、封裝大小、解壓 XML 大小及語意檢查碼。
+- 報告外層使用 schema v2，將 commit、量測時間、workflow run、runner、runtime、CPU 型號與 artifact 身分和
+  九個 schema v1 情境結果一起保存，避免不同提交或執行環境的樣本被混為同一基線。
 - 每次讀取與來回保存都必須完成語意檢查碼計算，避免以漏讀內容換取較漂亮數字。
 
 執行完整獨立行程報告：

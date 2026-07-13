@@ -6,6 +6,10 @@ using OdfKit.DOM;
 
 namespace OdfKit.Text;
 
+/// <summary>
+/// Provides task-oriented text document operations.
+/// 提供任務導向的文字文件作業。
+/// </summary>
 public partial class TextDocument
 {
     /// <summary>

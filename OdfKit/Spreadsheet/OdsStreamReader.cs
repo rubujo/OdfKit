@@ -563,11 +563,6 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     {
         if (options is null)
             throw new ArgumentNullException(nameof(options));
-        if (options.MaxXmlCharactersInDocument < 0)
-            throw new ArgumentOutOfRangeException(nameof(options));
-        if (options.MaxRows <= 0 || options.MaxColumns <= 0 || options.MaxRepeatedRows <= 0 ||
-            options.MaxRepeatedColumns <= 0 || options.MaxCellTextCharacters <= 0)
-            throw new ArgumentOutOfRangeException(nameof(options));
         return options;
     }
 

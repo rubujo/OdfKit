@@ -28,19 +28,40 @@ public class OdfLoadOptions
     /// Gets or sets the maximum number of ZIP entries allowed in a package.
     /// 取得或設定 ZIP 封裝中允許的最大專案數量。
     /// </summary>
-    public int MaxZipEntries { get; set; } = 5000;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1. / 當值小於 1 時擲出。</exception>
+    public int MaxZipEntries
+    {
+        get => _maxZipEntries;
+        set => _maxZipEntries = OdfOptionGuard.EnsurePositive(value, nameof(MaxZipEntries));
+    }
+
+    private int _maxZipEntries = 5000;
 
     /// <summary>
     /// Gets or sets the maximum uncompressed byte count allowed for a single package entry.
     /// 取得或設定單一封裝項目解壓縮後允許的最大位元組數。
     /// </summary>
-    public long MaxEntrySize { get; set; } = 500 * 1024 * 1024;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1. / 當值小於 1 時擲出。</exception>
+    public long MaxEntrySize
+    {
+        get => _maxEntrySize;
+        set => _maxEntrySize = OdfOptionGuard.EnsurePositive(value, nameof(MaxEntrySize));
+    }
+
+    private long _maxEntrySize = 500 * 1024 * 1024;
 
     /// <summary>
     /// Gets or sets the maximum total uncompressed byte count allowed for the package.
     /// 取得或設定整個 ZIP 封裝解壓後允許的總位元組數上限。
     /// </summary>
-    public long MaxTotalUncompressedSize { get; set; } = 1024 * 1024 * 1024;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1. / 當值小於 1 時擲出。</exception>
+    public long MaxTotalUncompressedSize
+    {
+        get => _maxTotalUncompressedSize;
+        set => _maxTotalUncompressedSize = OdfOptionGuard.EnsurePositive(value, nameof(MaxTotalUncompressedSize));
+    }
+
+    private long _maxTotalUncompressedSize = 1024 * 1024 * 1024;
 
     /// <summary>
     /// Gets or sets the maximum raw package byte count for non-seekable input streams.
@@ -50,17 +71,31 @@ public class OdfLoadOptions
     /// This limit applies before ZIP entry expansion and is separate from <see cref="MaxTotalUncompressedSize"/>.
     /// 此限制套用於 ZIP 項目展開之前，且與 <see cref="MaxTotalUncompressedSize"/> 分開計算。
     /// </remarks>
-    public long MaxPackageSize { get; set; } = 1024 * 1024 * 1024;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1. / 當值小於 1 時擲出。</exception>
+    public long MaxPackageSize
+    {
+        get => _maxPackageSize;
+        set => _maxPackageSize = OdfOptionGuard.EnsurePositive(value, nameof(MaxPackageSize));
+    }
+
+    private long _maxPackageSize = 1024 * 1024 * 1024;
 
     /// <summary>
     /// Gets or sets the maximum number of XML characters allowed in a single XML document.
     /// 取得或設定單一 XML 文件允許讀取的最大字元數。
     /// </summary>
     /// <remarks>
-    /// Set this value to zero or a negative number to disable the limit.
-    /// 設為 0 或負值時會停用此限制；一般應維持預設值，僅在受信任的大型文件情境中調整。
+    /// Set this value to zero to disable the limit.
+    /// 設為 0 時會停用此限制；一般應維持預設值，僅在受信任的大型文件情境中調整。
     /// </remarks>
-    public long MaxXmlCharactersInDocument { get; set; } = 64 * 1024 * 1024;
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is negative. / 當值為負數時擲出。</exception>
+    public long MaxXmlCharactersInDocument
+    {
+        get => _maxXmlCharactersInDocument;
+        set => _maxXmlCharactersInDocument = OdfOptionGuard.EnsureNonNegative(value, nameof(MaxXmlCharactersInDocument));
+    }
+
+    private long _maxXmlCharactersInDocument = 64 * 1024 * 1024;
 
     /// <summary>
     /// Gets or sets the password used to decrypt password-protected ODF documents.
@@ -110,4 +145,5 @@ public class OdfLoadOptions
     /// 取得使用預設載入設定的新執行個體。
     /// </summary>
     public static OdfLoadOptions Default => new();
+
 }

@@ -55,18 +55,14 @@ public sealed class OdfTextMatch
     public string Value { get; }
 
     /// <summary>
-    /// Gets the paragraph containing this match — a stable range handle beyond the plain
-    /// document-relative <see cref="Index"/> offset. Null when the match was not produced by a
-    /// paragraph-aware search (e.g. constructed directly by external code).
-    /// 取得包含此符合項目的段落——比單純的文件相對 <see cref="Index"/> offset 更穩定的 range
-    /// handle。若此符合項目非由段落感知搜尋產生（例如由外部程式碼直接建構），則為 null。
+    /// Gets the paragraph containing this match, or null when no paragraph handle is available.
+    /// 取得包含此符合項目的段落；若沒有可用的段落控制代碼，則為 null。
     /// </summary>
     public OdfParagraph? Paragraph { get; }
 
     /// <summary>
-    /// Gets the zero-based offset of this match within the paragraph's own concatenated text,
-    /// as opposed to <see cref="Index"/> which is relative to the whole document.
-    /// 取得此符合項目在段落自身串接文字中的從零開始 offset，相對於文件相對的 <see cref="Index"/>。
+    /// Gets the zero-based offset of this match within the paragraph's concatenated text.
+    /// 取得此符合項目在段落串接文字中從零開始的位移。
     /// </summary>
     public int ParagraphOffset { get; }
 }

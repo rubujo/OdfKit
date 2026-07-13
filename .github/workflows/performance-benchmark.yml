@@ -35,7 +35,11 @@ jobs:
 
       - name: Measure standard ODS ODT ODP workloads
         shell: pwsh
-        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release
+        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release -ArtifactName "standard-document-performance-${{ matrix.os }}"
+
+      - name: Validate standard document measurements
+        shell: pwsh
+        run: ./eng/Test-PerformanceBudgets.ps1 -SamplePath artifacts/performance/standard-documents.json
 
       - name: Upload standard document measurements
         if: always()
@@ -70,7 +74,12 @@ jobs:
       - name: Measure standard ODS ODT ODP workloads
         shell: pwsh
         continue-on-error: true
-        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release
+        run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release -ArtifactName "standard-document-performance-macos-latest"
+
+      - name: Validate standard document measurements
+        shell: pwsh
+        continue-on-error: true
+        run: ./eng/Test-PerformanceBudgets.ps1 -SamplePath artifacts/performance/standard-documents.json
 
       - name: Upload standard document measurements
         if: always()

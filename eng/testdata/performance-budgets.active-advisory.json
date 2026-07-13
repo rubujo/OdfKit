@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "status": "active",
+  "requiredSamples": 3,
+  "allocationRegressionPercent": 20,
+  "advisoryRegressionPercent": 30,
+  "environment": {
+    "runnerOs": "fixture",
+    "runnerArchitecture": "X64",
+    "runtimeVersion": "10.0.0-fixture",
+    "processorDescription": "Fixture CPU",
+    "artifactName": "standard-document-performance-fixture"
+  },
+  "scenarios": {
+    "OdsStreamWrite": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdsStreamRead": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdsDomRoundTrip": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdtStreamWrite": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdtStreamRead": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdtDomRoundTrip": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdpStructureWrite": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdpStructureRead": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 },
+    "OdpMediaRoundTrip": { "baselineElapsedMilliseconds": 2, "baselineAllocatedBytes": 3, "baselinePeakWorkingSetBytes": 2 }
+  }
+}

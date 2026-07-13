@@ -370,8 +370,6 @@ public sealed class OdtStreamReader : IDisposable
     {
         if (options is null)
             throw new ArgumentNullException(nameof(options));
-        if (options.MaxXmlCharactersInDocument < 0 || options.MaxNodes <= 0 || options.MaxNodeTextCharacters <= 0)
-            throw new ArgumentOutOfRangeException(nameof(options));
         return options;
     }
 }

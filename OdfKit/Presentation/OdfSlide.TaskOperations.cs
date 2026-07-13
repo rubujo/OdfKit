@@ -5,6 +5,10 @@ using OdfKit.DOM;
 
 namespace OdfKit.Presentation;
 
+/// <summary>
+/// Provides task-oriented slide operations.
+/// 提供任務導向的投影片作業。
+/// </summary>
 public partial class OdfSlide
 {
     /// <summary>

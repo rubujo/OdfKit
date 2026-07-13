@@ -36,11 +36,8 @@ public sealed class OdfShapeLayoutResult
     public int UpdatedCount => UpdatedShapeIds.Count;
 
     /// <summary>
-    /// Gets <see cref="MissingShapeIds"/> and <see cref="InvalidGeometryShapeIds"/> merged into
-    /// strongly typed diagnostics (<see cref="UpdatedShapeIds"/> describes a successful outcome,
-    /// not a diagnostic, and is intentionally excluded).
-    /// 取得合併 <see cref="MissingShapeIds"/> 與 <see cref="InvalidGeometryShapeIds"/> 而成的強型別
-    /// 診斷（<see cref="UpdatedShapeIds"/> 描述的是成功結果而非診斷，故刻意不納入）。
+    /// Gets missing-shape and invalid-geometry entries as strongly typed diagnostics.
+    /// 取得找不到圖形與無效幾何資訊的強型別診斷。
     /// </summary>
     public IReadOnlyList<OdfDiagnostic> Diagnostics =>
         OdfDiagnostic.FromStrings(MissingShapeIds, "MissingShapeId", OdfIssueSeverity.Error)

@@ -5,10 +5,8 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Unifies non-fatal diagnostic information across OdfKit's report types into a single strongly
-/// typed shape, replacing ad-hoc string collections such as warning or missing-name lists.
-/// 將 OdfKit 各報告類別的非致命診斷資訊統一為單一強型別形狀，取代個別的警告或缺漏名稱等
-/// 字串集合。
+/// Unifies non-fatal diagnostic information across OdfKit report types into one strongly typed shape.
+/// 將 OdfKit 各報告類別的非致命診斷資訊統一為單一強型別形狀。
 /// </summary>
 /// <param name="code">A short machine-readable code identifying the diagnostic kind. / 識別診斷種類的簡短機器可讀代碼。</param>
 /// <param name="severity">The diagnostic severity. / 診斷嚴重程度。</param>
