@@ -9,7 +9,7 @@
 .PARAMETER Configuration
     建置組態，預設 Release。
 .PARAMETER PublishAot
-    額外以 Native AOT 發佈；若因反射／密碼學路徑失敗，僅記錄警告。
+    以 Native AOT 發佈並執行原生可執行檔；任何發佈或執行錯誤皆視為失敗。
 .PARAMETER ForceRebuildOdfKit
     強制重編 OdfKit net10.0。
 #>
@@ -44,25 +44,35 @@ try {
     $modeLabel = if ($PublishAot) { "PublishTrimmed + NativeAOT" } else { "PublishTrimmed" }
     Write-Host "$modeLabel 發佈 TrimSmoke ($Configuration / win-x64)…"
 
-    dotnet restore $project
+    $restoreArgs = @("restore", $project, "-r", "win-x64")
+    if ($PublishAot) {
+        $restoreArgs += "/p:PublishAot=true"
+    }
+    dotnet @restoreArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "TrimSmoke 還原失敗，結束碼 $LASTEXITCODE"
+    }
 
     $publishArgs = @(
         "publish", $project,
         "-c", $Configuration,
         "-f", "net10.0",
+        "-r", "win-x64",
         "-o", $publishDir,
         "--no-restore",
-        "-p:BuildProjectReferences=false",
         "-p:RunAnalyzers=false"
     )
     if ($PublishAot) {
         $publishArgs += "/p:PublishAot=true"
     }
+    else {
+        $publishArgs += "-p:BuildProjectReferences=false"
+    }
 
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
     dotnet @publishArgs 2>&1 | ForEach-Object {
         Write-Host $_
-        if ($_ -match 'IL2\d{4}') {
+        if ($_ -match 'IL[23]\d{4}') {
             Write-Warning $_
         }
     }
@@ -73,7 +83,8 @@ try {
         throw "TrimSmoke 建置失敗，結束碼 $LASTEXITCODE"
     }
 
-    $exe = Join-Path $publishDir "OdfKit.TrimSmoke.exe"
+    $exeName = if ($IsWindows) { "OdfKit.TrimSmoke.exe" } else { "OdfKit.TrimSmoke" }
+    $exe = Join-Path $publishDir $exeName
     if (-not (Test-Path $exe)) {
         throw "找不到裁剪後執行檔：$exe"
     }

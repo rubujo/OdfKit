@@ -28,13 +28,18 @@
     <!-- 僅建置 net10.0 參考，避免 publish 時連帶編譯 netstandard2.0（621 檔 × 2 加倍耗時）。 -->
     <ProjectReference Include="..\..\OdfKit\OdfKit.csproj">
       <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
+      <!-- PublishAot 僅屬最上層可執行檔；不可傳入含 netstandard2.0 的函式庫還原圖。 -->
+      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>
 
-  <!-- BouncyCastle 密碼學路徑與 Sylvan.Data.Csv 尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁。
-       IL2104 由 Sylvan.Data.Csv 發出，已在此 smoke 專案文件化為第三方整包保留策略。 -->
   <ItemGroup>
-    <TrimmerRootAssembly Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
+  </ItemGroup>
+
+  <!-- Sylvan.Data.Csv 尚未完全 trimming / AOT 化；整包保留以避免 IL 連結器誤裁。
+       IL2104 / IL3053 由 Sylvan.Data.Csv 發出，已在此 smoke 專案文件化為第三方整包保留策略。 -->
+  <ItemGroup>
     <TrimmerRootAssembly Include="Sylvan.Data.Csv" />
   </ItemGroup>
 

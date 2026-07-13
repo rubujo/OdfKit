@@ -107,13 +107,13 @@ dotnet run --project tools/OdfKit.TrimSmoke
 ```
 
 標準驗證使用 `eng/Test-TrimSmoke.ps1`，它會以 `PublishTrimmed` 發佈並執行裁剪後的
-`OdfKit.TrimSmoke.exe`。`-PublishAot` 僅作為 Native AOT 研究入口；BouncyCastle OpenPGP
-路徑目前仍透過 trimming guard 保留必要組件，不宣稱完整 Native AOT 支援。
+`OdfKit.TrimSmoke.exe`。加上 `-PublishAot` 會產生並執行 `win-x64` 原生執行檔；CI 將此
+模式列為阻擋式閘門，並實際驗證 BouncyCastle OpenPGP RSA Session Key 加解密往返。
 
 成功時會輸出類似：
 
 ```text
-TrimSmoke OK: 15 API 根通過
+TrimSmoke OK: 16 API 根通過
 ```
 
 ## 5. 與 samples 的分工

@@ -43,4 +43,4 @@ jobs:
 
       - name: Run trim smoke (blocking)
         shell: pwsh
-        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release
+        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release -PublishAot

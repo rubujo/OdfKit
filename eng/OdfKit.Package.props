@@ -2,8 +2,8 @@
   <PropertyGroup>
     <Authors>OdfKit Contributors</Authors>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-    <ProjectUrl>https://github.com/OdfKit/OdfKit</ProjectUrl>
-    <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/rubujo/OdfKit</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rubujo/OdfKit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <IncludeSymbols>true</IncludeSymbols>

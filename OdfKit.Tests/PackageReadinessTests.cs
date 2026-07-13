@@ -28,6 +28,8 @@ public class PackageReadinessTests
         Assert.Equal("OdfKit", GetValue(propertyGroup, "PackageId"));
         Assert.Equal("CC0-1.0", GetValue(propertyGroup, "PackageLicenseExpression"));
         Assert.Equal("README.md", GetValue(propertyGroup, "PackageReadmeFile"));
+        Assert.Equal("https://github.com/rubujo/OdfKit", GetValue(propertyGroup, "PackageProjectUrl"));
+        Assert.Equal("https://github.com/rubujo/OdfKit", GetValue(propertyGroup, "RepositoryUrl"));
         Assert.Equal("git", GetValue(propertyGroup, "RepositoryType"));
         Assert.Equal("true", GetValue(propertyGroup, "IncludeSymbols"));
         Assert.Equal("snupkg", GetValue(propertyGroup, "SymbolPackageFormat"));

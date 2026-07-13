@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using OdfKit.Chart;
 using OdfKit.Compliance;
@@ -10,6 +11,12 @@ using OdfKit.Formula;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
 using OdfKit.Text;
+using Org.BouncyCastle.Bcpg;
+using Org.BouncyCastle.Bcpg.OpenPgp;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
 
 // Native AOT / trimming 煙霧測試：觸及主要公開 API 根，供 IL 連結器驗證（PERF-5e）。
 int checks = 0;
@@ -21,6 +28,7 @@ checks += SmokeDocumentFactoryKinds();
 checks += SmokeFormulaEvaluation();
 checks += SmokeXmlWriterRoundTrip();
 checks += SmokeEmbeddedDocumentFactory();
+checks += SmokeOpenPgpRoundTrip();
 
 Console.WriteLine($"TrimSmoke OK: {checks} API 根通過");
 
@@ -181,6 +189,53 @@ static int SmokeEmbeddedDocumentFactory()
     if (chartDoc is null || formulaDoc is null || chartReloaded is null || formulaReloaded is null)
     {
         throw new InvalidOperationException("嵌入式文件工廠失敗。");
+    }
+
+    return 1;
+}
+
+static int SmokeOpenPgpRoundTrip()
+{
+    var random = new SecureRandom();
+    var rsaParameters = new RsaKeyGenerationParameters(BigInteger.ValueOf(65537), random, 2048, 80);
+    var keyPairGenerator = new RsaKeyPairGenerator();
+    keyPairGenerator.Init(rsaParameters);
+
+    var pgpKeyPair = new PgpKeyPair(
+        PublicKeyAlgorithmTag.RsaGeneral,
+        keyPairGenerator.GenerateKeyPair(),
+        new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    var keyRingGenerator = new PgpKeyRingGenerator(
+        PgpSignature.DefaultCertification,
+        pgpKeyPair,
+        "native-aot@odfkit.example",
+        SymmetricKeyAlgorithmTag.Aes256,
+        Array.Empty<char>(),
+        true,
+        null,
+        null,
+        random);
+
+    using var publicKeyStream = new MemoryStream();
+    keyRingGenerator.GeneratePublicKeyRing().Encode(publicKeyStream);
+    using var secretKeyStream = new MemoryStream();
+    keyRingGenerator.GenerateSecretKeyRing().Encode(secretKeyStream);
+
+    var provider = new OdfBouncyCastleOpenPgpProvider(secretKeyStream.ToArray(), _ => []);
+    var recipient = new OdfOpenPgpRecipient
+    {
+        PublicKey = publicKeyStream.ToArray(),
+        KeyId = "native-aot",
+        Recipient = "native-aot@odfkit.example",
+    };
+    byte[] sessionKey = new byte[32];
+    RandomNumberGenerator.Fill(sessionKey);
+    byte[] encryptedPacket = provider.EncryptSessionKey(sessionKey, recipient);
+    byte[] recoveredKey = provider.DecryptSessionKey(encryptedPacket, recipient.KeyId);
+
+    if (!CryptographicOperations.FixedTimeEquals(sessionKey, recoveredKey))
+    {
+        throw new InvalidOperationException("OpenPGP Native AOT 往返失敗。");
     }
 
     return 1;

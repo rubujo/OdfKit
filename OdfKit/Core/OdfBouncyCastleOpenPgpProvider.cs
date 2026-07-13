@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Bcpg;
@@ -15,27 +14,15 @@ using Org.BouncyCastle.Security;
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 
-#if !NETSTANDARD2_0
 /// <summary>
 /// Provides the BouncyCastle-backed OpenPGP session key provider.
 /// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
 /// </summary>
 /// <remarks>
-/// Native AOT：BouncyCastle 演算法實作依賴執行期組裝探索，裁剪時須保留完整 <c>Org.BouncyCastle</c> 組件或改用靜態註冊表。
-/// </remarks>
-[RequiresUnreferencedCode("BouncyCastle OpenPGP 路徑尚未完成 trimming 相容；Native AOT 需保留 Org.BouncyCastle 組件。")]
-[RequiresDynamicCode("BouncyCastle 密碼學實作依賴動態程式碼產生。")]
-public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
-#else
-/// <summary>
-/// Provides the BouncyCastle-backed OpenPGP session key provider.
-/// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
-/// </summary>
-/// <remarks>
-/// Native AOT：BouncyCastle 演算法實作依賴執行期組裝探索，裁剪時須保留完整 <c>Org.BouncyCastle</c> 組件或改用靜態註冊表。
+/// Uses statically referenced cryptographic primitives and supports trimming and Native AOT.
+/// 使用靜態參照的密碼學基元，支援 trimming 與 Native AOT。
 /// </remarks>
 public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
-#endif
 {
     private readonly byte[]? _secretKeyRingData;
     private readonly Func<long, char[]>? _passphraseProvider;
