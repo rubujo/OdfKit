@@ -131,6 +131,12 @@ public partial class TextDocument
             case "database-next":
                 kind = OdfTextFieldKind.DatabaseNext;
                 return true;
+            case "user-field-get":
+                kind = OdfTextFieldKind.UserFieldGet;
+                return true;
+            case "user-field-input":
+                kind = OdfTextFieldKind.UserFieldInput;
+                return true;
             default:
                 kind = default;
                 return false;

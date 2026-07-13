@@ -28,6 +28,21 @@
 因此它是**整合展示範例**，不是最小入門範例。若只需要最短上手流程，請先讀
 [docs/getting-started.md](../docs/getting-started.md)。
 
+## 公文 ODT 範例
+
+`TaiwanGovernmentLetter.cs` 示範使用外部 OTT 範本、既有欄位 API 與
+`TemplateBinder` 產生公文形式的 ODT。未提供參數時，程式會建立一份由本專案
+自行產生的最小參考範本；也可傳入已加入 ODF user field 或 `{{欄位名稱}}`
+占位符的自有範本：
+
+```powershell
+dotnet run samples/TaiwanGovernmentLetter.cs
+dotnet run samples/TaiwanGovernmentLetter.cs -- <範本.ott> <輸出.odt>
+```
+
+此範例只展示檔案載入、範本繫結與檔案產出，不內嵌或散布政府機關範本，
+也不代表任何機關的正式版面或電子交換合規認證。
+
 ---
 
 ## 系統需求

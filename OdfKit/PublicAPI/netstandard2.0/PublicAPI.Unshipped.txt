@@ -17624,6 +17624,8 @@ OdfKit.Text.OdfTextFieldKind.Reference = 5 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextFieldKind.Sequence = 4 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextFieldKind.SequenceReference = 6 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextFieldKind.Time = 1 -> OdfKit.Text.OdfTextFieldKind
+OdfKit.Text.OdfTextFieldKind.UserFieldGet = 12 -> OdfKit.Text.OdfTextFieldKind
+OdfKit.Text.OdfTextFieldKind.UserFieldInput = 13 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextFieldKind.VariableGet = 9 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextFieldKind.VariableSet = 8 -> OdfKit.Text.OdfTextFieldKind
 OdfKit.Text.OdfTextImageCollection

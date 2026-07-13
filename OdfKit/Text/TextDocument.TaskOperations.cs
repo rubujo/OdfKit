@@ -43,10 +43,18 @@ public partial class TextDocument
     public OdtMutationReport SetFieldValue(string fieldName, string? value)
     {
         var report = new OdtMutationReport("SetFieldValue");
+        int logicalTargetCount = 0;
+        bool userFieldMatched = false;
         if (SetUserFieldValue(fieldName, value ?? string.Empty))
+        {
             report.UpdatedCount++;
+            userFieldMatched = true;
+        }
         if (FormFields.Contains(fieldName) && FormFields.TrySetValue(fieldName, value))
+        {
             report.UpdatedCount++;
+            logicalTargetCount++;
+        }
 
         OdfTextField[] inlineFields = GetTextFields()
             .Where(field => string.Equals(field.Identifier, fieldName, StringComparison.Ordinal))
@@ -55,11 +63,18 @@ public partial class TextDocument
         {
             field.DisplayText = value ?? string.Empty;
             report.UpdatedCount++;
+            if (field.Kind is OdfTextFieldKind.UserFieldGet or OdfTextFieldKind.UserFieldInput)
+                userFieldMatched = true;
+            else
+                logicalTargetCount++;
         }
+
+        if (userFieldMatched)
+            logicalTargetCount++;
 
         if (report.UpdatedCount == 0)
             report.MissingTargets.Add(fieldName);
-        else if (report.UpdatedCount > 1)
+        else if (logicalTargetCount > 1)
             report.AmbiguousTargets.Add(fieldName);
         return report;
     }

@@ -71,6 +71,16 @@ public enum OdfTextFieldKind
     /// 資料庫下一筆欄位。
     /// </summary>
     DatabaseNext,
+    /// <summary>
+    /// User-field-get field.
+    /// 使用者欄位讀取欄位。
+    /// </summary>
+    UserFieldGet,
+    /// <summary>
+    /// User-field-input field.
+    /// 使用者欄位輸入欄位。
+    /// </summary>
+    UserFieldInput,
 }
 
 /// <summary>
