@@ -1,4 +1,4 @@
-{
+﻿{
   "Err_ObjectDataReader_NoReadableProperties": "El tipo {0} no tiene propiedades públicas legibles que se puedan asignar a las columnas del lector de datos.",
   "Err_ObjectDataReader_Disposed": "No se puede acceder a un ObjectDataReader que ya se ha liberado.",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "No se encontró la columna '{0}' de la tabla de la hoja de cálculo.",
@@ -96,7 +96,7 @@
   "Cli_UnknownCommand": "comando desconocido: {0}",
   "Cli_UnknownOption": "opción desconocida: {0}",
   "Cli_UnknownProfile": "perfil desconocido: {0}",
-  "Cli_UsageConvertCsv": "uso: odfkit convert-csv entrada.(ods|fods|csv) salida.(csv|ods) [--delimiter carácter] [--sheet índice] [--sheet-name nombre]",
+  "Cli_UsageConvertCsv": "uso: odfkit convert-csv entrada.(ods|fods|csv) salida.(csv|ods) [--delimiter carácter] [--sheet índice] [--sheet-name nombre] [--encoding codificacion]",
   "Cli_UsageGeneral": "uso: odfkit <comando> [argumentos]",
   "Cli_UsageValidate": "uso: odfkit validate archivo-o-carpeta [opciones]",
   "Cli_UsageWithCmd": "uso: odfkit {0}",
@@ -579,5 +579,8 @@
   "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "No se encontró ninguna clave privada con el identificador 0x{0:X16} en el conjunto de claves secretas.",
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Se produjo un error secundario al cerrar los elementos XML durante la recuperación de la serialización: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "No se pudo inspeccionar la unidad '{0}' en busca de LibreOffice Portable: {1}",
-  "Err_StreamReader_ResourceLimitExceeded": "Se superó el límite de recursos del lector de flujo ({0} > {1})."
+  "Err_StreamReader_ResourceLimitExceeded": "Se superó el límite de recursos del lector de flujo ({0} > {1}).",
+  "Err_OdfFontSegmenter_PlaneOutOfRange": "Las asignaciones de fuentes por plano deben usar números de plano Unicode entre 1 y 16.",
+  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "Las asignaciones de fuentes por plano deben especificar un nombre de fuente no vacío para cada plano.",
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Las declaraciones font-face personalizadas deben especificar un nombre y una familia no vacíos."
 }

@@ -1,4 +1,4 @@
-{
+﻿{
   "Err_ObjectDataReader_NoReadableProperties": "型 {0} には、データリーダーの列にマップできる読み取り可能なパブリックプロパティがありません。",
   "Err_ObjectDataReader_Disposed": "破棄された ObjectDataReader にはアクセスできません。",
   "Err_OdfSpreadsheetTable_ColumnNotFound": "スプレッドシートのテーブル列 '{0}' が見つかりません。",
@@ -96,7 +96,7 @@
   "Cli_UnknownCommand": "不明なコマンド: {0}",
   "Cli_UnknownOption": "不明なオプション: {0}",
   "Cli_UnknownProfile": "不明なプロファイル: {0}",
-  "Cli_UsageConvertCsv": "使用方法: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter 文字] [--sheet インデックス] [--sheet-name 名前]",
+  "Cli_UsageConvertCsv": "使用方法: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter 文字] [--sheet インデックス] [--sheet-name 名前] [--encoding エンコーディング]",
   "Cli_UsageGeneral": "使用方法: odfkit <コマンド> [引数]",
   "Cli_UsageValidate": "使用方法: odfkit validate ファイルまたはフォルダー [オプション]",
   "Cli_UsageWithCmd": "使用方法: odfkit {0}",
@@ -579,5 +579,8 @@
   "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "秘密キーリングにキー ID 0x{0:X16} の秘密キーが見つかりません。",
   "Diag_OdfXmlWriter_SalvageCloseFailed": "シリアル化の復旧中に XML 要素を閉じる際、二次エラーが発生しました: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "LibreOffice Portable を検索するためドライブ '{0}' を調査できませんでした: {1}",
-  "Err_StreamReader_ResourceLimitExceeded": "ストリーミングリーダーのリソース制限を超えました ({0} > {1})。"
+  "Err_StreamReader_ResourceLimitExceeded": "ストリーミングリーダーのリソース制限を超えました ({0} > {1})。",
+  "Err_OdfFontSegmenter_PlaneOutOfRange": "プレーンフォントマッピングには 1 から 16 の Unicode プレーン番号を使用する必要があります。",
+  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "プレーンフォントマッピングでは、各プレーンに空でないフォント名を指定する必要があります。",
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "カスタム font-face 宣言では、空でない名前とファミリを指定する必要があります。"
 }

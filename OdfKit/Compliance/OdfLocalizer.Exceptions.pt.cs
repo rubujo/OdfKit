@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "comando desconhecido: {0}",
             ["Cli_UnknownOption"] = "opção desconhecida: {0}",
             ["Cli_UnknownProfile"] = "perfil desconhecido: {0}",
-            ["Cli_UsageConvertCsv"] = "uso: odfkit convert-csv entrada.(ods|fods|csv) saída.(csv|ods) [--delimiter caráter] [--sheet índice] [--sheet-name nome]",
+            ["Cli_UsageConvertCsv"] = "uso: odfkit convert-csv entrada.(ods|fods|csv) saída.(csv|ods) [--delimiter caráter] [--sheet índice] [--sheet-name nome] [--encoding codificacao]",
             ["Cli_UsageGeneral"] = "uso: odfkit <comando> [argumentos]",
             ["Cli_UsageValidate"] = "uso: odfkit validate ficheiro-ou-pasta [opções]",
             ["Cli_UsageWithCmd"] = "uso: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Ocorreu um erro secundário ao fechar elementos XML durante a recuperação da serialização: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Falha ao verificar a unidade '{0}' para LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "O limite de recursos do leitor de fluxo foi excedido ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Os mapeamentos de tipos de letra por plano devem utilizar números de plano Unicode entre 1 e 16.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Os mapeamentos de tipos de letra por plano devem especificar um nome de tipo de letra não vazio para cada plano.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "As declarações font-face personalizadas devem especificar um nome e uma família não vazios.",
         };
     }
 }

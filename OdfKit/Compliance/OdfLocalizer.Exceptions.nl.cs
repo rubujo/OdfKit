@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "onbekend commando: {0}",
             ["Cli_UnknownOption"] = "onbekende optie: {0}",
             ["Cli_UnknownProfile"] = "onbekend profiel: {0}",
-            ["Cli_UsageConvertCsv"] = "gebruik: odfkit convert-csv invoer.(ods|fods|csv) uitvoer.(csv|ods) [--delimiter teken] [--sheet index] [--sheet-name naam]",
+            ["Cli_UsageConvertCsv"] = "gebruik: odfkit convert-csv invoer.(ods|fods|csv) uitvoer.(csv|ods) [--delimiter teken] [--sheet index] [--sheet-name naam] [--encoding codering]",
             ["Cli_UsageGeneral"] = "gebruik: odfkit <commando> [argumenten]",
             ["Cli_UsageValidate"] = "gebruik: odfkit validate bestand-of-map [opties]",
             ["Cli_UsageWithCmd"] = "gebruik: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Er is een secundaire fout opgetreden bij het sluiten van XML-elementen tijdens serialisatieherstel: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan station '{0}' niet controleren op LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "De resourcelimiet van de streaming-reader is overschreden ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Vlak-lettertypetoewijzingen moeten Unicode-vlaknummers tussen 1 en 16 gebruiken.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Vlak-lettertypetoewijzingen moeten voor elk vlak een niet-lege lettertypenaam opgeven.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Aangepaste font-face-declaraties moeten een niet-lege naam en familie opgeven.",
         };
     }
 }

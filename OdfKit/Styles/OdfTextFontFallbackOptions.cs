@@ -1,4 +1,6 @@
-﻿namespace OdfKit.Styles;
+﻿using OdfKit.Compliance;
+
+namespace OdfKit.Styles;
 
 /// <summary>
 /// Configures text segmentation and font fallback behavior.
@@ -87,6 +89,45 @@ public sealed class OdfTextFontFallbackOptions
                 new OdfFontFaceInfo("HanaMinA", "HanaMinA", "system-serif", "variable"),
                 new OdfFontFaceInfo("HanaMinB", "HanaMinB", "system-serif", "variable")
             ]);
+    }
+
+    /// <summary>
+    /// Creates options that declare caller-supplied font faces for custom rare-glyph fonts.
+    /// 建立宣告呼叫端自訂 font-face 的遞補選項，供自訂罕字字型使用。
+    /// </summary>
+    /// <remarks>
+    /// Combine with <see cref="OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping"/> so text segmentation
+    /// routes supplementary-plane characters to the declared fonts.
+    /// 可搭配 <see cref="OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping"/> 使用，讓文字分段將增補平面字元導向所宣告的字型。
+    /// </remarks>
+    /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
+    /// <param name="fontFaces">The font-face declarations to write into the document. / 要寫入文件的 font-face 宣告集合。</param>
+    /// <returns>The configured fallback options. / 已設定的遞補選項。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="fontFaces"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="ArgumentException">當任一 font-face 宣告的名稱或字型家族為空白時擲出</exception>
+    public static OdfTextFontFallbackOptions Custom(string? baseFont, IReadOnlyList<OdfFontFaceInfo> fontFaces)
+    {
+        if (fontFaces is null)
+        {
+            throw new ArgumentNullException(nameof(fontFaces));
+        }
+
+        // 防禦性複製：呼叫端後續修改原集合不得影響本選項；同時驗證每筆宣告的必要欄位。
+        var copy = new OdfFontFaceInfo[fontFaces.Count];
+        for (int i = 0; i < copy.Length; i++)
+        {
+            OdfFontFaceInfo fontFace = fontFaces[i];
+            if (string.IsNullOrWhiteSpace(fontFace.Name) || string.IsNullOrWhiteSpace(fontFace.Family))
+            {
+                throw new ArgumentException(
+                    OdfLocalizer.GetMessage("Err_OdfTextFontFallbackOptions_FontFaceEmpty"),
+                    nameof(fontFaces));
+            }
+
+            copy[i] = fontFace;
+        }
+
+        return new OdfTextFontFallbackOptions(baseFont, declareDefaultCjkFallbackFonts: true, copy);
     }
 
     /// <summary>

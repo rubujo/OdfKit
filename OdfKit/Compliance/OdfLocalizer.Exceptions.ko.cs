@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "알 수 없는 명령입니다: {0}",
             ["Cli_UnknownOption"] = "알 수 없는 옵션입니다: {0}",
             ["Cli_UnknownProfile"] = "알 수 없는 프로필입니다: {0}",
-            ["Cli_UsageConvertCsv"] = "사용법: odfkit convert-csv 입력.(ods|fods|csv) 출력.(csv|ods) [--delimiter 문자] [--sheet 인덱스] [--sheet-name 이름]",
+            ["Cli_UsageConvertCsv"] = "사용법: odfkit convert-csv 입력.(ods|fods|csv) 출력.(csv|ods) [--delimiter 문자] [--sheet 인덱스] [--sheet-name 이름] [--encoding 인코딩]",
             ["Cli_UsageGeneral"] = "사용법: odfkit <명령> [매개변수]",
             ["Cli_UsageValidate"] = "사용법: odfkit validate 파일-또는-폴더 [옵션]",
             ["Cli_UsageWithCmd"] = "사용법: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "직렬화 복구 중 XML 요소를 닫는 과정에서 보조 오류가 발생했습니다: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "드라이브 '{0}'에서 LibreOffice Portable을 확인하지 못했습니다: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "스트리밍 reader 리소스 제한을 초과했습니다({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "평면 글꼴 매핑은 1에서 16 사이의 유니코드 평면 번호를 사용해야 합니다.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "평면 글꼴 매핑은 각 평면에 비어 있지 않은 글꼴 이름을 지정해야 합니다.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "사용자 지정 font-face 선언은 비어 있지 않은 이름과 글꼴 패밀리를 지정해야 합니다.",
         };
     }
 }

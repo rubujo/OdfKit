@@ -860,7 +860,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--encoding", out string? encodingValue) ||
                         !TryParseCsvEncoding(encodingValue, out encoding))
                     {
-                        error.WriteLine("supported encodings: utf8, utf8bom");
+                        error.WriteLine("supported encodings: utf8, utf8bom, an IANA encoding name (e.g. big5, shift_jis, gb18030) or a code page number (e.g. 950)");
                         return false;
                     }
                     break;
@@ -910,6 +910,30 @@ public static class OdfKitCli
         {
             encoding = new UTF8Encoding(false);
             return true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            // 舊系統 CSV 常見 Big5、Shift-JIS、GB18030 等傳統編碼；這些編碼表不在
+            // .NET（Core）預設清單內，須先註冊 CodePages 提供者（重複註冊為無害的 no-op）。
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            try
+            {
+                // 純數字視為代碼頁編號（例如 950、932）；其餘視為 IANA 編碼名稱（例如 big5、shift_jis）。
+                // UTF-7 自 .NET 5 起預設封鎖（安全性考量），GetEncoding 會直接擲出，維持封鎖即可。
+                encoding = int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out int codePage)
+                    ? Encoding.GetEncoding(codePage)
+                    : Encoding.GetEncoding(value);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                // 無效的編碼名稱或代碼頁：交由呼叫端輸出使用說明。
+            }
+            catch (NotSupportedException)
+            {
+                // 平台不支援或已封鎖（例如 UTF-7）的編碼。
+            }
         }
 
         encoding = new UTF8Encoding(false);

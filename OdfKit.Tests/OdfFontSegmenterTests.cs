@@ -361,6 +361,174 @@ public class OdfFontSegmenterTests
         Assert.Equal(baseFont4, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont4, 15));
     }
 
+    /// <summary>
+    /// 驗證自訂平面對應註冊後可導向自訂字型，且 Dispose 後還原為原字型名稱。
+    /// </summary>
+    [Fact]
+    public void RegisterSupplementaryPlaneFontMapping_RoutesToCustomFontsAndRestoresOnDispose()
+    {
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        string plane3Char = char.ConvertFromUtf32(0x30000);
+        const string baseFont = "FakeGothic-UnitTest";
+
+        using (OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            baseFont,
+            new Dictionary<int, string> { [2] = "FakeGothic P1", [3] = "FakeGothic P2" }))
+        {
+            var segments = OdfFontSegmenter.SegmentText("前" + plane2Char + plane3Char + "後", baseFont);
+
+            Assert.Equal(4, segments.Count);
+            Assert.Equal(baseFont, segments[0].FontName);
+            Assert.Equal("FakeGothic P1", segments[1].FontName);
+            Assert.Equal("FakeGothic P2", segments[2].FontName);
+            Assert.Equal(baseFont, segments[3].FontName);
+        }
+
+        // Dispose 後規則移除：增補平面字元不再改派字型
+        var restored = OdfFontSegmenter.SegmentText(plane2Char, baseFont);
+        Assert.Single(restored);
+        Assert.Equal(baseFont, restored[0].FontName);
+    }
+
+    /// <summary>
+    /// 驗證自訂平面對應優先於內建規則，且命中規則後未列出的平面維持基礎字型（不再回退內建規則）。
+    /// </summary>
+    [Fact]
+    public void RegisterSupplementaryPlaneFontMapping_TakesPrecedenceOverBuiltInRules()
+    {
+        // BiauKai-UnitTest 含 "BiauKai"，未註冊時會命中內建楷體規則
+        const string baseFont = "BiauKai-UnitTest";
+        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+
+        using (OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            baseFont,
+            new Dictionary<int, string> { [2] = "Custom-ExtB" }))
+        {
+            // Plane 2 由自訂規則決定
+            Assert.Equal("Custom-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+            // Plane 15 未列於自訂規則：維持基礎字型，不回退內建的 TW-Kai-Plus-98_1
+            Assert.Equal(baseFont, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 15));
+        }
+
+        // 還原後內建規則恢復生效
+        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+    }
+
+    /// <summary>
+    /// 驗證自訂平面對應可涵蓋內建規則不處理的 Plane 1（SMP），且後註冊規則優先。
+    /// </summary>
+    [Fact]
+    public void RegisterSupplementaryPlaneFontMapping_SupportsPlane1AndLaterRegistrationWins()
+    {
+        string plane1Char = char.ConvertFromUtf32(0x1F600);
+        const string baseFont = "FakeSymbol-UnitTest";
+
+        using IDisposable first = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            baseFont, new Dictionary<int, string> { [1] = "Symbols-Old" });
+        using IDisposable second = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            baseFont, new Dictionary<int, string> { [1] = "Symbols-New" });
+
+        var segments = OdfFontSegmenter.SegmentText("文" + plane1Char, baseFont);
+
+        Assert.Equal(2, segments.Count);
+        Assert.Equal(baseFont, segments[0].FontName);
+        Assert.Equal("Symbols-New", segments[1].FontName);
+    }
+
+    /// <summary>
+    /// 驗證自訂平面對應的參數驗證：空白模式、null 字典、平面編號超界與空白字型名稱。
+    /// </summary>
+    [Fact]
+    public void RegisterSupplementaryPlaneFontMapping_ValidatesArguments()
+    {
+        var valid = new Dictionary<int, string> { [2] = "Font" };
+
+        Assert.Throws<ArgumentNullException>(
+            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping("", valid));
+        Assert.Throws<ArgumentNullException>(
+            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping("Pattern", null!));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+                "Pattern", new Dictionary<int, string> { [0] = "Font" }));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+                "Pattern", new Dictionary<int, string> { [17] = "Font" }));
+        Assert.Throws<ArgumentException>(
+            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+                "Pattern", new Dictionary<int, string> { [2] = " " }));
+    }
+
+    /// <summary>
+    /// 驗證註冊後修改原字典不影響既有規則（防禦性複製）。
+    /// </summary>
+    [Fact]
+    public void RegisterSupplementaryPlaneFontMapping_CopiesMappingDefensively()
+    {
+        const string baseFont = "FakeCopy-UnitTest";
+        var planeFonts = new Dictionary<int, string> { [2] = "Copied-Font" };
+
+        using IDisposable registration = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(baseFont, planeFonts);
+        planeFonts[2] = "Mutated-Font";
+        planeFonts[3] = "Injected-Font";
+
+        Assert.Equal("Copied-Font", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal(baseFont, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 3));
+    }
+
+    /// <summary>
+    /// 驗證 Custom 遞補選項會宣告自訂 font-face，並可搭配自訂平面對應讓段落分段導向自訂字型。
+    /// </summary>
+    [Fact]
+    public void ParagraphAddText_WithCustomOptions_SegmentsAndDeclaresCustomFontFaces()
+    {
+        using IDisposable registration = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            "FakeCustom-UnitTest",
+            new Dictionary<int, string> { [2] = "FakeCustom P1", [3] = "FakeCustom P2" });
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph();
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        string plane3Char = char.ConvertFromUtf32(0x30000);
+
+        IReadOnlyList<OdfTextRun> runs = paragraph.AddText(
+            "甲" + plane2Char + plane3Char,
+            OdfTextFontFallbackOptions.Custom(
+                "FakeCustom-UnitTest",
+                [
+                    new OdfFontFaceInfo("FakeCustom P1", "FakeCustom P1", "system-sans-serif", "variable"),
+                    new OdfFontFaceInfo("FakeCustom P2", "FakeCustom P2", "system-sans-serif", "variable")
+                ]));
+
+        Assert.Equal(3, runs.Count);
+        Assert.Equal("FakeCustom-UnitTest", runs[0].FontName);
+        Assert.Equal("FakeCustom P1", runs[1].FontName);
+        Assert.Equal("FakeCustom P2", runs[2].FontName);
+        AssertFontFace(document.ContentDom, "FakeCustom P1");
+        AssertFontFace(document.ContentDom, "FakeCustom P2");
+        AssertFontFace(document.StylesDom, "FakeCustom P1");
+        AssertFontFace(document.StylesDom, "FakeCustom P2");
+    }
+
+    /// <summary>
+    /// 驗證 Custom 遞補選項的參數驗證與防禦性複製行為。
+    /// </summary>
+    [Fact]
+    public void CustomOptions_ValidatesAndCopiesFontFaces()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => OdfTextFontFallbackOptions.Custom("Base", null!));
+        Assert.Throws<ArgumentException>(
+            () => OdfTextFontFallbackOptions.Custom(
+                "Base", [new OdfFontFaceInfo("", "Family", null, null)]));
+        Assert.Throws<ArgumentException>(
+            () => OdfTextFontFallbackOptions.Custom(
+                "Base", [new OdfFontFaceInfo("Name", " ", null, null)]));
+
+        OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Custom(
+            "Base", [new OdfFontFaceInfo("Name", "Family", null, null)]);
+        Assert.Equal("Base", options.BaseFont);
+        Assert.True(options.DeclareDefaultCjkFallbackFonts);
+    }
+
     private static string ReadEntry(OdfPackage package, string path)
     {
         using Stream stream = package.GetEntryStream(path);

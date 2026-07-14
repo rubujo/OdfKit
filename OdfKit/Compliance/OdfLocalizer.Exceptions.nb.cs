@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "ukjent kommando: {0}",
             ["Cli_UnknownOption"] = "ukjent alternativ: {0}",
             ["Cli_UnknownProfile"] = "ukjent profil: {0}",
-            ["Cli_UsageConvertCsv"] = "bruk: odfkit convert-csv inndata.(ods|fods|csv) utdata.(csv|ods) [--delimiter tegn] [--sheet indeks] [--sheet-name navn]",
+            ["Cli_UsageConvertCsv"] = "bruk: odfkit convert-csv inndata.(ods|fods|csv) utdata.(csv|ods) [--delimiter tegn] [--sheet indeks] [--sheet-name navn] [--encoding koding]",
             ["Cli_UsageGeneral"] = "bruk: odfkit <kommando> [argumenter]",
             ["Cli_UsageValidate"] = "bruk: odfkit validate fil-eller-mappe [alternativer]",
             ["Cli_UsageWithCmd"] = "bruk: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Det oppstod en sekundær feil ved lukking av XML-elementer under serialiseringsgjenoppretting: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan ikke undersøke stasjonen '{0}' etter LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Ressursgrensen for strømmeleseren er overskredet ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Planskrifttilordninger må bruke Unicode-plannumre mellom 1 og 16.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Planskrifttilordninger må angi et ikke-tomt skriftnavn for hvert plan.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Egendefinerte font-face-deklarasjoner må angi et ikke-tomt navn og en ikke-tom skriftfamilie.",
         };
     }
 }

@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "unknown command: {0}",
             ["Cli_UnknownOption"] = "unknown option: {0}",
             ["Cli_UnknownProfile"] = "unknown profile: {0}",
-            ["Cli_UsageConvertCsv"] = "usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter char] [--sheet index] [--sheet-name name]",
+            ["Cli_UsageConvertCsv"] = "usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter char] [--sheet index] [--sheet-name name] [--encoding encoding]",
             ["Cli_UsageGeneral"] = "usage: odfkit <command> [arguments]",
             ["Cli_UsageValidate"] = "usage: odfkit validate file-or-folder [options]",
             ["Cli_UsageWithCmd"] = "usage: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "A secondary error occurred while closing XML elements during serialization recovery: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Failed to inspect drive '{0}' for LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Streaming reader resource limit exceeded ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Plane font mappings must use Unicode plane numbers between 1 and 16.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Plane font mappings must specify a non-empty font name for every plane.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Custom font-face declarations must specify a non-empty name and family.",
         };
     }
 }

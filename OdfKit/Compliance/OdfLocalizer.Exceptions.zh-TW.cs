@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "未知的命令：{0}",
             ["Cli_UnknownOption"] = "未知的選項：{0}",
             ["Cli_UnknownProfile"] = "未知的設定檔：{0}",
-            ["Cli_UsageConvertCsv"] = "用法：odfkit convert-csv 來源.(ods|fods|csv) 輸出.(csv|ods) [--delimiter 字元] [--sheet 索引] [--sheet-name 名稱]",
+            ["Cli_UsageConvertCsv"] = "用法：odfkit convert-csv 來源.(ods|fods|csv) 輸出.(csv|ods) [--delimiter 字元] [--sheet 索引] [--sheet-name 名稱] [--encoding 編碼]",
             ["Cli_UsageGeneral"] = "用法：odfkit <命令> [參數]",
             ["Cli_UsageValidate"] = "用法：odfkit validate 檔案或資料夾 [選項]",
             ["Cli_UsageWithCmd"] = "用法：odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "序列化復原期間關閉 XML 元素時發生次要錯誤：{0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "檢查磁碟機「{0}」中的 LibreOffice Portable 失敗：{1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "串流讀取器資源上限已超過（{0} > {1}）。",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "平面字型對應的 Unicode 平面編號必須介於 1 至 16 之間。",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "平面字型對應必須為每個平面指定非空白的字型名稱。",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "自訂 font-face 宣告必須指定非空白的名稱與字型家族。",
         };
     }
 }

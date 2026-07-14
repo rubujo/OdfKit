@@ -1501,6 +1501,63 @@ public class CliTests : IDisposable
     }
 
     /// <summary>
+    /// 驗證 convert-csv 的 --encoding 可使用傳統代碼頁編碼（Big5）完成雙向轉換。
+    /// </summary>
+    [Fact]
+    public void ConvertCsvHonorsLegacyCodePageEncoding()
+    {
+        Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        Encoding big5 = Encoding.GetEncoding("big5");
+        string odsPath = CreateTempPath(".ods");
+        string csvPath = CreateTempPath(".csv");
+        string roundTripPath = CreateTempPath(".ods");
+        try
+        {
+            using (SpreadsheetDocument workbook = SpreadsheetDocument.Create())
+            {
+                OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+                sheet.Cells[0, 0].CellValue = "名稱";
+                sheet.Cells[1, 0].CellValue = "蘋果";
+                workbook.Save(odsPath);
+            }
+
+            AssertCommand(["convert-csv", odsPath, csvPath, "--encoding", "big5"], 0, "direction: ods-to-csv");
+
+            // 以 Big5 解碼可讀回中文，證明輸出未以 UTF-8 寫入
+            string csv = File.ReadAllText(csvPath, big5);
+            Assert.Contains("蘋果", csv);
+
+            AssertCommand(["convert-csv", csvPath, roundTripPath, "--encoding", "950"], 0, "direction: csv-to-ods");
+            using SpreadsheetDocument loaded = SpreadsheetDocument.Load(roundTripPath);
+            Assert.Equal("蘋果", loaded.Worksheets[0].Cells[1, 0].CellValue);
+        }
+        finally
+        {
+            TryDelete(odsPath);
+            TryDelete(csvPath);
+            TryDelete(roundTripPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 convert-csv 的 --encoding 遇到未知編碼名稱時失敗並輸出支援清單提示。
+    /// </summary>
+    [Fact]
+    public void ConvertCsvRejectsUnknownEncodingName()
+    {
+        using StringWriter output = new();
+        using StringWriter error = new();
+
+        int exitCode = OdfKitCli.Run(
+            ["convert-csv", "input.ods", "output.csv", "--encoding", "no-such-encoding"],
+            output,
+            error);
+
+        Assert.Equal(2, exitCode);
+        Assert.Contains("supported encodings", error.ToString());
+    }
+
+    /// <summary>
     /// 驗證 set-cell 透過工作導向 API 更新指定的 A1 儲存格。
     /// </summary>
     [Fact]

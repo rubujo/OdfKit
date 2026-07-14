@@ -1270,8 +1270,8 @@ OdfKit.Core.OdfSigningOptions.TsaUrl.get -> string?
 OdfKit.Core.OdfSigningOptions.TsaUrl.set -> void
 OdfKit.Core.OdfSingleSignatureValidationResult
 OdfKit.Core.OdfSingleSignatureValidationResult.Certificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2?
-OdfKit.Core.OdfSingleSignatureValidationResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Core.OdfSingleSignatureValidationResult.CheckedReferences.get -> System.Collections.Generic.List<string!>!
+OdfKit.Core.OdfSingleSignatureValidationResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Core.OdfSingleSignatureValidationResult.ErrorCode.get -> string?
 OdfKit.Core.OdfSingleSignatureValidationResult.ErrorMessage.get -> string?
 OdfKit.Core.OdfSingleSignatureValidationResult.IsCertificateValid.get -> bool
@@ -16817,6 +16817,19 @@ OdfKit.Styles.OdfDesignTheme.OdfDesignTheme() -> void
 OdfKit.Styles.OdfDesignTheme.StrokeColor.get -> string!
 OdfKit.Styles.OdfDesignTheme.StrokeColor.set -> void
 OdfKit.Styles.OdfDesignTheme.WithAccentFillColors(params string![]! colors) -> OdfKit.Styles.OdfDesignTheme!
+OdfKit.Styles.OdfFontFaceInfo
+OdfKit.Styles.OdfFontFaceInfo.Deconstruct(out string! Name, out string! Family, out string? GenericFamily, out string? Pitch) -> void
+OdfKit.Styles.OdfFontFaceInfo.Equals(OdfKit.Styles.OdfFontFaceInfo other) -> bool
+OdfKit.Styles.OdfFontFaceInfo.Family.get -> string!
+OdfKit.Styles.OdfFontFaceInfo.Family.init -> void
+OdfKit.Styles.OdfFontFaceInfo.GenericFamily.get -> string?
+OdfKit.Styles.OdfFontFaceInfo.GenericFamily.init -> void
+OdfKit.Styles.OdfFontFaceInfo.Name.get -> string!
+OdfKit.Styles.OdfFontFaceInfo.Name.init -> void
+OdfKit.Styles.OdfFontFaceInfo.OdfFontFaceInfo() -> void
+OdfKit.Styles.OdfFontFaceInfo.OdfFontFaceInfo(string! Name, string! Family, string? GenericFamily, string? Pitch) -> void
+OdfKit.Styles.OdfFontFaceInfo.Pitch.get -> string?
+OdfKit.Styles.OdfFontFaceInfo.Pitch.init -> void
 OdfKit.Styles.OdfFontResolver
 OdfKit.Styles.OdfFontSegmenter
 OdfKit.Styles.OdfFontSubset
@@ -17755,8 +17768,8 @@ OdfKit.Text.OdfUserFieldDeclarationInfo.ValueType.get -> string!
 OdfKit.Text.OdtMutationReport
 OdfKit.Text.OdtMutationReport.AmbiguousTargets.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Text.OdtMutationReport.Changed.get -> bool
-OdfKit.Text.OdtMutationReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Text.OdtMutationReport.CreatedPackagePaths.get -> System.Collections.Generic.IList<string!>!
+OdfKit.Text.OdtMutationReport.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
 OdfKit.Text.OdtMutationReport.MissingTargets.get -> System.Collections.Generic.IList<string!>!
 OdfKit.Text.OdtMutationReport.OdtMutationReport(string! operation) -> void
 OdfKit.Text.OdtMutationReport.Operation.get -> string!
@@ -18390,6 +18403,7 @@ override OdfKit.Spreadsheet.SpreadsheetDocument.MergeContentNodes(OdfKit.Core.Od
 override OdfKit.Styles.OdfBorder.Equals(object? obj) -> bool
 override OdfKit.Styles.OdfBorder.GetHashCode() -> int
 override OdfKit.Styles.OdfBorder.ToString() -> string!
+override OdfKit.Styles.OdfFontFaceInfo.GetHashCode() -> int
 override OdfKit.Styles.OdfLength.Equals(object? obj) -> bool
 override OdfKit.Styles.OdfLength.GetHashCode() -> int
 override OdfKit.Styles.OdfLength.ToString() -> string!
@@ -19223,6 +19237,8 @@ static OdfKit.Styles.OdfBorder.operator !=(OdfKit.Styles.OdfBorder left, OdfKit.
 static OdfKit.Styles.OdfBorder.operator ==(OdfKit.Styles.OdfBorder left, OdfKit.Styles.OdfBorder right) -> bool
 static OdfKit.Styles.OdfBorder.Parse(string! borderString) -> OdfKit.Styles.OdfBorder
 static OdfKit.Styles.OdfDesignTheme.Flowchart.get -> OdfKit.Styles.OdfDesignTheme!
+static OdfKit.Styles.OdfFontFaceInfo.operator !=(OdfKit.Styles.OdfFontFaceInfo left, OdfKit.Styles.OdfFontFaceInfo right) -> bool
+static OdfKit.Styles.OdfFontFaceInfo.operator ==(OdfKit.Styles.OdfFontFaceInfo left, OdfKit.Styles.OdfFontFaceInfo right) -> bool
 static OdfKit.Styles.OdfFontResolver.EmbedFonts(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
 static OdfKit.Styles.OdfFontResolver.EmbedFontSubsets(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
 static OdfKit.Styles.OdfFontResolver.GetFontFallbackCandidates(string! fontName) -> System.Collections.Generic.IReadOnlyList<string!>!
@@ -19236,6 +19252,7 @@ static OdfKit.Styles.OdfFontResolver.ResolveFontFallback(string! fontName, Syste
 static OdfKit.Styles.OdfFontResolver.ResolveFontPath(string! fontName) -> string?
 static OdfKit.Styles.OdfFontResolver.WarnIfUnresolvable(string! fontName, string! context) -> bool
 static OdfKit.Styles.OdfFontSegmenter.GetSupplementaryPlaneFontName(string! baseFontFamily, int plane) -> string!
+static OdfKit.Styles.OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(string! baseFontPattern, System.Collections.Generic.IReadOnlyDictionary<int, string!>! planeFontNames) -> System.IDisposable!
 static OdfKit.Styles.OdfFontSegmenter.SegmentText(string! text, string! defaultFontName) -> System.Collections.Generic.List<(string! Text, string! FontName)>!
 static OdfKit.Styles.OdfLayoutPreset.BusinessDeck.get -> OdfKit.Styles.OdfLayoutPreset!
 static OdfKit.Styles.OdfLayoutPreset.FlowDiagram.get -> OdfKit.Styles.OdfLayoutPreset!
@@ -19281,6 +19298,7 @@ static OdfKit.Styles.OdfStyleSet.BusinessReport.get -> OdfKit.Styles.OdfStyleSet
 static OdfKit.Styles.OdfStyleSet.FromTheme(OdfKit.Styles.OdfDesignTheme! theme) -> OdfKit.Styles.OdfStyleSet!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Cns11643() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Cns11643(string? baseFont) -> OdfKit.Styles.OdfTextFontFallbackOptions!
+static OdfKit.Styles.OdfTextFontFallbackOptions.Custom(string? baseFont, System.Collections.Generic.IReadOnlyList<OdfKit.Styles.OdfFontFaceInfo>! fontFaces) -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.HanaMin() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Jigmo() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.TemplateBinder.Bind(OdfKit.Drawing.DrawingDocument! document, System.Collections.Generic.IReadOnlyDictionary<string!, object?>! values) -> int
@@ -19399,3 +19417,5 @@ virtual OdfKit.Spreadsheet.OdsStreamWriter.Dispose(bool disposing) -> void
 virtual OdfKit.Text.OdfMediaOptimizer.Invoke(OdfKit.Text.OdfMediaOptimizationRequest! request) -> OdfKit.Text.OdfOptimizedMedia?
 ~override OdfKit.DOM.OdfXmlByteRange.Equals(object obj) -> bool
 ~override OdfKit.DOM.OdfXmlByteRange.ToString() -> string
+~override OdfKit.Styles.OdfFontFaceInfo.Equals(object obj) -> bool
+~override OdfKit.Styles.OdfFontFaceInfo.ToString() -> string

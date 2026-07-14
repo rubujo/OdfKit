@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "unbekannter Befehl: {0}",
             ["Cli_UnknownOption"] = "unbekannte Option: {0}",
             ["Cli_UnknownProfile"] = "unbekanntes Profil: {0}",
-            ["Cli_UsageConvertCsv"] = "Verwendung: odfkit convert-csv Eingabe.(ods|fods|csv) Ausgabe.(csv|ods) [--delimiter Zeichen] [--sheet Index] [--sheet-name Name]",
+            ["Cli_UsageConvertCsv"] = "Verwendung: odfkit convert-csv Eingabe.(ods|fods|csv) Ausgabe.(csv|ods) [--delimiter Zeichen] [--sheet Index] [--sheet-name Name] [--encoding Kodierung]",
             ["Cli_UsageGeneral"] = "Verwendung: odfkit <Befehl> [Argumente]",
             ["Cli_UsageValidate"] = "Verwendung: odfkit validate Datei-oder-Ordner [Optionen]",
             ["Cli_UsageWithCmd"] = "Verwendung: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Beim Schließen von XML-Elementen während der Serialisierungswiederherstellung ist ein sekundärer Fehler aufgetreten: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Das Laufwerk '{0}' konnte nicht auf LibreOffice Portable geprüft werden: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Das Ressourcenlimit des Streaming-Readers wurde überschritten ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Ebenen-Schriftartzuordnungen müssen Unicode-Ebenennummern zwischen 1 und 16 verwenden.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Ebenen-Schriftartzuordnungen müssen für jede Ebene einen nicht leeren Schriftartnamen angeben.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Benutzerdefinierte font-face-Deklarationen müssen einen nicht leeren Namen und eine nicht leere Schriftfamilie angeben.",
         };
     }
 }

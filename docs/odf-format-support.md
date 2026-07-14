@@ -80,6 +80,32 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
 CNS 11643 私用區碼位版本對照與 LibreOffice 開啟／匯出 PDF 的端到端 corpus 前，不應宣稱完整
 CNS 11643 官方語意相容或認證。
 
+### Unicode 版本相容性與自訂罕字字型擴充點
+
+OdfKit 核心處理**與 Unicode 版本無關**：文字內容以 Unicode 原樣通過 XML 層，字型分段以
+Unicode 平面（plane）為單位路由而非以區塊（block）為單位，因此新版 Unicode 於既有平面新增的
+區塊（例如 Unicode 17.0 於 Plane 3 新增的 CJK Ext J，U+323B0–U+33479）會自動歸入既有平面
+路由，不需要修改程式碼。
+
+內建對應表的 Plane 3（Ext G／H／J）覆蓋現況：
+
+- 字雲（`Jigmo3`）與 Windows `SimSun-ExtG` 有對應字型可接。
+- 全字庫（`TW-Kai-*`／`TW-Song-*`）與花園明朝（HanaMin）無 Plane 3 字面，維持基礎字型
+  （對應字元將依讀取端字型回退機制呈現）。
+
+若需接上內建規則未涵蓋的罕字字型（例如自備的黑體系 Ext B–J 補字字型），可組合下列公開
+擴充點，全程不需修改 OdfKit：
+
+- `OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(pattern, planeFontNames)`：註冊自訂
+  「基礎字型 → 平面 → 字型名稱」對應，優先於內建規則，可涵蓋 Plane 1 至 16；傳回
+  `IDisposable` 供還原。
+- `OdfTextFontFallbackOptions.Custom(baseFont, fontFaces)`：以自訂 `OdfFontFaceInfo` 清單宣告
+  font-face，配合上述分段規則讓 `AddText`／`SetText` 高階入口自動套用。
+- `OdfFontResolver.RegisterFont`／`RegisterFontDirectory`：註冊實體字型檔以供解析與內嵌。
+
+OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選擇（含授權與來源政策考量）由使用者
+自行決定。
+
 ## 矩陣
 
 | 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |

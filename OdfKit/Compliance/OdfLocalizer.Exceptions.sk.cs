@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "neznámy príkaz: {0}",
             ["Cli_UnknownOption"] = "neznáma možnosť: {0}",
             ["Cli_UnknownProfile"] = "neznámy profil: {0}",
-            ["Cli_UsageConvertCsv"] = "použitie: odfkit convert-csv vstup.(ods|fods|csv) výstup.(csv|ods) [--delimiter znak] [--sheet index] [--sheet-name názov]",
+            ["Cli_UsageConvertCsv"] = "použitie: odfkit convert-csv vstup.(ods|fods|csv) výstup.(csv|ods) [--delimiter znak] [--sheet index] [--sheet-name názov] [--encoding kodovanie]",
             ["Cli_UsageGeneral"] = "použitie: odfkit <príkaz> [parametre]",
             ["Cli_UsageValidate"] = "použitie: odfkit validate súbor-alebo-priečinok [možnosti]",
             ["Cli_UsageWithCmd"] = "použitie: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Pri zatváraní prvkov XML počas obnovy serializácie sa vyskytla sekundárna chyba: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Nepodarilo sa skontrolovať jednotku '{0}' na LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Bol prekročený limit prostriedkov streamovacieho readera ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Mapovania písiem podľa rovín musia používať čísla rovín Unicode od 1 do 16.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Mapovania písiem podľa rovín musia pre každú rovinu určiť neprázdny názov písma.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Vlastné deklarácie font-face musia určiť neprázdny názov a rodinu písma.",
         };
     }
 }

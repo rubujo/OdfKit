@@ -96,7 +96,7 @@
   "Cli_UnknownCommand": "arahan tidak dikenali: {0}",
   "Cli_UnknownOption": "pilihan tidak dikenali: {0}",
   "Cli_UnknownProfile": "profil tidak dikenali: {0}",
-  "Cli_UsageConvertCsv": "penggunaan: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter aksara] [--sheet indeks] [--sheet-name nama]",
+  "Cli_UsageConvertCsv": "penggunaan: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter aksara] [--sheet indeks] [--sheet-name nama] [--encoding pengekodan]",
   "Cli_UsageGeneral": "penggunaan: odfkit <arahan> [hujah]",
   "Cli_UsageValidate": "penggunaan: odfkit validate fail-atau-folder [pilihan]",
   "Cli_UsageWithCmd": "penggunaan: odfkit {0}",
@@ -579,5 +579,8 @@
   "Err_OdfBouncyCastleOpenPgpProvider_PrivateKeyNotFound": "Tiada kunci peribadi dengan Key ID 0x{0:X16} ditemui dalam gelang kunci rahsia.",
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Ralat sekunder berlaku semasa menutup elemen XML ketika pemulihan pensirian: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Gagal memeriksa pemacu '{0}' untuk LibreOffice Portable: {1}",
-  "Err_StreamReader_ResourceLimitExceeded": "Had sumber pembaca penstriman telah dilebihi ({0} > {1})."
+  "Err_StreamReader_ResourceLimitExceeded": "Had sumber pembaca penstriman telah dilebihi ({0} > {1}).",
+  "Err_OdfFontSegmenter_PlaneOutOfRange": "Pemetaan fon satah mesti menggunakan nombor satah Unicode antara 1 hingga 16.",
+  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "Pemetaan fon satah mesti menetapkan nama fon yang tidak kosong bagi setiap satah.",
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Pengisytiharan font-face tersuai mesti menetapkan nama dan keluarga fon yang tidak kosong."
 }

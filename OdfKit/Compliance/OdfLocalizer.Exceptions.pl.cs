@@ -114,7 +114,7 @@ public static partial class OdfLocalizer
             ["Cli_UnknownCommand"] = "Nieznane polecenie: {0}",
             ["Cli_UnknownOption"] = "Nieznana opcja: {0}",
             ["Cli_UnknownProfile"] = "Nieznany profil: {0}",
-            ["Cli_UsageConvertCsv"] = "Użycie: odfkit convert-csv wejście.(ods|fods|csv) wyjście.(csv|ods) [--delimiter znak] [--sheet indeks] [--sheet-name nazwa]",
+            ["Cli_UsageConvertCsv"] = "Użycie: odfkit convert-csv wejście.(ods|fods|csv) wyjście.(csv|ods) [--delimiter znak] [--sheet indeks] [--sheet-name nazwa] [--encoding kodowanie]",
             ["Cli_UsageGeneral"] = "Użycie: odfkit <polecenie> [argumenty]",
             ["Cli_UsageValidate"] = "Użycie: odfkit validate plik-lub-folder [opcje]",
             ["Cli_UsageWithCmd"] = "Użycie: odfkit {0}",
@@ -598,6 +598,9 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Podczas zamykania elementów XML w trakcie odzyskiwania serializacji wystąpił błąd pomocniczy: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Nie udało się sprawdzić dysku '{0}' w poszukiwaniu LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Przekroczono limit zasobów czytnika strumieniowego ({0} > {1}).",
+            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Mapowania czcionek płaszczyzn muszą używać numerów płaszczyzn Unicode od 1 do 16.",
+            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Mapowania czcionek płaszczyzn muszą określać niepustą nazwę czcionki dla każdej płaszczyzny.",
+            ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Niestandardowe deklaracje font-face muszą określać niepustą nazwę i rodzinę czcionek.",
         };
     }
 }
