@@ -24,7 +24,7 @@ internal static class OdfCjkTextSpanBuilder
             OdfCjkFontFallbackEngine.ApplyFontFallback(document, options);
         }
 
-        foreach ((string segmentText, string fontName) in OdfFontSegmenter.SegmentText(text, options.BaseFont))
+        foreach ((string segmentText, string fontName) in options.EffectiveFontContext.SegmentText(text, options.BaseFont))
         {
             var span = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
             span.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty)

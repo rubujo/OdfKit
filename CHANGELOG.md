@@ -4,6 +4,7 @@
 
 ## 尚未發佈
 
+- 字型子系統導入 `OdfFontContext` 實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數改由情境執行個體承載；`OdfFontResolver`／`OdfFontSegmenter` 靜態 API 公開表面不變，一律轉發 `Default`；新增 `OdfTextFontFallbackOptions.FontContext` 注入點，多租戶與測試隔離場景可路由高階文字入口的分段。存檔管線字型內嵌現階段仍走 `Default`（文件已註明）。
 - 新增自訂罕字字型擴充點：`OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
 - CLI `convert-csv --encoding` 開放 IANA 編碼名稱與代碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。
 - `docs/odf-format-support.md` 新增 Unicode 版本相容性聲明（平面路由與版本無關，Unicode 17.0 Ext J 自動歸入 Plane 3）與內建對應表 Plane 3 覆蓋現況。

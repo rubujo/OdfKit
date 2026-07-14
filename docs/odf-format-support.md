@@ -102,6 +102,10 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
 - `OdfTextFontFallbackOptions.Custom(baseFont, fontFaces)`：以自訂 `OdfFontFaceInfo` 清單宣告
   font-face，配合上述分段規則讓 `AddText`／`SetText` 高階入口自動套用。
 - `OdfFontResolver.RegisterFont`／`RegisterFontDirectory`：註冊實體字型檔以供解析與內嵌。
+- `OdfFontContext`：字型子系統的實例化情境。上述靜態 API 一律轉發至 `OdfFontContext.Default`；
+  多租戶或測試隔離場景可建立獨立執行個體，並經由 `OdfTextFontFallbackOptions.FontContext`
+  注入高階文字入口的分段路由。現階段存檔管線的字型內嵌（`EmbedFonts`／`EmbedFontSubsets`
+  的自動呼叫）仍使用 `Default` 情境。
 
 OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選擇（含授權與來源政策考量）由使用者
 自行決定。

@@ -16817,6 +16817,22 @@ OdfKit.Styles.OdfDesignTheme.OdfDesignTheme() -> void
 OdfKit.Styles.OdfDesignTheme.StrokeColor.get -> string!
 OdfKit.Styles.OdfDesignTheme.StrokeColor.set -> void
 OdfKit.Styles.OdfDesignTheme.WithAccentFillColors(params string![]! colors) -> OdfKit.Styles.OdfDesignTheme!
+OdfKit.Styles.OdfFontContext
+OdfKit.Styles.OdfFontContext.EmbedFonts(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
+OdfKit.Styles.OdfFontContext.EmbedFontSubsets(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
+OdfKit.Styles.OdfFontContext.GetFontFallbackCandidates(string! fontName) -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Styles.OdfFontContext.GetSupplementaryPlaneFontName(string! baseFontFamily, int plane) -> string!
+OdfKit.Styles.OdfFontContext.MapFont(string! fontName) -> string!
+OdfKit.Styles.OdfFontContext.OdfFontContext() -> void
+OdfKit.Styles.OdfFontContext.RegisterFallback(string! targetFont, string! replacementFont) -> void
+OdfKit.Styles.OdfFontContext.RegisterFont(string! fontName, string! filePath) -> void
+OdfKit.Styles.OdfFontContext.RegisterFontDirectory(string! directoryPath) -> void
+OdfKit.Styles.OdfFontContext.RegisterFontSubsetter(OdfKit.Styles.IFontSubsetter! subsetter) -> System.IDisposable!
+OdfKit.Styles.OdfFontContext.RegisterSupplementaryPlaneFontMapping(string! baseFontPattern, System.Collections.Generic.IReadOnlyDictionary<int, string!>! planeFontNames) -> System.IDisposable!
+OdfKit.Styles.OdfFontContext.ResolveFontFallback(string! fontName, System.Func<string!, bool>! isAvailable) -> string?
+OdfKit.Styles.OdfFontContext.ResolveFontPath(string! fontName) -> string?
+OdfKit.Styles.OdfFontContext.SegmentText(string! text, string! defaultFontName) -> System.Collections.Generic.List<(string! Text, string! FontName)>!
+OdfKit.Styles.OdfFontContext.WarnIfUnresolvable(string! fontName, string! context) -> bool
 OdfKit.Styles.OdfFontFaceInfo
 OdfKit.Styles.OdfFontFaceInfo.<Clone>$() -> OdfKit.Styles.OdfFontFaceInfo!
 OdfKit.Styles.OdfFontFaceInfo.Deconstruct(out string! Name, out string! Family, out string? GenericFamily, out string? Pitch) -> void
@@ -16958,6 +16974,8 @@ OdfKit.Styles.OdfStyleSet.WithTableHeaderColor(string? color) -> OdfKit.Styles.O
 OdfKit.Styles.OdfTextFontFallbackOptions
 OdfKit.Styles.OdfTextFontFallbackOptions.BaseFont.get -> string!
 OdfKit.Styles.OdfTextFontFallbackOptions.DeclareDefaultCjkFallbackFonts.get -> bool
+OdfKit.Styles.OdfTextFontFallbackOptions.FontContext.get -> OdfKit.Styles.OdfFontContext?
+OdfKit.Styles.OdfTextFontFallbackOptions.FontContext.init -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions() -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions(string? baseFont) -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions(string? baseFont, bool declareDefaultCjkFallbackFonts) -> void
@@ -19241,6 +19259,7 @@ static OdfKit.Styles.OdfBorder.operator !=(OdfKit.Styles.OdfBorder left, OdfKit.
 static OdfKit.Styles.OdfBorder.operator ==(OdfKit.Styles.OdfBorder left, OdfKit.Styles.OdfBorder right) -> bool
 static OdfKit.Styles.OdfBorder.Parse(string! borderString) -> OdfKit.Styles.OdfBorder
 static OdfKit.Styles.OdfDesignTheme.Flowchart.get -> OdfKit.Styles.OdfDesignTheme!
+static OdfKit.Styles.OdfFontContext.Default.get -> OdfKit.Styles.OdfFontContext!
 static OdfKit.Styles.OdfFontFaceInfo.operator !=(OdfKit.Styles.OdfFontFaceInfo? left, OdfKit.Styles.OdfFontFaceInfo? right) -> bool
 static OdfKit.Styles.OdfFontFaceInfo.operator ==(OdfKit.Styles.OdfFontFaceInfo? left, OdfKit.Styles.OdfFontFaceInfo? right) -> bool
 static OdfKit.Styles.OdfFontResolver.EmbedFonts(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void

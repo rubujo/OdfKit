@@ -55,6 +55,14 @@ public sealed class OdfTextFontFallbackOptions
     /// </summary>
     public bool DeclareDefaultCjkFallbackFonts { get; }
 
+    /// <summary>
+    /// Gets the font context used for text segmentation; null uses <see cref="OdfFontContext.Default"/>.
+    /// 取得文字分段所用的字型情境；為 null 時使用 <see cref="OdfFontContext.Default"/>。
+    /// </summary>
+    public OdfFontContext? FontContext { get; init; }
+
+    internal OdfFontContext EffectiveFontContext => FontContext ?? OdfFontContext.Default;
+
     internal IReadOnlyList<OdfFontFaceInfo> FontFaces { get; }
     /// <summary>
     /// Short overload of Cns11643 that uses default values for all optional parameters and forwards to the full overload.
