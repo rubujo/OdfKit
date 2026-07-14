@@ -116,8 +116,8 @@ public sealed class OdfTextFontFallbackOptions
         var copy = new OdfFontFaceInfo[fontFaces.Count];
         for (int i = 0; i < copy.Length; i++)
         {
-            OdfFontFaceInfo fontFace = fontFaces[i];
-            if (string.IsNullOrWhiteSpace(fontFace.Name) || string.IsNullOrWhiteSpace(fontFace.Family))
+            OdfFontFaceInfo? fontFace = fontFaces[i];
+            if (fontFace is null || string.IsNullOrWhiteSpace(fontFace.Name) || string.IsNullOrWhiteSpace(fontFace.Family))
             {
                 throw new ArgumentException(
                     OdfLocalizer.GetMessage("Err_OdfTextFontFallbackOptions_FontFaceEmpty"),

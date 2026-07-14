@@ -517,6 +517,8 @@ public class OdfFontSegmenterTests
         Assert.Throws<ArgumentNullException>(
             () => OdfTextFontFallbackOptions.Custom("Base", null!));
         Assert.Throws<ArgumentException>(
+            () => OdfTextFontFallbackOptions.Custom("Base", [null!]));
+        Assert.Throws<ArgumentException>(
             () => OdfTextFontFallbackOptions.Custom(
                 "Base", [new OdfFontFaceInfo("", "Family", null, null)]));
         Assert.Throws<ArgumentException>(

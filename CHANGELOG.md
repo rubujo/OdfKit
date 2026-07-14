@@ -4,7 +4,7 @@
 
 ## 尚未發佈
 
-- 新增自訂罕字字型擴充點：`OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
+- 新增自訂罕字字型擴充點：`OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
 - CLI `convert-csv --encoding` 開放 IANA 編碼名稱與代碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。
 - `docs/odf-format-support.md` 新增 Unicode 版本相容性聲明（平面路由與版本無關，Unicode 17.0 Ext J 自動歸入 Plane 3）與內建對應表 Plane 3 覆蓋現況。
 - 完成第二階段 API 人體工學與效能精修：新增 `OdfDiagnostic` 統一診斷模型（八個 report 類別加掛強型別 `Diagnostics` 檢視，見 `docs/reference/diagnostics.md`）、`ImportRecordsAsync`／`ReadRecordsAsync` 非同步物件繫結、`OdfTextMatch.Paragraph`／`ParagraphOffset` 段落定位資訊與搜尋取代單次 traversal 重構、HTML／PDF 匯出低緩衝寫入；同步擴大效能基準與 CI 迴歸閘門（find/replace、物件繫結、export 記憶體）。
