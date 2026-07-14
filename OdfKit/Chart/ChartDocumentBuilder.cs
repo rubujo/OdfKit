@@ -79,6 +79,20 @@ public sealed class ChartDocumentBuilder
     }
 
     /// <summary>
+    /// Sets the chart title using the specified font fallback options.
+    /// 使用指定的字型遞補選項設定圖表標題。
+    /// </summary>
+    /// <param name="title">The chart title. / 圖表標題。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
+    public ChartDocumentBuilder WithTitle(string? title, OdfTextFontFallbackOptions options)
+    {
+        _document.SetChartTitle(title, options);
+        return this;
+    }
+
+    /// <summary>
     /// Sets the style set this builder applies to subsequently created chart series.
     /// 設定此 builder 後續建立圖表序列會套用的樣式集合。
     /// </summary>
@@ -315,6 +329,20 @@ public sealed class ChartAxisBuilder
     public ChartAxisBuilder WithTitle(string? title)
     {
         _document.SetAxisTitle(_dimension, title);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the axis title using the specified font fallback options.
+    /// 使用指定的字型遞補選項設定座標軸標題。
+    /// </summary>
+    /// <param name="title">The title text. / 標題文字。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
+    public ChartAxisBuilder WithTitle(string? title, OdfTextFontFallbackOptions options)
+    {
+        _document.SetAxisTitle(_dimension, title, options);
         return this;
     }
 

@@ -62,6 +62,7 @@ OdfKit.Chart.ChartAxisBuilder.WithLogarithmic(bool? value) -> OdfKit.Chart.Chart
 OdfKit.Chart.ChartAxisBuilder.WithMaximum(double? value) -> OdfKit.Chart.ChartAxisBuilder!
 OdfKit.Chart.ChartAxisBuilder.WithMinimum(double? value) -> OdfKit.Chart.ChartAxisBuilder!
 OdfKit.Chart.ChartAxisBuilder.WithTitle(string? title) -> OdfKit.Chart.ChartAxisBuilder!
+OdfKit.Chart.ChartAxisBuilder.WithTitle(string? title, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> OdfKit.Chart.ChartAxisBuilder!
 OdfKit.Chart.ChartDocument
 OdfKit.Chart.ChartDocument.ChartDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Chart.ChartDocument.ChartDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
@@ -84,6 +85,7 @@ OdfKit.Chart.ChartDocumentBuilder.WithStockSeries(params OdfKit.Chart.OdfStockCh
 OdfKit.Chart.ChartDocumentBuilder.WithStyles(OdfKit.Styles.OdfStyleSet! styles) -> OdfKit.Chart.ChartDocumentBuilder!
 OdfKit.Chart.ChartDocumentBuilder.WithStyles(System.Action<OdfKit.Styles.OdfStyleSet!>! configure) -> OdfKit.Chart.ChartDocumentBuilder!
 OdfKit.Chart.ChartDocumentBuilder.WithTitle(string? title) -> OdfKit.Chart.ChartDocumentBuilder!
+OdfKit.Chart.ChartDocumentBuilder.WithTitle(string? title, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> OdfKit.Chart.ChartDocumentBuilder!
 OdfKit.Chart.ChartDocumentBuilder.WithType(OdfKit.Spreadsheet.OdfChartType chartType) -> OdfKit.Chart.ChartDocumentBuilder!
 OdfKit.Chart.ChartSeriesBuilder
 OdfKit.Chart.ChartSeriesBuilder.WithDataLabels(OdfKit.Chart.OdfChartDataLabelInfo? info) -> OdfKit.Chart.ChartSeriesBuilder!
@@ -240,8 +242,10 @@ OdfKit.Chart.OdfChartDocument.SetAxisNumberFormat(string! dimension, string? dat
 OdfKit.Chart.OdfChartDocument.SetAxisReverseDirection(string! dimension, bool? reverseDirection) -> void
 OdfKit.Chart.OdfChartDocument.SetAxisStyleName(string! dimension, string? styleName) -> void
 OdfKit.Chart.OdfChartDocument.SetAxisTitle(string! dimension, string? title) -> void
+OdfKit.Chart.OdfChartDocument.SetAxisTitle(string! dimension, string? title, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> void
 OdfKit.Chart.OdfChartDocument.SetBubbleSeries(System.Collections.Generic.IEnumerable<OdfKit.Chart.OdfBubbleChartSeriesRequest!>! series) -> void
 OdfKit.Chart.OdfChartDocument.SetCategories(string! cellRangeAddress) -> void
+OdfKit.Chart.OdfChartDocument.SetChartTitle(string? title, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> void
 OdfKit.Chart.OdfChartDocument.SetChartType(OdfKit.Spreadsheet.OdfChartType chartType) -> void
 OdfKit.Chart.OdfChartDocument.SetDataRange(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> void
 OdfKit.Chart.OdfChartDocument.SetDataRange(string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) -> void
@@ -15049,6 +15053,7 @@ OdfKit.Presentation.OdfEmbeddedTable.SetCellBorderRight(int row, int column, str
 OdfKit.Presentation.OdfEmbeddedTable.SetCellBorderTop(int row, int column, string? border) -> OdfKit.Presentation.OdfEmbeddedTable!
 OdfKit.Presentation.OdfEmbeddedTable.SetCellSpan(int row, int column, int rowSpan, int columnSpan) -> OdfKit.Presentation.OdfEmbeddedTable!
 OdfKit.Presentation.OdfEmbeddedTable.SetCellText(int row, int column, string! text) -> OdfKit.Presentation.OdfEmbeddedTable!
+OdfKit.Presentation.OdfEmbeddedTable.SetCellText(int row, int column, string! text, OdfKit.Styles.OdfTextFontFallbackOptions! options) -> OdfKit.Presentation.OdfEmbeddedTable!
 OdfKit.Presentation.OdfEmbeddedTable.SetCellTextStyle(int row, int column) -> OdfKit.Presentation.OdfEmbeddedTable!
 OdfKit.Presentation.OdfEmbeddedTable.SetCellTextStyle(int row, int column, bool? bold) -> OdfKit.Presentation.OdfEmbeddedTable!
 OdfKit.Presentation.OdfEmbeddedTable.SetCellTextStyle(int row, int column, bool? bold, bool? italic) -> OdfKit.Presentation.OdfEmbeddedTable!

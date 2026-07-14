@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 
 namespace OdfKit.Chart;
 
@@ -142,32 +143,63 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
         }
         set
         {
-            OdfNode chart = GetChartNode();
-            OdfNode? title = FindChildElement(chart, "title", OdfNamespaces.Chart);
-            if (title is null)
-            {
-                title = OdfNodeFactory.CreateElement("title", OdfNamespaces.Chart, "chart");
-                OdfNode? followingChild = FindFirstChartChild(
-                    chart,
-                    "subtitle",
-                    "footer",
-                    "legend",
-                    "plot-area",
-                    "wall",
-                    "floor");
-                if (followingChild is null)
-                {
-                    chart.AppendChild(title);
-                }
-                else
-                {
-                    chart.InsertBefore(title, followingChild);
-                }
-            }
-
-            OdfNode paragraph = FindOrCreateChild(title, "p", OdfNamespaces.Text, "text");
+            OdfNode paragraph = FindOrCreateChartTitleParagraph();
             paragraph.TextContent = value ?? string.Empty;
         }
+    }
+
+    /// <summary>
+    /// Sets the chart title using the specified font fallback options.
+    /// 使用指定的字型遞補選項設定圖表標題，依 Unicode 平面分段並套用對應字型。
+    /// </summary>
+    /// <param name="title">The chart title; a blank value clears it. / 圖表標題；空白值會清除標題文字。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
+    public void SetChartTitle(string? title, OdfTextFontFallbackOptions options)
+    {
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            // 空白值一律清除標題文字（不保留純空白內容）。
+            ChartTitle = null;
+            return;
+        }
+
+        OdfNode paragraph = FindOrCreateChartTitleParagraph();
+        paragraph.TextContent = string.Empty;
+        OdfCjkTextSpanBuilder.AppendSegmentedText(this, paragraph, title!, options);
+    }
+
+    private OdfNode FindOrCreateChartTitleParagraph()
+    {
+        OdfNode chart = GetChartNode();
+        OdfNode? title = FindChildElement(chart, "title", OdfNamespaces.Chart);
+        if (title is null)
+        {
+            title = OdfNodeFactory.CreateElement("title", OdfNamespaces.Chart, "chart");
+            OdfNode? followingChild = FindFirstChartChild(
+                chart,
+                "subtitle",
+                "footer",
+                "legend",
+                "plot-area",
+                "wall",
+                "floor");
+            if (followingChild is null)
+            {
+                chart.AppendChild(title);
+            }
+            else
+            {
+                chart.InsertBefore(title, followingChild);
+            }
+        }
+
+        return FindOrCreateChild(title, "p", OdfNamespaces.Text, "text");
     }
 
     /// <summary>

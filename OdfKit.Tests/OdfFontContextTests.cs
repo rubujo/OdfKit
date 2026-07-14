@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
@@ -154,6 +156,82 @@ public class OdfFontContextTests
         Assert.Same(optionContext, optionScoped.ResolveFontContext(document));
         Assert.Same(documentContext, bareOptions.ResolveFontContext(document));
         Assert.Same(OdfFontContext.Default, bareOptions.ResolveFontContext(null));
+    }
+
+    /// <summary>
+    /// 驗證圖表主標題與座標軸標題的字型遞補多載會分段、套用字型並宣告 font-face。
+    /// </summary>
+    [Fact]
+    public void ChartTitles_WithFallbackOptions_SegmentAndDeclareFontFaces()
+    {
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        using Chart.ChartDocument chartDoc = Chart.ChartDocument.Builder()
+            .WithTitle("甲" + plane2Char, OdfTextFontFallbackOptions.Cns11643("TW-Kai"))
+            .WithAxis("x", axis => axis.WithTitle("乙" + plane2Char, OdfTextFontFallbackOptions.Cns11643("TW-Kai")))
+            .Build();
+
+        // 主標題與軸標題的文字內容完整保留
+        Assert.Equal("甲" + plane2Char, chartDoc.ChartTitle);
+        Assert.Equal("乙" + plane2Char, chartDoc.FindAxisTitle("x"));
+
+        // 分段結果以 text:span 寫入且宣告了全字庫 font-face
+        Assert.Contains(
+            chartDoc.ContentDom.Descendants(),
+            node => node.LocalName == "span" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(
+            chartDoc.ContentDom.Descendants(),
+            node => node.LocalName == "font-face" &&
+                    node.GetAttribute("name", OdfNamespaces.Style) == "TW-Kai-Ext-B-98_1");
+    }
+
+    /// <summary>
+    /// 驗證圖表標題多載的空白清除語意與參數驗證。
+    /// </summary>
+    [Fact]
+    public void SetChartTitle_WithFallbackOptions_ValidatesAndClearsBlankTitle()
+    {
+        using Chart.ChartDocument chartDoc = Chart.ChartDocument.Builder().Build();
+        OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Cns11643("TW-Kai");
+
+        Assert.Throws<ArgumentNullException>(() => chartDoc.SetChartTitle("標題", null!));
+        Assert.Throws<ArgumentNullException>(() => chartDoc.SetAxisTitle("x", "標題", null!));
+
+        chartDoc.SetChartTitle("標題", options);
+        Assert.Equal("標題", chartDoc.ChartTitle);
+
+        chartDoc.SetChartTitle(" ", options);
+        Assert.True(string.IsNullOrEmpty(chartDoc.ChartTitle));
+    }
+
+    /// <summary>
+    /// 驗證簡報嵌入表格儲存格的字型遞補多載會分段、套用字型並宣告 font-face。
+    /// </summary>
+    [Fact]
+    public void EmbeddedTableSetCellText_WithFallbackOptions_SegmentsAndDeclaresFontFaces()
+    {
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        using Presentation.PresentationDocument document = Presentation.PresentationDocument.Create();
+        Presentation.OdfSlide slide = document.Slides.Add("Tables");
+        Presentation.OdfEmbeddedTable table = slide.AddTable(
+            2, 2,
+            OdfLength.Parse("1cm"), OdfLength.Parse("1cm"),
+            OdfLength.Parse("12cm"), OdfLength.Parse("6cm"));
+
+        Assert.Throws<ArgumentNullException>(
+            () => table.SetCellText(0, 0, null!, OdfTextFontFallbackOptions.Cns11643("TW-Kai")));
+        Assert.Throws<ArgumentNullException>(
+            () => table.SetCellText(0, 0, "文", null!));
+
+        table.SetCellText(0, 0, "甲" + plane2Char, OdfTextFontFallbackOptions.Cns11643("TW-Kai"));
+
+        Assert.Equal("甲" + plane2Char, table.GetCellText(0, 0));
+        Assert.Contains(
+            table.TableNode.Descendants(),
+            node => node.LocalName == "span" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(
+            document.ContentDom.Descendants(),
+            node => node.LocalName == "font-face" &&
+                    node.GetAttribute("name", OdfNamespaces.Style) == "TW-Kai-Ext-B-98_1");
     }
 
     private sealed class RecordingFontSubsetter : IFontSubsetter

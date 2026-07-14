@@ -4,6 +4,7 @@
 
 ## 尚未發佈
 
+- CNS 11643 字型遞補入口擴及圖表與簡報嵌入表格：新增 `OdfChartDocument.SetChartTitle(title, options)`／`SetAxisTitle(dimension, title, options)`（含 `ChartDocumentBuilder`／`ChartAxisBuilder.WithTitle(title, options)`）與 `OdfEmbeddedTable.SetCellText(row, column, text, options)` 多載，重用同一套分段與 font-face 宣告基礎；至此所有承載 ODF 文字 run 的高階入口皆支援字型遞補選項（頁首頁尾經由 `OdfParagraph` 既有多載涵蓋，MathML 公式內容不適用）。
 - 字型子系統重構為 `OdfFontContext` 單一實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數由情境執行個體承載；**移除** `OdfFontResolver` 與 `OdfFontSegmenter` 靜態類別（0.x 未發佈期間之刻意破壞性重整）。隔離注入點兩層：`OdfDocument.FontContext`（文件層級，含存檔時字型內嵌）與 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級），優先序「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器為行程層級，一律使用 `Default`。
 - 新增自訂罕字字型擴充點：`OdfFontContext.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
 - CLI `convert-csv --encoding` 開放 IANA 編碼名稱與代碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。

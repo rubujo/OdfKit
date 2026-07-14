@@ -73,6 +73,12 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
   OdfTextFontFallbackOptions.Cns11643())`、`HanaMin()` 或 `Jigmo()` 會將儲存格文字寫成富文字 run；`OdfSlide.AddTextBox(...)`
   與 `OdfDrawPage.AddTextBox(...)` 的 fallback options overload 會在文字方塊內寫入帶文字樣式的
   `text:span`。
+- 圖表（ODC 及嵌入圖表）與簡報嵌入表格亦有對應入口：`OdfChartDocument.SetChartTitle(...,
+  options)`／`SetAxisTitle(dimension, ..., options)`（builder 對應 `WithTitle(..., options)`）與
+  `OdfEmbeddedTable.SetCellText(row, column, ..., options)` 使用同一套分段與 font-face 宣告基礎；
+  頁首頁尾經由 `OdfPageHeaderFooter.GetOrCreateParagraph()` 取得 `OdfParagraph` 後即可使用段落
+  的 fallback options 多載。涵蓋範圍至此為所有承載 ODF 文字 run 的高階入口；MathML 公式內容
+  本質上不適用字型分段。
 - `OdfFontContext` 的 `RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
   註冊與子集化擴充點；OdfKit 不內建政府字型，也不替第三方字型授權背書。
 

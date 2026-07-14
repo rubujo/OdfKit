@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Chart;
@@ -76,6 +77,37 @@ public partial class OdfChartDocument
         OdfNode titleNode = FindOrCreateAxisTitle(axis);
         OdfNode paragraph = FindOrCreateChild(titleNode, "p", OdfNamespaces.Text, "text");
         paragraph.TextContent = title!;
+    }
+
+    /// <summary>
+    /// Sets the axis title using the specified font fallback options.
+    /// 使用指定的字型遞補選項設定指定維度座標軸的標題，依 Unicode 平面分段並套用對應字型。
+    /// </summary>
+    /// <param name="dimension">The axis dimension, e.g. x, y, or z. / 座標軸維度，例如 x、y 或 z。</param>
+    /// <param name="title">The axis title; a blank value removes the existing title. / 座標軸標題；空白值會移除既有標題。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="ArgumentException">當 <paramref name="dimension"/> 為空白時擲出</exception>
+    public void SetAxisTitle(string dimension, string? title, OdfTextFontFallbackOptions options)
+    {
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        ValidateAxisDimension(dimension);
+
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            SetAxisTitle(dimension, title);
+            return;
+        }
+
+        OdfNode axis = FindAxis(dimension) ?? FindOrCreateAxis(dimension);
+        OdfNode titleNode = FindOrCreateAxisTitle(axis);
+        OdfNode paragraph = FindOrCreateChild(titleNode, "p", OdfNamespaces.Text, "text");
+        paragraph.TextContent = string.Empty;
+        OdfCjkTextSpanBuilder.AppendSegmentedText(this, paragraph, title!, options);
     }
     /// <summary>
     /// Short overload of AddSeries that accepts valuesCellRangeAddress; remaining optional parameters use defaults and forward to the full overload.

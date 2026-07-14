@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Presentation;
@@ -104,6 +105,34 @@ public sealed class OdfEmbeddedTable
 
         OdfNode paragraph = GetOrCreateCellParagraph(cell);
         paragraph.TextContent = text;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the text of the specified cell using the specified font fallback options.
+    /// 使用指定的字型遞補選項設定指定儲存格的文字，依 Unicode 平面分段並套用對應字型。
+    /// </summary>
+    /// <param name="row">The zero-based row index. / 採 0 為基準的列索引。</param>
+    /// <param name="column">The zero-based column index. / 採 0 為基準的欄索引。</param>
+    /// <param name="text">The cell text. / 儲存格文字。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    /// <returns>The current embedded table. / 目前嵌入表格。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="text"/> 或 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="InvalidOperationException">當目標為被合併覆蓋的儲存格時擲出</exception>
+    public OdfEmbeddedTable SetCellText(int row, int column, string text, OdfTextFontFallbackOptions options)
+    {
+        if (text is null)
+            throw new ArgumentNullException(nameof(text));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+
+        OdfNode cell = GetCell(row, column);
+        if (cell.LocalName == "covered-table-cell")
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetTextCovered"));
+
+        OdfNode paragraph = GetOrCreateCellParagraph(cell);
+        paragraph.TextContent = string.Empty;
+        OdfCjkTextSpanBuilder.AppendSegmentedText(_document, paragraph, text, options);
         return this;
     }
 
