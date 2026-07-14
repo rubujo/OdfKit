@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "ODF-Validator-JAR nicht gefunden.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "ODF-Validator-JAR-Pfad nicht angegeben.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Timeout muss größer als 0 sein.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Schriftartdatei nicht gefunden.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Schriftartenverzeichnis nicht gefunden: „{0}“",
+            ["Err_OdfFontContext_FontNotFound"] = "Schriftartdatei nicht gefunden.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Schriftartenverzeichnis nicht gefunden: „{0}“",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Das Apply-Token muss einen Operator und mindestens einen Operanden enthalten.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Das Bracket-Gruppen-Token muss Inhalt enthalten.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Der Gruppentoken muss mindestens einen Untertoken enthalten.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Beim Schließen von XML-Elementen während der Serialisierungswiederherstellung ist ein sekundärer Fehler aufgetreten: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Das Laufwerk '{0}' konnte nicht auf LibreOffice Portable geprüft werden: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Das Ressourcenlimit des Streaming-Readers wurde überschritten ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Ebenen-Schriftartzuordnungen müssen Unicode-Ebenennummern zwischen 1 und 16 verwenden.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Ebenen-Schriftartzuordnungen müssen für jede Ebene einen nicht leeren Schriftartnamen angeben.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Ebenen-Schriftartzuordnungen müssen Unicode-Ebenennummern zwischen 1 und 16 verwenden.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Ebenen-Schriftartzuordnungen müssen für jede Ebene einen nicht leeren Schriftartnamen angeben.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Benutzerdefinierte font-face-Deklarationen müssen einen nicht leeren Namen und eine nicht leere Schriftfamilie angeben.",
         };
     }

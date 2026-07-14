@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "找不到 ODF Validator JAR。",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "未提供 ODF Validator JAR 路徑。",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "逾時必須大於 0。",
-            ["Err_OdfFontResolver_FontNotFound"] = "找不到字型檔案。",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "找不到字型目錄：'{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "找不到字型檔案。",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "找不到字型目錄：'{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "apply token 必須包含一個運算子與至少一個運算元。",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "括號群組 token 必須包含內容。",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "群組 token 必須包含至少一個子 token。",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "序列化復原期間關閉 XML 元素時發生次要錯誤：{0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "檢查磁碟機「{0}」中的 LibreOffice Portable 失敗：{1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "串流讀取器資源上限已超過（{0} > {1}）。",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "平面字型對應的 Unicode 平面編號必須介於 1 至 16 之間。",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "平面字型對應必須為每個平面指定非空白的字型名稱。",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "平面字型對應的 Unicode 平面編號必須介於 1 至 16 之間。",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "平面字型對應必須為每個平面指定非空白的字型名稱。",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "自訂 font-face 宣告必須指定非空白的名稱與字型家族。",
         };
     }

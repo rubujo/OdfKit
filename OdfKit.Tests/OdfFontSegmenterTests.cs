@@ -11,7 +11,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
-/// 鎖定 OdfFontSegmenter 的文字字面分段與字型指派之單元測試。
+/// 鎖定 OdfFontContext 的文字字面分段與字型指派之單元測試。
 /// </summary>
 public class OdfFontSegmenterTests
 {
@@ -21,8 +21,8 @@ public class OdfFontSegmenterTests
     [Fact]
     public void SegmentText_WithEmptyOrNull_ReturnsEmptyList()
     {
-        var result1 = OdfFontSegmenter.SegmentText(null!, "TW-Kai");
-        var result2 = OdfFontSegmenter.SegmentText(string.Empty, "TW-Kai");
+        var result1 = OdfFontContext.Default.SegmentText(null!, "TW-Kai");
+        var result2 = OdfFontContext.Default.SegmentText(string.Empty, "TW-Kai");
 
         Assert.Empty(result1);
         Assert.Empty(result2);
@@ -37,7 +37,7 @@ public class OdfFontSegmenterTests
         string text = "哈囉 World! 這是一般 Unicode 測試字串。";
         string defaultFont = "DFKai-SB";
 
-        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
 
         Assert.Single(segments);
         Assert.Equal(text, segments[0].Text);
@@ -58,7 +58,7 @@ public class OdfFontSegmenterTests
         string text = "測試" + plane2Char + "中文字" + plane15Char + "結尾";
         string defaultFont = "DFKai-SB";
 
-        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
 
         // 應分割為 5 段：
         // 1. "測試" (DFKai-SB)
@@ -91,7 +91,7 @@ public class OdfFontSegmenterTests
     public void FontSubsetterRegistration_EmbedsPrivateUseFontSubsetOnSave()
     {
         var subsetter = new FakeFontSubsetter();
-        using IDisposable registration = OdfFontResolver.RegisterFontSubsetter(subsetter);
+        using IDisposable registration = OdfFontContext.Default.RegisterFontSubsetter(subsetter);
         using TextDocument document = TextDocument.Create();
         string pua = char.ConvertFromUtf32(0xF0000);
 
@@ -249,10 +249,10 @@ public class OdfFontSegmenterTests
     {
         string baseFont = "TW-Song"; // 應判定為宋體/明體家族
 
-        Assert.Equal("TW-Song-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal("TW-Song-Plus-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 15));
-        Assert.Equal("TW-Song-Plus-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 16));
-        Assert.Equal("TW-Song-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 0));
+        Assert.Equal("TW-Song-Ext-B-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("TW-Song-Plus-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 15));
+        Assert.Equal("TW-Song-Plus-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 16));
+        Assert.Equal("TW-Song-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 0));
     }
 
     /// <summary>
@@ -263,10 +263,10 @@ public class OdfFontSegmenterTests
     {
         string baseFont = "DFKai-SB"; // 標楷體，應判定為楷體家族
 
-        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal("TW-Kai-Plus-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 15));
-        Assert.Equal("TW-Kai-Plus-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 16));
-        Assert.Equal("TW-Kai-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 0));
+        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("TW-Kai-Plus-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 15));
+        Assert.Equal("TW-Kai-Plus-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 16));
+        Assert.Equal("TW-Kai-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 0));
     }
 
     /// <summary>
@@ -277,10 +277,10 @@ public class OdfFontSegmenterTests
     {
         string baseFont = "HanaMinA"; // 花園明朝，應判定為 HanaMin 家族
 
-        Assert.Equal("HanaMinB", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal("HanaMinB", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 15));
-        Assert.Equal("HanaMinB", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 16));
-        Assert.Equal("HanaMinA", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 0));
+        Assert.Equal("HanaMinB", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("HanaMinB", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 15));
+        Assert.Equal("HanaMinB", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 16));
+        Assert.Equal("HanaMinA", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 0));
     }
 
     /// <summary>
@@ -291,9 +291,9 @@ public class OdfFontSegmenterTests
     {
         string baseFont = "Jigmo"; // 字雲字型
 
-        Assert.Equal("Jigmo2", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal("Jigmo3", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 3));
-        Assert.Equal("Jigmo", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 0));
+        Assert.Equal("Jigmo2", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("Jigmo3", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 3));
+        Assert.Equal("Jigmo", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 0));
     }
 
     /// <summary>
@@ -307,7 +307,7 @@ public class OdfFontSegmenterTests
         string text = "前段" + plane3Char + "後段";
         string defaultFont = "Jigmo";
 
-        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
 
         Assert.Equal(3, segments.Count);
         Assert.Equal("前段", segments[0].Text);
@@ -326,14 +326,14 @@ public class OdfFontSegmenterTests
     [Fact]
     public void GetSupplementaryPlaneFontName_WindowsSystemFonts_MapsToExtFonts()
     {
-        Assert.Equal("MingLiU-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName("MingLiU", 2));
-        Assert.Equal("PMingLiU-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName("PMingLiU", 2));
-        Assert.Equal("MingLiU_HKSCS-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName("MingLiU_HKSCS", 2));
-        Assert.Equal("SimSun-ExtG", OdfFontSegmenter.GetSupplementaryPlaneFontName("MingLiU", 3));
+        Assert.Equal("MingLiU-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("MingLiU", 2));
+        Assert.Equal("PMingLiU-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("PMingLiU", 2));
+        Assert.Equal("MingLiU_HKSCS-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("MingLiU_HKSCS", 2));
+        Assert.Equal("SimSun-ExtG", OdfFontContext.Default.GetSupplementaryPlaneFontName("MingLiU", 3));
 
-        Assert.Equal("SimSun-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName("SimSun", 2));
-        Assert.Equal("SimSun-ExtG", OdfFontSegmenter.GetSupplementaryPlaneFontName("SimSun", 3));
-        Assert.Equal("NSimSun", OdfFontSegmenter.GetSupplementaryPlaneFontName("NSimSun", 0));
+        Assert.Equal("SimSun-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("SimSun", 2));
+        Assert.Equal("SimSun-ExtG", OdfFontContext.Default.GetSupplementaryPlaneFontName("SimSun", 3));
+        Assert.Equal("NSimSun", OdfFontContext.Default.GetSupplementaryPlaneFontName("NSimSun", 0));
     }
 
     /// <summary>
@@ -347,18 +347,18 @@ public class OdfFontSegmenterTests
         string baseFont3 = "Microsoft JhengHei";
         string baseFont4 = "Arial";
 
-        Assert.Equal(baseFont1, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont1, 2));
-        Assert.Equal(baseFont1, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont1, 3));
-        Assert.Equal(baseFont1, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont1, 15));
+        Assert.Equal(baseFont1, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont1, 2));
+        Assert.Equal(baseFont1, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont1, 3));
+        Assert.Equal(baseFont1, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont1, 15));
 
-        Assert.Equal(baseFont2, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont2, 2));
-        Assert.Equal(baseFont2, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont2, 15));
+        Assert.Equal(baseFont2, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont2, 2));
+        Assert.Equal(baseFont2, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont2, 15));
 
-        Assert.Equal(baseFont3, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont3, 2));
-        Assert.Equal(baseFont3, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont3, 15));
+        Assert.Equal(baseFont3, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont3, 2));
+        Assert.Equal(baseFont3, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont3, 15));
 
-        Assert.Equal(baseFont4, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont4, 2));
-        Assert.Equal(baseFont4, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont4, 15));
+        Assert.Equal(baseFont4, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont4, 2));
+        Assert.Equal(baseFont4, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont4, 15));
     }
 
     /// <summary>
@@ -371,11 +371,11 @@ public class OdfFontSegmenterTests
         string plane3Char = char.ConvertFromUtf32(0x30000);
         const string baseFont = "FakeGothic-UnitTest";
 
-        using (OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+        using (OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             baseFont,
             new Dictionary<int, string> { [2] = "FakeGothic P1", [3] = "FakeGothic P2" }))
         {
-            var segments = OdfFontSegmenter.SegmentText("前" + plane2Char + plane3Char + "後", baseFont);
+            var segments = OdfFontContext.Default.SegmentText("前" + plane2Char + plane3Char + "後", baseFont);
 
             Assert.Equal(4, segments.Count);
             Assert.Equal(baseFont, segments[0].FontName);
@@ -385,7 +385,7 @@ public class OdfFontSegmenterTests
         }
 
         // Dispose 後規則移除：增補平面字元不再改派字型
-        var restored = OdfFontSegmenter.SegmentText(plane2Char, baseFont);
+        var restored = OdfFontContext.Default.SegmentText(plane2Char, baseFont);
         Assert.Single(restored);
         Assert.Equal(baseFont, restored[0].FontName);
     }
@@ -398,20 +398,20 @@ public class OdfFontSegmenterTests
     {
         // BiauKai-UnitTest 含 "BiauKai"，未註冊時會命中內建楷體規則
         const string baseFont = "BiauKai-UnitTest";
-        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
 
-        using (OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+        using (OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             baseFont,
             new Dictionary<int, string> { [2] = "Custom-ExtB" }))
         {
             // Plane 2 由自訂規則決定
-            Assert.Equal("Custom-ExtB", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+            Assert.Equal("Custom-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
             // Plane 15 未列於自訂規則：維持基礎字型，不回退內建的 TW-Kai-Plus-98_1
-            Assert.Equal(baseFont, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 15));
+            Assert.Equal(baseFont, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 15));
         }
 
         // 還原後內建規則恢復生效
-        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal("TW-Kai-Ext-B-98_1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
     }
 
     /// <summary>
@@ -423,12 +423,12 @@ public class OdfFontSegmenterTests
         string plane1Char = char.ConvertFromUtf32(0x1F600);
         const string baseFont = "FakeSymbol-UnitTest";
 
-        using IDisposable first = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+        using IDisposable first = OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             baseFont, new Dictionary<int, string> { [1] = "Symbols-Old" });
-        using IDisposable second = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+        using IDisposable second = OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             baseFont, new Dictionary<int, string> { [1] = "Symbols-New" });
 
-        var segments = OdfFontSegmenter.SegmentText("文" + plane1Char, baseFont);
+        var segments = OdfFontContext.Default.SegmentText("文" + plane1Char, baseFont);
 
         Assert.Equal(2, segments.Count);
         Assert.Equal(baseFont, segments[0].FontName);
@@ -444,17 +444,17 @@ public class OdfFontSegmenterTests
         var valid = new Dictionary<int, string> { [2] = "Font" };
 
         Assert.Throws<ArgumentNullException>(
-            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping("", valid));
+            () => OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping("", valid));
         Assert.Throws<ArgumentNullException>(
-            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping("Pattern", null!));
+            () => OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping("Pattern", null!));
         Assert.Throws<ArgumentOutOfRangeException>(
-            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            () => OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
                 "Pattern", new Dictionary<int, string> { [0] = "Font" }));
         Assert.Throws<ArgumentOutOfRangeException>(
-            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            () => OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
                 "Pattern", new Dictionary<int, string> { [17] = "Font" }));
         Assert.Throws<ArgumentException>(
-            () => OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+            () => OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
                 "Pattern", new Dictionary<int, string> { [2] = " " }));
     }
 
@@ -467,12 +467,12 @@ public class OdfFontSegmenterTests
         const string baseFont = "FakeCopy-UnitTest";
         var planeFonts = new Dictionary<int, string> { [2] = "Copied-Font" };
 
-        using IDisposable registration = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(baseFont, planeFonts);
+        using IDisposable registration = OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(baseFont, planeFonts);
         planeFonts[2] = "Mutated-Font";
         planeFonts[3] = "Injected-Font";
 
-        Assert.Equal("Copied-Font", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal(baseFont, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 3));
+        Assert.Equal("Copied-Font", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
+        Assert.Equal(baseFont, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 3));
     }
 
     /// <summary>
@@ -481,7 +481,7 @@ public class OdfFontSegmenterTests
     [Fact]
     public void ParagraphAddText_WithCustomOptions_SegmentsAndDeclaresCustomFontFaces()
     {
-        using IDisposable registration = OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
+        using IDisposable registration = OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             "FakeCustom-UnitTest",
             new Dictionary<int, string> { [2] = "FakeCustom P1", [3] = "FakeCustom P2" });
         using TextDocument document = TextDocument.Create();

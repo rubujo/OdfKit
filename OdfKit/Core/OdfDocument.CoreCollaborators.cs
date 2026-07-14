@@ -27,6 +27,8 @@ public abstract partial class OdfDocument
 
         internal OdfPackage Package => _document.Package;
 
+        internal OdfFontContext FontContext => _document.FontContext;
+
         internal string SubPath => _document.SubPath;
 
         internal OdfNode ContentDom => _document.ContentDom;

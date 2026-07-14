@@ -306,7 +306,7 @@ public static class OdfPdfExporter
 
     private static void AddSegmentedText(Paragraph paragraph, string text, string defaultFont)
     {
-        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
         foreach (var (segText, fontName) in segments)
         {
             if (fontName == defaultFont)
@@ -315,7 +315,7 @@ public static class OdfPdfExporter
             }
             else
             {
-                OdfFontResolver.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                OdfFontContext.Default.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
                 var run = paragraph.AddFormattedText();
                 run.Font.Name = fontName;
                 run.AddText(segText);
@@ -325,7 +325,7 @@ public static class OdfPdfExporter
 
     private static void AddSegmentedText(FormattedText formattedText, string text, string defaultFont)
     {
-        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
         foreach (var (segText, fontName) in segments)
         {
             if (fontName == defaultFont)
@@ -334,7 +334,7 @@ public static class OdfPdfExporter
             }
             else
             {
-                OdfFontResolver.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                OdfFontContext.Default.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
                 var run = formattedText.AddFormattedText();
                 run.Font.Name = fontName;
                 run.AddText(segText);
@@ -347,7 +347,7 @@ internal sealed class OdfPdfFontResolver : IFontResolver
 {
     public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
     {
-        string? resolved = Styles.OdfFontResolver.ResolveFontFallback(familyName, IsUsablePdfFont);
+        string? resolved = Styles.OdfFontContext.Default.ResolveFontFallback(familyName, IsUsablePdfFont);
         if (resolved is not null)
         {
             return new FontResolverInfo(resolved, isBold, isItalic);
@@ -362,15 +362,15 @@ internal sealed class OdfPdfFontResolver : IFontResolver
 
     public byte[] GetFont(string faceName)
     {
-        foreach (string candidate in Styles.OdfFontResolver.GetFontFallbackCandidates(faceName))
+        foreach (string candidate in Styles.OdfFontContext.Default.GetFontFallbackCandidates(faceName))
         {
-            string? fontPath = Styles.OdfFontResolver.ResolveFontPath(candidate);
-            if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+            string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(candidate);
+            if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
             {
                 return File.ReadAllBytes(fontPath);
             }
 
-            if (fontPath is not null && Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+            if (fontPath is not null && Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
             {
                 OdfKitDiagnostics.Warn(
                     OdfLocalizer.GetMessage("Diag_OdfPdfExporter_TrueTypeCollectionFontFallback", candidate));
@@ -380,7 +380,7 @@ internal sealed class OdfPdfFontResolver : IFontResolver
         string[] fallbacks = { "Arial", "Courier New", "Liberation Sans", "DejaVu Sans" };
         foreach (var fb in fallbacks)
         {
-            string? fontPath = Styles.OdfFontResolver.ResolveFontPath(fb);
+            string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(fb);
             if (fontPath is not null && File.Exists(fontPath))
             {
                 return File.ReadAllBytes(fontPath);
@@ -410,7 +410,7 @@ internal sealed class OdfPdfFontResolver : IFontResolver
 
     private static bool IsUsablePdfFont(string familyName)
     {
-        string? fontPath = Styles.OdfFontResolver.ResolveFontPath(familyName);
-        return fontPath is not null && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath);
+        string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(familyName);
+        return fontPath is not null && !Styles.OdfFontContext.IsTrueTypeCollection(fontPath);
     }
 }

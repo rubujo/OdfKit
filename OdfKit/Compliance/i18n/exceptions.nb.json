@@ -336,8 +336,8 @@
   "Err_OdfExternalValidator_OdfNotFound": "ODF Validator JAR ikke funnet.",
   "Err_OdfExternalValidator_OdfValidatorJarPath": "ODF Validator JAR-bane ikke oppgitt.",
   "Err_OdfExternalValidator_TimeoutGreater0": "Tidsavbrudd må være større enn 0.",
-  "Err_OdfFontResolver_FontNotFound": "Finner ikke skriftfil.",
-  "Err_OdfFontResolver_FontNotFound_2": "Fontkatalog ikke funnet: '{0}'",
+  "Err_OdfFontContext_FontNotFound": "Finner ikke skriftfil.",
+  "Err_OdfFontContext_FontDirectoryNotFound": "Fontkatalog ikke funnet: '{0}'",
   "Err_OdfFormulaDocument_ApplyTokenContainLeast": "Apply-tokenet må inneholde en operator og minst én operand.",
   "Err_OdfFormulaDocument_BracketGroupTokenContain": "Brakettgruppetokenet må inneholde innhold.",
   "Err_OdfFormulaDocument_GroupTokenContainLeast": "Gruppetokenet må inneholde minst ett undertoken.",
@@ -580,7 +580,7 @@
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Det oppstod en sekundær feil ved lukking av XML-elementer under serialiseringsgjenoppretting: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Kan ikke undersøke stasjonen '{0}' etter LibreOffice Portable: {1}",
   "Err_StreamReader_ResourceLimitExceeded": "Ressursgrensen for strømmeleseren er overskredet ({0} > {1}).",
-  "Err_OdfFontSegmenter_PlaneOutOfRange": "Planskrifttilordninger må bruke Unicode-plannumre mellom 1 og 16.",
-  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "Planskrifttilordninger må angi et ikke-tomt skriftnavn for hvert plan.",
+  "Err_OdfFontContext_PlaneOutOfRange": "Planskrifttilordninger må bruke Unicode-plannumre mellom 1 og 16.",
+  "Err_OdfFontContext_PlaneFontNameEmpty": "Planskrifttilordninger må angi et ikke-tomt skriftnavn for hvert plan.",
   "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Egendefinerte font-face-deklarasjoner må angi et ikke-tomt navn og en ikke-tom skriftfamilie."
 }

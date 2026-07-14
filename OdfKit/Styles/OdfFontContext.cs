@@ -15,15 +15,17 @@ namespace OdfKit.Styles;
 /// </summary>
 /// <remarks>
 /// Each instance owns its font registrations, fallback mappings, plane font mappings, and subsetter,
-/// so independent contexts (for example per tenant) never observe each other's state. The static APIs on
-/// <see cref="OdfFontResolver"/> and <see cref="OdfFontSegmenter"/> forward to <see cref="Default"/>.
+/// so independent contexts (for example per tenant) never observe each other's state. Precedence at the
+/// high-level text entry points is per-call options, then the owning document's context, then <see cref="Default"/>.
 /// All members are thread-safe; lookup hot paths read immutable snapshots without locks.
 /// 每個執行個體擁有自己的字型註冊、替代對照、平面字型對應與子集化器，彼此獨立的情境（例如各租戶）
-/// 不會觀察到對方的狀態。<see cref="OdfFontResolver"/> 與 <see cref="OdfFontSegmenter"/> 的靜態 API
-/// 一律轉發至 <see cref="Default"/>。所有成員皆為執行緒安全；查詢熱路徑以不可變快照無鎖讀取。
+/// 不會觀察到對方的狀態。高階文字入口的優先序為：每次呼叫的選項、所屬文件的情境、最後才是
+/// <see cref="Default"/>。所有成員皆為執行緒安全；查詢熱路徑以不可變快照無鎖讀取。
 /// </remarks>
 public sealed class OdfFontContext
 {
+    internal const string DefaultBaseFontFamily = "TW-Kai";
+
     // 「已警告過的缺失字型名稱」快取上限：避免長駐轉換服務處理大量不重複字型名稱時，
     // 此僅供診斷用途的快取無上限成長而緩慢洩漏記憶體；超過上限時清空重來（可接受偶爾重複警告）。
     private const int MaxWarnedMissingFontsCacheSize = 2_000;
@@ -69,6 +71,37 @@ public sealed class OdfFontContext
     }
 
     /// <summary>
+    /// Returns whether the file is a TrueType Collection.
+    /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。PDFsharp 等部分渲染後端不支援直接讀取。
+    /// </summary>
+    /// <param name="filePath">The font file path. / 字型檔案路徑。</param>
+    /// <returns>Whether the file starts with the TTC signature. / 若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/>。</returns>
+    public static bool IsTrueTypeCollection(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            return false;
+
+        try
+        {
+            using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            byte[] signature = new byte[4];
+            if (fs.Read(signature, 0, 4) != 4)
+                return false;
+
+            // 'ttcf' 的大端序位元組序列。
+            return signature[0] == 0x74 && signature[1] == 0x74 && signature[2] == 0x63 && signature[3] == 0x66;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Registers a font file for the specified font name.
     /// 為指定字型名稱註冊字型檔案。
     /// </summary>
@@ -83,7 +116,7 @@ public sealed class OdfFontContext
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentNullException(nameof(filePath));
         if (!File.Exists(filePath))
-            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontResolver_FontNotFound"), filePath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontContext_FontNotFound"), filePath);
 
         lock (_lock)
         {
@@ -103,7 +136,7 @@ public sealed class OdfFontContext
         if (string.IsNullOrEmpty(directoryPath))
             throw new ArgumentNullException(nameof(directoryPath));
         if (!Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontResolver_FontNotFound_2", directoryPath));
+            throw new DirectoryNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontContext_FontDirectoryNotFound", directoryPath));
 
         lock (_lock)
         {
@@ -275,7 +308,7 @@ public sealed class OdfFontContext
         OdfKitDiagnostics.Warn(
             $"找不到字型「{fontName}」對應的檔案（{context}）。此名稱通常用於顯示 CNS 11643 高位字面或其他罕見 Unicode 補充平面字元，" +
             "若系統未安裝對應字型（例如全字庫、花園明朝、字雲），這些字元可能會顯示為空白方塊。" +
-            "可呼叫 OdfFontResolver.RegisterFont 或 RegisterFontDirectory 註冊實際字型檔案位置。");
+            "可透過 OdfFontContext 的 RegisterFont 或 RegisterFontDirectory 註冊實際字型檔案位置。");
         return false;
     }
 
@@ -334,13 +367,13 @@ public sealed class OdfFontContext
                 throw new ArgumentOutOfRangeException(
                     nameof(planeFontNames),
                     pair.Key,
-                    OdfLocalizer.GetMessage("Err_OdfFontSegmenter_PlaneOutOfRange"));
+                    OdfLocalizer.GetMessage("Err_OdfFontContext_PlaneOutOfRange"));
             }
 
             if (string.IsNullOrWhiteSpace(pair.Value))
             {
                 throw new ArgumentException(
-                    OdfLocalizer.GetMessage("Err_OdfFontSegmenter_PlaneFontNameEmpty"),
+                    OdfLocalizer.GetMessage("Err_OdfFontContext_PlaneFontNameEmpty"),
                     nameof(planeFontNames));
             }
 
@@ -448,7 +481,7 @@ public sealed class OdfFontContext
     public string GetSupplementaryPlaneFontName(string baseFontFamily, int plane)
     {
         if (string.IsNullOrEmpty(baseFontFamily))
-            baseFontFamily = OdfFontSegmenter.DefaultBaseFontFamily;
+            baseFontFamily = DefaultBaseFontFamily;
 
         // 0. 自訂註冊規則優先於所有內建對應
         if (GetCustomPlaneFontName(baseFontFamily, plane) is string customFontName)
@@ -456,7 +489,7 @@ public sealed class OdfFontContext
             return customFontName;
         }
 
-        return OdfFontSegmenter.GetBuiltInSupplementaryPlaneFontName(baseFontFamily, plane);
+        return GetBuiltInSupplementaryPlaneFontName(baseFontFamily, plane);
     }
 
     /// <summary>
@@ -616,6 +649,96 @@ public sealed class OdfFontContext
     }
 
     /// <summary>
+    /// 內建的增補平面字型對應規則（與執行個體狀態無關，所有情境共用）。
+    /// </summary>
+    private static string GetBuiltInSupplementaryPlaneFontName(string baseFontFamily, int plane)
+    {
+        // 1. 支援全字庫正宋體 (TW-Song)
+        if (baseFontFamily.Contains("TW-Song", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("全字庫正宋", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => "TW-Song-Ext-B-98_1",
+                15 => "TW-Song-Plus-98_1",
+                16 => "TW-Song-Plus-98_1",
+                _ => "TW-Song-98_1"
+            };
+        }
+
+        // 2. 支援全字庫正楷體與標楷體 (TW-Kai / DFKai-SB / BiauKai)
+        if (baseFontFamily.Contains("TW-Kai", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("全字庫正楷", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("DFKai-SB", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("標楷", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("BiauKai", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => "TW-Kai-Ext-B-98_1",
+                15 => "TW-Kai-Plus-98_1",
+                16 => "TW-Kai-Plus-98_1",
+                _ => "TW-Kai-98_1"
+            };
+        }
+
+        // 3. 支援字雲 / Jigmo 字型對應
+        if (baseFontFamily.Contains("Jigmo", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("字雲", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => "Jigmo2",
+                3 => "Jigmo3",
+                _ => "Jigmo"
+            };
+        }
+
+        // 4. 支援花園明朝 (HanaMin) / Hanazono 字型對應
+        if (baseFontFamily.Contains("HanaMin", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("Hanazono", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("花園", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => "HanaMinB",
+                15 => "HanaMinB",
+                16 => "HanaMinB",
+                _ => "HanaMinA"
+            };
+        }
+
+        // 5. 支援 Windows 系統字型 MingLiU（細明體）／PMingLiU（新細明體）對照
+        if (baseFontFamily.Contains("MingLiU", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("細明", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => baseFontFamily.Contains("PMingLiU", StringComparison.OrdinalIgnoreCase) || baseFontFamily.Contains("新細明", StringComparison.OrdinalIgnoreCase) ? "PMingLiU-ExtB"
+                   : baseFontFamily.Contains("HKSCS", StringComparison.OrdinalIgnoreCase) ? "MingLiU_HKSCS-ExtB"
+                   : "MingLiU-ExtB",
+                3 => "SimSun-ExtG", // Windows 目前由 SimSun-ExtG 涵蓋 Plane 3
+                _ => baseFontFamily
+            };
+        }
+
+        // 6. 支援 Windows 系統字型 SimSun（中易宋體）／NSimSun 對照
+        if (baseFontFamily.Contains("SimSun", StringComparison.OrdinalIgnoreCase) ||
+            baseFontFamily.Contains("宋体", StringComparison.OrdinalIgnoreCase))
+        {
+            return plane switch
+            {
+                2 => "SimSun-ExtB",
+                3 => "SimSun-ExtG",
+                _ => baseFontFamily
+            };
+        }
+
+        // 其餘常規字型（如思源黑體、Noto Sans、微軟正黑體等）不進行任何拆分字型對照，直接傳回原字型
+        return baseFontFamily;
+    }
+
+    /// <summary>
     /// 查詢自訂平面對應規則；命中規則時傳回對應字型名稱（該平面未設定時傳回基礎字型家族），無任何規則命中時傳回 null。
     /// </summary>
     private string? GetCustomPlaneFontName(string baseFontFamily, int plane)
@@ -628,7 +751,7 @@ public sealed class OdfFontContext
         }
 
         if (string.IsNullOrEmpty(baseFontFamily))
-            baseFontFamily = OdfFontSegmenter.DefaultBaseFontFamily;
+            baseFontFamily = DefaultBaseFontFamily;
 
         foreach (PlaneFontMappingRegistration mapping in customMappings)
         {

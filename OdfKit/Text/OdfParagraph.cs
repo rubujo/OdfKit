@@ -275,7 +275,7 @@ public partial class OdfParagraph
             OdfCjkFontFallbackEngine.ApplyFontFallback(Doc, options);
         }
 
-        List<(string Text, string FontName)> segments = options.EffectiveFontContext.SegmentText(text, options.BaseFont);
+        List<(string Text, string FontName)> segments = options.ResolveFontContext(Doc).SegmentText(text, options.BaseFont);
         var runs = new List<OdfTextRun>(segments.Count);
         foreach ((string segmentText, string fontName) in segments)
         {

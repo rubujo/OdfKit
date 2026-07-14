@@ -59,7 +59,7 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
 與罕見中文字情境，核心能力聚焦在 **Unicode 平面分段、ODF font-face 宣告與外部字型註冊／子集化
 擴充點**：
 
-- `OdfFontSegmenter` 可依 BMP、Plane 2、Plane 3、Plane 15/16 將文字拆成多個片段，並對應
+- `OdfFontContext.SegmentText` 可依 BMP、Plane 2、Plane 3、Plane 15/16 將文字拆成多個片段，並對應
   `TW-Kai-*`、`TW-Song-*`、HanaMin、Jigmo 或 Windows ExtB／ExtG 字型名稱。
 - `TextDocument.ApplyCjkFontFallback()` 會宣告常見 CJK fallback 與 `TW-Kai-98_1`、
   `TW-Kai-Ext-B-98_1`、`TW-Kai-Plus-98_1`、`TW-Song-98_1`、`TW-Song-Ext-B-98_1`、
@@ -73,7 +73,7 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
   OdfTextFontFallbackOptions.Cns11643())`、`HanaMin()` 或 `Jigmo()` 會將儲存格文字寫成富文字 run；`OdfSlide.AddTextBox(...)`
   與 `OdfDrawPage.AddTextBox(...)` 的 fallback options overload 會在文字方塊內寫入帶文字樣式的
   `text:span`。
-- `OdfFontResolver.RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
+- `OdfFontContext` 的 `RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
   註冊與子集化擴充點；OdfKit 不內建政府字型，也不替第三方字型授權背書。
 
 因此，現階段可說 OdfKit 具備全字庫與補充平面文字的 ODF 文件骨架支援；在缺少真實全字庫字型、
@@ -96,16 +96,18 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
 若需接上內建規則未涵蓋的罕字字型（例如自備的黑體系 Ext B–J 補字字型），可組合下列公開
 擴充點，全程不需修改 OdfKit：
 
-- `OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(pattern, planeFontNames)`：註冊自訂
+- `OdfFontContext.RegisterSupplementaryPlaneFontMapping(pattern, planeFontNames)`：註冊自訂
   「基礎字型 → 平面 → 字型名稱」對應，優先於內建規則，可涵蓋 Plane 1 至 16；傳回
   `IDisposable` 供還原。
 - `OdfTextFontFallbackOptions.Custom(baseFont, fontFaces)`：以自訂 `OdfFontFaceInfo` 清單宣告
   font-face，配合上述分段規則讓 `AddText`／`SetText` 高階入口自動套用。
-- `OdfFontResolver.RegisterFont`／`RegisterFontDirectory`：註冊實體字型檔以供解析與內嵌。
-- `OdfFontContext`：字型子系統的實例化情境。上述靜態 API 一律轉發至 `OdfFontContext.Default`；
-  多租戶或測試隔離場景可建立獨立執行個體，並經由 `OdfTextFontFallbackOptions.FontContext`
-  注入高階文字入口的分段路由。現階段存檔管線的字型內嵌（`EmbedFonts`／`EmbedFontSubsets`
-  的自動呼叫）仍使用 `Default` 情境。
+- `OdfFontContext.RegisterFont`／`RegisterFontDirectory`：註冊實體字型檔以供解析與內嵌。
+- `OdfFontContext` 是字型子系統的唯一入口：單租戶場景直接使用 `OdfFontContext.Default`；
+  多租戶或測試隔離場景可建立獨立執行個體，經由 `OdfDocument.FontContext`（文件層級，含存檔
+  時的字型內嵌）或 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級）注入，優先序為
+  「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器
+  （`GlobalFontSettings.FontResolver`）為行程層級，一律使用 `Default` 情境；嵌入子文件與
+  最外層文件共用封裝時，存檔內嵌以最外層文件的情境為準。
 
 OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選擇（含授權與來源政策考量）由使用者
 自行決定。

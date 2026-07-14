@@ -5,7 +5,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
-/// 鎖定 OdfFontResolver 的字型替代對照與對應之單元測試。
+/// 鎖定 OdfFontContext 的字型替代對照與對應之單元測試。
 /// </summary>
 public class OdfFontResolverTests
 {
@@ -18,20 +18,20 @@ public class OdfFontResolverTests
         // 1. 註冊替代對照規則
         string target = "Microsoft YaHei";
         string replacement = "Noto Sans CJK TC";
-        OdfFontResolver.RegisterFallback(target, replacement);
+        OdfFontContext.Default.RegisterFallback(target, replacement);
 
         // 2. 驗證已註冊字型的替代對照
-        string mapped = OdfFontResolver.MapFont(target);
+        string mapped = OdfFontContext.Default.MapFont(target);
         Assert.Equal(replacement, mapped);
 
         // 3. 驗證未註冊字型對照應回傳原字型名稱
         string unregistered = "Unregistered Font Family";
-        string original = OdfFontResolver.MapFont(unregistered);
+        string original = OdfFontContext.Default.MapFont(unregistered);
         Assert.Equal(unregistered, original);
 
         // 4. 驗證空值或 Null 傳回原字串
-        Assert.Equal(string.Empty, OdfFontResolver.MapFont(string.Empty));
-        Assert.Null(OdfFontResolver.MapFont(null!));
+        Assert.Equal(string.Empty, OdfFontContext.Default.MapFont(string.Empty));
+        Assert.Null(OdfFontContext.Default.MapFont(null!));
     }
 
     /// <summary>
@@ -40,10 +40,10 @@ public class OdfFontResolverTests
     [Fact]
     public void RegisterFallback_NullOrEmptyArguments_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => OdfFontResolver.RegisterFallback(null!, "Font"));
-        Assert.Throws<ArgumentNullException>(() => OdfFontResolver.RegisterFallback("Font", null!));
-        Assert.Throws<ArgumentNullException>(() => OdfFontResolver.RegisterFallback(string.Empty, "Font"));
-        Assert.Throws<ArgumentNullException>(() => OdfFontResolver.RegisterFallback("Font", string.Empty));
+        Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback(null!, "Font"));
+        Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback("Font", null!));
+        Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback(string.Empty, "Font"));
+        Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback("Font", string.Empty));
     }
 
     /// <summary>
@@ -52,17 +52,17 @@ public class OdfFontResolverTests
     [Fact]
     public void BuiltInFallbackCandidatesCoverOfficeAndTaiwanCjkFonts()
     {
-        IReadOnlyList<string> calibri = OdfFontResolver.GetFontFallbackCandidates("Calibri");
+        IReadOnlyList<string> calibri = OdfFontContext.Default.GetFontFallbackCandidates("Calibri");
         Assert.Equal("Calibri", calibri[0]);
         Assert.Contains("Carlito", calibri);
         Assert.Contains("DejaVu Sans", calibri);
 
-        IReadOnlyList<string> cambria = OdfFontResolver.GetFontFallbackCandidates("Cambria");
+        IReadOnlyList<string> cambria = OdfFontContext.Default.GetFontFallbackCandidates("Cambria");
         Assert.Equal("Cambria", cambria[0]);
         Assert.Contains("Caladea", cambria);
         Assert.Contains("DejaVu Serif", cambria);
 
-        IReadOnlyList<string> pmingliu = OdfFontResolver.GetFontFallbackCandidates("新細明體");
+        IReadOnlyList<string> pmingliu = OdfFontContext.Default.GetFontFallbackCandidates("新細明體");
         Assert.Equal("新細明體", pmingliu[0]);
         Assert.Contains("Noto Serif CJK TC", pmingliu);
         Assert.Contains("Source Han Serif TC", pmingliu);
@@ -74,19 +74,19 @@ public class OdfFontResolverTests
     [Fact]
     public void ResolveFontFallbackUsesRegisteredFallbackBeforeBuiltInCandidates()
     {
-        OdfFontResolver.RegisterFallback("Calibri", "Company Sans");
+        OdfFontContext.Default.RegisterFallback("Calibri", "Company Sans");
 
-        IReadOnlyList<string> candidates = OdfFontResolver.GetFontFallbackCandidates("Calibri");
+        IReadOnlyList<string> candidates = OdfFontContext.Default.GetFontFallbackCandidates("Calibri");
         Assert.Equal("Calibri", candidates[0]);
         Assert.Equal("Company Sans", candidates[1]);
 
-        string? resolved = OdfFontResolver.ResolveFontFallback(
+        string? resolved = OdfFontContext.Default.ResolveFontFallback(
             "Calibri",
             name => name == "Carlito");
 
         Assert.Equal("Carlito", resolved);
 
-        string? registeredResolved = OdfFontResolver.ResolveFontFallback(
+        string? registeredResolved = OdfFontContext.Default.ResolveFontFallback(
             "Calibri",
             name => name == "Company Sans" || name == "Carlito");
 
@@ -99,8 +99,8 @@ public class OdfFontResolverTests
     [Fact]
     public void ResolveFontFallbackHandlesEmptyInputAndNullProbe()
     {
-        Assert.Empty(OdfFontResolver.GetFontFallbackCandidates(string.Empty));
-        Assert.Null(OdfFontResolver.ResolveFontFallback(string.Empty, _ => true));
-        Assert.Throws<ArgumentNullException>(() => OdfFontResolver.ResolveFontFallback("Calibri", null!));
+        Assert.Empty(OdfFontContext.Default.GetFontFallbackCandidates(string.Empty));
+        Assert.Null(OdfFontContext.Default.ResolveFontFallback(string.Empty, _ => true));
+        Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.ResolveFontFallback("Calibri", null!));
     }
 }

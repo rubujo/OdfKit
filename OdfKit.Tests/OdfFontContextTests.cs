@@ -54,24 +54,53 @@ public class OdfFontContextTests
     }
 
     /// <summary>
-    /// 驗證 OdfFontSegmenter 靜態 API 轉發至 Default 情境（雙向可觀察）。
+    /// 驗證 Default 為穩定單例，且文件與選項未指定情境時皆解析至 Default。
     /// </summary>
     [Fact]
-    public void StaticSegmenterApi_ForwardsToDefaultContext()
+    public void DefaultContext_IsStableSingleton()
     {
-        const string baseFont = "ForwardGothic-UnitTest";
+        Assert.Same(OdfFontContext.Default, OdfFontContext.Default);
 
-        using (OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(
-            baseFont, new Dictionary<int, string> { [2] = "Forwarded P1" }))
-        {
-            // 靜態註冊經由 Default 情境可見
-            Assert.Equal("Forwarded P1", OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
-            Assert.Equal("Forwarded P1", OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
-        }
+        using TextDocument document = TextDocument.Create();
+        Assert.Same(OdfFontContext.Default, document.FontContext);
+    }
 
-        // Dispose 後兩側同步還原
-        Assert.Equal(baseFont, OdfFontContext.Default.GetSupplementaryPlaneFontName(baseFont, 2));
-        Assert.Equal(baseFont, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont, 2));
+    /// <summary>
+    /// 驗證 OdfDocument.FontContext 拒絕 null 並可指派自訂情境。
+    /// </summary>
+    [Fact]
+    public void DocumentFontContext_ValidatesAndAcceptsCustomContext()
+    {
+        using TextDocument document = TextDocument.Create();
+        var context = new OdfFontContext();
+
+        Assert.Throws<ArgumentNullException>(() => document.FontContext = null!);
+
+        document.FontContext = context;
+        Assert.Same(context, document.FontContext);
+    }
+
+    /// <summary>
+    /// 驗證存檔時的字型子集化內嵌使用文件層級的字型情境，且 Default 情境不受影響。
+    /// </summary>
+    [Fact]
+    public void SaveWithDocumentFontContext_EmbedsSubsetsViaDocumentContext()
+    {
+        var context = new OdfFontContext();
+        var subsetter = new RecordingFontSubsetter();
+        using IDisposable registration = context.RegisterFontSubsetter(subsetter);
+
+        using TextDocument document = TextDocument.Create();
+        document.FontContext = context;
+        document.AddFontFace("CtxFont", "CtxFont", "system-serif", "variable");
+        document.AddParagraph("自造字" + char.ConvertFromUtf32(0xF0000));
+
+        using var stream = new System.IO.MemoryStream();
+        document.SaveToStream(stream);
+
+        // 子集化器只註冊於文件的情境，仍被存檔管線呼叫 → 內嵌走的是文件情境
+        Assert.Contains(subsetter.Requests, request => request.FontName == "CtxFont");
+        Assert.True(document.Package.HasEntry("Fonts/Subsets/CtxFont-subset.ttf"));
     }
 
     /// <summary>
@@ -106,14 +135,35 @@ public class OdfFontContextTests
     }
 
     /// <summary>
-    /// 驗證 FontContext 為 null 時分段走 Default 情境（既有行為不變）。
+    /// 驗證 FontContext 解析優先序：選項優先、其次文件、最後 Default。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithoutFontContext_UsesDefaultContext()
+    public void ResolveFontContext_HonorsOptionThenDocumentThenDefault()
     {
-        var options = new OdfTextFontFallbackOptions("TW-Kai", declareDefaultCjkFallbackFonts: false);
+        var documentContext = new OdfFontContext();
+        var optionContext = new OdfFontContext();
+        using TextDocument document = TextDocument.Create();
+        document.FontContext = documentContext;
 
-        Assert.Null(options.FontContext);
-        Assert.Same(OdfFontContext.Default, options.EffectiveFontContext);
+        var bareOptions = new OdfTextFontFallbackOptions("TW-Kai", declareDefaultCjkFallbackFonts: false);
+        var optionScoped = new OdfTextFontFallbackOptions("TW-Kai", declareDefaultCjkFallbackFonts: false)
+        {
+            FontContext = optionContext
+        };
+
+        Assert.Same(optionContext, optionScoped.ResolveFontContext(document));
+        Assert.Same(documentContext, bareOptions.ResolveFontContext(document));
+        Assert.Same(OdfFontContext.Default, bareOptions.ResolveFontContext(null));
+    }
+
+    private sealed class RecordingFontSubsetter : IFontSubsetter
+    {
+        public List<OdfFontSubsetRequest> Requests { get; } = [];
+
+        public OdfFontSubset? CreateSubset(OdfFontSubsetRequest request)
+        {
+            Requests.Add(request);
+            return new OdfFontSubset([0x00, 0x01], ".ttf", "font/ttf");
+        }
     }
 }

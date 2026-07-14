@@ -901,6 +901,8 @@ OdfKit.Core.OdfDocument.FindOrCreateMetaRoot() -> OdfKit.DOM.OdfNode!
 OdfKit.Core.OdfDocument.FindOrCreateSettingsNode(OdfKit.DOM.OdfNode! root, string! name) -> OdfKit.DOM.OdfNode!
 OdfKit.Core.OdfDocument.FindSettingsConfigItem(string! name) -> OdfKit.DOM.OdfNode?
 OdfKit.Core.OdfDocument.FindSettingsNode(OdfKit.DOM.OdfNode! root, string! name) -> OdfKit.DOM.OdfNode?
+OdfKit.Core.OdfDocument.FontContext.get -> OdfKit.Styles.OdfFontContext!
+OdfKit.Core.OdfDocument.FontContext.set -> void
 OdfKit.Core.OdfDocument.Format.get -> OdfKit.Compliance.OdfFormatInfo?
 OdfKit.Core.OdfDocument.GetAllCustomProperties() -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
 OdfKit.Core.OdfDocument.GetEmbeddedDocument<T>(string! subPath) -> T!
@@ -16846,8 +16848,6 @@ OdfKit.Styles.OdfFontFaceInfo.Name.init -> void
 OdfKit.Styles.OdfFontFaceInfo.OdfFontFaceInfo(string! Name, string! Family, string? GenericFamily, string? Pitch) -> void
 OdfKit.Styles.OdfFontFaceInfo.Pitch.get -> string?
 OdfKit.Styles.OdfFontFaceInfo.Pitch.init -> void
-OdfKit.Styles.OdfFontResolver
-OdfKit.Styles.OdfFontSegmenter
 OdfKit.Styles.OdfFontSubset
 OdfKit.Styles.OdfFontSubset.Bytes.get -> byte[]!
 OdfKit.Styles.OdfFontSubset.Extension.get -> string!
@@ -19260,23 +19260,9 @@ static OdfKit.Styles.OdfBorder.operator ==(OdfKit.Styles.OdfBorder left, OdfKit.
 static OdfKit.Styles.OdfBorder.Parse(string! borderString) -> OdfKit.Styles.OdfBorder
 static OdfKit.Styles.OdfDesignTheme.Flowchart.get -> OdfKit.Styles.OdfDesignTheme!
 static OdfKit.Styles.OdfFontContext.Default.get -> OdfKit.Styles.OdfFontContext!
+static OdfKit.Styles.OdfFontContext.IsTrueTypeCollection(string! filePath) -> bool
 static OdfKit.Styles.OdfFontFaceInfo.operator !=(OdfKit.Styles.OdfFontFaceInfo? left, OdfKit.Styles.OdfFontFaceInfo? right) -> bool
 static OdfKit.Styles.OdfFontFaceInfo.operator ==(OdfKit.Styles.OdfFontFaceInfo? left, OdfKit.Styles.OdfFontFaceInfo? right) -> bool
-static OdfKit.Styles.OdfFontResolver.EmbedFonts(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
-static OdfKit.Styles.OdfFontResolver.EmbedFontSubsets(OdfKit.Core.OdfPackage! package, OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
-static OdfKit.Styles.OdfFontResolver.GetFontFallbackCandidates(string! fontName) -> System.Collections.Generic.IReadOnlyList<string!>!
-static OdfKit.Styles.OdfFontResolver.IsTrueTypeCollection(string! filePath) -> bool
-static OdfKit.Styles.OdfFontResolver.MapFont(string! fontName) -> string!
-static OdfKit.Styles.OdfFontResolver.RegisterFallback(string! targetFont, string! replacementFont) -> void
-static OdfKit.Styles.OdfFontResolver.RegisterFont(string! fontName, string! filePath) -> void
-static OdfKit.Styles.OdfFontResolver.RegisterFontDirectory(string! directoryPath) -> void
-static OdfKit.Styles.OdfFontResolver.RegisterFontSubsetter(OdfKit.Styles.IFontSubsetter! subsetter) -> System.IDisposable!
-static OdfKit.Styles.OdfFontResolver.ResolveFontFallback(string! fontName, System.Func<string!, bool>! isAvailable) -> string?
-static OdfKit.Styles.OdfFontResolver.ResolveFontPath(string! fontName) -> string?
-static OdfKit.Styles.OdfFontResolver.WarnIfUnresolvable(string! fontName, string! context) -> bool
-static OdfKit.Styles.OdfFontSegmenter.GetSupplementaryPlaneFontName(string! baseFontFamily, int plane) -> string!
-static OdfKit.Styles.OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping(string! baseFontPattern, System.Collections.Generic.IReadOnlyDictionary<int, string!>! planeFontNames) -> System.IDisposable!
-static OdfKit.Styles.OdfFontSegmenter.SegmentText(string! text, string! defaultFontName) -> System.Collections.Generic.List<(string! Text, string! FontName)>!
 static OdfKit.Styles.OdfLayoutPreset.BusinessDeck.get -> OdfKit.Styles.OdfLayoutPreset!
 static OdfKit.Styles.OdfLayoutPreset.FlowDiagram.get -> OdfKit.Styles.OdfLayoutPreset!
 static OdfKit.Styles.OdfLength.explicit operator double(OdfKit.Styles.OdfLength len) -> double

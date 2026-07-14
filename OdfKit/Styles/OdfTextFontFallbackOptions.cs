@@ -56,12 +56,16 @@ public sealed class OdfTextFontFallbackOptions
     public bool DeclareDefaultCjkFallbackFonts { get; }
 
     /// <summary>
-    /// Gets the font context used for text segmentation; null uses <see cref="OdfFontContext.Default"/>.
-    /// 取得文字分段所用的字型情境；為 null 時使用 <see cref="OdfFontContext.Default"/>。
+    /// Gets the font context used for text segmentation; null uses the owning document's context.
+    /// 取得文字分段所用的字型情境；為 null 時使用所屬文件的字型情境。
     /// </summary>
     public OdfFontContext? FontContext { get; init; }
 
-    internal OdfFontContext EffectiveFontContext => FontContext ?? OdfFontContext.Default;
+    /// <summary>
+    /// 解析實際生效的字型情境：每次呼叫的選項優先，其次為所屬文件的情境，最後為 <see cref="OdfFontContext.Default"/>。
+    /// </summary>
+    internal OdfFontContext ResolveFontContext(Core.OdfDocument? document)
+        => FontContext ?? document?.FontContext ?? OdfFontContext.Default;
 
     internal IReadOnlyList<OdfFontFaceInfo> FontFaces { get; }
     /// <summary>
@@ -104,9 +108,9 @@ public sealed class OdfTextFontFallbackOptions
     /// 建立宣告呼叫端自訂 font-face 的遞補選項，供自訂罕字字型使用。
     /// </summary>
     /// <remarks>
-    /// Combine with <see cref="OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping"/> so text segmentation
+    /// Combine with <see cref="OdfFontContext.RegisterSupplementaryPlaneFontMapping"/> so text segmentation
     /// routes supplementary-plane characters to the declared fonts.
-    /// 可搭配 <see cref="OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping"/> 使用，讓文字分段將增補平面字元導向所宣告的字型。
+    /// 可搭配 <see cref="OdfFontContext.RegisterSupplementaryPlaneFontMapping"/> 使用，讓文字分段將增補平面字元導向所宣告的字型。
     /// </remarks>
     /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
     /// <param name="fontFaces">The font-face declarations to write into the document. / 要寫入文件的 font-face 宣告集合。</param>

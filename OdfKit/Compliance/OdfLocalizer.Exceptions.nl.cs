@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "ODF Validator JAR niet gevonden.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "ODF Validator JAR-pad niet opgegeven.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Time-out moet groter zijn dan 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Lettertypebestand niet gevonden.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Lettertypemap niet gevonden: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Lettertypebestand niet gevonden.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Lettertypemap niet gevonden: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Het apply-token moet een operator en ten minste één operand bevatten.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Het beugelgroeptoken moet inhoud bevatten.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Het groepstoken moet minimaal één subtoken bevatten.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Er is een secundaire fout opgetreden bij het sluiten van XML-elementen tijdens serialisatieherstel: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Kan station '{0}' niet controleren op LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "De resourcelimiet van de streaming-reader is overschreden ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Vlak-lettertypetoewijzingen moeten Unicode-vlaknummers tussen 1 en 16 gebruiken.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Vlak-lettertypetoewijzingen moeten voor elk vlak een niet-lege lettertypenaam opgeven.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Vlak-lettertypetoewijzingen moeten Unicode-vlaknummers tussen 1 en 16 gebruiken.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Vlak-lettertypetoewijzingen moeten voor elk vlak een niet-lege lettertypenaam opgeven.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Aangepaste font-face-declaraties moeten een niet-lege naam en familie opgeven.",
         };
     }

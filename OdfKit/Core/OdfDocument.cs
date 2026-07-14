@@ -189,6 +189,27 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     public OdfPackage Package { get; }
 
+    private OdfFontContext _fontContext = OdfFontContext.Default;
+
+    /// <summary>
+    /// Gets or sets the font context used by this document.
+    /// 取得或設定此文件所使用的字型情境。
+    /// </summary>
+    /// <remarks>
+    /// Text segmentation entry points and save-time font embedding resolve fonts through this context;
+    /// per-call <see cref="Styles.OdfTextFontFallbackOptions.FontContext"/> takes precedence when set.
+    /// Defaults to <see cref="OdfFontContext.Default"/>.
+    /// 文字分段入口與存檔時的字型內嵌都經由此情境解析字型；若個別呼叫設定了
+    /// <see cref="Styles.OdfTextFontFallbackOptions.FontContext"/> 則以其優先。預設為
+    /// <see cref="OdfFontContext.Default"/>。
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">當設定值為 <see langword="null"/> 時擲出</exception>
+    public OdfFontContext FontContext
+    {
+        get => _fontContext;
+        set => _fontContext = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
     /// <summary>
     /// Gets the ODF document kind declared by the current package's MIME type.
     /// 取得目前封裝 MIME 類型所宣告的 ODF 文件種類。

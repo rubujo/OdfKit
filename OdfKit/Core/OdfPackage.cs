@@ -55,6 +55,13 @@ public enum OdfPackageMode
 public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 {
     private const string RdfMetadataPath = "META-INF/manifest.rdf";
+
+    /// <summary>
+    /// 存檔掛鉤（字型內嵌）所使用的字型情境；由擁有此封裝的文件於存檔準備時指派，
+    /// 獨立操作封裝時維持 <see cref="Styles.OdfFontContext.Default"/>。
+    /// </summary>
+    internal Styles.OdfFontContext FontContext { get; set; } = Styles.OdfFontContext.Default;
+
     private readonly OdfPackageMode _mode;
     private Stream? _underlyingStream;
     private readonly bool _leaveOpen;

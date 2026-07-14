@@ -2890,19 +2890,19 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfFontResolver.RegisterFontDirectory"/> 註冊自訂目錄後能觸發字型重新掃描，
+    /// 驗證 <see cref="OdfFontContext.Default.RegisterFontDirectory"/> 註冊自訂目錄後能觸發字型重新掃描，
     /// 且 <c>OdfSaveOptions.EmbedUsedFonts</c> 儲存選項能將真實系統字型（Windows <c>arial.ttf</c>，
     /// 複製一份至自訂目錄後以該目錄掃描解析）正確內嵌至 ODT 封裝的 <c>Fonts/</c> 專案，
     /// 且內嵌字型後的文件仍可被真實 LibreOffice 26.x headless 模式開啟並轉出 PDF。
     /// </summary>
     /// <remarks>
     /// 真實 TTF 檔案的內部名稱表（由 <c>TtfFontNameReader</c> 讀出）固定為其原始字型家族名稱
-    /// （此處為 "Arial"），與檔名無關；而 <see cref="OdfFontResolver.RegisterFontDirectory"/> 觸發的
+    /// （此處為 "Arial"），與檔名無關；而 <see cref="OdfFontContext.Default.RegisterFontDirectory"/> 觸發的
     /// 目錄掃描僅在該名稱尚未登錄時才會寫入 <c>_fontMap</c>（不會覆寫既有專案）。
-    /// 由於 <c>OdfFontResolver</c> 的字型登錄表為整個測試組件共用的靜態狀態，
+    /// 由於 <c>OdfFontContext.Default</c> 的字型登錄表為整個測試組件共用的狀態，
     /// <c>FormulaAndStylesTest.cs</c> 中既有測試會以同樣的 "Arial" 名稱註冊一個測試結束後即刪除的
     /// 暫存檔路徑；為避免平行執行時受該靜態狀態汙染影響（解析到已刪除的暫存路徑），
-    /// 本測試改用 <see cref="OdfFontResolver.RegisterFont"/>（顯式登錄，永遠覆寫既有專案）
+    /// 本測試改用 <see cref="OdfFontContext.Default.RegisterFont"/>（顯式登錄，永遠覆寫既有專案）
     /// 以獨一字型名稱直接登錄複製後的真實字型路徑，而不依賴目錄掃描的「尚未登錄才寫入」語意。
     /// </remarks>
     [Fact]
@@ -2937,8 +2937,8 @@ public partial class LibreOfficeInteropTests
 
             // 先以 RegisterFontDirectory 觸發重新掃描旗標（驗證其副作用），
             // 再以 RegisterFont 顯式登錄獨一名稱以避免覆寫語意差異造成的測試間汙染。
-            OdfFontResolver.RegisterFontDirectory(customFontDir);
-            OdfFontResolver.RegisterFont(uniqueFontName, copiedFontPath);
+            OdfFontContext.Default.RegisterFontDirectory(customFontDir);
+            OdfFontContext.Default.RegisterFont(uniqueFontName, copiedFontPath);
 
             string odtPath = Path.Combine(tempRoot, "interop-embedded-font.odt");
             string expectedFontEntry = "Fonts/" + uniqueFontName + ".ttf";

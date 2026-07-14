@@ -90,7 +90,7 @@ internal static class OdfPackageSaveHooksEngine
             try
             {
                 var dummy = new OdfNode(OdfNodeType.Element, "dummy", string.Empty);
-                OdfFontResolver.EmbedFonts(ctx.Package, contentRoot ?? dummy, stylesRoot ?? dummy);
+                ctx.Package.FontContext.EmbedFonts(ctx.Package, contentRoot ?? dummy, stylesRoot ?? dummy);
                 if (contentRoot != null)
                     contentModified = true;
                 if (stylesRoot != null)

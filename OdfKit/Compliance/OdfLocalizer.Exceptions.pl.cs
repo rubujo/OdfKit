@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "Nie znaleziono pliku JAR narzędzia ODF Validator.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "Nie podano ścieżki pliku JAR narzędzia ODF Validator.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Limit czasu musi być większy niż 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Nie znaleziono pliku czcionki.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Nie znaleziono katalogu czcionek: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Nie znaleziono pliku czcionki.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Nie znaleziono katalogu czcionek: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Token apply musi zawierać operator i co najmniej jeden operand.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Token grupy nawiasowej musi zawierać treść.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Token grupy musi zawierać co najmniej jeden podtoken.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Podczas zamykania elementów XML w trakcie odzyskiwania serializacji wystąpił błąd pomocniczy: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Nie udało się sprawdzić dysku '{0}' w poszukiwaniu LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Przekroczono limit zasobów czytnika strumieniowego ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Mapowania czcionek płaszczyzn muszą używać numerów płaszczyzn Unicode od 1 do 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Mapowania czcionek płaszczyzn muszą określać niepustą nazwę czcionki dla każdej płaszczyzny.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Mapowania czcionek płaszczyzn muszą używać numerów płaszczyzn Unicode od 1 do 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Mapowania czcionek płaszczyzn muszą określać niepustą nazwę czcionki dla każdej płaszczyzny.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Niestandardowe deklaracje font-face muszą określać niepustą nazwę i rodzinę czcionek.",
         };
     }

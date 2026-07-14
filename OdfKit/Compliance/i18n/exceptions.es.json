@@ -336,8 +336,8 @@
   "Err_OdfExternalValidator_OdfNotFound": "No se encontró el archivo JAR de ODF Validator.",
   "Err_OdfExternalValidator_OdfValidatorJarPath": "No se proporcionó la ruta del archivo JAR de ODF Validator.",
   "Err_OdfExternalValidator_TimeoutGreater0": "El tiempo de espera debe ser mayor que 0.",
-  "Err_OdfFontResolver_FontNotFound": "No se encontró el archivo de fuente.",
-  "Err_OdfFontResolver_FontNotFound_2": "No se encontró el directorio de fuentes: '{0}'",
+  "Err_OdfFontContext_FontNotFound": "No se encontró el archivo de fuente.",
+  "Err_OdfFontContext_FontDirectoryNotFound": "No se encontró el directorio de fuentes: '{0}'",
   "Err_OdfFormulaDocument_ApplyTokenContainLeast": "El token apply debe contener un operador y al menos un operando.",
   "Err_OdfFormulaDocument_BracketGroupTokenContain": "El token de grupo entre corchetes debe contener contenido.",
   "Err_OdfFormulaDocument_GroupTokenContainLeast": "El token de grupo debe contener al menos un subtoken.",
@@ -580,7 +580,7 @@
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Se produjo un error secundario al cerrar los elementos XML durante la recuperación de la serialización: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "No se pudo inspeccionar la unidad '{0}' en busca de LibreOffice Portable: {1}",
   "Err_StreamReader_ResourceLimitExceeded": "Se superó el límite de recursos del lector de flujo ({0} > {1}).",
-  "Err_OdfFontSegmenter_PlaneOutOfRange": "Las asignaciones de fuentes por plano deben usar números de plano Unicode entre 1 y 16.",
-  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "Las asignaciones de fuentes por plano deben especificar un nombre de fuente no vacío para cada plano.",
+  "Err_OdfFontContext_PlaneOutOfRange": "Las asignaciones de fuentes por plano deben usar números de plano Unicode entre 1 y 16.",
+  "Err_OdfFontContext_PlaneFontNameEmpty": "Las asignaciones de fuentes por plano deben especificar un nombre de fuente no vacío para cada plano.",
   "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Las declaraciones font-face personalizadas deben especificar un nombre y una familia no vacíos."
 }

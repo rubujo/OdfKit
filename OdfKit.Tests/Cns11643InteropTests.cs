@@ -63,7 +63,7 @@ public class Cns11643InteropTests
     public void Paragraph_AddTextWithFallbackOptions_UsesRegisteredSubsetterForPrivateUseRun()
     {
         var subsetter = new FakeFontSubsetter();
-        using IDisposable registration = OdfFontResolver.RegisterFontSubsetter(subsetter);
+        using IDisposable registration = OdfFontContext.Default.RegisterFontSubsetter(subsetter);
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
         string pua = char.ConvertFromUtf32(0xF0000);

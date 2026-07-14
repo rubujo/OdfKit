@@ -51,11 +51,11 @@ public static class OdfTextMeasurer
         if (hasSupplementary)
         {
             double totalCm = 0;
-            var segments = OdfFontSegmenter.SegmentText(text, fontName);
+            var segments = OdfFontContext.Default.SegmentText(text, fontName);
             foreach (var (segText, font) in segments)
             {
                 if (font != fontName)
-                    OdfFontResolver.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
+                    OdfFontContext.Default.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
                 var width = MeasureWidthSingle(segText, font, fontSizePoints, isBold, isItalic, writingMode);
                 totalCm += width.ToCentimeters();
             }
@@ -73,8 +73,8 @@ public static class OdfTextMeasurer
             return OdfLength.FromCentimeters(0);
 
         // 1. 字型替代對照
-        string mappedFont = OdfFontResolver.MapFont(fontName);
-        string? fontPath = OdfFontResolver.ResolveFontPath(mappedFont);
+        string mappedFont = OdfFontContext.Default.MapFont(fontName);
+        string? fontPath = OdfFontContext.Default.ResolveFontPath(mappedFont);
 
         SKTypeface? typeface = null;
         // 只釋放本方法建立的 typeface；SKTypeface.Default 為共用單例，不可 Dispose。

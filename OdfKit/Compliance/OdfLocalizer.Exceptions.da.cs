@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "ODF Validator JAR blev ikke fundet.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "ODF Validator JAR-sti ikke angivet.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Timeout skal være større end 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Skrifttypefil blev ikke fundet.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Skrifttypemappe ikke fundet: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Skrifttypefil blev ikke fundet.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Skrifttypemappe ikke fundet: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Apply-tokenet skal indeholde en operator og mindst én operand.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Bracketgruppetokenet skal indeholde indhold.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Gruppetokenet skal indeholde mindst ét ​​undertoken.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Der opstod en sekundær fejl under lukning af XML-elementer ved gendannelse af serialisering: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Drevet '{0}' kunne ikke undersøges for LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Streaming-readerens ressourcegrænse er overskredet ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Planskrifttypetilknytninger skal bruge Unicode-plannumre mellem 1 og 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Planskrifttypetilknytninger skal angive et ikke-tomt skrifttypenavn for hvert plan.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Planskrifttypetilknytninger skal bruge Unicode-plannumre mellem 1 og 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Planskrifttypetilknytninger skal angive et ikke-tomt skrifttypenavn for hvert plan.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Brugerdefinerede font-face-erklæringer skal angive et ikke-tomt navn og en ikke-tom skrifttypefamilie.",
         };
     }

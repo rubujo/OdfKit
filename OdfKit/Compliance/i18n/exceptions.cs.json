@@ -336,8 +336,8 @@
   "Err_OdfExternalValidator_OdfNotFound": "Soubor JAR nástroje ODF Validator nebyl nalezen.",
   "Err_OdfExternalValidator_OdfValidatorJarPath": "Cesta k souboru JAR nástroje ODF Validator nebyla zadána.",
   "Err_OdfExternalValidator_TimeoutGreater0": "Časový limit musí být větší než 0.",
-  "Err_OdfFontResolver_FontNotFound": "Soubor písma nebyl nalezen.",
-  "Err_OdfFontResolver_FontNotFound_2": "Adresář písem nebyl nalezen: '{0}'",
+  "Err_OdfFontContext_FontNotFound": "Soubor písma nebyl nalezen.",
+  "Err_OdfFontContext_FontDirectoryNotFound": "Adresář písem nebyl nalezen: '{0}'",
   "Err_OdfFormulaDocument_ApplyTokenContainLeast": "Token apply musí obsahovat operátor a alespoň jeden operand.",
   "Err_OdfFormulaDocument_BracketGroupTokenContain": "Token skupiny v závorkách musí obsahovat obsah.",
   "Err_OdfFormulaDocument_GroupTokenContainLeast": "Token skupiny musí obsahovat alespoň jeden podtoken.",
@@ -580,7 +580,7 @@
   "Diag_OdfXmlWriter_SalvageCloseFailed": "Při zavírání prvků XML během obnovy serializace došlo k sekundární chybě: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "Při hledání LibreOffice Portable se nepodařilo zkontrolovat jednotku '{0}': {1}",
   "Err_StreamReader_ResourceLimitExceeded": "Byl překročen limit prostředků čtečky datového proudu ({0} > {1}).",
-  "Err_OdfFontSegmenter_PlaneOutOfRange": "Mapování písem podle rovin musí používat čísla rovin Unicode od 1 do 16.",
-  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "Mapování písem podle rovin musí pro každou rovinu určit neprázdný název písma.",
+  "Err_OdfFontContext_PlaneOutOfRange": "Mapování písem podle rovin musí používat čísla rovin Unicode od 1 do 16.",
+  "Err_OdfFontContext_PlaneFontNameEmpty": "Mapování písem podle rovin musí pro každou rovinu určit neprázdný název písma.",
   "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Vlastní deklarace font-face musí určit neprázdný název a rodinu písma."
 }

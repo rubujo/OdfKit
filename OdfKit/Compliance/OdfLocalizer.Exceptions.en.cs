@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "ODF Validator JAR not found.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "ODF Validator JAR path not provided.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Timeout must be greater than 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Font file not found.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Font directory not found: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Font file not found.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Font directory not found: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "The apply token must contain an operator and at least one operand.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "The bracket group token must contain content.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "The group token must contain at least one sub-token.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "A secondary error occurred while closing XML elements during serialization recovery: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Failed to inspect drive '{0}' for LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Streaming reader resource limit exceeded ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Plane font mappings must use Unicode plane numbers between 1 and 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Plane font mappings must specify a non-empty font name for every plane.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Plane font mappings must use Unicode plane numbers between 1 and 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Plane font mappings must specify a non-empty font name for every plane.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Custom font-face declarations must specify a non-empty name and family.",
         };
     }

@@ -336,8 +336,8 @@
   "Err_OdfExternalValidator_OdfNotFound": "ODF 유효성 검사기 JAR을 찾을 수 없습니다.",
   "Err_OdfExternalValidator_OdfValidatorJarPath": "ODF 유효성 검사기 JAR 경로가 제공되지 않았습니다.",
   "Err_OdfExternalValidator_TimeoutGreater0": "시간 초과는 0보다 커야 합니다.",
-  "Err_OdfFontResolver_FontNotFound": "글꼴 파일을 찾을 수 없습니다.",
-  "Err_OdfFontResolver_FontNotFound_2": "글꼴 디렉터리를 찾을 수 없습니다: '{0}'",
+  "Err_OdfFontContext_FontNotFound": "글꼴 파일을 찾을 수 없습니다.",
+  "Err_OdfFontContext_FontDirectoryNotFound": "글꼴 디렉터리를 찾을 수 없습니다: '{0}'",
   "Err_OdfFormulaDocument_ApplyTokenContainLeast": "apply 토큰에는 연산자 하나와 피연산자 하나 이상이 포함되어야 합니다.",
   "Err_OdfFormulaDocument_BracketGroupTokenContain": "브래킷 그룹 토큰에는 콘텐츠가 포함되어야 합니다.",
   "Err_OdfFormulaDocument_GroupTokenContainLeast": "그룹 토큰에는 하나 이상의 하위 토큰이 포함되어야 합니다.",
@@ -580,7 +580,7 @@
   "Diag_OdfXmlWriter_SalvageCloseFailed": "직렬화 복구 중 XML 요소를 닫는 과정에서 보조 오류가 발생했습니다: {0}",
   "Diag_LibreOfficeRenderer_PortableDiscoveryFailed": "드라이브 '{0}'에서 LibreOffice Portable을 확인하지 못했습니다: {1}",
   "Err_StreamReader_ResourceLimitExceeded": "스트리밍 reader 리소스 제한을 초과했습니다({0} > {1}).",
-  "Err_OdfFontSegmenter_PlaneOutOfRange": "평면 글꼴 매핑은 1에서 16 사이의 유니코드 평면 번호를 사용해야 합니다.",
-  "Err_OdfFontSegmenter_PlaneFontNameEmpty": "평면 글꼴 매핑은 각 평면에 비어 있지 않은 글꼴 이름을 지정해야 합니다.",
+  "Err_OdfFontContext_PlaneOutOfRange": "평면 글꼴 매핑은 1에서 16 사이의 유니코드 평면 번호를 사용해야 합니다.",
+  "Err_OdfFontContext_PlaneFontNameEmpty": "평면 글꼴 매핑은 각 평면에 비어 있지 않은 글꼴 이름을 지정해야 합니다.",
   "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "사용자 지정 font-face 선언은 비어 있지 않은 이름과 글꼴 패밀리를 지정해야 합니다."
 }

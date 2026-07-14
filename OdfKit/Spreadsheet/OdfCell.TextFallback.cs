@@ -33,7 +33,7 @@ public partial class OdfCell
         }
 
         var richText = new OdfRichText();
-        foreach ((string segmentText, string fontName) in options.EffectiveFontContext.SegmentText(text, options.BaseFont))
+        foreach ((string segmentText, string fontName) in options.ResolveFontContext(_doc).SegmentText(text, options.BaseFont))
         {
             richText.AddRun(segmentText, new OdfRichTextRunOptions { FontFamily = fontName });
         }

@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "JAR Pengesah ODF tidak ditemui.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "Laluan JAR Pengesah ODF tidak disediakan.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Tamat masa mestilah lebih besar daripada 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Fail fon tidak ditemui.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Direktori fon tidak ditemui: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Fail fon tidak ditemui.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Direktori fon tidak ditemui: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Token apply mesti mengandungi satu operator dan sekurang-kurangnya satu operan.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Token kumpulan kurungan mesti mengandungi kandungan.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Token kumpulan mesti mengandungi sekurang-kurangnya satu subtoken.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Ralat sekunder berlaku semasa menutup elemen XML ketika pemulihan pensirian: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Gagal memeriksa pemacu '{0}' untuk LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Had sumber pembaca penstriman telah dilebihi ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Pemetaan fon satah mesti menggunakan nombor satah Unicode antara 1 hingga 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Pemetaan fon satah mesti menetapkan nama fon yang tidak kosong bagi setiap satah.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Pemetaan fon satah mesti menggunakan nombor satah Unicode antara 1 hingga 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Pemetaan fon satah mesti menetapkan nama fon yang tidak kosong bagi setiap satah.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Pengisytiharan font-face tersuai mesti menetapkan nama dan keluarga fon yang tidak kosong.",
         };
     }

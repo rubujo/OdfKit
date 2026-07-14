@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "JAR do validador ODF não encontrado.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "Caminho JAR do validador ODF não fornecido.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "O tempo limite deve ser maior que 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "Arquivo de fonte não encontrado.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Diretório de fontes não encontrado: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "Arquivo de fonte não encontrado.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Diretório de fontes não encontrado: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "O token apply deve conter um operador e pelo menos um operando.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "O token do grupo de colchetes deve conter conteúdo.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "O token do grupo deve conter pelo menos um subtoken.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Ocorreu um erro secundário ao fechar elementos XML durante a recuperação da serialização: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Falha ao verificar a unidade '{0}' para LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "O limite de recursos do leitor de fluxo foi excedido ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Os mapeamentos de fontes por plano devem usar números de plano Unicode entre 1 e 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Os mapeamentos de fontes por plano devem especificar um nome de fonte não vazio para cada plano.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Os mapeamentos de fontes por plano devem usar números de plano Unicode entre 1 e 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Os mapeamentos de fontes por plano devem especificar um nome de fonte não vazio para cada plano.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "As declarações font-face personalizadas devem especificar um nome e uma família não vazios.",
         };
     }

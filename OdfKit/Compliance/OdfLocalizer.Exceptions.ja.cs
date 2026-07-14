@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "ODF Validator の JAR が見つかりません。",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "ODF Validator の JAR パスが指定されていません。",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "タイムアウトは 0 より大きい必要があります。",
-            ["Err_OdfFontResolver_FontNotFound"] = "フォントファイルが見つかりません。",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "フォントディレクトリが見つかりません: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "フォントファイルが見つかりません。",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "フォントディレクトリが見つかりません: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "apply トークンには演算子と少なくとも 1 つのオペランドが必要です。",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "かっこグループのトークンには内容が必要です。",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "グループトークンには少なくとも 1 つのサブトークンが必要です。",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "シリアル化の復旧中に XML 要素を閉じる際、二次エラーが発生しました: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "LibreOffice Portable を検索するためドライブ '{0}' を調査できませんでした: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "ストリーミングリーダーのリソース制限を超えました ({0} > {1})。",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "プレーンフォントマッピングには 1 から 16 の Unicode プレーン番号を使用する必要があります。",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "プレーンフォントマッピングでは、各プレーンに空でないフォント名を指定する必要があります。",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "プレーンフォントマッピングには 1 から 16 の Unicode プレーン番号を使用する必要があります。",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "プレーンフォントマッピングでは、各プレーンに空でないフォント名を指定する必要があります。",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "カスタム font-face 宣言では、空でない名前とファミリを指定する必要があります。",
         };
     }

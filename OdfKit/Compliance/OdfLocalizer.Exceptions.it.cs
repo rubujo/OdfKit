@@ -354,8 +354,8 @@ public static partial class OdfLocalizer
             ["Err_OdfExternalValidator_OdfNotFound"] = "JAR del validatore ODF non trovato.",
             ["Err_OdfExternalValidator_OdfValidatorJarPath"] = "Percorso JAR del validatore ODF non fornito.",
             ["Err_OdfExternalValidator_TimeoutGreater0"] = "Il timeout deve essere maggiore di 0.",
-            ["Err_OdfFontResolver_FontNotFound"] = "File di caratteri non trovato.",
-            ["Err_OdfFontResolver_FontNotFound_2"] = "Directory dei caratteri non trovata: '{0}'",
+            ["Err_OdfFontContext_FontNotFound"] = "File di caratteri non trovato.",
+            ["Err_OdfFontContext_FontDirectoryNotFound"] = "Directory dei caratteri non trovata: '{0}'",
             ["Err_OdfFormulaDocument_ApplyTokenContainLeast"] = "Il token apply deve contenere un operatore e almeno un operando.",
             ["Err_OdfFormulaDocument_BracketGroupTokenContain"] = "Il token del gruppo di parentesi deve contenere contenuto.",
             ["Err_OdfFormulaDocument_GroupTokenContainLeast"] = "Il token del gruppo deve contenere almeno un sottotoken.",
@@ -598,8 +598,8 @@ public static partial class OdfLocalizer
             ["Diag_OdfXmlWriter_SalvageCloseFailed"] = "Si è verificato un errore secondario durante la chiusura degli elementi XML nel recupero della serializzazione: {0}",
             ["Diag_LibreOfficeRenderer_PortableDiscoveryFailed"] = "Impossibile controllare l'unità '{0}' per LibreOffice Portable: {1}",
             ["Err_StreamReader_ResourceLimitExceeded"] = "Il limite di risorse del lettore di flusso è stato superato ({0} > {1}).",
-            ["Err_OdfFontSegmenter_PlaneOutOfRange"] = "Le mappature dei tipi di carattere per piano devono usare numeri di piano Unicode compresi tra 1 e 16.",
-            ["Err_OdfFontSegmenter_PlaneFontNameEmpty"] = "Le mappature dei tipi di carattere per piano devono specificare un nome di carattere non vuoto per ogni piano.",
+            ["Err_OdfFontContext_PlaneOutOfRange"] = "Le mappature dei tipi di carattere per piano devono usare numeri di piano Unicode compresi tra 1 e 16.",
+            ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Le mappature dei tipi di carattere per piano devono specificare un nome di carattere non vuoto per ogni piano.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Le dichiarazioni font-face personalizzate devono specificare un nome e una famiglia non vuoti.",
         };
     }

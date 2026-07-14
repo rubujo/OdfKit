@@ -4,8 +4,8 @@
 
 ## 尚未發佈
 
-- 字型子系統導入 `OdfFontContext` 實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數改由情境執行個體承載；`OdfFontResolver`／`OdfFontSegmenter` 靜態 API 公開表面不變，一律轉發 `Default`；新增 `OdfTextFontFallbackOptions.FontContext` 注入點，多租戶與測試隔離場景可路由高階文字入口的分段。存檔管線字型內嵌現階段仍走 `Default`（文件已註明）。
-- 新增自訂罕字字型擴充點：`OdfFontSegmenter.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
+- 字型子系統重構為 `OdfFontContext` 單一實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數由情境執行個體承載；**移除** `OdfFontResolver` 與 `OdfFontSegmenter` 靜態類別（0.x 未發佈期間之刻意破壞性重整）。隔離注入點兩層：`OdfDocument.FontContext`（文件層級，含存檔時字型內嵌）與 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級），優先序「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器為行程層級，一律使用 `Default`。
+- 新增自訂罕字字型擴充點：`OdfFontContext.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
 - CLI `convert-csv --encoding` 開放 IANA 編碼名稱與代碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。
 - `docs/odf-format-support.md` 新增 Unicode 版本相容性聲明（平面路由與版本無關，Unicode 17.0 Ext J 自動歸入 Plane 3）與內建對應表 Plane 3 覆蓋現況。
 - 完成第二階段 API 人體工學與效能精修：新增 `OdfDiagnostic` 統一診斷模型（八個 report 類別加掛強型別 `Diagnostics` 檢視，見 `docs/reference/diagnostics.md`）、`ImportRecordsAsync`／`ReadRecordsAsync` 非同步物件繫結、`OdfTextMatch.Paragraph`／`ParagraphOffset` 段落定位資訊與搜尋取代單次 traversal 重構、HTML／PDF 匯出低緩衝寫入；同步擴大效能基準與 CI 迴歸閘門（find/replace、物件繫結、export 記憶體）。

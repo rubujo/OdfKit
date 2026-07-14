@@ -19,7 +19,10 @@ internal static class OdfDocumentPersistenceEngine
         ctx.PrepareForPersistence(options);
         ctx.StyleEngine.FlushPendingStyles();
         ctx.Package.FormulaExternalLinksForSave = ctx.FormulaExternalLinks;
-        OdfFontResolver.EmbedFontSubsets(ctx.Package, ctx.ContentDom, ctx.StylesDom);
+        // 於存檔準備時定點指派封裝的字型情境，供封裝層存檔掛鉤（EmbedFonts）使用；
+        // 嵌入子文件共用外層封裝時，最外層文件的情境為最終有效值。
+        ctx.Package.FontContext = ctx.FontContext;
+        ctx.FontContext.EmbedFontSubsets(ctx.Package, ctx.ContentDom, ctx.StylesDom);
         OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
         ReportVersionCompatibility(ctx, options);
         ApplySaveVersionOptions(ctx, options);

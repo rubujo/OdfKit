@@ -904,7 +904,7 @@ namespace OdfKit.Tests
 
         #endregion
 
-        #region OdfFontResolver Tests
+        #region OdfFontContext Tests
 
         [Fact]
         public void TestFontResolverRegistrationAndEmbedding()
@@ -916,9 +916,9 @@ namespace OdfKit.Tests
                 // Write a dummy file to pass the exists validation
                 File.WriteAllBytes(dummyPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
 
-                OdfFontResolver.RegisterFont("MyDummyFont", dummyPath);
+                OdfFontContext.Default.RegisterFont("MyDummyFont", dummyPath);
 
-                string? resolved = OdfFontResolver.ResolveFontPath("MyDummyFont");
+                string? resolved = OdfFontContext.Default.ResolveFontPath("MyDummyFont");
                 Assert.Equal(dummyPath, resolved);
             }
             finally
@@ -943,9 +943,9 @@ namespace OdfKit.Tests
                 try
                 {
                     File.WriteAllBytes(tempArialPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
-                    OdfFontResolver.RegisterFont("Arial", tempArialPath);
+                    OdfFontContext.Default.RegisterFont("Arial", tempArialPath);
 
-                    OdfFontResolver.EmbedFonts(package, fontFace, fontFace);
+                    OdfFontContext.Default.EmbedFonts(package, fontFace, fontFace);
 
                     // Verify ZIP entry was written
                     Assert.True(package.HasEntry("Fonts/Arial.ttf"));
@@ -963,7 +963,7 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 驗證 <see cref="OdfFontResolver.IsTrueTypeCollection"/> 能依 'ttcf' 幻數正確區分
+        /// 驗證 <see cref="OdfFontContext.IsTrueTypeCollection"/> 能依 'ttcf' 幻數正確區分
         /// TrueType Collection（.ttc）與一般 TrueType（.ttf）字型檔案，並對不存在的路徑安全回傳 false。
         /// </summary>
         [Fact]
@@ -977,9 +977,9 @@ namespace OdfKit.Tests
                 File.WriteAllBytes(ttcPath, new byte[] { 0x74, 0x74, 0x63, 0x66, 0x00, 0x01, 0x00, 0x00 });
                 File.WriteAllBytes(ttfPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
 
-                Assert.True(OdfFontResolver.IsTrueTypeCollection(ttcPath));
-                Assert.False(OdfFontResolver.IsTrueTypeCollection(ttfPath));
-                Assert.False(OdfFontResolver.IsTrueTypeCollection(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_" + Guid.NewGuid().ToString("N") + ".ttc")));
+                Assert.True(OdfFontContext.IsTrueTypeCollection(ttcPath));
+                Assert.False(OdfFontContext.IsTrueTypeCollection(ttfPath));
+                Assert.False(OdfFontContext.IsTrueTypeCollection(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_" + Guid.NewGuid().ToString("N") + ".ttc")));
             }
             finally
             {
@@ -994,7 +994,7 @@ namespace OdfKit.Tests
 
         /// <summary>
         /// 驗證系統真實 TrueType Collection 字型檔案（Windows <c>Nirmala.ttc</c>）可被
-        /// <see cref="OdfFontResolver.IsTrueTypeCollection"/> 正確識別，確保此偵測邏輯與真實字型檔案結構相容。
+        /// <see cref="OdfFontContext.IsTrueTypeCollection"/> 正確識別，確保此偵測邏輯與真實字型檔案結構相容。
         /// </summary>
         [Fact]
         public void TestIsTrueTypeCollectionDetectsRealSystemTtcFile()
@@ -1005,11 +1005,11 @@ namespace OdfKit.Tests
                 Assert.Skip("找不到系統真實 TTC 字型檔案，略過真機字型格式偵測。");
             }
 
-            Assert.True(OdfFontResolver.IsTrueTypeCollection(realTtcPath));
+            Assert.True(OdfFontContext.IsTrueTypeCollection(realTtcPath));
         }
 
         /// <summary>
-        /// 驗證 <see cref="OdfFontResolver.WarnIfUnresolvable"/> 對已註冊字型回傳 <see langword="true"/>，
+        /// 驗證 <see cref="OdfFontContext.Default.WarnIfUnresolvable"/> 對已註冊字型回傳 <see langword="true"/>，
         /// 對無法解析的字型名稱回傳 <see langword="false"/> 且同一名稱僅記錄一次警告（不重複觸發）。
         /// </summary>
         [Fact]
@@ -1021,13 +1021,13 @@ namespace OdfKit.Tests
             try
             {
                 File.WriteAllBytes(dummyPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
-                OdfFontResolver.RegisterFont(registeredFontName, dummyPath);
+                OdfFontContext.Default.RegisterFont(registeredFontName, dummyPath);
 
-                Assert.True(OdfFontResolver.WarnIfUnresolvable(registeredFontName, "單元測試"));
+                Assert.True(OdfFontContext.Default.WarnIfUnresolvable(registeredFontName, "單元測試"));
 
                 // 重複呼叫同一個無法解析的字型名稱不應拋出例外（內部以 HashSet 去重警告）。
-                Assert.False(OdfFontResolver.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
-                Assert.False(OdfFontResolver.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
+                Assert.False(OdfFontContext.Default.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
+                Assert.False(OdfFontContext.Default.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
             }
             finally
             {
@@ -1038,15 +1038,15 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 驗證 <see cref="OdfFontResolver.RegisterFontDirectory"/> 註冊的自訂目錄會在下一次字型查詢時
-        /// 被掃描，使該目錄中含有效字型名稱表的 TrueType 檔案可被 <see cref="OdfFontResolver.ResolveFontPath"/>
+        /// 驗證 <see cref="OdfFontContext.Default.RegisterFontDirectory"/> 註冊的自訂目錄會在下一次字型查詢時
+        /// 被掃描，使該目錄中含有效字型名稱表的 TrueType 檔案可被 <see cref="OdfFontContext.Default.ResolveFontPath"/>
         /// 解析出正確路徑；並驗證對不存在的目錄路徑擲出 <see cref="DirectoryNotFoundException"/>。
         /// </summary>
         [Fact]
         public void TestRegisterFontDirectoryTriggersRescanAndResolvesFontsFromCustomDirectory()
         {
             Assert.Throws<DirectoryNotFoundException>(
-                () => OdfFontResolver.RegisterFontDirectory(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_dir_" + Guid.NewGuid().ToString("N"))));
+                () => OdfFontContext.Default.RegisterFontDirectory(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_dir_" + Guid.NewGuid().ToString("N"))));
 
             string customDir = Path.Combine(Path.GetTempPath(), "odfkit_fontdir_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(customDir);
@@ -1062,7 +1062,7 @@ namespace OdfKit.Tests
                 string copiedFontPath = Path.Combine(customDir, "arial.ttf");
                 File.Copy(realFontPath, copiedFontPath);
 
-                OdfFontResolver.RegisterFontDirectory(customDir);
+                OdfFontContext.Default.RegisterFontDirectory(customDir);
 
                 // TtfFontNameReader 讀出的內部名稱表固定為原始字型家族名稱「Arial」（與檔名無關），
                 // 但目錄掃描僅在該鍵尚未登錄時才會寫入 _fontMap（不會覆寫既有專案，見原始碼
@@ -1070,9 +1070,9 @@ namespace OdfKit.Tests
                 // 測試組件共用的靜態狀態，可能已被 FormulaAndStylesTest.cs 中其他測試登錄過
                 // 一個測試結束後即刪除的暫存路徑，故先以 RegisterFont 顯式覆寫為本次複製的真實路徑，
                 // 確保以下解析結果必定對應到本測試剛建立、確實存在的檔案，而非殘留的舊暫存路徑。
-                OdfFontResolver.RegisterFont("Arial", copiedFontPath);
+                OdfFontContext.Default.RegisterFont("Arial", copiedFontPath);
 
-                string? resolved = OdfFontResolver.ResolveFontPath("Arial");
+                string? resolved = OdfFontContext.Default.ResolveFontPath("Arial");
                 Assert.Equal(copiedFontPath, resolved);
                 Assert.True(File.Exists(resolved), "RegisterFontDirectory 掃描後解析出的字型路徑必須實際存在。");
             }
@@ -1167,7 +1167,7 @@ namespace OdfKit.Tests
             // Register a dummy Arial font path for resolving
             string dummyArialPath = Path.Combine(Path.GetTempPath(), "dummy_save_arial.ttf");
             File.WriteAllBytes(dummyArialPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
-            OdfFontResolver.RegisterFont("Arial", dummyArialPath);
+            OdfFontContext.Default.RegisterFont("Arial", dummyArialPath);
 
             try
             {
