@@ -586,5 +586,8 @@
   "Err_OdfCodePointMigration_MappingCodePointInvalid": "Codepunttoewijzingen moeten geldige Unicode-scalarwaarden gebruiken (U+0000 tot U+10FFFF, exclusief surrogaten).",
   "Err_OdfBig5EEncoding_MappingEmpty": "Big5E-codering vereist een niet-lege toewijzing van Unicode naar Big5E.",
   "Err_OdfBig5EEncoding_InvalidBig5Code": "Big5E-codewaarden moeten geldige dubbelbyte Big5-codes zijn (leidende byte 0x81 tot 0xFE).",
-  "Err_OdfCnsMappingTable_InvalidLine": "De regel van de CNS 11643-toewijzingstabel heeft niet de verwachte indeling \"vlak-code<TAB>hex\": {0}."
+  "Err_OdfCnsMappingTable_InvalidLine": "De regel van de CNS 11643-toewijzingstabel heeft niet de verwachte indeling \"vlak-code<TAB>hex\": {0}.",
+  "Err_OdfCodePointMappingTable_InvalidLine": "De regel van de codepunttoewijzingstabel heeft niet de verwachte gescheiden hexadecimale indeling: {0}.",
+  "Err_OdfCodePointMappingTable_LineTooLong": "De regel van de codepunttoewijzingstabel overschrijdt de maximale lengte van {0} tekens.",
+  "Err_OdfCodePointMappingTable_TooManyEntries": "De codepunttoewijzingstabel overschrijdt het maximum van {0} vermeldingen."
 }

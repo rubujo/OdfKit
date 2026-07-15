@@ -137,6 +137,22 @@ OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選�
   驗證）的官方對照表執行全集驗收——10.4 萬 CNS↔Unicode 碼位的平面路由與分段無損、
   CP950 差異白名單、Big5E 全碼位編解碼往返。本機無資料時對應測試自動略過。
 
+碼位遷移引擎本身是語系中立的（吃 `IReadOnlyDictionary<int, int>`），對照表來源不限全字庫。
+`OdfCodePointMappingTable` 提供與格式無關的階梯：
+
+- `ParseDelimitedHex(reader, separator)`：行式十六進位對照表——可**直接餵入 unicode.org
+  官方對照檔**（`Public/MAPPINGS` 下的 BIG5.TXT、CP950.TXT 等，TAB 分隔、`0x` 前綴、`#` 註解）
+  與 UCD 式分號清單（`U+` 前綴亦可）；不支援 `XXXX..YYYY` 範圍語法。
+- `Parse(reader, lineParser)`：委派擴充點，自訂行格式只需一行解析邏輯。
+- `Join(keyToSource, keyToTarget)`：通用字串鍵聯結（`JoinOnCns` 為其 CNS 語境別名）。
+- 資源預算（比照 security-limits 的入口原則）：兩個解析方法（含 CNS 特化版）施行每行
+  4,096 字元與每表 2,000,000 筆上限，超出擲出 `FormatException`；8 位十六進位溢為負值
+  一律視為無效，例外訊息中的原始行會截斷並清洗控制字元。對照表屬營運端提供的設定資料，
+  行長檢查在該行讀入後執行——餵入不可信串流前應另行預先限制輸入大小。
+- JSON／試算表來源（例如日本文字情報基盤的 MJ 縮退對照，JSON 格式）由呼叫端以對應的
+  反序列化器轉成字典即可餵入 `MigrateTextCodePoints`——同一引擎同樣適用日本外字（MJ）、
+  GB 18030-2022 的 PUA 重指派與歐洲 MUFI 等 PUA 遷移場景。
+
 ## 矩陣
 
 | 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |

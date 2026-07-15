@@ -4,6 +4,7 @@
 
 ## 尚未發佈
 
+- 新增 `OdfCodePointMappingTable` 通用碼位對照表輔助：`ParseDelimitedHex` 可直接解析 unicode.org 官方對照檔（TAB／分號分隔、`0x`／`U+` 前綴、`#` 註解）、`Parse(lineParser)` 委派擴充點支援任意行格式、`Join` 通用字串鍵聯結（`JoinOnCns` 改為轉呼叫別名）。碼位遷移鏈至此格式中立，同樣適用日本 MJ 外字、GB 18030-2022 PUA 重指派與 MUFI 等遷移場景。解析入口比照 security-limits 原則施行文件化資源預算（行長 4,096／筆數 2,000,000、負值十六進位拒絕、例外訊息截斷與控制字元清洗），CNS 特化解析器同步套用。
 - samples 第 9 節新增 CNS 11643 正面示例（全字庫遞補分段、自訂罕字字型情境、PUA 碼位遷移、Big5E 編碼 CSV 匯出）；`OdfTextFontFallbackOptions.Custom` 新增 `fontContext` 三參數多載，修補「自訂 font-face 清單與自訂字型情境無法同時使用」的 API 組合縫隙。
 - 效能：`SegmentText` 導入每呼叫平面字型快取，逐字元的內建規則鏈評估（多次 `Contains`）攤提為每平面一次；125k 字元混排基準下，fall-through 家族（如 Noto Sans）由 362ms 降至 10ms（−97%）、MingLiU −76%、TW-Kai −32%，純 BMP 快路徑維持零額外配置。
 - 新增全字庫（CNS 11643 open data）整合：`OdfCns11643MappingTable` 官方對照表解析與聯結、`OdfBig5EEncoding` 資料驅動 Big5E 編碼（可餵入 CSV 匯入匯出）、`OdfDocument.MigrateTextCodePoints` 文件碼位遷移（舊版全字庫 PUA 自造字 → 新版 Unicode 正式碼位，回傳統計報告）。維持「機制內建、資料外部」：對照表由使用者自政府資料開放平臺下載，倉庫不內建資料。新增 cns11643-baseline CI workflow 以釘選版本官方資料驗收 10.4 萬碼位的平面路由、CP950 差異白名單（2 字）與 Big5E 全碼位往返。

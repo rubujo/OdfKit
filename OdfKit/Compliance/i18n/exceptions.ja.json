@@ -586,5 +586,8 @@
   "Err_OdfCodePointMigration_MappingCodePointInvalid": "コードポイントマッピングには有効な Unicode スカラー値（U+0000 から U+10FFFF、サロゲートを除く）を使用する必要があります。",
   "Err_OdfBig5EEncoding_MappingEmpty": "Big5E エンコーディングには空でない Unicode から Big5E へのマッピングが必要です。",
   "Err_OdfBig5EEncoding_InvalidBig5Code": "Big5E コード値は有効な 2 バイト Big5 コード（先頭バイト 0x81 から 0xFE）である必要があります。",
-  "Err_OdfCnsMappingTable_InvalidLine": "CNS 11643 対照表の行が想定される「面-コード<TAB>16進値」形式ではありません: {0}。"
+  "Err_OdfCnsMappingTable_InvalidLine": "CNS 11643 対照表の行が想定される「面-コード<TAB>16進値」形式ではありません: {0}。",
+  "Err_OdfCodePointMappingTable_InvalidLine": "コードポイント対照表の行が想定される 16 進数区切り形式ではありません: {0}。",
+  "Err_OdfCodePointMappingTable_LineTooLong": "コードポイント対照表の行が最大長 {0} 文字を超えています。",
+  "Err_OdfCodePointMappingTable_TooManyEntries": "コードポイント対照表が最大 {0} 件のエントリー数を超えています。"
 }

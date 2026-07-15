@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "A codificação Big5E requer um mapeamento de Unicode para Big5E não vazio.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Os valores de código Big5E devem ser códigos Big5 de dois bytes válidos (byte inicial de 0x81 a 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "A linha da tabela de mapeamento CNS 11643 não está no formato esperado \"plano-código<TAB>hexadecimal\": {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "A linha da tabela de mapeamento de pontos de código não está no formato hexadecimal delimitado esperado: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "A linha da tabela de mapeamento de pontos de código excede o comprimento máximo de {0} caracteres.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "A tabela de mapeamento de pontos de código excede o máximo de {0} entradas.",
         };
     }
 }

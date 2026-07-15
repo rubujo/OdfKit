@@ -586,5 +586,8 @@
   "Err_OdfCodePointMigration_MappingCodePointInvalid": "碼位對應必須使用有效的 Unicode 純量值（U+0000 至 U+10FFFF，不含代理碼位）。",
   "Err_OdfBig5EEncoding_MappingEmpty": "Big5E 編碼需要非空的 Unicode 對 Big5E 對應表。",
   "Err_OdfBig5EEncoding_InvalidBig5Code": "Big5E 碼值必須是有效的雙位元組 Big5 碼（前導位元組 0x81 至 0xFE）。",
-  "Err_OdfCnsMappingTable_InvalidLine": "CNS 11643 對照表資料行不符合預期的「字面-編碼<TAB>十六進位」格式：{0}。"
+  "Err_OdfCnsMappingTable_InvalidLine": "CNS 11643 對照表資料行不符合預期的「字面-編碼<TAB>十六進位」格式：{0}。",
+  "Err_OdfCodePointMappingTable_InvalidLine": "碼位對照表資料行不符合預期的十六進位分隔格式：{0}。",
+  "Err_OdfCodePointMappingTable_LineTooLong": "碼位對照表資料行超過 {0} 字元的長度上限。",
+  "Err_OdfCodePointMappingTable_TooManyEntries": "碼位對照表超過 {0} 筆項目的數量上限。"
 }

@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Pengekodan Big5E memerlukan pemetaan Unicode kepada Big5E yang tidak kosong.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Nilai kod Big5E mestilah kod Big5 dwibait yang sah (bait pendahulu 0x81 hingga 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "Baris jadual pemetaan CNS 11643 tidak dalam format yang dijangka \"satah-kod<TAB>heks\": {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "Baris jadual pemetaan titik kod tidak dalam format heksadesimal berpembatas yang dijangka: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "Baris jadual pemetaan titik kod melebihi panjang maksimum {0} aksara.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Jadual pemetaan titik kod melebihi maksimum {0} entri.",
         };
     }
 }

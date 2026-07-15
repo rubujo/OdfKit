@@ -586,5 +586,8 @@
   "Err_OdfCodePointMigration_MappingCodePointInvalid": "Les correspondances de points de code doivent utiliser des valeurs scalaires Unicode valides (U+0000 à U+10FFFF, hors substituts).",
   "Err_OdfBig5EEncoding_MappingEmpty": "L'encodage Big5E nécessite une correspondance non vide entre Unicode et Big5E.",
   "Err_OdfBig5EEncoding_InvalidBig5Code": "Les valeurs de code Big5E doivent être des codes Big5 à deux octets valides (octet de tête de 0x81 à 0xFE).",
-  "Err_OdfCnsMappingTable_InvalidLine": "La ligne de la table de correspondance CNS 11643 n'est pas au format attendu « plan-code<TAB>hexadécimal » : {0}."
+  "Err_OdfCnsMappingTable_InvalidLine": "La ligne de la table de correspondance CNS 11643 n'est pas au format attendu « plan-code<TAB>hexadécimal » : {0}.",
+  "Err_OdfCodePointMappingTable_InvalidLine": "La ligne de la table de correspondance de points de code n'est pas au format hexadécimal délimité attendu : {0}.",
+  "Err_OdfCodePointMappingTable_LineTooLong": "La ligne de la table de correspondance de points de code dépasse la longueur maximale de {0} caractères.",
+  "Err_OdfCodePointMappingTable_TooManyEntries": "La table de correspondance de points de code dépasse le maximum de {0} entrées."
 }

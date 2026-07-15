@@ -35,13 +35,15 @@ public static class OdfCns11643MappingTable
         string? originalLine;
         while ((originalLine = reader.ReadLine()) is not null)
         {
+            OdfCodePointMappingTable.EnsureLineLength(originalLine);
+
             string line = originalLine.Trim();
             if (line.Length == 0)
             {
                 continue;
             }
 
-            string[] fields = line.Split('\t');
+            string[] fields = line.Split(TabSeparator);
             if (fields.Length != 2)
             {
                 throw InvalidLine(originalLine);
@@ -50,12 +52,14 @@ public static class OdfCns11643MappingTable
             string cnsCode = fields[0].Trim();
             string valueText = fields[1].Trim();
             if (!cnsCode.Contains("-", StringComparison.Ordinal) ||
-                !int.TryParse(valueText, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out int value))
+                !int.TryParse(valueText, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out int value) ||
+                value < 0)
             {
                 throw InvalidLine(originalLine);
             }
 
             result[cnsCode] = value;
+            OdfCodePointMappingTable.EnsureEntryBudget(result.Count);
         }
 
         return result;
@@ -72,29 +76,12 @@ public static class OdfCns11643MappingTable
     public static IReadOnlyDictionary<int, int> JoinOnCns(
         IReadOnlyDictionary<string, int> cnsToSource,
         IReadOnlyDictionary<string, int> cnsToTarget)
-    {
-        if (cnsToSource is null)
-        {
-            throw new ArgumentNullException(nameof(cnsToSource));
-        }
+        => OdfCodePointMappingTable.Join(cnsToSource, cnsToTarget);
 
-        if (cnsToTarget is null)
-        {
-            throw new ArgumentNullException(nameof(cnsToTarget));
-        }
-
-        var result = new Dictionary<int, int>();
-        foreach (KeyValuePair<string, int> source in cnsToSource)
-        {
-            if (cnsToTarget.TryGetValue(source.Key, out int target))
-            {
-                result[source.Value] = target;
-            }
-        }
-
-        return result;
-    }
+    private static readonly char[] TabSeparator = ['\t'];
 
     private static FormatException InvalidLine(string line) =>
-        new(OdfLocalizer.GetMessage("Err_OdfCnsMappingTable_InvalidLine", line));
+        new(OdfLocalizer.GetMessage(
+            "Err_OdfCnsMappingTable_InvalidLine",
+            OdfCodePointMappingTable.FormatLineForMessage(line)));
 }

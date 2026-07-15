@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Die Big5E-Kodierung erfordert eine nicht leere Zuordnung von Unicode zu Big5E.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-Codewerte müssen gültige Doppelbyte-Big5-Codes sein (Führungsbyte 0x81 bis 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "Die Zeile der CNS 11643-Zuordnungstabelle entspricht nicht dem erwarteten Format „Ebene-Code<TAB>Hex“: {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "Die Zeile der Codepunkt-Zuordnungstabelle entspricht nicht dem erwarteten getrennten Hexadezimalformat: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "Die Zeile der Codepunkt-Zuordnungstabelle überschreitet die maximale Länge von {0} Zeichen.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Die Codepunkt-Zuordnungstabelle überschreitet das Maximum von {0} Einträgen.",
         };
     }
 }

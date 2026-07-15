@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E 인코딩에는 비어 있지 않은 유니코드-Big5E 매핑이 필요합니다.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E 코드 값은 유효한 2바이트 Big5 코드(선행 바이트 0x81~0xFE)여야 합니다.",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "CNS 11643 대응표의 행이 예상 형식 \"면-코드<TAB>16진수\"가 아닙니다: {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "코드 포인트 대응표의 행이 예상되는 구분 16진수 형식이 아닙니다: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "코드 포인트 대응표의 행이 최대 길이 {0}자를 초과합니다.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "코드 포인트 대응표가 최대 {0}개 항목을 초과합니다.",
         };
     }
 }

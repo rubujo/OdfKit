@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E-kodning kræver en ikke-tom tilknytning fra Unicode til Big5E.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-kodeværdier skal være gyldige dobbeltbyte Big5-koder (indledende byte 0x81 til 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "Linjen i CNS 11643-tilknytningstabellen har ikke det forventede format \"plan-kode<TAB>hex\": {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "Linjen i kodepunkttilknytningstabellen har ikke det forventede afgrænsede hexadecimale format: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "Linjen i kodepunkttilknytningstabellen overskrider den maksimale længde på {0} tegn.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Kodepunkttilknytningstabellen overskrider maksimum på {0} poster.",
         };
     }
 }

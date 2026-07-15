@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Kódovanie Big5E vyžaduje neprázdne mapovanie Unicode na Big5E.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Hodnoty kódu Big5E musia byť platné dvojbajtové kódy Big5 (úvodný bajt 0x81 až 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "Riadok mapovacej tabuľky CNS 11643 nemá očakávaný formát „rovina-kód<TAB>hex“: {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "Riadok tabuľky mapovania kódových bodov nemá očakávaný oddelený šestnástkový formát: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "Riadok tabuľky mapovania kódových bodov prekračuje maximálnu dĺžku {0} znakov.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Tabuľka mapovania kódových bodov prekračuje maximum {0} položiek.",
         };
     }
 }

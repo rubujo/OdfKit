@@ -605,6 +605,9 @@ public static partial class OdfLocalizer
             ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E-koding krever en ikke-tom tilordning fra Unicode til Big5E.",
             ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-kodeverdier må være gyldige dobbeltbyte Big5-koder (ledende byte 0x81 til 0xFE).",
             ["Err_OdfCnsMappingTable_InvalidLine"] = "Linjen i CNS 11643-tilordningstabellen har ikke det forventede formatet «plan-kode<TAB>heks»: {0}.",
+            ["Err_OdfCodePointMappingTable_InvalidLine"] = "Linjen i kodepunkttilordningstabellen har ikke det forventede avgrensede heksadesimale formatet: {0}.",
+            ["Err_OdfCodePointMappingTable_LineTooLong"] = "Linjen i kodepunkttilordningstabellen overskrider maksimal lengde på {0} tegn.",
+            ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Kodepunkttilordningstabellen overskrider maksimum på {0} oppføringer.",
         };
     }
 }
