@@ -95,6 +95,10 @@ BenchmarkDotNet 預設的多次暖身 + 多次迭代統計工作，單一情境�
 | MiniExcel | `1.45.0`（`Apache-2.0`） |
 | ClosedXML | `0.105.0`（`MIT`） |
 
+專案直接參照的 .NET 10 套件已更新至 `10.0.10`，但本次執行時本機安裝的
+.NET Host／Runtime 仍為 `10.0.9`；環境欄記錄實際執行階段，不以 NuGet
+套件版本替代。
+
 本機單次量測結果會受 CPU、記憶體、磁碟、電源模式與背景負載影響，因此本
 文件記錄「如何量測」與「本機實測結果」，不作為跨機器的服務等級承諾；
 方針與 [效能基準線](performance-baselines.md) 一致。
@@ -102,25 +106,26 @@ BenchmarkDotNet 預設的多次暖身 + 多次迭代統計工作，單一情境�
 ## 3. 實測結果表
 
 情境：`1,000,000` 列 × `10` 欄混合型別資料，手動計時模式，各情境獨立子
-行程執行一次。量測日期 **2026-07-09**（v0.0.1 完滿基線），於導入共用
+行程執行一次。量測日期 **2026-07-16**（v0.0.1 完滿基線），於導入共用
 `OdfRawXmlWriter` 熱路徑後以 `pwsh eng/Benchmark-Competitive.ps1` 執行；
 **下表採用當日第 3 次完整跑分**（與第 2 次同量級；配置量／峰值高度穩定）。
 
 | 情境 | 套件（授權） | 輸出格式 | 耗時 | GC 累積配置量 | 峰值工作集 | 輸出檔案大小 |
 |------|--------------|----------|------|----------------|------------|--------------|
-| `OdsStreamWriter` | OdfKit（CC0-1.0） | `.ods` | 5,226 ms | **472.4 MB** | **37.3 MB** | 95.3 MB |
-| `MiniExcel` | MiniExcel 1.45.0（Apache-2.0） | `.xlsx` | **5,190 ms** | 3,357.9 MB | 46.5 MB | 111.0 MB |
-| `ClosedXml` | ClosedXML 0.105.0（MIT，DOM 對照組） | `.xlsx` | 37,201 ms | 10,952.2 MB | 2,181.0 MB | 65.2 MB |
+| `OdsStreamWriter` | OdfKit（CC0-1.0） | `.ods` | **5,068 ms** | **472.7 MB** | **39.4 MB** | 95.3 MB |
+| `MiniExcel` | MiniExcel 1.45.0（Apache-2.0） | `.xlsx` | 6,160 ms | 3,359.6 MB | 49.1 MB | 111.0 MB |
+| `ClosedXml` | ClosedXML 0.105.0（MIT，DOM 對照組） | `.xlsx` | 42,405 ms | 10,947.9 MB | 2,206.5 MB | 65.2 MB |
 
-（粗體標示各欄位表現最佳者。耗時欄 MiniExcel 僅快約 0.7%，可視為本機誤差內接近持平。）
+（粗體標示各欄位表現最佳者。本次第 3 次量測中，`OdsStreamWriter` 耗時比
+MiniExcel 約少 17.7%。）
 
 同日多次手動量測對照（便於評估穩定性；單位同表）：
 
 | 情境 | 第 1 次耗時 | 第 2 次耗時 | 第 3 次耗時 | 配置量（第 3 次） | 峰值（第 3 次） |
 |------|-------------|-------------|-------------|-------------------|-----------------|
-| `OdsStreamWriter` | 8,288 ms | 4,955 ms | 5,226 ms | 472.4 MB | 37.3 MB |
-| `MiniExcel` | 7,990 ms | 4,920 ms | 5,190 ms | 3,357.9 MB | 46.5 MB |
-| `ClosedXml` | 39,021 ms | 38,837 ms | 37,201 ms | 10,952.2 MB | 2,181.0 MB |
+| `OdsStreamWriter` | 6,534 ms | 5,602 ms | 5,068 ms | 472.7 MB | 39.4 MB |
+| `MiniExcel` | 7,895 ms | 6,730 ms | 6,160 ms | 3,359.6 MB | 49.1 MB |
+| `ClosedXml` | 51,657 ms | 44,160 ms | 42,405 ms | 10,947.9 MB | 2,206.5 MB |
 
 配置量與峰值工作集跨次幾乎一致；耗時第 1 次偏高（冷行程／背景負載），
 第 2／3 次同量級，故官方對比表以第 3 次（v0.0.1 完滿基線）為準，並誠實列出歷史次數。
@@ -144,20 +149,20 @@ dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStream
 ## 5. 結果解讀
 
 - **記憶體（峰值工作集）：OdsStreamWriter 仍明顯領先 DOM 路徑。** 第 3 次
-  `37.3 MB` 對 `ClosedXml` 的 `2,181.0 MB`，約 58 倍；主因是串流寫入不把整份
-  活頁簿常駐為物件圖。`MiniExcel` 同屬串流路線，峰值約 `46.5 MB`，與
+  `39.4 MB` 對 `ClosedXml` 的 `2,206.5 MB`，約 56 倍；主因是串流寫入不把整份
+  活頁簿常駐為物件圖。`MiniExcel` 同屬串流路線，峰值約 `49.1 MB`，與
   `OdsStreamWriter` 差距約 1.25 倍。公開敘事應強調「遠低於 DOM 方案的峰值
   工作集」，而非未加限定的「小於 1MB」口號（見 `AGENTS.md` 與本文件方針）。
-- **耗時：熱路徑後已與 MiniExcel 接近持平。** 第 3 次 `OdsStreamWriter`
-  （`5,226 ms`）與 `MiniExcel`（`5,190 ms`）僅差約 **0.7%**，在手動單次量測
-  誤差內可視為同量級。相對 2026-07 初版（`XmlWriter` 逐格路徑約慢 20%）已明顯
+- **耗時：本次三次量測均優於 MiniExcel。** 第 3 次 `OdsStreamWriter`
+  （`5,068 ms`）比 `MiniExcel`（`6,160 ms`）約少 **17.7%**。相對 2026-07
+  初版（`XmlWriter` 逐格路徑約慢 20%）已明顯
   收斂，主因是共用 `OdfRawXmlWriter` 批次組裝標記、關閉內建 `CheckCharacters`，
   並以 `OdfXmlCharacterGuard` 維持非法字元快速失敗（同路徑已套用至
-  `OdtStreamWriter` 段落／標題／清單熱迴圈）。第 1 次兩套件耗時皆偏高且差距
-  仍小，顯示相對關係穩定、絕對值易受冷啟動影響。
+  `OdtStreamWriter` 段落／標題／清單熱迴圈）。第 1 次兩套件耗時皆偏高但相對
+  比例接近後兩次，顯示相對關係穩定、絕對值易受冷啟動影響。
 - **GC 累積配置量：`OdsStreamWriter` 明顯優於兩組對照。** 第 3 次約
-  `472.4 MB`，約為 MiniExcel（`3,357.9 MB`）的七分之一、ClosedXML
-  （`10,952.2 MB`）的二十三分之一；亦低於熱路徑前約 `770 MB` 的舊量測。累積
+  `472.7 MB`，約為 MiniExcel（`3,359.6 MB`）的七分之一、ClosedXML
+  （`10,947.9 MB`）的二十三分之一；亦低於熱路徑前約 `770 MB` 的舊量測。累積
   配置量仍高於峰值工作集，代表配置後可被世代 GC 回收，不可與常駐記憶體混談。
 - **輸出檔案大小僅供參考，不代表壓縮效率排名。** 如第 1.2 節所述，ODS
   與 XLSX 是不同 schema，`ClosedXml` 輸出的 `.xlsx`（`65.2 MB`）小於
@@ -166,7 +171,7 @@ dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStream
 
 ## 6. 已知限制
 
-- 本文件僅涵蓋「單一情境、單一機器、單次或雙次量測」，非長期追蹤的效能
+- 本文件僅涵蓋「單一情境、單一機器、三次手動量測」，非長期追蹤的效能
   回歸關卡；長期回歸偵測請見 [效能基準線](performance-baselines.md) 中的
   `eng/Benchmark-Regression.ps1`。
 - 手動計時模式的耗時量測未排除子行程啟動（JIT 暖身、組件載入）的一次性
