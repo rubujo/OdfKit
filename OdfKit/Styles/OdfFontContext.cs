@@ -540,23 +540,8 @@ public sealed class OdfFontContext
                 // 寫入套件並於指令清單中註冊
                 package.WriteEntry(zipPath, bytes, mediaType);
 
-                // 更新 DOM 專案 <style:font-face>
-                OdfNode? uriNode = null;
-                foreach (var child in fontFace.Children)
-                {
-                    if (child.LocalName == "font-face-uri" && child.NamespaceUri == OdfNamespaces.Style)
-                    {
-                        uriNode = child;
-                        break;
-                    }
-                }
-
-                if (uriNode is null)
-                {
-                    uriNode = new OdfNode(OdfNodeType.Element, "font-face-uri", OdfNamespaces.Style, "style");
-                    fontFace.AppendChild(uriNode);
-                }
-
+                // ODF 1.1 至 1.4 以 style:font-face > svg:font-face-src > svg:font-face-uri 表示字型來源。
+                OdfNode uriNode = FindOrCreateFontFaceUri(fontFace, ext);
                 uriNode.SetAttribute("href", OdfNamespaces.XLink, zipPath, "xlink");
                 uriNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
             }
@@ -642,8 +627,8 @@ public sealed class OdfFontContext
 
             string path = $"Fonts/Subsets/{SanitizePackagePathSegment(fontName!)}-subset{subset.Extension}";
             package.WriteEntry(path, subset.Bytes, subset.MediaType);
-            LinkFontSubset(contentRoot, fontName!, path);
-            LinkFontSubset(stylesRoot, fontName!, path);
+            LinkFontSubset(contentRoot, fontName!, path, subset.Extension);
+            LinkFontSubset(stylesRoot, fontName!, path, subset.Extension);
         }
     }
 
@@ -827,7 +812,7 @@ public sealed class OdfFontContext
             or >= 0xF0000 and <= 0xFFFFD
             or >= 0x100000 and <= 0x10FFFD;
 
-    private static void LinkFontSubset(OdfNode root, string fontName, string packagePath)
+    private static void LinkFontSubset(OdfNode root, string fontName, string packagePath, string extension)
     {
         List<OdfNode> fontFaces = [];
         GatherFontFaces(root, fontFaces);
@@ -835,27 +820,104 @@ public sealed class OdfFontContext
         {
             if (fontFace.GetAttribute("name", OdfNamespaces.Style) == fontName)
             {
-                OdfNode uriNode = FindOrCreateFontFaceUri(fontFace);
+                OdfNode uriNode = FindOrCreateFontFaceUri(fontFace, extension);
                 uriNode.SetAttribute("href", OdfNamespaces.XLink, packagePath, "xlink");
                 uriNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
             }
         }
     }
 
-    private static OdfNode FindOrCreateFontFaceUri(OdfNode fontFace)
+    private static OdfNode FindOrCreateFontFaceUri(OdfNode fontFace, string extension)
     {
+        OdfNode? sourceNode = null;
+        OdfNode? legacyUriNode = null;
         foreach (OdfNode child in fontFace.Children)
         {
-            if (child.LocalName == "font-face-uri" && child.NamespaceUri == OdfNamespaces.Style)
+            if (child.LocalName == "font-face-src" && child.NamespaceUri == OdfNamespaces.Svg)
             {
-                return child;
+                sourceNode = child;
+            }
+
+            if (child.LocalName == "font-face-uri")
+            {
+                legacyUriNode = child;
             }
         }
 
-        OdfNode uriNode = new(OdfNodeType.Element, "font-face-uri", OdfNamespaces.Style, "style");
-        fontFace.AppendChild(uriNode);
+        if (sourceNode is null)
+        {
+            sourceNode = new OdfNode(OdfNodeType.Element, "font-face-src", OdfNamespaces.Svg, "svg");
+            fontFace.AppendChild(sourceNode);
+        }
+
+        OdfNode? uriNode = null;
+        foreach (OdfNode child in sourceNode.Children)
+        {
+            if (child.LocalName == "font-face-uri" && child.NamespaceUri == OdfNamespaces.Svg)
+            {
+                uriNode = child;
+                break;
+            }
+        }
+
+        if (uriNode is null)
+        {
+            uriNode = new OdfNode(OdfNodeType.Element, "font-face-uri", OdfNamespaces.Svg, "svg");
+            sourceNode.AppendChild(uriNode);
+        }
+
+        if (legacyUriNode is not null)
+        {
+            CopyAttributeIfPresent(legacyUriNode, uriNode, "href", OdfNamespaces.XLink, "xlink");
+            CopyAttributeIfPresent(legacyUriNode, uriNode, "actuate", OdfNamespaces.XLink, "xlink");
+            fontFace.RemoveChild(legacyUriNode);
+        }
+
+        string? format = GetFontFaceFormat(extension);
+        if (format is not null)
+        {
+            OdfNode? formatNode = null;
+            foreach (OdfNode child in uriNode.Children)
+            {
+                if (child.LocalName == "font-face-format" && child.NamespaceUri == OdfNamespaces.Svg)
+                {
+                    formatNode = child;
+                    break;
+                }
+            }
+
+            if (formatNode is null)
+            {
+                formatNode = new OdfNode(OdfNodeType.Element, "font-face-format", OdfNamespaces.Svg, "svg");
+                uriNode.AppendChild(formatNode);
+            }
+
+            formatNode.SetAttribute("string", OdfNamespaces.Svg, format, "svg");
+        }
+
         return uriNode;
     }
+
+    private static void CopyAttributeIfPresent(
+        OdfNode source,
+        OdfNode destination,
+        string localName,
+        string namespaceUri,
+        string prefix)
+    {
+        string? value = source.GetAttribute(localName, namespaceUri);
+        if (value is not null)
+        {
+            destination.SetAttribute(localName, namespaceUri, value, prefix);
+        }
+    }
+
+    private static string? GetFontFaceFormat(string extension) => extension.ToLowerInvariant() switch
+    {
+        ".ttf" or ".ttc" => "truetype",
+        ".otf" or ".otc" => "opentype",
+        _ => null
+    };
 
     private static string SanitizePackagePathSegment(string value)
     {

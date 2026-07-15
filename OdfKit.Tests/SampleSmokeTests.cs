@@ -49,6 +49,7 @@ public class SampleSmokeTests
                 ("output_formula.odf", OdfDocumentKind.Formula),
                 ("output_image.odi", OdfDocumentKind.Image),
                 ("output_database.odb", OdfDocumentKind.Database),
+                ("cns11643-demo.odt", OdfDocumentKind.Text),
                 ("output_stream.ods", OdfDocumentKind.Spreadsheet),
                 ("output_stream.odt", OdfDocumentKind.Text)
             ];
@@ -66,6 +67,16 @@ public class SampleSmokeTests
                 OdfValidationReport report = OdfValidator.Validate(path);
                 Assert.True(report.IsValid, FormatIssues(fileName, report));
             }
+
+            string big5EPath = Path.Combine(outputDir, "cns11643-demo-big5e.csv");
+            Assert.True(File.Exists(big5EPath), $"範例產出檔案不存在：{big5EPath}");
+            byte[] big5EBytes = File.ReadAllBytes(big5EPath);
+            Assert.True(big5EBytes.Length >= 6, "Big5E CSV 內容長度不足。");
+            Assert.Equal([0x8E, 0x40, 0x2C, 0x8E, 0x41], big5EBytes[..5]);
+            Assert.True(
+                big5EBytes[5..].SequenceEqual(new byte[] { 0x0A }) ||
+                big5EBytes[5..].SequenceEqual(new byte[] { 0x0D, 0x0A }),
+                "Big5E CSV 應以 LF 或 CRLF 結尾。");
 
             Assert.False(File.Exists(Path.Combine(outputDir, "output_pdf.pdf")));
             Assert.False(File.Exists(Path.Combine(outputDir, "output_docx.docx")));

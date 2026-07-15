@@ -32,11 +32,11 @@ public static class OdfCns11643MappingTable
         }
 
         var result = new Dictionary<string, int>(StringComparer.Ordinal);
+        int parsedEntryCount = 0;
+        var lineReader = new OdfBoundedLineReader(reader);
         string? originalLine;
-        while ((originalLine = reader.ReadLine()) is not null)
+        while ((originalLine = lineReader.ReadLine()) is not null)
         {
-            OdfCodePointMappingTable.EnsureLineLength(originalLine);
-
             string line = originalLine.Trim();
             if (line.Length == 0)
             {
@@ -59,7 +59,8 @@ public static class OdfCns11643MappingTable
             }
 
             result[cnsCode] = value;
-            OdfCodePointMappingTable.EnsureEntryBudget(result.Count);
+            parsedEntryCount++;
+            OdfCodePointMappingTable.EnsureEntryBudget(parsedEntryCount);
         }
 
         return result;

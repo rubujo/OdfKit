@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'OdfKit/Core/OdfCns11643MappingTable.cs'
+      - 'OdfKit/Core/OdfCodePointMappingTable.cs'
       - 'OdfKit/Core/OdfBig5EEncoding.cs'
       - 'OdfKit/Core/OdfDocument.CodePointMigration.cs'
       - 'OdfKit/Core/OdfCodePointMigrationReport.cs'
@@ -18,6 +19,7 @@ on:
       - main
     paths:
       - 'OdfKit/Core/OdfCns11643MappingTable.cs'
+      - 'OdfKit/Core/OdfCodePointMappingTable.cs'
       - 'OdfKit/Core/OdfBig5EEncoding.cs'
       - 'OdfKit/Core/OdfDocument.CodePointMigration.cs'
       - 'OdfKit/Core/OdfCodePointMigrationReport.cs'

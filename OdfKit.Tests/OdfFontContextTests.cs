@@ -241,10 +241,34 @@ public class OdfFontContextTests
     public void CustomOptions_WithFontContext_CarriesContextThroughFactory()
     {
         var context = new OdfFontContext();
+        using IDisposable registration = context.RegisterSupplementaryPlaneFontMapping(
+            "Base", new Dictionary<int, string> { [2] = "Name" });
+        using TextDocument document = TextDocument.Create();
 
         OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Custom(
-            "Base", [new OdfFontFaceInfo("Name", "Family", null, null)], context);
+            "Base",
+            [
+                new OdfFontFaceInfo("Base", "Base Family", null, null),
+                new OdfFontFaceInfo("Name", "Family", null, null)
+            ],
+            context);
         Assert.Same(context, options.FontContext);
+
+        IReadOnlyList<OdfTextRun> runs = document.AddParagraph().AddText(
+            "甲" + char.ConvertFromUtf32(0x20BB7), options);
+        Assert.Equal(2, runs.Count);
+        Assert.Equal("Base", runs[0].FontName);
+        Assert.Equal("Name", runs[1].FontName);
+        Assert.Contains(
+            document.ContentDom.Descendants(),
+            node => node.LocalName == "font-face" &&
+                node.NamespaceUri == OdfNamespaces.Style &&
+                node.GetAttribute("name", OdfNamespaces.Style) == "Name");
+        Assert.Contains(
+            document.ContentDom.Descendants(),
+            node => node.LocalName == "font-face" &&
+                node.NamespaceUri == OdfNamespaces.Style &&
+                node.GetAttribute("name", OdfNamespaces.Style) == "Base");
 
         OdfTextFontFallbackOptions shortOverload = OdfTextFontFallbackOptions.Custom(
             "Base", [new OdfFontFaceInfo("Name", "Family", null, null)]);

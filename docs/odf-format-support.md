@@ -82,6 +82,30 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
 - `OdfFontContext` 的 `RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
   註冊與子集化擴充點；OdfKit 不內建政府字型，也不替第三方字型授權背書。
 
+上述四個層次不得混為同一項保證：
+
+1. **font-face 宣告**只是在 `content.xml`／`styles.xml` 中建立字型名稱與家族的 ODF 中繼資料，
+   不代表讀取端已安裝該字型，也不代表字型檔已嵌入封裝。
+2. **run 分段**只在呼叫帶有 `OdfTextFontFallbackOptions` 的高階文字寫入入口時執行；載入或解析
+   既有 ODF 不會自動掃描整份文件並重寫 run。分段依 Unicode 平面選擇字型名稱，不能讓 OpenType
+   GSUB／GPOS 跨越不同字型檔運作。
+3. **完整字型內嵌**由 `OdfFontContext.EmbedFonts` 將已解析的實體字型檔寫入封裝，並以 ODF 1.1～1.4
+   規定的 `style:font-face > svg:font-face-src > svg:font-face-uri` 結構連結；封裝中的字型檔會有
+   對應的 manifest media type。
+4. **字型子集內嵌**只在文件含 PUA 碼位且已註冊外部 `IFontSubsetter` 時於存檔管線執行。
+   OdfKit 核心沒有 TTF／OTF 子集編譯器，倉庫亦不存在 `OdfKit.Extensions.WebFont` 套件。
+   目前請求會把文件中蒐集到的 PUA 碼位集合交給每個已宣告的 font-face，尚未建立文字 run 至
+   實際字型的逐一碼位歸屬；外部實作應容忍來源字型沒有部分請求字形。
+
+`IFontSubsetter` 契約只傳遞字型名稱、可解析的檔案路徑與 PUA 碼位集合，並不保證保留 GSUB、
+GPOS、GDEF、垂直 metrics 或 Unicode variation sequence。OpenType 的 `vert`／`vrt2` 是 GSUB
+feature tags，不是獨立資料表；IVS 非預設變體通常由 `cmap` format 14 表示。因此，外部子集化器
+必須自行完成 glyph closure、所需 layout tables／feature records 與 variation selector 對應的保留，
+並以實際排版引擎驗證；僅「保留 GSUB 表」不足以宣稱直排或 IVS 完整相容。規格依據見
+[OpenType GSUB](https://learn.microsoft.com/en-us/typography/opentype/spec/gsub)、
+[`vert`／`vrt2` feature 定義](https://learn.microsoft.com/en-us/typography/opentype/otspec190/features_uz)
+與 [`cmap` format 14](https://learn.microsoft.com/en-us/typography/opentype/otspec190/cmap)。
+
 因此，現階段可說 OdfKit 具備全字庫與補充平面文字的 ODF 文件骨架支援；在缺少真實全字庫字型、
 CNS 11643 私用區碼位版本對照與 LibreOffice 開啟／匯出 PDF 的端到端 corpus 前，不應宣稱完整
 CNS 11643 官方語意相容或認證。
@@ -115,8 +139,8 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
   （`GlobalFontSettings.FontResolver`）為行程層級，一律使用 `Default` 情境；嵌入子文件與
   最外層文件共用封裝時，存檔內嵌以最外層文件的情境為準。
 
-OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選擇（含授權與來源政策考量）由使用者
-自行決定。
+OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何第三方罕字字型檔；字型選擇、實體檔案
+註冊、內嵌與授權政策仍由使用者自行決定。
 
 ### 中文碼對照、Big5／Big5E 與碼位遷移
 
@@ -124,15 +148,26 @@ OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選�
 對照表資料由使用者自[政府資料開放平臺](https://data.gov.tw/dataset/5961)下載
 （政府資料開放授權條款－第 1 版），倉庫不內建任何對照資料：
 
+> 資料來源標示：數位發展部，2026，CNS11643 中文標準交換碼全字庫中文碼對照表
+> （釘選快照 2026-05-05）。該資料依[政府資料開放授權條款－第 1 版](https://data.gov.tw/license)
+> 釋出。CI 只在驗證期間下載並快取原始封存檔，不會把對照表納入原始碼、NuGet 套件或發行成品；
+> 因此 OdfKit 原創程式碼維持 CC0，而政府資料本身不宣告為 CC0。若使用者另行散布對照表或其
+> 衍生資料，仍須履行原授權的顯名義務。全字庫資料集另提供 OFL 1.1 選項供字型用途選擇，
+> 本專案的中文碼對照表 baseline 明確採用 OGDL-Taiwan-1.0。
+
 - `OdfCns11643MappingTable.Parse`／`JoinOnCns`：解析官方「字面-編碼<TAB>十六進位」對照表
   格式並以 CNS 字碼聯結兩表（例如 CNS↔Unicode 聯 CNS↔Big5E 得 Unicode↔Big5E）。
 - `OdfBig5EEncoding.Create(unicodeToBig5E)`：由對照表驅動的 Big5E 編碼，可直接餵入
-  `OdfCsvOptions.Encoding`。CLI 的 `--encoding` 不內建 `big5e`（需外部資料）；Big5 則由
+  `OdfCsvOptions.Encoding`。官方資料若有多個 Unicode 純量值共用同一 Big5E 碼，解碼會以數值
+  最小的純量值作為確定性的 canonical 結果；因此 alias 不保證逐字往返，但解碼後重新編碼會
+  回到同一 Big5E 碼。CLI 的 `--encoding` 不內建 `big5e`（需外部資料）；Big5 則由
   .NET CP950 提供（`--encoding big5`），與官方 CNS↔Big5 表的差異經 baseline 測試量化為
   2 字（U+5F5E、U+7B9A 重複對應歧義字，CP950 不提供編碼）。
 - `OdfDocument.MigrateTextCodePoints(mapping)`：資料驅動的文件碼位遷移（含 ContentDom 與
   StylesDom），供舊版全字庫 PUA 自造字遷移至新版 Unicode 正式碼位的封存情境，回傳
-  `OdfCodePointMigrationReport` 統計。
+  `OdfCodePointMigrationReport` 統計。此方法只替換兩個 DOM 的文字節點，不會重新執行
+  `SegmentText` 或重套文字 run 的字型；若遷移前後跨越 Unicode 平面，呼叫端應在套用 fallback
+  樣式前先完成遷移，或於遷移後自行重建受影響的文字 runs。
 - CI baseline：`.github/workflows/cns11643-baseline.yml` 以釘選版本（2026-05-05、SHA-256
   驗證）的官方對照表執行全集驗收——10.4 萬 CNS↔Unicode 碼位的平面路由與分段無損、
   CP950 差異白名單、Big5E 全碼位編解碼往返。本機無資料時對應測試自動略過。

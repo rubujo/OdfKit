@@ -64,7 +64,7 @@ public sealed class OdfBig5EEncoding : Encoding
         var reverse = new Dictionary<int, int>();
         foreach (KeyValuePair<int, int> pair in unicodeToBig5E)
         {
-            if (!IsUnicodeScalar(pair.Key) || !IsValidBig5Code(pair.Value))
+            if (!IsUnicodeScalar(pair.Key) || pair.Key <= 0x7F || !IsValidBig5Code(pair.Value))
             {
                 throw new ArgumentException(
                     OdfLocalizer.GetMessage("Err_OdfBig5EEncoding_InvalidBig5Code"),
@@ -72,7 +72,7 @@ public sealed class OdfBig5EEncoding : Encoding
             }
 
             forward[pair.Key] = pair.Value;
-            if (!reverse.ContainsKey(pair.Value))
+            if (!reverse.TryGetValue(pair.Value, out int canonicalCodePoint) || pair.Key < canonicalCodePoint)
             {
                 reverse[pair.Value] = pair.Key;
             }
@@ -92,7 +92,7 @@ public sealed class OdfBig5EEncoding : Encoding
     public override int GetByteCount(char[] chars, int index, int count)
     {
         ValidateArraySegment(chars, index, count, nameof(chars), nameof(index), nameof(count));
-        return Encode(chars, index, count, null, 0);
+        return Encode(chars, index, count, null, 0, EncoderFallback);
     }
 
     /// <summary>
@@ -118,13 +118,7 @@ public sealed class OdfBig5EEncoding : Encoding
             throw new ArgumentOutOfRangeException(nameof(byteIndex));
         }
 
-        int required = Encode(chars, charIndex, charCount, null, 0);
-        if (required > bytes.Length - byteIndex)
-        {
-            throw new ArgumentException(null, nameof(bytes));
-        }
-
-        return Encode(chars, charIndex, charCount, bytes, byteIndex);
+        return Encode(chars, charIndex, charCount, bytes, byteIndex, EncoderFallback);
     }
 
     /// <summary>
@@ -138,7 +132,7 @@ public sealed class OdfBig5EEncoding : Encoding
     public override int GetCharCount(byte[] bytes, int index, int count)
     {
         ValidateArraySegment(bytes, index, count, nameof(bytes), nameof(index), nameof(count));
-        return Decode(bytes, index, count, null, 0);
+        return Decode(bytes, index, count, null, 0, DecoderFallback);
     }
 
     /// <summary>
@@ -164,14 +158,22 @@ public sealed class OdfBig5EEncoding : Encoding
             throw new ArgumentOutOfRangeException(nameof(charIndex));
         }
 
-        int required = Decode(bytes, byteIndex, byteCount, null, 0);
-        if (required > chars.Length - charIndex)
-        {
-            throw new ArgumentException(null, nameof(chars));
-        }
-
-        return Decode(bytes, byteIndex, byteCount, chars, charIndex);
+        return Decode(bytes, byteIndex, byteCount, chars, charIndex, DecoderFallback);
     }
+
+    /// <summary>
+    /// Creates a stateful encoder for block-based conversion.
+    /// 建立用於區塊式轉換的具狀態編碼器。
+    /// </summary>
+    /// <returns>A stateful Big5E encoder. / 具狀態的 Big5E 編碼器。</returns>
+    public override Encoder GetEncoder() => new Big5EEncoder(this);
+
+    /// <summary>
+    /// Creates a stateful decoder for block-based conversion.
+    /// 建立用於區塊式轉換的具狀態解碼器。
+    /// </summary>
+    /// <returns>A stateful Big5E decoder. / 具狀態的 Big5E 解碼器。</returns>
+    public override Decoder GetDecoder() => new Big5EDecoder(this);
 
     /// <summary>
     /// Gets a safe upper bound for bytes produced from a character count.
@@ -181,12 +183,19 @@ public sealed class OdfBig5EEncoding : Encoding
     /// <returns>A safe maximum byte count. / 安全的最大位元組數量。</returns>
     public override int GetMaxByteCount(int charCount)
     {
-        if (charCount < 0 || charCount > (int.MaxValue - 2) / 2)
+        if (charCount < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(charCount));
         }
 
-        return (charCount * 2) + 2;
+        long multiplier = Math.Max(2L, EncoderFallback.MaxCharCount * 2L);
+        long maximum = (charCount + 1L) * multiplier;
+        if (maximum > int.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(nameof(charCount));
+        }
+
+        return (int)maximum;
     }
 
     /// <summary>
@@ -202,22 +211,39 @@ public sealed class OdfBig5EEncoding : Encoding
             throw new ArgumentOutOfRangeException(nameof(byteCount));
         }
 
-        return byteCount;
+        long multiplier = Math.Max(1, DecoderFallback.MaxCharCount);
+        long maximum = (byteCount + 1L) * multiplier;
+        if (maximum > int.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(nameof(byteCount));
+        }
+
+        return (int)maximum;
     }
 
-    private int Encode(char[] chars, int index, int count, byte[]? bytes, int byteIndex)
+    private int Encode(
+        char[] chars,
+        int index,
+        int count,
+        byte[]? bytes,
+        int byteIndex,
+        EncoderFallback fallback)
     {
         int end = index + count;
         int written = 0;
+        EncoderFallbackBuffer? fallbackBuffer = null;
         while (index < end)
         {
+            int sourceIndex = index;
             char current = chars[index];
             int codePoint;
+            bool isSurrogatePair = false;
             if (char.IsHighSurrogate(current) &&
                 index + 1 < end &&
                 char.IsLowSurrogate(chars[index + 1]))
             {
                 codePoint = char.ConvertToUtf32(current, chars[index + 1]);
+                isSurrogatePair = true;
                 index += 2;
             }
             else
@@ -239,20 +265,34 @@ public sealed class OdfBig5EEncoding : Encoding
             }
             else
             {
-                WriteByte(bytes, byteIndex + written, 0x3F);
-                written++;
+                fallbackBuffer ??= fallback.CreateFallbackBuffer();
+                bool hasFallback = isSurrogatePair
+                    ? fallbackBuffer.Fallback(current, chars[sourceIndex + 1], sourceIndex)
+                    : fallbackBuffer.Fallback(current, sourceIndex);
+                if (hasFallback)
+                {
+                    written += EncodeFallback(fallbackBuffer, bytes, byteIndex + written, sourceIndex);
+                }
             }
         }
 
         return written;
     }
 
-    private int Decode(byte[] bytes, int index, int count, char[]? chars, int charIndex)
+    private int Decode(
+        byte[] bytes,
+        int index,
+        int count,
+        char[]? chars,
+        int charIndex,
+        DecoderFallback fallback)
     {
         int end = index + count;
         int written = 0;
+        DecoderFallbackBuffer? fallbackBuffer = null;
         while (index < end)
         {
+            int sourceIndex = index;
             byte current = bytes[index++];
             if (current < 0x80)
             {
@@ -263,9 +303,11 @@ public sealed class OdfBig5EEncoding : Encoding
 
             if (current is >= 0x81 and <= 0xFE && index < end)
             {
-                int big5Code = (current << 8) | bytes[index++];
-                if (_big5EToUnicode.TryGetValue(big5Code, out int codePoint))
+                byte trail = bytes[index];
+                int big5Code = (current << 8) | trail;
+                if (IsValidBig5Code(big5Code) && _big5EToUnicode.TryGetValue(big5Code, out int codePoint))
                 {
+                    index++;
                     if (codePoint <= 0xFFFF)
                     {
                         WriteChar(chars, charIndex + written, (char)codePoint);
@@ -281,13 +323,353 @@ public sealed class OdfBig5EEncoding : Encoding
 
                     continue;
                 }
+
+                if (IsValidBig5Code(big5Code))
+                {
+                    index++;
+                    fallbackBuffer ??= fallback.CreateFallbackBuffer();
+                    written += DecodeFallback(
+                        fallbackBuffer,
+                        [current, trail],
+                        sourceIndex,
+                        chars,
+                        charIndex + written);
+                    continue;
+                }
             }
 
-            WriteChar(chars, charIndex + written, '?');
+            fallbackBuffer ??= fallback.CreateFallbackBuffer();
+            written += DecodeFallback(
+                fallbackBuffer,
+                [current],
+                sourceIndex,
+                chars,
+                charIndex + written);
+        }
+
+        return written;
+    }
+
+    private int EncodeFallback(
+        EncoderFallbackBuffer fallbackBuffer,
+        byte[]? bytes,
+        int byteIndex,
+        int sourceIndex)
+    {
+        int written = 0;
+        while (fallbackBuffer.Remaining > 0)
+        {
+            char current = fallbackBuffer.GetNextChar();
+            int codePoint = current;
+            if (char.IsHighSurrogate(current) && fallbackBuffer.Remaining > 0)
+            {
+                char low = fallbackBuffer.GetNextChar();
+                if (char.IsLowSurrogate(low))
+                {
+                    codePoint = char.ConvertToUtf32(current, low);
+                }
+                else
+                {
+                    fallbackBuffer.MovePrevious();
+                }
+            }
+
+            if (codePoint <= 0x7F)
+            {
+                WriteByte(bytes, byteIndex + written, (byte)codePoint);
+                written++;
+            }
+            else if (_unicodeToBig5E.TryGetValue(codePoint, out int big5Code))
+            {
+                WriteByte(bytes, byteIndex + written, (byte)(big5Code >> 8));
+                WriteByte(bytes, byteIndex + written + 1, (byte)big5Code);
+                written += 2;
+            }
+            else
+            {
+                throw new EncoderFallbackException();
+            }
+        }
+
+        return written;
+    }
+
+    private static int DecodeFallback(
+        DecoderFallbackBuffer fallbackBuffer,
+        byte[] bytesUnknown,
+        int sourceIndex,
+        char[]? chars,
+        int charIndex)
+    {
+        if (!fallbackBuffer.Fallback(bytesUnknown, sourceIndex))
+        {
+            return 0;
+        }
+
+        int written = 0;
+        while (fallbackBuffer.Remaining > 0)
+        {
+            WriteChar(chars, charIndex + written, fallbackBuffer.GetNextChar());
             written++;
         }
 
         return written;
+    }
+
+    private static char[] PrepareEncoderInput(
+        char[] chars,
+        int index,
+        int count,
+        char pendingHighSurrogate,
+        bool flush,
+        out int inputIndex,
+        out int inputCount,
+        out char nextPendingHighSurrogate)
+    {
+        inputIndex = index;
+        inputCount = count;
+        nextPendingHighSurrogate = '\0';
+        if (pendingHighSurrogate == '\0')
+        {
+            if (!flush && count > 0 && char.IsHighSurrogate(chars[index + count - 1]))
+            {
+                inputCount--;
+                nextPendingHighSurrogate = chars[index + count - 1];
+            }
+
+            return chars;
+        }
+
+        int prefixLength = pendingHighSurrogate == '\0' ? 0 : 1;
+        var input = new char[prefixLength + count];
+        if (prefixLength != 0)
+        {
+            input[0] = pendingHighSurrogate;
+        }
+
+        Array.Copy(chars, index, input, prefixLength, count);
+        inputIndex = 0;
+        inputCount = input.Length;
+        if (!flush && input.Length > 0 && char.IsHighSurrogate(input[input.Length - 1]))
+        {
+            nextPendingHighSurrogate = input[input.Length - 1];
+            inputCount--;
+        }
+
+        return input;
+    }
+
+    private static byte[] PrepareDecoderInput(
+        byte[] bytes,
+        int index,
+        int count,
+        byte pendingLeadByte,
+        bool flush,
+        out int inputIndex,
+        out int inputCount,
+        out byte nextPendingLeadByte)
+    {
+        inputIndex = index;
+        inputCount = count;
+        nextPendingLeadByte = 0;
+        if (pendingLeadByte == 0)
+        {
+            if (!flush && count > 0 && bytes[index + count - 1] is >= 0x81 and <= 0xFE)
+            {
+                inputCount--;
+                nextPendingLeadByte = bytes[index + count - 1];
+            }
+
+            return bytes;
+        }
+
+        int prefixLength = pendingLeadByte == 0 ? 0 : 1;
+        var input = new byte[prefixLength + count];
+        if (prefixLength != 0)
+        {
+            input[0] = pendingLeadByte;
+        }
+
+        Array.Copy(bytes, index, input, prefixLength, count);
+        inputIndex = 0;
+        inputCount = input.Length;
+        if (!flush && input.Length > 0 && input[input.Length - 1] is >= 0x81 and <= 0xFE)
+        {
+            nextPendingLeadByte = input[input.Length - 1];
+            inputCount--;
+        }
+
+        return input;
+    }
+
+    private sealed class Big5EEncoder : Encoder
+    {
+        private readonly OdfBig5EEncoding _encoding;
+        private char _pendingHighSurrogate;
+
+        internal Big5EEncoder(OdfBig5EEncoding encoding)
+        {
+            _encoding = encoding;
+            Fallback = encoding.EncoderFallback;
+        }
+
+        public override int GetByteCount(char[] chars, int index, int count, bool flush)
+        {
+            ValidateArraySegment(chars, index, count, nameof(chars), nameof(index), nameof(count));
+            char[] input = PrepareEncoderInput(
+                chars,
+                index,
+                count,
+                _pendingHighSurrogate,
+                flush,
+                out int inputIndex,
+                out int inputCount,
+                out _);
+            return _encoding.Encode(
+                input,
+                inputIndex,
+                inputCount,
+                null,
+                0,
+                Fallback ?? _encoding.EncoderFallback);
+        }
+
+        public override int GetBytes(
+            char[] chars,
+            int charIndex,
+            int charCount,
+            byte[] bytes,
+            int byteIndex,
+            bool flush)
+        {
+            ValidateArraySegment(chars, charIndex, charCount, nameof(chars), nameof(charIndex), nameof(charCount));
+            if (bytes is null)
+            {
+                throw new ArgumentNullException(nameof(bytes));
+            }
+
+            if (byteIndex < 0 || byteIndex > bytes.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(byteIndex));
+            }
+
+            char[] input = PrepareEncoderInput(
+                chars,
+                charIndex,
+                charCount,
+                _pendingHighSurrogate,
+                flush,
+                out int inputIndex,
+                out int inputCount,
+                out char nextPendingHighSurrogate);
+            EncoderFallback fallback = Fallback ?? _encoding.EncoderFallback;
+            int written = _encoding.Encode(input, inputIndex, inputCount, bytes, byteIndex, fallback);
+            _pendingHighSurrogate = nextPendingHighSurrogate;
+            return written;
+        }
+
+        public override void Reset()
+        {
+            _pendingHighSurrogate = '\0';
+            FallbackBuffer.Reset();
+        }
+    }
+
+    private sealed class Big5EDecoder : Decoder
+    {
+        private readonly OdfBig5EEncoding _encoding;
+        private byte _pendingLeadByte;
+
+        internal Big5EDecoder(OdfBig5EEncoding encoding)
+        {
+            _encoding = encoding;
+            Fallback = encoding.DecoderFallback;
+        }
+
+        public override int GetCharCount(byte[] bytes, int index, int count)
+        {
+            ValidateArraySegment(bytes, index, count, nameof(bytes), nameof(index), nameof(count));
+            byte[] input = PrepareDecoderInput(
+                bytes,
+                index,
+                count,
+                _pendingLeadByte,
+                flush: false,
+                out int inputIndex,
+                out int inputCount,
+                out _);
+            return _encoding.Decode(
+                input,
+                inputIndex,
+                inputCount,
+                null,
+                0,
+                Fallback ?? _encoding.DecoderFallback);
+        }
+
+        public override int GetCharCount(byte[] bytes, int index, int count, bool flush)
+        {
+            ValidateArraySegment(bytes, index, count, nameof(bytes), nameof(index), nameof(count));
+            byte[] input = PrepareDecoderInput(
+                bytes,
+                index,
+                count,
+                _pendingLeadByte,
+                flush,
+                out int inputIndex,
+                out int inputCount,
+                out _);
+            return _encoding.Decode(
+                input,
+                inputIndex,
+                inputCount,
+                null,
+                0,
+                Fallback ?? _encoding.DecoderFallback);
+        }
+
+        public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
+            => GetChars(bytes, byteIndex, byteCount, chars, charIndex, flush: false);
+
+        public override int GetChars(
+            byte[] bytes,
+            int byteIndex,
+            int byteCount,
+            char[] chars,
+            int charIndex,
+            bool flush)
+        {
+            ValidateArraySegment(bytes, byteIndex, byteCount, nameof(bytes), nameof(byteIndex), nameof(byteCount));
+            if (chars is null)
+            {
+                throw new ArgumentNullException(nameof(chars));
+            }
+
+            if (charIndex < 0 || charIndex > chars.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(charIndex));
+            }
+
+            byte[] input = PrepareDecoderInput(
+                bytes,
+                byteIndex,
+                byteCount,
+                _pendingLeadByte,
+                flush,
+                out int inputIndex,
+                out int inputCount,
+                out byte nextPendingLeadByte);
+            DecoderFallback fallback = Fallback ?? _encoding.DecoderFallback;
+            int written = _encoding.Decode(input, inputIndex, inputCount, chars, charIndex, fallback);
+            _pendingLeadByte = nextPendingLeadByte;
+            return written;
+        }
+
+        public override void Reset()
+        {
+            _pendingLeadByte = 0;
+            FallbackBuffer.Reset();
+        }
     }
 
     private static void ValidateArraySegment<T>(
@@ -318,6 +700,11 @@ public sealed class OdfBig5EEncoding : Encoding
     {
         if (bytes is not null)
         {
+            if ((uint)index >= (uint)bytes.Length)
+            {
+                throw new ArgumentException(null, nameof(bytes));
+            }
+
             bytes[index] = value;
         }
     }
@@ -326,6 +713,11 @@ public sealed class OdfBig5EEncoding : Encoding
     {
         if (chars is not null)
         {
+            if ((uint)index >= (uint)chars.Length)
+            {
+                throw new ArgumentException(null, nameof(chars));
+            }
+
             chars[index] = value;
         }
     }

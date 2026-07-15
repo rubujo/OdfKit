@@ -32,6 +32,8 @@
 自訂罕字字型情境（`OdfFontContext` + `Custom(baseFont, fontFaces, fontContext)`）、PUA 自造字
 碼位遷移（`MigrateTextCodePoints`）與 Big5E 編碼 CSV 匯出（`OdfCns11643MappingTable` +
 `OdfBig5EEncoding`，範例用合成小表；實務對照表請自[政府資料開放平臺](https://data.gov.tw/dataset/5961)下載）。
+`MigrateTextCodePoints` 只替換文字節點內容，不會重新分段或重套既有字型樣式；若碼位跨越
+Unicode 平面，應如範例先遷移未套用平面字型樣式的文字，再使用遞補選項分段。
 支援邊界詳見 [docs/odf-format-support.md](../docs/odf-format-support.md)。
 
 ## 公文 ODT 範例

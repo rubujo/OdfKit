@@ -66,6 +66,8 @@ public class OdfCodePointMappingTableTests
             () => OdfCodePointMappingTable.ParseDelimitedHex(new StringReader("only-one-field"), '\t'));
         Assert.Throws<FormatException>(
             () => OdfCodePointMappingTable.ParseDelimitedHex(new StringReader("XYZ\t4E00"), '\t'));
+        Assert.Throws<FormatException>(
+            () => OdfCodePointMappingTable.ParseDelimitedHex(new StringReader("E000;;4E00"), ';'));
     }
 
     /// <summary>
@@ -115,6 +117,12 @@ public class OdfCodePointMappingTableTests
         string longLine = new string('A', 5_000) + "\t4E00";
         Assert.Throws<FormatException>(
             () => OdfCodePointMappingTable.ParseDelimitedHex(new StringReader(longLine), '\t'));
+
+        string boundaryCrLf = new string(' ', 1_023) + "\r\n4E00\t4E01";
+        IReadOnlyDictionary<int, int> boundaryResult = OdfCodePointMappingTable.ParseDelimitedHex(
+            new StringReader(boundaryCrLf),
+            '\t');
+        Assert.Equal(0x4E01, boundaryResult[0x4E00]);
 
         // 8 位十六進位（FFFFFFFF）溢位為負值：視為無效輸入
         Assert.Throws<FormatException>(

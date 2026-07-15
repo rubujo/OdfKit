@@ -757,16 +757,26 @@ static void DemoCns11643RareCharacters(string outputDir)
     string plane2Char = char.ConvertFromUtf32(0x20BB7); // 𠮷
     string puaChar = char.ConvertFromUtf32(0xF0000);    // 舊版全字庫 PUA 自造字碼位
 
-    // 9-1. 全字庫（CNS 11643）字型遞補：AddText 依 Unicode 平面自動分段，
-    //      Plane 2 → TW-Kai-Ext-B-98_1、PUA → TW-Kai-Plus-98_1，並自動宣告 font-face。
     using var document = TextDocument.Create();
     document.Metadata.Title = "CNS 11643 罕字示範";
+
+    // 9-1. PUA 自造字碼位遷移：先遷移未套用平面字型樣式的文字，再進行後續分段。
+    //      MigrateTextCodePoints 只替換文字節點內容，不會重新分段或重套既有字型樣式。
+    //      實務上的對應表應以全字庫 open data 的新舊版 CNS↔Unicode 對照表推導。
+    OdfParagraph migrationParagraph = document.AddParagraph();
+    migrationParagraph.AddTextRun("待遷移的舊版 PUA 自造字：" + puaChar);
+    OdfCodePointMigrationReport report = document.MigrateTextCodePoints(
+        new Dictionary<int, int> { [0xF0000] = 0x20BB7 });
+    Console.WriteLine($"    碼位遷移：替換 {report.TotalReplacements} 處、影響 {report.AffectedTextNodes} 個文字節點");
+
+    // 9-2. 全字庫（CNS 11643）字型遞補：AddText 依 Unicode 平面自動分段，
+    //      Plane 2 → TW-Kai-Ext-B-98_1、PUA → TW-Kai-Plus-98_1，並自動宣告 font-face。
     OdfParagraph paragraph = document.AddParagraph();
     paragraph.AddText(
         "含罕字的公文內容：" + plane2Char + "字與自造字" + puaChar + "。",
         OdfTextFontFallbackOptions.Cns11643());
 
-    // 9-2. 自訂罕字字型情境：以獨立 OdfFontContext 註冊「基礎字型 → 平面 → 字型」對應
+    // 9-3. 自訂罕字字型情境：以獨立 OdfFontContext 註冊「基礎字型 → 平面 → 字型」對應
     //      （例如自備的黑體系 Ext B–J 補字字型），經 Custom 的 fontContext 參數注入即可
     //      隔離生效，不影響行程層級的 OdfFontContext.Default。
     var customContext = new OdfFontContext();
@@ -778,15 +788,11 @@ static void DemoCns11643RareCharacters(string outputDir)
         "自訂罕字字型：" + plane2Char,
         OdfTextFontFallbackOptions.Custom(
             "CustomGothic",
-            [new OdfFontFaceInfo("CustomGothic ExtB", "CustomGothic ExtB", "system-sans-serif", "variable")],
+            [
+                new OdfFontFaceInfo("CustomGothic", "CustomGothic", "system-sans-serif", "variable"),
+                new OdfFontFaceInfo("CustomGothic ExtB", "CustomGothic ExtB", "system-sans-serif", "variable")
+            ],
             customContext));
-
-    // 9-3. PUA 自造字碼位遷移：舊版全字庫把無 Unicode 對應的字放在 PUA，
-    //      新版對照表提供正式碼位後，可用 MigrateTextCodePoints 批次遷移並取得統計報告。
-    //      實務上的對應表應以全字庫 open data 的新舊版 CNS↔Unicode 對照表推導。
-    OdfCodePointMigrationReport report = document.MigrateTextCodePoints(
-        new Dictionary<int, int> { [0xF0000] = 0x20BB7 });
-    Console.WriteLine($"    碼位遷移：替換 {report.TotalReplacements} 處、影響 {report.AffectedTextNodes} 個文字節點");
 
     string odtPath = Path.Combine(outputDir, "cns11643-demo.odt");
     document.Save(odtPath);

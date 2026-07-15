@@ -19,14 +19,12 @@ namespace OdfKit.Core;
 /// are not validated as Unicode scalars because targets may be non-Unicode codes (for example Big5).
 /// Both parsers enforce a documented resource budget: at most 4,096 characters per line and
 /// 2,000,000 entries per table; exceeding either throws <see cref="FormatException"/>. Mapping
-/// tables are operator-supplied configuration data — the line length check runs after the line has
-/// been read, so callers ingesting untrusted streams should additionally bound the input size upfront.
+/// A bounded buffered reader rejects overlong lines before allocating their complete contents.
 /// 行式的十六進位對照表（Unicode.org 官方對照檔、UCD 式清單）用 <see cref="ParseDelimitedHex"/>；
 /// 自訂行格式用帶委派的 <see cref="Parse"/>；JSON 或試算表來源（例如日本 MJ 縮退對照）請由呼叫端
 /// 以對應的反序列化器自行轉換。解析值不做 Unicode 純量驗證，因為目標值可能是非 Unicode 碼（例如 Big5）。
 /// 兩個解析方法皆施行文件化的資源預算：每行至多 4,096 字元、每表至多 2,000,000 筆，超出即擲出
-/// <see cref="FormatException"/>。對照表屬營運端提供的設定資料——行長檢查在該行讀入後才執行，
-/// 若要餵入不可信串流，呼叫端應另行預先限制輸入大小。
+/// <see cref="FormatException"/>。解析器使用受限緩衝讀取，在配置完整資料行前即拒絕超長輸入。
 /// </remarks>
 public static class OdfCodePointMappingTable
 {
@@ -66,18 +64,18 @@ public static class OdfCodePointMappingTable
 
         char[] separators = [separator];
         var result = new Dictionary<int, int>();
+        int parsedEntryCount = 0;
+        var lineReader = new OdfBoundedLineReader(reader);
         string? originalLine;
-        while ((originalLine = reader.ReadLine()) is not null)
+        while ((originalLine = lineReader.ReadLine()) is not null)
         {
-            EnsureLineLength(originalLine);
-
             string line = StripComment(originalLine).Trim();
             if (line.Length == 0)
             {
                 continue;
             }
 
-            string[] fields = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            string[] fields = line.Split(separators, StringSplitOptions.None);
             if (fields.Length < 2 ||
                 !TryParseHexField(fields[0], out int key) ||
                 !TryParseHexField(fields[1], out int value))
@@ -87,7 +85,8 @@ public static class OdfCodePointMappingTable
             }
 
             result[key] = value;
-            EnsureEntryBudget(result.Count);
+            parsedEntryCount++;
+            EnsureEntryBudget(parsedEntryCount);
         }
 
         return result;
@@ -122,11 +121,11 @@ public static class OdfCodePointMappingTable
         }
 
         var result = new Dictionary<int, int>();
+        int parsedEntryCount = 0;
+        var boundedReader = new OdfBoundedLineReader(reader);
         string? line;
-        while ((line = reader.ReadLine()) is not null)
+        while ((line = boundedReader.ReadLine()) is not null)
         {
-            EnsureLineLength(line);
-
             if (string.IsNullOrWhiteSpace(line))
             {
                 continue;
@@ -135,7 +134,8 @@ public static class OdfCodePointMappingTable
             if (lineParser(line) is KeyValuePair<int, int> pair)
             {
                 result[pair.Key] = pair.Value;
-                EnsureEntryBudget(result.Count);
+                parsedEntryCount++;
+                EnsureEntryBudget(parsedEntryCount);
             }
         }
 

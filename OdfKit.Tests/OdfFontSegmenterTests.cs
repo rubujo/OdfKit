@@ -85,6 +85,51 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
+    /// 驗證未註冊自訂規則時，內建規則不處理的增補平面維持基礎字型，Plane 16 則維持既有的 PUA 遞補行為。
+    /// </summary>
+    [Theory]
+    [InlineData(1, "BiauKai-UnitTest")]
+    [InlineData(4, "BiauKai-UnitTest")]
+    [InlineData(5, "BiauKai-UnitTest")]
+    [InlineData(6, "BiauKai-UnitTest")]
+    [InlineData(7, "BiauKai-UnitTest")]
+    [InlineData(8, "BiauKai-UnitTest")]
+    [InlineData(9, "BiauKai-UnitTest")]
+    [InlineData(10, "BiauKai-UnitTest")]
+    [InlineData(11, "BiauKai-UnitTest")]
+    [InlineData(12, "BiauKai-UnitTest")]
+    [InlineData(13, "BiauKai-UnitTest")]
+    [InlineData(14, "BiauKai-UnitTest")]
+    [InlineData(16, "TW-Kai-Plus-98_1")]
+    public void SegmentText_WithoutCustomMapping_PreservesSupplementaryPlaneRouting(
+        int plane,
+        string expectedFont)
+    {
+        const string baseFont = "BiauKai-UnitTest";
+        string supplementaryCharacter = char.ConvertFromUtf32(plane << 16);
+
+        var segments = OdfFontContext.Default.SegmentText(
+            "前" + supplementaryCharacter + "後",
+            baseFont);
+
+        if (expectedFont == baseFont)
+        {
+            Assert.Single(segments);
+            Assert.Equal("前" + supplementaryCharacter + "後", segments[0].Text);
+            Assert.Equal(baseFont, segments[0].FontName);
+            return;
+        }
+
+        Assert.Equal(3, segments.Count);
+        Assert.Equal("前", segments[0].Text);
+        Assert.Equal(baseFont, segments[0].FontName);
+        Assert.Equal(supplementaryCharacter, segments[1].Text);
+        Assert.Equal(expectedFont, segments[1].FontName);
+        Assert.Equal("後", segments[2].Text);
+        Assert.Equal(baseFont, segments[2].FontName);
+    }
+
+    /// <summary>
     /// 驗證註冊字型子集化擴充點後，存檔會掃描 PUA 字元、嵌入子集字型並更新 font-face-uri。
     /// </summary>
     [Fact]
