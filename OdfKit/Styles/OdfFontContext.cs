@@ -410,6 +410,7 @@ public sealed class OdfFontContext
         int len = text.Length;
         var sb = new StringBuilder();
         string currentFont = defaultFontName;
+        string?[]? planeFontCache = null;
 
         while (i < len)
         {
@@ -429,15 +430,13 @@ public sealed class OdfFontContext
             int plane = codePoint >> 16;
             string targetFont = defaultFontName;
 
-            if (plane >= 1 && GetCustomPlaneFontName(defaultFontName, plane) is string customFont)
+            if (plane >= 1)
             {
-                // 自訂規則可涵蓋任何增補平面（含 Plane 1 SMP 與未來新增區塊）。
-                targetFont = customFont;
-            }
-            else if (plane == 2 || plane == 3 || plane == 15 || plane == 16)
-            {
-                // 內建規則維持既有行為：僅處理 CJK 罕字實際使用的平面。
-                targetFont = GetSupplementaryPlaneFontName(defaultFontName, plane);
+                // 每呼叫平面字型快取：同一次分段中基礎字型不變、平面至多 16 個，
+                // 把逐字元的規則鏈評估（多次 Contains）攤提為每個平面一次；
+                // 純 BMP 文字不會進入此分支，維持零額外配置的快路徑。
+                planeFontCache ??= new string?[17];
+                targetFont = planeFontCache[plane] ??= ResolveSupplementaryPlaneFont(defaultFontName, plane);
             }
 
             if (targetFont != currentFont)
@@ -735,6 +734,27 @@ public sealed class OdfFontContext
         }
 
         // 其餘常規字型（如思源黑體、Noto Sans、微軟正黑體等）不進行任何拆分字型對照，直接傳回原字型
+        return baseFontFamily;
+    }
+
+    /// <summary>
+    /// 解析單一增補平面的目標字型：自訂規則優先（涵蓋 Plane 1 至 16），其後為內建規則
+    /// （僅 CJK 罕字實際使用的平面），皆未命中時維持基礎字型。
+    /// </summary>
+    private string ResolveSupplementaryPlaneFont(string baseFontFamily, int plane)
+    {
+        if (GetCustomPlaneFontName(baseFontFamily, plane) is string customFontName)
+        {
+            return customFontName;
+        }
+
+        if (plane is 2 or 3 or 15 or 16)
+        {
+            return GetBuiltInSupplementaryPlaneFontName(
+                string.IsNullOrEmpty(baseFontFamily) ? DefaultBaseFontFamily : baseFontFamily,
+                plane);
+        }
+
         return baseFontFamily;
     }
 
