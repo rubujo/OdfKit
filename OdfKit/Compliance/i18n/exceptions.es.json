@@ -582,5 +582,9 @@
   "Err_StreamReader_ResourceLimitExceeded": "Se superó el límite de recursos del lector de flujo ({0} > {1}).",
   "Err_OdfFontContext_PlaneOutOfRange": "Las asignaciones de fuentes por plano deben usar números de plano Unicode entre 1 y 16.",
   "Err_OdfFontContext_PlaneFontNameEmpty": "Las asignaciones de fuentes por plano deben especificar un nombre de fuente no vacío para cada plano.",
-  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Las declaraciones font-face personalizadas deben especificar un nombre y una familia no vacíos."
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Las declaraciones font-face personalizadas deben especificar un nombre y una familia no vacíos.",
+  "Err_OdfCodePointMigration_MappingCodePointInvalid": "Las asignaciones de puntos de código deben usar valores escalares Unicode válidos (U+0000 a U+10FFFF, excluyendo sustitutos).",
+  "Err_OdfBig5EEncoding_MappingEmpty": "La codificación Big5E requiere una asignación de Unicode a Big5E no vacía.",
+  "Err_OdfBig5EEncoding_InvalidBig5Code": "Los valores de código Big5E deben ser códigos Big5 de doble byte válidos (byte inicial de 0x81 a 0xFE).",
+  "Err_OdfCnsMappingTable_InvalidLine": "La línea de la tabla de asignación CNS 11643 no tiene el formato esperado \"plano-código<TAB>hexadecimal\": {0}."
 }

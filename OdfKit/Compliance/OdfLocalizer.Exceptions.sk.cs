@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Mapovania písiem podľa rovín musia používať čísla rovín Unicode od 1 do 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Mapovania písiem podľa rovín musia pre každú rovinu určiť neprázdny názov písma.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Vlastné deklarácie font-face musia určiť neprázdny názov a rodinu písma.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Mapovania kódových bodov musia používať platné skalárne hodnoty Unicode (U+0000 až U+10FFFF, bez náhradných párov).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Kódovanie Big5E vyžaduje neprázdne mapovanie Unicode na Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Hodnoty kódu Big5E musia byť platné dvojbajtové kódy Big5 (úvodný bajt 0x81 až 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "Riadok mapovacej tabuľky CNS 11643 nemá očakávaný formát „rovina-kód<TAB>hex“: {0}.",
         };
     }
 }

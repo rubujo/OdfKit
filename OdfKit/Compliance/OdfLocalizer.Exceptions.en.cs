@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Plane font mappings must use Unicode plane numbers between 1 and 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Plane font mappings must specify a non-empty font name for every plane.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Custom font-face declarations must specify a non-empty name and family.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Code point mappings must use valid Unicode scalar values (U+0000 to U+10FFFF, excluding surrogates).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E encoding requires a non-empty Unicode to Big5E mapping.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E code values must be valid double-byte Big5 codes (lead byte 0x81 to 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "The CNS 11643 mapping table line is not in the expected \"plane-code<TAB>hex\" format: {0}.",
         };
     }
 }

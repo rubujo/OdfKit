@@ -1,0 +1,93 @@
+name: CNS 11643 baseline
+
+on:
+  pull_request:
+    paths:
+      - 'OdfKit/Core/OdfCns11643MappingTable.cs'
+      - 'OdfKit/Core/OdfBig5EEncoding.cs'
+      - 'OdfKit/Core/OdfDocument.CodePointMigration.cs'
+      - 'OdfKit/Core/OdfCodePointMigrationReport.cs'
+      - 'OdfKit/Styles/OdfFontContext.cs'
+      - 'OdfKit.Tests/Cns11643OpenDataBaselineTests.cs'
+      - 'eng/Install-Cns11643MappingTables.ps1'
+      - 'eng/external-tools.json'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/cns11643-baseline.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'OdfKit/Core/OdfCns11643MappingTable.cs'
+      - 'OdfKit/Core/OdfBig5EEncoding.cs'
+      - 'OdfKit/Core/OdfDocument.CodePointMigration.cs'
+      - 'OdfKit/Core/OdfCodePointMigrationReport.cs'
+      - 'OdfKit/Styles/OdfFontContext.cs'
+      - 'OdfKit.Tests/Cns11643OpenDataBaselineTests.cs'
+      - 'eng/Install-Cns11643MappingTables.ps1'
+      - 'eng/external-tools.json'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/cns11643-baseline.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: cns11643-baseline-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-against-cns11643-opendata:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+
+      - name: Read pinned mapping tables metadata
+        id: tables
+        shell: pwsh
+        run: |
+          $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).cns11643MappingTables
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE `
+            "odfkit/cns11643-mappingtables/r$($tool.cacheRevision)/$($tool.version)/$($tool.sha256)"
+          "cache_revision=$($tool.cacheRevision)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "version=$($tool.version)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$($tool.sha256)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Cache pinned mapping tables
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.tables.outputs.cache_root }}
+          key: cns11643-tables-${{ runner.os }}-r${{ steps.tables.outputs.cache_revision }}-${{ steps.tables.outputs.version }}-${{ steps.tables.outputs.sha256 }}
+
+      - name: Install and verify mapping tables
+        id: install
+        shell: pwsh
+        run: |
+          $tablesRoot = ./eng/Install-Cns11643MappingTables.ps1 `
+            -DestinationRoot '${{ steps.tables.outputs.cache_root }}'
+          "tables_root=$tablesRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Build tests
+        shell: pwsh
+        run: |
+          dotnet build OdfKit.Tests/OdfKit.Tests.csproj `
+            --configuration Release `
+            --framework net10.0
+
+      - name: Run CNS 11643 baseline tests
+        shell: pwsh
+        env:
+          ODFKIT_CNS11643_MAPPINGTABLES: ${{ steps.install.outputs.tables_root }}
+        run: |
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            --configuration Release `
+            --framework net10.0 `
+            --no-build `
+            --no-restore `
+            --filter 'FullyQualifiedName~Cns11643OpenDataBaselineTests'

@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "プレーンフォントマッピングには 1 から 16 の Unicode プレーン番号を使用する必要があります。",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "プレーンフォントマッピングでは、各プレーンに空でないフォント名を指定する必要があります。",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "カスタム font-face 宣言では、空でない名前とファミリを指定する必要があります。",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "コードポイントマッピングには有効な Unicode スカラー値（U+0000 から U+10FFFF、サロゲートを除く）を使用する必要があります。",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E エンコーディングには空でない Unicode から Big5E へのマッピングが必要です。",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E コード値は有効な 2 バイト Big5 コード（先頭バイト 0x81 から 0xFE）である必要があります。",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "CNS 11643 対照表の行が想定される「面-コード<TAB>16進値」形式ではありません: {0}。",
         };
     }
 }

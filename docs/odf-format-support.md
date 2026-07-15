@@ -118,6 +118,25 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
 OdfKit 不內建任何特定第三方罕字字型的名稱或檔案；字型選擇（含授權與來源政策考量）由使用者
 自行決定。
 
+### 中文碼對照、Big5／Big5E 與碼位遷移
+
+延續「機制內建、資料外部」原則，OdfKit 對全字庫（CNS 11643 open data）提供下列支援；
+對照表資料由使用者自[政府資料開放平臺](https://data.gov.tw/dataset/5961)下載
+（政府資料開放授權條款－第 1 版），倉庫不內建任何對照資料：
+
+- `OdfCns11643MappingTable.Parse`／`JoinOnCns`：解析官方「字面-編碼<TAB>十六進位」對照表
+  格式並以 CNS 字碼聯結兩表（例如 CNS↔Unicode 聯 CNS↔Big5E 得 Unicode↔Big5E）。
+- `OdfBig5EEncoding.Create(unicodeToBig5E)`：由對照表驅動的 Big5E 編碼，可直接餵入
+  `OdfCsvOptions.Encoding`。CLI 的 `--encoding` 不內建 `big5e`（需外部資料）；Big5 則由
+  .NET CP950 提供（`--encoding big5`），與官方 CNS↔Big5 表的差異經 baseline 測試量化為
+  2 字（U+5F5E、U+7B9A 重複對應歧義字，CP950 不提供編碼）。
+- `OdfDocument.MigrateTextCodePoints(mapping)`：資料驅動的文件碼位遷移（含 ContentDom 與
+  StylesDom），供舊版全字庫 PUA 自造字遷移至新版 Unicode 正式碼位的封存情境，回傳
+  `OdfCodePointMigrationReport` 統計。
+- CI baseline：`.github/workflows/cns11643-baseline.yml` 以釘選版本（2026-05-05、SHA-256
+  驗證）的官方對照表執行全集驗收——10.4 萬 CNS↔Unicode 碼位的平面路由與分段無損、
+  CP950 差異白名單、Big5E 全碼位編解碼往返。本機無資料時對應測試自動略過。
+
 ## 矩陣
 
 | 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |

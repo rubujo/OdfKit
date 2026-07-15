@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Ebenen-Schriftartzuordnungen müssen Unicode-Ebenennummern zwischen 1 und 16 verwenden.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Ebenen-Schriftartzuordnungen müssen für jede Ebene einen nicht leeren Schriftartnamen angeben.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Benutzerdefinierte font-face-Deklarationen müssen einen nicht leeren Namen und eine nicht leere Schriftfamilie angeben.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Codepunktzuordnungen müssen gültige Unicode-Skalarwerte verwenden (U+0000 bis U+10FFFF, ohne Surrogate).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Die Big5E-Kodierung erfordert eine nicht leere Zuordnung von Unicode zu Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-Codewerte müssen gültige Doppelbyte-Big5-Codes sein (Führungsbyte 0x81 bis 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "Die Zeile der CNS 11643-Zuordnungstabelle entspricht nicht dem erwarteten Format „Ebene-Code<TAB>Hex“: {0}.",
         };
     }
 }

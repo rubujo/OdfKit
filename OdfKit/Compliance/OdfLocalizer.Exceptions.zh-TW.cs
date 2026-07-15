@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "平面字型對應的 Unicode 平面編號必須介於 1 至 16 之間。",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "平面字型對應必須為每個平面指定非空白的字型名稱。",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "自訂 font-face 宣告必須指定非空白的名稱與字型家族。",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "碼位對應必須使用有效的 Unicode 純量值（U+0000 至 U+10FFFF，不含代理碼位）。",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E 編碼需要非空的 Unicode 對 Big5E 對應表。",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E 碼值必須是有效的雙位元組 Big5 碼（前導位元組 0x81 至 0xFE）。",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "CNS 11643 對照表資料行不符合預期的「字面-編碼<TAB>十六進位」格式：{0}。",
         };
     }
 }

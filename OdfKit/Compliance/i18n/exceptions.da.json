@@ -582,5 +582,9 @@
   "Err_StreamReader_ResourceLimitExceeded": "Streaming-readerens ressourcegrænse er overskredet ({0} > {1}).",
   "Err_OdfFontContext_PlaneOutOfRange": "Planskrifttypetilknytninger skal bruge Unicode-plannumre mellem 1 og 16.",
   "Err_OdfFontContext_PlaneFontNameEmpty": "Planskrifttypetilknytninger skal angive et ikke-tomt skrifttypenavn for hvert plan.",
-  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Brugerdefinerede font-face-erklæringer skal angive et ikke-tomt navn og en ikke-tom skrifttypefamilie."
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Brugerdefinerede font-face-erklæringer skal angive et ikke-tomt navn og en ikke-tom skrifttypefamilie.",
+  "Err_OdfCodePointMigration_MappingCodePointInvalid": "Kodepunkttilknytninger skal bruge gyldige Unicode-skalarværdier (U+0000 til U+10FFFF, undtagen surrogater).",
+  "Err_OdfBig5EEncoding_MappingEmpty": "Big5E-kodning kræver en ikke-tom tilknytning fra Unicode til Big5E.",
+  "Err_OdfBig5EEncoding_InvalidBig5Code": "Big5E-kodeværdier skal være gyldige dobbeltbyte Big5-koder (indledende byte 0x81 til 0xFE).",
+  "Err_OdfCnsMappingTable_InvalidLine": "Linjen i CNS 11643-tilknytningstabellen har ikke det forventede format \"plan-kode<TAB>hex\": {0}."
 }

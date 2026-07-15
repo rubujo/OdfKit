@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Mapowania czcionek płaszczyzn muszą używać numerów płaszczyzn Unicode od 1 do 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Mapowania czcionek płaszczyzn muszą określać niepustą nazwę czcionki dla każdej płaszczyzny.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Niestandardowe deklaracje font-face muszą określać niepustą nazwę i rodzinę czcionek.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Mapowania punktów kodowych muszą używać prawidłowych wartości skalarnych Unicode (od U+0000 do U+10FFFF, z wyłączeniem surogatów).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Kodowanie Big5E wymaga niepustego mapowania Unicode na Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Wartości kodu Big5E muszą być prawidłowymi dwubajtowymi kodami Big5 (bajt wiodący od 0x81 do 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "Wiersz tabeli mapowania CNS 11643 nie ma oczekiwanego formatu „płaszczyzna-kod<TAB>hex”: {0}.",
         };
     }
 }

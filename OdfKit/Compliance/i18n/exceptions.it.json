@@ -582,5 +582,9 @@
   "Err_StreamReader_ResourceLimitExceeded": "Il limite di risorse del lettore di flusso è stato superato ({0} > {1}).",
   "Err_OdfFontContext_PlaneOutOfRange": "Le mappature dei tipi di carattere per piano devono usare numeri di piano Unicode compresi tra 1 e 16.",
   "Err_OdfFontContext_PlaneFontNameEmpty": "Le mappature dei tipi di carattere per piano devono specificare un nome di carattere non vuoto per ogni piano.",
-  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Le dichiarazioni font-face personalizzate devono specificare un nome e una famiglia non vuoti."
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "Le dichiarazioni font-face personalizzate devono specificare un nome e una famiglia non vuoti.",
+  "Err_OdfCodePointMigration_MappingCodePointInvalid": "Le mappature dei punti di codice devono usare valori scalari Unicode validi (da U+0000 a U+10FFFF, esclusi i surrogati).",
+  "Err_OdfBig5EEncoding_MappingEmpty": "La codifica Big5E richiede una mappatura non vuota da Unicode a Big5E.",
+  "Err_OdfBig5EEncoding_InvalidBig5Code": "I valori di codice Big5E devono essere codici Big5 a doppio byte validi (byte iniziale da 0x81 a 0xFE).",
+  "Err_OdfCnsMappingTable_InvalidLine": "La riga della tabella di mappatura CNS 11643 non è nel formato previsto \"piano-codice<TAB>esadecimale\": {0}."
 }

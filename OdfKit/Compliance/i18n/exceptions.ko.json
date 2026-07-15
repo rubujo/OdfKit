@@ -582,5 +582,9 @@
   "Err_StreamReader_ResourceLimitExceeded": "스트리밍 reader 리소스 제한을 초과했습니다({0} > {1}).",
   "Err_OdfFontContext_PlaneOutOfRange": "평면 글꼴 매핑은 1에서 16 사이의 유니코드 평면 번호를 사용해야 합니다.",
   "Err_OdfFontContext_PlaneFontNameEmpty": "평면 글꼴 매핑은 각 평면에 비어 있지 않은 글꼴 이름을 지정해야 합니다.",
-  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "사용자 지정 font-face 선언은 비어 있지 않은 이름과 글꼴 패밀리를 지정해야 합니다."
+  "Err_OdfTextFontFallbackOptions_FontFaceEmpty": "사용자 지정 font-face 선언은 비어 있지 않은 이름과 글꼴 패밀리를 지정해야 합니다.",
+  "Err_OdfCodePointMigration_MappingCodePointInvalid": "코드 포인트 매핑은 유효한 유니코드 스칼라 값(U+0000~U+10FFFF, 서로게이트 제외)을 사용해야 합니다.",
+  "Err_OdfBig5EEncoding_MappingEmpty": "Big5E 인코딩에는 비어 있지 않은 유니코드-Big5E 매핑이 필요합니다.",
+  "Err_OdfBig5EEncoding_InvalidBig5Code": "Big5E 코드 값은 유효한 2바이트 Big5 코드(선행 바이트 0x81~0xFE)여야 합니다.",
+  "Err_OdfCnsMappingTable_InvalidLine": "CNS 11643 대응표의 행이 예상 형식 \"면-코드<TAB>16진수\"가 아닙니다: {0}."
 }

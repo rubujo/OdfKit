@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Os mapeamentos de tipos de letra por plano devem utilizar números de plano Unicode entre 1 e 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Os mapeamentos de tipos de letra por plano devem especificar um nome de tipo de letra não vazio para cada plano.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "As declarações font-face personalizadas devem especificar um nome e uma família não vazios.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Os mapeamentos de pontos de código devem utilizar valores escalares Unicode válidos (U+0000 a U+10FFFF, excluindo substitutos).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "A codificação Big5E requer um mapeamento de Unicode para Big5E não vazio.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Os valores de código Big5E devem ser códigos Big5 de dois bytes válidos (byte inicial de 0x81 a 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "A linha da tabela de mapeamento CNS 11643 não está no formato esperado \"plano-código<TAB>hexadecimal\": {0}.",
         };
     }
 }

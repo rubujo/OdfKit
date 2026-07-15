@@ -842,11 +842,17 @@ OdfKit.Core.IOdfOpenPgpKeyProvider.DecryptSessionKey(byte[]! encryptedKeyPacket,
 OdfKit.Core.IOdfOpenPgpKeyProvider.EncryptSessionKey(byte[]! sessionKey, OdfKit.Core.OdfOpenPgpRecipient! recipient) -> byte[]!
 OdfKit.Core.IOdfRenderer
 OdfKit.Core.IOdfRenderer.ExportToPdf(OdfKit.Core.OdfDocument! document, System.IO.Stream! pdfStream, System.Security.Cryptography.X509Certificates.X509Certificate2? certificate = null) -> void
+OdfKit.Core.OdfBig5EEncoding
 OdfKit.Core.OdfBouncyCastleOpenPgpProvider
 OdfKit.Core.OdfBouncyCastleOpenPgpProvider.DecryptSessionKey(byte[]! encryptedKeyPacket, string! keyId) -> byte[]!
 OdfKit.Core.OdfBouncyCastleOpenPgpProvider.EncryptSessionKey(byte[]! sessionKey, OdfKit.Core.OdfOpenPgpRecipient! recipient) -> byte[]!
 OdfKit.Core.OdfBouncyCastleOpenPgpProvider.OdfBouncyCastleOpenPgpProvider() -> void
 OdfKit.Core.OdfBouncyCastleOpenPgpProvider.OdfBouncyCastleOpenPgpProvider(byte[]! secretKeyRingData, System.Func<long, char[]!>! passphraseProvider) -> void
+OdfKit.Core.OdfCns11643MappingTable
+OdfKit.Core.OdfCodePointMigrationReport
+OdfKit.Core.OdfCodePointMigrationReport.AffectedTextNodes.get -> int
+OdfKit.Core.OdfCodePointMigrationReport.ReplacementsByCodePoint.get -> System.Collections.Generic.IReadOnlyDictionary<int, int>!
+OdfKit.Core.OdfCodePointMigrationReport.TotalReplacements.get -> int
 OdfKit.Core.OdfCrc32
 OdfKit.Core.OdfCrc32Stream
 OdfKit.Core.OdfCrc32Stream.Crc32.get -> uint
@@ -921,6 +927,7 @@ OdfKit.Core.OdfDocument.Language.set -> void
 OdfKit.Core.OdfDocument.LastVersionCompatibilityReport.get -> OdfKit.Compliance.OdfVersionCompatibilityReport?
 OdfKit.Core.OdfDocument.LinkUpdateMode.get -> int
 OdfKit.Core.OdfDocument.LinkUpdateMode.set -> void
+OdfKit.Core.OdfDocument.MigrateTextCodePoints(System.Collections.Generic.IReadOnlyDictionary<int, int>! codePointMapping) -> OdfKit.Core.OdfCodePointMigrationReport!
 OdfKit.Core.OdfDocument.ModificationDate.get -> System.DateTime?
 OdfKit.Core.OdfDocument.ModificationDate.set -> void
 OdfKit.Core.OdfDocument.OdfDocument(OdfKit.Core.OdfPackage! package) -> void
@@ -18115,6 +18122,14 @@ override OdfKit.Compliance.OdfQualifiedName.ToString() -> string!
 override OdfKit.Compliance.OdfVersionCompatibilityIssue.Equals(object? obj) -> bool
 override OdfKit.Compliance.OdfVersionCompatibilityIssue.GetHashCode() -> int
 override OdfKit.Compliance.OdfVersionCompatibilityIssue.ToString() -> string!
+override OdfKit.Core.OdfBig5EEncoding.EncodingName.get -> string!
+override OdfKit.Core.OdfBig5EEncoding.GetByteCount(char[]! chars, int index, int count) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetBytes(char[]! chars, int charIndex, int charCount, byte[]! bytes, int byteIndex) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetCharCount(byte[]! bytes, int index, int count) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetChars(byte[]! bytes, int byteIndex, int byteCount, char[]! chars, int charIndex) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetMaxByteCount(int charCount) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetMaxCharCount(int byteCount) -> int
+override OdfKit.Core.OdfBig5EEncoding.WebName.get -> string!
 override OdfKit.Core.OdfCrc32Stream.CanRead.get -> bool
 override OdfKit.Core.OdfCrc32Stream.CanSeek.get -> bool
 override OdfKit.Core.OdfCrc32Stream.CanWrite.get -> bool
@@ -18625,6 +18640,9 @@ static OdfKit.Compliance.OdfVersionCompatibilityIssue.operator ==(OdfKit.Complia
 static OdfKit.Compliance.OdfVersionRange.AllKnown.get -> OdfKit.Compliance.OdfVersionRange!
 static OdfKit.Compliance.OdfVersionRange.Exact(OdfKit.Compliance.OdfVersion version) -> OdfKit.Compliance.OdfVersionRange!
 static OdfKit.Core.ComputedStyle.Resolve(OdfKit.DOM.OdfElement! element) -> OdfKit.Core.ComputedStyle!
+static OdfKit.Core.OdfBig5EEncoding.Create(System.Collections.Generic.IReadOnlyDictionary<int, int>! unicodeToBig5E) -> OdfKit.Core.OdfBig5EEncoding!
+static OdfKit.Core.OdfCns11643MappingTable.JoinOnCns(System.Collections.Generic.IReadOnlyDictionary<string!, int>! cnsToSource, System.Collections.Generic.IReadOnlyDictionary<string!, int>! cnsToTarget) -> System.Collections.Generic.IReadOnlyDictionary<int, int>!
+static OdfKit.Core.OdfCns11643MappingTable.Parse(System.IO.TextReader! reader) -> System.Collections.Generic.IReadOnlyDictionary<string!, int>!
 static OdfKit.Core.OdfCrc32.Compute(System.ReadOnlySpan<byte> bytes) -> uint
 static OdfKit.Core.OdfCrc32.Compute(uint currentCrc, System.ReadOnlySpan<byte> bytes) -> uint
 static OdfKit.Core.OdfDocument.ClearParagraphTextContentRecursive(OdfKit.DOM.OdfNode! node) -> void

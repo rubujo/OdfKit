@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Planskrifttilordninger må bruke Unicode-plannumre mellom 1 og 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Planskrifttilordninger må angi et ikke-tomt skriftnavn for hvert plan.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Egendefinerte font-face-deklarasjoner må angi et ikke-tomt navn og en ikke-tom skriftfamilie.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Kodepunkttilordninger må bruke gyldige Unicode-skalarverdier (U+0000 til U+10FFFF, unntatt surrogater).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E-koding krever en ikke-tom tilordning fra Unicode til Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-kodeverdier må være gyldige dobbeltbyte Big5-koder (ledende byte 0x81 til 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "Linjen i CNS 11643-tilordningstabellen har ikke det forventede formatet «plan-kode<TAB>heks»: {0}.",
         };
     }
 }

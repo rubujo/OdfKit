@@ -9,6 +9,15 @@
     "minimumJavaVersion": "11",
     "supportedOdfVersions": ["1.0", "1.1", "1.2", "1.3", "1.4"]
   },
+  "cns11643MappingTables": {
+    "source": "cns11643.gov.tw",
+    "cacheRevision": "1",
+    "version": "2026-05-05",
+    "archiveFileName": "MapingTables.zip",
+    "uri": "https://www.cns11643.gov.tw/opendata/MapingTables.zip",
+    "sha256": "f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659",
+    "license": "OGDL-Taiwan-1.0"
+  },
   "jing": {
     "source": "github-release",
     "cacheRevision": "1",

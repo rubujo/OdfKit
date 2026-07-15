@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Les correspondances de polices par plan doivent utiliser des numéros de plan Unicode compris entre 1 et 16.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Les correspondances de polices par plan doivent indiquer un nom de police non vide pour chaque plan.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Les déclarations font-face personnalisées doivent indiquer un nom et une famille non vides.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Les correspondances de points de code doivent utiliser des valeurs scalaires Unicode valides (U+0000 à U+10FFFF, hors substituts).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "L'encodage Big5E nécessite une correspondance non vide entre Unicode et Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Les valeurs de code Big5E doivent être des codes Big5 à deux octets valides (octet de tête de 0x81 à 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "La ligne de la table de correspondance CNS 11643 n'est pas au format attendu « plan-code<TAB>hexadécimal » : {0}.",
         };
     }
 }

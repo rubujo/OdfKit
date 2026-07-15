@@ -601,6 +601,10 @@ public static partial class OdfLocalizer
             ["Err_OdfFontContext_PlaneOutOfRange"] = "Vlak-lettertypetoewijzingen moeten Unicode-vlaknummers tussen 1 en 16 gebruiken.",
             ["Err_OdfFontContext_PlaneFontNameEmpty"] = "Vlak-lettertypetoewijzingen moeten voor elk vlak een niet-lege lettertypenaam opgeven.",
             ["Err_OdfTextFontFallbackOptions_FontFaceEmpty"] = "Aangepaste font-face-declaraties moeten een niet-lege naam en familie opgeven.",
+            ["Err_OdfCodePointMigration_MappingCodePointInvalid"] = "Codepunttoewijzingen moeten geldige Unicode-scalarwaarden gebruiken (U+0000 tot U+10FFFF, exclusief surrogaten).",
+            ["Err_OdfBig5EEncoding_MappingEmpty"] = "Big5E-codering vereist een niet-lege toewijzing van Unicode naar Big5E.",
+            ["Err_OdfBig5EEncoding_InvalidBig5Code"] = "Big5E-codewaarden moeten geldige dubbelbyte Big5-codes zijn (leidende byte 0x81 tot 0xFE).",
+            ["Err_OdfCnsMappingTable_InvalidLine"] = "De regel van de CNS 11643-toewijzingstabel heeft niet de verwachte indeling \"vlak-code<TAB>hex\": {0}.",
         };
     }
 }
