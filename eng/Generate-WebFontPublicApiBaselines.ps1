@@ -16,76 +16,23 @@ $projects = @(
     'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj',
     'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj'
 )
-$previousBaseline = $env:ODFKIT_PUBLICAPI_BASELINE
-$previousCi = $env:CI
-$utf8Bom = [System.Text.UTF8Encoding]::new($true)
 
-try {
-    $env:ODFKIT_PUBLICAPI_BASELINE = '1'
-    $env:CI = 'true'
-    foreach ($relativeProject in $projects) {
-        $project = Join-Path $repoRoot $relativeProject
-        $projectRoot = Split-Path -Parent $project
-        $original = [System.IO.File]::ReadAllText($project)
-        & dotnet restore $project -p:NuGetAudit=false --nologo
-        if ($LASTEXITCODE -ne 0) {
-            throw "還原失敗：$relativeProject"
-        }
-        $frameworkMatch = [regex]::Match($original, '<TargetFrameworks?>([^<]+)</TargetFrameworks?>')
-        if (-not $frameworkMatch.Success) {
-            throw "找不到 TargetFramework：$relativeProject"
-        }
-
-        $frameworks = $frameworkMatch.Groups[1].Value -split ';'
-        try {
-            foreach ($framework in $frameworks) {
-                $apiRoot = Join-Path $projectRoot "PublicAPI/$framework"
-                New-Item -ItemType Directory -Force -Path $apiRoot | Out-Null
-                $shipped = Join-Path $apiRoot 'PublicAPI.Shipped.txt'
-                $unshipped = Join-Path $apiRoot 'PublicAPI.Unshipped.txt'
-                [System.IO.File]::WriteAllText($shipped, "#nullable enable`r`n", $utf8Bom)
-                [System.IO.File]::WriteAllText($unshipped, "#nullable enable`r`n", $utf8Bom)
-
-                $singleFramework = "<TargetFramework>$framework</TargetFramework>"
-                $withoutFramework = $original.Remove($frameworkMatch.Index, $frameworkMatch.Length)
-                $patched = $withoutFramework.Insert($frameworkMatch.Index, $singleFramework)
-                [System.IO.File]::WriteAllText($project, $patched, $utf8Bom)
-                Write-Host "產生 $relativeProject / $framework Public API 基線…"
-                & dotnet format analyzers $project --diagnostics RS0016 --severity warn --include-generated --verbosity minimal --no-restore
-                if ($LASTEXITCODE -ne 0) {
-                    throw "Public API code fix 失敗：$relativeProject / $framework"
-                }
-
-                if ((Get-Item $unshipped).Length -le 20) {
-                    throw "Public API 基線是空的：$relativeProject / $framework"
-                }
-
-                [System.IO.File]::WriteAllText($project, $original, $utf8Bom)
-            }
-        }
-        finally {
-            [System.IO.File]::WriteAllText($project, $original, $utf8Bom)
-        }
+foreach ($project in $projects) {
+    $content = Get-Content -LiteralPath (Join-Path $repoRoot $project) -Raw
+    $match = [regex]::Match($content, '<TargetFrameworks?>([^<]+)</TargetFrameworks?>')
+    if (-not $match.Success) {
+        throw "找不到 TargetFramework：$project"
     }
-}
-finally {
-    $env:ODFKIT_PUBLICAPI_BASELINE = $previousBaseline
-    $env:CI = $previousCi
-}
 
-if ($Verify) {
-    try {
-        $env:CI = 'true'
-        foreach ($relativeProject in $projects) {
-            & dotnet build (Join-Path $repoRoot $relativeProject) -c Release --nologo /p:RunAnalyzersDuringBuild=true
-            if ($LASTEXITCODE -ne 0) {
-                throw "Public API 驗證失敗：$relativeProject"
-            }
-        }
+    $parameters = @{
+        Project = $project
+        Frameworks = @($match.Groups[1].Value -split ';')
+        Verify = $Verify
     }
-    finally {
-        $env:CI = $previousCi
+    & (Join-Path $PSScriptRoot 'Generate-PublicApiBaseline.ps1') @parameters
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
     }
 }
 
-Write-Host 'PASS：WebFont Package Public API 基線完成。'
+Write-Host 'PASS：WebFont 專案已透過共同 Public API 基線機制完成。'

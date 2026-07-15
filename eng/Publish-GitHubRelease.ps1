@@ -55,8 +55,12 @@ try {
         Get-ChildItem -LiteralPath $outDir -Filter *.nupkg -File
         Get-ChildItem -LiteralPath $outDir -Filter *.snupkg -File
     )
+    $hashManifest = Join-Path $outDir "SHA256SUMS"
     if ($packages.Count -eq 0) {
         throw "找不到套件：$outDir"
+    }
+    if (-not (Test-Path -LiteralPath $hashManifest -PathType Leaf)) {
+        throw "找不到已驗證套件的 SHA-256 manifest：$hashManifest"
     }
 
     $bundleDir = Split-Path -Parent $bundlePath
@@ -92,7 +96,7 @@ try {
         throw "找不到 gh CLI。請安裝 GitHub CLI 並執行 gh auth login。"
     }
 
-    $assetPaths = @($bundlePath) + ($packages | ForEach-Object { $_.FullName })
+    $assetPaths = @($bundlePath, $hashManifest) + ($packages | ForEach-Object { $_.FullName })
     $ghArgs = @("release", "create", $Tag, "--title", $Title)
     if (-not [string]::IsNullOrWhiteSpace($NotesFile)) {
         $ghArgs += @("--notes-file", $NotesFile)

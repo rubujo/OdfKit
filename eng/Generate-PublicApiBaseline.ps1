@@ -20,14 +20,15 @@
 [CmdletBinding()]
 param(
     [string]$Configuration = 'Release',
+    [string]$Project = 'OdfKit/OdfKit.csproj',
     [string[]]$Frameworks = @('net10.0', 'netstandard2.0'),
     [switch]$Verify
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$project = Join-Path $repoRoot 'OdfKit/OdfKit.csproj'
-$publicApiRoot = Join-Path $repoRoot 'OdfKit/PublicAPI'
+$project = Join-Path $repoRoot $Project
+$publicApiRoot = Join-Path (Split-Path -Parent $project) 'PublicAPI'
 $previousBaselineMode = $env:ODFKIT_PUBLICAPI_BASELINE
 $previousCi = $env:CI
 
@@ -57,27 +58,40 @@ try {
         [System.IO.File]::WriteAllText($unshipped, "#nullable enable`r`n", $utf8Bom)
 
         Write-Host "產生 PublicAPI 基線：$tfm …"
-        $patched = $csprojOriginal -replace
-            '<TargetFrameworks>net10\.0;netstandard2\.0</TargetFrameworks>',
-            "<TargetFrameworks>$tfm</TargetFrameworks>"
-        if ($patched -eq $csprojOriginal -and $csprojOriginal -notmatch [regex]::Escape("<TargetFrameworks>$tfm</TargetFrameworks>")) {
-            throw "無法將 TargetFrameworks 暫時鎖定為 $tfm；請檢查 OdfKit.csproj。"
+        $frameworkMatch = [regex]::Match(
+            $csprojOriginal,
+            '<TargetFrameworks?>([^<]+)</TargetFrameworks?>')
+        if (-not $frameworkMatch.Success) {
+            throw "找不到 TargetFramework：$Project"
         }
 
+        $withoutFramework = $csprojOriginal.Remove($frameworkMatch.Index, $frameworkMatch.Length)
+        $patched = $withoutFramework.Insert(
+            $frameworkMatch.Index,
+            "<TargetFramework>$tfm</TargetFramework>")
         [System.IO.File]::WriteAllText($project, $patched, $utf8Bom)
+
+        & dotnet restore $project `
+            -p:NuGetAudit=false `
+            -p:WarningsNotAsErrors=NU1510 `
+            --nologo
+        if ($LASTEXITCODE -ne 0) {
+            throw "還原失敗：$Project / $tfm"
+        }
 
         & dotnet format analyzers $project `
             --diagnostics RS0016 `
             --severity warn `
             --include-generated `
-            --verbosity minimal
+            --verbosity minimal `
+            --no-restore
         if ($LASTEXITCODE -ne 0) {
             throw "dotnet format analyzers 失敗（$tfm，exit $LASTEXITCODE）。"
         }
 
         $lineCount = @(Get-Content -LiteralPath $unshipped).Count
         Write-Host "  $tfm Unshipped 行數：$lineCount"
-        if ($lineCount -lt 100) {
+        if ($lineCount -lt 2) {
             throw "$tfm PublicAPI.Unshipped.txt 行數異常偏低（$lineCount），請檢查 analyzer 是否生效。"
         }
 
@@ -95,7 +109,19 @@ if ($Verify) {
     try {
         Write-Host '驗證建置（無 BASELINE 模式，CI analyzer 開啟）…'
         $env:CI = 'true'
-        & dotnet build $project -c $Configuration --nologo /p:RunAnalyzersDuringBuild=true
+        & dotnet restore $project `
+            -p:NuGetAudit=false `
+            -p:WarningsNotAsErrors=NU1510 `
+            --nologo
+        if ($LASTEXITCODE -ne 0) {
+            throw "驗證前還原失敗：$Project"
+        }
+
+        & dotnet build $project `
+            -c $Configuration `
+            --nologo `
+            --no-restore `
+            /p:RunAnalyzersDuringBuild=true
         if ($LASTEXITCODE -ne 0) {
             throw "驗證建置失敗。若僅剩 RS0026／RS0027，請確認 .editorconfig 已將其設為 suggestion。"
         }
@@ -106,5 +132,5 @@ if ($Verify) {
     }
 }
 
-Write-Host '完成。請檢視 OdfKit/PublicAPI/*/PublicAPI.Unshipped.txt 後提交。'
+Write-Host "完成。請檢視 $Project 的 PublicAPI 基線後提交。"
 Write-Host '提示：0.x 維持 Unshipped；1.0 發佈時再移入 Shipped。'

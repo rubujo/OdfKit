@@ -42,11 +42,7 @@ jobs:
 
       - name: Run consumer smoke test & validations
         shell: pwsh
-        run: ./eng/Test-NuGetPack.ps1 -Configuration Release
-
-      - name: Pack NuGet Packages
-        shell: pwsh
-        run: ./eng/Pack-NuGet.ps1 -Configuration Release
+        run: ./eng/Test-NuGetPack.ps1 -Configuration Release -GenerateHashManifest
 
       - name: Create GitHub Release and Upload Assets
         shell: pwsh
