@@ -1,21 +1,30 @@
 ﻿using Microsoft.Playwright;
 
-if (args.Length is < 1 or > 2
+if (args.Length is < 2 or > 3
     || !Uri.TryCreate(args[0], UriKind.Absolute, out Uri? target)
-    || target.Scheme is not ("http" or "https"))
+    || target.Scheme is not ("http" or "https")
+    || args[1] is not ("chromium" or "firefox" or "webkit"))
 {
-    Console.Error.WriteLine("Usage: OdfKit.WebFontBrowserSmoke <url> [screenshot-path]");
+    Console.Error.WriteLine("Usage: OdfKit.WebFontBrowserSmoke <url> <chromium|firefox|webkit> [screenshot-path]");
     return 2;
 }
 
-string screenshotPath = Path.GetFullPath(args.Length == 2
-    ? args[1]
-    : Path.Combine("artifacts", "webfont-smoke", "playwright-proof.png"));
+string browserName = args[1];
+string screenshotPath = Path.GetFullPath(args.Length == 3
+    ? args[2]
+    : Path.Combine("artifacts", "webfont-smoke", $"playwright-{browserName}.png"));
 Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
 var errors = new List<string>();
 
 using IPlaywright playwright = await Playwright.CreateAsync();
-await using IBrowser browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+IBrowserType browserType = browserName switch
+{
+    "chromium" => playwright.Chromium,
+    "firefox" => playwright.Firefox,
+    "webkit" => playwright.Webkit,
+    _ => throw new InvalidOperationException()
+};
+await using IBrowser browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
 {
     Headless = true
 });
@@ -62,7 +71,7 @@ try
         Path = screenshotPath,
         FullPage = true
     });
-    Console.WriteLine($"PASS: Chromium loaded {loadedCases} international WebFont cases.");
+    Console.WriteLine($"PASS: {browserName} loaded {loadedCases} international WebFont cases.");
     Console.WriteLine($"Screenshot: {screenshotPath}");
     return 0;
 }

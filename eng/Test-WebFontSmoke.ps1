@@ -9,7 +9,9 @@ param(
     [string]$MappingTablesRoot,
     [string]$PythonPath = "python",
     [switch]$SkipPythonInstall,
-    [switch]$RunBrowser
+    [switch]$RunBrowser,
+    [ValidateSet("chromium", "firefox", "webkit")]
+    [string[]]$Browsers = @("chromium", "firefox", "webkit")
 )
 
 $ErrorActionPreference = "Stop"
@@ -269,6 +271,12 @@ $productCss = Get-Content -LiteralPath (Join-Path $productAssetPath "webfonts.cs
 if ($productCss -notmatch "\./[a-f0-9]{64}/[^']+\.woff2") {
     throw "產品化 Build smoke 的 CSS 未使用 content-addressed URL。"
 }
+$fontFaceCount = ([regex]::Matches($productCss, "@font-face")).Count
+$woff2Index = $productCss.IndexOf("format('woff2')", [StringComparison]::Ordinal)
+$woffIndex = $productCss.IndexOf("format('woff')", [StringComparison]::Ordinal)
+if ($fontFaceCount -ne 1 -or $woff2Index -lt 0 -or $woffIndex -le $woff2Index) {
+    throw "產品化 Build smoke 的 CSS 未將 WOFF2／WOFF 合併為 WOFF2 優先的 src fallback。"
+}
 
 if (-not [string]::IsNullOrWhiteSpace($MappingTablesRoot)) {
     $unicodeDirectory = Join-Path $MappingTablesRoot "Unicode"
@@ -395,15 +403,18 @@ try {
         }
 
         $playwrightInstaller = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/bin/Release/net10.0/playwright.ps1"
-        & $playwrightInstaller install chromium
+        & $playwrightInstaller install @Browsers
         if ($LASTEXITCODE -ne 0) {
-            throw "Playwright Chromium 安裝失敗。"
+            throw "Playwright 瀏覽器安裝失敗。"
         }
 
-        $browserScreenshot = Join-Path $destinationPath "playwright-international.png"
-        dotnet run --project $browserProject -c Release --no-build -- "$url/international" $browserScreenshot
-        if ($LASTEXITCODE -ne 0) {
-            throw "Playwright WebFont browser smoke 失敗。"
+        foreach ($browser in $Browsers) {
+            $browserScreenshot = Join-Path $destinationPath "playwright-international-$browser.png"
+            dotnet run --project $browserProject -c Release --no-build -- `
+                "$url/international" $browser $browserScreenshot
+            if ($LASTEXITCODE -ne 0) {
+                throw "Playwright WebFont $browser smoke 失敗。"
+            }
         }
     }
 }

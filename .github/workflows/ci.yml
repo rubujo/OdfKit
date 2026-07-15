@@ -145,14 +145,20 @@ jobs:
 
       - name: Real international fonts and HTTP assets
         shell: pwsh
-        run: ./eng/Test-WebFontSmoke.ps1 -PythonPath python -RunBrowser
+        run: |
+          $mappingRoot = ./eng/Install-Cns11643MappingTables.ps1 `
+            -DestinationRoot artifacts/cns11643
+          ./eng/Test-WebFontSmoke.ps1 `
+            -PythonPath python `
+            -MappingTablesRoot $mappingRoot `
+            -RunBrowser
 
       - name: Upload WebFont browser proof
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: webfont-browser-proof
-          path: artifacts/webfont-smoke/playwright-international.png
+          path: artifacts/webfont-smoke/playwright-international-*.png
           if-no-files-found: warn
 
   full-regression:

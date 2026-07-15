@@ -254,6 +254,7 @@ try {
         'project-docs/ip-compliance.html',
         'project-docs/security-limits.html',
         'project-docs/evidence-index.html',
+        'project-docs/webfont-evidence-matrix.html',
         'project-docs/webfonts.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
         'sitemap.xml',
@@ -268,6 +269,7 @@ try {
         'evidence-index.html',
         'ip-compliance.html',
         'security-limits.html',
+        'webfont-evidence-matrix.html',
         'webfonts.html'
     )
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'

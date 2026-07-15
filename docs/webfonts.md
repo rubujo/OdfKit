@@ -147,6 +147,8 @@ manifest／`webfonts.css` alias 則不得當成不可變資產。WOFF2 已壓縮
 
 - 來源字型只由 `FontSourceId` 對應到部署端 allowlist，不接受任意 URL 或要求參數路徑。
 - FontTools 使用 `ProcessStartInfo.ArgumentList`，不經 shell；具備來源、輸出、純量值與逾時上限。
+- 目前產品 engine 在啟動 FontTools 前明確拒絕 CFF2、COLR／CPAL、CBDT／CBLC、`sbix` 與
+  OpenType SVG table；這些能力尚未取得跨瀏覽器與 closure 證據，不會靜默刪表後宣稱成功。
 - 取消或逾時會終止完整子行程樹。
 - Worker 使用有界 Channel、立即拒絕滿載佇列，並對相同 canonical request 執行 single-flight。
 - manifest 只接受純檔名、SHA-256、已知格式與有界集合；啟動時驗證實際 bytes 與 hash。
@@ -162,6 +164,54 @@ WAF 與供應商 SLA 必須在採用者的 staging／CDN 帳號驗收，不應�
 同一 PUA 碼位在不同機關可代表不同字形，因此 cache key 與 manifest 必須包含 Profile 版本。
 目前 corpus 涵蓋 Arabic、Devanagari、香港 TTC／CFF、日本 IVS、CNS Plane 15 PUA，以及
 Unicode Plane 0～3；新增國家或機構資料應透過 `ICharacterMappingProvider` 或 JSON Profile。
+
+### 全字庫 CNS 11643 Profile
+
+`OdfKit.WebFonts.Profiles` 內建的是可追溯的 EUC-TW provider 與資料身分，不把全字庫字型或
+完整對照表塞進 nupkg。目前已驗證的 Profile 為 `cns11643-euc-tw-2026-05-05`，對應官方
+`MapingTables.zip`，SHA-256 為
+`f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659`。取得流程：
+
+```powershell
+$root = pwsh eng/Install-Cns11643MappingTables.ps1 `
+  -DestinationRoot artifacts/cns11643
+odfkit-webfonts build `
+  --font C:\CNSFonts\TW-Sung-98_1.ttf `
+  --text App_Data\legacy-euc-tw.bin `
+  --encoding euc-tw `
+  --cns-mapping-archive artifacts\cns11643\MapingTables.zip `
+  --profile cns11643-euc-tw-2026-05-05 `
+  --output wwwroot\_odf-fonts
+```
+
+CLI 會再次驗證官方封存檔 SHA-256，拒絕未對應 EUC-TW bytes、衝突 mapping、Profile 版本不符
+與損毀資料。字型須由部署者依授權自行取得；全字庫官方授權要求來源標示，若選擇 OFL-1.1
+散布修改後字型，還須隨附著作權聲明與 OFL 全文。
+
+自訂 JSON Profile 必須包含來源與授權追溯欄位：
+
+```json
+{
+  "schemaVersion": 1,
+  "profileId": "agency-eudc-2026.07",
+  "dataVersion": "2026.07",
+  "sourceUri": "file:///deployment/profiles/agency-eudc.json",
+  "sourceSha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "licenseId": "LicenseRef-Agency-EUDC",
+  "attribution": "機關自造字對照表 2026.07。",
+  "mappings": {
+    "8140": "𠀀",
+    "8EA140": "󰀁"
+  }
+}
+```
+
+程式碼 provider 只需實作 `ICharacterMappingProvider`；需要把版本、來源、SHA-256、授權與顯名
+寫入稽核資料時，實作 `ITraceableCharacterMappingProvider`。缺字、衝突或未對應 bytes 一律
+失敗，不會改猜 Big5、替換成 `?` 或靜默 fallback。
+
+各 Phase 的自動證據與保留閘門見
+[WebFont 證據矩陣](webfont-evidence-matrix.md)。
 
 ## 第一方規格依據
 
@@ -187,5 +237,5 @@ pwsh eng/Test-NuGetPack.ps1
 ```
 
 真實字型 smoke 使用鎖定版本與 SHA-256，不把第三方字型提交到 repository。GitHub Actions
-會安裝 Playwright Chromium，驗證六組多國案例並上傳完整頁面截圖；單元測試另驗證 1,000 個
+會安裝 Playwright Chromium、Firefox 與 WebKit，驗證六組多國案例並上傳完整頁面截圖；單元測試另驗證 1,000 個
 同鍵工作只執行一次、滿載佇列立即拒絕、256 個並行靜態資產要求，以及損毀資產啟動失敗。
