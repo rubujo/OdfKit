@@ -488,6 +488,9 @@ public sealed class OdfFontContext
             return customFontName;
         }
 
+        // 本公開 API 為「家族正規化」用途：對任一平面（含 BMP）回傳該家族的正規化全字庫字型名
+        // （例如 plane 0 → TW-Kai-98_1），與 SegmentText 所用之 ResolveSupplementaryPlaneFont
+        // 「保留使用者 BMP 字型、僅拆分 2/3/15/16」的用途刻意不同。詳見 OdfFontSegmenterTests。
         return GetBuiltInSupplementaryPlaneFontName(baseFontFamily, plane);
     }
 
@@ -528,7 +531,9 @@ public sealed class OdfFontContext
 
                 byte[] bytes = File.ReadAllBytes(fontPath);
                 string ext = Path.GetExtension(fontPath).ToLowerInvariant();
-                string zipPath = $"Fonts/{fontName}{ext}";
+                // 先行套用與 WriteEntry 相同的條目名稱正規化，確保下方 href 與實際寫入的封裝條目名一致；
+                // 原先 href 直接用未正規化字串，對含前導斜線或點區段的病態字型名可能與實際條目分歧。
+                string zipPath = OdfPackage.SanitizeEntryName($"Fonts/{fontName}{ext}");
 
                 string mediaType = ext switch
                 {

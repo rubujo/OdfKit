@@ -16,7 +16,9 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
     private readonly IWebFontSubsetEngine _engine;
     private readonly WebFontWorkerOptions _options;
     private readonly Channel<GenerationJob> _queue;
-    private readonly ConcurrentDictionary<string, Task<WebFontManifest>> _inflight = new(StringComparer.Ordinal);
+    // 以 Lazy 包裹入列作業：ConcurrentDictionary.GetOrAdd 的工廠委派在競爭下可能被呼叫多次，
+    // 若直接入列會產生重複的孤兒 job；改為只在勝出項目的 Value 被存取時入列一次。
+    private readonly ConcurrentDictionary<string, Lazy<Task<WebFontManifest>>> _inflight = new(StringComparer.Ordinal);
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Task[] _consumers;
 
@@ -57,9 +59,10 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         CancellationToken cancellationToken = default)
     {
         string key = CreateKey(request, destinationDirectory);
-        Task<WebFontManifest> task = _inflight.GetOrAdd(
+        Lazy<Task<WebFontManifest>> lazy = _inflight.GetOrAdd(
             key,
-            _ => EnqueueAsync(key, request, destinationDirectory));
+            k => new Lazy<Task<WebFontManifest>>(() => EnqueueAsync(k, request, destinationDirectory)));
+        Task<WebFontManifest> task = lazy.Value;
         try
         {
             return await task.WaitAsync(cancellationToken).ConfigureAwait(false);

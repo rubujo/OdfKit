@@ -26,8 +26,16 @@ public sealed class PrivateUseCharacterMappingProvider : ICharacterMappingProvid
                 nameof(profileId));
         }
 
+        // 以大小寫不敏感的序數比較器複製對照：Decode 以 BitConverter.ToString 產生大寫十六進位鍵，
+        // 若呼叫端提供小寫鍵，區分大小寫的字典會靜默失配。防禦性複製亦避免呼叫端後續修改影響本執行個體。
+        var normalized = new Dictionary<string, int>(mappings.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (KeyValuePair<string, int> pair in mappings)
+        {
+            normalized[pair.Key] = pair.Value;
+        }
+
         ProfileId = profileId;
-        _mappings = mappings;
+        _mappings = normalized;
     }
 
     /// <inheritdoc />

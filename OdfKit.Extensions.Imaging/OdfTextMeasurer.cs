@@ -26,11 +26,14 @@ public static class OdfTextMeasurer
     /// <param name="isBold">The value to use. / 是否為粗體</param>
     /// <param name="isItalic">The value to use. / 是否為斜體</param>
     /// <param name="writingMode">The value to use. / 書寫模式（橫書或直書）</param>
+    /// <param name="fontContext">The font context for segmentation and resolution; null uses <see cref="OdfFontContext.Default"/>. / 用於分段與解析的字型情境；為 null 時使用 <see cref="OdfFontContext.Default"/>。</param>
     /// <returns>The result. / 量測後的物理長度 <see cref="OdfLength"/></returns>
-    public static OdfLength MeasureWidth(string text, string fontName, double fontSizePoints, bool isBold = false, bool isItalic = false, OdfWritingMode writingMode = OdfWritingMode.LrTb)
+    public static OdfLength MeasureWidth(string text, string fontName, double fontSizePoints, bool isBold = false, bool isItalic = false, OdfWritingMode writingMode = OdfWritingMode.LrTb, OdfFontContext? fontContext = null)
     {
         if (string.IsNullOrEmpty(text))
             return OdfLength.FromCentimeters(0);
+
+        OdfFontContext context = fontContext ?? OdfFontContext.Default;
 
         // 檢查是否含有高字面字元（第 2 字面或第 15/16 字面）
         bool hasSupplementary = false;
@@ -51,30 +54,30 @@ public static class OdfTextMeasurer
         if (hasSupplementary)
         {
             double totalCm = 0;
-            var segments = OdfFontContext.Default.SegmentText(text, fontName);
+            var segments = context.SegmentText(text, fontName);
             foreach (var (segText, font) in segments)
             {
                 if (font != fontName)
-                    OdfFontContext.Default.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
-                var width = MeasureWidthSingle(segText, font, fontSizePoints, isBold, isItalic, writingMode);
+                    context.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
+                var width = MeasureWidthSingle(segText, font, fontSizePoints, isBold, isItalic, writingMode, context);
                 totalCm += width.ToCentimeters();
             }
             return OdfLength.FromCentimeters(totalCm);
         }
         else
         {
-            return MeasureWidthSingle(text, fontName, fontSizePoints, isBold, isItalic, writingMode);
+            return MeasureWidthSingle(text, fontName, fontSizePoints, isBold, isItalic, writingMode, context);
         }
     }
 
-    private static OdfLength MeasureWidthSingle(string text, string fontName, double fontSizePoints, bool isBold, bool isItalic, OdfWritingMode writingMode)
+    private static OdfLength MeasureWidthSingle(string text, string fontName, double fontSizePoints, bool isBold, bool isItalic, OdfWritingMode writingMode, OdfFontContext fontContext)
     {
         if (string.IsNullOrEmpty(text))
             return OdfLength.FromCentimeters(0);
 
         // 1. 字型替代對照
-        string mappedFont = OdfFontContext.Default.MapFont(fontName);
-        string? fontPath = OdfFontContext.Default.ResolveFontPath(mappedFont);
+        string mappedFont = fontContext.MapFont(fontName);
+        string? fontPath = fontContext.ResolveFontPath(mappedFont);
 
         SKTypeface? typeface = null;
         // 只釋放本方法建立的 typeface；SKTypeface.Default 為共用單例，不可 Dispose。

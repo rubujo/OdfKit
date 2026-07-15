@@ -7,7 +7,8 @@
     "uri": "https://repo1.maven.org/maven2/org/odftoolkit/odfvalidator/0.13.0/odfvalidator-0.13.0-jar-with-dependencies.jar",
     "sha256": "5684feec5cbdcd5783998978c096ac9ccea53a454e2d6ae803ce482d2336d1dc",
     "minimumJavaVersion": "11",
-    "supportedOdfVersions": ["1.0", "1.1", "1.2", "1.3", "1.4"]
+    "supportedOdfVersions": ["1.0", "1.1", "1.2", "1.3", "1.4"],
+    "supportedOdfVersionsSource": "https://dev.blog.documentfoundation.org/2026/01/22/validating-odf-and-ooxml-files/ — TDF 開發部落格公告 0.13.0（2026-01-23 發佈）新增 ODF 1.4 支援；odftoolkit.org/downloads.html 仍標示 1.2 為過時字樣。"
   },
   "cns11643MappingTables": {
     "source": "cns11643.gov.tw",

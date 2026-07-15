@@ -127,6 +127,10 @@ public static class OdfPdfExporter
     {
         var doc = new Document();
 
+        // 文字分段沿用文件的字型情境（而非固定 Default），與 ODF 文字入口一致；
+        // 未設定時 TextDocument.FontContext 即為 OdfFontContext.Default。
+        OdfFontContext fontContext = odfDoc.FontContext;
+
         // 依作業系統決定預設的中文字型名稱，以防止中文在導出 PDF 時因為 Arial 字型不支援而顯示為方塊字
         // 在 Windows 平台上使用標楷體（DFKai-SB），因為它是標準 .ttf 檔，能避開 PDFsharp 無法直接解析 .ttc（如微軟正黑體）的 NullReferenceException 限制
         string defaultChineseFont = "DFKai-SB";
@@ -173,13 +177,13 @@ public static class OdfPdfExporter
                             : level == 2 ? StyleNames.Heading2
                             : StyleNames.Heading3;
                         var para = section.AddParagraph(string.Empty, styleName);
-                        ConvertParagraphContent(node, para, defaultChineseFont);
+                        ConvertParagraphContent(node, para, defaultChineseFont, fontContext);
                         break;
                     }
                 case "p":
                     {
                         var para = section.AddParagraph();
-                        ConvertParagraphContent(node, para, defaultChineseFont);
+                        ConvertParagraphContent(node, para, defaultChineseFont, fontContext);
                         break;
                     }
                 case "list":
@@ -191,7 +195,7 @@ public static class OdfPdfExporter
                                 var para = section.AddParagraph();
                                 para.Format.LeftIndent = "1cm";
                                 para.Format.FirstLineIndent = "-0.5cm";
-                                ConvertParagraphContent(item, para, defaultChineseFont);
+                                ConvertParagraphContent(item, para, defaultChineseFont, fontContext);
                             }
                         }
                         break;
@@ -202,25 +206,25 @@ public static class OdfPdfExporter
         return doc;
     }
 
-    private static void ConvertParagraphContent(OdfNode odfPara, Paragraph migraPara, string defaultFont)
+    private static void ConvertParagraphContent(OdfNode odfPara, Paragraph migraPara, string defaultFont, OdfFontContext fontContext)
     {
         bool hasChildren = false;
         foreach (var child in odfPara.Children)
         {
             hasChildren = true;
-            ProcessChildNode(child, migraPara, defaultFont);
+            ProcessChildNode(child, migraPara, defaultFont, fontContext);
         }
         if (!hasChildren)
         {
-            AddSegmentedText(migraPara, odfPara.TextContent ?? string.Empty, defaultFont);
+            AddSegmentedText(migraPara, odfPara.TextContent ?? string.Empty, defaultFont, fontContext);
         }
     }
 
-    private static void ProcessChildNode(OdfNode child, Paragraph parent, string defaultFont)
+    private static void ProcessChildNode(OdfNode child, Paragraph parent, string defaultFont, OdfFontContext fontContext)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
-            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont);
+            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont, fontContext);
             return;
         }
 
@@ -235,7 +239,7 @@ public static class OdfPdfExporter
                     var fmt = parent.AddFormattedText();
                     foreach (var grandChild in child.Children)
                     {
-                        ProcessChildNode(grandChild, fmt, defaultFont);
+                        ProcessChildNode(grandChild, fmt, defaultFont, fontContext);
                     }
                     break;
 
@@ -260,11 +264,11 @@ public static class OdfPdfExporter
         }
     }
 
-    private static void ProcessChildNode(OdfNode child, FormattedText parent, string defaultFont)
+    private static void ProcessChildNode(OdfNode child, FormattedText parent, string defaultFont, OdfFontContext fontContext)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
-            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont);
+            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont, fontContext);
             return;
         }
 
@@ -279,7 +283,7 @@ public static class OdfPdfExporter
                     var fmt = parent.AddFormattedText();
                     foreach (var grandChild in child.Children)
                     {
-                        ProcessChildNode(grandChild, fmt, defaultFont);
+                        ProcessChildNode(grandChild, fmt, defaultFont, fontContext);
                     }
                     break;
 
@@ -304,9 +308,9 @@ public static class OdfPdfExporter
         }
     }
 
-    private static void AddSegmentedText(Paragraph paragraph, string text, string defaultFont)
+    private static void AddSegmentedText(Paragraph paragraph, string text, string defaultFont, OdfFontContext fontContext)
     {
-        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
+        var segments = fontContext.SegmentText(text, defaultFont);
         foreach (var (segText, fontName) in segments)
         {
             if (fontName == defaultFont)
@@ -315,7 +319,7 @@ public static class OdfPdfExporter
             }
             else
             {
-                OdfFontContext.Default.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                fontContext.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
                 var run = paragraph.AddFormattedText();
                 run.Font.Name = fontName;
                 run.AddText(segText);
@@ -323,9 +327,9 @@ public static class OdfPdfExporter
         }
     }
 
-    private static void AddSegmentedText(FormattedText formattedText, string text, string defaultFont)
+    private static void AddSegmentedText(FormattedText formattedText, string text, string defaultFont, OdfFontContext fontContext)
     {
-        var segments = OdfFontContext.Default.SegmentText(text, defaultFont);
+        var segments = fontContext.SegmentText(text, defaultFont);
         foreach (var (segText, fontName) in segments)
         {
             if (fontName == defaultFont)
@@ -334,7 +338,7 @@ public static class OdfPdfExporter
             }
             else
             {
-                OdfFontContext.Default.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                fontContext.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
                 var run = formattedText.AddFormattedText();
                 run.Font.Name = fontName;
                 run.AddText(segText);
