@@ -19331,6 +19331,7 @@ static OdfKit.Styles.OdfStyleSet.FromTheme(OdfKit.Styles.OdfDesignTheme! theme) 
 static OdfKit.Styles.OdfTextFontFallbackOptions.Cns11643() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Cns11643(string? baseFont) -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Custom(string? baseFont, System.Collections.Generic.IReadOnlyList<OdfKit.Styles.OdfFontFaceInfo!>! fontFaces) -> OdfKit.Styles.OdfTextFontFallbackOptions!
+static OdfKit.Styles.OdfTextFontFallbackOptions.Custom(string? baseFont, System.Collections.Generic.IReadOnlyList<OdfKit.Styles.OdfFontFaceInfo!>! fontFaces, OdfKit.Styles.OdfFontContext? fontContext) -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.HanaMin() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.Styles.OdfTextFontFallbackOptions.Jigmo() -> OdfKit.Styles.OdfTextFontFallbackOptions!
 static OdfKit.TemplateBinder.Bind(OdfKit.Drawing.DrawingDocument! document, System.Collections.Generic.IReadOnlyDictionary<string!, object?>! values) -> int

@@ -4,6 +4,7 @@
 
 ## 尚未發佈
 
+- samples 第 9 節新增 CNS 11643 正面示例（全字庫遞補分段、自訂罕字字型情境、PUA 碼位遷移、Big5E 編碼 CSV 匯出）；`OdfTextFontFallbackOptions.Custom` 新增 `fontContext` 三參數多載，修補「自訂 font-face 清單與自訂字型情境無法同時使用」的 API 組合縫隙。
 - 效能：`SegmentText` 導入每呼叫平面字型快取，逐字元的內建規則鏈評估（多次 `Contains`）攤提為每平面一次；125k 字元混排基準下，fall-through 家族（如 Noto Sans）由 362ms 降至 10ms（−97%）、MingLiU −76%、TW-Kai −32%，純 BMP 快路徑維持零額外配置。
 - 新增全字庫（CNS 11643 open data）整合：`OdfCns11643MappingTable` 官方對照表解析與聯結、`OdfBig5EEncoding` 資料驅動 Big5E 編碼（可餵入 CSV 匯入匯出）、`OdfDocument.MigrateTextCodePoints` 文件碼位遷移（舊版全字庫 PUA 自造字 → 新版 Unicode 正式碼位，回傳統計報告）。維持「機制內建、資料外部」：對照表由使用者自政府資料開放平臺下載，倉庫不內建資料。新增 cns11643-baseline CI workflow 以釘選版本官方資料驗收 10.4 萬碼位的平面路由、CP950 差異白名單（2 字）與 Big5E 全碼位往返。
 - CNS 11643 字型遞補入口擴及圖表與簡報嵌入表格：新增 `OdfChartDocument.SetChartTitle(title, options)`／`SetAxisTitle(dimension, title, options)`（含 `ChartDocumentBuilder`／`ChartAxisBuilder.WithTitle(title, options)`）與 `OdfEmbeddedTable.SetCellText(row, column, text, options)` 多載，重用同一套分段與 font-face 宣告基礎；至此所有承載 ODF 文字 run 的高階入口皆支援字型遞補選項（頁首頁尾經由 `OdfParagraph` 既有多載涵蓋，MathML 公式內容不適用）。

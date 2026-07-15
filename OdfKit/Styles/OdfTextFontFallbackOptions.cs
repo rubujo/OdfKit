@@ -104,6 +104,16 @@ public sealed class OdfTextFontFallbackOptions
     }
 
     /// <summary>
+    /// Short overload of Custom that uses the ambient font context; forwards to the full overload.
+    /// 便利多載：Custom 使用環境字型情境（文件情境或 Default），轉呼叫最長多載。
+    /// </summary>
+    /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
+    /// <param name="fontFaces">The font-face declarations to write into the document. / 要寫入文件的 font-face 宣告集合。</param>
+    /// <returns>The configured fallback options. / 已設定的遞補選項。</returns>
+    public static OdfTextFontFallbackOptions Custom(string? baseFont, IReadOnlyList<OdfFontFaceInfo> fontFaces)
+        => Custom(baseFont, fontFaces, null);
+
+    /// <summary>
     /// Creates options that declare caller-supplied font faces for custom rare-glyph fonts.
     /// 建立宣告呼叫端自訂 font-face 的遞補選項，供自訂罕字字型使用。
     /// </summary>
@@ -114,10 +124,11 @@ public sealed class OdfTextFontFallbackOptions
     /// </remarks>
     /// <param name="baseFont">The base CJK font family. / 基礎 CJK 字型家族。</param>
     /// <param name="fontFaces">The font-face declarations to write into the document. / 要寫入文件的 font-face 宣告集合。</param>
+    /// <param name="fontContext">The font context used for segmentation; null uses the document context or <see cref="OdfFontContext.Default"/>. / 分段所用的字型情境；為 null 時使用文件情境或 <see cref="OdfFontContext.Default"/>。</param>
     /// <returns>The configured fallback options. / 已設定的遞補選項。</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="fontFaces"/> 為 <see langword="null"/> 時擲出</exception>
     /// <exception cref="ArgumentException">當任一 font-face 宣告的名稱或字型家族為空白時擲出</exception>
-    public static OdfTextFontFallbackOptions Custom(string? baseFont, IReadOnlyList<OdfFontFaceInfo> fontFaces)
+    public static OdfTextFontFallbackOptions Custom(string? baseFont, IReadOnlyList<OdfFontFaceInfo> fontFaces, OdfFontContext? fontContext)
     {
         if (fontFaces is null)
         {
@@ -139,7 +150,10 @@ public sealed class OdfTextFontFallbackOptions
             copy[i] = fontFace;
         }
 
-        return new OdfTextFontFallbackOptions(baseFont, declareDefaultCjkFallbackFonts: true, copy);
+        return new OdfTextFontFallbackOptions(baseFont, declareDefaultCjkFallbackFonts: true, copy)
+        {
+            FontContext = fontContext
+        };
     }
 
     /// <summary>

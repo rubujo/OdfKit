@@ -68,6 +68,7 @@ if (!smokeOnly)
     DemoExtensions(outputDir);
 }
 
+DemoCns11643RareCharacters(outputDir);
 DemoOdtStreamWriter(outputDir);
 
 Console.WriteLine("==================================================");
@@ -744,12 +745,80 @@ static byte[] CreatePngBytes()
 }
 
 /// <summary>
+/// 示範 CNS 11643 罕字與中文碼功能：全字庫字型遞補分段、自訂罕字字型情境、
+/// PUA 自造字碼位遷移，以及以官方對照表格式建立 Big5E 編碼匯出 CSV。
+/// </summary>
+/// <param name="outputDir"> 輸出的目標目錄 </param>
+static void DemoCns11643RareCharacters(string outputDir)
+{
+    Console.WriteLine(" 9. 正在示範 CNS 11643 罕字分段、碼位遷移與 Big5E 編碼 ⋯⋯");
+
+    // Unicode Plane 2（Ext-B）罕字與 Plane 15 PUA 自造字示範字元
+    string plane2Char = char.ConvertFromUtf32(0x20BB7); // 𠮷
+    string puaChar = char.ConvertFromUtf32(0xF0000);    // 舊版全字庫 PUA 自造字碼位
+
+    // 9-1. 全字庫（CNS 11643）字型遞補：AddText 依 Unicode 平面自動分段，
+    //      Plane 2 → TW-Kai-Ext-B-98_1、PUA → TW-Kai-Plus-98_1，並自動宣告 font-face。
+    using var document = TextDocument.Create();
+    document.Metadata.Title = "CNS 11643 罕字示範";
+    OdfParagraph paragraph = document.AddParagraph();
+    paragraph.AddText(
+        "含罕字的公文內容：" + plane2Char + "字與自造字" + puaChar + "。",
+        OdfTextFontFallbackOptions.Cns11643());
+
+    // 9-2. 自訂罕字字型情境：以獨立 OdfFontContext 註冊「基礎字型 → 平面 → 字型」對應
+    //      （例如自備的黑體系 Ext B–J 補字字型），經 Custom 的 fontContext 參數注入即可
+    //      隔離生效，不影響行程層級的 OdfFontContext.Default。
+    var customContext = new OdfFontContext();
+    using IDisposable planeMapping = customContext.RegisterSupplementaryPlaneFontMapping(
+        "CustomGothic",
+        new Dictionary<int, string> { [2] = "CustomGothic ExtB" });
+    OdfParagraph customParagraph = document.AddParagraph();
+    customParagraph.AddText(
+        "自訂罕字字型：" + plane2Char,
+        OdfTextFontFallbackOptions.Custom(
+            "CustomGothic",
+            [new OdfFontFaceInfo("CustomGothic ExtB", "CustomGothic ExtB", "system-sans-serif", "variable")],
+            customContext));
+
+    // 9-3. PUA 自造字碼位遷移：舊版全字庫把無 Unicode 對應的字放在 PUA，
+    //      新版對照表提供正式碼位後，可用 MigrateTextCodePoints 批次遷移並取得統計報告。
+    //      實務上的對應表應以全字庫 open data 的新舊版 CNS↔Unicode 對照表推導。
+    OdfCodePointMigrationReport report = document.MigrateTextCodePoints(
+        new Dictionary<int, int> { [0xF0000] = 0x20BB7 });
+    Console.WriteLine($"    碼位遷移：替換 {report.TotalReplacements} 處、影響 {report.AffectedTextNodes} 個文字節點");
+
+    string odtPath = Path.Combine(outputDir, "cns11643-demo.odt");
+    document.Save(odtPath);
+    Console.WriteLine($"    已建立：{odtPath}");
+
+    // 9-4. Big5E 編碼：解析官方「字面-編碼<TAB>十六進位」格式並聯結出 Unicode↔Big5E，
+    //      即可建立可直接餵入 CSV 匯出的 Encoding。此處為求範例自足使用合成小表；
+    //      實務請自政府資料開放平臺（dataset 5961）下載 MapingTables.zip，
+    //      以 CNS2UNICODE_*.txt 與 CNS2BIG5_Big5E.txt 兩表聯結（政府資料開放授權條款第 1 版）。
+    IReadOnlyDictionary<string, int> cnsToUnicode =
+        OdfCns11643MappingTable.Parse(new StringReader("1-2121\t4E00\n1-2122\t4E8C"));
+    IReadOnlyDictionary<string, int> cnsToBig5E =
+        OdfCns11643MappingTable.Parse(new StringReader("1-2121\t8E40\n1-2122\t8E41"));
+    OdfBig5EEncoding big5E = OdfBig5EEncoding.Create(
+        OdfCns11643MappingTable.JoinOnCns(cnsToUnicode, cnsToBig5E));
+
+    using var workbook = SpreadsheetDocument.Create();
+    OdfTableSheet sheet = workbook.Worksheets.Add("Big5E");
+    sheet.Cells[0, 0].CellValue = "一";
+    sheet.Cells[0, 1].CellValue = "二";
+    string csvPath = Path.Combine(outputDir, "cns11643-demo-big5e.csv");
+    OdfCsvExporter.ExportToFile(workbook, csvPath, new OdfCsvOptions { Encoding = big5E });
+    Console.WriteLine($"    已建立（Big5E 編碼）：{csvPath}");
+}
+
+/// <summary>
 /// 示範高效能低記憶體的 OdtStreamWriter API，適用於以資料流寫入大型文字文件。
 /// </summary>
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdtStreamWriter(string outputDir)
 {
-    Console.WriteLine(" 9. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
+    Console.WriteLine("10. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.odt");
     FileStream fileStream;

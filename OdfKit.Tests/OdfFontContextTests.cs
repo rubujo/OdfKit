@@ -234,6 +234,23 @@ public class OdfFontContextTests
                     node.GetAttribute("name", OdfNamespaces.Style) == "TW-Kai-Ext-B-98_1");
     }
 
+    /// <summary>
+    /// 驗證 Custom 三參數多載可同時攜帶自訂 font-face 與字型情境，短多載維持 null 情境。
+    /// </summary>
+    [Fact]
+    public void CustomOptions_WithFontContext_CarriesContextThroughFactory()
+    {
+        var context = new OdfFontContext();
+
+        OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Custom(
+            "Base", [new OdfFontFaceInfo("Name", "Family", null, null)], context);
+        Assert.Same(context, options.FontContext);
+
+        OdfTextFontFallbackOptions shortOverload = OdfTextFontFallbackOptions.Custom(
+            "Base", [new OdfFontFaceInfo("Name", "Family", null, null)]);
+        Assert.Null(shortOverload.FontContext);
+    }
+
     private sealed class RecordingFontSubsetter : IFontSubsetter
     {
         public List<OdfFontSubsetRequest> Requests { get; } = [];

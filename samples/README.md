@@ -28,6 +28,12 @@
 因此它是**整合展示範例**，不是最小入門範例。若只需要最短上手流程，請先讀
 [docs/getting-started.md](../docs/getting-started.md)。
 
+範例第 9 節示範 CNS 11643 罕字支援：全字庫字型遞補分段（`OdfTextFontFallbackOptions.Cns11643()`）、
+自訂罕字字型情境（`OdfFontContext` + `Custom(baseFont, fontFaces, fontContext)`）、PUA 自造字
+碼位遷移（`MigrateTextCodePoints`）與 Big5E 編碼 CSV 匯出（`OdfCns11643MappingTable` +
+`OdfBig5EEncoding`，範例用合成小表；實務對照表請自[政府資料開放平臺](https://data.gov.tw/dataset/5961)下載）。
+支援邊界詳見 [docs/odf-format-support.md](../docs/odf-format-support.md)。
+
 ## 公文 ODT 範例
 
 `TaiwanGovernmentLetter.cs` 示範使用外部 OTT 範本、既有欄位 API 與
