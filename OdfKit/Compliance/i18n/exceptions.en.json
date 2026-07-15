@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "The CNS 11643 mapping table line is not in the expected \"plane-code<TAB>hex\" format: {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "The code point mapping table line is not in the expected delimited hexadecimal format: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "The code point mapping table line exceeds the maximum length of {0} characters.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "The code point mapping table exceeds the maximum of {0} entries."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "The code point mapping table exceeds the maximum of {0} entries.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "The WebFont asset store configuration is invalid.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "The WebFont asset manifest is invalid or exceeds its configured limits.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "A WebFont asset is missing, invalid, or does not match its manifest.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "The encoded source bytes are required.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "The legacy character mapping is invalid.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "The legacy character mapping is invalid at line {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "The legacy byte sequence is malformed or unmapped.",
+  "Err_WebFont_ConfigurationInvalid": "The WebFont configuration is invalid.",
+  "Err_WebFont_RequestInvalid": "The WebFont request is invalid.",
+  "Err_WebFont_DataInvalid": "The WebFont data is invalid or corrupted.",
+  "Err_WebFont_ProcessFailed": "The WebFont process failed.",
+  "Err_WebFont_ProcessFailedWithDetail": "The WebFont process failed: {0}",
+  "Err_WebFont_QueueFull": "The WebFont job queue is full.",
+  "Err_WebFont_UnmappedByte": "The legacy byte at offset {0} is unmapped."
 }

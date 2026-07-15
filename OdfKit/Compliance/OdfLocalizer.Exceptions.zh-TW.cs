@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "碼位對照表資料行不符合預期的十六進位分隔格式：{0}。",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "碼位對照表資料行超過 {0} 字元的長度上限。",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "碼位對照表超過 {0} 筆項目的數量上限。",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "WebFont 資產儲存區設定無效。",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "WebFont 資產 manifest 無效或超過設定限制。",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "WebFont 資產遺失、無效或與其 manifest 不符。",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "必須提供已編碼的來源位元組。",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "舊式字元對照無效。",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "舊式字元對照第 {0} 行無效。",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "舊式位元組序列格式錯誤或沒有對應。",
+            ["Err_WebFont_ConfigurationInvalid"] = "WebFont 設定無效。",
+            ["Err_WebFont_RequestInvalid"] = "WebFont 要求無效。",
+            ["Err_WebFont_DataInvalid"] = "WebFont 資料無效或已損毀。",
+            ["Err_WebFont_ProcessFailed"] = "WebFont 處理程序失敗。",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "WebFont 處理程序失敗：{0}",
+            ["Err_WebFont_QueueFull"] = "WebFont 工作佇列已滿。",
+            ["Err_WebFont_UnmappedByte"] = "位移 {0} 的舊式位元組沒有對應。",
         };
     }
 }

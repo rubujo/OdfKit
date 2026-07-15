@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "Die Zeile der Codepunkt-Zuordnungstabelle entspricht nicht dem erwarteten getrennten Hexadezimalformat: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "Die Zeile der Codepunkt-Zuordnungstabelle überschreitet die maximale Länge von {0} Zeichen.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Die Codepunkt-Zuordnungstabelle überschreitet das Maximum von {0} Einträgen.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "Die Konfiguration des WebFont-Asset-Speichers ist ungültig.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "Das WebFont-Asset-Manifest ist ungültig oder überschreitet die konfigurierten Grenzwerte.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "Ein WebFont-Asset fehlt, ist ungültig oder stimmt nicht mit seinem Manifest überein.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "Die codierten Quellbytes sind erforderlich.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "Die Legacy-Zeichenzuordnung ist ungültig.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "Die Legacy-Zeichenzuordnung ist in Zeile {0} ungültig.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "Die Legacy-Bytefolge ist fehlerhaft oder nicht zugeordnet.",
+            ["Err_WebFont_ConfigurationInvalid"] = "Die WebFont-Konfiguration ist ungültig.",
+            ["Err_WebFont_RequestInvalid"] = "Die WebFont-Anforderung ist ungültig.",
+            ["Err_WebFont_DataInvalid"] = "Die WebFont-Daten sind ungültig oder beschädigt.",
+            ["Err_WebFont_ProcessFailed"] = "Der WebFont-Prozess ist fehlgeschlagen.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "Der WebFont-Prozess ist fehlgeschlagen: {0}",
+            ["Err_WebFont_QueueFull"] = "Die WebFont-Auftragswarteschlange ist voll.",
+            ["Err_WebFont_UnmappedByte"] = "Das Legacy-Byte am Offset {0} ist nicht zugeordnet.",
         };
     }
 }

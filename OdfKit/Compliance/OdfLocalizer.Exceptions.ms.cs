@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "Baris jadual pemetaan titik kod tidak dalam format heksadesimal berpembatas yang dijangka: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "Baris jadual pemetaan titik kod melebihi panjang maksimum {0} aksara.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "Jadual pemetaan titik kod melebihi maksimum {0} entri.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "Konfigurasi stor aset WebFont tidak sah.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "Manifest aset WebFont tidak sah atau melebihi had yang dikonfigurasikan.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "Aset WebFont tiada, tidak sah atau tidak sepadan dengan manifestnya.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "Bait sumber berkod diperlukan.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "Pemetaan aksara legasi tidak sah.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "Pemetaan aksara legasi tidak sah pada baris {0}.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "Jujukan bait legasi rosak atau tidak dipetakan.",
+            ["Err_WebFont_ConfigurationInvalid"] = "Konfigurasi WebFont tidak sah.",
+            ["Err_WebFont_RequestInvalid"] = "Permintaan WebFont tidak sah.",
+            ["Err_WebFont_DataInvalid"] = "Data WebFont tidak sah atau rosak.",
+            ["Err_WebFont_ProcessFailed"] = "Proses WebFont gagal.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "Proses WebFont gagal: {0}",
+            ["Err_WebFont_QueueFull"] = "Baris gilir kerja WebFont penuh.",
+            ["Err_WebFont_UnmappedByte"] = "Bait legasi pada ofset {0} tidak dipetakan.",
         };
     }
 }

@@ -1,0 +1,8 @@
+﻿#nullable enable
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.IsReusable.get -> bool
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.OdfWebFontHandler() -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.ProcessRequest(System.Web.HttpContext! context) -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml
+static OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink() -> System.Web.IHtmlString!
+static OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink(string! stylesheetUrl) -> System.Web.IHtmlString!

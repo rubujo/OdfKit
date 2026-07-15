@@ -1,0 +1,19 @@
+﻿#nullable enable
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.EnvironmentVariables.get -> System.Collections.Generic.IDictionary<string!, string!>!
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.ExecutablePath.get -> string!
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.ExecutablePath.set -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.ExecutablePrefixArguments.get -> System.Collections.Generic.IList<string!>!
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.FontSources.get -> System.Collections.Generic.IDictionary<string!, string!>!
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.FontToolsWebFontEngineOptions() -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxOutputBytes.get -> long
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxOutputBytes.set -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxSourceBytes.get -> long
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxSourceBytes.set -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxUnicodeScalars.get -> int
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.MaxUnicodeScalars.set -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.ProcessTimeout.get -> System.TimeSpan
+OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions.ProcessTimeout.set -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontSubsetEngine
+OdfKit.WebFonts.OpenType.FontToolsWebFontSubsetEngine.FontToolsWebFontSubsetEngine(OdfKit.WebFonts.OpenType.FontToolsWebFontEngineOptions! options) -> void
+OdfKit.WebFonts.OpenType.FontToolsWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!

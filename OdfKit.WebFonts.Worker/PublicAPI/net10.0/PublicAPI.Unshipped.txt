@@ -1,0 +1,13 @@
+﻿#nullable enable
+OdfKit.WebFonts.Worker.WebFontGenerationWorker
+OdfKit.WebFonts.Worker.WebFontGenerationWorker.DisposeAsync() -> System.Threading.Tasks.ValueTask
+OdfKit.WebFonts.Worker.WebFontGenerationWorker.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
+OdfKit.WebFonts.Worker.WebFontGenerationWorker.WebFontGenerationWorker(OdfKit.WebFonts.IWebFontSubsetEngine! engine, OdfKit.WebFonts.Worker.WebFontWorkerOptions! options) -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.JobTimeout.get -> System.TimeSpan
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.JobTimeout.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.get -> int
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.QueueCapacity.get -> int
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.QueueCapacity.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.WebFontWorkerOptions() -> void

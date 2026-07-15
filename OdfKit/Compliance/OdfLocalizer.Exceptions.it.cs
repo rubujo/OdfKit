@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "La riga della tabella di mappatura dei punti di codice non è nel formato esadecimale delimitato previsto: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "La riga della tabella di mappatura dei punti di codice supera la lunghezza massima di {0} caratteri.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "La tabella di mappatura dei punti di codice supera il massimo di {0} voci.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "La configurazione dell’archivio di risorse WebFont non è valida.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "Il manifesto delle risorse WebFont non è valido o supera i limiti configurati.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "Una risorsa WebFont è mancante, non valida o non corrisponde al proprio manifesto.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "I byte sorgente codificati sono obbligatori.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "La mappatura dei caratteri legacy non è valida.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "La mappatura dei caratteri legacy non è valida alla riga {0}.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "La sequenza di byte legacy è malformata o non mappata.",
+            ["Err_WebFont_ConfigurationInvalid"] = "La configurazione WebFont non è valida.",
+            ["Err_WebFont_RequestInvalid"] = "La richiesta WebFont non è valida.",
+            ["Err_WebFont_DataInvalid"] = "I dati WebFont non sono validi o sono danneggiati.",
+            ["Err_WebFont_ProcessFailed"] = "Il processo WebFont non è riuscito.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "Il processo WebFont non è riuscito: {0}",
+            ["Err_WebFont_QueueFull"] = "La coda dei processi WebFont è piena.",
+            ["Err_WebFont_UnmappedByte"] = "Il byte legacy all'offset {0} non è mappato.",
         };
     }
 }

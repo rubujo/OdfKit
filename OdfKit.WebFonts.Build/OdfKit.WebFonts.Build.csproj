@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <Import Project="..\eng\OdfKit.WebFonts.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.WebFonts.Build</PackageId>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>odfkit-webfonts</ToolCommandName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Reproducible CLI and MSBuild integration for prebuilt OdfKit WebFont assets.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="buildTransitive\OdfKit.WebFonts.Build.targets" Pack="true" PackagePath="buildTransitive\OdfKit.WebFonts.Build.targets" />
+    <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\OdfKit.WebFonts.Encoding.Legacy\OdfKit.WebFonts.Encoding.Legacy.csproj" />
+    <ProjectReference Include="..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+</Project>

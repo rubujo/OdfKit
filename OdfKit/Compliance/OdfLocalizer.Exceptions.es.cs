@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "La línea de la tabla de asignación de puntos de código no tiene el formato hexadecimal delimitado esperado: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "La línea de la tabla de asignación de puntos de código supera la longitud máxima de {0} caracteres.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "La tabla de asignación de puntos de código supera el máximo de {0} entradas.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "La configuración del almacén de recursos WebFont no es válida.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "El manifiesto de recursos WebFont no es válido o supera los límites configurados.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "Falta un recurso WebFont, no es válido o no coincide con su manifiesto.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "Se requieren los bytes de origen codificados.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "La asignación de caracteres heredada no es válida.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "La asignación de caracteres heredada no es válida en la línea {0}.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "La secuencia de bytes heredada está mal formada o no está asignada.",
+            ["Err_WebFont_ConfigurationInvalid"] = "La configuración de WebFont no es válida.",
+            ["Err_WebFont_RequestInvalid"] = "La solicitud de WebFont no es válida.",
+            ["Err_WebFont_DataInvalid"] = "Los datos de WebFont no son válidos o están dañados.",
+            ["Err_WebFont_ProcessFailed"] = "El proceso WebFont ha fallado.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "El proceso WebFont ha fallado: {0}",
+            ["Err_WebFont_QueueFull"] = "La cola de trabajos WebFont está llena.",
+            ["Err_WebFont_UnmappedByte"] = "El byte heredado en el desplazamiento {0} no está asignado.",
         };
     }
 }

@@ -1,0 +1,5 @@
+﻿#nullable enable
+OdfKit.WebFonts.Profiles.JsonCharacterMappingProvider
+OdfKit.WebFonts.Profiles.JsonCharacterMappingProvider.Decode(byte[]! source) -> string!
+OdfKit.WebFonts.Profiles.JsonCharacterMappingProvider.ProfileId.get -> string!
+static OdfKit.WebFonts.Profiles.JsonCharacterMappingProvider.Load(System.IO.Stream! stream, int maxBytes, int maxEntries) -> OdfKit.WebFonts.Profiles.JsonCharacterMappingProvider!

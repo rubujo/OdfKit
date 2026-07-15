@@ -1,0 +1,16 @@
+﻿#nullable enable
+OdfKit.WebFonts.Encoding.Legacy.Big5CharacterMappingProvider
+OdfKit.WebFonts.Encoding.Legacy.Big5CharacterMappingProvider.Big5CharacterMappingProvider() -> void
+OdfKit.WebFonts.Encoding.Legacy.Big5CharacterMappingProvider.Decode(byte[]! source) -> string!
+OdfKit.WebFonts.Encoding.Legacy.Big5CharacterMappingProvider.ProfileId.get -> string!
+OdfKit.WebFonts.Encoding.Legacy.Big5ECharacterMappingProvider
+OdfKit.WebFonts.Encoding.Legacy.Big5ECharacterMappingProvider.Big5ECharacterMappingProvider(OdfKit.WebFonts.Encoding.Legacy.Big5EMapping! mapping) -> void
+OdfKit.WebFonts.Encoding.Legacy.Big5ECharacterMappingProvider.Decode(byte[]! source) -> string!
+OdfKit.WebFonts.Encoding.Legacy.Big5ECharacterMappingProvider.ProfileId.get -> string!
+OdfKit.WebFonts.Encoding.Legacy.Big5EMapping
+OdfKit.WebFonts.Encoding.Legacy.Big5EMapping.Version.get -> string!
+OdfKit.WebFonts.Encoding.Legacy.PrivateUseCharacterMappingProvider
+OdfKit.WebFonts.Encoding.Legacy.PrivateUseCharacterMappingProvider.Decode(byte[]! source) -> string!
+OdfKit.WebFonts.Encoding.Legacy.PrivateUseCharacterMappingProvider.PrivateUseCharacterMappingProvider(string! profileId, System.Collections.Generic.IReadOnlyDictionary<string!, int>! mappings) -> void
+OdfKit.WebFonts.Encoding.Legacy.PrivateUseCharacterMappingProvider.ProfileId.get -> string!
+static OdfKit.WebFonts.Encoding.Legacy.Big5EMapping.Load(System.IO.TextReader! reader, string! version) -> OdfKit.WebFonts.Encoding.Legacy.Big5EMapping!

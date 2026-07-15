@@ -1,0 +1,4 @@
+﻿#nullable enable
+OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector
+static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.AddStylesheetLink(string! html, string! stylesheetUrl) -> string!
+static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.Collect(OdfKit.Text.TextDocument! document, OdfKit.WebFonts.WebFontFaceIdentity! face, string! profileId, string! fontFamily, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>! formats) -> OdfKit.WebFonts.WebFontSubsetRequest!

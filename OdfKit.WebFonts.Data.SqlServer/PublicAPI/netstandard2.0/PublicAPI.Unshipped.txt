@@ -1,0 +1,5 @@
+﻿#nullable enable
+OdfKit.WebFonts.Data.SqlServer.SqlServerWebFontTextReader
+static OdfKit.WebFonts.Data.SqlServer.SqlServerWebFontTextReader.ReadLegacyBytes(System.Data.Common.DbDataReader! reader, int ordinal, OdfKit.WebFonts.ICharacterMappingProvider! mappingProvider) -> OdfKit.WebFonts.WebFontTextSequence!
+static OdfKit.WebFonts.Data.SqlServer.SqlServerWebFontTextReader.ReadLegacyBytes(System.Data.Common.DbDataReader! reader, int ordinal, OdfKit.WebFonts.ICharacterMappingProvider! mappingProvider, int maxBytes) -> OdfKit.WebFonts.WebFontTextSequence!
+static OdfKit.WebFonts.Data.SqlServer.SqlServerWebFontTextReader.ReadProviderDecodedText(System.Data.Common.DbDataReader! reader, int ordinal) -> OdfKit.WebFonts.WebFontTextSequence!

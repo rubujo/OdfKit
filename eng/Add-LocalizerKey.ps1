@@ -36,6 +36,26 @@ param(
 
     [string]$ZhTwMessage,
 
+    [string]$DaMessage,
+
+    [string]$DeMessage,
+
+    [string]$FrMessage,
+
+    [string]$ItMessage,
+
+    [string]$KoMessage,
+
+    [string]$MsMessage,
+
+    [string]$NbMessage,
+
+    [string]$NlMessage,
+
+    [string]$PtMessage,
+
+    [string]$SkMessage,
+
     [Parameter(Mandatory = $true)]
     [string]$JaMessage,
 
@@ -67,6 +87,16 @@ function Get-MessageForCulture {
     switch ($Culture) {
         'en' { return $EnMessage }
         'zh-TW' { return $ZhTwMessage }
+        'da' { return $(if ($DaMessage) { $DaMessage } else { $EnMessage }) }
+        'de' { return $(if ($DeMessage) { $DeMessage } else { $EnMessage }) }
+        'fr' { return $(if ($FrMessage) { $FrMessage } else { $EnMessage }) }
+        'it' { return $(if ($ItMessage) { $ItMessage } else { $EnMessage }) }
+        'ko' { return $(if ($KoMessage) { $KoMessage } else { $EnMessage }) }
+        'ms' { return $(if ($MsMessage) { $MsMessage } else { $EnMessage }) }
+        'nb' { return $(if ($NbMessage) { $NbMessage } else { $EnMessage }) }
+        'nl' { return $(if ($NlMessage) { $NlMessage } else { $EnMessage }) }
+        'pt' { return $(if ($PtMessage) { $PtMessage } else { $EnMessage }) }
+        'sk' { return $(if ($SkMessage) { $SkMessage } else { $EnMessage }) }
         'ja' { return $JaMessage }
         'es' { return $EsMessage }
         'cs' { return $CsMessage }

@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "De regel van de codepunttoewijzingstabel heeft niet de verwachte gescheiden hexadecimale indeling: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "De regel van de codepunttoewijzingstabel overschrijdt de maximale lengte van {0} tekens.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "De codepunttoewijzingstabel overschrijdt het maximum van {0} vermeldingen.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "De configuratie van de WebFont-assetopslag is ongeldig.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "Het WebFont-assetmanifest is ongeldig of overschrijdt de geconfigureerde limieten.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "Een WebFont-asset ontbreekt, is ongeldig of komt niet overeen met het manifest.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "De gecodeerde bronbytes zijn vereist.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "De verouderde tekentoewijzing is ongeldig.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "De verouderde tekentoewijzing is ongeldig op regel {0}.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "De verouderde bytereeks is ongeldig of niet toegewezen.",
+            ["Err_WebFont_ConfigurationInvalid"] = "De WebFont-configuratie is ongeldig.",
+            ["Err_WebFont_RequestInvalid"] = "De WebFont-aanvraag is ongeldig.",
+            ["Err_WebFont_DataInvalid"] = "De WebFont-gegevens zijn ongeldig of beschadigd.",
+            ["Err_WebFont_ProcessFailed"] = "Het WebFont-proces is mislukt.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "Het WebFont-proces is mislukt: {0}",
+            ["Err_WebFont_QueueFull"] = "De WebFont-taakwachtrij is vol.",
+            ["Err_WebFont_UnmappedByte"] = "De verouderde byte op offset {0} is niet toegewezen.",
         };
     }
 }

@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "Linjen i CNS 11643-tilordningstabellen har ikke det forventede formatet «plan-kode<TAB>heks»: {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "Linjen i kodepunkttilordningstabellen har ikke det forventede avgrensede heksadesimale formatet: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "Linjen i kodepunkttilordningstabellen overskrider maksimal lengde på {0} tegn.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "Kodepunkttilordningstabellen overskrider maksimum på {0} oppføringer."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "Kodepunkttilordningstabellen overskrider maksimum på {0} oppføringer.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "Konfigurasjonen av WebFont-ressurslageret er ugyldig.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "WebFont-ressursmanifestet er ugyldig eller overskrider de konfigurerte grensene.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "En WebFont-ressurs mangler, er ugyldig eller samsvarer ikke med manifestet.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "De kodede kildebytene er påkrevd.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "Den eldre tegntilordningen er ugyldig.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "Den eldre tegntilordningen er ugyldig på linje {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "Den eldre bytesekvensen er ugyldig eller ikke tilordnet.",
+  "Err_WebFont_ConfigurationInvalid": "WebFont-konfigurasjonen er ugyldig.",
+  "Err_WebFont_RequestInvalid": "WebFont-forespørselen er ugyldig.",
+  "Err_WebFont_DataInvalid": "WebFont-dataene er ugyldige eller skadet.",
+  "Err_WebFont_ProcessFailed": "WebFont-prosessen mislyktes.",
+  "Err_WebFont_ProcessFailedWithDetail": "WebFont-prosessen mislyktes: {0}",
+  "Err_WebFont_QueueFull": "WebFont-jobbkøen er full.",
+  "Err_WebFont_UnmappedByte": "Den eldre byten ved forskyvning {0} er ikke tilordnet."
 }

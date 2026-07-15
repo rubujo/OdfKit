@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "コードポイント対照表の行が想定される 16 進数区切り形式ではありません: {0}。",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "コードポイント対照表の行が最大長 {0} 文字を超えています。",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "コードポイント対照表が最大 {0} 件のエントリー数を超えています。",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "WebFont アセットストアの構成が無効です。",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "WebFont アセットマニフェストが無効であるか、構成された制限を超えています。",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "WebFont アセットが存在しない、無効、またはマニフェストと一致しません。",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "エンコードされたソースバイトが必要です。",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "レガシー文字マッピングが無効です。",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "レガシー文字マッピングの {0} 行目が無効です。",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "レガシーバイトシーケンスの形式が不正か、マッピングされていません。",
+            ["Err_WebFont_ConfigurationInvalid"] = "WebFont の構成が無効です。",
+            ["Err_WebFont_RequestInvalid"] = "WebFont リクエストが無効です。",
+            ["Err_WebFont_DataInvalid"] = "WebFont データが無効または破損しています。",
+            ["Err_WebFont_ProcessFailed"] = "WebFont プロセスが失敗しました。",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "WebFont プロセスが失敗しました: {0}",
+            ["Err_WebFont_QueueFull"] = "WebFont ジョブキューがいっぱいです。",
+            ["Err_WebFont_UnmappedByte"] = "オフセット {0} のレガシーバイトはマッピングされていません。",
         };
     }
 }

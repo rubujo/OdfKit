@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "A linha da tabela de mapeamento CNS 11643 não está no formato esperado \"plano-código<TAB>hexadecimal\": {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "A linha da tabela de mapeamento de pontos de código não está no formato hexadecimal delimitado esperado: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "A linha da tabela de mapeamento de pontos de código excede o comprimento máximo de {0} caracteres.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "A tabela de mapeamento de pontos de código excede o máximo de {0} entradas."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "A tabela de mapeamento de pontos de código excede o máximo de {0} entradas.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "A configuração do armazenamento de recursos WebFont é inválida.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "O manifesto de recursos WebFont é inválido ou excede os limites configurados.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "Um recurso WebFont está em falta, é inválido ou não corresponde ao respetivo manifesto.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "Os bytes de origem codificados são obrigatórios.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "O mapeamento de carateres legado é inválido.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "O mapeamento de carateres legado é inválido na linha {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "A sequência de bytes legada está malformada ou não está mapeada.",
+  "Err_WebFont_ConfigurationInvalid": "A configuração WebFont é inválida.",
+  "Err_WebFont_RequestInvalid": "O pedido WebFont é inválido.",
+  "Err_WebFont_DataInvalid": "Os dados WebFont são inválidos ou estão danificados.",
+  "Err_WebFont_ProcessFailed": "O processo WebFont falhou.",
+  "Err_WebFont_ProcessFailedWithDetail": "O processo WebFont falhou: {0}",
+  "Err_WebFont_QueueFull": "A fila de tarefas WebFont está cheia.",
+  "Err_WebFont_UnmappedByte": "O byte legado no deslocamento {0} não está mapeado."
 }

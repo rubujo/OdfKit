@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <Import Project="..\eng\OdfKit.WebFonts.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.WebFonts.Abstractions</PackageId>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>OdfKit.WebFonts</RootNamespace>
+    <AssemblyName>OdfKit.WebFonts.Abstractions</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Framework-neutral contracts for secure, international WebFont assets and Unicode sequences.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+</Project>

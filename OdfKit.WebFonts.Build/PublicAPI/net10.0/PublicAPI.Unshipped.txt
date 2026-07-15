@@ -1,0 +1,36 @@
+﻿#nullable enable
+OdfKit.WebFonts.Build.WebFontAssetBuilder
+OdfKit.WebFonts.Build.WebFontAssetBuilder.BuildAsync(OdfKit.WebFonts.Build.WebFontBuildOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
+OdfKit.WebFonts.Build.WebFontAssetBuilder.WebFontAssetBuilder() -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions
+OdfKit.WebFonts.Build.WebFontBuildOptions.Big5EMappingPath.get -> string?
+OdfKit.WebFonts.Build.WebFontBuildOptions.Big5EMappingPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FaceIndex.get -> int
+OdfKit.WebFonts.Build.WebFontBuildOptions.FaceIndex.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontFamily.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontFamily.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontPath.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontSourceId.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontSourceId.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsExecutable.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsExecutable.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.get -> string?
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.get -> string?
+OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.get -> long
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxUniqueUnicodeScalars.get -> int
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxUniqueUnicodeScalars.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.OutputDirectory.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.OutputDirectory.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.get -> string!
+OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.WebFontBuildOptions() -> void

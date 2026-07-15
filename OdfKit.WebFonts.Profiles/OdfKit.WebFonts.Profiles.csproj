@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <Import Project="..\eng\OdfKit.WebFonts.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.WebFonts.Profiles</PackageId>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Versioned, country-neutral legacy and private character mapping profiles for OdfKit WebFonts.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+    <PackageReference Include="System.Text.Json" Version="10.0.10" />
+  </ItemGroup>
+</Project>

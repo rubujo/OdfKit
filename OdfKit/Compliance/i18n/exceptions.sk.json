@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "Riadok mapovacej tabuľky CNS 11643 nemá očakávaný formát „rovina-kód<TAB>hex“: {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "Riadok tabuľky mapovania kódových bodov nemá očakávaný oddelený šestnástkový formát: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "Riadok tabuľky mapovania kódových bodov prekračuje maximálnu dĺžku {0} znakov.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "Tabuľka mapovania kódových bodov prekračuje maximum {0} položiek."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "Tabuľka mapovania kódových bodov prekračuje maximum {0} položiek.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "Konfigurácia úložiska prostriedkov WebFont je neplatná.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "Manifest prostriedkov WebFont je neplatný alebo prekračuje nakonfigurované limity.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "Prostriedok WebFont chýba, je neplatný alebo nezodpovedá svojmu manifestu.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "Vyžadujú sa zakódované zdrojové bajty.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "Mapovanie staršej znakovej sady je neplatné.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "Mapovanie staršej znakovej sady je neplatné na riadku {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "Sekvencia bajtov staršej znakovej sady je poškodená alebo nenamapovaná.",
+  "Err_WebFont_ConfigurationInvalid": "Konfigurácia WebFont je neplatná.",
+  "Err_WebFont_RequestInvalid": "Požiadavka WebFont je neplatná.",
+  "Err_WebFont_DataInvalid": "Údaje WebFont sú neplatné alebo poškodené.",
+  "Err_WebFont_ProcessFailed": "Proces WebFont zlyhal.",
+  "Err_WebFont_ProcessFailedWithDetail": "Proces WebFont zlyhal: {0}",
+  "Err_WebFont_QueueFull": "Front úloh WebFont je plný.",
+  "Err_WebFont_UnmappedByte": "Starší bajt na posune {0} nie je namapovaný."
 }

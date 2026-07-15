@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "Linjen i CNS 11643-tilknytningstabellen har ikke det forventede format \"plan-kode<TAB>hex\": {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "Linjen i kodepunkttilknytningstabellen har ikke det forventede afgrænsede hexadecimale format: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "Linjen i kodepunkttilknytningstabellen overskrider den maksimale længde på {0} tegn.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "Kodepunkttilknytningstabellen overskrider maksimum på {0} poster."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "Kodepunkttilknytningstabellen overskrider maksimum på {0} poster.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "Konfigurationen af WebFont-aktivlageret er ugyldig.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "WebFont-aktivmanifestet er ugyldigt eller overskrider de konfigurerede grænser.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "Et WebFont-aktiv mangler, er ugyldigt eller stemmer ikke overens med manifestet.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "De kodede kildebyte er påkrævet.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "Den ældre tegntilknytning er ugyldig.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "Den ældre tegntilknytning er ugyldig på linje {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "Den ældre bytesekvens er ugyldig eller uden tilknytning.",
+  "Err_WebFont_ConfigurationInvalid": "WebFont-konfigurationen er ugyldig.",
+  "Err_WebFont_RequestInvalid": "WebFont-anmodningen er ugyldig.",
+  "Err_WebFont_DataInvalid": "WebFont-dataene er ugyldige eller beskadigede.",
+  "Err_WebFont_ProcessFailed": "WebFont-processen mislykkedes.",
+  "Err_WebFont_ProcessFailedWithDetail": "WebFont-processen mislykkedes: {0}",
+  "Err_WebFont_QueueFull": "WebFont-arbejdskøen er fuld.",
+  "Err_WebFont_UnmappedByte": "Den ældre byte ved forskydning {0} har ingen tilknytning."
 }

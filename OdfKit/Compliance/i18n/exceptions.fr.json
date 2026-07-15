@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "La ligne de la table de correspondance CNS 11643 n'est pas au format attendu « plan-code<TAB>hexadécimal » : {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "La ligne de la table de correspondance de points de code n'est pas au format hexadécimal délimité attendu : {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "La ligne de la table de correspondance de points de code dépasse la longueur maximale de {0} caractères.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "La table de correspondance de points de code dépasse le maximum de {0} entrées."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "La table de correspondance de points de code dépasse le maximum de {0} entrées.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "La configuration du magasin de ressources WebFont n’est pas valide.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "Le manifeste des ressources WebFont n’est pas valide ou dépasse les limites configurées.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "Une ressource WebFont est absente, non valide ou ne correspond pas à son manifeste.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "Les octets source encodés sont requis.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "Le mappage de caractères hérité est invalide.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "Le mappage de caractères hérité est invalide à la ligne {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "La séquence d’octets héritée est incorrecte ou sans correspondance.",
+  "Err_WebFont_ConfigurationInvalid": "La configuration WebFont est invalide.",
+  "Err_WebFont_RequestInvalid": "La demande WebFont est invalide.",
+  "Err_WebFont_DataInvalid": "Les données WebFont sont invalides ou endommagées.",
+  "Err_WebFont_ProcessFailed": "Le processus WebFont a échoué.",
+  "Err_WebFont_ProcessFailedWithDetail": "Le processus WebFont a échoué : {0}",
+  "Err_WebFont_QueueFull": "La file de travaux WebFont est pleine.",
+  "Err_WebFont_UnmappedByte": "Le byte hérité au décalage {0} est sans correspondance."
 }

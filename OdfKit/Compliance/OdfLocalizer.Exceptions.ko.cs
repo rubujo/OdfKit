@@ -608,6 +608,20 @@ public static partial class OdfLocalizer
             ["Err_OdfCodePointMappingTable_InvalidLine"] = "코드 포인트 대응표의 행이 예상되는 구분 16진수 형식이 아닙니다: {0}.",
             ["Err_OdfCodePointMappingTable_LineTooLong"] = "코드 포인트 대응표의 행이 최대 길이 {0}자를 초과합니다.",
             ["Err_OdfCodePointMappingTable_TooManyEntries"] = "코드 포인트 대응표가 최대 {0}개 항목을 초과합니다.",
+            ["Err_OdfWebFontAssetStore_ConfigurationInvalid"] = "WebFont 자산 저장소 구성이 올바르지 않습니다.",
+            ["Err_OdfWebFontAssetStore_ManifestInvalid"] = "WebFont 자산 매니페스트가 올바르지 않거나 구성된 제한을 초과합니다.",
+            ["Err_OdfWebFontAssetStore_AssetInvalid"] = "WebFont 자산이 없거나 올바르지 않거나 매니페스트와 일치하지 않습니다.",
+            ["Err_WebFontLegacyEncoding_SourceRequired"] = "인코딩된 원본 바이트가 필요합니다.",
+            ["Err_WebFontLegacyEncoding_MappingInvalid"] = "레거시 문자 매핑이 잘못되었습니다.",
+            ["Err_WebFontLegacyEncoding_MappingLineInvalid"] = "레거시 문자 매핑의 {0}번째 줄이 잘못되었습니다.",
+            ["Err_WebFontLegacyEncoding_ByteSequenceInvalid"] = "레거시 바이트 시퀀스가 잘못되었거나 매핑되지 않았습니다.",
+            ["Err_WebFont_ConfigurationInvalid"] = "WebFont 구성이 잘못되었습니다.",
+            ["Err_WebFont_RequestInvalid"] = "WebFont 요청이 잘못되었습니다.",
+            ["Err_WebFont_DataInvalid"] = "WebFont 데이터가 잘못되었거나 손상되었습니다.",
+            ["Err_WebFont_ProcessFailed"] = "WebFont 프로세스에 실패했습니다.",
+            ["Err_WebFont_ProcessFailedWithDetail"] = "WebFont 프로세스에 실패했습니다: {0}",
+            ["Err_WebFont_QueueFull"] = "WebFont 작업 대기열이 가득 찼습니다.",
+            ["Err_WebFont_UnmappedByte"] = "오프셋 {0}의 레거시 바이트가 매핑되지 않았습니다.",
         };
     }
 }

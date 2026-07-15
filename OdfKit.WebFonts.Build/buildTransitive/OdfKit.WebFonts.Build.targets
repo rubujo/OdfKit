@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <OdfKitWebFontsToolAssembly>$(MSBuildThisFileDirectory)..\tools\net10.0\any\OdfKit.WebFonts.Build.dll</OdfKitWebFontsToolAssembly>
+    <OdfKitWebFontsOutputDirectory Condition="'$(OdfKitWebFontsOutputDirectory)' == ''">$(PublishDir)wwwroot\_odf-fonts</OdfKitWebFontsOutputDirectory>
+    <OdfKitWebFontsProfile Condition="'$(OdfKitWebFontsProfile)' == ''">default</OdfKitWebFontsProfile>
+    <OdfKitWebFontsFormats Condition="'$(OdfKitWebFontsFormats)' == ''">woff2</OdfKitWebFontsFormats>
+  </PropertyGroup>
+  <Target Name="OdfKitBuildWebFonts"
+          BeforeTargets="PrepareForPublish"
+          Condition="'$(OdfKitWebFontsEnabled)' == 'true'">
+    <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsFontPath)' == ''"
+           Text="Set OdfKitWebFontsFontPath or OdfKitWebFontsArguments when OdfKitWebFontsEnabled is true." />
+    <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsContentRoot)' == ''"
+           Text="Set OdfKitWebFontsContentRoot or OdfKitWebFontsArguments when OdfKitWebFontsEnabled is true." />
+    <Exec Condition="'$(OdfKitWebFontsArguments)' != ''"
+          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsArguments)" />
+    <Exec Condition="'$(OdfKitWebFontsArguments)' == ''"
+          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build --font &quot;$(OdfKitWebFontsFontPath)&quot; --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot;" />
+  </Target>
+</Project>

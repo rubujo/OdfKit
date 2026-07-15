@@ -589,5 +589,19 @@
   "Err_OdfCnsMappingTable_InvalidLine": "Wiersz tabeli mapowania CNS 11643 nie ma oczekiwanego formatu „płaszczyzna-kod<TAB>hex”: {0}.",
   "Err_OdfCodePointMappingTable_InvalidLine": "Wiersz tabeli mapowania punktów kodowych nie ma oczekiwanego rozdzielanego formatu szesnastkowego: {0}.",
   "Err_OdfCodePointMappingTable_LineTooLong": "Wiersz tabeli mapowania punktów kodowych przekracza maksymalną długość {0} znaków.",
-  "Err_OdfCodePointMappingTable_TooManyEntries": "Tabela mapowania punktów kodowych przekracza maksimum {0} wpisów."
+  "Err_OdfCodePointMappingTable_TooManyEntries": "Tabela mapowania punktów kodowych przekracza maksimum {0} wpisów.",
+  "Err_OdfWebFontAssetStore_ConfigurationInvalid": "Konfiguracja magazynu zasobów WebFont jest nieprawidłowa.",
+  "Err_OdfWebFontAssetStore_ManifestInvalid": "Manifest zasobów WebFont jest nieprawidłowy lub przekracza skonfigurowane limity.",
+  "Err_OdfWebFontAssetStore_AssetInvalid": "Brakuje zasobu WebFont, jest on nieprawidłowy lub nie odpowiada manifestowi.",
+  "Err_WebFontLegacyEncoding_SourceRequired": "Wymagane są zakodowane bajty źródłowe.",
+  "Err_WebFontLegacyEncoding_MappingInvalid": "Mapowanie starszego zestawu znaków jest nieprawidłowe.",
+  "Err_WebFontLegacyEncoding_MappingLineInvalid": "Mapowanie starszego zestawu znaków jest nieprawidłowe w wierszu {0}.",
+  "Err_WebFontLegacyEncoding_ByteSequenceInvalid": "Starsza sekwencja bajtów jest nieprawidłowa lub nie została zmapowana.",
+  "Err_WebFont_ConfigurationInvalid": "Konfiguracja WebFont jest nieprawidłowa.",
+  "Err_WebFont_RequestInvalid": "Żądanie WebFont jest nieprawidłowe.",
+  "Err_WebFont_DataInvalid": "Dane WebFont są nieprawidłowe lub uszkodzone.",
+  "Err_WebFont_ProcessFailed": "Proces WebFont nie powiódł się.",
+  "Err_WebFont_ProcessFailedWithDetail": "Proces WebFont nie powiódł się: {0}",
+  "Err_WebFont_QueueFull": "Kolejka zadań WebFont jest pełna.",
+  "Err_WebFont_UnmappedByte": "Starszy bajt pod przesunięciem {0} nie jest zmapowany."
 }

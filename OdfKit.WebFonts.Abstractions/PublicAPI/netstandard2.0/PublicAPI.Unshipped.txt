@@ -1,0 +1,61 @@
+﻿#nullable enable
+OdfKit.WebFonts.ICharacterMappingProvider
+OdfKit.WebFonts.ICharacterMappingProvider.Decode(byte[]! source) -> string!
+OdfKit.WebFonts.ICharacterMappingProvider.ProfileId.get -> string!
+OdfKit.WebFonts.IWebFontSubsetEngine
+OdfKit.WebFonts.IWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
+OdfKit.WebFonts.WebFontAsset
+OdfKit.WebFonts.WebFontAsset.ByteLength.get -> long
+OdfKit.WebFonts.WebFontAsset.ByteLength.init -> void
+OdfKit.WebFonts.WebFontAsset.FileName.get -> string!
+OdfKit.WebFonts.WebFontAsset.FileName.init -> void
+OdfKit.WebFonts.WebFontAsset.FontFamily.get -> string!
+OdfKit.WebFonts.WebFontAsset.FontFamily.init -> void
+OdfKit.WebFonts.WebFontAsset.Format.get -> OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontAsset.Format.init -> void
+OdfKit.WebFonts.WebFontAsset.Sha256.get -> string!
+OdfKit.WebFonts.WebFontAsset.Sha256.init -> void
+OdfKit.WebFonts.WebFontAsset.UnicodeRanges.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.WebFonts.WebFontAsset.UnicodeRanges.init -> void
+OdfKit.WebFonts.WebFontAsset.WebFontAsset() -> void
+OdfKit.WebFonts.WebFontFaceIdentity
+OdfKit.WebFonts.WebFontFaceIdentity.FaceIndex.get -> int
+OdfKit.WebFonts.WebFontFaceIdentity.FaceIndex.init -> void
+OdfKit.WebFonts.WebFontFaceIdentity.FontSourceId.get -> string!
+OdfKit.WebFonts.WebFontFaceIdentity.FontSourceId.init -> void
+OdfKit.WebFonts.WebFontFaceIdentity.SourceSha256.get -> string!
+OdfKit.WebFonts.WebFontFaceIdentity.SourceSha256.init -> void
+OdfKit.WebFonts.WebFontFaceIdentity.WebFontFaceIdentity() -> void
+OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontFormat.OpenType = 3 -> OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontFormat.TrueType = 2 -> OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontFormat.Woff = 1 -> OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontFormat.Woff2 = 0 -> OdfKit.WebFonts.WebFontFormat
+OdfKit.WebFonts.WebFontManifest
+OdfKit.WebFonts.WebFontManifest.Assets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontAsset!>!
+OdfKit.WebFonts.WebFontManifest.Assets.init -> void
+OdfKit.WebFonts.WebFontManifest.ProfileId.get -> string!
+OdfKit.WebFonts.WebFontManifest.ProfileId.init -> void
+OdfKit.WebFonts.WebFontManifest.SchemaVersion.get -> int
+OdfKit.WebFonts.WebFontManifest.SchemaVersion.init -> void
+OdfKit.WebFonts.WebFontManifest.StylesheetFileName.get -> string?
+OdfKit.WebFonts.WebFontManifest.StylesheetFileName.init -> void
+OdfKit.WebFonts.WebFontManifest.StylesheetSha256.get -> string?
+OdfKit.WebFonts.WebFontManifest.StylesheetSha256.init -> void
+OdfKit.WebFonts.WebFontManifest.WebFontManifest() -> void
+OdfKit.WebFonts.WebFontSubsetRequest
+OdfKit.WebFonts.WebFontSubsetRequest.Face.get -> OdfKit.WebFonts.WebFontFaceIdentity!
+OdfKit.WebFonts.WebFontSubsetRequest.Face.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.FontFamily.get -> string!
+OdfKit.WebFonts.WebFontSubsetRequest.FontFamily.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.WebFontSubsetRequest.Formats.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.ProfileId.get -> string!
+OdfKit.WebFonts.WebFontSubsetRequest.ProfileId.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!
+OdfKit.WebFonts.WebFontSubsetRequest.Sequences.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.WebFontSubsetRequest() -> void
+OdfKit.WebFonts.WebFontTextSequence
+OdfKit.WebFonts.WebFontTextSequence.Text.get -> string!
+OdfKit.WebFonts.WebFontTextSequence.UnicodeScalars.get -> System.Collections.Generic.IReadOnlyList<int>!
+static OdfKit.WebFonts.WebFontTextSequence.Create(string! text) -> OdfKit.WebFonts.WebFontTextSequence!
