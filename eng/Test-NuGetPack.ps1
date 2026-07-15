@@ -4,10 +4,14 @@
     驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置（REL-1）。
 .PARAMETER Configuration
     建置組態，預設 Release。
+.PARAMETER OutputDirectory
+    封裝輸出目錄，預設 artifacts/nuget。
 .PARAMETER SkipPack
     略過封裝，使用既有 artifacts/nuget。
 .PARAMETER SkipConsumerSmoke
     略過消費端煙霧測試，只驗證封裝契約。
+.PARAMETER ConsumerSmokeDirectory
+    消費端 smoke 的 artifacts 子目錄名稱。
 .PARAMETER SkipNetFrameworkSmoke
     略過 Windows net48 CLR 消費端煙霧；用於非 x64 Windows runner。
 .PARAMETER GenerateHashManifest
@@ -18,8 +22,10 @@
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
+    [string]$OutputDirectory = "artifacts/nuget",
     [switch]$SkipPack,
     [switch]$SkipConsumerSmoke,
+    [string]$ConsumerSmokeDirectory = "nuget-consumer-smoke",
     [switch]$SkipNetFrameworkSmoke,
     [switch]$GenerateHashManifest,
     [switch]$VerifyHashManifest
@@ -30,20 +36,29 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")
-$outDir = Join-Path $repoRoot "artifacts/nuget"
+$outDir = Join-Path $repoRoot $OutputDirectory
 $hashManifestPath = Join-Path $outDir "SHA256SUMS"
-$expectedTfms = @("net10.0", "netstandard2.0")
 $previousNugetPackages = $env:NUGET_PACKAGES
 
 $expectedPackages = @(
-    @{ Id = "OdfKit"; Assembly = "OdfKit.dll"; RequireSnupkg = $true },
-    @{ Id = "OdfKit.Extensions.Html"; Assembly = "OdfKit.Extensions.Html.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Imaging"; Assembly = "OdfKit.Extensions.Imaging.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Ooxml"; Assembly = "OdfKit.Extensions.Ooxml.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Pdf"; Assembly = "OdfKit.Extensions.Pdf.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Rendering"; Assembly = "OdfKit.Extensions.Rendering.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Rdf"; Assembly = "OdfKit.Extensions.Rdf.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Collaboration"; Assembly = "OdfKit.Extensions.Collaboration.dll"; RequireSnupkg = $false }
+    @{ Id = "OdfKit"; Assembly = "OdfKit.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
+    @{ Id = "OdfKit.Extensions.Html"; Assembly = "OdfKit.Extensions.Html.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Imaging"; Assembly = "OdfKit.Extensions.Imaging.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Ooxml"; Assembly = "OdfKit.Extensions.Ooxml.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Pdf"; Assembly = "OdfKit.Extensions.Pdf.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Rendering"; Assembly = "OdfKit.Extensions.Rendering.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Rdf"; Assembly = "OdfKit.Extensions.Rdf.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Collaboration"; Assembly = "OdfKit.Extensions.Collaboration.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Abstractions"; Assembly = "OdfKit.WebFonts.Abstractions.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Encoding.Legacy"; Assembly = "OdfKit.WebFonts.Encoding.Legacy.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Data.SqlServer"; Assembly = "OdfKit.WebFonts.Data.SqlServer.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.OpenType"; Assembly = "OdfKit.WebFonts.OpenType.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Build"; Tool = $true; Tfms = @(); Consumer = $false; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Worker"; Assembly = "OdfKit.WebFonts.Worker.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Profiles"; Assembly = "OdfKit.WebFonts.Profiles.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Hosting.AspNetCore"; Assembly = "OdfKit.WebFonts.Hosting.AspNetCore.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $false },
+    @{ Id = "OdfKit.WebFonts.Hosting.SystemWeb"; Assembly = "OdfKit.WebFonts.Hosting.SystemWeb.dll"; Tfms = @("net48"); Consumer = $false; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Html.WebFonts"; Assembly = "OdfKit.Extensions.Html.WebFonts.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false }
 )
 
 $allowedPrereleaseDependencies = @(
@@ -117,7 +132,7 @@ function Test-NuGetPackageHashManifest {
 Push-Location $repoRoot
 try {
     if (-not $SkipPack) {
-        & (Join-Path $PSScriptRoot "Pack-NuGet.ps1") -Configuration $Configuration
+        & (Join-Path $PSScriptRoot "Pack-NuGet.ps1") -Configuration $Configuration -OutputDirectory $OutputDirectory
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 
@@ -133,11 +148,19 @@ try {
 
         $zip = [System.IO.Compression.ZipFile]::OpenRead($nupkgPath)
         try {
-            foreach ($tfm in $expectedTfms) {
+            foreach ($tfm in $pkg.Tfms) {
                 $entryPath = "lib/$tfm/$($pkg.Assembly)"
                 $entry = $zip.Entries | Where-Object { $_.FullName -eq $entryPath }
                 if (-not $entry) {
                     throw "套件 $($pkg.Id) 缺少 $entryPath"
+                }
+            }
+
+            if ($pkg.Tool) {
+                $toolSettings = $zip.Entries | Where-Object { $_.FullName -eq "tools/net10.0/any/DotnetToolSettings.xml" }
+                $toolAssembly = $zip.Entries | Where-Object { $_.FullName -like "tools/net10.0/any/*.dll" } | Select-Object -First 1
+                if (-not $toolSettings -or -not $toolAssembly) {
+                    throw "工具套件 $($pkg.Id) 缺少 net10.0 tool payload"
                 }
             }
 
@@ -162,6 +185,12 @@ try {
 
             $dependencies = $nuspecXml.package.metadata.dependencies.group.dependency + $nuspecXml.package.metadata.dependencies.dependency
             $dependencyIds = @($dependencies | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.id })
+            if ($pkg.Id -like '*WebFonts*') {
+                $readme = $zip.Entries | Where-Object { $_.FullName -eq 'README.md' }
+                if (-not $readme -or [string]$nuspecXml.package.metadata.readme -ne 'README.md') {
+                    throw "套件 $($pkg.Id) 缺少 NuGet README.md 或 readme metadata"
+                }
+            }
             foreach ($dependency in $dependencies) {
                 if ($null -eq $dependency) {
                     continue
@@ -196,7 +225,7 @@ try {
             }
         }
 
-        Write-Host "OK：$($pkg.Id) 雙 TFM 結構"
+        Write-Host "OK：$($pkg.Id) 套件結構"
     }
 
     if ($GenerateHashManifest) {
@@ -209,7 +238,7 @@ try {
     }
 
     $artifactsRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts"))
-    $smokeDir = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot "nuget-consumer-smoke"))
+    $smokeDir = [System.IO.Path]::GetFullPath((Join-Path $artifactsRoot $ConsumerSmokeDirectory))
     $artifactsPrefix = $artifactsRoot.TrimEnd(
         [System.IO.Path]::DirectorySeparatorChar,
         [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
@@ -235,7 +264,7 @@ try {
 </configuration>
 "@ | Set-Content -LiteralPath (Join-Path $smokeDir "NuGet.Config") -Encoding utf8
 
-    foreach ($pkg in $expectedPackages) {
+    foreach ($pkg in $expectedPackages | Where-Object { $_.Consumer }) {
         dotnet add $smokeDir package $pkg.Id --version $packageVersion
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }

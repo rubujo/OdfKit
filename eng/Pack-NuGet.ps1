@@ -26,7 +26,17 @@ $packableProjects = @(
     "OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj",
     "OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj",
     "OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj",
-    "OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj"
+    "OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj",
+    "OdfKit.WebFonts.Abstractions/OdfKit.WebFonts.Abstractions.csproj",
+    "OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj",
+    "OdfKit.WebFonts.Data.SqlServer/OdfKit.WebFonts.Data.SqlServer.csproj",
+    "OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj",
+    "OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj",
+    "OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj",
+    "OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj",
+    "OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj",
+    "OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj",
+    "OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj"
 )
 
 if (Test-Path -LiteralPath $outDir) {

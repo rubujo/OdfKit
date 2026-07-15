@@ -7,7 +7,10 @@ on:
     paths:
       - 'OdfKit/**'
       - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.WebFonts.*/**'
       - 'OdfKit.Tests/**'
+      - 'tests/OdfKit.WebFont*/**'
+      - 'samples/WebFonts.*/**'
       - 'eng/**'
       - 'docs/**'
       - 'README.md'
@@ -18,7 +21,10 @@ on:
     paths:
       - 'OdfKit/**'
       - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.WebFonts.*/**'
       - 'OdfKit.Tests/**'
+      - 'tests/OdfKit.WebFont*/**'
+      - 'samples/WebFonts.*/**'
       - 'eng/**'
       - 'docs/**'
       - 'README.md'
@@ -114,6 +120,40 @@ jobs:
         run: |
           # 驗證 RS0016/RS0017 基線與雙 TFM 建置在 TreatWarningsAsErrors 下通過。
           dotnet build OdfKit/OdfKit.csproj -c Release --nologo /p:RunAnalyzersDuringBuild=true
+
+  webfont-validation:
+    name: WebFont packages and browser assets
+    needs: maintainability
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+
+      - name: Unit and host tests
+        shell: pwsh
+        run: |
+          dotnet test tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj -c Release -f net10.0
+          dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj -c Release
+          dotnet build samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj -c Release
+
+      - name: Real international fonts and HTTP assets
+        shell: pwsh
+        run: ./eng/Test-WebFontSmoke.ps1 -PythonPath python -RunBrowser
+
+      - name: Upload WebFont browser proof
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: webfont-browser-proof
+          path: artifacts/webfont-smoke/playwright-international.png
+          if-no-files-found: warn
 
   full-regression:
     name: Full regression (${{ matrix.framework }})

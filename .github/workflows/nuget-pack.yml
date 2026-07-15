@@ -5,6 +5,8 @@ on:
     paths:
       - 'OdfKit/**'
       - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.WebFonts.*/**'
+      - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/OdfKit.Package.props'
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
@@ -19,6 +21,8 @@ on:
     paths:
       - 'OdfKit/**'
       - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.WebFonts.*/**'
+      - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/OdfKit.Package.props'
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
