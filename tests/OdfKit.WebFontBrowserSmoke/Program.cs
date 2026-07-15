@@ -24,10 +24,18 @@ IBrowserType browserType = browserName switch
     "webkit" => playwright.Webkit,
     _ => throw new InvalidOperationException()
 };
-await using IBrowser browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
+var launchOptions = new BrowserTypeLaunchOptions
 {
     Headless = true
-});
+};
+if (browserName == "firefox")
+{
+    launchOptions.FirefoxUserPrefs = new Dictionary<string, object>
+    {
+        ["browser.privateWindowSeparation.enabled"] = false
+    };
+}
+await using IBrowser browser = await browserType.LaunchAsync(launchOptions);
 IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions
 {
     Locale = "zh-TW",

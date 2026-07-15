@@ -42,6 +42,27 @@ $sourcePath = Join-Path $destinationPath "sources"
 New-Item -ItemType Directory -Path $assetPath -Force | Out-Null
 New-Item -ItemType Directory -Path $sourcePath -Force | Out-Null
 
+function Invoke-LockedDownload {
+    param(
+        [Parameter(Mandatory)][uri]$Uri,
+        [Parameter(Mandatory)][string]$Destination
+    )
+
+    $temporaryPath = "$Destination.download"
+    try {
+        Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+        Invoke-WebRequest `
+            -Uri $Uri `
+            -OutFile $temporaryPath `
+            -MaximumRetryCount 3 `
+            -RetryIntervalSec 2
+        Move-Item -LiteralPath $temporaryPath -Destination $Destination -Force
+    }
+    finally {
+        Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
 function Get-LockedFile {
     param(
         [Parameter(Mandatory)]$Definition,
@@ -52,7 +73,7 @@ function Get-LockedFile {
     $path = Join-Path $sourcePath $FileName
     if (-not (Test-Path -LiteralPath $path)) {
         Write-Host "下載鎖定測試資產 $FileName..."
-        Invoke-WebRequest -Uri $Definition.uri -OutFile $path
+        Invoke-LockedDownload -Uri $Definition.uri -Destination $path
     }
 
     $actualSha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -96,7 +117,7 @@ if ([string]::IsNullOrWhiteSpace($FontPath)) {
     $FontPath = Join-Path $destinationPath $configuration.font.fileName
     if (-not (Test-Path -LiteralPath $FontPath)) {
         Write-Host "下載測試字型 $($configuration.font.version)..."
-        Invoke-WebRequest -Uri $configuration.font.uri -OutFile $FontPath
+        Invoke-LockedDownload -Uri $configuration.font.uri -Destination $FontPath
     }
 }
 
@@ -406,6 +427,23 @@ try {
         & $playwrightInstaller install @Browsers
         if ($LASTEXITCODE -ne 0) {
             throw "Playwright 瀏覽器安裝失敗。"
+        }
+
+        if ($IsWindows -and $Browsers -contains "firefox") {
+            $playwrightBrowserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
+                Join-Path $env:LOCALAPPDATA "ms-playwright"
+            }
+            elseif ($env:PLAYWRIGHT_BROWSERS_PATH -eq "0") {
+                $null
+            }
+            else {
+                $env:PLAYWRIGHT_BROWSERS_PATH
+            }
+            if (-not [string]::IsNullOrWhiteSpace($playwrightBrowserRoot)) {
+                $removedShortcuts = & (Join-Path $PSScriptRoot "Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1") `
+                    -BrowserRoot $playwrightBrowserRoot
+                Write-Host "已移除 $removedShortcuts 個 Playwright Firefox 私密瀏覽開始功能表捷徑。"
+            }
         }
 
         foreach ($browser in $Browsers) {

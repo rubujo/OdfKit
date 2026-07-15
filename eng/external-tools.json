@@ -24,7 +24,7 @@
       "source": "notofonts/noto-cjk",
       "version": "Sans2.004",
       "fileName": "NotoSansTC-VF.ttf",
-      "uri": "https://github.com/notofonts/noto-cjk/raw/refs/tags/Sans2.004/Sans/Variable/TTF/Subset/NotoSansTC-VF.ttf",
+      "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/Variable/TTF/Subset/NotoSansTC-VF.ttf",
       "sha256": "ac091cc8cd19e848202afc8fe6d3809b4526c8fdbdb4be82da20c4f785949591",
       "license": "OFL-1.1"
     },
@@ -43,13 +43,13 @@
       },
       "cjkCollection": {
         "fileName": "NotoSansCJK-Regular.ttc",
-        "uri": "https://github.com/notofonts/noto-cjk/raw/refs/tags/Sans2.004/Sans/OTC/NotoSansCJK-Regular.ttc",
+        "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/OTC/NotoSansCJK-Regular.ttc",
         "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
         "license": "OFL-1.1"
       },
       "cjkOpenType": {
         "fileName": "NotoSansCJKhk-Regular.otf",
-        "uri": "https://github.com/notofonts/noto-cjk/raw/refs/tags/Sans2.004/Sans/OTF/TraditionalChineseHK/NotoSansCJKhk-Regular.otf",
+        "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/OTF/TraditionalChineseHK/NotoSansCJKhk-Regular.otf",
         "sha256": "97c937514d645eae90415d30ba025e08a94d5bdffdc627404864f90aa0c7d83b",
         "license": "OFL-1.1"
       },

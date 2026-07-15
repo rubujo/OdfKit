@@ -225,6 +225,7 @@ CLI 會再次驗證官方封存檔 SHA-256，拒絕未對應 EUC-TW bytes、衝�
 - [Microsoft Azure Front Door 與 Blob Storage](https://learn.microsoft.com/en-us/azure/frontdoor/scenario-storage-blobs)
 - [FontTools subset](https://fonttools.readthedocs.io/en/latest/subset/)
 - [Playwright .NET Continuous Integration](https://playwright.dev/dotnet/docs/ci)
+- [Mozilla Private Browsing Proxy](https://firefox-source-docs.mozilla.org/browser/app/pbproxy/private-browsing-proxy/index.html)
 - [GitHub Actions workflow artifacts](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflow-artifacts)
 
 ## 可執行驗證
@@ -239,3 +240,5 @@ pwsh eng/Test-NuGetPack.ps1
 真實字型 smoke 使用鎖定版本與 SHA-256，不把第三方字型提交到 repository。GitHub Actions
 會安裝 Playwright Chromium、Firefox 與 WebKit，驗證六組多國案例並上傳完整頁面截圖；單元測試另驗證 1,000 個
 同鍵工作只執行一次、滿載佇列立即拒絕、256 個並行靜態資產要求，以及損毀資產啟動失敗。
+Windows 上的 Firefox smoke 會停用私密瀏覽捷徑 OS 整合，並在安裝後只清理目標位於
+Playwright browser cache 的 `private_browsing.exe` 捷徑；一般 Firefox 捷徑與執行檔不受影響。
