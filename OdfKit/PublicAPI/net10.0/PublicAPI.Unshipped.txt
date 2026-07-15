@@ -18128,6 +18128,8 @@ override OdfKit.Core.OdfBig5EEncoding.GetByteCount(char[]! chars, int index, int
 override OdfKit.Core.OdfBig5EEncoding.GetBytes(char[]! chars, int charIndex, int charCount, byte[]! bytes, int byteIndex) -> int
 override OdfKit.Core.OdfBig5EEncoding.GetCharCount(byte[]! bytes, int index, int count) -> int
 override OdfKit.Core.OdfBig5EEncoding.GetChars(byte[]! bytes, int byteIndex, int byteCount, char[]! chars, int charIndex) -> int
+override OdfKit.Core.OdfBig5EEncoding.GetDecoder() -> System.Text.Decoder!
+override OdfKit.Core.OdfBig5EEncoding.GetEncoder() -> System.Text.Encoder!
 override OdfKit.Core.OdfBig5EEncoding.GetMaxByteCount(int charCount) -> int
 override OdfKit.Core.OdfBig5EEncoding.GetMaxCharCount(int byteCount) -> int
 override OdfKit.Core.OdfBig5EEncoding.WebName.get -> string!
