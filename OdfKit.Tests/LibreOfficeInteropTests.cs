@@ -51,7 +51,7 @@ public partial class LibreOfficeInteropTests
             string odtPath = Path.Combine(tempRoot, "interop-tracked-changes.odt");
             CreateTrackedChangesDocument(odtPath);
 
-            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odtPath);
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt:Text (encoded):UTF8", odtPath);
             string txtPath = Path.Combine(outputDir, "interop-tracked-changes.txt");
             Assert.True(File.Exists(txtPath), "LibreOffice 應輸出追蹤修訂 ODT 的文字轉換結果。");
             Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
