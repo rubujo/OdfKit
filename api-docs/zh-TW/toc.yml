@@ -4,6 +4,8 @@
   href: guide.md
 - name: API 參考文件 [en + zh-TW]
   uid: OdfKit
+- name: WebFont 多國罕用字
+  href: ../../docs/webfonts.md
 - name: 授權
   href: ../articles/license.md
 - name: AI 與智慧財產

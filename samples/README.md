@@ -4,6 +4,15 @@
 此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔指令碼 (File-based apps)** 特性，
 不需要建立傳統 `.csproj`，即可直接執行。
 
+WebFont 專用範例另見：
+
+- [`WebFonts.AspNetCore`](WebFonts.AspNetCore/README.md)：可執行的 ASP.NET Core、嚴格 CSP、
+  同源或 CDN 託管範例。
+- [`WebFonts.WebForms`](WebFonts.WebForms/README.md)：ASP.NET Web Forms Handler、
+  `Web.config` 與 ASPX 範例。
+- [`docs/webfonts.md`](../docs/webfonts.md)：Dapper、EF Core、ADO.NET、Big5／Big5E、CSP、
+  CORS、CDN 與自動內容掃描 cookbook。
+
 ---
 
 ## 技術背景與最佳實踐

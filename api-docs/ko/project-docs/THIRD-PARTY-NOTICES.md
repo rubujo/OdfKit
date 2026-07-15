@@ -2,7 +2,7 @@
 title: 제3자 고지
 _lang: ko
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3
+translation_source_sha256: 8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20
 ---
 
 # 제3자 고지
@@ -34,6 +34,13 @@ OdfKit은 CC0-1.0 Universal을 사용합니다. 다음 종속성에는 각각의
 
 재배포할 때 해당 조건이 요구하는 라이선스와 저작권 고지를 보존하십시오. 링크는
 [권위 있는 원본](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)을 참조하십시오.
+
+## WebFont 테스트 종속성
+
+- FontTools / Brotli — MIT / MIT
+- Noto Sans Arabic / Devanagari / CJK — SIL Open Font License 1.1
+- IPAmj Mincho — IPA Font License Agreement v1.0
+- CNS 11643 fonts — Government Open Data License v1 / OFL-1.1
 
 * Copyright (c) OASIS Open 2021. All Rights Reserved.
 * 스키마 헤더와 [OASIS IPR Policy](https://www.oasis-open.org/committees/office/ipr.php)를 참조하십시오.

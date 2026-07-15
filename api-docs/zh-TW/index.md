@@ -11,6 +11,7 @@ API 成員內容目前以英文與正體中文（臺灣）提供。
 
 - [開啟 API 參考文件 [en + zh-TW]](xref:OdfKit)
 - [使用、合規、安全與證據指南](guide.md)
+- [WebFont 多國罕用字、CSP 與 CDN 指南](../../docs/webfonts.md)
 - [其他語言](../index.md)
 
 > **AI 產製聲明**

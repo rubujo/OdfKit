@@ -15,6 +15,15 @@
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | 中繼資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | 協作擴充 | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程整合 |
+| `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
+| `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
+| `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0` | 受信任 FontTools 子集化與多格式輸出 | 僅在 build／隔離 Worker 使用 |
+| `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
+| `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
+| `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
+| `OdfKit.WebFonts.Hosting.SystemWeb` | Web Forms 託管 | `net48` | IIS Handler 與 HTML helper | 不在 IIS 行程內子集化 |
+| `OdfKit.Extensions.Html.WebFonts` | HTML 整合 | `net10.0;netstandard2.0` | ODF 文字需求收集與外部 CSS link | 不掃描瀏覽器 DOM |
 
 ## 2. 非封裝工具與工程元件
 
@@ -27,6 +36,7 @@
 | `OdfKit.TrimSmoke` | 開發工具 | trimming / Native AOT API 根煙霧測試 |
 | `OdfKit.Tests` | 測試套件 | 單元、整合、互通與 packaging 驗證 |
 | `OdfKit.Benchmarks` | 基準測試 | 效能與資源使用量量測 |
+| `OdfKit.WebFonts.Build` | .NET Tool／MSBuild | 自動掃描受信任內容並產生 content-addressed WebFont 資產 |
 
 ## 3. 依情境選型
 
@@ -41,6 +51,7 @@
 | 協作編輯或操作序列輸出 | `OdfKit` + `OdfKit.Extensions.Collaboration` |
 | 在 CI / 批次流程中做驗證或轉檔 | `OdfKit.Cli` |
 | 將資料庫查詢（含 Entity Framework Core）或任意物件序列匯出成 ODS，或反向以 `DbDataReader` 邊界串流灌入 `SqlBulkCopy` 等 bulk copy API | `OdfKit`（核心即可，透過 `ObjectDataReader<T>` 與 `OdsStreamWriter.WriteDataAsync<T>`，無需額外擴充套件） |
+| 在 ASP.NET Core／Web Forms 顯示多國罕用字、IVS 或機構 PUA | `OdfKit.WebFonts.Build` + `OdfKit.WebFonts.Hosting.AspNetCore`／`OdfKit.WebFonts.Hosting.SystemWeb`；Big5／Big5E 或 SQL bytes 再加入對應 Encoding／Data 套件 |
 
 ## 4. 選型原則
 
@@ -56,4 +67,5 @@
 - [NuGet 相容矩陣](nuget-compatibility-matrix.md)
 - [tools/README.md](../tools/README.md)
 - [Rendering 後端部署](rendering-backend-deployment.md)
+- [WebFont 多國罕用字套件](webfonts.md)
 - [版本與交付資訊](version-delivery.md)

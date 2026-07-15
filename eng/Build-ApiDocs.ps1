@@ -108,7 +108,7 @@ try {
     $zhTwContentFiles = @(
         Get-ChildItem api-docs/zh-TW, api-docs/articles -Recurse -File -Include *.md
         Get-Item api-docs/index.md
-        Get-ChildItem OdfKit, OdfKit.Extensions.* -Recurse -File -Filter *.cs |
+        Get-ChildItem OdfKit, OdfKit.Extensions.*, OdfKit.WebFonts.* -Recurse -File -Filter *.cs |
             Where-Object {
                 $_.FullName -notmatch '[\\/]DOM[\\/]Generated[\\/]' -and
                 $_.Name -notmatch '^OdfLocalizer\.Exceptions\.[a-z]{2}(?:-[A-Z]{2})?\.cs$'
@@ -132,18 +132,28 @@ try {
 
     if (-not $SkipProjectBuild) {
         $projects = @(
-            'OdfKit/OdfKit.csproj',
-            'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj',
-            'OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj',
-            'OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj',
-            'OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj',
-            'OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj',
-            'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj',
-            'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj'
+            @{ Path = 'OdfKit/OdfKit.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Abstractions/OdfKit.WebFonts.Abstractions.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Data.SqlServer/OdfKit.WebFonts.Data.SqlServer.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj'; Framework = 'net48' }
         )
         foreach ($project in $projects) {
-            dotnet build $project -c Release -f net10.0 /p:ODFKIT_PUBLICAPI_BASELINE=1
-            if ($LASTEXITCODE) { throw "API 文件組件建置失敗：$project" }
+            dotnet build $project.Path -c Release -f $project.Framework /p:ODFKIT_PUBLICAPI_BASELINE=1
+            if ($LASTEXITCODE) { throw "API 文件組件建置失敗：$($project.Path)" }
         }
     }
 
@@ -244,6 +254,7 @@ try {
         'project-docs/ip-compliance.html',
         'project-docs/security-limits.html',
         'project-docs/evidence-index.html',
+        'project-docs/webfonts.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
         'sitemap.xml',
         'index.json',
@@ -256,7 +267,8 @@ try {
         'THIRD-PARTY-NOTICES.html',
         'evidence-index.html',
         'ip-compliance.html',
-        'security-limits.html'
+        'security-limits.html',
+        'webfonts.html'
     )
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'
     $unexpectedProjectDocs = @(
@@ -265,7 +277,7 @@ try {
     )
     if ($unexpectedProjectDocs.Count) {
         $unexpectedProjectDocs | ForEach-Object { Write-Host "  未核准資源：$($_.FullName.Substring($siteDir.Length + 1))" }
-        throw 'project-docs 只能發布四個權威 HTML 頁面。'
+        throw 'project-docs 只能發布核准的權威 HTML 頁面。'
     }
     $unresolvedXrefs = [System.Collections.Generic.List[string]]::new()
     Get-ChildItem $siteDir -Recurse -File |

@@ -2,7 +2,7 @@
   "metadata": [
     {
       "src": [
-        { "src": "..", "files": ["OdfKit/bin/Release/net10.0/OdfKit.dll", "OdfKit.Extensions.Collaboration/bin/Release/net10.0/OdfKit.Extensions.Collaboration.dll", "OdfKit.Extensions.Html/bin/Release/net10.0/OdfKit.Extensions.Html.dll", "OdfKit.Extensions.Imaging/bin/Release/net10.0/OdfKit.Extensions.Imaging.dll", "OdfKit.Extensions.Ooxml/bin/Release/net10.0/OdfKit.Extensions.Ooxml.dll", "OdfKit.Extensions.Pdf/bin/Release/net10.0/OdfKit.Extensions.Pdf.dll", "OdfKit.Extensions.Rdf/bin/Release/net10.0/OdfKit.Extensions.Rdf.dll", "OdfKit.Extensions.Rendering/bin/Release/net10.0/OdfKit.Extensions.Rendering.dll"] }
+        { "src": "..", "files": ["OdfKit/bin/Release/net10.0/OdfKit.dll", "OdfKit.Extensions.Collaboration/bin/Release/net10.0/OdfKit.Extensions.Collaboration.dll", "OdfKit.Extensions.Html/bin/Release/net10.0/OdfKit.Extensions.Html.dll", "OdfKit.Extensions.Imaging/bin/Release/net10.0/OdfKit.Extensions.Imaging.dll", "OdfKit.Extensions.Ooxml/bin/Release/net10.0/OdfKit.Extensions.Ooxml.dll", "OdfKit.Extensions.Pdf/bin/Release/net10.0/OdfKit.Extensions.Pdf.dll", "OdfKit.Extensions.Rdf/bin/Release/net10.0/OdfKit.Extensions.Rdf.dll", "OdfKit.Extensions.Rendering/bin/Release/net10.0/OdfKit.Extensions.Rendering.dll", "OdfKit.WebFonts.Abstractions/bin/Release/net10.0/OdfKit.WebFonts.Abstractions.dll", "OdfKit.WebFonts.Encoding.Legacy/bin/Release/net10.0/OdfKit.WebFonts.Encoding.Legacy.dll", "OdfKit.WebFonts.Data.SqlServer/bin/Release/net10.0/OdfKit.WebFonts.Data.SqlServer.dll", "OdfKit.WebFonts.OpenType/bin/Release/net10.0/OdfKit.WebFonts.OpenType.dll", "OdfKit.WebFonts.Build/bin/Release/net10.0/OdfKit.WebFonts.Build.dll", "OdfKit.WebFonts.Worker/bin/Release/net10.0/OdfKit.WebFonts.Worker.dll", "OdfKit.WebFonts.Profiles/bin/Release/net10.0/OdfKit.WebFonts.Profiles.dll", "OdfKit.WebFonts.Hosting.AspNetCore/bin/Release/net10.0/OdfKit.WebFonts.Hosting.AspNetCore.dll", "OdfKit.Extensions.Html.WebFonts/bin/Release/net10.0/OdfKit.Extensions.Html.WebFonts.dll", "OdfKit.WebFonts.Hosting.SystemWeb/bin/Release/net48/OdfKit.WebFonts.Hosting.SystemWeb.dll"] }
       ],
       "properties": { "TargetFramework": "net10.0", "Configuration": "Release" },
       "filter": "filterConfig.yml",
@@ -15,7 +15,7 @@
       { "files": ["api/**.yml"] },
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
       { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },
-      { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md"], "dest": "project-docs" },
+      { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md", "webfonts.md"], "dest": "project-docs" },
       { "src": "..", "files": ["THIRD-PARTY-NOTICES.md"], "dest": "project-docs" }
     ],
     "globalMetadata": {

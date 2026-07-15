@@ -36,6 +36,7 @@
 | [快速開始](getting-started.md) | 第一個專案、第一個文件、CLI 驗證 |
 | [核心 SDK 快速開始](core-quickstart.md) | 核心 SDK 的純受控建立、載入、驗證與低記憶體匯出路徑 |
 | [實作食譜](cookbook.md) | 常見操作片段與實作範例 |
+| [WebFont 多國罕用字套件](webfonts.md) | ASP.NET Core／Web Forms、CSP、CDN、自動內容掃描、Big5／Big5E 與 ORM 整合 |
 | [API 表面分層](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
 | [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
 | [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |

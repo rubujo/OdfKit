@@ -2,7 +2,7 @@
 title: Avvisi di terze parti
 _lang: it
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3
+translation_source_sha256: 8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20
 ---
 
 # Avvisi di terze parti
@@ -34,6 +34,13 @@ OdfKit usa CC0-1.0 Universal. Queste dipendenze mantengono la propria licenza:
 
 La ridistribuzione deve conservare licenze e copyright richiesti. Consultare la
 [versione autorevole](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
+
+## Dipendenze dei test WebFont
+
+- FontTools / Brotli — MIT / MIT
+- Noto Sans Arabic / Devanagari / CJK — SIL Open Font License 1.1
+- IPAmj Mincho — IPA Font License Agreement v1.0
+- CNS 11643 fonts — Government Open Data License v1 / OFL-1.1
 
 * Copyright (c) OASIS Open 2021. All Rights Reserved.
 * Vedere le intestazioni degli schemi e la [OASIS IPR Policy](https://www.oasis-open.org/committees/office/ipr.php).

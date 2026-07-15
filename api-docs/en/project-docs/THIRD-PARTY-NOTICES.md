@@ -2,7 +2,7 @@
 title: Third-Party Notices
 _lang: en
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3
+translation_source_sha256: 8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20
 ---
 
 # Third-Party Notices
@@ -40,6 +40,13 @@ notice required by the applicable terms. Consult the package links in the
 [authoritative notice](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
 
 For the OASIS schema files:
+
+## WebFont test dependencies
+
+- FontTools / Brotli — MIT / MIT
+- Noto Sans Arabic / Devanagari / CJK — SIL Open Font License 1.1
+- IPAmj Mincho — IPA Font License Agreement v1.0
+- CNS 11643 fonts — Government Open Data License v1 / OFL-1.1
 
 * Copyright (c) OASIS Open 2021. All Rights Reserved.
 * See the headers of each schema and the [OASIS IPR Policy](https://www.oasis-open.org/committees/office/ipr.php).

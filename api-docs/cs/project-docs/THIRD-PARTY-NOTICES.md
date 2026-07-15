@@ -2,7 +2,7 @@
 title: Oznámení třetích stran
 _lang: cs
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: eb97b83c5abe4680a534264cc53b045a46885a06b5d33249324139295796c0f3
+translation_source_sha256: 8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20
 ---
 
 # Oznámení třetích stran
@@ -35,6 +35,13 @@ Projekt OdfKit je poskytován pod licencí [CC0-1.0 Universal](https://creativec
 Při distribuci aplikace obsahující výše uvedené závislosti zachovejte oznámení o licenci a autorských právech vyžadovaná podmínkami jednotlivých balíčků.
 
 Oznámení o autorských právech pro soubory schémat OASIS (Relax-NG Schemas):
+
+## Závislosti testů WebFont
+
+- FontTools / Brotli — MIT / MIT
+- Noto Sans Arabic / Devanagari / CJK — SIL Open Font License 1.1
+- IPAmj Mincho — IPA Font License Agreement v1.0
+- CNS 11643 fonts — Government Open Data License v1 / OFL-1.1
 
 * Copyright (c) OASIS Open 2021. All Rights Reserved.
 * Úplné zásady duševního vlastnictví naleznete v záhlaví jednotlivých souborů schema a v dokumentu [OASIS IPR Policy](https://www.oasis-open.org/committees/office/ipr.php).
