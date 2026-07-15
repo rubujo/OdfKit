@@ -1,10 +1,12 @@
-﻿using System.Security.Cryptography;
+﻿using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.WebFonts.Encoding.Legacy;
 using OdfKit.WebFonts.OpenType;
+using OdfKit.WebFonts.Profiles;
 
 namespace OdfKit.WebFonts.Build;
 
@@ -114,6 +116,8 @@ public sealed class WebFontAssetBuilder
                 null or "utf-8" => new UTF8Encoding(false, true).GetString(bytes),
                 "big5" or "cp950" => new Big5CharacterMappingProvider().Decode(bytes),
                 "big5e" => DecodeBig5E(options, bytes),
+                "json-profile" => DecodeJsonProfile(options, bytes),
+                "euc-tw" or "cns11643" => DecodeCns11643(options, bytes),
                 _ => throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
             });
         }
@@ -187,23 +191,100 @@ public sealed class WebFontAssetBuilder
         return new Big5ECharacterMappingProvider(mapping).Decode(bytes);
     }
 
+    private static string DecodeJsonProfile(WebFontBuildOptions options, byte[] bytes)
+    {
+        if (string.IsNullOrWhiteSpace(options.JsonProfilePath))
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
+        }
+
+        using FileStream stream = File.OpenRead(options.JsonProfilePath);
+        JsonCharacterMappingProvider provider = JsonCharacterMappingProvider.Load(
+            stream,
+            16 * 1024 * 1024,
+            1_000_000);
+        if (!string.Equals(provider.ProfileId, options.ProfileId, StringComparison.Ordinal))
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        return provider.Decode(bytes);
+    }
+
+    private static string DecodeCns11643(WebFontBuildOptions options, byte[] bytes)
+    {
+        if (string.IsNullOrWhiteSpace(options.CnsMappingArchivePath))
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
+        }
+
+        string archivePath = Path.GetFullPath(options.CnsMappingArchivePath);
+        if (!string.Equals(
+                ComputeSha256(archivePath),
+                Cns11643EucTwMappingProvider.VerifiedArchiveSha256,
+                StringComparison.Ordinal))
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        using ZipArchive archive = ZipFile.OpenRead(archivePath);
+        List<ZipArchiveEntry> entries = archive.Entries
+            .Where(entry => entry.FullName.Replace('\\', '/').StartsWith(
+                    "Unicode/CNS2UNICODE_Unicode ",
+                    StringComparison.Ordinal)
+                && entry.FullName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(entry => entry.FullName, StringComparer.Ordinal)
+            .ToList();
+        if (entries.Count == 0)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        var readers = new List<TextReader>(entries.Count);
+        try
+        {
+            foreach (ZipArchiveEntry entry in entries)
+            {
+                readers.Add(new StreamReader(entry.Open(), new UTF8Encoding(false, true)));
+            }
+
+            Cns11643EucTwMappingProvider provider = Cns11643EucTwMappingProvider.Load(
+                readers,
+                1_000_000);
+            if (!string.Equals(provider.ProfileId, options.ProfileId, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            return provider.Decode(bytes);
+        }
+        finally
+        {
+            foreach (TextReader reader in readers)
+            {
+                reader.Dispose();
+            }
+        }
+    }
+
     private static string CreateCss(WebFontManifest manifest)
     {
         var css = new StringBuilder();
-        foreach (WebFontAsset asset in manifest.Assets)
+        foreach (IGrouping<string, WebFontAsset> group in manifest.Assets
+                     .GroupBy(
+                         asset => $"{asset.FontFamily}\u001F{string.Join(",", asset.UnicodeRanges)}",
+                         StringComparer.Ordinal)
+                     .OrderBy(group => group.Key, StringComparer.Ordinal))
         {
-            string format = asset.Format switch
-            {
-                WebFontFormat.Woff2 => "woff2",
-                WebFontFormat.Woff => "woff",
-                WebFontFormat.TrueType => "truetype",
-                WebFontFormat.OpenType => "opentype",
-                _ => string.Empty
-            };
+            WebFontAsset first = group.First();
+            string sources = string.Join(
+                ",\n       ",
+                group.OrderBy(asset => GetCssFormatPriority(asset.Format))
+                    .Select(asset => $"url('./{asset.Sha256}/{asset.FileName}') format('{GetCssFormat(asset.Format)}')"));
             css.AppendLine("@font-face {");
-            css.Append("  font-family: '").Append(EscapeCss(asset.FontFamily)).AppendLine("';");
-            css.Append("  src: url('./").Append(asset.Sha256).Append('/').Append(asset.FileName).Append("') format('").Append(format).AppendLine("');");
-            css.Append("  unicode-range: ").Append(string.Join(", ", asset.UnicodeRanges)).AppendLine(";");
+            css.Append("  font-family: '").Append(EscapeCss(first.FontFamily)).AppendLine("';");
+            css.Append("  src: ").Append(sources).AppendLine(";");
+            css.Append("  unicode-range: ").Append(string.Join(", ", first.UnicodeRanges)).AppendLine(";");
             css.AppendLine("  font-display: swap;");
             css.AppendLine("}");
         }
@@ -263,4 +344,26 @@ public sealed class WebFontAssetBuilder
     private static string EscapeCss(string value)
         => value.Replace("\\", "\\\\", StringComparison.Ordinal)
             .Replace("'", "\\'", StringComparison.Ordinal);
+
+    private static string GetCssFormat(WebFontFormat format)
+        => format switch
+        {
+            WebFontFormat.Woff2 => "woff2",
+            WebFontFormat.Woff => "woff",
+            WebFontFormat.TrueType => "truetype",
+            WebFontFormat.OpenType => "opentype",
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(format),
+                OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
+        };
+
+    private static int GetCssFormatPriority(WebFontFormat format)
+        => format switch
+        {
+            WebFontFormat.Woff2 => 0,
+            WebFontFormat.Woff => 1,
+            WebFontFormat.OpenType => 2,
+            WebFontFormat.TrueType => 3,
+            _ => int.MaxValue
+        };
 }

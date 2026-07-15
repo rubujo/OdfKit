@@ -61,6 +61,18 @@ public sealed class WebFontBuildOptions
     public string? Big5EMappingPath { get; init; }
 
     /// <summary>
+    /// Gets or initializes an optional bounded JSON mapping profile path.
+    /// 取得或初始化選用的有界 JSON mapping profile 路徑。
+    /// </summary>
+    public string? JsonProfilePath { get; init; }
+
+    /// <summary>
+    /// Gets or initializes the pinned official CNS 11643 mapping archive path for EUC-TW input.
+    /// 取得或初始化供 EUC-TW 輸入使用且已鎖定的官方 CNS 11643 對照表封存檔路徑。
+    /// </summary>
+    public string? CnsMappingArchivePath { get; init; }
+
+    /// <summary>
     /// Gets or initializes the mapping profile identifier.
     /// 取得或初始化 mapping profile 識別碼。
     /// </summary>

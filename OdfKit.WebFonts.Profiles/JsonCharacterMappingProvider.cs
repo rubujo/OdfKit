@@ -9,20 +9,43 @@ namespace OdfKit.WebFonts.Profiles;
 /// Loads a versioned country, organization, or tenant mapping profile from bounded JSON.
 /// 從有界 JSON 載入版本化的國家、組織或租戶 mapping profile。
 /// </summary>
-public sealed class JsonCharacterMappingProvider : ICharacterMappingProvider
+public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingProvider
 {
     private readonly IReadOnlyDictionary<string, string> _mappings;
     private readonly int _maximumByteLength;
 
-    private JsonCharacterMappingProvider(string profileId, IReadOnlyDictionary<string, string> mappings, int maximumByteLength)
+    private JsonCharacterMappingProvider(
+        MappingProfile profile,
+        IReadOnlyDictionary<string, string> mappings,
+        int maximumByteLength)
     {
-        ProfileId = profileId;
+        ProfileId = profile.ProfileId;
+        DataVersion = profile.DataVersion;
+        SourceUri = profile.SourceUri;
+        SourceSha256 = profile.SourceSha256.ToLowerInvariant();
+        LicenseId = profile.LicenseId;
+        Attribution = profile.Attribution;
         _mappings = mappings;
         _maximumByteLength = maximumByteLength;
     }
 
     /// <inheritdoc />
     public string ProfileId { get; }
+
+    /// <inheritdoc />
+    public string DataVersion { get; }
+
+    /// <inheritdoc />
+    public string SourceUri { get; }
+
+    /// <inheritdoc />
+    public string SourceSha256 { get; }
+
+    /// <inheritdoc />
+    public string LicenseId { get; }
+
+    /// <inheritdoc />
+    public string Attribution { get; }
 
     /// <summary>
     /// Loads a profile with strict size and entry-count limits.
@@ -72,6 +95,13 @@ public sealed class JsonCharacterMappingProvider : ICharacterMappingProvider
             || profile.SchemaVersion != 1
             || string.IsNullOrWhiteSpace(profile.ProfileId)
             || profile.ProfileId.Length > 256
+            || string.IsNullOrWhiteSpace(profile.DataVersion)
+            || !Uri.TryCreate(profile.SourceUri, UriKind.Absolute, out Uri? sourceUri)
+            || sourceUri.Scheme is not ("https" or "file")
+            || profile.SourceSha256.Length != 64
+            || !profile.SourceSha256.All(Uri.IsHexDigit)
+            || string.IsNullOrWhiteSpace(profile.LicenseId)
+            || string.IsNullOrWhiteSpace(profile.Attribution)
             || profile.Mappings.Count is 0
             || profile.Mappings.Count > maxEntries)
         {
@@ -99,7 +129,7 @@ public sealed class JsonCharacterMappingProvider : ICharacterMappingProvider
             maximumByteLength = Math.Max(maximumByteLength, key.Length / 2);
         }
 
-        return new JsonCharacterMappingProvider(profile.ProfileId, mappings, maximumByteLength);
+        return new JsonCharacterMappingProvider(profile, mappings, maximumByteLength);
     }
 
     /// <inheritdoc />
@@ -164,6 +194,16 @@ public sealed class JsonCharacterMappingProvider : ICharacterMappingProvider
         public int SchemaVersion { get; set; }
 
         public string ProfileId { get; set; } = string.Empty;
+
+        public string DataVersion { get; set; } = string.Empty;
+
+        public string SourceUri { get; set; } = string.Empty;
+
+        public string SourceSha256 { get; set; } = string.Empty;
+
+        public string LicenseId { get; set; } = string.Empty;
+
+        public string Attribution { get; set; } = string.Empty;
 
         public Dictionary<string, string> Mappings { get; set; } = new(StringComparer.Ordinal);
     }

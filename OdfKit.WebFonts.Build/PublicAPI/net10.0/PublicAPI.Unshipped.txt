@@ -5,6 +5,8 @@ OdfKit.WebFonts.Build.WebFontAssetBuilder.WebFontAssetBuilder() -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions
 OdfKit.WebFonts.Build.WebFontBuildOptions.Big5EMappingPath.get -> string?
 OdfKit.WebFonts.Build.WebFontBuildOptions.Big5EMappingPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.CnsMappingArchivePath.get -> string?
+OdfKit.WebFonts.Build.WebFontBuildOptions.CnsMappingArchivePath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.FaceIndex.get -> int
@@ -21,6 +23,8 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.get -> strin
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
 OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.JsonProfilePath.get -> string?
+OdfKit.WebFonts.Build.WebFontBuildOptions.JsonProfilePath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.get -> string?
 OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.get -> long

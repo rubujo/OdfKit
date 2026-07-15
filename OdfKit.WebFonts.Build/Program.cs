@@ -8,7 +8,7 @@ static async Task<int> RunAsync(string[] args)
 {
     if (args.Length == 0 || args[0] is "-h" or "--help")
     {
-        Console.WriteLine("odfkit-webfonts build --font <path> (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf,otf] [--face <index>] [--encoding utf-8|big5|big5e] [--big5e-map <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--pyftsubset <path>] [--fonttools-pythonpath <path>]");
+        Console.WriteLine("odfkit-webfonts build --font <path> (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf,otf] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--pyftsubset <path>] [--fonttools-pythonpath <path>]");
         return 0;
     }
 
@@ -40,6 +40,8 @@ static async Task<int> RunAsync(string[] args)
             FaceIndex = int.Parse(Get(values, "face", "0"), System.Globalization.CultureInfo.InvariantCulture),
             LegacyEncoding = GetOptional(values, "encoding"),
             Big5EMappingPath = GetOptional(values, "big5e-map"),
+            JsonProfilePath = GetOptional(values, "json-profile"),
+            CnsMappingArchivePath = GetOptional(values, "cns-mapping-archive"),
             FontToolsExecutable = Get(values, "pyftsubset", "pyftsubset"),
             FontToolsPythonModulePath = GetOptional(values, "fonttools-pythonpath"),
             Formats = ParseFormats(Get(values, "formats", "woff2,woff"))

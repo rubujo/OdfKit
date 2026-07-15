@@ -15,6 +15,6 @@
     <Exec Condition="'$(OdfKitWebFontsArguments)' != ''"
           Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsArguments)" />
     <Exec Condition="'$(OdfKitWebFontsArguments)' == ''"
-          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build --font &quot;$(OdfKitWebFontsFontPath)&quot; --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot;" />
+          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build --font &quot;$(OdfKitWebFontsFontPath)&quot; --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot; $(OdfKitWebFontsAdditionalArguments)" />
   </Target>
 </Project>

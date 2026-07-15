@@ -2,6 +2,12 @@
 OdfKit.WebFonts.ICharacterMappingProvider
 OdfKit.WebFonts.ICharacterMappingProvider.Decode(byte[]! source) -> string!
 OdfKit.WebFonts.ICharacterMappingProvider.ProfileId.get -> string!
+OdfKit.WebFonts.ITraceableCharacterMappingProvider
+OdfKit.WebFonts.ITraceableCharacterMappingProvider.Attribution.get -> string!
+OdfKit.WebFonts.ITraceableCharacterMappingProvider.DataVersion.get -> string!
+OdfKit.WebFonts.ITraceableCharacterMappingProvider.LicenseId.get -> string!
+OdfKit.WebFonts.ITraceableCharacterMappingProvider.SourceSha256.get -> string!
+OdfKit.WebFonts.ITraceableCharacterMappingProvider.SourceUri.get -> string!
 OdfKit.WebFonts.IWebFontSubsetEngine
 OdfKit.WebFonts.IWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.WebFontAsset

@@ -34,6 +34,7 @@ public sealed class FontToolsWebFontSubsetEngine : IWebFontSubsetEngine
     {
         ValidateRequest(request, destinationDirectory);
         string sourcePath = ResolveSource(request.Face);
+        RejectUnverifiedFontTechnologies(sourcePath, request.Face.FaceIndex);
         Directory.CreateDirectory(destinationDirectory);
 
         int[] scalars = request.Sequences
@@ -307,6 +308,90 @@ public sealed class FontToolsWebFontSubsetEngine : IWebFontSubsetEngine
 
     private static bool IsCollection(string path)
         => Path.GetExtension(path).ToLowerInvariant() is ".ttc" or ".otc";
+
+    private static void RejectUnverifiedFontTechnologies(string path, int faceIndex)
+    {
+        IReadOnlySet<string> tags = ReadSfntTableTags(path, faceIndex);
+        if (tags.Contains("CFF2")
+            || tags.Contains("COLR")
+            || tags.Contains("CPAL")
+            || tags.Contains("CBDT")
+            || tags.Contains("CBLC")
+            || tags.Contains("sbix")
+            || tags.Contains("SVG "))
+        {
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+    }
+
+    private static IReadOnlySet<string> ReadSfntTableTags(string path, int faceIndex)
+    {
+        using FileStream stream = File.OpenRead(path);
+        using var reader = new BinaryReader(stream);
+        byte[] signature = reader.ReadBytes(4);
+        long faceOffset = 0;
+        if (signature.AsSpan().SequenceEqual("ttcf"u8))
+        {
+            _ = ReadUInt32BigEndian(reader);
+            uint faceCount = ReadUInt32BigEndian(reader);
+            if (faceIndex < 0 || (uint)faceIndex >= faceCount)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            stream.Position = 12L + (faceIndex * 4L);
+            faceOffset = ReadUInt32BigEndian(reader);
+            stream.Position = faceOffset;
+            signature = reader.ReadBytes(4);
+        }
+
+        if (signature.Length != 4
+            || !(signature.AsSpan().SequenceEqual("OTTO"u8)
+                || signature.AsSpan().SequenceEqual("true"u8)
+                || signature.AsSpan().SequenceEqual(new byte[] { 0, 1, 0, 0 })))
+        {
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        ushort tableCount = ReadUInt16BigEndian(reader);
+        stream.Position = faceOffset + 12;
+        var tags = new HashSet<string>(StringComparer.Ordinal);
+        for (int index = 0; index < tableCount; index++)
+        {
+            byte[] tag = reader.ReadBytes(4);
+            if (tag.Length != 4)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            tags.Add(System.Text.Encoding.ASCII.GetString(tag));
+            stream.Position += 12;
+        }
+
+        return tags;
+    }
+
+    private static ushort ReadUInt16BigEndian(BinaryReader reader)
+    {
+        Span<byte> bytes = stackalloc byte[2];
+        if (reader.Read(bytes) != bytes.Length)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        return System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(bytes);
+    }
+
+    private static uint ReadUInt32BigEndian(BinaryReader reader)
+    {
+        Span<byte> bytes = stackalloc byte[4];
+        if (reader.Read(bytes) != bytes.Length)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        return System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(bytes);
+    }
 
     private static string Truncate(string value, int maximumLength)
         => value.Length <= maximumLength ? value : value[..maximumLength];
