@@ -12,11 +12,21 @@
     <File Path=".github/copilot-instructions.md" />
   </Folder>
   <Project Path="OdfKit/OdfKit.csproj" />
+  <Project Path="OdfKit.WebFonts.Abstractions/OdfKit.WebFonts.Abstractions.csproj" />
+  <Project Path="OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj" />
+  <Project Path="OdfKit.WebFonts.Data.SqlServer/OdfKit.WebFonts.Data.SqlServer.csproj" />
+  <Project Path="OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj" />
+  <Project Path="OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj" />
+  <Project Path="OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj" />
+  <Project Path="OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj" />
+  <Project Path="OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
+  <Project Path="OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj" />
   <Project Path="OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj" />
   <Project Path="OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj" />
   <Project Path="OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj" />
   <Project Path="OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj" />
   <Project Path="OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj" />
+  <Project Path="OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj" />
   <Project Path="OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj" />
   <Project Path="OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
@@ -25,4 +35,9 @@
   <Project Path="tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj" />
   <Project Path="tools/OdfCorpusGenerator/OdfCorpusGenerator.csproj" />
   <Project Path="tests/OdfKit.NetFramework48Smoke/OdfKit.NetFramework48Smoke.csproj" />
+  <Project Path="tests/OdfKit.WebFontSmoke/OdfKit.WebFontSmoke.csproj" />
+  <Project Path="tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj" />
+  <Project Path="tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj" />
+  <Project Path="tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj" />
+  <Project Path="samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj" />
 </Solution>

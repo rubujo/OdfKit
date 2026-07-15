@@ -28,6 +28,16 @@ $libraryProjects = @(
     'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj',
     'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj',
     'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj',
+    'OdfKit.WebFonts.Abstractions/OdfKit.WebFonts.Abstractions.csproj',
+    'OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj',
+    'OdfKit.WebFonts.Data.SqlServer/OdfKit.WebFonts.Data.SqlServer.csproj',
+    'OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj',
+    'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj',
+    'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj',
+    'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj',
+    'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj',
+    'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj',
+    'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj',
     'tools/OdfKit.Cli/OdfKit.Cli.csproj',
     'tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj'
 )
@@ -72,9 +82,16 @@ foreach ($relative in $libraryProjects) {
 }
 
 if ($IncludeTests) {
-    $testsProject = Join-Path $root 'OdfKit.Tests/OdfKit.Tests.csproj'
     Write-Host '格式化測試專案（僅 whitespace，跳過 analyzer 修正）…'
-    Invoke-DotNetFormat -ProjectPath $testsProject -Relative 'OdfKit.Tests/OdfKit.Tests.csproj' -WhitespaceOnly
+    foreach ($relative in @(
+        'OdfKit.Tests/OdfKit.Tests.csproj',
+        'tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj',
+        'tests/OdfKit.WebFontSmoke/OdfKit.WebFontSmoke.csproj',
+        'tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj',
+        'tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj',
+        'samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj')) {
+        Invoke-DotNetFormat -ProjectPath (Join-Path $root $relative) -Relative $relative -WhitespaceOnly
+    }
 }
 
 & (Join-Path $PSScriptRoot 'Test-MergeConflictMarkers.ps1') -Root $root

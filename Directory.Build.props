@@ -22,4 +22,9 @@
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'OdfKit.WebFontSmoke' AND '$(OdfKitWebFontSmokeIntermediateRoot)' != ''">
+    <BaseIntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(OdfKitWebFontSmokeIntermediateRoot)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
 </Project>
