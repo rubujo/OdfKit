@@ -1,12 +1,20 @@
 ﻿using System.Net;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OdfKit.WebFonts.Hosting.AspNetCore;
 
 namespace OdfKit.WebFonts.Tests;
@@ -215,6 +223,141 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
+    public async Task GenerationEndpoint_RequiresAuthorizationAllowlistAndPublishesImmutableAsset()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            var engine = new DynamicAssetEngine();
+            await using WebApplication application = await StartGenerationApplicationAsync(
+                rootPath,
+                engine,
+                permitLimit: 10);
+            using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+            OdfWebFontGenerationRequest request = CreateGenerationRequest();
+
+            using HttpResponseMessage unauthorized = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                request,
+                TestContext.Current.CancellationToken);
+            client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+            using HttpResponseMessage disallowed = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                new OdfWebFontGenerationRequest
+                {
+                    FontSourceId = request.FontSourceId,
+                    FaceIndex = request.FaceIndex,
+                    ProfileId = "untrusted-profile",
+                    FontFamily = request.FontFamily,
+                    Sequences = request.Sequences,
+                    Formats = request.Formats
+                },
+                TestContext.Current.CancellationToken);
+            using HttpResponseMessage generated = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                request,
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, unauthorized.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, disallowed.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, generated.StatusCode);
+            WebFontManifest manifest = await generated.Content.ReadFromJsonAsync<WebFontManifest>(
+                cancellationToken: TestContext.Current.CancellationToken)
+                ?? throw new InvalidDataException();
+            WebFontAsset asset = Assert.Single(manifest.Assets);
+            using HttpResponseMessage assetResponse = await client.GetAsync(
+                $"/_odf-fonts/{asset.Sha256}/{asset.FileName}",
+                TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.OK, assetResponse.StatusCode);
+            Assert.Equal("public, max-age=31536000, immutable", assetResponse.Headers.CacheControl?.ToString());
+            await File.WriteAllBytesAsync(
+                Path.Combine(rootPath, asset.Sha256, asset.FileName),
+                "tampered"u8.ToArray(),
+                TestContext.Current.CancellationToken);
+            using HttpResponseMessage tamperedResponse = await client.GetAsync(
+                $"/_odf-fonts/{asset.Sha256}/{asset.FileName}",
+                TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.NotFound, tamperedResponse.StatusCode);
+            Assert.Equal(1, engine.CallCount);
+
+            await application.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task GenerationEndpoint_EnforcesNamedRateLimiter()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            var engine = new DynamicAssetEngine();
+            await using WebApplication application = await StartGenerationApplicationAsync(
+                rootPath,
+                engine,
+                permitLimit: 1);
+            using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+            client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+
+            using HttpResponseMessage first = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                CreateGenerationRequest(),
+                TestContext.Current.CancellationToken);
+            using HttpResponseMessage rejected = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                CreateGenerationRequest(),
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+            Assert.Equal(HttpStatusCode.TooManyRequests, rejected.StatusCode);
+            Assert.Equal(1, engine.CallCount);
+
+            await application.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task GenerationEndpoint_RejectsOversizedChunkedJsonBodyBeforeEngine()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            var engine = new DynamicAssetEngine();
+            await using WebApplication application = await StartGenerationApplicationAsync(
+                rootPath,
+                engine,
+                permitLimit: 10,
+                maxRequestBodyBytes: 128);
+            using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+            client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+            using var content = new StreamContent(new MemoryStream(new byte[1024]));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            content.Headers.ContentLength = null;
+
+            using HttpResponseMessage response = await client.PostAsync(
+                "/_odf-fonts/generate",
+                content,
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+            Assert.Equal(0, engine.CallCount);
+
+            await application.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
     public async Task Startup_RejectsAssetWhoseContentDoesNotMatchManifestHash()
     {
         string rootPath = CreateTemporaryRoot();
@@ -239,6 +382,87 @@ public sealed class WebFontHostingTests
         {
             DeleteTemporaryRoot(rootPath);
         }
+    }
+
+    private static OdfWebFontGenerationRequest CreateGenerationRequest()
+        => new()
+        {
+            FontSourceId = "trusted-dynamic-face",
+            ProfileId = "dynamic-test-v1",
+            FontFamily = "OdfKit Dynamic Test",
+            Sequences = ["A𠆩"],
+            Formats = [WebFontFormat.Woff2]
+        };
+
+    private static async Task<WebApplication> StartGenerationApplicationAsync(
+        string rootPath,
+        DynamicAssetEngine engine,
+        int permitLimit,
+        int maxRequestBodyBytes = 64 * 1024)
+    {
+        byte[] initialBytes = "wOF2-initial"u8.ToArray();
+        const string initialFileName = "initial.woff2";
+        string initialSha256 = Convert.ToHexString(SHA256.HashData(initialBytes)).ToLowerInvariant();
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, initialFileName),
+            initialBytes,
+            TestContext.Current.CancellationToken);
+        await WriteManifestAsync(
+            rootPath,
+            initialFileName,
+            initialBytes.Length,
+            initialSha256);
+
+        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        builder.Services.AddAuthentication(TestAuthenticationHandler.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(
+                TestAuthenticationHandler.SchemeName,
+                _ => { });
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("webfont-generation", policy => policy.RequireAuthenticatedUser());
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = (int)HttpStatusCode.TooManyRequests;
+            options.AddFixedWindowLimiter(
+                "webfont-generation",
+                limiterOptions =>
+                {
+                    limiterOptions.PermitLimit = permitLimit;
+                    limiterOptions.QueueLimit = 0;
+                    limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    limiterOptions.Window = TimeSpan.FromMinutes(1);
+                });
+        });
+        builder.Services.AddOdfWebFonts(rootPath);
+        builder.Services.AddOdfWebFontGeneration(
+            _ => engine,
+            options =>
+            {
+                options.AuthorizationPolicyName = "webfont-generation";
+                options.RateLimiterPolicyName = "webfont-generation";
+                options.MaxRequestBodyBytes = maxRequestBodyBytes;
+                options.AllowedFaces.Add(new WebFontFaceIdentity
+                {
+                    FontSourceId = "trusted-dynamic-face",
+                    SourceSha256 = new string('a', 64)
+                });
+                options.AllowedProfileIds.Add("dynamic-test-v1");
+            },
+            options =>
+            {
+                options.MaxConcurrency = 1;
+                options.QueueCapacity = 2;
+                options.JobTimeout = TimeSpan.FromSeconds(10);
+            });
+        WebApplication application = builder.Build();
+        application.UseRouting();
+        application.UseAuthentication();
+        application.UseAuthorization();
+        application.UseRateLimiter();
+        application.MapOdfWebFonts();
+        await application.StartAsync(TestContext.Current.CancellationToken);
+        return application;
     }
 
     private static Task<WebApplication> StartApplicationAsync(string rootPath)
@@ -341,5 +565,69 @@ public sealed class WebFontHostingTests
         }
 
         Directory.Delete(resolvedRoot, recursive: true);
+    }
+
+    private sealed class DynamicAssetEngine : IWebFontSubsetEngine
+    {
+        private int _callCount;
+
+        public int CallCount => Volatile.Read(ref _callCount);
+
+        public async Task<WebFontManifest> GenerateAsync(
+            WebFontSubsetRequest request,
+            string destinationDirectory,
+            CancellationToken cancellationToken = default)
+        {
+            Interlocked.Increment(ref _callCount);
+            byte[] bytes = "wOF2-real-http-generation"u8.ToArray();
+            string sha256 = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+            const string fileName = "dynamic.woff2";
+            string hashDirectory = Path.Combine(destinationDirectory, sha256);
+            Directory.CreateDirectory(hashDirectory);
+            await File.WriteAllBytesAsync(
+                Path.Combine(hashDirectory, fileName),
+                bytes,
+                cancellationToken);
+            return new WebFontManifest
+            {
+                ProfileId = request.ProfileId,
+                Assets =
+                [
+                    new WebFontAsset
+                    {
+                        FileName = fileName,
+                        Sha256 = sha256,
+                        ByteLength = bytes.Length,
+                        Format = WebFontFormat.Woff2,
+                        FontFamily = request.FontFamily,
+                        UnicodeRanges = ["U+41", "U+201A9"]
+                    }
+                ]
+            };
+        }
+    }
+
+    private sealed class TestAuthenticationHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder)
+        : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+    {
+        public const string SchemeName = "WebFontTest";
+
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        {
+            if (!Request.Headers.ContainsKey("X-Test-Authorization"))
+            {
+                return Task.FromResult(AuthenticateResult.NoResult());
+            }
+
+            var identity = new ClaimsIdentity(
+                [new Claim(ClaimTypes.NameIdentifier, "webfont-test")],
+                SchemeName);
+            var principal = new ClaimsPrincipal(identity);
+            return Task.FromResult(AuthenticateResult.Success(
+                new AuthenticationTicket(principal, SchemeName)));
+        }
     }
 }

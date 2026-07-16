@@ -26,5 +26,18 @@
     <BaseIntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
     <MSBuildProjectExtensionsPath>$(OdfKitWebFontSmokeIntermediateRoot)</MSBuildProjectExtensionsPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)\obj\**</DefaultItemExcludes>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'OdfKit.WebFontWorkerProcessSmoke' AND '$(OdfKitWebFontWorkerProcessSmokeIntermediateRoot)' != ''">
+    <BaseIntermediateOutputPath>$(OdfKitWebFontWorkerProcessSmokeIntermediateRoot)</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(OdfKitWebFontWorkerProcessSmokeIntermediateRoot)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(OdfKitWebFontWorkerProcessSmokeIntermediateRoot)</MSBuildProjectExtensionsPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)\obj\**</DefaultItemExcludes>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'OdfKit.WebFontFormatMatrix' AND '$(OdfKitWebFontFormatMatrixIntermediateRoot)' != ''">
+    <BaseIntermediateOutputPath>$(OdfKitWebFontFormatMatrixIntermediateRoot)</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(OdfKitWebFontFormatMatrixIntermediateRoot)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(OdfKitWebFontFormatMatrixIntermediateRoot)</MSBuildProjectExtensionsPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)\obj\**</DefaultItemExcludes>
   </PropertyGroup>
 </Project>

@@ -2,7 +2,7 @@
 title: Hinweise zu Drittanbietern
 _lang: de
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20
+translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
 ---
 
 # Hinweise zu Drittanbietern
@@ -38,8 +38,8 @@ Links enthält die [maßgebliche Fassung](https://github.com/rubujo/OdfKit/blob/
 
 ## Abhängigkeiten der WebFont-Tests
 
-- FontTools / Brotli — MIT / MIT
 - Noto Sans Arabic / Devanagari / CJK — SIL Open Font License 1.1
+- Noto Color Emoji — SIL Open Font License 1.1
 - IPAmj Mincho — IPA Font License Agreement v1.0
 - CNS 11643 fonts — Government Open Data License v1 / OFL-1.1
 

@@ -24,9 +24,9 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | RDF 圖形與 SPARQL 查詢橋接（於 OdfKit.Extensions.Rdf 中使用） | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | 提供 `dynamic` 型別執行期繫結支援（於 OdfKit.Extensions.Ooxml 之 netstandard2.0 目標使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與代碼生成（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |
-| [FontTools](https://github.com/fonttools/fonttools) / [Brotli](https://github.com/google/brotli) | WebFont 最小測試的字型子集化與 WOFF2 壓縮工具（僅測試時下載） | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE) / [MIT](https://github.com/google/brotli/blob/master/LICENSE) |
 | [Noto Sans TC](https://github.com/notofonts/noto-cjk) | WebFont 最小測試使用的繁體中文字型（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/notofonts/noto-cjk/blob/main/LICENSE) |
 | [Noto Sans Arabic／Devanagari](https://github.com/google/fonts) 與 [Noto Sans CJK](https://github.com/notofonts/noto-cjk) | 多國文字、複雜塑形、TTC face 與 OpenType CFF smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://openfontlicense.org/) |
+| [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) | Color／bitmap font 明確拒絕 smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/googlefonts/noto-emoji/blob/main/LICENSE) |
 | [IPAmj Mincho](https://moji.or.jp/mojikiban/font/) | 日本文字資訊基盤 IVS smoke（僅測試時下載，不隨套件散布） | [IPA Font License Agreement v1.0](https://moji.or.jp/ipafont/license/) |
 | [全字庫宋體](https://www.cns11643.gov.tw/pageView.jsp?ID=59) | CNS 11643 Plane 15 PUA smoke（僅測試時下載，不隨套件散布） | 政府資料開放授權條款第 1 版／OFL-1.1（依資料集聲明） |
 

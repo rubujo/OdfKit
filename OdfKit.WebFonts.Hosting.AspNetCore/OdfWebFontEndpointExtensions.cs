@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using OdfKit.WebFonts.Worker;
 
 namespace OdfKit.WebFonts.Hosting.AspNetCore;
 
@@ -33,6 +35,36 @@ public static class OdfWebFontEndpointExtensions
         services.AddSingleton(serviceProvider => new OdfWebFontResourceProvider(
             serviceProvider.GetRequiredService<IOptions<OdfWebFontOptions>>(),
             serviceProvider.GetRequiredService<WebFontAssetStore>()));
+        return services;
+    }
+
+    /// <summary>
+    /// Adds an opt-in bounded WebFont generation worker for authenticated endpoints.
+    /// 加入選擇啟用且供授權 endpoint 使用的有界 WebFont 動態產生 worker。
+    /// </summary>
+    /// <param name="services">The application service collection. / 應用程式服務集合。</param>
+    /// <param name="engineFactory">The factory for an isolated trusted subset engine adapter. / 建立隔離且受信任子集引擎 adapter 的工廠。</param>
+    /// <param name="configureGeneration">The generation endpoint allowlist and limits. / 動態產生 endpoint 的允許清單與限制。</param>
+    /// <param name="configureWorker">The bounded worker limits and durable-cache settings. / 有界 worker 限制與耐久快取設定。</param>
+    /// <returns>The original service collection. / 原始服務集合。</returns>
+    public static IServiceCollection AddOdfWebFontGeneration(
+        this IServiceCollection services,
+        Func<IServiceProvider, IWebFontSubsetEngine> engineFactory,
+        Action<OdfWebFontGenerationOptions> configureGeneration,
+        Action<WebFontWorkerOptions> configureWorker)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(engineFactory);
+        ArgumentNullException.ThrowIfNull(configureGeneration);
+        ArgumentNullException.ThrowIfNull(configureWorker);
+        services.Configure(configureGeneration);
+        services.Configure(configureWorker);
+        services.AddSingleton(serviceProvider => new WebFontGenerationWorker(
+            engineFactory(serviceProvider)
+                ?? throw new InvalidOperationException(
+                    OdfKit.Compliance.OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid")),
+            serviceProvider.GetRequiredService<IOptions<WebFontWorkerOptions>>().Value));
+        services.AddSingleton<OdfWebFontGenerationService>();
         return services;
     }
 
@@ -144,6 +176,26 @@ public static class OdfWebFontEndpointExtensions
                     entityTag: new EntityTagHeaderValue($"\"{asset.Descriptor.Sha256}\""),
                     enableRangeProcessing: false);
             });
+
+        OdfWebFontGenerationService? generationService = endpoints.ServiceProvider
+            .GetService<OdfWebFontGenerationService>();
+        if (generationService is not null)
+        {
+            OdfWebFontGenerationOptions generationOptions = endpoints.ServiceProvider
+                .GetRequiredService<IOptions<OdfWebFontGenerationOptions>>()
+                .Value;
+            OdfWebFontGenerationOptionValidator.Validate(generationOptions);
+            group.MapPost(
+                    "/generate",
+                    static (HttpRequest request, OdfWebFontGenerationService service, CancellationToken cancellationToken)
+                        => service.GenerateAsync(request, cancellationToken))
+                .RequireAuthorization(new AuthorizeAttribute
+                {
+                    Policy = generationOptions.AuthorizationPolicyName
+                })
+                .RequireRateLimiting(generationOptions.RateLimiterPolicyName);
+        }
+
         return group;
     }
 

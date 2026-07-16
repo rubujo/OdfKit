@@ -1,12 +1,52 @@
 # WebFont 多國罕用字套件
 
-OdfKit WebFonts 將受信任字型與文字 corpus 預先轉成內容定址的 WOFF2／WOFF／TTF／OTF
-資產。正式預設是建置期產生與唯讀傳送；HTTP 要求不執行 FontTools，也不自動上傳頁面文字。
-這項邊界同時改善 CSP、隱私、效能與 CDN cache hit ratio。
+> 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 動態端點
+> 與單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
+> Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
+> complex-script shaping、惡意來源字型 fuzz、跨節點 store
+> 與外部安全／客戶驗收仍未完成，因此整套產品仍標示 experimental。權威實作邊界見
+> [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
-## 最短使用方式
+OdfKit WebFonts 的主要產品情境，是 ASP.NET Core 與 ASP.NET Web Forms 在執行期遇到 CNS
+11643、IVS、PUA 或其它多國 Unicode sequence 時，快速取得只含所需 glyph 的 WebFont。核心
+不綁定全字庫；CNS 是可追溯的內建 Profile／mapping provider，自訂 JSON Profile 與 C#
+provider 使用同一套中性契約。
 
-先安裝 Build Tool 與 ASP.NET Core Hosting 套件，並確認來源字型授權允許子集化及 Web 散布：
+## 產品模型
+
+動態內容是主線，預產生是必要的暖機及 fallback：
+
+1. 應用程式把受信任文字轉成 canonical sequence request。
+2. 先以來源字型 SHA-256、face、Profile、sequence 與格式計算 canonical hash。
+3. durable cache 命中時直接回傳內容定址資產；未命中才送入有界 managed Worker。
+4. 相同 hash 以 single-flight 合併，完成資產放入 object storage／CDN。
+5. 公開 HTTP 只取得不可變資產；動態 generation endpoint 必須選擇啟用、授權、限流與 allowlist。
+
+首頁、常用介面與已知 corpus 應在 build／publish 預產生。這能降低冷啟動延遲，並在 Worker
+故障時維持既有難字顯示。未完成 object store、跨節點協調、租戶配額及失敗接手前，單機動態
+Worker 不構成大規模 production 承諾。
+
+## 純 .NET 邊界
+
+產品套件不得啟動 FontTools、Python、Node.js 或其它外部程序，也不得包含 native runtime asset
+或在 build／request time 下載工具。乾淨 consumer 只能依賴受支援 .NET SDK／Runtime 與 NuGet
+還原內容。
+
+CI 的 clean consumer 會從同一批 `0.0.1` nupkg 安裝 library 與 `OdfKit.WebFonts.Build` dotnet
+tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build 與 run 使用
+`--no-restore`，不以 project reference 或開發環境工具代替套件內容。
+
+第一個可交付 engine 以 TrueType outline 為界：支援 TTF、TTC 選定 face、Unicode scalar、
+Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。CFF／CFF2、
+variable、color／bitmap font 與未完成的 complex shaping 必須明確拒絕，不能刪表或 fallback。
+
+WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
+encoder。因此正確宣稱是「OdfKit 不帶入額外 native 相依」，不是「Brotli 演算法由純 managed
+C# 實作」。`net48` 第一階段使用 TTF／WOFF，不為 WOFF2 引入 native 套件。
+
+## 預定最短使用方式
+
+以下介面已由 repository smoke 實際執行；正式發布仍受證據矩陣與人工閘門約束：
 
 ```powershell
 dotnet tool install OdfKit.WebFonts.Build
@@ -15,11 +55,11 @@ odfkit-webfonts build `
   --content-root . `
   --content-extensions .cshtml,.razor,.resx,.html,.txt `
   --output wwwroot/_odf-fonts `
-  --profile organization-v1 `
+  --profile cns11643-euc-tw-2026-05-05 `
   --formats woff2
 ```
 
-ASP.NET Core：
+ASP.NET Core 的唯讀資產介面維持少量設定：
 
 ```csharp
 builder.Services.AddOdfWebFonts("wwwroot/_odf-fonts");
@@ -28,45 +68,17 @@ WebApplication app = builder.Build();
 app.MapOdfWebFonts();
 ```
 
-需要 CDN 時只增加公開基底 URL 與精確 CORS allowlist：
+動態 endpoint 必須另外註冊 managed engine、具名授權、具名 rate limiter，以及 face、Profile、
+format allowlist。用戶端只能傳 sequence 與 allowlist ID，不能傳字型路徑、URL 或來源 hash。
+成功結果是 manifest，後續以 `/{sha256}/{fileName}` GET 不可變資產。
 
-```csharp
-builder.Services.AddOdfWebFonts(options =>
-{
-    options.AssetRootPath = "wwwroot/_odf-fonts";
-    options.PublicBaseUrl = "https://fonts.example.com/odf";
-    options.AllowedOrigins.Add("https://app.example.com");
-    options.CrossOriginResourcePolicy = OdfWebFontCrossOriginPolicy.CrossOrigin;
-});
-```
-
-`OdfWebFontResourceProvider` 會提供內容指紋 CSS URL、HTML link 與 CSP 來源，無須行內
-JavaScript 或行內 CSS。
-
-## 自動內容收集
-
-`--content-root` 會依確定性路徑順序掃描指定副檔名，略過 `bin`、`obj`、`.git` 與
-`node_modules`。掃描內容只在受信任的 build／publish 環境處理；不會在瀏覽器將 DOM、姓名或
-PUA 文字回傳伺服器。CLI 會去除重複 Unicode 純量值，並套用 corpus bytes 與唯一純量值硬上限。
-
-NuGet 的 `buildTransitive` target 也能在 publish 前自動執行：
-
-```xml
-<PropertyGroup>
-  <OdfKitWebFontsEnabled>true</OdfKitWebFontsEnabled>
-  <OdfKitWebFontsFontPath>$(MSBuildProjectDirectory)\Fonts\licensed.ttf</OdfKitWebFontsFontPath>
-  <OdfKitWebFontsContentRoot>$(MSBuildProjectDirectory)</OdfKitWebFontsContentRoot>
-  <OdfKitWebFontsProfile>organization-v1</OdfKitWebFontsProfile>
-  <OdfKitWebFontsFormats>woff2</OdfKitWebFontsFormats>
-</PropertyGroup>
-```
-
-執行期新資料應由應用程式明確送到有界背景工作，不應攔截完整 HTML response 或掃描瀏覽器
-DOM。大量使用者應共用國家、組織或租戶 Profile 字型分片，避免 per-user 字型破壞 CDN cache。
+JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric label 或一般 access log。正式環境
+應使用 TLS、短效 token、租戶配額與資料最小化；大量下載交給 CDN／Object Storage。
 
 ## ASP.NET Web Forms
 
-Web Forms 使用 `net48` Handler，並維持唯讀資產模式：
+Web Forms 的 `net48` Handler 維持唯讀資產模式；managed Phase 2 的 CLI／MSBuild 在部署前產生
+TTF／WOFF，IIS worker process 不同步子集化：
 
 ```xml
 <appSettings>
@@ -89,106 +101,24 @@ Master Page 加入：
 <%= OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink() %>
 ```
 
-Web Forms 不在 IIS worker process 內執行字型子集化。
+若 Web Forms 也需要即時新文字，應由受控後端服務或排程呼叫同一 managed engine，再將完成資產
+部署到共用 store；不得在每個頁面要求內無界產字。
 
-## SQL、Dapper、EF 與其他 ORM
+## 全字庫 CNS 11643 Profile
 
-ORM 只決定資料如何取得，不改變 WebFont 管線：
+`OdfKit.WebFonts.Profiles` 提供可追溯的 EUC-TW provider 與資料身分，不把全字庫字型或完整
+第三方資料塞入 nupkg。目前鎖定的 Profile 為 `cns11643-euc-tw-2026-05-05`，對應官方
+`MapingTables.zip`，SHA-256：
 
-- `nchar`／`nvarchar` 對應 .NET `string`，直接建立 `WebFontTextSequence`。
-- 保留 Big5／Big5E 原始資料時使用 `varbinary` 對應 `byte[]`，再以明確 mapping provider 解碼。
-- `varchar`／`text` 若已因 code page 轉成 `?` 或亂碼，字型套件無法事後還原。
-
-Dapper：
-
-```csharp
-string text = connection.QuerySingle<string>(
-    "SELECT RareText FROM Documents WHERE Id = @id",
-    new { id });
-WebFontTextSequence sequence = WebFontTextSequence.Create(text);
+```text
+f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659
 ```
 
-EF Core：
+字型須由部署者依授權合法取得並設定 `FontSourceId`、路徑與 SHA-256。引擎在子集化前必須檢查
+`OS/2.fsType`，拒絕禁止 embedding、禁止 subsetting 或 bitmap-only 的來源。全字庫資料要求的
+來源標示、OFL 字型的著作權與授權全文仍由實際散布方式決定，不因使用 OdfKit 而消失。
 
-```csharp
-string[] values = await db.People
-    .Select(person => person.Name)
-    .ToArrayAsync(cancellationToken);
-WebFontTextSequence[] sequences = values
-    .Select(WebFontTextSequence.Create)
-    .ToArray();
-```
-
-ADO.NET legacy bytes：
-
-```csharp
-byte[] bytes = SqlServerWebFontTextReader.ReadLegacyBytes(reader, ordinal, 1_048_576);
-string text = new Big5CharacterMappingProvider().Decode(bytes);
-```
-
-相同原則適用於 RepoDb、NPoco、PetaPoco 與 LINQ to SQL。
-
-## CSP、CORS 與 HTTP Cache
-
-同源部署建議：
-
-```http
-Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
-```
-
-CDN 部署在 `style-src` 與 `font-src` 加入精確 HTTPS origin。套件不會自動寫入或放寬網站的
-CSP。跨來源資產只對 `AllowedOrigins` 內的精確 origin 輸出
-`Access-Control-Allow-Origin`；不反射任意 `Origin`，也不使用萬用字元。
-
-字型與內容指紋 CSS 使用一年 `immutable`、SHA-256 ETag、正確 MIME 與 `nosniff`。穩定
-manifest／`webfonts.css` alias 則不得當成不可變資產。WOFF2 已壓縮，不應再套 HTTP Brotli。
-
-## 安全與效能邊界
-
-- 來源字型只由 `FontSourceId` 對應到部署端 allowlist，不接受任意 URL 或要求參數路徑。
-- FontTools 使用 `ProcessStartInfo.ArgumentList`，不經 shell；具備來源、輸出、純量值與逾時上限。
-- 目前產品 engine 在啟動 FontTools 前明確拒絕 CFF2、COLR／CPAL、CBDT／CBLC、`sbix` 與
-  OpenType SVG table；這些能力尚未取得跨瀏覽器與 closure 證據，不會靜默刪表後宣稱成功。
-- 取消或逾時會終止完整子行程樹。
-- Worker 使用有界 Channel、立即拒絕滿載佇列，並對相同 canonical request 執行 single-flight。
-- manifest 只接受純檔名、SHA-256、已知格式與有界集合；啟動時驗證實際 bytes 與 hash。
-- 正式資料平面應是 CDN／Object Storage。ASP.NET endpoint 適合開發、小型部署及 origin fallback，
-  不作為十萬級流量的單機承諾。
-
-GitHub Actions 可持續驗證單元、封裝、真實字型、瀏覽器與有限併發 smoke；跨區十萬人容量、
-WAF 與供應商 SLA 必須在採用者的 staging／CDN 帳號驗收，不應由 GitHub runner 假裝證明。
-
-## 多國與 PUA
-
-核心以 Unicode sequence、字型 face 與版本化 Profile 表達，不內建「所有 PUA 都相同」的假設。
-同一 PUA 碼位在不同機關可代表不同字形，因此 cache key 與 manifest 必須包含 Profile 版本。
-目前 corpus 涵蓋 Arabic、Devanagari、香港 TTC／CFF、日本 IVS、CNS Plane 15 PUA，以及
-Unicode Plane 0～3；新增國家或機構資料應透過 `ICharacterMappingProvider` 或 JSON Profile。
-
-### 全字庫 CNS 11643 Profile
-
-`OdfKit.WebFonts.Profiles` 內建的是可追溯的 EUC-TW provider 與資料身分，不把全字庫字型或
-完整對照表塞進 nupkg。目前已驗證的 Profile 為 `cns11643-euc-tw-2026-05-05`，對應官方
-`MapingTables.zip`，SHA-256 為
-`f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659`。取得流程：
-
-```powershell
-$root = pwsh eng/Install-Cns11643MappingTables.ps1 `
-  -DestinationRoot artifacts/cns11643
-odfkit-webfonts build `
-  --font C:\CNSFonts\TW-Sung-98_1.ttf `
-  --text App_Data\legacy-euc-tw.bin `
-  --encoding euc-tw `
-  --cns-mapping-archive artifacts\cns11643\MapingTables.zip `
-  --profile cns11643-euc-tw-2026-05-05 `
-  --output wwwroot\_odf-fonts
-```
-
-CLI 會再次驗證官方封存檔 SHA-256，拒絕未對應 EUC-TW bytes、衝突 mapping、Profile 版本不符
-與損毀資料。字型須由部署者依授權自行取得；全字庫官方授權要求來源標示，若選擇 OFL-1.1
-散布修改後字型，還須隨附著作權聲明與 OFL 全文。
-
-自訂 JSON Profile 必須包含來源與授權追溯欄位：
+自訂 JSON Profile 必須含版本、來源、SHA-256、授權與 attribution：
 
 ```json
 {
@@ -206,39 +136,40 @@ CLI 會再次驗證官方封存檔 SHA-256，拒絕未對應 EUC-TW bytes、衝�
 }
 ```
 
-程式碼 provider 只需實作 `ICharacterMappingProvider`；需要把版本、來源、SHA-256、授權與顯名
-寫入稽核資料時，實作 `ITraceableCharacterMappingProvider`。缺字、衝突或未對應 bytes 一律
-失敗，不會改猜 Big5、替換成 `?` 或靜默 fallback。
+C# provider 實作 `ICharacterMappingProvider`；需要完整稽核資料時實作
+`ITraceableCharacterMappingProvider`。缺字、衝突或未對應 bytes 一律失敗，不改猜 Big5、
+不替換成 `?`，也不靜默 fallback。
 
-各 Phase 的自動證據與保留閘門見
-[WebFont 證據矩陣](webfont-evidence-matrix.md)。
+## ORM 與資料庫
+
+ORM 只決定資料取得方式，不改變 WebFont 管線：`nchar`／`nvarchar` 以 .NET `string` 建立
+`WebFontTextSequence`；保留 Big5／Big5E 原始資料時，以 `varbinary`／`byte[]` 交給明確 mapping
+provider。資料若已被 code page 轉成 `?` 或亂碼，字型套件無法事後還原。
+
+## CSP、Cache 與安全
+
+同源建議使用 `font-src 'self'`；CDN 部署只加入精確 HTTPS origin。套件不放寬 CSP、不反射任意
+`Origin`，也不使用萬用字元 CORS。內容指紋資產使用一年 `immutable`、SHA-256 ETag、正確 MIME
+與 `nosniff`；穩定 manifest／CSS alias 不得標成不可變。
+
+來源字型只由部署端 allowlist 解析；parser 與 Worker 必須有 bytes、table、glyph、composite
+depth、sequence、產出、queue、timeout 與 concurrency 上限。GitHub Actions 可以證明有限併發與
+可重現錯誤處理，不能代替真實 CDN、WAF、跨區容量或第三方惡意字型安全審查。
+
+## 狀態與證據
+
+目前可相信的完成度、不能宣稱的能力與升級條件見
+[WebFont 證據矩陣](webfont-evidence-matrix.md)。產品與 smoke 產字路徑均不使用 FontTools、
+Python、Node 或外部字型程序；Playwright 只作瀏覽器 oracle。
 
 ## 第一方規格依據
 
+- [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
+- [Microsoft OpenType 1.9.1](https://learn.microsoft.com/en-us/typography/opentype/spec/)
+- [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
 - [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
-- [W3C CSS Font Loading Level 3](https://www.w3.org/TR/css-font-loading/)
-- [W3C Content Security Policy Level 3](https://www.w3.org/TR/CSP3/)
-- [Unicode 17 Private-Use Characters](https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-23/)
-- [Microsoft SQL Server nchar／nvarchar](https://learn.microsoft.com/en-us/sql/t-sql/data-types/nchar-and-nvarchar-transact-sql?view=sql-server-ver17)
+- [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
+- [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [Microsoft ASP.NET Core rate limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0)
-- [Microsoft Azure Front Door 與 Blob Storage](https://learn.microsoft.com/en-us/azure/frontdoor/scenario-storage-blobs)
-- [FontTools subset](https://fonttools.readthedocs.io/en/latest/subset/)
-- [Playwright .NET Continuous Integration](https://playwright.dev/dotnet/docs/ci)
-- [Mozilla Private Browsing Proxy](https://firefox-source-docs.mozilla.org/browser/app/pbproxy/private-browsing-proxy/index.html)
-- [GitHub Actions workflow artifacts](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflow-artifacts)
-
-## 可執行驗證
-
-```powershell
-dotnet test tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj -c Release -f net10.0
-dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj -c Release
-pwsh eng/Test-WebFontSmoke.ps1 -RunBrowser
-pwsh eng/Test-NuGetPack.ps1
-```
-
-真實字型 smoke 使用鎖定版本與 SHA-256，不把第三方字型提交到 repository。GitHub Actions
-會安裝 Playwright Chromium、Firefox 與 WebKit，驗證六組多國案例並上傳完整頁面截圖；單元測試另驗證 1,000 個
-同鍵工作只執行一次、滿載佇列立即拒絕、256 個並行靜態資產要求，以及損毀資產啟動失敗。
-Windows 上的 Firefox smoke 會停用私密瀏覽捷徑 OS 整合，並在安裝後只清理目標位於
-Playwright browser cache 的 `private_browsing.exe` 捷徑；一般 Firefox 捷徑與執行檔不受影響。
+- [Microsoft .NET bounded channels](https://learn.microsoft.com/en-us/dotnet/core/extensions/channels)

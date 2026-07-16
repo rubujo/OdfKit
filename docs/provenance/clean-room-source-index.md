@@ -1,7 +1,7 @@
 # Clean-room 來源索引
 
 本文件集中記錄 `DefaultFormulaEvaluator.*`、`OdfSchemaPatternValidator.*`、
-`OdfKit.Extensions.Collaboration`、OpenPGP 加密與受控轉換保真度的規格來源、
+`OdfKit.Extensions.Collaboration`、OpenPGP 加密、WebFont managed 引擎與受控轉換保真度的規格來源、
 測試證據與非目標，避免日後維護者把外部參考實作或辦公套件原始碼當成可複製來源。
 
 ## 原則
@@ -76,6 +76,14 @@ DOM、動態表格擴張與 header/footer/note selection 完整語意仍屬非�
 但觀察結果必須寫成相容性 regression，不得宣稱為規格要求。新增轉檔 fidelity 行為時，應以
 最小 ODF / OOXML / RTF / SVG fixture 鎖定輸入與輸出，不以外部原始碼或不可再散布 golden
 作為依據。
+
+## WebFont managed 引擎來源
+
+字型 parser、TrueType subset、GSUB closure、TTF／WOFF／WOFF2 writer 與 verifier 的允許規格、
+禁止實作來源、黑箱 oracle 隔離及 fixture 規則，集中記錄於
+[WebFont managed 引擎 Clean-room 來源紀錄](webfont-managed-clean-room.md)。不得從 FontTools、
+FreeType、HarfBuzz、SixLabors.Fonts、OpenFontSharp、LayoutFarm Typography、OTS 或瀏覽器
+字型引擎移植、翻譯、反編譯或改寫產品程式碼。
 
 ## 不可接受來源
 

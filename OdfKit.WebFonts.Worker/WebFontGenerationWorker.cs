@@ -15,10 +15,14 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
 {
     private readonly IWebFontSubsetEngine _engine;
     private readonly WebFontWorkerOptions _options;
+    private readonly FileSystemGenerationCache? _durableCache;
     private readonly Channel<GenerationJob> _queue;
     // 以 Lazy 包裹入列作業：ConcurrentDictionary.GetOrAdd 的工廠委派在競爭下可能被呼叫多次，
     // 若直接入列會產生重複的孤兒 job；改為只在勝出項目的 Value 被存取時入列一次。
     private readonly ConcurrentDictionary<string, Lazy<Task<WebFontManifest>>> _inflight = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, WebFontManifest> _completed = new(StringComparer.Ordinal);
+    private int _completedCount;
+    private int _disposeState;
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Task[] _consumers;
 
@@ -36,9 +40,25 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         _options = options ?? throw new ArgumentNullException(
             nameof(options),
             OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
-        if (options.QueueCapacity <= 0 || options.MaxConcurrency <= 0 || options.JobTimeout <= TimeSpan.Zero)
+        if (options.QueueCapacity <= 0
+            || options.MaxConcurrency <= 0
+            || options.JobTimeout <= TimeSpan.Zero
+            || options.MaxMemoryCacheEntries < 0
+            || options.MaxCachedManifestBytes <= 0
+            || options.MaxCachedAssetCount <= 0
+            || options.MaxCachedAssetBytes <= 0
+            || options.CacheLockRetryDelay <= TimeSpan.Zero
+            || options.MaxCacheLockRetryDelay < options.CacheLockRetryDelay
+            || options.MaxCacheLockRetryDelay > TimeSpan.FromMilliseconds(int.MaxValue)
+            || options.DurableCacheDirectory is not null
+                && string.IsNullOrWhiteSpace(options.DurableCacheDirectory))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
+        }
+
+        if (options.DurableCacheDirectory is not null)
+        {
+            _durableCache = new FileSystemGenerationCache(options.DurableCacheDirectory, options);
         }
 
         _queue = Channel.CreateBounded<GenerationJob>(new BoundedChannelOptions(options.QueueCapacity)
@@ -58,7 +78,16 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         string destinationDirectory,
         CancellationToken cancellationToken = default)
     {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
         string key = CreateKey(request, destinationDirectory);
+        // 耐久快取每次命中都必須重新驗證檔案、雜湊與連結狀態，避免同一行程內的
+        // 記憶體捷徑掩蓋部署後遭竄改或遭替換的資產。
+        if (_durableCache is null
+            && _completed.TryGetValue(key, out WebFontManifest? completed))
+        {
+            return completed;
+        }
+
         Lazy<Task<WebFontManifest>> lazy = _inflight.GetOrAdd(
             key,
             k => new Lazy<Task<WebFontManifest>>(() => EnqueueAsync(k, request, destinationDirectory)));
@@ -79,6 +108,11 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
+        {
+            return;
+        }
+
         _queue.Writer.TryComplete();
         _shutdown.Cancel();
         try
@@ -87,6 +121,12 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         }
         catch (OperationCanceledException)
         {
+        }
+
+        while (_queue.Reader.TryRead(out GenerationJob? job))
+        {
+            job.Completion.TrySetCanceled(new CancellationToken(canceled: true));
+            _inflight.TryRemove(job.Key, out _);
         }
 
         _shutdown.Dispose();
@@ -116,10 +156,9 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
             timeout.CancelAfter(_options.JobTimeout);
             try
             {
-                WebFontManifest manifest = await _engine.GenerateAsync(
-                    job.Request,
-                    job.DestinationDirectory,
-                    timeout.Token).ConfigureAwait(false);
+                WebFontManifest manifest = await GenerateOrLoadAsync(job, timeout.Token).ConfigureAwait(false);
+                TryCacheCompleted(job.Key, manifest);
+
                 job.Completion.TrySetResult(manifest);
             }
             catch (Exception exception)
@@ -133,20 +172,84 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         }
     }
 
+    private async Task<WebFontManifest> GenerateOrLoadAsync(
+        GenerationJob job,
+        CancellationToken cancellationToken)
+    {
+        if (_durableCache is null)
+        {
+            return await _engine.GenerateAsync(
+                job.Request,
+                job.DestinationDirectory,
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        WebFontManifest? cached = await _durableCache.TryLoadAsync(
+            job.Key,
+            job.Request,
+            job.DestinationDirectory,
+            cancellationToken).ConfigureAwait(false);
+        if (cached is not null)
+        {
+            return cached;
+        }
+
+        await using IAsyncDisposable lease = await _durableCache.AcquireLeaseAsync(
+            job.Key,
+            cancellationToken).ConfigureAwait(false);
+        cached = await _durableCache.TryLoadAsync(
+            job.Key,
+            job.Request,
+            job.DestinationDirectory,
+            cancellationToken).ConfigureAwait(false);
+        if (cached is not null)
+        {
+            return cached;
+        }
+
+        WebFontManifest generated = await _engine.GenerateAsync(
+            job.Request,
+            job.DestinationDirectory,
+            cancellationToken).ConfigureAwait(false);
+        await _durableCache.StoreAsync(
+            job.Key,
+            generated,
+            job.Request,
+            job.DestinationDirectory,
+            cancellationToken).ConfigureAwait(false);
+        return generated;
+    }
+
     private static string CreateKey(WebFontSubsetRequest request, string destinationDirectory)
     {
-        if (request is null || string.IsNullOrWhiteSpace(destinationDirectory))
+        if (request is null
+            || request.Face is null
+            || string.IsNullOrWhiteSpace(request.Face.FontSourceId)
+            || !IsSha256(request.Face.SourceSha256)
+            || request.Face.FaceIndex < 0
+            || string.IsNullOrWhiteSpace(request.ProfileId)
+            || string.IsNullOrWhiteSpace(request.FontFamily)
+            || request.Sequences is not { Count: > 0 }
+            || request.Sequences.Any(sequence => sequence is null)
+            || request.Formats is not { Count: > 0 }
+            || string.IsNullOrWhiteSpace(destinationDirectory))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        var canonical = new StringBuilder()
-            .Append(request.Face.FontSourceId).Append('|')
-            .Append(request.Face.SourceSha256).Append('|')
-            .Append(request.Face.FaceIndex).Append('|')
-            .Append(request.ProfileId).Append('|')
-            .Append(request.FontFamily).Append('|')
-            .Append(Path.GetFullPath(destinationDirectory)).Append('|');
+        string destinationPath = Path.GetFullPath(destinationDirectory);
+        if (OperatingSystem.IsWindows())
+        {
+            destinationPath = destinationPath.ToUpperInvariant();
+        }
+
+        var canonical = new StringBuilder();
+        AppendCanonicalPart(canonical, request.Face.FontSourceId);
+        AppendCanonicalPart(canonical, request.Face.SourceSha256.ToUpperInvariant());
+        canonical.Append(request.Face.FaceIndex.ToString(CultureInfo.InvariantCulture)).Append('|');
+        AppendCanonicalPart(canonical, request.ProfileId);
+        AppendCanonicalPart(canonical, request.FontFamily);
+        AppendCanonicalPart(canonical, destinationPath);
         foreach (WebFontFormat format in request.Formats.Distinct().OrderBy(value => value))
         {
             canonical.Append((int)format).Append(',');
@@ -165,6 +268,34 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
 
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString())));
     }
+
+    private void TryCacheCompleted(string key, WebFontManifest manifest)
+    {
+        if (_durableCache is not null
+            || _options.MaxMemoryCacheEntries == 0
+            || Interlocked.Increment(ref _completedCount) > _options.MaxMemoryCacheEntries)
+        {
+            Interlocked.Decrement(ref _completedCount);
+            return;
+        }
+
+        if (!_completed.TryAdd(key, manifest))
+        {
+            Interlocked.Decrement(ref _completedCount);
+        }
+    }
+
+    private static void AppendCanonicalPart(StringBuilder canonical, string value)
+        => canonical.Append(value.Length.ToString(CultureInfo.InvariantCulture))
+            .Append(':')
+            .Append(value)
+            .Append('|');
+
+    private static bool IsSha256(string? value)
+        => value is { Length: 64 } && value.All(character =>
+            character is >= '0' and <= '9'
+            or >= 'a' and <= 'f'
+            or >= 'A' and <= 'F');
 
     private sealed record GenerationJob(
         string Key,

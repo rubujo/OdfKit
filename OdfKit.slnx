@@ -39,5 +39,7 @@
   <Project Path="tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj" />
   <Project Path="tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj" />
   <Project Path="tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj" />
+  <Project Path="tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj" />
+  <Project Path="tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj" />
   <Project Path="samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj" />
 </Solution>

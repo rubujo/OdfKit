@@ -1,0 +1,263 @@
+﻿using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using OdfKit.Compliance;
+
+namespace OdfKit.WebFonts.Worker;
+
+internal sealed class FileSystemGenerationCache
+{
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        AllowTrailingCommas = false,
+        MaxDepth = 32,
+        PropertyNameCaseInsensitive = true,
+        ReadCommentHandling = JsonCommentHandling.Disallow,
+        WriteIndented = false
+    };
+
+    private readonly string _cacheDirectory;
+    private readonly WebFontWorkerOptions _options;
+
+    public FileSystemGenerationCache(string cacheDirectory, WebFontWorkerOptions options)
+    {
+        _cacheDirectory = Path.GetFullPath(cacheDirectory);
+        _options = options;
+        Directory.CreateDirectory(_cacheDirectory);
+    }
+
+    public async Task<WebFontManifest?> TryLoadAsync(
+        string key,
+        WebFontSubsetRequest request,
+        string destinationDirectory,
+        CancellationToken cancellationToken)
+    {
+        string path = GetManifestPath(key);
+        if (!File.Exists(path))
+        {
+            return null;
+        }
+
+        byte[] bytes;
+        try
+        {
+            await using var stream = new FileStream(
+                path,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize: 4096,
+                FileOptions.Asynchronous | FileOptions.SequentialScan);
+            if (stream.Length <= 0 || stream.Length > _options.MaxCachedManifestBytes)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            bytes = new byte[checked((int)stream.Length)];
+            await stream.ReadExactlyAsync(bytes, cancellationToken).ConfigureAwait(false);
+        }
+        catch (IOException exception)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"), exception);
+        }
+
+        WebFontManifest manifest;
+        try
+        {
+            manifest = JsonSerializer.Deserialize<WebFontManifest>(bytes, SerializerOptions)
+                ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+        catch (JsonException exception)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"), exception);
+        }
+
+        ValidateManifest(manifest, request, destinationDirectory);
+        return manifest;
+    }
+
+    public async Task<IAsyncDisposable> AcquireLeaseAsync(string key, CancellationToken cancellationToken)
+    {
+        string path = Path.Combine(_cacheDirectory, string.Concat(key, ".lock"));
+        TimeSpan retryDelay = _options.CacheLockRetryDelay;
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                FileStream stream = new(
+                    path,
+                    FileMode.OpenOrCreate,
+                    FileAccess.ReadWrite,
+                    FileShare.None,
+                    bufferSize: 1,
+                    FileOptions.Asynchronous | FileOptions.DeleteOnClose);
+                return new FileLease(stream);
+            }
+            catch (IOException)
+            {
+                double jitter = 1.0 + (Random.Shared.NextDouble() * 0.25);
+                TimeSpan actualDelay = TimeSpan.FromMilliseconds(Math.Min(
+                    retryDelay.TotalMilliseconds * jitter,
+                    _options.MaxCacheLockRetryDelay.TotalMilliseconds));
+                await Task.Delay(actualDelay, cancellationToken).ConfigureAwait(false);
+                retryDelay = TimeSpan.FromMilliseconds(Math.Min(
+                    retryDelay.TotalMilliseconds * 2,
+                    _options.MaxCacheLockRetryDelay.TotalMilliseconds));
+            }
+        }
+    }
+
+    public async Task StoreAsync(
+        string key,
+        WebFontManifest manifest,
+        WebFontSubsetRequest request,
+        string destinationDirectory,
+        CancellationToken cancellationToken)
+    {
+        ValidateManifest(manifest, request, destinationDirectory);
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(manifest, SerializerOptions);
+        if (bytes.Length <= 0 || bytes.Length > _options.MaxCachedManifestBytes)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        string path = GetManifestPath(key);
+        string temporaryPath = Path.Combine(
+            _cacheDirectory,
+            string.Concat(key, ".", Guid.NewGuid().ToString("N"), ".tmp"));
+        try
+        {
+            await using (var stream = new FileStream(
+                             temporaryPath,
+                             FileMode.CreateNew,
+                             FileAccess.Write,
+                             FileShare.None,
+                             bufferSize: 4096,
+                             FileOptions.Asynchronous | FileOptions.WriteThrough))
+            {
+                await stream.WriteAsync(bytes, cancellationToken).ConfigureAwait(false);
+                await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            File.Move(temporaryPath, path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+            {
+                File.Delete(temporaryPath);
+            }
+        }
+    }
+
+    private void ValidateManifest(
+        WebFontManifest manifest,
+        WebFontSubsetRequest request,
+        string destinationDirectory)
+    {
+        if (manifest.SchemaVersion != 1
+            || !string.Equals(manifest.ProfileId, request.ProfileId, StringComparison.Ordinal)
+            || manifest.Assets is not { Count: > 0 } assets
+            || assets.Count > _options.MaxCachedAssetCount
+            || manifest.StylesheetFileName is not null
+            || manifest.StylesheetSha256 is not null)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        string rootPath = Path.GetFullPath(destinationDirectory);
+        WebFontFormat[] requestedFormats = request.Formats
+            .Distinct()
+            .OrderBy(format => format)
+            .ToArray();
+        string[] expectedRanges = request.Sequences
+            .SelectMany(sequence => sequence.UnicodeScalars)
+            .Where(RequiresGlyph)
+            .Distinct()
+            .OrderBy(scalar => scalar)
+            .Select(scalar => $"U+{scalar:X}")
+            .ToArray();
+        if (assets.Count != requestedFormats.Length
+            || !assets.Select(asset => asset?.Format)
+                .OrderBy(format => format)
+                .SequenceEqual(requestedFormats.Select(format => (WebFontFormat?)format)))
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        foreach (WebFontAsset asset in assets)
+        {
+            if (asset is null
+                || !IsPlainFileName(asset.FileName)
+                || !IsSha256(asset.Sha256)
+                || asset.ByteLength <= 0
+                || asset.ByteLength > _options.MaxCachedAssetBytes
+                || !string.Equals(asset.FontFamily, request.FontFamily, StringComparison.Ordinal)
+                || !request.Formats.Contains(asset.Format)
+                || asset.UnicodeRanges is null
+                || asset.UnicodeRanges.Count > 4096
+                || asset.UnicodeRanges.Any(range => string.IsNullOrEmpty(range) || range.Length is <= 2 or > 64)
+                || !asset.UnicodeRanges.SequenceEqual(expectedRanges, StringComparer.Ordinal))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            string assetPath = Path.GetFullPath(Path.Combine(rootPath, asset.Sha256, asset.FileName));
+            if (!IsContainedPath(rootPath, assetPath))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            var info = new FileInfo(assetPath);
+            if (!info.Exists
+                || info.LinkTarget is not null
+                || new DirectoryInfo(info.DirectoryName!).LinkTarget is not null
+                || info.Length != asset.ByteLength
+                || !string.Equals(ComputeSha256(assetPath), asset.Sha256, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+        }
+    }
+
+    private string GetManifestPath(string key)
+        => Path.Combine(_cacheDirectory, string.Concat(key, ".json"));
+
+    private static bool IsPlainFileName(string? value)
+        => !string.IsNullOrWhiteSpace(value)
+            && value.Length <= 255
+            && string.Equals(value, Path.GetFileName(value), StringComparison.Ordinal)
+            && value.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+
+    private static bool IsSha256(string? value)
+        => value is { Length: 64 } && value.All(character =>
+            character is >= '0' and <= '9'
+            or >= 'a' and <= 'f'
+            or >= 'A' and <= 'F');
+
+    private static bool IsContainedPath(string rootPath, string candidatePath)
+    {
+        string rootWithSeparator = rootPath.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        return candidatePath.StartsWith(rootWithSeparator, comparison);
+    }
+
+    private static string ComputeSha256(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+    }
+
+    private static bool RequiresGlyph(int scalar)
+        => scalar != 0xFEFF && !Rune.IsControl(new Rune(scalar));
+
+    private sealed class FileLease(FileStream stream) : IAsyncDisposable
+    {
+        public ValueTask DisposeAsync() => stream.DisposeAsync();
+    }
+}

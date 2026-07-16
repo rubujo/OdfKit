@@ -91,16 +91,22 @@ public sealed class WebFontBuildOptions
     public string OutputDirectory { get; init; } = string.Empty;
 
     /// <summary>
-    /// Gets or initializes the FontTools executable path.
-    /// 取得或初始化 FontTools 執行檔路徑。
+    /// Gets or initializes the maximum source font size in bytes.
+    /// 取得或初始化來源字型的最大位元組數。
     /// </summary>
-    public string FontToolsExecutable { get; init; } = "pyftsubset";
+    public long MaxSourceBytes { get; init; } = 256L * 1024 * 1024;
 
     /// <summary>
-    /// Gets or initializes an optional Python module root containing FontTools.
-    /// 取得或初始化包含 FontTools 的選用 Python 模組根目錄。
+    /// Gets or initializes the maximum generated asset size in bytes.
+    /// 取得或初始化產生資產的最大位元組數。
     /// </summary>
-    public string? FontToolsPythonModulePath { get; init; }
+    public long MaxOutputBytes { get; init; } = 32L * 1024 * 1024;
+
+    /// <summary>
+    /// Gets or initializes a value indicating whether source table checksums must be valid.
+    /// 取得或初始化是否必須驗證來源表格 checksum。
+    /// </summary>
+    public bool ValidateSourceChecksums { get; init; } = true;
 
     /// <summary>
     /// Gets or initializes the output formats.

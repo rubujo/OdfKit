@@ -4,10 +4,24 @@ OdfKit.WebFonts.Worker.WebFontGenerationWorker.DisposeAsync() -> System.Threadin
 OdfKit.WebFonts.Worker.WebFontGenerationWorker.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.Worker.WebFontGenerationWorker.WebFontGenerationWorker(OdfKit.WebFonts.IWebFontSubsetEngine! engine, OdfKit.WebFonts.Worker.WebFontWorkerOptions! options) -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.get -> System.TimeSpan
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableCacheDirectory.get -> string?
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableCacheDirectory.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.JobTimeout.get -> System.TimeSpan
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.JobTimeout.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedAssetBytes.get -> long
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedAssetBytes.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedAssetCount.get -> int
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedAssetCount.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedManifestBytes.get -> int
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCachedManifestBytes.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCacheLockRetryDelay.get -> System.TimeSpan
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCacheLockRetryDelay.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.get -> int
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxMemoryCacheEntries.get -> int
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxMemoryCacheEntries.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.QueueCapacity.get -> int
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.QueueCapacity.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.WebFontWorkerOptions() -> void

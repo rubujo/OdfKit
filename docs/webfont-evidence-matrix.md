@@ -4,30 +4,54 @@
 >
 > 版本政策：所有套件沿用 OdfKit 的 `0.0.1`、pack、Public API、文件與 CI 機制。
 
-本矩陣只把可由 repository、GitHub Actions 或鎖定外部資料重現的結果列為「已實證」。
-`experimental` 表示已有有界實作，但不構成 production、安全或容量承諾；「人工閘門」不能由
-GitHub runner 代替。
+本矩陣只採計純 C#／.NET 產品路徑。2026-07-16 的本機證據使用官方 CNS 11643
+`TW-Sung-Ext-B-98_1.ttf`、鎖定 SHA-256、managed verifier 與三個 Playwright 瀏覽器；不採計
+FontTools／Python 產物。
 
-| Phase | 狀態 | 已實證且可重跑 | Experimental／限制 | 人工或外部閘門 |
+狀態定義：
+
+- 「已實證」：repository 與 CI 可在產品邊界內重現。
+- 「Experimental」：已有有界實作，但缺少完整格式、部署或客戶證據。
+- 「未完成」：設計或周邊 API 已存在，但必要產品能力尚未由 managed engine 證明。
+- 「人工閘門」：GitHub runner 無法代替的法律、安全、市場或實際部署決策。
+
+| Phase | 目前狀態 | 已實證 | 尚缺的產品證據 | 人工或外部閘門 |
 | --- | --- | --- | --- | --- |
-| 0 中性契約與 corpus | 已實證 | Unicode sequence／IVS／PUA、opaque font ID、來源 SHA-256、版本化 JSON Profile、CNS 11643 EUC-TW provider；官方 CNS、Noto、IPAmj 等測試資料皆鎖版本與 SHA-256 | 未隨 nupkg 內建完整第三方資料或字型；自訂 C# provider 由部署者負責 | 真實客戶 corpus、`EUDC.TTE`／`educ.ttc` 實檔、個別字型散布法律審查 |
-| 1 engine／format／browser | 部分已實證 | TTF／OTF／TTC face／CFF／variable source；WOFF2／WOFF／TTF／OTF；cmap、IVS format 14、GSUB／GPOS presence、可重現 hash；Playwright Chromium／Firefox／WebKit 載入與截圖 | Playwright WebKit 不等同 Safari；CFF2、COLR／CPAL、CBDT／CBLC、`sbix` 與 SVG table 目前由產品 engine 明確拒絕；AAT／Graphite 也沒有完整證據；產品 verifier 仍以 signature／大小為主 | Safari 實機、真實裝置、第三方惡意字型安全稽核、完整 shaping golden |
-| 2 CLI／MSBuild／HTML | 已實證 | CLI、確定性 content scan、大小／scalar 上限、buildTransitive、content-addressed manifest、CSS hash、WOFF2 優先多來源 `src`、HTML requirement collector | HTML integration 是整份文件需求收集器，尚非所有 ODF run 的完整 coverage planner | 採用者實際 publish／CDN pipeline 驗收 |
-| 3 ASP.NET Core／System.Web | 已實證 | ASP.NET Core DI／唯讀 endpoint／CORS／CORP／CSP helper／ETag／immutable／nosniff；net48 handler／helper；256 並行 GET；pack 與 DocFX 共用閘門 | System.Web 不在 IIS process 內產字；高流量應使用 CDN／object storage | 真實 IIS、反向代理、WAF、CDN 與組織 CSP 驗收 |
-| 4 runtime worker | Experimental | bounded Channel、queue-full 快速拒絕、timeout、同鍵 single-flight、1,000 同鍵測試；外部 process tree 取消 | 不提供公開 request-time generation endpoint；不是 OS sandbox；沒有 distributed lock、durable object store 或跨節點 single-flight | 設計夥伴證明靜態資產不足後，才進行隔離容器、durable store、跨節點 load／fuzz |
-| 5 發布／產品化 | 人工閘門 | v0.0.1 由共同 props 取得；所有 WebFont csproj 共用 package validation、Public API、snupkg、DocFX、Markdown 與 NuGet consumer gate；發布使用同一批已驗證 bytes 及 `SHA256SUMS` | GitHub tag／release 本身不可用同一 `v0.0.1` tag 重複建立；滾動驗證產物以 commit SHA artifact 區分 | 設計夥伴、市場採用、維護責任人、漏洞回應策略、第三方安全與法律審查 |
+| 0 中性契約與 corpus | 已實證（工程） | 中性 sequence／IVS／PUA 契約、opaque font ID、實際 bytes SHA-256、版本化 JSON Profile、CNS EUC-TW provider、clean-room 紀錄；WebFont 專案共用 `0.0.1` 與 pack；本機 managed-only nupkg 掃描通過 | CI 發布產物的 managed-only 掃描與授權漂移自動化 | 個別字型法律審查、真實客戶 corpus、`EUDC.TTE`／`educ.ttc` 實檔 |
+| 1 engine／format／browser | Experimental | 有界 sfnt／TTC parser、TrueType composite 與部分 GSUB closure、`cmap` 4／12／14、TTF／WOFF／net10 WOFF2、checksum、`fsType`；真實 CNS Ext-B／PUA、IPAmj IVS 與雙 CNS face TTC 成功，真實 CFF OTF／OTC、CFF2、variable、color 明確拒絕；CNS Ext-B 在 Chromium／Firefox／WebKit 實載；64 組真實來源字型固定種子 mutation | 非 variable 的 Arabic／Devanagari 等 complex-script shaping；更廣結構感知／coverage-guided fuzz；完整 GSUB／GPOS 驗證 | Safari 實機、第三方惡意字型安全稽核；CFF／CFF2／variable／color 維持不支援 |
+| 2 CLI／MSBuild／HTML | 已實證（套件 consumer） | Managed CLI／MSBuild、內容掃描、manifest、CSS、TTF／WOFF／WOFF2、byte-identical 重建與 verifier 已用真實 CNS 執行；同批 `0.0.1` nupkg 的 library 與 dotnet tool clean consumer 均真實產字，build/run 使用 `--no-restore` | 採用者實際 publish／CDN pipeline 的權限、快取與回復驗收 | 採用者 publish／CDN pipeline 驗收 |
+| 3 ASP.NET Core／System.Web | Experimental | ASP.NET Core managed dynamic endpoint 已用真實字型通過 401／429／hash GET 與 256 路平行 immutable GET；靜態 endpoint、net48 handler／helper 與範例存在 | 真實 IIS 與含峰值資源量測的持續負載 | 反向代理、身分提供者、WAF、CDN 與組織 CSP 驗收 |
+| 4 runtime worker | Experimental | bounded Channel、single-flight、檔案 cache；兩個 OS process 僅產生一次、lease owner 強制終止後接手；verifier 拒絕截斷、內容損毀與超限展開長度的真實 WOFF2；真實來源與 TTF／WOFF／WOFF2 共 448 組 deterministic mutation 無越界或非預期例外 | 長時間 load、峰值記憶體／CPU 量測、coverage-guided fuzz；多節點維持關閉 | object store、fencing token、跨節點失敗注入、第三方安全測試 |
+| 5 發布／產品化 | 未完成 | 共用版本／pack／Public API／snupkg／DocFX／Markdown 機制；OpenType 雙 TFM、Public API、本機全量 pack consumer、WebFont 真實產字 clean consumer 與 net48 CLR smoke 通過 | 遠端 CI 綠燈、SBOM 與發布產物證據一致 | 設計夥伴、市場採用、維護責任、漏洞回應、外部法律與安全審查 |
 
-## 可重現指令
+## 目前不能宣稱的事項
+
+- WebFont 套件已完成或已達 production-ready。
+- OdfKit 已支援 OTF／CFF／CFF2／variable／color font 或所有 TTC／WOFF2 變體。
+- CFF／CFF2、variable、color font 或任意 complex-script shaping 已支援。
+- 單機檔案 lease 等同 distributed lock，或 GitHub runner 的 load test 等同真實容量承諾。
+- 本機三瀏覽器 smoke 等同跨平台實機、第三方安全稽核或 production-ready。
+
+## 升級證據入口
+
+實作順序、格式拒絕矩陣、授權準入與 clean consumer 定義見
+[WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。每個 Phase 只有在該文件列出的必要
+證據全部進入 CI 後才能更新狀態。
+
+目前仍可執行的中性驗證：
 
 ```powershell
 dotnet test tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj -c Release -f net10.0
 dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj -c Release
-pwsh eng/Test-WebFontSmoke.ps1 -RunBrowser
-pwsh eng/Test-NuGetPack.ps1 -GenerateHashManifest
+pwsh eng/Test-NuGetPack.ps1
 pwsh eng/Build-ApiDocs.ps1
 pwsh eng/Test-MarkdownLinks.ps1
 ```
 
-真實字型 smoke 的下載 URI、版本、授權與 SHA-256 位於 `eng/external-tools.json`。CNS 11643
-官方資料集為不定期更新，因此上游內容改變時必須先人工審查，再更新版本與 hash；不得自動接受
-未知內容。
+真實 Managed CNS 與三瀏覽器證據可由下列指令重現：
+
+```powershell
+pwsh eng/Test-WebFontSmoke.ps1 -RunBrowser
+pwsh eng/Test-WebFontFormatMatrix.ps1
+pwsh eng/Test-WebFontPackageConsumer.ps1 -FontPath <font> -SourceSha256 <sha256>
+```

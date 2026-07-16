@@ -1,0 +1,122 @@
+#Requires -Version 7.0
+<#
+.SYNOPSIS
+以 SHA-256 鎖定的真實字型驗證 managed TTC、IVS、PUA 與明確格式拒絕。
+#>
+[CmdletBinding()]
+param(
+    [string]$Destination = "artifacts/webfont-format-matrix"
+)
+
+$ErrorActionPreference = "Stop"
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$destinationPath = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
+$repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
+    [IO.Path]::DirectorySeparatorChar,
+    [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+$comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+if (-not $destinationPath.StartsWith($repoPrefix, $comparison)) {
+    throw "Destination 必須位於方案目錄內。"
+}
+
+$manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot "external-tools.json") -Raw | ConvertFrom-Json
+$definitions = $manifest.webFontSmoke.internationalFonts
+$sourceRoot = Join-Path $destinationPath "sources"
+$outputRoot = Join-Path $destinationPath "evidence"
+New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
+New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
+
+function Invoke-LockedDownload {
+    param(
+        [Parameter(Mandatory)][uri]$Uri,
+        [Parameter(Mandatory)][string]$DestinationPath,
+        [Parameter(Mandatory)][string]$ExpectedSha256
+    )
+
+    if (Test-Path -LiteralPath $DestinationPath) {
+        $existingHash = (Get-FileHash -LiteralPath $DestinationPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($existingHash -eq $ExpectedSha256) { return }
+        throw "已存在的下載檔 SHA-256 不符合：$DestinationPath"
+    }
+
+    $temporaryPath = "$DestinationPath.download"
+    try {
+        Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+        Invoke-WebRequest -Uri $Uri -OutFile $temporaryPath `
+            -MaximumRetryCount 3 -RetryIntervalSec 2 -TimeoutSec 180
+        $actualHash = (Get-FileHash -LiteralPath $temporaryPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actualHash -ne $ExpectedSha256) {
+            throw "下載檔 SHA-256 不符合：$Uri"
+        }
+        Move-Item -LiteralPath $temporaryPath -Destination $DestinationPath
+    }
+    finally {
+        Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Get-DirectFont {
+    param([Parameter(Mandatory)]$Definition)
+
+    $path = Join-Path $sourceRoot $Definition.fileName
+    Invoke-LockedDownload -Uri $Definition.uri -DestinationPath $path -ExpectedSha256 $Definition.sha256
+    return (Resolve-Path -LiteralPath $path).Path
+}
+
+function Get-ArchiveFont {
+    param([Parameter(Mandatory)]$Definition)
+
+    $archivePath = Join-Path $sourceRoot $Definition.archiveFileName
+    Invoke-LockedDownload `
+        -Uri $Definition.uri `
+        -DestinationPath $archivePath `
+        -ExpectedSha256 $Definition.archiveSha256
+    $extractRoot = Join-Path $sourceRoot ([IO.Path]::GetFileNameWithoutExtension($Definition.archiveFileName))
+    $font = Get-ChildItem -LiteralPath $extractRoot -Filter $Definition.fileName -File -Recurse -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if ($null -eq $font) {
+        New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $extractRoot -Force
+        $font = Get-ChildItem -LiteralPath $extractRoot -Filter $Definition.fileName -File -Recurse |
+            Select-Object -First 1
+    }
+    if ($null -eq $font) { throw "封存檔缺少字型：$($Definition.fileName)" }
+    $actualHash = (Get-FileHash -LiteralPath $font.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualHash -ne $Definition.sha256) { throw "解壓字型 SHA-256 不符合：$($Definition.fileName)" }
+    return $font.FullName
+}
+
+$extBPath = Get-ArchiveFont $definitions.cnsExtB
+$plusPath = Get-ArchiveFont $definitions.cnsPlus
+$ipamjPath = Get-ArchiveFont $definitions.ipamj
+$collectionPath = Get-DirectFont $definitions.cjkCollection
+$openTypePath = Get-DirectFont $definitions.cjkOpenType
+$arabicPath = Get-DirectFont $definitions.arabic
+$devanagariPath = Get-DirectFont $definitions.devanagari
+$cff2Path = Get-DirectFont $definitions.cjkCff2
+$colorEmojiPath = Get-DirectFont $definitions.colorEmoji
+
+$projectPath = Join-Path $repoRoot "tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj"
+$intermediateRoot = Join-Path $destinationPath "obj"
+dotnet restore $projectPath --nologo -p:NuGetAudit=false `
+    -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
+if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣還原失敗。" }
+dotnet build $projectPath -c Release --nologo --no-restore `
+    -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
+if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣建置失敗。" }
+
+dotnet run --project $projectPath -c Release --no-build -- `
+    $outputRoot `
+    $extBPath `
+    $plusPath `
+    $ipamjPath `
+    $collectionPath `
+    $openTypePath `
+    $arabicPath `
+    $devanagariPath `
+    $cff2Path `
+    $colorEmojiPath
+if ($LASTEXITCODE -ne 0) { throw "WebFont 真實格式矩陣失敗。" }
+
+Write-Host "PASS：真實 TTF／TTC／IVS／PUA 與 OTF／OTC／CFF2／variable／color 拒絕矩陣通過。"
+Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

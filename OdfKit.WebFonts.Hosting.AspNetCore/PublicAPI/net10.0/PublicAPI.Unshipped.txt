@@ -4,6 +4,35 @@ OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontCrossOriginPolicy.CrossOrigin = 2 -
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontCrossOriginPolicy.SameOrigin = 0 -> OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontCrossOriginPolicy
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontCrossOriginPolicy.SameSite = 1 -> OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontCrossOriginPolicy
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontEndpointExtensions
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.AllowedFaces.get -> System.Collections.Generic.ICollection<OdfKit.WebFonts.WebFontFaceIdentity!>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.AllowedFormats.get -> System.Collections.Generic.ICollection<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.AllowedProfileIds.get -> System.Collections.Generic.ICollection<string!>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.AuthorizationPolicyName.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.AuthorizationPolicyName.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxRequestBodyBytes.get -> int
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxRequestBodyBytes.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxSequenceCount.get -> int
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxSequenceCount.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxUnicodeScalarCount.get -> int
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.MaxUnicodeScalarCount.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.OdfWebFontGenerationOptions() -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.RateLimiterPolicyName.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions.RateLimiterPolicyName.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FaceIndex.get -> int
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FaceIndex.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FontFamily.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FontFamily.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FontSourceId.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.FontSourceId.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Formats.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.OdfWebFontGenerationRequest() -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.ProfileId.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.ProfileId.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Sequences.init -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.AllowedOrigins.get -> System.Collections.Generic.ICollection<string!>!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.AssetRootPath.get -> string!
@@ -28,6 +57,7 @@ OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.ContentSecurityPol
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.CreateStylesheetLink() -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.StylesheetFileName.get -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.StylesheetUrl.get -> string!
+static OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontEndpointExtensions.AddOdfWebFontGeneration(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Func<System.IServiceProvider!, OdfKit.WebFonts.IWebFontSubsetEngine!>! engineFactory, System.Action<OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationOptions!>! configureGeneration, System.Action<OdfKit.WebFonts.Worker.WebFontWorkerOptions!>! configureWorker) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontEndpointExtensions.AddOdfWebFonts(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! assetRootPath) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontEndpointExtensions.AddOdfWebFonts(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontEndpointExtensions.MapOdfWebFonts(this Microsoft.AspNetCore.Routing.IEndpointRouteBuilder! endpoints) -> Microsoft.AspNetCore.Routing.RouteGroupBuilder!

@@ -17,10 +17,6 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.FontPath.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontPath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontSourceId.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontSourceId.init -> void
-OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsExecutable.get -> string!
-OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsExecutable.init -> void
-OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.get -> string?
-OdfKit.WebFonts.Build.WebFontBuildOptions.FontToolsPythonModulePath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
 OdfKit.WebFonts.Build.WebFontBuildOptions.Formats.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.JsonProfilePath.get -> string?
@@ -29,6 +25,10 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.get -> string?
 OdfKit.WebFonts.Build.WebFontBuildOptions.LegacyEncoding.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.get -> long
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxOutputBytes.get -> long
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxOutputBytes.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSourceBytes.get -> long
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSourceBytes.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxUniqueUnicodeScalars.get -> int
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxUniqueUnicodeScalars.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.OutputDirectory.get -> string!
@@ -37,4 +37,6 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.ValidateSourceChecksums.get -> bool
+OdfKit.WebFonts.Build.WebFontBuildOptions.ValidateSourceChecksums.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.WebFontBuildOptions() -> void

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\OdfKit.WebFonts.Worker\OdfKit.WebFonts.Worker.csproj" />
   </ItemGroup>
 
   <ItemGroup>

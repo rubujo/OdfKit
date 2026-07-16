@@ -87,6 +87,8 @@ if ($IncludeTests) {
         'OdfKit.Tests/OdfKit.Tests.csproj',
         'tests/OdfKit.WebFonts.Tests/OdfKit.WebFonts.Tests.csproj',
         'tests/OdfKit.WebFontSmoke/OdfKit.WebFontSmoke.csproj',
+        'tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj',
+        'tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj',
         'tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj',
         'tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj',
         'samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj')) {

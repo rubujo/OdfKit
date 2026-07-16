@@ -254,8 +254,10 @@ try {
         'project-docs/ip-compliance.html',
         'project-docs/security-limits.html',
         'project-docs/evidence-index.html',
+        'project-docs/webfont-managed-architecture.html',
         'project-docs/webfont-evidence-matrix.html',
         'project-docs/webfonts.html',
+        'project-docs/provenance/webfont-managed-clean-room.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
         'sitemap.xml',
         'index.json',
@@ -269,6 +271,8 @@ try {
         'evidence-index.html',
         'ip-compliance.html',
         'security-limits.html',
+        'webfont-managed-clean-room.html',
+        'webfont-managed-architecture.html',
         'webfont-evidence-matrix.html',
         'webfonts.html'
     )

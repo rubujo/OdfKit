@@ -8,9 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Program.cs" />
     <Compile Remove="obj\**\*.cs" />
+    <Compile Remove="artifacts\**\*.cs" />
     <ProjectReference Include="..\..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.AspNetCore\OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
   </ItemGroup>
 
 </Project>

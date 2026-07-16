@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
@@ -17,15 +18,21 @@ internal sealed class WebFontAssetStore
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private readonly Dictionary<string, StoredWebFontAsset> _assets;
+    private readonly ConcurrentDictionary<string, StoredWebFontAsset> _assets;
+    private readonly string _rootPath;
+    private readonly OdfWebFontOptions _options;
 
     public WebFontAssetStore(IOptions<OdfWebFontOptions> optionsAccessor)
     {
         OdfWebFontOptions options = optionsAccessor.Value;
         string rootPath = ResolveRootPath(options);
+        _rootPath = rootPath;
+        _options = options;
         string manifestPath = ResolveManifestPath(rootPath, options);
         Manifest = LoadManifest(manifestPath, options);
-        _assets = IndexAssets(rootPath, Manifest, options);
+        _assets = new ConcurrentDictionary<string, StoredWebFontAsset>(
+            IndexAssets(rootPath, Manifest, options),
+            StringComparer.Ordinal);
         Css = LoadOptionalCss(rootPath, Manifest, options);
     }
 
@@ -50,7 +57,46 @@ internal sealed class WebFontAssetStore
             return false;
         }
 
-        return _assets.TryGetValue(CreateKey(sha256, fileName), out asset);
+        if (!_assets.TryGetValue(CreateKey(sha256, fileName), out asset)
+            || asset is null)
+        {
+            return false;
+        }
+
+        var info = new FileInfo(asset.FullPath);
+        if (!info.Exists
+            || info.LinkTarget is not null
+            || new DirectoryInfo(info.DirectoryName!).LinkTarget is not null
+            || info.Length != asset.Descriptor.ByteLength
+            || info.LastWriteTimeUtc != asset.LastModified.UtcDateTime)
+        {
+            asset = null;
+            return false;
+        }
+
+        return true;
+    }
+
+    public void RegisterGeneratedAssets(WebFontManifest manifest)
+    {
+        if (manifest is null
+            || manifest.SchemaVersion != 1
+            || string.IsNullOrWhiteSpace(manifest.ProfileId)
+            || manifest.ProfileId.Length > 256
+            || manifest.Assets.Count == 0
+            || manifest.Assets.Count > _options.MaxAssetCount
+            || manifest.StylesheetFileName is not null
+            || manifest.StylesheetSha256 is not null)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"));
+        }
+
+        Dictionary<string, StoredWebFontAsset> generated = IndexAssets(_rootPath, manifest, _options);
+        foreach ((string key, StoredWebFontAsset asset) in generated)
+        {
+            _assets.TryAdd(key, asset);
+        }
     }
 
     private static string ResolveRootPath(OdfWebFontOptions options)
@@ -180,6 +226,8 @@ internal sealed class WebFontAssetStore
 
             var fileInfo = new FileInfo(fullPath);
             if (!fileInfo.Exists
+                || fileInfo.LinkTarget is not null
+                || new DirectoryInfo(fileInfo.DirectoryName!).LinkTarget is not null
                 || fileInfo.Length != descriptor.ByteLength
                 || fileInfo.Length > options.MaxAssetBytes
                 || !string.Equals(ComputeSha256(fullPath), descriptor.Sha256, StringComparison.OrdinalIgnoreCase))

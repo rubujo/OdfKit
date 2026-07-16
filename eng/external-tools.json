@@ -30,30 +30,49 @@
     },
     "internationalFonts": {
       "arabic": {
+        "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
         "fileName": "NotoSansArabic-VF.ttf",
-        "uri": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansarabic/NotoSansArabic%5Bwdth,wght%5D.ttf",
+        "uri": "https://raw.githubusercontent.com/google/fonts/26c5c976d82d50c24a8f0a7ac455e0a7c639c226/ofl/notosansarabic/NotoSansArabic%5Bwdth,wght%5D.ttf",
         "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
         "license": "OFL-1.1"
       },
       "devanagari": {
+        "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
         "fileName": "NotoSansDevanagari-VF.ttf",
-        "uri": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansdevanagari/NotoSansDevanagari%5Bwdth,wght%5D.ttf",
+        "uri": "https://raw.githubusercontent.com/google/fonts/26c5c976d82d50c24a8f0a7ac455e0a7c639c226/ofl/notosansdevanagari/NotoSansDevanagari%5Bwdth,wght%5D.ttf",
         "sha256": "9ce7b04f60e363d8870e5997744cf85cf69d38a4d7d129d364d92a3b14b461d7",
         "license": "OFL-1.1"
       },
       "cjkCollection": {
+        "version": "Sans2.004",
         "fileName": "NotoSansCJK-Regular.ttc",
         "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/OTC/NotoSansCJK-Regular.ttc",
         "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
         "license": "OFL-1.1"
       },
       "cjkOpenType": {
+        "version": "Sans2.004",
         "fileName": "NotoSansCJKhk-Regular.otf",
         "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/OTF/TraditionalChineseHK/NotoSansCJKhk-Regular.otf",
         "sha256": "97c937514d645eae90415d30ba025e08a94d5bdffdc627404864f90aa0c7d83b",
         "license": "OFL-1.1"
       },
+      "cjkCff2": {
+        "version": "Sans2.004",
+        "fileName": "NotoSansTC-VF.otf",
+        "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/Variable/OTF/Subset/NotoSansTC-VF.otf",
+        "sha256": "a080726eee9d78ec74fd95184a79c58c3085f10713e26876aab0130f543e9120",
+        "license": "OFL-1.1"
+      },
+      "colorEmoji": {
+        "version": "2.047",
+        "fileName": "NotoColorEmoji.ttf",
+        "uri": "https://raw.githubusercontent.com/googlefonts/noto-emoji/v2.047/fonts/NotoColorEmoji.ttf",
+        "sha256": "39ee3c587e10e89669b9ff32703261d10d5f9c4dd5ad147b6b5a1c5200591817",
+        "license": "OFL-1.1"
+      },
       "ipamj": {
+        "version": "006.01",
         "archiveFileName": "ipamjm00601.zip",
         "fileName": "ipamjm.ttf",
         "uri": "https://dforest.watch.impress.co.jp/library/i/ipamjfont/10750/ipamjm00601.zip",
@@ -61,7 +80,17 @@
         "sha256": "a3e84f495f3c388db7a1473bf1985c1c076d0c814100f10a027ca6853eb1e8cb",
         "license": "IPA-Font-1.0"
       },
-      "cnsSung": {
+      "cnsExtB": {
+        "version": "98_1",
+        "archiveFileName": "Fonts_Sung.zip",
+        "fileName": "TW-Sung-Ext-B-98_1.ttf",
+        "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Sung.zip",
+        "archiveSha256": "25cb90ddf7c98bfeebd9e88a79c63dcde7eaaf81409a15b323ace744bade7867",
+        "sha256": "eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583",
+        "license": "OGDL-Taiwan-1.0"
+      },
+      "cnsPlus": {
+        "version": "98_1",
         "archiveFileName": "Fonts_Sung.zip",
         "fileName": "TW-Sung-Plus-98_1.ttf",
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Sung.zip",
@@ -69,10 +98,6 @@
         "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
         "license": "OGDL-Taiwan-1.0"
       }
-    },
-    "pythonPackages": {
-      "fontToolsVersion": "4.63.0",
-      "brotliVersion": "1.2.0"
     }
   },
   "jing": {

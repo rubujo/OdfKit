@@ -34,9 +34,9 @@
     {
       "id": "third-party-notices",
       "source": "THIRD-PARTY-NOTICES.md",
-      "sourceSha256": "8fd1b78ed38af561f353eb48b1671c0dc7331f4b2912c678fdfb36a900bb3f20",
+      "sourceSha256": "b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154",
       "destination": "api-docs/{locale}/project-docs/THIRD-PARTY-NOTICES.md",
-      "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "FontTools", "Noto Sans", "IPAmj Mincho", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
+      "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "Noto Sans", "Noto Color Emoji", "IPAmj Mincho", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
     }
   ]
 }

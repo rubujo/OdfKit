@@ -150,16 +150,23 @@ jobs:
           $mappingRoot = ./eng/Install-Cns11643MappingTables.ps1 `
             -DestinationRoot artifacts/cns11643
           ./eng/Test-WebFontSmoke.ps1 `
-            -PythonPath python `
             -MappingTablesRoot $mappingRoot `
             -RunBrowser
+          ./eng/Test-WebFontFormatMatrix.ps1
+          ./eng/Test-WebFontPackageConsumer.ps1 `
+            -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
+            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
 
-      - name: Upload WebFont browser proof
+      - name: Upload WebFont real evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: webfont-browser-proof
-          path: artifacts/webfont-smoke/playwright-international-*.png
+          name: webfont-real-evidence
+          path: |
+            artifacts/webfont-smoke/playwright-managed-*.png
+            artifacts/webfont-format-matrix/evidence/format-matrix.json
+            artifacts/webfont-package-consumer/**/webfonts.json
+            artifacts/webfont-worker-process-smoke/**
           if-no-files-found: warn
 
   full-regression:

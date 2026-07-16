@@ -41,20 +41,15 @@ public sealed class WebFontAssetBuilder
             SelectUniqueScalars(text, options.MaxUniqueUnicodeScalars));
         string sourceSha256 = ComputeSha256(fontPath);
 
-        var engineOptions = new FontToolsWebFontEngineOptions
+        var engineOptions = new ManagedOpenTypeWebFontEngineOptions
         {
-            ExecutablePath = options.FontToolsExecutable,
-            MaxUnicodeScalars = options.MaxUniqueUnicodeScalars
+            MaxUnicodeScalars = options.MaxUniqueUnicodeScalars,
+            MaxSourceBytes = options.MaxSourceBytes,
+            MaxOutputBytes = options.MaxOutputBytes,
+            ValidateSourceChecksums = options.ValidateSourceChecksums
         };
-        if (!string.IsNullOrWhiteSpace(options.FontToolsPythonModulePath))
-        {
-            engineOptions.ExecutablePrefixArguments.Add("-m");
-            engineOptions.ExecutablePrefixArguments.Add("fontTools.subset.__main__");
-            engineOptions.EnvironmentVariables["PYTHONPATH"] = Path.GetFullPath(options.FontToolsPythonModulePath);
-        }
-
         engineOptions.FontSources.Add(options.FontSourceId, fontPath);
-        var engine = new FontToolsWebFontSubsetEngine(engineOptions);
+        var engine = new ManagedOpenTypeWebFontSubsetEngine(engineOptions);
         WebFontManifest engineManifest = await engine.GenerateAsync(
             new WebFontSubsetRequest
             {
@@ -158,6 +153,11 @@ public sealed class WebFontAssetBuilder
         var result = new StringBuilder();
         foreach (Rune rune in text.EnumerateRunes())
         {
+            if (Rune.IsControl(rune) || rune.Value == 0xFEFF)
+            {
+                continue;
+            }
+
             if (!seen.Add(rune.Value))
             {
                 continue;
@@ -307,6 +307,8 @@ public sealed class WebFontAssetBuilder
             || options.FaceIndex < 0
             || options.MaxCorpusBytes <= 0
             || options.MaxUniqueUnicodeScalars <= 0
+            || options.MaxSourceBytes <= 0
+            || options.MaxOutputBytes <= 0
             || options.Formats.Count == 0)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));

@@ -18,7 +18,7 @@
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
-| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0` | 受信任 FontTools 子集化與多格式輸出 | 僅在 build／隔離 Worker 使用 |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0`（規劃加入 `netstandard2.0`） | 純 .NET OpenType 子集化；目前重新實作中 | 不得依賴外部程序或 native 套件；可用格式見 managed 架構契約 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
@@ -68,4 +68,5 @@
 - [tools/README.md](../tools/README.md)
 - [Rendering 後端部署](rendering-backend-deployment.md)
 - [WebFont 多國罕用字套件](webfonts.md)
+- [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
 - [版本與交付資訊](version-delivery.md)

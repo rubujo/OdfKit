@@ -68,7 +68,7 @@ try
     string? ready = await page.GetAttributeAsync("body", "data-international-ready");
     int loadedCases = await page.EvaluateAsync<int>(
         "() => window.__odfKitInternationalProof?.loadedCases?.length ?? 0");
-    if (ready != "true" || loadedCases != 6 || errors.Count != 0)
+    if (ready != "true" || loadedCases != 1 || errors.Count != 0)
     {
         throw new InvalidOperationException(
             $"Browser proof failed: ready={ready}, loadedCases={loadedCases}, errors={string.Join(" | ", errors)}");
@@ -79,7 +79,7 @@ try
         Path = screenshotPath,
         FullPage = true
     });
-    Console.WriteLine($"PASS: {browserName} loaded {loadedCases} international WebFont cases.");
+    Console.WriteLine($"PASS: {browserName} loaded the managed CNS WebFont case.");
     Console.WriteLine($"Screenshot: {screenshotPath}");
     return 0;
 }

@@ -8,7 +8,7 @@ static async Task<int> RunAsync(string[] args)
 {
     if (args.Length == 0 || args[0] is "-h" or "--help")
     {
-        Console.WriteLine("odfkit-webfonts build --font <path> (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf,otf] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--pyftsubset <path>] [--fonttools-pythonpath <path>]");
+        Console.WriteLine("odfkit-webfonts build --font <path> (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--max-source-bytes <bytes>] [--max-output-bytes <bytes>] [--skip-source-checksums true|false]");
         return 0;
     }
 
@@ -42,8 +42,13 @@ static async Task<int> RunAsync(string[] args)
             Big5EMappingPath = GetOptional(values, "big5e-map"),
             JsonProfilePath = GetOptional(values, "json-profile"),
             CnsMappingArchivePath = GetOptional(values, "cns-mapping-archive"),
-            FontToolsExecutable = Get(values, "pyftsubset", "pyftsubset"),
-            FontToolsPythonModulePath = GetOptional(values, "fonttools-pythonpath"),
+            MaxSourceBytes = long.Parse(
+                Get(values, "max-source-bytes", (256L * 1024 * 1024).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+                System.Globalization.CultureInfo.InvariantCulture),
+            MaxOutputBytes = long.Parse(
+                Get(values, "max-output-bytes", (32L * 1024 * 1024).ToString(System.Globalization.CultureInfo.InvariantCulture)),
+                System.Globalization.CultureInfo.InvariantCulture),
+            ValidateSourceChecksums = !bool.Parse(Get(values, "skip-source-checksums", "false")),
             Formats = ParseFormats(Get(values, "formats", "woff2,woff"))
         };
         WebFontManifest manifest = await new WebFontAssetBuilder().BuildAsync(options).ConfigureAwait(false);
@@ -91,7 +96,6 @@ static IReadOnlyList<WebFontFormat> ParseFormats(string value)
             "woff2" => WebFontFormat.Woff2,
             "woff" => WebFontFormat.Woff,
             "ttf" => WebFontFormat.TrueType,
-            "otf" => WebFontFormat.OpenType,
             _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
         })
         .ToArray();

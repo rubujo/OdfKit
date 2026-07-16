@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置（REL-1）。
+    驗證 OdfKit NuGet 封裝結構與 net8.0、net10.0、net48 消費端煙霧建置（REL-1）。
 .PARAMETER Configuration
     建置組態，預設 Release。
 .PARAMETER OutputDirectory
@@ -52,7 +52,7 @@ $expectedPackages = @(
     @{ Id = "OdfKit.WebFonts.Abstractions"; Assembly = "OdfKit.WebFonts.Abstractions.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Encoding.Legacy"; Assembly = "OdfKit.WebFonts.Encoding.Legacy.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Data.SqlServer"; Assembly = "OdfKit.WebFonts.Data.SqlServer.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
-    @{ Id = "OdfKit.WebFonts.OpenType"; Assembly = "OdfKit.WebFonts.OpenType.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },
+    @{ Id = "OdfKit.WebFonts.OpenType"; Assembly = "OdfKit.WebFonts.OpenType.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Build"; Tool = $true; Tfms = @(); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Worker"; Assembly = "OdfKit.WebFonts.Worker.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Profiles"; Assembly = "OdfKit.WebFonts.Profiles.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
@@ -190,6 +190,16 @@ try {
                 if (-not $readme -or [string]$nuspecXml.package.metadata.readme -ne 'README.md') {
                     throw "套件 $($pkg.Id) 缺少 NuGet README.md 或 readme metadata"
                 }
+
+                if ($pkg.Id -ne 'OdfKit.WebFonts.Build') {
+                    $forbiddenPayload = $zip.Entries | Where-Object {
+                        $_.FullName -match '^(?:runtimes/|tools/)' `
+                            -or $_.FullName -match '\.(?:exe|dll\.config|py|pyc|pyd|node|so|dylib)$'
+                    } | Select-Object -First 1
+                    if ($forbiddenPayload) {
+                        throw "受控 WebFont 套件含外部工具或原生 payload：$($forbiddenPayload.FullName)"
+                    }
+                }
             }
             foreach ($dependency in $dependencies) {
                 if ($null -eq $dependency) {
@@ -312,6 +322,69 @@ Console.WriteLine("ok");
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     dotnet run --project $smokeDir -c $Configuration --no-build
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    $net10SmokeDir = Join-Path $smokeDir "net10-webfonts"
+    dotnet new console -n WebFontNet10ConsumerSmoke -o $net10SmokeDir -f net10.0 --force
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    foreach ($packageId in @(
+        "OdfKit.WebFonts.OpenType",
+        "OdfKit.WebFonts.Worker",
+        "OdfKit.WebFonts.Hosting.AspNetCore")) {
+        dotnet add $net10SmokeDir package $packageId --version $packageVersion
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+
+    @"
+using OdfKit.WebFonts.Hosting.AspNetCore;
+using OdfKit.WebFonts.OpenType;
+using OdfKit.WebFonts.Worker;
+using OdfKit.WebFonts;
+using Microsoft.Extensions.DependencyInjection;
+
+var workerOptions = new WebFontWorkerOptions
+{
+    CacheLockRetryDelay = TimeSpan.FromMilliseconds(25),
+    MaxCacheLockRetryDelay = TimeSpan.FromMilliseconds(250)
+};
+if (workerOptions.MaxCacheLockRetryDelay <= workerOptions.CacheLockRetryDelay)
+{
+    throw new InvalidOperationException("WebFont Worker package API smoke failed.");
+}
+
+_ = new ManagedOpenTypeWebFontEngineOptions();
+_ = new OdfWebFontOptions();
+_ = new OdfWebFontGenerationRequest();
+var generationOptions = new OdfWebFontGenerationOptions
+{
+    AuthorizationPolicyName = "webfont-generation",
+    RateLimiterPolicyName = "webfont-generation"
+};
+generationOptions.AllowedFaces.Add(new WebFontFaceIdentity
+{
+    FontSourceId = "consumer-smoke",
+    SourceSha256 = new string('a', 64)
+});
+generationOptions.AllowedProfileIds.Add("consumer-v1");
+IServiceCollection services = new ServiceCollection();
+services.AddOdfWebFontGeneration(
+    _ => throw new NotSupportedException(),
+    options =>
+    {
+        options.AuthorizationPolicyName = generationOptions.AuthorizationPolicyName;
+        options.RateLimiterPolicyName = generationOptions.RateLimiterPolicyName;
+        options.AllowedFaces.Add(generationOptions.AllowedFaces.Single());
+        options.AllowedProfileIds.Add(generationOptions.AllowedProfileIds.Single());
+    },
+    _ => { });
+Console.WriteLine("WebFont net10 package consumer smoke passed.");
+"@ | Set-Content -LiteralPath (Join-Path $net10SmokeDir "Program.cs") -Encoding utf8
+
+    dotnet build $net10SmokeDir -c $Configuration
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    dotnet run --project $net10SmokeDir -c $Configuration --no-build
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     if ($IsWindows -and -not $SkipNetFrameworkSmoke) {
