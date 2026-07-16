@@ -10,6 +10,7 @@ namespace OdfKit.WebFonts.Hosting.AspNetCore;
 /// </summary>
 public sealed class OdfWebFontResourceProvider
 {
+    private readonly WebFontAssetStore _assetStore;
     private readonly string _publicBaseUrl;
 
     /// <summary>
@@ -25,6 +26,7 @@ public sealed class OdfWebFontResourceProvider
         ArgumentNullException.ThrowIfNull(optionsAccessor);
         OdfWebFontOptions options = optionsAccessor.Value;
         OdfWebFontOptionValidator.Validate(options);
+        _assetStore = assetStore;
         _publicBaseUrl = ResolvePublicBaseUrl(options);
         StylesheetFileName = assetStore.StylesheetFileName ?? "webfonts.css";
     }
@@ -65,6 +67,41 @@ public sealed class OdfWebFontResourceProvider
     /// <returns>The HTML link element. / HTML link 元素。</returns>
     public string CreateStylesheetLink()
         => $"<link rel=\"stylesheet\" href=\"{WebUtility.HtmlEncode(StylesheetUrl)}\" />";
+
+    /// <summary>
+    /// Creates an opt-in preload link for one validated immutable font asset.
+    /// 為單一已驗證不可變字型資產建立選擇啟用的 preload link。
+    /// </summary>
+    /// <param name="asset">The manifest asset to preload. / 要預先載入的 manifest 資產。</param>
+    /// <returns>The encoded HTML link element. / 已編碼的 HTML link 元素。</returns>
+    /// <exception cref="ArgumentException">The asset is not present in the validated store. / 資產不存在於已驗證的儲存區。</exception>
+    public string CreateFontPreloadLink(WebFontAsset asset)
+    {
+        ArgumentNullException.ThrowIfNull(asset);
+        if (!_assetStore.TryGetAsset(asset.Sha256, asset.FileName, out StoredWebFontAsset? stored)
+            || stored is null
+            || stored.Descriptor.Format != asset.Format)
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"),
+                nameof(asset));
+        }
+
+        string url = string.Concat(_publicBaseUrl, "/", asset.Sha256, "/", asset.FileName);
+        return $"<link rel=\"preload\" href=\"{WebUtility.HtmlEncode(url)}\" as=\"font\" type=\"{GetContentType(asset.Format)}\" crossorigin=\"anonymous\" />";
+    }
+
+    private static string GetContentType(WebFontFormat format)
+        => format switch
+        {
+            WebFontFormat.Woff2 => "font/woff2",
+            WebFontFormat.Woff => "font/woff",
+            WebFontFormat.TrueType => "font/ttf",
+            WebFontFormat.OpenType => "font/otf",
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(format),
+                OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
+        };
 
     private static string ResolvePublicBaseUrl(OdfWebFontOptions options)
     {

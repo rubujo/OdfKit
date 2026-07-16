@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "assetRootPath": "OdfWebFonts",
+  "apiKeyEnvironmentVariable": "ODFKIT_WEBFONT_API_KEY",
+  "maxRequestBodyBytes": 65536,
+  "maxConcurrentGenerations": 2,
+  "maxSequenceCount": 256,
+  "maxUnicodeScalarCount": 4096,
+  "maxAssetBytes": 33554432,
+  "allowPublicCrossOriginAssets": false,
+  "fontSources": [
+    {
+      "id": "cns-ext-b",
+      "path": "Fonts/TW-Sung-Ext-B-98_1.ttf",
+      "sha256": "eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583",
+      "faceIndex": 0,
+      "fontFamily": "OdfKit CNS Ext-B"
+    }
+  ],
+  "allowedProfileIds": [
+    "cns11643-euc-tw-2026-05-05"
+  ],
+  "allowedFormats": [
+    "Woff",
+    "TrueType"
+  ]
+}

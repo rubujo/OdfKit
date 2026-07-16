@@ -26,6 +26,8 @@
     <PackageReference Include="OdfKit.Extensions.Pdf" Version="$(OdfKitPackageVersion)" />
     <PackageReference Include="OdfKit.Extensions.Rdf" Version="$(OdfKitPackageVersion)" />
     <PackageReference Include="OdfKit.Extensions.Rendering" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.WebFonts.Hosting.SystemWeb" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.WebFonts.Windows" Version="$(OdfKitPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseLocalPackages)' != 'true'">
@@ -37,6 +39,8 @@
     <ProjectReference Include="..\..\OdfKit.Extensions.Pdf\OdfKit.Extensions.Pdf.csproj" />
     <ProjectReference Include="..\..\OdfKit.Extensions.Rdf\OdfKit.Extensions.Rdf.csproj" />
     <ProjectReference Include="..\..\OdfKit.Extensions.Rendering\OdfKit.Extensions.Rendering.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.SystemWeb\OdfKit.WebFonts.Hosting.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Windows\OdfKit.WebFonts.Windows.csproj" />
   </ItemGroup>
 
 </Project>

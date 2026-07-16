@@ -34,8 +34,19 @@ $consumerRoot = Join-Path $destinationPath "consumer"
 $toolRoot = Join-Path $destinationPath "tool"
 $cliOutputRoot = Join-Path $destinationPath "cli-output"
 $cliReproRoot = Join-Path $destinationPath "cli-output-repro"
+$libraryOutput = Join-Path $destinationPath "library-output"
 $contentRoot = Join-Path $destinationPath "content"
 $nugetPackages = Join-Path $destinationPath "nuget-cache"
+foreach ($stalePath in @(
+        $packageRoot,
+        $consumerRoot,
+        $toolRoot,
+        $cliOutputRoot,
+        $cliReproRoot,
+        $libraryOutput,
+        $nugetPackages)) {
+    Remove-Item -LiteralPath $stalePath -Recurse -Force -ErrorAction SilentlyContinue
+}
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $contentRoot -Force | Out-Null
 Set-Content -LiteralPath (Join-Path $contentRoot "corpus.txt") -Value "A𠆩" -Encoding utf8NoBOM
@@ -46,6 +57,8 @@ $projects = @(
     "OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj",
     "OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj",
     "OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj",
+    "OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj",
+    "OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj",
     "OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj"
 )
 foreach ($project in $projects) {
@@ -127,7 +140,6 @@ return 0;
 
     dotnet build $consumerRoot -c $Configuration --nologo
     if ($LASTEXITCODE -ne 0) { throw "WebFont package consumer 建置失敗。" }
-    $libraryOutput = Join-Path $destinationPath "library-output"
     dotnet run --project $consumerRoot -c $Configuration --no-build --no-restore -- `
         $resolvedFontPath $actualSourceSha256 $libraryOutput
     if ($LASTEXITCODE -ne 0) { throw "WebFont package consumer 產字失敗。" }
@@ -160,9 +172,25 @@ return 0;
     if (@($first.assets).Count -ne 3 -or $firstHashes -ne $secondHashes) {
         throw "WebFont CLI nupkg 未產生三格式或結果不具確定性。"
     }
+
+    if ($IsWindows) {
+        $systemWebSmoke = Join-Path $repoRoot "tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj"
+        $systemWebProperties = @(
+            "-p:UseLocalPackages=true",
+            "-p:OdfKitPackageVersion=$packageVersion"
+        )
+        dotnet restore $systemWebSmoke @systemWebProperties --configfile $nugetConfigPath
+        if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 還原失敗。" }
+        dotnet build $systemWebSmoke -c $Configuration --no-restore --nologo @systemWebProperties
+        if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 建置失敗。" }
+        $systemWebExecutable = Join-Path $repoRoot `
+            "tests/OdfKit.WebFonts.SystemWebSmoke/bin/$Configuration/net48/OdfKit.WebFonts.SystemWebSmoke.exe"
+        & $systemWebExecutable --font $resolvedFontPath --sha256 $actualSourceSha256
+        if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 真實產字失敗。" }
+    }
 }
 finally {
     $env:NUGET_PACKAGES = $previousNugetPackages
 }
 
-Write-Host "PASS：同批 0.0.1 nupkg 的 library 與 CLI clean consumer 真實產字成功。"
+Write-Host "PASS：同批 0.0.1 nupkg 的 library、CLI 與 Windows System.Web consumer 真實產字成功。"

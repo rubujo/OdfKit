@@ -54,6 +54,7 @@ OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.RoutePrefix.get -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.RoutePrefix.set -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.ContentSecurityPolicySource.get -> string!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.CreateFontPreloadLink(OdfKit.WebFonts.WebFontAsset! asset) -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.CreateStylesheetLink() -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.StylesheetFileName.get -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontResourceProvider.StylesheetUrl.get -> string!

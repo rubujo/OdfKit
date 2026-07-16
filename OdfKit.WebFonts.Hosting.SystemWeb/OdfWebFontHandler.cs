@@ -16,6 +16,9 @@ namespace OdfKit.WebFonts.Hosting.SystemWeb;
 public sealed class OdfWebFontHandler : IHttpHandler
 {
     private static readonly Lazy<AssetCatalog> Catalog = new(LoadCatalog, isThreadSafe: true);
+    private static readonly Lazy<bool> AllowPublicCrossOriginAssets = new(
+        LoadAllowPublicCrossOriginAssets,
+        isThreadSafe: true);
 
     /// <inheritdoc />
     public bool IsReusable => true;
@@ -77,11 +80,41 @@ public sealed class OdfWebFontHandler : IHttpHandler
         response.Cache.SetCacheability(HttpCacheability.Public);
         response.Cache.SetMaxAge(TimeSpan.FromDays(365));
         response.Cache.SetExpires(DateTime.UtcNow.AddYears(1));
-        response.Headers["Cache-Control"] = "public,max-age=31536000,immutable";
-        response.Headers["ETag"] = etag;
-        response.Headers["X-Content-Type-Options"] = "nosniff";
-        response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
+        response.Cache.AppendCacheExtension("immutable");
+        response.Cache.SetETag(etag);
+        response.AddHeader("X-Content-Type-Options", "nosniff");
+        WriteCrossOriginHeaders(response);
         response.TransmitFile(asset.FullPath);
+    }
+
+    private static bool LoadAllowPublicCrossOriginAssets()
+    {
+        string? configured = ConfigurationManager.AppSettings["OdfKit.WebFonts.AllowPublicCrossOriginAssets"];
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            return false;
+        }
+
+        if (!bool.TryParse(configured, out bool result))
+        {
+            throw new ConfigurationErrorsException(
+                OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
+        }
+
+        return result;
+    }
+
+    private static void WriteCrossOriginHeaders(HttpResponse response)
+    {
+        if (AllowPublicCrossOriginAssets.Value)
+        {
+            response.AddHeader("Access-Control-Allow-Origin", "*");
+            response.AddHeader("Cross-Origin-Resource-Policy", "cross-origin");
+        }
+        else
+        {
+            response.AddHeader("Cross-Origin-Resource-Policy", "same-origin");
+        }
     }
 
     private static AssetCatalog LoadCatalog()
@@ -103,7 +136,7 @@ public sealed class OdfWebFontHandler : IHttpHandler
     {
         response.ContentType = "application/json; charset=utf-8";
         response.Cache.SetCacheability(HttpCacheability.NoCache);
-        response.Headers["X-Content-Type-Options"] = "nosniff";
+        response.AddHeader("X-Content-Type-Options", "nosniff");
         response.Write(catalog.ManifestJson);
     }
 
@@ -120,15 +153,15 @@ public sealed class OdfWebFontHandler : IHttpHandler
         {
             response.Cache.SetCacheability(HttpCacheability.Public);
             response.Cache.SetMaxAge(TimeSpan.FromDays(365));
-            response.Headers["Cache-Control"] = "public,max-age=31536000,immutable";
-            response.Headers["ETag"] = $"\"{catalog.StylesheetSha256}\"";
+            response.Cache.AppendCacheExtension("immutable");
+            response.Cache.SetETag($"\"{catalog.StylesheetSha256}\"");
         }
         else
         {
             response.Cache.SetCacheability(HttpCacheability.NoCache);
         }
 
-        response.Headers["X-Content-Type-Options"] = "nosniff";
+        response.AddHeader("X-Content-Type-Options", "nosniff");
         response.Write(catalog.Css);
     }
 

@@ -1,8 +1,50 @@
 ﻿#nullable enable
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler.IsReusable.get -> bool
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler.OdfWebFontDynamicHandler() -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler.OdfWebFontDynamicHandler(OdfKit.WebFonts.IWebFontSubsetEngine! engine, OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions! options) -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler.ProcessRequest(System.Web.HttpContext! context) -> void
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.IsReusable.get -> bool
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.OdfWebFontHandler() -> void
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler.ProcessRequest(System.Web.HttpContext! context) -> void
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowedFaces.get -> System.Collections.Generic.ICollection<OdfKit.WebFonts.WebFontFaceIdentity!>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowedFontFamilies.get -> System.Collections.Generic.ICollection<string!>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowedFormats.get -> System.Collections.Generic.ICollection<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowedProfileIds.get -> System.Collections.Generic.ICollection<string!>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowPublicCrossOriginAssets.get -> bool
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AllowPublicCrossOriginAssets.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.ApiKey.get -> string!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.ApiKey.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AssetRootPath.get -> string!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.AssetRootPath.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.FontSources.get -> System.Collections.Generic.IDictionary<string!, string!>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxAssetBytes.get -> long
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxAssetBytes.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxConcurrentGenerations.get -> int
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxConcurrentGenerations.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxRequestBodyBytes.get -> int
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxRequestBodyBytes.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxSequenceCount.get -> int
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxSequenceCount.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxUnicodeScalarCount.get -> int
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.MaxUnicodeScalarCount.set -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationOptions.OdfWebFontSystemWebGenerationOptions() -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FaceIndex.get -> int
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FaceIndex.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FontFamily.get -> string!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FontFamily.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FontSourceId.get -> string!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.FontSourceId.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Formats.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.OdfWebFontSystemWebGenerationRequest() -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.ProfileId.get -> string!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.ProfileId.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Sequences.init -> void
 static OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink() -> System.Web.IHtmlString!
 static OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink(string! stylesheetUrl) -> System.Web.IHtmlString!

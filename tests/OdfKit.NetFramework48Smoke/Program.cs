@@ -10,6 +10,8 @@ using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 using OdfKit.Text;
+using OdfKit.WebFonts.Hosting.SystemWeb;
+using OdfKit.WebFonts.Windows;
 
 namespace OdfKit.NetFramework48Smoke;
 
@@ -108,6 +110,9 @@ internal static class Program
         _ = typeof(LocalProcessBackend);
         _ = OdfRdfGraphUris.ResolveSubjectUri("content.xml");
         _ = new OdtOperationCompatibilityOptions();
+        _ = new OdfWebFontSystemWebGenerationOptions();
+        _ = typeof(OdfWebFontDynamicHandler);
+        _ = typeof(WindowsEudcFontSourceResolver);
 
         OdfLength measured = OdfTextMeasurer.MeasureWidth("OdfKit", "Arial", 12);
         Require(measured.ToCentimeters() > 0, "Imaging native runtime smoke failed.");

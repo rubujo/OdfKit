@@ -1,9 +1,13 @@
 # ASP.NET Web Forms WebFont Sample
 
 1. 安裝 `OdfKit.WebFonts.Hosting.SystemWeb`。
-2. 將 build-time 產生的 `webfonts.json`、CSS 與 SHA-256 目錄部署到
-   `App_Data/OdfWebFonts`，或把 `PublicBaseUrl` 改成 CDN URL。
-3. 將 `Default.aspx` 與 `Web.config` 放入 .NET Framework 4.8 Web Forms 應用程式。
+2. 依授權合法取得字型，放在 `App_Data/Fonts`，並以實際 SHA-256 更新
+   `webfonts.dynamic.example.json` 後另存為 `App_Data/webfonts.dynamic.json`。
+3. 以應用程式集區環境變數 `ODFKIT_WEBFONT_API_KEY` 提供高熵 API key；不得把 secret 提交至
+   `Web.config` 或原始碼。
+4. 將 `Default.aspx` 與 `Web.config` 放入 .NET Framework 4.8 Web Forms 應用程式。
 
-IIS 行程只讀取由純 .NET 引擎預產生的資產，不在 HTTP request 中動態產字。正式部署說明見
-[`docs/webfonts.md`](../../docs/webfonts.md)。
+受信任後端以 `POST /_odf-fonts/generate` 與 `X-OdfKit-WebFont-Key` 要求動態產字；公開頁面只
+GET 回傳 manifest 中的內容定址資產。Handler 使用有界並行、face／Profile／format allowlist，
+並在相同路徑保留預產生 manifest／CSS fallback。`net48` 明確只產生 TTF／WOFF，不會靜默把
+WOFF2 改成其它格式。正式部署與 JSON 本文範例見 [`docs/webfonts.md`](../../docs/webfonts.md)。

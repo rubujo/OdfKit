@@ -8,10 +8,19 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <UseLocalPackages Condition="'$(UseLocalPackages)' == ''">false</UseLocalPackages>
+    <OdfKitPackageVersion Condition="'$(OdfKitPackageVersion)' == ''">0.0.1</OdfKitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseLocalPackages)' == 'true'">
+    <PackageReference Include="OdfKit.WebFonts.Hosting.SystemWeb" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.WebFonts.OpenType" Version="$(OdfKitPackageVersion)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseLocalPackages)' != 'true'">
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.SystemWeb\OdfKit.WebFonts.Hosting.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />

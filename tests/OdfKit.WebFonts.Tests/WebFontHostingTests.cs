@@ -137,6 +137,18 @@ public sealed class WebFontHostingTests
         Assert.Equal(
             "<link rel=\"stylesheet\" href=\"https://fonts.example.com/assets/webfonts.css\" />",
             provider.CreateStylesheetLink());
+        Assert.Equal(
+            $"<link rel=\"preload\" href=\"https://fonts.example.com/assets/{sha256}/{fileName}\" as=\"font\" type=\"font/woff2\" crossorigin=\"anonymous\" />",
+            provider.CreateFontPreloadLink(
+                new WebFontAsset
+                {
+                    FileName = fileName,
+                    Sha256 = sha256,
+                    ByteLength = fontBytes.Length,
+                    Format = WebFontFormat.Woff2,
+                    FontFamily = "OdfKit Test",
+                    UnicodeRanges = ["U+9089", "U+E0110"]
+                }));
 
         await application.StopAsync(TestContext.Current.CancellationToken);
         DeleteTemporaryRoot(rootPath);

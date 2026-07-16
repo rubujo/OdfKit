@@ -1,12 +1,375 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Web;
+using OdfKit.WebFonts;
 using OdfKit.WebFonts.Hosting.SystemWeb;
+using OdfKit.WebFonts.OpenType;
 
-IHttpHandler handler = new OdfWebFontHandler();
-string markup = OdfWebFontHtml.StylesheetLink().ToHtmlString();
-if (!handler.IsReusable || !markup.Contains("/_odf-fonts/webfonts.css"))
+string? fontPath = GetArgument(args, "--font");
+string? sourceSha256 = GetArgument(args, "--sha256");
+string root = Path.Combine(Path.GetTempPath(), "odfkit-systemweb-smoke-" + Guid.NewGuid().ToString("N"));
+Directory.CreateDirectory(root);
+
+try
 {
+    IWebFontSubsetEngine engine;
+    var options = new OdfWebFontSystemWebGenerationOptions
+    {
+        AssetRootPath = root,
+        ApiKey = "system-web-smoke-key",
+        AllowPublicCrossOriginAssets = true,
+        MaxConcurrentGenerations = 1,
+        MaxSequenceCount = 8,
+        MaxUnicodeScalarCount = 32
+    };
+    options.AllowedProfileIds.Add("smoke-profile@1");
+    options.AllowedFontFamilies.Add("OdfKit SystemWeb Smoke");
+    options.AllowedFormats.Clear();
+    options.AllowedFormats.Add(WebFontFormat.Woff);
+    options.AllowedFormats.Add(WebFontFormat.TrueType);
+
+    if (fontPath is not null || sourceSha256 is not null)
+    {
+        if (fontPath is null
+            || sourceSha256 is null
+            || !File.Exists(fontPath)
+            || !string.Equals(ComputeHash(fontPath), sourceSha256, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("The real System.Web smoke font contract is invalid.");
+        }
+
+        options.FontSources.Add("smoke-source", Path.GetFullPath(fontPath));
+        options.AllowedFaces.Add(new WebFontFaceIdentity
+        {
+            FontSourceId = "smoke-source",
+            SourceSha256 = sourceSha256,
+            FaceIndex = 0
+        });
+        var engineOptions = new ManagedOpenTypeWebFontEngineOptions
+        {
+            MaxUnicodeScalars = 32,
+            MaxOutputBytes = 32L * 1024 * 1024
+        };
+        engineOptions.FontSources.Add("smoke-source", Path.GetFullPath(fontPath));
+        engine = new ManagedOpenTypeWebFontSubsetEngine(engineOptions);
+    }
+    else
+    {
+        options.FontSources.Add("smoke-source", "programmatic-smoke-source.ttf");
+        options.AllowedFaces.Add(new WebFontFaceIdentity
+        {
+            FontSourceId = "smoke-source",
+            SourceSha256 = new string('a', 64),
+            FaceIndex = 0
+        });
+        engine = new DeterministicSmokeEngine();
+    }
+
+    var handler = new OdfWebFontDynamicHandler(engine, options);
+    string json = JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+    {
+        FontSourceId = "smoke-source",
+        FaceIndex = 0,
+        ProfileId = "smoke-profile@1",
+        FontFamily = "OdfKit SystemWeb Smoke",
+        Sequences = new[] { "A𠆩" },
+        Formats = new[] { WebFontFormat.Woff, WebFontFormat.TrueType }
+    });
+
+    var unauthorized = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, null);
+    var unauthorizedContext = new HttpContext(unauthorized);
+    handler.ProcessRequest(unauthorizedContext);
+    unauthorizedContext.Response.Flush();
+    Require(unauthorizedContext.Response.StatusCode == 401, "System.Web dynamic endpoint did not reject a missing API key.");
+
+    var invalidFormat = new RecordingWorkerRequest(
+        "POST",
+        "/_odf-fonts/generate",
+        JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+        {
+            FontSourceId = "smoke-source",
+            FaceIndex = 0,
+            ProfileId = "smoke-profile@1",
+            FontFamily = "OdfKit SystemWeb Smoke",
+            Sequences = new[] { "A𠆩" },
+            Formats = new[] { WebFontFormat.Woff2 }
+        }),
+        options.ApiKey);
+    var invalidFormatContext = new HttpContext(invalidFormat);
+    handler.ProcessRequest(invalidFormatContext);
+    invalidFormatContext.Response.Flush();
+    Require(invalidFormatContext.Response.StatusCode == 400, "System.Web dynamic endpoint did not reject WOFF2 on net48.");
+
+    using (var blockingEngine = new BlockingSmokeEngine())
+    {
+        var limitedHandler = new OdfWebFontDynamicHandler(blockingEngine, options);
+        var firstWorker = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, options.ApiKey);
+        Task firstGeneration = Task.Run(() =>
+        {
+            var firstContext = new HttpContext(firstWorker);
+            limitedHandler.ProcessRequest(firstContext);
+            firstContext.Response.Flush();
+        });
+        Require(blockingEngine.Started.Wait(TimeSpan.FromSeconds(5)), "System.Web bounded generation did not start.");
+        var saturatedWorker = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, options.ApiKey);
+        var saturatedContext = new HttpContext(saturatedWorker);
+        limitedHandler.ProcessRequest(saturatedContext);
+        saturatedContext.Response.Flush();
+        Require(saturatedContext.Response.StatusCode == 429, "System.Web dynamic endpoint did not enforce bounded concurrency.");
+        blockingEngine.Release.Set();
+        Require(firstGeneration.Wait(TimeSpan.FromSeconds(5)), "System.Web bounded generation did not finish.");
+    }
+    Directory.Delete(root, recursive: true);
+    Directory.CreateDirectory(root);
+
+    var generated = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, options.ApiKey);
+    var generatedContext = new HttpContext(generated);
+    handler.ProcessRequest(generatedContext);
+    generatedContext.Response.Flush();
+    Require(generatedContext.Response.StatusCode == 200, "System.Web dynamic endpoint did not generate assets.");
+    Require(generated.ResponseText.Contains("smoke-profile@1"), "System.Web dynamic endpoint returned no manifest body.");
+    string[] generatedPaths = Directory.GetFiles(root, "*", SearchOption.AllDirectories);
+    Require(generatedPaths.Length == 2, "System.Web dynamic endpoint returned an incomplete manifest.");
+
+    foreach (string generatedPath in generatedPaths)
+    {
+        string hash = Path.GetFileName(Path.GetDirectoryName(generatedPath));
+        string fileName = Path.GetFileName(generatedPath);
+        WebFontFormat format = string.Equals(Path.GetExtension(fileName), ".woff", StringComparison.OrdinalIgnoreCase)
+            ? WebFontFormat.Woff
+            : WebFontFormat.TrueType;
+        var assetRequest = new RecordingWorkerRequest(
+            "GET",
+            $"/_odf-fonts/{hash}/{fileName}",
+            null,
+            null);
+        var assetContext = new HttpContext(assetRequest);
+        handler.ProcessRequest(assetContext);
+        assetContext.Response.Flush();
+        Require(assetContext.Response.StatusCode == 200, "System.Web dynamic endpoint did not serve an immutable asset.");
+        assetRequest.ResponseHeaders.TryGetValue("ETag", out string? etag);
+        Require(
+            string.Equals(etag, $"\"{hash}\"", StringComparison.Ordinal),
+            "System.Web dynamic endpoint returned an invalid ETag: "
+            + string.Join(",", assetRequest.ResponseHeaders.Select(pair => $"{pair.Key}={pair.Value}")));
+        Require(
+            assetRequest.ResponseHeaders.TryGetValue("Access-Control-Allow-Origin", out string? allowOrigin)
+            && string.Equals(allowOrigin, "*", StringComparison.Ordinal),
+            "System.Web CDN asset did not emit wildcard CORS.");
+        Require(
+            assetRequest.ResponseHeaders.TryGetValue("Cross-Origin-Resource-Policy", out string? resourcePolicy)
+            && string.Equals(resourcePolicy, "cross-origin", StringComparison.Ordinal),
+            "System.Web CDN asset did not emit cross-origin CORP.");
+
+        if (fontPath is not null)
+        {
+            using FileStream stream = File.OpenRead(generatedPath);
+            ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(
+                stream,
+                format,
+                new[] { WebFontTextSequence.Create("A𠆩") });
+        }
+    }
+
+    IHttpHandler staticHandler = new OdfWebFontHandler();
+    string markup = OdfWebFontHtml.StylesheetLink().ToHtmlString();
+    Require(staticHandler.IsReusable && handler.IsReusable, "System.Web handlers are not reusable.");
+    Require(markup.Contains("/_odf-fonts/webfonts.css"), "System.Web stylesheet helper returned an invalid URL.");
+
+    Console.WriteLine(fontPath is null
+        ? "PASS: System.Web authenticated dynamic handler contract loaded."
+        : "PASS: System.Web generated and verified real WOFF/TTF assets on CLR net48.");
+    return 0;
+}
+catch (Exception exception)
+{
+    Console.Error.WriteLine(exception.GetType().FullName);
+    Console.Error.WriteLine(exception.Message);
+    Console.Error.WriteLine(exception.StackTrace);
     return 1;
 }
+finally
+{
+    if (Directory.Exists(root))
+    {
+        Directory.Delete(root, recursive: true);
+    }
+}
 
-Console.WriteLine("PASS: System.Web handler and Web Forms stylesheet helper loaded.");
-return 0;
+static string? GetArgument(string[] values, string name)
+{
+    int index = Array.IndexOf(values, name);
+    return index >= 0 && index + 1 < values.Length ? values[index + 1] : null;
+}
+
+static string ComputeHash(string path)
+{
+    using FileStream stream = File.OpenRead(path);
+    using SHA256 sha256 = SHA256.Create();
+    return BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty).ToLowerInvariant();
+}
+
+static void Require(bool condition, string message)
+{
+    if (!condition)
+    {
+        throw new InvalidOperationException(message);
+    }
+}
+
+internal sealed class DeterministicSmokeEngine : IWebFontSubsetEngine
+{
+    public Task<WebFontManifest> GenerateAsync(
+        WebFontSubsetRequest request,
+        string destinationDirectory,
+        CancellationToken cancellationToken = default)
+    {
+        var assets = new List<WebFontAsset>();
+        foreach (WebFontFormat format in request.Formats)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            byte[] bytes = Encoding.UTF8.GetBytes($"{request.ProfileId}:{request.FontFamily}:{format}:A𠆩");
+            string hash;
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                hash = BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", string.Empty).ToLowerInvariant();
+            }
+
+            string extension = format == WebFontFormat.Woff ? "woff" : "ttf";
+            string fileName = $"systemweb.{hash.Substring(0, 16)}.{extension}";
+            string directory = Path.Combine(destinationDirectory, hash);
+            Directory.CreateDirectory(directory);
+            File.WriteAllBytes(Path.Combine(directory, fileName), bytes);
+            assets.Add(new WebFontAsset
+            {
+                FileName = fileName,
+                Sha256 = hash,
+                ByteLength = bytes.LongLength,
+                Format = format,
+                FontFamily = request.FontFamily,
+                UnicodeRanges = new[] { "U+41", "U+201A9" }
+            });
+        }
+
+        return Task.FromResult(new WebFontManifest
+        {
+            ProfileId = request.ProfileId,
+            Assets = assets
+        });
+    }
+}
+
+internal sealed class BlockingSmokeEngine : IWebFontSubsetEngine, IDisposable
+{
+    private readonly DeterministicSmokeEngine _inner = new();
+
+    public ManualResetEventSlim Started { get; } = new(initialState: false);
+
+    public ManualResetEventSlim Release { get; } = new(initialState: false);
+
+    public Task<WebFontManifest> GenerateAsync(
+        WebFontSubsetRequest request,
+        string destinationDirectory,
+        CancellationToken cancellationToken = default)
+    {
+        Started.Set();
+        Release.Wait(cancellationToken);
+        return _inner.GenerateAsync(request, destinationDirectory, cancellationToken);
+    }
+
+    public void Dispose()
+    {
+        Started.Dispose();
+        Release.Dispose();
+    }
+}
+
+internal sealed class RecordingWorkerRequest : HttpWorkerRequest
+{
+    private readonly byte[] _body;
+    private readonly string _method;
+    private readonly string _path;
+    private readonly string? _apiKey;
+    private readonly StringBuilder _responseBody = new();
+
+    public RecordingWorkerRequest(string method, string path, string? body, string? apiKey)
+    {
+        _method = method;
+        _path = path;
+        _body = body is null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body);
+        _apiKey = apiKey;
+    }
+
+    public int StatusCode { get; private set; } = 200;
+
+    public IDictionary<string, string> ResponseHeaders { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    public string ResponseText => _responseBody.ToString();
+
+    public override string GetHttpVerbName() => _method;
+
+    public override string GetHttpVersion() => "HTTP/1.1";
+
+    public override string GetLocalAddress() => "127.0.0.1";
+
+    public override int GetLocalPort() => 80;
+
+    public override string GetQueryString() => string.Empty;
+
+    public override string GetRawUrl() => _path;
+
+    public override string GetRemoteAddress() => "127.0.0.1";
+
+    public override int GetRemotePort() => 49152;
+
+    public override string GetUriPath() => _path;
+
+    public override byte[] GetPreloadedEntityBody() => _body;
+
+    public override int GetPreloadedEntityBodyLength() => _body.Length;
+
+    public override int GetTotalEntityBodyLength() => _body.Length;
+
+    public override bool IsEntireEntityBodyIsPreloaded() => true;
+
+    public override string? GetKnownRequestHeader(int index)
+        => index switch
+        {
+            HeaderContentLength => _body.Length.ToString(CultureInfo.InvariantCulture),
+            HeaderContentType when _body.Length > 0 => "application/json; charset=utf-8",
+            _ => null
+        };
+
+    public override string[][] GetUnknownRequestHeaders()
+        => _apiKey is null ? Array.Empty<string[]>() : new[] { new[] { "X-OdfKit-WebFont-Key", _apiKey } };
+
+    public override void SendStatus(int statusCode, string statusDescription)
+        => StatusCode = statusCode;
+
+    public override void SendKnownResponseHeader(int index, string value)
+        => ResponseHeaders[GetKnownResponseHeaderName(index)] = value;
+
+    public override void SendUnknownResponseHeader(string name, string value)
+        => ResponseHeaders[name] = value;
+
+    public override void SendResponseFromMemory(byte[] data, int length)
+        => _responseBody.Append(Encoding.UTF8.GetString(data, 0, length));
+
+    public override void SendResponseFromFile(string filename, long offset, long length)
+    {
+    }
+
+    public override void SendResponseFromFile(IntPtr handle, long offset, long length)
+    {
+    }
+
+    public override void FlushResponse(bool finalFlush)
+    {
+    }
+
+    public override void EndOfRequest()
+    {
+    }
+}
