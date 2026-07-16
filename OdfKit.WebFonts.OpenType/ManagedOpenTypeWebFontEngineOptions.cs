@@ -19,6 +19,18 @@ public sealed class ManagedOpenTypeWebFontEngineOptions
     public long MaxSourceBytes { get; set; } = 256L * 1024 * 1024;
 
     /// <summary>
+    /// Gets or sets the maximum total bytes retained by the verified source-font cache.
+    /// 取得或設定已驗證來源字型快取保留的位元組總上限。
+    /// </summary>
+    public long MaxCachedSourceBytes { get; set; } = 128L * 1024 * 1024;
+
+    /// <summary>
+    /// Gets or sets the maximum number of verified source fonts retained in memory.
+    /// 取得或設定記憶體中保留的已驗證來源字型數量上限。
+    /// </summary>
+    public int MaxCachedSourceEntries { get; set; } = 4;
+
+    /// <summary>
     /// Gets or sets the maximum generated asset size in bytes.
     /// 取得或設定產生資產的最大位元組數。
     /// </summary>

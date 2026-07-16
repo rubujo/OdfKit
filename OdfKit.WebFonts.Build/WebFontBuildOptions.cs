@@ -49,6 +49,18 @@ public sealed class WebFontBuildOptions
     public int MaxUniqueUnicodeScalars { get; init; } = 100_000;
 
     /// <summary>
+    /// Gets or initializes the fixed Unicode bucket width used for stable asset slicing, or zero to disable slicing.
+    /// 取得或初始化穩定資產切片使用的固定 Unicode bucket 寬度；設為零則停用切片。
+    /// </summary>
+    public int UnicodeRangeSliceSize { get; init; }
+
+    /// <summary>
+    /// Gets or initializes the maximum number of stable Unicode slices.
+    /// 取得或初始化穩定 Unicode 切片數量上限。
+    /// </summary>
+    public int MaxSliceCount { get; init; } = 512;
+
+    /// <summary>
     /// Gets or initializes the optional legacy encoding name.
     /// 取得或初始化選用的舊式編碼名稱。
     /// </summary>
@@ -85,6 +97,18 @@ public sealed class WebFontBuildOptions
     public string FontFamily { get; init; } = "OdfKitWebFont";
 
     /// <summary>
+    /// Gets or initializes the emitted CSS font-display strategy.
+    /// 取得或初始化輸出的 CSS font-display 策略。
+    /// </summary>
+    public WebFontDisplayMode FontDisplay { get; init; } = WebFontDisplayMode.Swap;
+
+    /// <summary>
+    /// Gets or initializes the optional local fallback face and metric overrides.
+    /// 取得或初始化選用的本機 fallback face 與字型度量覆寫。
+    /// </summary>
+    public WebFontFallbackMetrics? FallbackMetrics { get; init; }
+
+    /// <summary>
     /// Gets or initializes the output directory.
     /// 取得或初始化輸出目錄。
     /// </summary>
@@ -112,5 +136,5 @@ public sealed class WebFontBuildOptions
     /// Gets or initializes the output formats.
     /// 取得或初始化輸出格式。
     /// </summary>
-    public IReadOnlyList<WebFontFormat> Formats { get; init; } = [WebFontFormat.Woff2, WebFontFormat.Woff];
+    public IReadOnlyList<WebFontFormat> Formats { get; init; } = [WebFontFormat.Woff2];
 }

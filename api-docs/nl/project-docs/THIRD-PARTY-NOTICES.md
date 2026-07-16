@@ -2,7 +2,7 @@
 title: Kennisgevingen van derden
 _lang: nl
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Kennisgevingen van derden
@@ -23,6 +23,7 @@ OdfKit gebruikt CC0-1.0 Universal. Deze afhankelijkheden behouden hun licentie:
 | System.Numerics.Tensors | Gevectoriseerde aggregaten voor net10.0 | MIT |
 | System.IO.Hashing | CRC-32 voor net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0-compatibiliteit | MIT |
+| Microsoft.Win32.Registry | netstandard2.0-compatibiliteit voor het opzoeken van Windows EUDC-registerbronnen | MIT |
 | Markdig | Markdown-AST-parser | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Tekenen en tekstvorming | MIT |
 | ScottPlot | Grafieken en fallback-visualisatie | MIT |

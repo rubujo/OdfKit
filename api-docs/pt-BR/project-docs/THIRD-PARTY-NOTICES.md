@@ -2,7 +2,7 @@
 title: Avisos de terceiros
 _lang: pt-BR
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Avisos de terceiros
@@ -23,6 +23,7 @@ O projeto OdfKit é disponibilizado sob a licença [CC0-1.0 Universal](https://c
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | Operações numéricas vetorizadas para funções de agregação de fórmulas; somente no destino net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Cálculo da soma de verificação CRC-32; somente no destino net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Memory](https://github.com/dotnet/runtime) / [System.Buffers](https://github.com/dotnet/runtime) / [System.Threading.Tasks.Extensions](https://github.com/dotnet/runtime) / [Microsoft.Bcl.AsyncInterfaces](https://github.com/dotnet/runtime) / [Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) / [System.Text.Encoding.CodePages](https://github.com/dotnet/runtime) | Compatibilidade com a plataforma netstandard2.0 para complementar os tipos e as APIs integrados ao net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [Microsoft.Win32.Registry](https://github.com/dotnet/runtime) | Compatibilidade com netstandard2.0 para resolver origens do Registro do Windows EUDC | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Markdig](https://github.com/xoofx/markdig) | Backend de análise de AST Markdown usado em OdfKit.Extensions.Html | [BSD-2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | Desenho de imagens e composição de texto multiplataforma usados em OdfKit.Extensions.Imaging | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | Desenho de gráficos em memória e visualização alternativa de imagens usados em OdfKit.Extensions.Imaging | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |

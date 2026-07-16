@@ -11,6 +11,10 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.get -> System.Collections
 OdfKit.WebFonts.Build.WebFontBuildOptions.ContentPaths.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.FaceIndex.get -> int
 OdfKit.WebFonts.Build.WebFontBuildOptions.FaceIndex.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FallbackMetrics.get -> OdfKit.WebFonts.Build.WebFontFallbackMetrics?
+OdfKit.WebFonts.Build.WebFontBuildOptions.FallbackMetrics.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontDisplay.get -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontBuildOptions.FontDisplay.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontFamily.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontFamily.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.FontPath.get -> string!
@@ -27,6 +31,8 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.get -> long
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxCorpusBytes.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxOutputBytes.get -> long
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxOutputBytes.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSliceCount.get -> int
+OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSliceCount.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSourceBytes.get -> long
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxSourceBytes.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.MaxUniqueUnicodeScalars.get -> int
@@ -37,6 +43,28 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.UnicodeRangeSliceSize.get -> int
+OdfKit.WebFonts.Build.WebFontBuildOptions.UnicodeRangeSliceSize.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.ValidateSourceChecksums.get -> bool
 OdfKit.WebFonts.Build.WebFontBuildOptions.ValidateSourceChecksums.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.WebFontBuildOptions() -> void
+OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontDisplayMode.Auto = 0 -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontDisplayMode.Block = 1 -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontDisplayMode.Fallback = 3 -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontDisplayMode.Optional = 4 -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontDisplayMode.Swap = 2 -> OdfKit.WebFonts.Build.WebFontDisplayMode
+OdfKit.WebFonts.Build.WebFontFallbackMetrics
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.AscentOverridePercentage.get -> double
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.AscentOverridePercentage.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.DescentOverridePercentage.get -> double
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.DescentOverridePercentage.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.FontFamily.get -> string!
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.FontFamily.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.LineGapOverridePercentage.get -> double
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.LineGapOverridePercentage.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.LocalFontName.get -> string!
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.LocalFontName.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.SizeAdjustPercentage.get -> double
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.SizeAdjustPercentage.init -> void
+OdfKit.WebFonts.Build.WebFontFallbackMetrics.WebFontFallbackMetrics() -> void

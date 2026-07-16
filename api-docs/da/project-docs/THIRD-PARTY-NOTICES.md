@@ -2,7 +2,7 @@
 title: Tredjepartsmeddelelser
 _lang: da
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Tredjepartsmeddelelser
@@ -23,6 +23,7 @@ OdfKit bruger CC0-1.0 Universal. Disse avhengighetene bevarer licensene sine:
 | System.Numerics.Tensors | Vektoriserede aggregater for net10.0 | MIT |
 | System.IO.Hashing | CRC-32 for net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0-kompatibilitet | MIT |
+| Microsoft.Win32.Registry | netstandard2.0-understøttelse til opslag af Windows EUDC-registreringskilder | MIT |
 | Markdig | Markdown-AST-analyse | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Tegning og tekstformning | MIT |
 | ScottPlot | Diagrammer og fallback-visualisering | MIT |

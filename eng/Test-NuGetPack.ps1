@@ -56,6 +56,7 @@ $expectedPackages = @(
     @{ Id = "OdfKit.WebFonts.Build"; Tool = $true; Tfms = @(); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Worker"; Assembly = "OdfKit.WebFonts.Worker.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Profiles"; Assembly = "OdfKit.WebFonts.Profiles.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
+    @{ Id = "OdfKit.WebFonts.Windows"; Assembly = "OdfKit.WebFonts.Windows.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Hosting.AspNetCore"; Assembly = "OdfKit.WebFonts.Hosting.AspNetCore.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Hosting.SystemWeb"; Assembly = "OdfKit.WebFonts.Hosting.SystemWeb.dll"; Tfms = @("net48"); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.Extensions.Html.WebFonts"; Assembly = "OdfKit.Extensions.Html.WebFonts.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true }
@@ -290,6 +291,7 @@ using OdfKit.Extensions.Rendering;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Encoding.Legacy;
 using OdfKit.WebFonts.Profiles;
+using OdfKit.WebFonts.Windows;
 using System.Runtime.InteropServices;
 
 using var doc = TextDocument.Create();
@@ -307,6 +309,7 @@ if (webFontSequence.UnicodeScalars.Count != 3)
 }
 _ = new Big5CharacterMappingProvider();
 _ = typeof(JsonCharacterMappingProvider);
+_ = typeof(WindowsEudcFontSourceResolver);
 
 var measured = OdfTextMeasurer.MeasureWidth("OdfKit", "Arial", 12);
 if (measured.ToCentimeters() <= 0)

@@ -35,6 +35,7 @@ $libraryProjects = @(
     'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj',
     'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj',
     'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj',
+    'OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj',
     'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj',
     'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj',
     'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj',
@@ -91,6 +92,7 @@ if ($IncludeTests) {
         'tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj',
         'tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj',
         'tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj',
+        'tests/OdfKit.NetFramework48Smoke/OdfKit.NetFramework48Smoke.csproj',
         'samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj')) {
         Invoke-DotNetFormat -ProjectPath (Join-Path $root $relative) -Relative $relative -WhitespaceOnly
     }

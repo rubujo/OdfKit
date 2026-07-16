@@ -2,6 +2,10 @@
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.FontSources.get -> System.Collections.Generic.IDictionary<string!, string!>!
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.ManagedOpenTypeWebFontEngineOptions() -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCachedSourceBytes.get -> long
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCachedSourceBytes.set -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCachedSourceEntries.get -> int
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCachedSourceEntries.set -> void
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCompositeDepth.get -> int
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxCompositeDepth.set -> void
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.MaxOutputBytes.get -> long

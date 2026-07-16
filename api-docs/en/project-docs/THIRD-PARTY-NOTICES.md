@@ -2,7 +2,7 @@
 title: Third-Party Notices
 _lang: en
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Third-Party Notices
@@ -26,6 +26,7 @@ and runtime dependencies retain their respective licenses.
 | System.Numerics.Tensors | Vectorized formula aggregates for net10.0 | MIT |
 | System.IO.Hashing | CRC-32 checksums for net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0 compatibility support | MIT |
+| Microsoft.Win32.Registry | netstandard2.0 compatibility support for resolving Windows EUDC registry sources | MIT |
 | Markdig | Markdown AST parsing backend in OdfKit.Extensions.Html | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Cross-platform drawing and text shaping in OdfKit.Extensions.Imaging | MIT |
 | ScottPlot | In-memory charts and fallback visualization | MIT |

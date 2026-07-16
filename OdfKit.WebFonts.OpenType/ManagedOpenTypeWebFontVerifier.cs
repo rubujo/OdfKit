@@ -111,6 +111,30 @@ public static class ManagedOpenTypeWebFontVerifier
         }
     }
 
+    internal static void VerifyRetainsGlyphIds(
+        byte[] source,
+        int faceIndex,
+        Stream subset,
+        WebFontFormat format,
+        IEnumerable<int> unicodeScalars)
+    {
+        SfntFont sourceFont = SfntFont.Parse(source, faceIndex, 256, validateChecksums: true);
+        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
+        if (sourceFont.GlyphCount != subsetFont.GlyphCount)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        foreach (int scalar in unicodeScalars.Distinct())
+        {
+            ushort sourceGlyph = sourceFont.GetGlyphId(scalar);
+            if (sourceGlyph == 0 || sourceGlyph != subsetFont.GetGlyphId(scalar))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+        }
+    }
+
     private static bool IsVariationSelector(int scalar)
         => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
 
@@ -177,13 +201,16 @@ public static class ManagedOpenTypeWebFontVerifier
             int compressedLength = CheckedInt(SfntFont.ReadUInt32(data, record + 8, "WOFF-compressedLength"), "WOFF-compressedLength");
             int originalLength = CheckedInt(SfntFont.ReadUInt32(data, record + 12, "WOFF-originalLength"), "WOFF-originalLength");
             uint checksum = SfntFont.ReadUInt32(data, record + 16, "WOFF-checksum");
-            if (compressedLength != originalLength)
+            if (compressedLength > originalLength)
             {
-                throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+                throw SfntFont.DataInvalid("WOFF-compressedLength");
             }
 
-            SfntFont.EnsureRange(data, offset, originalLength, "WOFF-table");
-            byte[] table = data.Slice(offset, originalLength).ToArray();
+            SfntFont.EnsureRange(data, offset, compressedLength, "WOFF-table");
+            ReadOnlySpan<byte> stored = data.Slice(offset, compressedLength);
+            byte[] table = compressedLength == originalLength
+                ? stored.ToArray()
+                : WebFontWriters.DecompressZlib(stored, originalLength);
             if (tables.ContainsKey(tag) || SfntFont.CalculateTableChecksum(tag, table) != checksum)
             {
                 throw SfntFont.DataInvalid("WOFF-table");

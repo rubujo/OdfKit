@@ -1,0 +1,4 @@
+﻿#nullable enable
+OdfKit.WebFonts.Windows.WindowsEudcFontSourceResolver
+static OdfKit.WebFonts.Windows.WindowsEudcFontSourceResolver.ResolveAssociatedFont(int codePage, string! typeface) -> string!
+static OdfKit.WebFonts.Windows.WindowsEudcFontSourceResolver.ResolveSystemDefaultFont(int codePage) -> string!

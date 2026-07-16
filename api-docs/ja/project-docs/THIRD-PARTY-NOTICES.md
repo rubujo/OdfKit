@@ -2,7 +2,7 @@
 title: 第三者に関する通知
 _lang: ja
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # 第三者に関する通知
@@ -23,6 +23,7 @@ OdfKit プロジェクトは [CC0-1.0 Universal](https://creativecommons.org/pub
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | 数式集計関数のベクトル化された数値演算。net10.0 ターゲットのみ | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | CRC-32 チェックサムの計算。net10.0 ターゲットのみ | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Memory](https://github.com/dotnet/runtime) / [System.Buffers](https://github.com/dotnet/runtime) / [System.Threading.Tasks.Extensions](https://github.com/dotnet/runtime) / [Microsoft.Bcl.AsyncInterfaces](https://github.com/dotnet/runtime) / [Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) / [System.Text.Encoding.CodePages](https://github.com/dotnet/runtime) | net10.0 に組み込まれている型と API を補う、netstandard2.0 プラットフォーム互換性のサポート | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [Microsoft.Win32.Registry](https://github.com/dotnet/runtime) | Windows EUDC レジストリソースを解決するための netstandard2.0 互換性サポート | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Markdig](https://github.com/xoofx/markdig) | OdfKit.Extensions.Html で使用する Markdown AST 解析バックエンド | [BSD-2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | OdfKit.Extensions.Imaging で使用するクロスプラットフォームの画像描画と文字組版 | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | OdfKit.Extensions.Imaging で使用するメモリ内グラフ描画とフォールバック画像の可視化 | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |

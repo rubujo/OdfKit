@@ -37,8 +37,9 @@ public sealed class WebFontAssetBuilder
         string fontPath = Path.GetFullPath(options.FontPath);
         string outputDirectory = Path.GetFullPath(options.OutputDirectory);
         string text = await ReadTextAsync(options, cancellationToken).ConfigureAwait(false);
-        WebFontTextSequence sequence = WebFontTextSequence.Create(
-            SelectUniqueScalars(text, options.MaxUniqueUnicodeScalars));
+        IReadOnlyList<WebFontTextSequence> sequences = SelectUniqueSequences(
+            text,
+            options.MaxUniqueUnicodeScalars);
         string sourceSha256 = ComputeSha256(fontPath);
 
         var engineOptions = new ManagedOpenTypeWebFontEngineOptions
@@ -50,24 +51,34 @@ public sealed class WebFontAssetBuilder
         };
         engineOptions.FontSources.Add(options.FontSourceId, fontPath);
         var engine = new ManagedOpenTypeWebFontSubsetEngine(engineOptions);
-        WebFontManifest engineManifest = await engine.GenerateAsync(
-            new WebFontSubsetRequest
-            {
-                Face = new WebFontFaceIdentity
+        var assets = new List<WebFontAsset>();
+        foreach (IReadOnlyList<WebFontTextSequence> slice in CreateSlices(sequences, options))
+        {
+            WebFontManifest sliceManifest = await engine.GenerateAsync(
+                new WebFontSubsetRequest
                 {
-                    FontSourceId = options.FontSourceId,
-                    SourceSha256 = sourceSha256,
-                    FaceIndex = options.FaceIndex
+                    Face = new WebFontFaceIdentity
+                    {
+                        FontSourceId = options.FontSourceId,
+                        SourceSha256 = sourceSha256,
+                        FaceIndex = options.FaceIndex
+                    },
+                    ProfileId = options.ProfileId,
+                    FontFamily = options.FontFamily,
+                    Sequences = slice,
+                    Formats = options.Formats
                 },
-                ProfileId = options.ProfileId,
-                FontFamily = options.FontFamily,
-                Sequences = [sequence],
-                Formats = options.Formats
-            },
-            outputDirectory,
-            cancellationToken).ConfigureAwait(false);
+                outputDirectory,
+                cancellationToken).ConfigureAwait(false);
+            assets.AddRange(sliceManifest.Assets);
+        }
 
-        string css = CreateCss(engineManifest);
+        var engineManifest = new WebFontManifest
+        {
+            ProfileId = options.ProfileId,
+            Assets = assets
+        };
+        string css = CreateCss(engineManifest, options);
         string cssSha256 = ComputeSha256(System.Text.Encoding.UTF8.GetBytes(css));
         string stylesheetFileName = $"webfonts.{cssSha256[..16]}.css";
         var manifest = new WebFontManifest
@@ -147,37 +158,83 @@ public sealed class WebFontAssetBuilder
         return await File.ReadAllBytesAsync(info.FullName, cancellationToken).ConfigureAwait(false);
     }
 
-    private static string SelectUniqueScalars(string text, int maximumCount)
+    internal static IReadOnlyList<WebFontTextSequence> SelectUniqueSequences(string text, int maximumCount)
     {
-        var seen = new HashSet<int>();
-        var result = new StringBuilder();
-        foreach (Rune rune in text.EnumerateRunes())
+        Rune[] runes = text.EnumerateRunes().ToArray();
+        var seenScalars = new HashSet<int>();
+        var seenSequences = new HashSet<string>(StringComparer.Ordinal);
+        var result = new List<WebFontTextSequence>();
+        for (int index = 0; index < runes.Length; index++)
         {
-            if (Rune.IsControl(rune) || rune.Value == 0xFEFF)
+            Rune rune = runes[index];
+            if (Rune.IsControl(rune) || rune.Value == 0xFEFF || IsVariationSelector(rune.Value))
             {
                 continue;
             }
 
-            if (!seen.Add(rune.Value))
+            string value = rune.ToString();
+            if (index + 1 < runes.Length && IsVariationSelector(runes[index + 1].Value))
             {
-                continue;
+                value += runes[++index].ToString();
             }
 
-            if (seen.Count > maximumCount)
+            foreach (Rune scalar in value.EnumerateRunes())
+            {
+                if (!IsVariationSelector(scalar.Value))
+                {
+                    seenScalars.Add(scalar.Value);
+                }
+            }
+
+            if (seenScalars.Count > maximumCount)
             {
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }
 
-            result.Append(rune.ToString());
+            if (seenSequences.Add(value))
+            {
+                result.Add(WebFontTextSequence.Create(value));
+            }
         }
 
-        if (result.Length == 0)
+        if (result.Count == 0)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 
-        return result.ToString();
+        return result;
     }
+
+    internal static IReadOnlyList<IReadOnlyList<WebFontTextSequence>> CreateSlices(
+        IReadOnlyList<WebFontTextSequence> sequences,
+        WebFontBuildOptions options)
+    {
+        if (options.UnicodeRangeSliceSize == 0)
+        {
+            return [sequences];
+        }
+
+        IReadOnlyList<IReadOnlyList<WebFontTextSequence>> slices = sequences
+            .GroupBy(sequence => GetBaseScalar(sequence) / options.UnicodeRangeSliceSize)
+            .OrderBy(group => group.Key)
+            .Select(group => (IReadOnlyList<WebFontTextSequence>)group
+                .OrderBy(GetBaseScalar)
+                .ThenBy(sequence => string.Join(",", sequence.UnicodeScalars), StringComparer.Ordinal)
+                .ToArray())
+            .ToArray();
+        if (slices.Count > options.MaxSliceCount)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        return slices;
+    }
+
+    private static int GetBaseScalar(WebFontTextSequence sequence)
+        => sequence.UnicodeScalars.First(scalar => !IsVariationSelector(scalar));
+
+    private static bool IsVariationSelector(int scalar)
+        => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
 
     private static string DecodeBig5E(WebFontBuildOptions options, byte[] bytes)
     {
@@ -267,7 +324,7 @@ public sealed class WebFontAssetBuilder
         }
     }
 
-    private static string CreateCss(WebFontManifest manifest)
+    internal static string CreateCss(WebFontManifest manifest, WebFontBuildOptions options)
     {
         var css = new StringBuilder();
         foreach (IGrouping<string, WebFontAsset> group in manifest.Assets
@@ -285,12 +342,47 @@ public sealed class WebFontAssetBuilder
             css.Append("  font-family: '").Append(EscapeCss(first.FontFamily)).AppendLine("';");
             css.Append("  src: ").Append(sources).AppendLine(";");
             css.Append("  unicode-range: ").Append(string.Join(", ", first.UnicodeRanges)).AppendLine(";");
-            css.AppendLine("  font-display: swap;");
+            css.Append("  font-display: ").Append(GetFontDisplay(options.FontDisplay)).AppendLine(";");
             css.AppendLine("}");
+        }
+
+        if (options.FallbackMetrics is not null)
+        {
+            AppendFallbackFace(css, options.FallbackMetrics);
         }
 
         return css.ToString();
     }
+
+    private static void AppendFallbackFace(StringBuilder css, WebFontFallbackMetrics fallback)
+    {
+        css.AppendLine("@font-face {");
+        css.Append("  font-family: '").Append(EscapeCss(fallback.FontFamily)).AppendLine("';");
+        css.Append("  src: local('").Append(EscapeCss(fallback.LocalFontName)).AppendLine("');");
+        css.Append("  size-adjust: ").Append(FormatPercentage(fallback.SizeAdjustPercentage)).AppendLine(";");
+        css.Append("  ascent-override: ").Append(FormatPercentage(fallback.AscentOverridePercentage)).AppendLine(";");
+        css.Append("  descent-override: ").Append(FormatPercentage(fallback.DescentOverridePercentage)).AppendLine(";");
+        css.Append("  line-gap-override: ").Append(FormatPercentage(fallback.LineGapOverridePercentage)).AppendLine(";");
+        css.AppendLine("}");
+    }
+
+    private static string FormatPercentage(double value)
+        => string.Concat(
+            value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
+            "%");
+
+    private static string GetFontDisplay(WebFontDisplayMode mode)
+        => mode switch
+        {
+            WebFontDisplayMode.Auto => "auto",
+            WebFontDisplayMode.Block => "block",
+            WebFontDisplayMode.Swap => "swap",
+            WebFontDisplayMode.Fallback => "fallback",
+            WebFontDisplayMode.Optional => "optional",
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(mode),
+                OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"))
+        };
 
     private static void Validate(WebFontBuildOptions options)
     {
@@ -307,13 +399,30 @@ public sealed class WebFontAssetBuilder
             || options.FaceIndex < 0
             || options.MaxCorpusBytes <= 0
             || options.MaxUniqueUnicodeScalars <= 0
+            || options.UnicodeRangeSliceSize < 0
+            || options.UnicodeRangeSliceSize > 0x110000
+            || options.MaxSliceCount <= 0
             || options.MaxSourceBytes <= 0
             || options.MaxOutputBytes <= 0
+            || !Enum.IsDefined(options.FontDisplay)
+            || !IsValidFallback(options.FallbackMetrics)
             || options.Formats.Count == 0)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
         }
     }
+
+    private static bool IsValidFallback(WebFontFallbackMetrics? fallback)
+        => fallback is null
+            || (!string.IsNullOrWhiteSpace(fallback.FontFamily)
+                && !string.IsNullOrWhiteSpace(fallback.LocalFontName)
+                && IsValidPercentage(fallback.SizeAdjustPercentage, allowZero: false)
+                && IsValidPercentage(fallback.AscentOverridePercentage, allowZero: true)
+                && IsValidPercentage(fallback.DescentOverridePercentage, allowZero: true)
+                && IsValidPercentage(fallback.LineGapOverridePercentage, allowZero: true));
+
+    private static bool IsValidPercentage(double value, bool allowZero)
+        => double.IsFinite(value) && value <= 1000 && (allowZero ? value >= 0 : value > 0);
 
     private static async Task WriteAtomicAsync(string path, string content, CancellationToken cancellationToken)
     {

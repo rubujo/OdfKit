@@ -2,7 +2,7 @@
 title: Hinweise zu Drittanbietern
 _lang: de
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Hinweise zu Drittanbietern
@@ -24,6 +24,7 @@ OdfKit nutzt CC0-1.0 Universal. Folgende Abhängigkeiten behalten ihre Lizenzen:
 | System.Numerics.Tensors | Vektorisierte Aggregatberechnung unter net10.0 | MIT |
 | System.IO.Hashing | CRC-32-Prüfsummen unter net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0-Kompatibilität | MIT |
+| Microsoft.Win32.Registry | netstandard2.0-Kompatibilität für die Auflösung von Windows-EUDC-Registrierungsquellen | MIT |
 | Markdig | Markdown-AST-Parser für OdfKit.Extensions.Html | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Zeichnen und Textformung | MIT |
 | ScottPlot | Diagramme und Ersatzvisualisierung | MIT |

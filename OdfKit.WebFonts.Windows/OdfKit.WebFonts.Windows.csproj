@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <Import Project="..\eng\OdfKit.WebFonts.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.WebFonts.Windows</PackageId>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Trusted Windows EUDC registry source resolution for OdfKit WebFonts.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+  </ItemGroup>
+</Project>

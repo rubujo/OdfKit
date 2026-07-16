@@ -10,6 +10,10 @@ namespace OdfKit.WebFonts.OpenType;
 public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
 {
     private readonly ManagedOpenTypeWebFontEngineOptions _options;
+    private readonly object _sourceCacheGate = new();
+    private readonly Dictionary<string, byte[]> _sourceCache = new(StringComparer.Ordinal);
+    private readonly Queue<string> _sourceCacheOrder = new();
+    private long _cachedSourceBytes;
 
     /// <summary>
     /// Initializes the bounded managed engine.
@@ -32,18 +36,10 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
     {
         ValidateRequest(request, destinationDirectory);
         string sourcePath = ResolveSource(request.Face);
-        byte[] sourceBytes = await ReadSourceAsync(
+        byte[] sourceBytes = await GetVerifiedSourceAsync(
             sourcePath,
-            _options.MaxSourceBytes,
+            request.Face.SourceSha256,
             cancellationToken).ConfigureAwait(false);
-        if (!string.IsNullOrWhiteSpace(request.Face.SourceSha256)
-            && !string.Equals(
-                ComputeSha256(sourceBytes),
-                request.Face.SourceSha256,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            throw DataInvalid("source-sha256");
-        }
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -98,7 +94,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
                 ByteLength = output.LongLength,
                 Format = format,
                 FontFamily = request.FontFamily,
-                UnicodeRanges = scalars.Select(value => $"U+{value:X}").ToArray()
+                UnicodeRanges = UnicodeRangeFormatter.Create(scalars)
             });
         }
 
@@ -140,6 +136,9 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         if (_options.FontSources.Count == 0
             || _options.MaxSourceBytes <= 0
             || _options.MaxOutputBytes <= 0
+            || _options.MaxCachedSourceBytes < 0
+            || _options.MaxCachedSourceEntries < 0
+            || (_options.MaxCachedSourceBytes == 0) != (_options.MaxCachedSourceEntries == 0)
             || _options.MaxUnicodeScalars <= 0
             || _options.MaxTableCount <= 0
             || _options.MaxCompositeDepth <= 0)
@@ -232,6 +231,78 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         }
 
         return bytes;
+    }
+
+    private async Task<byte[]> GetVerifiedSourceAsync(
+        string path,
+        string expectedSha256,
+        CancellationToken cancellationToken)
+    {
+        string normalizedSha256 = expectedSha256?.Trim().ToLowerInvariant() ?? string.Empty;
+        string cacheKey = string.IsNullOrEmpty(normalizedSha256)
+            ? string.Empty
+            : string.Concat(path, "|", normalizedSha256);
+        if (cacheKey.Length != 0)
+        {
+            lock (_sourceCacheGate)
+            {
+                if (_sourceCache.TryGetValue(cacheKey, out byte[]? cached))
+                {
+                    return cached;
+                }
+            }
+        }
+
+        byte[] bytes = await ReadSourceAsync(path, _options.MaxSourceBytes, cancellationToken).ConfigureAwait(false);
+        string actualSha256 = ComputeSha256(bytes);
+        if (normalizedSha256.Length != 0
+            && !string.Equals(actualSha256, normalizedSha256, StringComparison.Ordinal))
+        {
+            throw DataInvalid("source-sha256");
+        }
+
+        if (cacheKey.Length != 0)
+        {
+            CacheVerifiedSource(cacheKey, bytes);
+        }
+
+        return bytes;
+    }
+
+    private void CacheVerifiedSource(string cacheKey, byte[] bytes)
+    {
+        if (_options.MaxCachedSourceEntries == 0 || bytes.LongLength > _options.MaxCachedSourceBytes)
+        {
+            return;
+        }
+
+        lock (_sourceCacheGate)
+        {
+            if (_sourceCache.ContainsKey(cacheKey))
+            {
+                return;
+            }
+
+            while (_sourceCache.Count >= _options.MaxCachedSourceEntries
+                   || _cachedSourceBytes + bytes.LongLength > _options.MaxCachedSourceBytes)
+            {
+                if (_sourceCacheOrder.Count == 0)
+                {
+                    return;
+                }
+
+                string removedKey = _sourceCacheOrder.Dequeue();
+                if (_sourceCache.TryGetValue(removedKey, out byte[]? removed))
+                {
+                    _sourceCache.Remove(removedKey);
+                    _cachedSourceBytes -= removed.LongLength;
+                }
+            }
+
+            _sourceCache.Add(cacheKey, bytes);
+            _sourceCacheOrder.Enqueue(cacheKey);
+            _cachedSourceBytes += bytes.LongLength;
+        }
     }
 
     private static async Task WriteImmutableAsync(

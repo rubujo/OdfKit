@@ -2,7 +2,7 @@
 title: Avvisi di terze parti
 _lang: it
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Avvisi di terze parti
@@ -23,6 +23,7 @@ OdfKit usa CC0-1.0 Universal. Queste dipendenze mantengono la propria licenza:
 | System.Numerics.Tensors | Aggregati vettoriali per net10.0 | MIT |
 | System.IO.Hashing | Checksum CRC-32 per net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | Compatibilità netstandard2.0 | MIT |
+| Microsoft.Win32.Registry | Compatibilità netstandard2.0 per risolvere le origini del Registro di sistema Windows EUDC | MIT |
 | Markdig | Analisi AST Markdown | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Disegno e composizione del testo | MIT |
 | ScottPlot | Grafici e visualizzazione di fallback | MIT |

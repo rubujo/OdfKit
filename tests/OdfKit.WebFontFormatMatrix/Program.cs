@@ -14,6 +14,19 @@ internal static class Program
 
     public static async Task<int> Main(string[] args)
     {
+        try
+        {
+            return await RunAsync(args).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(exception);
+            return 1;
+        }
+    }
+
+    private static async Task<int> RunAsync(string[] args)
+    {
         if (args.Length != 10)
         {
             return 2;
@@ -37,15 +50,25 @@ internal static class Program
             CreateTrueTypeCollection(
                 await File.ReadAllBytesAsync(extBPath).ConfigureAwait(false),
                 await File.ReadAllBytesAsync(plusPath).ConfigureAwait(false))).ConfigureAwait(false);
+        string eudcTtePath = Path.Combine(outputRoot, "EUDC.TTE");
+        File.Copy(extBPath, eudcTtePath, overwrite: true);
 
         var results = new List<MatrixResult>();
-        await VerifySuccessAsync(
+        WebFontManifest extBManifest = await VerifySuccessAsync(
             results,
             "cns-ext-b-ttf",
             extBPath,
             faceIndex: 0,
             ExtBText,
             outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "windows-eudc-tte",
+            eudcTtePath,
+            faceIndex: 0,
+            ExtBText,
+            outputRoot).ConfigureAwait(false);
+        await VerifySourceCacheAsync(eudcTtePath, outputRoot).ConfigureAwait(false);
         await VerifySuccessAsync(
             results,
             "ipamj-ivs",
@@ -119,7 +142,8 @@ internal static class Program
             outputRoot).ConfigureAwait(false);
 
         var fuzzResults = new List<FuzzResult>(RunDeterministicMutationFuzz(
-            Path.Combine(outputRoot, "cns-ext-b-ttf", "first")))
+            Path.Combine(outputRoot, "cns-ext-b-ttf", "first"),
+            extBManifest))
         {
             RunSourceMutationFuzz(extBPath)
         };
@@ -132,13 +156,16 @@ internal static class Program
                 schemaVersion = 1,
                 generatedAtUtc = DateTimeOffset.UtcNow,
                 results,
+                verifiedSourceCache = true,
                 deterministicMutationFuzz = fuzzResults
             }, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
         Console.WriteLine($"PASS: {results.Count} real managed format cases. Evidence: {evidencePath}");
         return 0;
     }
 
-    private static IReadOnlyList<FuzzResult> RunDeterministicMutationFuzz(string assetRoot)
+    private static IReadOnlyList<FuzzResult> RunDeterministicMutationFuzz(
+        string assetRoot,
+        WebFontManifest manifest)
     {
         var results = new List<FuzzResult>();
         foreach ((string extension, WebFontFormat format) in new[]
@@ -148,7 +175,8 @@ internal static class Program
                      (".woff2", WebFontFormat.Woff2)
                  })
         {
-            string path = Directory.GetFiles(assetRoot, $"*{extension}", SearchOption.AllDirectories).Single();
+            WebFontAsset asset = manifest.Assets.Single(item => item.Format == format);
+            string path = Path.Combine(assetRoot, asset.Sha256, asset.FileName);
             byte[] valid = File.ReadAllBytes(path);
             int accepted = 0;
             int rejected = 0;
@@ -253,7 +281,7 @@ internal static class Program
         return value;
     }
 
-    private static async Task VerifySuccessAsync(
+    private static async Task<WebFontManifest> VerifySuccessAsync(
         ICollection<MatrixResult> results,
         string id,
         string sourcePath,
@@ -284,11 +312,20 @@ internal static class Program
             throw new InvalidDataException($"{id} was not byte deterministic.");
         }
 
+        byte[] sourceBytes = await File.ReadAllBytesAsync(sourcePath).ConfigureAwait(false);
         foreach (WebFontAsset asset in first.Assets)
         {
             string assetPath = Path.Combine(outputRoot, id, "first", asset.Sha256, asset.FileName);
             await using FileStream stream = File.OpenRead(assetPath);
             ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(stream, asset.Format, [sequence]);
+            stream.Position = 0;
+            ManagedOpenTypeWebFontVerifier.VerifyRetainsGlyphIds(
+                sourceBytes,
+                faceIndex,
+                stream,
+                asset.Format,
+                sequence.UnicodeScalars.Where(scalar => scalar is not (>= 0xFE00 and <= 0xFE0F)
+                    and not (>= 0xE0100 and <= 0xE01EF)));
         }
 
         results.Add(new MatrixResult(
@@ -298,6 +335,41 @@ internal static class Program
             sourceSha256,
             faceIndex,
             firstHashes));
+        return first;
+    }
+
+    private static async Task VerifySourceCacheAsync(string sourcePath, string outputRoot)
+    {
+        string sourceSha256 = await ComputeSha256Async(sourcePath).ConfigureAwait(false);
+        var options = new ManagedOpenTypeWebFontEngineOptions
+        {
+            MaxCachedSourceBytes = 128L * 1024 * 1024,
+            MaxCachedSourceEntries = 1,
+            MaxUnicodeScalars = 16
+        };
+        options.FontSources["eudc-cache"] = sourcePath;
+        var engine = new ManagedOpenTypeWebFontSubsetEngine(options);
+        var request = new WebFontSubsetRequest
+        {
+            Face = new WebFontFaceIdentity
+            {
+                FontSourceId = "eudc-cache",
+                SourceSha256 = sourceSha256
+            },
+            ProfileId = "eudc-cache-v1",
+            FontFamily = "OdfKit EUDC Cache",
+            Sequences = [WebFontTextSequence.Create(ExtBText)],
+            Formats = [WebFontFormat.TrueType]
+        };
+        await engine.GenerateAsync(
+            request,
+            Path.Combine(outputRoot, "eudc-cache", "first")).ConfigureAwait(false);
+
+        long length = new FileInfo(sourcePath).Length;
+        await File.WriteAllBytesAsync(sourcePath, new byte[checked((int)length)]).ConfigureAwait(false);
+        await engine.GenerateAsync(
+            request,
+            Path.Combine(outputRoot, "eudc-cache", "second")).ConfigureAwait(false);
     }
 
     private static async Task VerifyRejectedAsync(

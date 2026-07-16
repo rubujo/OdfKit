@@ -1,7 +1,5 @@
 ﻿using System.Buffers.Binary;
-#if NET10_0_OR_GREATER
 using System.IO.Compression;
-#endif
 using System.Text;
 using OdfKit.Compliance;
 
@@ -78,12 +76,15 @@ internal static class WebFontWriters
         var records = new List<TableOutputRecord>(tables.Length);
         foreach (KeyValuePair<string, byte[]> table in tables)
         {
+            byte[] compressed = CompressZlib(table.Value);
+            byte[] stored = compressed.Length < table.Value.Length ? compressed : table.Value;
             records.Add(new TableOutputRecord(
                 table.Key,
                 SfntFont.CalculateTableChecksum(table.Key, table.Value),
                 offset,
-                table.Value));
-            offset = checked(offset + Align4(table.Value.Length));
+                stored,
+                table.Value.Length));
+            offset = checked(offset + Align4(stored.Length));
         }
 
         var output = new byte[offset];
@@ -98,12 +99,90 @@ internal static class WebFontWriters
             WriteTag(output, recordOffset, records[index].Tag);
             BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(recordOffset + 4, 4), checked((uint)records[index].Offset));
             BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(recordOffset + 8, 4), checked((uint)records[index].Data.Length));
-            BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(recordOffset + 12, 4), checked((uint)records[index].Data.Length));
+            BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(recordOffset + 12, 4), checked((uint)records[index].OriginalLength));
             BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(recordOffset + 16, 4), records[index].Checksum);
             records[index].Data.CopyTo(output, records[index].Offset);
         }
 
         return output;
+    }
+
+    internal static byte[] CompressZlib(ReadOnlySpan<byte> input)
+    {
+        using var output = new MemoryStream();
+        output.WriteByte(0x78);
+        output.WriteByte(0x9C);
+        using (var compressor = new DeflateStream(output, CompressionLevel.Optimal, leaveOpen: true))
+        {
+#if NET10_0_OR_GREATER
+            compressor.Write(input);
+#else
+            byte[] buffer = input.ToArray();
+            compressor.Write(buffer, 0, buffer.Length);
+#endif
+        }
+
+        uint adler32 = CalculateAdler32(input);
+        output.WriteByte(unchecked((byte)(adler32 >> 24)));
+        output.WriteByte(unchecked((byte)(adler32 >> 16)));
+        output.WriteByte(unchecked((byte)(adler32 >> 8)));
+        output.WriteByte(unchecked((byte)adler32));
+        return output.ToArray();
+    }
+
+    internal static byte[] DecompressZlib(ReadOnlySpan<byte> input, int expectedLength)
+    {
+        if (input.Length < 6
+            || expectedLength < 0
+            || (input[0] & 0x0F) != 8
+            || ((input[0] << 8) | input[1]) % 31 != 0
+            || (input[1] & 0x20) != 0)
+        {
+            throw SfntFont.DataInvalid("zlib-header");
+        }
+
+        byte[] payload = input.Slice(2, input.Length - 6).ToArray();
+        using var compressed = new MemoryStream(payload, writable: false);
+        using var decompressor = new DeflateStream(compressed, CompressionMode.Decompress);
+        var result = new byte[expectedLength];
+        int read = 0;
+        while (read < result.Length)
+        {
+            int count = decompressor.Read(result, read, result.Length - read);
+            if (count == 0)
+            {
+                throw SfntFont.DataInvalid("zlib-truncated");
+            }
+
+            read += count;
+        }
+
+        if (decompressor.ReadByte() != -1)
+        {
+            throw SfntFont.DataInvalid("zlib-expanded-size");
+        }
+
+        uint expectedAdler32 = BinaryPrimitives.ReadUInt32BigEndian(input.Slice(input.Length - 4, 4));
+        if (CalculateAdler32(result) != expectedAdler32)
+        {
+            throw SfntFont.DataInvalid("zlib-adler32");
+        }
+
+        return result;
+    }
+
+    private static uint CalculateAdler32(ReadOnlySpan<byte> input)
+    {
+        const uint modulus = 65521;
+        uint first = 1;
+        uint second = 0;
+        foreach (byte value in input)
+        {
+            first = (first + value) % modulus;
+            second = (second + first) % modulus;
+        }
+
+        return (second << 16) | first;
     }
 
 #if NET10_0_OR_GREATER
@@ -249,12 +328,18 @@ internal static class WebFontWriters
 
     private sealed class TableOutputRecord
     {
-        internal TableOutputRecord(string tag, uint checksum, int offset, byte[] data)
+        internal TableOutputRecord(
+            string tag,
+            uint checksum,
+            int offset,
+            byte[] data,
+            int? originalLength = null)
         {
             Tag = tag;
             Checksum = checksum;
             Offset = offset;
             Data = data;
+            OriginalLength = originalLength ?? data.Length;
         }
 
         internal string Tag { get; }
@@ -264,5 +349,7 @@ internal static class WebFontWriters
         internal int Offset { get; }
 
         internal byte[] Data { get; }
+
+        internal int OriginalLength { get; }
     }
 }

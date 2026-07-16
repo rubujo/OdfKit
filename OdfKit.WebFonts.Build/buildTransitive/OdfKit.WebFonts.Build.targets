@@ -8,13 +8,20 @@
   <Target Name="OdfKitBuildWebFonts"
           BeforeTargets="PrepareForPublish"
           Condition="'$(OdfKitWebFontsEnabled)' == 'true'">
-    <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsFontPath)' == ''"
-           Text="Set OdfKitWebFontsFontPath or OdfKitWebFontsArguments when OdfKitWebFontsEnabled is true." />
+    <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsFontPath)' == '' and '$(OdfKitWebFontsEudcCodePage)' == ''"
+           Text="Set OdfKitWebFontsFontPath, OdfKitWebFontsEudcCodePage, or OdfKitWebFontsArguments when OdfKitWebFontsEnabled is true." />
+    <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsFontPath)' != '' and '$(OdfKitWebFontsEudcCodePage)' != ''"
+           Text="Set only one of OdfKitWebFontsFontPath and OdfKitWebFontsEudcCodePage." />
     <Error Condition="'$(OdfKitWebFontsArguments)' == '' and '$(OdfKitWebFontsContentRoot)' == ''"
            Text="Set OdfKitWebFontsContentRoot or OdfKitWebFontsArguments when OdfKitWebFontsEnabled is true." />
     <Exec Condition="'$(OdfKitWebFontsArguments)' != ''"
           Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsArguments)" />
     <Exec Condition="'$(OdfKitWebFontsArguments)' == ''"
-          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build --font &quot;$(OdfKitWebFontsFontPath)&quot; --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot; $(OdfKitWebFontsAdditionalArguments)" />
+          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsSourceArguments) --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot; $(OdfKitWebFontsAdditionalArguments)" />
   </Target>
+  <PropertyGroup>
+    <OdfKitWebFontsSourceArguments Condition="'$(OdfKitWebFontsFontPath)' != ''">--font &quot;$(OdfKitWebFontsFontPath)&quot;</OdfKitWebFontsSourceArguments>
+    <OdfKitWebFontsSourceArguments Condition="'$(OdfKitWebFontsFontPath)' == '' and '$(OdfKitWebFontsEudcTypeface)' == ''">--eudc-code-page &quot;$(OdfKitWebFontsEudcCodePage)&quot;</OdfKitWebFontsSourceArguments>
+    <OdfKitWebFontsSourceArguments Condition="'$(OdfKitWebFontsFontPath)' == '' and '$(OdfKitWebFontsEudcTypeface)' != ''">--eudc-code-page &quot;$(OdfKitWebFontsEudcCodePage)&quot; --eudc-typeface &quot;$(OdfKitWebFontsEudcTypeface)&quot;</OdfKitWebFontsSourceArguments>
+  </PropertyGroup>
 </Project>

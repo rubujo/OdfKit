@@ -1,6 +1,7 @@
 ﻿using OdfKit.Compliance;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Build;
+using OdfKit.WebFonts.Windows;
 
 return await RunAsync(args).ConfigureAwait(false);
 
@@ -8,7 +9,7 @@ static async Task<int> RunAsync(string[] args)
 {
     if (args.Length == 0 || args[0] is "-h" or "--help")
     {
-        Console.WriteLine("odfkit-webfonts build --font <path> (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--max-source-bytes <bytes>] [--max-output-bytes <bytes>] [--skip-source-checksums true|false]");
+        Console.WriteLine("odfkit-webfonts build (--font <path> | --eudc-code-page <id> [--eudc-typeface <name>]) (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf] [--font-display auto|block|swap|fallback|optional] [--slice-size <codepoints>] [--max-slices <count>] [--fallback-family <name> --fallback-local <name> --size-adjust <percent> --ascent-override <percent> --descent-override <percent> --line-gap-override <percent>] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--max-source-bytes <bytes>] [--max-output-bytes <bytes>] [--skip-source-checksums true|false]");
         return 0;
     }
 
@@ -24,7 +25,7 @@ static async Task<int> RunAsync(string[] args)
         IReadOnlyList<string> contentPaths = DiscoverContentPaths(values);
         var options = new WebFontBuildOptions
         {
-            FontPath = Required(values, "font"),
+            FontPath = ResolveFontPath(values),
             TextPath = GetOptional(values, "text") ?? string.Empty,
             ContentPaths = contentPaths,
             MaxCorpusBytes = long.Parse(
@@ -33,8 +34,16 @@ static async Task<int> RunAsync(string[] args)
             MaxUniqueUnicodeScalars = int.Parse(
                 Get(values, "max-scalars", "100000"),
                 System.Globalization.CultureInfo.InvariantCulture),
+            UnicodeRangeSliceSize = int.Parse(
+                Get(values, "slice-size", "0"),
+                System.Globalization.CultureInfo.InvariantCulture),
+            MaxSliceCount = int.Parse(
+                Get(values, "max-slices", "512"),
+                System.Globalization.CultureInfo.InvariantCulture),
             OutputDirectory = Required(values, "output"),
             FontFamily = Get(values, "family", "OdfKitWebFont"),
+            FontDisplay = ParseFontDisplay(Get(values, "font-display", "swap")),
+            FallbackMetrics = ParseFallbackMetrics(values),
             ProfileId = Get(values, "profile", "default"),
             FontSourceId = Get(values, "font-id", "source"),
             FaceIndex = int.Parse(Get(values, "face", "0"), System.Globalization.CultureInfo.InvariantCulture),
@@ -49,7 +58,7 @@ static async Task<int> RunAsync(string[] args)
                 Get(values, "max-output-bytes", (32L * 1024 * 1024).ToString(System.Globalization.CultureInfo.InvariantCulture)),
                 System.Globalization.CultureInfo.InvariantCulture),
             ValidateSourceChecksums = !bool.Parse(Get(values, "skip-source-checksums", "false")),
-            Formats = ParseFormats(Get(values, "formats", "woff2,woff"))
+            Formats = ParseFormats(Get(values, "formats", "woff2"))
         };
         WebFontManifest manifest = await new WebFontAssetBuilder().BuildAsync(options).ConfigureAwait(false);
         Console.WriteLine($"Generated {manifest.Assets.Count} assets for profile '{manifest.ProfileId}'.");
@@ -89,6 +98,27 @@ static string Get(IReadOnlyDictionary<string, string> values, string name, strin
 static string? GetOptional(IReadOnlyDictionary<string, string> values, string name)
     => values.TryGetValue(name, out string? value) ? value : null;
 
+static string ResolveFontPath(IReadOnlyDictionary<string, string> values)
+{
+    string? explicitPath = GetOptional(values, "font");
+    string? codePageValue = GetOptional(values, "eudc-code-page");
+    if (!string.IsNullOrWhiteSpace(explicitPath) == !string.IsNullOrWhiteSpace(codePageValue))
+    {
+        throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
+    }
+
+    if (!string.IsNullOrWhiteSpace(explicitPath))
+    {
+        return explicitPath;
+    }
+
+    int codePage = int.Parse(codePageValue!, System.Globalization.CultureInfo.InvariantCulture);
+    string? typeface = GetOptional(values, "eudc-typeface");
+    return string.IsNullOrWhiteSpace(typeface)
+        ? WindowsEudcFontSourceResolver.ResolveSystemDefaultFont(codePage)
+        : WindowsEudcFontSourceResolver.ResolveAssociatedFont(codePage, typeface);
+}
+
 static IReadOnlyList<WebFontFormat> ParseFormats(string value)
     => value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(item => item.ToLowerInvariant() switch
@@ -99,6 +129,41 @@ static IReadOnlyList<WebFontFormat> ParseFormats(string value)
             _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
         })
         .ToArray();
+
+static WebFontDisplayMode ParseFontDisplay(string value)
+    => value.ToLowerInvariant() switch
+    {
+        "auto" => WebFontDisplayMode.Auto,
+        "block" => WebFontDisplayMode.Block,
+        "swap" => WebFontDisplayMode.Swap,
+        "fallback" => WebFontDisplayMode.Fallback,
+        "optional" => WebFontDisplayMode.Optional,
+        _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
+    };
+
+static WebFontFallbackMetrics? ParseFallbackMetrics(IReadOnlyDictionary<string, string> values)
+{
+    string? localName = GetOptional(values, "fallback-local");
+    if (string.IsNullOrWhiteSpace(localName))
+    {
+        return null;
+    }
+
+    return new WebFontFallbackMetrics
+    {
+        FontFamily = Get(values, "fallback-family", "OdfKitWebFontFallback"),
+        LocalFontName = localName,
+        SizeAdjustPercentage = ParsePercentage(values, "size-adjust", 100),
+        AscentOverridePercentage = ParsePercentage(values, "ascent-override", 100),
+        DescentOverridePercentage = ParsePercentage(values, "descent-override", 20),
+        LineGapOverridePercentage = ParsePercentage(values, "line-gap-override", 0)
+    };
+}
+
+static double ParsePercentage(IReadOnlyDictionary<string, string> values, string name, double defaultValue)
+    => double.Parse(
+        Get(values, name, defaultValue.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+        System.Globalization.CultureInfo.InvariantCulture);
 
 static IReadOnlyList<string> DiscoverContentPaths(IReadOnlyDictionary<string, string> values)
 {

@@ -24,11 +24,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Build\OdfKit.WebFonts.Build.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Encoding.Legacy\OdfKit.WebFonts.Encoding.Legacy.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Data.SqlServer\OdfKit.WebFonts.Data.SqlServer.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Profiles\OdfKit.WebFonts.Profiles.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Worker\OdfKit.WebFonts.Worker.csproj" />
     <ProjectReference Include="..\..\OdfKit.Extensions.Html.WebFonts\OdfKit.Extensions.Html.WebFonts.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.AspNetCore\OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
   </ItemGroup>
 </Project>

@@ -73,6 +73,11 @@ internal sealed class SfntFont
     internal bool ContainsUnicodeScalar(int scalar)
         => _cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph) && glyph != 0;
 
+    internal ushort GlyphCount => _glyphCount;
+
+    internal ushort GetGlyphId(int scalar)
+        => _cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph) ? glyph : (ushort)0;
+
     internal bool ContainsVariationSequence(int baseScalar, int selector)
         => _cmap.ContainsVariation(new UnicodeVariationSequence(baseScalar, selector));
 

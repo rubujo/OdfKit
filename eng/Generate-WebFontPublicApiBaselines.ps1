@@ -12,6 +12,7 @@ $projects = @(
     'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj',
     'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj',
     'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj',
+    'OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj',
     'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj',
     'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj',
     'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj'

@@ -2,7 +2,7 @@
 title: Notis pihak ketiga
 _lang: ms
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b492deb43118779eeddf404293c70fab8315a1fbd39fd18e64ec4da172c20154
+translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
 ---
 
 # Notis pihak ketiga
@@ -23,6 +23,7 @@ OdfKit menggunakan CC0-1.0 Universal. Kebergantungan berikut mengekalkan lesenny
 | System.Numerics.Tensors | Agregat bervektor untuk net10.0 | MIT |
 | System.IO.Hashing | Semak jumlah CRC-32 untuk net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | Keserasian netstandard2.0 | MIT |
+| Microsoft.Win32.Registry | Sokongan keserasian netstandard2.0 untuk menyelesaikan sumber pendaftaran Windows EUDC | MIT |
 | Markdig | Penghuraian AST Markdown | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Lukisan dan pembentukan teks | MIT |
 | ScottPlot | Carta dan visualisasi gantian | MIT |

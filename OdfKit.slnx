@@ -19,6 +19,7 @@
   <Project Path="OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj" />
   <Project Path="OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj" />
   <Project Path="OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj" />
+  <Project Path="OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj" />
   <Project Path="OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
   <Project Path="OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj" />
   <Project Path="OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj" />
