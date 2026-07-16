@@ -15,8 +15,11 @@
       { "files": ["api/**.yml"] },
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
       { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },
-      { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md", "webfonts.md", "webfont-managed-architecture.md", "webfont-evidence-matrix.md", "provenance/webfont-managed-clean-room.md"], "dest": "project-docs" },
+      { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md", "webfonts.md", "webfont-managed-architecture.md", "webfont-evidence-matrix.md", "webfont-ift-tracking.md", "provenance/webfont-managed-clean-room.md"], "dest": "project-docs" },
       { "src": "..", "files": ["THIRD-PARTY-NOTICES.md"], "dest": "project-docs" }
+    ],
+    "resource": [
+      { "src": "../samples/WebFonts.WebForms", "files": ["Web.config", "webfonts.dynamic.example.json"], "dest": "samples/WebFonts.WebForms" }
     ],
     "globalMetadata": {
       "_appName": "OdfKit API Reference",

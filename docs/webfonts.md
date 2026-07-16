@@ -1,7 +1,7 @@
 # WebFont 多國罕用字套件
 
-> 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 動態端點
-> 與單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
+> 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
+> System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
 > Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
 > complex-script shaping、惡意來源字型 fuzz、跨節點 store
 > 與外部安全／客戶驗收仍未完成，因此整套產品仍標示 experimental。權威實作邊界見
@@ -59,6 +59,36 @@ odfkit-webfonts build `
   --formats woff2
 ```
 
+大型 corpus 可選擇固定 Unicode bucket 切片；bucket 邊界由 scalar 數值決定，新增一個字只會使
+對應 bucket 的內容 hash 改變，不會推移後續切片。切片並非預設，必須依實際頁面 corpus、資產
+數與 cache hit ratio 決定，例如：
+
+```powershell
+odfkit-webfonts build `
+  --font Fonts/licensed.ttf `
+  --content-root . `
+  --output wwwroot/_odf-fonts `
+  --formats woff2 `
+  --slice-size 256 `
+  --max-slices 512 `
+  --font-display optional
+```
+
+產生器會把相鄰 scalar 合併為 canonical `unicode-range` 區間。IVS 的 base scalar 與 variation
+selector 保持在同一個 slice。預設只產生 WOFF2；需要舊瀏覽器或 `net48` 部署時可明確要求
+WOFF／TTF。WOFF writer 會逐 table 產生 zlib stream，只有壓縮後較小時才採用壓縮內容。
+
+`pwsh eng/Test-WebFontFormatMatrix.ps1` 使用 SHA-256
+`eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583` 的官方 CNS Ext-B
+TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,692 bytes、WOFF2
+140,504 bytes。該案例的 WOFF 比 TTF 小約 71.5%；這是鎖定 corpus 的證據，不是所有字型的固定
+壓縮承諾。
+
+`font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
+部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、
+`--size-adjust`、`--ascent-override`、`--descent-override` 與 `--line-gap-override` 會產生獨立的
+本機 fallback `@font-face`。
+
 ASP.NET Core 的唯讀資產介面維持少量設定：
 
 ```csharp
@@ -75,25 +105,54 @@ format allowlist。用戶端只能傳 sequence 與 allowlist ID，不能傳字�
 JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric label 或一般 access log。正式環境
 應使用 TLS、短效 token、租戶配額與資料最小化；大量下載交給 CDN／Object Storage。
 
+`OdfWebFontResourceProvider.CreateFontPreloadLink` 只對呼叫端明確指定且已在 manifest 驗證的單一
+資產產生 preload。它不會自動 preload 所有 slice，因為 preload 會略過 `unicode-range` 的延遲
+選取而可能造成不必要下載。
+
 ## ASP.NET Web Forms
 
-Web Forms 的 `net48` Handler 維持唯讀資產模式；managed Phase 2 的 CLI／MSBuild 在部署前產生
-TTF／WOFF，IIS worker process 不同步子集化：
+Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
+face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
+容量已滿回傳 429，不建立無界 queue。`net48` 使用 managed TrueType engine 產生 TTF／WOFF，
+要求 WOFF2、CFF／CFF2、variable 或 color font 會明確失敗。
+
+API key 只能由指定環境變數載入。JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，
+HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
+[`samples/WebFonts.WebForms/webfonts.dynamic.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.example.json)。
 
 ```xml
 <appSettings>
   <add key="OdfKit.WebFonts.AssetRootPath" value="~/App_Data/OdfWebFonts" />
-  <add key="OdfKit.WebFonts.PublicBaseUrl" value="https://fonts.example.com/odf" />
+  <add key="OdfKit.WebFonts.PublicBaseUrl" value="/_odf-fonts" />
   <add key="OdfKit.WebFonts.StylesheetFileName" value="webfonts.css" />
+  <add key="OdfKit.WebFonts.DynamicConfigurationPath"
+       value="~/App_Data/webfonts.dynamic.json" />
 </appSettings>
 <system.webServer>
   <handlers>
-    <add name="OdfWebFonts" path="_odf-fonts/*" verb="GET,HEAD"
-         type="OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHandler, OdfKit.WebFonts.Hosting.SystemWeb"
+    <add name="OdfWebFonts" path="_odf-fonts/*" verb="GET,HEAD,POST"
+         type="OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontDynamicHandler, OdfKit.WebFonts.Hosting.SystemWeb"
          resourceType="Unspecified" />
   </handlers>
 </system.webServer>
 ```
+
+受信任後端以 `POST /_odf-fonts/generate` 傳入：
+
+```json
+{
+  "fontSourceId": "cns-ext-b",
+  "faceIndex": 0,
+  "profileId": "cns11643-euc-tw-2026-05-05",
+  "fontFamily": "OdfKit CNS Ext-B",
+  "sequences": ["A𠆩", "邉󠄐"],
+  "formats": ["Woff", "TrueType"]
+}
+```
+
+要求標頭必須包含 `X-OdfKit-WebFont-Key`。成功回傳 manifest，公開頁面只 GET
+`/{sha256}/{fileName}`；資產會重新驗證 SHA-256、大小與副檔名，再以 immutable cache 與 ETag
+傳送。Handler 重啟後仍可安全讀取內容定址產物，不依賴 process-local registry。
 
 Master Page 加入：
 
@@ -101,8 +160,73 @@ Master Page 加入：
 <%= OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink() %>
 ```
 
-若 Web Forms 也需要即時新文字，應由受控後端服務或排程呼叫同一 managed engine，再將完成資產
-部署到共用 store；不得在每個頁面要求內無界產字。
+`OdfWebFontHandler` 仍提供純唯讀部署；動態 Handler 找不到動態資產時會委派既有 manifest／CSS
+資產，因此 CLI／MSBuild 預產生仍是暖機與故障 fallback。System.Web 目前沒有跨節點 durable
+lease；多節點必須在外部受控服務產生後部署至共用 object store，不能把單機 semaphore 宣稱為
+distributed lock。
+
+## WAF 與 HiNet CDN 部署
+
+可以部署在 WAF／CDN 後方，但必須依路徑分離動態控制平面與公開資料平面。中華電信官方目前
+公開說明 CDN 提供快取，並可搭配 WAF、BOT Challenge 與 DDoS 防護；公開產品頁未提供租戶層級
+cache key、header pass-through 或 purge API 契約，因此下列規則必須由實際服務設定與 staging
+probe 驗收，不能僅依產品名稱推定。參考
+[中華電信 CDN 官方產品頁](https://www.cht.com.tw/home/campaign/Hinet/cdn-service-6.html)。
+
+| 路徑 | WAF／CDN 規則 | 原因 |
+| --- | --- | --- |
+| `POST /_odf-fonts/generate` | 不快取；只允許受信任後端；保留 `Content-Type` 與 `X-OdfKit-WebFont-Key`；本文上限 64 KiB；不記錄本文與 key | sequence 可能是個資／PUA，回應依授權與即時 cache 狀態而異 |
+| `GET/HEAD /_odf-fonts/{sha256}/{fileName}` | 快取 200；保留 `Cache-Control`、`ETag`、`Content-Type`、CORS、CORP 與 `nosniff`；不得用 BOT HTML challenge 取代字型 | URL 已含內容 hash，可安全長期 immutable cache |
+| `GET /_odf-fonts/webfonts.json`、`webfonts.css` | alias 不長期快取；有指紋的 CSS 才可 immutable | alias 內容可能在部署後改變 |
+| 401／400／413／429／503 | 不快取 | 避免把授權、限流或暫時失敗擴散到所有使用者 |
+
+若 CDN 使用 `fonts.example.com`，而網站使用另一個 origin，ASP.NET Core 應設定精確
+`AllowedOrigins` 與 cross-origin CORP。System.Web 的 JSON 與 `Web.config` 則把
+`AllowPublicCrossOriginAssets`／`OdfKit.WebFonts.AllowPublicCrossOriginAssets` 設為 `true`；這只對
+公開內容定址 GET 輸出 `Access-Control-Allow-Origin: *` 與 `Cross-Origin-Resource-Policy:
+cross-origin`，不會替 generation API 開 CORS。資產不含 cookie 或使用者特定資料，因此不使用
+credentialed CORS。
+
+ASP.NET Core 在 proxy 後必須只信任已知 WAF／CDN proxy 的 forwarded headers，且 middleware 要在
+HSTS、驗證與限流前執行；Microsoft 明確警告不得信任未知 proxy 提供的 `X-Forwarded-*`，否則可
+遭 IP／scheme spoofing。參考
+[ASP.NET Core proxy 與 load balancer 指南](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-10.0)。
+IIS 亦應把 `requestFiltering/requestLimits/maxAllowedContentLength` 設為不大於 Handler 的本文上限；
+超限要求會由 IIS 以 413.1 擋下。參考
+[IIS request limits](https://learn.microsoft.com/en-us/iis/configuration/system.webserver/security/requestfiltering/requestlimits/)。
+
+正式切換前至少以外部 probe 驗證：首次 MISS 到 origin、第二次 HIT、ETag 304、三種字型 MIME、
+CORS／CORP、401／429 不快取、POST 不快取、WAF 阻擋超限本文，以及 purge 後重新回源。HiNet
+租戶若無法針對上述路徑與標頭設定，就只能讓 CDN 承載 immutable GET，generation API 改走不經
+CDN 的內部 origin。
+
+## Windows EUDC.TTE
+
+Microsoft 文件說明 TrueType EUDC／PUA 字型可安裝為 `.ttf` 或 `.tte`；`.tte` 會被作業系統隱藏，
+GDI 無法用一般字型列舉 API 檢查，關聯資料位於目前使用者的 `HKEY_CURRENT_USER\EUDC\<codePage>`。
+參考 [Character Sets and Fonts](https://learn.microsoft.com/en-us/windows/win32/intl/character-sets-and-fonts)
+與 [EUDC](https://learn.microsoft.com/en-us/windows/win32/intl/eudc)。
+
+`OdfKit.WebFonts.Windows` 在 `net10.0` 與 `netstandard2.0` 提供
+`WindowsEudcFontSourceResolver`，只讀取目前使用者登錄設定，並只接受存在的 `.tte`／`.ttf`
+檔案。CLI 可直接指定合法取得的檔案：
+
+```powershell
+odfkit-webfonts build --font C:\Windows\Fonts\EUDC.TTE --text pua.txt --output wwwroot\_odf-fonts
+```
+
+或在 Windows 上由 code page 的 system default／指定 typeface 關聯解析：
+
+```powershell
+odfkit-webfonts build --eudc-code-page 950 --text pua.txt --output wwwroot\_odf-fonts
+odfkit-webfonts build --eudc-code-page 950 --eudc-typeface "MingLiU" --text pua.txt --output wwwroot\_odf-fonts
+```
+
+解析器不寫入登錄、不接受來自 HTTP request 的 code page、typeface 或路徑，也不繞過來源
+SHA-256、`fsType`、sfnt 結構與輸出上限。`.tte` 只是 Windows 安裝方式；內容仍必須是目前引擎
+支援的 TrueType outline，CFF、variable、color 或損毀檔案照常明確拒絕。EUDC／PUA 的語意不會
+自動跨電腦保存，部署者必須提供版本化 mapping、字型來源 SHA-256、授權與資料治理；使用者個人
+EUDC 字型不得在未授權時散布或上傳 CDN。
 
 ## 全字庫 CNS 11643 Profile
 
@@ -149,7 +273,8 @@ provider。資料若已被 code page 轉成 `?` 或亂碼，字型套件無法�
 ## CSP、Cache 與安全
 
 同源建議使用 `font-src 'self'`；CDN 部署只加入精確 HTTPS origin。套件不放寬 CSP、不反射任意
-`Origin`，也不使用萬用字元 CORS。內容指紋資產使用一年 `immutable`、SHA-256 ETag、正確 MIME
+`Origin`，也不對 generation API 啟用 CORS。只有不含 cookie 或使用者特定資料的公開內容定址
+字型資產可選擇輸出萬用字元 CORS。內容指紋資產使用一年 `immutable`、SHA-256 ETag、正確 MIME
 與 `nosniff`；穩定 manifest／CSS alias 不得標成不可變。
 
 來源字型只由部署端 allowlist 解析；parser 與 Worker 必須有 bytes、table、glyph、composite
@@ -168,6 +293,8 @@ Python、Node 或外部字型程序；Playwright 只作瀏覽器 oracle。
 - [Microsoft OpenType 1.9.1](https://learn.microsoft.com/en-us/typography/opentype/spec/)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
+- [W3C Incremental Font Transfer](https://www.w3.org/TR/IFT/)
+- [WebFont IFT 標準追蹤與相容性閘門](webfont-ift-tracking.md)
 - [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
 - [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)

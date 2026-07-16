@@ -1,9 +1,11 @@
 # OdfKit WebFonts
 
-OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 預產生與安全託管套件組。
+OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生、預產生與安全託管套件組。
 
-- 預設採建置期產生及唯讀、內容定址的 WOFF2／WOFF／TTF／OTF 資產。
-- 支援 ASP.NET Core、ASP.NET Web Forms、Unicode、Big5、明確 Big5E 與版本化 PUA Profile。
+- ASP.NET Core 與 ASP.NET Web Forms 均提供須經授權、有界且以內容定址的動態產生路徑；
+  CLI／MSBuild 預產生作為暖機與 fallback。
+- 支援 WOFF2／WOFF／TTF、Unicode、Big5、明確 Big5E 與版本化 PUA Profile；不支援的
+  CFF／CFF2、variable、color font 會明確拒絕。
 - 提供 CLI／MSBuild 自動內容掃描、CSP/CDN URL、精確 CORS allowlist 與有界背景 Worker。
 - 核心不綁定 ADO.NET、Dapper、EF Core 或其它 ORM。
 

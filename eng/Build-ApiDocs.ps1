@@ -147,6 +147,7 @@ try {
             @{ Path = 'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj'; Framework = 'net48' }
@@ -256,6 +257,7 @@ try {
         'project-docs/evidence-index.html',
         'project-docs/webfont-managed-architecture.html',
         'project-docs/webfont-evidence-matrix.html',
+        'project-docs/webfont-ift-tracking.html',
         'project-docs/webfonts.html',
         'project-docs/provenance/webfont-managed-clean-room.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
@@ -274,6 +276,7 @@ try {
         'webfont-managed-clean-room.html',
         'webfont-managed-architecture.html',
         'webfont-evidence-matrix.html',
+        'webfont-ift-tracking.html',
         'webfonts.html'
     )
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'

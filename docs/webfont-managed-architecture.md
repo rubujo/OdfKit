@@ -30,7 +30,7 @@
    為 `0.0.1` 滾動更新，不建立第二套版本來源。
 
 目前版本稽核結果：`OdfKit.WebFonts.Abstractions`、`Build`、`Data.SqlServer`、
-`Encoding.Legacy`、`Hosting.AspNetCore`、`Hosting.SystemWeb`、`OpenType`、`Profiles`、`Worker`
+`Encoding.Legacy`、`Hosting.AspNetCore`、`Hosting.SystemWeb`、`OpenType`、`Profiles`、`Windows`、`Worker`
 及 `OdfKit.Extensions.Html.WebFonts` 均直接匯入 `eng/OdfKit.Package.props`；共同檔案設定
 `Version=0.0.1`、Package Validation、snupkg 與 repository metadata。各專案沒有另設 WebFont
 版本值，目前不需新增版本機制。後續 CI 應以 MSBuild evaluated property 及實際 nupkg metadata
@@ -119,6 +119,14 @@ bitstream；但 .NET Runtime 官方來源顯示該 API 呼叫 runtime native enc
 
 `netstandard2.0`／`net48` 第一階段只承諾 TTF／WOFF。若未來找到授權相容且可稽核的純
 managed Brotli encoder，才可增加舊 TFM 的 WOFF2；不得為追求格式一致性而引入 native package。
+
+WOFF 依 W3C WOFF 1.0 規則逐 table 使用 zlib；壓縮結果未小於原 table 時保留未壓縮 bytes。
+WOFF2 目前維持規格允許的 `glyf`／`loca` null transform。W3C 規格建議在多個 transform 可用時
+通常選擇較小者，但在 clean-room writer、獨立解碼驗證與真實 corpus 基準完成前，不實作或宣稱
+支援 transformed `glyf`。第三方文章所稱固定壓縮百分比不得作為產品承諾。
+
+IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
+[WebFont IFT 標準追蹤與相容性閘門](webfont-ift-tracking.md)。
 
 ## 4. 安全與資源模型
 

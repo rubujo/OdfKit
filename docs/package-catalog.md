@@ -18,11 +18,12 @@
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
-| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0`（規劃加入 `netstandard2.0`） | 純 .NET OpenType 子集化；目前重新實作中 | 不得依賴外部程序或 native 套件；可用格式見 managed 架構契約 |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TrueType 子集化、TTF／WOFF 與 net10 WOFF2 | CFF／CFF2、variable、color font 明確拒絕；可用格式見 managed 架構契約 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
-| `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
-| `OdfKit.WebFonts.Hosting.SystemWeb` | Web Forms 託管 | `net48` | IIS Handler 與 HTML helper | 不在 IIS 行程內子集化 |
+| `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 須經授權及限流的動態產生、唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
+| `OdfKit.WebFonts.Hosting.SystemWeb` | Web Forms 託管 | `net48` | API key、allowlist 與有界並行的動態產生、不可變資產、靜態 fallback 及 HTML helper | request-time 只支援 TTF／WOFF；多節點 generation 須外部協調 |
+| `OdfKit.WebFonts.Windows` | Windows EUDC 來源 | `net10.0;netstandard2.0` | 唯讀解析目前使用者 EUDC 登錄關聯與 `.tte`／`.ttf` 路徑；相容 ASP.NET Core 與 net48 consumer | 不寫登錄、不從 HTTP request 接受來源 |
 | `OdfKit.Extensions.Html.WebFonts` | HTML 整合 | `net10.0;netstandard2.0` | ODF 文字需求收集與外部 CSS link | 不掃描瀏覽器 DOM |
 
 ## 2. 非封裝工具與工程元件
