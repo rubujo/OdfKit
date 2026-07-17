@@ -1,6 +1,6 @@
 # WebFont Phase 0～5 證據矩陣
 
-> 更新日期：2026-07-17
+> 更新日期：2026-07-18
 >
 > 版本政策：所有套件沿用 OdfKit 的 `0.0.1`、pack、Public API、文件與 CI 機制。
 
@@ -21,7 +21,7 @@
 | 0 中性契約與 corpus | 已實證（工程） | 中性 sequence／IVS／PUA 契約、opaque font ID、實際 bytes SHA-256、版本化 JSON Profile、CNS EUC-TW provider、Windows EUDC `.tte`／`.ttf` 登錄來源 resolver、clean-room 紀錄；合法 CNS TrueType fixture 已複製為 `.tte` 通過 managed 產字與 cache 重用；Windows resolver 的 `netstandard2.0` 資產已由 net8 與 net48 consumer 載入；WebFont 專案共用 `0.0.1` 與 pack；CI 掃描 nupkg 的 managed-only 邊界並鎖定完整 NuGet 相依版本與 nuspec 授權宣告 | 真實客戶 corpus 的持續擴充 | 個別字型法律審查、客戶合法 `EUDC.TTE` 實檔與登錄關聯驗收 |
 | 1 engine／format／browser | Experimental | 有界 sfnt／TTC parser、TrueType composite 與 GSUB output closure、`cmap` 4／12／14、TTF／OTF／zlib WOFF／net10 WOFF2、checksum、`fsType`；TrueType Variable Fonts 已實作 `gvar` short／long offset 重建與 `fvar`／`gvar` axis 驗證；standalone CID-keyed 靜態 CFF 1.0 已實作 INDEX／DICT／FDSelect／charset／Private／Subrs／Type 2 operand verifier；含 VariationStore 的 CFF2 variable 已實作 32-bit INDEX、DICT、FDSelect 0／3／4、ItemVariationData、`vsindex`、`blend`、subroutine 與 retain-GIDs；Source Han Sans 2.005R 靜態 CFF／CFF2 variable 均產生 OTF／WOFF／WOFF2；真實 CNS 宋體／楷體 Ext-B／PUA、IPAmj IVS 與雙 CNS face TTC 成功；複雜文字保留完整 glyph ID space、`cmap`、GDEF／GPOS／GSUB；Chromium／Firefox／WebKit 已完成 CFF、Arabic／Devanagari TrueType variable 的 `wdth`／`wght` 及 Source Han CFF2 的 300／500／700 `wght` Canvas／DOM 來源與 subset 像素差分 | CFF／CFF2 尚缺 compact INDEX／DICT／subroutine 重寫、名稱式 CFF 與 coverage-guided fuzz；擴大 variable／complex-script corpus；尚未做 layout table 重寫或 aggressive glyph pruning | Safari 實機、第三方惡意字型安全稽核；OTC／名稱式 CFF、無 VariationStore 的 CFF2、color 維持不支援 |
 | 2 CLI／MSBuild／HTML | 已實證（套件 consumer） | Managed CLI／MSBuild、內容掃描、canonical `unicode-range`、固定 Unicode bucket、可設定 `font-display`／fallback metrics、選擇啟用 preload、manifest、CSS、TTF／WOFF／WOFF2、byte-identical 重建與 verifier；同批 `0.0.1` nupkg 的 library 與 dotnet tool clean consumer 均真實產字，build/run 使用 `--no-restore`；真實 CNS managed engine 的 128 路有界負載以 16 個 generation key 實證 87.5% cache hit | 真實 CNS 大型 corpus 的 CSS／manifest 大小與瀏覽器傳輸量基準；採用者 publish／CDN pipeline 驗收 | 採用者 publish／CDN pipeline 驗收 |
-| 3 ASP.NET Core／System.Web | Experimental | ASP.NET Core managed dynamic endpoint 已用真實字型通過 401／429／hash GET 與 256 路平行 immutable GET；兩平台的 manifest、CSS 與字型資產皆實際通過 GET／HEAD、SHA-256 ETag、無本文 304 與原始 bytes 一致性，並拒絕無效 UTF-8 CSS；Handler 產生的動態成功與錯誤回應使用 `no-store, no-cache`；System.Web net48 Handler 已通過 API key、allowlist、格式拒絕、內容定址 GET，並在 CLR net48 由同批 nupkg 以官方 CNS Ext-B TrueType 與 Source Han Sans CFF2 真字型產生及 managed verifier 驗證 TTF／OTF／WOFF；ProjectReference 與 nupkg consumer 使用隔離的 `obj`／`bin`，避免綠燈載入舊套件；靜態 fallback 與兩平台範例存在 | 真實 IIS classic／Integrated 部署與含峰值資源量測的持續負載 | 反向代理、身分提供者、WAF、CDN 與組織 CSP 驗收；ASP.NET Core middleware 提前產生的 401／429 須由 host／WAF 驗證不快取 |
+| 3 ASP.NET Core／System.Web | Experimental | ASP.NET Core managed dynamic endpoint 已用真實字型通過 401／429／hash GET 與 256 路平行 immutable GET；兩平台的 manifest、CSS 與字型資產皆實際通過 GET／HEAD、SHA-256 ETag、無本文 304 與原始 bytes 一致性，並拒絕無效 UTF-8 CSS；Handler 產生的動態成功與錯誤回應使用 `no-store, no-cache`；System.Web net48 Handler 已通過 API key、allowlist、格式拒絕、內容定址 GET，並在 CLR net48 由同批 nupkg 以官方 CNS Ext-B TrueType 與 Source Han Sans CFF2 真字型產生及 managed verifier 驗證 TTF／OTF／WOFF；ProjectReference 與 nupkg consumer 使用隔離的 `obj`／`bin`，避免綠燈載入舊套件；官方 CNS Ext-B 已部署至隔離的 IIS Express Integrated pipeline，實際通過頁面編譯、401、動態 TTF／WOFF、GET／HEAD、SHA-256、ETag 與 304；靜態 fallback 與兩平台範例存在 | 完整 IIS Classic mode 與含峰值資源量測的持續負載 | 完整 IIS Integrated／Classic 客戶環境、反向代理、身分提供者、WAF、CDN 與組織 CSP 驗收；ASP.NET Core middleware 提前產生的 401／429 須由 host／WAF 驗證不快取 |
 | 4 runtime worker | Experimental | bounded Channel、single-flight、檔案 cache；兩個 OS process 僅產生一次、lease owner 強制終止後接手；verifier 拒絕截斷、內容損毀與超限展開長度的真實 WOFF2；真實來源、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 672 組 deterministic mutation 經有界結構入口驗證，無越界或非預期例外；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString；真實 CNS managed engine 的 128 路有界負載記錄 elapsed、CPU、peak working set 與 allocation JSON 證據並套用 CI 資源上限 | 長時間 soak、不同硬體容量基線、coverage-guided fuzz；多節點維持關閉 | object store、fencing token、跨節點失敗注入、第三方安全測試 |
 | 5 發布／產品化 | Experimental（工程發布閘門已實證） | 共用版本／pack／Public API／snupkg／DocFX／Markdown 機制；OpenType 雙 TFM、Public API、全量 pack consumer、WebFont 真實產字 clean consumer 與 net48 CLR smoke 已在遠端 CI 通過；同批 nupkg 產生可重現 SPDX 2.3 SBOM，並由 Linux、Windows x64／ARM64 與 macOS ARM64 consumer 對提交、SHA-256、32 個跨平台相依聯集及 nuspec 授權宣告重新驗證 | 正式 NuGet 發布演練、漏洞回應與 SBOM 消費流程演練 | 設計夥伴、市場採用、維護責任、外部法律與第三方安全審查 |
 
@@ -56,5 +56,6 @@ pwsh eng/Test-MarkdownLinks.ps1
 pwsh eng/Test-WebFontSmoke.ps1 -RunBrowser
 pwsh eng/Test-WebFontFormatMatrix.ps1
 pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1
+pwsh eng/Test-WebFontIisExpressSmoke.ps1 -FontPath <font> -SourceSha256 <sha256>
 pwsh eng/Test-WebFontPackageConsumer.ps1 -FontPath <font> -SourceSha256 <sha256>
 ```

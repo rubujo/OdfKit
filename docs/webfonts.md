@@ -245,6 +245,15 @@ IIS 亦應把 `requestFiltering/requestLimits/maxAllowedContentLength` 設為不
 超限要求會由 IIS 以 413.1 擋下。參考
 [IIS request limits](https://learn.microsoft.com/en-us/iis/configuration/system.webserver/security/requestfiltering/requestlimits/)。
 
+Repository 的 `eng/Test-WebFontIisExpressSmoke.ps1` 會以隔離站台與隨機 localhost port 啟動 IIS
+Express，實際編譯 Web Forms 頁面並以官方 CNS Ext-B 執行 401、動態 TTF／WOFF、GET／HEAD、
+SHA-256、ETag 與 304。IIS Express 與 IIS 使用相同的 `applicationHost.config`／`Web.config`
+設定模型，但 IIS Express 由使用者啟動且沒有 WAS；因此這項證據只涵蓋 Integrated pipeline，
+不取代完整 IIS Classic mode 或正式站台驗收。參考
+[Microsoft IIS Express 概觀](https://learn.microsoft.com/en-us/iis/extensions/introduction-to-iis-express/iis-express-overview)、
+[IIS Express 命令列](https://learn.microsoft.com/en-us/iis/extensions/using-iis-express/running-iis-express-from-the-command-line)
+與 [IIS Integrated／Classic 架構](https://learn.microsoft.com/en-us/iis/get-started/introduction-to-iis/introduction-to-iis-architecture)。
+
 正式切換前至少以外部 probe 驗證：首次 MISS 到 origin、第二次 HIT、ETag 304、三種字型 MIME、
 CORS／CORP、401／429 不快取、POST 不快取、WAF 阻擋超限本文，以及 purge 後重新回源。HiNet
 租戶若無法針對上述路徑與標頭設定，就只能讓 CDN 承載 immutable GET，generation API 改走不經
