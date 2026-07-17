@@ -342,7 +342,17 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             }
             else
             {
-                File.Move(temporaryPath, path);
+                try
+                {
+                    File.Move(temporaryPath, path);
+                }
+                catch (IOException) when (File.Exists(path))
+                {
+                    if (!string.Equals(ComputeFileSha256(path), expectedSha256, StringComparison.Ordinal))
+                    {
+                        throw DataInvalid("destination-sha256");
+                    }
+                }
             }
         }
         finally

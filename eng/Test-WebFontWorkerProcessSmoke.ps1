@@ -227,10 +227,61 @@ try {
         throw "強制終止持鎖 worker 後，接手產生或暫存清理結果不正確。"
     }
 
+    $loadPath = Join-Path $runPath "bounded-load"
+    $loadCachePath = Join-Path $loadPath "cache"
+    $loadAssetPath = Join-Path $loadPath "assets"
+    $loadCounterPath = Join-Path $loadPath "engine-calls.txt"
+    $loadGatePath = Join-Path $loadPath "start.gate"
+    $loadReadyPath = Join-Path $loadPath "load.ready"
+    $loadStdoutPath = Join-Path $loadPath "load.stdout.log"
+    $loadStderrPath = Join-Path $loadPath "load.stderr.log"
+    New-Item -ItemType Directory -Path $loadPath -Force | Out-Null
+    Set-Content -LiteralPath $loadGatePath -Value "start" -Encoding utf8NoBOM
+    $loadParameters = @{
+        FilePath = "dotnet"
+        ArgumentList = @(
+            "`"$appDll`"",
+            "`"$loadCachePath`"",
+            "`"$loadAssetPath`"",
+            "`"$loadCounterPath`"",
+            "`"$loadGatePath`"",
+            "`"$loadReadyPath`"",
+            "`"$resolvedFontPath`"",
+            $actualSourceSha256,
+            "bounded-load"
+        )
+        RedirectStandardOutput = $loadStdoutPath
+        RedirectStandardError = $loadStderrPath
+        PassThru = $true
+    }
+    if ($IsWindows) {
+        $loadParameters.WindowStyle = "Hidden"
+    }
+    $load = Start-Process @loadParameters
+    $processes += $load
+    if (-not $load.WaitForExit(180000)) {
+        throw "真實 managed engine 有界負載驗證逾時。"
+    }
+    if ($load.ExitCode -ne 0) {
+        throw "真實 managed engine 有界負載驗證失敗，結束碼為 $($load.ExitCode)。"
+    }
+
+    $metricsPath = "$loadCounterPath.metrics.json"
+    if (-not (Test-Path -LiteralPath $metricsPath -PathType Leaf)) {
+        throw "真實 managed engine 有界負載未產生資源量測證據。"
+    }
+    $metrics = Get-Content -LiteralPath $metricsPath -Raw | ConvertFrom-Json
+    if ($metrics.schemaVersion -ne 1 -or $metrics.requestCount -ne 128 `
+        -or $metrics.uniqueKeyCount -ne 16 -or $metrics.engineCalls -ne 16 `
+        -or $metrics.cacheHitRatio -lt 0.85) {
+        throw "真實 managed engine 有界負載的 single-flight 或 cache hit 證據不正確。"
+    }
+
     Write-Host "PASS：兩個獨立 OS process 共用純 .NET WOFF2，底層 engine 僅執行一次。"
     Write-Host "PASS：持有 generation lease 的 process 遭強制終止後，另一 process 可接手並完成。"
     Write-Host "PASS：真實 HTTP endpoint 已驗證授權 401、限流 429、256 路 GET、SHA-256 與 immutable cache。"
     Write-Host "PASS：Managed verifier 已拒絕截斷、內容損毀及超限展開長度的真實 WOFF2 產物。"
+    Write-Host "PASS：真實 CNS managed engine 的 128 路有界負載、single-flight 與資源預算通過。"
     Write-Host "證據：$runPath"
 }
 finally {

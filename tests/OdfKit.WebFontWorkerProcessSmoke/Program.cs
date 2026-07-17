@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Net;
+using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Buffers.Binary;
 using System.Security.Claims;
@@ -39,9 +40,16 @@ internal static class Program
         string readyPath = Path.GetFullPath(args[4]);
         string fontPath = Path.GetFullPath(args[5]);
         string sourceSha256 = args[6];
-        bool holdUntilKilled = args.Length == 8
-            && string.Equals(args[7], "hold-until-killed", StringComparison.Ordinal);
-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        string? mode = args.Length == 8 ? args[7] : null;
+        bool holdUntilKilled = string.Equals(mode, "hold-until-killed", StringComparison.Ordinal);
+        bool runBoundedLoad = string.Equals(mode, "bounded-load", StringComparison.Ordinal);
+        if (mode is not null && !holdUntilKilled && !runBoundedLoad)
+        {
+            return 2;
+        }
+
+        using var timeout = new CancellationTokenSource(
+            runBoundedLoad ? TimeSpan.FromMinutes(3) : TimeSpan.FromSeconds(30));
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(readyPath)!);
@@ -59,10 +67,23 @@ internal static class Program
             };
             engineOptions.FontSources["process-smoke"] = fontPath;
             var fontEngine = new ManagedOpenTypeWebFontSubsetEngine(engineOptions);
+            if (runBoundedLoad)
+            {
+                await RunBoundedLoadAsync(
+                    fontEngine,
+                    cacheDirectory,
+                    assetDirectory,
+                    counterPath,
+                    sourceSha256,
+                    timeout.Token).ConfigureAwait(false);
+                return 0;
+            }
+
             var engine = new CrossProcessCountingEngine(
                 counterPath,
                 string.Concat(readyPath, ".engine-started"),
                 holdUntilKilled,
+                TimeSpan.FromMilliseconds(500),
                 fontEngine);
             await using var worker = new WebFontGenerationWorker(
                 engine,
@@ -75,7 +96,7 @@ internal static class Program
                     JobTimeout = TimeSpan.FromSeconds(15)
                 });
             WebFontManifest manifest = await worker.GenerateAsync(
-                CreateRequest(sourceSha256),
+                CreateRequest(sourceSha256, "process-smoke-v1"),
                 assetDirectory,
                 timeout.Token).ConfigureAwait(false);
             WebFontAsset asset = manifest.Assets.Single();
@@ -126,7 +147,7 @@ internal static class Program
         }
     }
 
-    private static WebFontSubsetRequest CreateRequest(string sourceSha256)
+    private static WebFontSubsetRequest CreateRequest(string sourceSha256, string profileId)
         => new()
         {
             Face = new WebFontFaceIdentity
@@ -134,11 +155,93 @@ internal static class Program
                 FontSourceId = "process-smoke",
                 SourceSha256 = sourceSha256
             },
-            ProfileId = "process-smoke-v1",
+            ProfileId = profileId,
             FontFamily = "OdfKit Process Smoke",
             Sequences = [WebFontTextSequence.Create("𠆩A\r\n\uFEFF")],
             Formats = [WebFontFormat.Woff2]
         };
+
+    private static async Task RunBoundedLoadAsync(
+        IWebFontSubsetEngine fontEngine,
+        string cacheDirectory,
+        string assetDirectory,
+        string counterPath,
+        string sourceSha256,
+        CancellationToken cancellationToken)
+    {
+        const int requestCount = 128;
+        const int uniqueKeyCount = 16;
+        var engine = new CrossProcessCountingEngine(
+            counterPath,
+            string.Concat(counterPath, ".engine-started"),
+            holdUntilKilled: false,
+            TimeSpan.Zero,
+            fontEngine);
+        await using var worker = new WebFontGenerationWorker(
+            engine,
+            new WebFontWorkerOptions
+            {
+                DurableCacheDirectory = cacheDirectory,
+                QueueCapacity = 32,
+                MaxConcurrency = 2,
+                MaxMemoryCacheEntries = uniqueKeyCount,
+                JobTimeout = TimeSpan.FromMinutes(1)
+            });
+
+        using Process process = Process.GetCurrentProcess();
+        TimeSpan initialCpu = process.TotalProcessorTime;
+        long initialAllocatedBytes = GC.GetTotalAllocatedBytes(precise: true);
+        var stopwatch = Stopwatch.StartNew();
+        Task<WebFontManifest>[] requests = Enumerable.Range(0, requestCount)
+            .Select(index => worker.GenerateAsync(
+                CreateRequest(sourceSha256, $"bounded-load-{index % uniqueKeyCount}"),
+                assetDirectory,
+                cancellationToken))
+            .ToArray();
+        WebFontManifest[] manifests = await Task.WhenAll(requests).ConfigureAwait(false);
+        stopwatch.Stop();
+        process.Refresh();
+
+        int engineCalls = File.ReadLines(counterPath).Count();
+        int uniqueProfiles = manifests.Select(manifest => manifest.ProfileId)
+            .Distinct(StringComparer.Ordinal)
+            .Count();
+        if (engineCalls != uniqueKeyCount || uniqueProfiles != uniqueKeyCount
+            || manifests.Any(manifest => manifest.Assets.Count != 1))
+        {
+            throw new InvalidDataException("The bounded load did not preserve single-flight or manifest integrity.");
+        }
+
+        double cacheHitRatio = (requestCount - engineCalls) / (double)requestCount;
+        long allocatedBytes = GC.GetTotalAllocatedBytes(precise: true) - initialAllocatedBytes;
+        double cpuSeconds = (process.TotalProcessorTime - initialCpu).TotalSeconds;
+        long peakWorkingSetBytes = process.PeakWorkingSet64;
+        var evidence = new
+        {
+            schemaVersion = 1,
+            requestCount,
+            uniqueKeyCount,
+            engineCalls,
+            cacheHitRatio,
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds,
+            cpuMilliseconds = (long)(cpuSeconds * 1000),
+            peakWorkingSetBytes,
+            allocatedBytes
+        };
+        await File.WriteAllTextAsync(
+            string.Concat(counterPath, ".metrics.json"),
+            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true }),
+            cancellationToken).ConfigureAwait(false);
+
+        if (cacheHitRatio < 0.85
+            || stopwatch.Elapsed > TimeSpan.FromMinutes(2)
+            || cpuSeconds > 240
+            || peakWorkingSetBytes > 1024L * 1024 * 1024
+            || allocatedBytes > 2L * 1024 * 1024 * 1024)
+        {
+            throw new InvalidDataException("The bounded load exceeded its reproducible resource budget.");
+        }
+    }
 
     private static async Task VerifyDynamicHttpAsync(
         IWebFontSubsetEngine engine,
@@ -362,7 +465,7 @@ internal static class Program
         string sourceSha256,
         CancellationToken cancellationToken)
     {
-        WebFontSubsetRequest request = CreateRequest(sourceSha256);
+        WebFontSubsetRequest request = CreateRequest(sourceSha256, "process-smoke-v1");
         request = new WebFontSubsetRequest
         {
             Face = new WebFontFaceIdentity
@@ -420,6 +523,7 @@ internal static class Program
         string counterPath,
         string engineStartedPath,
         bool holdUntilKilled,
+        TimeSpan generationDelay,
         IWebFontSubsetEngine inner) : IWebFontSubsetEngine
     {
         public async Task<WebFontManifest> GenerateAsync(
@@ -437,7 +541,10 @@ internal static class Program
                 await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
             }
 
-            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+            if (generationDelay > TimeSpan.Zero)
+            {
+                await Task.Delay(generationDelay, cancellationToken).ConfigureAwait(false);
+            }
             return await inner.GenerateAsync(
                 request,
                 destinationDirectory,
