@@ -287,6 +287,11 @@ depth、sequence、產出、queue、timeout 與 concurrency 上限。GitHub Acti
 [WebFont 證據矩陣](webfont-evidence-matrix.md)。產品與 smoke 產字路徑均不使用 FontTools、
 Python、Node 或外部字型程序；Playwright 只作瀏覽器 oracle。
 
+NuGet pack 後執行 `pwsh eng/Test-WebFontSupplyChain.ps1`，會以所有 WebFont 專案的
+`project.assets.json` 驗證完整相依版本與 nuspec 授權宣告，並為同批 `0.0.1` nupkg 產生
+SPDX 2.3 JSON。CI consumer 使用 `-VerifyExisting` 重新計算套件 SHA-256 與 SBOM；任何新增、
+移除、版本或授權中繼資料漂移都會失敗，必須人工更新並審查政策檔，不能自動接受。
+
 ## 第一方規格依據
 
 - [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
@@ -300,3 +305,5 @@ Python、Node 或外部字型程序；Playwright 只作瀏覽器 oracle。
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [Microsoft ASP.NET Core rate limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0)
 - [Microsoft .NET bounded channels](https://learn.microsoft.com/en-us/dotnet/core/extensions/channels)
+- [NuGet `.nuspec` license metadata](https://learn.microsoft.com/en-us/nuget/reference/nuspec#license)
+- [SPDX 2.3 specification](https://spdx.github.io/spdx-spec/v2.3/)

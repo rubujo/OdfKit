@@ -186,8 +186,9 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC，以及 CFF／CFF2／variable／color 負向格式矩陣。
 - 真實來源字型與 TTF／WOFF／WOFF2 共 448 組固定種子 mutation verifier 測試。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
+- 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
 
-剩餘工作以第 5、6 節的來源字型 fuzz、complex-script shaping 廣度、SBOM 與外部人工閘門為準；
+剩餘工作以第 5、6 節的來源字型 fuzz、complex-script shaping 廣度與外部人工閘門為準；
 不得因上述核心可用而把整套產品標示 production-ready。
 
 ## 8. 第一方依據
@@ -208,3 +209,6 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - [OpenFontSharp 1.0.0 NuGet](https://www.nuget.org/packages/OpenFontSharp/1.0.0)
 - [LayoutFarm Typography repository](https://github.com/LayoutFarm/Typography)
 - [Microsoft.Playwright .NET repository 與 MIT 授權](https://github.com/microsoft/playwright-dotnet)
+- [NuGet `.nuspec` license metadata](https://learn.microsoft.com/en-us/nuget/reference/nuspec#license)
+- [SPDX 2.3 specification](https://spdx.github.io/spdx-spec/v2.3/)
+- [GitHub SBOM 匯出與 Actions 指引](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/export-dependencies-as-sbom)

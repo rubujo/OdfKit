@@ -12,6 +12,8 @@ on:
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
+      - 'eng/Test-WebFontSupplyChain.ps1'
+      - 'eng/webfont-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
       - 'docs/webfonts-package-readme.md'
@@ -32,6 +34,8 @@ on:
       - 'eng/Get-PackageVersion.ps1'
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
+      - 'eng/Test-WebFontSupplyChain.ps1'
+      - 'eng/webfont-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
       - 'docs/webfonts-package-readme.md'
@@ -72,6 +76,24 @@ jobs:
             -SkipConsumerSmoke `
             -GenerateHashManifest
 
+      - name: Validate WebFont supply chain and SPDX SBOM
+        shell: pwsh
+        run: |
+          $schemaPath = 'artifacts/tools/spdx-2.3-schema.json'
+          New-Item -ItemType Directory -Force (Split-Path $schemaPath) | Out-Null
+          Invoke-WebRequest `
+            'https://raw.githubusercontent.com/spdx/spdx-spec/v2.3/schemas/spdx-schema.json' `
+            -OutFile $schemaPath `
+            -MaximumRetryCount 3 `
+            -RetryIntervalSec 2 `
+            -TimeoutSec 60
+          $actualHash = (Get-FileHash $schemaPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expectedHash = '239208b7ac287b3cf5d9a9af23f9d69863971102a5e1587a27a398b43490b89b'
+          if ($actualHash -ne $expectedHash) {
+            throw "SPDX 2.3 schema SHA-256 mismatch: $actualHash"
+          }
+          ./eng/Test-WebFontSupplyChain.ps1 -SchemaPath $schemaPath
+
       - name: Upload immutable NuGet snapshot
         uses: actions/upload-artifact@v7
         with:
@@ -80,6 +102,14 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
+
+      - name: Upload WebFont SPDX SBOM
+        uses: actions/upload-artifact@v7
+        with:
+          name: odfkit-webfont-sbom-${{ github.sha }}
+          path: artifacts/webfont-sbom/manifest.spdx.json
+          if-no-files-found: error
+          retention-days: 1
 
   validate-nuget-consumers:
     name: Validate consumer (${{ matrix.name }})
@@ -119,6 +149,12 @@ jobs:
           name: odfkit-nuget-${{ github.sha }}
           path: artifacts/nuget
 
+      - name: Download WebFont SPDX SBOM
+        uses: actions/download-artifact@v8
+        with:
+          name: odfkit-webfont-sbom-${{ github.sha }}
+          path: artifacts/webfont-sbom
+
       - name: Verify snapshot and run native consumer smoke
         shell: pwsh
         run: |
@@ -131,3 +167,4 @@ jobs:
             $parameters.SkipNetFrameworkSmoke = $true
           }
           ./eng/Test-NuGetPack.ps1 @parameters
+          ./eng/Test-WebFontSupplyChain.ps1 -VerifyExisting
