@@ -18,7 +18,7 @@
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
-| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TrueType／standalone CID-keyed 靜態 CFF 1.0 子集化、TTF／OTF／WOFF、net10 WOFF2 與 experimental TrueType variable | OTC、名稱式 CFF、CFF2、PostScript variable、color font 明確拒絕；可用格式見 managed 架構契約 |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TrueType、standalone CID-keyed 靜態 CFF 1.0、含 VariationStore 的 CFF2 variable 子集化、TTF／OTF／WOFF、net10 WOFF2 | Variable／CFF／CFF2 能力為 experimental；OTC、名稱式 CFF、無 VariationStore 的 CFF2、color font 明確拒絕 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 須經授權及限流的動態產生、唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |

@@ -36,13 +36,20 @@ CI 的 clean consumer 會從同一批 `0.0.1` nupkg 安裝 library 與 `OdfKit.W
 tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build 與 run 使用
 `--no-restore`，不以 project reference 或開發環境工具代替套件內容。
 
-第一個可交付 engine 以 TrueType outline 為界：支援 TTF、TTC 選定 face、Unicode scalar、
+第一個可交付 engine 支援 TrueType outline、Unicode scalar、
 Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
 Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed 靜態 CFF 1.0 的
-retain-GIDs 路徑目前為 experimental；OTC、名稱式 CFF、CFF2、PostScript variable、
+retain-GIDs 路徑目前為 experimental。含 `fvar`／VariationStore 的 standalone CFF2 variable
+`OTTO` 亦有 experimental retain-GIDs 路徑；OTC、名稱式 CFF、無 VariationStore 的 CFF2、
 color／bitmap font 必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
+
+設定來源 SHA-256 時，engine 的有界 source cache 同時保留已驗證 bytes 與依 face 解析的 immutable
+sfnt 模型；相同來源／face 的後續動態請求不再重新複製所有 table。CFF／CFF2 的 INDEX、DICT、
+VariationStore 與 subroutine 結構使用以 table byte array 為生命週期的弱參照快取；來源 cache
+淘汰後解析模型可一併回收，不建立跨來源的無界靜態字典。輸出 bytes、選字 closure 與 verifier
+仍依每個 canonical request 重新產生及驗證。
 
 WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
 encoder。因此正確宣稱是「OdfKit 不帶入額外 native 相依」，不是「Brotli 演算法由純 managed
@@ -104,6 +111,16 @@ glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所�
 Chromium、Firefox 與 WebKit 亦已對九組 CFF 中文、Arabic 與 Devanagari 字串完成來源／subset
 逐像素差分。
 
+CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
+Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 以
+等長的零位移 CFF2 CharString 取代，保留 GID、INDEX offsets、`fvar`、`avar`、`STAT`、HVAR 與
+其它 variation metadata。Source Han Sans 2.005R `SourceHanSansTW-VF.otf` 的來源為
+10,495,320 bytes，managed OTF 為 10,396,064 bytes、WOFF 為 200,728 bytes、WOFF2 為
+144,408 bytes；SHA-256 為
+`e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`。Chromium、Firefox 與
+WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
+缺少第三方惡意字型稽核與更廣 CFF2 corpus 而維持 experimental。
+
 `font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
 部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、
 `--size-adjust`、`--ascent-override`、`--descent-override` 與 `--line-gap-override` 會產生獨立的
@@ -134,9 +151,9 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
-以及 standalone CID-keyed 靜態 CFF WOFF；TrueType variable 與靜態 CFF 為
-experimental，要求 WOFF2、OTC、名稱式 CFF、CFF2、PostScript variable 或 color font 會
-明確失敗。
+以及 standalone CID-keyed 靜態 CFF／有 VariationStore 的 CFF2 variable WOFF；TrueType
+variable、靜態 CFF 與 CFF2 variable 為 experimental。要求 WOFF2、OTC、名稱式 CFF、無
+VariationStore 的 CFF2 或 color font 會明確失敗。
 
 API key 只能由指定環境變數載入。JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，
 HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
@@ -245,8 +262,8 @@ odfkit-webfonts build --eudc-code-page 950 --eudc-typeface "MingLiU" --text pua.
 ```
 
 解析器不寫入登錄、不接受來自 HTTP request 的 code page、typeface 或路徑，也不繞過來源
-SHA-256、`fsType`、sfnt 結構與輸出上限。`.tte` 只是 Windows 安裝方式；內容仍必須是目前引擎
-支援的 TrueType outline；EUDC 的 CFF、CFF2、PostScript variable、color 或損毀檔案照常
+SHA-256、`fsType`、sfnt 結構與輸出上限。`.tte` 只是 Windows 安裝方式；目前 EUDC resolver
+只接受 `.tte`／`.ttf` 路徑及 TrueType outline，color、PostScript outline 或損毀檔案照常
 明確拒絕。
 TrueType Variable Fonts 仍須通過 experimental 閘門。EUDC／PUA 的語意不會
 自動跨電腦保存，部署者必須提供版本化 mapping、字型來源 SHA-256、授權與資料治理；使用者個人

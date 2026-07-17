@@ -76,5 +76,18 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 真實黑箱 corpus：Adobe Source Han Sans 2.005R `SourceHanSansTC-Regular.otf`，SHA-256 為
   `10e6d832bc73650840aa7fbfec4e10c527f8136ae2aec71c3e1c13a67475c24a`，只進 CI cache／artifact。
 - Chromium、Firefox 與 WebKit 對來源 OTF 與 managed WOFF2 的三組中文逐 RGBA byte 及文字
-  metrics 相同；名稱式 CFF、OTC、CFF2 與 color font 仍明確拒絕。
+  metrics 相同；名稱式 CFF、OTC 與 color font 仍明確拒絕。
 - 尚未通過的人工作業：第三方結構相異性與惡意 CFF 安全審查；能力維持 experimental。
+
+### 2026-07-17 CFF2 Variable
+
+- 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1 CFF2／Font Variations、Adobe
+  CFF／Type 2 技術文件與 W3C WOFF／WOFF2；未讀取、搜尋或改寫禁止來源。
+- 原創範圍：32-bit INDEX、CFF2 DICT、FDSelect 0／3／4、Item Variation Store、`vsindex`、
+  `blend`、隱含 subroutine return 與等長零位移 CharString 的純 C# 有界實作。
+- 真實黑箱 corpus：Adobe Source Han Sans 2.005R `SourceHanSansTW-VF.otf`，SHA-256 為
+  `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`，只進 CI cache／artifact。
+- Chromium、Firefox 與 WebKit 對 300／500／700 三個 `wght` 座標的來源／subset DOM 截圖
+  bytes 相同；managed verifier 另逐一驗證所有輸出 glyph CharString。
+- 尚未通過的人工作業：第三方結構相異性、惡意 CFF2 安全審查與更廣多軸 corpus；能力維持
+  experimental。

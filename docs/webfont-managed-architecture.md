@@ -86,9 +86,9 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
-- 名稱式 CFF、CFF2 outline、OTC collection；standalone CID-keyed 靜態 CFF 1.0 僅依第 3.5 節
-  的 experimental 邊界解封。
-- 尚未通過第 3.5 節證據閘門的 variable font；CFF2／PostScript variable 維持拒絕。
+- 名稱式 CFF、OTC collection；standalone CID-keyed 靜態 CFF 1.0 與含 VariationStore 的
+  CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。
+- 尚未通過第 3.5 節證據閘門的 variable font；無 VariationStore／`fvar` 的 CFF2 維持拒絕。
 - COLR／CPAL、CBDT／CBLC、`sbix`、SVG 或其它 color／bitmap font。
 - AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
 - `OS/2.fsType` 禁止 embedding、禁止 subsetting 或只允許 bitmap embedding 的字型。
@@ -141,7 +141,8 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    GID 使用相鄰相同 offset 表示零長度 variation data；short offsets 依規格以實際位移除以 2
    編碼，long offsets 使用 32-bit 位移。`fvar` 與 `gvar` 必須成對存在且 axis count 一致；
    `avar`、`STAT`、`HVAR`、`VVAR`、`MVAR` 與 `cvar` 在 GID 不變的前提下原樣保留。正式能力
-   宣稱仍須通過真實字型、short／long offset、三瀏覽器 variation axis 差分與 mutation 證據。
+   Source Han 與 Noto Arabic／Devanagari 的 short／long offset、`wdth`／`wght` 三瀏覽器 DOM
+   截圖與 Canvas 差分及 mutation 已通過；能力仍維持 experimental。
 2. **靜態 CFF 1.0**：已解封 standalone、含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`；名稱式
    CFF 與 OTC 續留拒絕。有界 parser 驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、
    local Subrs、charset 與 FDSelect。CharStrings 採 retain-GIDs，以相同長度的合法無 outline
@@ -150,8 +151,12 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    必須另有跨 subroutine Type 2 operand verifier，不能只掃描單一 CharString 尾端 bytes。
 3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
    不重編 local／global subr bias。
-4. **CFF2／PostScript Variable Fonts**：在 `blend`、`vsindex`、Item Variation Store 與真實
-   瀏覽器差分完成前維持明確拒絕。
+4. **CFF2／PostScript Variable Fonts**：已解封 standalone、含 `fvar`／VariationStore 的
+   variable `OTTO`。有界 parser 驗證 32-bit INDEX、Top／Font／Private DICT、FDSelect
+   0／3／4、VariationRegion、ItemVariationData、`vsindex`、`blend` 與 subroutine；未選 glyph
+   以等長零位移 CharString 取代，不重排 INDEX 或 variation metadata。Source Han Sans 2.005R
+   已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。無
+   VariationStore 的 CFF2、超出資源上限的 INDEX／region 與無法唯一驗證的 operator 維持拒絕。
 
 真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
@@ -160,7 +165,8 @@ tag 的單檔可減少 CI 傳輸量；下載後仍須驗證完整檔案 SHA-256�
 
 第一方規格入口：[Adobe CFF TN #5176](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf)、
 [Adobe Type 2 TN #5177](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5177.Type2.pdf)、
-[Microsoft `gvar`](https://learn.microsoft.com/en-us/typography/opentype/spec/gvar) 與
+[Microsoft `gvar`](https://learn.microsoft.com/en-us/typography/opentype/spec/gvar)、
+[Microsoft CFF2](https://learn.microsoft.com/en-us/typography/opentype/spec/cff2)、
 [W3C WOFF2](https://www.w3.org/TR/WOFF2/)。實作不得參考 FontTools、HarfBuzz、FreeType 或其它
 subset compiler 原始碼；第三方工具只能放在隔離 oracle job。
 
@@ -220,10 +226,11 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 只執行 `dotnet` 的雙 process smoke、真實 WOFF2 verifier、失敗接手與 HTTP 安全驗證。
 - 官方 CNS Ext-B 真字型與 Chromium／Firefox／WebKit 截圖證據。
 - 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；Source Han Sans 2.005R 靜態 CFF 1.0 與
-  TrueType variable 正向矩陣，以及 OTC／CFF2／color 負向矩陣。
+  TrueType variable、CFF2 variable 正向矩陣，以及 OTC／color 負向矩陣。
 - 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
-- 真實來源字型與 TTF／WOFF／WOFF2 共 448 組固定種子 mutation verifier 測試。
+- 真實來源字型、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 672 組固定種子 mutation
+  有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
 

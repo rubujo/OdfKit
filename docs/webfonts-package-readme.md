@@ -5,8 +5,8 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
 - ASP.NET Core 與 ASP.NET Web Forms 均提供須經授權、有界且以內容定址的動態產生路徑；
   CLI／MSBuild 預產生作為暖機與 fallback。
 - 支援 WOFF2／WOFF／TTF／OTF、Unicode、Big5、明確 Big5E 與版本化 PUA Profile；TrueType
-  Variable Fonts 與 standalone CID-keyed 靜態 CFF 1.0 為 experimental，OTC、CFF2、
-  PostScript variable 與 color font 明確拒絕。
+  Variable Fonts、standalone CID-keyed 靜態 CFF 1.0 與含 VariationStore 的 CFF2 variable
+  `OTTO` 為 experimental；OTC、名稱式 CFF、無 VariationStore 的 CFF2 與 color font 明確拒絕。
 - Arabic／Devanagari 採保留完整 glyph ID、`cmap`、GDEF／GPOS／GSUB 的 correctness-first
   路徑；其它 complex script 必須先有合法 corpus 與三瀏覽器差分證據。
 - 提供 CLI／MSBuild 自動內容掃描、CSP/CDN URL、精確 CORS allowlist 與有界背景 Worker。
