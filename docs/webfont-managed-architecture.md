@@ -87,7 +87,7 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
 - CFF／CFF2 outline、OTC collection。
-- variable font（包含 `fvar`／`gvar` 等 variation tables）。
+- 尚未通過第 3.5 節證據閘門的 variable font；CFF2／PostScript variable 維持拒絕。
 - COLR／CPAL、CBDT／CBLC、`sbix`、SVG 或其它 color／bitmap font。
 - AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
 - `OS/2.fsType` 禁止 embedding、禁止 subsetting 或只允許 bitmap embedding 的字型。
@@ -99,13 +99,17 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 ### 3.3 shaping 策略
 
 只依 `cmap` 收 glyph 不足以支援 Arabic、Devanagari 或任意 OpenType shaping。現有引擎會對
-GSUB lookup 1／2／3／4／7／8 建立保守 glyph closure，並對 contextual 結構採有界驗證；這只
-足以支援目前已驗證的 CNS direct-glyph 情境，不代表完整 complex-script shaping。
+GSUB lookup 1／2／3／4／7／8 建立保守 glyph closure，並對 contextual 結構採有界驗證，供 CNS
+direct-glyph 與可證明 closure 完整的情境使用。對 Arabic／Devanagari，現階段改採
+correctness-first 路徑：保留完整 glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，且來源與輸出的
+layout tables 必須 byte-identical，不做 aggressive glyph pruning 或 lookup 重寫。2026-07-17 的
+遠端 CI 已在 Chromium、Firefox 與 WebKit 以合法鎖定的 Noto 靜態字型通過六組字串的逐 RGBA
+byte 與文字 metrics 差分。
 
-後續依 script／language／feature 實作 GSUB lookup closure，並涵蓋 contextual、ligature、
-alternate、extension lookup 及 GDEF 關聯。GPOS 不產生新 glyph，但仍須驗證 coverage 與 glyph
-reference。只有 managed closure、獨立 shaping oracle 與 Chromium／Firefox／WebKit golden
-一致時，才將對應 script 從 experimental 升為已支援。
+這項證據只涵蓋目前鎖定的 Arabic／Devanagari corpus，不代表任意 complex-script shaping。
+其它 script／language／feature 必須先擴充 GSUB closure 或採相同 correctness-first 路徑，驗證
+contextual、ligature、alternate、extension lookup、GDEF 關聯及 GPOS glyph reference；只有
+managed 結構驗證、合法 corpus 與 Chromium／Firefox／WebKit golden 一致時，才能新增支援聲明。
 
 ### 3.4 WOFF 與 WOFF2
 
@@ -127,6 +131,36 @@ WOFF2 目前維持規格允許的 `glyf`／`loca` null transform。W3C 規格建
 
 IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
 [WebFont IFT 標準追蹤與相容性閘門](webfont-ift-tracking.md)。
+
+### 3.5 CFF 與 Variable Fonts 分階段解封
+
+這兩類能力採獨立閘門，不因其中一項完成而連帶解封另一項：
+
+1. **TrueType Variable Fonts**：retain-GIDs 路徑重建 `gvar` 的 glyph data offsets，未保留
+   GID 使用相鄰相同 offset 表示零長度 variation data；short offsets 依規格以實際位移除以 2
+   編碼，long offsets 使用 32-bit 位移。`fvar` 與 `gvar` 必須成對存在且 axis count 一致；
+   `avar`、`STAT`、`HVAR`、`VVAR`、`MVAR` 與 `cvar` 在 GID 不變的前提下原樣保留。正式能力
+   宣稱仍須通過真實字型、short／long offset、三瀏覽器 variation axis 差分與 mutation 證據。
+2. **靜態 CFF 1.0**：只先處理 standalone `OTTO`，OTC 續留拒絕。Top DICT、FDArray 內的
+   Font DICT、Private DICT 與 local Subrs 的所有絕對／相對 offset 都必須由有界 parser 重建；
+   不能只修 Top DICT。CharStrings 採 retain-GIDs，未用 glyph 改為 `endchar`，subroutines 首期
+   不剪枝。`seac` 必須以能跨 subroutine 追蹤 operand stack 的 Type 2 verifier 判斷，不能只掃描
+   單一 CharString 尾端 bytes。
+3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
+   不重編 local／global subr bias。
+4. **CFF2／PostScript Variable Fonts**：在 `blend`、`vsindex`、Item Variation Store 與真實
+   瀏覽器差分完成前維持明確拒絕。
+
+真實 corpus 鎖定 Adobe Source Han Sans 官方最新 `2.005R` 單檔，不把字型納入 repository 或
+nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
+`SourceHanSansTW-VF.otf` 皆記錄來源 URI、SHA-256 與 OFL-1.1。相較下載大型 release zip，官方
+tag 的單檔可減少 CI 傳輸量；下載後仍須驗證完整檔案 SHA-256。
+
+第一方規格入口：[Adobe CFF TN #5176](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf)、
+[Adobe Type 2 TN #5177](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5177.Type2.pdf)、
+[Microsoft `gvar`](https://learn.microsoft.com/en-us/typography/opentype/spec/gvar) 與
+[W3C WOFF2](https://www.w3.org/TR/WOFF2/)。實作不得參考 FontTools、HarfBuzz、FreeType 或其它
+subset compiler 原始碼；第三方工具只能放在隔離 oracle job。
 
 ## 4. 安全與資源模型
 
@@ -183,7 +217,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 中性的 Abstractions、Profile、CNS mapping、manifest、Build、Hosting 與 Worker。
 - 只執行 `dotnet` 的雙 process smoke、真實 WOFF2 verifier、失敗接手與 HTTP 安全驗證。
 - 官方 CNS Ext-B 真字型與 Chromium／Firefox／WebKit 截圖證據。
-- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC，以及 CFF／CFF2／variable／color 負向格式矩陣。
+- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；CFF／CFF2／color 負向矩陣，以及 TrueType
+  variable 的分階段正向矩陣。
 - 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
 - 真實來源字型與 TTF／WOFF／WOFF2 共 448 組固定種子 mutation verifier 測試。

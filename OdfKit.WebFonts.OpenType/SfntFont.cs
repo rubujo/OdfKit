@@ -45,7 +45,6 @@ internal sealed class SfntFont
     private static readonly HashSet<string> RejectedTables = new(StringComparer.Ordinal)
     {
         "CFF ", "CFF2", "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
-        "fvar", "gvar", "avar", "HVAR", "VVAR", "MVAR", "cvar",
         "Silf", "Glat", "Gloc", "Feat", "Sill", "morx", "mort", "kerx"
     };
 
@@ -245,6 +244,18 @@ internal sealed class SfntFont
             ["loca"] = subsetLoca,
             ["head"] = (byte[])_tables["head"].Clone()
         };
+        bool hasFvar = tables.TryGetValue("fvar", out byte[]? fvar);
+        bool hasGvar = tables.TryGetValue("gvar", out byte[]? gvar);
+        if (hasFvar != hasGvar || hasFvar && (fvar is null || gvar is null))
+        {
+            throw DataInvalid("variation-tables");
+        }
+
+        if (hasFvar)
+        {
+            tables["gvar"] = GvarSubsetter.Build(gvar!, fvar!, _glyphCount, selectedGlyphs);
+        }
+
         tables.Remove("DSIG");
         BinaryPrimitives.WriteInt16BigEndian(tables["head"].AsSpan(50, 2), 1);
         ushort headFlags = BinaryPrimitives.ReadUInt16BigEndian(tables["head"].AsSpan(16, 2));

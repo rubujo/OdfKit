@@ -144,14 +144,14 @@ internal static class Program
             faceIndex: 0,
             "香港邨裏𠮷",
             outputRoot).ConfigureAwait(false);
-        await VerifyRejectedAsync(
+        await VerifySuccessAsync(
             results,
             "arabic-variable",
             arabicVariablePath,
             faceIndex: 0,
             "السَّلَامُ عَلَيْكُمْ",
             outputRoot).ConfigureAwait(false);
-        await VerifyRejectedAsync(
+        await VerifySuccessAsync(
             results,
             "devanagari-variable",
             devanagariVariablePath,

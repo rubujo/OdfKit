@@ -17,6 +17,8 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - [OpenType font file 與 checksum](https://learn.microsoft.com/en-us/typography/opentype/spec/otff)
 - [OpenType `cmap`](https://learn.microsoft.com/en-us/typography/opentype/spec/cmap)
 - [OpenType `glyf`](https://learn.microsoft.com/en-us/typography/opentype/spec/glyf)
+- [OpenType `fvar`](https://learn.microsoft.com/en-us/typography/opentype/spec/fvar)
+- [OpenType `gvar`](https://learn.microsoft.com/en-us/typography/opentype/spec/gvar)
 - [OpenType GSUB](https://learn.microsoft.com/en-us/typography/opentype/spec/gsub)
 - [OpenType `OS/2.fsType`](https://learn.microsoft.com/en-us/typography/opentype/spec/os2)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
@@ -50,3 +52,15 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 
 任何修改 `OdfKit.WebFonts.OpenType` parser／writer 的 PR 必須在說明中列出所依規格章節、加入正向
 與負向 fixture，並確認未參考禁止來源。第三方程式碼相似性或授權疑慮未釐清前不得發布套件。
+
+### 2026-07-17 TrueType Variable Fonts
+
+- 參與者：Codex agent；提示範圍為純 C#／.NET、Clean Room、安全、效能、retain-GIDs、CFF 與
+  Variable Fonts 的分階段規劃與實作。
+- 實作依據僅限 Microsoft OpenType 1.9.1 的 `fvar`、`gvar` 與 W3C WOFF2；未讀取、搜尋或改寫
+  FontTools、HarfBuzz、FreeType 或其它 subset compiler 原始碼。
+- 原創範圍：`gvar` short／long offset 有界解析、未選 GID 的零長度資料重建、精確單次配置及
+  synthetic 正負向 fixture。
+- 真實黑箱 corpus：Adobe Source Han Sans 2.005R 與鎖定版本 Noto Arabic／Devanagari，皆為
+  OFL-1.1；只下載到 CI cache／本機 artifacts，不納入 repository 或 nupkg。
+- 尚未通過的人工作業：由維護者進行第三方結構相異性審查；完成前能力維持 experimental。

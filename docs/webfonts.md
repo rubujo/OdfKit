@@ -37,8 +37,11 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 `--no-restore`，不以 project reference 或開發環境工具代替套件內容。
 
 第一個可交付 engine 以 TrueType outline 為界：支援 TTF、TTC 選定 face、Unicode scalar、
-Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。CFF／CFF2、
-variable、color／bitmap font 與未完成的 complex shaping 必須明確拒絕，不能刪表或 fallback。
+Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
+Variable Fonts 的 retain-GIDs／`gvar` 重建目前為 experimental；CFF／CFF2、PostScript
+variable、color／bitmap font 必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
+下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
+不得據此推定為已支援。
 
 WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
 encoder。因此正確宣稱是「OdfKit 不帶入額外 native 相依」，不是「Brotli 演算法由純 managed
@@ -87,7 +90,9 @@ TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,6
 Arabic／Devanagari 等需要 GSUB／GPOS 的文字會進入 correctness-first 模式：輸出保留來源的完整
 glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup。這能由瀏覽器維持塑形
 正確性，但檔案通常只獲得 WOFF／WOFF2 壓縮效益，不應宣稱是 aggressive subset。實際驗證以
-`pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1` 比較來源 TTF 與 managed WOFF2 的逐像素結果。
+`pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1` 比較來源 TTF 與 managed WOFF2 的逐像素結果；
+2026-07-17 的遠端 CI 已在 Chromium、Firefox 與 WebKit 通過六組 Arabic／Devanagari 字串的
+RGBA bytes 與文字 metrics 差分。
 
 `font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
 部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、
@@ -118,8 +123,9 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
-容量已滿回傳 429，不建立無界 queue。`net48` 使用 managed TrueType engine 產生 TTF／WOFF，
-要求 WOFF2、CFF／CFF2、variable 或 color font 會明確失敗。
+容量已滿回傳 429，不建立無界 queue。`net48` 使用 managed TrueType engine 產生 TTF／WOFF；
+TrueType variable 為 experimental，要求 WOFF2、CFF／CFF2、PostScript variable 或 color
+font 會明確失敗。
 
 API key 只能由指定環境變數載入。JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，
 HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
@@ -229,7 +235,8 @@ odfkit-webfonts build --eudc-code-page 950 --eudc-typeface "MingLiU" --text pua.
 
 解析器不寫入登錄、不接受來自 HTTP request 的 code page、typeface 或路徑，也不繞過來源
 SHA-256、`fsType`、sfnt 結構與輸出上限。`.tte` 只是 Windows 安裝方式；內容仍必須是目前引擎
-支援的 TrueType outline，CFF、variable、color 或損毀檔案照常明確拒絕。EUDC／PUA 的語意不會
+支援的 TrueType outline；CFF／CFF2、PostScript variable、color 或損毀檔案照常明確拒絕。
+TrueType Variable Fonts 仍須通過 experimental 閘門。EUDC／PUA 的語意不會
 自動跨電腦保存，部署者必須提供版本化 mapping、字型來源 SHA-256、授權與資料治理；使用者個人
 EUDC 字型不得在未授權時散布或上傳 CDN。
 
