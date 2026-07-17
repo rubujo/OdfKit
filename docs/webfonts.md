@@ -81,8 +81,13 @@ WOFF／TTF。WOFF writer 會逐 table 產生 zlib stream，只有壓縮後較小
 `pwsh eng/Test-WebFontFormatMatrix.ps1` 使用 SHA-256
 `eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583` 的官方 CNS Ext-B
 TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,692 bytes、WOFF2
-140,504 bytes。該案例的 WOFF 比 TTF 小約 71.5%；這是鎖定 corpus 的證據，不是所有字型的固定
+138,660 bytes。該案例的 WOFF 比 TTF 小約 71.5%；這是鎖定 corpus 的證據，不是所有字型的固定
 壓縮承諾。
+
+Arabic／Devanagari 等需要 GSUB／GPOS 的文字會進入 correctness-first 模式：輸出保留來源的完整
+glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup。這能由瀏覽器維持塑形
+正確性，但檔案通常只獲得 WOFF／WOFF2 壓縮效益，不應宣稱是 aggressive subset。實際驗證以
+`pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1` 比較來源 TTF 與 managed WOFF2 的逐像素結果。
 
 `font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
 部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、

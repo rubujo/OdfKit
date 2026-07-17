@@ -148,16 +148,18 @@ jobs:
         id: cns-font-source
         shell: pwsh
         run: |
-          $font = (Get-Content eng/external-tools.json -Raw |
-            ConvertFrom-Json).webFontSmoke.internationalFonts.cnsExtB
-          "cache_revision=$($font.cacheRevision)" >> $env:GITHUB_OUTPUT
-          "archive_sha256=$($font.archiveSha256)" >> $env:GITHUB_OUTPUT
+          $fonts = (Get-Content eng/external-tools.json -Raw |
+            ConvertFrom-Json).webFontSmoke.internationalFonts
+          "sung_revision=$($fonts.cnsExtB.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "sung_sha256=$($fonts.cnsExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
+          "kai_revision=$($fonts.cnsKaiExtB.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "kai_sha256=$($fonts.cnsKaiExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
 
       - name: Restore locked CNS font source
         uses: actions/cache@v6
         with:
           path: artifacts/webfont-source-cache
-          key: webfont-cns-sung-${{ runner.os }}-r${{ steps.cns-font-source.outputs.cache_revision }}-${{ steps.cns-font-source.outputs.archive_sha256 }}
+          key: webfont-cns-${{ runner.os }}-sung-r${{ steps.cns-font-source.outputs.sung_revision }}-${{ steps.cns-font-source.outputs.sung_sha256 }}-kai-r${{ steps.cns-font-source.outputs.kai_revision }}-${{ steps.cns-font-source.outputs.kai_sha256 }}
 
       - name: Real international fonts and HTTP assets
         shell: pwsh
@@ -169,7 +171,9 @@ jobs:
             -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
             -RunBrowser
           ./eng/Test-WebFontFormatMatrix.ps1 `
-            -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip
+            -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
+            -CnsKaiFontArchivePath artifacts/webfont-source-cache/Fonts_Kai.zip
+          ./eng/Test-WebFontLayoutBrowserSmoke.ps1
           dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj `
             -c Release -- `
             --font artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
@@ -186,6 +190,8 @@ jobs:
           path: |
             artifacts/webfont-smoke/playwright-managed-*.png
             artifacts/webfont-format-matrix/evidence/format-matrix.json
+            artifacts/webfont-layout-browser/layout-*.json
+            artifacts/webfont-layout-browser/layout-*.png
             artifacts/webfont-package-consumer/**/webfonts.json
             artifacts/webfont-worker-process-smoke/**
           if-no-files-found: warn

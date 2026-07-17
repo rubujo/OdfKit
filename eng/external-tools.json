@@ -36,6 +36,13 @@
         "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
         "license": "OFL-1.1"
       },
+      "arabicStatic": {
+        "version": "notofonts-noto-fonts-ffebf8c1ee449e544955a7e813c54f9b73848eac",
+        "fileName": "NotoSansArabic-Regular.ttf",
+        "uri": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansArabic/NotoSansArabic-Regular.ttf",
+        "sha256": "ceea25b464a656dc3b26849bab9356740401af62aedf1bfa8b7f0d9b75925b1b",
+        "license": "OFL-1.1"
+      },
       "devanagari": {
         "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
         "fileName": "NotoSansDevanagari-VF.ttf",
@@ -55,6 +62,13 @@
         "fileName": "NotoSansCJKhk-Regular.otf",
         "uri": "https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/OTF/TraditionalChineseHK/NotoSansCJKhk-Regular.otf",
         "sha256": "97c937514d645eae90415d30ba025e08a94d5bdffdc627404864f90aa0c7d83b",
+        "license": "OFL-1.1"
+      },
+      "devanagariStatic": {
+        "version": "notofonts-noto-fonts-ffebf8c1ee449e544955a7e813c54f9b73848eac",
+        "fileName": "NotoSansDevanagari-Regular.ttf",
+        "uri": "https://raw.githubusercontent.com/notofonts/noto-fonts/ffebf8c1ee449e544955a7e813c54f9b73848eac/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf",
+        "sha256": "385e78e6359a9d88a0f243d53b1209d7548361ba2194e2b9ec779bcaa7e8949d",
         "license": "OFL-1.1"
       },
       "cjkCff2": {
@@ -97,6 +111,25 @@
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Sung.zip",
         "archiveSha256": "25cb90ddf7c98bfeebd9e88a79c63dcde7eaaf81409a15b323ace744bade7867",
         "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
+        "license": "OGDL-Taiwan-1.0"
+      },
+      "cnsKaiExtB": {
+        "cacheRevision": "1",
+        "version": "98_1",
+        "archiveFileName": "Fonts_Kai.zip",
+        "fileName": "TW-Kai-Ext-B-98_1.ttf",
+        "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Kai.zip",
+        "archiveSha256": "d03cc7960f5204b50da1a33a4537242f45bd96370ef169f2c9010d79353e9228",
+        "sha256": "562d19fde56dfa52a3fed88a53154698e1d66e4b9c0a1faa9ba4ffa98e9d7a92",
+        "license": "OGDL-Taiwan-1.0"
+      },
+      "cnsKaiPlus": {
+        "version": "98_1",
+        "archiveFileName": "Fonts_Kai.zip",
+        "fileName": "TW-Kai-Plus-98_1.ttf",
+        "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Kai.zip",
+        "archiveSha256": "d03cc7960f5204b50da1a33a4537242f45bd96370ef169f2c9010d79353e9228",
+        "sha256": "acd099424c70c2baf3fe8d7b31abbbc6a97af76ef210e94c07eb1eb84d1c62fb",
         "license": "OGDL-Taiwan-1.0"
       }
     }

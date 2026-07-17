@@ -224,11 +224,23 @@ internal sealed class SfntFont
             GsubGlyphClosure.Add(gsub, selectedGlyphs, _glyphCount);
         }
 
+        bool retainFullLayoutGlyphSpace = scalars.Any(IsComplexShapingScalar)
+            && (_tables.ContainsKey("GSUB") || _tables.ContainsKey("GPOS"));
+        if (retainFullLayoutGlyphSpace)
+        {
+            for (int glyph = 1; glyph < _glyphCount; glyph++)
+            {
+                selectedGlyphs.Add((ushort)glyph);
+            }
+        }
+
         AddCompositeClosure(selectedGlyphs, maxCompositeDepth);
         byte[] subsetGlyf = BuildGlyf(selectedGlyphs, out byte[] subsetLoca);
         var tables = new SortedDictionary<string, byte[]>(_tables, StringComparer.Ordinal)
         {
-            ["cmap"] = CmapMapping.Build(mappings, selectedVariations),
+            ["cmap"] = retainFullLayoutGlyphSpace
+                ? (byte[])_tables["cmap"].Clone()
+                : CmapMapping.Build(mappings, selectedVariations),
             ["glyf"] = subsetGlyf,
             ["loca"] = subsetLoca,
             ["head"] = (byte[])_tables["head"].Clone()
@@ -240,6 +252,30 @@ internal sealed class SfntFont
         tables["head"].AsSpan(8, 4).Clear();
         return new SfntSubset(Flavor, tables);
     }
+
+    internal bool TryGetTable(string tag, out ReadOnlyMemory<byte> table)
+    {
+        if (_tables.TryGetValue(tag, out byte[]? value))
+        {
+            table = value;
+            return true;
+        }
+
+        table = default;
+        return false;
+    }
+
+    private static bool IsComplexShapingScalar(int scalar)
+        => scalar is >= 0x0600 and <= 0x08FF
+            or >= 0x0900 and <= 0x0DFF
+            or >= 0x0F00 and <= 0x109F
+            or >= 0x1780 and <= 0x17FF
+            or >= 0x1A20 and <= 0x1AAF
+            or >= 0xA8E0 and <= 0xA8FF
+            or >= 0xA980 and <= 0xA9DF
+            or >= 0xAA60 and <= 0xAA7F
+            or >= 0xFB50 and <= 0xFDFF
+            or >= 0xFE70 and <= 0xFEFF;
 
     private void AddCompositeClosure(HashSet<ushort> glyphs, int maxDepth)
     {

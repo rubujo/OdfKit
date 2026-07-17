@@ -135,6 +135,26 @@ public static class ManagedOpenTypeWebFontVerifier
         }
     }
 
+    internal static void VerifyRetainsLayoutTables(
+        byte[] source,
+        int faceIndex,
+        Stream subset,
+        WebFontFormat format)
+    {
+        SfntFont sourceFont = SfntFont.Parse(source, faceIndex, 256, validateChecksums: true);
+        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
+        foreach (string tag in new[] { "GDEF", "GPOS", "GSUB" })
+        {
+            bool sourceHasTable = sourceFont.TryGetTable(tag, out ReadOnlyMemory<byte> sourceTable);
+            bool subsetHasTable = subsetFont.TryGetTable(tag, out ReadOnlyMemory<byte> subsetTable);
+            if (sourceHasTable != subsetHasTable
+                || (sourceHasTable && !sourceTable.Span.SequenceEqual(subsetTable.Span)))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+        }
+    }
+
     private static bool IsVariationSelector(int scalar)
         => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
 
@@ -290,7 +310,11 @@ public static class ManagedOpenTypeWebFontVerifier
         }
 
         SfntFont.EnsureRange(data, position, compressedLength, "WOFF2-compressedData");
-        if (position + compressedLength != bytes.Length)
+        int compressedEnd = checked(position + compressedLength);
+        int paddingLength = bytes.Length - compressedEnd;
+        if (paddingLength is < 0 or > 3
+            || (bytes.Length & 3) != 0
+            || data.Slice(compressedEnd, paddingLength).ContainsAnyExcept((byte)0))
         {
             throw SfntFont.DataInvalid("WOFF2-trailingData");
         }

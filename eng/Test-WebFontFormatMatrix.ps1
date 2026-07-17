@@ -6,7 +6,8 @@
 [CmdletBinding()]
 param(
     [string]$Destination = "artifacts/webfont-format-matrix",
-    [string]$CnsFontArchivePath
+    [string]$CnsFontArchivePath,
+    [string]$CnsKaiFontArchivePath
 )
 
 $ErrorActionPreference = "Stop"
@@ -115,11 +116,15 @@ function Get-ArchiveFont {
 
 $extBPath = Get-ArchiveFont $definitions.cnsExtB -ArchivePath $CnsFontArchivePath
 $plusPath = Get-ArchiveFont $definitions.cnsPlus -ArchivePath $CnsFontArchivePath
+$kaiExtBPath = Get-ArchiveFont $definitions.cnsKaiExtB -ArchivePath $CnsKaiFontArchivePath
+$kaiPlusPath = Get-ArchiveFont $definitions.cnsKaiPlus -ArchivePath $CnsKaiFontArchivePath
 $ipamjPath = Get-ArchiveFont $definitions.ipamj
 $collectionPath = Get-DirectFont $definitions.cjkCollection
 $openTypePath = Get-DirectFont $definitions.cjkOpenType
 $arabicPath = Get-DirectFont $definitions.arabic
 $devanagariPath = Get-DirectFont $definitions.devanagari
+$arabicStaticPath = Get-DirectFont $definitions.arabicStatic
+$devanagariStaticPath = Get-DirectFont $definitions.devanagariStatic
 $cff2Path = Get-DirectFont $definitions.cjkCff2
 $colorEmojiPath = Get-DirectFont $definitions.colorEmoji
 
@@ -136,9 +141,13 @@ dotnet run --project $projectPath -c Release --no-build -- `
     $outputRoot `
     $extBPath `
     $plusPath `
+    $kaiExtBPath `
+    $kaiPlusPath `
     $ipamjPath `
     $collectionPath `
     $openTypePath `
+    $arabicStaticPath `
+    $devanagariStaticPath `
     $arabicPath `
     $devanagariPath `
     $cff2Path `

@@ -226,6 +226,16 @@ try {
         $installer = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/bin/Release/net10.0/playwright.ps1"
         & $installer install @Browsers
         if ($LASTEXITCODE -ne 0) { throw "Playwright 瀏覽器安裝失敗。" }
+        if ($IsWindows) {
+            $browserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
+                Join-Path $env:LOCALAPPDATA 'ms-playwright'
+            }
+            else {
+                [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
+            }
+            & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+                -BrowserRoot $browserRoot | Out-Null
+        }
         foreach ($browser in $Browsers) {
             $screenshot = Join-Path $destinationPath "playwright-managed-$browser.png"
             dotnet run --project $browserProject -c Release --no-build -- $url $browser $screenshot

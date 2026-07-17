@@ -5,8 +5,8 @@
 > 版本政策：所有套件沿用 OdfKit 的 `0.0.1`、pack、Public API、文件與 CI 機制。
 
 本矩陣只採計純 C#／.NET 產品路徑。2026-07-17 的本機與 GitHub Actions 證據使用官方 CNS 11643
-`TW-Sung-Ext-B-98_1.ttf`、鎖定 SHA-256、managed verifier 與三個 Playwright 瀏覽器；不採計
-FontTools／Python 產物。
+宋體／楷體、鎖定 SHA-256 的 Noto Arabic／Devanagari、managed verifier 與 Playwright 瀏覽器；
+不採計 FontTools／Python 產物。
 
 狀態定義：
 
@@ -18,7 +18,7 @@ FontTools／Python 產物。
 | Phase | 目前狀態 | 已實證 | 尚缺的產品證據 | 人工或外部閘門 |
 | --- | --- | --- | --- | --- |
 | 0 中性契約與 corpus | 已實證（工程） | 中性 sequence／IVS／PUA 契約、opaque font ID、實際 bytes SHA-256、版本化 JSON Profile、CNS EUC-TW provider、Windows EUDC `.tte`／`.ttf` 登錄來源 resolver、clean-room 紀錄；合法 CNS TrueType fixture 已複製為 `.tte` 通過 managed 產字與 cache 重用；Windows resolver 的 `netstandard2.0` 資產已由 net8 與 net48 consumer 載入；WebFont 專案共用 `0.0.1` 與 pack；CI 掃描 nupkg 的 managed-only 邊界並鎖定完整 NuGet 相依版本與 nuspec 授權宣告 | 真實客戶 corpus 的持續擴充 | 個別字型法律審查、客戶合法 `EUDC.TTE` 實檔與登錄關聯驗收 |
-| 1 engine／format／browser | Experimental | 有界 sfnt／TTC parser、TrueType composite 與部分 GSUB closure、`cmap` 4／12／14、TTF／zlib WOFF／net10 WOFF2、checksum、`fsType`；真實 CNS Ext-B／PUA、IPAmj IVS 與雙 CNS face TTC 成功，真實 CFF OTF／OTC、CFF2、variable、color 明確拒絕；CNS Ext-B 在 Chromium／Firefox／WebKit 實載；64 組真實來源字型固定種子 mutation；format matrix 比較來源與三格式輸出的 glyph ID／glyph count | 非 variable 的 Arabic／Devanagari 等 complex-script shaping；更廣結構感知／coverage-guided fuzz；完整 GSUB／GPOS 驗證 | Safari 實機、第三方惡意字型安全稽核；CFF／CFF2／variable／color 維持不支援 |
+| 1 engine／format／browser | Experimental | 有界 sfnt／TTC parser、TrueType composite 與 GSUB output closure、`cmap` 4／12／14、TTF／zlib WOFF／net10 WOFF2、checksum、`fsType`；真實 CNS 宋體／楷體 Ext-B／PUA、IPAmj IVS 與雙 CNS face TTC 成功，真實 CFF OTF／OTC、CFF2、variable、color 明確拒絕；複雜文字採 correctness-first 模式保留完整 glyph ID space、`cmap`、GDEF／GPOS／GSUB，來源與輸出 layout tables 必須 byte-identical；真實 Arabic／Devanagari 在 Chromium 與 WebKit 的六組字串逐 RGBA byte 及文字 metrics 相同，Firefox 已納入 CI gate；WOFF2 依規格四位元組對齊並拒絕非零／過長 padding | 擴大 complex-script corpus、Firefox 新 gate 的遠端持續證據、更廣結構感知／coverage-guided fuzz；尚未做 layout table 重寫或 aggressive glyph pruning | Safari 實機、第三方惡意字型安全稽核；CFF／CFF2／variable／color 維持不支援 |
 | 2 CLI／MSBuild／HTML | 已實證（套件 consumer） | Managed CLI／MSBuild、內容掃描、canonical `unicode-range`、固定 Unicode bucket、可設定 `font-display`／fallback metrics、選擇啟用 preload、manifest、CSS、TTF／WOFF／WOFF2、byte-identical 重建與 verifier；同批 `0.0.1` nupkg 的 library 與 dotnet tool clean consumer 均真實產字，build/run 使用 `--no-restore`；真實 CNS managed engine 的 128 路有界負載以 16 個 generation key 實證 87.5% cache hit | 真實 CNS 大型 corpus 的 CSS／manifest 大小與瀏覽器傳輸量基準；採用者 publish／CDN pipeline 驗收 | 採用者 publish／CDN pipeline 驗收 |
 | 3 ASP.NET Core／System.Web | Experimental | ASP.NET Core managed dynamic endpoint 已用真實字型通過 401／429／hash GET 與 256 路平行 immutable GET；System.Web net48 Handler 已通過 API key、allowlist、格式拒絕、內容定址 GET，並在 CLR net48 由同批 nupkg 以官方 CNS Ext-B 真字型產生及 managed verifier 驗證 WOFF／TTF；靜態 fallback 與兩平台範例存在 | 真實 IIS classic／Integrated 部署與含峰值資源量測的持續負載 | 反向代理、身分提供者、WAF、CDN 與組織 CSP 驗收 |
 | 4 runtime worker | Experimental | bounded Channel、single-flight、檔案 cache；兩個 OS process 僅產生一次、lease owner 強制終止後接手；verifier 拒絕截斷、內容損毀與超限展開長度的真實 WOFF2；真實來源與 TTF／WOFF／WOFF2 共 448 組 deterministic mutation 無越界或非預期例外；真實 CNS managed engine 的 128 路有界負載記錄 elapsed、CPU、peak working set 與 allocation JSON 證據並套用 CI 資源上限 | 長時間 soak、不同硬體容量基線、coverage-guided fuzz；多節點維持關閉 | object store、fencing token、跨節點失敗注入、第三方安全測試 |
@@ -28,7 +28,7 @@ FontTools／Python 產物。
 
 - WebFont 套件已完成或已達 production-ready。
 - OdfKit 已支援 OTF／CFF／CFF2／variable／color font 或所有 TTC／WOFF2 變體。
-- CFF／CFF2、variable、color font 或任意 complex-script shaping 已支援。
+- CFF／CFF2、variable、color font 或所有語系的任意 complex-script shaping 已支援。
 - 單機檔案 lease 等同 distributed lock，或 GitHub runner 的 load test 等同真實容量承諾。
 - 本機三瀏覽器 smoke 等同跨平台實機、第三方安全稽核或 production-ready。
 
@@ -54,5 +54,6 @@ pwsh eng/Test-MarkdownLinks.ps1
 ```powershell
 pwsh eng/Test-WebFontSmoke.ps1 -RunBrowser
 pwsh eng/Test-WebFontFormatMatrix.ps1
+pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1
 pwsh eng/Test-WebFontPackageConsumer.ps1 -FontPath <font> -SourceSha256 <sha256>
 ```

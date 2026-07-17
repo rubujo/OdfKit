@@ -150,7 +150,7 @@ Worker 不需要也不得啟動隔離外部程序。
 | 1 managed engine | 有界 sfnt／TTC parser、TrueType composite closure、`cmap` 4／12／14、TTF writer、`fsType` 與格式拒絕 | C# 生成的最小 fixtures、真實 CNS／多 Plane／IVS／PUA；checksum round-trip、mutation／fuzz、雙 TFM build；不支援矩陣逐項有負向測試 |
 | 2 build 與格式 | WOFF writer、net10 WOFF2 null transform、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
 | 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
-| 4 closure 與規模 | 逐 lookup 增加 GSUB closure、明確 script 能力；有界多節點介面、load 與 deterministic mutation fuzz | 每個新增 script 具 managed closure、獨立 oracle 與三瀏覽器 golden；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |
+| 4 closure 與規模 | 逐 lookup 增加 GSUB output closure；複雜 script 先以完整 glyph ID／`cmap`／layout tables 的 correctness-first 模式支援；有界多節點介面、load 與 deterministic mutation fuzz | 每個新增 script 具合法鎖定 corpus、來源／輸出 layout table 一致性與三瀏覽器 golden；只有具結構驗證與差分證據後才能做 aggressive pruning；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |
 | 5 產品化 | NuGet／DocFX／Public API／SBOM／授權漂移／安全與證據矩陣；人工發布決策 | 同一批 nupkg 通過 net10、netstandard2.0、net48 consumer；無 native／tool／process path；外部安全與法律審查、真實客戶 corpus 與容量驗收仍分開標示 |
 
 Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或測試工具成功就跳過前一階段。
@@ -184,6 +184,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 只執行 `dotnet` 的雙 process smoke、真實 WOFF2 verifier、失敗接手與 HTTP 安全驗證。
 - 官方 CNS Ext-B 真字型與 Chromium／Firefox／WebKit 截圖證據。
 - 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC，以及 CFF／CFF2／variable／color 負向格式矩陣。
+- 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
+- WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
 - 真實來源字型與 TTF／WOFF／WOFF2 共 448 組固定種子 mutation verifier 測試。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
@@ -198,6 +200,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - [OpenType `cmap`](https://learn.microsoft.com/en-us/typography/opentype/spec/cmap)
 - [OpenType `glyf`](https://learn.microsoft.com/en-us/typography/opentype/spec/glyf)
 - [OpenType `OS/2.fsType`](https://learn.microsoft.com/en-us/typography/opentype/spec/os2)
+- [OpenType GSUB](https://learn.microsoft.com/en-us/typography/opentype/spec/gsub)
+- [OpenType GPOS](https://learn.microsoft.com/en-us/typography/opentype/spec/gpos)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
 - [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)

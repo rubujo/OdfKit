@@ -188,7 +188,7 @@ internal static class WebFontWriters
 #if NET10_0_OR_GREATER
     internal static byte[] WriteWoff2(SfntSubset subset)
     {
-        KeyValuePair<string, byte[]>[] tables = subset.Tables.ToArray();
+        KeyValuePair<string, byte[]>[] tables = OrderWoff2Tables(subset.Tables);
         byte[] sfnt = WriteTrueType(subset);
         using var directoryStream = new MemoryStream();
         using var tableStream = new MemoryStream();
@@ -223,7 +223,8 @@ internal static class WebFontWriters
         }
 
         byte[] directory = directoryStream.ToArray();
-        int length = checked(48 + directory.Length + compressedLength);
+        int compressedEnd = checked(48 + directory.Length + compressedLength);
+        int length = Align4(compressedEnd);
         var output = new byte[length];
         WriteTag(output, 0, "wOF2");
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(4, 4), subset.Flavor);
@@ -234,6 +235,27 @@ internal static class WebFontWriters
         directory.CopyTo(output, 48);
         compressedBuffer.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directory.Length));
         return output;
+    }
+
+    private static KeyValuePair<string, byte[]>[] OrderWoff2Tables(
+        IReadOnlyDictionary<string, byte[]> tables)
+    {
+        var ordered = new List<KeyValuePair<string, byte[]>>(tables.Count);
+        foreach (KeyValuePair<string, byte[]> table in tables)
+        {
+            if (table.Key == "loca")
+            {
+                continue;
+            }
+
+            ordered.Add(table);
+            if (table.Key == "glyf" && tables.TryGetValue("loca", out byte[]? loca))
+            {
+                ordered.Add(new KeyValuePair<string, byte[]>("loca", loca));
+            }
+        }
+
+        return ordered.ToArray();
     }
 #endif
 
