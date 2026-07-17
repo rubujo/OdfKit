@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "assetRootPath": "OdfWebFonts",
   "apiKeyEnvironmentVariable": "ODFKIT_WEBFONT_API_KEY",
+  "apiKeyAppSettingName": "OdfKit.WebFonts.ApiKey",
   "maxRequestBodyBytes": 65536,
   "maxConcurrentGenerations": 2,
   "maxSequenceCount": 256,

@@ -6,10 +6,11 @@
 1. 依授權合法取得字型，放在 `Fonts` 或部署端受保護目錄。範例不散布全字庫字型。
 2. 將 `appsettings.WebFont.example.json` 複製為 `appsettings.Development.json`，依實際檔案更新
    `FontPath`、`SourceSha256`、`FontSourceId`、`FaceIndex` 與版本化 `ProfileId`。
-3. 以環境變數提供至少 32 bytes 的高熵 API key，再啟動網站：
+3. 以標準 .NET 組態提供至少 32 bytes 的高熵 API key，再啟動網站。正式環境建議使用
+   Secret Manager、環境變數或 Key Vault provider；不要把實際 secret 提交至 `appsettings.json`：
 
 ```powershell
-$env:ODFKIT_WEBFONT_API_KEY = '<deployment-secret-at-least-32-bytes>'
+$env:OdfKit__WebFonts__ApiKey = '<deployment-secret-at-least-32-random-bytes>'
 dotnet run --project samples/WebFonts.AspNetCore --urls http://127.0.0.1:5080
 ```
 
@@ -17,7 +18,7 @@ dotnet run --project samples/WebFonts.AspNetCore --urls http://127.0.0.1:5080
 request 中提供實體字型路徑：
 
 ```powershell
-$headers = @{ 'X-OdfKit-WebFont-Key' = $env:ODFKIT_WEBFONT_API_KEY }
+$headers = @{ 'X-OdfKit-WebFont-Key' = $env:OdfKit__WebFonts__ApiKey }
 $body = @{
   fontSourceId = 'cns-ext-b'
   faceIndex = 0
@@ -40,8 +41,20 @@ endpoint 具 API key authorization、固定窗口 rate limit、來源／face／P
 `@font-face`，瀏覽器不應持有 API key。預產生的 `webfonts.json` 與 CSS 也可放入相同
 `AssetRoot`；這類穩定 alias 維持 `no-cache`，並以實際傳輸 bytes 的 SHA-256 ETag 支援
 GET／HEAD 與 304 重驗證。指紋 CSS 與字型資產使用一年 `immutable`。generation Handler 的
-成功與輸入錯誤回應使用 `no-store, no-cache`；authentication／rate limiter 在 Handler 前產生的
-401／429 仍須由 host 或 WAF 統一加入不快取政策。
+成功與輸入錯誤回應使用 `no-store, no-cache`；sample 也在 authentication／rate limiter 前對
+generation POST 套用相同政策，使 401／429 不可被 IIS、WAF 或 CDN 快取。
+
+`OdfKit:WebFonts:ApiKey` 可直接放在未提交且受保護的 `appsettings.{Environment}.json`，也可由
+`OdfKit__WebFonts__ApiKey` 環境變數覆寫；舊的 `ODFKIT_WEBFONT_API_KEY` 僅保留為找不到標準組態
+鍵時的相容 fallback。完整產製、保管與輪替流程見 [`docs/webfonts.md`](../../docs/webfonts.md)。
+
+Windows CI 可用官方 CNS 字型，透過 IIS Express 與 ANCM 實際驗證 In-Process／Out-of-Process：
+
+```powershell
+pwsh eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 `
+  -FontPath <TW-Sung-Ext-B-98_1.ttf> `
+  -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+```
 
 若由 CDN 提供資產，設定 `OdfKit__WebFonts__PublicBaseUrl`；跨來源部署須另外設定精確的
 `OdfKit__WebFonts__AllowedOrigin`。正式 CSP、CORS、WAF 與 CDN 說明見

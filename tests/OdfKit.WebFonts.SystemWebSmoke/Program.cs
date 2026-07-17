@@ -21,7 +21,7 @@ try
     var options = new OdfWebFontSystemWebGenerationOptions
     {
         AssetRootPath = root,
-        ApiKey = "system-web-smoke-key",
+        ApiKey = "system-web-smoke-key-32-bytes-minimum",
         AllowPublicCrossOriginAssets = true,
         MaxConcurrentGenerations = 1,
         MaxSequenceCount = 8,

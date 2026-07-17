@@ -219,6 +219,10 @@ jobs:
             -NoBuild `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
             -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+          ./eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 `
+            -NoBuild `
+            -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
+            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
           ./eng/Test-WebFontPackageConsumer.ps1 `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
             -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583 `
@@ -238,6 +242,8 @@ jobs:
             artifacts/webfont-package-consumer/**/webfonts.json
             artifacts/webfont-iis-express-smoke/evidence.json
             artifacts/webfont-iis-express-smoke/iisexpress.*.log
+            artifacts/webfont-aspnetcore-iis-express-smoke/evidence.json
+            artifacts/webfont-aspnetcore-iis-express-smoke/**/iisexpress.*.log
             artifacts/webfont-worker-process-smoke/**
           if-no-files-found: warn
 

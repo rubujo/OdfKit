@@ -1,6 +1,6 @@
 # WebFont IFT 標準追蹤與相容性閘門
 
-> 基準日期：2026-07-16
+> 基準日期：2026-07-18
 >
 > 狀態：追蹤中；OdfKit 尚未實作或宣稱支援 Incremental Font Transfer。
 
@@ -11,6 +11,12 @@ Recommendation Draft。W3C
 [出版歷史](https://www.w3.org/standards/history/IFT/)顯示 2025-07-31 曾發布 Candidate
 Recommendation Snapshot，2025-11-18 發布後續 Candidate Recommendation Draft。這仍是可變動的候選
 標準，不是已完成互通報告的 W3C Recommendation。
+
+W3C 2025 TPAC 的官方展示明確使用 WebAssembly polyfill，而不是穩定瀏覽器原生實作；Mozilla
+追蹤項目 [1977870](https://bugzilla.mozilla.org/show_bug.cgi?id=1977870) 截至基準日仍為 NEW。
+因此目前的 Chromium／Firefox／WebKit Playwright matrix 不能作為 IFT client oracle，也不能只
+測試 `tech(incremental)` CSS 是否可解析就宣稱 wire interoperability。參考
+[W3C IFT TPAC demo](https://www.w3.org/2025/11/TPAC/demo-font-transfer.html)。
 
 IFT 同時定義 table-keyed 與 glyph-keyed patch。保留 glyph ID 只協助 glyph-keyed patch 的穩定
 glyph-to-ID 指派；它不會自動產生 IFT／IFTX table、patch map、compatibility ID、patch 檔案、
@@ -38,3 +44,5 @@ IFT」或「已與 IFT 相容」。
    與 cache hit ratio；沒有實測優勢不得改成預設。
 
 在這些閘門完成前，穩定 Unicode bucket 與受控動態補洞是可部署路徑，IFT 僅維持標準追蹤。
+W3C polyfill 可作為獨立測試 oracle 的候選，但不得進入產品 runtime，也不得取代純 managed
+encoder／decoder、穩定瀏覽器實證或 clean-room 來源紀錄。

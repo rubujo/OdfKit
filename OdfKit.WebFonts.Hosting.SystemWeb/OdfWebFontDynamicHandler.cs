@@ -361,7 +361,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         if (configuration is null
             || configuration.SchemaVersion != 1
-            || string.IsNullOrWhiteSpace(configuration.ApiKeyEnvironmentVariable)
+            || (string.IsNullOrWhiteSpace(configuration.ApiKeyEnvironmentVariable)
+                && string.IsNullOrWhiteSpace(configuration.ApiKeyAppSettingName))
             || configuration.FontSources is not { Count: > 0 }
             || configuration.AllowedProfileIds is not { Count: > 0 }
             || configuration.AllowedFormats is not { Count: > 0 })
@@ -369,7 +370,13 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             throw ConfigurationInvalid();
         }
 
-        string? apiKey = Environment.GetEnvironmentVariable(configuration.ApiKeyEnvironmentVariable);
+        string? apiKey = string.IsNullOrWhiteSpace(configuration.ApiKeyEnvironmentVariable)
+            ? null
+            : Environment.GetEnvironmentVariable(configuration.ApiKeyEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(configuration.ApiKeyAppSettingName))
+        {
+            apiKey = ConfigurationManager.AppSettings[configuration.ApiKeyAppSettingName];
+        }
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             throw ConfigurationInvalid();
@@ -379,7 +386,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         var options = new OdfWebFontSystemWebGenerationOptions
         {
             AssetRootPath = MapTrustedPath(configuration.AssetRootPath, baseDirectory),
-            ApiKey = apiKey,
+            ApiKey = apiKey!,
             MaxRequestBodyBytes = configuration.MaxRequestBodyBytes,
             MaxConcurrentGenerations = configuration.MaxConcurrentGenerations,
             MaxSequenceCount = configuration.MaxSequenceCount,
@@ -633,6 +640,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         {
             if (string.IsNullOrWhiteSpace(options.AssetRootPath)
                 || string.IsNullOrWhiteSpace(options.ApiKey)
+                || Encoding.UTF8.GetByteCount(options.ApiKey) < 32
                 || options.ApiKey.Length > 512
                 || options.MaxRequestBodyBytes is <= 0 or > 1024 * 1024
                 || options.MaxConcurrentGenerations is <= 0 or > 64
@@ -674,7 +682,9 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         public string AssetRootPath { get; set; } = string.Empty;
 
-        public string ApiKeyEnvironmentVariable { get; set; } = string.Empty;
+        public string ApiKeyEnvironmentVariable { get; set; } = "ODFKIT_WEBFONT_API_KEY";
+
+        public string ApiKeyAppSettingName { get; set; } = "OdfKit.WebFonts.ApiKey";
 
         public int MaxRequestBodyBytes { get; set; } = 64 * 1024;
 

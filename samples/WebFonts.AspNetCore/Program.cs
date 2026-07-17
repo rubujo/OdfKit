@@ -22,7 +22,11 @@ string sourceSha256 = (settings["SourceSha256"] ?? string.Empty).ToLowerInvarian
 string profileId = settings["ProfileId"] ?? "cns11643-euc-tw-2026-05-05";
 int faceIndex = settings.GetValue("FaceIndex", 0);
 string? publicBaseUrl = settings["PublicBaseUrl"];
-string? apiKey = Environment.GetEnvironmentVariable("ODFKIT_WEBFONT_API_KEY");
+string? apiKey = settings["ApiKey"];
+if (string.IsNullOrWhiteSpace(apiKey))
+{
+    apiKey = Environment.GetEnvironmentVariable("ODFKIT_WEBFONT_API_KEY");
+}
 
 if (!File.Exists(fontPath)
     || fontSourceId.Length is < 1 or > 256
@@ -34,7 +38,7 @@ if (!File.Exists(fontPath)
     || System.Text.Encoding.UTF8.GetByteCount(apiKey) < 32)
 {
     Console.Error.WriteLine(
-        "Configure a licensed font, its SHA-256, and a 32-byte ODFKIT_WEBFONT_API_KEY before starting the sample.");
+        "Configure a licensed font, its SHA-256, and a 32-byte OdfKit:WebFonts:ApiKey before starting the sample.");
     return;
 }
 
@@ -109,6 +113,18 @@ builder.Services.AddOdfWebFontGeneration(
     });
 
 WebApplication app = builder.Build();
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method)
+        && context.Request.Path.Equals("/_odf-fonts/generate", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.Headers.CacheControl = "no-store";
+        context.Response.Headers.Pragma = "no-cache";
+        context.Response.Headers.Expires = "0";
+    }
+
+    await next();
+});
 app.Use(async (context, next) =>
 {
     OdfWebFontResourceProvider resources = context.RequestServices

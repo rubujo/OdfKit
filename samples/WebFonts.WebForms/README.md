@@ -3,8 +3,8 @@
 1. 安裝 `OdfKit.WebFonts.Hosting.SystemWeb`。
 2. 依授權合法取得字型，放在 `App_Data/Fonts`，並以實際 SHA-256 更新
    `webfonts.dynamic.example.json` 後另存為 `App_Data/webfonts.dynamic.json`。
-3. 以應用程式集區環境變數 `ODFKIT_WEBFONT_API_KEY` 提供高熵 API key；不得把 secret 提交至
-   `Web.config` 或原始碼。
+3. 以應用程式集區環境變數 `ODFKIT_WEBFONT_API_KEY`，或受 Protected Configuration 保護的
+   `Web.config` 鍵 `OdfKit.WebFonts.ApiKey` 提供高熵 API key；不得把明文 secret 提交至原始碼。
 4. 將 `Default.aspx` 與 `Web.config` 放入 .NET Framework 4.8 Web Forms 應用程式。
 
 範例 `Web.config` 包含目前套件相依組件的 binding redirects；若由專案系統安裝或升級套件，應以
@@ -26,6 +26,7 @@ pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
   -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
 ```
 
-此測試會部署隔離站台、實際編譯頁面、經 HTTP 動態產生 TTF／WOFF，並驗證未授權回應、
+此測試會將隨機 key 寫入隔離站台的 `web.config`、清除環境變數、實際編譯頁面、經 HTTP 動態
+產生 TTF／WOFF，並驗證未授權回應、
 GET／HEAD、內容 SHA-256、ETag 與 304；它證明 IIS Express 的 Integrated pipeline，不等同完整
 IIS Classic mode 或客戶 WAF／CDN 驗收。

@@ -70,6 +70,7 @@ $dynamicConfiguration = @{
     schemaVersion = 1
     assetRootPath = "OdfWebFonts"
     apiKeyEnvironmentVariable = "ODFKIT_WEBFONT_API_KEY"
+    apiKeyAppSettingName = "OdfKit.WebFonts.ApiKey"
     maxRequestBodyBytes = 65536
     maxConcurrentGenerations = 2
     maxSequenceCount = 256
@@ -100,7 +101,15 @@ $baseUri = [Uri]"http://localhost:$port/"
 $standardOutputPath = Join-Path $destinationPath "iisexpress.stdout.log"
 $standardErrorPath = Join-Path $destinationPath "iisexpress.stderr.log"
 $previousApiKey = $env:ODFKIT_WEBFONT_API_KEY
-$env:ODFKIT_WEBFONT_API_KEY = $apiKey
+$env:ODFKIT_WEBFONT_API_KEY = $null
+[xml]$siteWebConfig = Get-Content -LiteralPath (Join-Path $sitePath "Web.config") -Raw
+$apiKeySetting = @(@($siteWebConfig.configuration.appSettings.add) |
+        Where-Object key -EQ "OdfKit.WebFonts.ApiKey")
+if ($apiKeySetting.Count -ne 1) {
+    throw "Web Forms sample 缺少 web.config API key 設定。"
+}
+$apiKeySetting[0].SetAttribute("value", $apiKey)
+$siteWebConfig.Save((Join-Path $sitePath "Web.config"))
 $process = $null
 $httpHandler = [Net.Http.HttpClientHandler]::new()
 $httpHandler.UseProxy = $false
@@ -284,5 +293,7 @@ finally {
         Stop-Process -Id $process.Id -Force
         $process.WaitForExit(5000) | Out-Null
     }
+    $apiKeySetting[0].SetAttribute("value", "")
+    $siteWebConfig.Save((Join-Path $sitePath "Web.config"))
     $env:ODFKIT_WEBFONT_API_KEY = $previousApiKey
 }

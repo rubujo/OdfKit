@@ -139,6 +139,30 @@ app.MapOdfWebFonts();
 format allowlist。用戶端只能傳 sequence 與 allowlist ID，不能傳字型路徑、URL 或來源 hash。
 成功結果是 manifest，後續以 `/{sha256}/{fileName}` GET 不可變資產。
 
+### API key 產製與管理
+
+每個環境應使用不同的 32-byte cryptographic random key；不要使用密碼、時間戳或可預測識別碼。
+PowerShell 7 可直接以 .NET 產生 Base64 值：
+
+```powershell
+$bytes = [Security.Cryptography.RandomNumberGenerator]::GetBytes(32)
+$apiKey = [Convert]::ToBase64String($bytes)
+```
+
+ASP.NET Core 使用標準鍵 `OdfKit:WebFonts:ApiKey`。`appsettings.json` 可設定 `ApiKey`，而
+`OdfKit__WebFonts__ApiKey`、User Secrets 或 Key Vault provider 可依 ASP.NET Core 原生 provider
+順序覆寫；`ODFKIT_WEBFONT_API_KEY` 只在標準鍵不存在時作為相容 fallback。Microsoft 明確建議
+不要把 production secret 放進可能提交的 `appsettings.json`；Secret Manager 只適合開發，正式
+環境應使用受控 secret store。參考
+[ASP.NET Core configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0)、
+[Safe storage of app secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-10.0)
+與 [Azure Key Vault provider](https://learn.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-10.0)。
+
+目前 sample 每次啟動載入單一 key。輪替時先在受信任後端與目標節點部署新 key，再重新啟動；
+完成切換後從所有節點與 secret store 撤銷舊值。需要無中斷雙 key overlap、每租戶 key、到期時間
+或集中撤銷時，應接入既有身分提供者／API gateway，不應把長效共用 key 發給瀏覽器。access log
+必須遮蔽 `X-OdfKit-WebFont-Key`，監控只記錄結果與租戶 opaque ID，不記錄 key 或 request sequence。
+
 JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric label 或一般 access log。正式環境
 應使用 TLS、短效 token、租戶配額與資料最小化；大量下載交給 CDN／Object Storage。
 
@@ -155,8 +179,13 @@ face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限�
 variable、靜態 CFF 與 CFF2 variable 為 experimental。要求 WOFF2、OTC、名稱式 CFF、無
 VariationStore 的 CFF2 或 color font 會明確失敗。
 
-API key 只能由指定環境變數載入。JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，
-HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
+API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的
+`web.config/appSettings` 鍵，預設為 `OdfKit.WebFonts.ApiKey`。環境變數優先序是明確契約。
+直接放在 `web.config` 時必須使用 ASP.NET Protected Configuration 加密 `appSettings`，並限制
+解密金鑰與檔案 ACL；Microsoft 說明 Protected Configuration 可由 ASP.NET 在執行期透明解密。
+參考 [Protected Configuration](https://learn.microsoft.com/en-us/previous-versions/aspnet/hh8x3tas(v=vs.100))。
+JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，HTTP 用戶端不能傳入路徑、URL 或
+hash。範例設定見
 [`samples/WebFonts.WebForms/webfonts.dynamic.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.example.json)。
 
 ```xml
@@ -166,6 +195,7 @@ HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
   <add key="OdfKit.WebFonts.StylesheetFileName" value="webfonts.css" />
   <add key="OdfKit.WebFonts.DynamicConfigurationPath"
        value="~/App_Data/webfonts.dynamic.json" />
+  <add key="OdfKit.WebFonts.ApiKey" value="&lt;protected-deployment-secret&gt;" />
 </appSettings>
 <system.webServer>
   <handlers>
@@ -227,8 +257,9 @@ probe 驗收，不能僅依產品名稱推定。參考
 必須向 origin 驗證；`no-store` 才禁止保存。ASP.NET Core 的
 [Minimal API file result](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#file-results)
 在提供 ETag 時會處理 `If-None-Match` 與 304。ASP.NET Core 的 authentication／rate-limiter
-middleware 可能在 generation Handler 執行前就回傳 401／429，因此 host 與 WAF 仍必須對整個
-POST 路徑及所有錯誤狀態強制不快取；不能只依成功 Handler 的 header。
+middleware 可能在 generation Handler 執行前就回傳 401／429，因此 sample 會在這些 middleware
+前對整個 POST 路徑加入 `no-store`；WAF 仍須對該路徑及所有錯誤狀態強制不快取，不能只依成功
+Handler 的 header。
 
 若 CDN 使用 `fonts.example.com`，而網站使用另一個 origin，ASP.NET Core 應設定精確
 `AllowedOrigins` 與 cross-origin CORP。System.Web 的 JSON 與 `Web.config` 則把
@@ -249,9 +280,16 @@ Repository 的 `eng/Test-WebFontIisExpressSmoke.ps1` 會以隔離站台與隨機
 Express，實際編譯 Web Forms 頁面並以官方 CNS Ext-B 執行 401、動態 TTF／WOFF、GET／HEAD、
 SHA-256、ETag 與 304。IIS Express 與 IIS 使用相同的 `applicationHost.config`／`Web.config`
 設定模型，但 IIS Express 由使用者啟動且沒有 WAS；因此這項證據只涵蓋 Integrated pipeline，
-不取代完整 IIS Classic mode 或正式站台驗收。參考
+不取代完整 IIS Classic mode 或正式站台驗收。
+
+`eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1` 則使用完整隔離 `applicationhost.config` 與 ANCM
+V2，分別發布並實際啟動 In-Process 與 Out-of-Process。前者驗證
+`appsettings.{Environment}.json` API key，後者驗證環境變數覆寫；兩者皆執行 401/no-store、
+動態 WOFF2、GET／HEAD、SHA-256、ETag 與 304。In-Process 在 `iisexpress.exe` 內執行，
+Out-of-Process 由 ANCM 啟動 Kestrel 並代理。參考
 [Microsoft IIS Express 概觀](https://learn.microsoft.com/en-us/iis/extensions/introduction-to-iis-express/iis-express-overview)、
 [IIS Express 命令列](https://learn.microsoft.com/en-us/iis/extensions/using-iis-express/running-iis-express-from-the-command-line)
+、[ASP.NET Core Module](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module?view=aspnetcore-10.0)
 與 [IIS Integrated／Classic 架構](https://learn.microsoft.com/en-us/iis/get-started/introduction-to-iis/introduction-to-iis-architecture)。
 
 正式切換前至少以外部 probe 驗證：首次 MISS 到 origin、第二次 HIT、ETag 304、三種字型 MIME、
