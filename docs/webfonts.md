@@ -192,6 +192,10 @@ HTTP 用戶端不能傳入路徑、URL 或 hash。範例設定見
 要求標頭必須包含 `X-OdfKit-WebFont-Key`。成功回傳 manifest，公開頁面只 GET
 `/{sha256}/{fileName}`；資產會重新驗證 SHA-256、大小與副檔名，再以 immutable cache 與 ETag
 傳送。Handler 重啟後仍可安全讀取內容定址產物，不依賴 process-local registry。
+動態 POST 產生的成功與錯誤回應使用 `Cache-Control: no-store, no-cache`；manifest、CSS 與字型
+資產皆明確支援 GET／HEAD。System.Web 與 ASP.NET Core 會以實際傳輸 bytes 的 SHA-256 作為
+ETag，收到相符的 `If-None-Match` 時回傳無本文的 304。讀取 CSS 時會拒絕無效 UTF-8，而不是
+靜默轉碼後讓檔名、manifest hash 與回應內容不一致。
 
 Master Page 加入：
 
@@ -214,10 +218,17 @@ probe 驗收，不能僅依產品名稱推定。參考
 
 | 路徑 | WAF／CDN 規則 | 原因 |
 | --- | --- | --- |
-| `POST /_odf-fonts/generate` | 不快取；只允許受信任後端；保留 `Content-Type` 與 `X-OdfKit-WebFont-Key`；本文上限 64 KiB；不記錄本文與 key | sequence 可能是個資／PUA，回應依授權與即時 cache 狀態而異 |
+| `POST /_odf-fonts/generate` | 不快取；origin Handler 回應 `no-store, no-cache`；只允許受信任後端；保留 `Content-Type` 與 `X-OdfKit-WebFont-Key`；本文上限 64 KiB；不記錄本文與 key | sequence 可能是個資／PUA，回應依授權與即時 cache 狀態而異 |
 | `GET/HEAD /_odf-fonts/{sha256}/{fileName}` | 快取 200；保留 `Cache-Control`、`ETag`、`Content-Type`、CORS、CORP 與 `nosniff`；不得用 BOT HTML challenge 取代字型 | URL 已含內容 hash，可安全長期 immutable cache |
-| `GET /_odf-fonts/webfonts.json`、`webfonts.css` | alias 不長期快取；有指紋的 CSS 才可 immutable | alias 內容可能在部署後改變 |
+| `GET/HEAD /_odf-fonts/manifest.json`、`webfonts.css` | alias 使用 `no-cache`、強 ETag 與 304 重驗證；有指紋的 CSS 使用一年 `immutable`；CDN 必須保留原始 bytes 與 ETag | alias 內容可能在部署後改變，但不需每次重傳本文 |
 | 401／400／413／429／503 | 不快取 | 避免把授權、限流或暫時失敗擴散到所有使用者 |
+
+依 [RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html)，`no-cache` 允許保存回應，但重新使用前
+必須向 origin 驗證；`no-store` 才禁止保存。ASP.NET Core 的
+[Minimal API file result](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#file-results)
+在提供 ETag 時會處理 `If-None-Match` 與 304。ASP.NET Core 的 authentication／rate-limiter
+middleware 可能在 generation Handler 執行前就回傳 401／429，因此 host 與 WAF 仍必須對整個
+POST 路徑及所有錯誤狀態強制不快取；不能只依成功 Handler 的 header。
 
 若 CDN 使用 `fonts.example.com`，而網站使用另一個 origin，ASP.NET Core 應設定精確
 `AllowedOrigins` 與 cross-origin CORP。System.Web 的 JSON 與 `Web.config` 則把

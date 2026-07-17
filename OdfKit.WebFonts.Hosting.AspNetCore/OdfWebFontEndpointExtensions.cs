@@ -118,48 +118,60 @@ public static class OdfWebFontEndpointExtensions
         _ = endpoints.ServiceProvider.GetRequiredService<WebFontAssetStore>();
 
         RouteGroupBuilder group = endpoints.MapGroup(routePrefix);
-        group.MapGet(
+        group.MapMethods(
             "/manifest.json",
+            [HttpMethods.Get, HttpMethods.Head],
             static (HttpContext context, WebFontAssetStore store) =>
             {
                 ApplyCrossOriginHeaders(context);
                 context.Response.Headers.CacheControl = "no-cache";
                 context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
-                return Results.Json(store.Manifest);
+                return Results.File(
+                    store.ManifestBytes,
+                    "application/json; charset=utf-8",
+                    entityTag: new EntityTagHeaderValue($"\"{store.ManifestSha256}\""));
             });
-        group.MapGet(
+        group.MapMethods(
             "/webfonts.css",
+            [HttpMethods.Get, HttpMethods.Head],
             static (HttpContext context, WebFontAssetStore store) =>
             {
                 ApplyCrossOriginHeaders(context);
-                if (store.Css is null)
+                if (store.CssBytes is null || store.CssSha256 is null)
                 {
                     return Results.NotFound();
                 }
 
                 context.Response.Headers.CacheControl = "no-cache";
                 context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
-                return Results.Text(store.Css, "text/css; charset=utf-8");
+                return Results.File(
+                    store.CssBytes,
+                    "text/css; charset=utf-8",
+                    entityTag: new EntityTagHeaderValue($"\"{store.CssSha256}\""));
             });
-        group.MapGet(
+        group.MapMethods(
             "/{stylesheetFileName}",
+            [HttpMethods.Get, HttpMethods.Head],
             static (HttpContext context, string stylesheetFileName, WebFontAssetStore store) =>
             {
                 ApplyCrossOriginHeaders(context);
                 if (!store.IsStylesheet(stylesheetFileName)
-                    || store.Css is null
-                    || store.StylesheetSha256 is null)
+                    || store.CssBytes is null
+                    || store.CssSha256 is null)
                 {
                     return Results.NotFound();
                 }
 
                 context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
                 context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
-                context.Response.Headers.ETag = $"\"{store.StylesheetSha256}\"";
-                return Results.Text(store.Css, "text/css; charset=utf-8");
+                return Results.File(
+                    store.CssBytes,
+                    "text/css; charset=utf-8",
+                    entityTag: new EntityTagHeaderValue($"\"{store.CssSha256}\""));
             });
-        group.MapGet(
+        group.MapMethods(
             "/{sha256:regex(^[a-fA-F0-9]{{64}}$)}/{fileName}",
+            [HttpMethods.Get, HttpMethods.Head],
             static (HttpContext context, string sha256, string fileName, WebFontAssetStore store) =>
             {
                 ApplyCrossOriginHeaders(context);

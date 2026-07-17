@@ -191,7 +191,7 @@ Worker 不需要也不得啟動隔離外部程序。
 | 0 契約與治理 | 移除 FontTools 產品 API；建立 neutral engine、版本化 Profile、CNS provider、license policy 與 managed guard | 所有 WebFont csproj 繼承共同 `0.0.1`／pack；clean package scan；合法 corpus 均有 URI、版本、SHA-256、授權與不散布裁定 |
 | 1 managed engine | 有界 sfnt／TTC parser、TrueType composite closure、`cmap` 4／12／14、TTF writer、`fsType` 與格式拒絕 | C# 生成的最小 fixtures、真實 CNS／多 Plane／IVS／PUA；checksum round-trip、mutation／fuzz、雙 TFM build；不支援矩陣逐項有負向測試 |
 | 2 build 與格式 | WOFF writer、net10 WOFF2 null transform、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
-| 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
+| 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；manifest、CSS 與字型的 GET／HEAD、原始 bytes SHA-256 ETag 與 304；動態 Handler 回應 `no-store`；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
 | 4 closure 與規模 | 逐 lookup 增加 GSUB output closure；複雜 script 先以完整 glyph ID／`cmap`／layout tables 的 correctness-first 模式支援；有界多節點介面、load 與 deterministic mutation fuzz | 每個新增 script 具合法鎖定 corpus、來源／輸出 layout table 一致性與三瀏覽器 golden；只有具結構驗證與差分證據後才能做 aggressive pruning；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |
 | 5 產品化 | NuGet／DocFX／Public API／SBOM／授權漂移／安全與證據矩陣；人工發布決策 | 同一批 nupkg 通過 net10、netstandard2.0、net48 consumer；無 native／tool／process path；外部安全與法律審查、真實客戶 corpus 與容量驗收仍分開標示 |
 

@@ -46,9 +46,39 @@ public sealed class WebFontHostingTests
         using HttpResponseMessage unknownResponse = await client.GetAsync(
             $"/_odf-fonts/{new string('0', 64)}/{fileName}",
             TestContext.Current.CancellationToken);
+        using var manifestValidationRequest = new HttpRequestMessage(HttpMethod.Get, "/_odf-fonts/manifest.json");
+        manifestValidationRequest.Headers.IfNoneMatch.Add(manifestResponse.Headers.ETag!);
+        using HttpResponseMessage manifestValidationResponse = await client.SendAsync(
+            manifestValidationRequest,
+            TestContext.Current.CancellationToken);
+        using var manifestHeadRequest = new HttpRequestMessage(HttpMethod.Head, "/_odf-fonts/manifest.json");
+        using HttpResponseMessage manifestHeadResponse = await client.SendAsync(
+            manifestHeadRequest,
+            TestContext.Current.CancellationToken);
+        using var assetValidationRequest = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/_odf-fonts/{sha256}/{fileName}");
+        assetValidationRequest.Headers.IfNoneMatch.Add(assetResponse.Headers.ETag!);
+        using HttpResponseMessage assetValidationResponse = await client.SendAsync(
+            assetValidationRequest,
+            TestContext.Current.CancellationToken);
+        using var assetHeadRequest = new HttpRequestMessage(
+            HttpMethod.Head,
+            $"/_odf-fonts/{sha256}/{fileName}");
+        using HttpResponseMessage assetHeadResponse = await client.SendAsync(
+            assetHeadRequest,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, manifestResponse.StatusCode);
         Assert.Equal("no-cache", manifestResponse.Headers.CacheControl?.ToString());
+        Assert.NotNull(manifestResponse.Headers.ETag);
+        Assert.Equal(HttpStatusCode.NotModified, manifestValidationResponse.StatusCode);
+        Assert.Empty(await manifestValidationResponse.Content.ReadAsByteArrayAsync(
+            TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.OK, manifestHeadResponse.StatusCode);
+        Assert.Equal(manifestResponse.Headers.ETag, manifestHeadResponse.Headers.ETag);
+        Assert.Empty(await manifestHeadResponse.Content.ReadAsByteArrayAsync(
+            TestContext.Current.CancellationToken));
         Assert.Equal(HttpStatusCode.OK, assetResponse.StatusCode);
         Assert.Equal("font/woff2", assetResponse.Content.Headers.ContentType?.MediaType);
         System.Net.Http.Headers.CacheControlHeaderValue cacheControl = Assert.IsType<System.Net.Http.Headers.CacheControlHeaderValue>(
@@ -61,6 +91,11 @@ public sealed class WebFontHostingTests
         Assert.Equal(
             fontBytes,
             await assetResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.NotModified, assetValidationResponse.StatusCode);
+        Assert.Empty(await assetValidationResponse.Content.ReadAsByteArrayAsync(
+            TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.OK, assetHeadResponse.StatusCode);
+        Assert.Empty(await assetHeadResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
         Assert.Equal(HttpStatusCode.NotFound, unknownResponse.StatusCode);
 
         await application.StopAsync(TestContext.Current.CancellationToken);
@@ -155,13 +190,63 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
+    public async Task Endpoints_RevalidateLegacyStylesheetWithoutChangingBytes()
+    {
+        string rootPath = CreateTemporaryRoot();
+        byte[] fontBytes = "wOF2-legacy-css-smoke"u8.ToArray();
+        const string fileName = "legacy-css.woff2";
+        byte[] cssBytes = System.Text.Encoding.UTF8.GetBytes(
+            "\uFEFF@font-face { font-family: 'Legacy'; }\n");
+        string sha256 = Convert.ToHexString(SHA256.HashData(fontBytes)).ToLowerInvariant();
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, fileName),
+            fontBytes,
+            TestContext.Current.CancellationToken);
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, "webfonts.css"),
+            cssBytes,
+            TestContext.Current.CancellationToken);
+        await WriteManifestAsync(rootPath, fileName, fontBytes.Length, sha256);
+
+        await using WebApplication application = await StartApplicationAsync(rootPath);
+        using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+        using HttpResponseMessage response = await client.GetAsync(
+            "/_odf-fonts/webfonts.css",
+            TestContext.Current.CancellationToken);
+        using var validationRequest = new HttpRequestMessage(HttpMethod.Get, "/_odf-fonts/webfonts.css");
+        validationRequest.Headers.IfNoneMatch.Add(response.Headers.ETag!);
+        using HttpResponseMessage validationResponse = await client.SendAsync(
+            validationRequest,
+            TestContext.Current.CancellationToken);
+        using var headRequest = new HttpRequestMessage(HttpMethod.Head, "/_odf-fonts/webfonts.css");
+        using HttpResponseMessage headResponse = await client.SendAsync(
+            headRequest,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("no-cache", response.Headers.CacheControl?.ToString());
+        Assert.Equal(
+            cssBytes,
+            await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.NotModified, validationResponse.StatusCode);
+        Assert.Empty(await validationResponse.Content.ReadAsByteArrayAsync(
+            TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.OK, headResponse.StatusCode);
+        Assert.Equal(response.Headers.ETag, headResponse.Headers.ETag);
+        Assert.Empty(await headResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+
+        await application.StopAsync(TestContext.Current.CancellationToken);
+        DeleteTemporaryRoot(rootPath);
+    }
+
+    [Fact]
     public async Task ResourceProvider_UsesImmutableFingerprintedStylesheet()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-stylesheet-smoke"u8.ToArray();
         string fileName = "stylesheet.woff2";
         string sha256 = Convert.ToHexString(SHA256.HashData(fontBytes)).ToLowerInvariant();
-        const string css = "@font-face { font-family: 'Smoke'; }\n";
+        const string css = "\uFEFF@font-face { font-family: 'Smoke'; }\n";
         string cssSha256 = Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(css)))
             .ToLowerInvariant();
         string cssFileName = $"webfonts.{cssSha256[..16]}.css";
@@ -178,6 +263,11 @@ public sealed class WebFontHostingTests
         using HttpResponseMessage response = await client.GetAsync(
             provider.StylesheetUrl,
             TestContext.Current.CancellationToken);
+        using var validationRequest = new HttpRequestMessage(HttpMethod.Get, provider.StylesheetUrl);
+        validationRequest.Headers.IfNoneMatch.Add(response.Headers.ETag!);
+        using HttpResponseMessage validationResponse = await client.SendAsync(
+            validationRequest,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal($"/_odf-fonts/{cssFileName}", provider.StylesheetUrl);
         Assert.Equal("'self'", provider.ContentSecurityPolicySource);
@@ -186,6 +276,12 @@ public sealed class WebFontHostingTests
             response.Headers.CacheControl);
         Assert.Contains(cacheControl.Extensions, value => value.Name == "immutable");
         Assert.Equal($"\"{cssSha256}\"", response.Headers.ETag?.Tag);
+        Assert.Equal(
+            System.Text.Encoding.UTF8.GetBytes(css),
+            await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(HttpStatusCode.NotModified, validationResponse.StatusCode);
+        Assert.Empty(await validationResponse.Content.ReadAsByteArrayAsync(
+            TestContext.Current.CancellationToken));
 
         await application.StopAsync(TestContext.Current.CancellationToken);
         DeleteTemporaryRoot(rootPath);
@@ -273,6 +369,11 @@ public sealed class WebFontHostingTests
             Assert.Equal(HttpStatusCode.Unauthorized, unauthorized.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, disallowed.StatusCode);
             Assert.Equal(HttpStatusCode.OK, generated.StatusCode);
+            Assert.True(disallowed.Headers.CacheControl is { NoStore: true, NoCache: true });
+            Assert.True(generated.Headers.CacheControl is { NoStore: true, NoCache: true });
+            Assert.Contains(
+                generated.Headers.Pragma,
+                value => string.Equals(value.Name, "no-cache", StringComparison.OrdinalIgnoreCase));
             WebFontManifest manifest = await generated.Content.ReadFromJsonAsync<WebFontManifest>(
                 cancellationToken: TestContext.Current.CancellationToken)
                 ?? throw new InvalidDataException();
@@ -420,6 +521,7 @@ public sealed class WebFontHostingTests
                 TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+            Assert.True(response.Headers.CacheControl is { NoStore: true, NoCache: true });
             Assert.Equal(0, engine.CallCount);
 
             await application.StopAsync(TestContext.Current.CancellationToken);
@@ -446,6 +548,33 @@ public sealed class WebFontHostingTests
             Path.Combine(rootPath, sha256, fileName),
             "wOF2-tampered"u8.ToArray(),
             TestContext.Current.CancellationToken);
+
+        try
+        {
+            await Assert.ThrowsAsync<InvalidDataException>(() => StartApplicationAsync(rootPath));
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task Startup_RejectsInvalidUtf8Stylesheet()
+    {
+        string rootPath = CreateTemporaryRoot();
+        byte[] fontBytes = "wOF2-invalid-css"u8.ToArray();
+        const string fileName = "invalid-css.woff2";
+        string sha256 = Convert.ToHexString(SHA256.HashData(fontBytes)).ToLowerInvariant();
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, fileName),
+            fontBytes,
+            TestContext.Current.CancellationToken);
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, "webfonts.css"),
+            [0xC3, 0x28],
+            TestContext.Current.CancellationToken);
+        await WriteManifestAsync(rootPath, fileName, fontBytes.Length, sha256);
 
         try
         {

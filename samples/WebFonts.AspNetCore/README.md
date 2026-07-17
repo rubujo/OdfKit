@@ -38,7 +38,10 @@ endpoint 具 API key authorization、固定窗口 rate limit、來源／face／P
 有界 queue、single-flight、三分鐘工作上限及檔案 durable cache。空的 `AssetRoot` 可直接冷啟動；
 產生後回傳的 hash URL 使用一年 `immutable`。受信任後端應依 POST 回傳 manifest 建立頁面所需的
 `@font-face`，瀏覽器不應持有 API key。預產生的 `webfonts.json` 與 CSS 也可放入相同
-`AssetRoot`；這類穩定 alias 維持 `no-cache`。
+`AssetRoot`；這類穩定 alias 維持 `no-cache`，並以實際傳輸 bytes 的 SHA-256 ETag 支援
+GET／HEAD 與 304 重驗證。指紋 CSS 與字型資產使用一年 `immutable`。generation Handler 的
+成功與輸入錯誤回應使用 `no-store, no-cache`；authentication／rate limiter 在 Handler 前產生的
+401／429 仍須由 host 或 WAF 統一加入不快取政策。
 
 若由 CDN 提供資產，設定 `OdfKit__WebFonts__PublicBaseUrl`；跨來源部署須另外設定精確的
 `OdfKit__WebFonts__AllowedOrigin`。正式 CSP、CORS、WAF 與 CDN 說明見

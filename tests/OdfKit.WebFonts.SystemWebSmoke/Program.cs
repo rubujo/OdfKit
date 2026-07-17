@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Web;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Hosting.SystemWeb;
@@ -89,6 +90,7 @@ try
     handler.ProcessRequest(unauthorizedContext);
     unauthorizedContext.Response.Flush();
     Require(unauthorizedContext.Response.StatusCode == 401, "System.Web dynamic endpoint did not reject a missing API key.");
+    RequireNoStore(unauthorized, "unauthorized generation response");
 
     var invalidFormat = new RecordingWorkerRequest(
         "POST",
@@ -107,6 +109,7 @@ try
     handler.ProcessRequest(invalidFormatContext);
     invalidFormatContext.Response.Flush();
     Require(invalidFormatContext.Response.StatusCode == 400, "System.Web dynamic endpoint did not reject WOFF2 on net48.");
+    RequireNoStore(invalidFormat, "invalid generation response");
 
     using (var blockingEngine = new BlockingSmokeEngine())
     {
@@ -124,6 +127,7 @@ try
         limitedHandler.ProcessRequest(saturatedContext);
         saturatedContext.Response.Flush();
         Require(saturatedContext.Response.StatusCode == 429, "System.Web dynamic endpoint did not enforce bounded concurrency.");
+        RequireNoStore(saturatedWorker, "rate-limited generation response");
         blockingEngine.Release.Set();
         Require(firstGeneration.Wait(TimeSpan.FromSeconds(5)), "System.Web bounded generation did not finish.");
     }
@@ -135,7 +139,16 @@ try
     handler.ProcessRequest(generatedContext);
     generatedContext.Response.Flush();
     Require(generatedContext.Response.StatusCode == 200, "System.Web dynamic endpoint did not generate assets.");
+    RequireNoStore(generated, "successful generation response");
     Require(generated.ResponseText.Contains("smoke-profile@1"), "System.Web dynamic endpoint returned no manifest body.");
+    var manifestOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+    WebFontManifest generatedManifest = JsonSerializer.Deserialize<WebFontManifest>(
+        generated.ResponseBytes,
+        manifestOptions) ?? throw new InvalidDataException("The generated manifest was empty.");
     string[] generatedPaths = Directory.GetFiles(root, "*", SearchOption.AllDirectories);
     Require(generatedPaths.Length == 2, "System.Web dynamic endpoint returned an incomplete manifest.");
 
@@ -179,9 +192,96 @@ try
         }
     }
 
-    IHttpHandler staticHandler = new OdfWebFontHandler();
+    byte[] cssBytes = Encoding.UTF8.GetBytes("\uFEFF@font-face { font-family: 'OdfKit SystemWeb Smoke'; }\n");
+    string cssSha256 = ComputeBytesHash(cssBytes);
+    string cssFileName = $"webfonts.{cssSha256.Substring(0, 16)}.css";
+    File.WriteAllBytes(Path.Combine(root, cssFileName), cssBytes);
+    var staticManifest = new WebFontManifest
+    {
+        ProfileId = generatedManifest.ProfileId,
+        Assets = generatedManifest.Assets,
+        StylesheetFileName = cssFileName,
+        StylesheetSha256 = cssSha256
+    };
+    byte[] manifestBytes = JsonSerializer.SerializeToUtf8Bytes(staticManifest, manifestOptions);
+    File.WriteAllBytes(Path.Combine(root, "webfonts.json"), manifestBytes);
+    var staticHandler = new OdfWebFontHandler(root, allowPublicCrossOriginAssets: true);
+
+    var manifestRequest = new RecordingWorkerRequest("GET", "/_odf-fonts/manifest.json", null, null);
+    var manifestContext = new HttpContext(manifestRequest);
+    staticHandler.ProcessRequest(manifestContext);
+    manifestContext.Response.Flush();
+    Require(manifestContext.Response.StatusCode == 200, "System.Web static manifest GET failed.");
+    Require(manifestRequest.ResponseBytes.SequenceEqual(manifestBytes), "System.Web static manifest changed the source bytes.");
+    Require(
+        manifestRequest.ResponseHeaders.TryGetValue("ETag", out string? manifestEtag),
+        "System.Web static manifest emitted no ETag. Headers: "
+        + string.Join(", ", manifestRequest.ResponseHeaders.Select(pair => $"{pair.Key}={pair.Value}")));
+
+    var manifestConditional = new RecordingWorkerRequest(
+        "GET",
+        "/_odf-fonts/manifest.json",
+        null,
+        null,
+        $"W/{manifestEtag}");
+    var manifestConditionalContext = new HttpContext(manifestConditional);
+    staticHandler.ProcessRequest(manifestConditionalContext);
+    manifestConditionalContext.Response.Flush();
+    Require(manifestConditionalContext.Response.StatusCode == 304, "System.Web static manifest did not revalidate to 304.");
+    Require(manifestConditional.ResponseBytes.Length == 0, "System.Web static manifest 304 returned a body.");
+
+    var cssRequest = new RecordingWorkerRequest("GET", $"/_odf-fonts/{cssFileName}", null, null);
+    var cssContext = new HttpContext(cssRequest);
+    staticHandler.ProcessRequest(cssContext);
+    cssContext.Response.Flush();
+    Require(cssContext.Response.StatusCode == 200, "System.Web fingerprinted CSS GET failed.");
+    Require(cssRequest.ResponseBytes.SequenceEqual(cssBytes), "System.Web fingerprinted CSS changed the source bytes.");
+    Require(
+        cssRequest.ResponseHeaders.TryGetValue("Cache-Control", out string? cssCacheControl)
+        && cssCacheControl.Contains("immutable", StringComparison.OrdinalIgnoreCase),
+        "System.Web fingerprinted CSS was not immutable.");
+
+    WebFontAsset staticAsset = generatedManifest.Assets[0];
+    var assetHead = new RecordingWorkerRequest(
+        "HEAD",
+        $"/_odf-fonts/{staticAsset.Sha256}/{staticAsset.FileName}",
+        null,
+        null);
+    var assetHeadContext = new HttpContext(assetHead);
+    staticHandler.ProcessRequest(assetHeadContext);
+    assetHeadContext.Response.Flush();
+    Require(assetHeadContext.Response.StatusCode == 200, "System.Web static asset HEAD failed.");
+    Require(assetHead.ResponseBytes.Length == 0, "System.Web static asset HEAD returned a body.");
+
+    string invalidCssRoot = Path.Combine(root, "invalid-css-corpus");
+    string invalidAssetDirectory = Path.Combine(invalidCssRoot, staticAsset.Sha256);
+    Directory.CreateDirectory(invalidAssetDirectory);
+    File.Copy(
+        Path.Combine(root, staticAsset.Sha256, staticAsset.FileName),
+        Path.Combine(invalidAssetDirectory, staticAsset.FileName));
+    File.WriteAllBytes(Path.Combine(invalidCssRoot, "webfonts.css"), new byte[] { 0xC3, 0x28 });
+    File.WriteAllBytes(
+        Path.Combine(invalidCssRoot, "webfonts.json"),
+        JsonSerializer.SerializeToUtf8Bytes(new WebFontManifest
+        {
+            ProfileId = staticManifest.ProfileId,
+            Assets = new[] { staticAsset }
+        }, manifestOptions));
+    bool invalidCssRejected = false;
+    try
+    {
+        _ = new OdfWebFontHandler(invalidCssRoot, allowPublicCrossOriginAssets: false);
+    }
+    catch (InvalidDataException)
+    {
+        invalidCssRejected = true;
+    }
+
+    Require(invalidCssRejected, "System.Web static handler accepted invalid UTF-8 CSS.");
+
+    IHttpHandler configuredStaticHandler = new OdfWebFontHandler();
     string markup = OdfWebFontHtml.StylesheetLink().ToHtmlString();
-    Require(staticHandler.IsReusable && handler.IsReusable, "System.Web handlers are not reusable.");
+    Require(configuredStaticHandler.IsReusable && handler.IsReusable, "System.Web handlers are not reusable.");
     Require(markup.Contains("/_odf-fonts/webfonts.css"), "System.Web stylesheet helper returned an invalid URL.");
 
     Console.WriteLine(fontPath is null
@@ -217,6 +317,21 @@ static string ComputeHash(string path)
     using FileStream stream = File.OpenRead(path);
     using SHA256 sha256 = SHA256.Create();
     return BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty).ToLowerInvariant();
+}
+
+static string ComputeBytesHash(byte[] bytes)
+{
+    using SHA256 sha256 = SHA256.Create();
+    return BitConverter.ToString(sha256.ComputeHash(bytes)).Replace("-", string.Empty).ToLowerInvariant();
+}
+
+static void RequireNoStore(RecordingWorkerRequest request, string scenario)
+{
+    Require(
+        request.ResponseHeaders.TryGetValue("Cache-Control", out string? cacheControl)
+        && cacheControl.Contains("no-store", StringComparison.OrdinalIgnoreCase),
+        $"System.Web {scenario} did not emit Cache-Control: no-store. Headers: "
+        + string.Join(", ", request.ResponseHeaders.Select(pair => $"{pair.Key}={pair.Value}")));
 }
 
 static void Require(bool condition, string message)
@@ -300,25 +415,34 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
     private readonly string _method;
     private readonly string _path;
     private readonly string? _apiKey;
-    private readonly StringBuilder _responseBody = new();
+    private readonly string? _ifNoneMatch;
+    private readonly MemoryStream _responseBody = new();
 
-    public RecordingWorkerRequest(string method, string path, string? body, string? apiKey)
+    public RecordingWorkerRequest(
+        string method,
+        string path,
+        string? body,
+        string? apiKey,
+        string? ifNoneMatch = null)
     {
         _method = method;
         _path = path;
         _body = body is null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body);
         _apiKey = apiKey;
+        _ifNoneMatch = ifNoneMatch;
     }
 
     public int StatusCode { get; private set; } = 200;
 
     public IDictionary<string, string> ResponseHeaders { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-    public string ResponseText => _responseBody.ToString();
+    public byte[] ResponseBytes => _responseBody.ToArray();
+
+    public string ResponseText => Encoding.UTF8.GetString(ResponseBytes);
 
     public override string GetHttpVerbName() => _method;
 
-    public override string GetHttpVersion() => "HTTP/1.1";
+    public override string GetHttpVersion() => "HTTP/1.0";
 
     public override string GetLocalAddress() => "127.0.0.1";
 
@@ -351,7 +475,20 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
         };
 
     public override string[][] GetUnknownRequestHeaders()
-        => _apiKey is null ? Array.Empty<string[]>() : new[] { new[] { "X-OdfKit-WebFont-Key", _apiKey } };
+    {
+        var headers = new List<string[]>(2);
+        if (_apiKey is not null)
+        {
+            headers.Add(new[] { "X-OdfKit-WebFont-Key", _apiKey });
+        }
+
+        if (_ifNoneMatch is not null)
+        {
+            headers.Add(new[] { "If-None-Match", _ifNoneMatch });
+        }
+
+        return headers.ToArray();
+    }
 
     public override void SendStatus(int statusCode, string statusDescription)
         => StatusCode = statusCode;
@@ -363,7 +500,7 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
         => ResponseHeaders[name] = value;
 
     public override void SendResponseFromMemory(byte[] data, int length)
-        => _responseBody.Append(Encoding.UTF8.GetString(data, 0, length));
+        => _responseBody.Write(data, 0, length);
 
     public override void SendResponseFromFile(string filename, long offset, long length)
     {

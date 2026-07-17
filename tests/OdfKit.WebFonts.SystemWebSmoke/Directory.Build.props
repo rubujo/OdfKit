@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup Condition="'$(UseLocalPackages)' == 'true'">
+    <BaseIntermediateOutputPath>obj\packages\</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\packages\</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(MSBuildProjectDirectory)\obj\**;$(MSBuildProjectDirectory)\bin\**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

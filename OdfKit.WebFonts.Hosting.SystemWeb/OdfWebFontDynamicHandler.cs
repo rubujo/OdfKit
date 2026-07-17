@@ -95,7 +95,15 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         if (string.Equals(method, "POST", StringComparison.OrdinalIgnoreCase)
             && path.EndsWith("/generate", StringComparison.OrdinalIgnoreCase))
         {
-            Generate(context, runtime);
+            try
+            {
+                Generate(context, runtime);
+            }
+            finally
+            {
+                ApplyGenerationResponseHeaders(context.Response);
+            }
+
             return;
         }
 
@@ -187,8 +195,6 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
                 .GetAwaiter()
                 .GetResult();
             response.ContentType = "application/json; charset=utf-8";
-            response.Cache.SetCacheability(HttpCacheability.NoCache);
-            response.AddHeader("X-Content-Type-Options", "nosniff");
             response.Write(JsonSerializer.Serialize(manifest, SerializerOptions));
         }
         catch (Exception exception) when (exception is ArgumentException
@@ -210,6 +216,15 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         {
             runtime.GenerationSlots.Release();
         }
+    }
+
+    private static void ApplyGenerationResponseHeaders(HttpResponse response)
+    {
+        response.Cache.SetCacheability(HttpCacheability.NoCache);
+        response.Cache.SetNoStore();
+        response.Cache.SetNoServerCaching();
+        response.AddHeader("Pragma", "no-cache");
+        response.AddHeader("X-Content-Type-Options", "nosniff");
     }
 
     private static bool TryServeGeneratedAsset(HttpContext context, DynamicRuntime runtime)

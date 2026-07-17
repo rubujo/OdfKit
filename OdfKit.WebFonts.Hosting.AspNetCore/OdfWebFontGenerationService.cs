@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using OdfKit.Compliance;
 using OdfKit.WebFonts.Worker;
 
@@ -39,6 +40,9 @@ internal sealed class OdfWebFontGenerationService
 
     public async Task<IResult> GenerateAsync(HttpRequest request, CancellationToken cancellationToken)
     {
+        request.HttpContext.Response.Headers.CacheControl = "no-store,no-cache";
+        request.HttpContext.Response.Headers.Pragma = "no-cache";
+        request.HttpContext.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
         if (!request.HasJsonContentType())
         {
             return Results.StatusCode(StatusCodes.Status415UnsupportedMediaType);

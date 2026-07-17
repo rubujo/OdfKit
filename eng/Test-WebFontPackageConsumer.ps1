@@ -200,7 +200,7 @@ return 0;
         dotnet build $systemWebSmoke -c $Configuration --no-restore --nologo @systemWebProperties
         if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 建置失敗。" }
         $systemWebExecutable = Join-Path $repoRoot `
-            "tests/OdfKit.WebFonts.SystemWebSmoke/bin/$Configuration/net48/OdfKit.WebFonts.SystemWebSmoke.exe"
+            "tests/OdfKit.WebFonts.SystemWebSmoke/bin/packages/$Configuration/net48/OdfKit.WebFonts.SystemWebSmoke.exe"
         & $systemWebExecutable --font $resolvedFontPath --sha256 $actualSourceSha256
         if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 真實產字失敗。" }
         if ($hasCff2) {

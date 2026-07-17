@@ -23,4 +23,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
   </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>OdfKit.WebFonts.SystemWebSmoke</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

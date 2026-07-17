@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
@@ -29,25 +30,34 @@ internal sealed class WebFontAssetStore
         _rootPath = rootPath;
         _options = options;
         string? manifestPath = ResolveManifestPath(rootPath, options);
-        Manifest = manifestPath is null
+        LoadedManifest loadedManifest = manifestPath is null
             ? CreateEmptyDynamicManifest()
             : LoadManifest(manifestPath, options);
+        Manifest = loadedManifest.Manifest;
+        ManifestBytes = loadedManifest.Bytes;
+        ManifestSha256 = ComputeSha256(ManifestBytes);
         _assets = new ConcurrentDictionary<string, StoredWebFontAsset>(
             IndexAssets(rootPath, Manifest, options),
             StringComparer.Ordinal);
-        Css = LoadOptionalCss(rootPath, Manifest, options);
+        LoadedStylesheet? stylesheet = LoadOptionalCss(rootPath, Manifest, options);
+        CssBytes = stylesheet?.Bytes;
+        CssSha256 = stylesheet?.Sha256;
     }
 
     public WebFontManifest Manifest { get; }
 
-    public string? Css { get; }
+    public byte[] ManifestBytes { get; }
+
+    public string ManifestSha256 { get; }
+
+    public byte[]? CssBytes { get; }
+
+    public string? CssSha256 { get; }
 
     public string? StylesheetFileName => Manifest.StylesheetFileName;
 
-    public string? StylesheetSha256 => Manifest.StylesheetSha256;
-
     public bool IsStylesheet(string fileName)
-        => Css is not null
+        => CssBytes is not null
             && string.Equals(fileName, StylesheetFileName, StringComparison.Ordinal)
             && IsPlainFileName(fileName);
 
@@ -139,18 +149,24 @@ internal sealed class WebFontAssetStore
         return manifestPath;
     }
 
-    private static WebFontManifest CreateEmptyDynamicManifest()
-        => new()
+    private static LoadedManifest CreateEmptyDynamicManifest()
+    {
+        var manifest = new WebFontManifest
         {
             ProfileId = "dynamic-uninitialized-v1"
         };
+        return new LoadedManifest(
+            manifest,
+            JsonSerializer.SerializeToUtf8Bytes(manifest, SerializerOptions));
+    }
 
-    private static WebFontManifest LoadManifest(string manifestPath, OdfWebFontOptions options)
+    private static LoadedManifest LoadManifest(string manifestPath, OdfWebFontOptions options)
     {
         try
         {
+            byte[] bytes = File.ReadAllBytes(manifestPath);
             WebFontManifest? manifest = JsonSerializer.Deserialize<WebFontManifest>(
-                File.ReadAllBytes(manifestPath),
+                bytes,
                 SerializerOptions);
             if (manifest is null
                 || manifest.SchemaVersion != 1
@@ -163,7 +179,7 @@ internal sealed class WebFontAssetStore
                     OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"));
             }
 
-            return manifest;
+            return new LoadedManifest(manifest, bytes);
         }
         catch (JsonException exception)
         {
@@ -173,7 +189,7 @@ internal sealed class WebFontAssetStore
         }
     }
 
-    private static string? LoadOptionalCss(
+    private static LoadedStylesheet? LoadOptionalCss(
         string rootPath,
         WebFontManifest manifest,
         OdfWebFontOptions options)
@@ -203,14 +219,28 @@ internal sealed class WebFontAssetStore
                 OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"));
         }
 
+        byte[] bytes = File.ReadAllBytes(path);
+        string actualSha256 = ComputeSha256(bytes);
         if (expectedSha256 is not null
-            && !string.Equals(ComputeSha256(path), expectedSha256, StringComparison.OrdinalIgnoreCase))
+            && !string.Equals(actualSha256, expectedSha256, StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidDataException(
                 OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"));
         }
 
-        return File.ReadAllText(path);
+        try
+        {
+            _ = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true)
+                .GetCharCount(bytes);
+        }
+        catch (DecoderFallbackException exception)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"),
+                exception);
+        }
+
+        return new LoadedStylesheet(bytes, actualSha256);
     }
 
     private static Dictionary<string, StoredWebFontAsset> IndexAssets(
@@ -305,6 +335,9 @@ internal sealed class WebFontAssetStore
         return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
     }
 
+    private static string ComputeSha256(byte[] bytes)
+        => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+
     private static string CreateKey(string sha256, string fileName)
         => string.Concat(sha256.ToLowerInvariant(), ":", fileName);
 
@@ -318,6 +351,10 @@ internal sealed class WebFontAssetStore
             _ => "application/octet-stream"
         };
 }
+
+internal sealed record LoadedManifest(WebFontManifest Manifest, byte[] Bytes);
+
+internal sealed record LoadedStylesheet(byte[] Bytes, string Sha256);
 
 internal sealed record StoredWebFontAsset(
     WebFontAsset Descriptor,
