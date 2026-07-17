@@ -242,6 +242,11 @@ f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659
 `OS/2.fsType`，拒絕禁止 embedding、禁止 subsetting 或 bitmap-only 的來源。全字庫資料要求的
 來源標示、OFL 字型的著作權與授權全文仍由實際散布方式決定，不因使用 OdfKit 而消失。
 
+CI 首次只從政府資料開放平臺列出的全字庫官方端點取得宋體封存檔，並以鎖定的封存檔
+SHA-256 驗證。驗證成功後可存入 GitHub Actions cache，供相同 hash 的後續執行重用；cache
+內容每次仍會重新驗證，且不會進入 nupkg。冷 cache 遇到官方端點不可達時會明確失敗，不會
+切換至未追溯的第三方鏡像或略過真實 CNS 測試。
+
 自訂 JSON Profile 必須含版本、來源、SHA-256、授權與 attribution：
 
 ```json

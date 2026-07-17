@@ -144,6 +144,21 @@ jobs:
           dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj -c Release
           dotnet build samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj -c Release
 
+      - name: Resolve locked CNS font source
+        id: cns-font-source
+        shell: pwsh
+        run: |
+          $font = (Get-Content eng/external-tools.json -Raw |
+            ConvertFrom-Json).webFontSmoke.internationalFonts.cnsExtB
+          "cache_revision=$($font.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "archive_sha256=$($font.archiveSha256)" >> $env:GITHUB_OUTPUT
+
+      - name: Restore locked CNS font source
+        uses: actions/cache@v6
+        with:
+          path: artifacts/webfont-source-cache
+          key: webfont-cns-sung-${{ runner.os }}-r${{ steps.cns-font-source.outputs.cache_revision }}-${{ steps.cns-font-source.outputs.archive_sha256 }}
+
       - name: Real international fonts and HTTP assets
         shell: pwsh
         run: |
@@ -151,8 +166,10 @@ jobs:
             -DestinationRoot artifacts/cns11643
           ./eng/Test-WebFontSmoke.ps1 `
             -MappingTablesRoot $mappingRoot `
+            -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
             -RunBrowser
-          ./eng/Test-WebFontFormatMatrix.ps1
+          ./eng/Test-WebFontFormatMatrix.ps1 `
+            -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip
           dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj `
             -c Release -- `
             --font artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `

@@ -7,6 +7,7 @@
 param(
     [string]$Destination = "artifacts/webfont-smoke",
     [string]$FontPath,
+    [string]$CnsFontArchivePath,
     [string]$MappingTablesRoot,
     [switch]$RunBrowser,
     [ValidateSet("chromium", "firefox", "webkit")]
@@ -61,8 +62,17 @@ function Invoke-LockedDownload {
 }
 
 if ([string]::IsNullOrWhiteSpace($FontPath)) {
-    $archivePath = Join-Path $sourceDirectory $fontDefinition.archiveFileName
+    $archivePath = if ([string]::IsNullOrWhiteSpace($CnsFontArchivePath)) {
+        Join-Path $sourceDirectory $fontDefinition.archiveFileName
+    }
+    else {
+        [IO.Path]::GetFullPath((Join-Path $repoRoot $CnsFontArchivePath))
+    }
+    if (-not $archivePath.StartsWith($repoPrefix, $comparison)) {
+        throw "CnsFontArchivePath 必須位於方案目錄內。"
+    }
     if (-not (Test-Path -LiteralPath $archivePath)) {
+        New-Item -ItemType Directory -Path (Split-Path -Parent $archivePath) -Force | Out-Null
         Invoke-LockedDownload -Uri $fontDefinition.uri -Destination $archivePath
     }
     $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()

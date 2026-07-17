@@ -5,7 +5,8 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Destination = "artifacts/webfont-format-matrix"
+    [string]$Destination = "artifacts/webfont-format-matrix",
+    [string]$CnsFontArchivePath
 )
 
 $ErrorActionPreference = "Stop"
@@ -78,12 +79,24 @@ function Get-DirectFont {
 }
 
 function Get-ArchiveFont {
-    param([Parameter(Mandatory)]$Definition)
+    param(
+        [Parameter(Mandatory)]$Definition,
+        [string]$ArchivePath
+    )
 
-    $archivePath = Join-Path $sourceRoot $Definition.archiveFileName
+    if ([string]::IsNullOrWhiteSpace($ArchivePath)) {
+        $ArchivePath = Join-Path $sourceRoot $Definition.archiveFileName
+    }
+    else {
+        $ArchivePath = [IO.Path]::GetFullPath((Join-Path $repoRoot $ArchivePath))
+        if (-not $ArchivePath.StartsWith($repoPrefix, $comparison)) {
+            throw "CnsFontArchivePath 必須位於方案目錄內。"
+        }
+        New-Item -ItemType Directory -Path (Split-Path -Parent $ArchivePath) -Force | Out-Null
+    }
     Invoke-LockedDownload `
         -Uri $Definition.uri `
-        -DestinationPath $archivePath `
+        -DestinationPath $ArchivePath `
         -ExpectedSha256 $Definition.archiveSha256
     $extractRoot = Join-Path $sourceRoot ([IO.Path]::GetFileNameWithoutExtension($Definition.archiveFileName))
     $font = Get-ChildItem -LiteralPath $extractRoot -Filter $Definition.fileName -File -Recurse -ErrorAction SilentlyContinue |
@@ -100,8 +113,8 @@ function Get-ArchiveFont {
     return $font.FullName
 }
 
-$extBPath = Get-ArchiveFont $definitions.cnsExtB
-$plusPath = Get-ArchiveFont $definitions.cnsPlus
+$extBPath = Get-ArchiveFont $definitions.cnsExtB -ArchivePath $CnsFontArchivePath
+$plusPath = Get-ArchiveFont $definitions.cnsPlus -ArchivePath $CnsFontArchivePath
 $ipamjPath = Get-ArchiveFont $definitions.ipamj
 $collectionPath = Get-DirectFont $definitions.cjkCollection
 $openTypePath = Get-DirectFont $definitions.cjkOpenType

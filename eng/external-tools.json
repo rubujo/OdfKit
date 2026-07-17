@@ -81,6 +81,7 @@
         "license": "IPA-Font-1.0"
       },
       "cnsExtB": {
+        "cacheRevision": "1",
         "version": "98_1",
         "archiveFileName": "Fonts_Sung.zip",
         "fileName": "TW-Sung-Ext-B-98_1.ttf",
