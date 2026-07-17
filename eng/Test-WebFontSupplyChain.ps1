@@ -10,12 +10,15 @@
     不覆寫輸出，改為驗證既有 SBOM 與目前提交、套件及相依完全一致。
 .PARAMETER SchemaPath
     選用的 SPDX 2.3 官方 JSON schema；提供時會執行獨立 schema 驗證。
+.PARAMETER SkipRestoreClosureValidation
+    僅於 consumer runner 驗證既有 SBOM 時，略過原始專案 restore closure 與 NuGet 快取授權宣告驗證。
 #>
 [CmdletBinding()]
 param(
     [string]$PackageDirectory = "artifacts/nuget",
     [string]$OutputPath = "artifacts/webfont-sbom/manifest.spdx.json",
     [switch]$VerifyExisting,
+    [switch]$SkipRestoreClosureValidation,
     [string]$SchemaPath
 )
 
@@ -92,6 +95,9 @@ $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json -Depth 20
 if ($policy.schemaVersion -ne 1) {
     throw "不支援的 WebFont 相依政策版本：$($policy.schemaVersion)"
 }
+if ($SkipRestoreClosureValidation -and -not $VerifyExisting) {
+    throw "SkipRestoreClosureValidation 僅能搭配 VerifyExisting 使用。"
+}
 
 $allowedLicenses = [System.Collections.Generic.HashSet[string]]::new(
     [string[]]$policy.allowedLicenses,
@@ -111,88 +117,92 @@ $resolvedById = [System.Collections.Generic.Dictionary[string, string]]::new(
     [StringComparer]::OrdinalIgnoreCase)
 $packageFolders = [System.Collections.Generic.HashSet[string]]::new(
     [StringComparer]::OrdinalIgnoreCase)
-foreach ($relativeProjectPath in $projectPaths) {
-    $projectPath = Join-Path $repoRoot $relativeProjectPath
-    $assetsPath = Join-Path (Split-Path -Parent $projectPath) "obj/project.assets.json"
-    if (-not (Test-Path -LiteralPath $assetsPath -PathType Leaf)) {
-        throw "缺少 restore 資產；請先執行既有 pack 或 restore：$assetsPath"
-    }
-
-    $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -Depth 100
-    foreach ($folderProperty in $assets.packageFolders.PSObject.Properties) {
-        [void]$packageFolders.Add([System.IO.Path]::GetFullPath($folderProperty.Name))
-    }
-    foreach ($libraryProperty in $assets.libraries.PSObject.Properties) {
-        if ([string]$libraryProperty.Value.type -ne "package") {
-            continue
+if (-not $SkipRestoreClosureValidation) {
+    foreach ($relativeProjectPath in $projectPaths) {
+        $projectPath = Join-Path $repoRoot $relativeProjectPath
+        $assetsPath = Join-Path (Split-Path -Parent $projectPath) "obj/project.assets.json"
+        if (-not (Test-Path -LiteralPath $assetsPath -PathType Leaf)) {
+            throw "缺少 restore 資產；請先執行既有 pack 或 restore：$assetsPath"
         }
 
-        $separatorIndex = $libraryProperty.Name.LastIndexOf('/')
-        if ($separatorIndex -le 0) {
-            throw "無效的 restore 套件識別：$($libraryProperty.Name)"
+        $assets = Get-Content -LiteralPath $assetsPath -Raw | ConvertFrom-Json -Depth 100
+        foreach ($folderProperty in $assets.packageFolders.PSObject.Properties) {
+            [void]$packageFolders.Add([System.IO.Path]::GetFullPath($folderProperty.Name))
         }
-        $id = $libraryProperty.Name.Substring(0, $separatorIndex)
-        $version = $libraryProperty.Name.Substring($separatorIndex + 1)
-        $existingVersion = $null
-        if ($resolvedById.TryGetValue($id, [ref]$existingVersion)) {
-            if (-not [string]::Equals($existingVersion, $version, [StringComparison]::Ordinal)) {
-                throw "WebFont 相依同時解析出多個版本：$id $existingVersion / $version"
+        foreach ($libraryProperty in $assets.libraries.PSObject.Properties) {
+            if ([string]$libraryProperty.Value.type -ne "package") {
+                continue
+            }
+
+            $separatorIndex = $libraryProperty.Name.LastIndexOf('/')
+            if ($separatorIndex -le 0) {
+                throw "無效的 restore 套件識別：$($libraryProperty.Name)"
+            }
+            $id = $libraryProperty.Name.Substring(0, $separatorIndex)
+            $version = $libraryProperty.Name.Substring($separatorIndex + 1)
+            $existingVersion = $null
+            if ($resolvedById.TryGetValue($id, [ref]$existingVersion)) {
+                if (-not [string]::Equals($existingVersion, $version, [StringComparison]::Ordinal)) {
+                    throw "WebFont 相依同時解析出多個版本：$id $existingVersion / $version"
+                }
+            }
+            else {
+                $resolvedById.Add($id, $version)
+            }
+        }
+    }
+}
+
+if (-not $SkipRestoreClosureValidation) {
+    foreach ($resolved in $resolvedById.GetEnumerator()) {
+        $policyEntry = $null
+        if (-not $policyById.TryGetValue($resolved.Key, [ref]$policyEntry)) {
+            throw "WebFont 出現未審核相依：$($resolved.Key) $($resolved.Value)"
+        }
+        if (-not [string]::Equals([string]$policyEntry.version, $resolved.Value, [StringComparison]::Ordinal)) {
+            throw "WebFont 相依版本漂移：$($resolved.Key) $($policyEntry.version) -> $($resolved.Value)"
+        }
+
+        $packageCachePath = $null
+        foreach ($packageFolder in $packageFolders) {
+            $candidate = Join-Path $packageFolder "$($resolved.Key.ToLowerInvariant())/$($resolved.Value.ToLowerInvariant())"
+            if (Test-Path -LiteralPath $candidate -PathType Container) {
+                $packageCachePath = $candidate
+                break
+            }
+        }
+        if (-not $packageCachePath) {
+            throw "NuGet global-packages 缺少已解析相依：$($resolved.Key) $($resolved.Value)"
+        }
+
+        $nuspecPath = Get-ChildItem -LiteralPath $packageCachePath -Filter "*.nuspec" -File | Select-Object -First 1
+        if (-not $nuspecPath) {
+            throw "NuGet 快取缺少 nuspec：$($resolved.Key) $($resolved.Value)"
+        }
+        [xml]$dependencyNuspec = Get-Content -LiteralPath $nuspecPath.FullName -Raw
+        $metadata = $dependencyNuspec.package.metadata
+        if ([string]$policyEntry.declarationKind -eq "expression") {
+            $actualDeclaration = [string]$metadata.license.InnerText
+            $actualKind = [string]$metadata.license.type
+            if ($actualKind -ne "expression" -or $actualDeclaration -ne [string]$policyEntry.declaration) {
+                throw "NuGet 授權宣告漂移：$($resolved.Key) $actualKind $actualDeclaration"
+            }
+        }
+        elseif ([string]$policyEntry.declarationKind -eq "url") {
+            $actualDeclaration = [string]$metadata.licenseUrl
+            if ($actualDeclaration -ne [string]$policyEntry.declaration) {
+                throw "NuGet 授權 URL 漂移：$($resolved.Key) $actualDeclaration"
             }
         }
         else {
-            $resolvedById.Add($id, $version)
+            throw "未知的授權宣告種類：$($policyEntry.declarationKind)"
         }
     }
-}
 
-foreach ($resolved in $resolvedById.GetEnumerator()) {
-    $policyEntry = $null
-    if (-not $policyById.TryGetValue($resolved.Key, [ref]$policyEntry)) {
-        throw "WebFont 出現未審核相依：$($resolved.Key) $($resolved.Value)"
-    }
-    if (-not [string]::Equals([string]$policyEntry.version, $resolved.Value, [StringComparison]::Ordinal)) {
-        throw "WebFont 相依版本漂移：$($resolved.Key) $($policyEntry.version) -> $($resolved.Value)"
-    }
-
-    $packageCachePath = $null
-    foreach ($packageFolder in $packageFolders) {
-        $candidate = Join-Path $packageFolder "$($resolved.Key.ToLowerInvariant())/$($resolved.Value.ToLowerInvariant())"
-        if (Test-Path -LiteralPath $candidate -PathType Container) {
-            $packageCachePath = $candidate
-            break
+    foreach ($policyEntry in $policy.packages) {
+        if (-not $resolvedById.ContainsKey([string]$policyEntry.id) -and -not [bool]$policyEntry.optional) {
+            throw "WebFont 相依政策含已不再解析的套件：$($policyEntry.id)"
         }
-    }
-    if (-not $packageCachePath) {
-        throw "NuGet global-packages 缺少已解析相依：$($resolved.Key) $($resolved.Value)"
-    }
-
-    $nuspecPath = Get-ChildItem -LiteralPath $packageCachePath -Filter "*.nuspec" -File | Select-Object -First 1
-    if (-not $nuspecPath) {
-        throw "NuGet 快取缺少 nuspec：$($resolved.Key) $($resolved.Value)"
-    }
-    [xml]$dependencyNuspec = Get-Content -LiteralPath $nuspecPath.FullName -Raw
-    $metadata = $dependencyNuspec.package.metadata
-    if ([string]$policyEntry.declarationKind -eq "expression") {
-        $actualDeclaration = [string]$metadata.license.InnerText
-        $actualKind = [string]$metadata.license.type
-        if ($actualKind -ne "expression" -or $actualDeclaration -ne [string]$policyEntry.declaration) {
-            throw "NuGet 授權宣告漂移：$($resolved.Key) $actualKind $actualDeclaration"
-        }
-    }
-    elseif ([string]$policyEntry.declarationKind -eq "url") {
-        $actualDeclaration = [string]$metadata.licenseUrl
-        if ($actualDeclaration -ne [string]$policyEntry.declaration) {
-            throw "NuGet 授權 URL 漂移：$($resolved.Key) $actualDeclaration"
-        }
-    }
-    else {
-        throw "未知的授權宣告種類：$($policyEntry.declarationKind)"
-    }
-}
-
-foreach ($policyEntry in $policy.packages) {
-    if (-not $resolvedById.ContainsKey([string]$policyEntry.id) -and -not [bool]$policyEntry.optional) {
-        throw "WebFont 相依政策含已不再解析的套件：$($policyEntry.id)"
     }
 }
 
@@ -348,4 +358,9 @@ if (-not [string]::IsNullOrWhiteSpace($SchemaPath)) {
     Write-Host "OK：WebFont SBOM 通過 SPDX 2.3 官方 JSON schema。"
 }
 
-Write-Host "OK：WebFont $($resolvedById.Count) 個 NuGet 相依版本與授權宣告未漂移。"
+if ($SkipRestoreClosureValidation) {
+    Write-Host "OK：consumer runner 已驗證 WebFont SBOM、提交與 NuGet 發布產物一致。"
+}
+else {
+    Write-Host "OK：WebFont $($resolvedById.Count) 個 NuGet 相依版本與授權宣告未漂移。"
+}

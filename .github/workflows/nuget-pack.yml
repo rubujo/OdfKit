@@ -167,4 +167,6 @@ jobs:
             $parameters.SkipNetFrameworkSmoke = $true
           }
           ./eng/Test-NuGetPack.ps1 @parameters
-          ./eng/Test-WebFontSupplyChain.ps1 -VerifyExisting
+          ./eng/Test-WebFontSupplyChain.ps1 `
+            -VerifyExisting `
+            -SkipRestoreClosureValidation
