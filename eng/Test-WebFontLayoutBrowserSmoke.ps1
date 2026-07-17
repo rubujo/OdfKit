@@ -9,10 +9,72 @@ param(
     [string]$Destination = "artifacts/webfont-layout-browser",
     [ValidateSet("chromium", "firefox", "webkit")]
     [string[]]$Browsers = @("chromium", "firefox", "webkit"),
+    [ValidateRange(30, 600)]
+    [int]$BrowserTimeoutSeconds = 120,
     [switch]$InstallBrowsers
 )
 
 $ErrorActionPreference = "Stop"
+
+function Invoke-LayoutBrowserSmoke {
+    param(
+        [Parameter(Mandatory)][string]$AppDll,
+        [Parameter(Mandatory)][string]$BrowserName,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [Parameter(Mandatory)][int]$TimeoutSeconds
+    )
+
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = "dotnet"
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.ArgumentList.Add($AppDll)
+    foreach ($argument in $Arguments) {
+        $startInfo.ArgumentList.Add($argument)
+    }
+
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        if (-not $process.Start()) {
+            throw "$BrowserName 複雜塑形差分驗證程序無法啟動。"
+        }
+
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $timedOut = -not $process.WaitForExit($TimeoutSeconds * 1000)
+        if ($timedOut) {
+            if (-not $process.HasExited) {
+                $process.Kill($true)
+            }
+            $process.WaitForExit()
+        }
+        else {
+            $process.WaitForExit()
+        }
+
+        $stdout = $stdoutTask.GetAwaiter().GetResult().Trim()
+        $stderr = $stderrTask.GetAwaiter().GetResult().Trim()
+        if (-not [string]::IsNullOrWhiteSpace($stdout)) {
+            Write-Host $stdout
+        }
+        if (-not [string]::IsNullOrWhiteSpace($stderr)) {
+            Write-Warning "$BrowserName stderr：`n$stderr"
+        }
+        if ($timedOut) {
+            throw "$BrowserName 複雜塑形差分驗證逾時（$TimeoutSeconds 秒）。"
+        }
+        if ($process.ExitCode -ne 0) {
+            throw "$BrowserName 複雜塑形差分驗證失敗，結束碼為 $($process.ExitCode)。"
+        }
+    }
+    finally {
+        $process.Dispose()
+    }
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
     [IO.Path]::DirectorySeparatorChar,
@@ -44,6 +106,11 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
 $project = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj"
 dotnet build $project -c Release --nologo --no-restore
 if ($LASTEXITCODE -ne 0) { throw "WebFont browser smoke 建置失敗。" }
+$appDll = Join-Path $repoRoot `
+    "tests/OdfKit.WebFontBrowserSmoke/bin/Release/net10.0/OdfKit.WebFontBrowserSmoke.dll"
+if (-not (Test-Path -LiteralPath $appDll -PathType Leaf)) {
+    throw "WebFont browser smoke 程式不存在。"
+}
 if ($InstallBrowsers) {
     $installer = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/bin/Release/net10.0/playwright.ps1"
     & $installer install @Browsers
@@ -64,16 +131,20 @@ New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
 foreach ($browser in $Browsers) {
     $screenshot = Join-Path $destinationRoot "layout-$browser.png"
     $evidence = Join-Path $destinationRoot "layout-$browser.json"
-    dotnet run --project $project -c Release --no-build -- `
-        layout `
-        $browser `
-        $arabicSource `
-        $arabicSubsets[0].FullName `
-        $devanagariSource `
-        $devanagariSubsets[0].FullName `
-        $screenshot `
-        $evidence
-    if ($LASTEXITCODE -ne 0) { throw "$browser 複雜塑形差分驗證失敗。" }
+    Write-Host "驗證 $browser 複雜塑形差分（上限 $BrowserTimeoutSeconds 秒）…"
+    Invoke-LayoutBrowserSmoke `
+        -AppDll $appDll `
+        -BrowserName $browser `
+        -TimeoutSeconds $BrowserTimeoutSeconds `
+        -Arguments @(
+            "layout",
+            $browser,
+            $arabicSource,
+            $arabicSubsets[0].FullName,
+            $devanagariSource,
+            $devanagariSubsets[0].FullName,
+            $screenshot,
+            $evidence)
 }
 
 Write-Host "PASS：阿拉伯文與 Devanagari 來源／subset 在 $($Browsers -join '／') 的塑形像素一致。"
