@@ -37,7 +37,22 @@ function Invoke-LockedDownload {
     $temporaryPath = "$Destination.download"
     try {
         Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
-        Invoke-WebRequest -Uri $Uri -OutFile $temporaryPath -MaximumRetryCount 3 -RetryIntervalSec 2
+        $downloaded = $false
+        for ($attempt = 1; $attempt -le 4; $attempt++) {
+            try {
+                Invoke-WebRequest -Uri $Uri -OutFile $temporaryPath `
+                    -MaximumRetryCount 3 -RetryIntervalSec 2 -TimeoutSec 180
+                $downloaded = $true
+                break
+            }
+            catch {
+                Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+                if ($attempt -eq 4) { throw }
+                Write-Warning "下載失敗，將重試鎖定來源（第 $attempt 次）：$Uri"
+                Start-Sleep -Seconds ([Math]::Pow(2, $attempt))
+            }
+        }
+        if (-not $downloaded) { throw "無法下載鎖定的 WebFont 測試來源：$Uri" }
         Move-Item -LiteralPath $temporaryPath -Destination $Destination -Force
     }
     finally {
