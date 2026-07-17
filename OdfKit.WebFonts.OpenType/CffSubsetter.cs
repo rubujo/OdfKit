@@ -1,9 +1,13 @@
 ﻿using System.Buffers.Binary;
 
+using System.Runtime.CompilerServices;
+
 namespace OdfKit.WebFonts.OpenType;
 
 internal static class CffSubsetter
 {
+    private static readonly ConditionalWeakTable<byte[], ParsedCff> ParsedFonts = new();
+
     private const int RosOperator = 0x0C1E;
     private const int FdArrayOperator = 0x0C24;
     private const int FdSelectOperator = 0x0C25;
@@ -14,6 +18,30 @@ internal static class CffSubsetter
 
     internal static byte[] Build(byte[] source, ushort glyphCount, ISet<ushort> selectedGlyphs)
     {
+        ParsedCff parsed = GetParsed(source, glyphCount);
+        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
+
+        var output = (byte[])source.Clone();
+        for (ushort glyph = 0; glyph < glyphCount; glyph++)
+        {
+            if (!selectedGlyphs.Contains(glyph))
+            {
+                CffRange range = parsed.CharStrings.Objects[glyph];
+                WriteBlankCharString(output.AsSpan(range.Offset, range.Length));
+            }
+        }
+
+        return output;
+    }
+
+    internal static void Validate(byte[] source, ushort glyphCount, ISet<ushort> selectedGlyphs)
+    {
+        ParsedCff parsed = GetParsed(source, glyphCount);
+        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
+    }
+
+    private static ParsedCff Parse(byte[] source, ushort glyphCount)
+    {
         SfntFont.EnsureRange(source, 0, 4, "CFF-header");
         if (source[0] != 1 || source[2] < 4 || source[2] > source.Length || source[3] is < 1 or > 4)
         {
@@ -23,7 +51,7 @@ internal static class CffSubsetter
         CffIndex nameIndex = ReadIndex(source, source[2], "CFF-Name");
         CffIndex topDictIndex = ReadIndex(source, nameIndex.NextOffset, "CFF-TopDICT");
         CffIndex stringIndex = ReadIndex(source, topDictIndex.NextOffset, "CFF-String");
-        _ = ReadIndex(source, stringIndex.NextOffset, "CFF-GlobalSubrs");
+        CffIndex globalSubrs = ReadIndex(source, stringIndex.NextOffset, "CFF-GlobalSubrs");
         if (nameIndex.Objects.Count != 1 || topDictIndex.Objects.Count != 1)
         {
             throw SfntFont.DataInvalid("CFF-FontSet");
@@ -51,38 +79,60 @@ internal static class CffSubsetter
             throw SfntFont.DataInvalid("CFF-FDArray-count");
         }
 
-        foreach (CffRange fontDictRange in fdArray.Objects)
+        var localSubrsByFontDict = new IReadOnlyList<ReadOnlyMemory<byte>>[fdArray.Objects.Count];
+        for (int index = 0; index < fdArray.Objects.Count; index++)
         {
+            CffRange fontDictRange = fdArray.Objects[index];
             Dictionary<int, long?[]> fontDict = ReadDict(
                 source.AsSpan(fontDictRange.Offset, fontDictRange.Length),
                 "CFF-FontDICT");
-            ValidatePrivateDict(source, fontDict);
+            localSubrsByFontDict[index] = ValidatePrivateDict(source, fontDict);
         }
 
-        ValidateFdSelect(source, fdSelectOffset, glyphCount, fdArray.Objects.Count);
+        byte[] fontDictByGlyph = ValidateFdSelect(source, fdSelectOffset, glyphCount, fdArray.Objects.Count);
         ValidateCharset(source, charsetOffset, glyphCount);
         if (topDict.TryGetValue(PrivateOperator, out long?[]? topPrivate))
         {
-            ValidatePrivateDict(source, new Dictionary<int, long?[]>
+            _ = ValidatePrivateDict(source, new Dictionary<int, long?[]>
             {
                 [PrivateOperator] = topPrivate
             });
         }
 
-        var output = (byte[])source.Clone();
-        for (ushort glyph = 0; glyph < glyphCount; glyph++)
-        {
-            if (!selectedGlyphs.Contains(glyph))
-            {
-                CffRange range = charStrings.Objects[glyph];
-                WriteBlankCharString(output.AsSpan(range.Offset, range.Length));
-            }
-        }
-
-        return output;
+        return new ParsedCff(
+            charStrings,
+            globalSubrs.GetPrograms(source),
+            localSubrsByFontDict,
+            fontDictByGlyph);
     }
 
-    private static void ValidatePrivateDict(byte[] source, IReadOnlyDictionary<int, long?[]> dict)
+    private static ParsedCff GetParsed(byte[] source, ushort glyphCount)
+        => ParsedFonts.GetValue(source, value => Parse(value, glyphCount));
+
+    private static void VerifySelectedGlyphs(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> selectedGlyphs,
+        ParsedCff parsed)
+    {
+        foreach (ushort glyph in selectedGlyphs)
+        {
+            if (glyph >= glyphCount)
+            {
+                throw SfntFont.DataInvalid("CFF-selected-glyph");
+            }
+
+            CffRange range = parsed.CharStrings.Objects[glyph];
+            Type2CharStringVerifier.Verify(
+                new ReadOnlyMemory<byte>(source, range.Offset, range.Length),
+                parsed.GlobalSubroutines,
+                parsed.LocalSubroutinesByFontDict[parsed.FontDictByGlyph[glyph]]);
+        }
+    }
+
+    private static IReadOnlyList<ReadOnlyMemory<byte>> ValidatePrivateDict(
+        byte[] source,
+        IReadOnlyDictionary<int, long?[]> dict)
     {
         if (!dict.TryGetValue(PrivateOperator, out long?[]? operands))
         {
@@ -99,7 +149,7 @@ internal static class CffSubsetter
         SfntFont.EnsureRange(source, offset, size, "CFF-Private");
         if (size == 0)
         {
-            return;
+            return [];
         }
 
         Dictionary<int, long?[]> privateDict = ReadDict(source.AsSpan(offset, size), "CFF-Private");
@@ -111,12 +161,15 @@ internal static class CffSubsetter
             }
 
             int subrsOffset = ToInt((long)offset + relativeValue, "CFF-Subrs");
-            _ = ReadIndex(source, subrsOffset, "CFF-LocalSubrs");
+            return ReadIndex(source, subrsOffset, "CFF-LocalSubrs").GetPrograms(source);
         }
+
+        return [];
     }
 
-    private static void ValidateFdSelect(byte[] source, int offset, ushort glyphCount, int fdCount)
+    private static byte[] ValidateFdSelect(byte[] source, int offset, ushort glyphCount, int fdCount)
     {
+        var fontDictByGlyph = new byte[glyphCount];
         SfntFont.EnsureRange(source, offset, 1, "CFF-FDSelect");
         byte format = source[offset];
         if (format == 0)
@@ -128,9 +181,11 @@ internal static class CffSubsetter
                 {
                     throw SfntFont.DataInvalid("CFF-FDSelect-fd");
                 }
+
+                fontDictByGlyph[glyph] = source[offset + 1 + glyph];
             }
 
-            return;
+            return fontDictByGlyph;
         }
 
         if (format != 3)
@@ -148,6 +203,7 @@ internal static class CffSubsetter
         int recordsOffset = offset + 3;
         SfntFont.EnsureRange(source, recordsOffset, checked((rangeCount * 3) + 2), "CFF-FDSelect");
         int previous = -1;
+        int previousFd = -1;
         for (int index = 0; index < rangeCount; index++)
         {
             int recordOffset = recordsOffset + (index * 3);
@@ -158,7 +214,13 @@ internal static class CffSubsetter
                 throw SfntFont.DataInvalid("CFF-FDSelect-range");
             }
 
+            if (previous >= 0)
+            {
+                fontDictByGlyph.AsSpan(previous, firstGlyph - previous).Fill(checked((byte)previousFd));
+            }
+
             previous = firstGlyph;
+            previousFd = fd;
         }
 
         int sentinel = SfntFont.ReadUInt16(source, recordsOffset + (rangeCount * 3), "CFF-FDSelect-sentinel");
@@ -166,6 +228,8 @@ internal static class CffSubsetter
         {
             throw SfntFont.DataInvalid("CFF-FDSelect-sentinel");
         }
+        fontDictByGlyph.AsSpan(previous, sentinel - previous).Fill(checked((byte)previousFd));
+        return fontDictByGlyph;
     }
 
     private static void ValidateCharset(byte[] source, int offset, ushort glyphCount)
@@ -468,6 +532,39 @@ internal static class CffSubsetter
         internal IReadOnlyList<CffRange> Objects { get; }
 
         internal int NextOffset { get; }
+
+        internal IReadOnlyList<ReadOnlyMemory<byte>> GetPrograms(byte[] source)
+        {
+            var programs = new ReadOnlyMemory<byte>[Objects.Count];
+            for (int index = 0; index < Objects.Count; index++)
+            {
+                CffRange range = Objects[index];
+                if (range.Length > 65_535)
+                {
+                    throw SfntFont.DataInvalid("CFF-CharString-length");
+                }
+
+                programs[index] = new ReadOnlyMemory<byte>(source, range.Offset, range.Length);
+            }
+
+            return programs;
+        }
+    }
+
+    private sealed class ParsedCff(
+        CffIndex charStrings,
+        IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
+        IReadOnlyList<ReadOnlyMemory<byte>>[] localSubroutinesByFontDict,
+        byte[] fontDictByGlyph)
+    {
+        internal CffIndex CharStrings { get; } = charStrings;
+
+        internal IReadOnlyList<ReadOnlyMemory<byte>> GlobalSubroutines { get; } = globalSubroutines;
+
+        internal IReadOnlyList<ReadOnlyMemory<byte>>[] LocalSubroutinesByFontDict { get; }
+            = localSubroutinesByFontDict;
+
+        internal byte[] FontDictByGlyph { get; } = fontDictByGlyph;
     }
 
     private readonly struct CffRange

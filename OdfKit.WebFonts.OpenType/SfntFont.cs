@@ -44,7 +44,7 @@ internal sealed class SfntFont
     private static readonly string[] CommonRequiredTables = ["OS/2", "cmap", "head", "hhea", "hmtx", "maxp", "name", "post"];
     private static readonly HashSet<string> RejectedTables = new(StringComparer.Ordinal)
     {
-        "CFF2", "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
+        "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
         "Silf", "Glat", "Gloc", "Feat", "Sill", "morx", "mort", "kerx"
     };
 
@@ -113,13 +113,13 @@ internal sealed class SfntFont
 
         EnsureRange(data, faceOffset, 12, "sfnt-header");
         uint flavor = ReadUInt32(data, faceOffset, "sfnt-flavor");
-        bool isCff = flavor == 0x4F54544F;
-        if (flavor != 0x00010000 && flavor != 0x74727565 && !isCff)
+        bool isPostScript = flavor == 0x4F54544F;
+        if (flavor != 0x00010000 && flavor != 0x74727565 && !isPostScript)
         {
             throw NotSupported("sfnt-flavor");
         }
 
-        if (isCollection && isCff)
+        if (isCollection && isPostScript)
         {
             throw NotSupported("otc-face");
         }
@@ -182,7 +182,16 @@ internal sealed class SfntFont
             }
         }
 
-        string[] outlineTables = isCff ? ["CFF "] : ["glyf", "loca"];
+        bool hasCff = tables.ContainsKey("CFF ");
+        bool hasCff2 = tables.ContainsKey("CFF2");
+        if (isPostScript && hasCff == hasCff2)
+        {
+            throw DataInvalid("outline-postscript");
+        }
+
+        string[] outlineTables = isPostScript
+            ? hasCff ? ["CFF "] : ["CFF2"]
+            : ["glyf", "loca"];
         foreach (string tag in outlineTables)
         {
             if (!tables.ContainsKey(tag))
@@ -191,7 +200,12 @@ internal sealed class SfntFont
             }
         }
 
-        if (isCff && (tables.ContainsKey("glyf") || tables.ContainsKey("loca")))
+        if (isPostScript && (tables.ContainsKey("glyf") || tables.ContainsKey("loca")))
+        {
+            throw DataInvalid("outline-ambiguous");
+        }
+
+        if (!isPostScript && (hasCff || hasCff2))
         {
             throw DataInvalid("outline-ambiguous");
         }
@@ -208,7 +222,7 @@ internal sealed class SfntFont
         byte[] head = tables["head"];
         EnsureRange(head, 0, 54, "head");
         uint[] locations = [];
-        if (!isCff)
+        if (!isPostScript)
         {
             short locaFormat = ReadInt16(head, 50, "head-indexToLocFormat");
             locations = ReadLocations(tables["loca"], glyphCount, locaFormat, tables["glyf"].Length);
@@ -266,9 +280,23 @@ internal sealed class SfntFont
                 : CmapMapping.Build(mappings, selectedVariations),
             ["head"] = (byte[])_tables["head"].Clone()
         };
-        if (Flavor == 0x4F54544F)
+        bool isCff2 = _tables.ContainsKey("CFF2");
+        if (_tables.TryGetValue("CFF ", out byte[]? cff))
         {
-            tables["CFF "] = CffSubsetter.Build(_tables["CFF "], _glyphCount, selectedGlyphs);
+            tables["CFF "] = CffSubsetter.Build(cff, _glyphCount, selectedGlyphs);
+        }
+        else if (isCff2)
+        {
+            if (!_tables.TryGetValue("fvar", out byte[]? cff2Fvar) || _tables.ContainsKey("gvar"))
+            {
+                throw DataInvalid("CFF2-variation-tables");
+            }
+
+            tables["CFF2"] = Cff2Subsetter.Build(
+                _tables["CFF2"],
+                cff2Fvar,
+                _glyphCount,
+                selectedGlyphs);
         }
         else
         {
@@ -279,12 +307,12 @@ internal sealed class SfntFont
 
         bool hasFvar = tables.TryGetValue("fvar", out byte[]? fvar);
         bool hasGvar = tables.TryGetValue("gvar", out byte[]? gvar);
-        if (hasFvar != hasGvar || hasFvar && (fvar is null || gvar is null))
+        if (!isCff2 && (hasFvar != hasGvar || hasFvar && (fvar is null || gvar is null)))
         {
             throw DataInvalid("variation-tables");
         }
 
-        if (hasFvar)
+        if (hasFvar && !isCff2)
         {
             tables["gvar"] = GvarSubsetter.Build(gvar!, fvar!, _glyphCount, selectedGlyphs);
         }
@@ -322,6 +350,39 @@ internal sealed class SfntFont
 
         table = default;
         return false;
+    }
+
+    internal void ValidateCffGlyphs(ISet<ushort> glyphs)
+    {
+        if (_tables.TryGetValue("CFF ", out byte[]? cff))
+        {
+            CffSubsetter.Validate(cff, _glyphCount, glyphs);
+        }
+        else if (_tables.TryGetValue("CFF2", out byte[]? cff2))
+        {
+            if (!_tables.TryGetValue("fvar", out byte[]? fvar))
+            {
+                throw DataInvalid("CFF2-fvar-missing");
+            }
+
+            Cff2Subsetter.Validate(cff2, fvar, _glyphCount, glyphs);
+        }
+    }
+
+    internal void ValidateAllCffGlyphs()
+    {
+        if (!_tables.ContainsKey("CFF ") && !_tables.ContainsKey("CFF2"))
+        {
+            return;
+        }
+
+        var glyphs = new HashSet<ushort>();
+        for (int glyph = 0; glyph < _glyphCount; glyph++)
+        {
+            glyphs.Add((ushort)glyph);
+        }
+
+        ValidateCffGlyphs(glyphs);
     }
 
     private static bool IsComplexShapingScalar(int scalar)
@@ -564,7 +625,7 @@ internal sealed class SfntFont
     internal static InvalidDataException DataInvalid(string detail)
         => new($"{OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")} [{detail}]");
 
-    private static NotSupportedException NotSupported(string detail)
+    internal static NotSupportedException NotSupported(string detail)
         => new($"{OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")} [{detail}]");
 }
 

@@ -166,13 +166,14 @@ internal static class Program
             faceIndex: 0,
             "क्षेत्रज्ञ भारत",
             outputRoot).ConfigureAwait(false);
-        await VerifyRejectedAsync(
+        await VerifySuccessAsync(
             results,
             "cff2-variable",
             cff2VariablePath,
             faceIndex: 0,
-            "繁體字",
-            outputRoot).ConfigureAwait(false);
+            "繁體字 香港邨裏",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
         await VerifyRejectedAsync(
             results,
             "color-bitmap",
@@ -186,7 +187,10 @@ internal static class Program
             extBManifest))
         {
             RunSourceMutationFuzz(extBPath, WebFontFormat.TrueType, "TrueTypeSource"),
-            RunSourceMutationFuzz(cffOpenTypePath, WebFontFormat.OpenType, "CffSource")
+            RunSourceMutationFuzz(cffOpenTypePath, WebFontFormat.OpenType, "CffSource"),
+            RunCffTableMutationFuzz(cffOpenTypePath),
+            RunSourceMutationFuzz(cff2VariablePath, WebFontFormat.OpenType, "Cff2Source"),
+            RunCff2TableMutationFuzz(cff2VariablePath)
         };
 
         string evidencePath = Path.Combine(outputRoot, "format-matrix.json");
@@ -247,7 +251,7 @@ internal static class Program
                 try
                 {
                     using var stream = new MemoryStream(mutated, writable: false);
-                    ManagedOpenTypeWebFontVerifier.Verify(stream, format);
+                    ManagedOpenTypeWebFontVerifier.VerifyStructure(stream, format);
                     accepted++;
                 }
                 catch (InvalidDataException)
@@ -296,7 +300,7 @@ internal static class Program
             try
             {
                 using var stream = new MemoryStream(mutated, writable: false);
-                ManagedOpenTypeWebFontVerifier.Verify(stream, format);
+                ManagedOpenTypeWebFontVerifier.VerifyStructure(stream, format);
                 accepted++;
             }
             catch (InvalidDataException)
@@ -315,6 +319,128 @@ internal static class Program
         }
 
         return new FuzzResult(resultName, 64, accepted, rejected);
+    }
+
+    private static FuzzResult RunCffTableMutationFuzz(string sourcePath)
+    {
+        byte[] source = File.ReadAllBytes(sourcePath);
+        SfntFont font = SfntFont.Parse(source, 0, 256, validateChecksums: true);
+        if (!font.TryGetTable("CFF ", out ReadOnlyMemory<byte> table))
+        {
+            throw new InvalidDataException("The CFF mutation source has no CFF table.");
+        }
+
+        byte[] valid = table.ToArray();
+        int accepted = 0;
+        int rejected = 0;
+        uint state = 0x51775176u;
+        for (int iteration = 0; iteration < 64; iteration++)
+        {
+            byte[] mutated;
+            if (iteration < 3)
+            {
+                mutated = (byte[])valid.Clone();
+                mutated[new[] { 0, 2, 3 }[iteration]] = 0;
+            }
+            else if ((iteration & 1) == 0)
+            {
+                state = NextState(state);
+                int length = (int)(state % (uint)valid.Length);
+                mutated = valid.AsSpan(0, length).ToArray();
+            }
+            else
+            {
+                mutated = (byte[])valid.Clone();
+                state = NextState(state);
+                int mutationWindow = Math.Min(mutated.Length, 64 * 1024);
+                int offset = (int)(state % (uint)mutationWindow);
+                state = NextState(state);
+                mutated[offset] ^= (byte)(1 << (int)(state & 7));
+            }
+
+            try
+            {
+                CffSubsetter.Validate(mutated, font.GlyphCount, new HashSet<ushort>());
+                accepted++;
+            }
+            catch (InvalidDataException)
+            {
+                rejected++;
+            }
+            catch (NotSupportedException)
+            {
+                rejected++;
+            }
+        }
+
+        if (rejected < 3)
+        {
+            throw new InvalidDataException("The direct CFF table mutations did not exercise structural rejection paths.");
+        }
+
+        return new FuzzResult("CffTable", 64, accepted, rejected);
+    }
+
+    private static FuzzResult RunCff2TableMutationFuzz(string sourcePath)
+    {
+        byte[] source = File.ReadAllBytes(sourcePath);
+        SfntFont font = SfntFont.Parse(source, 0, 256, validateChecksums: true);
+        if (!font.TryGetTable("CFF2", out ReadOnlyMemory<byte> table)
+            || !font.TryGetTable("fvar", out ReadOnlyMemory<byte> fvar))
+        {
+            throw new InvalidDataException("The CFF2 mutation source is incomplete.");
+        }
+
+        byte[] valid = table.ToArray();
+        int accepted = 0;
+        int rejected = 0;
+        uint state = 0x43464632u;
+        for (int iteration = 0; iteration < 32; iteration++)
+        {
+            byte[] mutated;
+            if (iteration < 3)
+            {
+                mutated = (byte[])valid.Clone();
+                int offset = iteration switch { 0 => 0, 1 => 2, _ => 4 };
+                mutated[offset] = 0;
+            }
+            else if ((iteration & 1) == 0)
+            {
+                state = NextState(state);
+                int length = (int)(state % (uint)valid.Length);
+                mutated = valid.AsSpan(0, length).ToArray();
+            }
+            else
+            {
+                mutated = (byte[])valid.Clone();
+                state = NextState(state);
+                int mutationWindow = Math.Min(mutated.Length, 64 * 1024);
+                int offset = (int)(state % (uint)mutationWindow);
+                state = NextState(state);
+                mutated[offset] ^= (byte)(1 << (int)(state & 7));
+            }
+
+            try
+            {
+                Cff2Subsetter.Validate(mutated, fvar.ToArray(), font.GlyphCount, new HashSet<ushort>());
+                accepted++;
+            }
+            catch (InvalidDataException)
+            {
+                rejected++;
+            }
+            catch (NotSupportedException)
+            {
+                rejected++;
+            }
+        }
+
+        if (rejected < 3)
+        {
+            throw new InvalidDataException("The direct CFF2 table mutations did not exercise structural rejection paths.");
+        }
+
+        return new FuzzResult("Cff2Table", 32, accepted, rejected);
     }
 
     private static uint NextState(uint value)

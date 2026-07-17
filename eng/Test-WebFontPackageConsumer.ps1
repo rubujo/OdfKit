@@ -7,6 +7,8 @@
 param(
     [Parameter(Mandatory)][string]$FontPath,
     [Parameter(Mandatory)][string]$SourceSha256,
+    [string]$Cff2FontPath,
+    [string]$Cff2SourceSha256,
     [string]$Destination = "artifacts/webfont-package-consumer",
     [string]$Configuration = "Release"
 )
@@ -26,6 +28,20 @@ $resolvedFontPath = (Resolve-Path -LiteralPath $FontPath).Path
 $actualSourceSha256 = (Get-FileHash -LiteralPath $resolvedFontPath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($SourceSha256 -notmatch "^[0-9a-fA-F]{64}$" -or $actualSourceSha256 -ne $SourceSha256.ToLowerInvariant()) {
     throw "WebFont package consumer 的來源字型 SHA-256 不符合。"
+}
+$hasCff2 = -not [string]::IsNullOrWhiteSpace($Cff2FontPath) `
+    -or -not [string]::IsNullOrWhiteSpace($Cff2SourceSha256)
+if ($hasCff2) {
+    if ([string]::IsNullOrWhiteSpace($Cff2FontPath) `
+        -or [string]::IsNullOrWhiteSpace($Cff2SourceSha256)) {
+        throw "CFF2 package consumer 必須同時指定來源路徑與 SHA-256。"
+    }
+    $resolvedCff2FontPath = (Resolve-Path -LiteralPath $Cff2FontPath).Path
+    $actualCff2Sha256 = (Get-FileHash -LiteralPath $resolvedCff2FontPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($Cff2SourceSha256 -notmatch "^[0-9a-fA-F]{64}$" `
+        -or $actualCff2Sha256 -ne $Cff2SourceSha256.ToLowerInvariant()) {
+        throw "CFF2 package consumer 的來源字型 SHA-256 不符合。"
+    }
 }
 
 $packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")
@@ -187,6 +203,14 @@ return 0;
             "tests/OdfKit.WebFonts.SystemWebSmoke/bin/$Configuration/net48/OdfKit.WebFonts.SystemWebSmoke.exe"
         & $systemWebExecutable --font $resolvedFontPath --sha256 $actualSourceSha256
         if ($LASTEXITCODE -ne 0) { throw "System.Web WebFont nupkg consumer 真實產字失敗。" }
+        if ($hasCff2) {
+            & $systemWebExecutable `
+                --font $resolvedCff2FontPath `
+                --sha256 $actualCff2Sha256 `
+                --text "繁體字 香港邨裏" `
+                --postscript
+            if ($LASTEXITCODE -ne 0) { throw "System.Web CFF2 nupkg consumer 真實產字失敗。" }
+        }
     }
 }
 finally {

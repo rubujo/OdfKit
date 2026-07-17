@@ -30,7 +30,16 @@ public static class ManagedOpenTypeWebFontVerifier
     /// <param name="format">The declared WebFont format. / 宣告的 WebFont 格式。</param>
     /// <param name="maximumBytes">The maximum accepted byte count. / 可接受的最大位元組數。</param>
     public static void Verify(Stream font, WebFontFormat format, long maximumBytes)
-        => _ = Parse(font, format, maximumBytes);
+    {
+        SfntFont parsed = Parse(font, format, maximumBytes);
+        parsed.ValidateAllCffGlyphs();
+    }
+
+    internal static void VerifyStructure(Stream font, WebFontFormat format)
+    {
+        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024);
+        parsed.ValidateCffGlyphs(new HashSet<ushort>());
+    }
 
     /// <summary>
     /// Verifies a WebFont and confirms that every requested Unicode scalar is mapped.
@@ -59,6 +68,7 @@ public static class ManagedOpenTypeWebFontVerifier
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }
         }
+        parsed.ValidateAllCffGlyphs();
     }
 
     /// <summary>
@@ -109,6 +119,7 @@ public static class ManagedOpenTypeWebFontVerifier
                 }
             }
         }
+        parsed.ValidateAllCffGlyphs();
     }
 
     internal static void VerifyRetainsGlyphIds(

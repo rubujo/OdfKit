@@ -1,0 +1,64 @@
+﻿using OdfKit.WebFonts.OpenType;
+
+namespace OdfKit.WebFonts.Tests;
+
+public sealed class Cff2CharStringVerifierTests
+{
+    [Fact]
+    public void Verify_AcceptsBlendAndVariationIndex()
+    {
+        byte[] charString = [140, 15, 139, 140, 141, 140, 16, 22];
+
+        Cff2CharStringVerifier.Verify(charString, [], [], [1, 2], defaultVariationIndex: 0);
+    }
+
+    [Fact]
+    public void Verify_AcceptsEmptyAndZeroHintMaskPrograms()
+    {
+        Cff2CharStringVerifier.Verify(Array.Empty<byte>(), [], [], [1], defaultVariationIndex: 0);
+        Cff2CharStringVerifier.Verify(new byte[] { 19 }, [], [], [1], defaultVariationIndex: 0);
+    }
+
+    [Theory]
+    [InlineData((byte)11)]
+    [InlineData((byte)14)]
+    public void Verify_RejectsRemovedType2Operators(byte operation)
+    {
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(new byte[] { operation }, [], [], [1], defaultVariationIndex: 0));
+
+        Assert.Contains("removed-operator", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Verify_RejectsBlendWithInsufficientOperands()
+    {
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(new byte[] { 139, 140, 16 }, [], [], [2], defaultVariationIndex: 0));
+
+        Assert.Contains("blend-stack", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Verify_RejectsRecursiveSubroutineBeyondLimit()
+    {
+        byte[] charString = [32, 10];
+        ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 32, 10 }];
+
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(charString, [], localSubroutines, [1], defaultVariationIndex: 0));
+
+        Assert.Contains("depth", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Verify_RejectsOperandStackOverflow()
+    {
+        byte[] charString = Enumerable.Repeat((byte)139, 514).ToArray();
+
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(charString, [], [], [1], defaultVariationIndex: 0));
+
+        Assert.Contains("stack", exception.Message, StringComparison.Ordinal);
+    }
+}

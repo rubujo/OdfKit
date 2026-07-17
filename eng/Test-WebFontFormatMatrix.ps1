@@ -137,22 +137,49 @@ dotnet build $projectPath -c Release --nologo --no-restore `
     -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
 if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣建置失敗。" }
 
-dotnet run --project $projectPath -c Release --no-build -- `
-    $outputRoot `
-    $extBPath `
-    $plusPath `
-    $kaiExtBPath `
-    $kaiPlusPath `
-    $ipamjPath `
-    $collectionPath `
-    $openTypePath `
-    $arabicStaticPath `
-    $devanagariStaticPath `
-    $arabicPath `
-    $devanagariPath `
-    $cff2Path `
-    $colorEmojiPath
-if ($LASTEXITCODE -ne 0) { throw "WebFont 真實格式矩陣失敗。" }
+$runnerPath = Join-Path $repoRoot `
+    "tests/OdfKit.WebFontFormatMatrix/bin/Release/net10.0/OdfKit.WebFontFormatMatrix.dll"
+$runnerArguments = @(
+    $runnerPath,
+    $outputRoot,
+    $extBPath,
+    $plusPath,
+    $kaiExtBPath,
+    $kaiPlusPath,
+    $ipamjPath,
+    $collectionPath,
+    $openTypePath,
+    $arabicStaticPath,
+    $devanagariStaticPath,
+    $arabicPath,
+    $devanagariPath,
+    $cff2Path,
+    $colorEmojiPath)
+$startInfo = [Diagnostics.ProcessStartInfo]::new()
+$startInfo.FileName = "dotnet"
+$startInfo.UseShellExecute = $false
+$startInfo.CreateNoWindow = $true
+$startInfo.RedirectStandardOutput = $true
+$startInfo.RedirectStandardError = $true
+foreach ($argument in $runnerArguments) { $startInfo.ArgumentList.Add($argument) }
+$process = [Diagnostics.Process]::new()
+$process.StartInfo = $startInfo
+try {
+    if (-not $process.Start()) { throw "WebFont 真實格式矩陣程序無法啟動。" }
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
+    $process.WaitForExit()
+    $stdout = $stdoutTask.GetAwaiter().GetResult().Trim()
+    $stderr = $stderrTask.GetAwaiter().GetResult().Trim()
+    [IO.File]::WriteAllText((Join-Path $destinationPath "runner.stdout.log"), $stdout)
+    [IO.File]::WriteAllText((Join-Path $destinationPath "runner.stderr.log"), $stderr)
+    if (-not [string]::IsNullOrWhiteSpace($stdout)) { Write-Host $stdout }
+    if (-not [string]::IsNullOrWhiteSpace($stderr)) { Write-Warning "格式矩陣 stderr：`n$stderr" }
+    if ($process.ExitCode -ne 0) { throw "WebFont 真實格式矩陣失敗。" }
+}
+finally {
+    $process.Dispose()
+}
 
-Write-Host "PASS：真實 TTF／TTC／IVS／PUA／TrueType variable／CFF OTF 正向與 OTC／CFF2／color 拒絕矩陣通過。"
+Write-Host "PASS：真實 TTF／TTC／IVS／PUA／TrueType variable／CFF／CFF2 正向與 OTC／color 拒絕矩陣通過。"
 Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

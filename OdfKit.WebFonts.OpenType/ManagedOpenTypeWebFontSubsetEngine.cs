@@ -4,14 +4,14 @@ using OdfKit.Compliance;
 namespace OdfKit.WebFonts.OpenType;
 
 /// <summary>
-/// Produces deterministic TrueType, WOFF, and supported WOFF2 subsets using only .NET APIs.
-/// 僅使用 .NET API 產生確定性的 TrueType、WOFF 與受支援的 WOFF2 子集。
+/// Produces deterministic supported OpenType, WOFF, and WOFF2 subsets using only .NET APIs.
+/// 僅使用 .NET API 產生確定性的受支援 OpenType、WOFF 與 WOFF2 子集。
 /// </summary>
 public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
 {
     private readonly ManagedOpenTypeWebFontEngineOptions _options;
     private readonly object _sourceCacheGate = new();
-    private readonly Dictionary<string, byte[]> _sourceCache = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, CachedSource> _sourceCache = new(StringComparer.Ordinal);
     private readonly Queue<string> _sourceCacheOrder = new();
     private long _cachedSourceBytes;
 
@@ -36,15 +36,14 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
     {
         ValidateRequest(request, destinationDirectory);
         string sourcePath = ResolveSource(request.Face);
-        byte[] sourceBytes = await GetVerifiedSourceAsync(
+        CachedSource cachedSource = await GetVerifiedSourceAsync(
             sourcePath,
             request.Face.SourceSha256,
             cancellationToken).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        SfntFont source = SfntFont.Parse(
-            sourceBytes,
+        SfntFont source = cachedSource.GetFont(
             request.Face.FaceIndex,
             _options.MaxTableCount,
             _options.ValidateSourceChecksums);
@@ -230,7 +229,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         return bytes;
     }
 
-    private async Task<byte[]> GetVerifiedSourceAsync(
+    private async Task<CachedSource> GetVerifiedSourceAsync(
         string path,
         string expectedSha256,
         CancellationToken cancellationToken)
@@ -243,7 +242,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         {
             lock (_sourceCacheGate)
             {
-                if (_sourceCache.TryGetValue(cacheKey, out byte[]? cached))
+                if (_sourceCache.TryGetValue(cacheKey, out CachedSource? cached))
                 {
                     return cached;
                 }
@@ -258,47 +257,66 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             throw DataInvalid("source-sha256");
         }
 
-        if (cacheKey.Length != 0)
-        {
-            CacheVerifiedSource(cacheKey, bytes);
-        }
-
-        return bytes;
+        var source = new CachedSource(bytes);
+        return cacheKey.Length == 0 ? source : CacheVerifiedSource(cacheKey, source);
     }
 
-    private void CacheVerifiedSource(string cacheKey, byte[] bytes)
+    private CachedSource CacheVerifiedSource(string cacheKey, CachedSource source)
     {
-        if (_options.MaxCachedSourceEntries == 0 || bytes.LongLength > _options.MaxCachedSourceBytes)
+        if (_options.MaxCachedSourceEntries == 0 || source.Bytes.LongLength > _options.MaxCachedSourceBytes)
         {
-            return;
+            return source;
         }
 
         lock (_sourceCacheGate)
         {
-            if (_sourceCache.ContainsKey(cacheKey))
+            if (_sourceCache.TryGetValue(cacheKey, out CachedSource? cached))
             {
-                return;
+                return cached;
             }
 
             while (_sourceCache.Count >= _options.MaxCachedSourceEntries
-                   || _cachedSourceBytes + bytes.LongLength > _options.MaxCachedSourceBytes)
+                   || _cachedSourceBytes + source.Bytes.LongLength > _options.MaxCachedSourceBytes)
             {
                 if (_sourceCacheOrder.Count == 0)
                 {
-                    return;
+                    return source;
                 }
 
                 string removedKey = _sourceCacheOrder.Dequeue();
-                if (_sourceCache.TryGetValue(removedKey, out byte[]? removed))
+                if (_sourceCache.TryGetValue(removedKey, out CachedSource? removed))
                 {
                     _sourceCache.Remove(removedKey);
-                    _cachedSourceBytes -= removed.LongLength;
+                    _cachedSourceBytes -= removed.Bytes.LongLength;
                 }
             }
 
-            _sourceCache.Add(cacheKey, bytes);
+            _sourceCache.Add(cacheKey, source);
             _sourceCacheOrder.Enqueue(cacheKey);
-            _cachedSourceBytes += bytes.LongLength;
+            _cachedSourceBytes += source.Bytes.LongLength;
+            return source;
+        }
+    }
+
+    private sealed class CachedSource(byte[] bytes)
+    {
+        private readonly object _gate = new();
+        private readonly Dictionary<int, SfntFont> _fonts = [];
+
+        internal byte[] Bytes { get; } = bytes;
+
+        internal SfntFont GetFont(int faceIndex, int maxTableCount, bool validateChecksums)
+        {
+            lock (_gate)
+            {
+                if (!_fonts.TryGetValue(faceIndex, out SfntFont? font))
+                {
+                    font = SfntFont.Parse(Bytes, faceIndex, maxTableCount, validateChecksums);
+                    _fonts.Add(faceIndex, font);
+                }
+
+                return font;
+            }
         }
     }
 

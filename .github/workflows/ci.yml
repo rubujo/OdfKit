@@ -209,9 +209,17 @@ jobs:
             -c Release -- `
             --font artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
             --sha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+          dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj `
+            -c Release -- `
+            --font artifacts/webfont-format-matrix/sources/SourceHanSansTW-VF.otf `
+            --sha256 e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77 `
+            --text "繁體字 香港邨裏" `
+            --postscript
           ./eng/Test-WebFontPackageConsumer.ps1 `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583 `
+            -Cff2FontPath artifacts/webfont-format-matrix/sources/SourceHanSansTW-VF.otf `
+            -Cff2SourceSha256 e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77
 
       - name: Upload WebFont real evidence
         if: always()

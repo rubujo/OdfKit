@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-以三瀏覽器比較真實 CFF、阿拉伯文與 Devanagari 來源字型及 managed subset 的像素。
+以三瀏覽器比較真實 CFF／CFF2、阿拉伯文與 Devanagari variable 來源及 managed subset 的像素。
 #>
 [CmdletBinding()]
 param(
@@ -99,12 +99,27 @@ $devanagariSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "deva
 $cffSource = Join-Path $sourceRoot "SourceHanSansTC-Regular.otf"
 $cffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-otf/first") `
         -Filter "*.woff2" -File -Recurse)
+$arabicVariableSource = Join-Path $sourceRoot "NotoSansArabic-VF.ttf"
+$devanagariVariableSource = Join-Path $sourceRoot "NotoSansDevanagari-VF.ttf"
+$arabicVariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "arabic-variable/first") `
+        -Filter "*.woff2" -File -Recurse)
+$devanagariVariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "devanagari-variable/first") `
+        -Filter "*.woff2" -File -Recurse)
+$cff2VariableSource = Join-Path $sourceRoot "SourceHanSansTW-VF.otf"
+$cff2VariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-variable/first") `
+        -Filter "*.woff2" -File -Recurse)
 if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
     -or -not (Test-Path -LiteralPath $cffSource) `
+    -or -not (Test-Path -LiteralPath $arabicVariableSource) `
+    -or -not (Test-Path -LiteralPath $devanagariVariableSource) `
+    -or -not (Test-Path -LiteralPath $cff2VariableSource) `
     -or $arabicSubsets.Count -ne 1 `
     -or $devanagariSubsets.Count -ne 1 `
-    -or $cffSubsets.Count -ne 1) {
+    -or $cffSubsets.Count -ne 1 `
+    -or $arabicVariableSubsets.Count -ne 1 `
+    -or $devanagariVariableSubsets.Count -ne 1 `
+    -or $cff2VariableSubsets.Count -ne 1) {
     throw "請先執行 eng/Test-WebFontFormatMatrix.ps1 產生 layout corpus。"
 }
 
@@ -150,8 +165,14 @@ foreach ($browser in $Browsers) {
             $devanagariSubsets[0].FullName,
             $cffSource,
             $cffSubsets[0].FullName,
+            $arabicVariableSource,
+            $arabicVariableSubsets[0].FullName,
+            $devanagariVariableSource,
+            $devanagariVariableSubsets[0].FullName,
+            $cff2VariableSource,
+            $cff2VariableSubsets[0].FullName,
             $screenshot,
             $evidence)
 }
 
-Write-Host "PASS：CFF、阿拉伯文與 Devanagari 來源／subset 在 $($Browsers -join '／') 的像素一致。"
+Write-Host "PASS：CFF、阿拉伯文、Devanagari 與 TrueType variable 多軸來源／subset 在 $($Browsers -join '／') 的像素一致。"

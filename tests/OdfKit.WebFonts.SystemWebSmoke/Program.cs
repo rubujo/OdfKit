@@ -9,6 +9,8 @@ using OdfKit.WebFonts.OpenType;
 
 string? fontPath = GetArgument(args, "--font");
 string? sourceSha256 = GetArgument(args, "--sha256");
+string text = GetArgument(args, "--text") ?? "A𠆩";
+bool usePostScriptOutline = args.Contains("--postscript", StringComparer.Ordinal);
 string root = Path.Combine(Path.GetTempPath(), "odfkit-systemweb-smoke-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
 
@@ -28,7 +30,7 @@ try
     options.AllowedFontFamilies.Add("OdfKit SystemWeb Smoke");
     options.AllowedFormats.Clear();
     options.AllowedFormats.Add(WebFontFormat.Woff);
-    options.AllowedFormats.Add(WebFontFormat.TrueType);
+    options.AllowedFormats.Add(usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType);
 
     if (fontPath is not null || sourceSha256 is not null)
     {
@@ -74,8 +76,12 @@ try
         FaceIndex = 0,
         ProfileId = "smoke-profile@1",
         FontFamily = "OdfKit SystemWeb Smoke",
-        Sequences = new[] { "A𠆩" },
-        Formats = new[] { WebFontFormat.Woff, WebFontFormat.TrueType }
+        Sequences = new[] { text },
+        Formats = new[]
+        {
+            WebFontFormat.Woff,
+            usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType
+        }
     });
 
     var unauthorized = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, null);
@@ -139,7 +145,7 @@ try
         string fileName = Path.GetFileName(generatedPath);
         WebFontFormat format = string.Equals(Path.GetExtension(fileName), ".woff", StringComparison.OrdinalIgnoreCase)
             ? WebFontFormat.Woff
-            : WebFontFormat.TrueType;
+            : usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType;
         var assetRequest = new RecordingWorkerRequest(
             "GET",
             $"/_odf-fonts/{hash}/{fileName}",
@@ -169,7 +175,7 @@ try
             ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(
                 stream,
                 format,
-                new[] { WebFontTextSequence.Create("A𠆩") });
+                new[] { WebFontTextSequence.Create(text) });
         }
     }
 
@@ -180,7 +186,9 @@ try
 
     Console.WriteLine(fontPath is null
         ? "PASS: System.Web authenticated dynamic handler contract loaded."
-        : "PASS: System.Web generated and verified real WOFF/TTF assets on CLR net48.");
+        : usePostScriptOutline
+            ? "PASS: System.Web generated and verified real CFF2 OTF/WOFF assets on CLR net48."
+            : "PASS: System.Web generated and verified real WOFF/TTF assets on CLR net48.");
     return 0;
 }
 catch (Exception exception)

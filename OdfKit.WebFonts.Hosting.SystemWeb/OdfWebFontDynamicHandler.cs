@@ -470,6 +470,12 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             return true;
         }
 
+        if (string.Equals(extension, ".otf", StringComparison.OrdinalIgnoreCase))
+        {
+            contentType = "font/otf";
+            return true;
+        }
+
         contentType = string.Empty;
         return false;
     }
@@ -624,7 +630,9 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
                 || options.AllowedFontFamilies.Count is <= 0 or > 256
                 || options.AllowedFormats.Count is <= 0 or > 2
                 || options.AllowedFormats.Distinct().Count() != options.AllowedFormats.Count
-                || options.AllowedFormats.Any(format => format is not WebFontFormat.Woff and not WebFontFormat.TrueType)
+                || options.AllowedFormats.Any(format => format is not WebFontFormat.Woff
+                    and not WebFontFormat.TrueType
+                    and not WebFontFormat.OpenType)
                 || options.AllowedProfileIds.Any(value => string.IsNullOrWhiteSpace(value) || value.Length > 256)
                 || options.AllowedFontFamilies.Any(value => string.IsNullOrWhiteSpace(value) || value.Length > 256)
                 || options.AllowedFaces.Any(face => !IsValidFace(face, options.FontSources)))
