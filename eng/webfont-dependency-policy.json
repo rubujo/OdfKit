@@ -15,6 +15,7 @@
     { "id": "Microsoft.Bcl.HashCode", "version": "6.0.0", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "Microsoft.CodeAnalysis.PublicApiAnalyzers", "version": "5.6.0", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "Microsoft.NETCore.Platforms", "version": "1.1.0", "license": "MIT", "declarationKind": "url", "declaration": "http://go.microsoft.com/fwlink/?LinkId=329770" },
+    { "id": "Microsoft.NETFramework.ReferenceAssemblies", "version": "1.0.3", "license": "MIT", "declarationKind": "url", "declaration": "https://github.com/Microsoft/dotnet/blob/master/LICENSE", "optional": true },
     { "id": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "license": "MIT", "declarationKind": "url", "declaration": "https://github.com/Microsoft/dotnet/blob/master/LICENSE" },
     { "id": "Microsoft.Win32.Registry", "version": "5.0.0", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "NETStandard.Library", "version": "2.0.3", "license": "MIT", "declarationKind": "url", "declaration": "https://github.com/dotnet/standard/blob/master/LICENSE.TXT" },

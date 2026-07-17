@@ -191,7 +191,7 @@ foreach ($resolved in $resolvedById.GetEnumerator()) {
 }
 
 foreach ($policyEntry in $policy.packages) {
-    if (-not $resolvedById.ContainsKey([string]$policyEntry.id)) {
+    if (-not $resolvedById.ContainsKey([string]$policyEntry.id) -and -not [bool]$policyEntry.optional) {
         throw "WebFont 相依政策含已不再解析的套件：$($policyEntry.id)"
     }
 }
