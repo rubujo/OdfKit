@@ -101,6 +101,14 @@ try {
             throw "WebFont Worker process smoke helper 執行逾時。"
         }
         if ($process.ExitCode -ne 0) {
+            Get-ChildItem -LiteralPath $runPath -Filter "process-*.stderr.log" -File |
+                ForEach-Object {
+                    $stderr = [string](Get-Content -LiteralPath $_.FullName -Raw)
+                    $stderr = $stderr.Trim()
+                    if (-not [string]::IsNullOrWhiteSpace($stderr)) {
+                        Write-Warning "$($_.Name)：`n$stderr"
+                    }
+                }
             throw "WebFont Worker process smoke helper 結束碼為 $($process.ExitCode)。"
         }
     }

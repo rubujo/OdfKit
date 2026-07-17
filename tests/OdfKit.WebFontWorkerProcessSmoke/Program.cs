@@ -428,20 +428,58 @@ internal static class Program
         CancellationToken cancellationToken)
     {
         byte[] validBytes = await File.ReadAllBytesAsync(assetPath, cancellationToken).ConfigureAwait(false);
-        byte[] truncatedBytes = validBytes[..^1];
-        VerifyInvalidOutputRejected(truncatedBytes);
+        // WOFF2 最多可有三個尾端對齊位元組；移除四個位元組才能保證截斷實際內容。
+        byte[] truncatedBytes = validBytes[..^4];
+        VerifyInvalidOutputRejected(truncatedBytes, "truncated");
 
         byte[] corruptBytes = (byte[])validBytes.Clone();
-        int corruptOffset = Math.Max(48, corruptBytes.Length / 2);
-        corruptBytes[corruptOffset] ^= 0x5A;
-        VerifyInvalidOutputRejected(corruptBytes);
+        (int compressedOffset, int compressedLength) = ReadWoff2CompressedRange(corruptBytes);
+        corruptBytes.AsSpan(compressedOffset, compressedLength).Fill(0xFF);
+        VerifyInvalidOutputRejected(corruptBytes, "compressed payload replaced");
 
         byte[] expandedBombBytes = (byte[])validBytes.Clone();
         BinaryPrimitives.WriteUInt32BigEndian(expandedBombBytes.AsSpan(16, 4), int.MaxValue);
-        VerifyInvalidOutputRejected(expandedBombBytes);
+        VerifyInvalidOutputRejected(expandedBombBytes, "expanded size overflow");
     }
 
-    private static void VerifyInvalidOutputRejected(byte[] bytes)
+    private static (int Offset, int Length) ReadWoff2CompressedRange(ReadOnlySpan<byte> bytes)
+    {
+        int position = 48;
+        ushort tableCount = BinaryPrimitives.ReadUInt16BigEndian(bytes.Slice(12, 2));
+        for (int index = 0; index < tableCount; index++)
+        {
+            byte flags = bytes[position++];
+            if ((flags & 0x3F) == 63)
+            {
+                position += 4;
+            }
+
+            SkipUIntBase128(bytes, ref position);
+        }
+
+        int compressedLength = checked((int)BinaryPrimitives.ReadUInt32BigEndian(bytes.Slice(20, 4)));
+        if (position > bytes.Length - compressedLength)
+        {
+            throw new InvalidDataException("The generated WOFF2 compressed range is invalid.");
+        }
+
+        return (position, compressedLength);
+    }
+
+    private static void SkipUIntBase128(ReadOnlySpan<byte> bytes, ref int position)
+    {
+        for (int index = 0; index < 5 && position < bytes.Length; index++)
+        {
+            if ((bytes[position++] & 0x80) == 0)
+            {
+                return;
+            }
+        }
+
+        throw new InvalidDataException("The generated WOFF2 directory contains an invalid UIntBase128 value.");
+    }
+
+    private static void VerifyInvalidOutputRejected(byte[] bytes, string damageKind)
     {
         using var stream = new MemoryStream(bytes, writable: false);
         try
@@ -456,7 +494,8 @@ internal static class Program
             return;
         }
 
-        throw new InvalidDataException("The managed verifier silently accepted a damaged WOFF2 asset.");
+        throw new InvalidDataException(
+            $"The managed verifier silently accepted a damaged WOFF2 asset ({damageKind}).");
     }
 
     private static async Task VerifyMissingUnicodeRejectedAsync(
