@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.AspNetCore\OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
   </ItemGroup>
 </Project>

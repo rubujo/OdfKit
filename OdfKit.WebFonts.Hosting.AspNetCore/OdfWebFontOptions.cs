@@ -6,6 +6,8 @@
 /// </summary>
 public sealed class OdfWebFontOptions
 {
+    internal bool AllowMissingManifestForGeneration { get; set; }
+
     /// <summary>
     /// Gets or sets the application route prefix used when no public CDN base URL is configured.
     /// 取得或設定未指定公開 CDN 基底 URL 時使用的應用程式路由前綴。

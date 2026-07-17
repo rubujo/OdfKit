@@ -59,6 +59,8 @@ public static class OdfWebFontEndpointExtensions
         ArgumentNullException.ThrowIfNull(configureWorker);
         services.Configure(configureGeneration);
         services.Configure(configureWorker);
+        services.PostConfigure<OdfWebFontOptions>(
+            options => options.AllowMissingManifestForGeneration = true);
         services.AddSingleton(serviceProvider => new WebFontGenerationWorker(
             engineFactory(serviceProvider)
                 ?? throw new InvalidOperationException(

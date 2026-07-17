@@ -301,6 +301,67 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
+    public async Task GenerationEndpoint_ColdStartsWithoutPrebuiltManifest()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            var engine = new DynamicAssetEngine();
+            await using WebApplication application = await StartGenerationApplicationAsync(
+                rootPath,
+                engine,
+                permitLimit: 10,
+                seedInitialManifest: false);
+            using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+
+            using HttpResponseMessage initialManifest = await client.GetAsync(
+                "/_odf-fonts/manifest.json",
+                TestContext.Current.CancellationToken);
+            client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+            using HttpResponseMessage generated = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                CreateGenerationRequest(),
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, initialManifest.StatusCode);
+            WebFontManifest emptyManifest = await initialManifest.Content.ReadFromJsonAsync<WebFontManifest>(
+                cancellationToken: TestContext.Current.CancellationToken)
+                ?? throw new InvalidDataException();
+            Assert.Empty(emptyManifest.Assets);
+            Assert.Equal(HttpStatusCode.OK, generated.StatusCode);
+            WebFontManifest manifest = await generated.Content.ReadFromJsonAsync<WebFontManifest>(
+                cancellationToken: TestContext.Current.CancellationToken)
+                ?? throw new InvalidDataException();
+            WebFontAsset asset = Assert.Single(manifest.Assets);
+            using HttpResponseMessage assetResponse = await client.GetAsync(
+                $"/_odf-fonts/{asset.Sha256}/{asset.FileName}",
+                TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.OK, assetResponse.StatusCode);
+            Assert.Equal(1, engine.CallCount);
+
+            await application.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task StaticHosting_RejectsMissingManifest()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            await Assert.ThrowsAsync<InvalidDataException>(() => StartApplicationAsync(rootPath));
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
     public async Task GenerationEndpoint_EnforcesNamedRateLimiter()
     {
         string rootPath = CreateTemporaryRoot();
@@ -410,20 +471,24 @@ public sealed class WebFontHostingTests
         string rootPath,
         DynamicAssetEngine engine,
         int permitLimit,
-        int maxRequestBodyBytes = 64 * 1024)
+        int maxRequestBodyBytes = 64 * 1024,
+        bool seedInitialManifest = true)
     {
-        byte[] initialBytes = "wOF2-initial"u8.ToArray();
-        const string initialFileName = "initial.woff2";
-        string initialSha256 = Convert.ToHexString(SHA256.HashData(initialBytes)).ToLowerInvariant();
-        await File.WriteAllBytesAsync(
-            Path.Combine(rootPath, initialFileName),
-            initialBytes,
-            TestContext.Current.CancellationToken);
-        await WriteManifestAsync(
-            rootPath,
-            initialFileName,
-            initialBytes.Length,
-            initialSha256);
+        if (seedInitialManifest)
+        {
+            byte[] initialBytes = "wOF2-initial"u8.ToArray();
+            const string initialFileName = "initial.woff2";
+            string initialSha256 = Convert.ToHexString(SHA256.HashData(initialBytes)).ToLowerInvariant();
+            await File.WriteAllBytesAsync(
+                Path.Combine(rootPath, initialFileName),
+                initialBytes,
+                TestContext.Current.CancellationToken);
+            await WriteManifestAsync(
+                rootPath,
+                initialFileName,
+                initialBytes.Length,
+                initialSha256);
+        }
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");

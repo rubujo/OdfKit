@@ -28,8 +28,10 @@ internal sealed class WebFontAssetStore
         string rootPath = ResolveRootPath(options);
         _rootPath = rootPath;
         _options = options;
-        string manifestPath = ResolveManifestPath(rootPath, options);
-        Manifest = LoadManifest(manifestPath, options);
+        string? manifestPath = ResolveManifestPath(rootPath, options);
+        Manifest = manifestPath is null
+            ? CreateEmptyDynamicManifest()
+            : LoadManifest(manifestPath, options);
         _assets = new ConcurrentDictionary<string, StoredWebFontAsset>(
             IndexAssets(rootPath, Manifest, options),
             StringComparer.Ordinal);
@@ -113,7 +115,7 @@ internal sealed class WebFontAssetStore
         return rootPath;
     }
 
-    private static string ResolveManifestPath(string rootPath, OdfWebFontOptions options)
+    private static string? ResolveManifestPath(string rootPath, OdfWebFontOptions options)
     {
         if (!IsPlainFileName(options.ManifestFileName))
         {
@@ -123,6 +125,11 @@ internal sealed class WebFontAssetStore
 
         string manifestPath = Path.Combine(rootPath, options.ManifestFileName);
         var manifestInfo = new FileInfo(manifestPath);
+        if (!manifestInfo.Exists && options.AllowMissingManifestForGeneration)
+        {
+            return null;
+        }
+
         if (!manifestInfo.Exists || manifestInfo.Length <= 0 || manifestInfo.Length > options.MaxManifestBytes)
         {
             throw new InvalidDataException(
@@ -131,6 +138,12 @@ internal sealed class WebFontAssetStore
 
         return manifestPath;
     }
+
+    private static WebFontManifest CreateEmptyDynamicManifest()
+        => new()
+        {
+            ProfileId = "dynamic-uninitialized-v1"
+        };
 
     private static WebFontManifest LoadManifest(string manifestPath, OdfWebFontOptions options)
     {
