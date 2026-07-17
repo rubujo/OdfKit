@@ -48,6 +48,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             request.Face.FaceIndex,
             _options.MaxTableCount,
             _options.ValidateSourceChecksums);
+        source.ValidateOutputFormats(request.Formats);
         IReadOnlyList<int> scalars = request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
             .Where(RequiresGlyph)
@@ -60,7 +61,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         }
 
         IReadOnlyList<UnicodeVariationSequence> variationSequences = CreateVariationSequences(request.Sequences);
-        SfntSubset subset = source.CreateTrueTypeSubset(scalars, variationSequences, _options.MaxCompositeDepth);
+        SfntSubset subset = source.CreateSubset(scalars, variationSequences, _options.MaxCompositeDepth);
         Directory.CreateDirectory(destinationDirectory);
         var assets = new List<WebFontAsset>(request.Formats.Count);
         foreach (WebFontFormat format in request.Formats.Distinct())
@@ -167,10 +168,6 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 #endif
-        if (request.Formats.Contains(WebFontFormat.OpenType))
-        {
-            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
-        }
     }
 
     private string ResolveSource(WebFontFaceIdentity face)
@@ -370,6 +367,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             WebFontFormat.Woff2 => "woff2",
             WebFontFormat.Woff => "woff",
             WebFontFormat.TrueType => "ttf",
+            WebFontFormat.OpenType => "otf",
             _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
         };
 

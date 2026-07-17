@@ -2,8 +2,8 @@
 
 > 建立日期：2026-07-16
 >
-> 適用範圍：`OdfKit.WebFonts.OpenType` 的 sfnt／TTC parser、TrueType subset、`cmap`、GSUB
-> closure、TTF／WOFF／WOFF2 writer 與 verifier。
+> 適用範圍：`OdfKit.WebFonts.OpenType` 的 sfnt／TTC parser、TrueType／CFF 1.0 subset、
+> `cmap`、GSUB closure、TTF／OTF／WOFF／WOFF2 writer 與 verifier。
 
 ## 實作契約
 
@@ -23,6 +23,8 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - [OpenType `OS/2.fsType`](https://learn.microsoft.com/en-us/typography/opentype/spec/os2)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
+- [Adobe CFF TN #5176](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf)
+- [Adobe Type 2 TN #5177](https://adobe-type-tools.github.io/font-tech-notes/pdfs/5177.Type2.pdf)
 - [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [.NET 公開 `BrotliEncoder` API](https://learn.microsoft.com/en-us/dotnet/api/system.io.compression.brotliencoder?view=net-10.0)
@@ -64,3 +66,15 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 真實黑箱 corpus：Adobe Source Han Sans 2.005R 與鎖定版本 Noto Arabic／Devanagari，皆為
   OFL-1.1；只下載到 CI cache／本機 artifacts，不納入 repository 或 nupkg。
 - 尚未通過的人工作業：由維護者進行第三方結構相異性審查；完成前能力維持 experimental。
+
+### 2026-07-17 靜態 CFF 1.0
+
+- 參與者：Codex agent；實作依據僅限 Adobe CFF TN #5176、Adobe Type 2 TN #5177、Microsoft
+  OpenType 1.9.1 與 W3C WOFF／WOFF2；未讀取、搜尋或改寫任何禁止來源。
+- 原創範圍：CID-keyed CFF INDEX／DICT／FDSelect／charset／Private／Subrs 有界驗證、相同長度
+  Type 2 空 outline 程式、精確單次 CFF table 配置與格式／outline 一致性閘門。
+- 真實黑箱 corpus：Adobe Source Han Sans 2.005R `SourceHanSansTC-Regular.otf`，SHA-256 為
+  `10e6d832bc73650840aa7fbfec4e10c527f8136ae2aec71c3e1c13a67475c24a`，只進 CI cache／artifact。
+- Chromium、Firefox 與 WebKit 對來源 OTF 與 managed WOFF2 的三組中文逐 RGBA byte 及文字
+  metrics 相同；名稱式 CFF、OTC、CFF2 與 color font 仍明確拒絕。
+- 尚未通過的人工作業：第三方結構相異性與惡意 CFF 安全審查；能力維持 experimental。

@@ -154,5 +154,5 @@ dotnet run --project $projectPath -c Release --no-build -- `
     $colorEmojiPath
 if ($LASTEXITCODE -ne 0) { throw "WebFont 真實格式矩陣失敗。" }
 
-Write-Host "PASS：真實 TTF／TTC／IVS／PUA／TrueType variable 正向與 OTF／OTC／CFF2／color 拒絕矩陣通過。"
+Write-Host "PASS：真實 TTF／TTC／IVS／PUA／TrueType variable／CFF OTF 正向與 OTC／CFF2／color 拒絕矩陣通過。"
 Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

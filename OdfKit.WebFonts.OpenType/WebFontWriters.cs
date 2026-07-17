@@ -22,7 +22,7 @@ internal static class WebFontWriters
     internal static byte[] Write(SfntSubset subset, WebFontFormat format)
         => format switch
         {
-            WebFontFormat.TrueType => WriteTrueType(subset),
+            WebFontFormat.TrueType or WebFontFormat.OpenType => WriteTrueType(subset),
             WebFontFormat.Woff => WriteWoff(subset),
 #if NET10_0_OR_GREATER
             WebFontFormat.Woff2 => WriteWoff2(subset),

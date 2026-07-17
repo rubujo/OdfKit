@@ -8,11 +8,12 @@ internal static class LayoutBrowserSmoke
 {
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 7 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        if (args.Length != 9 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
                 "Usage: layout <browser> <arabic-source> <arabic-subset> "
-                + "<devanagari-source> <devanagari-subset> <screenshot> <evidence>");
+                + "<devanagari-source> <devanagari-subset> <cff-source> <cff-subset> "
+                + "<screenshot> <evidence>");
             return 2;
         }
 
@@ -21,8 +22,10 @@ internal static class LayoutBrowserSmoke
         string arabicSubsetPath = Path.GetFullPath(args[2]);
         string devanagariSourcePath = Path.GetFullPath(args[3]);
         string devanagariSubsetPath = Path.GetFullPath(args[4]);
-        string screenshotPath = Path.GetFullPath(args[5]);
-        string evidencePath = Path.GetFullPath(args[6]);
+        string cffSourcePath = Path.GetFullPath(args[5]);
+        string cffSubsetPath = Path.GetFullPath(args[6]);
+        string screenshotPath = Path.GetFullPath(args[7]);
+        string evidencePath = Path.GetFullPath(args[8]);
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
@@ -30,6 +33,8 @@ internal static class LayoutBrowserSmoke
         byte[] arabicSubset = await File.ReadAllBytesAsync(arabicSubsetPath).ConfigureAwait(false);
         byte[] devanagariSource = await File.ReadAllBytesAsync(devanagariSourcePath).ConfigureAwait(false);
         byte[] devanagariSubset = await File.ReadAllBytesAsync(devanagariSubsetPath).ConfigureAwait(false);
+        byte[] cffSource = await File.ReadAllBytesAsync(cffSourcePath).ConfigureAwait(false);
+        byte[] cffSubset = await File.ReadAllBytesAsync(cffSubsetPath).ConfigureAwait(false);
 
         var errors = new List<string>();
         var browserMessages = new List<string>();
@@ -71,7 +76,9 @@ internal static class LayoutBrowserSmoke
             ["/fonts/arabic-source.ttf"] = (arabicSource, "font/ttf"),
             ["/fonts/arabic-subset"] = (arabicSubset, GetSubsetContentType(arabicSubset)),
             ["/fonts/devanagari-source.ttf"] = (devanagariSource, "font/ttf"),
-            ["/fonts/devanagari-subset"] = (devanagariSubset, GetSubsetContentType(devanagariSubset))
+            ["/fonts/devanagari-subset"] = (devanagariSubset, GetSubsetContentType(devanagariSubset)),
+            ["/fonts/cff-source.otf"] = (cffSource, "font/otf"),
+            ["/fonts/cff-subset"] = (cffSubset, GetSubsetContentType(cffSubset))
         };
         await page.RouteAsync("https://odfkit.test/**", async route =>
         {
@@ -145,12 +152,14 @@ internal static class LayoutBrowserSmoke
                 sources = new
                 {
                     arabic = ComputeSha256(arabicSource),
-                    devanagari = ComputeSha256(devanagariSource)
+                    devanagari = ComputeSha256(devanagariSource),
+                    cff = ComputeSha256(cffSource)
                 },
                 subsets = new
                 {
                     arabic = ComputeSha256(arabicSubset),
-                    devanagari = ComputeSha256(devanagariSubset)
+                    devanagari = ComputeSha256(devanagariSubset),
+                    cff = ComputeSha256(cffSubset)
                 },
                 proof
             };
@@ -158,7 +167,7 @@ internal static class LayoutBrowserSmoke
                 evidencePath,
                 JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true }))
                 .ConfigureAwait(false);
-            Console.WriteLine($"PASS: {browserName} preserved real Arabic and Devanagari shaping pixels.");
+            Console.WriteLine($"PASS: {browserName} preserved real CFF, Arabic, and Devanagari pixels.");
             Console.WriteLine($"Evidence: {evidencePath}");
             return 0;
         }
@@ -204,6 +213,20 @@ internal static class LayoutBrowserSmoke
                     "शृंखला हिन्दी",
                     "कर्मण्येवाधिकारस्ते"
                 }
+            },
+            new
+            {
+                id = "cff",
+                direction = "ltr",
+                language = "zh-Hant",
+                sourceFamily = "OdfKit CFF Source",
+                subsetFamily = "OdfKit CFF Subset",
+                texts = new[]
+                {
+                    "香港邨裏𠮷",
+                    "全字庫難字顯示",
+                    "繁體中文測試"
+                }
             }
         });
         string template = """
@@ -216,6 +239,8 @@ internal static class LayoutBrowserSmoke
                 @font-face { font-family: "OdfKit Arabic Subset"; src: url("/fonts/arabic-subset"); }
                 @font-face { font-family: "OdfKit Devanagari Source"; src: url("/fonts/devanagari-source.ttf") format("truetype"); }
                 @font-face { font-family: "OdfKit Devanagari Subset"; src: url("/fonts/devanagari-subset"); }
+                @font-face { font-family: "OdfKit CFF Source"; src: url("/fonts/cff-source.otf") format("opentype"); }
+                @font-face { font-family: "OdfKit CFF Subset"; src: url("/fonts/cff-subset"); }
                 :root { color-scheme: dark; font-family: system-ui, sans-serif; }
                 body { margin: 0; background: #07131c; color: #eef8ff; }
                 main { width: min(1320px, calc(100vw - 48px)); margin: 28px auto; }

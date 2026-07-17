@@ -139,11 +139,19 @@ internal static class Program
             outputRoot).ConfigureAwait(false);
         await VerifyRejectedAsync(
             results,
-            "cff-otf",
+            "cff-otf-truetype-output",
             cffOpenTypePath,
             faceIndex: 0,
             "香港邨裏𠮷",
             outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "cff-otf",
+            cffOpenTypePath,
+            faceIndex: 0,
+            "香港邨裏𠮷 全字庫難字顯示 繁體中文測試",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
         await VerifySuccessAsync(
             results,
             "arabic-variable",
@@ -177,7 +185,8 @@ internal static class Program
             Path.Combine(outputRoot, "cns-ext-b-ttf", "first"),
             extBManifest))
         {
-            RunSourceMutationFuzz(extBPath)
+            RunSourceMutationFuzz(extBPath, WebFontFormat.TrueType, "TrueTypeSource"),
+            RunSourceMutationFuzz(cffOpenTypePath, WebFontFormat.OpenType, "CffSource")
         };
 
         string evidencePath = Path.Combine(outputRoot, "format-matrix.json");
@@ -262,7 +271,10 @@ internal static class Program
         return results;
     }
 
-    private static FuzzResult RunSourceMutationFuzz(string sourcePath)
+    private static FuzzResult RunSourceMutationFuzz(
+        string sourcePath,
+        WebFontFormat format,
+        string resultName)
     {
         byte[] valid = File.ReadAllBytes(sourcePath);
         int accepted = 0;
@@ -284,7 +296,7 @@ internal static class Program
             try
             {
                 using var stream = new MemoryStream(mutated, writable: false);
-                ManagedOpenTypeWebFontVerifier.Verify(stream, WebFontFormat.TrueType);
+                ManagedOpenTypeWebFontVerifier.Verify(stream, format);
                 accepted++;
             }
             catch (InvalidDataException)
@@ -302,7 +314,7 @@ internal static class Program
             throw new InvalidDataException("The source-font mutation fuzz did not exercise a rejection path.");
         }
 
-        return new FuzzResult("TrueTypeSource", 64, accepted, rejected);
+        return new FuzzResult(resultName, 64, accepted, rejected);
     }
 
     private static uint NextState(uint value)
@@ -321,6 +333,25 @@ internal static class Program
         string text,
         string outputRoot)
     {
+        return await VerifySuccessAsync(
+            results,
+            id,
+            sourcePath,
+            faceIndex,
+            text,
+            outputRoot,
+            [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+    }
+
+    private static async Task<WebFontManifest> VerifySuccessAsync(
+        ICollection<MatrixResult> results,
+        string id,
+        string sourcePath,
+        int faceIndex,
+        string text,
+        string outputRoot,
+        IReadOnlyList<WebFontFormat> formats)
+    {
         string sourceSha256 = await ComputeSha256Async(sourcePath).ConfigureAwait(false);
         WebFontTextSequence sequence = WebFontTextSequence.Create(text);
         string firstOutput = Path.Combine(outputRoot, id, "first");
@@ -333,14 +364,16 @@ internal static class Program
             sourceSha256,
             faceIndex,
             sequence,
-            firstOutput).ConfigureAwait(false);
+            firstOutput,
+            formats).ConfigureAwait(false);
         WebFontManifest second = await GenerateAsync(
             id,
             sourcePath,
             sourceSha256,
             faceIndex,
             sequence,
-            secondOutput).ConfigureAwait(false);
+            secondOutput,
+            formats).ConfigureAwait(false);
         string[] firstHashes = first.Assets.OrderBy(asset => asset.Format).Select(asset => asset.Sha256).ToArray();
         string[] secondHashes = second.Assets.OrderBy(asset => asset.Format).Select(asset => asset.Sha256).ToArray();
         if (!firstHashes.SequenceEqual(secondHashes, StringComparer.Ordinal))
@@ -538,6 +571,25 @@ internal static class Program
         WebFontTextSequence sequence,
         string destination)
     {
+        return GenerateAsync(
+            id,
+            sourcePath,
+            sourceSha256,
+            faceIndex,
+            sequence,
+            destination,
+            [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2]);
+    }
+
+    private static Task<WebFontManifest> GenerateAsync(
+        string id,
+        string sourcePath,
+        string sourceSha256,
+        int faceIndex,
+        WebFontTextSequence sequence,
+        string destination,
+        IReadOnlyList<WebFontFormat> formats)
+    {
         var options = new ManagedOpenTypeWebFontEngineOptions
         {
             MaxSourceBytes = 256L * 1024 * 1024,
@@ -558,7 +610,7 @@ internal static class Program
                 ProfileId = $"{id}-v1",
                 FontFamily = $"OdfKit {id}",
                 Sequences = [sequence],
-                Formats = [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2]
+                Formats = formats
             },
             destination);
     }

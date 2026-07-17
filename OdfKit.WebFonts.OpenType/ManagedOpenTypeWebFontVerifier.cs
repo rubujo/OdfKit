@@ -178,7 +178,7 @@ public static class ManagedOpenTypeWebFontVerifier
         byte[] bytes = ReadBounded(font, (int)maximumBytes);
         byte[] sfnt = format switch
         {
-            WebFontFormat.TrueType => bytes,
+            WebFontFormat.TrueType or WebFontFormat.OpenType => bytes,
             WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumBytes),
 #if NET10_0_OR_GREATER
             WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumBytes),

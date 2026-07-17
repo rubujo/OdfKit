@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-以三瀏覽器比較真實阿拉伯文與 Devanagari 來源字型及 managed subset 的塑形像素。
+以三瀏覽器比較真實 CFF、阿拉伯文與 Devanagari 來源字型及 managed subset 的像素。
 #>
 [CmdletBinding()]
 param(
@@ -96,10 +96,15 @@ $arabicSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "arabic-s
         -Filter "*.woff2" -File -Recurse)
 $devanagariSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "devanagari-static-layout/first") `
         -Filter "*.woff2" -File -Recurse)
+$cffSource = Join-Path $sourceRoot "SourceHanSansTC-Regular.otf"
+$cffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-otf/first") `
+        -Filter "*.woff2" -File -Recurse)
 if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
+    -or -not (Test-Path -LiteralPath $cffSource) `
     -or $arabicSubsets.Count -ne 1 `
-    -or $devanagariSubsets.Count -ne 1) {
+    -or $devanagariSubsets.Count -ne 1 `
+    -or $cffSubsets.Count -ne 1) {
     throw "請先執行 eng/Test-WebFontFormatMatrix.ps1 產生 layout corpus。"
 }
 
@@ -143,8 +148,10 @@ foreach ($browser in $Browsers) {
             $arabicSubsets[0].FullName,
             $devanagariSource,
             $devanagariSubsets[0].FullName,
+            $cffSource,
+            $cffSubsets[0].FullName,
             $screenshot,
             $evidence)
 }
 
-Write-Host "PASS：阿拉伯文與 Devanagari 來源／subset 在 $($Browsers -join '／') 的塑形像素一致。"
+Write-Host "PASS：CFF、阿拉伯文與 Devanagari 來源／subset 在 $($Browsers -join '／') 的像素一致。"

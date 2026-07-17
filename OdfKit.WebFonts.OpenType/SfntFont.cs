@@ -41,10 +41,10 @@ internal sealed class SfntSubset
 
 internal sealed class SfntFont
 {
-    private static readonly string[] RequiredTables = ["OS/2", "cmap", "glyf", "head", "hhea", "hmtx", "loca", "maxp", "name", "post"];
+    private static readonly string[] CommonRequiredTables = ["OS/2", "cmap", "head", "hhea", "hmtx", "maxp", "name", "post"];
     private static readonly HashSet<string> RejectedTables = new(StringComparer.Ordinal)
     {
-        "CFF ", "CFF2", "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
+        "CFF2", "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
         "Silf", "Glat", "Gloc", "Feat", "Sill", "morx", "mort", "kerx"
     };
 
@@ -89,7 +89,8 @@ internal sealed class SfntFont
 
         ReadOnlySpan<byte> data = source;
         int faceOffset = 0;
-        if (data.Slice(0, 4).SequenceEqual("ttcf"u8))
+        bool isCollection = data.Slice(0, 4).SequenceEqual("ttcf"u8);
+        if (isCollection)
         {
             if (data.Length < 16)
             {
@@ -112,9 +113,15 @@ internal sealed class SfntFont
 
         EnsureRange(data, faceOffset, 12, "sfnt-header");
         uint flavor = ReadUInt32(data, faceOffset, "sfnt-flavor");
-        if (flavor != 0x00010000 && flavor != 0x74727565)
+        bool isCff = flavor == 0x4F54544F;
+        if (flavor != 0x00010000 && flavor != 0x74727565 && !isCff)
         {
             throw NotSupported("sfnt-flavor");
+        }
+
+        if (isCollection && isCff)
+        {
+            throw NotSupported("otc-face");
         }
 
         ushort tableCount = ReadUInt16(data, faceOffset + 4, "table-count");
@@ -167,12 +174,26 @@ internal sealed class SfntFont
             throw NotSupported(rejectedTag);
         }
 
-        foreach (string tag in RequiredTables)
+        foreach (string tag in CommonRequiredTables)
         {
             if (!tables.ContainsKey(tag))
             {
                 throw DataInvalid($"{tag}-missing");
             }
+        }
+
+        string[] outlineTables = isCff ? ["CFF "] : ["glyf", "loca"];
+        foreach (string tag in outlineTables)
+        {
+            if (!tables.ContainsKey(tag))
+            {
+                throw DataInvalid($"{tag}-missing");
+            }
+        }
+
+        if (isCff && (tables.ContainsKey("glyf") || tables.ContainsKey("loca")))
+        {
+            throw DataInvalid("outline-ambiguous");
         }
 
         ValidateEmbeddingRights(tables["OS/2"]);
@@ -186,13 +207,18 @@ internal sealed class SfntFont
 
         byte[] head = tables["head"];
         EnsureRange(head, 0, 54, "head");
-        short locaFormat = ReadInt16(head, 50, "head-indexToLocFormat");
-        uint[] locations = ReadLocations(tables["loca"], glyphCount, locaFormat, tables["glyf"].Length);
+        uint[] locations = [];
+        if (!isCff)
+        {
+            short locaFormat = ReadInt16(head, 50, "head-indexToLocFormat");
+            locations = ReadLocations(tables["loca"], glyphCount, locaFormat, tables["glyf"].Length);
+        }
+
         CmapMapping cmap = CmapMapping.Parse(tables["cmap"], glyphCount);
         return new SfntFont(flavor, tables, glyphCount, locations, cmap);
     }
 
-    internal SfntSubset CreateTrueTypeSubset(
+    internal SfntSubset CreateSubset(
         IReadOnlyList<int> scalars,
         IReadOnlyList<UnicodeVariationSequence> variationSequences,
         int maxCompositeDepth)
@@ -233,17 +259,24 @@ internal sealed class SfntFont
             }
         }
 
-        AddCompositeClosure(selectedGlyphs, maxCompositeDepth);
-        byte[] subsetGlyf = BuildGlyf(selectedGlyphs, out byte[] subsetLoca);
         var tables = new SortedDictionary<string, byte[]>(_tables, StringComparer.Ordinal)
         {
             ["cmap"] = retainFullLayoutGlyphSpace
                 ? (byte[])_tables["cmap"].Clone()
                 : CmapMapping.Build(mappings, selectedVariations),
-            ["glyf"] = subsetGlyf,
-            ["loca"] = subsetLoca,
             ["head"] = (byte[])_tables["head"].Clone()
         };
+        if (Flavor == 0x4F54544F)
+        {
+            tables["CFF "] = CffSubsetter.Build(_tables["CFF "], _glyphCount, selectedGlyphs);
+        }
+        else
+        {
+            AddCompositeClosure(selectedGlyphs, maxCompositeDepth);
+            tables["glyf"] = BuildGlyf(selectedGlyphs, out byte[] subsetLoca);
+            tables["loca"] = subsetLoca;
+        }
+
         bool hasFvar = tables.TryGetValue("fvar", out byte[]? fvar);
         bool hasGvar = tables.TryGetValue("gvar", out byte[]? gvar);
         if (hasFvar != hasGvar || hasFvar && (fvar is null || gvar is null))
@@ -257,11 +290,26 @@ internal sealed class SfntFont
         }
 
         tables.Remove("DSIG");
-        BinaryPrimitives.WriteInt16BigEndian(tables["head"].AsSpan(50, 2), 1);
-        ushort headFlags = BinaryPrimitives.ReadUInt16BigEndian(tables["head"].AsSpan(16, 2));
-        BinaryPrimitives.WriteUInt16BigEndian(tables["head"].AsSpan(16, 2), (ushort)(headFlags | 0x0800));
+        if (Flavor != 0x4F54544F)
+        {
+            BinaryPrimitives.WriteInt16BigEndian(tables["head"].AsSpan(50, 2), 1);
+            ushort headFlags = BinaryPrimitives.ReadUInt16BigEndian(tables["head"].AsSpan(16, 2));
+            BinaryPrimitives.WriteUInt16BigEndian(tables["head"].AsSpan(16, 2), (ushort)(headFlags | 0x0800));
+        }
+
         tables["head"].AsSpan(8, 4).Clear();
         return new SfntSubset(Flavor, tables);
+    }
+
+    internal void ValidateOutputFormats(IEnumerable<WebFontFormat> formats)
+    {
+        bool isCff = Flavor == 0x4F54544F;
+        if (formats.Any(format => isCff
+                ? format == WebFontFormat.TrueType
+                : format == WebFontFormat.OpenType))
+        {
+            throw NotSupported("format-outline-mismatch");
+        }
     }
 
     internal bool TryGetTable(string tag, out ReadOnlyMemory<byte> table)

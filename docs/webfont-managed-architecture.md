@@ -86,7 +86,8 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
-- CFF／CFF2 outline、OTC collection。
+- 名稱式 CFF、CFF2 outline、OTC collection；standalone CID-keyed 靜態 CFF 1.0 僅依第 3.5 節
+  的 experimental 邊界解封。
 - 尚未通過第 3.5 節證據閘門的 variable font；CFF2／PostScript variable 維持拒絕。
 - COLR／CPAL、CBDT／CBLC、`sbix`、SVG 或其它 color／bitmap font。
 - AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
@@ -141,17 +142,18 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    編碼，long offsets 使用 32-bit 位移。`fvar` 與 `gvar` 必須成對存在且 axis count 一致；
    `avar`、`STAT`、`HVAR`、`VVAR`、`MVAR` 與 `cvar` 在 GID 不變的前提下原樣保留。正式能力
    宣稱仍須通過真實字型、short／long offset、三瀏覽器 variation axis 差分與 mutation 證據。
-2. **靜態 CFF 1.0**：只先處理 standalone `OTTO`，OTC 續留拒絕。Top DICT、FDArray 內的
-   Font DICT、Private DICT 與 local Subrs 的所有絕對／相對 offset 都必須由有界 parser 重建；
-   不能只修 Top DICT。CharStrings 採 retain-GIDs，未用 glyph 改為 `endchar`，subroutines 首期
-   不剪枝。`seac` 必須以能跨 subroutine 追蹤 operand stack 的 Type 2 verifier 判斷，不能只掃描
-   單一 CharString 尾端 bytes。
+2. **靜態 CFF 1.0**：已解封 standalone、含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`；名稱式
+   CFF 與 OTC 續留拒絕。有界 parser 驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、
+   local Subrs、charset 與 FDSelect。CharStrings 採 retain-GIDs，以相同長度的合法無 outline
+   Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／relative
+   offset 不需改寫，global／local subroutine 首期不剪枝。compact INDEX／DICT 重寫及名稱式 CFF
+   必須另有跨 subroutine Type 2 operand verifier，不能只掃描單一 CharString 尾端 bytes。
 3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
    不重編 local／global subr bias。
 4. **CFF2／PostScript Variable Fonts**：在 `blend`、`vsindex`、Item Variation Store 與真實
    瀏覽器差分完成前維持明確拒絕。
 
-真實 corpus 鎖定 Adobe Source Han Sans 官方最新 `2.005R` 單檔，不把字型納入 repository 或
+真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
 `SourceHanSansTW-VF.otf` 皆記錄來源 URI、SHA-256 與 OFL-1.1。相較下載大型 release zip，官方
 tag 的單檔可減少 CI 傳輸量；下載後仍須驗證完整檔案 SHA-256。
@@ -217,8 +219,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 中性的 Abstractions、Profile、CNS mapping、manifest、Build、Hosting 與 Worker。
 - 只執行 `dotnet` 的雙 process smoke、真實 WOFF2 verifier、失敗接手與 HTTP 安全驗證。
 - 官方 CNS Ext-B 真字型與 Chromium／Firefox／WebKit 截圖證據。
-- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；CFF／CFF2／color 負向矩陣，以及 TrueType
-  variable 的分階段正向矩陣。
+- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；Source Han Sans 2.005R 靜態 CFF 1.0 與
+  TrueType variable 正向矩陣，以及 OTC／CFF2／color 負向矩陣。
 - 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
 - 真實來源字型與 TTF／WOFF／WOFF2 共 448 組固定種子 mutation verifier 測試。
