@@ -27,24 +27,32 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
 
 輸出：`artifacts/nuget/`（檔名含目前版本，例如 `OdfKit.0.0.1.nupkg`）。
 
-## 3. 發佈步驟 (自動化 CD)
+## 3. 發佈步驟（自動化 CD）
 
-本專案現已導入 **Git Tag 觸發的自動化 CD 發佈流程**。發佈步驟如下：
+套件版本只由 `eng/OdfKit.Package.props` 取得，目前持續維持 `0.0.1` 滾動更新；發布流程不得為
+WebFont 或 Release 另造 `0.0.2` 等第二套版本。Git tag／Release 是某一提交的不可變交付快照，
+不是 `main` 的版本來源，也不表示後續 `0.0.1` 工作停止。
 
-1. **更新 props 檔版本號**：在 `eng/OdfKit.Package.props` 中更新 `<Version>`（例如改為 `0.0.2`）。
-2. **提交變更並 Push**：將版本變更提交並推送到 GitHub 的 `main` 分支。
-3. **本機或線上打 Tag 觸發 CD**：
-   在命令列中建立並推送對應的 Git Tag（格式必須為 `v*`，例如 `v0.0.2`，且必須與 props 中的版本號完全一致）：
+1. **確認共同版本來源**：`pwsh eng/Get-PackageVersion.ps1` 必須輸出 `0.0.1`；不要修改版本號。
+2. **完成提交與驗證**：將變更提交並推送到 GitHub 的 `main` 分支，等待必要 CI 全綠。
+3. **建立一次性交付快照**：僅在 `v0.0.1` tag 尚不存在時建立並推送；tag 必須與共同版本來源
+   完全一致：
    ```powershell
-   git tag v0.0.2
-   git push origin v0.0.2
+   git tag -s v0.0.1 -m "OdfKit 0.0.1"
+   git push origin v0.0.1
    ```
+   若 tag 或 Release 已存在，禁止 force-move tag 或靜默覆寫同名資產。由於套件採 `0.0.1`
+   滾動政策，後續 `main` 仍以原始碼與每次 CI 的 commit-bound artifact 交付；新的公開快照必須
+   另經人工交付決策，但不得因此改成 `0.0.2`。
 4. **追蹤發佈進度**：
    GitHub Actions 的 `GitHub Release CD` 工作流會被自動觸發。它會：
    - 驗證 Tag 版本與 props 檔版本是否對等。
    - 執行 NuGet 封裝結構檢查與消費端煙霧測試。
-   - 在雲端自動進行 NuGet 打包。
-   - 自動在 GitHub 上建立 Release，並利用 `GITHUB_TOKEN` 將 `.nupkg`、`.snupkg` 以及打包好的 ZIP 資產上傳至該 Release 中。
+   - 將同批套件發布至隔離本機 feed，由乾淨 consumer 還原、執行 NuGet Audit 並驗證 SBOM。
+   - 對套件、雜湊 manifest、SBOM 與彙整 ZIP 建立 GitHub Sigstore provenance；WebFont nupkg
+     另繫結 SPDX SBOM attestation。
+   - 自動建立 GitHub Release，並利用 `GITHUB_TOKEN` 上傳 `.nupkg`、`.snupkg`、`SHA256SUMS`、
+     SPDX SBOM 與 ZIP 資產。
 
 ## 4. 消費端：自 Release 安裝套件
 
@@ -98,8 +106,16 @@ consumer smoke 與 Imaging native runtime smoke，避免各平台重新封裝出
 `actions/cache@v6`）安裝 .NET SDK。artifact 只保留一天；NuGet restore cache 依作業系統與
 相依檔雜湊分區，不依 CPU 架構或 RID 重複建立。
 
+封裝 job 另執行 `eng/Test-WebFontReleaseRehearsal.ps1`：它使用 `dotnet nuget push` 將同批
+nupkg 放入隔離本機 feed，以 package source mapping 強制 `OdfKit*` 只來自該 feed，再由乾淨
+net10 consumer 還原與執行。外部相依清單取自同批 SPDX，不接受未列入 SBOM 的 package id；
+NuGet Audit 使用 `all` 模式與 `https://data.nuget.org/v3/index.json`，audit 通訊錯誤以及
+moderate、high、critical advisory 都會使演練失敗。這是可重現的發布與漏洞偵測閘門，不等同
+完整事件回應演練或第三方安全審查。
+
 ## 版本策略
 
 - 目前版本：**0.0.1**（`eng/OdfKit.Package.props`）
+- 版本政策：維持 **0.0.1 滾動更新**，不得建立 `0.0.2` 路線或 WebFont 專屬版本來源
 - 發佈前：`dotnet test` 全綠、`pwsh eng/Format-Safe.ps1`、`pwsh eng/Test-GpgSignatures.ps1`
 - Git 標籤格式：`v{Version}`（例如 `v0.0.1`）

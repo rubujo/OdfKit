@@ -10,6 +10,9 @@ concurrency:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
 
 jobs:
   release:
@@ -44,9 +47,38 @@ jobs:
         shell: pwsh
         run: ./eng/Test-NuGetPack.ps1 -Configuration Release -GenerateHashManifest
 
+      - name: Validate supply chain and rehearse release feed
+        shell: pwsh
+        run: |
+          ./eng/Test-WebFontSupplyChain.ps1
+          ./eng/Test-WebFontReleaseRehearsal.ps1
+          ./eng/Publish-GitHubRelease.ps1 -SkipValidation -Tag "${{ github.ref_name }}"
+
+      - name: Attest release provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            artifacts/nuget/*.nupkg
+            artifacts/nuget/*.snupkg
+            artifacts/nuget/SHA256SUMS
+            artifacts/webfont-sbom/manifest.spdx.json
+            artifacts/OdfKit-nuget-packages.zip
+
+      - name: Attest WebFont SBOM
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            artifacts/nuget/OdfKit.WebFonts*.nupkg
+            artifacts/nuget/OdfKit.Extensions.Html.WebFonts*.nupkg
+          sbom-path: artifacts/webfont-sbom/manifest.spdx.json
+
       - name: Create GitHub Release and Upload Assets
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./eng/Publish-GitHubRelease.ps1 -CreateRelease -Tag "${{ github.ref_name }}" -SkipValidation
+          ./eng/Publish-GitHubRelease.ps1 `
+            -CreateRelease `
+            -Tag "${{ github.ref_name }}" `
+            -SkipValidation `
+            -UseExistingBundle

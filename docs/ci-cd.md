@@ -46,7 +46,7 @@ testhost 收尾不穩。
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | Native AOT / trim smoke | PR / main |
-| `nuget-pack.yml` | 八個 NuGet 套件的單次封裝與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
+| `nuget-pack.yml` | 十九個 NuGet 套件的單次封裝、WebFont 發布演練與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
 | `performance-benchmark.yml` | DOM 與 ODS 串流效能／配置量回歸基準 | 每週 / 手動 |
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
 | `api-docs.yml` | 17 語系 GitHub Pages API reference 建置（DocFX）與部署；結構與閘門見 [api-docs-site.md](api-docs-site.md) | PR（僅建置）/ main / 手動 |
@@ -69,7 +69,7 @@ cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路
 
 NuGet 驗證由 Ubuntu 僅封裝一次，產生 `SHA256SUMS` 後以上傳 artifact 將同一份短期快照
 分送至 Linux x64、Windows x64、Windows ARM64 與 macOS ARM64 runner。每個 consumer job
-都會先驗證 SHA-256，再以安裝八個套件的獨立專案執行 managed 與 Imaging native runtime
+都會先驗證 SHA-256，再以安裝發布套件的獨立專案執行 managed 與 Imaging native runtime
 smoke。artifact 保留一天且不作為跨次 workflow cache；NuGet restore cache 則刻意只以
 `runner.os` 與相依檔雜湊分區，不加入架構或 RID，因為套件快取本身可攜帶多個 RID 資產，
 加入架構只會複製同一份下載內容。此工作流程只在 PR、`main` push 與手動觸發時執行，

@@ -13,6 +13,7 @@ on:
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
       - 'eng/Test-WebFontSupplyChain.ps1'
+      - 'eng/Test-WebFontReleaseRehearsal.ps1'
       - 'eng/webfont-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
@@ -35,6 +36,7 @@ on:
       - 'eng/Pack-NuGet.ps1'
       - 'eng/Test-NuGetPack.ps1'
       - 'eng/Test-WebFontSupplyChain.ps1'
+      - 'eng/Test-WebFontReleaseRehearsal.ps1'
       - 'eng/webfont-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
@@ -94,6 +96,10 @@ jobs:
           }
           ./eng/Test-WebFontSupplyChain.ps1 -SchemaPath $schemaPath
 
+      - name: Rehearse local release feed and NuGet audit
+        shell: pwsh
+        run: ./eng/Test-WebFontReleaseRehearsal.ps1
+
       - name: Upload immutable NuGet snapshot
         uses: actions/upload-artifact@v7
         with:
@@ -107,7 +113,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: odfkit-webfont-sbom-${{ github.sha }}
-          path: artifacts/webfont-sbom/manifest.spdx.json
+          path: |
+            artifacts/webfont-sbom/manifest.spdx.json
+            artifacts/webfont-release-rehearsal/evidence.json
           if-no-files-found: error
           retention-days: 1
 
