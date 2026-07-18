@@ -237,7 +237,7 @@ public sealed class Woff2TransformDecoderTests
         directoryBytes.CopyTo(output, 48);
         compressed.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directoryBytes.Length));
 
-        Assert.Equal(originalHmtx.Length, 10);
+        Assert.Equal(10, originalHmtx.Length);
         return output;
     }
 
