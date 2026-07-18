@@ -302,18 +302,30 @@ public static class ManagedOpenTypeWebFontVerifier
         uint flavor = SfntFont.ReadUInt32(data, 4, "WOFF2-flavor");
         uint declaredLength = SfntFont.ReadUInt32(data, 8, "WOFF2-length");
         ushort tableCount = SfntFont.ReadUInt16(data, 12, "WOFF2-tableCount");
-        uint totalSfntSize = SfntFont.ReadUInt32(data, 16, "WOFF2-sfntSize");
+        _ = SfntFont.ReadUInt32(data, 16, "WOFF2-sfntSize");
         int compressedLength = CheckedInt(SfntFont.ReadUInt32(data, 20, "WOFF2-compressedLength"), "WOFF2-compressedLength");
+        uint metadataOffset = SfntFont.ReadUInt32(data, 28, "WOFF2-metaOffset");
+        uint metadataLength = SfntFont.ReadUInt32(data, 32, "WOFF2-metaLength");
+        uint metadataOriginalLength = SfntFont.ReadUInt32(data, 36, "WOFF2-metaOrigLength");
+        uint privateOffset = SfntFont.ReadUInt32(data, 40, "WOFF2-privOffset");
+        uint privateLength = SfntFont.ReadUInt32(data, 44, "WOFF2-privLength");
         if (declaredLength != bytes.Length
-            || totalSfntSize > maximumExpandedBytes
             || tableCount == 0
             || tableCount > 256)
         {
             throw SfntFont.DataInvalid("WOFF2-header");
         }
+        if (flavor == 0x74746366)
+        {
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+        if (flavor is not (0x00010000 or 0x74727565 or 0x4F54544F))
+        {
+            throw SfntFont.DataInvalid("WOFF2-flavor");
+        }
 
         int position = 48;
-        var entries = new List<(string Tag, int Length)>(tableCount);
+        var entries = new List<Woff2TableEntry>(tableCount);
         int uncompressedLength = 0;
         for (int index = 0; index < tableCount; index++)
         {
@@ -333,32 +345,53 @@ public static class ManagedOpenTypeWebFontVerifier
                 tag = GetKnownWoff2Tag(tagIndex);
             }
 
-            bool nullTransform = tag is "glyf" or "loca" ? transformVersion == 3 : transformVersion == 0;
-            if (!nullTransform)
+            bool nullTransform = tag is "glyf" or "loca"
+                ? transformVersion == 3
+                : transformVersion == 0;
+            bool supportedTransform = tag switch
+            {
+                "glyf" or "loca" => transformVersion == 0,
+                "hmtx" => transformVersion == 1,
+                _ => false
+            };
+            if (!nullTransform && !supportedTransform)
             {
                 throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }
 
             uint originalLength = ReadUIntBase128(data, ref position);
-            int length = CheckedInt(originalLength, "WOFF2-tableLength");
-            if (length > maximumExpandedBytes - uncompressedLength)
+            int originalTableLength = CheckedInt(originalLength, "WOFF2-tableLength");
+            int storedLength = originalTableLength;
+            if (supportedTransform)
+            {
+                storedLength = CheckedInt(
+                    ReadUIntBase128(data, ref position),
+                    "WOFF2-transformLength");
+            }
+
+            if (storedLength > maximumExpandedBytes - uncompressedLength)
             {
                 throw SfntFont.DataInvalid("WOFF2-expandedSize");
             }
 
-            uncompressedLength += length;
-            entries.Add((tag, length));
+            uncompressedLength += storedLength;
+            entries.Add(new Woff2TableEntry(
+                tag,
+                originalTableLength,
+                storedLength,
+                transformVersion));
         }
 
         SfntFont.EnsureRange(data, position, compressedLength, "WOFF2-compressedData");
         int compressedEnd = checked(position + compressedLength);
-        int paddingLength = bytes.Length - compressedEnd;
-        if (paddingLength is < 0 or > 3
-            || (bytes.Length & 3) != 0
-            || data.Slice(compressedEnd, paddingLength).ContainsAnyExcept((byte)0))
-        {
-            throw SfntFont.DataInvalid("WOFF2-trailingData");
-        }
+        ValidateWoff2TrailingBlocks(
+            data,
+            compressedEnd,
+            metadataOffset,
+            metadataLength,
+            metadataOriginalLength,
+            privateOffset,
+            privateLength);
 
         var uncompressed = new byte[uncompressedLength];
         if (!BrotliDecoder.TryDecompress(
@@ -371,27 +404,311 @@ public static class ManagedOpenTypeWebFontVerifier
         }
 
         var tables = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
+        var transformedTables = new List<(Woff2TableEntry Entry, byte[] Data)>();
         int tableOffset = 0;
-        foreach ((string tag, int length) in entries)
+        foreach (Woff2TableEntry entry in entries)
         {
-            byte[] table = uncompressed.AsSpan(tableOffset, length).ToArray();
-            if (tables.ContainsKey(tag))
+            byte[] table = uncompressed.AsSpan(tableOffset, entry.StoredLength).ToArray();
+            if (tables.ContainsKey(entry.Tag)
+                || transformedTables.Any(item => item.Entry.Tag == entry.Tag))
             {
                 throw SfntFont.DataInvalid("WOFF2-table");
             }
 
-            tables.Add(tag, table);
+            if (entry.IsTransformed)
+            {
+                transformedTables.Add((entry, table));
+            }
+            else
+            {
+                tables.Add(entry.Tag, table);
+            }
 
-            tableOffset += length;
+            tableOffset += entry.StoredLength;
+        }
+
+        (Woff2TableEntry Entry, byte[] Data)? transformedGlyf = transformedTables
+            .Where(item => item.Entry.Tag == "glyf")
+            .Cast<(Woff2TableEntry Entry, byte[] Data)?>()
+            .SingleOrDefault();
+        (Woff2TableEntry Entry, byte[] Data)? transformedLoca = transformedTables
+            .Where(item => item.Entry.Tag == "loca")
+            .Cast<(Woff2TableEntry Entry, byte[] Data)?>()
+            .SingleOrDefault();
+        if (transformedGlyf.HasValue != transformedLoca.HasValue)
+        {
+            throw SfntFont.DataInvalid("WOFF2-glyf-loca-pair");
+        }
+        if (transformedGlyf.HasValue)
+        {
+            Woff2GlyfReconstruction reconstructed = Woff2GlyfReconstructor.Reconstruct(
+                transformedGlyf.Value.Data,
+                transformedGlyf.Value.Entry.OriginalLength,
+                transformedLoca!.Value.Entry.StoredLength,
+                transformedLoca.Value.Entry.OriginalLength,
+                tables,
+                maximumExpandedBytes);
+            tables.Add("glyf", reconstructed.Glyf);
+            tables.Add("loca", reconstructed.Loca);
+        }
+
+        foreach ((Woff2TableEntry entry, byte[] transformed) in transformedTables
+                     .Where(item => item.Entry.Tag == "hmtx"))
+        {
+            byte[] table = ReconstructTransformedHmtx(transformed, tables);
+            if (table.Length != entry.OriginalLength)
+            {
+                throw SfntFont.DataInvalid("WOFF2-transformLength");
+            }
+
+            tables.Add(entry.Tag, table);
         }
 
         byte[] sfnt = WebFontWriters.WriteTrueType(new SfntSubset(flavor, tables));
-        if (totalSfntSize != sfnt.Length)
+        if (sfnt.Length > maximumExpandedBytes)
         {
             throw SfntFont.DataInvalid("WOFF2-sfntSize");
         }
 
         return sfnt;
+    }
+
+    private static void ValidateWoff2TrailingBlocks(
+        ReadOnlySpan<byte> data,
+        int compressedEnd,
+        uint metadataOffset,
+        uint metadataLength,
+        uint metadataOriginalLength,
+        uint privateOffset,
+        uint privateLength)
+    {
+        bool hasMetadata = metadataOffset != 0 || metadataLength != 0 || metadataOriginalLength != 0;
+        if (hasMetadata
+            && (metadataOffset == 0 || metadataLength == 0 || metadataOriginalLength == 0))
+        {
+            throw SfntFont.DataInvalid("WOFF2-metadata");
+        }
+
+        bool hasPrivateData = privateOffset != 0 || privateLength != 0;
+        if (hasPrivateData && (privateOffset == 0 || privateLength == 0))
+        {
+            throw SfntFont.DataInvalid("WOFF2-privateData");
+        }
+
+        int cursor = compressedEnd;
+        if (hasMetadata)
+        {
+            cursor = ValidateWoff2Block(
+                data,
+                cursor,
+                metadataOffset,
+                metadataLength,
+                "WOFF2-metadata");
+        }
+        if (hasPrivateData)
+        {
+            cursor = ValidateWoff2Block(
+                data,
+                cursor,
+                privateOffset,
+                privateLength,
+                "WOFF2-privateData");
+        }
+
+        int trailingLength = data.Length - cursor;
+        if (trailingLength is < 0 or > 3
+            || data.Slice(cursor, trailingLength).ContainsAnyExcept((byte)0))
+        {
+            throw SfntFont.DataInvalid("WOFF2-trailingData");
+        }
+    }
+
+    private static int ValidateWoff2Block(
+        ReadOnlySpan<byte> data,
+        int cursor,
+        uint declaredOffset,
+        uint declaredLength,
+        string detail)
+    {
+        int alignedOffset = checked((cursor + 3) & ~3);
+        int offset = CheckedInt(declaredOffset, detail);
+        int length = CheckedInt(declaredLength, detail);
+        if (offset != alignedOffset
+            || alignedOffset - cursor > 3
+            || data.Slice(cursor, alignedOffset - cursor).ContainsAnyExcept((byte)0))
+        {
+            throw SfntFont.DataInvalid(detail);
+        }
+
+        SfntFont.EnsureRange(data, offset, length, detail);
+        return checked(offset + length);
+    }
+
+    private static byte[] ReconstructTransformedHmtx(
+        ReadOnlySpan<byte> transformed,
+        IReadOnlyDictionary<string, byte[]> tables)
+    {
+        if (!tables.TryGetValue("maxp", out byte[]? maxp)
+            || !tables.TryGetValue("hhea", out byte[]? hhea)
+            || !tables.TryGetValue("head", out byte[]? head)
+            || !tables.TryGetValue("loca", out byte[]? loca)
+            || !tables.TryGetValue("glyf", out byte[]? glyf))
+        {
+            throw SfntFont.DataInvalid("WOFF2-hmtx-dependencies");
+        }
+
+        SfntFont.EnsureRange(maxp, 0, 6, "WOFF2-maxp");
+        SfntFont.EnsureRange(hhea, 0, 36, "WOFF2-hhea");
+        SfntFont.EnsureRange(head, 0, 54, "WOFF2-head");
+        ushort glyphCount = SfntFont.ReadUInt16(maxp, 4, "WOFF2-numGlyphs");
+        ushort metricCount = SfntFont.ReadUInt16(hhea, 34, "WOFF2-numHMetrics");
+        short indexFormat = SfntFont.ReadInt16(head, 50, "WOFF2-indexToLocFormat");
+        if (glyphCount == 0 || metricCount == 0 || metricCount > glyphCount)
+        {
+            throw SfntFont.DataInvalid("WOFF2-hmtx-counts");
+        }
+
+        uint[] locations = ReadWoff2Locations(loca, glyphCount, indexFormat, glyf.Length);
+        var xMins = new short[glyphCount];
+        for (int glyph = 0; glyph < glyphCount; glyph++)
+        {
+            uint start = locations[glyph];
+            uint end = locations[glyph + 1];
+            if (start == end)
+            {
+                continue;
+            }
+
+            int glyphOffset = CheckedInt(start, "WOFF2-glyf-offset");
+            SfntFont.EnsureRange(glyf, glyphOffset, 10, "WOFF2-glyf");
+            xMins[glyph] = SfntFont.ReadInt16(glyf, glyphOffset + 2, "WOFF2-glyf-xMin");
+        }
+
+        SfntFont.EnsureRange(transformed, 0, 1, "WOFF2-hmtx-flags");
+        byte flags = transformed[0];
+        if ((flags & 0xFC) != 0 || (flags & 0x03) == 0)
+        {
+            throw SfntFont.DataInvalid("WOFF2-hmtx-flags");
+        }
+
+        int position = 1;
+        var advances = new ushort[metricCount];
+        for (int metric = 0; metric < metricCount; metric++)
+        {
+            SfntFont.EnsureRange(transformed, position, 2, "WOFF2-hmtx-advance");
+            advances[metric] = SfntFont.ReadUInt16(transformed, position, "WOFF2-hmtx-advance");
+            position += 2;
+        }
+
+        short[] proportionalBearings = ReadWoff2Bearings(
+            transformed,
+            ref position,
+            metricCount,
+            omitted: (flags & 0x01) != 0,
+            xMins.AsSpan(0, metricCount));
+        int additionalCount = glyphCount - metricCount;
+        short[] additionalBearings = ReadWoff2Bearings(
+            transformed,
+            ref position,
+            additionalCount,
+            omitted: (flags & 0x02) != 0,
+            xMins.AsSpan(metricCount, additionalCount));
+        if (position != transformed.Length)
+        {
+            throw SfntFont.DataInvalid("WOFF2-hmtx-length");
+        }
+
+        var result = new byte[checked((metricCount * 4) + (additionalCount * 2))];
+        int output = 0;
+        for (int metric = 0; metric < metricCount; metric++)
+        {
+            BinaryPrimitives.WriteUInt16BigEndian(result.AsSpan(output, 2), advances[metric]);
+            BinaryPrimitives.WriteInt16BigEndian(result.AsSpan(output + 2, 2), proportionalBearings[metric]);
+            output += 4;
+        }
+        for (int glyph = 0; glyph < additionalCount; glyph++)
+        {
+            BinaryPrimitives.WriteInt16BigEndian(result.AsSpan(output, 2), additionalBearings[glyph]);
+            output += 2;
+        }
+
+        return result;
+    }
+
+    private static short[] ReadWoff2Bearings(
+        ReadOnlySpan<byte> transformed,
+        ref int position,
+        int count,
+        bool omitted,
+        ReadOnlySpan<short> xMins)
+    {
+        if (omitted)
+        {
+            return xMins.ToArray();
+        }
+
+        var result = new short[count];
+        for (int index = 0; index < count; index++)
+        {
+            SfntFont.EnsureRange(transformed, position, 2, "WOFF2-hmtx-bearing");
+            result[index] = SfntFont.ReadInt16(transformed, position, "WOFF2-hmtx-bearing");
+            position += 2;
+        }
+
+        return result;
+    }
+
+    private static uint[] ReadWoff2Locations(
+        ReadOnlySpan<byte> loca,
+        ushort glyphCount,
+        short indexFormat,
+        int glyfLength)
+    {
+        int entrySize = indexFormat switch
+        {
+            0 => 2,
+            1 => 4,
+            _ => throw SfntFont.DataInvalid("WOFF2-indexToLocFormat")
+        };
+        int requiredLength = checked((glyphCount + 1) * entrySize);
+        if (loca.Length != requiredLength)
+        {
+            throw SfntFont.DataInvalid("WOFF2-loca-length");
+        }
+
+        var result = new uint[glyphCount + 1];
+        uint previous = 0;
+        for (int index = 0; index <= glyphCount; index++)
+        {
+            int offset = index * entrySize;
+            uint current = indexFormat == 0
+                ? checked((uint)SfntFont.ReadUInt16(loca, offset, "WOFF2-loca") * 2)
+                : SfntFont.ReadUInt32(loca, offset, "WOFF2-loca");
+            if (current < previous || current > glyfLength)
+            {
+                throw SfntFont.DataInvalid("WOFF2-loca-order");
+            }
+
+            result[index] = current;
+            previous = current;
+        }
+
+        return result;
+    }
+
+    private readonly record struct Woff2TableEntry(
+        string Tag,
+        int OriginalLength,
+        int StoredLength,
+        int TransformVersion)
+    {
+        internal bool IsTransformed
+            => Tag switch
+            {
+                "glyf" or "loca" => TransformVersion == 0,
+                "hmtx" => TransformVersion == 1,
+                _ => false
+            };
     }
 #endif
 

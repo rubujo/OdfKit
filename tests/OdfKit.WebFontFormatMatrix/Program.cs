@@ -27,6 +27,17 @@ internal static class Program
 
     private static async Task<int> RunAsync(string[] args)
     {
+        if (args.Length == 4 && args[0] == "woff2-corpus")
+        {
+            await VerifyWoff2CorpusAsync(args[1], args[2], args[3]).ConfigureAwait(false);
+            return 0;
+        }
+        if (args.Length == 4 && args[0] == "woff2-production")
+        {
+            await VerifyProductionWoff2Async(args[1], args[2], args[3]).ConfigureAwait(false);
+            return 0;
+        }
+
         if (args.Length != 15)
         {
             return 2;
@@ -252,6 +263,252 @@ internal static class Program
             }, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
         Console.WriteLine($"PASS: {results.Count} real managed format cases. Evidence: {evidencePath}");
         return 0;
+    }
+
+    private static async Task VerifyWoff2CorpusAsync(
+        string woff2Path,
+        string referencePath,
+        string evidencePath)
+    {
+        woff2Path = Path.GetFullPath(woff2Path);
+        referencePath = Path.GetFullPath(referencePath);
+        evidencePath = Path.GetFullPath(evidencePath);
+        byte[] woff2 = await File.ReadAllBytesAsync(woff2Path).ConfigureAwait(false);
+        byte[] reference = await File.ReadAllBytesAsync(referencePath).ConfigureAwait(false);
+        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            maximumExpandedBytes: 32 * 1024 * 1024);
+        string decodedPath = Path.ChangeExtension(evidencePath, ".decoded.ttf");
+        string? decodedDirectory = Path.GetDirectoryName(decodedPath);
+        if (!string.IsNullOrEmpty(decodedDirectory))
+        {
+            Directory.CreateDirectory(decodedDirectory);
+        }
+        await File.WriteAllBytesAsync(decodedPath, decoded).ConfigureAwait(false);
+        using (var stream = new MemoryStream(decoded, writable: false))
+        {
+            ManagedOpenTypeWebFontVerifier.Verify(stream, WebFontFormat.TrueType);
+        }
+
+        SfntFont decodedFont = SfntFont.Parse(decoded, 0, 256, validateChecksums: true);
+        SfntFont referenceFont = SfntFont.Parse(reference, 0, 256, validateChecksums: true);
+        if (decodedFont.GlyphCount != referenceFont.GlyphCount)
+        {
+            throw new InvalidDataException("WOFF2 corpus glyph count differs from its W3C reference.");
+        }
+
+        string[] comparedTables = ReadTableTags(reference)
+            .Where(tag => tag is not ("glyf" or "loca" or "head" or "hmtx"))
+            .ToArray();
+        foreach (string tag in comparedTables)
+        {
+            bool hasDecoded = decodedFont.TryGetTable(tag, out ReadOnlyMemory<byte> decodedTable);
+            bool hasReference = referenceFont.TryGetTable(tag, out ReadOnlyMemory<byte> referenceTable);
+            if (!hasDecoded || !hasReference || !decodedTable.Span.SequenceEqual(referenceTable.Span))
+            {
+                string decodedHash = Convert.ToHexStringLower(SHA256.HashData(decodedTable.Span));
+                string referenceHash = Convert.ToHexStringLower(SHA256.HashData(referenceTable.Span));
+                throw new InvalidDataException(
+                    $"WOFF2 corpus table differs from its W3C reference: {tag} "
+                    + $"({decodedHash} != {referenceHash}).");
+            }
+        }
+
+        string? directory = Path.GetDirectoryName(evidencePath);
+        directory = string.IsNullOrEmpty(directory) ? Directory.GetCurrentDirectory() : directory;
+        Directory.CreateDirectory(directory);
+
+        var evidence = new
+        {
+            schemaVersion = "1.0",
+            status = "passed",
+            source = "w3c/woff2-compiled-tests",
+            woff2Sha256 = Convert.ToHexStringLower(SHA256.HashData(woff2)),
+            referenceSha256 = Convert.ToHexStringLower(SHA256.HashData(reference)),
+            decodedSha256 = Convert.ToHexStringLower(SHA256.HashData(decoded)),
+            glyphCount = decodedFont.GlyphCount,
+            comparedTables
+        };
+        await File.WriteAllTextAsync(
+            evidencePath,
+            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+    }
+
+    private static async Task VerifyProductionWoff2Async(
+        string woff2Path,
+        string text,
+        string evidencePath)
+    {
+        woff2Path = Path.GetFullPath(woff2Path);
+        evidencePath = Path.GetFullPath(evidencePath);
+        byte[] woff2 = await File.ReadAllBytesAsync(woff2Path).ConfigureAwait(false);
+        using (var stream = new MemoryStream(woff2, writable: false))
+        {
+            ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(
+                stream,
+                WebFontFormat.Woff2,
+                [WebFontTextSequence.Create(text)]);
+        }
+
+        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            maximumExpandedBytes: 32 * 1024 * 1024);
+        SfntFont font = SfntFont.Parse(decoded, 0, 256, validateChecksums: true);
+        string[] transforms = ReadWoff2Transforms(woff2);
+        (int mutationCount, int acceptedMutations) = RunWoff2MutationFuzz(woff2);
+        string? directory = Path.GetDirectoryName(evidencePath);
+        directory = string.IsNullOrEmpty(directory) ? Directory.GetCurrentDirectory() : directory;
+        Directory.CreateDirectory(directory);
+
+        string sourceSha256 = Convert.ToHexStringLower(SHA256.HashData(woff2));
+        string scenario = Path.GetFileNameWithoutExtension(woff2Path);
+        string generatedRoot = Path.Combine(directory, $"{scenario}-generated");
+        RecreateDirectory(generatedRoot);
+        WebFontManifest manifest = await GenerateAsync(
+            scenario,
+            woff2Path,
+            sourceSha256,
+            faceIndex: 0,
+            WebFontTextSequence.Create(text),
+            generatedRoot,
+            [WebFontFormat.Woff2]).ConfigureAwait(false);
+        WebFontAsset generated = manifest.Assets.Single();
+        string generatedPath = Path.Combine(generatedRoot, generated.Sha256, generated.FileName);
+        await using (FileStream stream = File.OpenRead(generatedPath))
+        {
+            ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(
+                stream,
+                WebFontFormat.Woff2,
+                [WebFontTextSequence.Create(text)]);
+        }
+
+        var evidence = new
+        {
+            schemaVersion = "1.0",
+            status = "passed",
+            source = "fonts.googleapis.com/fonts.gstatic.com",
+            fileName = Path.GetFileName(woff2Path),
+            sha256 = sourceSha256,
+            decodedSha256 = Convert.ToHexStringLower(SHA256.HashData(decoded)),
+            generatedSha256 = generated.Sha256,
+            generatedBytes = new FileInfo(generatedPath).Length,
+            glyphCount = font.GlyphCount,
+            requestedText = text,
+            transforms,
+            mutationCount,
+            acceptedMutations,
+            hasGsub = font.TryGetTable("GSUB", out _),
+            hasGpos = font.TryGetTable("GPOS", out _)
+        };
+        await File.WriteAllTextAsync(
+            evidencePath,
+            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+    }
+
+    private static (int Count, int Accepted) RunWoff2MutationFuzz(byte[] source)
+    {
+        const int mutationCount = 64;
+        int accepted = 0;
+        for (int index = 0; index < mutationCount; index++)
+        {
+            byte[] mutation = (byte[])source.Clone();
+            int position = 48 + ((index * 7919) % (mutation.Length - 48));
+            mutation[position] ^= checked((byte)(1 << (index & 7)));
+            try
+            {
+                using var stream = new MemoryStream(mutation, writable: false);
+                ManagedOpenTypeWebFontVerifier.Verify(stream, WebFontFormat.Woff2);
+                accepted++;
+            }
+            catch (Exception exception) when (exception is InvalidDataException or NotSupportedException)
+            {
+                // 預期的有界拒絕。
+            }
+        }
+
+        return (mutationCount, accepted);
+    }
+
+    private static string[] ReadWoff2Transforms(ReadOnlySpan<byte> woff2)
+    {
+        string[] knownTags =
+        [
+            "cmap", "head", "hhea", "hmtx", "maxp", "name", "OS/2", "post",
+            "cvt ", "fpgm", "glyf", "loca", "prep", "CFF ", "VORG", "EBDT",
+            "EBLC", "gasp", "hdmx", "kern", "LTSH", "PCLT", "VDMX", "vhea",
+            "vmtx", "BASE", "GDEF", "GPOS", "GSUB", "EBSC", "JSTF", "MATH",
+            "CBDT", "CBLC", "COLR", "CPAL", "SVG ", "sbix", "acnt", "avar",
+            "bdat", "bloc", "bsln", "cvar", "fdsc", "feat", "fmtx", "fvar",
+            "gvar", "hsty", "just", "lcar", "mort", "morx", "opbd", "prop",
+            "trak", "Zapf", "Silf", "Glat", "Gloc", "Feat", "Sill"
+        ];
+        SfntFont.EnsureRange(woff2, 0, 48, "WOFF2-corpus-header");
+        ushort count = SfntFont.ReadUInt16(woff2, 12, "WOFF2-corpus-count");
+        int position = 48;
+        var transforms = new List<string>();
+        for (int index = 0; index < count; index++)
+        {
+            SfntFont.EnsureRange(woff2, position, 1, "WOFF2-corpus-flags");
+            byte flags = woff2[position++];
+            int tagIndex = flags & 0x3F;
+            int version = flags >> 6;
+            string tag;
+            if (tagIndex == 63)
+            {
+                SfntFont.EnsureRange(woff2, position, 4, "WOFF2-corpus-tag");
+                tag = System.Text.Encoding.ASCII.GetString(woff2.Slice(position, 4));
+                position += 4;
+            }
+            else
+            {
+                tag = knownTags[tagIndex];
+            }
+
+            _ = ReadCorpusUIntBase128(woff2, ref position);
+            bool transformed = tag is "glyf" or "loca" ? version != 3 : version != 0;
+            if (transformed)
+            {
+                _ = ReadCorpusUIntBase128(woff2, ref position);
+                transforms.Add($"{tag}:v{version}");
+            }
+        }
+
+        return transforms.ToArray();
+    }
+
+    private static uint ReadCorpusUIntBase128(ReadOnlySpan<byte> data, ref int position)
+    {
+        uint value = 0;
+        for (int index = 0; index < 5; index++)
+        {
+            SfntFont.EnsureRange(data, position, 1, "WOFF2-corpus-base128");
+            byte current = data[position++];
+            if ((value & 0xFE000000) != 0)
+            {
+                throw new InvalidDataException("WOFF2 corpus UIntBase128 overflowed.");
+            }
+            value = (value << 7) | (uint)(current & 0x7F);
+            if ((current & 0x80) == 0)
+            {
+                return value;
+            }
+        }
+
+        throw new InvalidDataException("WOFF2 corpus UIntBase128 is too long.");
+    }
+
+    private static string[] ReadTableTags(ReadOnlySpan<byte> sfnt)
+    {
+        SfntFont.EnsureRange(sfnt, 0, 12, "WOFF2-corpus-header");
+        ushort tableCount = SfntFont.ReadUInt16(sfnt, 4, "WOFF2-corpus-count");
+        SfntFont.EnsureRange(sfnt, 12, checked(tableCount * 16), "WOFF2-corpus-directory");
+        var tags = new string[tableCount];
+        for (int index = 0; index < tableCount; index++)
+        {
+            tags[index] = System.Text.Encoding.ASCII.GetString(sfnt.Slice(12 + (index * 16), 4));
+        }
+
+        return tags;
     }
 
     private static IReadOnlyList<FuzzResult> RunDeterministicMutationFuzz(

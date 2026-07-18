@@ -41,6 +41,7 @@
 | `Test-XmlReaderSecurity.ps1` | 掃描手寫 `XmlReaderSettings`，要求明確禁止 DTD 並停用外部 XML resolver。 |
 | `Test-NuGetPack.ps1` | 驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置。 |
 | `Test-WebFontReleaseRehearsal.ps1` | 以同批 nupkg 演練隔離本機 feed、SBOM 消費與 NuGet Audit。 |
+| `Test-WebFontWoff2Corpus.ps1` | 下載 SHA-256 鎖定的 W3C 與 Google Fonts production corpus，驗證 standalone transformed WOFF2 解碼與固定種子 mutation。 |
 | `Test-OdfCorpus.ps1` | 執行內建（與選用外部）corpus 驗證，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |
 | `Test-OdfPolicy.ps1` | 執行 `Category=Policy` 測試，覆蓋巨集淨化、外部資源 policy、加密文件重新加密與相關安全邊界。 |
 | `Test-OdfTypedDomCoverage.ps1` | 執行 typed DOM 對 ODF schema 的覆蓋率報告與門檻檢查。 |

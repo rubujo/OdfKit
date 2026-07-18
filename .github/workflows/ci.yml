@@ -167,6 +167,7 @@ jobs:
           path: |
             artifacts/cns11643
             artifacts/webfont-format-matrix/sources
+            artifacts/webfont-woff2-corpus/sources
           key: webfont-real-corpus-${{ runner.os }}-${{ hashFiles('eng/external-tools.json') }}
 
       - name: Prepare locked CNS mapping
@@ -194,6 +195,11 @@ jobs:
           ./eng/Test-WebFontFormatMatrix.ps1 `
             -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
             -CnsKaiFontArchivePath artifacts/webfont-source-cache/Fonts_Kai.zip
+
+      - name: Locked transformed WOFF2 corpus
+        shell: pwsh
+        timeout-minutes: 5
+        run: ./eng/Test-WebFontWoff2Corpus.ps1
 
       - name: Complex shaping browser differential
         shell: pwsh
@@ -237,6 +243,7 @@ jobs:
           path: |
             artifacts/webfont-smoke/playwright-managed-*.png
             artifacts/webfont-format-matrix/evidence/format-matrix.json
+            artifacts/webfont-woff2-corpus/evidence/**
             artifacts/webfont-layout-browser/layout-*.json
             artifacts/webfont-layout-browser/layout-*.png
             artifacts/webfont-package-consumer/**/webfonts.json

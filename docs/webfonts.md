@@ -42,7 +42,8 @@ Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed 靜
 retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
 OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`
 亦有 experimental retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
-以及 `net10.0` 由本引擎產生的 null-transform WOFF2；輸出只產生瀏覽器部署用的獨立
+以及 `net10.0` standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
+`hmtx` version 1 transform，也接受規格合法的 null transform。輸出只產生瀏覽器部署用的獨立
 TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、無 VariationStore 的 CFF2 與未知
 color table 版本必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
@@ -57,6 +58,13 @@ VariationStore 與 subroutine 結構使用以 table byte array 為生命週期�
 WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
 encoder。因此正確宣稱是「OdfKit 不帶入額外 native 相依」，不是「Brotli 演算法由純 managed
 C# 實作」。`net48` 第一階段使用 TTF／WOFF，不為 WOFF2 引入 native 套件。
+
+transformed WOFF2 輸入的 table 反轉換本身是 OdfKit 依 W3C WOFF2 規格 clean-room 撰寫的
+純 C#：包含 triplet 座標、simple／composite glyph、bbox、instructions、short／long `loca`
+與 `hmtx` bearing 重建。Brotli bitstream 仍由 .NET Runtime API 解壓。CI 會下載 SHA-256 鎖定的
+W3C decoder corpus，以及 Google Fonts production Noto Sans v42 Latin／Devanagari WOFF2；檔案
+只進 cache／artifact，不進 repository 或 nupkg。WOFF2 collection 仍明確拒絕，不能以 standalone
+transform 支援推定為 collection 支援。
 
 ## 預定最短使用方式
 

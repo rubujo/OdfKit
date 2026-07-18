@@ -141,6 +141,43 @@
       }
     }
   },
+  "webFontWoff2Corpus": {
+    "source": "w3c/woff2-compiled-tests",
+    "revision": "1fd8cd583645618f4df36c65a297479840ad5510",
+    "license": "W3C test material; downloaded for verification and not redistributed",
+    "woff2": {
+      "fileName": "roundtrip-hmtx-lsb-001.woff2",
+      "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-hmtx-lsb-001.woff2",
+      "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-hmtx-lsb-001.woff2?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+      "sha256": "45bb9141f6a683710529785ff55a3d755ac40b8eec6f762bb79f523345f7465c"
+    },
+    "reference": {
+      "fileName": "roundtrip-hmtx-lsb-001.ttf",
+      "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-hmtx-lsb-001.ttf",
+      "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-hmtx-lsb-001.ttf?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+      "sha256": "dce1cef405e00a13be7444b9cfa1742663590fb3e21025ff7581c124318a635a"
+    },
+    "production": [
+      {
+        "id": "google-fonts-noto-sans-v42-latin",
+        "version": "v42",
+        "fileName": "noto-sans-v42-latin.woff2",
+        "uri": "https://fonts.gstatic.com/s/notosans/v42/o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyD9A-9a6VI.woff2",
+        "sha256": "09aee8065d25508f23a4c3d92cd777ac869c52d93fd868a88f025d888a7937d6",
+        "license": "OFL-1.1",
+        "text": "OdfKit WebFont café"
+      },
+      {
+        "id": "google-fonts-noto-sans-v42-devanagari",
+        "version": "v42",
+        "fileName": "noto-sans-v42-devanagari.woff2",
+        "uri": "https://fonts.gstatic.com/s/notosans/v42/o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyD9A-9b6VLKzA.woff2",
+        "sha256": "1ccb720178c307d17a30f2f8eda43c2f9ffa831c02cb7f7d9d7b8708bcbaf43c",
+        "license": "OFL-1.1",
+        "text": "क्षेत्रज्ञ भारत हिन्दी"
+      }
+    ]
+  },
   "jing": {
     "source": "github-release",
     "cacheRevision": "1",

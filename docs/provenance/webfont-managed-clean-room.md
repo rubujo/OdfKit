@@ -121,6 +121,34 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `Noto-COLRv1.ttf`，SHA-256
   `23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44`。兩者採 OFL-1.1，
   僅下載到 CI cache／artifact，不納入 repository 或 nupkg。
-- 一般 transformed WOFF2、逐 paint graph／SVG document 主動內容安全稽核、分格式 aggressive
-  color pruning、sbix／SVG 真實 corpus 與第三方惡意 color font 稽核尚未完成；能力維持
+- 本節完成時一般 transformed WOFF2 尚待後續切片；逐 paint graph／SVG document 主動內容安全
+  稽核、分格式 aggressive color pruning、sbix／SVG 真實 corpus 與第三方惡意 color font 稽核
+  尚未完成；能力維持
   experimental。
+
+### 2026-07-18 WOFF2 transformed tables decoder
+
+- 參與者：Codex agent；原創實作只依 W3C WOFF 2.0 Recommendation 的 255UInt16、Table
+  Directory、5.1 transformed `glyf`、5.2 triplet、5.3 `loca` 與 5.4 `hmtx` 規範文字。未讀取、
+  搜尋、翻譯或改寫 FontTools、Google woff2、FreeType、HarfBuzz、OTS 或瀏覽器解碼器原始碼。
+- 原創範圍：七個 glyf substream 的精確切分與消耗、simple／composite glyph、bbox／overlap
+  bitmap、instructions、四類 triplet、short／long `loca`、`hmtx` bearing 重建，以及展開大小、
+  glyph／point／component、offset、reserved flag 與尾端資料防禦。
+- 正向 corpus：W3C `woff2-compiled-tests` commit
+  `1fd8cd583645618f4df36c65a297479840ad5510` 的 WOFF2／TTF pair；Google Fonts production
+  Noto Sans v42 Latin WOFF2 SHA-256
+  `09aee8065d25508f23a4c3d92cd777ac869c52d93fd868a88f025d888a7937d6` 與 Devanagari WOFF2
+  SHA-256 `1ccb720178c307d17a30f2f8eda43c2f9ffa831c02cb7f7d9d7b8708bcbaf43c`。Google 字型為
+  OFL-1.1；所有 corpus 只下載至 CI cache／artifact，不納入 repository 或 nupkg。
+- W3C 與 production corpus 只作黑箱資料／結果驗證，不作程式碼來源。synthetic C# fixture
+  驗證 `hmtx` 三種合法 omission 組合、simple triplet、composite、short／long `loca` 與負向拒絕；
+  兩個 production WOFF2 各執行 64 組固定種子 byte mutation，限制結果只能是有效解析或明確的
+  `InvalidDataException`／`NotSupportedException`。
+- decoder 與 synthetic fixture 完成後，為釐清 2019 compiled corpus 的 `hmtx` reference bytes
+  差異，曾只讀檢視 W3C `woff2-tests` 的 fixture generator 中 `transformHmtx`／`makeLSB1` 測試資料
+  建構段落；未檢視其 glyf decoder、Google woff2 或 FontTools 內部實作，亦未依該段落修改產品
+  演算法。W3C pair 因此只比較非 transform tables 並驗證重建 sfnt 結構；`hmtx` bytes 的精確
+  正向契約由獨立 C# synthetic fixture 三種 flags 覆蓋。此 post-implementation 檢視須納入人工
+  clean-room 審閱，不得隱匿為完全未接觸測試 generator。
+- WOFF2 collection 尚未實作；第三方惡意 WOFF2 安全稽核與 coverage-guided fuzz 尚待人工／外部
+  閘門，因此整體 engine 狀態仍為 experimental。
