@@ -1,4 +1,5 @@
 ﻿using System.Buffers.Binary;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.Json;
 using OdfKit.WebFonts;
@@ -64,6 +65,12 @@ internal static class Program
         await File.WriteAllBytesAsync(
             trueTypeCollectionPath,
             CreateOpenTypeCollection(
+                await File.ReadAllBytesAsync(extBPath).ConfigureAwait(false),
+                await File.ReadAllBytesAsync(plusPath).ConfigureAwait(false))).ConfigureAwait(false);
+        string woff2CollectionPath = Path.Combine(outputRoot, "cns-managed-real-faces.woff2");
+        await File.WriteAllBytesAsync(
+            woff2CollectionPath,
+            CreateWoff2Collection(
                 await File.ReadAllBytesAsync(extBPath).ConfigureAwait(false),
                 await File.ReadAllBytesAsync(plusPath).ConfigureAwait(false))).ConfigureAwait(false);
         string cff2CollectionPath = Path.Combine(outputRoot, "source-han-cff2-variable.otc");
@@ -159,6 +166,20 @@ internal static class Program
             results,
             "managed-ttc-face-1",
             trueTypeCollectionPath,
+            faceIndex: 1,
+            PuaText,
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "managed-woff2-collection-face-0",
+            woff2CollectionPath,
+            faceIndex: 0,
+            ExtBText,
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "managed-woff2-collection-face-1",
+            woff2CollectionPath,
             faceIndex: 1,
             PuaText,
             outputRoot).ConfigureAwait(false);
@@ -1099,6 +1120,103 @@ internal static class Program
         }
 
         return output;
+    }
+
+    private static byte[] CreateWoff2Collection(params byte[][] fonts)
+    {
+        FaceSource[] faces = fonts.Select(ParseFace).ToArray();
+        int globalTableCount = faces.Sum(face => face.Tables.Length);
+        if (faces.Length == 0 || faces.Length > 256 || globalTableCount is 0 or > 256)
+        {
+            throw new InvalidDataException("The WOFF2 collection fixture exceeds the managed test bounds.");
+        }
+
+        using var directory = new MemoryStream();
+        using var tableData = new MemoryStream();
+        foreach (FaceSource face in faces)
+        {
+            foreach (TableSource table in face.Tables)
+            {
+                string tag = System.Text.Encoding.ASCII.GetString(table.Tag);
+                int transformVersion = tag is "glyf" or "loca" ? 3 : 0;
+                directory.WriteByte(checked((byte)((transformVersion << 6) | 63)));
+                directory.Write(table.Tag);
+                WriteUIntBase128(directory, checked((uint)table.Data.Length));
+                tableData.Write(table.Data);
+            }
+        }
+
+        WriteUInt32(directory, 0x00010000);
+        Write255UInt16(directory, checked((ushort)faces.Length));
+        int globalIndex = 0;
+        foreach (FaceSource face in faces)
+        {
+            Write255UInt16(directory, checked((ushort)face.Tables.Length));
+            WriteUInt32(directory, BinaryPrimitives.ReadUInt32BigEndian(face.Header));
+            for (int table = 0; table < face.Tables.Length; table++)
+            {
+                Write255UInt16(directory, checked((ushort)globalIndex++));
+            }
+        }
+
+        byte[] uncompressed = tableData.ToArray();
+        var compressed = new byte[BrotliEncoder.GetMaxCompressedLength(uncompressed.Length)];
+        if (!BrotliEncoder.TryCompress(
+                uncompressed,
+                compressed,
+                out int compressedLength,
+                quality: 11,
+                window: 22))
+        {
+            throw new InvalidDataException("The WOFF2 collection fixture could not be compressed.");
+        }
+
+        byte[] directoryBytes = directory.ToArray();
+        int contentEnd = checked(48 + directoryBytes.Length + compressedLength);
+        var output = new byte[Align4(contentEnd)];
+        "wOF2"u8.CopyTo(output);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(4, 4), 0x74746366);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(8, 4), checked((uint)output.Length));
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)globalTableCount));
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), 1);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(20, 4), checked((uint)compressedLength));
+        directoryBytes.CopyTo(output, 48);
+        compressed.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directoryBytes.Length));
+        return output;
+    }
+
+    private static void WriteUIntBase128(Stream stream, uint value)
+    {
+        Span<byte> bytes = stackalloc byte[5];
+        int index = bytes.Length;
+        bytes[--index] = checked((byte)(value & 0x7F));
+        while ((value >>= 7) != 0)
+        {
+            bytes[--index] = checked((byte)((value & 0x7F) | 0x80));
+        }
+
+        stream.Write(bytes[index..]);
+    }
+
+    private static void Write255UInt16(Stream stream, ushort value)
+    {
+        if (value < 253)
+        {
+            stream.WriteByte(checked((byte)value));
+            return;
+        }
+
+        stream.WriteByte(253);
+        Span<byte> bytes = stackalloc byte[2];
+        BinaryPrimitives.WriteUInt16BigEndian(bytes, value);
+        stream.Write(bytes);
+    }
+
+    private static void WriteUInt32(Stream stream, uint value)
+    {
+        Span<byte> bytes = stackalloc byte[4];
+        BinaryPrimitives.WriteUInt32BigEndian(bytes, value);
+        stream.Write(bytes);
     }
 
     private static FaceSource ParseFace(byte[] font)

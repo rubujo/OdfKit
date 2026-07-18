@@ -43,7 +43,9 @@ retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex
 OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`
 亦有 experimental retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
 以及 `net10.0` standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
-`hmtx` version 1 transform，也接受規格合法的 null transform。輸出只產生瀏覽器部署用的獨立
+`hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
+路徑接受 WOFF2 collection 的指定 face，驗證 collection directory、table index 與共享
+transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只產生瀏覽器部署用的獨立
 TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、無 VariationStore 的 CFF2 與未知
 color table 版本必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
@@ -63,8 +65,9 @@ transformed WOFF2 輸入的 table 反轉換本身是 OdfKit 依 W3C WOFF2 規格
 純 C#：包含 triplet 座標、simple／composite glyph、bbox、instructions、short／long `loca`
 與 `hmtx` bearing 重建。Brotli bitstream 仍由 .NET Runtime API 解壓。CI 會下載 SHA-256 鎖定的
 W3C decoder corpus，以及 Google Fonts production Noto Sans v42 Latin／Devanagari WOFF2；檔案
-只進 cache／artifact，不進 repository 或 nupkg。WOFF2 collection 仍明確拒絕，不能以 standalone
-transform 支援推定為 collection 支援。
+只進 cache／artifact，不進 repository 或 nupkg。WOFF2 collection 以官方 CNS 宋體 Ext-B／PUA
+真實 face 建立 null-transform collection，分別選取兩個 face 後產生獨立 TTF／WOFF／WOFF2；
+transformed collection 與瀏覽器端直接 collection 部署仍保留 experimental／拒絕閘門。
 
 ## 預定最短使用方式
 

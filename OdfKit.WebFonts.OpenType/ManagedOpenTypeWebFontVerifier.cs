@@ -129,8 +129,7 @@ public static class ManagedOpenTypeWebFontVerifier
         WebFontFormat format,
         IEnumerable<int> unicodeScalars)
     {
-        byte[] sourceSfnt = DecodeSource(source, checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024)));
-        SfntFont sourceFont = SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
+        SfntFont sourceFont = ParseSourceFace(source, faceIndex);
         SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
         if (sourceFont.GlyphCount != subsetFont.GlyphCount)
         {
@@ -153,8 +152,7 @@ public static class ManagedOpenTypeWebFontVerifier
         Stream subset,
         WebFontFormat format)
     {
-        byte[] sourceSfnt = DecodeSource(source, checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024)));
-        SfntFont sourceFont = SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
+        SfntFont sourceFont = ParseSourceFace(source, faceIndex);
         SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
         foreach (string tag in new[] { "GDEF", "GPOS", "GSUB" })
         {
@@ -170,6 +168,21 @@ public static class ManagedOpenTypeWebFontVerifier
 
     private static bool IsVariationSelector(int scalar)
         => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
+
+    private static SfntFont ParseSourceFace(byte[] source, int faceIndex)
+    {
+        int maximumBytes = checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024));
+#if NET10_0_OR_GREATER
+        if (source.Length >= 4 && source.AsSpan(0, 4).SequenceEqual("wOF2"u8))
+        {
+            byte[] selectedFace = DecodeWoff2(source, maximumBytes, faceIndex);
+            return SfntFont.Parse(selectedFace, 0, 256, validateChecksums: true);
+        }
+#endif
+
+        byte[] sourceSfnt = DecodeSource(source, maximumBytes);
+        return SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
+    }
 
     private static bool RequiresGlyph(int scalar)
         => scalar != 0xFEFF
@@ -291,6 +304,9 @@ public static class ManagedOpenTypeWebFontVerifier
 
 #if NET10_0_OR_GREATER
     internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes)
+        => DecodeWoff2(bytes, maximumExpandedBytes, 0);
+
+    internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes, int faceIndex)
     {
         ReadOnlySpan<byte> data = bytes;
         SfntFont.EnsureRange(data, 0, 48, "WOFF2-header");
@@ -315,11 +331,8 @@ public static class ManagedOpenTypeWebFontVerifier
         {
             throw SfntFont.DataInvalid("WOFF2-header");
         }
-        if (flavor == 0x74746366)
-        {
-            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
-        }
-        if (flavor is not (0x00010000 or 0x74727565 or 0x4F54544F))
+        bool isCollection = flavor == 0x74746366;
+        if (!isCollection && flavor is not (0x00010000 or 0x74727565 or 0x4F54544F))
         {
             throw SfntFont.DataInvalid("WOFF2-flavor");
         }
@@ -382,6 +395,25 @@ public static class ManagedOpenTypeWebFontVerifier
                 transformVersion));
         }
 
+        Woff2CollectionFace? collectionFace = null;
+        if (isCollection)
+        {
+            IReadOnlyList<Woff2CollectionFace> faces = ReadWoff2Collection(
+                data,
+                ref position,
+                entries);
+            if (faceIndex < 0 || faceIndex >= faces.Count)
+            {
+                throw SfntFont.DataInvalid("WOFF2-collection-face");
+            }
+
+            collectionFace = faces[faceIndex];
+        }
+        else if (faceIndex != 0)
+        {
+            throw SfntFont.DataInvalid("WOFF2-face");
+        }
+
         SfntFont.EnsureRange(data, position, compressedLength, "WOFF2-compressedData");
         int compressedEnd = checked(position + compressedLength);
         ValidateWoff2TrailingBlocks(
@@ -403,12 +435,23 @@ public static class ManagedOpenTypeWebFontVerifier
             throw SfntFont.DataInvalid("WOFF2-Brotli");
         }
 
+        var storedOffsets = new int[entries.Count];
+        int tableOffset = 0;
+        for (int index = 0; index < entries.Count; index++)
+        {
+            Woff2TableEntry entry = entries[index];
+            storedOffsets[index] = tableOffset;
+            tableOffset += entry.StoredLength;
+        }
+
+        IReadOnlyList<int> selectedTableIndices = collectionFace?.TableIndices
+            ?? Enumerable.Range(0, entries.Count).ToArray();
         var tables = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         var transformedTables = new List<(Woff2TableEntry Entry, byte[] Data)>();
-        int tableOffset = 0;
-        foreach (Woff2TableEntry entry in entries)
+        foreach (int index in selectedTableIndices)
         {
-            byte[] table = uncompressed.AsSpan(tableOffset, entry.StoredLength).ToArray();
+            Woff2TableEntry entry = entries[index];
+            byte[] table = uncompressed.AsSpan(storedOffsets[index], entry.StoredLength).ToArray();
             if (tables.ContainsKey(entry.Tag)
                 || transformedTables.Any(item => item.Entry.Tag == entry.Tag))
             {
@@ -423,8 +466,6 @@ public static class ManagedOpenTypeWebFontVerifier
             {
                 tables.Add(entry.Tag, table);
             }
-
-            tableOffset += entry.StoredLength;
         }
 
         (Woff2TableEntry Entry, byte[] Data)? transformedGlyf = transformedTables
@@ -464,7 +505,8 @@ public static class ManagedOpenTypeWebFontVerifier
             tables.Add(entry.Tag, table);
         }
 
-        byte[] sfnt = WebFontWriters.WriteTrueType(new SfntSubset(flavor, tables));
+        uint selectedFlavor = collectionFace?.Flavor ?? flavor;
+        byte[] sfnt = WebFontWriters.WriteTrueType(new SfntSubset(selectedFlavor, tables));
         if (sfnt.Length > maximumExpandedBytes)
         {
             throw SfntFont.DataInvalid("WOFF2-sfntSize");
@@ -695,6 +737,134 @@ public static class ManagedOpenTypeWebFontVerifier
 
         return result;
     }
+
+    private static IReadOnlyList<Woff2CollectionFace> ReadWoff2Collection(
+        ReadOnlySpan<byte> data,
+        ref int position,
+        IReadOnlyList<Woff2TableEntry> entries)
+    {
+        SfntFont.EnsureRange(data, position, 4, "WOFF2-collection-version");
+        uint version = SfntFont.ReadUInt32(data, position, "WOFF2-collection-version");
+        position += 4;
+        if (version is not (0x00010000 or 0x00020000))
+        {
+            throw SfntFont.DataInvalid("WOFF2-collection-version");
+        }
+
+        ushort faceCount = Read255UInt16(data, ref position);
+        if (faceCount is 0 or > 256)
+        {
+            throw SfntFont.DataInvalid("WOFF2-collection-count");
+        }
+
+        var faces = new List<Woff2CollectionFace>(faceCount);
+        var glyfToLoca = new Dictionary<int, int>();
+        var locaToGlyf = new Dictionary<int, int>();
+        for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
+        {
+            ushort tableCount = Read255UInt16(data, ref position);
+            SfntFont.EnsureRange(data, position, 4, "WOFF2-collection-flavor");
+            uint flavor = SfntFont.ReadUInt32(data, position, "WOFF2-collection-flavor");
+            position += 4;
+            if (tableCount == 0
+                || tableCount > entries.Count
+                || flavor is not (0x00010000 or 0x74727565 or 0x4F54544F))
+            {
+                throw SfntFont.DataInvalid("WOFF2-collection-face");
+            }
+
+            var indices = new int[tableCount];
+            var uniqueIndices = new HashSet<int>();
+            var uniqueTags = new HashSet<string>(StringComparer.Ordinal);
+            int glyfIndex = -1;
+            int locaIndex = -1;
+            for (int table = 0; table < tableCount; table++)
+            {
+                int tableIndex = Read255UInt16(data, ref position);
+                if (tableIndex >= entries.Count
+                    || !uniqueIndices.Add(tableIndex)
+                    || !uniqueTags.Add(entries[tableIndex].Tag))
+                {
+                    throw SfntFont.DataInvalid("WOFF2-collection-table");
+                }
+
+                indices[table] = tableIndex;
+                if (entries[tableIndex].Tag == "glyf")
+                {
+                    glyfIndex = tableIndex;
+                }
+                else if (entries[tableIndex].Tag == "loca")
+                {
+                    locaIndex = tableIndex;
+                }
+            }
+
+            ValidateWoff2CollectionGlyfLocaPair(
+                entries,
+                glyfIndex,
+                locaIndex,
+                glyfToLoca,
+                locaToGlyf);
+            faces.Add(new Woff2CollectionFace(flavor, indices));
+        }
+
+        return faces;
+    }
+
+    private static void ValidateWoff2CollectionGlyfLocaPair(
+        IReadOnlyList<Woff2TableEntry> entries,
+        int glyfIndex,
+        int locaIndex,
+        IDictionary<int, int> glyfToLoca,
+        IDictionary<int, int> locaToGlyf)
+    {
+        if ((glyfIndex >= 0) != (locaIndex >= 0))
+        {
+            throw SfntFont.DataInvalid("WOFF2-glyf-loca-pair");
+        }
+        if (glyfIndex < 0)
+        {
+            return;
+        }
+
+        if (entries[glyfIndex].IsTransformed != entries[locaIndex].IsTransformed
+            || (glyfToLoca.TryGetValue(glyfIndex, out int existingLoca)
+                && existingLoca != locaIndex)
+            || (locaToGlyf.TryGetValue(locaIndex, out int existingGlyf)
+                && existingGlyf != glyfIndex))
+        {
+            throw SfntFont.DataInvalid("WOFF2-glyf-loca-pair");
+        }
+
+        glyfToLoca[glyfIndex] = locaIndex;
+        locaToGlyf[locaIndex] = glyfIndex;
+    }
+
+    private static ushort Read255UInt16(ReadOnlySpan<byte> data, ref int position)
+    {
+        SfntFont.EnsureRange(data, position, 1, "WOFF2-255UInt16");
+        byte code = data[position++];
+        if (code == 253)
+        {
+            SfntFont.EnsureRange(data, position, 2, "WOFF2-255UInt16");
+            ushort value = SfntFont.ReadUInt16(data, position, "WOFF2-255UInt16");
+            position += 2;
+            return value;
+        }
+
+        if (code is 254 or 255)
+        {
+            SfntFont.EnsureRange(data, position, 1, "WOFF2-255UInt16");
+            int offset = code == 255 ? 253 : 506;
+            return checked((ushort)(data[position++] + offset));
+        }
+
+        return code;
+    }
+
+    private readonly record struct Woff2CollectionFace(
+        uint Flavor,
+        IReadOnlyList<int> TableIndices);
 
     private readonly record struct Woff2TableEntry(
         string Tag,

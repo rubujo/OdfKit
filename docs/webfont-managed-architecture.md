@@ -73,13 +73,14 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 - 輸入是來源容器：standalone TTF／OTF、TTC／OTC 的指定 face、Windows EUDC `.tte`，以及
   可安全展開的 standalone WOFF；`net10.0` 另接受 null 或標準 transformed-table 的 standalone
-  WOFF2。來源副檔名不作
+  WOFF2，並以 experimental 路徑接受 WOFF2 collection 的指定 face。來源副檔名不作
   信任依據，均以 signature、table directory、checksum、展開上限與 `faceIndex` 驗證。
 - 輸出是瀏覽器部署資產：獨立 TTF／OTF、WOFF 1.0；`net10.0` 另提供 WOFF2。TTC／OTC
   只作輸入，不作產品輸出；每次先抽出指定 face，再產生內容定址的獨立 WebFont。
 - 一般工具產生的 WOFF2 可使用 `glyf`／`loca` version 0 或 `hmtx` version 1 transform；目前
-  clean-room decoder 已有界重建上述標準 transform。未知 transform version 與 WOFF2 collection
-  仍須明確拒絕，不能由 standalone 支援推定為任意 WOFF2 支援。
+  clean-room decoder 已有界重建上述標準 transform。WOFF2 collection 另解析 collection directory、
+  每個 face 的全域 table index，以及共享 transformed `glyf`／`loca` 配對；未知 transform version
+  仍須明確拒絕，不能由已支援路徑推定為任意 WOFF2 支援。
 - 字元：Unicode scalar、Supplementary Plane、PUA、IVS；`cmap` format 4／12／14。
 - glyph closure：`.notdef`、要求字元及 TrueType composite component 的遞迴閉包。
 - 法律資料：預設保留 `name` license description／URL、`OS/2` 與必要 metadata。
@@ -95,7 +96,7 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 | Windows EUDC `.tte` | 已實作，內容仍須為合法 sfnt | 產生獨立 TTF／WOFF；`net10.0` 可產生 WOFF2 |
 | WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 standalone | `net10.0` 已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
-| WOFF2 collection | 尚未實作 collection directory 與共享 transformed-table pair 重建，明確拒絕 | 無 |
+| WOFF2 collection | `net10.0` experimental；指定 `faceIndex`，有界解析 collection directory 與共享 transformed `glyf`／`loca` 配對 | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
 | TrueType／CFF／CFF2 variable | experimental correctness-first | 保留 variation metadata 的獨立資產 |
 | COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | experimental correctness-first；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
 | Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |

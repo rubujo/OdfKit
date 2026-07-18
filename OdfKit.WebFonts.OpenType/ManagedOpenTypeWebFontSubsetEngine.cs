@@ -262,8 +262,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             throw DataInvalid("source-sha256");
         }
 
-        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeSource(bytes, checked((int)_options.MaxSourceBytes));
-        var source = new CachedSource(decoded);
+        var source = new CachedSource(bytes, checked((int)_options.MaxSourceBytes));
         return cacheKey.Length == 0 ? source : CacheVerifiedSource(cacheKey, source);
     }
 
@@ -304,7 +303,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         }
     }
 
-    private sealed class CachedSource(byte[] bytes)
+    private sealed class CachedSource(byte[] bytes, int maximumExpandedBytes)
     {
         private readonly object _gate = new();
         private readonly Dictionary<int, SfntFont> _fonts = [];
@@ -317,7 +316,30 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             {
                 if (!_fonts.TryGetValue(faceIndex, out SfntFont? font))
                 {
-                    font = SfntFont.Parse(Bytes, faceIndex, maxTableCount, validateChecksums);
+                    byte[] decoded = Bytes;
+                    int decodedFaceIndex = faceIndex;
+                    if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOFF"u8))
+                    {
+                        decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff(Bytes, maximumExpandedBytes);
+                        decodedFaceIndex = faceIndex;
+                    }
+#if NET10_0_OR_GREATER
+                    else if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOF2"u8))
+                    {
+                        decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                            Bytes,
+                            maximumExpandedBytes,
+                            faceIndex);
+                        decodedFaceIndex = 0;
+                    }
+#else
+                    else if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOF2"u8))
+                    {
+                        throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+                    }
+#endif
+
+                    font = SfntFont.Parse(decoded, decodedFaceIndex, maxTableCount, validateChecksums);
                     _fonts.Add(faceIndex, font);
                 }
 

@@ -60,6 +60,36 @@ public sealed class Woff2TransformDecoderTests
     }
 
     [Fact]
+    public void DecodeWoff2CollectionSelectsRequestedFace()
+    {
+        byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: false);
+
+        byte[] first = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 0);
+        byte[] second = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 1);
+
+        Assert.Equal([0, 1, 2, 3], ReadSfntTable(first, "TEST"));
+        Assert.Equal([4, 5, 6, 7], ReadSfntTable(second, "TEST"));
+    }
+
+    [Fact]
+    public void DecodeWoff2CollectionRejectsOutOfRangeFace()
+    {
+        byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: false);
+
+        Assert.Throws<InvalidDataException>(
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 2));
+    }
+
+    [Fact]
+    public void DecodeWoff2CollectionRejectsDuplicateFaceTable()
+    {
+        byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: true);
+
+        Assert.Throws<InvalidDataException>(
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 1));
+    }
+
+    [Fact]
     public void ReconstructGlyfDecodesSimpleTripletsAndLongLoca()
     {
         byte[] transformed = CreateTransformedGlyf(
@@ -208,6 +238,62 @@ public sealed class Woff2TransformDecoderTests
         compressed.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directoryBytes.Length));
 
         Assert.Equal(originalHmtx.Length, 10);
+        return output;
+    }
+
+    private static byte[] CreateWoff2Collection(bool duplicateSecondFaceTable)
+    {
+        byte[][] tables =
+        [
+            new byte[54],
+            [0, 1, 2, 3],
+            [4, 5, 6, 7]
+        ];
+        using var directory = new MemoryStream();
+        using var tableData = new MemoryStream();
+        for (int index = 0; index < tables.Length; index++)
+        {
+            directory.WriteByte(63);
+            directory.Write(index == 0 ? "head"u8 : "TEST"u8);
+            WriteUIntBase128(directory, checked((uint)tables[index].Length));
+            tableData.Write(tables[index]);
+        }
+
+        WriteUInt32(directory, 0x00010000);
+        Write255UInt16(directory, 2);
+        for (ushort face = 0; face < 2; face++)
+        {
+            Write255UInt16(directory, duplicateSecondFaceTable && face == 1 ? (ushort)3 : (ushort)2);
+            WriteUInt32(directory, 0x00010000);
+            Write255UInt16(directory, 0);
+            Write255UInt16(directory, checked((ushort)(face + 1)));
+            if (duplicateSecondFaceTable && face == 1)
+            {
+                Write255UInt16(directory, checked((ushort)(face + 1)));
+            }
+        }
+
+        byte[] uncompressed = tableData.ToArray();
+        var compressed = new byte[BrotliEncoder.GetMaxCompressedLength(uncompressed.Length)];
+        Assert.True(BrotliEncoder.TryCompress(
+            uncompressed,
+            compressed,
+            out int compressedLength,
+            quality: 5,
+            window: 18));
+
+        byte[] directoryBytes = directory.ToArray();
+        int contentLength = checked(48 + directoryBytes.Length + compressedLength);
+        int outputLength = (contentLength + 3) & ~3;
+        var output = new byte[outputLength];
+        "wOF2"u8.CopyTo(output);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(4, 4), 0x74746366);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(8, 4), checked((uint)output.Length));
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)tables.Length));
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), 1);
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(20, 4), checked((uint)compressedLength));
+        directoryBytes.CopyTo(output, 48);
+        compressed.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directoryBytes.Length));
         return output;
     }
 
@@ -391,6 +477,18 @@ public sealed class Woff2TransformDecoderTests
         Span<byte> bytes = stackalloc byte[2];
         BinaryPrimitives.WriteUInt16BigEndian(bytes, value);
         stream.Write(bytes);
+    }
+
+    private static void Write255UInt16(Stream stream, ushort value)
+    {
+        if (value < 253)
+        {
+            stream.WriteByte(checked((byte)value));
+            return;
+        }
+
+        stream.WriteByte(253);
+        WriteUInt16(stream, value);
     }
 
     private static void WriteInt16(Stream stream, short value)
