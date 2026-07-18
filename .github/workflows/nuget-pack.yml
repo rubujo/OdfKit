@@ -161,7 +161,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: odfkit-webfont-sbom-${{ github.sha }}
-          path: artifacts/webfont-sbom
+          path: artifacts
 
       - name: Verify snapshot and run native consumer smoke
         shell: pwsh
