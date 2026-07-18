@@ -97,7 +97,7 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 | WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 standalone | `net10.0` 已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 collection | `net10.0` experimental；指定 `faceIndex`，有界解析 collection directory 與共享 transformed `glyf`／`loca` 配對 | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
-| TrueType／CFF／CFF2 variable | experimental correctness-first | 保留 variation metadata 的獨立資產 |
+| TrueType／CFF／CFF2 variable，以及省略 VariationStore 的非變動 CFF2 | experimental correctness-first | 保留必要 metadata 的獨立資產 |
 | COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | experimental correctness-first；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
 | Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |
 
@@ -113,7 +113,8 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 - 名稱式 CFF；standalone／OTC face 的 CID-keyed 靜態 CFF 1.0 與含 VariationStore 的
   CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。直接 collection 輸出仍須獨立 writer
   與三瀏覽器證據。
-- 尚未通過第 3.5 節證據閘門的 variable font；無 VariationStore／`fvar` 的 CFF2 維持拒絕。
+- 尚未通過第 3.5 節證據閘門的 variable font；缺少 VariationStore 卻使用 `vsindex`／`blend`，
+  或 VariationStore／`fvar` 不一致的 CFF2 維持拒絕。
 - 尚未通過第 3.6 節結構驗證的 color table 版本或組合。
 - AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
 - `OS/2.fsType` 禁止 embedding、禁止 subsetting 或只允許 bitmap embedding 的字型。
@@ -185,8 +186,11 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    Top／Font／Private DICT、FDSelect
    0／3／4、VariationRegion、ItemVariationData、`vsindex`、`blend` 與 subroutine；未選 glyph
    以等長零位移 CharString 取代，不重排 INDEX 或 variation metadata。Source Han Sans 2.005R
-   已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。無
-   VariationStore 的 CFF2、超出資源上限的 INDEX／region 與無法唯一驗證的 operator 維持拒絕。
+   已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。Microsoft
+   OpenType 1.9.1 明定非變動 CFF2 必須省略 VariationStore；此結構已由有界規格 fixture 解封，
+   但因尚缺可再散布的真實靜態 CFF2 與三瀏覽器證據而維持 experimental。缺少 VariationStore
+   卻使用 `vsindex`／`blend`、VariationStore／`fvar` 不一致、超出資源上限的 INDEX／region 與
+   無法唯一驗證的 operator 仍明確拒絕。
 
 OTC 瀏覽器差分不假設所有引擎都接受 raw collection：Chromium 直接比較 raw OTC 與 managed
 WOFF2；Firefox／WebKit 以同一 face 的 managed standalone OTF 對 WOFF2。如此三個引擎都實際

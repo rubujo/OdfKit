@@ -6,7 +6,7 @@ namespace OdfKit.WebFonts.OpenType;
 
 internal static class Cff2Subsetter
 {
-    private static readonly ConditionalWeakTable<byte[], ParsedCff2> ParsedFonts = new();
+    private static readonly ConditionalWeakTable<byte[], ParsedCff2CacheEntry> ParsedFonts = new();
 
     private const int CharStringsOperator = 17;
     private const int PrivateOperator = 18;
@@ -34,7 +34,7 @@ internal static class Cff2Subsetter
 
     internal static byte[] Build(
         byte[] source,
-        byte[] fvar,
+        byte[]? fvar,
         ushort glyphCount,
         ISet<ushort> selectedGlyphs)
     {
@@ -56,7 +56,7 @@ internal static class Cff2Subsetter
 
     internal static void Validate(
         byte[] source,
-        byte[] fvar,
+        byte[]? fvar,
         ushort glyphCount,
         ISet<ushort> selectedGlyphs)
     {
@@ -64,7 +64,7 @@ internal static class Cff2Subsetter
         VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
     }
 
-    private static ParsedCff2 Parse(byte[] source, byte[] fvar, ushort glyphCount)
+    private static ParsedCff2 Parse(byte[] source, ushort? variationAxisCount, ushort glyphCount)
     {
         SfntFont.EnsureRange(source, 0, 5, "CFF2-header");
         if (source[0] != 2 || source[1] != 0 || source[2] != 5)
@@ -87,16 +87,23 @@ internal static class Cff2Subsetter
         int[] variationRegionCounts;
         if (topDict.TryGetValue(VariationStoreOperator, out double?[]? variationOperands))
         {
+            if (variationAxisCount is null)
+            {
+                throw SfntFont.DataInvalid("CFF2-fvar-missing");
+            }
+
             int variationStoreOffset = GetIntegerOperand(
                 variationOperands,
                 1,
                 "CFF2-VariationStore");
-            ushort axisCount = ValidateFvar(fvar);
-            variationRegionCounts = ReadVariationStore(source, variationStoreOffset, axisCount);
+            variationRegionCounts = ReadVariationStore(
+                source,
+                variationStoreOffset,
+                variationAxisCount.Value);
         }
         else
         {
-            throw SfntFont.DataInvalid("CFF2-VariationStore-missing");
+            variationRegionCounts = [];
         }
 
         Cff2Index charStrings = ReadIndex(source, charStringsOffset, "CFF2-CharStrings", glyphCount);
@@ -159,8 +166,20 @@ internal static class Cff2Subsetter
             variationRegionCounts);
     }
 
-    private static ParsedCff2 GetParsed(byte[] source, byte[] fvar, ushort glyphCount)
-        => ParsedFonts.GetValue(source, value => Parse(value, fvar, glyphCount));
+    private static ParsedCff2 GetParsed(byte[] source, byte[]? fvar, ushort glyphCount)
+    {
+        ushort? variationAxisCount = fvar is null ? null : ValidateFvar(fvar);
+        ParsedCff2CacheEntry cached = ParsedFonts.GetValue(
+            source,
+            value => new ParsedCff2CacheEntry(
+                Parse(value, variationAxisCount, glyphCount),
+                glyphCount,
+                variationAxisCount));
+
+        return cached.GlyphCount == glyphCount && cached.VariationAxisCount == variationAxisCount
+            ? cached.Font
+            : Parse(source, variationAxisCount, glyphCount);
+    }
 
     private static (IReadOnlyList<ReadOnlyMemory<byte>> Subroutines, int DefaultVariationIndex) ReadPrivateDict(
         byte[] source,
@@ -808,5 +827,17 @@ internal static class Cff2Subsetter
         internal int[] DefaultVariationIndexes { get; } = defaultVariationIndexes;
 
         internal int[] VariationRegionCounts { get; } = variationRegionCounts;
+    }
+
+    private sealed class ParsedCff2CacheEntry(
+        ParsedCff2 font,
+        ushort glyphCount,
+        ushort? variationAxisCount)
+    {
+        internal ParsedCff2 Font { get; } = font;
+
+        internal ushort GlyphCount { get; } = glyphCount;
+
+        internal ushort? VariationAxisCount { get; } = variationAxisCount;
     }
 }

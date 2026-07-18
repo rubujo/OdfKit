@@ -18,7 +18,9 @@ internal static class Cff2CharStringVerifier
     {
         if (globalSubroutines.Count > 65_535
             || localSubroutines.Count > 65_535
-            || (uint)defaultVariationIndex >= (uint)variationRegionCounts.Length)
+            || variationRegionCounts.Length == 0 && defaultVariationIndex != 0
+            || variationRegionCounts.Length != 0
+                && (uint)defaultVariationIndex >= (uint)variationRegionCounts.Length)
         {
             throw SfntFont.DataInvalid("CFF2-CharString-context");
         }
@@ -212,6 +214,11 @@ internal static class Cff2CharStringVerifier
 
     private static void ProcessBlend(VerificationState state)
     {
+        if (state.VariationRegionCounts.Length == 0)
+        {
+            throw SfntFont.DataInvalid("CFF2-CharString-blend-without-vstore");
+        }
+
         int valueCount = RequireInteger(Pop(state, "blend-count"), 1, MaximumStackDepth, "blend-count");
         int regionCount = state.VariationRegionCounts[state.ActiveVariationIndex];
         int operandCount = checked(valueCount + (valueCount * regionCount));

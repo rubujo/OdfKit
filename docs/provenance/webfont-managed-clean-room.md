@@ -92,6 +92,22 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 尚未通過的人工作業：第三方結構相異性、惡意 CFF2 安全審查與更廣多軸 corpus；能力維持
   experimental。
 
+### 2026-07-18 非變動 CFF2
+
+- 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1
+  [CFF2](https://learn.microsoft.com/en-us/typography/opentype/spec/cff2)。該規格明定不支援 Font
+  Variations 的字型必須省略 VariationStore；未讀取、搜尋或改寫 FontTools、FreeType、HarfBuzz
+  或其它第三方 parser／subsetter 實作。
+- 原創範圍：允許省略 VariationStore／`fvar` 的 CFF2 結構，並以空 variation context 驗證
+  Top／Font／Private DICT、INDEX、CharString 與 subroutine；缺少 store 的 `vsindex`／`blend`
+  仍以有界 `InvalidDataException` 明確拒絕。
+- 安全與效能：CFF2 弱參照解析快取除來源 bytes 外，同時核對 glyph count 與 variation axis
+  count；上下文不同時重新解析，避免跨 face／metadata 誤用快取結果，來源淘汰後仍可回收。
+- 證據：以官方規格欄位建立的最小二進位 fixture 驗證合法非變動 CFF2、retain-GIDs、非法
+  `vsindex`／`blend` 與跨 glyph count 快取隔離。fixture 是結構測試，不冒充真實字型 corpus。
+- 尚未通過的人工作業：截至 2026-07-18 尚未找到授權可追溯、可鎖定 SHA-256 且能在
+  Chromium／Firefox／WebKit 重現的真實非變動 CFF2；能力維持 experimental。
+
 ### 2026-07-18 OpenType Collection CFF／CFF2
 
 - 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1 Font Collections、Adobe

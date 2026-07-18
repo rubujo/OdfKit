@@ -7,9 +7,10 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
 - 接受 TTF／OTF／TTC／OTC 指定 face、`.tte`、WOFF，以及 net10 standalone WOFF2 null／
   `glyf`／`loca`／`hmtx` transform；net10 WOFF2 collection 指定 face 為 experimental 輸入，輸出瀏覽器部署用
   WOFF2／WOFF／TTF／OTF；支援 Unicode、Big5、明確 Big5E 與版本化 PUA Profile；TrueType
-  Variable Fonts、standalone／OTC face 的 CID-keyed 靜態 CFF 1.0 與含 VariationStore 的 CFF2
-  variable `OTTO` 為 experimental；名稱式 CFF、無 VariationStore 的 CFF2 與直接 collection
-  輸出明確拒絕；color font 採保留完整 glyph ID 空間的 experimental 路徑。
+  Variable Fonts、standalone／OTC face 的 CID-keyed 靜態 CFF 1.0、含 VariationStore 的 CFF2
+  variable `OTTO` 與不含 VariationStore 的非變動 CFF2 為 experimental；名稱式 CFF、缺少
+  VariationStore 卻使用 `vsindex`／`blend` 的 CFF2 與直接 collection 輸出明確拒絕；color font
+  採保留完整 glyph ID 空間的 experimental 路徑。
 - Arabic／Devanagari 採保留完整 glyph ID、`cmap`、GDEF／GPOS／GSUB 的 correctness-first
   路徑；其它 complex script 必須先有合法 corpus 與三瀏覽器差分證據。
 - 提供 CLI／MSBuild 自動內容掃描、CSP/CDN URL、精確 CORS allowlist 與有界背景 Worker。

@@ -301,10 +301,12 @@ internal sealed class SfntFont
         }
         else if (isCff2)
         {
-            if (!_tables.TryGetValue("fvar", out byte[]? cff2Fvar) || _tables.ContainsKey("gvar"))
+            if (_tables.ContainsKey("gvar"))
             {
                 throw DataInvalid("CFF2-variation-tables");
             }
+
+            _tables.TryGetValue("fvar", out byte[]? cff2Fvar);
 
             tables["CFF2"] = Cff2Subsetter.Build(
                 _tables["CFF2"],
@@ -374,11 +376,7 @@ internal sealed class SfntFont
         }
         else if (_tables.TryGetValue("CFF2", out byte[]? cff2))
         {
-            if (!_tables.TryGetValue("fvar", out byte[]? fvar))
-            {
-                throw DataInvalid("CFF2-fvar-missing");
-            }
-
+            _tables.TryGetValue("fvar", out byte[]? fvar);
             Cff2Subsetter.Validate(cff2, fvar, _glyphCount, glyphs);
         }
     }

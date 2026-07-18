@@ -19,6 +19,21 @@ public sealed class Cff2CharStringVerifierTests
         Cff2CharStringVerifier.Verify(new byte[] { 19 }, [], [], [1], defaultVariationIndex: 0);
     }
 
+    [Fact]
+    public void Verify_AcceptsNonVariableContextWithoutVariationStore()
+    {
+        Cff2CharStringVerifier.Verify(Array.Empty<byte>(), [], [], [], defaultVariationIndex: 0);
+    }
+
+    [Fact]
+    public void Verify_RejectsBlendWithoutVariationStore()
+    {
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(new byte[] { 139, 16 }, [], [], [], defaultVariationIndex: 0));
+
+        Assert.Contains("blend-without-vstore", exception.Message, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData((byte)11)]
     [InlineData((byte)14)]

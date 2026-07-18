@@ -40,14 +40,16 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
 Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed 靜態 CFF 1.0 的
 retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
-OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`
-亦有 experimental retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
+OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`，以及
+依規格省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2，亦有 experimental
+retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
 以及 `net10.0` standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
 `hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
 路徑接受 WOFF2 collection 的指定 face，驗證 collection directory、table index 與共享
 transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只產生瀏覽器部署用的獨立
-TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、無 VariationStore 的 CFF2 與未知
-color table 版本必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
+TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、缺少 VariationStore 卻使用
+`vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
+Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
 
@@ -143,6 +145,14 @@ Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 
 WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
 缺少第三方惡意字型稽核與更廣 CFF2 corpus 而維持 experimental。
 
+OpenType 1.9.1 明定不支援 Font Variations 的 CFF2 必須省略 VariationStore，因此 parser 也接受
+省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2；`fvar` 可依字型其它變動資料
+存在或省略，但存在時仍須通過結構驗證。這條路徑已用依官方
+CFF2 結構建立的有界二進位 fixture 驗證 INDEX、DICT、CharString、retain-GIDs 與錯誤拒絕，並
+修正解析快取，使不同 glyph count／variation axis context 不會共用結果；截至 2026-07-18 尚未
+找到可鎖定、可再散布且能在三瀏覽器重現的真實靜態 CFF2 corpus，因此仍屬 experimental，不能
+宣稱已有真實瀏覽器相容性證據。
+
 `font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
 部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、
 `--size-adjust`、`--ascent-override`、`--descent-override` 與 `--line-gap-override` 會產生獨立的
@@ -197,9 +207,11 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
-以及 standalone／OTC face 的 CID-keyed 靜態 CFF 或有 VariationStore 的 CFF2 variable WOFF；
-TrueType variable、靜態 CFF、CFF2 variable 與 color font 為 experimental。`net48` 要求 WOFF2、
-名稱式 CFF、無 VariationStore 的 CFF2、未知 color table 版本或直接輸出 collection 會明確失敗。
+以及 standalone／OTC face 的 CID-keyed 靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
+VariationStore 的非變動 CFF2 WOFF；TrueType variable、靜態 CFF、CFF2 與 color font 為
+experimental。`net48` 要求 WOFF2、
+名稱式 CFF、缺少 VariationStore 卻使用 `vsindex`／`blend` 的 CFF2、未知 color table 版本或
+直接輸出 collection 會明確失敗。
 
 API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的
 `web.config/appSettings` 鍵，預設為 `OdfKit.WebFonts.ApiKey`。環境變數優先序是明確契約。
