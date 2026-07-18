@@ -313,8 +313,9 @@ IIS 亦應把 `requestFiltering/requestLimits/maxAllowedContentLength` 設為不
 Repository 的 `eng/Test-WebFontIisExpressSmoke.ps1` 會以隔離站台與隨機 localhost port 啟動 IIS
 Express，實際編譯 Web Forms 頁面並以官方 CNS Ext-B 執行 401、動態 TTF／WOFF、GET／HEAD、
 SHA-256、ETag 與 304。IIS Express 與 IIS 使用相同的 `applicationHost.config`／`Web.config`
-設定模型，但 IIS Express 由使用者啟動且沒有 WAS；因此這項證據只涵蓋 Integrated pipeline，
-不取代完整 IIS Classic mode 或正式站台驗收。
+設定模型；CI 分別以 `Clr4IntegratedAppPool` 與 `Clr4ClassicAppPool` 執行完整 HTTP smoke，Classic
+路徑由 ASP.NET 4 ISAPI mapping 交給 `system.web/httpHandlers`。IIS Express 由使用者啟動且沒有
+WAS，因此這項證據不取代正式 IIS 站台或客戶安全設定的驗收。
 
 `eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1` 則使用完整隔離 `applicationhost.config` 與 ANCM
 V2，分別發布並實際啟動 In-Process 與 Out-of-Process。前者驗證

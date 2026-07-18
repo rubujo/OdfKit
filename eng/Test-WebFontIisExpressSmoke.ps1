@@ -16,6 +16,9 @@ param(
 
     [string]$IisExpressPath = "C:\Program Files\IIS Express\iisexpress.exe",
 
+    [ValidateSet("Integrated", "Classic")]
+    [string]$Pipeline = "Integrated",
+
     [switch]$NoBuild
 )
 
@@ -36,6 +39,16 @@ if ($actualSourceSha256 -ne $SourceSha256.ToLowerInvariant()) {
 }
 if (-not (Test-Path -LiteralPath $IisExpressPath -PathType Leaf)) {
     throw "找不到 IIS Express：$IisExpressPath"
+}
+$applicationHostSource = Join-Path ([Environment]::GetFolderPath("MyDocuments")) `
+    "IISExpress/config/applicationhost.config"
+if (-not (Test-Path -LiteralPath $applicationHostSource -PathType Leaf)) {
+    throw "找不到 IIS Express 使用者 applicationhost.config：$applicationHostSource"
+}
+$applicationPool = if ($Pipeline -eq "Classic") { "Clr4ClassicAppPool" } else { "Clr4IntegratedAppPool" }
+$applicationHostText = Get-Content -LiteralPath $applicationHostSource -Raw
+if (-not $applicationHostText.Contains("name=`"$applicationPool`"", [StringComparison]::Ordinal)) {
+    throw "IIS Express applicationhost.config 缺少 $applicationPool。"
 }
 
 $projectPath = Join-Path $repoRoot "OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj"
@@ -110,6 +123,21 @@ if ($apiKeySetting.Count -ne 1) {
 }
 $apiKeySetting[0].SetAttribute("value", $apiKey)
 $siteWebConfig.Save((Join-Path $sitePath "Web.config"))
+$applicationHostPath = Join-Path $destinationPath "applicationhost.config"
+Copy-Item -LiteralPath $applicationHostSource -Destination $applicationHostPath
+[xml]$applicationHost = Get-Content -LiteralPath $applicationHostPath -Raw
+$sites = $applicationHost.configuration.'system.applicationHost'.sites
+$site = @($sites.site)[0]
+foreach ($unusedSite in @($sites.site | Select-Object -Skip 1)) {
+    $sites.RemoveChild($unusedSite) | Out-Null
+}
+$siteName = "OdfKitWebFontsWebForms$Pipeline"
+$site.SetAttribute("name", $siteName)
+$site.SetAttribute("serverAutoStart", "true")
+$site.application.SetAttribute("applicationPool", $applicationPool)
+$site.application.virtualDirectory.SetAttribute("physicalPath", $sitePath)
+$site.bindings.binding.SetAttribute("bindingInformation", ":${port}:localhost")
+$applicationHost.Save($applicationHostPath)
 $process = $null
 $httpHandler = [Net.Http.HttpClientHandler]::new()
 $httpHandler.UseProxy = $false
@@ -132,7 +160,7 @@ function Read-ResponseBytes {
 
 try {
     $process = Start-Process -FilePath $IisExpressPath `
-        -ArgumentList @("/path:`"$sitePath`"", "/port:$port", "/clr:v4.0", "/systray:false", "/trace:error") `
+        -ArgumentList @("/config:`"$applicationHostPath`"", "/site:`"$siteName`"", "/systray:false", "/trace:error") `
         -PassThru `
         -WindowStyle Hidden `
         -RedirectStandardOutput $standardOutputPath `
@@ -272,7 +300,7 @@ try {
     [ordered]@{
         server = "IIS Express"
         runtime = ".NET Framework 4.8"
-        pipeline = "Integrated"
+        pipeline = $Pipeline
         profileId = $manifest.ProfileId
         sourceSha256 = $actualSourceSha256
         assets = @($manifest.Assets | ForEach-Object {
@@ -285,7 +313,7 @@ try {
         })
     } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $destinationPath "evidence.json") -Encoding utf8NoBOM
 
-    Write-Host "PASS: IIS Express 實際處理 Web Forms 動態產字、內容定址快取與條件式要求。"
+    Write-Host "PASS: IIS Express $Pipeline pipeline 實際處理 Web Forms 動態產字、內容定址快取與條件式要求。"
 }
 finally {
     $client.Dispose()

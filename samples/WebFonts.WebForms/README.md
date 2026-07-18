@@ -22,11 +22,17 @@ Windows 開發機或 CI 可用官方 CNS 字型執行真實 IIS Express smoke：
 
 ```powershell
 pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
+  -Pipeline Integrated `
+  -FontPath <TW-Sung-Ext-B-98_1.ttf> `
+  -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
+  -Pipeline Classic `
+  -Destination artifacts/webfont-iis-express-classic-smoke `
   -FontPath <TW-Sung-Ext-B-98_1.ttf> `
   -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
 ```
 
 此測試會將隨機 key 寫入隔離站台的 `web.config`、清除環境變數、實際編譯頁面、經 HTTP 動態
-產生 TTF／WOFF，並驗證未授權回應、
-GET／HEAD、內容 SHA-256、ETag 與 304；它證明 IIS Express 的 Integrated pipeline，不等同完整
-IIS Classic mode 或客戶 WAF／CDN 驗收。
+產生 TTF／WOFF，並驗證未授權回應、GET／HEAD、內容 SHA-256、ETag 與 304。兩次執行分別以
+`Clr4IntegratedAppPool` 與 `Clr4ClassicAppPool` 啟動隔離站台；它們不等同客戶正式 IIS、WAF／CDN
+或組織安全設定的驗收。
