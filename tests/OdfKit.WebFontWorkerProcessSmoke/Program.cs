@@ -437,9 +437,42 @@ internal static class Program
         corruptBytes.AsSpan(compressedOffset, compressedLength).Fill(0xFF);
         VerifyInvalidOutputRejected(corruptBytes, "compressed payload replaced");
 
-        byte[] expandedBombBytes = (byte[])validBytes.Clone();
-        BinaryPrimitives.WriteUInt32BigEndian(expandedBombBytes.AsSpan(16, 4), int.MaxValue);
-        VerifyInvalidOutputRejected(expandedBombBytes, "expanded size overflow");
+        byte[] expandedBombBytes = CreateWoff2ExpandedLengthBomb(validBytes);
+        VerifyInvalidOutputRejected(expandedBombBytes, "table length overflow");
+    }
+
+    private static byte[] CreateWoff2ExpandedLengthBomb(ReadOnlySpan<byte> bytes)
+    {
+        int lengthStart = 49;
+        byte flags = bytes[48];
+        if ((flags & 0x3F) == 63)
+        {
+            lengthStart += 4;
+        }
+
+        int lengthEnd = lengthStart;
+        SkipUIntBase128(bytes, ref lengthEnd);
+        ReadOnlySpan<byte> oversizedLength = [0x87, 0xFF, 0xFF, 0xFF, 0x7F];
+        int delta = oversizedLength.Length - (lengthEnd - lengthStart);
+        var result = new byte[checked(bytes.Length + delta)];
+        bytes[..lengthStart].CopyTo(result);
+        oversizedLength.CopyTo(result.AsSpan(lengthStart));
+        bytes[lengthEnd..].CopyTo(result.AsSpan(lengthStart + oversizedLength.Length));
+        BinaryPrimitives.WriteUInt32BigEndian(result.AsSpan(8, 4), checked((uint)result.Length));
+        AdjustWoff2Offset(result, 28, delta);
+        AdjustWoff2Offset(result, 40, delta);
+        return result;
+    }
+
+    private static void AdjustWoff2Offset(Span<byte> bytes, int fieldOffset, int delta)
+    {
+        uint offset = BinaryPrimitives.ReadUInt32BigEndian(bytes.Slice(fieldOffset, 4));
+        if (offset != 0)
+        {
+            BinaryPrimitives.WriteUInt32BigEndian(
+                bytes.Slice(fieldOffset, 4),
+                checked(offset + (uint)delta));
+        }
     }
 
     private static (int Offset, int Length) ReadWoff2CompressedRange(ReadOnlySpan<byte> bytes)
