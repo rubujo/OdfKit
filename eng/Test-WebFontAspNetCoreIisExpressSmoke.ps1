@@ -42,14 +42,10 @@ if (-not (Test-Path -LiteralPath $ancmPath -PathType Leaf)) {
     throw "IIS Express 缺少 ASP.NET Core Module V2：$ancmPath"
 }
 
-$applicationHostSource = Join-Path ([Environment]::GetFolderPath("MyDocuments")) `
-    "IISExpress/config/applicationhost.config"
+$iisExpressDirectory = Split-Path -Parent $IisExpressPath
+$applicationHostSource = Join-Path $iisExpressDirectory "AppServer/applicationhost.config"
 if (-not (Test-Path -LiteralPath $applicationHostSource -PathType Leaf)) {
-    throw "找不到 IIS Express 使用者 applicationhost.config：$applicationHostSource"
-}
-$applicationHostText = Get-Content -LiteralPath $applicationHostSource -Raw
-if (-not $applicationHostText.Contains('name="AspNetCoreModuleV2"', [StringComparison]::Ordinal)) {
-    throw "IIS Express applicationhost.config 未註冊 AspNetCoreModuleV2。"
+    throw "找不到 IIS Express 安裝範本 applicationhost.config：$applicationHostSource"
 }
 
 $projectPath = Join-Path $repoRoot "samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj"
@@ -159,6 +155,49 @@ function Invoke-HostingModelSmoke {
     $applicationHostPath = Join-Path $modelRoot "applicationhost.config"
     Copy-Item -LiteralPath $applicationHostSource -Destination $applicationHostPath
     [xml]$applicationHost = Get-Content -LiteralPath $applicationHostPath -Raw
+    $webServerSectionGroups = @($applicationHost.configuration.configSections.sectionGroup |
+            Where-Object name -EQ "system.webServer")
+    if ($webServerSectionGroups.Count -ne 1) {
+        throw "IIS Express 安裝範本缺少唯一的 system.webServer section group。"
+    }
+    $webServerSections = $webServerSectionGroups[0]
+    $ancmSections = @($webServerSections.section | Where-Object name -EQ "aspNetCore")
+    if ($ancmSections.Count -gt 1) {
+        throw "IIS Express 安裝範本包含重複的 aspNetCore section。"
+    }
+    if ($ancmSections.Count -eq 0) {
+        $ancmSection = $applicationHost.CreateElement("section")
+        $ancmSection.SetAttribute("name", "aspNetCore")
+        $ancmSection.SetAttribute("overrideModeDefault", "Allow")
+        $webServerSections.AppendChild($ancmSection) | Out-Null
+    }
+    $globalModules = $applicationHost.configuration.'system.webServer'.globalModules
+    $ancmGlobalModules = @($globalModules.add | Where-Object name -EQ "AspNetCoreModuleV2")
+    if ($ancmGlobalModules.Count -gt 1) {
+        throw "IIS Express 安裝範本包含重複的 AspNetCoreModuleV2 global module。"
+    }
+    if ($ancmGlobalModules.Count -eq 0) {
+        $ancmGlobalModule = $applicationHost.CreateElement("add")
+        $ancmGlobalModule.SetAttribute("name", "AspNetCoreModuleV2")
+        $ancmGlobalModule.SetAttribute("image", $ancmPath)
+        $globalModules.AppendChild($ancmGlobalModule) | Out-Null
+    }
+    $rootLocations = @($applicationHost.configuration.location | Where-Object path -EQ "")
+    if ($rootLocations.Count -ne 1) {
+        throw "IIS Express 安裝範本缺少唯一的 root location。"
+    }
+    $rootLocation = $rootLocations[0]
+    $modules = $rootLocation.'system.webServer'.modules
+    $ancmModules = @($modules.add | Where-Object name -EQ "AspNetCoreModuleV2")
+    if ($ancmModules.Count -gt 1) {
+        throw "IIS Express 安裝範本包含重複的 AspNetCoreModuleV2 module。"
+    }
+    if ($ancmModules.Count -eq 0) {
+        $ancmModule = $applicationHost.CreateElement("add")
+        $ancmModule.SetAttribute("name", "AspNetCoreModuleV2")
+        $ancmModule.SetAttribute("lockItem", "true")
+        $modules.AppendChild($ancmModule) | Out-Null
+    }
     $sites = $applicationHost.configuration.'system.applicationHost'.sites
     $site = @($sites.site)[0]
     foreach ($unusedSite in @($sites.site | Select-Object -Skip 1)) {

@@ -40,10 +40,10 @@ if ($actualSourceSha256 -ne $SourceSha256.ToLowerInvariant()) {
 if (-not (Test-Path -LiteralPath $IisExpressPath -PathType Leaf)) {
     throw "找不到 IIS Express：$IisExpressPath"
 }
-$applicationHostSource = Join-Path ([Environment]::GetFolderPath("MyDocuments")) `
-    "IISExpress/config/applicationhost.config"
+$iisExpressDirectory = Split-Path -Parent $IisExpressPath
+$applicationHostSource = Join-Path $iisExpressDirectory "AppServer/applicationhost.config"
 if (-not (Test-Path -LiteralPath $applicationHostSource -PathType Leaf)) {
-    throw "找不到 IIS Express 使用者 applicationhost.config：$applicationHostSource"
+    throw "找不到 IIS Express 安裝範本 applicationhost.config：$applicationHostSource"
 }
 $applicationPool = if ($Pipeline -eq "Classic") { "Clr4ClassicAppPool" } else { "Clr4IntegratedAppPool" }
 $applicationHostText = Get-Content -LiteralPath $applicationHostSource -Raw

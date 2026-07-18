@@ -315,13 +315,15 @@ Express，實際編譯 Web Forms 頁面並以官方 CNS Ext-B 執行 401、動�
 SHA-256、ETag 與 304。IIS Express 與 IIS 使用相同的 `applicationHost.config`／`Web.config`
 設定模型；CI 分別以 `Clr4IntegratedAppPool` 與 `Clr4ClassicAppPool` 執行完整 HTTP smoke，Classic
 路徑由 ASP.NET 4 ISAPI mapping 交給 `system.web/httpHandlers`。IIS Express 由使用者啟動且沒有
-WAS，因此這項證據不取代正式 IIS 站台或客戶安全設定的驗收。
+WAS。Smoke 從 IIS Express 安裝目錄複製官方 `AppServer/applicationhost.config` 至 artifact，不依賴
+使用者曾啟動 IIS Express 所產生的個人設定；因此這項證據不取代正式 IIS 站台或客戶安全設定的驗收。
 
 `eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1` 則使用完整隔離 `applicationhost.config` 與 ANCM
 V2，分別發布並實際啟動 In-Process 與 Out-of-Process。前者驗證
 `appsettings.{Environment}.json` API key，後者驗證環境變數覆寫；兩者皆執行 401/no-store、
 動態 WOFF2、GET／HEAD、SHA-256、ETag 與 304。In-Process 在 `iisexpress.exe` 內執行，
-Out-of-Process 由 ANCM 啟動 Kestrel 並代理。參考
+Out-of-Process 由 ANCM 啟動 Kestrel 並代理。隔離設定會以已驗證存在的 ANCM V2 DLL 顯式加入
+`aspNetCore` section、global module 與 locked module，避免依賴個人 `applicationhost.config`。參考
 [Microsoft IIS Express 概觀](https://learn.microsoft.com/en-us/iis/extensions/introduction-to-iis-express/iis-express-overview)、
 [IIS Express 命令列](https://learn.microsoft.com/en-us/iis/extensions/using-iis-express/running-iis-express-from-the-command-line)
 、[ASP.NET Core Module](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module?view=aspnetcore-10.0)
