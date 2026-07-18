@@ -47,6 +47,11 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             request.Face.FaceIndex,
             _options.MaxTableCount,
             _options.ValidateSourceChecksums);
+        if (source.HasColorTables && string.IsNullOrWhiteSpace(request.Face.SourceSha256))
+        {
+            throw DataInvalid("color-source-sha256");
+        }
+
         source.ValidateOutputFormats(request.Formats);
         IReadOnlyList<int> scalars = request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
@@ -257,7 +262,8 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             throw DataInvalid("source-sha256");
         }
 
-        var source = new CachedSource(bytes);
+        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeSource(bytes, checked((int)_options.MaxSourceBytes));
+        var source = new CachedSource(decoded);
         return cacheKey.Length == 0 ? source : CacheVerifiedSource(cacheKey, source);
     }
 

@@ -44,7 +44,6 @@ internal sealed class SfntFont
     private static readonly string[] CommonRequiredTables = ["OS/2", "cmap", "head", "hhea", "hmtx", "maxp", "name", "post"];
     private static readonly HashSet<string> RejectedTables = new(StringComparer.Ordinal)
     {
-        "COLR", "CPAL", "CBDT", "CBLC", "EBDT", "EBLC", "EBSC", "SVG ", "sbix",
         "Silf", "Glat", "Gloc", "Feat", "Sill", "morx", "mort", "kerx"
     };
 
@@ -52,19 +51,22 @@ internal sealed class SfntFont
     private readonly ushort _glyphCount;
     private readonly uint[] _locations;
     private readonly CmapMapping _cmap;
+    private readonly bool _hasColorTables;
 
     private SfntFont(
         uint flavor,
         SortedDictionary<string, byte[]> tables,
         ushort glyphCount,
         uint[] locations,
-        CmapMapping cmap)
+        CmapMapping cmap,
+        bool hasColorTables)
     {
         Flavor = flavor;
         _tables = tables;
         _glyphCount = glyphCount;
         _locations = locations;
         _cmap = cmap;
+        _hasColorTables = hasColorTables;
     }
 
     private uint Flavor { get; }
@@ -73,6 +75,8 @@ internal sealed class SfntFont
         => _cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph) && glyph != 0;
 
     internal ushort GlyphCount => _glyphCount;
+
+    internal bool HasColorTables => _hasColorTables;
 
     internal ushort GetGlyphId(int scalar)
         => _cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph) ? glyph : (ushort)0;
@@ -117,11 +121,6 @@ internal sealed class SfntFont
         if (flavor != 0x00010000 && flavor != 0x74727565 && !isPostScript)
         {
             throw NotSupported("sfnt-flavor");
-        }
-
-        if (isCollection && isPostScript)
-        {
-            throw NotSupported("otc-face");
         }
 
         ushort tableCount = ReadUInt16(data, faceOffset + 4, "table-count");
@@ -184,14 +183,18 @@ internal sealed class SfntFont
 
         bool hasCff = tables.ContainsKey("CFF ");
         bool hasCff2 = tables.ContainsKey("CFF2");
+        bool isBitmapOnly = !isPostScript
+            && !tables.ContainsKey("glyf")
+            && !tables.ContainsKey("loca")
+            && (tables.ContainsKey("CBDT") && tables.ContainsKey("CBLC")
+                || tables.ContainsKey("EBDT") && tables.ContainsKey("EBLC"));
         if (isPostScript && hasCff == hasCff2)
         {
             throw DataInvalid("outline-postscript");
         }
-
         string[] outlineTables = isPostScript
             ? hasCff ? ["CFF "] : ["CFF2"]
-            : ["glyf", "loca"];
+            : isBitmapOnly ? [] : ["glyf", "loca"];
         foreach (string tag in outlineTables)
         {
             if (!tables.ContainsKey(tag))
@@ -222,14 +225,15 @@ internal sealed class SfntFont
         byte[] head = tables["head"];
         EnsureRange(head, 0, 54, "head");
         uint[] locations = [];
-        if (!isPostScript)
+        if (!isPostScript && !isBitmapOnly)
         {
             short locaFormat = ReadInt16(head, 50, "head-indexToLocFormat");
             locations = ReadLocations(tables["loca"], glyphCount, locaFormat, tables["glyf"].Length);
         }
 
         CmapMapping cmap = CmapMapping.Parse(tables["cmap"], glyphCount);
-        return new SfntFont(flavor, tables, glyphCount, locations, cmap);
+        bool hasColorTables = ColorFontValidator.Validate(tables, glyphCount);
+        return new SfntFont(flavor, tables, glyphCount, locations, cmap, hasColorTables);
     }
 
     internal SfntSubset CreateSubset(
@@ -261,6 +265,16 @@ internal sealed class SfntFont
         if (_tables.TryGetValue("GSUB", out byte[]? gsub))
         {
             GsubGlyphClosure.Add(gsub, selectedGlyphs, _glyphCount);
+        }
+
+        // Color tables may reference glyphs and bitmap strikes outside cmap. Retaining the
+        // full glyph space is the correctness-first path until table-specific pruning exists.
+        if (_hasColorTables)
+        {
+            for (int glyph = 1; glyph < _glyphCount; glyph++)
+            {
+                selectedGlyphs.Add((ushort)glyph);
+            }
         }
 
         bool retainFullLayoutGlyphSpace = scalars.Any(IsComplexShapingScalar)
@@ -298,7 +312,7 @@ internal sealed class SfntFont
                 _glyphCount,
                 selectedGlyphs);
         }
-        else
+        else if (_tables.ContainsKey("glyf"))
         {
             AddCompositeClosure(selectedGlyphs, maxCompositeDepth);
             tables["glyf"] = BuildGlyf(selectedGlyphs, out byte[] subsetLoca);

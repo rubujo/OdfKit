@@ -27,7 +27,7 @@ internal static class Program
 
     private static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 14)
+        if (args.Length != 15)
         {
             return 2;
         }
@@ -46,14 +46,20 @@ internal static class Program
         string devanagariVariablePath = Path.GetFullPath(args[11]);
         string cff2VariablePath = Path.GetFullPath(args[12]);
         string colorEmojiPath = Path.GetFullPath(args[13]);
+        string colorEmojiColrV1Path = Path.GetFullPath(args[14]);
         Directory.CreateDirectory(outputRoot);
 
         string trueTypeCollectionPath = Path.Combine(outputRoot, "cns-managed-real-faces.ttc");
         await File.WriteAllBytesAsync(
             trueTypeCollectionPath,
-            CreateTrueTypeCollection(
+            CreateOpenTypeCollection(
                 await File.ReadAllBytesAsync(extBPath).ConfigureAwait(false),
                 await File.ReadAllBytesAsync(plusPath).ConfigureAwait(false))).ConfigureAwait(false);
+        string cff2CollectionPath = Path.Combine(outputRoot, "source-han-cff2-variable.otc");
+        await File.WriteAllBytesAsync(
+            cff2CollectionPath,
+            CreateOpenTypeCollection(
+                await File.ReadAllBytesAsync(cff2VariablePath).ConfigureAwait(false))).ConfigureAwait(false);
         string eudcTtePath = Path.Combine(outputRoot, "EUDC.TTE");
         File.Copy(extBPath, eudcTtePath, overwrite: true);
 
@@ -62,6 +68,22 @@ internal static class Program
             results,
             "cns-ext-b-ttf",
             extBPath,
+            faceIndex: 0,
+            ExtBText,
+            outputRoot).ConfigureAwait(false);
+        WebFontAsset woffInput = extBManifest.Assets.Single(asset => asset.Format == WebFontFormat.Woff);
+        await VerifySuccessAsync(
+            results,
+            "woff-input",
+            Path.Combine(outputRoot, "cns-ext-b-ttf", "first", woffInput.Sha256, woffInput.FileName),
+            faceIndex: 0,
+            ExtBText,
+            outputRoot).ConfigureAwait(false);
+        WebFontAsset woff2Input = extBManifest.Assets.Single(asset => asset.Format == WebFontFormat.Woff2);
+        await VerifySuccessAsync(
+            results,
+            "woff2-input-null-transform",
+            Path.Combine(outputRoot, "cns-ext-b-ttf", "first", woff2Input.Sha256, woff2Input.FileName),
             faceIndex: 0,
             ExtBText,
             outputRoot).ConfigureAwait(false);
@@ -130,13 +152,22 @@ internal static class Program
             PuaText,
             outputRoot).ConfigureAwait(false);
 
-        await VerifyRejectedAsync(
+        await VerifySuccessAsync(
             results,
             "cff-otc",
             cffCollectionPath,
             faceIndex: 4,
             "香港邨裏𠮷",
-            outputRoot).ConfigureAwait(false);
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "cff-otc-face-0",
+            cffCollectionPath,
+            faceIndex: 0,
+            "香港邨裏𠮷",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
         await VerifyRejectedAsync(
             results,
             "cff-otf-truetype-output",
@@ -174,10 +205,25 @@ internal static class Program
             "繁體字 香港邨裏",
             outputRoot,
             [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
-        await VerifyRejectedAsync(
+        await VerifySuccessAsync(
+            results,
+            "cff2-otc-variable",
+            cff2CollectionPath,
+            faceIndex: 0,
+            "繁體字 香港邨裏",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+        await VerifySuccessAsync(
             results,
             "color-bitmap",
             colorEmojiPath,
+            faceIndex: 0,
+            "😀",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "color-colrv1",
+            colorEmojiColrV1Path,
             faceIndex: 0,
             "😀",
             outputRoot).ConfigureAwait(false);
@@ -748,7 +794,7 @@ internal static class Program
         return Convert.ToHexStringLower(hash);
     }
 
-    private static byte[] CreateTrueTypeCollection(params byte[][] fonts)
+    private static byte[] CreateOpenTypeCollection(params byte[][] fonts)
     {
         FaceSource[] faces = fonts.Select(ParseFace).ToArray();
         int headerLength = checked(12 + (faces.Length * 4));
@@ -800,16 +846,17 @@ internal static class Program
 
     private static FaceSource ParseFace(byte[] font)
     {
-        if (font.Length < 12 || BinaryPrimitives.ReadUInt32BigEndian(font) is not (0x00010000 or 0x74727565))
+        if (font.Length < 12
+            || BinaryPrimitives.ReadUInt32BigEndian(font) is not (0x00010000 or 0x74727565 or 0x4F54544F))
         {
-            throw new InvalidDataException("The TTC fixture source is not a TrueType sfnt.");
+            throw new InvalidDataException("The collection fixture source is not an OpenType sfnt.");
         }
 
         ushort tableCount = BinaryPrimitives.ReadUInt16BigEndian(font.AsSpan(4, 2));
         int directoryEnd = checked(12 + (tableCount * 16));
         if (tableCount == 0 || directoryEnd > font.Length)
         {
-            throw new InvalidDataException("The TTC fixture source directory is invalid.");
+            throw new InvalidDataException("The collection fixture source directory is invalid.");
         }
 
         var tables = new TableSource[tableCount];
@@ -822,7 +869,7 @@ internal static class Program
                 || sourceLength > int.MaxValue
                 || (ulong)sourceOffset + sourceLength > (ulong)font.Length)
             {
-                throw new InvalidDataException("The TTC fixture source table is outside the file.");
+                throw new InvalidDataException("The collection fixture source table is outside the file.");
             }
 
             tables[index] = new TableSource(

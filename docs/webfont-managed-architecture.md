@@ -2,7 +2,8 @@
 
 > 基準日期：2026-07-16
 >
-> 狀態：TrueType／WOFF／WOFF2 核心已實作；其餘能力依本文件閘門維持 experimental 或拒絕。
+> 狀態：TrueType／OpenType collection、WOFF／WOFF2 輸入正規化與瀏覽器格式輸出已實作；
+> 各 outline、layout、variation 與 color table 能力依本文件閘門維持 experimental 或拒絕。
 
 本文件取代以 FontTools 外部程序作為產品引擎的舊設計。OdfKit WebFonts 的產品路徑必須讓
 只安裝受支援 .NET SDK／Runtime 與 NuGet 套件的乾淨 consumer 完成字型子集化、預產生與
@@ -68,14 +69,33 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 ## 3. 格式與行為邊界
 
-### 3.1 第一個可交付核心
+### 3.1 輸入與輸出契約
 
-- 輸入：TrueType outline 的 standalone sfnt，以及從 TTC 選定的一個 TrueType face。
-- 輸出：standalone TTF、WOFF 1.0；`net10.0` 另提供 WOFF2。
+- 輸入是來源容器：standalone TTF／OTF、TTC／OTC 的指定 face、Windows EUDC `.tte`，以及
+  可安全展開的 standalone WOFF；`net10.0` 另接受採 null transform 的 WOFF2。來源副檔名不作
+  信任依據，均以 signature、table directory、checksum、展開上限與 `faceIndex` 驗證。
+- 輸出是瀏覽器部署資產：獨立 TTF／OTF、WOFF 1.0；`net10.0` 另提供 WOFF2。TTC／OTC
+  只作輸入，不作產品輸出；每次先抽出指定 face，再產生內容定址的獨立 WebFont。
+- 一般工具產生的 WOFF2 可使用 `glyf`／`loca` 或 `hmtx` transform；尚未完成 clean-room
+  反轉換前必須明確拒絕，不能把目前的 null-transform 輸入解碼誤稱為任意 WOFF2 支援。
 - 字元：Unicode scalar、Supplementary Plane、PUA、IVS；`cmap` format 4／12／14。
 - glyph closure：`.notdef`、要求字元及 TrueType composite component 的遞迴閉包。
 - 法律資料：預設保留 `name` license description／URL、`OS/2` 與必要 metadata。
 - 確定性：相同來源 bytes、face、Profile、sequence 與 options 產生完全相同 bytes 與 SHA-256。
+
+「所有可用輸入」以能由公開規格安全正規化為 sfnt face 為邊界，不等於接受任意歷史或私有字型
+封裝：
+
+| 輸入族群 | 狀態 | 產品輸出 |
+| --- | --- | --- |
+| TTF／OTF standalone | 已實作 | 依 outline 產生 TTF 或 OTF，另可產生 WOFF／WOFF2 |
+| TTC／OTC | 已實作，指定 `faceIndex` | 抽出單一 face 後產生獨立瀏覽器資產 |
+| Windows EUDC `.tte` | 已實作，內容仍須為合法 sfnt | 產生獨立 TTF／WOFF；`net10.0` 可產生 WOFF2 |
+| WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
+| WOFF2 standalone | null transform 已實作；標準 transformed table 反轉換待完成 | 重新子集化後產生獨立瀏覽器資產 |
+| TrueType／CFF／CFF2 variable | experimental correctness-first | 保留 variation metadata 的獨立資產 |
+| COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | experimental correctness-first；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
+| Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |
 
 初版保留原 glyph ID 與 `maxp.numGlyphs`，以相同 `loca` offset 清空未使用 outline。這可在不
 重寫所有 layout table glyph reference 的前提下，移除 CJK outline 的主要體積。修改後必須重建
@@ -86,10 +106,11 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
-- 名稱式 CFF、OTC collection；standalone CID-keyed 靜態 CFF 1.0 與含 VariationStore 的
-  CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。
+- 名稱式 CFF；standalone／OTC face 的 CID-keyed 靜態 CFF 1.0 與含 VariationStore 的
+  CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。直接 collection 輸出仍須獨立 writer
+  與三瀏覽器證據。
 - 尚未通過第 3.5 節證據閘門的 variable font；無 VariationStore／`fvar` 的 CFF2 維持拒絕。
-- COLR／CPAL、CBDT／CBLC、`sbix`、SVG 或其它 color／bitmap font。
+- 尚未通過第 3.6 節結構驗證的 color table 版本或組合。
 - AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
 - `OS/2.fsType` 禁止 embedding、禁止 subsetting 或只允許 bitmap embedding 的字型。
 - table 越界／重疊、checked arithmetic 溢位、checksum 不符、重複必要 table、glyph cycle、
@@ -143,20 +164,40 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    `avar`、`STAT`、`HVAR`、`VVAR`、`MVAR` 與 `cvar` 在 GID 不變的前提下原樣保留。正式能力
    Source Han 與 Noto Arabic／Devanagari 的 short／long offset、`wdth`／`wght` 三瀏覽器 DOM
    截圖與 Canvas 差分及 mutation 已通過；能力仍維持 experimental。
-2. **靜態 CFF 1.0**：已解封 standalone、含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`；名稱式
-   CFF 與 OTC 續留拒絕。有界 parser 驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、
+2. **靜態 CFF 1.0**：已解封 standalone／OTC face、含 ROS／FDArray／FDSelect 的 CID-keyed
+   `OTTO`；名稱式 CFF 續留拒絕。有界 parser 驗證 collection 絕對 table offset、CFF INDEX、
+   Top DICT、Font DICT、Private DICT、
    local Subrs、charset 與 FDSelect。CharStrings 採 retain-GIDs，以相同長度的合法無 outline
    Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／relative
    offset 不需改寫，global／local subroutine 首期不剪枝。compact INDEX／DICT 重寫及名稱式 CFF
    必須另有跨 subroutine Type 2 operand verifier，不能只掃描單一 CharString 尾端 bytes。
 3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
    不重編 local／global subr bias。
-4. **CFF2／PostScript Variable Fonts**：已解封 standalone、含 `fvar`／VariationStore 的
-   variable `OTTO`。有界 parser 驗證 32-bit INDEX、Top／Font／Private DICT、FDSelect
+4. **CFF2／PostScript Variable Fonts**：已解封 standalone／OTC face、含 `fvar`／VariationStore
+   的 variable `OTTO`。有界 parser 驗證 collection 絕對 table offset、32-bit INDEX、
+   Top／Font／Private DICT、FDSelect
    0／3／4、VariationRegion、ItemVariationData、`vsindex`、`blend` 與 subroutine；未選 glyph
    以等長零位移 CharString 取代，不重排 INDEX 或 variation metadata。Source Han Sans 2.005R
    已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。無
    VariationStore 的 CFF2、超出資源上限的 INDEX／region 與無法唯一驗證的 operator 維持拒絕。
+
+OTC 瀏覽器差分不假設所有引擎都接受 raw collection：Chromium 直接比較 raw OTC 與 managed
+WOFF2；Firefox／WebKit 以同一 face 的 managed standalone OTF 對 WOFF2。如此三個引擎都實際
+驗證獨立部署資產，raw `format(collection)` 則只列為 Chromium 能力證據。
+
+### 3.6 Color font correctness-first 路徑
+
+OpenType 1.9.1 定義的 color 輸入族群為 COLR／CPAL v0／v1、CBDT／CBLC、EBDT／EBLC、
+`sbix` 與 `SVG `。目前 managed parser 會驗證成對表格、版本、計數、offset、strike／document
+範圍與 glyph ID；偵測到 color table 時保留完整 glyph ID 空間與原始 color tables，只縮減對外
+`cmap`。這是避免刪掉 COLR layer glyph 或 bitmap strike 的 correctness-first 實作，不宣稱已完成
+aggressive color pruning。
+
+每一種 color 模型須分別以可再散布且鎖定 SHA-256 的真實 corpus 通過 TTF／OTF、WOFF、WOFF2
+managed verifier 與 Chromium／Firefox／WebKit 截圖，才可從 experimental 升級。未知版本、缺少
+CPAL 或 bitmap location／data 配對、越界頂層 paint root／document／strike，以及任何無法唯一
+驗證的組合均明確拒絕。COLRv1 巢狀 paint graph 尚未完整巡訪；SVG document 另須維持 CSP 與
+主動內容安全邊界。完成相應安全稽核前，不得宣稱可接受任意不受信任 color font。
 
 真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
@@ -225,14 +266,17 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 中性的 Abstractions、Profile、CNS mapping、manifest、Build、Hosting 與 Worker。
 - 只執行 `dotnet` 的雙 process smoke、真實 WOFF2 verifier、失敗接手與 HTTP 安全驗證。
 - 官方 CNS Ext-B 真字型與 Chromium／Firefox／WebKit 截圖證據。
-- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；Source Han Sans 2.005R 靜態 CFF 1.0 與
-  TrueType variable、CFF2 variable 正向矩陣，以及 OTC／color 負向矩陣。
+- 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；Noto CJK 靜態 CFF OTC 與 Source Han Sans 2.005R
+  靜態 CFF 1.0、TrueType variable、CFF2 variable、CFF2 OTC、WOFF／null-transform WOFF2 輸入
+  正向矩陣，以及 Noto Color Emoji bitmap color 正向矩陣。
 - 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
 - 真實來源字型、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 672 組固定種子 mutation
   有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
+- 同批 nupkg 的隔離本機 feed 發布、SBOM 精確 source mapping、乾淨 consumer／CLI 與 NuGet Audit
+  `all` 演練；正式 tag workflow 另建立 GitHub Sigstore provenance 與 WebFont SBOM attestation。
 
 剩餘工作以第 5、6 節的來源字型 fuzz、complex-script shaping 廣度與外部人工閘門為準；
 不得因上述核心可用而把整套產品標示 production-ready。
@@ -248,6 +292,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - [OpenType GPOS](https://learn.microsoft.com/en-us/typography/opentype/spec/gpos)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
+- [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
+- [OpenType 1.9.1 font file 與 color tables](https://learn.microsoft.com/en-us/typography/opentype/spec/otff)
 - [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [Unicode UTS #37](https://www.unicode.org/reports/tr37/)
@@ -260,3 +306,5 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - [NuGet `.nuspec` license metadata](https://learn.microsoft.com/en-us/nuget/reference/nuspec#license)
 - [SPDX 2.3 specification](https://spdx.github.io/spdx-spec/v2.3/)
 - [GitHub SBOM 匯出與 Actions 指引](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/export-dependencies-as-sbom)
+- [NuGet 套件漏洞稽核](https://learn.microsoft.com/en-us/nuget/concepts/auditing-packages)
+- [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)

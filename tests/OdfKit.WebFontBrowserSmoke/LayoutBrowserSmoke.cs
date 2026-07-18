@@ -8,7 +8,7 @@ internal static class LayoutBrowserSmoke
 {
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 15 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        if (args.Length != 21 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
                 "Usage: layout <browser> <arabic-source> <arabic-subset> "
@@ -16,6 +16,9 @@ internal static class LayoutBrowserSmoke
                 + "<arabic-variable-source> <arabic-variable-subset> "
                 + "<devanagari-variable-source> <devanagari-variable-subset> "
                 + "<cff2-variable-source> <cff2-variable-subset> "
+                + "<cff-collection-source> <cff-collection-subset> "
+                + "<cff2-collection-source> <cff2-collection-subset> "
+                + "<color-colrv1-source> <color-colrv1-subset> "
                 + "<screenshot> <evidence>");
             return 2;
         }
@@ -33,8 +36,14 @@ internal static class LayoutBrowserSmoke
         string devanagariVariableSubsetPath = Path.GetFullPath(args[10]);
         string cff2VariableSourcePath = Path.GetFullPath(args[11]);
         string cff2VariableSubsetPath = Path.GetFullPath(args[12]);
-        string screenshotPath = Path.GetFullPath(args[13]);
-        string evidencePath = Path.GetFullPath(args[14]);
+        string cffCollectionSourcePath = Path.GetFullPath(args[13]);
+        string cffCollectionSubsetPath = Path.GetFullPath(args[14]);
+        string cff2CollectionSourcePath = Path.GetFullPath(args[15]);
+        string cff2CollectionSubsetPath = Path.GetFullPath(args[16]);
+        string colorColrV1SourcePath = Path.GetFullPath(args[17]);
+        string colorColrV1SubsetPath = Path.GetFullPath(args[18]);
+        string screenshotPath = Path.GetFullPath(args[19]);
+        string evidencePath = Path.GetFullPath(args[20]);
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
@@ -52,6 +61,12 @@ internal static class LayoutBrowserSmoke
             .ConfigureAwait(false);
         byte[] cff2VariableSource = await File.ReadAllBytesAsync(cff2VariableSourcePath).ConfigureAwait(false);
         byte[] cff2VariableSubset = await File.ReadAllBytesAsync(cff2VariableSubsetPath).ConfigureAwait(false);
+        byte[] cffCollectionSource = await File.ReadAllBytesAsync(cffCollectionSourcePath).ConfigureAwait(false);
+        byte[] cffCollectionSubset = await File.ReadAllBytesAsync(cffCollectionSubsetPath).ConfigureAwait(false);
+        byte[] cff2CollectionSource = await File.ReadAllBytesAsync(cff2CollectionSourcePath).ConfigureAwait(false);
+        byte[] cff2CollectionSubset = await File.ReadAllBytesAsync(cff2CollectionSubsetPath).ConfigureAwait(false);
+        byte[] colorColrV1Source = await File.ReadAllBytesAsync(colorColrV1SourcePath).ConfigureAwait(false);
+        byte[] colorColrV1Subset = await File.ReadAllBytesAsync(colorColrV1SubsetPath).ConfigureAwait(false);
 
         var errors = new List<string>();
         var browserMessages = new List<string>();
@@ -103,7 +118,16 @@ internal static class LayoutBrowserSmoke
             ["/fonts/devanagari-variable-subset"]
                 = (devanagariVariableSubset, GetSubsetContentType(devanagariVariableSubset)),
             ["/fonts/cff2-variable-source.otf"] = (cff2VariableSource, "font/otf"),
-            ["/fonts/cff2-variable-subset"] = (cff2VariableSubset, GetSubsetContentType(cff2VariableSubset))
+            ["/fonts/cff2-variable-subset"] = (cff2VariableSubset, GetSubsetContentType(cff2VariableSubset)),
+            ["/fonts/cff-collection-source.otc"]
+                = (cffCollectionSource, browserName == "chromium" ? "font/collection" : "font/otf"),
+            ["/fonts/cff-collection-subset"] = (cffCollectionSubset, GetSubsetContentType(cffCollectionSubset)),
+            ["/fonts/cff2-collection-source.otc"]
+                = (cff2CollectionSource, browserName == "chromium" ? "font/collection" : "font/otf"),
+            ["/fonts/cff2-collection-subset"]
+                = (cff2CollectionSubset, GetSubsetContentType(cff2CollectionSubset)),
+            ["/fonts/color-colrv1-source.ttf"] = (colorColrV1Source, "font/ttf"),
+            ["/fonts/color-colrv1-subset"] = (colorColrV1Subset, GetSubsetContentType(colorColrV1Subset))
         };
         await page.RouteAsync("https://odfkit.test/**", async route =>
         {
@@ -114,7 +138,7 @@ internal static class LayoutBrowserSmoke
                 {
                     Status = 200,
                     ContentType = "text/html; charset=utf-8",
-                    Body = CreatePage()
+                    Body = CreatePage(browserName)
                 }).ConfigureAwait(false);
                 return;
             }
@@ -213,6 +237,7 @@ internal static class LayoutBrowserSmoke
                 schemaVersion = 1,
                 generatedAtUtc = DateTimeOffset.UtcNow,
                 browser = browserName,
+                rawCollectionRenderingTested = browserName == "chromium",
                 sources = new
                 {
                     arabic = ComputeSha256(arabicSource),
@@ -220,7 +245,10 @@ internal static class LayoutBrowserSmoke
                     cff = ComputeSha256(cffSource),
                     arabicVariable = ComputeSha256(arabicVariableSource),
                     devanagariVariable = ComputeSha256(devanagariVariableSource),
-                    cff2Variable = ComputeSha256(cff2VariableSource)
+                    cff2Variable = ComputeSha256(cff2VariableSource),
+                    cffCollection = ComputeSha256(cffCollectionSource),
+                    cff2Collection = ComputeSha256(cff2CollectionSource),
+                    colorColrV1 = ComputeSha256(colorColrV1Source)
                 },
                 subsets = new
                 {
@@ -229,7 +257,10 @@ internal static class LayoutBrowserSmoke
                     cff = ComputeSha256(cffSubset),
                     arabicVariable = ComputeSha256(arabicVariableSubset),
                     devanagariVariable = ComputeSha256(devanagariVariableSubset),
-                    cff2Variable = ComputeSha256(cff2VariableSubset)
+                    cff2Variable = ComputeSha256(cff2VariableSubset),
+                    cffCollection = ComputeSha256(cffCollectionSubset),
+                    cff2Collection = ComputeSha256(cff2CollectionSubset),
+                    colorColrV1 = ComputeSha256(colorColrV1Subset)
                 },
                 proof,
                 domProof
@@ -254,7 +285,7 @@ internal static class LayoutBrowserSmoke
         }
     }
 
-    private static string CreatePage()
+    private static string CreatePage(string browserName)
     {
         string cases = JsonSerializer.Serialize(new[]
         {
@@ -353,8 +384,59 @@ internal static class LayoutBrowserSmoke
                     new { weight = 700, stretch = "normal" }
                 },
                 requireAxisDifference = true
+            },
+            new
+            {
+                id = "cff-collection",
+                direction = "ltr",
+                language = "zh-Hant",
+                sourceFamily = "OdfKit CFF Collection Source",
+                subsetFamily = "OdfKit CFF Collection Subset",
+                texts = new[] { "香港邨裏𠮷" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
+            },
+            new
+            {
+                id = "cff2-collection-variable",
+                direction = "ltr",
+                language = "zh-Hant",
+                sourceFamily = "OdfKit CFF2 Collection Source",
+                subsetFamily = "OdfKit CFF2 Collection Subset",
+                texts = new[] { "繁體字 香港邨裏" },
+                axes = new[]
+                {
+                    new { weight = 300, stretch = "normal" },
+                    new { weight = 500, stretch = "normal" },
+                    new { weight = 700, stretch = "normal" }
+                },
+                requireAxisDifference = true
+            },
+            new
+            {
+                id = "color-colrv1",
+                direction = "ltr",
+                language = "und",
+                sourceFamily = "OdfKit Color COLRv1 Source",
+                subsetFamily = "OdfKit Color COLRv1 Subset",
+                texts = new[] { "😀" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
             }
         });
+        string collectionFaces = browserName == "chromium"
+            ? """
+                @font-face { font-family: "OdfKit CFF Collection Source"; src: url("/fonts/cff-collection-source.otc") format("collection"); }
+                @font-face { font-family: "OdfKit CFF Collection Subset"; src: url("/fonts/cff-collection-subset"); }
+                @font-face { font-family: "OdfKit CFF2 Collection Source"; src: url("/fonts/cff2-collection-source.otc") format("collection"); font-weight: 250 900; }
+                @font-face { font-family: "OdfKit CFF2 Collection Subset"; src: url("/fonts/cff2-collection-subset"); font-weight: 250 900; }
+                """
+            : """
+                @font-face { font-family: "OdfKit CFF Collection Source"; src: url("/fonts/cff-collection-source.otc") format("opentype"); }
+                @font-face { font-family: "OdfKit CFF Collection Subset"; src: url("/fonts/cff-collection-subset"); }
+                @font-face { font-family: "OdfKit CFF2 Collection Source"; src: url("/fonts/cff2-collection-source.otc") format("opentype"); font-weight: 250 900; }
+                @font-face { font-family: "OdfKit CFF2 Collection Subset"; src: url("/fonts/cff2-collection-subset"); font-weight: 250 900; }
+                """;
         string template = """
             <!doctype html>
             <html lang="en">
@@ -373,6 +455,9 @@ internal static class LayoutBrowserSmoke
                 @font-face { font-family: "OdfKit Devanagari Variable Subset"; src: url("/fonts/devanagari-variable-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit CFF2 Variable Source"; src: url("/fonts/cff2-variable-source.otf") format("opentype"); font-weight: 250 900; }
                 @font-face { font-family: "OdfKit CFF2 Variable Subset"; src: url("/fonts/cff2-variable-subset"); font-weight: 250 900; }
+                @font-face { font-family: "OdfKit Color COLRv1 Source"; src: url("/fonts/color-colrv1-source.ttf") format("truetype"); }
+                @font-face { font-family: "OdfKit Color COLRv1 Subset"; src: url("/fonts/color-colrv1-subset"); }
+                __COLLECTION_FACES__
                 :root { color-scheme: dark; font-family: system-ui, sans-serif; }
                 body { margin: 0; background: #07131c; color: #eef8ff; }
                 main { width: min(1320px, calc(100vw - 48px)); margin: 28px auto; }
@@ -416,14 +501,17 @@ internal static class LayoutBrowserSmoke
                   const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
                   let hash = 2166136261;
                   let alpha = 0;
+                  let chromatic = 0;
                   for (let index = 0; index < pixels.length; index++) {
                     hash ^= pixels[index];
                     hash = Math.imul(hash, 16777619);
                     if ((index & 3) === 3) alpha += pixels[index];
+                    if ((index & 3) === 0 && pixels[index + 3] !== 0
+                        && (pixels[index] !== pixels[index + 1] || pixels[index + 1] !== pixels[index + 2])) chromatic++;
                   }
                   const measured = context.measureText(text);
                   const metrics = Object.fromEntries(metricFields.map(field => [field, measured[field]]));
-                  return { pixels, hash: hash >>> 0, alpha, metrics, appliedStretch: context.fontStretch };
+                  return { pixels, hash: hash >>> 0, alpha, chromatic, metrics, appliedStretch: context.fontStretch };
                 };
                 const equalMetrics = (left, right) => metricFields.every(field => Math.abs(left[field] - right[field]) <= 0.01);
                 const loadFont = async (testCase, family, kind, sample, axes) => {
@@ -479,8 +567,11 @@ internal static class LayoutBrowserSmoke
                           if (source.alpha === 0 || subset.alpha === 0 || differentBytes !== 0 || !equalMetrics(source.metrics, subset.metrics)) {
                             throw new Error(`${testCase.id}: source/subset shaping mismatch for ${text} at wdth=${axes.stretch},wght=${axes.weight}; bytes=${differentBytes}`);
                           }
+                          if (testCase.id === 'color-colrv1' && (source.chromatic === 0 || subset.chromatic === 0)) {
+                            throw new Error('color-colrv1: loaded glyph did not contain chromatic pixels');
+                          }
                           axisHashes.push(source.hash);
-                          results.push({ id: testCase.id, text, axes, sourceHash: source.hash, subsetHash: subset.hash, differentBytes, metrics: source.metrics });
+                          results.push({ id: testCase.id, text, axes, sourceHash: source.hash, subsetHash: subset.hash, differentBytes, chromaticPixels: source.chromatic, metrics: source.metrics });
                         }
                       }
                       if (testCase.requireAxisDifference && new Set(axisHashes).size < 2) {
@@ -503,7 +594,9 @@ internal static class LayoutBrowserSmoke
             </body>
             </html>
             """;
-        return template.Replace("__CASES__", cases, StringComparison.Ordinal);
+        return template
+            .Replace("__CASES__", cases, StringComparison.Ordinal)
+            .Replace("__COLLECTION_FACES__", collectionFaces, StringComparison.Ordinal);
     }
 
     private static string ComputeSha256(byte[] bytes)

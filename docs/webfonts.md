@@ -39,9 +39,12 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 第一個可交付 engine 支援 TrueType outline、Unicode scalar、
 Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
 Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed 靜態 CFF 1.0 的
-retain-GIDs 路徑目前為 experimental。含 `fvar`／VariationStore 的 standalone CFF2 variable
-`OTTO` 亦有 experimental retain-GIDs 路徑；OTC、名稱式 CFF、無 VariationStore 的 CFF2、
-color／bitmap font 必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
+retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
+OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`
+亦有 experimental retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
+以及 `net10.0` 由本引擎產生的 null-transform WOFF2；輸出只產生瀏覽器部署用的獨立
+TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、無 VariationStore 的 CFF2 與未知
+color table 版本必須明確拒絕，不能刪表或 fallback。Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
 
@@ -101,6 +104,14 @@ glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup�
 `pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1` 比較來源 TTF 與 managed WOFF2 的逐像素結果；
 2026-07-17 的遠端 CI 已在 Chromium、Firefox 與 WebKit 通過六組 Arabic／Devanagari 字串的
 RGBA bytes 與文字 metrics 差分。
+
+Color font 採相同 correctness-first 原則：COLR／CPAL、CBDT／CBLC、EBDT／EBLC、`sbix` 與
+`SVG ` 先做有界結構驗證，保留完整 glyph ID 空間與 color tables，再縮減外部 `cmap`。鎖定的
+Noto Color Emoji v2.047 bitmap-only 與 COLRv1 字型用於 managed 正向矩陣；COLRv1 來源與 managed
+WOFF2 已在 Chromium／Firefox／WebKit 通過逐 RGBA byte 差分，且測試要求非灰階像素。CBDT
+bitmap-only 可作輸入，但 Firefox WebFont sanitizer 不接受沒有 outline 的來源／輸出，因此不能
+宣稱為跨瀏覽器部署格式；其它 color 模型仍須分別補齊合法 corpus，不能以系統 emoji fallback
+或黑白 outline 冒充成功。
 
 靜態 CFF 1.0 目前只接受含 ROS／FDArray／FDSelect 的 standalone CID-keyed `OTTO`。有界 parser
 會驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、charset 與 FDSelect；未選
@@ -175,9 +186,9 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
-以及 standalone CID-keyed 靜態 CFF／有 VariationStore 的 CFF2 variable WOFF；TrueType
-variable、靜態 CFF 與 CFF2 variable 為 experimental。要求 WOFF2、OTC、名稱式 CFF、無
-VariationStore 的 CFF2 或 color font 會明確失敗。
+以及 standalone／OTC face 的 CID-keyed 靜態 CFF 或有 VariationStore 的 CFF2 variable WOFF；
+TrueType variable、靜態 CFF、CFF2 variable 與 color font 為 experimental。`net48` 要求 WOFF2、
+名稱式 CFF、無 VariationStore 的 CFF2、未知 color table 版本或直接輸出 collection 會明確失敗。
 
 API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的
 `web.config/appSettings` 鍵，預設為 `OdfKit.WebFonts.ApiKey`。環境變數優先序是明確契約。
@@ -396,12 +407,21 @@ NuGet pack 後執行 `pwsh eng/Test-WebFontSupplyChain.ps1`，會以所有 WebFo
 SPDX 2.3 JSON。CI consumer 使用 `-VerifyExisting` 重新計算套件 SHA-256 與 SBOM；任何新增、
 移除、版本或授權中繼資料漂移都會失敗，必須人工更新並審查政策檔，不能自動接受。
 
+`pwsh eng/Test-WebFontReleaseRehearsal.ps1` 會把同批 nupkg 實際 `push` 至隔離本機 feed，強制
+`OdfKit*` 只從該 feed 還原，並由乾淨 net10 consumer 與 CLI 執行。外部 package source mapping
+由同批 SBOM 精確產生；NuGet Audit 以 `all` 模式查詢 nuget.org 的獨立漏洞資料 endpoint，
+moderate 以上 advisory、audit 來源失效或通訊失敗都會使 CI 失敗。演練輸出 commit、套件數、
+雜湊與 audit policy JSON，但不把「目前沒有已知 advisory」誤寫成第三方安全保證。
+
 ## 第一方規格依據
 
 - [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
 - [Microsoft OpenType 1.9.1](https://learn.microsoft.com/en-us/typography/opentype/spec/)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
+- [Microsoft OpenType 1.9.1 color tables](https://learn.microsoft.com/en-us/typography/opentype/spec/otff)
+- [Microsoft COLR](https://learn.microsoft.com/en-us/typography/opentype/spec/colr)
+- [Microsoft CPAL](https://learn.microsoft.com/en-us/typography/opentype/spec/cpal)
 - [W3C Incremental Font Transfer](https://www.w3.org/TR/IFT/)
 - [WebFont IFT 標準追蹤與相容性閘門](webfont-ift-tracking.md)
 - [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
@@ -410,4 +430,7 @@ SPDX 2.3 JSON。CI consumer 使用 `-VerifyExisting` 重新計算套件 SHA-256 
 - [Microsoft ASP.NET Core rate limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0)
 - [Microsoft .NET bounded channels](https://learn.microsoft.com/en-us/dotnet/core/extensions/channels)
 - [NuGet `.nuspec` license metadata](https://learn.microsoft.com/en-us/nuget/reference/nuspec#license)
+- [NuGet 本機 feed](https://learn.microsoft.com/en-us/nuget/hosting-packages/local-feeds)
+- [NuGet 套件漏洞稽核](https://learn.microsoft.com/en-us/nuget/concepts/auditing-packages)
 - [SPDX 2.3 specification](https://spdx.github.io/spdx-spec/v2.3/)
+- [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)

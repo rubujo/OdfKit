@@ -129,7 +129,8 @@ public static class ManagedOpenTypeWebFontVerifier
         WebFontFormat format,
         IEnumerable<int> unicodeScalars)
     {
-        SfntFont sourceFont = SfntFont.Parse(source, faceIndex, 256, validateChecksums: true);
+        byte[] sourceSfnt = DecodeSource(source, checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024)));
+        SfntFont sourceFont = SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
         SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
         if (sourceFont.GlyphCount != subsetFont.GlyphCount)
         {
@@ -152,7 +153,8 @@ public static class ManagedOpenTypeWebFontVerifier
         Stream subset,
         WebFontFormat format)
     {
-        SfntFont sourceFont = SfntFont.Parse(source, faceIndex, 256, validateChecksums: true);
+        byte[] sourceSfnt = DecodeSource(source, checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024)));
+        SfntFont sourceFont = SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
         SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
         foreach (string tag in new[] { "GDEF", "GPOS", "GSUB" })
         {
@@ -201,7 +203,35 @@ public static class ManagedOpenTypeWebFontVerifier
         return SfntFont.Parse(sfnt, 0, 256, validateChecksums: true);
     }
 
-    private static byte[] DecodeWoff(byte[] bytes, int maximumExpandedBytes)
+    internal static byte[] DecodeSource(byte[] bytes, int maximumExpandedBytes)
+    {
+        if (bytes.Length < 4)
+        {
+            throw SfntFont.DataInvalid("source-signature");
+        }
+
+        ReadOnlySpan<byte> signature = bytes.AsSpan(0, 4);
+        if (signature.SequenceEqual("wOFF"u8))
+        {
+            return DecodeWoff(bytes, maximumExpandedBytes);
+        }
+
+#if NET10_0_OR_GREATER
+        if (signature.SequenceEqual("wOF2"u8))
+        {
+            return DecodeWoff2(bytes, maximumExpandedBytes);
+        }
+#else
+        if (signature.SequenceEqual("wOF2"u8))
+        {
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+#endif
+
+        return bytes;
+    }
+
+    internal static byte[] DecodeWoff(byte[] bytes, int maximumExpandedBytes)
     {
         ReadOnlySpan<byte> data = bytes;
         SfntFont.EnsureRange(data, 0, 44, "WOFF-header");
@@ -260,7 +290,7 @@ public static class ManagedOpenTypeWebFontVerifier
     }
 
 #if NET10_0_OR_GREATER
-    private static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes)
+    internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes)
     {
         ReadOnlySpan<byte> data = bytes;
         SfntFont.EnsureRange(data, 0, 48, "WOFF2-header");

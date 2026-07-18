@@ -108,18 +108,39 @@ $devanagariVariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRo
 $cff2VariableSource = Join-Path $sourceRoot "SourceHanSansTW-VF.otf"
 $cff2VariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-variable/first") `
         -Filter "*.woff2" -File -Recurse)
+$cffCollectionSource = Join-Path $sourceRoot "NotoSansCJK-Regular.ttc"
+$cffCollectionSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-otc-face-0/first") `
+        -Filter "*.woff2" -File -Recurse)
+$cffCollectionStandalone = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-otc-face-0/first") `
+        -Filter "*.otf" -File -Recurse)
+$cff2CollectionSource = Join-Path $evidenceRoot "source-han-cff2-variable.otc"
+$cff2CollectionSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-otc-variable/first") `
+        -Filter "*.woff2" -File -Recurse)
+$cff2CollectionStandalone = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-otc-variable/first") `
+        -Filter "*.otf" -File -Recurse)
+$colorColrV1Source = Join-Path $sourceRoot "Noto-COLRv1.ttf"
+$colorColrV1Subsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "color-colrv1/first") `
+        -Filter "*.woff2" -File -Recurse)
 if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
     -or -not (Test-Path -LiteralPath $cffSource) `
     -or -not (Test-Path -LiteralPath $arabicVariableSource) `
     -or -not (Test-Path -LiteralPath $devanagariVariableSource) `
     -or -not (Test-Path -LiteralPath $cff2VariableSource) `
+    -or -not (Test-Path -LiteralPath $cffCollectionSource) `
+    -or -not (Test-Path -LiteralPath $cff2CollectionSource) `
+    -or -not (Test-Path -LiteralPath $colorColrV1Source) `
     -or $arabicSubsets.Count -ne 1 `
     -or $devanagariSubsets.Count -ne 1 `
     -or $cffSubsets.Count -ne 1 `
     -or $arabicVariableSubsets.Count -ne 1 `
     -or $devanagariVariableSubsets.Count -ne 1 `
-    -or $cff2VariableSubsets.Count -ne 1) {
+    -or $cff2VariableSubsets.Count -ne 1 `
+    -or $cffCollectionSubsets.Count -ne 1 `
+    -or $cffCollectionStandalone.Count -ne 1 `
+    -or $cff2CollectionSubsets.Count -ne 1 `
+    -or $cff2CollectionStandalone.Count -ne 1 `
+    -or $colorColrV1Subsets.Count -ne 1) {
     throw "請先執行 eng/Test-WebFontFormatMatrix.ps1 產生 layout corpus。"
 }
 
@@ -149,6 +170,18 @@ if ($InstallBrowsers) {
 
 New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
 foreach ($browser in $Browsers) {
+    $cffCollectionBrowserSource = if ($browser -eq "chromium") {
+        $cffCollectionSource
+    }
+    else {
+        $cffCollectionStandalone[0].FullName
+    }
+    $cff2CollectionBrowserSource = if ($browser -eq "chromium") {
+        $cff2CollectionSource
+    }
+    else {
+        $cff2CollectionStandalone[0].FullName
+    }
     $screenshot = Join-Path $destinationRoot "layout-$browser.png"
     $evidence = Join-Path $destinationRoot "layout-$browser.json"
     Write-Host "驗證 $browser 複雜塑形差分（上限 $BrowserTimeoutSeconds 秒）…"
@@ -171,8 +204,14 @@ foreach ($browser in $Browsers) {
             $devanagariVariableSubsets[0].FullName,
             $cff2VariableSource,
             $cff2VariableSubsets[0].FullName,
+            $cffCollectionBrowserSource,
+            $cffCollectionSubsets[0].FullName,
+            $cff2CollectionBrowserSource,
+            $cff2CollectionSubsets[0].FullName,
+            $colorColrV1Source,
+            $colorColrV1Subsets[0].FullName,
             $screenshot,
             $evidence)
 }
 
-Write-Host "PASS：CFF、阿拉伯文、Devanagari 與 TrueType variable 多軸來源／subset 在 $($Browsers -join '／') 的像素一致。"
+Write-Host "PASS：CFF／CFF2 OTC 與 COLRv1 color 輸入均轉為獨立 WOFF2，且輸出在三瀏覽器像素一致；原始 OTC 僅另由 Chromium 作能力佐證。"

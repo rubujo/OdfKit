@@ -76,7 +76,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 真實黑箱 corpus：Adobe Source Han Sans 2.005R `SourceHanSansTC-Regular.otf`，SHA-256 為
   `10e6d832bc73650840aa7fbfec4e10c527f8136ae2aec71c3e1c13a67475c24a`，只進 CI cache／artifact。
 - Chromium、Firefox 與 WebKit 對來源 OTF 與 managed WOFF2 的三組中文逐 RGBA byte 及文字
-  metrics 相同；名稱式 CFF、OTC 與 color font 仍明確拒絕。
+  metrics 相同；此階段名稱式 CFF、OTC 與 color font 仍明確拒絕。
 - 尚未通過的人工作業：第三方結構相異性與惡意 CFF 安全審查；能力維持 experimental。
 
 ### 2026-07-17 CFF2 Variable
@@ -90,4 +90,37 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - Chromium、Firefox 與 WebKit 對 300／500／700 三個 `wght` 座標的來源／subset DOM 截圖
   bytes 相同；managed verifier 另逐一驗證所有輸出 glyph CharString。
 - 尚未通過的人工作業：第三方結構相異性、惡意 CFF2 安全審查與更廣多軸 corpus；能力維持
+  experimental。
+
+### 2026-07-18 OpenType Collection CFF／CFF2
+
+- 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1 Font Collections、Adobe
+  CFF／Type 2 技術文件與 W3C WOFF／WOFF2；未讀取、搜尋或改寫禁止來源。
+- 原創範圍：沿用有界 `ttcf` header 與 collection 起點絕對 table offset 驗證，將指定 CFF／CFF2
+  face 複製至既有 immutable table model，再由 standalone writer 重建 checksum；不重用或翻譯
+  FontTools、HarfBuzz、FreeType 的 collection 程式碼。
+- 真實黑箱 corpus：Noto Sans CJK `Sans2.004` OTC face 4，SHA-256
+  `b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a`；另以鎖定的 Source Han
+  Sans 2.005R CFF2 variable 建立規格合法的單 face OTC。兩者皆 deterministic 產生並由 managed
+  verifier 驗證 OTF／WOFF／WOFF2，不納入 repository 或 nupkg。
+- 瀏覽器證據：Chromium 直接比較 raw OTC 與 managed WOFF2；Firefox／WebKit 不接受 raw OTC，
+  改以同一 face 的 managed standalone OTF 與 WOFF2 逐 RGBA byte 比較。三者皆驗證可部署輸出，
+  但 raw `format(collection)` 能力只由 Chromium 證實。
+- 尚未通過的人工作業：共享 CFF／CFF2 table 的多 face corpus、直接 collection writer 與第三方
+  惡意 collection 安全審查；來源 face 支援維持 experimental。
+
+### 2026-07-18 WOFF 輸入與 Color Fonts
+
+- 參與者：Codex agent；實作依據僅限 W3C WOFF／WOFF2 與 Microsoft OpenType 1.9.1 的
+  COLR、CPAL、CBDT、CBLC、EBDT、EBLC、`sbix` 與 `SVG ` 規格；未讀取、搜尋或改寫禁止來源。
+- 原創範圍：WOFF zlib 與 null-transform WOFF2 的有界 sfnt 正規化；color table 成對關係、版本、
+  計數、offset、strike／document／glyph range 驗證；color 輸入保留完整 GID 的
+  correctness-first 路徑。
+- 真實 corpus：Google Noto Emoji v2.047 `NotoColorEmoji.ttf`，SHA-256
+  `39ee3c587e10e89669b9ff32703261d10d5f9c4dd5ad147b6b5a1c5200591817`；同 tag
+  `Noto-COLRv1.ttf`，SHA-256
+  `23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44`。兩者採 OFL-1.1，
+  僅下載到 CI cache／artifact，不納入 repository 或 nupkg。
+- 一般 transformed WOFF2、逐 paint graph／SVG document 主動內容安全稽核、分格式 aggressive
+  color pruning、sbix／SVG 真實 corpus 與第三方惡意 color font 稽核尚未完成；能力維持
   experimental。

@@ -189,7 +189,7 @@ jobs:
 
       - name: Real international format matrix
         shell: pwsh
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: |
           ./eng/Test-WebFontFormatMatrix.ps1 `
             -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `

@@ -85,6 +85,13 @@
         "sha256": "39ee3c587e10e89669b9ff32703261d10d5f9c4dd5ad147b6b5a1c5200591817",
         "license": "OFL-1.1"
       },
+      "colorEmojiColrV1": {
+        "version": "2.047",
+        "fileName": "Noto-COLRv1.ttf",
+        "uri": "https://raw.githubusercontent.com/googlefonts/noto-emoji/v2.047/fonts/Noto-COLRv1.ttf",
+        "sha256": "23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44",
+        "license": "OFL-1.1"
+      },
       "ipamj": {
         "version": "006.01",
         "archiveFileName": "ipamjm00601.zip",
