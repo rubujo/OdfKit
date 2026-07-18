@@ -14,7 +14,9 @@ on:
       - 'eng/Test-NuGetPack.ps1'
       - 'eng/Test-WebFontSupplyChain.ps1'
       - 'eng/Test-WebFontReleaseRehearsal.ps1'
+      - 'eng/Test-WebFontStandardsAndDependencies.ps1'
       - 'eng/webfont-dependency-policy.json'
+      - 'eng/webfont-standards-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
       - 'docs/webfonts-package-readme.md'
@@ -37,7 +39,9 @@ on:
       - 'eng/Test-NuGetPack.ps1'
       - 'eng/Test-WebFontSupplyChain.ps1'
       - 'eng/Test-WebFontReleaseRehearsal.ps1'
+      - 'eng/Test-WebFontStandardsAndDependencies.ps1'
       - 'eng/webfont-dependency-policy.json'
+      - 'eng/webfont-standards-dependency-policy.json'
       - 'eng/Test-NetFramework48Smoke.ps1'
       - 'tests/OdfKit.NetFramework48Smoke/**'
       - 'docs/webfonts-package-readme.md'
@@ -69,6 +73,12 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
+
+      - name: Validate current WebFont standards and stable dependencies
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./eng/Test-WebFontStandardsAndDependencies.ps1 -Online
 
       - name: Pack and validate NuGet contract
         shell: pwsh

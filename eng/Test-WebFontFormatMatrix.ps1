@@ -131,10 +131,14 @@ $colorEmojiColrV1Path = Get-DirectFont $definitions.colorEmojiColrV1
 
 $projectPath = Join-Path $repoRoot "tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj"
 $intermediateRoot = Join-Path $destinationPath "obj"
-dotnet restore $projectPath --nologo -p:NuGetAudit=false `
+dotnet restore $projectPath --nologo --ignore-failed-sources `
+    -p:NuGetAudit=false `
+    -p:IsTrimmable=false `
+    -p:WarningsNotAsErrors=NU1801 `
     -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
 if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣還原失敗。" }
 dotnet build $projectPath -c Release --nologo --no-restore `
+    -p:IsTrimmable=false `
     -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
 if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣建置失敗。" }
 

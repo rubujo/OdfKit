@@ -102,7 +102,7 @@ consumer smoke 與 Imaging native runtime smoke，避免各平台重新封裝出
 
 工作流程使用 `actions/checkout@v7`、`actions/upload-artifact@v7` 與
 `actions/download-artifact@v8`，並透過共用複合 action
-`./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v5` 與
+`./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v6` 與
 `actions/cache@v6`）安裝 .NET SDK。artifact 只保留一天；NuGet restore cache 依作業系統與
 相依檔雜湊分區，不依 CPU 架構或 RID 重複建立。
 
@@ -110,8 +110,16 @@ consumer smoke 與 Imaging native runtime smoke，避免各平台重新封裝出
 nupkg 放入隔離本機 feed，以 package source mapping 強制 `OdfKit*` 只來自該 feed，再由乾淨
 net10 consumer 還原與執行。外部相依清單取自同批 SPDX，不接受未列入 SBOM 的 package id；
 NuGet Audit 使用 `all` 模式與 `https://data.nuget.org/v3/index.json`，audit 通訊錯誤以及
-moderate、high、critical advisory 都會使演練失敗。這是可重現的發布與漏洞偵測閘門，不等同
-完整事件回應演練或第三方安全審查。
+moderate、high、critical advisory 都會使演練失敗。演練會再從隔離 feed 撤除
+`OdfKit.WebFonts.OpenType`、清空 consumer cache，要求 restore fail closed；之後只允許由同批
+SHA-256 不可變套件快照復原，並重新通過 restore、build 與 run。這是可重現的發布撤除／復原與
+漏洞偵測閘門，不等同真實 GitHub Release 復原、完整事件指揮或第三方安全審查。
+
+`eng/Test-WebFontStandardsAndDependencies.ps1` 另在封裝前向 NuGet 官方 flat-container 查詢
+WebFont 所有 direct package 的最新穩定版本，並向 GitHub 官方 API 驗證所有 `actions/*`
+工作流程元件的最新穩定 release；Preview 只能存在於具精確版本、理由、移除條件與複查期限的
+例外。規範政策每 90 天失效，OpenType 除版本外也必須追蹤官方 errata；IFT 依 2025-11-18
+Candidate Recommendation Draft 追蹤，不把 draft 誤列為已支援功能。
 
 ## 版本策略
 

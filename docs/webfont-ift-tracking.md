@@ -10,7 +10,9 @@ W3C 的 [Incremental Font Transfer](https://www.w3.org/TR/IFT/) 目前是 Candid
 Recommendation Draft。W3C
 [出版歷史](https://www.w3.org/standards/history/IFT/)顯示 2025-07-31 曾發布 Candidate
 Recommendation Snapshot，2025-11-18 發布後續 Candidate Recommendation Draft。這仍是可變動的候選
-標準，不是已完成互通報告的 W3C Recommendation。
+標準，不是已完成互通報告的 W3C Recommendation；W3C 最新發布頁亦明載目前沒有完成的
+implementation report，測試套件仍在開發。版本由
+`eng/webfont-standards-dependency-policy.json` 鎖定，超過 90 天未複查會使發布閘門失敗。
 
 W3C 2025 TPAC 的官方展示明確使用 WebAssembly polyfill，而不是穩定瀏覽器原生實作；Mozilla
 追蹤項目 [1977870](https://bugzilla.mozilla.org/show_bug.cgi?id=1977870) 截至基準日仍為 NEW。

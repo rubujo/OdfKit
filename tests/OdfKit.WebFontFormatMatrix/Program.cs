@@ -1,8 +1,11 @@
 ﻿using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using OdfKit.WebFonts;
+using OdfKit.WebFonts.Build;
 using OdfKit.WebFonts.OpenType;
 
 namespace OdfKit.WebFontFormatMatrix;
@@ -271,6 +274,10 @@ internal static class Program
             RunCff2TableMutationFuzz(cff2VariablePath)
         };
 
+        LargeCnsDeliveryEvidence largeCnsDelivery = await VerifyLargeCnsDeliveryAsync(
+            extBPath,
+            outputRoot).ConfigureAwait(false);
+
         string evidencePath = Path.Combine(outputRoot, "format-matrix.json");
         await File.WriteAllTextAsync(
             evidencePath,
@@ -280,10 +287,114 @@ internal static class Program
                 generatedAtUtc = DateTimeOffset.UtcNow,
                 results,
                 verifiedSourceCache = true,
-                deterministicMutationFuzz = fuzzResults
+                deterministicMutationFuzz = fuzzResults,
+                largeCnsDelivery
             }, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
         Console.WriteLine($"PASS: {results.Count} real managed format cases. Evidence: {evidencePath}");
         return 0;
+    }
+
+    private static async Task<LargeCnsDeliveryEvidence> VerifyLargeCnsDeliveryAsync(
+        string sourcePath,
+        string outputRoot)
+    {
+        const int targetScalarCount = 2048;
+        const int unicodeRangeSliceSize = 256;
+        byte[] sourceBytes = await File.ReadAllBytesAsync(sourcePath).ConfigureAwait(false);
+        SfntFont source = SfntFont.Parse(sourceBytes, 0, 256, validateChecksums: true);
+        int[] scalars = source.UnicodeScalars
+            .Where(scalar => scalar is >= 0x10000 and <= 0x10FFFF)
+            .OrderBy(scalar => scalar)
+            .Take(targetScalarCount)
+            .ToArray();
+        if (scalars.Length != targetScalarCount)
+        {
+            throw new InvalidDataException("The official CNS font does not contain the required large corpus.");
+        }
+
+        var corpus = new StringBuilder(targetScalarCount * 2);
+        foreach (int scalar in scalars)
+        {
+            corpus.Append(char.ConvertFromUtf32(scalar));
+        }
+
+        string benchmarkRoot = Path.Combine(outputRoot, "large-cns-delivery");
+        RecreateDirectory(benchmarkRoot);
+        string corpusPath = Path.Combine(benchmarkRoot, "cns-ext-b-2048.txt");
+        await File.WriteAllTextAsync(
+            corpusPath,
+            corpus.ToString(),
+            new UTF8Encoding(false)).ConfigureAwait(false);
+
+        string firstRoot = Path.Combine(benchmarkRoot, "first");
+        string secondRoot = Path.Combine(benchmarkRoot, "second");
+        var builder = new WebFontAssetBuilder();
+        WebFontBuildOptions CreateOptions(string destination) => new()
+        {
+            FontPath = sourcePath,
+            FontSourceId = "cns-official-ext-b-large",
+            TextPath = corpusPath,
+            OutputDirectory = destination,
+            ProfileId = "cns11643-large-delivery-v1",
+            FontFamily = "OdfKit CNS Large Delivery",
+            Formats = [WebFontFormat.Woff2],
+            UnicodeRangeSliceSize = unicodeRangeSliceSize,
+            MaxSliceCount = 512,
+            MaxUniqueUnicodeScalars = targetScalarCount,
+            MaxSourceBytes = 128L * 1024 * 1024,
+            MaxOutputBytes = 64L * 1024 * 1024
+        };
+
+        using Process process = Process.GetCurrentProcess();
+        long initialAllocatedBytes = GC.GetTotalAllocatedBytes(precise: true);
+        var stopwatch = Stopwatch.StartNew();
+        WebFontManifest first = await builder.BuildAsync(CreateOptions(firstRoot)).ConfigureAwait(false);
+        WebFontManifest second = await builder.BuildAsync(CreateOptions(secondRoot)).ConfigureAwait(false);
+        stopwatch.Stop();
+        process.Refresh();
+
+        string[] firstHashes = first.Assets.Select(asset => asset.Sha256).OrderBy(value => value).ToArray();
+        string[] secondHashes = second.Assets.Select(asset => asset.Sha256).OrderBy(value => value).ToArray();
+        string stylesheetFileName = first.StylesheetFileName
+            ?? throw new InvalidDataException("The large CNS delivery build emitted no stylesheet name.");
+        if (first.Assets.Count < 2
+            || first.Assets.Any(asset => asset.Format != WebFontFormat.Woff2)
+            || !firstHashes.SequenceEqual(secondHashes, StringComparer.Ordinal)
+            || string.IsNullOrWhiteSpace(stylesheetFileName)
+            || !string.Equals(first.StylesheetSha256, second.StylesheetSha256, StringComparison.Ordinal))
+        {
+            throw new InvalidDataException("The large CNS delivery build was incomplete or non-deterministic.");
+        }
+
+        long fontPayloadBytes = first.Assets.Sum(asset => asset.ByteLength);
+        long cssBytes = new FileInfo(Path.Combine(firstRoot, stylesheetFileName)).Length;
+        long manifestBytes = new FileInfo(Path.Combine(firstRoot, "webfonts.json")).Length;
+        long coldPayloadBytes = checked(fontPayloadBytes + cssBytes + manifestBytes);
+        long allocatedBytes = GC.GetTotalAllocatedBytes(precise: true) - initialAllocatedBytes;
+        if (cssBytes > 256L * 1024
+            || manifestBytes > 1024L * 1024
+            || coldPayloadBytes > 256L * 1024 * 1024
+            || allocatedBytes > 8L * 1024 * 1024 * 1024
+            || stopwatch.Elapsed > TimeSpan.FromMinutes(10))
+        {
+            throw new InvalidDataException("The large CNS delivery build exceeded its reproducible resource budget.");
+        }
+
+        return new LargeCnsDeliveryEvidence(
+            Path.GetFileName(sourcePath),
+            Convert.ToHexStringLower(SHA256.HashData(sourceBytes)),
+            sourceBytes.LongLength,
+            targetScalarCount,
+            unicodeRangeSliceSize,
+            first.Assets.Count,
+            fontPayloadBytes,
+            cssBytes,
+            manifestBytes,
+            coldPayloadBytes,
+            stopwatch.ElapsedMilliseconds,
+            process.WorkingSet64,
+            allocatedBytes,
+            true);
     }
 
     private static async Task VerifyWoff2CorpusAsync(
@@ -1292,4 +1403,20 @@ internal static class Program
         int Cases,
         int Accepted,
         int Rejected);
+
+    private sealed record LargeCnsDeliveryEvidence(
+        string SourceFile,
+        string SourceSha256,
+        long SourceBytes,
+        int ScalarCount,
+        int UnicodeRangeSliceSize,
+        int AssetCount,
+        long FontPayloadBytes,
+        long CssBytes,
+        long ManifestBytes,
+        long ColdPayloadBytes,
+        long ElapsedMilliseconds,
+        long WorkingSetBytes,
+        long AllocatedBytes,
+        bool Reproducible);
 }

@@ -27,6 +27,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $policyPath = Join-Path $PSScriptRoot "webfont-dependency-policy.json"
+& (Join-Path $PSScriptRoot "Test-WebFontStandardsAndDependencies.ps1")
 $packageRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $PackageDirectory))
 $sbomPath = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputPath))
 $packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")

@@ -286,6 +286,14 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
   有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
+- OpenType 1.9.1 加官方 errata、Unicode 17.0、W3C WOFF／WOFF2／CSS Fonts Level 4 與 IFT
+  2025-11-18 CRD 的 90 天複查閘門；WebFont direct NuGet 相依須在線上 CI 比對官方最新穩定版。
+  Preview 相依必須有精確版本、理由、移除條件及到期日。目前唯一例外是經由 OdfKit core
+  傳遞的 `CSharpMath 1.0.0-pre.1`，WebFont 本身未直接參照，且到期前必須重新評估拆除 core
+  localization 相依或升級至相容穩定版。
+- 官方 CNS Ext-B 67,492,856-byte 字型的 2,048 個真實 supplementary-plane scalar 已依 256
+  code-point bucket 產生 8 個 deterministic WOFF2；冷啟 CSS、manifest 與字型 payload 合計
+  2,154,873 bytes，兩輪 hash 一致，CI 同時記錄耗時、工作集與配置量。
 - 同批 nupkg 的隔離本機 feed 發布、SBOM 精確 source mapping、乾淨 consumer／CLI 與 NuGet Audit
   `all` 演練；正式 tag workflow 另建立 GitHub Sigstore provenance 與 WebFont SBOM attestation。
 

@@ -228,6 +228,58 @@ try {
         throw "發布演練的 WebFont CLI 無法由隔離 feed 執行。"
     }
 
+    $recoveryPackage = $packageFiles |
+        Where-Object { $_.Name -eq "OdfKit.WebFonts.OpenType.$packageVersion.nupkg" } |
+        Select-Object -First 1
+    if ($null -eq $recoveryPackage) {
+        throw "發布復原演練找不到 OpenType nupkg 快照。"
+    }
+    $feedPackage = Get-ChildItem -LiteralPath $feedRoot -Filter $recoveryPackage.Name -File -Recurse |
+        Select-Object -First 1
+    if ($null -eq $feedPackage) {
+        throw "發布復原演練找不到已推送的 OpenType nupkg。"
+    }
+
+    $expectedRecoverySha256 = (Get-FileHash -LiteralPath $recoveryPackage.FullName -Algorithm SHA256).
+        Hash.ToLowerInvariant()
+    $quarantineRoot = Join-Path $workRoot "quarantine"
+    New-Item -ItemType Directory -Path $quarantineRoot -Force | Out-Null
+    Move-Item -LiteralPath $feedPackage.FullName -Destination (Join-Path $quarantineRoot $feedPackage.Name)
+    Remove-Item -LiteralPath $nugetCache -Recurse -Force
+    Remove-Item -LiteralPath (Join-Path $consumerRoot "obj") -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath (Join-Path $consumerRoot "bin") -Recurse -Force -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Path $nugetCache -Force | Out-Null
+
+    & dotnet @restoreArguments 2>&1 | Out-Null
+    $revokedRestoreExitCode = $LASTEXITCODE
+    if ($revokedRestoreExitCode -eq 0) {
+        throw "發布復原演練在必要 nupkg 撤除後未能 fail closed。"
+    }
+
+    Copy-Item -LiteralPath $recoveryPackage.FullName -Destination $feedPackage.FullName
+    $restoredRecoverySha256 = (Get-FileHash -LiteralPath $feedPackage.FullName -Algorithm SHA256).
+        Hash.ToLowerInvariant()
+    if ($restoredRecoverySha256 -ne $expectedRecoverySha256) {
+        throw "發布復原演練由不可變快照復原的 nupkg SHA-256 不一致。"
+    }
+
+    Remove-Item -LiteralPath $nugetCache -Recurse -Force
+    Remove-Item -LiteralPath (Join-Path $consumerRoot "obj") -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath (Join-Path $consumerRoot "bin") -Recurse -Force -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Path $nugetCache -Force | Out-Null
+    & dotnet @restoreArguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "發布復原演練無法由不可變快照重新還原 consumer。"
+    }
+    & dotnet build $consumerProjectPath -c Release --no-restore --nologo
+    if ($LASTEXITCODE -ne 0) {
+        throw "發布復原演練重新還原後無法建置 consumer。"
+    }
+    & dotnet run --project $consumerProjectPath -c Release --no-build --no-restore
+    if ($LASTEXITCODE -ne 0) {
+        throw "發布復原演練重新還原後無法執行 consumer。"
+    }
+
     $commitTimestamp = (& git -C $repoRoot show -s --format=%cI $revision).Trim()
     $evidence = [ordered]@{
         schemaVersion = 1
@@ -251,6 +303,14 @@ try {
         sbomSha256 = (Get-FileHash -LiteralPath $resolvedSbomPath -Algorithm SHA256).Hash.ToLowerInvariant()
         consumerTargetFramework = "net10.0"
         cliInstalledFromLocalFeed = $true
+        incidentRecovery = [ordered]@{
+            revokedPackage = $recoveryPackage.Name
+            revokedRestoreExitCode = $revokedRestoreExitCode
+            failClosed = $true
+            immutableSnapshotSha256 = $expectedRecoverySha256
+            restoredFeedSha256 = $restoredRecoverySha256
+            restoreBuildRunSucceeded = $true
+        }
     }
     $evidencePath = Join-Path $outputRoot "evidence.json"
     ($evidence | ConvertTo-Json -Depth 10) + "`n" |
@@ -264,4 +324,4 @@ finally {
     }
 }
 
-Write-Host "PASS：$packageVersion 同批資產已通過本機 feed、乾淨 consumer、SBOM 消費與 NuGet Audit 演練。"
+Write-Host "PASS：$packageVersion 同批資產已通過本機 feed、乾淨 consumer、SBOM 消費、NuGet Audit 與撤除復原演練。"

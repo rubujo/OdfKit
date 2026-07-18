@@ -78,6 +78,8 @@ internal sealed class SfntFont
 
     internal bool HasColorTables => _hasColorTables;
 
+    internal IEnumerable<int> UnicodeScalars => _cmap.UnicodeMappings.Keys;
+
     internal ushort GetGlyphId(int scalar)
         => _cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph) ? glyph : (ushort)0;
 

@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Remove="artifacts\**\*.cs" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Build\OdfKit.WebFonts.Build.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-07-18",
+  "maximumReviewAgeDays": 90,
+  "standards": [
+    {
+      "id": "OpenType",
+      "version": "1.9.1",
+      "status": "current",
+      "uri": "https://learn.microsoft.com/en-us/typography/opentype/spec/",
+      "errataUri": "https://learn.microsoft.com/en-us/typography/opentype/spec/errata"
+    },
+    {
+      "id": "Unicode",
+      "version": "17.0.0",
+      "status": "current",
+      "uri": "https://www.unicode.org/versions/Unicode17.0.0/"
+    },
+    {
+      "id": "WOFF",
+      "version": "1.0",
+      "status": "recommendation",
+      "uri": "https://www.w3.org/TR/WOFF/"
+    },
+    {
+      "id": "WOFF2",
+      "version": "1.0",
+      "status": "recommendation",
+      "uri": "https://www.w3.org/TR/WOFF2/"
+    },
+    {
+      "id": "CSS-Fonts",
+      "version": "Level 4",
+      "status": "current-draft",
+      "uri": "https://www.w3.org/TR/css-fonts-4/"
+    },
+    {
+      "id": "IFT",
+      "version": "2025-11-18",
+      "status": "candidate-recommendation-draft",
+      "uri": "https://www.w3.org/TR/2025/CRD-IFT-20251118/"
+    }
+  ],
+  "latestStablePackages": [
+    {
+      "id": "Microsoft.CodeAnalysis.PublicApiAnalyzers",
+      "version": "5.6.0"
+    },
+    {
+      "id": "Microsoft.NETFramework.ReferenceAssemblies.net48",
+      "version": "1.0.3"
+    },
+    {
+      "id": "Microsoft.Win32.Registry",
+      "version": "5.0.0"
+    },
+    {
+      "id": "System.Text.Encoding.CodePages",
+      "version": "10.0.10"
+    },
+    {
+      "id": "System.Text.Json",
+      "version": "10.0.10"
+    }
+  ],
+  "githubActions": [
+    {
+      "id": "attest",
+      "major": 4,
+      "latestRelease": "v4.2.0"
+    },
+    {
+      "id": "cache",
+      "major": 6,
+      "latestRelease": "v6.1.0"
+    },
+    {
+      "id": "checkout",
+      "major": 7,
+      "latestRelease": "v7.0.0"
+    },
+    {
+      "id": "configure-pages",
+      "major": 6,
+      "latestRelease": "v6.0.0"
+    },
+    {
+      "id": "deploy-pages",
+      "major": 5,
+      "latestRelease": "v5.0.0"
+    },
+    {
+      "id": "download-artifact",
+      "major": 8,
+      "latestRelease": "v8.0.1"
+    },
+    {
+      "id": "setup-dotnet",
+      "major": 6,
+      "latestRelease": "v6.0.0"
+    },
+    {
+      "id": "setup-java",
+      "major": 5,
+      "latestRelease": "v5.6.0"
+    },
+    {
+      "id": "upload-artifact",
+      "major": 7,
+      "latestRelease": "v7.0.1"
+    },
+    {
+      "id": "upload-pages-artifact",
+      "major": 5,
+      "latestRelease": "v5.0.0"
+    }
+  ],
+  "prereleaseExceptions": [
+    {
+      "id": "CSharpMath",
+      "version": "1.0.0-pre.1",
+      "scope": "transitive-via-odfkit-core",
+      "reason": "OdfKit core formula APIs use the 1.0 atom model; WebFont does not directly reference this package. The older 0.5.1 stable line is not API-compatible with the current formula implementation.",
+      "removeWhen": "OdfKit ships a stable compatible CSharpMath version or WebFont localization is separated from the core package dependency.",
+      "reviewBy": "2026-10-16"
+    }
+  ]
+}

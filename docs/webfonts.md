@@ -435,11 +435,23 @@ SPDX 2.3 JSON。CI consumer 使用 `-VerifyExisting` 重新計算套件 SHA-256 
 由同批 SBOM 精確產生；NuGet Audit 以 `all` 模式查詢 nuget.org 的獨立漏洞資料 endpoint，
 moderate 以上 advisory、audit 來源失效或通訊失敗都會使 CI 失敗。演練輸出 commit、套件數、
 雜湊與 audit policy JSON，但不把「目前沒有已知 advisory」誤寫成第三方安全保證。
+演練另會撤除隔離 feed 中的 OpenType nupkg、清空 consumer cache 並確認 restore fail closed，
+再由同批 SHA-256 快照復原及重跑 restore／build／run。
+
+`pwsh eng/Test-WebFontStandardsAndDependencies.ps1 -Online` 會從 NuGet 官方資料確認 WebFont direct
+相依仍是最新穩定版，並以 90 天期限追蹤 OpenType errata、Unicode、WOFF／WOFF2、CSS Fonts 與
+IFT。Preview 不得直接加入 WebFont；目前唯一例外是 OdfKit core 傳遞的
+`CSharpMath 1.0.0-pre.1`，具有精確理由、移除條件與複查期限。
+
+真實大型傳輸基準以官方 CNS Ext-B 67,492,856-byte 字型的 2,048 個 supplementary-plane
+scalar 執行：256 code-point bucket 產生 8 個 WOFF2，兩輪 hash 一致；冷啟字型、CSS 與 manifest
+合計 2,154,873 bytes。這是固定 runner corpus 的回歸基準，不等同特定客戶頁面或 CDN 網路量測。
 
 ## 第一方規格依據
 
 - [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
 - [Microsoft OpenType 1.9.1](https://learn.microsoft.com/en-us/typography/opentype/spec/)
+- [Microsoft OpenType 1.9.1 errata](https://learn.microsoft.com/en-us/typography/opentype/spec/errata)
 - [W3C WOFF 1.0](https://www.w3.org/TR/WOFF/)
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
 - [Microsoft OpenType 1.9.1 color tables](https://learn.microsoft.com/en-us/typography/opentype/spec/otff)
