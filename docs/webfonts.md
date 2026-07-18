@@ -317,13 +317,17 @@ SHA-256、ETag 與 304。IIS Express 與 IIS 使用相同的 `applicationHost.co
 路徑由 ASP.NET 4 ISAPI mapping 交給 `system.web/httpHandlers`。IIS Express 由使用者啟動且沒有
 WAS。Smoke 從 IIS Express 安裝目錄複製官方 `AppServer/applicationhost.config` 至 artifact，不依賴
 使用者曾啟動 IIS Express 所產生的個人設定；因此這項證據不取代正式 IIS 站台或客戶安全設定的驗收。
+兩種 pipeline 另對內容定址 WOFF 執行 16 路有界負載，至少 256、最多 1,024 次 GET；每個回應
+重算 SHA-256，evidence 記錄總傳輸 bytes、elapsed、CPU 與 IIS Express initial／peak working set。
 
 `eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1` 則使用完整隔離 `applicationhost.config` 與 ANCM
 V2，分別發布並實際啟動 In-Process 與 Out-of-Process。前者驗證
 `appsettings.{Environment}.json` API key，後者驗證環境變數覆寫；兩者皆執行 401/no-store、
 動態 WOFF2、GET／HEAD、SHA-256、ETag 與 304。In-Process 在 `iisexpress.exe` 內執行，
 Out-of-Process 由 ANCM 啟動 Kestrel 並代理。隔離設定會以已驗證存在的 ANCM V2 DLL 顯式加入
-`aspNetCore` section、global module 與 locked module，避免依賴個人 `applicationhost.config`。參考
+`aspNetCore` section、global module 與 locked module，避免依賴個人 `applicationhost.config`。
+兩種 hosting model 亦執行相同有界 WOFF2 負載；In-Process 量測 IIS Express，Out-of-Process
+同時計入 IIS Express proxy 與其唯一 Kestrel `dotnet` 子程序，避免只量到代理層就宣稱應用程式資源量。參考
 [Microsoft IIS Express 概觀](https://learn.microsoft.com/en-us/iis/extensions/introduction-to-iis-express/iis-express-overview)、
 [IIS Express 命令列](https://learn.microsoft.com/en-us/iis/extensions/using-iis-express/running-iis-express-from-the-command-line)
 、[ASP.NET Core Module](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module?view=aspnetcore-10.0)

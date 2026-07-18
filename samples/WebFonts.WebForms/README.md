@@ -35,4 +35,5 @@ pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
 此測試會將隨機 key 寫入隔離站台的 `web.config`、清除環境變數、實際編譯頁面、經 HTTP 動態
 產生 TTF／WOFF，並驗證未授權回應、GET／HEAD、內容 SHA-256、ETag 與 304。兩次執行分別以
 `Clr4IntegratedAppPool` 與 `Clr4ClassicAppPool` 啟動隔離站台；它們不等同客戶正式 IIS、WAF／CDN
-或組織安全設定的驗收。
+或組織安全設定的驗收。每個 pipeline 另對 WOFF 執行 16 路、256～1,024 次有界 GET 負載，逐一
+驗證 SHA-256 並將 CPU 與 initial／peak working set 寫入 `evidence.json`；這不等同長時間 soak。

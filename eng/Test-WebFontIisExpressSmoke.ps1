@@ -24,6 +24,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "WebFontIisSmoke.Common.ps1")
 $destinationPath = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
 $repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
     [IO.Path]::DirectorySeparatorChar,
@@ -297,12 +298,25 @@ try {
         }
     }
 
+    $loadAsset = @($manifest.Assets | Where-Object Format -EQ "Woff")
+    Assert-Condition ($loadAsset.Count -eq 1) "IIS Express hosted load 缺少唯一的 WOFF 資產。"
+    $loadAssetUri = [Uri]::new(
+        $baseUri,
+        "_odf-fonts/$($loadAsset[0].Sha256)/$($loadAsset[0].FileName)")
+    $hostedLoad = Invoke-WebFontHostedAssetLoad `
+        -Client $client `
+        -AssetUri $loadAssetUri `
+        -ExpectedSha256 $loadAsset[0].Sha256 `
+        -ExpectedByteLength $loadAsset[0].ByteLength `
+        -HostProcesses @($process)
+
     [ordered]@{
         server = "IIS Express"
         runtime = ".NET Framework 4.8"
         pipeline = $Pipeline
         profileId = $manifest.ProfileId
         sourceSha256 = $actualSourceSha256
+        hostedLoad = $hostedLoad
         assets = @($manifest.Assets | ForEach-Object {
             [ordered]@{
                 format = $_.Format

@@ -21,6 +21,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "WebFontIisSmoke.Common.ps1")
 $destinationPath = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
 $repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
     [IO.Path]::DirectorySeparatorChar,
@@ -429,6 +430,21 @@ function Invoke-HostingModelSmoke {
             "ASP.NET Core $HostingModel 缺少 IIS Express listener 證據。"
         Assert-Condition ($iisTrace.Contains("Response sent: $baseUri", [StringComparison]::Ordinal)) `
             "ASP.NET Core $HostingModel 缺少 IIS Express proxy 回應證據。"
+        $hostProcesses = @($process)
+        if ($HostingModel -eq "OutOfProcess") {
+            $childProcessIds = @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $($process.Id)" |
+                    Where-Object Name -EQ "dotnet.exe" |
+                    Select-Object -ExpandProperty ProcessId)
+            Assert-Condition ($childProcessIds.Count -eq 1) `
+                "ASP.NET Core OutOfProcess 缺少唯一的 Kestrel dotnet 子程序。"
+            $hostProcesses += [Diagnostics.Process]::GetProcessById($childProcessIds[0])
+        }
+        $hostedLoad = Invoke-WebFontHostedAssetLoad `
+            -Client $client `
+            -AssetUri $assetUri `
+            -ExpectedSha256 $asset.sha256 `
+            -ExpectedByteLength $asset.byteLength `
+            -HostProcesses $hostProcesses
 
         return [ordered]@{
             hostingModel = $HostingModel
@@ -437,6 +453,7 @@ function Invoke-HostingModelSmoke {
             profileId = $manifest.profileId
             sourceSha256 = $actualSourceSha256
             webConfigSha256 = (Get-FileHash -LiteralPath $webConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            hostedLoad = $hostedLoad
             asset = [ordered]@{
                 format = "Woff2"
                 fileName = $asset.fileName

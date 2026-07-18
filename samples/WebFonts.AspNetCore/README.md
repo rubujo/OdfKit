@@ -56,6 +56,10 @@ pwsh eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 `
   -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
 ```
 
+Smoke 另對 In-Process／Out-of-Process 的 WOFF2 資產執行 16 路、256～1,024 次有界 GET 負載，
+逐一重算 SHA-256 並記錄 CPU 與 initial／peak working set。Out-of-Process 同時計入 IIS Express
+proxy 與 Kestrel `dotnet` 子程序；這些數值是 CI 回歸預算，不是正式容量承諾或長時間 soak。
+
 若由 CDN 提供資產，設定 `OdfKit__WebFonts__PublicBaseUrl`；跨來源部署須另外設定精確的
 `OdfKit__WebFonts__AllowedOrigin`。正式 CSP、CORS、WAF 與 CDN 說明見
 [`docs/webfonts.md`](../../docs/webfonts.md)。
