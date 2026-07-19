@@ -189,7 +189,7 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    的 variable `OTTO`。有界 parser 驗證 collection 絕對 table offset、32-bit INDEX、
    Top／Font／Private DICT、FDSelect
    0／3／4、VariationRegion、ItemVariationData、`vsindex`、`blend` 與 subroutine；未選 glyph
-   以單一零 hint `hintmask` 取代，再以兩趟 relocation 重建 32-bit INDEX、Top／Font／Private
+   以規格允許的零長度 CharString 取代，再以兩趟 relocation 重建 32-bit INDEX、Top／Font／Private
    DICT、Header length 與 local Subrs 相對 offset；variation metadata 原樣保留。Source Han Sans 2.005R
    已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。Microsoft
    OpenType 1.9.1 明定非變動 CFF2 必須省略 VariationStore；此結構已由有界規格 fixture 解封，
@@ -205,15 +205,18 @@ WOFF2；Firefox／WebKit 以同一 face 的 managed standalone OTF 對 WOFF2。�
 
 OpenType 1.9.1 定義的 color 輸入族群為 COLR／CPAL v0／v1、CBDT／CBLC、EBDT／EBLC、
 `sbix` 與 `SVG `。目前 managed parser 會驗證成對表格、版本、計數、offset、strike／document
-範圍與 glyph ID；偵測到 color table 時保留完整 glyph ID 空間與原始 color tables，只縮減對外
-`cmap`。這是避免刪掉 COLR layer glyph 或 bitmap strike 的 correctness-first 實作，不宣稱已完成
-aggressive color pruning。
+範圍與 glyph ID。COLRv0 layer 與 COLRv1 全部 32 種 paint 會建立有界 DAG，巡訪 layer list、
+`PaintGlyph` 與 `PaintColrGlyph`，拒絕循環、未知格式、超深 graph、非法 palette／clip／offset；
+`sbix dupe` 亦建立有界 glyph closure 並拒絕循環及非 OpenType 圖片類型。SVG document 不跨 glyph
+引用 outline，bitmap location table 也不建立跨 glyph outline 關係，因此這兩類只保留要求 glyph
+的 fallback outline。所有路徑維持原始 glyph ID 編號及 color tables，只縮減對外 `cmap` 與未被
+closure 觸及的 outline；不宣稱已完成 aggressive color-table pruning。
 
 每一種 color 模型須分別以可再散布且鎖定 SHA-256 的真實 corpus 通過 TTF／OTF、WOFF、WOFF2
 managed verifier 與 Chromium／Firefox／WebKit 截圖，才可從 experimental 升級。未知版本、缺少
 CPAL 或 bitmap location／data 配對、越界頂層 paint root／document／strike，以及任何無法唯一
-驗證的組合均明確拒絕。COLRv1 巢狀 paint graph 尚未完整巡訪；SVG document 另須維持 CSP 與
-主動內容安全邊界。完成相應安全稽核前，不得宣稱可接受任意不受信任 color font。
+驗證的組合均明確拒絕。SVG document 另維持禁止 DTD、script、外部參照、互動及主動內容的安全
+邊界。完成各格式真實 corpus 與採用者額外安全稽核前，不得宣稱可接受任意不受信任 color font。
 
 真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與

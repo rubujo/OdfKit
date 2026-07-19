@@ -125,8 +125,12 @@ glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup�
 RGBA bytes 與文字 metrics 差分。
 
 Color font 採相同 correctness-first 原則：COLR／CPAL、CBDT／CBLC、EBDT／EBLC、`sbix` 與
-`SVG ` 先做有界結構驗證，保留完整 glyph ID 空間與 color tables，再縮減外部 `cmap`。鎖定的
-Noto Color Emoji v2.047 bitmap-only 與 COLRv1 字型用於 managed 正向矩陣；COLRv1 來源與 managed
+`SVG ` 先做有界結構驗證，保留 glyph ID 編號與 color tables，再縮減外部 `cmap`。COLRv0 layer、
+COLRv1 全部 32 種 paint、layer list、`PaintGlyph`／`PaintColrGlyph` DAG 與 `sbix dupe` 會建立
+實際 outline closure；循環、超深 graph、未知 paint、非法 palette／clip／offset 與 `sbix` 類型
+會明確拒絕。SVG document 本身不跨 glyph 引用 outline；bitmap location table 也不建立跨 glyph
+outline 關係，因此只保留使用者要求的 fallback outline。鎖定的 Noto Color Emoji v2.047
+bitmap-only 與 COLRv1 字型用於 managed 正向矩陣；COLRv1 來源與 managed
 WOFF2 已在 Chromium／Firefox／WebKit 通過逐 RGBA byte 差分，且測試要求非灰階像素。CBDT
 bitmap-only 可作輸入，但 Firefox WebFont sanitizer 不接受沒有 outline 的來源／輸出，因此不能
 宣稱為跨瀏覽器部署格式；其它 color 模型仍須分別補齊合法 corpus，不能以系統 emoji fallback
@@ -153,11 +157,11 @@ closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
 Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 縮為
-單一零 hint 的 `hintmask`，再以兩趟 relocation 重建 Top／Font／Private DICT、32-bit INDEX、
+規格允許的零長度 CharString，再以兩趟 relocation 重建 Top／Font／Private DICT、32-bit INDEX、
 Header Top DICT length 與 local Subrs 相對 offset；GID、VariationStore、subroutine bytes、
 `fvar`、`avar`、`STAT`、HVAR 與其它 variation metadata 保持不變。Source Han Sans 2.005R
-`SourceHanSansTW-VF.otf` 的來源為 10,495,320 bytes，managed OTF 為 364,352 bytes、WOFF 為
-110,424 bytes、WOFF2 為 72,616 bytes；SHA-256 為
+`SourceHanSansTW-VF.otf` 的來源為 10,495,320 bytes，managed OTF 為 343,400 bytes、WOFF 為
+72,324 bytes、WOFF2 為 54,736 bytes；來源 SHA-256 為
 `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`。Chromium、Firefox 與
 WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
 缺少更廣 CFF2 corpus 而維持 experimental。第三方惡意字型稽核只屬採用者額外證據。

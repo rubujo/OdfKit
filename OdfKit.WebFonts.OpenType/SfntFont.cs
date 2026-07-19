@@ -51,7 +51,7 @@ internal sealed class SfntFont
     private readonly ushort _glyphCount;
     private readonly uint[] _locations;
     private readonly CmapMapping _cmap;
-    private readonly bool _hasColorTables;
+    private readonly ColorGlyphClosure _colorGlyphClosure;
 
     private SfntFont(
         uint flavor,
@@ -59,14 +59,14 @@ internal sealed class SfntFont
         ushort glyphCount,
         uint[] locations,
         CmapMapping cmap,
-        bool hasColorTables)
+        ColorGlyphClosure colorGlyphClosure)
     {
         Flavor = flavor;
         _tables = tables;
         _glyphCount = glyphCount;
         _locations = locations;
         _cmap = cmap;
-        _hasColorTables = hasColorTables;
+        _colorGlyphClosure = colorGlyphClosure;
     }
 
     private uint Flavor { get; }
@@ -76,7 +76,7 @@ internal sealed class SfntFont
 
     internal ushort GlyphCount => _glyphCount;
 
-    internal bool HasColorTables => _hasColorTables;
+    internal bool HasColorTables => _colorGlyphClosure.HasColorTables;
 
     internal IEnumerable<int> UnicodeScalars => _cmap.UnicodeMappings.Keys;
 
@@ -234,8 +234,8 @@ internal sealed class SfntFont
         }
 
         CmapMapping cmap = CmapMapping.Parse(tables["cmap"], glyphCount);
-        bool hasColorTables = ColorFontValidator.Validate(tables, glyphCount);
-        return new SfntFont(flavor, tables, glyphCount, locations, cmap, hasColorTables);
+        ColorGlyphClosure colorGlyphClosure = ColorFontValidator.Validate(tables, glyphCount);
+        return new SfntFont(flavor, tables, glyphCount, locations, cmap, colorGlyphClosure);
     }
 
     internal SfntSubset CreateSubset(
@@ -269,15 +269,7 @@ internal sealed class SfntFont
             GsubGlyphClosure.Add(gsub, selectedGlyphs, _glyphCount);
         }
 
-        // Color tables may reference glyphs and bitmap strikes outside cmap. Retaining the
-        // full glyph space is the correctness-first path until table-specific pruning exists.
-        if (_hasColorTables)
-        {
-            for (int glyph = 1; glyph < _glyphCount; glyph++)
-            {
-                selectedGlyphs.Add((ushort)glyph);
-            }
-        }
+        _colorGlyphClosure.AddReferencedGlyphs(selectedGlyphs);
 
         bool retainFullLayoutGlyphSpace = scalars.Any(IsComplexShapingScalar)
             && (_tables.ContainsKey("GSUB") || _tables.ContainsKey("GPOS"));
