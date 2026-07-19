@@ -65,7 +65,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   synthetic 正負向 fixture。
 - 真實黑箱 corpus：Adobe Source Han Sans 2.005R 與鎖定版本 Noto Arabic／Devanagari，皆為
   OFL-1.1；只下載到 CI cache／本機 artifacts，不納入 repository 或 nupkg。
-- 尚未通過的人工作業：由維護者進行第三方結構相異性審查；完成前能力維持 experimental。
+- 採用者外部驗收：可另由第三方進行結構相異性審查；此項不計入工程完成條件。
 
 ### 2026-07-17 靜態 CFF 1.0
 
@@ -77,7 +77,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `10e6d832bc73650840aa7fbfec4e10c527f8136ae2aec71c3e1c13a67475c24a`，只進 CI cache／artifact。
 - Chromium、Firefox 與 WebKit 對來源 OTF 與 managed WOFF2 的三組中文逐 RGBA byte 及文字
   metrics 相同；此階段名稱式 CFF、OTC 與 color font 仍明確拒絕。
-- 尚未通過的人工作業：第三方結構相異性與惡意 CFF 安全審查；能力維持 experimental。
+- 採用者外部驗收：第三方結構相異性與惡意 CFF 安全審查；此項不計入工程完成條件。
 
 ### 2026-07-19 名稱式 CFF 1.0
 
@@ -89,7 +89,9 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   charset，並允許省略 Private DICT。CharStrings 繼續使用相同長度的 retain-GIDs 空 outline。
 - 安全與效能：CFF 弱參照解析快取新增 glyph count context 核對，避免相同 table bytes 在不同
   face metadata 下誤用；預定義 charset 依各自固定 glyph 上限拒絕超界輸入。名稱式 `seac`
-  組合字仍由 Type 2 verifier 明確拒絕，不會靜默遺失元件。
+  依 Adobe #5177 從 `endchar` 取得 StandardEncoding base／accent code，再透過 #5176 charset
+  SID 找回 GID；解析結果沿用弱參照快取。代碼非整數或超過 0～255、SID 缺漏、重複 charset SID、
+  CID-keyed `seac` 與規格禁止的巢狀組字均明確拒絕。
 - corpus：[Adobe 官方 Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/tag/2.042R-u/1.062R-i/1.026R-vf)
   `2.042R-u/1.062R-i/1.026R-vf` OTF release，授權為
   [OFL-1.1](https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md)；ZIP SHA-256 為
@@ -97,13 +99,14 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `SourceCodePro-Regular.otf` SHA-256 為
   `9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8`。字型只在測試時下載，
   不進入 repository 或 nupkg。
-- 證據：純 C# 最小二進位 fixture 驗證合法名稱式 CFF、等長輸出、預定義 charset 上限與跨
-  glyph count 快取隔離；官方 OTF 實際產生 OTF／WOFF／WOFF2，所有輸出由 managed verifier
-  逐 glyph 驗證，另以 64 組固定種子來源 mutation 驗證明確拒絕。
+- 證據：純 C# 最小二進位 fixture 驗證合法名稱式 CFF、等長輸出、預定義 charset 上限、跨
+  glyph count 快取隔離，以及 ISOAdobe／Expert／ExpertSubset／自訂 charset 的 `seac` closure；
+  負向案例涵蓋缺漏元件、巢狀組字與非法元件代碼。官方 OTF 實際產生 OTF／WOFF／WOFF2，所有
+  輸出由 managed verifier 逐 glyph 驗證，另以 64 組固定種子來源 mutation 驗證明確拒絕。
 - 瀏覽器證據：format matrix 產生的 WOFF2 與官方 OTF 由 Chromium／Firefox／WebKit 比較三組
   Latin 文字的 Canvas RGBA bytes 與文字 metrics，並輸出每瀏覽器 JSON 及截圖 artifact。
-- 尚未通過的人工作業：`seac` closure、compact rewrite、第三方結構相異性與惡意字型安全
-  審查；能力維持 experimental。
+- 尚缺的工程證據：可再散布的真實 `seac` 三瀏覽器 corpus 與 compact rewrite；完成前能力維持
+  experimental。第三方結構相異性與惡意字型安全審查只屬採用者外部驗收。
 
 ### 2026-07-17 CFF2 Variable
 
@@ -115,8 +118,8 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`，只進 CI cache／artifact。
 - Chromium、Firefox 與 WebKit 對 300／500／700 三個 `wght` 座標的來源／subset DOM 截圖
   bytes 相同；managed verifier 另逐一驗證所有輸出 glyph CharString。
-- 尚未通過的人工作業：第三方結構相異性、惡意 CFF2 安全審查與更廣多軸 corpus；能力維持
-  experimental。
+- 尚缺的工程證據：更廣多軸 corpus；完成前能力維持 experimental。第三方結構相異性與惡意
+  CFF2 安全審查只屬採用者外部驗收。
 
 ### 2026-07-18 非變動 CFF2
 
@@ -131,7 +134,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   count；上下文不同時重新解析，避免跨 face／metadata 誤用快取結果，來源淘汰後仍可回收。
 - 證據：以官方規格欄位建立的最小二進位 fixture 驗證合法非變動 CFF2、retain-GIDs、非法
   `vsindex`／`blend` 與跨 glyph count 快取隔離。fixture 是結構測試，不冒充真實字型 corpus。
-- 尚未通過的人工作業：截至 2026-07-18 尚未找到授權可追溯、可鎖定 SHA-256 且能在
+- 尚缺的工程證據：截至 2026-07-18 尚未找到授權可追溯、可鎖定 SHA-256 且能在
   Chromium／Firefox／WebKit 重現的真實非變動 CFF2；能力維持 experimental。
 
 ### 2026-07-18 OpenType Collection CFF／CFF2
@@ -148,8 +151,8 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 瀏覽器證據：Chromium 直接比較 raw OTC 與 managed WOFF2；Firefox／WebKit 不接受 raw OTC，
   改以同一 face 的 managed standalone OTF 與 WOFF2 逐 RGBA byte 比較。三者皆驗證可部署輸出，
   但 raw `format(collection)` 能力只由 Chromium 證實。
-- 尚未通過的人工作業：共享 CFF／CFF2 table 的多 face corpus、直接 collection writer 與第三方
-  惡意 collection 安全審查；來源 face 支援維持 experimental。
+- 尚缺的工程證據：共享 CFF／CFF2 table 的多 face corpus 與直接 collection writer；來源 face
+  支援維持 experimental。第三方惡意 collection 安全審查只屬採用者外部驗收。
 
 ### 2026-07-18 WOFF 輸入與 Color Fonts
 

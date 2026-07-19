@@ -3,8 +3,8 @@
 > 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
 > System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
 > Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
-> complex-script shaping、第三方惡意來源字型安全稽核、跨節點 store
-> 與外部安全／客戶驗收仍未完成，因此整套產品仍標示 experimental。權威實作邊界見
+> complex-script shaping、compact CFF／CFF2、分格式 color closure 與擴充 transformed WOFF2
+> corpus 尚未完成，因此整套產品仍標示 experimental。權威實作邊界見
 > [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
 OdfKit WebFonts 的主要產品情境，是 ASP.NET Core 與 ASP.NET Web Forms 在執行期遇到 CNS
@@ -47,8 +47,9 @@ retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte
 `hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
 路徑接受 WOFF2 collection 的指定 face，驗證 collection directory、table index 與共享
 transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只產生瀏覽器部署用的獨立
-TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF 的 `seac` 組合字、缺少 VariationStore
-卻使用 `vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
+TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF 的 `seac` 會依 StandardEncoding 與
+charset 保留 base／accent 元件；找不到元件、巢狀組字、缺少 VariationStore 卻使用
+`vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
 Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
@@ -133,7 +134,9 @@ bitmap-only 可作輸入，但 Firefox WebFont sanitizer 不接受沒有 outline
 
 靜態 CFF 1.0 接受含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`，以及不含 ROS／FDArray／
 FDSelect 的名稱式 CFF。名稱式路徑接受三種預定義 charset 或有界自訂 charset，Private DICT
-可省略；存在時仍驗證 local Subrs。名稱式 `seac` 組合字目前明確拒絕，不能遺失元件後繼續。
+可省略；存在時仍驗證 local Subrs。名稱式 `seac` 會從 Type 2 `endchar` 取得 bchar／achar，依
+StandardEncoding SID 反查 charset GID 並保留兩個元件；代碼非 0～255 整數、元件不存在或元件
+本身再使用 `seac` 時明確拒絕，不能遺失元件後繼續。
 有界 parser 會驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、charset 與
 FDSelect；未選
 glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所有 CFF absolute／relative offset
@@ -142,8 +145,10 @@ glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所�
 16,297,544 bytes，WOFF 為 1,788,872 bytes，WOFF2 為 1,443,492 bytes。數字只適用該 corpus。
 Chromium、Firefox 與 WebKit 亦會對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串，以及
 三組名稱式 CFF Latin 字串完成來源／subset 逐像素差分。名稱式路徑另有最小結構 fixture、
-retain-GIDs、cache-context 負向測試及 64 組固定種子來源 mutation；能力仍因 compact rewrite、
-`seac` closure 與第三方安全審查未完成而維持 experimental。
+retain-GIDs、cache-context 負向測試、ISOAdobe／Expert／ExpertSubset／自訂 charset 的 `seac`
+closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能力仍因 compact rewrite 與專用
+真實 `seac` 三瀏覽器 corpus 未完成而維持 experimental。第三方安全審查只屬採用者額外證據，
+不阻擋工程完成。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
 Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 以
@@ -153,7 +158,7 @@ Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 
 144,408 bytes；SHA-256 為
 `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`。Chromium、Firefox 與
 WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
-缺少第三方惡意字型稽核與更廣 CFF2 corpus 而維持 experimental。
+缺少更廣 CFF2 corpus 而維持 experimental。第三方惡意字型稽核只屬採用者額外證據。
 
 OpenType 1.9.1 明定不支援 Font Variations 的 CFF2 必須省略 VariationStore，因此 parser 也接受
 省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2；`fvar` 可依字型其它變動資料
@@ -219,9 +224,8 @@ face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限�
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
 以及 standalone／OTC face 的 CID-keyed／名稱式靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
 VariationStore 的非變動 CFF2 WOFF；TrueType variable、靜態 CFF、CFF2 與 color font 為
-experimental。`net48` 要求 WOFF2、
-名稱式 CFF 的 `seac` 組合字、缺少 VariationStore 卻使用 `vsindex`／`blend` 的 CFF2、未知
-color table 版本或
+experimental。`net48` 要求 WOFF2、缺少或巢狀元件的名稱式 CFF `seac`、缺少 VariationStore
+卻使用 `vsindex`／`blend` 的 CFF2、未知 color table 版本或
 直接輸出 collection 會明確失敗。
 
 API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的

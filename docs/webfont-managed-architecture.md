@@ -110,8 +110,10 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
-- 名稱式 CFF 的 `seac` 組合字；名稱式與 standalone／OTC face 的 CID-keyed 靜態 CFF 1.0，
-  以及含 VariationStore 的 CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。直接
+- 名稱式 CFF 的 `seac` 只依第 3.5 節的 StandardEncoding／charset closure 邊界解封；找不到
+  base／accent 元件、元件代碼不是 0～255 整數或巢狀 `seac` 必須拒絕。名稱式與 standalone／OTC
+  face 的 CID-keyed 靜態 CFF 1.0，以及含 VariationStore 的 CFF2 variable 僅依第 3.5 節的
+  experimental 邊界解封。直接
   collection 輸出仍須獨立 writer 與三瀏覽器證據。
 - 尚未通過第 3.5 節證據閘門的 variable font；缺少 VariationStore 卻使用 `vsindex`／`blend`，
   或 VariationStore／`fvar` 不一致的 CFF2 維持拒絕。
@@ -177,8 +179,10 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    offset、CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、預定義／自訂 charset 與
    FDSelect；解析快取同時核對 glyph count。CharStrings 採 retain-GIDs，以相同長度的合法無
    outline Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／
-   relative offset 不需改寫，global／local subroutine 首期不剪枝。名稱式 `seac` 組合字仍明確
-   拒絕；compact INDEX／DICT 與 subroutine 重寫須另有結構與效能證據。
+   relative offset 不需改寫，global／local subroutine 首期不剪枝。名稱式 `seac` 會解析 Type 2
+   `endchar` 的 StandardEncoding base／accent code，經 ISOAdobe／Expert／ExpertSubset 或自訂 charset
+   找回元件 GID 並納入保留集合；找不到元件、非整數／超界代碼與規格禁止的巢狀組字明確拒絕。
+   Compact INDEX／DICT 與 subroutine 重寫須另有結構與效能證據。
 3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
    不重編 local／global subr bias。
 4. **CFF2／PostScript Variable Fonts**：已解封 standalone／OTC face、含 `fvar`／VariationStore
@@ -245,9 +249,11 @@ Worker 不需要也不得啟動隔離外部程序。
 | 2 build 與格式 | WOFF writer、net10 WOFF2 null-transform writer 與標準 transformed-table decoder、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；W3C 與 production transformed WOFF2 corpus；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
 | 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；manifest、CSS 與字型的 GET／HEAD、原始 bytes SHA-256 ETag 與 304；動態 Handler 回應 `no-store`；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
 | 4 closure 與規模 | 逐 lookup 增加 GSUB output closure；複雜 script 先以完整 glyph ID／`cmap`／layout tables 的 correctness-first 模式支援；有界多節點介面、load 與固定種子變異韌性測試 | 每個新增 script 具合法鎖定 corpus、來源／輸出 layout table 一致性與三瀏覽器 golden；只有具結構驗證與差分證據後才能做 aggressive pruning；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |
-| 5 產品化 | NuGet／DocFX／Public API／SBOM／授權漂移／安全與證據矩陣；人工發布決策 | 同一批 nupkg 通過 net10、netstandard2.0、net48 consumer；無 native／tool／process path；外部安全與法律審查、真實客戶 corpus 與容量驗收仍分開標示 |
+| 5 工程發布 | NuGet／DocFX／Public API／SBOM／授權漂移、安全與證據矩陣 | 同一批 nupkg 通過 net10、netstandard2.0、net48 consumer；無額外 native／tool／process path；pack、文件、SBOM、provenance 與復原演練均由 repository 閘門重現 |
 
 Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或測試工具成功就跳過前一階段。
+客戶 WAF／CDN 現場、Safari 實機、第三方安全／法律審查、市場採用與正式對外發布營運不納入
+套件工程完成條件；它們只作採用者驗收建議，不得取代或阻擋上述可重現工程閘門。
 
 ## 6. CI 的真實性要求
 

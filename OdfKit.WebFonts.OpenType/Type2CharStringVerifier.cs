@@ -9,7 +9,7 @@ internal static class Type2CharStringVerifier
     private const int MaximumHints = 96;
     private const int MaximumCharStringLength = 65_535;
 
-    internal static void Verify(
+    internal static Type2SeacComponents? Verify(
         ReadOnlyMemory<byte> charString,
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
         IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines)
@@ -25,6 +25,8 @@ internal static class Type2CharStringVerifier
         {
             throw SfntFont.DataInvalid("CFF-CharString-termination");
         }
+
+        return state.SeacComponents;
     }
 
     private static ProgramResult ProcessProgram(
@@ -215,10 +217,27 @@ internal static class Type2CharStringVerifier
         bool hasSeac = count is 4 or 5;
         if (hasSeac)
         {
-            throw SfntFont.NotSupported("cff-seac");
-        }
+            if (count == 5 && state.WidthSeen)
+            {
+                throw SfntFont.DataInvalid("CFF-CharString-endchar-width");
+            }
 
-        if (count != 0 && !hasWidth)
+            int componentOffset = count - 2;
+            int baseCode = RequireInteger(
+                state.Stack[componentOffset],
+                byte.MinValue,
+                byte.MaxValue,
+                "seac-bchar");
+            int accentCode = RequireInteger(
+                state.Stack[componentOffset + 1],
+                byte.MinValue,
+                byte.MaxValue,
+                "seac-achar");
+            state.SeacComponents = new Type2SeacComponents(
+                checked((byte)baseCode),
+                checked((byte)accentCode));
+        }
+        else if (count != 0 && !hasWidth)
         {
             throw SfntFont.DataInvalid("CFF-CharString-endchar");
         }
@@ -644,6 +663,8 @@ internal static class Type2CharStringVerifier
         internal int HintCount { get; set; }
 
         internal bool WidthSeen { get; set; }
+
+        internal Type2SeacComponents? SeacComponents { get; set; }
     }
 
     private enum ProgramResult
@@ -652,4 +673,17 @@ internal static class Type2CharStringVerifier
         Return,
         EndChar
     }
+}
+
+internal readonly struct Type2SeacComponents
+{
+    internal Type2SeacComponents(byte baseCode, byte accentCode)
+    {
+        BaseCode = baseCode;
+        AccentCode = accentCode;
+    }
+
+    internal byte BaseCode { get; }
+
+    internal byte AccentCode { get; }
 }
