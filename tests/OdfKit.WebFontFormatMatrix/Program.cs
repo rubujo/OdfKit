@@ -47,7 +47,7 @@ internal static class Program
             return 0;
         }
 
-        if (args.Length != 16)
+        if (args.Length != 18)
         {
             return 2;
         }
@@ -68,6 +68,8 @@ internal static class Program
         string cff2VariablePath = Path.GetFullPath(args[13]);
         string colorEmojiPath = Path.GetFullPath(args[14]);
         string colorEmojiColrV1Path = Path.GetFullPath(args[15]);
+        string colorSbixPath = Path.GetFullPath(args[16]);
+        string colorSvgPath = Path.GetFullPath(args[17]);
         Directory.CreateDirectory(outputRoot);
 
         string trueTypeCollectionPath = Path.Combine(outputRoot, "cns-managed-real-faces.ttc");
@@ -275,6 +277,20 @@ internal static class Program
             colorEmojiColrV1Path,
             faceIndex: 0,
             "😀",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "color-sbix",
+            colorSbixPath,
+            faceIndex: 0,
+            "simple_linear",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "color-svg",
+            colorSvgPath,
+            faceIndex: 0,
+            "simple_linear",
             outputRoot).ConfigureAwait(false);
 
         var robustnessResults = new List<MutationRobustnessResult>(RunDeterministicMutationRobustnessChecks(

@@ -8,7 +8,7 @@ internal static class LayoutBrowserSmoke
 {
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 23 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        if (args.Length != 27 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
                 "Usage: layout <browser> <arabic-source> <arabic-subset> "
@@ -20,6 +20,8 @@ internal static class LayoutBrowserSmoke
                 + "<cff-collection-source> <cff-collection-subset> "
                 + "<cff2-collection-source> <cff2-collection-subset> "
                 + "<color-colrv1-source> <color-colrv1-subset> "
+                + "<color-sbix-source> <color-sbix-subset> "
+                + "<color-svg-source> <color-svg-subset> "
                 + "<screenshot> <evidence>");
             return 2;
         }
@@ -45,8 +47,12 @@ internal static class LayoutBrowserSmoke
         string cff2CollectionSubsetPath = Path.GetFullPath(args[18]);
         string colorColrV1SourcePath = Path.GetFullPath(args[19]);
         string colorColrV1SubsetPath = Path.GetFullPath(args[20]);
-        string screenshotPath = Path.GetFullPath(args[21]);
-        string evidencePath = Path.GetFullPath(args[22]);
+        string colorSbixSourcePath = Path.GetFullPath(args[21]);
+        string colorSbixSubsetPath = Path.GetFullPath(args[22]);
+        string colorSvgSourcePath = Path.GetFullPath(args[23]);
+        string colorSvgSubsetPath = Path.GetFullPath(args[24]);
+        string screenshotPath = Path.GetFullPath(args[25]);
+        string evidencePath = Path.GetFullPath(args[26]);
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
@@ -72,6 +78,10 @@ internal static class LayoutBrowserSmoke
         byte[] cff2CollectionSubset = await File.ReadAllBytesAsync(cff2CollectionSubsetPath).ConfigureAwait(false);
         byte[] colorColrV1Source = await File.ReadAllBytesAsync(colorColrV1SourcePath).ConfigureAwait(false);
         byte[] colorColrV1Subset = await File.ReadAllBytesAsync(colorColrV1SubsetPath).ConfigureAwait(false);
+        byte[] colorSbixSource = await File.ReadAllBytesAsync(colorSbixSourcePath).ConfigureAwait(false);
+        byte[] colorSbixSubset = await File.ReadAllBytesAsync(colorSbixSubsetPath).ConfigureAwait(false);
+        byte[] colorSvgSource = await File.ReadAllBytesAsync(colorSvgSourcePath).ConfigureAwait(false);
+        byte[] colorSvgSubset = await File.ReadAllBytesAsync(colorSvgSubsetPath).ConfigureAwait(false);
 
         var errors = new List<string>();
         var browserMessages = new List<string>();
@@ -146,7 +156,11 @@ internal static class LayoutBrowserSmoke
             ["/fonts/cff2-collection-subset"]
                 = (cff2CollectionSubset, GetSubsetContentType(cff2CollectionSubset)),
             ["/fonts/color-colrv1-source.ttf"] = (colorColrV1Source, "font/ttf"),
-            ["/fonts/color-colrv1-subset"] = (colorColrV1Subset, GetSubsetContentType(colorColrV1Subset))
+            ["/fonts/color-colrv1-subset"] = (colorColrV1Subset, GetSubsetContentType(colorColrV1Subset)),
+            ["/fonts/color-sbix-source.ttf"] = (colorSbixSource, "font/ttf"),
+            ["/fonts/color-sbix-subset"] = (colorSbixSubset, GetSubsetContentType(colorSbixSubset)),
+            ["/fonts/color-svg-source.ttf"] = (colorSvgSource, "font/ttf"),
+            ["/fonts/color-svg-subset"] = (colorSvgSubset, GetSubsetContentType(colorSvgSubset))
         };
         await page.RouteAsync("https://odfkit.test/**", async route =>
         {
@@ -206,6 +220,7 @@ internal static class LayoutBrowserSmoke
                     $"Layout proof failed: ready={ready}, errors={string.Join(" | ", errors)}, "
                     + $"browser={string.Join(" | ", browserMessages)}");
             }
+            VerifyExpectedColorCases(proof, browserName);
 
             JsonElement domCases = await page.EvaluateAsync<JsonElement>("() => window.__odfKitDomProofCases")
                 .ConfigureAwait(false);
@@ -268,7 +283,9 @@ internal static class LayoutBrowserSmoke
                     cff2Variable = ComputeSha256(cff2VariableSource),
                     cffCollection = ComputeSha256(cffCollectionSource),
                     cff2Collection = ComputeSha256(cff2CollectionSource),
-                    colorColrV1 = ComputeSha256(colorColrV1Source)
+                    colorColrV1 = ComputeSha256(colorColrV1Source),
+                    colorSbix = ComputeSha256(colorSbixSource),
+                    colorSvg = ComputeSha256(colorSvgSource)
                 },
                 subsets = new
                 {
@@ -281,7 +298,15 @@ internal static class LayoutBrowserSmoke
                     cff2Variable = ComputeSha256(cff2VariableSubset),
                     cffCollection = ComputeSha256(cffCollectionSubset),
                     cff2Collection = ComputeSha256(cff2CollectionSubset),
-                    colorColrV1 = ComputeSha256(colorColrV1Subset)
+                    colorColrV1 = ComputeSha256(colorColrV1Subset),
+                    colorSbix = ComputeSha256(colorSbixSubset),
+                    colorSvg = ComputeSha256(colorSvgSubset)
+                },
+                colorRendering = new
+                {
+                    colrV1 = "verified",
+                    sbix = browserName == "chromium" ? "verified" : "browser-unavailable",
+                    svg = browserName == "firefox" ? "verified" : "browser-unavailable"
                 },
                 proof,
                 domProof
@@ -459,6 +484,28 @@ internal static class LayoutBrowserSmoke
                 texts = new[] { "😀" },
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
+            },
+            new
+            {
+                id = "color-sbix",
+                direction = "ltr",
+                language = "und",
+                sourceFamily = "OdfKit Color sbix Source",
+                subsetFamily = "OdfKit Color sbix Subset",
+                texts = new[] { "simple_linear" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
+            },
+            new
+            {
+                id = "color-svg",
+                direction = "ltr",
+                language = "und",
+                sourceFamily = "OdfKit Color SVG Source",
+                subsetFamily = "OdfKit Color SVG Subset",
+                texts = new[] { "simple_linear" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
             }
         });
         string collectionFaces = browserName == "chromium"
@@ -496,6 +543,10 @@ internal static class LayoutBrowserSmoke
                 @font-face { font-family: "OdfKit CFF2 Variable Subset"; src: url("/fonts/cff2-variable-subset"); font-weight: 250 900; }
                 @font-face { font-family: "OdfKit Color COLRv1 Source"; src: url("/fonts/color-colrv1-source.ttf") format("truetype"); }
                 @font-face { font-family: "OdfKit Color COLRv1 Subset"; src: url("/fonts/color-colrv1-subset"); }
+                @font-face { font-family: "OdfKit Color sbix Source"; src: url("/fonts/color-sbix-source.ttf") format("truetype"); }
+                @font-face { font-family: "OdfKit Color sbix Subset"; src: url("/fonts/color-sbix-subset"); }
+                @font-face { font-family: "OdfKit Color SVG Source"; src: url("/fonts/color-svg-source.ttf") format("truetype"); }
+                @font-face { font-family: "OdfKit Color SVG Subset"; src: url("/fonts/color-svg-subset"); }
                 __COLLECTION_FACES__
                 :root { color-scheme: dark; font-family: system-ui, sans-serif; }
                 body { margin: 0; background: #07131c; color: #eef8ff; }
@@ -515,7 +566,10 @@ internal static class LayoutBrowserSmoke
               <main><h1>OdfKit GSUB／GPOS browser differential</h1><p id="status">Running…</p><div id="cases"></div></main>
               <canvas id="proof" width="1600" height="240" hidden></canvas>
               <script>
-                const cases = __CASES__;
+                const browserName = "__BROWSER__";
+                const cases = __CASES__
+                  .filter(testCase => testCase.id !== 'color-sbix' || browserName === 'chromium')
+                  .filter(testCase => testCase.id !== 'color-svg' || browserName === 'firefox');
                 const root = document.querySelector('#cases');
                 const status = document.querySelector('#status');
                 const metricFields = ['width', 'actualBoundingBoxLeft', 'actualBoundingBoxRight', 'actualBoundingBoxAscent', 'actualBoundingBoxDescent'];
@@ -604,10 +658,10 @@ internal static class LayoutBrowserSmoke
                             if (source.pixels[index] !== subset.pixels[index]) differentBytes++;
                           }
                           if (source.alpha === 0 || subset.alpha === 0 || differentBytes !== 0 || !equalMetrics(source.metrics, subset.metrics)) {
-                            throw new Error(`${testCase.id}: source/subset shaping mismatch for ${text} at wdth=${axes.stretch},wght=${axes.weight}; bytes=${differentBytes}`);
+                            throw new Error(`${testCase.id}: source/subset shaping mismatch for ${text} at wdth=${axes.stretch},wght=${axes.weight}; bytes=${differentBytes},sourceAlpha=${source.alpha},subsetAlpha=${subset.alpha}`);
                           }
-                          if (testCase.id === 'color-colrv1' && (source.chromatic === 0 || subset.chromatic === 0)) {
-                            throw new Error('color-colrv1: loaded glyph did not contain chromatic pixels');
+                          if (testCase.id.startsWith('color-') && (source.chromatic === 0 || subset.chromatic === 0)) {
+                            throw new Error(`${testCase.id}: loaded glyph did not contain chromatic pixels`);
                           }
                           axisHashes.push(source.hash);
                           results.push({ id: testCase.id, text, axes, sourceHash: source.hash, subsetHash: subset.hash, differentBytes, chromaticPixels: source.chromatic, metrics: source.metrics });
@@ -634,12 +688,35 @@ internal static class LayoutBrowserSmoke
             </html>
             """;
         return template
+            .Replace("__BROWSER__", browserName, StringComparison.Ordinal)
             .Replace("__CASES__", cases, StringComparison.Ordinal)
             .Replace("__COLLECTION_FACES__", collectionFaces, StringComparison.Ordinal);
     }
 
     private static string ComputeSha256(byte[] bytes)
         => Convert.ToHexStringLower(SHA256.HashData(bytes));
+
+    private static void VerifyExpectedColorCases(JsonElement proof, string browserName)
+    {
+        string[] expected = browserName switch
+        {
+            "chromium" => ["color-colrv1", "color-sbix"],
+            "firefox" => ["color-colrv1", "color-svg"],
+            _ => ["color-colrv1"]
+        };
+        string[] actual = proof.GetProperty("cases")
+            .EnumerateArray()
+            .Select(item => item.GetProperty("id").GetString()!)
+            .Where(id => id.StartsWith("color-", StringComparison.Ordinal))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(id => id, StringComparer.Ordinal)
+            .ToArray();
+        if (!actual.SequenceEqual(expected.OrderBy(id => id, StringComparer.Ordinal), StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"Unexpected color proof matrix for {browserName}: {string.Join(",", actual)}.");
+        }
+    }
 
     private static string GetSubsetContentType(byte[] bytes)
         => bytes.AsSpan().StartsWith("wOF2"u8) ? "font/woff2" : "font/ttf";

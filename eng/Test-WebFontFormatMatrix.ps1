@@ -132,6 +132,8 @@ $devanagariStaticPath = Get-DirectFont $definitions.devanagariStatic
 $cff2Path = Get-DirectFont $definitions.cjkCff2
 $colorEmojiPath = Get-DirectFont $definitions.colorEmoji
 $colorEmojiColrV1Path = Get-DirectFont $definitions.colorEmojiColrV1
+$colorSbixPath = Get-DirectFont $definitions.colorSbix
+$colorSvgPath = Get-DirectFont $definitions.colorSvg
 
 $projectPath = Join-Path $repoRoot "tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj"
 $intermediateRoot = Join-Path $destinationPath "obj"
@@ -167,7 +169,9 @@ $runnerArguments = @(
     $devanagariPath,
     $cff2Path,
     $colorEmojiPath,
-    $colorEmojiColrV1Path)
+    $colorEmojiColrV1Path,
+    $colorSbixPath,
+    $colorSvgPath)
 $startInfo = [Diagnostics.ProcessStartInfo]::new()
 $startInfo.FileName = "dotnet"
 $startInfo.UseShellExecute = $false
@@ -194,5 +198,5 @@ finally {
     $process.Dispose()
 }
 
-Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／variable／CID／名稱式 CFF／CFF2、bitmap color 與 COLRv1 正向矩陣通過。"
+Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／variable／CID／名稱式 CFF／CFF2、bitmap、COLRv1、sbix 與 OpenType SVG 正向矩陣通過。"
 Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

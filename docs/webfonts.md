@@ -136,8 +136,13 @@ outline 關係，因此只保留使用者要求的 fallback outline。鎖定的 
 bitmap-only 與 COLRv1 字型用於 managed 正向矩陣；COLRv1 來源與 managed
 WOFF2 已在 Chromium／Firefox／WebKit 通過逐 RGBA byte 差分，且測試要求非灰階像素。CBDT
 bitmap-only 可作輸入，但 Firefox WebFont sanitizer 不接受沒有 outline 的來源／輸出，因此不能
-宣稱為跨瀏覽器部署格式；其它 color 模型仍須分別補齊合法 corpus，不能以系統 emoji fallback
-或黑白 outline 冒充成功。
+宣稱為跨瀏覽器部署格式。Google Color Fonts commit
+`0046ea4c3b69e9fbbe464c2594816894e3aa5e4b` 的 Apache-2.0 `samples-sbix.ttf` 與
+`samples-picosvg.ttf` 另以 SHA-256 鎖定；兩者都通過 deterministic TTF／WOFF／WOFF2
+managed verifier。瀏覽器差分只執行該引擎能實際產生彩色像素的模型：Chromium 驗證 `sbix`，
+Firefox 驗證 OpenType SVG，COLRv1 仍由三者驗證；不渲染的組合記錄為
+`browser-unavailable`，不能以兩張相同空白畫布冒充成功。這是保留 color table 的
+correctness-first 能力，不是把 `sbix`／SVG 轉換成 COLR 或 outline 的跨格式轉碼器。
 
 靜態 CFF 1.0 接受含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`，以及不含 ROS／FDArray／
 FDSelect 的名稱式 CFF。名稱式路徑接受三種預定義 charset 或有界自訂 charset，Private DICT

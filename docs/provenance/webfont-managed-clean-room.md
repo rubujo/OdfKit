@@ -210,8 +210,24 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   僅下載到 CI cache／artifact，不納入 repository 或 nupkg。
 - 後續已完成 COLR v0／v1 全部 paint graph、`sbix dupe` glyph closure、SVG document 主動內容
   安全檢查，以及 CBDT／CBLC、EBDT／EBLC 資料範圍驗證。分格式 aggressive color pruning 是
-  選用效能優化，不列為工程完成條件；sbix／SVG 真實 corpus 與第三方惡意 color font 稽核仍是
-  未取得的額外證據，因此能力維持 experimental。
+  選用效能優化，不列為工程完成條件；第三方惡意 color font 稽核仍是未取得的額外證據，因此
+  能力維持 experimental。
+
+### 2026-07-19 sbix 與 OpenType SVG 真實 corpus
+
+- 參與者：Codex agent；產品實作仍只依 Microsoft OpenType 1.9.1 規格。Google Color Fonts
+  repository 只讀取 README、Apache-2.0 LICENSE、兩個 TOML corpus metadata 與產生後字型；未讀取、
+  搜尋、翻譯或改寫其產生器、FontTools、HarfBuzz、FreeType、OTS 或瀏覽器原始碼。
+- 黑箱 corpus：commit `0046ea4c3b69e9fbbe464c2594816894e3aa5e4b` 的
+  `samples-sbix.ttf`，SHA-256
+  `0fd0a23379b0e982db8bef5f9a50cf7960a6ee3504778a9a9c039bde4d2f573d`；
+  `samples-picosvg.ttf`，SHA-256
+  `c55758a47ce0c0493eed2ba4a7ec131eed44649ab38a22ce318371427f841470`。兩者採
+  Apache-2.0，只下載至 CI cache／artifact，不納入 repository 或 nupkg。
+- 證據邊界：兩者通過 deterministic TTF／WOFF／WOFF2 managed verifier。瀏覽器測試要求來源與
+  managed WOFF2 逐 RGBA byte 相同且至少一個非灰階像素；Chromium 驗證 `sbix`，Firefox 驗證
+  OpenType SVG。其它不渲染組合明確記錄為 `browser-unavailable`，不以空白畫布算成功，也不宣稱
+  已實作 color table 跨格式轉碼。
 
 ### 2026-07-18 WOFF2 transformed tables decoder
 

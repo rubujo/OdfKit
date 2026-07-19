@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-以三瀏覽器比較真實 CFF／CFF2、阿拉伯文與 Devanagari variable 來源及 managed subset 的像素。
+以三瀏覽器比較真實 layout、variable 與瀏覽器可用 color 來源及 managed subset 的像素。
 #>
 [CmdletBinding()]
 param(
@@ -149,6 +149,12 @@ $cff2CollectionStandalone = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoo
 $colorColrV1Source = Join-Path $sourceRoot "Noto-COLRv1.ttf"
 $colorColrV1Subsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "color-colrv1/first") `
         -Filter "*.woff2" -File -Recurse)
+$colorSbixSource = Join-Path $sourceRoot "samples-sbix.ttf"
+$colorSbixSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "color-sbix/first") `
+        -Filter "*.woff2" -File -Recurse)
+$colorSvgSource = Join-Path $sourceRoot "samples-picosvg.ttf"
+$colorSvgSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "color-svg/first") `
+        -Filter "*.woff2" -File -Recurse)
 if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
     -or -not (Test-Path -LiteralPath $cffSource) `
@@ -159,6 +165,8 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $cffCollectionSource) `
     -or -not (Test-Path -LiteralPath $cff2CollectionSource) `
     -or -not (Test-Path -LiteralPath $colorColrV1Source) `
+    -or -not (Test-Path -LiteralPath $colorSbixSource) `
+    -or -not (Test-Path -LiteralPath $colorSvgSource) `
     -or $arabicSubsets.Count -ne 1 `
     -or $devanagariSubsets.Count -ne 1 `
     -or $cffSubsets.Count -ne 1 `
@@ -170,7 +178,9 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
     -or $cffCollectionStandalone.Count -ne 1 `
     -or $cff2CollectionSubsets.Count -ne 1 `
     -or $cff2CollectionStandalone.Count -ne 1 `
-    -or $colorColrV1Subsets.Count -ne 1) {
+    -or $colorColrV1Subsets.Count -ne 1 `
+    -or $colorSbixSubsets.Count -ne 1 `
+    -or $colorSvgSubsets.Count -ne 1) {
     throw "請先執行 eng/Test-WebFontFormatMatrix.ps1 產生 layout corpus。"
 }
 
@@ -256,6 +266,10 @@ foreach ($browser in $Browsers) {
             $cff2CollectionSubsets[0].FullName,
             $colorColrV1Source,
             $colorColrV1Subsets[0].FullName,
+            $colorSbixSource,
+            $colorSbixSubsets[0].FullName,
+            $colorSvgSource,
+            $colorSvgSubsets[0].FullName,
             $screenshot,
             $evidence)
 }
@@ -267,4 +281,4 @@ $rawCollectionSummary = if ($Browsers -contains "chromium") {
 else {
     "本次未驗證原始 OTC"
 }
-Write-Host "PASS：CID／名稱式 CFF、CFF2 OTC 與 COLRv1 color 輸入均轉為獨立 WOFF2，且輸出在 $browserSummary 像素一致；$rawCollectionSummary。"
+Write-Host "PASS：CID／名稱式 CFF、CFF2 OTC 與各瀏覽器明確可用的 color 模型均轉為獨立 WOFF2，且輸出在 $browserSummary 像素一致；不支援的 color 模型記錄為 browser-unavailable；$rawCollectionSummary。"

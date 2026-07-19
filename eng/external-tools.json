@@ -92,6 +92,20 @@
         "sha256": "23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44",
         "license": "OFL-1.1"
       },
+      "colorSbix": {
+        "version": "googlefonts-color-fonts-0046ea4c3b69e9fbbe464c2594816894e3aa5e4b",
+        "fileName": "samples-sbix.ttf",
+        "uri": "https://raw.githubusercontent.com/googlefonts/color-fonts/0046ea4c3b69e9fbbe464c2594816894e3aa5e4b/fonts/samples-sbix.ttf",
+        "sha256": "0fd0a23379b0e982db8bef5f9a50cf7960a6ee3504778a9a9c039bde4d2f573d",
+        "license": "Apache-2.0"
+      },
+      "colorSvg": {
+        "version": "googlefonts-color-fonts-0046ea4c3b69e9fbbe464c2594816894e3aa5e4b",
+        "fileName": "samples-picosvg.ttf",
+        "uri": "https://raw.githubusercontent.com/googlefonts/color-fonts/0046ea4c3b69e9fbbe464c2594816894e3aa5e4b/fonts/samples-picosvg.ttf",
+        "sha256": "c55758a47ce0c0493eed2ba4a7ec131eed44649ab38a22ce318371427f841470",
+        "license": "Apache-2.0"
+      },
       "ipamj": {
         "version": "006.01",
         "archiveFileName": "ipamjm00601.zip",

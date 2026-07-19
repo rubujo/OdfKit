@@ -213,10 +213,21 @@ OpenType 1.9.1 定義的 color 輸入族群為 COLR／CPAL v0／v1、CBDT／CBLC
 closure 觸及的 outline；不宣稱已完成 aggressive color-table pruning。
 
 每一種 color 模型須分別以可再散布且鎖定 SHA-256 的真實 corpus 通過 TTF／OTF、WOFF、WOFF2
-managed verifier 與 Chromium／Firefox／WebKit 截圖，才可從 experimental 升級。未知版本、缺少
+managed verifier，並在至少一個實際支援該模型的瀏覽器完成來源／subset 彩色像素差分，才可從
+experimental 升級。瀏覽器不支援的模型須記錄為 `browser-unavailable`，不得以相同空白畫布
+視為通過；跨瀏覽器部署若需要 color table 轉碼，必須另建 writer、授權與像素證據閘門。未知版本、缺少
 CPAL 或 bitmap location／data 配對、越界頂層 paint root／document／strike，以及任何無法唯一
 驗證的組合均明確拒絕。SVG document 另維持禁止 DTD、script、外部參照、互動及主動內容的安全
 邊界。完成各格式真實 corpus 與採用者額外安全稽核前，不得宣稱可接受任意不受信任 color font。
+
+目前真實 color corpus 另鎖定 [Google Color Fonts](https://github.com/googlefonts/color-fonts)
+commit `0046ea4c3b69e9fbbe464c2594816894e3aa5e4b` 的 Apache-2.0
+`samples-sbix.ttf`（SHA-256
+`0fd0a23379b0e982db8bef5f9a50cf7960a6ee3504778a9a9c039bde4d2f573d`）與
+`samples-picosvg.ttf`（SHA-256
+`c55758a47ce0c0493eed2ba4a7ec131eed44649ab38a22ce318371427f841470`）。Chromium 的 `sbix`、
+Firefox 的 OpenType SVG，以及三瀏覽器 COLRv1 必須含非灰階像素且來源／managed WOFF2
+逐 RGBA byte 相同；其它組合只記錄瀏覽器不可用，不形成虛假綠燈。
 
 真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
