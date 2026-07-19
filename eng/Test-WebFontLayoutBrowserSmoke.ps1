@@ -85,8 +85,7 @@ function Invoke-LayoutBrowserSmoke {
                 [IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $PSScriptRoot) $env:PLAYWRIGHT_BROWSERS_PATH))
             }
             & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-                -BrowserRoot $browserRoot `
-                -RemoveProxyAssets | Out-Null
+                -BrowserRoot $browserRoot | Out-Null
         }
     }
 }
@@ -127,11 +126,26 @@ $nameCffSources = @(Get-ChildItem -LiteralPath $sourceRoot -Filter "SourceCodePr
 $nameCffSource = if ($nameCffSources.Count -eq 1) { $nameCffSources[0].FullName } else { $null }
 $nameCffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-name-otf/first") `
         -Filter "*.woff2" -File -Recurse)
+$seacCffSource = Join-Path $sourceRoot "afdko-seac.otf"
+$seacCffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-name-seac/first") `
+        -Filter "*.woff2" -File -Recurse)
+$staticCff2Source = Join-Path $sourceRoot "afdko-regular-CFF2.otf"
+$staticCff2Subsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-static/first") `
+        -Filter "*.woff2" -File -Recurse)
 $arabicVariableSource = Join-Path $sourceRoot "NotoSansArabic-VF.ttf"
 $devanagariVariableSource = Join-Path $sourceRoot "NotoSansDevanagari-VF.ttf"
 $arabicVariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "arabic-variable/first") `
         -Filter "*.woff2" -File -Recurse)
 $devanagariVariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "devanagari-variable/first") `
+        -Filter "*.woff2" -File -Recurse)
+$bengaliSource = Join-Path $sourceRoot "NotoSansBengali-VF.ttf"
+$bengaliSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "bengali-variable-layout/first") `
+        -Filter "*.woff2" -File -Recurse)
+$khmerSource = Join-Path $sourceRoot "NotoSansKhmer-VF.ttf"
+$khmerSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "khmer-variable-layout/first") `
+        -Filter "*.woff2" -File -Recurse)
+$thaiSource = Join-Path $sourceRoot "NotoSansThai-VF.ttf"
+$thaiSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "thai-variable-layout/first") `
         -Filter "*.woff2" -File -Recurse)
 $cff2VariableSource = Join-Path $sourceRoot "SourceHanSansTW-VF.otf"
 $cff2VariableSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff2-variable/first") `
@@ -159,8 +173,13 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
     -or -not (Test-Path -LiteralPath $cffSource) `
     -or $null -eq $nameCffSource `
+    -or -not (Test-Path -LiteralPath $seacCffSource) `
+    -or -not (Test-Path -LiteralPath $staticCff2Source) `
     -or -not (Test-Path -LiteralPath $arabicVariableSource) `
     -or -not (Test-Path -LiteralPath $devanagariVariableSource) `
+    -or -not (Test-Path -LiteralPath $bengaliSource) `
+    -or -not (Test-Path -LiteralPath $khmerSource) `
+    -or -not (Test-Path -LiteralPath $thaiSource) `
     -or -not (Test-Path -LiteralPath $cff2VariableSource) `
     -or -not (Test-Path -LiteralPath $cffCollectionSource) `
     -or -not (Test-Path -LiteralPath $cff2CollectionSource) `
@@ -171,8 +190,13 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
     -or $devanagariSubsets.Count -ne 1 `
     -or $cffSubsets.Count -ne 1 `
     -or $nameCffSubsets.Count -ne 1 `
+    -or $seacCffSubsets.Count -ne 1 `
+    -or $staticCff2Subsets.Count -ne 1 `
     -or $arabicVariableSubsets.Count -ne 1 `
     -or $devanagariVariableSubsets.Count -ne 1 `
+    -or $bengaliSubsets.Count -ne 1 `
+    -or $khmerSubsets.Count -ne 1 `
+    -or $thaiSubsets.Count -ne 1 `
     -or $cff2VariableSubsets.Count -ne 1 `
     -or $cffCollectionSubsets.Count -ne 1 `
     -or $cffCollectionStandalone.Count -ne 1 `
@@ -204,8 +228,7 @@ if ($InstallBrowsers) {
             [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
         }
         & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-            -BrowserRoot $browserRoot `
-            -RemoveProxyAssets | Out-Null
+            -BrowserRoot $browserRoot | Out-Null
     }
 }
 
@@ -217,8 +240,7 @@ if ($IsWindows -and $Browsers -contains 'firefox') {
         [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
     }
     & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-        -BrowserRoot $browserRoot `
-        -RemoveProxyAssets | Out-Null
+        -BrowserRoot $browserRoot | Out-Null
 }
 
 New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
@@ -254,10 +276,20 @@ foreach ($browser in $Browsers) {
             $cffSubsets[0].FullName,
             $nameCffSource,
             $nameCffSubsets[0].FullName,
+            $seacCffSource,
+            $seacCffSubsets[0].FullName,
+            $staticCff2Source,
+            $staticCff2Subsets[0].FullName,
             $arabicVariableSource,
             $arabicVariableSubsets[0].FullName,
             $devanagariVariableSource,
             $devanagariVariableSubsets[0].FullName,
+            $bengaliSource,
+            $bengaliSubsets[0].FullName,
+            $khmerSource,
+            $khmerSubsets[0].FullName,
+            $thaiSource,
+            $thaiSubsets[0].FullName,
             $cff2VariableSource,
             $cff2VariableSubsets[0].FullName,
             $cffCollectionBrowserSource,
@@ -281,4 +313,4 @@ $rawCollectionSummary = if ($Browsers -contains "chromium") {
 else {
     "本次未驗證原始 OTC"
 }
-Write-Host "PASS：CID／名稱式 CFF、CFF2 OTC 與各瀏覽器明確可用的 color 模型均轉為獨立 WOFF2，且輸出在 $browserSummary 像素一致；不支援的 color 模型記錄為 browser-unavailable；$rawCollectionSummary。"
+Write-Host "PASS：Arabic／Devanagari／Bengali／Khmer／Thai、CID／名稱式 CFF、真實 seac、靜態 CFF2、CFF2 OTC 與各瀏覽器明確可用的 color 模型均轉為獨立 WOFF2，且輸出在 $browserSummary 像素一致；不支援的 color 模型記錄為 browser-unavailable；$rawCollectionSummary。"

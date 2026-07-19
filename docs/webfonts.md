@@ -1,10 +1,10 @@
 # WebFont 多國罕用字套件
 
-> 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
-> System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
-> Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
-> complex-script shaping、分格式 color closure 與擴充 transformed WOFF2
-> corpus 尚未完成，因此整套產品仍標示 experimental。權威實作邊界見
+> 目前狀態：純 C#／.NET 子集引擎、TTF／OTF／WOFF／WOFF2、Build、ASP.NET Core 與
+> System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B、TTC／OTC、
+> IVS／PUA、CFF／CFF2、Arabic／Devanagari／Bengali／Khmer／Thai 與有界 color corpus 已進入
+> managed verifier 及瀏覽器矩陣。這是有界格式契約，不代表任意歷史字型、所有 layout engine、
+> 跨 color 技術轉碼或 production 部署均已獲證。權威實作邊界見
 > [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
 OdfKit WebFonts 的主要產品情境，是 ASP.NET Core 與 ASP.NET Web Forms 在執行期遇到 CNS
@@ -39,9 +39,9 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 第一個可交付 engine 支援 TrueType outline、Unicode scalar、
 Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
 Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed／名稱式靜態 CFF 1.0 的
-retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
+retain-GIDs 路徑已有鎖定 corpus。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
 OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`，以及
-依規格省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2，亦有 experimental
+依規格省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2，亦有真實 corpus 的
 retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
 以及 `net10.0` standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
 `hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
@@ -50,8 +50,8 @@ transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只�
 TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF 的 `seac` 會依 StandardEncoding 與
 charset 保留 base／accent 元件；找不到元件、巢狀組字、缺少 VariationStore 卻使用
 `vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
-Arabic／Devanagari 可使用
-下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
+Arabic／Devanagari／Bengali／Khmer／Thai 可使用下述 correctness-first 模式；其它尚未具合法
+corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
 
 設定來源 SHA-256 時，engine 的有界 source cache 同時保留已驗證 bytes 與依 face 解析的 immutable
@@ -119,13 +119,18 @@ TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,6
 `2.042R-u/1.062R-i/1.026R-vf` 的 [OFL-1.1](https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md) 官方 release 驗證名稱式 CFF；ZIP 與 OTF 分別鎖定
 SHA-256 `754a2e3ebb945ae905d720ac5896b3b34acc9546dd6551ef9536869788629dae` 與
 `9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8`，字型不進入 nupkg。
+Apache-2.0 的 Adobe AFDKO commit `a843a0a87d9db0ea62d5ce719900acf5749c143e` 另提供
+真實名稱式 `seac.otf` 與非變動 `regular_CFF2.otf`；兩者分別鎖定 SHA-256
+`b7aba7ad260e62794e57563726c377d5140253679f62bd97152d52b47c744daa` 與
+`e607fdc99e3386e3818ce3ee6d6e7218fd911370c25501dd9ad6c17cf40e72da`，只下載至 CI cache。
 
-Arabic／Devanagari 等需要 GSUB／GPOS 的文字會進入 correctness-first 模式：輸出保留來源的完整
+Arabic／Devanagari／Bengali／Khmer／Thai 等需要 GSUB／GPOS 的文字會進入 correctness-first
+模式：輸出保留來源的完整
 glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup。這能由瀏覽器維持塑形
 正確性，但檔案通常只獲得 WOFF／WOFF2 壓縮效益，不應宣稱是 aggressive subset。實際驗證以
 `pwsh eng/Test-WebFontLayoutBrowserSmoke.ps1` 比較來源 TTF 與 managed WOFF2 的逐像素結果；
-2026-07-17 的遠端 CI 已在 Chromium、Firefox 與 WebKit 通過六組 Arabic／Devanagari 字串的
-RGBA bytes 與文字 metrics 差分。
+鎖定矩陣已在 Chromium、Firefox 與 WebKit 比較 Arabic／Devanagari／Bengali／Khmer／Thai
+來源與 managed WOFF2 的 RGBA bytes、文字 metrics 及 variable axis DOM 結果。
 
 Color font 採相同 correctness-first 原則：COLR／CPAL、CBDT／CBLC、EBDT／EBLC、`sbix` 與
 `SVG ` 先做有界結構驗證，保留 glyph ID 編號與 color tables，再縮減外部 `cmap`。COLRv0 layer、
@@ -143,6 +148,11 @@ managed verifier。瀏覽器差分只執行該引擎能實際產生彩色像素�
 Firefox 驗證 OpenType SVG，COLRv1 仍由三者驗證；不渲染的組合記錄為
 `browser-unavailable`，不能以兩張相同空白畫布冒充成功。這是保留 color table 的
 correctness-first 能力，不是把 `sbix`／SVG 轉換成 COLR 或 outline 的跨格式轉碼器。
+EBDT／EBLC 與 `SVG ` 目前也不是細粒度子集編譯器：前者不逐 strike／glyph 重編 bitmap，後者
+不裁切 document index；兩者保留完整 color table，只縮減對外 `cmap` 與可證明安全的 fallback
+outline。這項限制是公開契約，不得以「支援 color font」掩蓋。
+EBDT／EBLC 目前只有產生式結構與越界測試，尚無可再散布的真實瀏覽器 corpus，因此不列入
+任何 `RequiredBrowserTargets` 相容集合。
 
 需要嚴格部署相容性時，呼叫端可設定 `RequiredBrowserTargets`。目前鎖定的 Playwright
 實證矩陣允許 Chromium 的 COLR v0／v1 與 `sbix`、Firefox 的 COLR v0／v1 與 OpenType
@@ -184,8 +194,8 @@ OTF 為 63,368 bytes、WOFF 為 40,404 bytes、WOFF2 為 31,496 bytes。數字�
 Chromium、Firefox 與 WebKit 亦會對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串，以及
 三組名稱式 CFF Latin 字串完成來源／subset 逐像素差分。名稱式路徑另有最小結構 fixture、
 retain-GIDs、cache-context 負向測試、ISOAdobe／Expert／ExpertSubset／自訂 charset 的 `seac`
-closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能力仍因專用真實 `seac`
-三瀏覽器 corpus 未完成而維持 experimental。第三方安全審查只屬採用者額外證據，
+closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；AFDKO 的真實 `seac` corpus 另在
+Chromium、Firefox 與 WebKit 通過來源／subset 差分。第三方安全審查只屬採用者額外證據，
 不阻擋工程完成。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
@@ -196,16 +206,16 @@ Header Top DICT length 與 local Subrs 相對 offset；GID、VariationStore、su
 `SourceHanSansTW-VF.otf` 的來源為 10,495,320 bytes，managed OTF 為 343,400 bytes、WOFF 為
 72,324 bytes、WOFF2 為 54,736 bytes；來源 SHA-256 為
 `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`。Chromium、Firefox 與
-WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
-缺少更廣 CFF2 corpus 而維持 experimental。第三方惡意字型稽核只屬採用者額外證據。
+WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；AFDKO 的
+非變動 CFF2 corpus 另以三瀏覽器驗證靜態路徑。第三方惡意字型稽核只屬採用者額外證據。
 
 OpenType 1.9.1 明定不支援 Font Variations 的 CFF2 必須省略 VariationStore，因此 parser 也接受
 省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2；`fvar` 可依字型其它變動資料
 存在或省略，但存在時仍須通過結構驗證。這條路徑已用依官方
 CFF2 結構建立的有界二進位 fixture 驗證 INDEX、DICT、CharString、retain-GIDs 與錯誤拒絕，並
-修正解析快取，使不同 glyph count／variation axis context 不會共用結果；截至 2026-07-18 尚未
-找到可鎖定、可再散布且能在三瀏覽器重現的真實靜態 CFF2 corpus，因此仍屬 experimental，不能
-宣稱已有真實瀏覽器相容性證據。
+修正解析快取，使不同 glyph count／variation axis context 不會共用結果；AFDKO
+`regular_CFF2.otf` 補上可再散布的真實靜態 CFF2 與三瀏覽器證據。這仍不代表任意 CFF2 operator
+或未列入矩陣的字型皆受支援。
 
 `font-display` 支援 `auto`、`block`、`swap`、`fallback` 與 `optional`。fallback metrics 必須由
 部署者依實際 fallback 字型量測後提供，不能由套件猜測；CLI 的 `--fallback-local`、
@@ -262,8 +272,8 @@ Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key �
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
 以及 standalone／OTC face 的 CID-keyed／名稱式靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
-VariationStore 的非變動 CFF2 WOFF；TrueType variable、靜態 CFF、CFF2 與 color font 為
-experimental。`net48` 要求 WOFF2、缺少或巢狀元件的名稱式 CFF `seac`、缺少 VariationStore
+VariationStore 的非變動 CFF2 WOFF；這些能力只承諾鎖定 corpus 的有界格式矩陣。`net48` 要求
+WOFF2、缺少或巢狀元件的名稱式 CFF `seac`、缺少 VariationStore
 卻使用 `vsindex`／`blend` 的 CFF2、未知 color table 版本或
 直接輸出 collection 會明確失敗。
 

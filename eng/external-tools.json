@@ -50,6 +50,27 @@
         "sha256": "9ce7b04f60e363d8870e5997744cf85cf69d38a4d7d129d364d92a3b14b461d7",
         "license": "OFL-1.1"
       },
+      "bengali": {
+        "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
+        "fileName": "NotoSansBengali-VF.ttf",
+        "uri": "https://raw.githubusercontent.com/google/fonts/26c5c976d82d50c24a8f0a7ac455e0a7c639c226/ofl/notosansbengali/NotoSansBengali%5Bwdth,wght%5D.ttf",
+        "sha256": "dcd42978094e584a849c84a51450eeac40c8826057d566ea6d4b9627a403a05a",
+        "license": "OFL-1.1"
+      },
+      "khmer": {
+        "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
+        "fileName": "NotoSansKhmer-VF.ttf",
+        "uri": "https://raw.githubusercontent.com/google/fonts/26c5c976d82d50c24a8f0a7ac455e0a7c639c226/ofl/notosanskhmer/NotoSansKhmer%5Bwdth,wght%5D.ttf",
+        "sha256": "f37a8431a0c5d5ed2f81a767417546aca576a81fb7eff9c924d46aecf828f2ca",
+        "license": "OFL-1.1"
+      },
+      "thai": {
+        "version": "google-fonts-26c5c976d82d50c24a8f0a7ac455e0a7c639c226",
+        "fileName": "NotoSansThai-VF.ttf",
+        "uri": "https://raw.githubusercontent.com/google/fonts/26c5c976d82d50c24a8f0a7ac455e0a7c639c226/ofl/notosansthai/NotoSansThai%5Bwdth,wght%5D.ttf",
+        "sha256": "5a1c559bb539583c8a1fd99d1c5b9491e5e14478c9cd2bd0970d5c3096cc9ef8",
+        "license": "OFL-1.1"
+      },
       "cjkCollection": {
         "version": "Sans2.004",
         "fileName": "NotoSansCJK-Regular.ttc",
@@ -166,6 +187,23 @@
     "sha256": "9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8",
     "license": "OFL-1.1",
     "licenseUri": "https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md"
+  },
+  "webFontAfdkoCorpus": {
+    "source": "adobe-type-tools/afdko",
+    "cacheRevision": "1",
+    "revision": "a843a0a87d9db0ea62d5ce719900acf5749c143e",
+    "license": "Apache-2.0",
+    "licenseUri": "https://github.com/adobe-type-tools/afdko/blob/a843a0a87d9db0ea62d5ce719900acf5749c143e/LICENSE.md",
+    "seac": {
+      "fileName": "afdko-seac.otf",
+      "uri": "https://raw.githubusercontent.com/adobe-type-tools/afdko/a843a0a87d9db0ea62d5ce719900acf5749c143e/tests/tx_data/input/seac.otf",
+      "sha256": "b7aba7ad260e62794e57563726c377d5140253679f62bd97152d52b47c744daa"
+    },
+    "staticCff2": {
+      "fileName": "afdko-regular-CFF2.otf",
+      "uri": "https://raw.githubusercontent.com/adobe-type-tools/afdko/a843a0a87d9db0ea62d5ce719900acf5749c143e/tests/tx_data/input/regular_CFF2.otf",
+      "sha256": "e607fdc99e3386e3818ce3ee6d6e7218fd911370c25501dd9ad6c17cf40e72da"
+    }
   },
   "webFontWoff2Corpus": {
     "source": "w3c/woff2-compiled-tests",

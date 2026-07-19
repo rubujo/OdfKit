@@ -56,16 +56,15 @@ try {
 
     $removed = & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
         -BrowserRoot $browserRoot `
-        -StartMenuRoot $startMenuRoot `
-        -RemoveProxyAssets
+        -StartMenuRoot $startMenuRoot
     if ($removed -ne 1 -or (Test-Path -LiteralPath $playwrightPrivateShortcut)) {
         throw '未精確移除 Playwright Firefox 私密瀏覽捷徑。'
     }
     if (-not (Test-Path -LiteralPath $playwrightFirefoxShortcut) `
         -or -not (Test-Path -LiteralPath $regularPrivateShortcut) `
         -or -not (Test-Path -LiteralPath $playwrightFirefox) `
-        -or (Test-Path -LiteralPath $playwrightPrivateProxy) `
-        -or (Test-Path -LiteralPath $privateManifest)) {
+        -or -not (Test-Path -LiteralPath $playwrightPrivateProxy) `
+        -or -not (Test-Path -LiteralPath $privateManifest)) {
         throw '清理範圍影響了瀏覽器執行檔或非目標捷徑。'
     }
 

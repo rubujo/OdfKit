@@ -8,14 +8,19 @@ internal static class LayoutBrowserSmoke
 {
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 27 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        if (args.Length != 37 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
                 "Usage: layout <browser> <arabic-source> <arabic-subset> "
                 + "<devanagari-source> <devanagari-subset> <cff-source> <cff-subset> "
                 + "<name-cff-source> <name-cff-subset> "
+                + "<seac-cff-source> <seac-cff-subset> "
+                + "<static-cff2-source> <static-cff2-subset> "
                 + "<arabic-variable-source> <arabic-variable-subset> "
                 + "<devanagari-variable-source> <devanagari-variable-subset> "
+                + "<bengali-source> <bengali-subset> "
+                + "<khmer-source> <khmer-subset> "
+                + "<thai-source> <thai-subset> "
                 + "<cff2-variable-source> <cff2-variable-subset> "
                 + "<cff-collection-source> <cff-collection-subset> "
                 + "<cff2-collection-source> <cff2-collection-subset> "
@@ -35,24 +40,34 @@ internal static class LayoutBrowserSmoke
         string cffSubsetPath = Path.GetFullPath(args[6]);
         string nameCffSourcePath = Path.GetFullPath(args[7]);
         string nameCffSubsetPath = Path.GetFullPath(args[8]);
-        string arabicVariableSourcePath = Path.GetFullPath(args[9]);
-        string arabicVariableSubsetPath = Path.GetFullPath(args[10]);
-        string devanagariVariableSourcePath = Path.GetFullPath(args[11]);
-        string devanagariVariableSubsetPath = Path.GetFullPath(args[12]);
-        string cff2VariableSourcePath = Path.GetFullPath(args[13]);
-        string cff2VariableSubsetPath = Path.GetFullPath(args[14]);
-        string cffCollectionSourcePath = Path.GetFullPath(args[15]);
-        string cffCollectionSubsetPath = Path.GetFullPath(args[16]);
-        string cff2CollectionSourcePath = Path.GetFullPath(args[17]);
-        string cff2CollectionSubsetPath = Path.GetFullPath(args[18]);
-        string colorColrV1SourcePath = Path.GetFullPath(args[19]);
-        string colorColrV1SubsetPath = Path.GetFullPath(args[20]);
-        string colorSbixSourcePath = Path.GetFullPath(args[21]);
-        string colorSbixSubsetPath = Path.GetFullPath(args[22]);
-        string colorSvgSourcePath = Path.GetFullPath(args[23]);
-        string colorSvgSubsetPath = Path.GetFullPath(args[24]);
-        string screenshotPath = Path.GetFullPath(args[25]);
-        string evidencePath = Path.GetFullPath(args[26]);
+        string seacCffSourcePath = Path.GetFullPath(args[9]);
+        string seacCffSubsetPath = Path.GetFullPath(args[10]);
+        string staticCff2SourcePath = Path.GetFullPath(args[11]);
+        string staticCff2SubsetPath = Path.GetFullPath(args[12]);
+        string arabicVariableSourcePath = Path.GetFullPath(args[13]);
+        string arabicVariableSubsetPath = Path.GetFullPath(args[14]);
+        string devanagariVariableSourcePath = Path.GetFullPath(args[15]);
+        string devanagariVariableSubsetPath = Path.GetFullPath(args[16]);
+        string bengaliSourcePath = Path.GetFullPath(args[17]);
+        string bengaliSubsetPath = Path.GetFullPath(args[18]);
+        string khmerSourcePath = Path.GetFullPath(args[19]);
+        string khmerSubsetPath = Path.GetFullPath(args[20]);
+        string thaiSourcePath = Path.GetFullPath(args[21]);
+        string thaiSubsetPath = Path.GetFullPath(args[22]);
+        string cff2VariableSourcePath = Path.GetFullPath(args[23]);
+        string cff2VariableSubsetPath = Path.GetFullPath(args[24]);
+        string cffCollectionSourcePath = Path.GetFullPath(args[25]);
+        string cffCollectionSubsetPath = Path.GetFullPath(args[26]);
+        string cff2CollectionSourcePath = Path.GetFullPath(args[27]);
+        string cff2CollectionSubsetPath = Path.GetFullPath(args[28]);
+        string colorColrV1SourcePath = Path.GetFullPath(args[29]);
+        string colorColrV1SubsetPath = Path.GetFullPath(args[30]);
+        string colorSbixSourcePath = Path.GetFullPath(args[31]);
+        string colorSbixSubsetPath = Path.GetFullPath(args[32]);
+        string colorSvgSourcePath = Path.GetFullPath(args[33]);
+        string colorSvgSubsetPath = Path.GetFullPath(args[34]);
+        string screenshotPath = Path.GetFullPath(args[35]);
+        string evidencePath = Path.GetFullPath(args[36]);
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
@@ -64,12 +79,22 @@ internal static class LayoutBrowserSmoke
         byte[] cffSubset = await File.ReadAllBytesAsync(cffSubsetPath).ConfigureAwait(false);
         byte[] nameCffSource = await File.ReadAllBytesAsync(nameCffSourcePath).ConfigureAwait(false);
         byte[] nameCffSubset = await File.ReadAllBytesAsync(nameCffSubsetPath).ConfigureAwait(false);
+        byte[] seacCffSource = await File.ReadAllBytesAsync(seacCffSourcePath).ConfigureAwait(false);
+        byte[] seacCffSubset = await File.ReadAllBytesAsync(seacCffSubsetPath).ConfigureAwait(false);
+        byte[] staticCff2Source = await File.ReadAllBytesAsync(staticCff2SourcePath).ConfigureAwait(false);
+        byte[] staticCff2Subset = await File.ReadAllBytesAsync(staticCff2SubsetPath).ConfigureAwait(false);
         byte[] arabicVariableSource = await File.ReadAllBytesAsync(arabicVariableSourcePath).ConfigureAwait(false);
         byte[] arabicVariableSubset = await File.ReadAllBytesAsync(arabicVariableSubsetPath).ConfigureAwait(false);
         byte[] devanagariVariableSource = await File.ReadAllBytesAsync(devanagariVariableSourcePath)
             .ConfigureAwait(false);
         byte[] devanagariVariableSubset = await File.ReadAllBytesAsync(devanagariVariableSubsetPath)
             .ConfigureAwait(false);
+        byte[] bengaliSource = await File.ReadAllBytesAsync(bengaliSourcePath).ConfigureAwait(false);
+        byte[] bengaliSubset = await File.ReadAllBytesAsync(bengaliSubsetPath).ConfigureAwait(false);
+        byte[] khmerSource = await File.ReadAllBytesAsync(khmerSourcePath).ConfigureAwait(false);
+        byte[] khmerSubset = await File.ReadAllBytesAsync(khmerSubsetPath).ConfigureAwait(false);
+        byte[] thaiSource = await File.ReadAllBytesAsync(thaiSourcePath).ConfigureAwait(false);
+        byte[] thaiSubset = await File.ReadAllBytesAsync(thaiSubsetPath).ConfigureAwait(false);
         byte[] cff2VariableSource = await File.ReadAllBytesAsync(cff2VariableSourcePath).ConfigureAwait(false);
         byte[] cff2VariableSubset = await File.ReadAllBytesAsync(cff2VariableSubsetPath).ConfigureAwait(false);
         byte[] cffCollectionSource = await File.ReadAllBytesAsync(cffCollectionSourcePath).ConfigureAwait(false);
@@ -140,12 +165,22 @@ internal static class LayoutBrowserSmoke
             ["/fonts/cff-subset"] = (cffSubset, GetSubsetContentType(cffSubset)),
             ["/fonts/name-cff-source.otf"] = (nameCffSource, "font/otf"),
             ["/fonts/name-cff-subset"] = (nameCffSubset, GetSubsetContentType(nameCffSubset)),
+            ["/fonts/seac-cff-source.otf"] = (seacCffSource, "font/otf"),
+            ["/fonts/seac-cff-subset"] = (seacCffSubset, GetSubsetContentType(seacCffSubset)),
+            ["/fonts/static-cff2-source.otf"] = (staticCff2Source, "font/otf"),
+            ["/fonts/static-cff2-subset"] = (staticCff2Subset, GetSubsetContentType(staticCff2Subset)),
             ["/fonts/arabic-variable-source.ttf"] = (arabicVariableSource, "font/ttf"),
             ["/fonts/arabic-variable-subset"]
                 = (arabicVariableSubset, GetSubsetContentType(arabicVariableSubset)),
             ["/fonts/devanagari-variable-source.ttf"] = (devanagariVariableSource, "font/ttf"),
             ["/fonts/devanagari-variable-subset"]
                 = (devanagariVariableSubset, GetSubsetContentType(devanagariVariableSubset)),
+            ["/fonts/bengali-source.ttf"] = (bengaliSource, "font/ttf"),
+            ["/fonts/bengali-subset"] = (bengaliSubset, GetSubsetContentType(bengaliSubset)),
+            ["/fonts/khmer-source.ttf"] = (khmerSource, "font/ttf"),
+            ["/fonts/khmer-subset"] = (khmerSubset, GetSubsetContentType(khmerSubset)),
+            ["/fonts/thai-source.ttf"] = (thaiSource, "font/ttf"),
+            ["/fonts/thai-subset"] = (thaiSubset, GetSubsetContentType(thaiSubset)),
             ["/fonts/cff2-variable-source.otf"] = (cff2VariableSource, "font/otf"),
             ["/fonts/cff2-variable-subset"] = (cff2VariableSubset, GetSubsetContentType(cff2VariableSubset)),
             ["/fonts/cff-collection-source.otc"]
@@ -225,10 +260,11 @@ internal static class LayoutBrowserSmoke
             JsonElement domCases = await page.EvaluateAsync<JsonElement>("() => window.__odfKitDomProofCases")
                 .ConfigureAwait(false);
             var domProof = new List<object>();
-            var sourceHashesByCase = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            var sourceHashesByText = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             foreach (JsonElement domCase in domCases.EnumerateArray())
             {
                 string caseId = domCase.GetProperty("caseId").GetString()!;
+                int textIndex = domCase.GetProperty("textIndex").GetInt32();
                 string sourceId = domCase.GetProperty("sourceId").GetString()!;
                 string subsetId = domCase.GetProperty("subsetId").GetString()!;
                 byte[] sourcePng = await page.Locator($"#{sourceId}").ScreenshotAsync().ConfigureAwait(false);
@@ -239,16 +275,18 @@ internal static class LayoutBrowserSmoke
                 }
 
                 string sourceHash = ComputeSha256(sourcePng);
-                if (!sourceHashesByCase.TryGetValue(caseId, out HashSet<string>? hashes))
+                string textKey = $"{caseId}:{textIndex}";
+                if (!sourceHashesByText.TryGetValue(textKey, out HashSet<string>? hashes))
                 {
                     hashes = new HashSet<string>(StringComparer.Ordinal);
-                    sourceHashesByCase.Add(caseId, hashes);
+                    sourceHashesByText.Add(textKey, hashes);
                 }
 
                 hashes.Add(sourceHash);
                 domProof.Add(new
                 {
                     caseId,
+                    textIndex,
                     axes = domCase.GetProperty("axes"),
                     sourceHash,
                     subsetHash = ComputeSha256(subsetPng),
@@ -256,7 +294,7 @@ internal static class LayoutBrowserSmoke
                 });
             }
 
-            if (sourceHashesByCase.Values.Any(hashes => hashes.Count != 3))
+            if (sourceHashesByText.Values.Any(hashes => hashes.Count != 3))
             {
                 throw new InvalidOperationException("A DOM variation axis did not change source pixels.");
             }
@@ -278,8 +316,13 @@ internal static class LayoutBrowserSmoke
                     devanagari = ComputeSha256(devanagariSource),
                     cff = ComputeSha256(cffSource),
                     nameCff = ComputeSha256(nameCffSource),
+                    seacCff = ComputeSha256(seacCffSource),
+                    staticCff2 = ComputeSha256(staticCff2Source),
                     arabicVariable = ComputeSha256(arabicVariableSource),
                     devanagariVariable = ComputeSha256(devanagariVariableSource),
+                    bengali = ComputeSha256(bengaliSource),
+                    khmer = ComputeSha256(khmerSource),
+                    thai = ComputeSha256(thaiSource),
                     cff2Variable = ComputeSha256(cff2VariableSource),
                     cffCollection = ComputeSha256(cffCollectionSource),
                     cff2Collection = ComputeSha256(cff2CollectionSource),
@@ -293,8 +336,13 @@ internal static class LayoutBrowserSmoke
                     devanagari = ComputeSha256(devanagariSubset),
                     cff = ComputeSha256(cffSubset),
                     nameCff = ComputeSha256(nameCffSubset),
+                    seacCff = ComputeSha256(seacCffSubset),
+                    staticCff2 = ComputeSha256(staticCff2Subset),
                     arabicVariable = ComputeSha256(arabicVariableSubset),
                     devanagariVariable = ComputeSha256(devanagariVariableSubset),
+                    bengali = ComputeSha256(bengaliSubset),
+                    khmer = ComputeSha256(khmerSubset),
+                    thai = ComputeSha256(thaiSubset),
                     cff2Variable = ComputeSha256(cff2VariableSubset),
                     cffCollection = ComputeSha256(cffCollectionSubset),
                     cff2Collection = ComputeSha256(cff2CollectionSubset),
@@ -401,6 +449,28 @@ internal static class LayoutBrowserSmoke
             },
             new
             {
+                id = "seac-cff",
+                direction = "ltr",
+                language = "en",
+                sourceFamily = "OdfKit seac CFF Source",
+                subsetFamily = "OdfKit seac CFF Subset",
+                texts = new[] { "AÁ", "ÁA", "AÁA" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
+            },
+            new
+            {
+                id = "static-cff2",
+                direction = "ltr",
+                language = "en",
+                sourceFamily = "OdfKit Static CFF2 Source",
+                subsetFamily = "OdfKit Static CFF2 Subset",
+                texts = new[] { "ABCabc", "CBAcba", "AaBbCc" },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
+            },
+            new
+            {
                 id = "arabic-variable",
                 direction = "rtl",
                 language = "ar",
@@ -423,6 +493,54 @@ internal static class LayoutBrowserSmoke
                 sourceFamily = "OdfKit Devanagari Variable Source",
                 subsetFamily = "OdfKit Devanagari Variable Subset",
                 texts = new[] { "क्षेत्रज्ञ भारत" },
+                axes = new[]
+                {
+                    new { weight = 300, stretch = "normal" },
+                    new { weight = 700, stretch = "normal" },
+                    new { weight = 300, stretch = "condensed" }
+                },
+                requireAxisDifference = true
+            },
+            new
+            {
+                id = "bengali-variable",
+                direction = "ltr",
+                language = "bn",
+                sourceFamily = "OdfKit Bengali Source",
+                subsetFamily = "OdfKit Bengali Subset",
+                texts = new[] { "বাংলা ভাষা বাংলাদেশ", "ক্ষুদ্র জ্ঞান", "স্বাধীনতা" },
+                axes = new[]
+                {
+                    new { weight = 300, stretch = "normal" },
+                    new { weight = 700, stretch = "normal" },
+                    new { weight = 300, stretch = "condensed" }
+                },
+                requireAxisDifference = true
+            },
+            new
+            {
+                id = "khmer-variable",
+                direction = "ltr",
+                language = "km",
+                sourceFamily = "OdfKit Khmer Source",
+                subsetFamily = "OdfKit Khmer Subset",
+                texts = new[] { "ខ្មែរជាភាសាសម្បូរបែប", "សួស្តីពិភពលោក", "កម្ពុជា" },
+                axes = new[]
+                {
+                    new { weight = 300, stretch = "normal" },
+                    new { weight = 700, stretch = "normal" },
+                    new { weight = 300, stretch = "condensed" }
+                },
+                requireAxisDifference = true
+            },
+            new
+            {
+                id = "thai-variable",
+                direction = "ltr",
+                language = "th",
+                sourceFamily = "OdfKit Thai Source",
+                subsetFamily = "OdfKit Thai Subset",
+                texts = new[] { "ภาษาไทยกำลังทดสอบ", "สวัสดีชาวโลก", "น้ำใจ" },
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -535,10 +653,20 @@ internal static class LayoutBrowserSmoke
                 @font-face { font-family: "OdfKit CFF Subset"; src: url("/fonts/cff-subset"); }
                 @font-face { font-family: "OdfKit Name CFF Source"; src: url("/fonts/name-cff-source.otf") format("opentype"); }
                 @font-face { font-family: "OdfKit Name CFF Subset"; src: url("/fonts/name-cff-subset"); }
+                @font-face { font-family: "OdfKit seac CFF Source"; src: url("/fonts/seac-cff-source.otf") format("opentype"); }
+                @font-face { font-family: "OdfKit seac CFF Subset"; src: url("/fonts/seac-cff-subset"); }
+                @font-face { font-family: "OdfKit Static CFF2 Source"; src: url("/fonts/static-cff2-source.otf") format("opentype"); }
+                @font-face { font-family: "OdfKit Static CFF2 Subset"; src: url("/fonts/static-cff2-subset"); }
                 @font-face { font-family: "OdfKit Arabic Variable Source"; src: url("/fonts/arabic-variable-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit Arabic Variable Subset"; src: url("/fonts/arabic-variable-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit Devanagari Variable Source"; src: url("/fonts/devanagari-variable-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit Devanagari Variable Subset"; src: url("/fonts/devanagari-variable-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Bengali Source"; src: url("/fonts/bengali-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Bengali Subset"; src: url("/fonts/bengali-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Khmer Source"; src: url("/fonts/khmer-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Khmer Subset"; src: url("/fonts/khmer-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Thai Source"; src: url("/fonts/thai-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
+                @font-face { font-family: "OdfKit Thai Subset"; src: url("/fonts/thai-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit CFF2 Variable Source"; src: url("/fonts/cff2-variable-source.otf") format("opentype"); font-weight: 250 900; }
                 @font-face { font-family: "OdfKit CFF2 Variable Subset"; src: url("/fonts/cff2-variable-subset"); font-weight: 250 900; }
                 @font-face { font-family: "OdfKit Color COLRv1 Source"; src: url("/fonts/color-colrv1-source.ttf") format("truetype"); }
@@ -643,7 +771,7 @@ internal static class LayoutBrowserSmoke
                             pair.className = 'pair';
                             pair.innerHTML = `<div id="${sourceId}" class="proof-sample" lang="${testCase.language}" dir="${testCase.direction}" style="font-family:'${testCase.sourceFamily}';font-weight:${axes.weight};font-stretch:${axes.stretch}">${text}</div><div id="${subsetId}" class="proof-sample" lang="${testCase.language}" dir="${testCase.direction}" style="font-family:'${testCase.subsetFamily}';font-weight:${axes.weight};font-stretch:${axes.stretch}">${text}</div>`;
                             domRoot.append(pair);
-                            domProofCases.push({ caseId: testCase.id, sourceId, subsetId, axes });
+                            domProofCases.push({ caseId: testCase.id, textIndex, sourceId, subsetId, axes });
                           });
                         });
                         article.append(domRoot);

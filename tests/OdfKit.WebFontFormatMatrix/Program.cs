@@ -47,7 +47,7 @@ internal static class Program
             return 0;
         }
 
-        if (args.Length != 18)
+        if (args.Length != 23)
         {
             return 2;
         }
@@ -61,15 +61,20 @@ internal static class Program
         string cffCollectionPath = Path.GetFullPath(args[6]);
         string cffOpenTypePath = Path.GetFullPath(args[7]);
         string nameCffOpenTypePath = Path.GetFullPath(args[8]);
-        string arabicStaticPath = Path.GetFullPath(args[9]);
-        string devanagariStaticPath = Path.GetFullPath(args[10]);
-        string arabicVariablePath = Path.GetFullPath(args[11]);
-        string devanagariVariablePath = Path.GetFullPath(args[12]);
-        string cff2VariablePath = Path.GetFullPath(args[13]);
-        string colorEmojiPath = Path.GetFullPath(args[14]);
-        string colorEmojiColrV1Path = Path.GetFullPath(args[15]);
-        string colorSbixPath = Path.GetFullPath(args[16]);
-        string colorSvgPath = Path.GetFullPath(args[17]);
+        string seacCffOpenTypePath = Path.GetFullPath(args[9]);
+        string staticCff2Path = Path.GetFullPath(args[10]);
+        string arabicStaticPath = Path.GetFullPath(args[11]);
+        string devanagariStaticPath = Path.GetFullPath(args[12]);
+        string bengaliPath = Path.GetFullPath(args[13]);
+        string khmerPath = Path.GetFullPath(args[14]);
+        string thaiPath = Path.GetFullPath(args[15]);
+        string arabicVariablePath = Path.GetFullPath(args[16]);
+        string devanagariVariablePath = Path.GetFullPath(args[17]);
+        string cff2VariablePath = Path.GetFullPath(args[18]);
+        string colorEmojiPath = Path.GetFullPath(args[19]);
+        string colorEmojiColrV1Path = Path.GetFullPath(args[20]);
+        string colorSbixPath = Path.GetFullPath(args[21]);
+        string colorSvgPath = Path.GetFullPath(args[22]);
         Directory.CreateDirectory(outputRoot);
 
         string trueTypeCollectionPath = Path.Combine(outputRoot, "cns-managed-real-faces.ttc");
@@ -168,6 +173,27 @@ internal static class Program
             outputRoot).ConfigureAwait(false);
         await VerifySuccessAsync(
             results,
+            "bengali-variable-layout",
+            bengaliPath,
+            faceIndex: 0,
+            "বাংলা ভাষা বাংলাদেশ",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "khmer-variable-layout",
+            khmerPath,
+            faceIndex: 0,
+            "ខ្មែរជាភាសាសម្បូរបែប",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "thai-variable-layout",
+            thaiPath,
+            faceIndex: 0,
+            "ภาษาไทยกำลังทดสอบ",
+            outputRoot).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
             "managed-ttc-face-0",
             trueTypeCollectionPath,
             faceIndex: 0,
@@ -232,6 +258,22 @@ internal static class Program
             nameCffOpenTypePath,
             faceIndex: 0,
             "OdfKit café fi ffi 0123456789",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "cff-name-seac",
+            seacCffOpenTypePath,
+            faceIndex: 0,
+            "AÁ",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
+            "cff2-static",
+            staticCff2Path,
+            faceIndex: 0,
+            "ABCabc",
             outputRoot,
             [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
         await VerifySuccessAsync(

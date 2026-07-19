@@ -169,7 +169,7 @@ internal sealed class SfntFont
             tables.Add(tag, table);
         }
 
-        string? rejectedTag = tables.Keys.FirstOrDefault(RejectedTables.Contains);
+        string? rejectedTag = tables.Keys.FirstOrDefault(IsRejectedLayoutTable);
         if (rejectedTag is not null)
         {
             throw NotSupported(rejectedTag);
@@ -415,9 +415,10 @@ internal sealed class SfntFont
         ValidateCffGlyphs(glyphs);
     }
 
-    private static bool IsComplexShapingScalar(int scalar)
+    internal static bool IsComplexShapingScalar(int scalar)
         => scalar is >= 0x0600 and <= 0x08FF
             or >= 0x0900 and <= 0x0DFF
+            or >= 0x0E00 and <= 0x0EFF
             or >= 0x0F00 and <= 0x109F
             or >= 0x1780 and <= 0x17FF
             or >= 0x1A20 and <= 0x1AAF
@@ -426,6 +427,9 @@ internal sealed class SfntFont
             or >= 0xAA60 and <= 0xAA7F
             or >= 0xFB50 and <= 0xFDFF
             or >= 0xFE70 and <= 0xFEFF;
+
+    internal static bool IsRejectedLayoutTable(string tag)
+        => RejectedTables.Contains(tag);
 
     private void AddCompositeClosure(HashSet<ushort> glyphs, int maxDepth)
     {

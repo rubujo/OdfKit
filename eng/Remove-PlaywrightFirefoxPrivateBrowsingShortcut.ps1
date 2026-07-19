@@ -8,9 +8,7 @@ param(
     [Parameter(Mandatory)]
     [string]$BrowserRoot,
 
-    [string]$StartMenuRoot = [Environment]::GetFolderPath('StartMenu'),
-
-    [switch]$RemoveProxyAssets
+    [string]$StartMenuRoot = [Environment]::GetFolderPath('StartMenu')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -59,21 +57,6 @@ try {
 }
 finally {
     [Runtime.InteropServices.Marshal]::FinalReleaseComObject($shell) | Out-Null
-}
-
-if ($RemoveProxyAssets) {
-    Get-ChildItem -LiteralPath $resolvedBrowserRoot -Directory -Filter 'firefox-*' -ErrorAction SilentlyContinue |
-        Where-Object Name -Match '^firefox-\d+$' |
-        ForEach-Object {
-            $firefoxRoot = Join-Path $_.FullName 'firefox'
-            foreach ($assetName in @('private_browsing.exe', 'private_browsing.VisualElementsManifest.xml')) {
-                $assetPath = [IO.Path]::GetFullPath((Join-Path $firefoxRoot $assetName))
-                if (-not $assetPath.StartsWith($resolvedBrowserRoot, [StringComparison]::OrdinalIgnoreCase)) {
-                    throw 'Playwright Firefox 私密瀏覽資產不在瀏覽器根目錄內。'
-                }
-                Remove-Item -LiteralPath $assetPath -Force -ErrorAction SilentlyContinue
-            }
-        }
 }
 
 return $removed

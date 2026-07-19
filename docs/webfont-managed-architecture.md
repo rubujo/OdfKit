@@ -97,8 +97,8 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 | WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 standalone | `net10.0` 已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 collection | `net10.0` 已實作；指定 `faceIndex`，有界解析 collection directory、共享 transformed `glyf`／`loca` 配對與 `hmtx`；以 W3C 官方多 face corpus 逐表比對 reference | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
-| TrueType／CFF／CFF2 variable，以及省略 VariationStore 的非變動 CFF2 | experimental correctness-first | 保留必要 metadata 的獨立資產 |
-| COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | experimental correctness-first；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
+| TrueType／CFF／CFF2 variable，以及省略 VariationStore 的非變動 CFF2 | 已實作有界 correctness-first 路徑；只承諾鎖定 corpus 與已驗證 operator | 保留必要 metadata 的獨立資產 |
+| COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | 已實作有界 correctness-first 路徑；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
 | Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |
 
 初版保留原 glyph ID 與 `maxp.numGlyphs`，以相同 `loca` offset 清空未使用 outline。這可在不
@@ -118,7 +118,9 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 - 尚未通過第 3.5 節證據閘門的 variable font；缺少 VariationStore 卻使用 `vsindex`／`blend`，
   或 VariationStore／`fvar` 不一致的 CFF2 維持拒絕。
 - 尚未通過第 3.6 節結構驗證的 color table 版本或組合。
-- AAT、Graphite，或需要尚未支援 shaping closure 的 script／feature。
+- AAT layout 的 `morx`／`mort`／`kerx` 與 Graphite 的 `Silf`／`Glat`／`Gloc`／`Feat`／`Sill`
+  一律明確拒絕；不得把保留 ancillary table 說成 AAT／Graphite shaping 支援。需要尚未驗證
+  shaping closure 的 script／feature 亦維持拒絕。
 - `OS/2.fsType` 禁止 embedding、禁止 subsetting 或只允許 bitmap embedding 的字型。
 - table 越界／重疊、checked arithmetic 溢位、checksum 不符、重複必要 table、glyph cycle、
   超過設定上限或任何無法唯一解讀的輸入。
@@ -129,13 +131,15 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 只依 `cmap` 收 glyph 不足以支援 Arabic、Devanagari 或任意 OpenType shaping。現有引擎會對
 GSUB lookup 1／2／3／4／7／8 建立保守 glyph closure，並對 contextual 結構採有界驗證，供 CNS
-direct-glyph 與可證明 closure 完整的情境使用。對 Arabic／Devanagari，現階段改採
+direct-glyph 與可證明 closure 完整的情境使用。對
+Arabic／Devanagari／Bengali／Khmer／Thai，現階段改採
 correctness-first 路徑：保留完整 glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，且來源與輸出的
-layout tables 必須 byte-identical，不做 aggressive glyph pruning 或 lookup 重寫。2026-07-17 的
-遠端 CI 已在 Chromium、Firefox 與 WebKit 以合法鎖定的 Noto 靜態字型通過六組字串的逐 RGBA
-byte 與文字 metrics 差分。
+layout tables 必須 byte-identical，不做 aggressive glyph pruning 或 lookup 重寫。鎖定的 Noto
+字型已在 Chromium、Firefox 與 WebKit 通過逐 RGBA byte、文字 metrics 與 variable axis DOM
+差分。
 
-這項證據只涵蓋目前鎖定的 Arabic／Devanagari corpus，不代表任意 complex-script shaping。
+這項證據只涵蓋目前鎖定的 Arabic／Devanagari／Bengali／Khmer／Thai corpus，不代表任意
+complex-script shaping。
 其它 script／language／feature 必須先擴充 GSUB closure 或採相同 correctness-first 路徑，驗證
 contextual、ligature、alternate、extension lookup、GDEF 關聯及 GPOS glyph reference；只有
 managed 結構驗證、合法 corpus 與 Chromium／Firefox／WebKit golden 一致時，才能新增支援聲明。
@@ -172,8 +176,9 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    GID 使用相鄰相同 offset 表示零長度 variation data；short offsets 依規格以實際位移除以 2
    編碼，long offsets 使用 32-bit 位移。`fvar` 與 `gvar` 必須成對存在且 axis count 一致；
    `avar`、`STAT`、`HVAR`、`VVAR`、`MVAR` 與 `cvar` 在 GID 不變的前提下原樣保留。正式能力
-   Source Han 與 Noto Arabic／Devanagari 的 short／long offset、`wdth`／`wght` 三瀏覽器 DOM
-   截圖與 Canvas 差分及 mutation 已通過；能力仍維持 experimental。
+   Source Han 與 Noto Arabic／Devanagari／Bengali／Khmer／Thai 的 short／long offset、
+   `wdth`／`wght` 三瀏覽器 DOM
+   截圖與 Canvas 差分及 mutation 已通過；只對鎖定格式矩陣作有界承諾。
 2. **靜態 CFF 1.0**：已解封 standalone／OTC face、含 ROS／FDArray／FDSelect 的 CID-keyed
    `OTTO`，以及不含這三個 CID operator 的名稱式 CFF。有界 parser 驗證 collection 絕對 table
    offset、CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、預定義／自訂 charset 與
@@ -192,8 +197,8 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    以規格允許的零長度 CharString 取代，再以兩趟 relocation 重建 32-bit INDEX、Top／Font／Private
    DICT、Header length 與 local Subrs 相對 offset；variation metadata 原樣保留。Source Han Sans 2.005R
    已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。Microsoft
-   OpenType 1.9.1 明定非變動 CFF2 必須省略 VariationStore；此結構已由有界規格 fixture 解封，
-   但因尚缺可再散布的真實靜態 CFF2 與三瀏覽器證據而維持 experimental。缺少 VariationStore
+   OpenType 1.9.1 明定非變動 CFF2 必須省略 VariationStore；此結構已由有界規格 fixture 與
+   Apache-2.0 AFDKO `regular_CFF2.otf` 的三瀏覽器證據解封。缺少 VariationStore
    卻使用 `vsindex`／`blend`、VariationStore／`fvar` 不一致、超出資源上限的 INDEX／region 與
    無法唯一驗證的 operator 仍明確拒絕。
 
@@ -212,9 +217,15 @@ OpenType 1.9.1 定義的 color 輸入族群為 COLR／CPAL v0／v1、CBDT／CBLC
 的 fallback outline。所有路徑維持原始 glyph ID 編號及 color tables，只縮減對外 `cmap` 與未被
 closure 觸及的 outline；不宣稱已完成 aggressive color-table pruning。
 
-每一種 color 模型須分別以可再散布且鎖定 SHA-256 的真實 corpus 通過 TTF／OTF、WOFF、WOFF2
-managed verifier，並在至少一個實際支援該模型的瀏覽器完成來源／subset 彩色像素差分，才可從
-experimental 升級。瀏覽器不支援的模型須記錄為 `browser-unavailable`，不得以相同空白畫布
+EBDT／EBLC 與 `SVG ` 的支援層級是安全保留，不是細粒度 subsetting。前者驗證 bitmap
+location／data 配對、strike、index、image format 與資料範圍，但不逐 strike／glyph 重編；後者
+驗證 document index、glyph range、壓縮上限與 XML 主動內容，但不裁切 SVG document。兩者均保留
+完整 color table，避免產生引用不一致的資產。
+
+每一種 color 模型只有在可再散布且鎖定 SHA-256 的真實 corpus 通過 TTF／OTF、WOFF、WOFF2
+managed verifier，並於至少一個實際支援該模型的瀏覽器完成來源／subset 彩色像素差分後，才可
+列入 `RequiredBrowserTargets` 相容矩陣。EBDT／EBLC 目前只有產生式結構測試，不在任何瀏覽器
+目標的已驗證集合。瀏覽器不支援的模型須記錄為 `browser-unavailable`，不得以相同空白畫布
 視為通過；跨瀏覽器部署若需要 color table 轉碼，必須另建 writer、授權與像素證據閘門。未知版本、缺少
 CPAL 或 bitmap location／data 配對、越界頂層 paint root／document／strike，以及任何無法唯一
 驗證的組合均明確拒絕。SVG document 另維持禁止 DTD、script、外部參照、互動及主動內容的安全
@@ -308,7 +319,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - 真實 CNS PUA、IPAmj IVS、雙 CNS face TTC；Noto CJK 靜態 CFF OTC 與 Source Han Sans 2.005R
   靜態 CFF 1.0、TrueType variable、CFF2 variable、CFF2 OTC、WOFF／standalone transformed WOFF2 輸入
   正向矩陣，以及 Noto Color Emoji bitmap color 正向矩陣。
-- 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
+- 官方 CNS 楷體 Ext-B／PUA、AFDKO `seac`／靜態 CFF2，以及 Noto
+  Arabic／Devanagari／Bengali／Khmer／Thai 的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
 - 真實來源字型、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 736 組固定種子 mutation
   有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。

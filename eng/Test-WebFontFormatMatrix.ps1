@@ -26,6 +26,7 @@ if (-not $destinationPath.StartsWith($repoPrefix, $comparison)) {
 $manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot "external-tools.json") -Raw | ConvertFrom-Json
 $definitions = $manifest.webFontSmoke.internationalFonts
 $nameCffDefinition = $manifest.webFontNameCffCorpus
+$afdkoDefinitions = $manifest.webFontAfdkoCorpus
 $sourceRoot = Join-Path $destinationPath "sources"
 $outputRoot = Join-Path $destinationPath "evidence"
 New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
@@ -123,10 +124,15 @@ $kaiExtBPath = Get-ArchiveFont $definitions.cnsKaiExtB -ArchivePath $CnsKaiFontA
 $kaiPlusPath = Get-ArchiveFont $definitions.cnsKaiPlus -ArchivePath $CnsKaiFontArchivePath
 $ipamjPath = Get-ArchiveFont $definitions.ipamj
 $nameCffPath = Get-ArchiveFont $nameCffDefinition -ArchivePath $NameCffArchivePath
+$seacCffPath = Get-DirectFont $afdkoDefinitions.seac
+$staticCff2Path = Get-DirectFont $afdkoDefinitions.staticCff2
 $collectionPath = Get-DirectFont $definitions.cjkCollection
 $openTypePath = Get-DirectFont $definitions.cjkOpenType
 $arabicPath = Get-DirectFont $definitions.arabic
 $devanagariPath = Get-DirectFont $definitions.devanagari
+$bengaliPath = Get-DirectFont $definitions.bengali
+$khmerPath = Get-DirectFont $definitions.khmer
+$thaiPath = Get-DirectFont $definitions.thai
 $arabicStaticPath = Get-DirectFont $definitions.arabicStatic
 $devanagariStaticPath = Get-DirectFont $definitions.devanagariStatic
 $cff2Path = Get-DirectFont $definitions.cjkCff2
@@ -163,8 +169,13 @@ $runnerArguments = @(
     $collectionPath,
     $openTypePath,
     $nameCffPath,
+    $seacCffPath,
+    $staticCff2Path,
     $arabicStaticPath,
     $devanagariStaticPath,
+    $bengaliPath,
+    $khmerPath,
+    $thaiPath,
     $arabicPath,
     $devanagariPath,
     $cff2Path,
@@ -198,5 +209,5 @@ finally {
     $process.Dispose()
 }
 
-Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／variable／CID／名稱式 CFF／CFF2、bitmap、COLRv1、sbix 與 OpenType SVG 正向矩陣通過。"
+Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／Arabic／Devanagari／Bengali／Khmer／Thai、variable／CID／名稱式 CFF／seac／靜態 CFF2、bitmap、COLRv1、sbix 與 OpenType SVG 正向矩陣通過。"
 Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

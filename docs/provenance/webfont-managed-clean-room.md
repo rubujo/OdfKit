@@ -63,7 +63,8 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   FontTools、HarfBuzz、FreeType 或其它 subset compiler 原始碼。
 - 原創範圍：`gvar` short／long offset 有界解析、未選 GID 的零長度資料重建、精確單次配置及
   synthetic 正負向 fixture。
-- 真實黑箱 corpus：Adobe Source Han Sans 2.005R 與鎖定版本 Noto Arabic／Devanagari，皆為
+- 真實黑箱 corpus：Adobe Source Han Sans 2.005R 與鎖定版本 Noto
+  Arabic／Devanagari／Bengali／Khmer／Thai，皆為
   OFL-1.1；只下載到 CI cache／本機 artifacts，不納入 repository 或 nupkg。
 - 採用者外部驗收：可另由第三方進行結構相異性審查；此項不計入工程完成條件。
 
@@ -105,8 +106,10 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   輸出由 managed verifier 逐 glyph 驗證，另以 64 組固定種子來源 mutation 驗證明確拒絕。
 - 瀏覽器證據：format matrix 產生的 WOFF2 與官方 OTF 由 Chromium／Firefox／WebKit 比較三組
   Latin 文字的 Canvas RGBA bytes 與文字 metrics，並輸出每瀏覽器 JSON 及截圖 artifact。
-- 尚缺的工程證據：可再散布的真實 `seac` 三瀏覽器 corpus；完成前能力維持 experimental。
-  Compact rewrite 已由下節完成。第三方結構相異性與惡意字型安全審查只屬採用者外部驗收。
+- 2026-07-20 補入 Apache-2.0 AFDKO commit
+  `a843a0a87d9db0ea62d5ce719900acf5749c143e` 的 `seac.otf`，SHA-256 為
+  `b7aba7ad260e62794e57563726c377d5140253679f62bd97152d52b47c744daa`；三瀏覽器均通過來源／subset
+  差分。Compact rewrite 已由下節完成。第三方結構相異性與惡意字型安全審查只屬採用者外部驗收。
 
 ### 2026-07-19 CFF 1.0 Compact Rewrite
 
@@ -175,8 +178,9 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   count；上下文不同時重新解析，避免跨 face／metadata 誤用快取結果，來源淘汰後仍可回收。
 - 證據：以官方規格欄位建立的最小二進位 fixture 驗證合法非變動 CFF2、retain-GIDs、非法
   `vsindex`／`blend` 與跨 glyph count 快取隔離。fixture 是結構測試，不冒充真實字型 corpus。
-- 尚缺的工程證據：截至 2026-07-18 尚未找到授權可追溯、可鎖定 SHA-256 且能在
-  Chromium／Firefox／WebKit 重現的真實非變動 CFF2；能力維持 experimental。
+- 2026-07-20 補入同一 Apache-2.0 AFDKO commit 的 `regular_CFF2.otf`，SHA-256 為
+  `e607fdc99e3386e3818ce3ee6d6e7218fd911370c25501dd9ad6c17cf40e72da`；Chromium、Firefox 與
+  WebKit 均通過來源／subset 差分。此證據只解封鎖定 operator 與 corpus，不泛化至任意 CFF2。
 
 ### 2026-07-18 OpenType Collection CFF／CFF2
 
@@ -209,9 +213,9 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44`。兩者採 OFL-1.1，
   僅下載到 CI cache／artifact，不納入 repository 或 nupkg。
 - 後續已完成 COLR v0／v1 全部 paint graph、`sbix dupe` glyph closure、SVG document 主動內容
-  安全檢查，以及 CBDT／CBLC、EBDT／EBLC 資料範圍驗證。分格式 aggressive color pruning 是
-  選用效能優化，不列為工程完成條件；第三方惡意 color font 稽核仍是未取得的額外證據，因此
-  能力維持 experimental。
+  安全檢查，以及 CBDT／CBLC、EBDT／EBLC 資料範圍驗證。EBDT／EBLC 與 SVG 採完整 color table
+  安全保留，不宣稱細粒度 subsetting。分格式 aggressive color pruning 是選用效能優化，不列為
+  工程完成條件；第三方惡意 color font 稽核仍是未取得的採用者外部證據。
 
 ### 2026-07-19 sbix 與 OpenType SVG 真實 corpus
 

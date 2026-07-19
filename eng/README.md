@@ -43,7 +43,7 @@
 | `Test-NuGetPack.ps1` | 驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置。 |
 | `Test-WebFontReleaseRehearsal.ps1` | 以同批 nupkg 演練隔離本機 feed、SBOM 消費與 NuGet Audit。 |
 | `Test-WebFontIisSustainedLoad.ps1` | 以鎖定 CNS 字型對 Web Forms Integrated／Classic 與 ASP.NET Core In／Out-of-Process 執行手動有界持續負載。 |
-| `Test-WebFontFormatMatrix.ps1` | 以 SHA-256 鎖定的 CNS、多國、CID／名稱式 CFF、CFF2、COLRv1、sbix 與 OpenType SVG corpus 驗證 managed 輸入、輸出及固定種子 mutation；`-NoRestore` 可供已還原的離線工作區使用。 |
+| `Test-WebFontFormatMatrix.ps1` | 以 SHA-256 鎖定的 CNS、多國 complex script、CID／名稱式 CFF、`seac`、靜態／variable CFF2、COLRv1、sbix 與 OpenType SVG corpus 驗證 managed 輸入、輸出及固定種子 mutation；`-NoRestore` 可供已還原的離線工作區使用。 |
 | `Test-WebFontLayoutBrowserSmoke.ps1` | 以 Chromium／Firefox／WebKit 比較真實來源與 managed WOFF2 的 Canvas RGBA bytes、文字 metrics 及截圖證據；color 模型只在實際支援的引擎要求彩色像素，其餘記錄為 `browser-unavailable`。 |
 | `Test-WebFontWoff2Corpus.ps1` | 下載 SHA-256 鎖定的 W3C 與 Google Fonts production corpus，驗證 standalone 與多 face collection transformed WOFF2 解碼、官方 reference 逐表比對及固定種子 mutation。 |
 | `Test-OdfCorpus.ps1` | 執行內建（與選用外部）corpus 驗證，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |

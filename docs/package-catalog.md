@@ -18,7 +18,7 @@
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
-| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TTF／OTF／TTC／OTC／TTE／WOFF 輸入、net10 standalone WOFF2 null／`glyf`／`loca`／`hmtx` transform、net10 WOFF2 collection 指定 face、standalone／OTC face 的 compact CID-keyed 與名稱式靜態 CFF 1.0、名稱式 CFF `seac` closure、compact CFF2 variable 與非變動 CFF2、color correctness-first 子集化；輸出 TTF／OTF／WOFF、net10 WOFF2 | Variable／CFF／CFF2／color 與 WOFF2 collection 輸入能力為 experimental；巢狀或找不到 StandardEncoding 元件的 `seac`、缺少 VariationStore 卻使用 `vsindex`／`blend` 的 CFF2 與直接 collection 輸出明確拒絕 |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TTF／OTF／TTC／OTC／TTE／WOFF 輸入、net10 transformed／collection WOFF2 指定 face、compact CID-keyed／名稱式 CFF、`seac` closure、variable／非變動 CFF2 與 color correctness-first 路徑；輸出 TTF／OTF／WOFF、net10 WOFF2 | 只承諾鎖定 corpus 的有界格式矩陣；EBDT／EBLC 與 SVG 不作細粒度 pruning，AAT／Graphite、非法 `seac`／CFF2 及直接 collection 輸出明確拒絕 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 須經授權及限流的動態產生、唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
