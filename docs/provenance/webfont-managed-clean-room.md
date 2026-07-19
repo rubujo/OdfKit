@@ -192,8 +192,9 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 瀏覽器證據：Chromium 直接比較 raw OTC 與 managed WOFF2；Firefox／WebKit 不接受 raw OTC，
   改以同一 face 的 managed standalone OTF 與 WOFF2 逐 RGBA byte 比較。三者皆驗證可部署輸出，
   但 raw `format(collection)` 能力只由 Chromium 證實。
-- 尚缺的工程證據：共享 CFF／CFF2 table 的多 face corpus 與直接 collection writer；來源 face
-  支援維持 experimental。第三方惡意 collection 安全審查只屬採用者外部驗收。
+- 尚缺的工程證據：共享 CFF／CFF2 table 的多 face corpus；來源 face 支援維持 experimental。
+  直接 collection writer 不在產品輸出契約內。第三方惡意 collection 安全審查只屬採用者外部
+  驗收。
 
 ### 2026-07-18 WOFF 輸入與 Color Fonts
 
@@ -207,10 +208,10 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   `Noto-COLRv1.ttf`，SHA-256
   `23549f29b5ad741fcb4c025b8dc44652ff0f459892467ebcccec1e6bbe839b44`。兩者採 OFL-1.1，
   僅下載到 CI cache／artifact，不納入 repository 或 nupkg。
-- 本節完成時一般 transformed WOFF2 尚待後續切片；逐 paint graph／SVG document 主動內容安全
-  稽核、分格式 aggressive color pruning、sbix／SVG 真實 corpus 與第三方惡意 color font 稽核
-  尚未完成；能力維持
-  experimental。
+- 後續已完成 COLR v0／v1 全部 paint graph、`sbix dupe` glyph closure、SVG document 主動內容
+  安全檢查，以及 CBDT／CBLC、EBDT／EBLC 資料範圍驗證。分格式 aggressive color pruning 是
+  選用效能優化，不列為工程完成條件；sbix／SVG 真實 corpus 與第三方惡意 color font 稽核仍是
+  未取得的額外證據，因此能力維持 experimental。
 
 ### 2026-07-18 WOFF2 transformed tables decoder
 
@@ -237,8 +238,11 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   演算法。W3C pair 因此只比較非 transform tables 並驗證重建 sfnt 結構；`hmtx` bytes 的精確
   正向契約由獨立 C# synthetic fixture 三種 flags 覆蓋。此 post-implementation 檢視須納入人工
   clean-room 審閱，不得隱匿為完全未接觸測試 generator。
-- WOFF2 collection 以規格建構的負向 fixture，以及 SHA-256 鎖定的官方 CNS 宋體 Ext-B／PUA
-  真實 sfnt face 所建立之 null-transform collection 驗證 face selection；直接 collection 輸出、
-  transformed collection 的擴充 corpus 與第三方惡意 WOFF2 安全稽核。Coverage-guided fuzz
-  不屬於套件完成或 CI 條件；若由獨立安全團隊執行，只作額外證據。
-  尚待人工／外部閘門，因此整體 engine 狀態仍為 experimental。
+- WOFF2 collection 以規格建構的負向 fixture、SHA-256 鎖定的官方 CNS 宋體 Ext-B／PUA
+  真實 sfnt face 所建立之 null-transform collection，以及同一 W3C commit 的 DSIG 移除／face-order
+  transformed collection 驗證。兩個 W3C collection 各有 3 face，含 `glyf`／`loca` v0 與
+  `hmtx` v1；每個輸出 face 的非重建表均逐 byte 比對官方 TTC reference，重建表通過 managed
+  結構驗證，另驗證越界 face 拒絕。直接
+  collection 輸出不是產品目標；第三方惡意 WOFF2 安全稽核與 coverage-guided fuzz 也不屬於
+  套件完成或 CI 條件，只能作外部額外證據。整體 engine 仍因其它格式 corpus 缺口維持
+  experimental。

@@ -41,6 +41,11 @@ internal static class Program
             await VerifyProductionWoff2Async(args[1], args[2], args[3]).ConfigureAwait(false);
             return 0;
         }
+        if (args.Length == 4 && args[0] == "woff2-collection-corpus")
+        {
+            await VerifyWoff2CollectionCorpusAsync(args[1], args[2], args[3]).ConfigureAwait(false);
+            return 0;
+        }
 
         if (args.Length != 16)
         {
@@ -547,6 +552,104 @@ internal static class Program
             JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
     }
 
+    private static async Task VerifyWoff2CollectionCorpusAsync(
+        string woff2Path,
+        string referencePath,
+        string evidencePath)
+    {
+        woff2Path = Path.GetFullPath(woff2Path);
+        referencePath = Path.GetFullPath(referencePath);
+        evidencePath = Path.GetFullPath(evidencePath);
+        byte[] woff2 = await File.ReadAllBytesAsync(woff2Path).ConfigureAwait(false);
+        byte[] reference = await File.ReadAllBytesAsync(referencePath).ConfigureAwait(false);
+        int faceCount = ReadCollectionFaceCount(reference);
+        bool referenceHasDsig = ReadCollectionHasDsig(reference, faceCount);
+        var faces = new List<object>(faceCount);
+        for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
+        {
+            byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                maximumExpandedBytes: 32 * 1024 * 1024,
+                faceIndex);
+            using (var stream = new MemoryStream(decoded, writable: false))
+            {
+                ManagedOpenTypeWebFontVerifier.Verify(stream, WebFontFormat.TrueType);
+            }
+
+            SfntFont decodedFont = SfntFont.Parse(decoded, 0, 256, validateChecksums: true);
+            SfntFont referenceFont = SfntFont.Parse(
+                reference,
+                faceIndex,
+                256,
+                validateChecksums: true);
+            if (decodedFont.GlyphCount != referenceFont.GlyphCount)
+            {
+                throw new InvalidDataException(
+                    $"WOFF2 collection face {faceIndex} glyph count differs from its W3C reference.");
+            }
+
+            string[] referenceTableTags = ReadCollectionFaceTableTags(reference, faceIndex);
+            string[] comparedTables = referenceTableTags
+                .Where(tag => tag is not ("DSIG" or "glyf" or "loca" or "head" or "hmtx"))
+                .ToArray();
+            foreach (string tag in comparedTables)
+            {
+                bool hasDecoded = decodedFont.TryGetTable(tag, out ReadOnlyMemory<byte> decodedTable);
+                bool hasReference = referenceFont.TryGetTable(tag, out ReadOnlyMemory<byte> referenceTable);
+                if (!hasDecoded || !hasReference || !decodedTable.Span.SequenceEqual(referenceTable.Span))
+                {
+                    throw new InvalidDataException(
+                        $"WOFF2 collection face {faceIndex} table differs from its W3C reference: {tag}.");
+                }
+            }
+
+            faces.Add(new
+            {
+                faceIndex,
+                decodedSha256 = Convert.ToHexStringLower(SHA256.HashData(decoded)),
+                glyphCount = decodedFont.GlyphCount,
+                comparedTables
+            });
+        }
+
+        bool rejectedOutOfRangeFace = false;
+        try
+        {
+            _ = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                maximumExpandedBytes: 32 * 1024 * 1024,
+                faceCount);
+        }
+        catch (InvalidDataException)
+        {
+            rejectedOutOfRangeFace = true;
+        }
+        if (!rejectedOutOfRangeFace)
+        {
+            throw new InvalidDataException("WOFF2 collection accepted an out-of-range face index.");
+        }
+
+        string? directory = Path.GetDirectoryName(evidencePath);
+        directory = string.IsNullOrEmpty(directory) ? Directory.GetCurrentDirectory() : directory;
+        Directory.CreateDirectory(directory);
+        var evidence = new
+        {
+            schemaVersion = "1.0",
+            status = "passed",
+            source = "w3c/woff2-compiled-tests",
+            woff2Sha256 = Convert.ToHexStringLower(SHA256.HashData(woff2)),
+            referenceSha256 = Convert.ToHexStringLower(SHA256.HashData(reference)),
+            faceCount,
+            referenceHasDsig,
+            transforms = ReadWoff2Transforms(woff2),
+            rejectedOutOfRangeFace,
+            faces
+        };
+        await File.WriteAllTextAsync(
+            evidencePath,
+            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+    }
+
     private static (int Count, int Accepted) RunWoff2MutationRobustnessChecks(byte[] source)
     {
         const int mutationCount = 64;
@@ -651,6 +754,73 @@ internal static class Program
         }
 
         return tags;
+    }
+
+    private static int ReadCollectionFaceCount(ReadOnlySpan<byte> collection)
+    {
+        SfntFont.EnsureRange(collection, 0, 12, "WOFF2-corpus-collection-header");
+        if (!collection[..4].SequenceEqual("ttcf"u8))
+        {
+            throw new InvalidDataException("WOFF2 corpus reference is not a font collection.");
+        }
+
+        uint count = SfntFont.ReadUInt32(collection, 8, "WOFF2-corpus-collection-count");
+        if (count is 0 or > 256)
+        {
+            throw new InvalidDataException("WOFF2 corpus reference has an invalid face count.");
+        }
+
+        return checked((int)count);
+    }
+
+    private static string[] ReadCollectionFaceTableTags(ReadOnlySpan<byte> collection, int faceIndex)
+    {
+        int faceCount = ReadCollectionFaceCount(collection);
+        if (faceIndex < 0 || faceIndex >= faceCount)
+        {
+            throw new InvalidDataException("WOFF2 corpus reference face index is invalid.");
+        }
+
+        int offsetPosition = checked(12 + (faceIndex * 4));
+        int faceOffset = checked((int)SfntFont.ReadUInt32(
+            collection,
+            offsetPosition,
+            "WOFF2-corpus-collection-offset"));
+        return ReadTableTags(collection[faceOffset..]);
+    }
+
+    private static bool ReadCollectionHasDsig(ReadOnlySpan<byte> collection, int faceCount)
+    {
+        uint version = SfntFont.ReadUInt32(collection, 4, "WOFF2-corpus-collection-version");
+        if (version == 0x00010000)
+        {
+            return false;
+        }
+        if (version != 0x00020000)
+        {
+            throw new InvalidDataException("WOFF2 corpus reference has an invalid collection version.");
+        }
+
+        int dsigPosition = checked(12 + (faceCount * 4));
+        SfntFont.EnsureRange(collection, dsigPosition, 12, "WOFF2-corpus-collection-dsig");
+        uint tag = SfntFont.ReadUInt32(collection, dsigPosition, "WOFF2-corpus-collection-dsig-tag");
+        uint length = SfntFont.ReadUInt32(collection, dsigPosition + 4, "WOFF2-corpus-collection-dsig-length");
+        uint offset = SfntFont.ReadUInt32(collection, dsigPosition + 8, "WOFF2-corpus-collection-dsig-offset");
+        if (tag == 0 && length == 0 && offset == 0)
+        {
+            return false;
+        }
+        if (tag != 0x44534947 || length == 0)
+        {
+            throw new InvalidDataException("WOFF2 corpus reference has an invalid DSIG record.");
+        }
+
+        SfntFont.EnsureRange(
+            collection,
+            checked((int)offset),
+            checked((int)length),
+            "WOFF2-corpus-collection-dsig-data");
+        return true;
     }
 
     private static IReadOnlyList<MutationRobustnessResult> RunDeterministicMutationRobustnessChecks(

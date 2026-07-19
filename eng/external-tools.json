@@ -169,6 +169,44 @@
       "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-hmtx-lsb-001.ttf?ref=1fd8cd583645618f4df36c65a297479840ad5510",
       "sha256": "dce1cef405e00a13be7444b9cfa1742663590fb3e21025ff7581c124318a635a"
     },
+    "collections": [
+      {
+        "id": "roundtrip-collection-dsig-001",
+        "expectedFaceCount": 3,
+        "expectedTransforms": [ "glyf:v0", "loca:v0", "hmtx:v1" ],
+        "expectedReferenceHasDsig": false,
+        "woff2": {
+          "fileName": "roundtrip-collection-dsig-001.woff2",
+          "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-collection-dsig-001.woff2",
+          "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-collection-dsig-001.woff2?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+          "sha256": "3e0076fd499f047a71a2b4d0bc6f3345061b63a771ad3a3d01cd7b3723c71258"
+        },
+        "reference": {
+          "fileName": "roundtrip-collection-dsig-001.ttf",
+          "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-collection-dsig-001.ttf",
+          "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-collection-dsig-001.ttf?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+          "sha256": "b8c4c91eb6df3206d749fe0e518b3a0d9577e09722b955695c16ed8a993f70ce"
+        }
+      },
+      {
+        "id": "roundtrip-collection-order-001",
+        "expectedFaceCount": 3,
+        "expectedTransforms": [ "glyf:v0", "loca:v0", "hmtx:v1" ],
+        "expectedReferenceHasDsig": false,
+        "woff2": {
+          "fileName": "roundtrip-collection-order-001.woff2",
+          "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-collection-order-001.woff2",
+          "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-collection-order-001.woff2?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+          "sha256": "7a246412785b588a43acf9cddaab0a36674f8581bd328a6107e9761e38713058"
+        },
+        "reference": {
+          "fileName": "roundtrip-collection-order-001.ttf",
+          "uri": "https://raw.githubusercontent.com/w3c/woff2-compiled-tests/1fd8cd583645618f4df36c65a297479840ad5510/Decoder/Tests/xhtml1/roundtrip-collection-order-001.ttf",
+          "apiPath": "repos/w3c/woff2-compiled-tests/contents/Decoder/Tests/xhtml1/roundtrip-collection-order-001.ttf?ref=1fd8cd583645618f4df36c65a297479840ad5510",
+          "sha256": "5dfd09d59fb93d8f38c74464aceaa3ba97064a26ec553199eeea46caf7822afe"
+        }
+      }
+    ],
     "production": [
       {
         "id": "google-fonts-noto-sans-v42-latin",

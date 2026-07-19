@@ -71,8 +71,11 @@ transformed WOFF2 輸入的 table 反轉換本身是 OdfKit 依 W3C WOFF2 規格
 與 `hmtx` bearing 重建。Brotli bitstream 仍由 .NET Runtime API 解壓。CI 會下載 SHA-256 鎖定的
 W3C decoder corpus，以及 Google Fonts production Noto Sans v42 Latin／Devanagari WOFF2；檔案
 只進 cache／artifact，不進 repository 或 nupkg。WOFF2 collection 以官方 CNS 宋體 Ext-B／PUA
-真實 face 建立 null-transform collection，分別選取兩個 face 後產生獨立 TTF／WOFF／WOFF2；
-transformed collection 與瀏覽器端直接 collection 部署仍保留 experimental／拒絕閘門。
+真實 face 建立 null-transform collection，分別選取兩個 face 後產生獨立 TTF／WOFF／WOFF2。
+另以 W3C 鎖版 DSIG 移除與 face-order corpus 驗證兩個 transformed collection、每個 3 face、
+`glyf`／`loca` v0、`hmtx` v1、非重建表與官方 TTC reference 逐 byte 一致、重建表結構有效及
+越界 face 拒絕。瀏覽器端直接
+collection 部署不在產品輸出契約內，不列為未完成能力。
 
 ## 預定最短使用方式
 

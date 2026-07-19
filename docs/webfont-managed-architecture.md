@@ -96,7 +96,7 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 | Windows EUDC `.tte` | 已實作，內容仍須為合法 sfnt | 產生獨立 TTF／WOFF；`net10.0` 可產生 WOFF2 |
 | WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
 | WOFF2 standalone | `net10.0` 已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
-| WOFF2 collection | `net10.0` experimental；指定 `faceIndex`，有界解析 collection directory 與共享 transformed `glyf`／`loca` 配對 | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
+| WOFF2 collection | `net10.0` 已實作；指定 `faceIndex`，有界解析 collection directory、共享 transformed `glyf`／`loca` 配對與 `hmtx`；以 W3C 官方多 face corpus 逐表比對 reference | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
 | TrueType／CFF／CFF2 variable，以及省略 VariationStore 的非變動 CFF2 | experimental correctness-first | 保留必要 metadata 的獨立資產 |
 | COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | experimental correctness-first；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
 | Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |
@@ -113,8 +113,8 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 - 名稱式 CFF 的 `seac` 只依第 3.5 節的 StandardEncoding／charset closure 邊界解封；找不到
   base／accent 元件、元件代碼不是 0～255 整數或巢狀 `seac` 必須拒絕。名稱式與 standalone／OTC
   face 的 CID-keyed 靜態 CFF 1.0，以及含 VariationStore 的 CFF2 variable 僅依第 3.5 節的
-  experimental 邊界解封。直接
-  collection 輸出仍須獨立 writer 與三瀏覽器證據。
+  experimental 邊界解封。TTC／OTC／WOFF2 collection 只作輸入；直接 collection 輸出不在
+  瀏覽器資產產品契約內，也不是完成條件。
 - 尚未通過第 3.5 節證據閘門的 variable font；缺少 VariationStore 卻使用 `vsindex`／`blend`，
   或 VariationStore／`fvar` 不一致的 CFF2 維持拒絕。
 - 尚未通過第 3.6 節結構驗證的 color table 版本或組合。

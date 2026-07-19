@@ -95,6 +95,32 @@ $evidence = Get-Content -LiteralPath $evidencePath -Raw | ConvertFrom-Json
 $evidence | Add-Member -NotePropertyName corpusRevision -NotePropertyValue $corpus.revision
 $evidence | Add-Member -NotePropertyName corpusLicense -NotePropertyValue $corpus.license
 $evidence | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding utf8NoBOM
+foreach ($collection in $corpus.collections) {
+    $collectionPath = Get-LockedCorpusFile $collection.woff2
+    $collectionReferencePath = Get-LockedCorpusFile $collection.reference
+    $collectionEvidencePath = Join-Path $evidenceRoot "$($collection.id).json"
+    & dotnet $runnerPath woff2-collection-corpus `
+        $collectionPath $collectionReferencePath $collectionEvidencePath
+    if ($LASTEXITCODE -ne 0) {
+        throw "W3C WOFF2 collection corpus 驗證失敗：$($collection.id)"
+    }
+    $collectionEvidence = Get-Content -LiteralPath $collectionEvidencePath -Raw |
+        ConvertFrom-Json
+    $actualTransforms = @($collectionEvidence.transforms | Sort-Object)
+    $expectedTransforms = @($collection.expectedTransforms | Sort-Object)
+    if ($collectionEvidence.faceCount -ne $collection.expectedFaceCount -or
+        (Compare-Object $actualTransforms $expectedTransforms) -or
+        $collectionEvidence.referenceHasDsig -ne $collection.expectedReferenceHasDsig -or
+        -not $collectionEvidence.rejectedOutOfRangeFace) {
+        throw "W3C WOFF2 collection 證據不符合鎖定契約：$($collection.id)"
+    }
+    $collectionEvidence | Add-Member -NotePropertyName corpusRevision `
+        -NotePropertyValue $corpus.revision
+    $collectionEvidence | Add-Member -NotePropertyName corpusLicense `
+        -NotePropertyValue $corpus.license
+    $collectionEvidence | ConvertTo-Json -Depth 10 |
+        Set-Content -LiteralPath $collectionEvidencePath -Encoding utf8NoBOM
+}
 foreach ($definition in $corpus.production) {
     $productionPath = Get-LockedCorpusFile $definition
     $productionEvidence = Join-Path $evidenceRoot "$($definition.id).json"

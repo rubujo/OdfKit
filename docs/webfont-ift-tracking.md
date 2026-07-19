@@ -1,6 +1,6 @@
 # WebFont IFT 標準追蹤與相容性閘門
 
-> 基準日期：2026-07-18
+> 基準日期：2026-07-19
 >
 > 狀態：追蹤中；OdfKit 尚未實作或宣稱支援 Incremental Font Transfer。
 

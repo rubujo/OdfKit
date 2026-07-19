@@ -45,7 +45,7 @@
 | `Test-WebFontIisSustainedLoad.ps1` | 以鎖定 CNS 字型對 Web Forms Integrated／Classic 與 ASP.NET Core In／Out-of-Process 執行手動有界持續負載。 |
 | `Test-WebFontFormatMatrix.ps1` | 以 SHA-256 鎖定的 CNS、多國、CID／名稱式 CFF、CFF2 與 color corpus 驗證 managed 輸入、輸出及固定種子 mutation；`-NoRestore` 可供已還原的離線工作區使用。 |
 | `Test-WebFontLayoutBrowserSmoke.ps1` | 以 Chromium／Firefox／WebKit 比較真實來源與 managed WOFF2 的 Canvas RGBA bytes、文字 metrics 及截圖證據。 |
-| `Test-WebFontWoff2Corpus.ps1` | 下載 SHA-256 鎖定的 W3C 與 Google Fonts production corpus，驗證 standalone transformed WOFF2 解碼與固定種子 mutation。 |
+| `Test-WebFontWoff2Corpus.ps1` | 下載 SHA-256 鎖定的 W3C 與 Google Fonts production corpus，驗證 standalone 與多 face collection transformed WOFF2 解碼、官方 reference 逐表比對及固定種子 mutation。 |
 | `Test-OdfCorpus.ps1` | 執行內建（與選用外部）corpus 驗證，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |
 | `Test-OdfPolicy.ps1` | 執行 `Category=Policy` 測試，覆蓋巨集淨化、外部資源 policy、加密文件重新加密與相關安全邊界。 |
 | `Test-OdfTypedDomCoverage.ps1` | 執行 typed DOM 對 ODF schema 的覆蓋率報告與門檻檢查。 |
