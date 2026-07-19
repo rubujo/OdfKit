@@ -35,4 +35,11 @@ public sealed class WebFontSubsetRequest
     /// 取得或初始化必要的輸出格式。
     /// </summary>
     public IReadOnlyList<WebFontFormat> Formats { get; init; } = Array.Empty<WebFontFormat>();
+
+    /// <summary>
+    /// Gets or initializes the browser engines that must support every retained color-font technology.
+    /// 取得或初始化必須支援所有保留色彩字型技術的瀏覽器引擎。
+    /// </summary>
+    public IReadOnlyList<WebFontBrowserTarget> RequiredBrowserTargets { get; init; }
+        = Array.Empty<WebFontBrowserTarget>();
 }

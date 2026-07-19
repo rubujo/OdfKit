@@ -41,6 +41,8 @@ OdfKit.WebFonts.Build.WebFontBuildOptions.OutputDirectory.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.OutputDirectory.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.ProfileId.init -> void
+OdfKit.WebFonts.Build.WebFontBuildOptions.RequiredBrowserTargets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>!
+OdfKit.WebFonts.Build.WebFontBuildOptions.RequiredBrowserTargets.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.get -> string!
 OdfKit.WebFonts.Build.WebFontBuildOptions.TextPath.init -> void
 OdfKit.WebFonts.Build.WebFontBuildOptions.UnicodeRangeSliceSize.get -> int

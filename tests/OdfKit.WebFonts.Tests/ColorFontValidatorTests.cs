@@ -14,7 +14,9 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionZero()
         };
 
-        Assert.True(ColorFontValidator.Validate(tables, glyphCount: 3).HasColorTables);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+
+        Assert.Equal(ColorFontTechnology.ColrV0, closure.Technologies);
     }
 
     [Fact]
@@ -42,7 +44,9 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionOne(paintOffset: 10)
         };
 
-        Assert.True(ColorFontValidator.Validate(tables, glyphCount: 3).HasColorTables);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+
+        Assert.Equal(ColorFontTechnology.ColrV1, closure.Technologies);
     }
 
     [Fact]
@@ -104,7 +108,9 @@ public sealed class ColorFontValidatorTests
             ["SVG "] = CreateSvg("<svg xmlns=\"http://www.w3.org/2000/svg\"><g id=\"glyph1\"/></svg>")
         };
 
-        Assert.True(ColorFontValidator.Validate(tables, glyphCount: 2).HasColorTables);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 2);
+
+        Assert.Equal(ColorFontTechnology.Svg, closure.Technologies);
     }
 
     [Theory]
@@ -142,7 +148,12 @@ public sealed class ColorFontValidatorTests
             [locationTag] = location
         };
 
-        Assert.True(ColorFontValidator.Validate(tables, glyphCount: 2).HasColorTables);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 2);
+        ColorFontTechnology expected = dataTag == "CBDT"
+            ? ColorFontTechnology.Cbdt
+            : ColorFontTechnology.Ebdt;
+
+        Assert.Equal(expected, closure.Technologies);
     }
 
     [Fact]
@@ -167,6 +178,7 @@ public sealed class ColorFontValidatorTests
 
         closure.AddReferencedGlyphs(glyphs);
 
+        Assert.Equal(ColorFontTechnology.Sbix, closure.Technologies);
         Assert.Equal<ushort>([1, 2], glyphs.OrderBy(glyph => glyph));
     }
 

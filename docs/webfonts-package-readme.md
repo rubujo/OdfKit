@@ -14,8 +14,10 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
   會驗證 COLR v0／v1、CPAL、SVG、sbix、CBDT／CBLC 與 EBDT／EBLC 結構，並將
   COLR／sbix 引用的字形加入閉包；未知 paint、循環引用、外部 SVG 資源及越界 bitmap
   資料會明確拒絕。色彩表目前採 correctness-first 保留，不宣稱 aggressive table pruning；也不會
-  把 SVG／sbix 轉成 COLR 或 outline。部署前必須依目標瀏覽器能力選擇來源，不能把相同空白畫面
-  視為成功。
+  把 SVG／sbix 轉成 COLR 或 outline。`RequiredBrowserTargets`、CLI `--browser-targets` 與
+  MSBuild `OdfKitWebFontsBrowserTargets` 可依鎖定的 Chromium／Firefox／Playwright WebKit
+  實證矩陣，在寫檔前拒絕不相容模型；不能把相同空白畫面視為成功，也不能把 Playwright
+  WebKit 證據推論為 Safari 實機證據。
 - Arabic／Devanagari 採保留完整 glyph ID、`cmap`、GDEF／GPOS／GSUB 的 correctness-first
   路徑；其它 complex script 必須先有合法 corpus 與三瀏覽器差分證據。
 - 提供 CLI／MSBuild 自動內容掃描、CSP/CDN URL、精確 CORS allowlist 與有界背景 Worker。

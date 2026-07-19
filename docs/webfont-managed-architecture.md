@@ -229,6 +229,13 @@ commit `0046ea4c3b69e9fbbe464c2594816894e3aa5e4b` 的 Apache-2.0
 Firefox 的 OpenType SVG，以及三瀏覽器 COLRv1 必須含非灰階像素且來源／managed WOFF2
 逐 RGBA byte 相同；其它組合只記錄瀏覽器不可用，不形成虛假綠燈。
 
+公開要求可用 `RequiredBrowserTargets` 將這份鎖定的實證矩陣提升為產生前閘門。Chromium
+目前接受 COLR v0／v1 與 `sbix`，Firefox 接受 COLR v0／v1 與 OpenType SVG，Playwright
+WebKit 接受 COLR v0／v1。保留的 color 技術若超出任一必要目標的集合，即明確拒絕且不寫檔；
+目標集合也必須進入 single-flight 與 durable cache key，避免嚴格要求誤用寬鬆要求的結果。
+空目標集合只表示未要求引擎替部署者判定瀏覽器，不表示所有瀏覽器皆相容。這個閘門不進行
+`sbix`／SVG／bitmap／COLR 互轉，也不把 Playwright WebKit 證據推論為 Safari 實機證據。
+
 真實 corpus 鎖定 Adobe Source Han Sans 官方 `2.005R` 單檔，不把字型納入 repository 或
 nupkg：`SourceHanSansTC-Regular.otf`、`SourceHanSansTW-VF.ttf` 與
 `SourceHanSansTW-VF.otf` 皆記錄來源 URI、SHA-256 與 OFL-1.1。相較下載大型 release zip，官方

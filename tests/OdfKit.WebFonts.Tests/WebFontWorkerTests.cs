@@ -30,6 +30,45 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
+    public async Task Worker_SeparatesBrowserCompatibilityRequirementsInCacheKey()
+    {
+        var engine = new CountingEngine();
+        await using var worker = new WebFontGenerationWorker(
+            engine,
+            new WebFontWorkerOptions { MaxMemoryCacheEntries = 8 });
+        WebFontSubsetRequest template = CreateRequest();
+        var chromium = new WebFontSubsetRequest
+        {
+            Face = template.Face,
+            ProfileId = template.ProfileId,
+            FontFamily = template.FontFamily,
+            Sequences = template.Sequences,
+            Formats = template.Formats,
+            RequiredBrowserTargets = [WebFontBrowserTarget.Chromium]
+        };
+        var firefox = new WebFontSubsetRequest
+        {
+            Face = template.Face,
+            ProfileId = template.ProfileId,
+            FontFamily = template.FontFamily,
+            Sequences = template.Sequences,
+            Formats = template.Formats,
+            RequiredBrowserTargets = [WebFontBrowserTarget.Firefox]
+        };
+
+        await worker.GenerateAsync(
+            chromium,
+            Path.GetTempPath(),
+            TestContext.Current.CancellationToken);
+        await worker.GenerateAsync(
+            firefox,
+            Path.GetTempPath(),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, engine.CallCount);
+    }
+
+    [Fact]
     public async Task Worker_RejectsInvalidNullableStateBeforeCreatingKey()
     {
         var engine = new CountingEngine();

@@ -41,4 +41,11 @@ public sealed class OdfWebFontSystemWebGenerationRequest
     /// 取得或初始化要求的允許清單格式。
     /// </summary>
     public IReadOnlyList<WebFontFormat> Formats { get; init; } = Array.Empty<WebFontFormat>();
+
+    /// <summary>
+    /// Gets or initializes the browser engines required to render retained color-font technologies.
+    /// 取得或初始化必須能呈現所保留色彩字型技術的瀏覽器引擎。
+    /// </summary>
+    public IReadOnlyList<WebFontBrowserTarget> RequiredBrowserTargets { get; init; }
+        = Array.Empty<WebFontBrowserTarget>();
 }

@@ -144,6 +144,31 @@ Firefox 驗證 OpenType SVG，COLRv1 仍由三者驗證；不渲染的組合記�
 `browser-unavailable`，不能以兩張相同空白畫布冒充成功。這是保留 color table 的
 correctness-first 能力，不是把 `sbix`／SVG 轉換成 COLR 或 outline 的跨格式轉碼器。
 
+需要嚴格部署相容性時，呼叫端可設定 `RequiredBrowserTargets`。目前鎖定的 Playwright
+實證矩陣允許 Chromium 的 COLR v0／v1 與 `sbix`、Firefox 的 COLR v0／v1 與 OpenType
+SVG，以及 WebKit 的 COLR v0／v1；只要保留的 color 技術不在任一必要目標的已驗證集合內，
+引擎就會在寫出資產前拋出 `NotSupportedException`，不會靜默 fallback。空集合維持既有
+correctness-first 行為，代表呼叫端自行承擔瀏覽器選擇；Playwright WebKit 證據不等同 Safari
+實機證據。
+
+```csharp
+var request = new WebFontSubsetRequest
+{
+    // 省略 face、profile、family、sequence 與 format 設定。
+    RequiredBrowserTargets =
+    [
+        WebFontBrowserTarget.Chromium,
+        WebFontBrowserTarget.Firefox,
+        WebFontBrowserTarget.WebKit
+    ]
+};
+```
+
+CLI 使用 `--browser-targets chromium,firefox,webkit`；MSBuild 使用
+`<OdfKitWebFontsBrowserTargets>chromium,firefox,webkit</OdfKitWebFontsBrowserTargets>`。
+ASP.NET Core 與 System.Web 的 generation JSON 使用 `requiredBrowserTargets` 字串 enum 陣列。
+這項 API 是產生前的嚴格相容性閘門，不是 color table 轉碼功能。
+
 靜態 CFF 1.0 接受含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`，以及不含 ROS／FDArray／
 FDSelect 的名稱式 CFF。名稱式路徑接受三種預定義 charset 或有界自訂 charset，Private DICT
 可省略；存在時仍驗證 local Subrs。名稱式 `seac` 會從 Type 2 `endchar` 取得 bchar／achar，依

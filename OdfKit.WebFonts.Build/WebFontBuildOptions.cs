@@ -137,4 +137,11 @@ public sealed class WebFontBuildOptions
     /// 取得或初始化輸出格式。
     /// </summary>
     public IReadOnlyList<WebFontFormat> Formats { get; init; } = [WebFontFormat.Woff2];
+
+    /// <summary>
+    /// Gets or initializes the browser engines required to render retained color-font technologies.
+    /// 取得或初始化必須能呈現所保留色彩字型技術的瀏覽器引擎。
+    /// </summary>
+    public IReadOnlyList<WebFontBrowserTarget> RequiredBrowserTargets { get; init; }
+        = Array.Empty<WebFontBrowserTarget>();
 }

@@ -9,7 +9,7 @@ static async Task<int> RunAsync(string[] args)
 {
     if (args.Length == 0 || args[0] is "-h" or "--help")
     {
-        Console.WriteLine("odfkit-webfonts build (--font <path> | --eudc-code-page <id> [--eudc-typeface <name>]) (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf] [--font-display auto|block|swap|fallback|optional] [--slice-size <codepoints>] [--max-slices <count>] [--fallback-family <name> --fallback-local <name> --size-adjust <percent> --ascent-override <percent> --descent-override <percent> --line-gap-override <percent>] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--max-source-bytes <bytes>] [--max-output-bytes <bytes>] [--skip-source-checksums true|false]");
+        Console.WriteLine("odfkit-webfonts build (--font <path> | --eudc-code-page <id> [--eudc-typeface <name>]) (--text <path> | --content-root <dir>) --output <dir> [--content-extensions .cshtml,.razor,.aspx,.resx,.html,.txt] [--family <name>] [--profile <id>] [--formats woff2,woff,ttf] [--browser-targets chromium,firefox,webkit] [--font-display auto|block|swap|fallback|optional] [--slice-size <codepoints>] [--max-slices <count>] [--fallback-family <name> --fallback-local <name> --size-adjust <percent> --ascent-override <percent> --descent-override <percent> --line-gap-override <percent>] [--face <index>] [--encoding utf-8|big5|big5e|json-profile|euc-tw] [--big5e-map <path>] [--json-profile <path>] [--cns-mapping-archive <path>] [--max-corpus-bytes <bytes>] [--max-scalars <count>] [--max-source-bytes <bytes>] [--max-output-bytes <bytes>] [--skip-source-checksums true|false]");
         return 0;
     }
 
@@ -58,13 +58,15 @@ static async Task<int> RunAsync(string[] args)
                 Get(values, "max-output-bytes", (32L * 1024 * 1024).ToString(System.Globalization.CultureInfo.InvariantCulture)),
                 System.Globalization.CultureInfo.InvariantCulture),
             ValidateSourceChecksums = !bool.Parse(Get(values, "skip-source-checksums", "false")),
-            Formats = ParseFormats(Get(values, "formats", "woff2"))
+            Formats = ParseFormats(Get(values, "formats", "woff2")),
+            RequiredBrowserTargets = ParseBrowserTargets(Get(values, "browser-targets", string.Empty))
         };
         WebFontManifest manifest = await new WebFontAssetBuilder().BuildAsync(options).ConfigureAwait(false);
         Console.WriteLine($"Generated {manifest.Assets.Count} assets for profile '{manifest.ProfileId}'.");
         return 0;
     }
-    catch (Exception exception) when (exception is ArgumentException or InvalidDataException or IOException)
+    catch (Exception exception) when (
+        exception is ArgumentException or InvalidDataException or IOException or NotSupportedException)
     {
         Console.Error.WriteLine(exception.Message);
         return 1;
@@ -128,6 +130,18 @@ static IReadOnlyList<WebFontFormat> ParseFormats(string value)
             "ttf" => WebFontFormat.TrueType,
             _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
         })
+        .ToArray();
+
+static IReadOnlyList<WebFontBrowserTarget> ParseBrowserTargets(string value)
+    => value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(item => item.ToLowerInvariant() switch
+        {
+            "chromium" => WebFontBrowserTarget.Chromium,
+            "firefox" => WebFontBrowserTarget.Firefox,
+            "webkit" => WebFontBrowserTarget.WebKit,
+            _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
+        })
+        .Distinct()
         .ToArray();
 
 static WebFontDisplayMode ParseFontDisplay(string value)

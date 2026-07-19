@@ -271,27 +271,53 @@ internal static class Program
             faceIndex: 0,
             "😀",
             outputRoot).ConfigureAwait(false);
+        var browserTargetCompatibility = new List<BrowserTargetCompatibilityEvidence>();
         await VerifySuccessAsync(
             results,
             "color-colrv1",
             colorEmojiColrV1Path,
             faceIndex: 0,
             "😀",
-            outputRoot).ConfigureAwait(false);
+            outputRoot,
+            [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2],
+            [WebFontBrowserTarget.Chromium, WebFontBrowserTarget.Firefox, WebFontBrowserTarget.WebKit])
+            .ConfigureAwait(false);
+        browserTargetCompatibility.AddRange(
+        [
+            new("COLRv1", WebFontBrowserTarget.Chromium, "generated"),
+            new("COLRv1", WebFontBrowserTarget.Firefox, "generated"),
+            new("COLRv1", WebFontBrowserTarget.WebKit, "generated")
+        ]);
         await VerifySuccessAsync(
             results,
             "color-sbix",
             colorSbixPath,
             faceIndex: 0,
             "simple_linear",
-            outputRoot).ConfigureAwait(false);
+            outputRoot,
+            [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2],
+            [WebFontBrowserTarget.Chromium]).ConfigureAwait(false);
+        browserTargetCompatibility.Add(new("sbix", WebFontBrowserTarget.Chromium, "generated"));
+        browserTargetCompatibility.Add(await VerifyBrowserTargetRejectedAsync(
+            colorSbixPath,
+            "simple_linear",
+            outputRoot,
+            WebFontBrowserTarget.Firefox).ConfigureAwait(false));
         await VerifySuccessAsync(
             results,
             "color-svg",
             colorSvgPath,
             faceIndex: 0,
             "simple_linear",
-            outputRoot).ConfigureAwait(false);
+            outputRoot,
+            [WebFontFormat.TrueType, WebFontFormat.Woff, WebFontFormat.Woff2],
+            [WebFontBrowserTarget.Firefox]).ConfigureAwait(false);
+        browserTargetCompatibility.Add(new("SVG", WebFontBrowserTarget.Firefox, "generated"));
+        browserTargetCompatibility.Add(await VerifyBrowserTargetRejectedAsync(
+            colorSvgPath,
+            "simple_linear",
+            outputRoot,
+            WebFontBrowserTarget.Chromium).ConfigureAwait(false));
 
         var robustnessResults = new List<MutationRobustnessResult>(RunDeterministicMutationRobustnessChecks(
             Path.Combine(outputRoot, "cns-ext-b-ttf", "first"),
@@ -317,6 +343,7 @@ internal static class Program
                 schemaVersion = 1,
                 generatedAtUtc = DateTimeOffset.UtcNow,
                 results,
+                browserTargetCompatibility,
                 verifiedSourceCache = true,
                 deterministicMutationRobustness = robustnessResults,
                 largeCnsDelivery
@@ -1108,6 +1135,25 @@ internal static class Program
         string text,
         string outputRoot,
         IReadOnlyList<WebFontFormat> formats)
+        => await VerifySuccessAsync(
+            results,
+            id,
+            sourcePath,
+            faceIndex,
+            text,
+            outputRoot,
+            formats,
+            Array.Empty<WebFontBrowserTarget>()).ConfigureAwait(false);
+
+    private static async Task<WebFontManifest> VerifySuccessAsync(
+        ICollection<MatrixResult> results,
+        string id,
+        string sourcePath,
+        int faceIndex,
+        string text,
+        string outputRoot,
+        IReadOnlyList<WebFontFormat> formats,
+        IReadOnlyList<WebFontBrowserTarget> requiredBrowserTargets)
     {
         string sourceSha256 = await ComputeSha256Async(sourcePath).ConfigureAwait(false);
         WebFontTextSequence sequence = WebFontTextSequence.Create(text);
@@ -1122,7 +1168,8 @@ internal static class Program
             faceIndex,
             sequence,
             firstOutput,
-            formats).ConfigureAwait(false);
+            formats,
+            requiredBrowserTargets).ConfigureAwait(false);
         WebFontManifest second = await GenerateAsync(
             id,
             sourcePath,
@@ -1130,7 +1177,8 @@ internal static class Program
             faceIndex,
             sequence,
             secondOutput,
-            formats).ConfigureAwait(false);
+            formats,
+            requiredBrowserTargets).ConfigureAwait(false);
         string[] firstHashes = first.Assets.OrderBy(asset => asset.Format).Select(asset => asset.Sha256).ToArray();
         string[] secondHashes = second.Assets.OrderBy(asset => asset.Format).Select(asset => asset.Sha256).ToArray();
         if (!firstHashes.SequenceEqual(secondHashes, StringComparer.Ordinal))
@@ -1320,6 +1368,43 @@ internal static class Program
         throw new InvalidDataException($"{id} was silently accepted instead of being rejected.");
     }
 
+    private static async Task<BrowserTargetCompatibilityEvidence> VerifyBrowserTargetRejectedAsync(
+        string sourcePath,
+        string text,
+        string outputRoot,
+        WebFontBrowserTarget target)
+    {
+        string id = $"color-target-{target.ToString().ToLowerInvariant()}";
+        string sourceSha256 = await ComputeSha256Async(sourcePath).ConfigureAwait(false);
+        await AssertThrowsNotSupportedAsync(GenerateAsync(
+            id,
+            sourcePath,
+            sourceSha256,
+            faceIndex: 0,
+            WebFontTextSequence.Create(text),
+            Path.Combine(outputRoot, id),
+            [WebFontFormat.Woff2],
+            [target])).ConfigureAwait(false);
+        string technology = Path.GetFileName(sourcePath).Contains("sbix", StringComparison.OrdinalIgnoreCase)
+            ? "sbix"
+            : "SVG";
+        return new BrowserTargetCompatibilityEvidence(technology, target, "rejected-not-supported");
+    }
+
+    private static async Task AssertThrowsNotSupportedAsync(Task<WebFontManifest> operation)
+    {
+        try
+        {
+            await operation.ConfigureAwait(false);
+        }
+        catch (NotSupportedException)
+        {
+            return;
+        }
+
+        throw new InvalidDataException("The incompatible browser target was silently accepted.");
+    }
+
     private static Task<WebFontManifest> GenerateAsync(
         string id,
         string sourcePath,
@@ -1346,6 +1431,25 @@ internal static class Program
         WebFontTextSequence sequence,
         string destination,
         IReadOnlyList<WebFontFormat> formats)
+        => GenerateAsync(
+            id,
+            sourcePath,
+            sourceSha256,
+            faceIndex,
+            sequence,
+            destination,
+            formats,
+            Array.Empty<WebFontBrowserTarget>());
+
+    private static Task<WebFontManifest> GenerateAsync(
+        string id,
+        string sourcePath,
+        string sourceSha256,
+        int faceIndex,
+        WebFontTextSequence sequence,
+        string destination,
+        IReadOnlyList<WebFontFormat> formats,
+        IReadOnlyList<WebFontBrowserTarget> requiredBrowserTargets)
     {
         var options = new ManagedOpenTypeWebFontEngineOptions
         {
@@ -1367,7 +1471,8 @@ internal static class Program
                 ProfileId = $"{id}-v1",
                 FontFamily = $"OdfKit {id}",
                 Sequences = [sequence],
-                Formats = formats
+                Formats = formats,
+                RequiredBrowserTargets = requiredBrowserTargets
             },
             destination);
     }
@@ -1599,6 +1704,11 @@ internal static class Program
         int Cases,
         int Accepted,
         int Rejected);
+
+    private sealed record BrowserTargetCompatibilityEvidence(
+        string Technology,
+        WebFontBrowserTarget Target,
+        string Outcome);
 
     private sealed record LargeCnsDeliveryEvidence(
         string SourceFile,

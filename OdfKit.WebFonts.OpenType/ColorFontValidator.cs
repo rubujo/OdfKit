@@ -5,17 +5,31 @@ using System.Xml;
 
 namespace OdfKit.WebFonts.OpenType;
 
+[Flags]
+internal enum ColorFontTechnology
+{
+    None = 0,
+    ColrV0 = 1,
+    ColrV1 = 2,
+    Cbdt = 4,
+    Ebdt = 8,
+    Svg = 16,
+    Sbix = 32
+}
+
 internal sealed class ColorGlyphClosure
 {
     private readonly IReadOnlyDictionary<ushort, ushort[]> _references;
 
-    internal ColorGlyphClosure(bool hasColorTables, IReadOnlyDictionary<ushort, ushort[]> references)
+    internal ColorGlyphClosure(ColorFontTechnology technologies, IReadOnlyDictionary<ushort, ushort[]> references)
     {
-        HasColorTables = hasColorTables;
+        Technologies = technologies;
         _references = references;
     }
 
-    internal bool HasColorTables { get; }
+    internal bool HasColorTables => Technologies != ColorFontTechnology.None;
+
+    internal ColorFontTechnology Technologies { get; }
 
     internal void AddReferencedGlyphs(HashSet<ushort> glyphs)
     {
@@ -49,14 +63,13 @@ internal static class ColorFontValidator
 {
     internal static ColorGlyphClosure Validate(IReadOnlyDictionary<string, byte[]> tables, ushort glyphCount)
     {
-        bool hasColor = false;
+        ColorFontTechnology technologies = ColorFontTechnology.None;
         var references = new Dictionary<ushort, HashSet<ushort>>();
         bool hasCpal = tables.TryGetValue("CPAL", out byte[]? cpal);
         ushort paletteEntryCount = 0;
         if (hasCpal)
         {
             paletteEntryCount = ValidateCpal(cpal!);
-            hasColor = true;
         }
 
         if (tables.TryGetValue("COLR", out byte[]? colr))
@@ -66,12 +79,18 @@ internal static class ColorFontValidator
                 throw SfntFont.DataInvalid("COLR-CPAL-pair");
             }
 
-            ValidateColr(colr, glyphCount, paletteEntryCount, references);
-            hasColor = true;
+            technologies |= ValidateColr(colr, glyphCount, paletteEntryCount, references);
         }
 
-        hasColor |= ValidateBitmapPair(tables, "CBDT", "CBLC", glyphCount);
-        hasColor |= ValidateBitmapPair(tables, "EBDT", "EBLC", glyphCount);
+        if (ValidateBitmapPair(tables, "CBDT", "CBLC", glyphCount))
+        {
+            technologies |= ColorFontTechnology.Cbdt;
+        }
+
+        if (ValidateBitmapPair(tables, "EBDT", "EBLC", glyphCount))
+        {
+            technologies |= ColorFontTechnology.Ebdt;
+        }
         if (tables.TryGetValue("EBSC", out byte[]? ebsc))
         {
             if (!tables.ContainsKey("EBDT") || !tables.ContainsKey("EBLC"))
@@ -80,13 +99,13 @@ internal static class ColorFontValidator
             }
 
             ValidateVersionAndCount(ebsc, "EBSC", 0x00020000u, 8, 28);
-            hasColor = true;
+            technologies |= ColorFontTechnology.Ebdt;
         }
 
         if (tables.TryGetValue("SVG ", out byte[]? svg))
         {
             ValidateSvg(svg, glyphCount);
-            hasColor = true;
+            technologies |= ColorFontTechnology.Svg;
         }
 
         if (tables.TryGetValue("sbix", out byte[]? sbix))
@@ -98,11 +117,11 @@ internal static class ColorFontValidator
                 AddReferences(references, reference.Key, reference.Value);
             }
 
-            hasColor = true;
+            technologies |= ColorFontTechnology.Sbix;
         }
 
         return new ColorGlyphClosure(
-            hasColor,
+            technologies,
             references.ToDictionary(
                 pair => pair.Key,
                 pair => pair.Value.OrderBy(glyph => glyph).ToArray()));
@@ -149,7 +168,7 @@ internal static class ColorFontValidator
         return entriesPerPalette;
     }
 
-    private static void ValidateColr(
+    private static ColorFontTechnology ValidateColr(
         byte[] table,
         ushort glyphCount,
         ushort paletteEntryCount,
@@ -238,13 +257,15 @@ internal static class ColorFontValidator
                 }
             }
 
-            return;
+            return ColorFontTechnology.ColrV1;
         }
 
         foreach (KeyValuePair<ushort, HashSet<ushort>> reference in versionZeroReferences)
         {
             AddReferences(references, reference.Key, reference.Value);
         }
+
+        return ColorFontTechnology.ColrV0;
     }
 
     private sealed class ColrV1GraphValidator

@@ -66,7 +66,8 @@ public sealed class WebFontAssetBuilder
                     ProfileId = options.ProfileId,
                     FontFamily = options.FontFamily,
                     Sequences = slice,
-                    Formats = options.Formats
+                    Formats = options.Formats,
+                    RequiredBrowserTargets = options.RequiredBrowserTargets
                 },
                 outputDirectory,
                 cancellationToken).ConfigureAwait(false);
@@ -406,7 +407,10 @@ public sealed class WebFontAssetBuilder
             || options.MaxOutputBytes <= 0
             || !Enum.IsDefined(options.FontDisplay)
             || !IsValidFallback(options.FallbackMetrics)
-            || options.Formats.Count == 0)
+            || options.Formats.Count == 0
+            || options.RequiredBrowserTargets is null
+            || options.RequiredBrowserTargets.Any(
+                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target)))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
         }

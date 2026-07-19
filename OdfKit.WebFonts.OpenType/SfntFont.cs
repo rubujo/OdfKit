@@ -350,6 +350,30 @@ internal sealed class SfntFont
         }
     }
 
+    internal void ValidateBrowserTargets(IEnumerable<WebFontBrowserTarget> targets)
+    {
+        foreach (WebFontBrowserTarget target in targets.Distinct())
+        {
+            ColorFontTechnology supported = target switch
+            {
+                WebFontBrowserTarget.Chromium => ColorFontTechnology.ColrV0
+                    | ColorFontTechnology.ColrV1
+                    | ColorFontTechnology.Sbix,
+                WebFontBrowserTarget.Firefox => ColorFontTechnology.ColrV0
+                    | ColorFontTechnology.ColrV1
+                    | ColorFontTechnology.Svg,
+                WebFontBrowserTarget.WebKit => ColorFontTechnology.ColrV0
+                    | ColorFontTechnology.ColrV1,
+                _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
+            };
+            ColorFontTechnology unsupported = _colorGlyphClosure.Technologies & ~supported;
+            if (unsupported != ColorFontTechnology.None)
+            {
+                throw NotSupported($"browser-target-{target}-{unsupported}");
+            }
+        }
+    }
+
     internal bool TryGetTable(string tag, out ReadOnlyMemory<byte> table)
     {
         if (_tables.TryGetValue(tag, out byte[]? value))

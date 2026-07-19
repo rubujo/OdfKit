@@ -31,6 +31,8 @@ OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Formats.init -> v
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.OdfWebFontGenerationRequest() -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.ProfileId.get -> string!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.ProfileId.init -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.RequiredBrowserTargets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>!
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.RequiredBrowserTargets.init -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontGenerationRequest.Sequences.init -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions

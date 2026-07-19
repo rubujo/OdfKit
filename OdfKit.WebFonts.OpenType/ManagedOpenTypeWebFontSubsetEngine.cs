@@ -53,6 +53,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         }
 
         source.ValidateOutputFormats(request.Formats);
+        source.ValidateBrowserTargets(request.RequiredBrowserTargets);
         IReadOnlyList<int> scalars = request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
             .Where(RequiresGlyph)
@@ -160,8 +161,11 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             || string.IsNullOrWhiteSpace(request.FontFamily)
             || request.Sequences.Count == 0
             || request.Formats.Count == 0
+            || request.RequiredBrowserTargets is null
             || request.Sequences.Sum(item => (long)item.UnicodeScalars.Count) > _options.MaxUnicodeScalars
-            || request.Formats.Any(format => !Enum.IsDefined(typeof(WebFontFormat), format)))
+            || request.Formats.Any(format => !Enum.IsDefined(typeof(WebFontFormat), format))
+            || request.RequiredBrowserTargets.Any(
+                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target)))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }

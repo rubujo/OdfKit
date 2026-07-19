@@ -4,6 +4,7 @@
     <OdfKitWebFontsOutputDirectory Condition="'$(OdfKitWebFontsOutputDirectory)' == ''">$(PublishDir)wwwroot\_odf-fonts</OdfKitWebFontsOutputDirectory>
     <OdfKitWebFontsProfile Condition="'$(OdfKitWebFontsProfile)' == ''">default</OdfKitWebFontsProfile>
     <OdfKitWebFontsFormats Condition="'$(OdfKitWebFontsFormats)' == ''">woff2</OdfKitWebFontsFormats>
+    <OdfKitWebFontsBrowserTargets Condition="'$(OdfKitWebFontsBrowserTargets)' == ''"></OdfKitWebFontsBrowserTargets>
   </PropertyGroup>
   <Target Name="OdfKitBuildWebFonts"
           BeforeTargets="PrepareForPublish"
@@ -17,7 +18,7 @@
     <Exec Condition="'$(OdfKitWebFontsArguments)' != ''"
           Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsArguments)" />
     <Exec Condition="'$(OdfKitWebFontsArguments)' == ''"
-          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsSourceArguments) --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot; $(OdfKitWebFontsAdditionalArguments)" />
+          Command="dotnet &quot;$(OdfKitWebFontsToolAssembly)&quot; build $(OdfKitWebFontsSourceArguments) --content-root &quot;$(OdfKitWebFontsContentRoot)&quot; --output &quot;$(OdfKitWebFontsOutputDirectory)&quot; --profile &quot;$(OdfKitWebFontsProfile)&quot; --formats &quot;$(OdfKitWebFontsFormats)&quot; --browser-targets &quot;$(OdfKitWebFontsBrowserTargets)&quot; $(OdfKitWebFontsAdditionalArguments)" />
   </Target>
   <PropertyGroup>
     <OdfKitWebFontsSourceArguments Condition="'$(OdfKitWebFontsFontPath)' != ''">--font &quot;$(OdfKitWebFontsFontPath)&quot;</OdfKitWebFontsSourceArguments>

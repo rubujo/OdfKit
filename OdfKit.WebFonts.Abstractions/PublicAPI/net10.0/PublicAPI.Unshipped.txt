@@ -24,6 +24,10 @@ OdfKit.WebFonts.WebFontAsset.Sha256.init -> void
 OdfKit.WebFonts.WebFontAsset.UnicodeRanges.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.WebFonts.WebFontAsset.UnicodeRanges.init -> void
 OdfKit.WebFonts.WebFontAsset.WebFontAsset() -> void
+OdfKit.WebFonts.WebFontBrowserTarget
+OdfKit.WebFonts.WebFontBrowserTarget.Chromium = 0 -> OdfKit.WebFonts.WebFontBrowserTarget
+OdfKit.WebFonts.WebFontBrowserTarget.Firefox = 1 -> OdfKit.WebFonts.WebFontBrowserTarget
+OdfKit.WebFonts.WebFontBrowserTarget.WebKit = 2 -> OdfKit.WebFonts.WebFontBrowserTarget
 OdfKit.WebFonts.WebFontFaceIdentity
 OdfKit.WebFonts.WebFontFaceIdentity.FaceIndex.get -> int
 OdfKit.WebFonts.WebFontFaceIdentity.FaceIndex.init -> void
@@ -58,6 +62,8 @@ OdfKit.WebFonts.WebFontSubsetRequest.Formats.get -> System.Collections.Generic.I
 OdfKit.WebFonts.WebFontSubsetRequest.Formats.init -> void
 OdfKit.WebFonts.WebFontSubsetRequest.ProfileId.get -> string!
 OdfKit.WebFonts.WebFontSubsetRequest.ProfileId.init -> void
+OdfKit.WebFonts.WebFontSubsetRequest.RequiredBrowserTargets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>!
+OdfKit.WebFonts.WebFontSubsetRequest.RequiredBrowserTargets.init -> void
 OdfKit.WebFonts.WebFontSubsetRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!
 OdfKit.WebFonts.WebFontSubsetRequest.Sequences.init -> void
 OdfKit.WebFonts.WebFontSubsetRequest.WebFontSubsetRequest() -> void

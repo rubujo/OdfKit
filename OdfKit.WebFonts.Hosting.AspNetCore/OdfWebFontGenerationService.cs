@@ -141,6 +141,10 @@ internal sealed class OdfWebFontGenerationService
             || request.Formats.Count > _options.AllowedFormats.Count
             || request.Formats.Distinct().Count() != request.Formats.Count
             || request.Formats.Any(format => !_options.AllowedFormats.Contains(format))
+            || request.RequiredBrowserTargets is null
+            || request.RequiredBrowserTargets.Distinct().Count() != request.RequiredBrowserTargets.Count
+            || request.RequiredBrowserTargets.Any(
+                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target))
             || !_options.AllowedProfileIds.Contains(request.ProfileId, StringComparer.Ordinal))
         {
             return false;
@@ -178,7 +182,8 @@ internal sealed class OdfWebFontGenerationService
                 ProfileId = request.ProfileId,
                 FontFamily = request.FontFamily,
                 Sequences = sequences,
-                Formats = request.Formats.ToArray()
+                Formats = request.Formats.ToArray(),
+                RequiredBrowserTargets = request.RequiredBrowserTargets.ToArray()
             };
             return true;
         }

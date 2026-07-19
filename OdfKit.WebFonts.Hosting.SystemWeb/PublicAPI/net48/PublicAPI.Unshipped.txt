@@ -44,6 +44,8 @@ OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Formats.i
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.OdfWebFontSystemWebGenerationRequest() -> void
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.ProfileId.get -> string!
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.ProfileId.init -> void
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.RequiredBrowserTargets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>!
+OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.RequiredBrowserTargets.init -> void
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Sequences.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontSystemWebGenerationRequest.Sequences.init -> void
 static OdfKit.WebFonts.Hosting.SystemWeb.OdfWebFontHtml.StylesheetLink() -> System.Web.IHtmlString!

@@ -232,6 +232,7 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
             || request.Sequences is not { Count: > 0 }
             || request.Sequences.Any(sequence => sequence is null)
             || request.Formats is not { Count: > 0 }
+            || request.RequiredBrowserTargets is null
             || string.IsNullOrWhiteSpace(destinationDirectory))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
@@ -253,6 +254,12 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         foreach (WebFontFormat format in request.Formats.Distinct().OrderBy(value => value))
         {
             canonical.Append((int)format).Append(',');
+        }
+
+        canonical.Append('|');
+        foreach (WebFontBrowserTarget target in request.RequiredBrowserTargets.Distinct().OrderBy(value => value))
+        {
+            canonical.Append((int)target).Append(',');
         }
 
         canonical.Append('|');
