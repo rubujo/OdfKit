@@ -7,7 +7,9 @@
 param(
     [string]$Destination = "artifacts/webfont-format-matrix",
     [string]$CnsFontArchivePath,
-    [string]$CnsKaiFontArchivePath
+    [string]$CnsKaiFontArchivePath,
+    [string]$NameCffArchivePath,
+    [switch]$NoRestore
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,6 +25,7 @@ if (-not $destinationPath.StartsWith($repoPrefix, $comparison)) {
 
 $manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot "external-tools.json") -Raw | ConvertFrom-Json
 $definitions = $manifest.webFontSmoke.internationalFonts
+$nameCffDefinition = $manifest.webFontNameCffCorpus
 $sourceRoot = Join-Path $destinationPath "sources"
 $outputRoot = Join-Path $destinationPath "evidence"
 New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
@@ -119,6 +122,7 @@ $plusPath = Get-ArchiveFont $definitions.cnsPlus -ArchivePath $CnsFontArchivePat
 $kaiExtBPath = Get-ArchiveFont $definitions.cnsKaiExtB -ArchivePath $CnsKaiFontArchivePath
 $kaiPlusPath = Get-ArchiveFont $definitions.cnsKaiPlus -ArchivePath $CnsKaiFontArchivePath
 $ipamjPath = Get-ArchiveFont $definitions.ipamj
+$nameCffPath = Get-ArchiveFont $nameCffDefinition -ArchivePath $NameCffArchivePath
 $collectionPath = Get-DirectFont $definitions.cjkCollection
 $openTypePath = Get-DirectFont $definitions.cjkOpenType
 $arabicPath = Get-DirectFont $definitions.arabic
@@ -131,12 +135,14 @@ $colorEmojiColrV1Path = Get-DirectFont $definitions.colorEmojiColrV1
 
 $projectPath = Join-Path $repoRoot "tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj"
 $intermediateRoot = Join-Path $destinationPath "obj"
-dotnet restore $projectPath --nologo --ignore-failed-sources `
-    -p:NuGetAudit=false `
-    -p:IsTrimmable=false `
-    -p:WarningsNotAsErrors=NU1801 `
-    -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
-if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣還原失敗。" }
+if (-not $NoRestore) {
+    dotnet restore $projectPath --nologo --ignore-failed-sources `
+        -p:NuGetAudit=false `
+        -p:IsTrimmable=false `
+        -p:WarningsNotAsErrors=NU1801 `
+        -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
+    if ($LASTEXITCODE -ne 0) { throw "WebFont 格式矩陣還原失敗。" }
+}
 dotnet build $projectPath -c Release --nologo --no-restore `
     -p:IsTrimmable=false `
     -p:OdfKitWebFontFormatMatrixIntermediateRoot="$intermediateRoot\"
@@ -154,6 +160,7 @@ $runnerArguments = @(
     $ipamjPath,
     $collectionPath,
     $openTypePath,
+    $nameCffPath,
     $arabicStaticPath,
     $devanagariStaticPath,
     $arabicPath,
@@ -187,5 +194,5 @@ finally {
     $process.Dispose()
 }
 
-Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／variable／CFF／CFF2、bitmap color 與 COLRv1 正向矩陣通過。"
+Write-Host "PASS：真實 TTF／TTC／OTC／WOFF／WOFF2／IVS／PUA／variable／CID／名稱式 CFF／CFF2、bitmap color 與 COLRv1 正向矩陣通過。"
 Write-Host "證據：$(Join-Path $outputRoot 'format-matrix.json')"

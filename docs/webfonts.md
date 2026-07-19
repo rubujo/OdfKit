@@ -111,7 +111,10 @@ WOFF／TTF。WOFF writer 會逐 table 產生 zlib stream，只有壓縮後較小
 `eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583` 的官方 CNS Ext-B
 TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,692 bytes、WOFF2
 138,660 bytes。該案例的 WOFF 比 TTF 小約 71.5%；這是鎖定 corpus 的證據，不是所有字型的固定
-壓縮承諾。
+壓縮承諾。相同矩陣另以 [Adobe Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/tag/2.042R-u/1.062R-i/1.026R-vf)
+`2.042R-u/1.062R-i/1.026R-vf` 的 [OFL-1.1](https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md) 官方 release 驗證名稱式 CFF；ZIP 與 OTF 分別鎖定
+SHA-256 `754a2e3ebb945ae905d720ac5896b3b34acc9546dd6551ef9536869788629dae` 與
+`9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8`，字型不進入 nupkg。
 
 Arabic／Devanagari 等需要 GSUB／GPOS 的文字會進入 correctness-first 模式：輸出保留來源的完整
 glyph ID space、`cmap`、GDEF、GPOS 與 GSUB，不嘗試重寫 layout lookup。這能由瀏覽器維持塑形
@@ -137,9 +140,10 @@ glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所�
 保持不變，不剪 global／local subroutine。這是 correctness-first retain-GIDs，不是 compact CFF
 重寫：鎖定的 Source Han Sans 2.005R 案例來源為 16,528,276 bytes，managed OTF 為
 16,297,544 bytes，WOFF 為 1,788,872 bytes，WOFF2 為 1,443,492 bytes。數字只適用該 corpus。
-Chromium、Firefox 與 WebKit 亦已對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串完成
-來源／subset 逐像素差分。名稱式路徑目前只有依官方結構建立的最小 fixture、retain-GIDs 與
-cache-context 負向測試，尚未取得可鎖定的真實三瀏覽器 corpus，因此維持 experimental。
+Chromium、Firefox 與 WebKit 亦會對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串，以及
+三組名稱式 CFF Latin 字串完成來源／subset 逐像素差分。名稱式路徑另有最小結構 fixture、
+retain-GIDs、cache-context 負向測試及 64 組固定種子來源 mutation；能力仍因 compact rewrite、
+`seac` closure 與第三方安全審查未完成而維持 experimental。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
 Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 以

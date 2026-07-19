@@ -282,7 +282,7 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
   正向矩陣，以及 Noto Color Emoji bitmap color 正向矩陣。
 - 官方 CNS 楷體 Ext-B／PUA，以及 Noto Arabic／Devanagari 靜態字型的 layout 保留與真實瀏覽器逐像素差分。
 - WOFF2 壓縮資料尾端四位元組對齊，並拒絕非零或超過三 bytes 的 padding。
-- 真實來源字型、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 672 組固定種子 mutation
+- 真實來源字型、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 736 組固定種子 mutation
   有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。

@@ -8,11 +8,12 @@ internal static class LayoutBrowserSmoke
 {
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 21 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        if (args.Length != 23 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
                 "Usage: layout <browser> <arabic-source> <arabic-subset> "
                 + "<devanagari-source> <devanagari-subset> <cff-source> <cff-subset> "
+                + "<name-cff-source> <name-cff-subset> "
                 + "<arabic-variable-source> <arabic-variable-subset> "
                 + "<devanagari-variable-source> <devanagari-variable-subset> "
                 + "<cff2-variable-source> <cff2-variable-subset> "
@@ -30,20 +31,22 @@ internal static class LayoutBrowserSmoke
         string devanagariSubsetPath = Path.GetFullPath(args[4]);
         string cffSourcePath = Path.GetFullPath(args[5]);
         string cffSubsetPath = Path.GetFullPath(args[6]);
-        string arabicVariableSourcePath = Path.GetFullPath(args[7]);
-        string arabicVariableSubsetPath = Path.GetFullPath(args[8]);
-        string devanagariVariableSourcePath = Path.GetFullPath(args[9]);
-        string devanagariVariableSubsetPath = Path.GetFullPath(args[10]);
-        string cff2VariableSourcePath = Path.GetFullPath(args[11]);
-        string cff2VariableSubsetPath = Path.GetFullPath(args[12]);
-        string cffCollectionSourcePath = Path.GetFullPath(args[13]);
-        string cffCollectionSubsetPath = Path.GetFullPath(args[14]);
-        string cff2CollectionSourcePath = Path.GetFullPath(args[15]);
-        string cff2CollectionSubsetPath = Path.GetFullPath(args[16]);
-        string colorColrV1SourcePath = Path.GetFullPath(args[17]);
-        string colorColrV1SubsetPath = Path.GetFullPath(args[18]);
-        string screenshotPath = Path.GetFullPath(args[19]);
-        string evidencePath = Path.GetFullPath(args[20]);
+        string nameCffSourcePath = Path.GetFullPath(args[7]);
+        string nameCffSubsetPath = Path.GetFullPath(args[8]);
+        string arabicVariableSourcePath = Path.GetFullPath(args[9]);
+        string arabicVariableSubsetPath = Path.GetFullPath(args[10]);
+        string devanagariVariableSourcePath = Path.GetFullPath(args[11]);
+        string devanagariVariableSubsetPath = Path.GetFullPath(args[12]);
+        string cff2VariableSourcePath = Path.GetFullPath(args[13]);
+        string cff2VariableSubsetPath = Path.GetFullPath(args[14]);
+        string cffCollectionSourcePath = Path.GetFullPath(args[15]);
+        string cffCollectionSubsetPath = Path.GetFullPath(args[16]);
+        string cff2CollectionSourcePath = Path.GetFullPath(args[17]);
+        string cff2CollectionSubsetPath = Path.GetFullPath(args[18]);
+        string colorColrV1SourcePath = Path.GetFullPath(args[19]);
+        string colorColrV1SubsetPath = Path.GetFullPath(args[20]);
+        string screenshotPath = Path.GetFullPath(args[21]);
+        string evidencePath = Path.GetFullPath(args[22]);
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
@@ -53,6 +56,8 @@ internal static class LayoutBrowserSmoke
         byte[] devanagariSubset = await File.ReadAllBytesAsync(devanagariSubsetPath).ConfigureAwait(false);
         byte[] cffSource = await File.ReadAllBytesAsync(cffSourcePath).ConfigureAwait(false);
         byte[] cffSubset = await File.ReadAllBytesAsync(cffSubsetPath).ConfigureAwait(false);
+        byte[] nameCffSource = await File.ReadAllBytesAsync(nameCffSourcePath).ConfigureAwait(false);
+        byte[] nameCffSubset = await File.ReadAllBytesAsync(nameCffSubsetPath).ConfigureAwait(false);
         byte[] arabicVariableSource = await File.ReadAllBytesAsync(arabicVariableSourcePath).ConfigureAwait(false);
         byte[] arabicVariableSubset = await File.ReadAllBytesAsync(arabicVariableSubsetPath).ConfigureAwait(false);
         byte[] devanagariVariableSource = await File.ReadAllBytesAsync(devanagariVariableSourcePath)
@@ -79,6 +84,18 @@ internal static class LayoutBrowserSmoke
             _ => throw new InvalidOperationException()
         };
         var launchOptions = new BrowserTypeLaunchOptions { Headless = true };
+        string? chromiumExecutable = Environment.GetEnvironmentVariable(
+            "ODFKIT_PLAYWRIGHT_CHROMIUM_EXECUTABLE");
+        if (browserName == "chromium" && !string.IsNullOrWhiteSpace(chromiumExecutable))
+        {
+            string executablePath = Path.GetFullPath(chromiumExecutable);
+            if (!File.Exists(executablePath))
+            {
+                throw new FileNotFoundException("Configured Chromium executable does not exist.", executablePath);
+            }
+
+            launchOptions.ExecutablePath = executablePath;
+        }
         if (browserName == "firefox")
         {
             launchOptions.FirefoxUserPrefs = new Dictionary<string, object>
@@ -111,6 +128,8 @@ internal static class LayoutBrowserSmoke
             ["/fonts/devanagari-subset"] = (devanagariSubset, GetSubsetContentType(devanagariSubset)),
             ["/fonts/cff-source.otf"] = (cffSource, "font/otf"),
             ["/fonts/cff-subset"] = (cffSubset, GetSubsetContentType(cffSubset)),
+            ["/fonts/name-cff-source.otf"] = (nameCffSource, "font/otf"),
+            ["/fonts/name-cff-subset"] = (nameCffSubset, GetSubsetContentType(nameCffSubset)),
             ["/fonts/arabic-variable-source.ttf"] = (arabicVariableSource, "font/ttf"),
             ["/fonts/arabic-variable-subset"]
                 = (arabicVariableSubset, GetSubsetContentType(arabicVariableSubset)),
@@ -243,6 +262,7 @@ internal static class LayoutBrowserSmoke
                     arabic = ComputeSha256(arabicSource),
                     devanagari = ComputeSha256(devanagariSource),
                     cff = ComputeSha256(cffSource),
+                    nameCff = ComputeSha256(nameCffSource),
                     arabicVariable = ComputeSha256(arabicVariableSource),
                     devanagariVariable = ComputeSha256(devanagariVariableSource),
                     cff2Variable = ComputeSha256(cff2VariableSource),
@@ -255,6 +275,7 @@ internal static class LayoutBrowserSmoke
                     arabic = ComputeSha256(arabicSubset),
                     devanagari = ComputeSha256(devanagariSubset),
                     cff = ComputeSha256(cffSubset),
+                    nameCff = ComputeSha256(nameCffSubset),
                     arabicVariable = ComputeSha256(arabicVariableSubset),
                     devanagariVariable = ComputeSha256(devanagariVariableSubset),
                     cff2Variable = ComputeSha256(cff2VariableSubset),
@@ -333,6 +354,22 @@ internal static class LayoutBrowserSmoke
                     "香港邨裏𠮷",
                     "全字庫難字顯示",
                     "繁體中文測試"
+                },
+                axes = new[] { new { weight = 400, stretch = "normal" } },
+                requireAxisDifference = false
+            },
+            new
+            {
+                id = "name-cff",
+                direction = "ltr",
+                language = "en",
+                sourceFamily = "OdfKit Name CFF Source",
+                subsetFamily = "OdfKit Name CFF Subset",
+                texts = new[]
+                {
+                    "OdfKit café",
+                    "fi ffi 0123456789",
+                    "OdfKit café 0123"
                 },
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
@@ -449,6 +486,8 @@ internal static class LayoutBrowserSmoke
                 @font-face { font-family: "OdfKit Devanagari Subset"; src: url("/fonts/devanagari-subset"); }
                 @font-face { font-family: "OdfKit CFF Source"; src: url("/fonts/cff-source.otf") format("opentype"); }
                 @font-face { font-family: "OdfKit CFF Subset"; src: url("/fonts/cff-subset"); }
+                @font-face { font-family: "OdfKit Name CFF Source"; src: url("/fonts/name-cff-source.otf") format("opentype"); }
+                @font-face { font-family: "OdfKit Name CFF Subset"; src: url("/fonts/name-cff-subset"); }
                 @font-face { font-family: "OdfKit Arabic Variable Source"; src: url("/fonts/arabic-variable-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit Arabic Variable Subset"; src: url("/fonts/arabic-variable-subset"); font-weight: 100 900; font-stretch: 62.5% 100%; }
                 @font-face { font-family: "OdfKit Devanagari Variable Source"; src: url("/fonts/devanagari-variable-source.ttf") format("truetype"); font-weight: 100 900; font-stretch: 62.5% 100%; }

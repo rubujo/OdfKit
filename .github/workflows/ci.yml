@@ -160,6 +160,9 @@ jobs:
           "sung_sha256=$($fonts.cnsExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
           "kai_revision=$($fonts.cnsKaiExtB.cacheRevision)" >> $env:GITHUB_OUTPUT
           "kai_sha256=$($fonts.cnsKaiExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
+          $nameCff = $tools.webFontNameCffCorpus
+          "name_cff_revision=$($nameCff.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "name_cff_sha256=$($nameCff.archiveSha256)" >> $env:GITHUB_OUTPUT
           $cacheMetadata = [ordered]@{
             mappingTables = $tools.cns11643MappingTables
             primaryFont = $tools.webFontSmoke.font
@@ -187,6 +190,12 @@ jobs:
           # external-tools.json 內 validator／Jing 等無關異動不再複製 230 MB corpus。
           key: webfont-real-corpus-${{ runner.os }}-${{ steps.cns-font-source.outputs.corpus_fingerprint }}
 
+      - name: Restore locked name-keyed CFF corpus
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: artifacts/webfont-name-cff-source-cache
+          key: webfont-name-cff-${{ runner.os }}-r${{ steps.cns-font-source.outputs.name_cff_revision }}-${{ steps.cns-font-source.outputs.name_cff_sha256 }}
+
       - name: Prepare locked CNS mapping
         id: cns-mapping
         shell: pwsh
@@ -211,7 +220,8 @@ jobs:
         run: |
           ./eng/Test-WebFontFormatMatrix.ps1 `
             -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
-            -CnsKaiFontArchivePath artifacts/webfont-source-cache/Fonts_Kai.zip
+            -CnsKaiFontArchivePath artifacts/webfont-source-cache/Fonts_Kai.zip `
+            -NameCffArchivePath artifacts/webfont-name-cff-source-cache/OTF-source-code-pro-2.042R-u_1.062R-i.zip
 
       - name: Locked transformed WOFF2 corpus
         shell: pwsh

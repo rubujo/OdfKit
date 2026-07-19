@@ -11,6 +11,7 @@ param(
     [string[]]$Browsers = @("chromium", "firefox", "webkit"),
     [ValidateRange(30, 600)]
     [int]$BrowserTimeoutSeconds = 120,
+    [string]$ChromiumExecutablePath,
     [switch]$InstallBrowsers
 )
 
@@ -21,7 +22,8 @@ function Invoke-LayoutBrowserSmoke {
         [Parameter(Mandatory)][string]$AppDll,
         [Parameter(Mandatory)][string]$BrowserName,
         [Parameter(Mandatory)][string[]]$Arguments,
-        [Parameter(Mandatory)][int]$TimeoutSeconds
+        [Parameter(Mandatory)][int]$TimeoutSeconds,
+        [string]$ChromiumExecutablePath
     )
 
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -30,6 +32,9 @@ function Invoke-LayoutBrowserSmoke {
     $startInfo.CreateNoWindow = $true
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
+    if ($BrowserName -eq "chromium" -and -not [string]::IsNullOrWhiteSpace($ChromiumExecutablePath)) {
+        $startInfo.Environment["ODFKIT_PLAYWRIGHT_CHROMIUM_EXECUTABLE"] = $ChromiumExecutablePath
+    }
     $startInfo.ArgumentList.Add($AppDll)
     foreach ($argument in $Arguments) {
         $startInfo.ArgumentList.Add($argument)
@@ -80,6 +85,13 @@ $repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
     [IO.Path]::DirectorySeparatorChar,
     [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 $comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+$resolvedChromium = $null
+if (-not [string]::IsNullOrWhiteSpace($ChromiumExecutablePath)) {
+    $resolvedChromium = [IO.Path]::GetFullPath($ChromiumExecutablePath)
+    if (-not (Test-Path -LiteralPath $resolvedChromium -PathType Leaf)) {
+        throw "ChromiumExecutablePath 不存在或不是檔案。"
+    }
+}
 $matrixRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $FormatMatrixRoot))
 $destinationRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
 foreach ($path in @($matrixRoot, $destinationRoot)) {
@@ -98,6 +110,11 @@ $devanagariSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "deva
         -Filter "*.woff2" -File -Recurse)
 $cffSource = Join-Path $sourceRoot "SourceHanSansTC-Regular.otf"
 $cffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-otf/first") `
+        -Filter "*.woff2" -File -Recurse)
+$nameCffSources = @(Get-ChildItem -LiteralPath $sourceRoot -Filter "SourceCodePro-Regular.otf" `
+        -File -Recurse)
+$nameCffSource = if ($nameCffSources.Count -eq 1) { $nameCffSources[0].FullName } else { $null }
+$nameCffSubsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "cff-name-otf/first") `
         -Filter "*.woff2" -File -Recurse)
 $arabicVariableSource = Join-Path $sourceRoot "NotoSansArabic-VF.ttf"
 $devanagariVariableSource = Join-Path $sourceRoot "NotoSansDevanagari-VF.ttf"
@@ -124,6 +141,7 @@ $colorColrV1Subsets = @(Get-ChildItem -LiteralPath (Join-Path $evidenceRoot "col
 if (-not (Test-Path -LiteralPath $arabicSource) `
     -or -not (Test-Path -LiteralPath $devanagariSource) `
     -or -not (Test-Path -LiteralPath $cffSource) `
+    -or $null -eq $nameCffSource `
     -or -not (Test-Path -LiteralPath $arabicVariableSource) `
     -or -not (Test-Path -LiteralPath $devanagariVariableSource) `
     -or -not (Test-Path -LiteralPath $cff2VariableSource) `
@@ -133,6 +151,7 @@ if (-not (Test-Path -LiteralPath $arabicSource) `
     -or $arabicSubsets.Count -ne 1 `
     -or $devanagariSubsets.Count -ne 1 `
     -or $cffSubsets.Count -ne 1 `
+    -or $nameCffSubsets.Count -ne 1 `
     -or $arabicVariableSubsets.Count -ne 1 `
     -or $devanagariVariableSubsets.Count -ne 1 `
     -or $cff2VariableSubsets.Count -ne 1 `
@@ -189,6 +208,7 @@ foreach ($browser in $Browsers) {
         -AppDll $appDll `
         -BrowserName $browser `
         -TimeoutSeconds $BrowserTimeoutSeconds `
+        -ChromiumExecutablePath $resolvedChromium `
         -Arguments @(
             "layout",
             $browser,
@@ -198,6 +218,8 @@ foreach ($browser in $Browsers) {
             $devanagariSubsets[0].FullName,
             $cffSource,
             $cffSubsets[0].FullName,
+            $nameCffSource,
+            $nameCffSubsets[0].FullName,
             $arabicVariableSource,
             $arabicVariableSubsets[0].FullName,
             $devanagariVariableSource,
@@ -214,4 +236,11 @@ foreach ($browser in $Browsers) {
             $evidence)
 }
 
-Write-Host "PASS：CFF／CFF2 OTC 與 COLRv1 color 輸入均轉為獨立 WOFF2，且輸出在三瀏覽器像素一致；原始 OTC 僅另由 Chromium 作能力佐證。"
+$browserSummary = $Browsers -join "／"
+$rawCollectionSummary = if ($Browsers -contains "chromium") {
+    "本次另由 Chromium 驗證原始 OTC"
+}
+else {
+    "本次未驗證原始 OTC"
+}
+Write-Host "PASS：CID／名稱式 CFF、CFF2 OTC 與 COLRv1 color 輸入均轉為獨立 WOFF2，且輸出在 $browserSummary 像素一致；$rawCollectionSummary。"

@@ -42,7 +42,7 @@ internal static class Program
             return 0;
         }
 
-        if (args.Length != 15)
+        if (args.Length != 16)
         {
             return 2;
         }
@@ -55,13 +55,14 @@ internal static class Program
         string ipamjPath = Path.GetFullPath(args[5]);
         string cffCollectionPath = Path.GetFullPath(args[6]);
         string cffOpenTypePath = Path.GetFullPath(args[7]);
-        string arabicStaticPath = Path.GetFullPath(args[8]);
-        string devanagariStaticPath = Path.GetFullPath(args[9]);
-        string arabicVariablePath = Path.GetFullPath(args[10]);
-        string devanagariVariablePath = Path.GetFullPath(args[11]);
-        string cff2VariablePath = Path.GetFullPath(args[12]);
-        string colorEmojiPath = Path.GetFullPath(args[13]);
-        string colorEmojiColrV1Path = Path.GetFullPath(args[14]);
+        string nameCffOpenTypePath = Path.GetFullPath(args[8]);
+        string arabicStaticPath = Path.GetFullPath(args[9]);
+        string devanagariStaticPath = Path.GetFullPath(args[10]);
+        string arabicVariablePath = Path.GetFullPath(args[11]);
+        string devanagariVariablePath = Path.GetFullPath(args[12]);
+        string cff2VariablePath = Path.GetFullPath(args[13]);
+        string colorEmojiPath = Path.GetFullPath(args[14]);
+        string colorEmojiColrV1Path = Path.GetFullPath(args[15]);
         Directory.CreateDirectory(outputRoot);
 
         string trueTypeCollectionPath = Path.Combine(outputRoot, "cns-managed-real-faces.ttc");
@@ -220,6 +221,14 @@ internal static class Program
             [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
         await VerifySuccessAsync(
             results,
+            "cff-name-otf",
+            nameCffOpenTypePath,
+            faceIndex: 0,
+            "OdfKit café fi ffi 0123456789",
+            outputRoot,
+            [WebFontFormat.OpenType, WebFontFormat.Woff, WebFontFormat.Woff2]).ConfigureAwait(false);
+        await VerifySuccessAsync(
+            results,
             "arabic-variable",
             arabicVariablePath,
             faceIndex: 0,
@@ -269,6 +278,7 @@ internal static class Program
         {
             RunSourceMutationFuzz(extBPath, WebFontFormat.TrueType, "TrueTypeSource"),
             RunSourceMutationFuzz(cffOpenTypePath, WebFontFormat.OpenType, "CffSource"),
+            RunSourceMutationFuzz(nameCffOpenTypePath, WebFontFormat.OpenType, "CffNameSource"),
             RunCffTableMutationFuzz(cffOpenTypePath),
             RunSourceMutationFuzz(cff2VariablePath, WebFontFormat.OpenType, "Cff2Source"),
             RunCff2TableMutationFuzz(cff2VariablePath)

@@ -141,6 +141,18 @@
       }
     }
   },
+  "webFontNameCffCorpus": {
+    "source": "adobe-fonts/source-code-pro",
+    "cacheRevision": "1",
+    "version": "2.042R-u/1.062R-i/1.026R-vf",
+    "archiveFileName": "OTF-source-code-pro-2.042R-u_1.062R-i.zip",
+    "fileName": "SourceCodePro-Regular.otf",
+    "uri": "https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u/1.062R-i/1.026R-vf/OTF-source-code-pro-2.042R-u_1.062R-i.zip",
+    "archiveSha256": "754a2e3ebb945ae905d720ac5896b3b34acc9546dd6551ef9536869788629dae",
+    "sha256": "9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8",
+    "license": "OFL-1.1",
+    "licenseUri": "https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md"
+  },
   "webFontWoff2Corpus": {
     "source": "w3c/woff2-compiled-tests",
     "revision": "1fd8cd583645618f4df36c65a297479840ad5510",

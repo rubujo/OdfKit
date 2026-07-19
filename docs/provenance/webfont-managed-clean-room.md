@@ -90,10 +90,20 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 安全與效能：CFF 弱參照解析快取新增 glyph count context 核對，避免相同 table bytes 在不同
   face metadata 下誤用；預定義 charset 依各自固定 glyph 上限拒絕超界輸入。名稱式 `seac`
   組合字仍由 Type 2 verifier 明確拒絕，不會靜默遺失元件。
+- corpus：[Adobe 官方 Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/tag/2.042R-u/1.062R-i/1.026R-vf)
+  `2.042R-u/1.062R-i/1.026R-vf` OTF release，授權為
+  [OFL-1.1](https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md)；ZIP SHA-256 為
+  `754a2e3ebb945ae905d720ac5896b3b34acc9546dd6551ef9536869788629dae`，
+  `SourceCodePro-Regular.otf` SHA-256 為
+  `9f9664e2edf6f045c11e774f9bd0be6993971f2544a39061a5ce478b96b051f8`。字型只在測試時下載，
+  不進入 repository 或 nupkg。
 - 證據：純 C# 最小二進位 fixture 驗證合法名稱式 CFF、等長輸出、預定義 charset 上限與跨
-  glyph count 快取隔離。fixture 只證明結構路徑，不冒充真實字型或瀏覽器部署證據。
-- 尚未通過的人工作業：可鎖定且可再散布的真實名稱式 CFF、Chromium／Firefox／WebKit 差分、
-  `seac` closure、第三方結構相異性與惡意字型安全審查；能力維持 experimental。
+  glyph count 快取隔離；官方 OTF 實際產生 OTF／WOFF／WOFF2，所有輸出由 managed verifier
+  逐 glyph 驗證，另以 64 組固定種子來源 mutation 驗證明確拒絕。
+- 瀏覽器證據：format matrix 產生的 WOFF2 與官方 OTF 由 Chromium／Firefox／WebKit 比較三組
+  Latin 文字的 Canvas RGBA bytes 與文字 metrics，並輸出每瀏覽器 JSON 及截圖 artifact。
+- 尚未通過的人工作業：`seac` closure、compact rewrite、第三方結構相異性與惡意字型安全
+  審查；能力維持 experimental。
 
 ### 2026-07-17 CFF2 Variable
 
