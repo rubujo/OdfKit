@@ -19,6 +19,18 @@ param(
     [ValidateSet("Integrated", "Classic")]
     [string]$Pipeline = "Integrated",
 
+    [ValidateRange(1, 256)]
+    [int]$HostedLoadConcurrency = 16,
+
+    [ValidateRange(1, 1000000)]
+    [int]$HostedLoadMinimumRequestCount = 256,
+
+    [ValidateRange(1, 1000000)]
+    [int]$HostedLoadMaximumRequestCount = 1024,
+
+    [ValidateRange(1, 60)]
+    [int]$HostedLoadMinimumDurationSeconds = 5,
+
     [switch]$NoBuild
 )
 
@@ -308,7 +320,11 @@ try {
         -AssetUri $loadAssetUri `
         -ExpectedSha256 $loadAsset[0].Sha256 `
         -ExpectedByteLength $loadAsset[0].ByteLength `
-        -HostProcesses @($process)
+        -HostProcesses @($process) `
+        -Concurrency $HostedLoadConcurrency `
+        -MinimumRequestCount $HostedLoadMinimumRequestCount `
+        -MaximumRequestCount $HostedLoadMaximumRequestCount `
+        -MinimumDurationSeconds $HostedLoadMinimumDurationSeconds
 
     [ordered]@{
         server = "IIS Express"

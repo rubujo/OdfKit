@@ -333,6 +333,21 @@ Out-of-Process 由 ANCM 啟動 Kestrel 並代理。隔離設定會以已驗證�
 、[ASP.NET Core Module](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module?view=aspnetcore-10.0)
 與 [IIS Integrated／Classic 架構](https://learn.microsoft.com/en-us/iis/get-started/introduction-to-iis/introduction-to-iis-architecture)。
 
+較長的本機有界持續負載由 `eng/Test-WebFontIisSustainedLoad.ps1` 執行，GitHub workflow
+預設關閉，只有手動指定 `run_webfont_iis_sustained_load` 才會啟動。2026-07-19 在 Windows x64、
+12 logical processors、16 路併發與官方 CNS Ext-B 字型下，實際結果如下：
+
+| Hosting path | Requests | Elapsed | CPU | Peak working set |
+| --- | ---: | ---: | ---: | ---: |
+| System.Web Integrated | 10,928 | 30.033 秒 | 25.547 秒 | 313.8 MiB |
+| System.Web Classic | 10,960 | 30.036 秒 | 21.734 秒 | 308.1 MiB |
+| ASP.NET Core In-Process | 8,288 | 30.047 秒 | 44.656 秒 | 100.7 MiB |
+| ASP.NET Core Out-of-Process | 4,096 | 67.107 秒 | 74.688 秒 | 115.7 MiB |
+
+每個回應都重新計算 SHA-256；Out-of-Process 的 CPU 與 working set 同時計入 IIS proxy 與
+Kestrel 子程序。這是單機、固定 corpus 的回歸證據，不是 production 容量、長時間 soak、
+WAF／CDN 或不同硬體的效能承諾。
+
 正式切換前至少以外部 probe 驗證：首次 MISS 到 origin、第二次 HIT、ETag 304、三種字型 MIME、
 CORS／CORP、401／429 不快取、POST 不快取、WAF 阻擋超限本文，以及 purge 後重新回源。HiNet
 租戶若無法針對上述路徑與標頭設定，就只能讓 CDN 承載 immutable GET，generation API 改走不經

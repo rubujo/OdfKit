@@ -24,10 +24,10 @@ function Invoke-WebFontHostedAssetLoad {
         [ValidateRange(1, 256)]
         [int]$Concurrency = 16,
 
-        [ValidateRange(1, 10000)]
+        [ValidateRange(1, 1000000)]
         [int]$MinimumRequestCount = 256,
 
-        [ValidateRange(1, 10000)]
+        [ValidateRange(1, 1000000)]
         [int]$MaximumRequestCount = 1024,
 
         [ValidateRange(1, 60)]
@@ -83,12 +83,17 @@ function Invoke-WebFontHostedAssetLoad {
     $cpuMilliseconds = [long]([TimeSpan]::FromTicks($finalCpuTicks - $initialCpuTicks).TotalMilliseconds)
     # 多程序 hosting 沒有共同的 peak 時間點；相加各程序 peak 是保守上界，適合作為 CI 回歸預算。
     $peakWorkingSetBytes = [long](($HostProcesses | Measure-Object PeakWorkingSet64 -Sum).Sum)
+    # 冷啟動與小型 runner 的吞吐差異可能讓最低請求數主導測試時間；wall-clock 預算仍受兩至四分鐘範圍約束。
+    $maximumElapsedSeconds = [Math]::Max(120, $MinimumDurationSeconds * 4)
+    $maximumCpuMilliseconds = [long][Math]::Max(
+        90000,
+        $MinimumDurationSeconds * [Environment]::ProcessorCount * 1500L)
     if ($requestCount -lt $MinimumRequestCount -or
         $requestCount -gt $MaximumRequestCount -or
-        $stopwatch.Elapsed -gt [TimeSpan]::FromMinutes(1) -or
-        $cpuMilliseconds -gt 90000 -or
+        $stopwatch.Elapsed.TotalSeconds -gt $maximumElapsedSeconds -or
+        $cpuMilliseconds -gt $maximumCpuMilliseconds -or
         $peakWorkingSetBytes -gt 1536L * 1024 * 1024) {
-        throw "IIS hosted load 超出可重現的資源預算。"
+        throw "IIS hosted load 超出資源預算：requests=$requestCount，elapsed=$($stopwatch.ElapsedMilliseconds) ms／$($maximumElapsedSeconds * 1000) ms，CPU=$cpuMilliseconds ms／$maximumCpuMilliseconds ms，peak=$peakWorkingSetBytes bytes／$([long](1536L * 1024 * 1024)) bytes。"
     }
 
     return [ordered]@{
@@ -98,12 +103,23 @@ function Invoke-WebFontHostedAssetLoad {
         minimumRequestCount = $MinimumRequestCount
         maximumRequestCount = $MaximumRequestCount
         minimumDurationSeconds = $MinimumDurationSeconds
+        maximumElapsedSeconds = $maximumElapsedSeconds
+        maximumCpuMilliseconds = $maximumCpuMilliseconds
         totalBytes = $totalBytes
         elapsedMilliseconds = $stopwatch.ElapsedMilliseconds
         cpuMilliseconds = $cpuMilliseconds
         initialWorkingSetBytes = $initialWorkingSetBytes
         peakWorkingSetBytes = $peakWorkingSetBytes
         bytesPerSecond = [long]($totalBytes / [Math]::Max($stopwatch.Elapsed.TotalSeconds, 0.001))
+        hostEnvironment = [ordered]@{
+            processorCount = [Environment]::ProcessorCount
+            osDescription = [Runtime.InteropServices.RuntimeInformation]::OSDescription
+            processArchitecture = [Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()
+            frameworkDescription = [Runtime.InteropServices.RuntimeInformation]::FrameworkDescription
+            runnerOs = $env:RUNNER_OS
+            runnerArchitecture = $env:RUNNER_ARCH
+            runnerEnvironment = $env:RUNNER_ENVIRONMENT
+        }
         hostProcesses = @($HostProcesses | ForEach-Object {
                 [ordered]@{
                     id = $_.Id

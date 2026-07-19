@@ -16,6 +16,20 @@ param(
 
     [string]$IisExpressPath = "C:\Program Files\IIS Express\iisexpress.exe",
 
+    [ValidateRange(1, 256)]
+    [int]$HostedLoadConcurrency = 16,
+
+    [ValidateRange(1, 1000000)]
+    [int]$HostedLoadMinimumRequestCount = 256,
+
+    [ValidateRange(1, 1000000)]
+    [int]$HostedLoadMaximumRequestCount = 1024,
+
+    [ValidateRange(1, 60)]
+    [int]$HostedLoadMinimumDurationSeconds = 5,
+
+    [switch]$ReuseCompletedEvidence,
+
     [switch]$NoBuild
 )
 
@@ -56,7 +70,9 @@ if ($NoBuild -and -not (Test-Path -LiteralPath $sampleAssembly -PathType Leaf)) 
     throw "NoBuild 需要先建置 ASP.NET Core WebFont sample。"
 }
 
-Remove-Item -LiteralPath $destinationPath -Recurse -Force -ErrorAction SilentlyContinue
+if (-not $ReuseCompletedEvidence) {
+    Remove-Item -LiteralPath $destinationPath -Recurse -Force -ErrorAction SilentlyContinue
+}
 New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
 $apiKey = [Guid]::NewGuid().ToString("N") + [Guid]::NewGuid().ToString("N")
 $previousAspNetCoreEnvironment = $env:ASPNETCORE_ENVIRONMENT
@@ -109,6 +125,10 @@ function Invoke-HostingModelSmoke {
     )
     if ($NoBuild) {
         $publishArguments += @("--no-build", "--no-restore")
+    }
+    else {
+        $intermediateRoot = Join-Path $destinationPath "build-obj"
+        $publishArguments += "-p:OdfKitWebFontAspNetCoreSampleIntermediateRoot=$intermediateRoot\"
     }
     $publishOutput = dotnet @publishArguments 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {
@@ -444,9 +464,13 @@ function Invoke-HostingModelSmoke {
             -AssetUri $assetUri `
             -ExpectedSha256 $asset.sha256 `
             -ExpectedByteLength $asset.byteLength `
-            -HostProcesses $hostProcesses
+            -HostProcesses $hostProcesses `
+            -Concurrency $HostedLoadConcurrency `
+            -MinimumRequestCount $HostedLoadMinimumRequestCount `
+            -MaximumRequestCount $HostedLoadMaximumRequestCount `
+            -MinimumDurationSeconds $HostedLoadMinimumDurationSeconds
 
-        return [ordered]@{
+        $result = [ordered]@{
             hostingModel = $HostingModel
             apiKeySource = if ($HostingModel -eq "InProcess") { "appsettings.IisSmoke.json" } else { "environment-override" }
             server = $serverHeader
@@ -461,6 +485,10 @@ function Invoke-HostingModelSmoke {
                 byteLength = $asset.byteLength
             }
         }
+        $result | ConvertTo-Json -Depth 8 | Set-Content `
+            -LiteralPath (Join-Path $modelRoot "evidence.json") `
+            -Encoding utf8NoBOM
+        return $result
     }
     finally {
         $client.Dispose()
@@ -474,8 +502,25 @@ function Invoke-HostingModelSmoke {
 
 try {
     $evidence = @(
-        Invoke-HostingModelSmoke -HostingModel InProcess
-        Invoke-HostingModelSmoke -HostingModel OutOfProcess
+        foreach ($hostingModel in @("InProcess", "OutOfProcess")) {
+            $modelEvidencePath = Join-Path $destinationPath "$($hostingModel.ToLowerInvariant())/evidence.json"
+            $modelEvidence = if ($ReuseCompletedEvidence -and
+                (Test-Path -LiteralPath $modelEvidencePath -PathType Leaf)) {
+                Get-Content -LiteralPath $modelEvidencePath -Raw | ConvertFrom-Json
+            }
+            else { $null }
+            $load = $modelEvidence.hostedLoad
+            $reusable = $null -ne $modelEvidence -and
+                $modelEvidence.hostingModel -eq $hostingModel -and
+                $modelEvidence.sourceSha256 -eq $actualSourceSha256 -and
+                $load.concurrency -eq $HostedLoadConcurrency -and
+                $load.minimumRequestCount -eq $HostedLoadMinimumRequestCount -and
+                $load.maximumRequestCount -eq $HostedLoadMaximumRequestCount -and
+                $load.minimumDurationSeconds -eq $HostedLoadMinimumDurationSeconds -and
+                $load.requestCount -ge $HostedLoadMinimumRequestCount -and
+                $load.requestCount -le $HostedLoadMaximumRequestCount
+            if ($reusable) { $modelEvidence } else { Invoke-HostingModelSmoke -HostingModel $hostingModel }
+        }
     )
     [ordered]@{
         server = "IIS Express"
