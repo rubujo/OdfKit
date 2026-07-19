@@ -234,7 +234,8 @@ try {
                 [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
             }
             & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-                -BrowserRoot $browserRoot | Out-Null
+                -BrowserRoot $browserRoot `
+                -RemoveProxyAssets | Out-Null
         }
         foreach ($browser in $Browsers) {
             $screenshot = Join-Path $destinationPath "playwright-managed-$browser.png"
@@ -248,6 +249,11 @@ try {
 finally {
     if (-not $process.HasExited) { Stop-Process -Id $process.Id; $process.WaitForExit() }
     $process.Dispose()
+    if ($IsWindows -and $RunBrowser -and $null -ne (Get-Variable browserRoot -ErrorAction SilentlyContinue)) {
+        & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+            -BrowserRoot $browserRoot `
+            -RemoveProxyAssets | Out-Null
+    }
     Remove-Item Env:ODFKIT_WEBFONT_SMOKE_ASSETS -ErrorAction SilentlyContinue
     Remove-Item Env:ODFKIT_WEBFONT_SMOKE_DYNAMIC_SOURCE -ErrorAction SilentlyContinue
     Remove-Item Env:ODFKIT_WEBFONT_SMOKE_DYNAMIC_SOURCE_SHA256 -ErrorAction SilentlyContinue

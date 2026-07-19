@@ -18,15 +18,18 @@ if (-not $temporaryRoot.StartsWith($systemTemporaryRoot, [StringComparison]::Ord
 $browserRoot = Join-Path $temporaryRoot 'ms-playwright'
 $playwrightFirefoxRoot = Join-Path $browserRoot 'firefox-1532/firefox'
 $regularFirefoxRoot = Join-Path $temporaryRoot 'Mozilla Firefox'
+$sandboxFirefoxRoot = Join-Path $temporaryRoot 'CodexSandboxOnline/ms-playwright/firefox-1532/firefox'
 $startMenuRoot = Join-Path $temporaryRoot 'Start Menu/Programs'
 $shell = $null
 
 try {
-    New-Item -ItemType Directory -Path $playwrightFirefoxRoot, $regularFirefoxRoot, $startMenuRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $playwrightFirefoxRoot, $regularFirefoxRoot, $sandboxFirefoxRoot, $startMenuRoot -Force | Out-Null
     $playwrightPrivateProxy = Join-Path $playwrightFirefoxRoot 'private_browsing.exe'
     $playwrightFirefox = Join-Path $playwrightFirefoxRoot 'firefox.exe'
     $regularPrivateProxy = Join-Path $regularFirefoxRoot 'private_browsing.exe'
+    $privateManifest = Join-Path $playwrightFirefoxRoot 'private_browsing.VisualElementsManifest.xml'
     New-Item -ItemType File -Path $playwrightPrivateProxy, $playwrightFirefox, $regularPrivateProxy -Force | Out-Null
+    New-Item -ItemType File -Path $privateManifest -Force | Out-Null
 
     $shell = New-Object -ComObject WScript.Shell
     $playwrightPrivateShortcut = Join-Path $startMenuRoot 'Nightly Private Browsing.lnk'
@@ -37,7 +40,15 @@ try {
             @($playwrightFirefoxShortcut, $playwrightFirefox),
             @($regularPrivateShortcut, $regularPrivateProxy))) {
         $shortcut = $shell.CreateShortcut($definition[0])
-        $shortcut.TargetPath = $definition[1]
+        $shortcut.TargetPath = if ($definition[0] -eq $playwrightPrivateShortcut) {
+            Join-Path $sandboxFirefoxRoot 'private_browsing.exe'
+        }
+        else {
+            $definition[1]
+        }
+        if ($definition[0] -eq $playwrightPrivateShortcut) {
+            $shortcut.IconLocation = "$playwrightPrivateProxy,0"
+        }
         $shortcut.Save()
     }
     [Runtime.InteropServices.Marshal]::FinalReleaseComObject($shell) | Out-Null
@@ -45,13 +56,16 @@ try {
 
     $removed = & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
         -BrowserRoot $browserRoot `
-        -StartMenuRoot $startMenuRoot
+        -StartMenuRoot $startMenuRoot `
+        -RemoveProxyAssets
     if ($removed -ne 1 -or (Test-Path -LiteralPath $playwrightPrivateShortcut)) {
         throw '未精確移除 Playwright Firefox 私密瀏覽捷徑。'
     }
     if (-not (Test-Path -LiteralPath $playwrightFirefoxShortcut) `
         -or -not (Test-Path -LiteralPath $regularPrivateShortcut) `
-        -or -not (Test-Path -LiteralPath $playwrightPrivateProxy)) {
+        -or -not (Test-Path -LiteralPath $playwrightFirefox) `
+        -or (Test-Path -LiteralPath $playwrightPrivateProxy) `
+        -or (Test-Path -LiteralPath $privateManifest)) {
         throw '清理範圍影響了瀏覽器執行檔或非目標捷徑。'
     }
 

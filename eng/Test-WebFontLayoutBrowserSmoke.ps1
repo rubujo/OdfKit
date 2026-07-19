@@ -77,6 +77,17 @@ function Invoke-LayoutBrowserSmoke {
     }
     finally {
         $process.Dispose()
+        if ($IsWindows -and $BrowserName -eq 'firefox') {
+            $browserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
+                Join-Path $env:LOCALAPPDATA 'ms-playwright'
+            }
+            else {
+                [IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $PSScriptRoot) $env:PLAYWRIGHT_BROWSERS_PATH))
+            }
+            & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+                -BrowserRoot $browserRoot `
+                -RemoveProxyAssets | Out-Null
+        }
     }
 }
 
@@ -183,8 +194,21 @@ if ($InstallBrowsers) {
             [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
         }
         & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
-            -BrowserRoot $browserRoot | Out-Null
+            -BrowserRoot $browserRoot `
+            -RemoveProxyAssets | Out-Null
     }
+}
+
+if ($IsWindows -and $Browsers -contains 'firefox') {
+    $browserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
+        Join-Path $env:LOCALAPPDATA 'ms-playwright'
+    }
+    else {
+        [IO.Path]::GetFullPath((Join-Path $repoRoot $env:PLAYWRIGHT_BROWSERS_PATH))
+    }
+    & (Join-Path $PSScriptRoot 'Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1') `
+        -BrowserRoot $browserRoot `
+        -RemoveProxyAssets | Out-Null
 }
 
 New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
