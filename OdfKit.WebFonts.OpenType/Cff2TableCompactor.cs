@@ -262,6 +262,7 @@ internal static class Cff2TableCompactor
         IReadOnlyDictionary<int, int[]> replacementValues)
     {
         var output = new List<byte>();
+        var encoded = new byte[4];
         foreach (DictEntry entry in entries)
         {
             if (!replacementValues.TryGetValue(entry.Operation, out int[]? values))
@@ -273,9 +274,8 @@ internal static class Cff2TableCompactor
             foreach (int value in values)
             {
                 output.Add(29);
-                Span<byte> encoded = stackalloc byte[4];
                 BinaryPrimitives.WriteInt32BigEndian(encoded, value);
-                output.AddRange(encoded.ToArray());
+                output.AddRange(encoded);
             }
 
             if ((entry.Operation & 0x0C00) != 0)
