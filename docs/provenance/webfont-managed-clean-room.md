@@ -195,5 +195,6 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   clean-room 審閱，不得隱匿為完全未接觸測試 generator。
 - WOFF2 collection 以規格建構的負向 fixture，以及 SHA-256 鎖定的官方 CNS 宋體 Ext-B／PUA
   真實 sfnt face 所建立之 null-transform collection 驗證 face selection；直接 collection 輸出、
-  transformed collection 的擴充 corpus、第三方惡意 WOFF2 安全稽核與 coverage-guided fuzz
+  transformed collection 的擴充 corpus 與第三方惡意 WOFF2 安全稽核。Coverage-guided fuzz
+  不屬於套件完成或 CI 條件；若由獨立安全團隊執行，只作額外證據。
   尚待人工／外部閘門，因此整體 engine 狀態仍為 experimental。

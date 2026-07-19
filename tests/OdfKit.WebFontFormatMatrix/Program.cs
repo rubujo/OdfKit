@@ -272,16 +272,16 @@ internal static class Program
             "😀",
             outputRoot).ConfigureAwait(false);
 
-        var fuzzResults = new List<FuzzResult>(RunDeterministicMutationFuzz(
+        var robustnessResults = new List<MutationRobustnessResult>(RunDeterministicMutationRobustnessChecks(
             Path.Combine(outputRoot, "cns-ext-b-ttf", "first"),
             extBManifest))
         {
-            RunSourceMutationFuzz(extBPath, WebFontFormat.TrueType, "TrueTypeSource"),
-            RunSourceMutationFuzz(cffOpenTypePath, WebFontFormat.OpenType, "CffSource"),
-            RunSourceMutationFuzz(nameCffOpenTypePath, WebFontFormat.OpenType, "CffNameSource"),
-            RunCffTableMutationFuzz(cffOpenTypePath),
-            RunSourceMutationFuzz(cff2VariablePath, WebFontFormat.OpenType, "Cff2Source"),
-            RunCff2TableMutationFuzz(cff2VariablePath)
+            RunSourceMutationRobustnessChecks(extBPath, WebFontFormat.TrueType, "TrueTypeSource"),
+            RunSourceMutationRobustnessChecks(cffOpenTypePath, WebFontFormat.OpenType, "CffSource"),
+            RunSourceMutationRobustnessChecks(nameCffOpenTypePath, WebFontFormat.OpenType, "CffNameSource"),
+            RunCffTableMutationRobustnessChecks(cffOpenTypePath),
+            RunSourceMutationRobustnessChecks(cff2VariablePath, WebFontFormat.OpenType, "Cff2Source"),
+            RunCff2TableMutationRobustnessChecks(cff2VariablePath)
         };
 
         LargeCnsDeliveryEvidence largeCnsDelivery = await VerifyLargeCnsDeliveryAsync(
@@ -297,7 +297,7 @@ internal static class Program
                 generatedAtUtc = DateTimeOffset.UtcNow,
                 results,
                 verifiedSourceCache = true,
-                deterministicMutationFuzz = fuzzResults,
+                deterministicMutationRobustness = robustnessResults,
                 largeCnsDelivery
             }, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
         Console.WriteLine($"PASS: {results.Count} real managed format cases. Evidence: {evidencePath}");
@@ -497,7 +497,7 @@ internal static class Program
             maximumExpandedBytes: 32 * 1024 * 1024);
         SfntFont font = SfntFont.Parse(decoded, 0, 256, validateChecksums: true);
         string[] transforms = ReadWoff2Transforms(woff2);
-        (int mutationCount, int acceptedMutations) = RunWoff2MutationFuzz(woff2);
+        (int mutationCount, int acceptedMutations) = RunWoff2MutationRobustnessChecks(woff2);
         string? directory = Path.GetDirectoryName(evidencePath);
         directory = string.IsNullOrEmpty(directory) ? Directory.GetCurrentDirectory() : directory;
         Directory.CreateDirectory(directory);
@@ -547,7 +547,7 @@ internal static class Program
             JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
     }
 
-    private static (int Count, int Accepted) RunWoff2MutationFuzz(byte[] source)
+    private static (int Count, int Accepted) RunWoff2MutationRobustnessChecks(byte[] source)
     {
         const int mutationCount = 64;
         int accepted = 0;
@@ -653,11 +653,11 @@ internal static class Program
         return tags;
     }
 
-    private static IReadOnlyList<FuzzResult> RunDeterministicMutationFuzz(
+    private static IReadOnlyList<MutationRobustnessResult> RunDeterministicMutationRobustnessChecks(
         string assetRoot,
         WebFontManifest manifest)
     {
-        var results = new List<FuzzResult>();
+        var results = new List<MutationRobustnessResult>();
         foreach ((string extension, WebFontFormat format) in new[]
                  {
                      (".ttf", WebFontFormat.TrueType),
@@ -711,16 +711,16 @@ internal static class Program
 
             if (rejected == 0)
             {
-                throw new InvalidDataException($"The {format} mutation fuzz did not exercise a rejection path.");
+                throw new InvalidDataException($"The {format} mutation robustness checks did not exercise a rejection path.");
             }
 
-            results.Add(new FuzzResult(format.ToString(), 128, accepted, rejected));
+            results.Add(new MutationRobustnessResult(format.ToString(), 128, accepted, rejected));
         }
 
         return results;
     }
 
-    private static FuzzResult RunSourceMutationFuzz(
+    private static MutationRobustnessResult RunSourceMutationRobustnessChecks(
         string sourcePath,
         WebFontFormat format,
         string resultName)
@@ -760,13 +760,13 @@ internal static class Program
 
         if (rejected == 0)
         {
-            throw new InvalidDataException("The source-font mutation fuzz did not exercise a rejection path.");
+            throw new InvalidDataException("The source-font mutation robustness checks did not exercise a rejection path.");
         }
 
-        return new FuzzResult(resultName, 64, accepted, rejected);
+        return new MutationRobustnessResult(resultName, 64, accepted, rejected);
     }
 
-    private static FuzzResult RunCffTableMutationFuzz(string sourcePath)
+    private static MutationRobustnessResult RunCffTableMutationRobustnessChecks(string sourcePath)
     {
         byte[] source = File.ReadAllBytes(sourcePath);
         SfntFont font = SfntFont.Parse(source, 0, 256, validateChecksums: true);
@@ -823,10 +823,10 @@ internal static class Program
             throw new InvalidDataException("The direct CFF table mutations did not exercise structural rejection paths.");
         }
 
-        return new FuzzResult("CffTable", 64, accepted, rejected);
+        return new MutationRobustnessResult("CffTable", 64, accepted, rejected);
     }
 
-    private static FuzzResult RunCff2TableMutationFuzz(string sourcePath)
+    private static MutationRobustnessResult RunCff2TableMutationRobustnessChecks(string sourcePath)
     {
         byte[] source = File.ReadAllBytes(sourcePath);
         SfntFont font = SfntFont.Parse(source, 0, 256, validateChecksums: true);
@@ -885,7 +885,7 @@ internal static class Program
             throw new InvalidDataException("The direct CFF2 table mutations did not exercise structural rejection paths.");
         }
 
-        return new FuzzResult("Cff2Table", 32, accepted, rejected);
+        return new MutationRobustnessResult("Cff2Table", 32, accepted, rejected);
     }
 
     private static uint NextState(uint value)
@@ -1408,7 +1408,7 @@ internal static class Program
         int FaceIndex,
         IReadOnlyList<string> OutputSha256);
 
-    private sealed record FuzzResult(
+    private sealed record MutationRobustnessResult(
         string Format,
         int Cases,
         int Accepted,
