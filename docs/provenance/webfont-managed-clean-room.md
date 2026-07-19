@@ -105,8 +105,26 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   輸出由 managed verifier 逐 glyph 驗證，另以 64 組固定種子來源 mutation 驗證明確拒絕。
 - 瀏覽器證據：format matrix 產生的 WOFF2 與官方 OTF 由 Chromium／Firefox／WebKit 比較三組
   Latin 文字的 Canvas RGBA bytes 與文字 metrics，並輸出每瀏覽器 JSON 及截圖 artifact。
-- 尚缺的工程證據：可再散布的真實 `seac` 三瀏覽器 corpus 與 compact rewrite；完成前能力維持
-  experimental。第三方結構相異性與惡意字型安全審查只屬採用者外部驗收。
+- 尚缺的工程證據：可再散布的真實 `seac` 三瀏覽器 corpus；完成前能力維持 experimental。
+  Compact rewrite 已由下節完成。第三方結構相異性與惡意字型安全審查只屬採用者外部驗收。
+
+### 2026-07-19 CFF 1.0 Compact Rewrite
+
+- 實作依據限於 Adobe CFF TN #5176、Adobe Type 2 TN #5177 與 Microsoft OpenType 1.9.1；
+  未讀取、搜尋或改寫第三方 parser、subsetter 或字型工具原始碼。
+- 原創範圍：未選 CharString 縮為單一 `endchar`，以固定 32-bit DICT operand 建立 Top DICT、
+  Font DICT 與 Private DICT 的兩趟 relocation，重算 CharStrings／charset／Encoding／FDArray／
+  FDSelect／Private 絕對 offset 與 local Subrs 相對 offset；GID、charset、FDSelect 與 subroutine
+  bytes 保持不變。
+- 安全與效能：替換區必須互不重疊，offset 不得指向替換區內部，所有 checked overflow 統一轉為
+  有界 `InvalidDataException`；未選 glyph 共用單一 `endchar` bytes，避免為大型 CJK 字型建立
+  數萬個相同的小陣列。
+- 證據：規格 fixture 驗證名稱式預定義／自訂 charset、Private／local Subrs relocation、輸出
+  縮小與重建冪等；25 案例真實矩陣以 Source Han Sans CID-keyed CFF、Noto CJK OTC 與 Adobe
+  Source Code Pro 名稱式 CFF 通過 OTF／WOFF／WOFF2 managed verifier 與三瀏覽器路徑。
+- 尺寸：Source Han Sans OTF 由 16,528,276 降至 2,312,096 bytes，WOFF 為 1,565,276 bytes、
+  WOFF2 為 1,170,684 bytes；Source Code Pro OTF 由 131,128 降至 63,368 bytes，WOFF 為
+  40,404 bytes、WOFF2 為 31,496 bytes。數值只適用鎖定 corpus 與目前測試字串。
 
 ### 2026-07-17 CFF2 Variable
 

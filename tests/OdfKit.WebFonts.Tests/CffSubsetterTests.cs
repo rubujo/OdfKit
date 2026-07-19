@@ -16,7 +16,7 @@ public sealed class CffSubsetterTests
         CffSubsetter.Validate(subset, glyphCount: 2, new HashSet<ushort> { 0, 1 });
 
         Assert.NotEqual(source, subset);
-        Assert.Equal(source.Length, subset.Length);
+        Assert.True(subset.Length < source.Length);
     }
 
     [Fact]
@@ -170,6 +170,23 @@ public sealed class CffSubsetterTests
         Assert.Contains("charset-duplicate", exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Build_RewritesPrivateSubrsOffsetsAndIsIdempotent()
+    {
+        byte[] source = BuildNameKeyedCffWithPrivateSubrs(
+            [14],
+            [32, 10, 14],
+            [139, 139, 139, 1, 14]);
+        var retainedGlyphs = new HashSet<ushort> { 0, 1 };
+
+        byte[] subset = CffSubsetter.Build(source, glyphCount: 3, retainedGlyphs);
+        CffSubsetter.Validate(subset, glyphCount: 3, new HashSet<ushort> { 0, 1, 2 });
+        byte[] rebuilt = CffSubsetter.Build(subset, glyphCount: 3, retainedGlyphs);
+
+        Assert.True(subset.Length < source.Length);
+        Assert.Equal(subset, rebuilt);
+    }
+
     private static byte[] BuildNameKeyedCff(params byte[][] charStrings)
         => BuildNameKeyedCffWithPredefinedCharset(0, charStrings);
 
@@ -250,13 +267,50 @@ public sealed class CffSubsetterTests
         return bytes.ToArray();
     }
 
+    private static byte[] BuildNameKeyedCffWithPrivateSubrs(params byte[][] charStrings)
+    {
+        byte[] nameIndex = [0, 1, 1, 1, 2, (byte)'A'];
+        const int topDictLength = 17;
+        int topDictIndexLength = 5 + topDictLength;
+        int charStringsOffset = 4 + nameIndex.Length + topDictIndexLength + 2 + 2;
+        var charStringsIndex = new List<byte>();
+        AppendIndex(charStringsIndex, charStrings);
+        int privateOffset = charStringsOffset + charStringsIndex.Count;
+        const int privateLength = 6;
+        var topDict = new List<byte>(topDictLength);
+        AppendDictOffset(topDict, charStringsOffset, 17);
+        AppendDictInteger(topDict, privateLength);
+        AppendDictInteger(topDict, privateOffset);
+        topDict.Add(18);
+
+        var bytes = new List<byte>
+        {
+            1, 0, 4, 1
+        };
+        bytes.AddRange(nameIndex);
+        bytes.AddRange([0, 1, 1, 1, checked((byte)(topDictLength + 1))]);
+        bytes.AddRange(topDict);
+        bytes.AddRange([0, 0]);
+        bytes.AddRange([0, 0]);
+        bytes.AddRange(charStringsIndex);
+        AppendDictInteger(bytes, privateLength);
+        bytes.Add(19);
+        AppendIndex(bytes, [new byte[] { 139, 22, 11 }]);
+        return bytes.ToArray();
+    }
+
     private static void AppendDictOffset(List<byte> bytes, int offset, byte operation)
+    {
+        AppendDictInteger(bytes, offset);
+        bytes.Add(operation);
+    }
+
+    private static void AppendDictInteger(List<byte> bytes, int value)
     {
         bytes.Add(29);
         Span<byte> encoded = stackalloc byte[4];
-        BinaryPrimitives.WriteInt32BigEndian(encoded, offset);
+        BinaryPrimitives.WriteInt32BigEndian(encoded, value);
         bytes.AddRange(encoded.ToArray());
-        bytes.Add(operation);
     }
 
     private static void AppendIndex(List<byte> bytes, IReadOnlyList<byte[]> objects)

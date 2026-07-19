@@ -37,17 +37,7 @@ internal static class CffSubsetter
             selectedGlyphs,
             parsed);
 
-        var output = (byte[])source.Clone();
-        for (ushort glyph = 0; glyph < glyphCount; glyph++)
-        {
-            if (!retainedGlyphs.Contains(glyph))
-            {
-                CffRange range = parsed.CharStrings.Objects[glyph];
-                WriteBlankCharString(output.AsSpan(range.Offset, range.Length));
-            }
-        }
-
-        return output;
+        return CffTableCompactor.Build(source, glyphCount, retainedGlyphs);
     }
 
     internal static void Validate(byte[] source, ushort glyphCount, ISet<ushort> selectedGlyphs)
@@ -733,57 +723,6 @@ internal static class CffSubsetter
         if (!dict.TryGetValue(operation, out long?[]? operands) || operands.Length != count)
         {
             throw SfntFont.DataInvalid(detail);
-        }
-    }
-
-    private static void WriteBlankCharString(Span<byte> output)
-    {
-        int position = 0;
-        while (output.Length - position > 6)
-        {
-            output[position++] = 139;
-            output[position++] = 12;
-            output[position++] = 18;
-        }
-
-        Span<byte> tail = output.Slice(position);
-        switch (tail.Length)
-        {
-            case 1:
-                tail[0] = 14;
-                break;
-            case 2:
-                tail[0] = 139;
-                tail[1] = 14;
-                break;
-            case 3:
-                tail[0] = 247;
-                tail[1] = 0;
-                tail[2] = 14;
-                break;
-            case 4:
-                tail[0] = 139;
-                tail[1] = 139;
-                tail[2] = 1;
-                tail[3] = 14;
-                break;
-            case 5:
-                tail[0] = 139;
-                tail[1] = 139;
-                tail[2] = 139;
-                tail[3] = 1;
-                tail[4] = 14;
-                break;
-            case 6:
-                tail[0] = 255;
-                tail[1] = 0;
-                tail[2] = 0;
-                tail[3] = 0;
-                tail[4] = 0;
-                tail[5] = 14;
-                break;
-            default:
-                throw SfntFont.DataInvalid("CFF-CharString-length");
         }
     }
 

@@ -177,9 +177,9 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
 2. **靜態 CFF 1.0**：已解封 standalone／OTC face、含 ROS／FDArray／FDSelect 的 CID-keyed
    `OTTO`，以及不含這三個 CID operator 的名稱式 CFF。有界 parser 驗證 collection 絕對 table
    offset、CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、預定義／自訂 charset 與
-   FDSelect；解析快取同時核對 glyph count。CharStrings 採 retain-GIDs，以相同長度的合法無
-   outline Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／
-   relative offset 不需改寫，global／local subroutine 首期不剪枝。名稱式 `seac` 會解析 Type 2
+   FDSelect；解析快取同時核對 glyph count。CharStrings 採 retain-GIDs，未選 glyph 縮成單一
+   `endchar`；兩趟 relocation 以固定 32-bit DICT offset 重建 Top DICT、FDArray、Private 與
+   local Subrs 相對位置，global／local subroutine bytes 不剪枝。名稱式 `seac` 會解析 Type 2
    `endchar` 的 StandardEncoding base／accent code，經 ISOAdobe／Expert／ExpertSubset 或自訂 charset
    找回元件 GID 並納入保留集合；找不到元件、非整數／超界代碼與規格禁止的巢狀組字明確拒絕。
    Compact INDEX／DICT 與 subroutine 重寫須另有結構與效能證據。

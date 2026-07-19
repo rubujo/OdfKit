@@ -3,7 +3,7 @@
 > 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
 > System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
 > Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
-> complex-script shaping、compact CFF／CFF2、分格式 color closure 與擴充 transformed WOFF2
+> complex-script shaping、compact CFF2、分格式 color closure 與擴充 transformed WOFF2
 > corpus 尚未完成，因此整套產品仍標示 experimental。權威實作邊界見
 > [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
@@ -139,15 +139,16 @@ StandardEncoding SID 反查 charset GID 並保留兩個元件；代碼非 0～25
 本身再使用 `seac` 時明確拒絕，不能遺失元件後繼續。
 有界 parser 會驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、charset 與
 FDSelect；未選
-glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所有 CFF absolute／relative offset
-保持不變，不剪 global／local subroutine。這是 correctness-first retain-GIDs，不是 compact CFF
-重寫：鎖定的 Source Han Sans 2.005R 案例來源為 16,528,276 bytes，managed OTF 為
-16,297,544 bytes，WOFF 為 1,788,872 bytes，WOFF2 為 1,443,492 bytes。數字只適用該 corpus。
+glyph 會縮成單一 `endchar`，再以兩趟 relocation 重建 CharStrings／Top DICT／Font DICT／Private
+DICT 與 local Subrs 相對 offset；GID、charset、FDSelect 與 subroutine bytes 保持不變。鎖定的
+Source Han Sans 2.005R 案例來源為 16,528,276 bytes，managed OTF 為 2,312,096 bytes、WOFF 為
+1,565,276 bytes、WOFF2 為 1,170,684 bytes；Source Code Pro 來源 OTF 為 131,128 bytes，managed
+OTF 為 63,368 bytes、WOFF 為 40,404 bytes、WOFF2 為 31,496 bytes。數字只適用該 corpus。
 Chromium、Firefox 與 WebKit 亦會對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串，以及
 三組名稱式 CFF Latin 字串完成來源／subset 逐像素差分。名稱式路徑另有最小結構 fixture、
 retain-GIDs、cache-context 負向測試、ISOAdobe／Expert／ExpertSubset／自訂 charset 的 `seac`
-closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能力仍因 compact rewrite 與專用
-真實 `seac` 三瀏覽器 corpus 未完成而維持 experimental。第三方安全審查只屬採用者額外證據，
+closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能力仍因專用真實 `seac`
+三瀏覽器 corpus 未完成而維持 experimental。第三方安全審查只屬採用者額外證據，
 不阻擋工程完成。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
