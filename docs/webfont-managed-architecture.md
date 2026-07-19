@@ -110,9 +110,9 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 
 下列能力在有完整 parser、closure、writer 與瀏覽器證據前不得宣稱支援：
 
-- 名稱式 CFF；standalone／OTC face 的 CID-keyed 靜態 CFF 1.0 與含 VariationStore 的
-  CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。直接 collection 輸出仍須獨立 writer
-  與三瀏覽器證據。
+- 名稱式 CFF 的 `seac` 組合字；名稱式與 standalone／OTC face 的 CID-keyed 靜態 CFF 1.0，
+  以及含 VariationStore 的 CFF2 variable 僅依第 3.5 節的 experimental 邊界解封。直接
+  collection 輸出仍須獨立 writer 與三瀏覽器證據。
 - 尚未通過第 3.5 節證據閘門的 variable font；缺少 VariationStore 卻使用 `vsindex`／`blend`，
   或 VariationStore／`fvar` 不一致的 CFF2 維持拒絕。
 - 尚未通過第 3.6 節結構驗證的 color table 版本或組合。
@@ -173,12 +173,12 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    Source Han 與 Noto Arabic／Devanagari 的 short／long offset、`wdth`／`wght` 三瀏覽器 DOM
    截圖與 Canvas 差分及 mutation 已通過；能力仍維持 experimental。
 2. **靜態 CFF 1.0**：已解封 standalone／OTC face、含 ROS／FDArray／FDSelect 的 CID-keyed
-   `OTTO`；名稱式 CFF 續留拒絕。有界 parser 驗證 collection 絕對 table offset、CFF INDEX、
-   Top DICT、Font DICT、Private DICT、
-   local Subrs、charset 與 FDSelect。CharStrings 採 retain-GIDs，以相同長度的合法無 outline
-   Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／relative
-   offset 不需改寫，global／local subroutine 首期不剪枝。compact INDEX／DICT 重寫及名稱式 CFF
-   必須另有跨 subroutine Type 2 operand verifier，不能只掃描單一 CharString 尾端 bytes。
+   `OTTO`，以及不含這三個 CID operator 的名稱式 CFF。有界 parser 驗證 collection 絕對 table
+   offset、CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、預定義／自訂 charset 與
+   FDSelect；解析快取同時核對 glyph count。CharStrings 採 retain-GIDs，以相同長度的合法無
+   outline Type 2 程式取代未選 glyph，因此 Top DICT、FDArray、Private 與 Subrs 的 absolute／
+   relative offset 不需改寫，global／local subroutine 首期不剪枝。名稱式 `seac` 組合字仍明確
+   拒絕；compact INDEX／DICT 與 subroutine 重寫須另有結構與效能證據。
 3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
    不重編 local／global subr bias。
 4. **CFF2／PostScript Variable Fonts**：已解封 standalone／OTC face、含 `fvar`／VariationStore

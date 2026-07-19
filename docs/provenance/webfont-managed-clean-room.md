@@ -79,6 +79,22 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
   metrics 相同；此階段名稱式 CFF、OTC 與 color font 仍明確拒絕。
 - 尚未通過的人工作業：第三方結構相異性與惡意 CFF 安全審查；能力維持 experimental。
 
+### 2026-07-19 名稱式 CFF 1.0
+
+- 參與者：Codex agent；實作依據限於先前已記錄的 Adobe CFF TN #5176、Adobe Type 2 TN
+  #5177 與 Microsoft OpenType 1.9.1；本階段未讀取、搜尋或改寫第三方 parser、subsetter 或
+  fuzz framework 原始碼。
+- 原創範圍：依 Top DICT 是否含 ROS 區分 CID-keyed 與名稱式 CFF；名稱式路徑禁止混入
+  FDArray／FDSelect，接受 ISOAdobe／Expert／ExpertSubset 預定義 charset 或既有有界自訂
+  charset，並允許省略 Private DICT。CharStrings 繼續使用相同長度的 retain-GIDs 空 outline。
+- 安全與效能：CFF 弱參照解析快取新增 glyph count context 核對，避免相同 table bytes 在不同
+  face metadata 下誤用；預定義 charset 依各自固定 glyph 上限拒絕超界輸入。名稱式 `seac`
+  組合字仍由 Type 2 verifier 明確拒絕，不會靜默遺失元件。
+- 證據：純 C# 最小二進位 fixture 驗證合法名稱式 CFF、等長輸出、預定義 charset 上限與跨
+  glyph count 快取隔離。fixture 只證明結構路徑，不冒充真實字型或瀏覽器部署證據。
+- 尚未通過的人工作業：可鎖定且可再散布的真實名稱式 CFF、Chromium／Firefox／WebKit 差分、
+  `seac` closure、第三方結構相異性與惡意字型安全審查；能力維持 experimental。
+
 ### 2026-07-17 CFF2 Variable
 
 - 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1 CFF2／Font Variations、Adobe

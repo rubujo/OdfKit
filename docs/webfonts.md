@@ -3,7 +3,7 @@
 > 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
 > System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
 > Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
-> complex-script shaping、惡意來源字型 fuzz、跨節點 store
+> complex-script shaping、第三方惡意來源字型安全稽核、跨節點 store
 > 與外部安全／客戶驗收仍未完成，因此整套產品仍標示 experimental。權威實作邊界見
 > [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
@@ -38,7 +38,7 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 
 第一個可交付 engine 支援 TrueType outline、Unicode scalar、
 Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
-Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed 靜態 CFF 1.0 的
+Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed／名稱式靜態 CFF 1.0 的
 retain-GIDs 路徑目前為 experimental。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
 OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`，以及
 依規格省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2，亦有 experimental
@@ -47,16 +47,18 @@ retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte
 `hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
 路徑接受 WOFF2 collection 的指定 face，驗證 collection directory、table index 與共享
 transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只產生瀏覽器部署用的獨立
-TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF、缺少 VariationStore 卻使用
-`vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
+TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF 的 `seac` 組合字、缺少 VariationStore
+卻使用 `vsindex`／`blend` 的 CFF2 與未知 color table 版本必須明確拒絕，不能刪表或 fallback。
 Arabic／Devanagari 可使用
 下述 correctness-first 模式；其它尚未具合法 corpus 與三瀏覽器差分證據的 complex script
 不得據此推定為已支援。
 
 設定來源 SHA-256 時，engine 的有界 source cache 同時保留已驗證 bytes 與依 face 解析的 immutable
 sfnt 模型；相同來源／face 的後續動態請求不再重新複製所有 table。CFF／CFF2 的 INDEX、DICT、
-VariationStore 與 subroutine 結構使用以 table byte array 為生命週期的弱參照快取；來源 cache
-淘汰後解析模型可一併回收，不建立跨來源的無界靜態字典。輸出 bytes、選字 closure 與 verifier
+VariationStore 與 subroutine 結構使用以 table byte array 為生命週期的弱參照快取；CFF 快取
+另核對 glyph count，CFF2 快取另核對 glyph count 與 variation axis context，避免同一 bytes 在
+不同 face metadata 下誤用解析結果。來源 cache 淘汰後解析模型可一併回收，不建立跨來源的
+無界靜態字典。輸出 bytes、選字 closure 與 verifier
 仍依每個 canonical request 重新產生及驗證。
 
 WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
@@ -126,14 +128,18 @@ bitmap-only 可作輸入，但 Firefox WebFont sanitizer 不接受沒有 outline
 宣稱為跨瀏覽器部署格式；其它 color 模型仍須分別補齊合法 corpus，不能以系統 emoji fallback
 或黑白 outline 冒充成功。
 
-靜態 CFF 1.0 目前只接受含 ROS／FDArray／FDSelect 的 standalone CID-keyed `OTTO`。有界 parser
-會驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、charset 與 FDSelect；未選
+靜態 CFF 1.0 接受含 ROS／FDArray／FDSelect 的 CID-keyed `OTTO`，以及不含 ROS／FDArray／
+FDSelect 的名稱式 CFF。名稱式路徑接受三種預定義 charset 或有界自訂 charset，Private DICT
+可省略；存在時仍驗證 local Subrs。名稱式 `seac` 組合字目前明確拒絕，不能遺失元件後繼續。
+有界 parser 會驗證 CFF INDEX、Top DICT、Font DICT、Private DICT、local Subrs、charset 與
+FDSelect；未選
 glyph 以相同 CharString 長度的合法無 outline 程式取代，因此所有 CFF absolute／relative offset
 保持不變，不剪 global／local subroutine。這是 correctness-first retain-GIDs，不是 compact CFF
 重寫：鎖定的 Source Han Sans 2.005R 案例來源為 16,528,276 bytes，managed OTF 為
 16,297,544 bytes，WOFF 為 1,788,872 bytes，WOFF2 為 1,443,492 bytes。數字只適用該 corpus。
-Chromium、Firefox 與 WebKit 亦已對九組 CFF 中文、Arabic 與 Devanagari 字串完成來源／subset
-逐像素差分。
+Chromium、Firefox 與 WebKit 亦已對九組 CID-keyed CFF 中文、Arabic 與 Devanagari 字串完成
+來源／subset 逐像素差分。名稱式路徑目前只有依官方結構建立的最小 fixture、retain-GIDs 與
+cache-context 負向測試，尚未取得可鎖定的真實三瀏覽器 corpus，因此維持 experimental。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
 Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 以
@@ -207,10 +213,11 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
 容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
-以及 standalone／OTC face 的 CID-keyed 靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
+以及 standalone／OTC face 的 CID-keyed／名稱式靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
 VariationStore 的非變動 CFF2 WOFF；TrueType variable、靜態 CFF、CFF2 與 color font 為
 experimental。`net48` 要求 WOFF2、
-名稱式 CFF、缺少 VariationStore 卻使用 `vsindex`／`blend` 的 CFF2、未知 color table 版本或
+名稱式 CFF 的 `seac` 組合字、缺少 VariationStore 卻使用 `vsindex`／`blend` 的 CFF2、未知
+color table 版本或
 直接輸出 collection 會明確失敗。
 
 API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的
