@@ -2,11 +2,26 @@ name: Performance benchmark
 
 on:
   workflow_dispatch:
+    inputs:
+      run_webfont_iis_sustained_load:
+        description: 'Run the opt-in four-path WebFont IIS sustained load'
+        required: false
+        default: false
+        type: boolean
+      run_macos_informational:
+        description: 'Run the opt-in informational macOS benchmark'
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '17 3 * * 1'
 
 permissions:
   contents: read
+
+concurrency:
+  group: performance-benchmark-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   benchmark-regression:
@@ -48,10 +63,11 @@ jobs:
           name: standard-document-performance-${{ matrix.os }}
           path: artifacts/performance/standard-documents.json
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
 
   benchmark-regression-macos:
     name: Benchmark Regression (macos-latest, informational)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_macos_informational
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
@@ -88,4 +104,59 @@ jobs:
           name: standard-document-performance-macos-latest
           path: artifacts/performance/standard-documents.json
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 14
+
+  webfont-iis-sustained-load:
+    name: WebFont IIS sustained load (Windows)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_webfont_iis_sustained_load
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+
+      - name: Resolve locked CNS font source
+        id: cns-font-source
+        shell: pwsh
+        run: |
+          $font = (Get-Content eng/external-tools.json -Raw |
+            ConvertFrom-Json).webFontSmoke.internationalFonts
+          "sung_revision=$($font.cnsExtB.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "sung_sha256=$($font.cnsExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
+          "kai_revision=$($font.cnsKaiExtB.cacheRevision)" >> $env:GITHUB_OUTPUT
+          "kai_sha256=$($font.cnsKaiExtB.archiveSha256)" >> $env:GITHUB_OUTPUT
+
+      - name: Restore locked CNS font source
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: artifacts/webfont-source-cache
+          # 與 ci.yml 共用同一份宋／楷封存 cache，不為 opt-in 負載另建副本。
+          key: webfont-cns-${{ runner.os }}-sung-r${{ steps.cns-font-source.outputs.sung_revision }}-${{ steps.cns-font-source.outputs.sung_sha256 }}-kai-r${{ steps.cns-font-source.outputs.kai_revision }}-${{ steps.cns-font-source.outputs.kai_sha256 }}
+
+      - name: Run four-path IIS sustained load
+        shell: pwsh
+        timeout-minutes: 35
+        run: |
+          ./eng/Test-WebFontIisSustainedLoad.ps1 `
+            -CnsFontArchivePath artifacts/webfont-source-cache/Fonts_Sung.zip `
+            -MinimumDurationSeconds 30 `
+            -MinimumRequestCount 4096 `
+            -MaximumRequestCount 65536
+
+      - name: Upload WebFont sustained-load evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: webfont-iis-sustained-load-${{ runner.os }}
+          path: |
+            artifacts/webfont-iis-sustained-load/evidence.json
+            artifacts/webfont-iis-sustained-load/**/evidence.json
+            artifacts/webfont-iis-sustained-load/**/iisexpress.*.log
+          if-no-files-found: warn
+          retention-days: 14

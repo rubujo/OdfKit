@@ -35,12 +35,14 @@
 | 腳本 | 用途 |
 |------|------|
 | `Test-GpgSignatures.ps1` | 驗證此 repo 所有提交皆為有效 GPG 簽署，且僅使用 repo 專屬金鑰。 |
+| `Test-CiResourcePolicy.ps1` | 驗證 GitHub Actions cache、artifact、timeout、排程與高成本工作 opt-in 的資源治理契約。 |
 | `Test-LibreOfficeInterop.ps1` | 執行 LibreOffice headless 實機互通性測試。 |
 | `Test-MergeConflictMarkers.ps1` | 掃描原始碼中的合併衝突標記（CS8300 成因）。 |
 | `Test-MarkdownLinks.ps1` | 驗證 `README.md`、`AGENTS.md`、`docs/` 與 eng 文件的本機連結目標及 Markdown anchor 存在，且未越出工作區。 |
 | `Test-XmlReaderSecurity.ps1` | 掃描手寫 `XmlReaderSettings`，要求明確禁止 DTD 並停用外部 XML resolver。 |
 | `Test-NuGetPack.ps1` | 驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置。 |
 | `Test-WebFontReleaseRehearsal.ps1` | 以同批 nupkg 演練隔離本機 feed、SBOM 消費與 NuGet Audit。 |
+| `Test-WebFontIisSustainedLoad.ps1` | 以鎖定 CNS 字型對 Web Forms Integrated／Classic 與 ASP.NET Core In／Out-of-Process 執行手動有界持續負載。 |
 | `Test-WebFontWoff2Corpus.ps1` | 下載 SHA-256 鎖定的 W3C 與 Google Fonts production corpus，驗證 standalone transformed WOFF2 解碼與固定種子 mutation。 |
 | `Test-OdfCorpus.ps1` | 執行內建（與選用外部）corpus 驗證，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |
 | `Test-OdfPolicy.ps1` | 執行 `Category=Policy` 測試，覆蓋巨集淨化、外部資源 policy、加密文件重新加密與相關安全邊界。 |

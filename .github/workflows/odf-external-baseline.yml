@@ -89,7 +89,7 @@ jobs:
           java-version: ${{ steps.validator.outputs.java_version }}
 
       - name: Cache pinned ODF Validator
-        uses: actions/cache@v6
+        uses: ./.github/actions/cache-odfkit
         with:
           path: ${{ steps.validator.outputs.cache_root }}
           key: odf-validator-${{ runner.os }}-${{ steps.validator.outputs.source }}-r${{ steps.validator.outputs.cache_revision }}-${{ steps.validator.outputs.version }}-${{ steps.validator.outputs.sha256 }}
@@ -103,7 +103,7 @@ jobs:
           "jar_path=$jarPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Cache pinned Jing
-        uses: actions/cache@v6
+        uses: ./.github/actions/cache-odfkit
         with:
           path: ${{ steps.jing.outputs.cache_root }}
           key: jing-${{ runner.os }}-${{ steps.jing.outputs.source }}-r${{ steps.jing.outputs.cache_revision }}-${{ steps.jing.outputs.version }}-${{ steps.jing.outputs.sha256 }}

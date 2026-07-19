@@ -9,21 +9,17 @@ permissions:
   contents: read
 
 concurrency:
-  group: libreoffice-interop
-  cancel-in-progress: false
+  group: libreoffice-interop-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   LIBREOFFICE_VERSION: 26.2.4
 
 jobs:
   libreoffice-interop:
-    name: LibreOffice ${{ matrix.framework }} interoperability
+    name: LibreOffice net8.0 and net10.0 interoperability
     runs-on: windows-latest
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        framework: [net8.0, net10.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -35,13 +31,30 @@ jobs:
             10.0.x
             8.0.x
 
+      - name: Restore pinned LibreOffice installer
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ runner.tool_cache }}/odfkit/libreoffice/${{ env.LIBREOFFICE_VERSION }}
+          key: libreoffice-msi-${{ runner.os }}-${{ env.LIBREOFFICE_VERSION }}
+
       - name: Install current LibreOffice release
         shell: pwsh
         run: |
           $fileName = "LibreOffice_$env:LIBREOFFICE_VERSION`_Win_x86-64.msi"
           $uri = "https://download.documentfoundation.org/libreoffice/stable/$env:LIBREOFFICE_VERSION/win/x86_64/$fileName"
-          $msi = Join-Path $env:RUNNER_TEMP $fileName
-          Invoke-WebRequest -Uri $uri -OutFile $msi
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE "odfkit/libreoffice/$env:LIBREOFFICE_VERSION"
+          New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+          $msi = Join-Path $cacheRoot $fileName
+          if (-not (Test-Path -LiteralPath $msi -PathType Leaf)) {
+            $temporaryPath = "$msi.download"
+            try {
+              Invoke-WebRequest -Uri $uri -OutFile $temporaryPath
+              Move-Item -LiteralPath $temporaryPath -Destination $msi
+            }
+            finally {
+              Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+            }
+          }
           $signature = Get-AuthenticodeSignature -FilePath $msi
           if ($signature.Status -ne 'Valid') {
             throw "LibreOffice installer signature is not valid: $($signature.Status)."
@@ -51,10 +64,18 @@ jobs:
             throw "LibreOffice installer failed with exit code $($process.ExitCode)."
           }
 
-      - name: Run real LibreOffice interoperability tests
+      - name: Run real LibreOffice interoperability tests (net8.0)
         shell: pwsh
         run: |
           ./eng/Test-LibreOfficeInterop.ps1 `
             -Configuration Release `
-            -Framework ${{ matrix.framework }} `
+            -Framework net8.0 `
+            -RequireLibreOffice
+
+      - name: Run real LibreOffice interoperability tests (net10.0)
+        shell: pwsh
+        run: |
+          ./eng/Test-LibreOfficeInterop.ps1 `
+            -Configuration Release `
+            -Framework net10.0 `
             -RequireLibreOffice

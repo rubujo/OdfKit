@@ -50,4 +50,4 @@ jobs:
         with:
           name: odf-typed-dom-coverage
           path: artifacts/typed-dom-coverage/odf-typed-dom-coverage.json
-          retention-days: 14
+          retention-days: 7

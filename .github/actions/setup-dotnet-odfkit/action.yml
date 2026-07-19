@@ -5,6 +5,10 @@ inputs:
     description: setup-dotnet 的 dotnet-version（支援多行）
     required: false
     default: 10.0.x
+  nuget-cache-revision:
+    description: 只有需要重建完整 NuGet cache 時才遞增的明確 epoch。
+    required: false
+    default: v1
 runs:
   using: composite
   steps:
@@ -16,53 +20,17 @@ runs:
         "NUGET_PACKAGES=$($env:GITHUB_WORKSPACE)/.nuget/packages" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
         New-Item -ItemType Directory -Path "$($env:GITHUB_WORKSPACE)/.nuget/packages" -Force | Out-Null
 
-    - name: Compute NuGet package version fingerprint
-      id: nuget-fingerprint
-      shell: pwsh
-      run: |
-        # 快取鍵只應該在「真的會改變還原結果」時才變動，cache 才能盡可能被共用而非
-        # 一直被拋棄重建。本 repo 沒有 Directory.Packages.props／packages.lock.json，
-        # 套件版本直接寫在各 csproj 的 PackageReference Version 屬性裡，所以改對
-        # *那些屬性* 取指紋，而不是對整個 csproj 檔案內容取雜湊（hashFiles('**/*.csproj')
-        # 舊寫法）——後者只要新增/移除 ProjectReference、調整 TargetFramework 等與
-        # 套件版本完全無關的異動也會整把換 key，逼出一份內容幾乎相同的新 cache
-        # （曾同時看到新舊兩份近 1.2GB 的 Windows NuGet cache 並存）。
-        # eng/OdfKit.Package.props 是 pack/publish 中繼資料（授權、作者、OdfKit 自身
-        # 套件版本），與「要還原哪些相依套件」無關，故不再納入指紋來源。
-        $versionLines = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj -File |
-            Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' } |
-            ForEach-Object {
-                Select-String -Path $_.FullName -Pattern '<PackageReference\s+[^>]*Include="([^"]+)"[^>]*Version="([^"]+)"' -AllMatches |
-                    ForEach-Object { $_.Matches } |
-                    ForEach-Object { "$($_.Groups[1].Value)=$($_.Groups[2].Value)" }
-            } |
-            Sort-Object -Unique
-
-        $fingerprintSource = $versionLines -join "`n"
-        $bytes = [System.Text.Encoding]::UTF8.GetBytes($fingerprintSource)
-        $hashBytes = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
-        $hex = ($hashBytes | ForEach-Object { $_.ToString('x2') }) -join ''
-        "fingerprint=$hex" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
     - name: Cache NuGet packages
-      uses: actions/cache@v6
+      uses: ./.github/actions/cache-odfkit
       with:
         path: ${{ github.workspace }}/.nuget/packages
-        # 快取鍵刻意不含各呼叫端 workflow 的區分後綴：所有 workflow 都還原同一份
-        # solution 的 NuGet 相依套件，各自加後綴會讓每個 workflow／OS 組合各自
-        # 保留一份幾乎相同的完整快取（曾多達 8 組），很快就超過 repo 層級的
-        # 10 GB Actions 快取總量上限，導致舊快取被提前逐出、還原命中率下降。
-        # 統一鍵值後所有 workflow 共用同一份快取，總量大幅降低。
-        #
-        # 鍵值同時區分 runner.os 與 runner.arch：runner.os 只分作業系統，不分
-        # CPU 架構——nuget-pack.yml 的 validate-nuget-consumers 矩陣同時有
-        # windows-latest（x64）與 windows-11-arm（ARM64），兩者 runner.os 皆為
-        # Windows，若不額外區分架構，這個做 native/AOT consumer smoke 測試、
-        # 可能觸發 RID-specific 還原（例如 win-x64 與 win-arm64 各自不同的
-        # runtime pack）的 job 會讓兩種架構共用同一格 cache、互相踩到對方存的內容。
-        key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ steps.nuget-fingerprint.outputs.fingerprint }}
+        # Cache 是 immutable；以每次套件版本變更產生 fingerprint 會複製整份
+        # Windows cache。明確 epoch 讓同一 OS 只保留一份；nupkg 可同時包含多個
+        # RID，不再因 x64／ARM64 複製整個 global-packages。套件變更時先
+        # 還原既有內容再下載差額；只有累積差額值得重建時才人工遞增 revision。
+        key: nuget-${{ runner.os }}-${{ inputs.nuget-cache-revision }}
         restore-keys: |
-          nuget-${{ runner.os }}-${{ runner.arch }}-
+          nuget-${{ runner.os }}-
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v6

@@ -112,6 +112,17 @@
 
 依實際修改範圍執行最小但充分的驗證；不得以完整測試成本較高為由略過可執行的針對性驗證。
 
+### A. CI 資源與快取治理
+
+- **本機優先**：能在本機重現與驗證的建置、測試、格式化及診斷，應先在本機完成；不得把 GitHub-hosted runner 當作互動式除錯環境，也不得以重跑 CI 取代分析失敗根因。
+- **最小充分矩陣**：workflow 的作業系統、TFM、瀏覽器與情境矩陣必須各自提供不同且必要的覆蓋；不得重複執行已有等價覆蓋的高成本工作。負載、長時間、macOS informational 與大型外部 corpus 工作預設採手動 opt-in，除非有明確、可重現且經審查的排程理由。
+- **快取容量預算**：GitHub Actions cache 以儲存庫預設 **10 GB** 上限規劃，並保留安全餘裕；快取 key 必須穩定、具必要 OS 或明確 epoch 邊界，不得按架構、commit SHA 或廣泛內容雜湊無界增生。需失效時調升明確 revision，不得依賴頻繁 key churn。
+- **PR 僅還原**：pull request 只能還原共用 cache，不得建立 branch-scoped cache；workflow 一律透過 `.github/actions/cache-odfkit` 使用 cache，避免各自產生不一致的儲存策略。
+- **短期產物**：artifact 只保留除錯、稽核或人工決策所需內容，成功時無用的 diagnostics 不得上傳；留存天數、job timeout、排程數量與 cache 軟上限以 `eng/ci-resource-policy.json` 為準。
+- **機器閘門**：修改 `.github/workflows`、`.github/actions` 或 CI 資源政策後，必須執行 `pwsh eng/Test-CiResourcePolicy.ps1`。不得為通過閘門而降低實質測試覆蓋；若確需超出政策，必須同時更新政策、文件與可稽核理由。
+
+### B. 最低驗證矩陣
+
 | 修改類型 | 最低驗證 |
 | --- | --- |
 | 僅函式庫程式碼 | `pwsh eng/Format-Safe.ps1`，並建置或測試受影響專案與 TFM |
@@ -121,6 +132,11 @@
 | XML 文件 | `Test-OneLineXmlSummary.ps1 -FailOnIssues` |
 | 封裝或跨套件 TFM 相容性 | `Test-NuGetPack.ps1` |
 | 效能文件數值 | `Benchmark-Competitive.ps1` |
+
+- **CI 資源政策**：
+  ```powershell
+  pwsh eng/Test-CiResourcePolicy.ps1
+  ```
 
 - **建置專案**：
   ```powershell

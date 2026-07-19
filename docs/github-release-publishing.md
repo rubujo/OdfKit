@@ -104,7 +104,7 @@ consumer smoke 與 Imaging native runtime smoke，避免各平台重新封裝出
 `actions/download-artifact@v8`，並透過共用複合 action
 `./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v6` 與
 `actions/cache@v6`）安裝 .NET SDK。artifact 只保留一天；NuGet restore cache 依作業系統與
-相依檔雜湊分區，不依 CPU 架構或 RID 重複建立。
+明確 revision 分區，不依 CPU 架構、RID 或任意專案檔雜湊重複建立。
 
 封裝 job 另執行 `eng/Test-WebFontReleaseRehearsal.ps1`：它使用 `dotnet nuget push` 將同批
 nupkg 放入隔離本機 feed，以 package source mapping 強制 `OdfKit*` 只來自該 feed，再由乾淨

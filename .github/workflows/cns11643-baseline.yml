@@ -62,7 +62,7 @@ jobs:
           "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Cache pinned mapping tables
-        uses: actions/cache@v6
+        uses: ./.github/actions/cache-odfkit
         with:
           path: ${{ steps.tables.outputs.cache_root }}
           key: cns11643-tables-${{ runner.os }}-r${{ steps.tables.outputs.cache_revision }}-${{ steps.tables.outputs.version }}-${{ steps.tables.outputs.sha256 }}
