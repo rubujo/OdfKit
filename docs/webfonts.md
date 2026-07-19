@@ -3,7 +3,7 @@
 > 目前狀態：純 C#／.NET TrueType 子集引擎、TTF／WOFF／WOFF2、Build、ASP.NET Core 與
 > System.Web 動態端點，以及單機 durable Worker 已有可執行實作。官方 CNS Ext-B 真字型已通過 managed verifier、
 > Chromium、Firefox 與 WebKit；真實 TTC／IVS／PUA 與不支援格式矩陣亦已進入 CI。完整多國
-> complex-script shaping、compact CFF2、分格式 color closure 與擴充 transformed WOFF2
+> complex-script shaping、分格式 color closure 與擴充 transformed WOFF2
 > corpus 尚未完成，因此整套產品仍標示 experimental。權威實作邊界見
 > [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)。
 
@@ -152,11 +152,12 @@ closure、巢狀／缺漏元件拒絕及 64 組固定種子來源 mutation；能
 不阻擋工程完成。
 
 CFF2 variable 路徑使用 32-bit INDEX count、Top／Font／Private DICT、FDSelect 0／3／4、
-Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 以
-等長的零位移 CFF2 CharString 取代，保留 GID、INDEX offsets、`fvar`、`avar`、`STAT`、HVAR 與
-其它 variation metadata。Source Han Sans 2.005R `SourceHanSansTW-VF.otf` 的來源為
-10,495,320 bytes，managed OTF 為 10,396,064 bytes、WOFF 為 200,728 bytes、WOFF2 為
-144,408 bytes；SHA-256 為
+Item Variation Store、`vsindex`、`blend` 與最多十層 subroutine 的有界 parser。未選 glyph 縮為
+單一零 hint 的 `hintmask`，再以兩趟 relocation 重建 Top／Font／Private DICT、32-bit INDEX、
+Header Top DICT length 與 local Subrs 相對 offset；GID、VariationStore、subroutine bytes、
+`fvar`、`avar`、`STAT`、HVAR 與其它 variation metadata 保持不變。Source Han Sans 2.005R
+`SourceHanSansTW-VF.otf` 的來源為 10,495,320 bytes，managed OTF 為 364,352 bytes、WOFF 為
+110,424 bytes、WOFF2 為 72,616 bytes；SHA-256 為
 `e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77`。Chromium、Firefox 與
 WebKit 均以 300／500／700 三個 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分；能力仍因
 缺少更廣 CFF2 corpus 而維持 experimental。第三方惡意字型稽核只屬採用者額外證據。

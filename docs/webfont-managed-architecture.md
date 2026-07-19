@@ -189,7 +189,8 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    的 variable `OTTO`。有界 parser 驗證 collection 絕對 table offset、32-bit INDEX、
    Top／Font／Private DICT、FDSelect
    0／3／4、VariationRegion、ItemVariationData、`vsindex`、`blend` 與 subroutine；未選 glyph
-   以等長零位移 CharString 取代，不重排 INDEX 或 variation metadata。Source Han Sans 2.005R
+   以單一零 hint `hintmask` 取代，再以兩趟 relocation 重建 32-bit INDEX、Top／Font／Private
+   DICT、Header length 與 local Subrs 相對 offset；variation metadata 原樣保留。Source Han Sans 2.005R
    已在三瀏覽器以 300／500／700 `wght` 座標完成來源／subset DOM 截圖逐 byte 差分。Microsoft
    OpenType 1.9.1 明定非變動 CFF2 必須省略 VariationStore；此結構已由有界規格 fixture 解封，
    但因尚缺可再散布的真實靜態 CFF2 與三瀏覽器證據而維持 experimental。缺少 VariationStore

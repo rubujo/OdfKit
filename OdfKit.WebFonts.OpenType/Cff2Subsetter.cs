@@ -41,17 +41,11 @@ internal static class Cff2Subsetter
         ParsedCff2 parsed = GetParsed(source, fvar, glyphCount);
         VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
 
-        var output = (byte[])source.Clone();
-        for (ushort glyph = 0; glyph < glyphCount; glyph++)
-        {
-            if (!selectedGlyphs.Contains(glyph))
-            {
-                Cff2Range range = parsed.CharStrings.Objects[glyph];
-                WriteBlankCharString(output.AsSpan(range.Offset, range.Length));
-            }
-        }
-
-        return output;
+        return Cff2TableCompactor.Build(
+            source,
+            glyphCount,
+            selectedGlyphs,
+            parsed.VariationRegionCounts);
     }
 
     internal static void Validate(
@@ -687,34 +681,6 @@ internal static class Cff2Subsetter
                 parsed.LocalSubroutinesByFontDict[fontDict],
                 parsed.VariationRegionCounts,
                 parsed.DefaultVariationIndexes[fontDict]);
-        }
-    }
-
-    private static void WriteBlankCharString(Span<byte> output)
-    {
-        if (output.Length == 0)
-        {
-            return;
-        }
-
-        int position = 0;
-        if (output.Length == 1)
-        {
-            output[0] = 19;
-            return;
-        }
-
-        if ((output.Length & 1) != 0)
-        {
-            output[position++] = 139;
-            output[position++] = 139;
-            output[position++] = 21;
-        }
-
-        while (position < output.Length)
-        {
-            output[position++] = 139;
-            output[position++] = 22;
         }
     }
 

@@ -139,6 +139,24 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 尚缺的工程證據：更廣多軸 corpus；完成前能力維持 experimental。第三方結構相異性與惡意
   CFF2 安全審查只屬採用者外部驗收。
 
+### 2026-07-19 CFF2 Compact Rewrite
+
+- 實作依據限於 Adobe CFF／Type 2 技術文件與 Microsoft OpenType 1.9.1 CFF2／Font
+  Variations；未讀取、搜尋或改寫第三方 parser、subsetter 或字型工具原始碼。
+- 原創範圍：未選 CharString 縮為單一零 hint `hintmask`，以固定 32-bit DICT operand 建立
+  Top／Font／Private DICT 與 32-bit INDEX 的兩趟 relocation，回填 Header Top DICT length、
+  VariationStore／CharStrings／FDArray／FDSelect 絕對 offset 與 local Subrs 相對 offset。
+- `vsindex`／`blend`：Private DICT tokenizer 維持 active variation index 與 blend stack 消耗，
+  非 offset 條目逐 bytes 保留；GID、VariationStore、subroutine bytes 與 variation metadata
+  不剪枝。
+- 安全與效能：沿用 CFF 1.0 的非重疊替換區、禁止 interior offset、checked overflow 正規化與
+  共用空 CharString bytes；Top DICT 長度超過 16-bit 時明確拒絕。
+- 證據：fixture 驗證 32-bit INDEX、Private／local Subrs relocation、縮小與冪等；25 案例真實
+  矩陣以 Source Han Sans CFF2 variable 與其 OTC face 通過 OTF／WOFF／WOFF2 managed verifier、
+  deterministic 第二次建置及三瀏覽器路徑。
+- 尺寸：Source Han Sans CFF2 OTF 由 10,495,320 降至 364,352 bytes，WOFF 為 110,424 bytes、
+  WOFF2 為 72,616 bytes。數值只適用鎖定 corpus 與目前測試字串。
+
 ### 2026-07-18 非變動 CFF2
 
 - 參與者：Codex agent；實作依據僅限 Microsoft OpenType 1.9.1

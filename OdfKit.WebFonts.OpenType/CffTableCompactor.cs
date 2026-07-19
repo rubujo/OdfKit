@@ -585,7 +585,7 @@ internal static class CffTableCompactor
         }
     }
 
-    private sealed class RelocationMap
+    internal sealed class RelocationMap
     {
         private readonly int _sourceLength;
         private readonly ReplacementInfo[] _replacements;
@@ -698,7 +698,7 @@ internal static class CffTableCompactor
         }
     }
 
-    private sealed class Replacement(int start, int length, byte[] bytes)
+    internal sealed class Replacement(int start, int length, byte[] bytes)
     {
         internal int Start { get; } = start;
 

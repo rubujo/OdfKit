@@ -67,18 +67,56 @@ public sealed class Cff2SubsetterTests
         Assert.Contains("fvar-header", exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Build_CompactsCharStringsAndRewritesPrivateSubrsOffsets()
+    {
+        byte[] source = BuildCff2WithCharStrings(
+            includeLocalSubrs: true,
+            [],
+            [32, 10],
+            [139, 139, 21]);
+        var retainedGlyphs = new HashSet<ushort> { 0, 1 };
+
+        byte[] subset = Cff2Subsetter.Build(
+            source,
+            fvar: null,
+            glyphCount: 3,
+            retainedGlyphs);
+        Cff2Subsetter.Validate(
+            subset,
+            fvar: null,
+            glyphCount: 3,
+            new HashSet<ushort> { 0, 1, 2 });
+        byte[] rebuilt = Cff2Subsetter.Build(
+            subset,
+            fvar: null,
+            glyphCount: 3,
+            retainedGlyphs);
+
+        Assert.True(subset.Length < source.Length);
+        Assert.Equal(subset, rebuilt);
+    }
+
     private static byte[] BuildCff2(byte[] charString)
+        => BuildCff2WithCharStrings(includeLocalSubrs: false, charString);
+
+    private static byte[] BuildCff2WithCharStrings(
+        bool includeLocalSubrs,
+        params byte[][] charStrings)
     {
         const int headerSize = 5;
         const int topDictSize = 13;
         const int globalSubrIndexSize = 4;
         int charStringsOffset = headerSize + topDictSize + globalSubrIndexSize;
-        int charStringsSize = 7 + charString.Length;
+        var charStringsIndex = new List<byte>();
+        AppendIndex(charStringsIndex, charStrings);
+        int charStringsSize = charStringsIndex.Count;
         int fontDictArrayOffset = charStringsOffset + charStringsSize;
         const int fontDictArraySize = 18;
         int privateDictOffset = fontDictArrayOffset + fontDictArraySize;
+        int privateDictLength = includeLocalSubrs ? 6 : 0;
 
-        var bytes = new List<byte>(privateDictOffset)
+        var bytes = new List<byte>()
         {
             2, 0, headerSize, 0, topDictSize
         };
@@ -89,15 +127,46 @@ public sealed class Cff2SubsetterTests
         bytes.AddRange([12, 36]);
 
         bytes.AddRange([0, 0, 0, 0]);
-        bytes.AddRange([0, 0, 0, 1, 1, 1, checked((byte)(charString.Length + 1))]);
-        bytes.AddRange(charString);
+        bytes.AddRange(charStringsIndex);
 
         bytes.AddRange([0, 0, 0, 1, 1, 1, 12]);
-        AppendDictInteger(bytes, 0);
+        AppendDictInteger(bytes, privateDictLength);
         AppendDictInteger(bytes, privateDictOffset);
         bytes.Add(18);
 
+        if (includeLocalSubrs)
+        {
+            AppendDictInteger(bytes, privateDictLength);
+            bytes.Add(19);
+            AppendIndex(bytes, [new byte[] { 139, 22 }]);
+        }
+
         return bytes.ToArray();
+    }
+
+    private static void AppendIndex(List<byte> bytes, IReadOnlyList<byte[]> objects)
+    {
+        Span<byte> count = stackalloc byte[4];
+        BinaryPrimitives.WriteUInt32BigEndian(count, checked((uint)objects.Count));
+        bytes.AddRange(count.ToArray());
+        if (objects.Count == 0)
+        {
+            return;
+        }
+
+        bytes.Add(1);
+        int offset = 1;
+        foreach (byte[] value in objects)
+        {
+            bytes.Add(checked((byte)offset));
+            offset = checked(offset + value.Length);
+        }
+
+        bytes.Add(checked((byte)offset));
+        foreach (byte[] value in objects)
+        {
+            bytes.AddRange(value);
+        }
     }
 
     private static void AppendDictInteger(List<byte> bytes, int value)
