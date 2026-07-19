@@ -4,7 +4,7 @@ namespace OdfKit.WebFonts.OpenType;
 
 internal static class Cff2TableCompactor
 {
-    private static readonly byte[] BlankCharString = [19];
+    private static readonly byte[] BlankCharString = [];
 
     private const int CharStringsOperator = 17;
     private const int PrivateOperator = 18;

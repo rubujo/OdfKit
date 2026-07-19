@@ -13,10 +13,18 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_AcceptsEmptyAndZeroHintMaskPrograms()
+    public void Verify_AcceptsEmptyProgram()
     {
         Cff2CharStringVerifier.Verify(Array.Empty<byte>(), [], [], [1], defaultVariationIndex: 0);
-        Cff2CharStringVerifier.Verify(new byte[] { 19 }, [], [], [1], defaultVariationIndex: 0);
+    }
+
+    [Fact]
+    public void Verify_RejectsHintMaskWithoutStemHints()
+    {
+        InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
+            Cff2CharStringVerifier.Verify(new byte[] { 19 }, [], [], [1], defaultVariationIndex: 0));
+
+        Assert.Contains("hintmask-stem", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

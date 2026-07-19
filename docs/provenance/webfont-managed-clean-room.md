@@ -143,7 +143,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 
 - 實作依據限於 Adobe CFF／Type 2 技術文件與 Microsoft OpenType 1.9.1 CFF2／Font
   Variations；未讀取、搜尋或改寫第三方 parser、subsetter 或字型工具原始碼。
-- 原創範圍：未選 CharString 縮為單一零 hint `hintmask`，以固定 32-bit DICT operand 建立
+- 原創範圍：未選 CharString 縮為規格允許的零長度資料，以固定 32-bit DICT operand 建立
   Top／Font／Private DICT 與 32-bit INDEX 的兩趟 relocation，回填 Header Top DICT length、
   VariationStore／CharStrings／FDArray／FDSelect 絕對 offset 與 local Subrs 相對 offset。
 - `vsindex`／`blend`：Private DICT tokenizer 維持 active variation index 與 blend stack 消耗，
@@ -154,8 +154,13 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 - 證據：fixture 驗證 32-bit INDEX、Private／local Subrs relocation、縮小與冪等；25 案例真實
   矩陣以 Source Han Sans CFF2 variable 與其 OTC face 通過 OTF／WOFF／WOFF2 managed verifier、
   deterministic 第二次建置及三瀏覽器路徑。
-- 尺寸：Source Han Sans CFF2 OTF 由 10,495,320 降至 364,352 bytes，WOFF 為 110,424 bytes、
-  WOFF2 為 72,616 bytes。數值只適用鎖定 corpus 與目前測試字串。
+- 尺寸：Source Han Sans CFF2 OTF 由 10,495,320 降至 343,400 bytes，WOFF 為 72,324 bytes、
+  WOFF2 為 54,736 bytes。輸出 SHA-256 依序為
+  `9edba222ee24ffd2a4fa6f7abde6fc548f140bdf10f20e198be2ef829784b9f3`、
+  `423bb1c93ce7728530b5b7f8268479e79c519b2c65ec13ad402b98fa8c2da346` 與
+  `ff08ef2e1c506e7b88a8cded8ebe949043edd38991ffd10238c2a024c87c8b20`。數值只適用鎖定 corpus
+  與目前測試字串。Firefox sanitizer 曾拒絕無 stem 的 `hintmask`；依 OpenType 1.9.1 改用零長度
+  CharString 後，Chromium／Firefox／WebKit 均通過像素差分。
 
 ### 2026-07-18 非變動 CFF2
 

@@ -186,6 +186,11 @@ internal static class Cff2CharStringVerifier
             state.Stack.Clear();
         }
 
+        if (state.HintCount == 0)
+        {
+            throw SfntFont.DataInvalid("CFF2-CharString-hintmask-stem");
+        }
+
         if (state.HintCount > MaximumHints)
         {
             throw SfntFont.DataInvalid("CFF2-CharString-hintmask-count");
