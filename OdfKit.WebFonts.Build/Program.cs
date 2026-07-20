@@ -65,8 +65,16 @@ static async Task<int> RunAsync(string[] args)
         Console.WriteLine($"Generated {manifest.Assets.Count} assets for profile '{manifest.ProfileId}'.");
         return 0;
     }
+    // FormatException 與 OverflowException 衍生自 SystemException 而非 ArgumentException：
+    // 先前未攔截，使用者只要在數值選項打錯一個字（例如 --face x）就會得到未處理例外
+    // 的堆疊追蹤，而不是乾淨的錯誤訊息與非零結束碼。
     catch (Exception exception) when (
-        exception is ArgumentException or InvalidDataException or IOException or NotSupportedException)
+        exception is ArgumentException
+            or InvalidDataException
+            or IOException
+            or NotSupportedException
+            or FormatException
+            or OverflowException)
     {
         Console.Error.WriteLine(exception.Message);
         return 1;
