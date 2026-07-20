@@ -2,11 +2,51 @@
 
 internal static class GsubGlyphClosure
 {
+    // 與 CharString 直譯器同樣的理由：外層 fixed-point 迴圈次數上限（4096）並不限制
+    // 每輪的工作量。lookup、subtable 與 coverage 三層相乘後，惡意 GSUB 可在單輪內
+    // 產生極大的掃描量，取消權杖只能讓它「可中斷」，不構成界限。
+    // 預設值以真實 corpus 量測為依據，而非估計：Adobe Source Han Sans TC 2.005R
+    // （GSUB 171,170 bytes、起始字圖 16,652、65,535 字圖）實際消耗 105,606 單位，
+    // 200,000,000 因此保有約 1,900 倍餘裕，同時把最壞情況壓在數秒內。
+    // 更換或放寬此值前應重新量測，不要僅憑推導調整。
+    private const int MaximumUnits = 200_000_000;
+
+    /// <summary>
+    /// 閉包工作量預算；以 subtable 套用次數與 coverage 項目數為計量單位。
+    /// </summary>
+    internal sealed class Budget(int maximumUnits, CancellationToken cancellationToken)
+    {
+        private int _remaining = maximumUnits;
+
+        internal int Consumed { get; private set; }
+
+        internal void Consume(int units)
+        {
+            Consumed += units;
+            _remaining -= units;
+            if (_remaining <= 0)
+            {
+                throw SfntFont.DataInvalid("GSUB-closure-budget");
+            }
+
+            // 計費點為每個 subtable 與每張 coverage，呼叫頻率是千級而非十億級，
+            // 因此每次都檢查取消即可，不需要容易寫錯的取樣條件。
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+    }
+
     internal static void Add(
         byte[] table,
         HashSet<ushort> glyphs,
         ushort glyphCount,
         CancellationToken cancellationToken = default)
+        => Add(table, glyphs, glyphCount, new Budget(MaximumUnits, cancellationToken));
+
+    internal static void Add(
+        byte[] table,
+        HashSet<ushort> glyphs,
+        ushort glyphCount,
+        Budget budget)
     {
         SfntFont.EnsureRange(table, 0, 10, "GSUB-header");
         ushort majorVersion = SfntFont.ReadUInt16(table, 0, "GSUB-version");
@@ -30,13 +70,13 @@ internal static class GsubGlyphClosure
             int before = glyphs.Count;
             for (int lookupIndex = 0; lookupIndex < lookupCount; lookupIndex++)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                budget.Consume(1);
                 ushort relativeOffset = SfntFont.ReadUInt16(
                     table,
                     lookupListOffset + 2 + (lookupIndex * 2),
                     "GSUB-lookupOffset");
                 int lookupOffset = checked(lookupListOffset + relativeOffset);
-                ApplyLookup(table, lookupOffset, glyphs, glyphCount);
+                ApplyLookup(table, lookupOffset, glyphs, glyphCount, budget);
             }
 
             if (glyphs.Count == before)
@@ -52,7 +92,8 @@ internal static class GsubGlyphClosure
         byte[] table,
         int lookupOffset,
         HashSet<ushort> glyphs,
-        ushort glyphCount)
+        ushort glyphCount,
+        Budget budget)
     {
         SfntFont.EnsureRange(table, lookupOffset, 6, "GSUB-lookup");
         ushort lookupType = SfntFont.ReadUInt16(table, lookupOffset, "GSUB-lookupType");
@@ -69,7 +110,8 @@ internal static class GsubGlyphClosure
                 table,
                 lookupOffset + 6 + (index * 2),
                 "GSUB-subtableOffset");
-            ApplySubtable(table, lookupType, checked(lookupOffset + relativeOffset), glyphs, glyphCount, 0);
+            budget.Consume(1);
+            ApplySubtable(table, lookupType, checked(lookupOffset + relativeOffset), glyphs, glyphCount, 0, budget);
         }
     }
 
@@ -79,7 +121,8 @@ internal static class GsubGlyphClosure
         int offset,
         HashSet<ushort> glyphs,
         ushort glyphCount,
-        int extensionDepth)
+        int extensionDepth,
+        Budget budget)
     {
         if (extensionDepth > 4)
         {
@@ -89,37 +132,37 @@ internal static class GsubGlyphClosure
         switch (lookupType)
         {
             case 1:
-                ApplySingle(table, offset, glyphs, glyphCount);
+                ApplySingle(table, offset, glyphs, glyphCount, budget);
                 break;
             case 2:
-                ApplyMultiple(table, offset, glyphs, glyphCount);
+                ApplyMultiple(table, offset, glyphs, glyphCount, budget);
                 break;
             case 3:
-                ApplyAlternate(table, offset, glyphs, glyphCount);
+                ApplyAlternate(table, offset, glyphs, glyphCount, budget);
                 break;
             case 4:
-                ApplyLigature(table, offset, glyphs, glyphCount);
+                ApplyLigature(table, offset, glyphs, glyphCount, budget);
                 break;
             case 5:
             case 6:
                 ValidateContextHeader(table, offset);
                 break;
             case 7:
-                ApplyExtension(table, offset, glyphs, glyphCount, extensionDepth);
+                ApplyExtension(table, offset, glyphs, glyphCount, extensionDepth, budget);
                 break;
             case 8:
-                ApplyReverseChain(table, offset, glyphs, glyphCount);
+                ApplyReverseChain(table, offset, glyphs, glyphCount, budget);
                 break;
             default:
                 throw SfntFont.DataInvalid("GSUB-lookupType");
         }
     }
 
-    private static void ApplySingle(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount)
+    private static void ApplySingle(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount, Budget budget)
     {
         ushort format = SfntFont.ReadUInt16(table, offset, "GSUB-singleFormat");
         ushort coverageOffset = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverage");
-        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount);
+        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount, budget);
         if (format == 1)
         {
             short delta = SfntFont.ReadInt16(table, offset + 4, "GSUB-singleDelta");
@@ -157,7 +200,7 @@ internal static class GsubGlyphClosure
         }
     }
 
-    private static void ApplyMultiple(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount)
+    private static void ApplyMultiple(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount, Budget budget)
     {
         if (SfntFont.ReadUInt16(table, offset, "GSUB-multipleFormat") != 1)
         {
@@ -165,7 +208,7 @@ internal static class GsubGlyphClosure
         }
 
         ushort coverageOffset = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverage");
-        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount);
+        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount, budget);
         ushort count = SfntFont.ReadUInt16(table, offset + 4, "GSUB-sequenceCount");
         if (count != coverage.Count)
         {
@@ -194,7 +237,7 @@ internal static class GsubGlyphClosure
         }
     }
 
-    private static void ApplyAlternate(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount)
+    private static void ApplyAlternate(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount, Budget budget)
     {
         if (SfntFont.ReadUInt16(table, offset, "GSUB-alternateFormat") != 1)
         {
@@ -202,7 +245,7 @@ internal static class GsubGlyphClosure
         }
 
         ushort coverageOffset = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverage");
-        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount);
+        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount, budget);
         ushort count = SfntFont.ReadUInt16(table, offset + 4, "GSUB-alternateCount");
         if (count != coverage.Count)
         {
@@ -231,7 +274,7 @@ internal static class GsubGlyphClosure
         }
     }
 
-    private static void ApplyLigature(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount)
+    private static void ApplyLigature(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount, Budget budget)
     {
         if (SfntFont.ReadUInt16(table, offset, "GSUB-ligatureFormat") != 1)
         {
@@ -239,7 +282,7 @@ internal static class GsubGlyphClosure
         }
 
         ushort coverageOffset = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverage");
-        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount);
+        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount, budget);
         ushort setCount = SfntFont.ReadUInt16(table, offset + 4, "GSUB-ligatureSetCount");
         if (setCount != coverage.Count)
         {
@@ -299,7 +342,8 @@ internal static class GsubGlyphClosure
         int offset,
         HashSet<ushort> glyphs,
         ushort glyphCount,
-        int extensionDepth)
+        int extensionDepth,
+        Budget budget)
     {
         if (SfntFont.ReadUInt16(table, offset, "GSUB-extensionFormat") != 1)
         {
@@ -319,10 +363,11 @@ internal static class GsubGlyphClosure
             checked(offset + (int)extensionOffset),
             glyphs,
             glyphCount,
-            extensionDepth + 1);
+            extensionDepth + 1,
+            budget);
     }
 
-    private static void ApplyReverseChain(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount)
+    private static void ApplyReverseChain(byte[] table, int offset, HashSet<ushort> glyphs, ushort glyphCount, Budget budget)
     {
         if (SfntFont.ReadUInt16(table, offset, "GSUB-reverseFormat") != 1)
         {
@@ -330,7 +375,7 @@ internal static class GsubGlyphClosure
         }
 
         ushort coverageOffset = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverage");
-        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount);
+        IReadOnlyList<ushort> coverage = ReadCoverage(table, checked(offset + coverageOffset), glyphCount, budget);
         int position = offset + 4;
         ushort backtrackCount = SfntFont.ReadUInt16(table, position, "GSUB-backtrackCount");
         position = checked(position + 2 + (backtrackCount * 2));
@@ -356,12 +401,18 @@ internal static class GsubGlyphClosure
         }
     }
 
-    private static IReadOnlyList<ushort> ReadCoverage(byte[] table, int offset, ushort glyphCount)
+    private static IReadOnlyList<ushort> ReadCoverage(
+        byte[] table,
+        int offset,
+        ushort glyphCount,
+        Budget budget)
     {
         ushort format = SfntFont.ReadUInt16(table, offset, "GSUB-coverageFormat");
         if (format == 1)
         {
             ushort count = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverageCount");
+            // coverage 掃描是閉包的主要成本，依實際項目數計費才能真正限制總工作量。
+            budget.Consume(count);
             SfntFont.EnsureRange(table, offset + 4, checked(count * 2), "GSUB-coverageGlyphs");
             var glyphs = new ushort[count];
             ushort previous = 0;
@@ -384,6 +435,8 @@ internal static class GsubGlyphClosure
         {
             ushort rangeCount = SfntFont.ReadUInt16(table, offset + 2, "GSUB-coverageRangeCount");
             SfntFont.EnsureRange(table, offset + 4, checked(rangeCount * 6), "GSUB-coverageRanges");
+            // format 2 展開後的項目數上界為 glyphCount（range 不重疊且遞增）。
+            budget.Consume(Math.Max((int)rangeCount, 1));
             var glyphs = new List<ushort>();
             ushort previousEnd = 0;
             for (int index = 0; index < rangeCount; index++)
