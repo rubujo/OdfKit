@@ -16,7 +16,11 @@ namespace OdfKit.WebFonts.Hosting.SystemWeb;
 /// </summary>
 public sealed class OdfWebFontHandler : IHttpHandler
 {
-    private static readonly Lazy<AssetCatalog> Catalog = new(LoadCatalog, isThreadSafe: true);
+    // 刻意不使用 Lazy：isThreadSafe: true 等同 ExecutionAndPublication，會永久快取例外，
+    // 使一次暫時性的載入失敗（權限、掛載延遲、manifest 尚未產生）在 AppDomain 回收前
+    // 都固定失敗。這裡只快取成功建立的結果，失敗允許後續請求重試。
+    private static readonly object CatalogGate = new();
+    private static AssetCatalog? catalog;
     private static readonly Lazy<bool> AllowPublicCrossOriginAssets = new(
         LoadAllowPublicCrossOriginAssets,
         isThreadSafe: true);
@@ -57,7 +61,7 @@ public sealed class OdfWebFontHandler : IHttpHandler
                 OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        AssetCatalog catalog = _catalog ?? Catalog.Value;
+        AssetCatalog catalog = _catalog ?? GetOrCreateCatalog();
         bool allowPublicCrossOriginAssets = _allowPublicCrossOriginAssets ?? AllowPublicCrossOriginAssets.Value;
         string path = context.Request.Path.TrimEnd('/');
         if (path.EndsWith("/manifest.json", StringComparison.OrdinalIgnoreCase))
@@ -121,6 +125,28 @@ public sealed class OdfWebFontHandler : IHttpHandler
         else
         {
             response.TransmitFile(asset.FullPath);
+        }
+    }
+
+    private static AssetCatalog GetOrCreateCatalog()
+    {
+        AssetCatalog? existing = Volatile.Read(ref catalog);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        lock (CatalogGate)
+        {
+            existing = catalog;
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            AssetCatalog created = LoadCatalog();
+            Volatile.Write(ref catalog, created);
+            return created;
         }
     }
 
@@ -337,9 +363,13 @@ public sealed class OdfWebFontHandler : IHttpHandler
                     descriptor.Sha256.ToLowerInvariant(),
                     descriptor.FileName));
                 var info = new FileInfo(fullPath);
+                // IsContained 只比對路徑字串；符號連結或 junction 的路徑仍位於根目錄下，
+                // 卻可指向外部檔案。與 ASP.NET Core 資產儲存區一致，明確拒絕 reparse point。
                 if (!IsPlainFileName(descriptor.FileName)
                     || !IsHash(descriptor.Sha256)
                     || !IsContained(fullRoot, fullPath)
+                    || HasReparsePoint(info)
+                    || HasReparsePoint(info.Directory)
                     || !info.Exists
                     || info.Length != descriptor.ByteLength
                     || info.Length <= 0
@@ -410,6 +440,25 @@ public sealed class OdfWebFontHandler : IHttpHandler
                 && value.Length <= 255
                 && string.Equals(value, Path.GetFileName(value), StringComparison.Ordinal)
                 && value.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+
+        private static bool HasReparsePoint(FileSystemInfo? info)
+        {
+            if (info is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return (info.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+            }
+            catch (Exception exception) when (exception is IOException
+                                              or UnauthorizedAccessException)
+            {
+                // 無法判定連結狀態時一律視為不可信。
+                return true;
+            }
+        }
 
         private static bool IsContained(string root, string path)
             => path.StartsWith(root.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);

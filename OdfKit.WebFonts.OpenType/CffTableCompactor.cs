@@ -694,6 +694,14 @@ internal static class CffTableCompactor
             int outputPosition = 0;
             foreach (Replacement replacement in ordered)
             {
+                // DICT 內的 offset 只各自做過來源範圍檢查，彼此並未交叉比對，因此
+                // 惡意 CFF 可讓 Private 與 CharStrings 等結構重疊。若不在此攔截，
+                // 負的區段長度會拋出未在地化的 ArgumentOutOfRangeException。
+                if (replacement.Start < sourcePosition)
+                {
+                    throw SfntFont.DataInvalid("CFF-compact-overlap");
+                }
+
                 int unchangedLength = checked(replacement.Start - sourcePosition);
                 source.AsSpan(sourcePosition, unchangedLength)
                     .CopyTo(output.AsSpan(outputPosition, unchangedLength));
