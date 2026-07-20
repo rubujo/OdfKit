@@ -192,8 +192,39 @@ IFT 的標準狀態、retain-gids 實證邊界與升級閘門見
    `endchar` 的 StandardEncoding base／accent code，經 ISOAdobe／Expert／ExpertSubset 或自訂 charset
    找回元件 GID 並納入保留集合；找不到元件、非整數／超界代碼與規格禁止的巢狀組字明確拒絕。
    Compact INDEX／DICT 與 subroutine 重寫須另有結構與效能證據。
-3. **Subroutine 剪枝**：只有真實部署基準證明其收益顯著高於 WOFF2 Brotli 後才進入；未進入前
-   不重編 local／global subr bias。
+3. **Subroutine 剪枝**：基準已完成，**閘門條件已滿足**，但實作尚未進行。
+
+   量測對象為 Source Han Sans TC `2.005R` 產生的 4 字元子集 OTF（CFF 表 1,559,452 bytes）：
+
+   | 項目 | bytes | 佔 CFF |
+   | --- | --- | --- |
+   | local subroutines（跨所有 Font DICT） | 1,283,669 | 82% |
+   | global subroutines | 9,795 | 0.6% |
+   | CharStrings INDEX（65,535 個保留槽） | 263,845 | 17% |
+
+   local subroutine 體積**與子集大小完全無關**：4 字元、4,608 字元與 9,000 字元三種子集
+   量到的都是同一個 1,283,669 bytes，因為目前保留完整 subroutine bytes 不剪枝。對「每次
+   請求產生小字集」的動態情境而言，這是純固定成本。
+
+   關鍵問題是 WOFF2 的 Brotli 是否已經吸收掉這部分。答案是否定的：
+
+   | | Brotli 後 |
+   | --- | --- |
+   | 完整 CFF | 1,021,537 |
+   | 移除 local subroutines | 272,801 |
+   | **Brotli 之外的額外收益** | **748,736（73.3%）** |
+
+   量測方式為解析產出 OTF 的 CFF 結構，取出各 Font DICT 的 local Subrs INDEX 區段，
+   比較完整與移除後的 Brotli（`CompressionLevel.SmallestSize`）體積。
+
+   **建議實作路徑**：不重編號。callsubr 的運算元已烘入 charstring，改變 INDEX 項目數會
+   連帶改變 bias 而使既有運算元全部失效。改為保留 INDEX 項目數不變，僅將未使用的
+   subroutine 本體替換為單一 `return`（op 11），與現行 CharStrings 對未選字圖改用單一
+   `endchar` 的作法一致。
+
+   此替換**可證明安全**：`Type2CharStringVerifier` 對動態計算的 subroutine 索引一律拒絕
+   （運算元非靜態常數時 `Pop` 回傳 unknown，隨即拋出 `CFF-Subrs-index`），因此靜態可達性
+   等同實際可達性，而該 verifier 已在子集化過程中走訪每個保留字圖的全部 callsubr。
 4. **CFF2／PostScript Variable Fonts**：已解封 standalone／OTC face、含 `fvar`／VariationStore
    的 variable `OTTO`。有界 parser 驗證 collection 絕對 table offset、32-bit INDEX、
    Top／Font／Private DICT、FDSelect
