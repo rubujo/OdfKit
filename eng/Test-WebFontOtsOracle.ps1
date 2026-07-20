@@ -201,7 +201,10 @@ $controlBytes = [IO.File]::ReadAllBytes($controlSource.FullName)
 [IO.File]::WriteAllBytes($controlPath, $controlBytes[0..([int]($controlBytes.Length * 0.6))])
 
 $controlOutput = & $otsExecutable $controlPath (Join-Path $evidenceRoot "control.tmp") 2>&1 | Out-String
-$controlAccepted = $LASTEXITCODE -eq 0
+$controlExitCode = $LASTEXITCODE
+# 負向對照預期 OTS 回傳非零；避免成功腳本沿用該原生程序結束碼。
+$global:LASTEXITCODE = 0
+$controlAccepted = $controlExitCode -eq 0
 if ($controlAccepted) { $failures++ }
 
 $results.Add([ordered]@{
