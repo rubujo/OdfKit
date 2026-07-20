@@ -35,14 +35,16 @@ internal static class CffSubsetter
         CancellationToken cancellationToken = default)
     {
         ParsedCff parsed = GetParsed(source, glyphCount);
+        var usage = new CffSubroutineUsage();
         HashSet<ushort> retainedGlyphs = VerifyAndExpandSelectedGlyphs(
             source,
             glyphCount,
             selectedGlyphs,
             parsed,
+            usage,
             cancellationToken);
 
-        return CffTableCompactor.Build(source, glyphCount, retainedGlyphs, cancellationToken);
+        return CffTableCompactor.Build(source, glyphCount, retainedGlyphs, usage, cancellationToken);
     }
 
     internal static void Validate(
@@ -52,7 +54,13 @@ internal static class CffSubsetter
         CancellationToken cancellationToken = default)
     {
         ParsedCff parsed = GetParsed(source, glyphCount);
-        _ = VerifyAndExpandSelectedGlyphs(source, glyphCount, selectedGlyphs, parsed, cancellationToken);
+        _ = VerifyAndExpandSelectedGlyphs(
+            source,
+            glyphCount,
+            selectedGlyphs,
+            parsed,
+            usage: null,
+            cancellationToken);
     }
 
     private static ParsedCff Parse(byte[] source, ushort glyphCount)
@@ -159,6 +167,7 @@ internal static class CffSubsetter
         ushort glyphCount,
         ISet<ushort> selectedGlyphs,
         ParsedCff parsed,
+        CffSubroutineUsage? usage,
         CancellationToken cancellationToken)
     {
         var retainedGlyphs = new HashSet<ushort>(selectedGlyphs);
@@ -170,12 +179,16 @@ internal static class CffSubsetter
                 throw SfntFont.DataInvalid("CFF-selected-glyph");
             }
 
+            int fontDict = parsed.FontDictByGlyph[glyph];
+            var glyphUsage = usage is null ? null : new Type2SubroutineUsage();
             CffRange range = parsed.CharStrings.Objects[glyph];
             Type2SeacComponents? components = Type2CharStringVerifier.Verify(
                 new ReadOnlyMemory<byte>(source, range.Offset, range.Length),
                 parsed.GlobalSubroutines,
-                parsed.LocalSubroutinesByFontDict[parsed.FontDictByGlyph[glyph]],
+                parsed.LocalSubroutinesByFontDict[fontDict],
+                glyphUsage,
                 cancellationToken);
+            usage?.Merge(fontDict, glyphUsage!);
             if (components is not Type2SeacComponents seac)
             {
                 continue;
@@ -186,8 +199,8 @@ internal static class CffSubsetter
                 throw SfntFont.DataInvalid("CFF-seac-CID");
             }
 
-            AddSeacComponent(source, parsed, retainedGlyphs, seac.BaseCode);
-            AddSeacComponent(source, parsed, retainedGlyphs, seac.AccentCode);
+            AddSeacComponent(source, parsed, retainedGlyphs, seac.BaseCode, usage);
+            AddSeacComponent(source, parsed, retainedGlyphs, seac.AccentCode, usage);
         }
 
         return retainedGlyphs;
@@ -197,7 +210,8 @@ internal static class CffSubsetter
         byte[] source,
         ParsedCff parsed,
         ISet<ushort> retainedGlyphs,
-        byte standardEncodingCode)
+        byte standardEncodingCode,
+        CffSubroutineUsage? usage)
     {
         ushort sid = GetStandardEncodingSid(standardEncodingCode);
         if (!parsed.GlyphBySid!.TryGetValue(sid, out ushort glyph))
@@ -205,11 +219,17 @@ internal static class CffSubsetter
             throw SfntFont.DataInvalid("CFF-seac-component");
         }
 
+        // seac 元件同樣會被保留，其 subroutine 因而也必須納入使用集合。
+        int fontDict = parsed.FontDictByGlyph[glyph];
+        var glyphUsage = usage is null ? null : new Type2SubroutineUsage();
         CffRange range = parsed.CharStrings.Objects[glyph];
         Type2SeacComponents? nested = Type2CharStringVerifier.Verify(
             new ReadOnlyMemory<byte>(source, range.Offset, range.Length),
             parsed.GlobalSubroutines,
-            parsed.LocalSubroutinesByFontDict[parsed.FontDictByGlyph[glyph]]);
+            parsed.LocalSubroutinesByFontDict[fontDict],
+            glyphUsage,
+            CancellationToken.None);
+        usage?.Merge(fontDict, glyphUsage!);
         if (nested is not null)
         {
             throw SfntFont.DataInvalid("CFF-seac-nested");
@@ -548,6 +568,33 @@ internal static class CffSubsetter
             251 => 149,
             _ => 0
         };
+    }
+
+    /// <summary>
+    /// 彙整子集保留字圖實際進入的 subroutine，供 compactor 剪除其餘本體。
+    /// </summary>
+    internal sealed class CffSubroutineUsage
+    {
+        internal HashSet<int> Global { get; } = [];
+
+        internal Dictionary<int, HashSet<int>> LocalByFontDict { get; } = [];
+
+        internal void Merge(int fontDict, Type2SubroutineUsage glyphUsage)
+        {
+            Global.UnionWith(glyphUsage.Global);
+            if (!LocalByFontDict.TryGetValue(fontDict, out HashSet<int>? local))
+            {
+                local = [];
+                LocalByFontDict.Add(fontDict, local);
+            }
+
+            local.UnionWith(glyphUsage.Local);
+        }
+
+        internal ISet<int> GetLocal(int fontDict)
+            => LocalByFontDict.TryGetValue(fontDict, out HashSet<int>? local)
+                ? local
+                : new HashSet<int>();
     }
 
     private static CffIndex ReadIndex(byte[] source, int offset, string detail)

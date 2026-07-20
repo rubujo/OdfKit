@@ -170,6 +170,28 @@ foreach ($case in $corpusCases) {
     }
 }
 
+# ---------------------------------------------------------------- 剪枝回歸
+# OTS 與瀏覽器只驗證正確性，不驗證 subroutine 剪枝是否真的發生：若剪枝失效
+# （例如誤用未帶 usage 的多載），輸出仍是合法字型，兩個閘門都不會紅。因此另以
+# 體積上界固定此行為。剪枝前 small/woff2 為 1,166,964 bytes，剪枝後 281,708；
+# 上界取 500,000 以容納字型或壓縮器的正常變動，同時能明確攔下剪枝失效。
+$smallWoff2 = Get-ChildItem -LiteralPath (Join-Path $assetRoot "small") -Recurse -File -Include *.woff2 |
+    Select-Object -First 1
+$pruningLimit = 500000
+$pruningHeld = $smallWoff2.Length -lt $pruningLimit
+if (-not $pruningHeld) { $failures++ }
+$results.Add([ordered]@{
+    case = "subroutine-pruning"
+    asset = $smallWoff2.Name
+    format = "woff2"
+    bytes = $smallWoff2.Length
+    limitBytes = $pruningLimit
+    otsAccepted = $true
+    expectedAccepted = $true
+})
+Write-Host ("[pruning] small/woff2 {0:N0} bytes（上界 {1:N0}）-> {2}" -f `
+    $smallWoff2.Length, $pruningLimit, $(if ($pruningHeld) { "PASS" } else { "FAIL：剪枝可能已失效" }))
+
 # ---------------------------------------------------------------- 負向對照
 # 若截斷的資產仍被接受，代表這個預言機沒有在判別，上方所有 PASS 都不可採信。
 $controlSource = Get-ChildItem -LiteralPath $assetRoot -Recurse -File -Include *.woff2 |

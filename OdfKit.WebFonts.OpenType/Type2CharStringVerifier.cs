@@ -26,13 +26,33 @@ internal static class Type2CharStringVerifier
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
         IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
         CancellationToken cancellationToken)
+        => Verify(charString, globalSubroutines, localSubroutines, usage: null, cancellationToken);
+
+    /// <summary>
+    /// 驗證 CharString，並可選擇記錄實際進入的 subroutine 索引。
+    /// </summary>
+    /// <remarks>
+    /// 記錄到的是靜態可達集合，而這等同實際可達集合：本驗證器對非靜態常數的
+    /// subroutine 索引一律拒絕（<c>Pop</c> 回傳未知值時即拋出 CFF-Subrs-index），
+    /// 因此不存在執行期才決定的呼叫目標。子集化據此可安全地剪除未被記錄的
+    /// subroutine 本體。
+    /// </remarks>
+    internal static Type2SeacComponents? Verify(
+        ReadOnlyMemory<byte> charString,
+        IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
+        IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
+        Type2SubroutineUsage? usage,
+        CancellationToken cancellationToken)
     {
         if (globalSubroutines.Count > 65_535 || localSubroutines.Count > 65_535)
         {
             throw SfntFont.DataInvalid("CFF-Subrs-count");
         }
 
-        var state = new VerificationState(globalSubroutines, localSubroutines, cancellationToken);
+        var state = new VerificationState(globalSubroutines, localSubroutines, cancellationToken)
+        {
+            Usage = usage
+        };
         ProgramResult result = ProcessProgram(charString, state, depth: 0, isSubroutine: false);
         if (result != ProgramResult.EndChar)
         {
@@ -166,6 +186,18 @@ internal static class Type2CharStringVerifier
         if ((uint)biasedIndex >= (uint)subroutines.Count || depth >= MaximumSubroutineDepth)
         {
             throw SfntFont.DataInvalid("CFF-Subrs-index-depth");
+        }
+
+        if (state.Usage is Type2SubroutineUsage usage)
+        {
+            if (ReferenceEquals(subroutines, state.GlobalSubroutines))
+            {
+                usage.Global.Add(biasedIndex);
+            }
+            else
+            {
+                usage.Local.Add(biasedIndex);
+            }
         }
 
         ProgramResult result = ProcessProgram(subroutines[biasedIndex], state, depth + 1, isSubroutine: true);
@@ -699,6 +731,8 @@ internal static class Type2CharStringVerifier
         internal bool WidthSeen { get; set; }
 
         internal Type2SeacComponents? SeacComponents { get; set; }
+
+        internal Type2SubroutineUsage? Usage { get; set; }
     }
 
     private enum ProgramResult
@@ -707,6 +741,20 @@ internal static class Type2CharStringVerifier
         Return,
         EndChar
     }
+}
+
+/// <summary>
+/// 記錄單次 CharString 驗證中實際進入的 subroutine 索引。
+/// </summary>
+/// <remarks>
+/// local 集合僅對本次驗證所用的 local subroutine 清單有效；呼叫端須依字圖所屬的
+/// Font DICT 分別彙整。
+/// </remarks>
+internal sealed class Type2SubroutineUsage
+{
+    internal HashSet<int> Global { get; } = [];
+
+    internal HashSet<int> Local { get; } = [];
 }
 
 internal readonly struct Type2SeacComponents

@@ -6,6 +6,10 @@ internal static class CffTableCompactor
 {
     private static readonly byte[] BlankCharString = [14];
 
+    // Type 2 的 return 運算子；未使用的 subroutine 縮成單一位元組，
+    // 與未選字圖縮成單一 endchar 的既有作法一致。
+    private static readonly byte[] BlankSubroutine = [11];
+
     private const int CharsetOperator = 15;
     private const int EncodingOperator = 16;
     private const int CharStringsOperator = 17;
@@ -20,10 +24,18 @@ internal static class CffTableCompactor
         ushort glyphCount,
         ISet<ushort> retainedGlyphs,
         CancellationToken cancellationToken = default)
+        => Build(source, glyphCount, retainedGlyphs, usage: null, cancellationToken);
+
+    internal static byte[] Build(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> retainedGlyphs,
+        CffSubsetter.CffSubroutineUsage? usage,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            return BuildCore(source, glyphCount, retainedGlyphs, cancellationToken);
+            return BuildCore(source, glyphCount, retainedGlyphs, usage, cancellationToken);
         }
         catch (OverflowException)
         {
@@ -35,6 +47,7 @@ internal static class CffTableCompactor
         byte[] source,
         ushort glyphCount,
         ISet<ushort> retainedGlyphs,
+        CffSubsetter.CffSubroutineUsage? usage,
         CancellationToken cancellationToken)
     {
         Layout layout = Parse(source, glyphCount);
@@ -44,6 +57,29 @@ internal static class CffTableCompactor
             new(layout.TopDictIndex.Start, layout.TopDictIndex.Length, Array.Empty<byte>()),
             new(layout.CharStrings.Start, layout.CharStrings.Length, compactCharStrings)
         };
+
+        // subroutine 剪枝：保留 INDEX 項目數不變以維持 bias（callsubr 的運算元已烘入
+        // charstring，改變項目數會使全部運算元失效），僅將未使用的本體替換為單一
+        // return。使用集合由 Type2CharStringVerifier 於驗證保留字圖時記錄，而該驗證器
+        // 對非靜態常數的 subroutine 索引一律拒絕，故靜態可達性等同實際可達性。
+        if (usage is not null)
+        {
+            AddSubroutineReplacement(replacements, source, layout.GlobalSubrs, usage.Global);
+            for (int index = 0; index < layout.FontDicts.Count; index++)
+            {
+                if (layout.FontDicts[index].PrivateDict?.Subrs is IndexLayout localSubrs)
+                {
+                    AddSubroutineReplacement(replacements, source, localSubrs, usage.GetLocal(index));
+                }
+            }
+
+            // 名稱式 CFF 沒有 FDArray，其單一 local Subrs 掛在 Top DICT 的 Private 之下；
+            // 子集化端一律以 Font DICT 索引 0 記錄該情形。
+            if (layout.FontDicts.Count == 0 && layout.TopPrivate?.Subrs is IndexLayout topSubrs)
+            {
+                AddSubroutineReplacement(replacements, source, topSubrs, usage.GetLocal(0));
+            }
+        }
 
         if (layout.FontDictIndex is not null)
         {
@@ -102,13 +138,39 @@ internal static class CffTableCompactor
         return offsetMap.Apply(source, replacements);
     }
 
+    /// <summary>
+    /// 以「未使用者換成單一 return」的方式重建 subroutine INDEX，項目數不變。
+    /// </summary>
+    private static void AddSubroutineReplacement(
+        List<Replacement> replacements,
+        byte[] source,
+        IndexLayout subrs,
+        ISet<int> used)
+    {
+        if (subrs.Objects.Count == 0)
+        {
+            return;
+        }
+
+        var objects = new byte[subrs.Objects.Count][];
+        for (int index = 0; index < objects.Length; index++)
+        {
+            Range range = subrs.Objects[index];
+            objects[index] = used.Contains(index)
+                ? source.AsSpan(range.Start, range.Length).ToArray()
+                : BlankSubroutine;
+        }
+
+        replacements.Add(new Replacement(subrs.Start, subrs.Length, BuildIndex(objects)));
+    }
+
     private static Layout Parse(byte[] source, ushort glyphCount)
     {
         SfntFont.EnsureRange(source, 0, 4, "CFF-compact-header");
         IndexLayout nameIndex = ReadIndex(source, source[2], "CFF-compact-Name");
         IndexLayout topDictIndex = ReadIndex(source, nameIndex.End, "CFF-compact-TopDICT");
         IndexLayout stringIndex = ReadIndex(source, topDictIndex.End, "CFF-compact-String");
-        _ = ReadIndex(source, stringIndex.End, "CFF-compact-GlobalSubrs");
+        IndexLayout globalSubrs = ReadIndex(source, stringIndex.End, "CFF-compact-GlobalSubrs");
         if (topDictIndex.Objects.Count != 1)
         {
             throw SfntFont.DataInvalid("CFF-compact-FontSet");
@@ -165,6 +227,7 @@ internal static class CffTableCompactor
             topDict,
             topPrivate,
             charStrings,
+            globalSubrs,
             fontDictIndex,
             fontDicts,
             privateDicts);
@@ -190,15 +253,16 @@ internal static class CffTableCompactor
             detail);
         DictEntry? subrs = Find(privateDict, SubrsOperator);
         int? subrsOffset = null;
+        IndexLayout? subrsIndex = null;
         if (subrs is not null)
         {
             RequireOperands(subrs, 1, $"{detail}-Subrs");
             long relativeOffset = ToInt(subrs.Operands[0], $"{detail}-Subrs");
             subrsOffset = ToInt((long)offset + relativeOffset, $"{detail}-Subrs");
-            _ = ReadIndex(source, subrsOffset.Value, $"{detail}-Subrs");
+            subrsIndex = ReadIndex(source, subrsOffset.Value, $"{detail}-Subrs");
         }
 
-        return new PrivateLayout(offset, length, privateDict, subrsOffset);
+        return new PrivateLayout(offset, length, privateDict, subrsOffset, subrsIndex);
     }
 
     private static byte[] RewriteTopDict(
@@ -739,6 +803,7 @@ internal static class CffTableCompactor
         IReadOnlyList<DictEntry> topDict,
         PrivateLayout? topPrivate,
         IndexLayout charStrings,
+        IndexLayout globalSubrs,
         IndexLayout? fontDictIndex,
         IReadOnlyList<FontDictLayout> fontDicts,
         IReadOnlyList<PrivateLayout> privateDicts)
@@ -750,6 +815,8 @@ internal static class CffTableCompactor
         internal PrivateLayout? TopPrivate { get; } = topPrivate;
 
         internal IndexLayout CharStrings { get; } = charStrings;
+
+        internal IndexLayout GlobalSubrs { get; } = globalSubrs;
 
         internal IndexLayout? FontDictIndex { get; } = fontDictIndex;
 
@@ -771,7 +838,8 @@ internal static class CffTableCompactor
         int start,
         int length,
         IReadOnlyList<DictEntry> entries,
-        int? subrsOffset)
+        int? subrsOffset,
+        IndexLayout? subrs)
     {
         internal int Start { get; } = start;
 
@@ -780,6 +848,8 @@ internal static class CffTableCompactor
         internal IReadOnlyList<DictEntry> Entries { get; } = entries;
 
         internal int? SubrsOffset { get; } = subrsOffset;
+
+        internal IndexLayout? Subrs { get; } = subrs;
     }
 
     private sealed class IndexLayout(int start, int length, IReadOnlyList<Range> objects)
