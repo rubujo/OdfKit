@@ -62,8 +62,12 @@ internal sealed class ColorGlyphClosure
 internal static class ColorFontValidator
 {
     /// <remarks>
-    /// 各 color table 的巡訪次數由「每個 strike／glyph 皆須佔用實際位元組」的
-    /// 範圍檢查隱含限制，因此取消權杖只在各技術階段之間檢查，不逐 glyph 傳遞。
+    /// 取消權杖只在各技術階段之間檢查，不逐 glyph 傳遞。依據是所有圖狀巡訪都有
+    /// 記憶化，而非僅靠位元組範圍檢查：COLR paint 的 <c>_visitStates</c> 與
+    /// <c>_dependencyCache</c>、<c>sbix dupe</c> 的 <c>states</c>，以及
+    /// <c>ColorGlyphClosure</c> 的 <c>visited</c>，都讓每個節點至多處理一次，
+    /// 因此不存在 CharString 直譯器那種 breadth^depth 的展開。
+    /// 若日後移除任一記憶化，本註解的前提即不再成立，必須改為逐 glyph 傳遞權杖。
     /// </remarks>
     internal static ColorGlyphClosure Validate(
         IReadOnlyDictionary<string, byte[]> tables,

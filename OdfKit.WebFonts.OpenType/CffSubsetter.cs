@@ -174,7 +174,8 @@ internal static class CffSubsetter
             Type2SeacComponents? components = Type2CharStringVerifier.Verify(
                 new ReadOnlyMemory<byte>(source, range.Offset, range.Length),
                 parsed.GlobalSubroutines,
-                parsed.LocalSubroutinesByFontDict[parsed.FontDictByGlyph[glyph]]);
+                parsed.LocalSubroutinesByFontDict[parsed.FontDictByGlyph[glyph]],
+                cancellationToken);
             if (components is not Type2SeacComponents seac)
             {
                 continue;

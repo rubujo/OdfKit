@@ -9,12 +9,31 @@ internal static class Cff2CharStringVerifier
     private const int MaximumHints = 96;
     private const int MaximumProgramLength = 1_048_576;
 
+    // 與 Type2 相同的理由：深度上限不限制呼叫廣度，巢狀 subroutine 可指數展開。
+    // CFF2 的程式長度上限更大（1 MiB），單層可容納的呼叫數也更多，總預算因此必要。
+    private const int MaximumOperations = 1_000_000;
+
     internal static void Verify(
         ReadOnlyMemory<byte> charString,
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
         IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
         int[] variationRegionCounts,
         int defaultVariationIndex)
+        => Verify(
+            charString,
+            globalSubroutines,
+            localSubroutines,
+            variationRegionCounts,
+            defaultVariationIndex,
+            CancellationToken.None);
+
+    internal static void Verify(
+        ReadOnlyMemory<byte> charString,
+        IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
+        IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
+        int[] variationRegionCounts,
+        int defaultVariationIndex,
+        CancellationToken cancellationToken)
     {
         if (globalSubroutines.Count > 65_535
             || localSubroutines.Count > 65_535
@@ -29,7 +48,8 @@ internal static class Cff2CharStringVerifier
             globalSubroutines,
             localSubroutines,
             variationRegionCounts,
-            defaultVariationIndex);
+            defaultVariationIndex,
+            cancellationToken);
         ProcessProgram(charString, state, depth: 0, isSubroutine: false);
         if (state.Stack.Count != 0)
         {
@@ -52,6 +72,7 @@ internal static class Cff2CharStringVerifier
         int position = 0;
         while (position < program.Length)
         {
+            state.ConsumeOperation();
             byte value = program[position++];
             if (value == 28 || value >= 32)
             {
@@ -423,8 +444,27 @@ internal static class Cff2CharStringVerifier
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
         IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
         int[] variationRegionCounts,
-        int defaultVariationIndex)
+        int defaultVariationIndex,
+        CancellationToken cancellationToken)
     {
+        private int _remainingOperations = MaximumOperations;
+
+        /// <summary>
+        /// 扣減總操作預算；耗盡時拒絕，並定期檢查取消要求。
+        /// </summary>
+        internal void ConsumeOperation()
+        {
+            if (--_remainingOperations <= 0)
+            {
+                throw SfntFont.DataInvalid("CFF2-CharString-operation-budget");
+            }
+
+            if ((_remainingOperations & 0xFFFF) == 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+        }
+
         internal IReadOnlyList<ReadOnlyMemory<byte>> GlobalSubroutines { get; } = globalSubroutines;
 
         internal IReadOnlyList<ReadOnlyMemory<byte>> LocalSubroutines { get; } = localSubroutines;

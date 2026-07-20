@@ -9,17 +9,30 @@ internal static class Type2CharStringVerifier
     private const int MaximumHints = 96;
     private const int MaximumCharStringLength = 65_535;
 
+    // 遞迴深度上限無法限制每層的呼叫廣度：巢狀 subroutine 可產生 breadth^depth 的
+    // 展開量，約 600 位元組的 subroutine 資料即足以造成實質無限的執行時間。
+    // 因此另設總操作預算。合法字型的單一字圖通常只執行數千個 operator，
+    // 一百萬提供兩個數量級以上的餘裕，同時把最壞情況壓在一秒內。
+    private const int MaximumOperations = 1_000_000;
+
     internal static Type2SeacComponents? Verify(
         ReadOnlyMemory<byte> charString,
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
         IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines)
+        => Verify(charString, globalSubroutines, localSubroutines, CancellationToken.None);
+
+    internal static Type2SeacComponents? Verify(
+        ReadOnlyMemory<byte> charString,
+        IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
+        IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
+        CancellationToken cancellationToken)
     {
         if (globalSubroutines.Count > 65_535 || localSubroutines.Count > 65_535)
         {
             throw SfntFont.DataInvalid("CFF-Subrs-count");
         }
 
-        var state = new VerificationState(globalSubroutines, localSubroutines);
+        var state = new VerificationState(globalSubroutines, localSubroutines, cancellationToken);
         ProgramResult result = ProcessProgram(charString, state, depth: 0, isSubroutine: false);
         if (result != ProgramResult.EndChar)
         {
@@ -44,6 +57,7 @@ internal static class Type2CharStringVerifier
         int position = 0;
         while (position < program.Length)
         {
+            state.ConsumeOperation();
             byte value = program[position++];
             if (value == 28 || value >= 32)
             {
@@ -650,8 +664,28 @@ internal static class Type2CharStringVerifier
 
     private sealed class VerificationState(
         IReadOnlyList<ReadOnlyMemory<byte>> globalSubroutines,
-        IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines)
+        IReadOnlyList<ReadOnlyMemory<byte>> localSubroutines,
+        CancellationToken cancellationToken)
     {
+        private int _remainingOperations = MaximumOperations;
+
+        /// <summary>
+        /// 扣減總操作預算；耗盡時拒絕，並定期檢查取消要求。
+        /// </summary>
+        internal void ConsumeOperation()
+        {
+            if (--_remainingOperations <= 0)
+            {
+                throw SfntFont.DataInvalid("CFF-CharString-operation-budget");
+            }
+
+            // 預算本身已把最壞情況壓在一秒內，取消檢查因此可以低頻進行。
+            if ((_remainingOperations & 0xFFFF) == 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+        }
+
         internal IReadOnlyList<ReadOnlyMemory<byte>> GlobalSubroutines { get; } = globalSubroutines;
 
         internal IReadOnlyList<ReadOnlyMemory<byte>> LocalSubroutines { get; } = localSubroutines;

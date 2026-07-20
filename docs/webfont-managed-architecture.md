@@ -274,8 +274,17 @@ glyph count、composite depth、sequence count、唯一 scalar 數、產出 byte
 GSUB 與 composite closure、CFF／CFF2 subsetter 與 compactor、`gvar` 子集化及 WOFF2 `glyf`
 重建，並在每個字圖級迴圈檢查。若取消權杖僅止於格式迴圈，`WebFontGenerationWorker` 的
 `JobTimeout` 會如期觸發卻無人觀察，單一惡意或損毀字型即可永久占住 consumer 執行緒。
-`ColorFontValidator` 的巡訪次數已由「每個 strike／glyph 均須佔用實際位元組」的範圍檢查
-隱含限制，僅在各色彩技術階段之間檢查取消。
+`ColorFontValidator` 僅在各色彩技術階段之間檢查取消，依據是其所有圖狀巡訪都有記憶化
+（COLR paint 的 visit 狀態與 dependency 快取、`sbix dupe` 閉包、`ColorGlyphClosure`），
+每個節點至多處理一次。
+
+記憶化是這裡的關鍵，位元組範圍檢查本身並不足夠。CharString 直譯器即為反例：它限制遞迴
+深度（10）卻不限制每層呼叫廣度，也沒有記憶化，巢狀 subroutine 因而可產生 breadth^depth
+的展開——約 600 位元組的 subroutine 資料即足以造成實質無限的執行時間，且會繞過逐字圖
+層級的取消檢查。因此兩個 CharString 直譯器另設一百萬次的總操作預算。
+
+通則：**遞迴深度上限不等於工作量上限**。任何遞迴或圖狀巡訪都必須指出其有界性來自
+記憶化、總量預算或可證明的線性消耗，不得只以「有深度上限」或「有範圍檢查」帶過。
 
 依規格上界推導迴圈次數是必要步驟，不能只確認索引不越界。`cmap` format 4 的 `segCount`
 必須以 subtable 自身宣告的 `length` 約束，且 segment 須依 `endCode` 遞增、不得重疊；只比對

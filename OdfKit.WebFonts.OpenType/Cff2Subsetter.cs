@@ -685,7 +685,8 @@ internal static class Cff2Subsetter
                 parsed.GlobalSubroutines,
                 parsed.LocalSubroutinesByFontDict[fontDict],
                 parsed.VariationRegionCounts,
-                parsed.DefaultVariationIndexes[fontDict]);
+                parsed.DefaultVariationIndexes[fontDict],
+                cancellationToken);
         }
     }
 
