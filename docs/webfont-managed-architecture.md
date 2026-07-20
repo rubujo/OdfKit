@@ -144,6 +144,22 @@ layout tables 必須 byte-identical，不做 aggressive glyph pruning 或 lookup
 
 這項證據只涵蓋目前鎖定的 Arabic／Devanagari／Bengali／Khmer／Thai corpus，不代表任意
 complex-script shaping。
+
+**廣度擴充沒有終點，但每一步有固定程序。** 本文件未訂定目標 script 清單，因此
+「complex-script 廣度」是可持續擴充的能力而非有完成狀態的任務。新增單一 script 需要
+下列四處協調修改：
+
+1. `eng/external-tools.json`：加入鎖定字型的 URI、版本、授權與 SHA-256。
+2. `eng/Test-WebFontFormatMatrix.ps1`：產生該 script 的子集 evidence 目錄。
+3. `eng/Test-WebFontLayoutBrowserSmoke.ps1`：宣告 `$<name>Source` 與 `$<name>Subsets`，
+   並於 `Invoke-LayoutBrowserSmoke` 的引數陣列追加 (source, subset) 配對。
+4. `tests/OdfKit.WebFontBrowserSmoke/LayoutBrowserSmoke.cs`：消費新增的配對。
+
+**已知阻力**：第 3 與第 4 步之間是**跨語言的位置式契約**——引數為扁平清單，PowerShell
+的追加順序必須與 C# 的讀取順序精確對齊，任一方漏改都會造成錯配而非編譯錯誤。將此契約
+改為資料驅動（具名 case 清單）可把新增 script 由四處程式碼修改降為一處設定修改，是擴充
+廣度前值得優先處理的項目。該重構的驗證前提是先完整執行 format matrix 以產生 evidence
+目錄，因此不宜在無法本機重現該前提時進行。
 其它 script／language／feature 必須先擴充 GSUB closure 或採相同 correctness-first 路徑，驗證
 contextual、ligature、alternate、extension lookup、GDEF 關聯及 GPOS glyph reference；只有
 managed 結構驗證、合法 corpus 與 Chromium／Firefox／WebKit golden 一致時，才能新增支援聲明。
