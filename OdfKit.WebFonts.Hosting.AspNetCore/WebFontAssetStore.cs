@@ -20,6 +20,11 @@ internal sealed class WebFontAssetStore
     };
 
     private readonly ConcurrentDictionary<string, StoredWebFontAsset> _assets;
+
+    // 動態產生的資產與 manifest 資產分開保存：manifest 條目在行程存活期間必須恆定，
+    // 動態條目則會隨每次產生累積，需獨立設界限，否則長時間執行的伺服器記憶體單調成長。
+    private readonly ConcurrentDictionary<string, StoredWebFontAsset> _generatedAssets =
+        new(StringComparer.Ordinal);
     private readonly string _rootPath;
     private readonly OdfWebFontOptions _options;
 
@@ -69,7 +74,8 @@ internal sealed class WebFontAssetStore
             return false;
         }
 
-        if (!_assets.TryGetValue(CreateKey(sha256, fileName), out asset)
+        string key = CreateKey(sha256, fileName);
+        if ((!_assets.TryGetValue(key, out asset) && !_generatedAssets.TryGetValue(key, out asset))
             || asset is null)
         {
             return false;
@@ -105,9 +111,17 @@ internal sealed class WebFontAssetStore
         }
 
         Dictionary<string, StoredWebFontAsset> generated = IndexAssets(_rootPath, manifest, _options);
+
+        // 條目數達上限時整批清空動態索引。資產本身是內容定址且留在磁碟上，
+        // 後續請求會在下一次產生時重新索引，因此清空只影響快取命中率，不影響正確性。
+        if (_generatedAssets.Count + generated.Count > _options.MaxGeneratedAssetCount)
+        {
+            _generatedAssets.Clear();
+        }
+
         foreach ((string key, StoredWebFontAsset asset) in generated)
         {
-            _assets.TryAdd(key, asset);
+            _generatedAssets.TryAdd(key, asset);
         }
     }
 

@@ -81,7 +81,11 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
   clean-room decoder 已有界重建上述標準 transform。WOFF2 collection 另解析 collection directory、
   每個 face 的全域 table index，以及共享 transformed `glyf`／`loca` 配對；未知 transform version
   仍須明確拒絕，不能由已支援路徑推定為任意 WOFF2 支援。
-- 字元：Unicode scalar、Supplementary Plane、PUA、IVS；`cmap` format 4／12／14。
+- 字元：Unicode scalar、Supplementary Plane、PUA、IVS；`cmap` format 4／12／14。輸出的
+  format 4 會將 `idDelta` 相同的相鄰碼位合併為單一 segment，使大型 CJK 字集遠低於該格式
+  16-bit 的 `length` 上限；仍無法表示的極端稀疏字集依 OpenType 1.9.1「format 12 存在時
+  format 4 為相容性選配」省略 format 4，不得因此中止產生。encoding record 依規格先以
+  platformID、再以 encodingID 排序。
 - glyph closure：`.notdef`、要求字元及 TrueType composite component 的遞迴閉包。
 - 法律資料：預設保留 `name` license description／URL、`OS/2` 與必要 metadata。
 - 確定性：相同來源 bytes、face、Profile、sequence 與 options 產生完全相同 bytes 與 SHA-256。
@@ -265,6 +269,20 @@ parser 使用 `ReadOnlyMemory<byte>`、`Span<T>` 與 big-endian `BinaryPrimitive
 length、乘加及 alignment 採 checked arithmetic。預設上限至少涵蓋來源 bytes、table count、
 glyph count、composite depth、sequence count、唯一 scalar 數、產出 bytes、工作逾時與並行數。
 
+工作逾時要能成立，取消權杖必須抵達實際耗用 CPU 的迴圈，而非只在工作邊界檢查。
+`CancellationToken` 因此貫穿 `SfntFont.Parse`／`CreateSubset`、`cmap` format 4／12／14 解析、
+GSUB 與 composite closure、CFF／CFF2 subsetter 與 compactor、`gvar` 子集化及 WOFF2 `glyf`
+重建，並在每個字圖級迴圈檢查。若取消權杖僅止於格式迴圈，`WebFontGenerationWorker` 的
+`JobTimeout` 會如期觸發卻無人觀察，單一惡意或損毀字型即可永久占住 consumer 執行緒。
+`ColorFontValidator` 的巡訪次數已由「每個 strike／glyph 均須佔用實際位元組」的範圍檢查
+隱含限制，僅在各色彩技術階段之間檢查取消。
+
+依規格上界推導迴圈次數是必要步驟，不能只確認索引不越界。`cmap` format 4 的 `segCount`
+必須以 subtable 自身宣告的 `length` 約束，且 segment 須依 `endCode` 遞增、不得重疊；只比對
+整張 `cmap` table 的範圍檢查會讓誇大的 `segCount` 通過，使展開迴圈達數十億次迭代而不觸發
+任何越界。`ManagedOpenTypeWebFontVerifier` 的公開 `Verify` 系列是這條路徑上唯一直接接受
+外部字型的入口，其位元組上限與取消權杖由呼叫端提供。
+
 來源字型只能由部署端 `FontSourceId` allowlist 解析，不接受 request URL 或任意路徑。每次工作
 均驗證來源 SHA-256、face index、Profile 版本、授權 policy 與 canonical request。動態 API
 維持具名授權、具名 rate limiter、有界 Channel、single-flight、租戶配額及不可變 hash GET；
@@ -339,6 +357,38 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 
 剩餘工作以第 5、6 節的來源字型固定種子變異韌性測試、complex-script shaping 廣度與外部人工閘門為準；
 不得因上述核心可用而把整套產品標示 production-ready。
+
+### 7.1 corpus 切片會遮蔽字集規模缺陷
+
+上述 CNS Ext-B 證據以 256 code-point bucket 切成 8 個 WOFF2，每片遠小於 `cmap` format 4 的
+16-bit `length` 上限；既有測試與範例設定亦一律使用 1,024／4,096 等小值。這使「每字元一個
+segment」的 format 4 建構在超過 8,188 個 BMP 字元時必定失敗的缺陷長期零覆蓋，儘管完整
+Big5 與 CNS 字集都遠超該界線。新增的 `CmapMappingTests` 以 20,000 字直接釘住此路徑。
+
+由此得出的通則：**分片產生的證據不能用來聲稱單片字集規模的能力**。任何以 bucket、slice 或
+取樣方式建立的 corpus，都必須另有一組刻意逼近格式結構上限的測試，否則格式層的規模缺陷
+不會出現在任何綠燈中。
+
+### 7.2 `cmap` 規模路徑的實機證據
+
+由 `eng/Test-WebFontCmapScaleBrowserProof.ps1` 與
+`tests/OdfKit.WebFontCmapScaleProof` 提供，來源為鎖定的 Adobe Source Han Sans TC `2.005R`
+（`SourceHanSansTC-Regular.otf`、SHA-256 `10e6d832…75c24a`、OFL-1.1，不納入 repository），
+該 face 於 CJK 表意文字區段提供 27,950 個可用 BMP 純量：
+
+| 案例 | 內容 | 輸出 encoding record | Chromium | Firefox | WebKit |
+| --- | --- | --- | --- | --- | --- |
+| dense | 12,000 個 BMP 字元的單片子集 | `(0,3)`、`(3,1)`、`(3,10)` | 通過 | 通過 | 通過 |
+| sparse | 9,000 個非相鄰 BMP 字元，format 4 依規格省略 | `(3,10)` | 通過 | 通過 | 通過 |
+| control（負向對照） | dense 資產截斷至 60% | 不適用 | 正確拒絕 | 正確拒絕 | 正確拒絕 |
+
+通過條件為 `document.fonts.load` 完成、`document.fonts.check` 為真、`document.fonts` 內屬於
+該子集的 `FontFace` 狀態為 `loaded`，且取樣字元逐一以該 family 在 canvas 描繪出實際墨跡、
+無 console 錯誤。負向對照是必要成分：若截斷資產仍回報 `FontFace` 已載入，代表量測只是在觀察
+fallback，正向結果不能採信。三個引擎對 control 均回報未載入且 canvas 無墨跡，量測敏感度成立。
+
+dense 案例同時是修正前後的分界證據：12,000 個 BMP 字元在 format 4 範圍合併之前必定以
+`cmap4-size` 失敗，因此這條路徑在此之前不可能有任何瀏覽器證據。
 
 ## 8. 第一方依據
 

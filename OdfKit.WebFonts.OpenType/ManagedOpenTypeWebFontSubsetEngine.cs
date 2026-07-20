@@ -53,7 +53,8 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         SfntFont source = cachedSource.GetFont(
             request.Face.FaceIndex,
             _options.MaxTableCount,
-            _options.ValidateSourceChecksums);
+            _options.ValidateSourceChecksums,
+            cancellationToken);
         if (source.HasColorTables && string.IsNullOrWhiteSpace(request.Face.SourceSha256))
         {
             throw DataInvalid("color-source-sha256");
@@ -73,7 +74,11 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         }
 
         IReadOnlyList<UnicodeVariationSequence> variationSequences = CreateVariationSequences(request.Sequences);
-        SfntSubset subset = source.CreateSubset(scalars, variationSequences, _options.MaxCompositeDepth);
+        SfntSubset subset = source.CreateSubset(
+            scalars,
+            variationSequences,
+            _options.MaxCompositeDepth,
+            cancellationToken);
         Directory.CreateDirectory(destinationDirectory);
         var assets = new List<WebFontAsset>(request.Formats.Count);
         foreach (WebFontFormat format in request.Formats.Distinct())
@@ -90,7 +95,10 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
                 ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(
                     verificationStream,
                     format,
-                    scalars);
+                    scalars,
+                    _options.MaxOutputBytes,
+                    _options.VerifyEveryOutputCharString,
+                    cancellationToken);
             }
 
             string sha256 = ComputeSha256(output);
@@ -321,7 +329,15 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
 
         internal byte[] Bytes { get; } = bytes;
 
-        internal SfntFont GetFont(int faceIndex, int maxTableCount, bool validateChecksums)
+        // 每個已解析 face 會保留一份完整表格副本，其記憶體不計入來源位元組上限，
+        // 因此對單一來源保留的 face 數另設界限，避免多 face TTC 無限累積。
+        private const int MaximumCachedFaces = 8;
+
+        internal SfntFont GetFont(
+            int faceIndex,
+            int maxTableCount,
+            bool validateChecksums,
+            CancellationToken cancellationToken)
         {
             lock (_gate)
             {
@@ -331,7 +347,10 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
                     int decodedFaceIndex = faceIndex;
                     if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOFF"u8))
                     {
-                        decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff(Bytes, maximumExpandedBytes);
+                        decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff(
+                            Bytes,
+                            maximumExpandedBytes,
+                            cancellationToken);
                         decodedFaceIndex = faceIndex;
                     }
 #if NET10_0_OR_GREATER
@@ -340,7 +359,8 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
                         decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
                             Bytes,
                             maximumExpandedBytes,
-                            faceIndex);
+                            faceIndex,
+                            cancellationToken);
                         decodedFaceIndex = 0;
                     }
 #else
@@ -350,7 +370,17 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
                     }
 #endif
 
-                    font = SfntFont.Parse(decoded, decodedFaceIndex, maxTableCount, validateChecksums);
+                    font = SfntFont.Parse(
+                        decoded,
+                        decodedFaceIndex,
+                        maxTableCount,
+                        validateChecksums,
+                        cancellationToken);
+                    if (_fonts.Count >= MaximumCachedFaces)
+                    {
+                        _fonts.Clear();
+                    }
+
                     _fonts.Add(faceIndex, font);
                 }
 
@@ -439,19 +469,47 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
 
     private static string ComputeSha256(byte[] bytes)
     {
+#if NET10_0_OR_GREATER
+        return ToLowerHex(SHA256.HashData(bytes));
+#else
         using SHA256 algorithm = SHA256.Create();
         return ToLowerHex(algorithm.ComputeHash(bytes));
+#endif
     }
 
     private static string ComputeFileSha256(string path)
     {
         using FileStream stream = File.OpenRead(path);
+#if NET10_0_OR_GREATER
+        return ToLowerHex(SHA256.HashData(stream));
+#else
         using SHA256 algorithm = SHA256.Create();
         return ToLowerHex(algorithm.ComputeHash(stream));
+#endif
     }
 
     private static string ToLowerHex(byte[] bytes)
-        => string.Concat(bytes.Select(value => value.ToString("x2", System.Globalization.CultureInfo.InvariantCulture)));
+    {
+#if NET10_0_OR_GREATER
+        return Convert.ToHexStringLower(bytes);
+#else
+        // netstandard2.0 沒有 Convert.ToHexString；以預配置緩衝區避免 LINQ 逐位元組配置。
+        var characters = new char[bytes.Length * 2];
+        for (int index = 0; index < bytes.Length; index++)
+        {
+            byte value = bytes[index];
+            characters[index * 2] = GetHexDigit(value >> 4);
+            characters[(index * 2) + 1] = GetHexDigit(value & 0x0F);
+        }
+
+        return new string(characters);
+#endif
+    }
+
+#if !NET10_0_OR_GREATER
+    private static char GetHexDigit(int value)
+        => (char)(value < 10 ? '0' + value : 'a' + (value - 10));
+#endif
 
     private static InvalidDataException DataInvalid(string detail)
         => new($"{OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")} [{detail}]");

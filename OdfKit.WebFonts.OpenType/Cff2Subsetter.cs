@@ -36,26 +36,29 @@ internal static class Cff2Subsetter
         byte[] source,
         byte[]? fvar,
         ushort glyphCount,
-        ISet<ushort> selectedGlyphs)
+        ISet<ushort> selectedGlyphs,
+        CancellationToken cancellationToken = default)
     {
         ParsedCff2 parsed = GetParsed(source, fvar, glyphCount);
-        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
+        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed, cancellationToken);
 
         return Cff2TableCompactor.Build(
             source,
             glyphCount,
             selectedGlyphs,
-            parsed.VariationRegionCounts);
+            parsed.VariationRegionCounts,
+            cancellationToken);
     }
 
     internal static void Validate(
         byte[] source,
         byte[]? fvar,
         ushort glyphCount,
-        ISet<ushort> selectedGlyphs)
+        ISet<ushort> selectedGlyphs,
+        CancellationToken cancellationToken = default)
     {
         ParsedCff2 parsed = GetParsed(source, fvar, glyphCount);
-        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
+        VerifySelectedGlyphs(source, glyphCount, selectedGlyphs, parsed, cancellationToken);
     }
 
     private static ParsedCff2 Parse(byte[] source, ushort? variationAxisCount, ushort glyphCount)
@@ -664,10 +667,12 @@ internal static class Cff2Subsetter
         byte[] source,
         ushort glyphCount,
         ISet<ushort> selectedGlyphs,
-        ParsedCff2 parsed)
+        ParsedCff2 parsed,
+        CancellationToken cancellationToken)
     {
         foreach (ushort glyph in selectedGlyphs)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (glyph >= glyphCount)
             {
                 throw SfntFont.DataInvalid("CFF2-selected-glyph");

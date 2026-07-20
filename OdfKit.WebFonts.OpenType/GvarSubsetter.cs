@@ -10,8 +10,10 @@ internal static class GvarSubsetter
         byte[] source,
         byte[] fvar,
         ushort glyphCount,
-        ISet<ushort> selectedGlyphs)
+        ISet<ushort> selectedGlyphs,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         SfntFont.EnsureRange(source, 0, 20, "gvar-header");
         SfntFont.EnsureRange(fvar, 0, 16, "fvar-header");
         if (SfntFont.ReadUInt16(source, 0, "gvar-version") != 1
@@ -96,6 +98,7 @@ internal static class GvarSubsetter
         int destination = dataOffset;
         for (int glyph = 0; glyph < glyphCount; glyph++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             rebuiltOffsets[glyph] = checked((uint)(destination - dataOffset));
             uint start = offsets[glyph];
             uint end = offsets[glyph + 1];

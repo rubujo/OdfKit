@@ -163,8 +163,11 @@ public sealed class WebFontAssetBuilder
     {
         Rune[] runes = text.EnumerateRunes().ToArray();
         var seenScalars = new HashSet<int>();
-        var seenSequences = new HashSet<string>(StringComparer.Ordinal);
+        var seenSequences = new HashSet<(int BaseScalar, int Selector)>();
         var result = new List<WebFontTextSequence>();
+
+        // 以純量配對而非字串判重：先前每個語料字元都會配置一個字串，大型語料
+        // 因而產生數千萬次配置。改以值型別鍵判重後，只有真正新出現的序列才具體化。
         for (int index = 0; index < runes.Length; index++)
         {
             Rune rune = runes[index];
@@ -173,29 +176,26 @@ public sealed class WebFontAssetBuilder
                 continue;
             }
 
-            string value = rune.ToString();
+            Rune? selector = null;
             if (index + 1 < runes.Length && IsVariationSelector(runes[index + 1].Value))
             {
-                value += runes[++index].ToString();
+                selector = runes[++index];
             }
 
-            foreach (Rune scalar in value.EnumerateRunes())
-            {
-                if (!IsVariationSelector(scalar.Value))
-                {
-                    seenScalars.Add(scalar.Value);
-                }
-            }
-
-            if (seenScalars.Count > maximumCount)
+            if (seenScalars.Add(rune.Value) && seenScalars.Count > maximumCount)
             {
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }
 
-            if (seenSequences.Add(value))
+            if (!seenSequences.Add((rune.Value, selector?.Value ?? -1)))
             {
-                result.Add(WebFontTextSequence.Create(value));
+                continue;
             }
+
+            string value = selector is null
+                ? rune.ToString()
+                : string.Concat(rune.ToString(), selector.Value.ToString());
+            result.Add(WebFontTextSequence.Create(value));
         }
 
         if (result.Count == 0)
@@ -456,9 +456,34 @@ public sealed class WebFontAssetBuilder
     private static string ComputeSha256(byte[] bytes)
         => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
+    /// <summary>
+    /// 以 CSS 字串字面值規則逸出值。
+    /// </summary>
+    /// <remarks>
+    /// 僅替換反斜線與單引號並不足夠：CSS 字串不得含裸換行，換行會終止字串並成為
+    /// 解析錯誤，可用來注入任意規則；若樣式被內嵌於 HTML，<c>&lt;</c> 亦可用於跳出
+    /// <c>&lt;style&gt;</c>。這裡對控制字元與具語法意義的字元一律採用「反斜線 + 十六進位 +
+    /// 空白」的標準逸出形式。
+    /// </remarks>
     private static string EscapeCss(string value)
-        => value.Replace("\\", "\\\\", StringComparison.Ordinal)
-            .Replace("'", "\\'", StringComparison.Ordinal);
+    {
+        var builder = new StringBuilder(value.Length);
+        foreach (char character in value)
+        {
+            if (character is '\\' or '\'' or '"' or '<' or '>' or '&'
+                || char.IsControl(character))
+            {
+                builder.Append('\\')
+                    .Append(((int)character).ToString("x", System.Globalization.CultureInfo.InvariantCulture))
+                    .Append(' ');
+                continue;
+            }
+
+            builder.Append(character);
+        }
+
+        return builder.ToString();
+    }
 
     private static string GetCssFormat(WebFontFormat format)
         => format switch

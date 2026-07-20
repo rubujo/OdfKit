@@ -30,14 +30,29 @@ public static class ManagedOpenTypeWebFontVerifier
     /// <param name="format">The declared WebFont format. / 宣告的 WebFont 格式。</param>
     /// <param name="maximumBytes">The maximum accepted byte count. / 可接受的最大位元組數。</param>
     public static void Verify(Stream font, WebFontFormat format, long maximumBytes)
+        => Verify(font, format, maximumBytes, CancellationToken.None);
+
+    /// <summary>
+    /// Verifies a bounded WebFont, observing a cancellation token.
+    /// 驗證有界的 WebFont，並遵守取消權杖。
+    /// </summary>
+    /// <param name="font">The readable font stream. / 可讀取的字型資料流。</param>
+    /// <param name="format">The declared WebFont format. / 宣告的 WebFont 格式。</param>
+    /// <param name="maximumBytes">The maximum accepted byte count. / 可接受的最大位元組數。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    public static void Verify(
+        Stream font,
+        WebFontFormat format,
+        long maximumBytes,
+        CancellationToken cancellationToken)
     {
-        SfntFont parsed = Parse(font, format, maximumBytes);
-        parsed.ValidateAllCffGlyphs();
+        SfntFont parsed = Parse(font, format, maximumBytes, cancellationToken);
+        parsed.ValidateAllCffGlyphs(cancellationToken);
     }
 
     internal static void VerifyStructure(Stream font, WebFontFormat format)
     {
-        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024);
+        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024, CancellationToken.None);
         parsed.ValidateCffGlyphs(new HashSet<ushort>());
     }
 
@@ -52,6 +67,31 @@ public static class ManagedOpenTypeWebFontVerifier
         Stream font,
         WebFontFormat format,
         IEnumerable<int> unicodeScalars)
+        => VerifyContainsScalars(
+            font,
+            format,
+            unicodeScalars,
+            32L * 1024 * 1024,
+            validateEveryCharString: true,
+            CancellationToken.None);
+
+    /// <summary>
+    /// Verifies a bounded WebFont and confirms that every requested Unicode scalar is mapped.
+    /// 驗證有界的 WebFont，並確認每個要求的 Unicode 純量值均有對應。
+    /// </summary>
+    /// <param name="font">The readable font stream. / 可讀取的字型資料流。</param>
+    /// <param name="format">The declared WebFont format. / 宣告的 WebFont 格式。</param>
+    /// <param name="unicodeScalars">The required Unicode scalars. / 必須存在的 Unicode 純量值。</param>
+    /// <param name="maximumBytes">The maximum accepted byte count. / 可接受的最大位元組數。</param>
+    /// <param name="validateEveryCharString">Whether every CFF CharString must be verified. / 是否必須驗證每個 CFF CharString。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    public static void VerifyContainsScalars(
+        Stream font,
+        WebFontFormat format,
+        IEnumerable<int> unicodeScalars,
+        long maximumBytes,
+        bool validateEveryCharString,
+        CancellationToken cancellationToken)
     {
         if (unicodeScalars is null)
         {
@@ -60,15 +100,20 @@ public static class ManagedOpenTypeWebFontVerifier
                 OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024);
+        SfntFont parsed = Parse(font, format, maximumBytes, cancellationToken);
         foreach (int scalar in unicodeScalars.Distinct())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (!parsed.ContainsUnicodeScalar(scalar))
             {
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }
         }
-        parsed.ValidateAllCffGlyphs();
+
+        if (validateEveryCharString)
+        {
+            parsed.ValidateAllCffGlyphs(cancellationToken);
+        }
     }
 
     /// <summary>
@@ -96,7 +141,7 @@ public static class ManagedOpenTypeWebFontVerifier
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024);
+        SfntFont parsed = Parse(font, format, 32L * 1024 * 1024, CancellationToken.None);
         foreach (WebFontTextSequence sequence in values)
         {
             for (int index = 0; index < sequence.UnicodeScalars.Count; index++)
@@ -130,7 +175,7 @@ public static class ManagedOpenTypeWebFontVerifier
         IEnumerable<int> unicodeScalars)
     {
         SfntFont sourceFont = ParseSourceFace(source, faceIndex);
-        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
+        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024, CancellationToken.None);
         if (sourceFont.GlyphCount != subsetFont.GlyphCount)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
@@ -153,7 +198,7 @@ public static class ManagedOpenTypeWebFontVerifier
         WebFontFormat format)
     {
         SfntFont sourceFont = ParseSourceFace(source, faceIndex);
-        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024);
+        SfntFont subsetFont = Parse(subset, format, 32L * 1024 * 1024, CancellationToken.None);
         foreach (string tag in new[] { "GDEF", "GPOS", "GSUB" })
         {
             bool sourceHasTable = sourceFont.TryGetTable(tag, out ReadOnlyMemory<byte> sourceTable);
@@ -189,7 +234,11 @@ public static class ManagedOpenTypeWebFontVerifier
             && scalar is not (>= 0x0000 and <= 0x001F)
             && scalar is not (>= 0x007F and <= 0x009F);
 
-    private static SfntFont Parse(Stream font, WebFontFormat format, long maximumBytes)
+    private static SfntFont Parse(
+        Stream font,
+        WebFontFormat format,
+        long maximumBytes,
+        CancellationToken cancellationToken)
     {
         if (font is null)
         {
@@ -205,15 +254,15 @@ public static class ManagedOpenTypeWebFontVerifier
         byte[] sfnt = format switch
         {
             WebFontFormat.TrueType or WebFontFormat.OpenType => bytes,
-            WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumBytes),
+            WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumBytes, cancellationToken),
 #if NET10_0_OR_GREATER
-            WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumBytes),
+            WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumBytes, 0, cancellationToken),
 #else
             WebFontFormat.Woff2 => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")),
 #endif
             _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
         };
-        return SfntFont.Parse(sfnt, 0, 256, validateChecksums: true);
+        return SfntFont.Parse(sfnt, 0, 256, validateChecksums: true, cancellationToken);
     }
 
     internal static byte[] DecodeSource(byte[] bytes, int maximumExpandedBytes)
@@ -245,6 +294,12 @@ public static class ManagedOpenTypeWebFontVerifier
     }
 
     internal static byte[] DecodeWoff(byte[] bytes, int maximumExpandedBytes)
+        => DecodeWoff(bytes, maximumExpandedBytes, CancellationToken.None);
+
+    internal static byte[] DecodeWoff(
+        byte[] bytes,
+        int maximumExpandedBytes,
+        CancellationToken cancellationToken)
     {
         ReadOnlySpan<byte> data = bytes;
         SfntFont.EnsureRange(data, 0, 44, "WOFF-header");
@@ -269,6 +324,7 @@ public static class ManagedOpenTypeWebFontVerifier
         var tables = new SortedDictionary<string, byte[]>(StringComparer.Ordinal);
         for (int index = 0; index < tableCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int record = 44 + (index * 20);
             string tag = Encoding.ASCII.GetString(bytes, record, 4);
             int offset = CheckedInt(SfntFont.ReadUInt32(data, record + 4, "WOFF-offset"), "WOFF-offset");
@@ -294,7 +350,9 @@ public static class ManagedOpenTypeWebFontVerifier
         }
 
         byte[] sfnt = WebFontWriters.WriteTrueType(new SfntSubset(flavor, tables));
-        if (totalSfntSize != sfnt.Length)
+        // 重建會以字母序重排表格並套用最小 4-byte 對齊，因此原始 totalSfntSize
+        // 只可能相等或更大。改用不等式，避免誤拒表格排列不同的合法 WOFF。
+        if (totalSfntSize < (uint)sfnt.Length)
         {
             throw SfntFont.DataInvalid("WOFF-sfntSize");
         }
@@ -304,9 +362,16 @@ public static class ManagedOpenTypeWebFontVerifier
 
 #if NET10_0_OR_GREATER
     internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes)
-        => DecodeWoff2(bytes, maximumExpandedBytes, 0);
+        => DecodeWoff2(bytes, maximumExpandedBytes, 0, CancellationToken.None);
 
     internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes, int faceIndex)
+        => DecodeWoff2(bytes, maximumExpandedBytes, faceIndex, CancellationToken.None);
+
+    internal static byte[] DecodeWoff2(
+        byte[] bytes,
+        int maximumExpandedBytes,
+        int faceIndex,
+        CancellationToken cancellationToken)
     {
         ReadOnlySpan<byte> data = bytes;
         SfntFont.EnsureRange(data, 0, 48, "WOFF2-header");
@@ -318,6 +383,9 @@ public static class ManagedOpenTypeWebFontVerifier
         uint flavor = SfntFont.ReadUInt32(data, 4, "WOFF2-flavor");
         uint declaredLength = SfntFont.ReadUInt32(data, 8, "WOFF2-length");
         ushort tableCount = SfntFont.ReadUInt16(data, 12, "WOFF2-tableCount");
+        // totalSfntSize 刻意視為建議值：本 decoder 不依它配置記憶體（展開長度由
+        // table directory 推導並另有上限），驗證它只會誤拒表格排列或填充方式不同的
+        // 合法字型。collection 的該欄位更是涵蓋整個集合而非單一 face。
         _ = SfntFont.ReadUInt32(data, 16, "WOFF2-sfntSize");
         int compressedLength = CheckedInt(SfntFont.ReadUInt32(data, 20, "WOFF2-compressedLength"), "WOFF2-compressedLength");
         uint metadataOffset = SfntFont.ReadUInt32(data, 28, "WOFF2-metaOffset");
@@ -342,6 +410,7 @@ public static class ManagedOpenTypeWebFontVerifier
         int uncompressedLength = 0;
         for (int index = 0; index < tableCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             SfntFont.EnsureRange(data, position, 1, "WOFF2-flags");
             byte flags = data[position++];
             int tagIndex = flags & 0x3F;
@@ -488,7 +557,8 @@ public static class ManagedOpenTypeWebFontVerifier
                 transformedLoca!.Value.Entry.StoredLength,
                 transformedLoca.Value.Entry.OriginalLength,
                 tables,
-                maximumExpandedBytes);
+                maximumExpandedBytes,
+                cancellationToken);
             tables.Add("glyf", reconstructed.Glyf);
             tables.Add("loca", reconstructed.Loca);
         }
@@ -575,7 +645,10 @@ public static class ManagedOpenTypeWebFontVerifier
         int alignedOffset = checked((cursor + 3) & ~3);
         int offset = CheckedInt(declaredOffset, detail);
         int length = CheckedInt(declaredLength, detail);
-        if (offset != alignedOffset
+        // 對齊後的位移可能超出資料尾端；先確認補齊區段仍在範圍內，
+        // 避免 Slice 拋出未在地化的 ArgumentOutOfRangeException。
+        if (alignedOffset > data.Length
+            || offset != alignedOffset
             || alignedOffset - cursor > 3
             || data.Slice(cursor, alignedOffset - cursor).ContainsAnyExcept((byte)0))
         {
@@ -944,23 +1017,14 @@ public static class ManagedOpenTypeWebFontVerifier
 
     private static string GetKnownWoff2Tag(int index)
     {
-        string[] tags =
-        [
-            "cmap", "head", "hhea", "hmtx", "maxp", "name", "OS/2", "post",
-            "cvt ", "fpgm", "glyf", "loca", "prep", "CFF ", "VORG", "EBDT",
-            "EBLC", "gasp", "hdmx", "kern", "LTSH", "PCLT", "VDMX", "vhea",
-            "vmtx", "BASE", "GDEF", "GPOS", "GSUB", "EBSC", "JSTF", "MATH",
-            "CBDT", "CBLC", "COLR", "CPAL", "SVG ", "sbix", "acnt", "avar",
-            "bdat", "bloc", "bsln", "cvar", "fdsc", "feat", "fmtx", "fvar",
-            "gvar", "hsty", "just", "lcar", "mort", "morx", "opbd", "prop",
-            "trak", "Zapf", "Silf", "Glat", "Gloc", "Feat", "Sill"
-        ];
-        if ((uint)index >= tags.Length)
+        // 與 writer 共用同一份靜態表，避免每次呼叫重新配置 63 個元素的陣列，
+        // 也不讓兩處的已知 tag 順序各自漂移。
+        if ((uint)index >= (uint)WebFontWriters.Woff2KnownTags.Length)
         {
             throw SfntFont.DataInvalid("WOFF2-tagIndex");
         }
 
-        return tags[index];
+        return WebFontWriters.Woff2KnownTags[index];
     }
 #endif
 

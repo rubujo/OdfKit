@@ -87,7 +87,11 @@ internal sealed class OdfWebFontGenerationService
             _assetStore.RegisterGeneratedAssets(manifest);
             return Results.Json(manifest);
         }
-        catch (ArgumentException)
+        // 要求的字元不在字型內、格式與輪廓類型不符，或保留的色彩技術超出必要瀏覽器
+        // 目標，都是用戶端可修正的輸入問題，必須回 400 而非讓例外逸出成 500。
+        catch (Exception exception) when (exception is ArgumentException
+                                          or InvalidDataException
+                                          or NotSupportedException)
         {
             return Results.BadRequest();
         }

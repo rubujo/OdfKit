@@ -223,6 +223,16 @@ jobs:
             -CnsKaiFontArchivePath artifacts/webfont-source-cache/Fonts_Kai.zip `
             -NameCffArchivePath artifacts/webfont-name-cff-source-cache/OTF-source-code-pro-2.042R-u_1.062R-i.zip
 
+      - name: cmap scale browser proof
+        shell: pwsh
+        # 本機含建置與瀏覽器安裝為 70 秒；6 分鐘對較慢的 runner 已有充足餘裕，
+        # 又不會過度佔用 job 的 70 分鐘總預算。
+        timeout-minutes: 6
+        # 複用 format matrix 已下載並快取的同一支鎖定字型，不重複取得 corpus。
+        run: |
+          ./eng/Test-WebFontCmapScaleBrowserProof.ps1 `
+            -SourceFontPath artifacts/webfont-format-matrix/sources/SourceHanSansTC-Regular.otf
+
       - name: Locked transformed WOFF2 corpus
         shell: pwsh
         timeout-minutes: 5
@@ -281,6 +291,8 @@ jobs:
             artifacts/webfont-woff2-corpus/evidence/**
             artifacts/webfont-layout-browser/layout-*.json
             artifacts/webfont-layout-browser/layout-*.png
+            artifacts/cmap-scale-proof/evidence/cmap-scale-browser-proof.json
+            artifacts/cmap-scale-proof/evidence/*.png
             artifacts/webfont-package-consumer/**/webfonts.json
             artifacts/webfont-iis-express-*-smoke/evidence.json
             artifacts/webfont-iis-express-*-smoke/iisexpress.*.log

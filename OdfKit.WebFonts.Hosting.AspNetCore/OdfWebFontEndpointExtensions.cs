@@ -226,11 +226,19 @@ public static class OdfWebFontEndpointExtensions
             _ => "same-origin"
         };
 
+        // 只要回應內容可能隨 Origin 而異，就必須無條件輸出 Vary: Origin。
+        // 資產帶 public,max-age=31536000,immutable；若只在允許的 Origin 上加 Vary，
+        // 共享快取會把缺少 Access-Control-Allow-Origin 的回應餵給合法的跨來源請求，
+        // 導致 @font-face 的 CORS 抓取全面失敗。
+        if (options.AllowedOrigins.Count > 0)
+        {
+            context.Response.Headers.AppendCommaSeparatedValues(HeaderNames.Vary, HeaderNames.Origin);
+        }
+
         string origin = context.Request.Headers.Origin.ToString();
         if (origin.Length > 0 && OdfWebFontOptionValidator.IsAllowedOrigin(options, origin))
         {
             context.Response.Headers.AccessControlAllowOrigin = origin;
-            context.Response.Headers.AppendCommaSeparatedValues(HeaderNames.Vary, HeaderNames.Origin);
         }
     }
 }

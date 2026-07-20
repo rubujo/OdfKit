@@ -33,9 +33,11 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private static readonly Lazy<DynamicRuntime> DefaultRuntime = new(
-        CreateDefaultRuntime,
-        LazyThreadSafetyMode.ExecutionAndPublication);
+    // 刻意不使用 Lazy：LazyThreadSafetyMode.ExecutionAndPublication 會永久快取例外，
+    // 使一次暫時性的設定讀取失敗（權限、掛載延遲）在 AppDomain 回收前都固定回 503。
+    // 這裡只快取成功建立的執行個體，失敗則允許後續請求重試。
+    private static readonly object DefaultRuntimeGate = new();
+    private static DynamicRuntime? defaultRuntime;
 
     private readonly DynamicRuntime? _runtime;
 
@@ -83,7 +85,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         DynamicRuntime runtime;
         try
         {
-            runtime = _runtime ?? DefaultRuntime.Value;
+            runtime = _runtime ?? GetOrCreateDefaultRuntime();
         }
         catch (Exception exception) when (exception is ConfigurationErrorsException
                                           or InvalidDataException
@@ -204,13 +206,14 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             response.ContentType = "application/json; charset=utf-8";
             response.Write(JsonSerializer.Serialize(manifest, SerializerOptions));
         }
+        // 與 ASP.NET Core 端點一致：字型缺字、格式不符等輸入問題回 400。
         catch (Exception exception) when (exception is ArgumentException
-                                          or NotSupportedException)
+                                          or NotSupportedException
+                                          or InvalidDataException)
         {
             response.StatusCode = 400;
         }
         catch (Exception exception) when (exception is IOException
-                                          or InvalidDataException
                                           or InvalidOperationException
                                           or OperationCanceledException
                                           or UnauthorizedAccessException
@@ -257,6 +260,13 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         var info = new FileInfo(fullPath);
         if (!info.Exists || info.Length <= 0 || info.Length > runtime.Options.MaxAssetBytes)
+        {
+            return false;
+        }
+
+        // net48 沒有 FileInfo.LinkTarget，改以 reparse point 屬性攔截符號連結與
+        // junction，避免資產目錄遭寫入後把根目錄外的檔案 TransmitFile 出去。
+        if (HasReparsePoint(info) || HasReparsePoint(info.Directory))
         {
             return false;
         }
@@ -334,6 +344,28 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         catch (PlatformNotSupportedException)
         {
             return CancellationToken.None;
+        }
+    }
+
+    private static DynamicRuntime GetOrCreateDefaultRuntime()
+    {
+        DynamicRuntime? existing = Volatile.Read(ref defaultRuntime);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        lock (DefaultRuntimeGate)
+        {
+            existing = defaultRuntime;
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            DynamicRuntime created = CreateDefaultRuntime();
+            Volatile.Write(ref defaultRuntime, created);
+            return created;
         }
     }
 
@@ -509,6 +541,25 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         return false;
     }
 
+    private static bool HasReparsePoint(FileSystemInfo? info)
+    {
+        if (info is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            return (info.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException)
+        {
+            // 無法判定連結狀態時一律視為不可信。
+            return true;
+        }
+    }
+
     private static bool IsContained(string root, string path)
         => path.StartsWith(
             root.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar,
@@ -664,7 +715,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
                 || options.AllowedFaces.Count is <= 0 or > 256
                 || options.AllowedProfileIds.Count is <= 0 or > 256
                 || options.AllowedFontFamilies.Count is <= 0 or > 256
-                || options.AllowedFormats.Count is <= 0 or > 2
+                // net48 可用的輸出格式為 TrueType、OpenType 與 WOFF 三種。
+                || options.AllowedFormats.Count is <= 0 or > 3
                 || options.AllowedFormats.Distinct().Count() != options.AllowedFormats.Count
                 || options.AllowedFormats.Any(format => format is not WebFontFormat.Woff
                     and not WebFontFormat.TrueType

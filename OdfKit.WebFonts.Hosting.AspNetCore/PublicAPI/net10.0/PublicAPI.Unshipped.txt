@@ -47,6 +47,8 @@ OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxAssetBytes.get -> long
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxAssetBytes.set -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxAssetCount.get -> int
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxAssetCount.set -> void
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxGeneratedAssetCount.get -> int
+OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxGeneratedAssetCount.set -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxManifestBytes.get -> long
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.MaxManifestBytes.set -> void
 OdfKit.WebFonts.Hosting.AspNetCore.OdfWebFontOptions.OdfWebFontOptions() -> void

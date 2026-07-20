@@ -59,4 +59,19 @@ public sealed class ManagedOpenTypeWebFontEngineOptions
     /// 取得或設定是否必須驗證來源表格 checksum。
     /// </summary>
     public bool ValidateSourceChecksums { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether every CFF CharString in generated output is verified.
+    /// 取得或設定是否驗證產生輸出中的每個 CFF CharString。
+    /// </summary>
+    /// <remarks>
+    /// Verifying every CharString rescans all glyphs for each requested format, which dominates
+    /// request latency for large CJK fonts. Keep it enabled for build-time generation; consider
+    /// disabling it for latency-sensitive dynamic endpoints, where the subset writer output is
+    /// already reparsed and structurally validated.
+    /// 驗證每個 CharString 會對每種要求格式重新掃描所有字圖，是大型 CJK 字型請求延遲的
+    /// 主要來源。建置期產生建議維持啟用；對延遲敏感的動態 endpoint 可考慮關閉，該路徑
+    /// 仍會重新解析並結構驗證子集輸出。
+    /// </remarks>
+    public bool VerifyEveryOutputCharString { get; set; } = true;
 }

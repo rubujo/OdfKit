@@ -107,7 +107,9 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         {
             if (task.IsCompleted)
             {
-                _inflight.TryRemove(key, out _);
+                // 必須連同 value 一起比對再移除：若不比對，本次工作完成後由其他呼叫端
+                // 為同一 key 新登記的 Lazy 會被誤刪，導致同鍵工作重複執行、單飛失效。
+                _inflight.TryRemove(new KeyValuePair<string, Lazy<Task<WebFontManifest>>>(key, lazy));
             }
         }
     }
@@ -289,9 +291,14 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
 
     private void TryCacheCompleted(string key, WebFontManifest manifest)
     {
-        if (_durableCache is not null
-            || _options.MaxMemoryCacheEntries == 0
-            || Interlocked.Increment(ref _completedCount) > _options.MaxMemoryCacheEntries)
+        // 前兩個條件因短路而未執行 Increment，必須先行返回；否則會遞減未曾遞增的
+        // 計數器，使 _completedCount 隨每次工作往負值漂移。
+        if (_durableCache is not null || _options.MaxMemoryCacheEntries == 0)
+        {
+            return;
+        }
+
+        if (Interlocked.Increment(ref _completedCount) > _options.MaxMemoryCacheEntries)
         {
             Interlocked.Decrement(ref _completedCount);
             return;

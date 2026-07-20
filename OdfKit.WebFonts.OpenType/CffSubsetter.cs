@@ -28,22 +28,31 @@ internal static class CffSubsetter
     private const int SubrsOperator = 19;
     private const int CharsetOperator = 15;
 
-    internal static byte[] Build(byte[] source, ushort glyphCount, ISet<ushort> selectedGlyphs)
+    internal static byte[] Build(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> selectedGlyphs,
+        CancellationToken cancellationToken = default)
     {
         ParsedCff parsed = GetParsed(source, glyphCount);
         HashSet<ushort> retainedGlyphs = VerifyAndExpandSelectedGlyphs(
             source,
             glyphCount,
             selectedGlyphs,
-            parsed);
+            parsed,
+            cancellationToken);
 
-        return CffTableCompactor.Build(source, glyphCount, retainedGlyphs);
+        return CffTableCompactor.Build(source, glyphCount, retainedGlyphs, cancellationToken);
     }
 
-    internal static void Validate(byte[] source, ushort glyphCount, ISet<ushort> selectedGlyphs)
+    internal static void Validate(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> selectedGlyphs,
+        CancellationToken cancellationToken = default)
     {
         ParsedCff parsed = GetParsed(source, glyphCount);
-        _ = VerifyAndExpandSelectedGlyphs(source, glyphCount, selectedGlyphs, parsed);
+        _ = VerifyAndExpandSelectedGlyphs(source, glyphCount, selectedGlyphs, parsed, cancellationToken);
     }
 
     private static ParsedCff Parse(byte[] source, ushort glyphCount)
@@ -149,11 +158,13 @@ internal static class CffSubsetter
         byte[] source,
         ushort glyphCount,
         ISet<ushort> selectedGlyphs,
-        ParsedCff parsed)
+        ParsedCff parsed,
+        CancellationToken cancellationToken)
     {
         var retainedGlyphs = new HashSet<ushort>(selectedGlyphs);
         foreach (ushort glyph in selectedGlyphs)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (glyph >= glyphCount)
             {
                 throw SfntFont.DataInvalid("CFF-selected-glyph");

@@ -51,6 +51,18 @@ public sealed class OdfWebFontOptions
     public long MaxAssetBytes { get; set; } = 32L * 1024 * 1024;
 
     /// <summary>
+    /// Gets or sets the maximum number of dynamically generated assets retained in the lookup index.
+    /// 取得或設定查詢索引中保留的動態產生資產數量上限。
+    /// </summary>
+    /// <remarks>
+    /// Generated assets are content addressed and remain on disk; this limit bounds only the
+    /// in-memory index, which is cleared and repopulated on demand once the limit is reached.
+    /// 產生的資產為內容定址且留存於磁碟；此上限只限制記憶體索引，達到上限後索引會被
+    /// 清空並在後續產生時重新填入。
+    /// </remarks>
+    public int MaxGeneratedAssetCount { get; set; } = 8192;
+
+    /// <summary>
     /// Gets the exact origins allowed to load locally hosted WebFont resources cross-origin.
     /// 取得允許跨來源載入本機託管 WebFont 資源的精確來源。
     /// </summary>

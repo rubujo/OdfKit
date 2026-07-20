@@ -61,7 +61,14 @@ internal sealed class ColorGlyphClosure
 
 internal static class ColorFontValidator
 {
-    internal static ColorGlyphClosure Validate(IReadOnlyDictionary<string, byte[]> tables, ushort glyphCount)
+    /// <remarks>
+    /// 各 color table 的巡訪次數由「每個 strike／glyph 皆須佔用實際位元組」的
+    /// 範圍檢查隱含限制，因此取消權杖只在各技術階段之間檢查，不逐 glyph 傳遞。
+    /// </remarks>
+    internal static ColorGlyphClosure Validate(
+        IReadOnlyDictionary<string, byte[]> tables,
+        ushort glyphCount,
+        CancellationToken cancellationToken = default)
     {
         ColorFontTechnology technologies = ColorFontTechnology.None;
         var references = new Dictionary<ushort, HashSet<ushort>>();
@@ -72,6 +79,7 @@ internal static class ColorFontValidator
             paletteEntryCount = ValidateCpal(cpal!);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (tables.TryGetValue("COLR", out byte[]? colr))
         {
             if (!hasCpal)
@@ -82,11 +90,13 @@ internal static class ColorFontValidator
             technologies |= ValidateColr(colr, glyphCount, paletteEntryCount, references);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (ValidateBitmapPair(tables, "CBDT", "CBLC", glyphCount))
         {
             technologies |= ColorFontTechnology.Cbdt;
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (ValidateBitmapPair(tables, "EBDT", "EBLC", glyphCount))
         {
             technologies |= ColorFontTechnology.Ebdt;
@@ -102,12 +112,14 @@ internal static class ColorFontValidator
             technologies |= ColorFontTechnology.Ebdt;
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (tables.TryGetValue("SVG ", out byte[]? svg))
         {
             ValidateSvg(svg, glyphCount);
             technologies |= ColorFontTechnology.Svg;
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (tables.TryGetValue("sbix", out byte[]? sbix))
         {
             var sbixReferences = new Dictionary<ushort, HashSet<ushort>>();

@@ -19,11 +19,12 @@ internal static class Cff2TableCompactor
         byte[] source,
         ushort glyphCount,
         ISet<ushort> retainedGlyphs,
-        int[] variationRegionCounts)
+        int[] variationRegionCounts,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            return BuildCore(source, glyphCount, retainedGlyphs, variationRegionCounts);
+            return BuildCore(source, glyphCount, retainedGlyphs, variationRegionCounts, cancellationToken);
         }
         catch (OverflowException)
         {
@@ -35,7 +36,8 @@ internal static class Cff2TableCompactor
         byte[] source,
         ushort glyphCount,
         ISet<ushort> retainedGlyphs,
-        int[] variationRegionCounts)
+        int[] variationRegionCounts,
+        CancellationToken cancellationToken)
     {
         Layout layout = Parse(source, glyphCount, variationRegionCounts);
         var replacements = new List<CffTableCompactor.Replacement>
@@ -44,7 +46,7 @@ internal static class Cff2TableCompactor
             new(
                 layout.CharStrings.Start,
                 layout.CharStrings.Length,
-                BuildCharStrings(source, layout.CharStrings, retainedGlyphs)),
+                BuildCharStrings(source, layout.CharStrings, retainedGlyphs, cancellationToken)),
             new(layout.FontDictIndex.Start, layout.FontDictIndex.Length, Array.Empty<byte>())
         };
 
@@ -295,11 +297,13 @@ internal static class Cff2TableCompactor
     private static byte[] BuildCharStrings(
         byte[] source,
         IndexLayout charStrings,
-        ISet<ushort> retainedGlyphs)
+        ISet<ushort> retainedGlyphs,
+        CancellationToken cancellationToken)
     {
         var objects = new byte[charStrings.Objects.Count][];
         for (ushort glyph = 0; glyph < objects.Length; glyph++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             DataRange range = charStrings.Objects[glyph];
             objects[glyph] = retainedGlyphs.Contains(glyph)
                 ? source.AsSpan(range.Start, range.Length).ToArray()

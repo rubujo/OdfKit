@@ -502,8 +502,16 @@ provider。資料若已被 code page 轉成 `?` 或亂碼，字型套件無法�
 與 `nosniff`；穩定 manifest／CSS alias 不得標成不可變。
 
 來源字型只由部署端 allowlist 解析；parser 與 Worker 必須有 bytes、table、glyph、composite
-depth、sequence、產出、queue、timeout 與 concurrency 上限。GitHub Actions 可以證明有限併發與
-可重現錯誤處理，不能代替真實 CDN、WAF、跨區容量或第三方惡意字型安全審查。
+depth、sequence、產出、queue、timeout 與 concurrency 上限。timeout 只有在取消權杖抵達實際
+耗用 CPU 的解析與子集化迴圈時才成立；`WebFontGenerationWorker.JobTimeout` 會取消交給引擎的
+權杖，引擎則將其貫穿至字圖級迴圈，逾時因而能真正回收 consumer 執行緒。GitHub Actions 可以
+證明有限併發與可重現錯誤處理，不能代替真實 CDN、WAF、跨區容量或第三方惡意字型安全審查。
+
+動態產生 endpoint 對用戶端可修正的輸入問題（要求的字元不在字型內、輸出格式與輪廓類型不符、
+保留的 color 技術超出 `RequiredBrowserTargets`）回應 400，不讓例外逸出為 500；佇列已滿、
+逾時與伺服端完整性失敗回應 503。資產回應在來源允許清單非空時一律輸出 `Vary: Origin`，
+避免一年期 `immutable` 快取讓共享快取把缺少 `Access-Control-Allow-Origin` 的回應提供給
+合法跨來源請求（`@font-face` 一律以 CORS 模式抓取）。
 
 ## 狀態與證據
 

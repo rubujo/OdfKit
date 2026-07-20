@@ -20,8 +20,10 @@ internal static class Woff2GlyfReconstructor
         int transformedLocaLength,
         int originalLocaLength,
         IReadOnlyDictionary<string, byte[]> tables,
-        int maximumExpandedBytes)
+        int maximumExpandedBytes,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (maximumExpandedBytes <= 0
             || transformedLocaLength != 0
             || !tables.TryGetValue("head", out byte[]? head)
@@ -100,6 +102,7 @@ internal static class Woff2GlyfReconstructor
         var locations = new uint[glyphCount + 1];
         for (int glyphIndex = 0; glyphIndex < glyphCount; glyphIndex++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             PadGlyphForLoca(glyf, indexFormat, maximumExpandedBytes);
             locations[glyphIndex] = CheckedUInt(glyf.Length, "WOFF2-glyf-offset");
             short contourCount = SfntFont.ReadInt16(

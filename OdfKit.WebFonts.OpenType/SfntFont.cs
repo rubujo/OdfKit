@@ -86,8 +86,14 @@ internal sealed class SfntFont
     internal bool ContainsVariationSequence(int baseScalar, int selector)
         => _cmap.ContainsVariation(new UnicodeVariationSequence(baseScalar, selector));
 
-    internal static SfntFont Parse(byte[] source, int faceIndex, int maxTableCount, bool validateChecksums)
+    internal static SfntFont Parse(
+        byte[] source,
+        int faceIndex,
+        int maxTableCount,
+        bool validateChecksums,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (source.Length < 12)
         {
             throw DataInvalid("sfnt-header");
@@ -137,6 +143,7 @@ internal sealed class SfntFont
         var ranges = new List<(int Offset, int End, string Tag)>(tableCount);
         for (int index = 0; index < tableCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int recordOffset = faceOffset + 12 + (index * 16);
             string tag = Encoding.ASCII.GetString(source, recordOffset, 4);
             if (!IsValidTag(tag) || tables.ContainsKey(tag))
@@ -233,15 +240,16 @@ internal sealed class SfntFont
             locations = ReadLocations(tables["loca"], glyphCount, locaFormat, tables["glyf"].Length);
         }
 
-        CmapMapping cmap = CmapMapping.Parse(tables["cmap"], glyphCount);
-        ColorGlyphClosure colorGlyphClosure = ColorFontValidator.Validate(tables, glyphCount);
+        CmapMapping cmap = CmapMapping.Parse(tables["cmap"], glyphCount, cancellationToken);
+        ColorGlyphClosure colorGlyphClosure = ColorFontValidator.Validate(tables, glyphCount, cancellationToken);
         return new SfntFont(flavor, tables, glyphCount, locations, cmap, colorGlyphClosure);
     }
 
     internal SfntSubset CreateSubset(
         IReadOnlyList<int> scalars,
         IReadOnlyList<UnicodeVariationSequence> variationSequences,
-        int maxCompositeDepth)
+        int maxCompositeDepth,
+        CancellationToken cancellationToken = default)
     {
         var mappings = new SortedDictionary<int, ushort>();
         var selectedGlyphs = new HashSet<ushort> { 0 };
@@ -250,6 +258,13 @@ internal sealed class SfntFont
             if (!_cmap.UnicodeMappings.TryGetValue(scalar, out ushort glyph))
             {
                 throw DataInvalid($"U+{scalar:X}-missing");
+            }
+
+            // 呼叫端已去重；重複純量在此代表契約違反，統一回報在地化錯誤而非
+            // 讓 SortedDictionary.Add 拋出未在地化的 ArgumentException。
+            if (mappings.ContainsKey(scalar))
+            {
+                throw DataInvalid($"U+{scalar:X}-duplicate");
             }
 
             mappings.Add(scalar, glyph);
@@ -266,7 +281,7 @@ internal sealed class SfntFont
 
         if (_tables.TryGetValue("GSUB", out byte[]? gsub))
         {
-            GsubGlyphClosure.Add(gsub, selectedGlyphs, _glyphCount);
+            GsubGlyphClosure.Add(gsub, selectedGlyphs, _glyphCount, cancellationToken);
         }
 
         _colorGlyphClosure.AddReferencedGlyphs(selectedGlyphs);
@@ -291,7 +306,7 @@ internal sealed class SfntFont
         bool isCff2 = _tables.ContainsKey("CFF2");
         if (_tables.TryGetValue("CFF ", out byte[]? cff))
         {
-            tables["CFF "] = CffSubsetter.Build(cff, _glyphCount, selectedGlyphs);
+            tables["CFF "] = CffSubsetter.Build(cff, _glyphCount, selectedGlyphs, cancellationToken);
         }
         else if (isCff2)
         {
@@ -306,12 +321,13 @@ internal sealed class SfntFont
                 _tables["CFF2"],
                 cff2Fvar,
                 _glyphCount,
-                selectedGlyphs);
+                selectedGlyphs,
+                cancellationToken);
         }
         else if (_tables.ContainsKey("glyf"))
         {
-            AddCompositeClosure(selectedGlyphs, maxCompositeDepth);
-            tables["glyf"] = BuildGlyf(selectedGlyphs, out byte[] subsetLoca);
+            AddCompositeClosure(selectedGlyphs, maxCompositeDepth, cancellationToken);
+            tables["glyf"] = BuildGlyf(selectedGlyphs, cancellationToken, out byte[] subsetLoca);
             tables["loca"] = subsetLoca;
         }
 
@@ -324,7 +340,7 @@ internal sealed class SfntFont
 
         if (hasFvar && !isCff2)
         {
-            tables["gvar"] = GvarSubsetter.Build(gvar!, fvar!, _glyphCount, selectedGlyphs);
+            tables["gvar"] = GvarSubsetter.Build(gvar!, fvar!, _glyphCount, selectedGlyphs, cancellationToken);
         }
 
         tables.Remove("DSIG");
@@ -386,20 +402,20 @@ internal sealed class SfntFont
         return false;
     }
 
-    internal void ValidateCffGlyphs(ISet<ushort> glyphs)
+    internal void ValidateCffGlyphs(ISet<ushort> glyphs, CancellationToken cancellationToken = default)
     {
         if (_tables.TryGetValue("CFF ", out byte[]? cff))
         {
-            CffSubsetter.Validate(cff, _glyphCount, glyphs);
+            CffSubsetter.Validate(cff, _glyphCount, glyphs, cancellationToken);
         }
         else if (_tables.TryGetValue("CFF2", out byte[]? cff2))
         {
             _tables.TryGetValue("fvar", out byte[]? fvar);
-            Cff2Subsetter.Validate(cff2, fvar, _glyphCount, glyphs);
+            Cff2Subsetter.Validate(cff2, fvar, _glyphCount, glyphs, cancellationToken);
         }
     }
 
-    internal void ValidateAllCffGlyphs()
+    internal void ValidateAllCffGlyphs(CancellationToken cancellationToken = default)
     {
         if (!_tables.ContainsKey("CFF ") && !_tables.ContainsKey("CFF2"))
         {
@@ -412,7 +428,7 @@ internal sealed class SfntFont
             glyphs.Add((ushort)glyph);
         }
 
-        ValidateCffGlyphs(glyphs);
+        ValidateCffGlyphs(glyphs, cancellationToken);
     }
 
     internal static bool IsComplexShapingScalar(int scalar)
@@ -431,11 +447,12 @@ internal sealed class SfntFont
     internal static bool IsRejectedLayoutTable(string tag)
         => RejectedTables.Contains(tag);
 
-    private void AddCompositeClosure(HashSet<ushort> glyphs, int maxDepth)
+    private void AddCompositeClosure(HashSet<ushort> glyphs, int maxDepth, CancellationToken cancellationToken)
     {
         var states = new byte[_glyphCount];
         foreach (ushort glyph in glyphs.ToArray())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             VisitComposite(glyph, 0, maxDepth, glyphs, states);
         }
     }
@@ -510,17 +527,20 @@ internal sealed class SfntFont
         states[glyph] = 2;
     }
 
-    private byte[] BuildGlyf(HashSet<ushort> selectedGlyphs, out byte[] loca)
+    private byte[] BuildGlyf(HashSet<ushort> selectedGlyphs, CancellationToken cancellationToken, out byte[] loca)
     {
+        byte[] glyf = _tables["glyf"];
         using var stream = new MemoryStream();
         loca = new byte[checked((_glyphCount + 1) * 4)];
         for (ushort glyph = 0; glyph < _glyphCount; glyph++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             BinaryPrimitives.WriteUInt32BigEndian(loca.AsSpan(glyph * 4, 4), checked((uint)stream.Length));
             if (selectedGlyphs.Contains(glyph))
             {
-                ReadOnlySpan<byte> glyphData = GetGlyph(glyph);
-                stream.Write(glyphData.ToArray(), 0, glyphData.Length);
+                // 直接由來源 glyf 位移寫出，避免每個字圖多配置一份陣列副本。
+                (int offset, int length) = GetGlyphRange(glyph);
+                stream.Write(glyf, offset, length);
                 while ((stream.Length & 3) != 0)
                 {
                     stream.WriteByte(0);
@@ -534,6 +554,12 @@ internal sealed class SfntFont
 
     private ReadOnlySpan<byte> GetGlyph(ushort glyph)
     {
+        (int offset, int length) = GetGlyphRange(glyph);
+        return _tables["glyf"].AsSpan(offset, length);
+    }
+
+    private (int Offset, int Length) GetGlyphRange(ushort glyph)
+    {
         uint start = _locations[glyph];
         uint end = _locations[glyph + 1];
         if (end < start || end > _tables["glyf"].Length)
@@ -541,7 +567,7 @@ internal sealed class SfntFont
             throw DataInvalid("loca-order");
         }
 
-        return _tables["glyf"].AsSpan(checked((int)start), checked((int)(end - start)));
+        return (checked((int)start), checked((int)(end - start)));
     }
 
     private static uint[] ReadLocations(byte[] loca, ushort glyphCount, short format, int glyfLength)
@@ -646,7 +672,7 @@ internal sealed class SfntFont
         }
     }
 
-    private static int CheckedInt(long value, string detail)
+    internal static int CheckedInt(long value, string detail)
     {
         if (value < 0 || value > int.MaxValue)
         {
@@ -696,7 +722,7 @@ internal sealed class CmapMapping
 
     internal Dictionary<int, ushort> UnicodeMappings { get; }
 
-    internal static CmapMapping Parse(byte[] cmap, ushort glyphCount)
+    internal static CmapMapping Parse(byte[] cmap, ushort glyphCount, CancellationToken cancellationToken = default)
     {
         SfntFont.EnsureRange(cmap, 0, 4, "cmap");
         ushort count = SfntFont.ReadUInt16(cmap, 2, "cmap-count");
@@ -706,6 +732,7 @@ internal sealed class CmapMapping
         var offsets = new HashSet<uint>();
         for (int index = 0; index < count; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int record = 4 + (index * 8);
             uint offset = SfntFont.ReadUInt32(cmap, record + 4, "cmap-offset");
             if (!offsets.Add(offset) || offset > int.MaxValue)
@@ -717,15 +744,15 @@ internal sealed class CmapMapping
             ushort format = SfntFont.ReadUInt16(cmap, subtable, "cmap-format");
             if (format == 4)
             {
-                ParseFormat4(cmap, subtable, glyphCount, mappings);
+                ParseFormat4(cmap, subtable, glyphCount, mappings, cancellationToken);
             }
             else if (format == 12)
             {
-                ParseFormat12(cmap, subtable, glyphCount, mappings);
+                ParseFormat12(cmap, subtable, glyphCount, mappings, cancellationToken);
             }
             else if (format == 14)
             {
-                ParseFormat14(cmap, subtable, glyphCount, mappings, variations);
+                ParseFormat14(cmap, subtable, glyphCount, mappings, variations, cancellationToken);
             }
         }
 
@@ -754,27 +781,44 @@ internal sealed class CmapMapping
         SortedDictionary<int, ushort> mappings,
         IReadOnlyList<CmapVariation> variations)
     {
-        byte[] format4 = BuildFormat4(mappings.Where(item => item.Key <= 0xFFFF));
+        // U+FFFF 為 format 4 的終止 segment 專用值，解析端亦一律略過，因此不納入
+        // format 4；該碼位仍由 format 12 涵蓋。
+        byte[]? format4 = BuildFormat4(mappings.Where(item => item.Key < 0xFFFF));
         byte[] format12 = BuildFormat12(mappings);
         byte[]? format14 = variations.Count == 0 ? null : BuildFormat14(variations);
-        ushort recordCount = checked((ushort)(format14 is null ? 3 : 4));
-        int directoryLength = 4 + (recordCount * 8);
+        ushort recordCount = checked((ushort)((format4 is null ? 0 : 2) + (format14 is null ? 0 : 1) + 1));
+        int directoryLength = checked(4 + (recordCount * 8));
         int format4Offset = directoryLength;
-        int format12Offset = checked(format4Offset + format4.Length);
-        int format14Offset = checked(format12Offset + format12.Length);
-        var output = new byte[checked(directoryLength + format4.Length + format12.Length + (format14?.Length ?? 0))];
+        int format14Offset = checked(format4Offset + (format4?.Length ?? 0));
+        int format12Offset = checked(format14Offset + (format14?.Length ?? 0));
+        var output = new byte[checked(format12Offset + format12.Length)];
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(2, 2), recordCount);
-        WriteEncodingRecord(output, 4, 0, 3, format4Offset);
-        WriteEncodingRecord(output, 12, 3, 1, format4Offset);
-        WriteEncodingRecord(output, 20, 3, 10, format12Offset);
-        if (format14 is not null)
+
+        // OpenType 1.9.1 'cmap'：encoding record 必須先依 platformID、再依 encodingID
+        // 排序，故順序為 (0,3)、(0,5)、(3,1)、(3,10)。
+        int record = 4;
+        if (format4 is not null)
         {
-            WriteEncodingRecord(output, 28, 0, 5, format14Offset);
+            WriteEncodingRecord(output, record, 0, 3, format4Offset);
+            record += 8;
         }
 
-        format4.CopyTo(output, format4Offset);
-        format12.CopyTo(output, format12Offset);
+        if (format14 is not null)
+        {
+            WriteEncodingRecord(output, record, 0, 5, format14Offset);
+            record += 8;
+        }
+
+        if (format4 is not null)
+        {
+            WriteEncodingRecord(output, record, 3, 1, format4Offset);
+            record += 8;
+        }
+
+        WriteEncodingRecord(output, record, 3, 10, format12Offset);
+        format4?.CopyTo(output, format4Offset);
         format14?.CopyTo(output, format14Offset);
+        format12.CopyTo(output, format12Offset);
         return output;
     }
 
@@ -782,7 +826,8 @@ internal sealed class CmapMapping
         byte[] cmap,
         int start,
         ushort glyphCount,
-        Dictionary<int, ushort> mappings)
+        Dictionary<int, ushort> mappings,
+        CancellationToken cancellationToken)
     {
         ushort length = SfntFont.ReadUInt16(cmap, start + 2, "cmap4-length");
         SfntFont.EnsureRange(cmap, start, length, "cmap4");
@@ -793,22 +838,35 @@ internal sealed class CmapMapping
         }
 
         int segCount = segCountX2 / 2;
+        // 四個平行陣列與 reservedPad 必須完整落在 subtable 自身宣告的 length 內。
+        // 只比對整張 cmap table 會讓誇大的 segCount 通過，進而以近乎無界的
+        // segment 展開迴圈耗盡 CPU。
+        if (checked(16 + (segCount * 8)) > length)
+        {
+            throw SfntFont.DataInvalid("cmap4-segments");
+        }
+
         int endCodes = start + 14;
         int startCodes = checked(endCodes + (segCount * 2) + 2);
         int deltas = checked(startCodes + (segCount * 2));
         int rangeOffsets = checked(deltas + (segCount * 2));
         SfntFont.EnsureRange(cmap, rangeOffsets, segCount * 2, "cmap4-arrays");
+        int previousEnd = -1;
         for (int segment = 0; segment < segCount; segment++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ushort end = SfntFont.ReadUInt16(cmap, endCodes + (segment * 2), "cmap4-end");
             ushort first = SfntFont.ReadUInt16(cmap, startCodes + (segment * 2), "cmap4-start");
             short delta = SfntFont.ReadInt16(cmap, deltas + (segment * 2), "cmap4-delta");
             ushort rangeOffset = SfntFont.ReadUInt16(cmap, rangeOffsets + (segment * 2), "cmap4-range");
-            if (first > end)
+            // OpenType 1.9.1 要求 segment 依 endCode 遞增排列；一致的搜尋語意也隱含
+            // segment 不得重疊。強制此規則同時把總展開次數限制在 0x10000 以內。
+            if (first > end || first <= previousEnd)
             {
                 throw SfntFont.DataInvalid("cmap4-order");
             }
 
+            previousEnd = end;
             for (int code = first; code <= end && code != 0xFFFF; code++)
             {
                 ushort glyph;
@@ -835,7 +893,8 @@ internal sealed class CmapMapping
         byte[] cmap,
         int start,
         ushort glyphCount,
-        Dictionary<int, ushort> mappings)
+        Dictionary<int, ushort> mappings,
+        CancellationToken cancellationToken)
     {
         uint length = SfntFont.ReadUInt32(cmap, start + 4, "cmap12-length");
         if (length > int.MaxValue)
@@ -854,6 +913,7 @@ internal sealed class CmapMapping
         uint previousEnd = 0;
         for (int index = 0; index < groupCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int group = start + 16 + (index * 12);
             uint first = SfntFont.ReadUInt32(cmap, group, "cmap12-start");
             uint end = SfntFont.ReadUInt32(cmap, group + 4, "cmap12-end");
@@ -883,7 +943,8 @@ internal sealed class CmapMapping
         int start,
         ushort glyphCount,
         Dictionary<int, ushort> mappings,
-        Dictionary<UnicodeVariationSequence, CmapVariation> variations)
+        Dictionary<UnicodeVariationSequence, CmapVariation> variations,
+        CancellationToken cancellationToken)
     {
         uint length = SfntFont.ReadUInt32(cmap, start + 2, "cmap14-length");
         if (length > int.MaxValue)
@@ -901,18 +962,19 @@ internal sealed class CmapMapping
         SfntFont.EnsureRange(cmap, start + 10, checked((int)selectorCount * 11), "cmap14-records");
         for (int index = 0; index < selectorCount; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int record = start + 10 + (index * 11);
             int selector = ReadUInt24(cmap, record, "cmap14-selector");
             uint defaultOffset = SfntFont.ReadUInt32(cmap, record + 3, "cmap14-default");
             uint nonDefaultOffset = SfntFont.ReadUInt32(cmap, record + 7, "cmap14-nondefault");
             if (defaultOffset != 0)
             {
-                ParseDefaultUvs(cmap, start, defaultOffset, selector, mappings, variations);
+                ParseDefaultUvs(cmap, start, defaultOffset, selector, mappings, variations, cancellationToken);
             }
 
             if (nonDefaultOffset != 0)
             {
-                ParseNonDefaultUvs(cmap, start, nonDefaultOffset, selector, glyphCount, variations);
+                ParseNonDefaultUvs(cmap, start, nonDefaultOffset, selector, glyphCount, variations, cancellationToken);
             }
         }
     }
@@ -923,9 +985,10 @@ internal sealed class CmapMapping
         uint relativeOffset,
         int selector,
         Dictionary<int, ushort> mappings,
-        Dictionary<UnicodeVariationSequence, CmapVariation> variations)
+        Dictionary<UnicodeVariationSequence, CmapVariation> variations,
+        CancellationToken cancellationToken)
     {
-        int offset = checked(start + checked((int)relativeOffset));
+        int offset = checked(start + SfntFont.CheckedInt(relativeOffset, "cmap14-default-offset"));
         uint count = SfntFont.ReadUInt32(cmap, offset, "cmap14-default-count");
         if (count > 1_000_000)
         {
@@ -935,6 +998,7 @@ internal sealed class CmapMapping
         SfntFont.EnsureRange(cmap, offset + 4, checked((int)count * 4), "cmap14-default-ranges");
         for (int index = 0; index < count; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int range = offset + 4 + (index * 4);
             int first = ReadUInt24(cmap, range, "cmap14-default-start");
             int additional = cmap[range + 3];
@@ -955,9 +1019,10 @@ internal sealed class CmapMapping
         uint relativeOffset,
         int selector,
         ushort glyphCount,
-        Dictionary<UnicodeVariationSequence, CmapVariation> variations)
+        Dictionary<UnicodeVariationSequence, CmapVariation> variations,
+        CancellationToken cancellationToken)
     {
-        int offset = checked(start + checked((int)relativeOffset));
+        int offset = checked(start + SfntFont.CheckedInt(relativeOffset, "cmap14-nondefault-offset"));
         uint count = SfntFont.ReadUInt32(cmap, offset, "cmap14-nondefault-count");
         if (count > 1_000_000)
         {
@@ -967,6 +1032,7 @@ internal sealed class CmapMapping
         SfntFont.EnsureRange(cmap, offset + 4, checked((int)count * 5), "cmap14-nondefault-records");
         for (int index = 0; index < count; index++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int record = offset + 4 + (index * 5);
             int scalar = ReadUInt24(cmap, record, "cmap14-scalar");
             ushort glyph = SfntFont.ReadUInt16(cmap, record + 3, "cmap14-glyph");
@@ -980,14 +1046,23 @@ internal sealed class CmapMapping
         }
     }
 
-    private static byte[] BuildFormat4(IEnumerable<KeyValuePair<int, ushort>> values)
+    /// <summary>
+    /// 建置 format 4 subtable；無法以 16-bit length 表示時回傳 <see langword="null"/>。
+    /// </summary>
+    /// <remarks>
+    /// 連續且 idDelta 相同的碼位會合併為單一 segment，使常見的 CJK 大字集子集
+    /// 遠低於 format 4 的長度上限。OpenType 1.9.1 明定 format 12 存在時 format 4
+    /// 僅為舊版應用程式的相容性選配，因此極端稀疏的字集改為省略 format 4，
+    /// 而非讓整次子集化失敗。
+    /// </remarks>
+    private static byte[]? BuildFormat4(IEnumerable<KeyValuePair<int, ushort>> values)
     {
-        KeyValuePair<int, ushort>[] mappings = values.OrderBy(item => item.Key).ToArray();
-        int segmentCount = checked(mappings.Length + 1);
+        List<(ushort Start, ushort End, ushort Delta)> segments = CreateFormat4Segments(values);
+        int segmentCount = checked(segments.Count + 1);
         int length = checked(16 + (segmentCount * 8));
         if (length > ushort.MaxValue)
         {
-            throw SfntFont.DataInvalid("cmap4-size");
+            return null;
         }
 
         var output = new byte[length];
@@ -1001,19 +1076,42 @@ internal sealed class CmapMapping
         int endCodes = 14;
         int startCodes = endCodes + (segmentCount * 2) + 2;
         int deltas = startCodes + (segmentCount * 2);
-        for (int index = 0; index < mappings.Length; index++)
+        for (int index = 0; index < segments.Count; index++)
         {
-            ushort code = checked((ushort)mappings[index].Key);
-            BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(endCodes + (index * 2), 2), code);
-            BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(startCodes + (index * 2), 2), code);
-            ushort delta = unchecked((ushort)(mappings[index].Value - code));
+            (ushort start, ushort end, ushort delta) = segments[index];
+            BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(endCodes + (index * 2), 2), end);
+            BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(startCodes + (index * 2), 2), start);
             BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(deltas + (index * 2), 2), delta);
         }
 
-        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(endCodes + (mappings.Length * 2), 2), 0xFFFF);
-        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(startCodes + (mappings.Length * 2), 2), 0xFFFF);
-        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(deltas + (mappings.Length * 2), 2), 1);
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(endCodes + (segments.Count * 2), 2), 0xFFFF);
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(startCodes + (segments.Count * 2), 2), 0xFFFF);
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(deltas + (segments.Count * 2), 2), 1);
         return output;
+    }
+
+    private static List<(ushort Start, ushort End, ushort Delta)> CreateFormat4Segments(
+        IEnumerable<KeyValuePair<int, ushort>> values)
+    {
+        var segments = new List<(ushort Start, ushort End, ushort Delta)>();
+        foreach (KeyValuePair<int, ushort> item in values.OrderBy(item => item.Key))
+        {
+            ushort code = checked((ushort)item.Key);
+            ushort delta = unchecked((ushort)(item.Value - code));
+            if (segments.Count > 0)
+            {
+                (ushort start, ushort end, ushort existingDelta) = segments[segments.Count - 1];
+                if (code == end + 1 && delta == existingDelta)
+                {
+                    segments[segments.Count - 1] = (start, code, existingDelta);
+                    continue;
+                }
+            }
+
+            segments.Add((code, code, delta));
+        }
+
+        return segments;
     }
 
     private static byte[] BuildFormat12(SortedDictionary<int, ushort> mappings)

@@ -7,7 +7,7 @@ namespace OdfKit.WebFonts.OpenType;
 
 internal static class WebFontWriters
 {
-    private static readonly string[] Woff2KnownTags =
+    internal static readonly string[] Woff2KnownTags =
     [
         "cmap", "head", "hhea", "hmtx", "maxp", "name", "OS/2", "post",
         "cvt ", "fpgm", "glyf", "loca", "prep", "CFF ", "VORG", "EBDT",
@@ -68,10 +68,28 @@ internal static class WebFontWriters
         return output;
     }
 
+    /// <summary>
+    /// 計算等價 sfnt 的總位元組數，不實際序列化。
+    /// </summary>
+    /// <remarks>
+    /// WOFF 與 WOFF2 標頭只需要這個長度；先前為此完整寫出一次 TTF，
+    /// 使同時要求多種格式時重複序列化整份字型。
+    /// </remarks>
+    private static int CalculateSfntLength(KeyValuePair<string, byte[]>[] tables)
+    {
+        int length = Align4(checked(12 + (tables.Length * 16)));
+        foreach (KeyValuePair<string, byte[]> table in tables)
+        {
+            length = checked(length + Align4(table.Value.Length));
+        }
+
+        return length;
+    }
+
     internal static byte[] WriteWoff(SfntSubset subset)
     {
         KeyValuePair<string, byte[]>[] tables = subset.Tables.ToArray();
-        byte[] sfnt = WriteTrueType(subset);
+        int totalSfntSize = CalculateSfntLength(tables);
         int offset = Align4(checked(44 + (tables.Length * 20)));
         var records = new List<TableOutputRecord>(tables.Length);
         foreach (KeyValuePair<string, byte[]> table in tables)
@@ -92,7 +110,7 @@ internal static class WebFontWriters
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(4, 4), subset.Flavor);
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(8, 4), checked((uint)output.Length));
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)tables.Length));
-        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), checked((uint)sfnt.Length));
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), checked((uint)totalSfntSize));
         for (int index = 0; index < records.Count; index++)
         {
             int recordOffset = 44 + (index * 20);
@@ -173,13 +191,27 @@ internal static class WebFontWriters
 
     private static uint CalculateAdler32(ReadOnlySpan<byte> input)
     {
-        const uint modulus = 65521;
+        const uint Modulus = 65521;
+
+        // 5552 是在 32-bit 累加器溢位前可安全處理的最大位元組數（zlib NMAX）。
+        // 分塊取模可省去逐位元組的兩次除法，大型 CJK 表格差異顯著。
+        const int MaximumBlock = 5552;
         uint first = 1;
         uint second = 0;
-        foreach (byte value in input)
+        int position = 0;
+        while (position < input.Length)
         {
-            first = (first + value) % modulus;
-            second = (second + first) % modulus;
+            int block = Math.Min(MaximumBlock, input.Length - position);
+            ReadOnlySpan<byte> slice = input.Slice(position, block);
+            for (int index = 0; index < slice.Length; index++)
+            {
+                first += slice[index];
+                second += first;
+            }
+
+            first %= Modulus;
+            second %= Modulus;
+            position += block;
         }
 
         return (second << 16) | first;
@@ -189,7 +221,7 @@ internal static class WebFontWriters
     internal static byte[] WriteWoff2(SfntSubset subset)
     {
         KeyValuePair<string, byte[]>[] tables = OrderWoff2Tables(subset.Tables);
-        byte[] sfnt = WriteTrueType(subset);
+        int totalSfntSize = CalculateSfntLength(tables);
         using var directoryStream = new MemoryStream();
         using var tableStream = new MemoryStream();
         foreach (KeyValuePair<string, byte[]> table in tables)
@@ -230,7 +262,7 @@ internal static class WebFontWriters
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(4, 4), subset.Flavor);
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(8, 4), checked((uint)length));
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)tables.Length));
-        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), checked((uint)sfnt.Length));
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), checked((uint)totalSfntSize));
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(20, 4), checked((uint)compressedLength));
         directory.CopyTo(output, 48);
         compressedBuffer.AsSpan(0, compressedLength).CopyTo(output.AsSpan(48 + directory.Length));

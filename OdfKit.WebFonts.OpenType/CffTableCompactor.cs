@@ -15,11 +15,15 @@ internal static class CffTableCompactor
     private const int FdArrayOperator = 0x0C24;
     private const int FdSelectOperator = 0x0C25;
 
-    internal static byte[] Build(byte[] source, ushort glyphCount, ISet<ushort> retainedGlyphs)
+    internal static byte[] Build(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> retainedGlyphs,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            return BuildCore(source, glyphCount, retainedGlyphs);
+            return BuildCore(source, glyphCount, retainedGlyphs, cancellationToken);
         }
         catch (OverflowException)
         {
@@ -27,10 +31,14 @@ internal static class CffTableCompactor
         }
     }
 
-    private static byte[] BuildCore(byte[] source, ushort glyphCount, ISet<ushort> retainedGlyphs)
+    private static byte[] BuildCore(
+        byte[] source,
+        ushort glyphCount,
+        ISet<ushort> retainedGlyphs,
+        CancellationToken cancellationToken)
     {
         Layout layout = Parse(source, glyphCount);
-        byte[] compactCharStrings = BuildCharStrings(source, layout.CharStrings, retainedGlyphs);
+        byte[] compactCharStrings = BuildCharStrings(source, layout.CharStrings, retainedGlyphs, cancellationToken);
         var replacements = new List<Replacement>
         {
             new(layout.TopDictIndex.Start, layout.TopDictIndex.Length, Array.Empty<byte>()),
@@ -309,11 +317,13 @@ internal static class CffTableCompactor
     private static byte[] BuildCharStrings(
         byte[] source,
         IndexLayout charStrings,
-        ISet<ushort> retainedGlyphs)
+        ISet<ushort> retainedGlyphs,
+        CancellationToken cancellationToken)
     {
         var objects = new byte[charStrings.Objects.Count][];
         for (ushort glyph = 0; glyph < objects.Length; glyph++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Range range = charStrings.Objects[glyph];
             objects[glyph] = retainedGlyphs.Contains(glyph)
                 ? source.AsSpan(range.Start, range.Length).ToArray()

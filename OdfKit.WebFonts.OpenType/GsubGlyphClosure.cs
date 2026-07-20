@@ -2,7 +2,11 @@
 
 internal static class GsubGlyphClosure
 {
-    internal static void Add(byte[] table, HashSet<ushort> glyphs, ushort glyphCount)
+    internal static void Add(
+        byte[] table,
+        HashSet<ushort> glyphs,
+        ushort glyphCount,
+        CancellationToken cancellationToken = default)
     {
         SfntFont.EnsureRange(table, 0, 10, "GSUB-header");
         ushort majorVersion = SfntFont.ReadUInt16(table, 0, "GSUB-version");
@@ -26,6 +30,7 @@ internal static class GsubGlyphClosure
             int before = glyphs.Count;
             for (int lookupIndex = 0; lookupIndex < lookupCount; lookupIndex++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 ushort relativeOffset = SfntFont.ReadUInt16(
                     table,
                     lookupListOffset + 2 + (lookupIndex * 2),

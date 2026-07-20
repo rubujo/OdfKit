@@ -58,18 +58,37 @@ public static class WindowsEudcFontSourceResolver
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 
+        string fontsDirectory = Path.GetFullPath(
+            Environment.GetFolderPath(Environment.SpecialFolder.Fonts));
         string path = Path.IsPathRooted(configuredPath)
             ? configuredPath
-            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), configuredPath);
+            : Path.Combine(fontsDirectory, configuredPath);
         string fullPath = Path.GetFullPath(path);
         string extension = Path.GetExtension(fullPath);
         if ((!string.Equals(extension, ".tte", StringComparison.OrdinalIgnoreCase)
              && !string.Equals(extension, ".ttf", StringComparison.OrdinalIgnoreCase))
+            || !IsWithinFontsDirectory(fontsDirectory, fullPath)
             || !File.Exists(fullPath))
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 
         return fullPath;
+    }
+
+    /// <summary>
+    /// 判斷解析後的路徑是否位於系統字型目錄之下。
+    /// </summary>
+    /// <remarks>
+    /// <c>HKEY_CURRENT_USER</c> 對目前使用者可寫，因此登錄值本身不是信任來源。
+    /// 若不限制目錄，登錄內容即可讓此方法回傳磁碟上任意 <c>.ttf</c>／<c>.tte</c> 路徑，
+    /// 與「來源字型只由部署端 allowlist 決定」的引擎不變量相牴觸。
+    /// </remarks>
+    private static bool IsWithinFontsDirectory(string fontsDirectory, string candidatePath)
+    {
+        string root = fontsDirectory.TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        return candidatePath.StartsWith(root, StringComparison.OrdinalIgnoreCase);
     }
 }
