@@ -155,11 +155,16 @@ complex-script shaping。
    並於 `Invoke-LayoutBrowserSmoke` 的引數陣列追加 (source, subset) 配對。
 4. `tests/OdfKit.WebFontBrowserSmoke/LayoutBrowserSmoke.cs`：消費新增的配對。
 
-**已知阻力**：第 3 與第 4 步之間是**跨語言的位置式契約**——引數為扁平清單，PowerShell
-的追加順序必須與 C# 的讀取順序精確對齊，任一方漏改都會造成錯配而非編譯錯誤。將此契約
-改為資料驅動（具名 case 清單）可把新增 script 由四處程式碼修改降為一處設定修改，是擴充
-廣度前值得優先處理的項目。該重構的驗證前提是先完整執行 format matrix 以產生 evidence
-目錄，因此不宜在無法本機重現該前提時進行。
+**已處理的阻力**：第 3 與第 4 步之間原為**跨語言的位置式契約**——37 個扁平引數，
+PowerShell 的追加順序必須與 C# 的讀取順序精確對齊，任一方漏改不會產生編譯或執行錯誤，
+而是靜默載入到別的字型，證據看起來仍是綠的。此契約已改為 `name=path` 具名形式：缺漏或
+拼錯立即以 `Missing layout argument: <name>` 失敗，重複鍵亦被攔下。驗證方式為先以位置式
+版本建立三瀏覽器通過基線，改動後重跑同一閘門比對，全數逐像素一致。
+
+**仍存在的成本**：新增 script 仍需四處修改，因為 C# 端保有逐 script 的專屬內容（證據
+欄位、case id，以及 `@font-face` 的逐字型 variable 軸範圍如 `font-weight: 100 900`）。
+將這些抽成 case descriptor 以達成「一處設定修改」是獨立的後續工作，涉及該檔案 851 行的
+資料流重構；其驗證前提是先完整執行 format matrix 以產生 evidence 目錄。
 其它 script／language／feature 必須先擴充 GSUB closure 或採相同 correctness-first 路徑，驗證
 contextual、ligature、alternate、extension lookup、GDEF 關聯及 GPOS glyph reference；只有
 managed 結構驗證、合法 corpus 與 Chromium／Firefox／WebKit golden 一致時，才能新增支援聲明。
