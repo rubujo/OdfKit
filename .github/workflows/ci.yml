@@ -248,6 +248,17 @@ jobs:
           ./eng/Test-WebFontCmapScaleBrowserProof.ps1 `
             -SourceFontPath artifacts/webfont-format-matrix/sources/SourceHanSansTC-Regular.otf
 
+      - name: OTS differential oracle
+        shell: pwsh
+        # OTS 是 Chromium 與 Firefox 內建的字型消毒器；通過 OTS 是能在瀏覽器載入的
+        # 必要條件。clean-room writer 沒有其它獨立實作可對照，這是唯一能反對我們
+        # 自身判斷的自動化證據。複用 format matrix 已快取的鎖定字型。
+        # 本機含 wheel 下載與 CLI 建置為 70 秒；6 分鐘對較慢的 runner 已有餘裕。
+        timeout-minutes: 6
+        run: |
+          ./eng/Test-WebFontOtsOracle.ps1 `
+            -SourceFontPath artifacts/webfont-format-matrix/sources/SourceHanSansTC-Regular.otf
+
       - name: Locked transformed WOFF2 corpus
         shell: pwsh
         timeout-minutes: 5
@@ -308,6 +319,7 @@ jobs:
             artifacts/webfont-layout-browser/layout-*.png
             artifacts/cmap-scale-proof/evidence/cmap-scale-browser-proof.json
             artifacts/cmap-scale-proof/evidence/*.png
+            artifacts/webfont-ots-oracle/evidence/ots-oracle.json
             artifacts/webfont-package-consumer/**/webfonts.json
             artifacts/webfont-iis-express-*-smoke/evidence.json
             artifacts/webfont-iis-express-*-smoke/iisexpress.*.log

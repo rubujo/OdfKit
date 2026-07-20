@@ -399,6 +399,29 @@ fallback，正向結果不能採信。三個引擎對 control 均回報未載入
 dense 案例同時是修正前後的分界證據：12,000 個 BMP 字元在 format 4 範圍合併之前必定以
 `cmap4-size` 失敗，因此這條路徑在此之前不可能有任何瀏覽器證據。
 
+### 7.3 OTS 差分預言機
+
+由 `eng/Test-WebFontOtsOracle.ps1` 提供，使用 PyPI 釘選版本的 OpenType Sanitiser
+（`9.2.0`、BSD-3-Clause、wheel SHA-256 釘選、只下載不安裝）。OTS 是 Chromium 與
+Firefox 內建的字型消毒器：瀏覽器不會把 `@font-face` 下載的位元組直接交給作業系統字型
+引擎，而是先經 OTS 解析、驗證並重新序列化，任一步失敗即整個拒絕。因此「通過 OTS」是
+「能在瀏覽器載入」的必要條件。
+
+這個閘門補的是 clean-room 實作的結構性盲點：本專案刻意不參考 FontTools、HarfBuzz 或
+FreeType 原始碼，因此規格讀錯的地方沒有任何東西會指出來。`cmap` encoding record 未依
+規格排序與 format 4 長度上限兩項缺陷，都通過了 mutation 測試、三瀏覽器截圖與 managed
+verifier 才被逐行審查發現。差分預言機提供的是唯一能自動反對我們自身判斷的證據來源。
+
+涵蓋三種字集規模（小樣本、跨越 format 4 合併路徑、超過長度上限而省略 format 4 的稀疏
+字集）× 三種輸出格式（OTF／WOFF／WOFF2），共 9 個資產，全部通過。稀疏案例的通過同時
+獨立確認了「format 12 存在時省略 format 4」在瀏覽器 sanitiser 層是可接受的。
+
+負向對照為必要成分：截斷的資產必須遭 OTS 拒絕。若對照通過，代表預言機並未判別，正向
+結果不可採信。
+
+OTS 僅作隔離 oracle，不進入任何產品相依圖，符合第 6 節「第三方 validator 只是獨立
+oracle job」的規定。
+
 ## 8. 第一方依據
 
 - [Microsoft OpenType 1.9.1](https://learn.microsoft.com/en-us/typography/opentype/spec/)

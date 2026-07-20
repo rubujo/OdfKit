@@ -1,4 +1,17 @@
 {
+  "opentypeSanitizer": {
+    "source": "pypi",
+    "cacheRevision": "1",
+    "version": "9.2.0",
+    "license": "BSD-3-Clause",
+    "role": "隔離 oracle：Chromium 與 Firefox 內建的 OpenType Sanitiser，用於差分驗證 OdfKit 產出是否會被瀏覽器接受。不得進入任何產品相依圖。",
+    "windowsWheel": {
+      "fileName": "opentype_sanitizer-9.2.0-py2.py3-none-win_amd64.whl",
+      "uri": "https://pypi.org/simple/opentype-sanitizer/",
+      "sha256": "4638a4ba50fb1211004cbb2d620cfc0cc8aa936c42fef64efec8f07987c3210f",
+      "executablePath": "ots/ots-sanitize.exe"
+    }
+  },
   "odfValidator": {
     "source": "maven-central",
     "cacheRevision": "1",
