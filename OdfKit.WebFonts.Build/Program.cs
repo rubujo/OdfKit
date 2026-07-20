@@ -136,6 +136,9 @@ static IReadOnlyList<WebFontFormat> ParseFormats(string value)
             "woff2" => WebFontFormat.Woff2,
             "woff" => WebFontFormat.Woff,
             "ttf" => WebFontFormat.TrueType,
+            // CFF 來源字型的引擎會拒絕 TrueType 輸出，因此少了 otf 就完全無法從 CLI
+            // 產生獨立 OTF——儘管架構文件把 OTF 列為產品輸出格式。
+            "otf" => WebFontFormat.OpenType,
             _ => throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"))
         })
         .ToArray();
