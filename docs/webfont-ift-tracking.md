@@ -14,6 +14,21 @@ Recommendation Snapshot，2025-11-18 發布後續 Candidate Recommendation Draft
 implementation report，測試套件仍在開發。版本由
 `eng/webfont-standards-dependency-policy.json` 鎖定，超過 90 天未複查會使發布閘門失敗。
 
+### 複查紀錄
+
+| 複查日期 | 標準狀態 | 結論 |
+| --- | --- | --- |
+| 2026-07-20 | 仍為 Candidate Recommendation Draft（2025-11-18） | 閘門維持關閉 |
+
+2026-07-20 複查：W3C 發布頁顯示 IFT 自 2025-11-18 的 Candidate Recommendation Draft
+起未再前進，仍未成為 Recommendation。[Web Fonts WG 章程](https://www.w3.org/2025/03/webfonts-wg.html)
+原訂 2026 年第二季完成，該時程已逾期而標準狀態未變。因此本文件所列的實作前提
+（穩定的 patch 格式、完成的 implementation report、可用的測試套件）仍未成立，
+閘門維持關閉。
+
+此複查本身即為文件所定 90 天週期的一次執行；前次記載基準為 2025-11-18，至本次
+複查已逾期，後續應恢復按週期執行。
+
 W3C 2025 TPAC 的官方展示明確使用 WebAssembly polyfill，而不是穩定瀏覽器原生實作；Mozilla
 追蹤項目 [1977870](https://bugzilla.mozilla.org/show_bug.cgi?id=1977870) 截至基準日仍為 NEW。
 因此目前的 Chromium／Firefox／WebKit Playwright matrix 不能作為 IFT client oracle，也不能只
