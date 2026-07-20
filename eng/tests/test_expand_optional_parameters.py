@@ -44,6 +44,33 @@ public sealed class Sample
         self.assertIn("public T Create<T>(string value) where T : new() => Create<T>(value, null);", result)
         self.assertIn("public T Create<T>(string value, object? options) where T : new()", result)
 
+    def test_skips_cancellation_token_only_optional(self) -> None:
+        source = """namespace Example;
+
+using System.Threading;
+using System.Threading.Tasks;
+
+public sealed class Sample
+{
+    public Task RunAsync(string path, CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+}
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "Sample.cs"
+            path.write_text(source, encoding="utf-8")
+
+            expanded = MODULE.process_file(path, dry_run=False)
+            result = path.read_text(encoding="utf-8")
+
+        self.assertEqual(0, expanded)
+        self.assertIn(
+            "CancellationToken cancellationToken = default",
+            result,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

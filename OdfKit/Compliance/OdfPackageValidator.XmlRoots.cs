@@ -50,12 +50,14 @@ public static partial class OdfPackageValidator
         try
         {
             using Stream stream = package.GetEntryStream("content.xml");
+            long maxXmlCharacters = package.LoadOptions.MaxXmlCharactersInDocument;
             var settings = new XmlReaderSettings
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
                 IgnoreWhitespace = true,
-                MaxCharactersFromEntities = 0
+                MaxCharactersFromEntities = 0,
+                MaxCharactersInDocument = maxXmlCharacters > 0 ? maxXmlCharacters : 0
             };
 
             using XmlReader reader = XmlReader.Create(stream, settings);
@@ -236,12 +238,14 @@ public static partial class OdfPackageValidator
         try
         {
             using Stream stream = package.GetEntryStream(entryName);
+            long maxXmlCharacters = package.LoadOptions.MaxXmlCharactersInDocument;
             var settings = new XmlReaderSettings
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
                 IgnoreWhitespace = true,
-                MaxCharactersFromEntities = 0
+                MaxCharactersFromEntities = 0,
+                MaxCharactersInDocument = maxXmlCharacters > 0 ? maxXmlCharacters : 0
             };
 
             using XmlReader reader = XmlReader.Create(stream, settings);

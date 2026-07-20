@@ -127,7 +127,7 @@
 | RS0026／RS0027 政策 | [public-api-optional-parameters.md](public-api-optional-parameters.md)；示範 `InsertRows`／`DeleteRows` |
 | 協作者地圖 | [architecture-collaborators.md](architecture-collaborators.md) |
 | 效能完滿基線 | `performance-comparison.md` 第 3 次跑分（2026-07-09） |
-| 單／多可選參數收斂 | 手寫 RS0026／27 為 error；`Expand-OptionalParameters.py` dry-run 0；高頻改 options |
+| 單／多可選參數收斂 | 手寫 RS0026／27 為 error；`Expand-OptionalParameters.py` 略過僅 CT 的 `= default`；高頻改 options；CT 政策見 `public-api-optional-parameters.md` |
 | 雙語 XML missing 清零 | `Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`（`-FailOnNewIssues` 零容忍） |
 | 便利多載／占位摘要語意化 | `Rewrite-ConvenienceSummaries.py`（全庫手寫）；`Rewrite-ExecuteOperationSummaries.py`（`Executes the X` → 方法語意） |
 

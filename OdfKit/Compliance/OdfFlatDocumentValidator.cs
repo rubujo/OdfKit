@@ -67,7 +67,9 @@ public static class OdfFlatDocumentValidator
 
             string? profileId = profile?.Id;
             OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);
-            FlatRootInfo? rootInfo = ReadRootInfo(stream, fileName, profileId, issues);
+            long maxXmlCharacters = options.LoadOptions?.MaxXmlCharactersInDocument
+                ?? new OdfLoadOptions().MaxXmlCharactersInDocument;
+            FlatRootInfo? rootInfo = ReadRootInfo(stream, fileName, profileId, issues, maxXmlCharacters);
 
             OdfDocumentKind documentKind = DetectDocumentKind(rootInfo?.MimeType, extensionKind, rootInfo?.BodyKind ?? OdfDocumentKind.Unknown);
             OdfVersion detectedVersion = rootInfo?.Version is not null
@@ -90,7 +92,7 @@ public static class OdfFlatDocumentValidator
             ValidateExtensionKind(extensionKind, documentKind, fileName, profileId, issues);
             ValidateProfileExtension(fileName, profile, profileId, issues);
             ValidateVersion(detectedVersion, profile, fileName, profileId, issues);
-            OdfProfileRuleValidator.ValidateFlatXml(stream, fileName, profile, schema, issues);
+            OdfProfileRuleValidator.ValidateFlatXml(stream, fileName, profile, schema, issues, maxXmlCharacters);
 
             foreach (var issue in issues)
             {
@@ -108,7 +110,12 @@ public static class OdfFlatDocumentValidator
         }
     }
 
-    private static FlatRootInfo? ReadRootInfo(Stream stream, string? fileName, string? profileId, List<OdfValidationIssue> issues)
+    private static FlatRootInfo? ReadRootInfo(
+        Stream stream,
+        string? fileName,
+        string? profileId,
+        List<OdfValidationIssue> issues,
+        long maxXmlCharacters)
     {
         try
         {
@@ -118,6 +125,7 @@ public static class OdfFlatDocumentValidator
                 XmlResolver = null,
                 IgnoreWhitespace = true,
                 MaxCharactersFromEntities = 0,
+                MaxCharactersInDocument = maxXmlCharacters > 0 ? maxXmlCharacters : 0,
                 CloseInput = false
             };
 

@@ -42,7 +42,14 @@ internal static partial class OdfProfileRuleValidator
             try
             {
                 using Stream stream = package.GetEntryStream(entryName);
-                ScanXml(stream, entryName, profile, schema, issues, closeInput: true);
+                ScanXml(
+                    stream,
+                    entryName,
+                    profile,
+                    schema,
+                    issues,
+                    closeInput: true,
+                    package.LoadOptions.MaxXmlCharactersInDocument);
             }
             catch (IOException ex)
             {
@@ -70,7 +77,8 @@ internal static partial class OdfProfileRuleValidator
         string? fileName,
         OdfComplianceProfile? profile,
         OdfSchemaSet schema,
-        List<OdfValidationIssue> issues)
+        List<OdfValidationIssue> issues,
+        long maxXmlCharacters)
     {
         if (profile is null)
         {
@@ -95,9 +103,9 @@ internal static partial class OdfProfileRuleValidator
 
         try
         {
-            ScanXml(stream, fileName, profile, schema, issues, closeInput: false);
+            ScanXml(stream, fileName, profile, schema, issues, closeInput: false, maxXmlCharacters);
             stream.Position = 0;
-            ValidateFlatSchemaPattern(stream, fileName, profile, schema, issues);
+            ValidateFlatSchemaPattern(stream, fileName, profile, schema, issues, maxXmlCharacters);
         }
         finally
         {

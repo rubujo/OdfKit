@@ -34,7 +34,15 @@ internal static partial class OdfProfileRuleValidator
             try
             {
                 using Stream stream = package.GetEntryStream(entryName);
-                ValidateRootSchemaPattern(stream, entryName, profile, schema, rule, issues, closeInput: true);
+                ValidateRootSchemaPattern(
+                    stream,
+                    entryName,
+                    profile,
+                    schema,
+                    rule,
+                    issues,
+                    closeInput: true,
+                    package.LoadOptions.MaxXmlCharactersInDocument);
             }
             catch (IOException ex)
             {
@@ -96,7 +104,8 @@ internal static partial class OdfProfileRuleValidator
         string? fileName,
         OdfComplianceProfile profile,
         OdfSchemaSet schema,
-        List<OdfValidationIssue> issues)
+        List<OdfValidationIssue> issues,
+        long maxXmlCharacters)
     {
         OdfPolicyRule? rule = FindRule(profile, "RequireSchemaPatternValidation");
         if (rule is null)
@@ -104,7 +113,7 @@ internal static partial class OdfProfileRuleValidator
             return;
         }
 
-        ValidateRootSchemaPattern(stream, fileName, profile, schema, rule, issues, closeInput: false);
+        ValidateRootSchemaPattern(stream, fileName, profile, schema, rule, issues, closeInput: false, maxXmlCharacters);
     }
 
     private static void ValidateRootSchemaPattern(
@@ -114,7 +123,8 @@ internal static partial class OdfProfileRuleValidator
         OdfSchemaSet schema,
         OdfPolicyRule rule,
         List<OdfValidationIssue> issues,
-        bool closeInput)
+        bool closeInput,
+        long maxXmlCharacters)
     {
         try
         {
@@ -124,6 +134,7 @@ internal static partial class OdfProfileRuleValidator
                 XmlResolver = null,
                 IgnoreWhitespace = true,
                 MaxCharactersFromEntities = 0,
+                MaxCharactersInDocument = maxXmlCharacters > 0 ? maxXmlCharacters : 0,
                 CloseInput = closeInput
             };
 

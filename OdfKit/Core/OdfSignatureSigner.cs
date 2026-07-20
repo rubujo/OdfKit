@@ -50,7 +50,7 @@ internal static class OdfSignatureSigner
         if (privateKey is null)
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_CertificateSupportedRsaEcdsa"));
 
-        var doc = new XmlDocument();
+        var doc = new XmlDocument { XmlResolver = null };
         XmlElement root;
         var settings = new XmlReaderSettings
         {

@@ -65,7 +65,8 @@ internal static partial class OdfProfileRuleValidator
         OdfComplianceProfile profile,
         OdfSchemaSet schema,
         List<OdfValidationIssue> issues,
-        bool closeInput)
+        bool closeInput,
+        long maxXmlCharacters)
     {
         var settings = new XmlReaderSettings
         {
@@ -73,6 +74,7 @@ internal static partial class OdfProfileRuleValidator
             XmlResolver = null,
             IgnoreWhitespace = true,
             MaxCharactersFromEntities = 0,
+            MaxCharactersInDocument = maxXmlCharacters > 0 ? maxXmlCharacters : 0,
             CloseInput = closeInput
         };
 

@@ -24,8 +24,11 @@ ZIP 項目數、單一項目、總解壓量與原始封裝大小必須設定為�
 `MaxXmlCharactersInDocument = 0` 明確表示停用 XML 字元限制，負值仍屬無效輸入。
 
 所有核心 XML Reader 均應禁止外部 DTD／resolver；新增載入入口時，必須沿用
-`OdfLoadOptions` 或提供等價且文件化的資源預算，不可建立無上限的旁路。簽章、時間戳記、
-憑證撤銷資料與外部網路回應另有各自的較小界限，不能以核心封裝上限取代。
+`OdfLoadOptions` 或提供等價且文件化的資源預算，不可建立無上限的旁路。套件與 Flat XML
+驗證路徑（`OdfPackageValidator`、`OdfFlatDocumentValidator`、profile 規則掃描）同樣套用
+`MaxXmlCharactersInDocument`：封裝路徑使用 `package.LoadOptions`，Flat 路徑使用
+`OdfValidationOptions.LoadOptions`（未指定時採 `OdfLoadOptions` 預設 64 MiB）。簽章、
+時間戳記、憑證撤銷資料與外部網路回應另有各自的較小界限，不能以核心封裝上限取代。
 
 這些限制是載入階段的資源防線，不等於文件內容安全政策。巨集、外部資源、簽章、加密與
 profile 規則應另以 `OdfPackageValidator`、`SanitizeMacros`、簽章驗證 API 或

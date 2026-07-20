@@ -96,7 +96,7 @@ internal static class OdfSignatureTsaClient
 
     internal static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)
     {
-        var cleanDoc = new XmlDocument();
+        var cleanDoc = new XmlDocument { XmlResolver = null };
         var imported = (XmlElement)cleanDoc.ImportNode(signatureValueElem, true);
         cleanDoc.AppendChild(imported);
 

@@ -4,6 +4,8 @@
 
 ## 尚未發佈
 
+- 補齊套件／Flat XML 驗證路徑（`OdfPackageValidator`、`OdfFlatDocumentValidator`、profile 規則掃描）的 `MaxCharactersInDocument`，與核心載入共用 `OdfLoadOptions.MaxXmlCharactersInDocument` 資源預算；簽章寫入／TSA 路徑的 `XmlDocument` 顯式 `XmlResolver = null`。同步更新 `docs/security-limits.md`。
+- 釐清公開 API 可選參數與 `CancellationToken` 政策：公開允許尾端 `= default` 或明確多載鏈兩種等價形狀，內部應必填並傳遞；`eng/Expand-OptionalParameters.py` 略過僅 CT 的 `= default`，避免機械拆除 .NET SDK 慣用便利形狀（見 `docs/public-api-optional-parameters.md`）。
 - WebFont 子集化修正 `cmap` format 4 建構與解析。建構端新增連續範圍合併（`idDelta` 相同的相鄰碼位併為單一 segment），解除先前「每字元一個 segment」導致的 8,188 個 BMP 字元硬性上限——該上限低於各層設定允許的 65,536，且遠低於 Big5 常用字集（13,053 字）與 CNS 11643 第 1、2 面（約 13,000 字），亦即完整繁中字集子集在修正前必定失敗。極端稀疏字集改為依 OpenType 1.9.1「format 12 存在時 format 4 為相容性選配」省略 format 4，不再中止產生。encoding record 改為規格要求的 platformID／encodingID 排序（`(0,3)`、`(0,5)`、`(3,1)`、`(3,10)`）。解析端以 subtable 宣告的 `length` 約束 `segCount`，並強制 segment 依 `endCode` 遞增且不重疊，將惡意 `cmap` 的展開迴圈上界由約 21 億次降至 0x10000 次。
 - 新增 `cmap` 規模路徑的三瀏覽器實機閘門（`eng/Test-WebFontCmapScaleBrowserProof.ps1`／`tests/OdfKit.WebFontCmapScaleProof`）：以鎖定的 Adobe Source Han Sans TC `2.005R` 產生 12,000 字單片子集與 9,000 字稀疏子集（後者依規格省略 format 4，僅保留 `(3,10)`），在 Chromium／Firefox／WebKit 驗證 `FontFace` 實際載入與取樣字元的 canvas 墨跡。同批資產截斷後的負向對照在三個引擎均正確遭拒，用以證明量測不是在觀察 fallback。字型與證據皆不納入 repository。
 - WebFont 產字熱路徑全面貫穿 `CancellationToken`（`SfntFont.Parse`／`CreateSubset`、`cmap` 各 format 解析、GSUB closure、composite closure、CFF／CFF2 subsetter 與 compactor、`gvar`、WOFF2 `glyf` 重建）。修正前 `WebFontGenerationWorker.JobTimeout` 雖會觸發卻無人觀察，單一惡意或損毀字型即可永久占住 consumer 執行緒，佇滿後動態產生端點需重啟行程才能恢復；架構文件宣稱的「工作逾時」界限至此才實際成立。`ColorFontValidator` 依其巡訪次數已由位元組範圍檢查隱含限制，僅在各色彩技術階段之間檢查取消，此取捨記於該方法 `<remarks>`。
