@@ -160,6 +160,19 @@ bitstream；但 .NET Runtime 官方來源顯示該 API 呼叫 runtime native enc
 `netstandard2.0`／`net48` 第一階段只承諾 TTF／WOFF。若未來找到授權相容且可稽核的純
 managed Brotli encoder，才可增加舊 TFM 的 WOFF2；不得為追求格式一致性而引入 native package。
 
+**2026-07-20 候選調查結論：閘門維持關閉。** 目前唯一符合「純 managed C#＋encoder」的
+現成套件是 [BrotliSharpLib](https://www.nuget.org/packages/BrotliSharpLib/)（MIT、
+完整 C# 移植、支援 .NET Standard 1.1 起）。功能、授權與 managed 邊界三項皆符合，但
+**維護一項不成立**：最新版 `0.3.3` 發布於 2019-02-06，逾七年無更新，因而不含
+`google/brotli` 其後的修正。第 2 節要求候選須「同時滿足功能、維護、授權及 managed
+邊界」，故不採用。壓縮器位於字型產生管線上，若移植碼日後出現漏洞將無上游修補可循，
+這使維護落差成為安全風險而非單純的新鮮度問題。
+
+此缺口的實際影響比表面窄：舊 TFM 只是無法**動態產生** WOFF2。以 `net10.0` 於建置期
+預產生 WOFF2 資產、再由 `net48` 主機以靜態內容定址路徑供應，是既有且已驗證的部署形態
+（見第 5 節 Phase 3 的「Web Forms config／handler 與離線預產生」）。因此舊 TFM 的
+WOFF2 缺口僅限於「每次請求即時產生」的情境。
+
 WOFF 依 W3C WOFF 1.0 規則逐 table 使用 zlib；壓縮結果未小於原 table 時保留未壓縮 bytes。
 WOFF2 writer 目前維持規格允許的 `glyf`／`loca` null transform；decoder 則依 W3C WOFF2
 Recommendation clean-room 實作 `glyf`／`loca` version 0 與 `hmtx` version 1 反轉換。重建採
