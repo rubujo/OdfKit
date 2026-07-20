@@ -40,22 +40,40 @@ public sealed class Cns11643EucTwMappingProvider : ITraceableCharacterMappingPro
         _mappings = mappings;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the versioned CNS 11643 EUC-TW profile identifier.
+    /// 取得版本化的 CNS 11643 EUC-TW profile 識別碼。
+    /// </summary>
     public string ProfileId => $"cns11643-euc-tw-{VerifiedDataVersion}";
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the pinned official data version.
+    /// 取得鎖定的官方資料版本。
+    /// </summary>
     public string DataVersion => VerifiedDataVersion;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the official source URI.
+    /// 取得官方來源 URI。
+    /// </summary>
     public string SourceUri => OfficialSourceUri;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the pinned SHA-256 digest of the source archive.
+    /// 取得來源封存檔鎖定的 SHA-256 摘要。
+    /// </summary>
     public string SourceSha256 => VerifiedArchiveSha256;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the source data license identifier.
+    /// 取得來源資料的授權識別碼。
+    /// </summary>
     public string LicenseId => "OGDL-Taiwan-1.0";
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the required source attribution.
+    /// 取得必要的來源標示。
+    /// </summary>
     public string Attribution => "數位發展部，CNS11643 中文標準交換碼全字庫網站，https://www.cns11643.gov.tw。";
 
     /// <summary>
@@ -105,7 +123,12 @@ public sealed class Cns11643EucTwMappingProvider : ITraceableCharacterMappingPro
         return new Cns11643EucTwMappingProvider(merged);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Decodes a complete EUC-TW sequence through the pinned CNS 11643 mapping.
+    /// 透過鎖定的 CNS 11643 對照解碼完整 EUC-TW 序列。
+    /// </summary>
+    /// <param name="source">The EUC-TW bytes to decode. / 要解碼的 EUC-TW 位元組。</param>
+    /// <returns>The decoded Unicode text. / 解碼後的 Unicode 文字。</returns>
     public string Decode(byte[] source)
     {
         if (source is null)

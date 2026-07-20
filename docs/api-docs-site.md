@@ -10,7 +10,7 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
 
 - **單一 DocFX 站，站內多語系**：DocFX（OSS 版）沒有原生多語系功能；本站採社群慣例，
   以「每語系一個內容資料夾」承載語系入口，全站共用一份 API reference。
-- **在地化概念內容**：12 個語系均提供各自的入口頁與使用、合規、安全及證據指南，
+- **在地化概念內容**：17 個語系均提供各自的入口頁與使用、合規、安全及證據指南，
   不以只有翻譯標題或首句的落地頁視為完成。
 - **API 成員內容回退**：API 成員內容由雙語（英文＋正體中文）XML 文件產生
   （政策見 `AGENTS.md`）。非英文／正體中文語系的指南會明確揭露此範圍，
@@ -22,11 +22,13 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
   切換器、`hreflang` 注入或模板 partial。
 - **根路徑是語言選擇頁**：根首頁保留 17 語系入口，不設定 `redirect_url` 強制導向
   `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
-- **權威來源與受控譯文**：正體中文正式文件直接以 DocFX file mapping 納入；其餘 11 語系的
+- **權威來源與受控譯文**：正體中文正式文件直接以 DocFX file mapping 納入；其餘 16 語系的
   譯文提交至 `api-docs/<locale>/`，並以來源 SHA-256、必要 token 與 CI 契約防止漂移。
 - **目的語系必須明示**：共用 API 入口標示 `[en + zh-TW]`；各語系正式文件連向同語系譯文，
   並在頁內揭露正體中文權威來源。全站 navbar 維持雙語，不模擬語系 session。
-- **不公開原始維護檔**：`project-docs/` 僅發布四個權威 HTML 頁面。權威頁所引用的
+- **不公開原始維護檔**：`project-docs/` 僅發布九個核准的 HTML 頁面，包含四個
+  合規／證據權威頁與五個 WebFont 權威頁。站台原生的快速開始與套件選型頁提供最小
+  導覽並連回 GitHub 權威全文。這些頁面所引用的
   次級 repo 文件與機器可讀 manifest 連到 GitHub `blob/main` 渲染頁，不複製成
   Pages 的 `.md` 或 `.json` 資源。
 
@@ -51,8 +53,9 @@ api-docs/
 ```
 
 `docs/ip-compliance.md`、`docs/security-limits.md`、`docs/evidence-index.md`、根目錄
-`THIRD-PARTY-NOTICES.md` 與 `api-docs/articles/license.md` 是 `zh-TW` 唯一權威來源。其他語系
-譯文的工作流程見 `api-docs/TRANSLATING.md`。
+`THIRD-PARTY-NOTICES.md` 與 `api-docs/articles/license.md` 是受控譯文的 `zh-TW` 唯一權威來源。
+五個 WebFont 文件直接發布共同權威內容，不納入逐語系翻譯承諾。
+其他語系譯文的工作流程見 `api-docs/TRANSLATING.md`。
 
 ## 3. 語系契約
 
@@ -79,19 +82,19 @@ api-docs/
 |------|------|
 | 語系契約驗證 | 見上節；防止語系入口孤立或遺漏。 |
 | 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出本地 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
-| `--warningsAsErrors` | DocFX build 警告視為錯誤。 |
+| `--warningsAsErrors` | DocFX metadata 與 build 警告均視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
 | 原始資源與 xref | 禁止內部 `.md` 連結、`project-docs/` 非核准資源及 modern 輸出殘留的 `xref:*`。 |
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
 | modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
-| 權威文件 | 驗證 IP、安全、證據與第三方聲明均建置為站內頁面。 |
+| 權威文件 | 驗證快速開始、套件選型、IP、安全、證據、WebFont 與第三方聲明均建置為站內頁面。 |
 | 404 頁面 | 驗證 `404.html` 存在、已注入站台根 `<base>`（GitHub Pages 於任意深度缺失路徑回傳其內容，相對資源需以站台根解析）且不進入 sitemap。 |
 | 翻譯契約 | 驗證 80 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
 
 ## 5. 本機建置與預覽
 
 ```powershell
-pwsh eng/Build-ApiDocs.ps1                    # 完整建置（含八個組件）
+pwsh eng/Build-ApiDocs.ps1                    # 完整建置（含 19 個公開套件組件）
 pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild  # 組件未變更時的快速重建
 pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild -OutputDirectory artifacts/api-site-check
 dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽

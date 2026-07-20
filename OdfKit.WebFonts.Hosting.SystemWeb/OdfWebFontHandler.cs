@@ -37,10 +37,17 @@ public sealed class OdfWebFontHandler : IHttpHandler
         _allowPublicCrossOriginAssets = allowPublicCrossOriginAssets;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets whether the handler instance can process multiple requests.
+    /// 取得 Handler 執行個體是否可處理多個要求。
+    /// </summary>
     public bool IsReusable => true;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Processes a manifest, stylesheet, or immutable WebFont asset request.
+    /// 處理 manifest、樣式表或不可變 WebFont 資產要求。
+    /// </summary>
+    /// <param name="context">The current HTTP context. / 目前的 HTTP 內容。</param>
     public void ProcessRequest(HttpContext context)
     {
         if (context is null)

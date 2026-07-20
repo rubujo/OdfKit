@@ -45,7 +45,7 @@ v0.0.1 起，各語系字串的**來源真相**為 `OdfKit/Compliance/i18n/excep
 與 [maintainability.md](../maintainability.md)。
 
 `OdfKit/Compliance/OdfLocalizer.ComplianceSuggestions.cs` 維護非例外的合規建議補充
-翻譯；新增內建 compliance rule 或 suggested-fix key 時，也必須讓 12 個支援語言
+翻譯；新增內建 compliance rule 或 suggested-fix key 時，也必須讓 17 個支援語言
 合併後的鍵值集合與英文一致。
 
 `OdfKit/Compliance/OdfLocalizer.ExtensionDiagnostics.cs` 維護 Extensions 套件的診斷

@@ -28,7 +28,14 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         ValidateOptions();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Generates deterministic, bounded WebFont subset assets.
+    /// 產生確定且有界的 WebFont 子集資產。
+    /// </summary>
+    /// <param name="request">The validated subset request. / 已驗證的子集要求。</param>
+    /// <param name="destinationDirectory">The trusted destination directory. / 受信任的目的目錄。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The generated content-addressed manifest. / 產生的內容定址 manifest。</returns>
     public async Task<WebFontManifest> GenerateAsync(
         WebFontSubsetRequest request,
         string destinationDirectory,

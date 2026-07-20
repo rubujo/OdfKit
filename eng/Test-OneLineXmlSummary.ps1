@@ -25,6 +25,17 @@ $roots = @(
     (Join-Path $repoRoot 'OdfKit.Extensions.Rdf'),
     (Join-Path $repoRoot 'OdfKit.Extensions.Rendering'),
     (Join-Path $repoRoot 'OdfKit.Extensions.Collaboration'),
+    (Join-Path $repoRoot 'OdfKit.Extensions.Html.WebFonts'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Abstractions'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Build'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Data.SqlServer'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Encoding.Legacy'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Hosting.AspNetCore'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Hosting.SystemWeb'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.OpenType'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Profiles'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Windows'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Worker'),
     (Join-Path $repoRoot 'tools/OdfKit.Cli')
 )
 

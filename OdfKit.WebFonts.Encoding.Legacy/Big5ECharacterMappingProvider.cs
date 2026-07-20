@@ -13,10 +13,18 @@ public sealed class Big5ECharacterMappingProvider(Big5EMapping mapping) : IChara
         nameof(mapping),
         OdfLocalizer.GetMessage("Err_WebFontLegacyEncoding_MappingInvalid"));
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the versioned Big5E mapping profile identifier.
+    /// 取得版本化的 Big5E 對照 profile 識別碼。
+    /// </summary>
     public string ProfileId => $"big5e-{_mapping.Version}";
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Decodes a complete Big5E byte sequence with strict fallback behavior.
+    /// 使用嚴格 fallback 行為解碼完整的 Big5E 位元組序列。
+    /// </summary>
+    /// <param name="source">The Big5E bytes to decode. / 要解碼的 Big5E 位元組。</param>
+    /// <returns>The decoded Unicode text. / 解碼後的 Unicode 文字。</returns>
     public string Decode(byte[] source)
     {
         if (source is null)

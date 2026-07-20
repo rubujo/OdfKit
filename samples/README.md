@@ -1,7 +1,7 @@
-# OdfKit .NET 10.0 單檔 C# 指令碼範例使用說明
+# OdfKit .NET 10.0 單檔 C# 應用程式範例使用說明
 
-本目錄包含一個以 `Sample.cs` 為主的 `OdfKit` 全功能展示範例。
-此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔指令碼 (File-based apps)** 特性，
+本目錄包含一個以 `Sample.cs` 為主的 `OdfKit` 整合展示範例。
+此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔應用程式 (File-based apps)** 特性，
 不需要建立傳統 `.csproj`，即可直接執行。
 
 WebFont 專用範例另見：
@@ -17,7 +17,7 @@ WebFont 專用範例另見：
 
 ## 技術背景與最佳實踐
 
-微軟在 .NET 10.0 中引入了更強大的單檔 C# 指令碼執行模式：
+微軟在 .NET 10.0 中引入了單檔 C# 應用程式執行模式：
 - **免專案檔運行**：使用 `dotnet run <file.cs>` 即可直接編譯並執行單個 `.cs` 檔案。
 - **檔案指令 (Directives)**：在程式碼頂端使用以 `#:` 開頭的指令，可以直接在程式碼內處理專案相依性。
   - `#:project <path.csproj>`：可用於直接參考本地 C# 專案。
@@ -137,7 +137,7 @@ dotnet run samples/Sample.cs
    - 使用 `OdfLocalizer.DefaultCulture` 與 `OdfLocalizer.GetMessage(...)` 展示 `zh-TW` 在地化訊息查找。
    - 驗證結果與在地化訊息會輸出到主控台，不額外產生獨立輸出檔案。
 6. **低記憶體高效能串流寫入 (OdsStreamWriter)**：
-   - 示範在大數據情境下，以順序工作表寫入模式將記憶體佔用控制在小於 1 MB，流式寫入多達 100 列以上的表格明細，有效杜絕記憶體不足 (OOM) 錯誤。
+   - 示範以順序工作表寫入模式流式寫入 100 列以上的表格明細；實際峰值工作集依文件內容與執行環境而異，請以[效能基準線](../docs/performance-baselines.md)的可重現量測為準。
    - `SwitchToSheet` 支援交錯多工作表寫入，但會使用暫存緩衝，適合便利性優先而非嚴格低記憶體的情境（未在範例中實際執行，行為詳見 API 文件）。
 7. **中繼資料 (Metadata) 讀取與更新**：
    - 展示如何載入既有檔案、讀取文件 metadata 標題與建立者資訊，並進行修改更新與二次存檔。
@@ -148,8 +148,10 @@ dotnet run samples/Sample.cs
    - 使用 `OdtOperationsExporter` / `OdtOperationsImporter` 展示協作操作匯出與回讀。
    - 使用 `RdfMetadata` 展示 RDF 三元組寫入與 SPARQL 查詢。
    - 使用 `OdfImageExporter` 將工作表渲染為 PNG。
-9. **低記憶體串流寫入**：
-   - 示範 `OdsStreamWriter` 與 `OdtStreamWriter` 的串流輸出。
+9. **CNS 11643 罕字整合**：
+   - 示範字型遞補分段、PUA 碼位遷移及合成 Big5E 對照表匯出；正式資料須由合法來源取得。
+10. **文字文件串流寫入**：
+   - 示範 `OdtStreamWriter` 的低常駐串流輸出與 `OdtStreamReader` 往返讀取。
 
 ---
 
@@ -170,7 +172,9 @@ dotnet run samples/Sample.cs
 | **`output_database.odb`** | ODF 資料庫文件 | 使用 `DatabaseDocument` 建立的資料來源描述。 |
 | **`output_stream.ods`** | ODF 試算表 | 透過 `OdsStreamWriter` 大量串流寫入的明細表。 |
 | **`output_stream.odt`** | ODF 文字文件 | 透過 `OdtStreamWriter` 串流寫入的文字文件。 |
-| **`output_pdf.pdf`** | PDF 檔案 | 將 ODT 內容完美轉譯後的 PDF 格式文件。 |
+| **`cns11643-demo.odt`** | ODF 文字文件 | CNS 11643 罕字字型遞補與碼位遷移展示。 |
+| **`cns11643-demo-big5e.csv`** | CSV 檔案 | 使用合成小型對照表產生的 Big5E 編碼展示。 |
+| **`output_pdf.pdf`** | PDF 檔案 | 依 PDF 擴充套件目前能力轉譯的 PDF 文件。 |
 | **`output_html.html`** | HTML 網頁 | 將 ODT 內容轉換後的純 HTML 網頁。 |
 | **`output_csv.csv`** | CSV 檔案 | 由 ODS 匯出之 CSV。 |
 | **`output_docx.docx`** | Word 文件 | 由 ODT 轉出的 DOCX。 |
@@ -188,7 +192,7 @@ dotnet run samples/Sample.cs
 
 ## 此範例目前未明說的限制
 
-- `Sample.cs` 為**大型整合展示指令碼**，覆蓋面廣，但不適合作為每個 API 的最小範例。
+- `Sample.cs` 為**大型整合展示應用程式**，覆蓋面廣，但不適合作為每個 API 的最小範例。
 - RDF 展示會輸出查詢結果到主控台，但不額外產生獨立 RDF 檔案。
 - Profile 驗證結果與 i18n 訊息展示輸出到主控台，不會另外建立報告檔。
 - 範例假設本儲存庫結構完整存在，無法單獨複製 `Sample.cs` 到其他目錄直接執行。

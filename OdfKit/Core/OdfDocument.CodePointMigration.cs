@@ -6,6 +6,10 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 
+/// <summary>
+/// Provides Unicode code-point migration operations for ODF documents.
+/// 提供 ODF 文件的 Unicode 碼位遷移操作。
+/// </summary>
 public abstract partial class OdfDocument
 {
     /// <summary>

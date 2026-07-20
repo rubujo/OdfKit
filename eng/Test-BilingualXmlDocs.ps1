@@ -17,7 +17,18 @@ $sourceRoots = @(
     'OdfKit.Extensions.Ooxml',
     'OdfKit.Extensions.Pdf',
     'OdfKit.Extensions.Rdf',
-    'OdfKit.Extensions.Rendering'
+    'OdfKit.Extensions.Rendering',
+    'OdfKit.Extensions.Html.WebFonts',
+    'OdfKit.WebFonts.Abstractions',
+    'OdfKit.WebFonts.Build',
+    'OdfKit.WebFonts.Data.SqlServer',
+    'OdfKit.WebFonts.Encoding.Legacy',
+    'OdfKit.WebFonts.Hosting.AspNetCore',
+    'OdfKit.WebFonts.Hosting.SystemWeb',
+    'OdfKit.WebFonts.OpenType',
+    'OdfKit.WebFonts.Profiles',
+    'OdfKit.WebFonts.Windows',
+    'OdfKit.WebFonts.Worker'
 )
 
 $declarationPattern = '^\s*(public|protected|protected\s+internal|private\s+protected)\s+(?!const\b)(?!readonly\b)(?!event\b).+'

@@ -1,13 +1,15 @@
 # OdfKit GitHub Release 發佈指南
 
-本文件說明 REL-1 套件如何驗證、封裝並以 **GitHub Release** 資產發佈。
+本文件說明 REL-1 套件如何驗證、封裝並以 **GitHub Release** 資產發佈。這是已備妥的
+發佈程序；目前尚未建立公開 Release。
 
 ## 發佈策略
 
 | 管道 | 現況 |
 |------|------|
 | **GitHub 原始碼** | 主要使用方式（`ProjectReference` / clone） |
-| **GitHub Release** | 附加 `.nupkg`、`.snupkg` 與彙整 zip，供本機 NuGet feed |
+| **CI 候選資產** | 目前可用的 commit-bound 驗證與人工決策輸入 |
+| **GitHub Release** | 自動化已備妥；目前尚未建立公開 Release |
 | **nuget.org** | **非目前目標**；未規劃公開推送 |
 
 套件清單與雙 TFM 矩陣見 [`nuget-compatibility-matrix.md`](nuget-compatibility-matrix.md)。
@@ -54,9 +56,9 @@ WebFont 或 Release 另造 `0.0.2` 等第二套版本。Git tag／Release 是某
    - 自動建立 GitHub Release，並利用 `GITHUB_TOKEN` 上傳 `.nupkg`、`.snupkg`、`SHA256SUMS`、
      SPDX SBOM 與 ZIP 資產。
 
-## 4. 消費端：自 Release 安裝套件
+## 4. 消費端：首個公開 Release 建立後安裝套件
 
-下載 Release 資產後，先將 `.nupkg` 與 `.snupkg` 放在固定資料夾，例如
+經人工核准並建立公開 Release 後，先將下載的 `.nupkg` 與 `.snupkg` 放在固定資料夾，例如
 `C:\packages\odfkit`。本機開發可以用具名 package source：
 
 ```powershell

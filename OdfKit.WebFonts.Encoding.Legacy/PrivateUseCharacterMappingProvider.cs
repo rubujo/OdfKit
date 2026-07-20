@@ -38,10 +38,18 @@ public sealed class PrivateUseCharacterMappingProvider : ICharacterMappingProvid
         _mappings = normalized;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the tenant-scoped private mapping profile identifier.
+    /// 取得租戶範圍的私用對照 profile 識別碼。
+    /// </summary>
     public string ProfileId { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Decodes a byte sequence through the explicit private-use mapping.
+    /// 透過明確的私用對照解碼位元組序列。
+    /// </summary>
+    /// <param name="source">The mapped byte sequence. / 已建立對照的位元組序列。</param>
+    /// <returns>The mapped private-use Unicode scalar. / 對照後的 Unicode 私用純量值。</returns>
     public string Decode(byte[] source)
     {
         if (source is null)

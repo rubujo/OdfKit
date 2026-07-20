@@ -1,6 +1,6 @@
 # ODF 1.4 逐章稽核紀錄
 
-本文件記錄針對 ODF 1.4（2025-12-03 正式核定為 OASIS Standard）四份正式規格文本，
+本文件記錄針對 ODF 1.4（OASIS Standard 文件日期為 2025-10-06）四份正式規格文本，
 逐章比對 OdfKit schema／驗證層／公式引擎是否有遺漏新增元素的稽核方法與結論。
 稽核基準為 `docs.oasis-open.org/office/OpenDocument/v1.4/os/` 下四份官方文本：
 

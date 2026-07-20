@@ -72,7 +72,14 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
             .ToArray();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Generates or reuses a bounded subset while coalescing identical requests.
+    /// 產生或重用有界子集，並合併相同要求。
+    /// </summary>
+    /// <param name="request">The subset request. / 子集要求。</param>
+    /// <param name="destinationDirectory">The trusted destination directory. / 受信任的目的目錄。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The generated or cached manifest. / 產生或快取的 manifest。</returns>
     public async Task<WebFontManifest> GenerateAsync(
         WebFontSubsetRequest request,
         string destinationDirectory,
@@ -105,7 +112,11 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Stops worker consumers and releases owned resources asynchronously.
+    /// 以非同步方式停止 worker consumer 並釋放擁有的資源。
+    /// </summary>
+    /// <returns>A value task that represents asynchronous disposal. / 代表非同步釋放作業的 value task。</returns>
     public async ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _disposeState, 1) != 0)

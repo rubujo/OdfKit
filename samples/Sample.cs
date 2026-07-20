@@ -31,15 +31,15 @@ using OdfKit.Collaboration;
 using OdfKit.Extensions.Rdf;
 
 // =====================================================================
-// OdfKit .NET 10.0 全功能單檔 Script 示範程式碼
+// OdfKit .NET 10.0 單檔整合展示應用程式
 // =====================================================================
 
 Console.WriteLine("==================================================");
-Console.WriteLine(" OdfKit .NET 10.0 全功能單檔 Script 示範");
+Console.WriteLine(" OdfKit .NET 10.0 單檔整合展示應用程式");
 Console.WriteLine("==================================================");
 
 // 建立輸出目錄；測試可透過環境變數改到暫存目錄，避免污染工作樹。
-string outputDir = Environment.GetEnvironmentVariable("ODFKIT_SAMPLE_OUTPUT_DIR");
+string? outputDir = Environment.GetEnvironmentVariable("ODFKIT_SAMPLE_OUTPUT_DIR");
 if (string.IsNullOrWhiteSpace(outputDir))
 {
     outputDir = Path.Combine(Directory.GetCurrentDirectory(), "samples", "output");
@@ -86,9 +86,9 @@ static void DemoTextDocument(string outputDir)
     using var document = TextDocument.Create();
     
     // 設定中介資料
-    document.Metadata.Title = "OdfKit 軟體元件全功能示範報告";
+    document.Metadata.Title = "OdfKit 軟體元件整合示範報告";
     document.Metadata.Creator = "OdfKit 開發小組";
-    document.Metadata.Subject = "OdfKit 全功能展示範例";
+    document.Metadata.Subject = "OdfKit 整合展示範例";
     document.Metadata.Description = "這是一份使用 OdfKit 高階 API 產生的示範文字文件。";
 
     // 1. 設定預設頁面樣式 (Standard) 的頁碼與首頁頁尾設定
@@ -142,7 +142,7 @@ static void DemoTextDocument(string outputDir)
     OdfList list = document.Body.Lists.Add();
     list.AddListItem("第一項：輕鬆建立豐富格式的 ODF 文件。");
     list.AddListItem("第二項：原生支援雙目標 Framework 編譯。");
-    list.AddListItem("第三項：完美的效能與低記憶體設計。");
+    list.AddListItem("第三項：可量測的效能與低常駐記憶體設計。");
 
     // 5. 新增具名頁面樣式 (橫向 - Landscape)
     document.AddPageStyle("Landscape", setup =>
@@ -168,7 +168,7 @@ static void DemoTextDocument(string outputDir)
     
     // 填入表格資料
     table.GetCell(1, 0).AddParagraph(" .NET 10.0 ");
-    table.GetCell(1, 1).AddParagraph(" 完整支援 C# 14 語法與單檔 Script 執行 ");
+    table.GetCell(1, 1).AddParagraph(" 使用 C# 14 語法與單檔應用程式執行模式 ");
     table.GetCell(2, 0).AddParagraph(" .NET Standard 2.0 ");
     table.GetCell(2, 1).AddParagraph(" 支援舊版與跨平台 Framework 相容性 ");
 
@@ -529,7 +529,7 @@ static void DemoOdsStreamWriter(string outputDir)
         fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
     }
 
-    // 初始化串流寫入器；順序使用 WriteStartSheet/WriteEndSheet 時，此模式記憶體佔用小於 1 MB。
+    // 初始化串流寫入器；順序使用 WriteStartSheet/WriteEndSheet 時採低常駐記憶體模式。
     // 若改用 SwitchToSheet 交錯寫入多張工作表，會啟用工作表暫存緩衝，不再是純串流模式。
     using (fileStream)
     using (var writer = new OdsStreamWriter(fileStream))
@@ -650,7 +650,7 @@ static void DemoExtensions(string outputDir)
     tempDoc.Body.Paragraphs.Add("本文件將會被分別轉譯為 PDF 以及 HTML 格式，展示 OdfKit 的擴充套件強大渲染實力。");
     
     OdfList list = tempDoc.Body.Lists.Add();
-    list.AddListItem("支援 PDF 格式完美重現。");
+    list.AddListItem("依 PDF 擴充套件目前能力輸出 PDF 格式。");
     list.AddListItem("支援 HTML 網頁流暢排版。");
 
     // 匯出成 PDF (使用 OdfKit.Extensions.Pdf 提供的 OdfPdfExporter)
@@ -840,7 +840,7 @@ static void DemoOdtStreamWriter(string outputDir)
         fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
     }
 
-    // 初始化串流寫入器，此模式記憶體佔用小於 1 MB
+    // 初始化串流寫入器，此模式採低常駐記憶體設計。
     using (fileStream)
     using (var writer = new OdtStreamWriter(fileStream))
     {

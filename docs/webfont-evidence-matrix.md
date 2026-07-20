@@ -34,11 +34,11 @@ WebFont 套件的「工程完成」只以 repository 內可由 .NET、NuGet、�
 ## 目前不能宣稱的事項
 
 - 不得把有界 repository 工程閘門完成解讀為任意客戶字型、任意部署或 production-ready。
-- OdfKit 已完整支援所有 OTF／CFF／CFF2／variable／color 模型或未知 WOFF2 transform version。
-- OdfKit 會直接輸出 TTC／OTC／WOFF2 collection；產品契約只抽取指定 face 並輸出獨立資產。
-- 所有 CFF／CFF2、PostScript variable、color font 或所有語系的任意 complex-script shaping 已支援。
-- 單機檔案 lease 等同 distributed lock，或 GitHub runner 的 load test 等同真實容量承諾。
-- 本機三瀏覽器 smoke 等同跨平台實機、第三方安全稽核或 production-ready。
+- 不得宣稱 OdfKit 已完整支援所有 OTF／CFF／CFF2／variable／color 模型或未知 WOFF2 transform version。
+- 不得宣稱 OdfKit 會直接輸出 TTC／OTC／WOFF2 collection；產品契約只抽取指定 face 並輸出獨立資產。
+- 不得宣稱所有 CFF／CFF2、PostScript variable、color font 或所有語系的任意 complex-script shaping 已支援。
+- 不得宣稱單機檔案 lease 等同 distributed lock，或 GitHub runner 的 load test 等同真實容量承諾。
+- 不得宣稱本機三瀏覽器 smoke 等同跨平台實機、第三方安全稽核或 production-ready。
 
 ## 升級證據入口
 

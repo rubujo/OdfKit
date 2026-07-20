@@ -4,9 +4,9 @@ OdfKit 是純受控 C# / .NET 的 ODF (OpenDocument Format) 文件處理
 SDK。它讓應用程式在不啟動 LibreOffice、OpenOffice、UNO、Microsoft
 Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF 文件內容。
 
-目前預設新建文件為 ODF 1.4。核心程式庫與可封裝擴充套件採
-`net10.0` 與 `netstandard2.0` 雙目標框架；CLI 與測試專案目前覆蓋
-`net10.0` 與 `net8.0`。
+目前預設新建文件為 ODF 1.4。核心與可攜式 managed 擴充套件採 `net10.0` 與
+`netstandard2.0` 雙目標框架；WebFont Worker 與 ASP.NET Core 託管套件採 `net10.0`，
+System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
 
 > **AI 產製聲明**
 > 本專案目前公開之原始碼、文件、範例、測試與相關內容，均為使用
@@ -37,6 +37,7 @@ Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF �
 | 核心 SDK | `OdfKit` | ODF 文件建立、載入、保存、驗證、來回讀寫 |
 | 匯出與轉換擴充 | `OdfKit.Extensions.Html`、`OdfKit.Extensions.Pdf`、`OdfKit.Extensions.Ooxml` | HTML / Markdown / RTF、PDF、DOCX / XLSX 互通 |
 | 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作匯出 |
+| WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
 | 工具 | `OdfKit.Cli`、samples、測試與 corpus 工具 | 自動化驗證、批次轉檔、範例與工程驗證 |
 
 套件挑選與相依說明請見 [套件目錄與選型指南](docs/package-catalog.md)；
@@ -108,7 +109,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 | 選型 | [套件目錄與選型指南](docs/package-catalog.md) | 核心套件、擴充套件、工具與情境對照 |
 | 導入 | [快速開始](docs/getting-started.md) | 安裝模式、第一個文件、CLI、下一步 |
 | SDK 路徑 | [核心 SDK 快速開始](docs/core-quickstart.md)、[API 表面分層](docs/api-surface-layers.md) | 核心純受控路徑、API 分層與新增 API 放置準則 |
-| API Reference | [線上 API 文件](https://rubujo.github.io/OdfKit/)（[站台結構說明](docs/api-docs-site.md)） | 12 語系入口、可搜尋的公開 API reference |
+| API Reference | [線上 API 文件](https://rubujo.github.io/OdfKit/)（[站台結構說明](docs/api-docs-site.md)） | 17 語系入口、可搜尋的公開 API reference |
 | 相容性 | [NuGet 相容矩陣](docs/nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | 功能邊界 | [ODF 格式支援矩陣](docs/odf-format-support.md) | 支援狀態、測試證據、已知缺口 |
 | 規則與語系 | [ODF Profile 來源](docs/odf-profile-sources.md)、[i18n 與在地化](docs/i18n-localization.md) | 內建 Profile、語系字典與訊息回退 |
@@ -120,8 +121,8 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 
 ## 版本與交付資訊
 
-- 目前主要交付管道為 **GitHub 原始碼** 與 **GitHub Release** 資產，
-  **未發佈至 nuget.org**。
+- 目前主要交付管道為 **GitHub 原始碼** 與 CI 產生的 commit-bound 候選資產；
+  尚未建立公開 GitHub Release，亦**未發佈至 nuget.org**。
 - OdfKit 以 `v0.0.1` 持續維護；版本號不表示必要功能會留待未來版本補完。
   相容性承諾與破壞性變更記錄於 [CHANGELOG](CHANGELOG.md)。
 - 版本、交付與安裝參考已整理於
@@ -149,7 +150,8 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
   但其高階語意 API 仍以對應主格式為主，完整變體專屬物件模型不屬於目前承諾範圍。
 - `OdfKit.Extensions.Rendering` 需本機 LibreOffice 或相容程序後端，
   不屬於核心 OdfKit 的純受控路徑。
-- 目前主要交付為 GitHub 原始碼與 Release 資產，**尚未發佈至 nuget.org**。
+- 目前主要交付為 GitHub 原始碼與 CI 候選資產；尚無公開 GitHub Release，亦
+  **尚未發佈至 nuget.org**。
 
 ## 授權與合規
 

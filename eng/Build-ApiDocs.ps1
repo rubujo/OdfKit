@@ -9,7 +9,7 @@
 .PARAMETER NoRestore
     略過 dotnet tool restore（本機反覆執行時使用）。
 .PARAMETER SkipProjectBuild
-    略過八個組件的 dotnet build（組件輸出已存在且未變更時使用）。
+    略過 19 個公開套件組件的 dotnet build（組件輸出已存在且未變更時使用）。
 .PARAMETER OutputDirectory
     網站輸出目錄；預設為 Pages workflow 使用的 artifacts/api-site。
 #>
@@ -158,9 +158,25 @@ try {
         }
     }
 
+    # net48 將 System.ValueTuple 視為 framework facade，因此一般建置不會複製 DLL；
+    # DocFX metadata 的獨立組件解析器仍需要同目錄參考。版本取自已審核的 WebFont
+    # 相依政策，並只複製 NuGet 套件的 managed facade，不引入執行期或產品相依捷徑。
+    $dependencyPolicy = Get-Content eng/webfont-dependency-policy.json -Raw | ConvertFrom-Json
+    $valueTuplePackage = @($dependencyPolicy.packages | Where-Object { $_.id -eq 'System.ValueTuple' })
+    if ($valueTuplePackage.Count -ne 1) { throw 'WebFont 相依政策必須恰好宣告一個 System.ValueTuple 版本。' }
+    $globalPackagesOutput = (& dotnet nuget locals global-packages --list --force-english-output 2>&1 | Out-String).Trim()
+    if ($LASTEXITCODE -or $globalPackagesOutput -notmatch '^global-packages:\s*(.+)$') {
+        throw "無法解析 NuGet global-packages 路徑：$globalPackagesOutput。"
+    }
+    $valueTupleSource = Join-Path $Matches[1] "system.valuetuple/$($valueTuplePackage[0].version)/lib/net462/System.ValueTuple.dll"
+    if (-not (Test-Path -LiteralPath $valueTupleSource)) { throw "缺少 DocFX net48 facade：$valueTupleSource。" }
+    $systemWebOutput = 'OdfKit.WebFonts.Hosting.SystemWeb/bin/Release/net48'
+    Copy-Item -LiteralPath $valueTupleSource -Destination $systemWebOutput -Force
+    Write-Host "PASS：DocFX net48 System.ValueTuple $($valueTuplePackage[0].version) facade 已就緒。"
+
     Remove-Item -Recurse -Force api-docs/api -ErrorAction Ignore
     if (Test-Path api-docs/api) { throw '無法清除 api-docs/api（檔案可能被鎖定），請關閉占用程式後重試。' }
-    dotnet docfx metadata api-docs/docfx.json
+    dotnet docfx metadata api-docs/docfx.json --warningsAsErrors
     if ($LASTEXITCODE) { throw 'DocFX metadata 產生失敗。' }
 
     # href 修復：metadata 對被 filterConfig 排除的型別（如 OdfKit.DOM.*）仍會在 references
@@ -252,6 +268,8 @@ try {
     Write-Host "PASS：站內連結健檢通過（$checkedLinks 條相對連結，0 失效）。"
 
     $requiredOutputs = @(
+        'articles/getting-started.html',
+        'articles/package-selection.html',
         'project-docs/ip-compliance.html',
         'project-docs/security-limits.html',
         'project-docs/evidence-index.html',

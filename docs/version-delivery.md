@@ -7,7 +7,7 @@
 | 項目 | 現況 |
 |------|------|
 | 原始碼 | GitHub repository |
-| 套件資產 | GitHub Release |
+| 套件資產 | CI 產生 commit-bound 候選資產；目前尚無公開 GitHub Release |
 | 公開套件倉庫 | 目前 **未發佈至 nuget.org** |
 
 ## 2. 版本身分與相容性資訊
@@ -17,7 +17,7 @@
 | SDK 版本身分 | `v0.0.1` 持續維護；版本號不代表等待未來版本補完必要能力 |
 | 權威版本來源 | `eng/OdfKit.Package.props`；Release 標籤只能驗證相符，不能反向決定版本 |
 | 版本變更紀錄 | [CHANGELOG](../CHANGELOG.md) |
-| 目標框架 | 核心與擴充套件：`net10.0;netstandard2.0`；CLI／主測試：`net10.0;net8.0`；Windows consumer smoke：`net48` |
+| 目標框架 | 核心與可攜式 managed 程式庫：`net10.0;netstandard2.0`；WebFont Build／Worker／ASP.NET Core：`net10.0`；System.Web：`net48`；CLI／主測試：`net10.0;net8.0` |
 | 功能相容性基準 | [ODF 格式支援矩陣](odf-format-support.md) 與測試證據 |
 
 `v0.0.1` 是持續完滿的產品身分，不是不可變快照。公開 API 在正式交付前仍可直接修正；每次
@@ -29,7 +29,7 @@
 | 模式 | 適用情境 | 參考文件 |
 |------|----------|----------|
 | 原始碼 / `ProjectReference` | 直接整合原始碼或追蹤最新主幹 | [快速開始](getting-started.md) |
-| GitHub Release `.nupkg` | 以固定版本資產建立內部套件來源 | [GitHub Release 發佈指南](github-release-publishing.md) |
+| GitHub Release `.nupkg` | 首個公開 Release 經人工核准後，以固定資產建立內部套件來源 | [GitHub Release 發佈指南](github-release-publishing.md) |
 | 本機 / CI 驗證 | 建置、測試、封裝與 smoke 驗證 | [NuGet 相容矩陣](nuget-compatibility-matrix.md) |
 
 ## 4. 常見查閱文件

@@ -29,22 +29,40 @@ public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingPro
         _maximumByteLength = maximumByteLength;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the mapping profile identifier.
+    /// 取得 mapping profile 識別碼。
+    /// </summary>
     public string ProfileId { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the mapping data version.
+    /// 取得 mapping 資料版本。
+    /// </summary>
     public string DataVersion { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the traceable source URI.
+    /// 取得可追溯的來源 URI。
+    /// </summary>
     public string SourceUri { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the pinned source SHA-256 digest.
+    /// 取得鎖定的來源 SHA-256 摘要。
+    /// </summary>
     public string SourceSha256 { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the source data license identifier.
+    /// 取得來源資料的授權識別碼。
+    /// </summary>
     public string LicenseId { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the required source attribution.
+    /// 取得必要的來源標示。
+    /// </summary>
     public string Attribution { get; }
 
     /// <summary>
@@ -132,7 +150,12 @@ public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingPro
         return new JsonCharacterMappingProvider(profile, mappings, maximumByteLength);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Decodes a complete byte sequence through the explicit JSON mapping.
+    /// 透過明確的 JSON 對照解碼完整位元組序列。
+    /// </summary>
+    /// <param name="source">The source bytes to decode. / 要解碼的來源位元組。</param>
+    /// <returns>The decoded Unicode text. / 解碼後的 Unicode 文字。</returns>
     public string Decode(byte[] source)
     {
         if (source is null)

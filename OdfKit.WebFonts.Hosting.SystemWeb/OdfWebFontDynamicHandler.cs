@@ -60,10 +60,17 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         _runtime = new DynamicRuntime(engine, options);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets whether the handler instance can process multiple requests.
+    /// 取得 Handler 執行個體是否可處理多個要求。
+    /// </summary>
     public bool IsReusable => true;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Processes an authenticated generation or immutable asset request.
+    /// 處理經授權的產生要求或不可變資產要求。
+    /// </summary>
+    /// <param name="context">The current HTTP context. / 目前的 HTTP 內容。</param>
     public void ProcessRequest(HttpContext context)
     {
         if (context is null)
