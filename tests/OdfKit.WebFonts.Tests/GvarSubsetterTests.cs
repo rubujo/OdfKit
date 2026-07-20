@@ -19,7 +19,8 @@ public sealed class GvarSubsetterTests
             source,
             CreateFvar(axisCount: 1),
             glyphCount: 3,
-            new HashSet<ushort> { 0, 2 });
+            new HashSet<ushort> { 0, 2 },
+            TestContext.Current.CancellationToken);
 
         uint[] offsets = ReadGvarOffsets(subset, longOffsets, glyphCount: 3);
         Assert.Equal((uint)0, offsets[0]);
@@ -41,7 +42,8 @@ public sealed class GvarSubsetterTests
             source,
             CreateFvar(axisCount: 2),
             glyphCount: 1,
-            new HashSet<ushort> { 0 }));
+            new HashSet<ushort> { 0 },
+            TestContext.Current.CancellationToken));
 
         Assert.Contains("variation-axis", exception.Message, StringComparison.Ordinal);
     }

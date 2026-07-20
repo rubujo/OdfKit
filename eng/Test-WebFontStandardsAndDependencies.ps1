@@ -1,9 +1,9 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-驗證 WebFont 規範基準、最新穩定 NuGet 直接相依與 Preview 例外。
+驗證 WebFont 規範基準、相依政策與 GitHub Actions 穩定大版本。
 .PARAMETER Online
-向 NuGet 官方 flat-container 查詢目前最新穩定版本；連線失敗時採 fail closed。
+向 NuGet 與 GitHub 官方 API 查詢最新穩定版本；連線失敗時採 fail closed。
 #>
 [CmdletBinding()]
 param(
@@ -142,9 +142,8 @@ $actionsById = @{}
 foreach ($action in $policy.githubActions) {
     $id = [string]$action.id
     $major = [int]$action.major
-    $latestRelease = [string]$action.latestRelease
     if ([string]::IsNullOrWhiteSpace($id) -or $actionsById.ContainsKey($id) `
-        -or $major -le 0 -or $latestRelease -notmatch '^v\d+(?:\.\d+){2}$') {
+        -or $major -le 0) {
         throw "WebFont GitHub Actions 政策含無效項目。"
     }
     $actionsById[$id] = $action
@@ -164,7 +163,7 @@ foreach ($file in $actionFiles) {
             throw "CI 使用未納入穩定版政策的 GitHub Action：actions/$id@v$major"
         }
         if ($major -ne [int]$actionsById[$id].major) {
-            throw "CI GitHub Action 不是已稽核的最新穩定 major：actions/$id@v$major"
+            throw "CI GitHub Action 不是已稽核的穩定 major：actions/$id@v$major"
         }
         $usedActions[$id] = $major
     }
@@ -210,11 +209,15 @@ if ($Online) {
             -RetryIntervalSec 2 `
             -TimeoutSec 60
         $latestRelease = [string]$release.tag_name
-        if ($latestRelease -ne [string]$action.Value.latestRelease) {
-            throw "GitHub Action 政策不是官方最新穩定版：actions/$($action.Key) $($action.Value.latestRelease) → $latestRelease"
+        if ($latestRelease -notmatch '^v(?<major>\d+)(?:\.\d+){2}$') {
+            throw "GitHub Action 官方最新 release 標籤格式無效：actions/$($action.Key) $latestRelease"
+        }
+        $latestMajor = [int]$Matches['major']
+        if ($latestMajor -ne [int]$action.Value.major) {
+            throw "GitHub Action 政策不是官方最新穩定 major：actions/$($action.Key)@v$($action.Value.major) → $latestRelease"
         }
     }
 }
 
 $mode = if ($Online) { "官方 NuGet／GitHub 線上" } else { "鎖定政策離線" }
-Write-Host "OK：WebFont 規範、最新穩定相依與 Preview 例外通過（$mode）。"
+Write-Host "OK：WebFont 規範、相依、GitHub Actions major 與 Preview 例外通過（$mode）。"

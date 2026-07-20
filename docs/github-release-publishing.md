@@ -119,9 +119,11 @@ SHA-256 不可變套件快照復原，並重新通過 restore、build 與 run。
 
 `eng/Test-WebFontStandardsAndDependencies.ps1` 另在封裝前向 NuGet 官方 flat-container 查詢
 WebFont 所有 direct package 的最新穩定版本，並向 GitHub 官方 API 驗證所有 `actions/*`
-工作流程元件的最新穩定 release；Preview 只能存在於具精確版本、理由、移除條件與複查期限的
-例外。規範政策每 90 天失效，OpenType 除版本外也必須追蹤官方 errata；IFT 依 2025-11-18
-Candidate Recommendation Draft 追蹤，不把 draft 誤列為已支援功能。
+工作流程元件已採用官方最新穩定 release 的 major。工作流程使用 `@vN` 時，同一 major 內的
+minor 與 patch release 可直接跟隨，不在政策中重複鎖定精確 release；若需不可變版本，應改用
+完整 commit SHA。Preview 只能存在於具精確版本、理由、移除條件與複查期限的例外。規範政策
+每 90 天失效，OpenType 除版本外也必須追蹤官方 errata；IFT 依 2025-11-18 Candidate
+Recommendation Draft 追蹤，不把 draft 誤列為已支援功能。
 
 ## 版本策略
 

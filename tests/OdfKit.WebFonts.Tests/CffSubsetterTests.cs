@@ -11,9 +11,21 @@ public sealed class CffSubsetterTests
     {
         byte[] source = BuildNameKeyedCff([14], [139, 22, 14]);
 
-        CffSubsetter.Validate(source, glyphCount: 2, new HashSet<ushort> { 0, 1 });
-        byte[] subset = CffSubsetter.Build(source, glyphCount: 2, new HashSet<ushort> { 0 });
-        CffSubsetter.Validate(subset, glyphCount: 2, new HashSet<ushort> { 0, 1 });
+        CffSubsetter.Validate(
+            source,
+            glyphCount: 2,
+            new HashSet<ushort> { 0, 1 },
+            cancellationToken: TestContext.Current.CancellationToken);
+        byte[] subset = CffSubsetter.Build(
+            source,
+            glyphCount: 2,
+            new HashSet<ushort> { 0 },
+            cancellationToken: TestContext.Current.CancellationToken);
+        CffSubsetter.Validate(
+            subset,
+            glyphCount: 2,
+            new HashSet<ushort> { 0, 1 },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotEqual(source, subset);
         Assert.True(subset.Length < source.Length);
@@ -23,10 +35,18 @@ public sealed class CffSubsetterTests
     public void Validate_DoesNotReuseCachedParseAcrossGlyphCounts()
     {
         byte[] source = BuildNameKeyedCff([14], [139, 22, 14]);
-        CffSubsetter.Validate(source, glyphCount: 2, new HashSet<ushort> { 0 });
+        CffSubsetter.Validate(
+            source,
+            glyphCount: 2,
+            new HashSet<ushort> { 0 },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            CffSubsetter.Validate(source, glyphCount: 1, new HashSet<ushort> { 0 }));
+            CffSubsetter.Validate(
+                source,
+                glyphCount: 1,
+                new HashSet<ushort> { 0 },
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("CharStrings-count", exception.Message, StringComparison.Ordinal);
     }
@@ -38,7 +58,11 @@ public sealed class CffSubsetterTests
         byte[] source = BuildNameKeyedCff(charStrings);
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            CffSubsetter.Validate(source, glyphCount: 230, new HashSet<ushort> { 0 }));
+            CffSubsetter.Validate(
+                source,
+                glyphCount: 230,
+                new HashSet<ushort> { 0 },
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("charset-predefined", exception.Message, StringComparison.Ordinal);
     }
@@ -59,7 +83,8 @@ public sealed class CffSubsetterTests
         byte[] subset = CffSubsetter.Build(
             source,
             glyphCount: 127,
-            new HashSet<ushort> { 0, 126 });
+            new HashSet<ushort> { 0, 126 },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(charStrings[34], subset.AsSpan(baseOffset, charStrings[34].Length).ToArray());
         Assert.Equal(charStrings[125], subset.AsSpan(accentOffset, charStrings[125].Length).ToArray());
@@ -84,7 +109,8 @@ public sealed class CffSubsetterTests
         byte[] subset = CffSubsetter.Build(
             source,
             checked((ushort)glyphCount),
-            new HashSet<ushort> { 0, 2 });
+            new HashSet<ushort> { 0, 2 },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(charStrings[1], subset.AsSpan(spaceOffset, charStrings[1].Length).ToArray());
         Assert.Equal(
@@ -115,7 +141,8 @@ public sealed class CffSubsetterTests
         byte[] subset = CffSubsetter.Build(
             source,
             glyphCount: 4,
-            new HashSet<ushort> { 0, 3 });
+            new HashSet<ushort> { 0, 3 },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(charStrings[1], subset.AsSpan(baseOffset, charStrings[1].Length).ToArray());
         Assert.Equal(charStrings[2], subset.AsSpan(accentOffset, charStrings[2].Length).ToArray());
@@ -132,7 +159,11 @@ public sealed class CffSubsetterTests
         byte[] source = BuildNameKeyedCff(charStrings);
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            CffSubsetter.Build(source, glyphCount: 125, new HashSet<ushort> { 0, 124 }));
+            CffSubsetter.Build(
+                source,
+                glyphCount: 125,
+                new HashSet<ushort> { 0, 124 },
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("seac-component", exception.Message, StringComparison.Ordinal);
     }
@@ -149,7 +180,11 @@ public sealed class CffSubsetterTests
         byte[] source = BuildNameKeyedCff(charStrings);
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            CffSubsetter.Build(source, glyphCount: 127, new HashSet<ushort> { 0, 126 }));
+            CffSubsetter.Build(
+                source,
+                glyphCount: 127,
+                new HashSet<ushort> { 0, 126 },
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("seac-nested", exception.Message, StringComparison.Ordinal);
     }
@@ -165,7 +200,11 @@ public sealed class CffSubsetterTests
             [139, 4, 14]);
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            CffSubsetter.Validate(source, glyphCount: 3, new HashSet<ushort> { 0 }));
+            CffSubsetter.Validate(
+                source,
+                glyphCount: 3,
+                new HashSet<ushort> { 0 },
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("charset-duplicate", exception.Message, StringComparison.Ordinal);
     }
@@ -179,9 +218,21 @@ public sealed class CffSubsetterTests
             [139, 139, 139, 1, 14]);
         var retainedGlyphs = new HashSet<ushort> { 0, 1 };
 
-        byte[] subset = CffSubsetter.Build(source, glyphCount: 3, retainedGlyphs);
-        CffSubsetter.Validate(subset, glyphCount: 3, new HashSet<ushort> { 0, 1, 2 });
-        byte[] rebuilt = CffSubsetter.Build(subset, glyphCount: 3, retainedGlyphs);
+        byte[] subset = CffSubsetter.Build(
+            source,
+            glyphCount: 3,
+            retainedGlyphs,
+            cancellationToken: TestContext.Current.CancellationToken);
+        CffSubsetter.Validate(
+            subset,
+            glyphCount: 3,
+            new HashSet<ushort> { 0, 1, 2 },
+            cancellationToken: TestContext.Current.CancellationToken);
+        byte[] rebuilt = CffSubsetter.Build(
+            subset,
+            glyphCount: 3,
+            retainedGlyphs,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(subset.Length < source.Length);
         Assert.Equal(subset, rebuilt);

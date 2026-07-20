@@ -15,7 +15,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] expected = CreateExpectedHmtx();
         byte[] woff2 = CreateWoff2(transformFlags, includeGlyf: true, appendHmtxByte: false);
 
-        byte[] sfnt = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024);
+        byte[] sfnt = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            1024 * 1024,
+            faceIndex: 0,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(expected, ReadSfntTable(sfnt, "hmtx"));
     }
@@ -26,7 +30,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] woff2 = CreateWoff2(0x04, includeGlyf: true, appendHmtxByte: false);
 
         Assert.Throws<InvalidDataException>(
-            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024));
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                1024 * 1024,
+                faceIndex: 0,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -35,7 +43,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] woff2 = CreateWoff2(3, includeGlyf: true, appendHmtxByte: true);
 
         Assert.Throws<InvalidDataException>(
-            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024));
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                1024 * 1024,
+                faceIndex: 0,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -44,7 +56,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] woff2 = CreateWoff2(3, includeGlyf: false, appendHmtxByte: false);
 
         Assert.Throws<InvalidDataException>(
-            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024));
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                1024 * 1024,
+                faceIndex: 0,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -54,7 +70,11 @@ public sealed class Woff2TransformDecoderTests
         BinaryPrimitives.WriteUInt32BigEndian(woff2.AsSpan(16, 4), 1);
         woff2 = AppendOptionalBlocks(woff2, [1, 2, 3, 4, 5], [6, 7, 8]);
 
-        byte[] sfnt = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024);
+        byte[] sfnt = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            1024 * 1024,
+            faceIndex: 0,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(CreateExpectedHmtx(), ReadSfntTable(sfnt, "hmtx"));
     }
@@ -64,8 +84,16 @@ public sealed class Woff2TransformDecoderTests
     {
         byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: false);
 
-        byte[] first = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 0);
-        byte[] second = ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 1);
+        byte[] first = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            1024 * 1024,
+            0,
+            TestContext.Current.CancellationToken);
+        byte[] second = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+            woff2,
+            1024 * 1024,
+            1,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal([0, 1, 2, 3], ReadSfntTable(first, "TEST"));
         Assert.Equal([4, 5, 6, 7], ReadSfntTable(second, "TEST"));
@@ -77,7 +105,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: false);
 
         Assert.Throws<InvalidDataException>(
-            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 2));
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                1024 * 1024,
+                2,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -86,7 +118,11 @@ public sealed class Woff2TransformDecoderTests
         byte[] woff2 = CreateWoff2Collection(duplicateSecondFaceTable: true);
 
         Assert.Throws<InvalidDataException>(
-            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(woff2, 1024 * 1024, 1));
+            () => ManagedOpenTypeWebFontVerifier.DecodeWoff2(
+                woff2,
+                1024 * 1024,
+                1,
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -107,7 +143,8 @@ public sealed class Woff2TransformDecoderTests
             transformedLocaLength: 0,
             originalLocaLength: 12,
             CreateGlyfDependencies(glyphCount: 2, indexFormat: 1),
-            maximumExpandedBytes: 1024 * 1024);
+            maximumExpandedBytes: 1024 * 1024,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(12, result.Loca.Length);
         Assert.Equal(0u, BinaryPrimitives.ReadUInt32BigEndian(result.Loca.AsSpan(0, 4)));
@@ -138,7 +175,8 @@ public sealed class Woff2TransformDecoderTests
             transformedLocaLength: 0,
             originalLocaLength: 6,
             CreateGlyfDependencies(glyphCount: 2, indexFormat: 0),
-            maximumExpandedBytes: 1024 * 1024);
+            maximumExpandedBytes: 1024 * 1024,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(-1, BinaryPrimitives.ReadInt16BigEndian(result.Glyf.AsSpan(0, 2)));
         Assert.Equal(-2, BinaryPrimitives.ReadInt16BigEndian(result.Glyf.AsSpan(2, 2)));
@@ -166,7 +204,8 @@ public sealed class Woff2TransformDecoderTests
             transformedLocaLength: 0,
             originalLocaLength: 4,
             CreateGlyfDependencies(glyphCount: 1, indexFormat: 0),
-            maximumExpandedBytes: 1024 * 1024));
+            maximumExpandedBytes: 1024 * 1024,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     private static byte[] CreateWoff2(

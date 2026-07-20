@@ -20,7 +20,10 @@ public sealed class CmapMappingTests
         }
 
         byte[] cmap = CmapMapping.Build(mappings, []);
-        CmapMapping parsed = CmapMapping.Parse(cmap, 20_001);
+        CmapMapping parsed = CmapMapping.Parse(
+            cmap,
+            20_001,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(20_000, parsed.UnicodeMappings.Count);
         Assert.Equal(1, parsed.UnicodeMappings[0x4E00]);
@@ -67,7 +70,10 @@ public sealed class CmapMappingTests
 
         byte[] cmap = CmapMapping.Build(mappings, []);
         (ushort Platform, ushort Encoding, int Offset)[] records = EnumerateEncodingRecords(cmap).ToArray();
-        CmapMapping parsed = CmapMapping.Parse(cmap, 12_001);
+        CmapMapping parsed = CmapMapping.Parse(
+            cmap,
+            12_001,
+            TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(records, record => record is (3, 1, _));
         Assert.Contains(records, record => record is (3, 10, _));
@@ -103,7 +109,10 @@ public sealed class CmapMappingTests
             declaredLength: 24,
             segments: [(0x0041, 0x0041, 0xFFC0), (0xFFFF, 0xFFFF, 1)]);
 
-        Assert.Throws<InvalidDataException>(() => CmapMapping.Parse(cmap, 16));
+        Assert.Throws<InvalidDataException>(() => CmapMapping.Parse(
+            cmap,
+            16,
+            TestContext.Current.CancellationToken));
     }
 
     /// <summary>
@@ -118,7 +127,10 @@ public sealed class CmapMappingTests
             declaredLength: 0,
             segments: [(0x0041, 0x0042, 0xFFC0), (0x0042, 0x0050, 1)]);
 
-        Assert.Throws<InvalidDataException>(() => CmapMapping.Parse(cmap, 4096));
+        Assert.Throws<InvalidDataException>(() => CmapMapping.Parse(
+            cmap,
+            4096,
+            TestContext.Current.CancellationToken));
     }
 
     private static CmapVariation CreateVariation(int baseScalar, int selector, ushort glyphId)

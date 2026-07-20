@@ -10,7 +10,11 @@ public sealed class Type2CharStringVerifierTests
         byte[] charString = [251, 0, 140, 12, 10, 10, 14];
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 139, 139, 21, 11 }];
 
-        Type2CharStringVerifier.Verify(charString, [], localSubroutines);
+        Type2CharStringVerifier.Verify(
+            charString,
+            [],
+            localSubroutines,
+            TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -22,7 +26,8 @@ public sealed class Type2CharStringVerifierTests
         Type2SeacComponents? components = Type2CharStringVerifier.Verify(
             charString,
             [],
-            localSubroutines);
+            localSubroutines,
+            TestContext.Current.CancellationToken);
 
         Assert.True(components.HasValue);
         Assert.Equal(65, components.Value.BaseCode);
@@ -35,7 +40,11 @@ public sealed class Type2CharStringVerifierTests
     public void Verify_RejectsInvalidSeacComponentCodes(byte[] charString, string detail)
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            Type2CharStringVerifier.Verify(charString, [], []));
+            Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                [],
+                TestContext.Current.CancellationToken));
 
         Assert.Contains(detail, exception.Message, StringComparison.Ordinal);
     }
@@ -47,7 +56,11 @@ public sealed class Type2CharStringVerifierTests
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 32, 10, 11 }];
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            Type2CharStringVerifier.Verify(charString, [], localSubroutines));
+            Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                localSubroutines,
+                TestContext.Current.CancellationToken));
 
         Assert.Contains("depth", exception.Message, StringComparison.Ordinal);
     }
@@ -58,7 +71,11 @@ public sealed class Type2CharStringVerifierTests
         byte[] charString = Enumerable.Repeat((byte)139, 49).Append((byte)14).ToArray();
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            Type2CharStringVerifier.Verify(charString, [], []));
+            Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                [],
+                TestContext.Current.CancellationToken));
 
         Assert.Contains("stack", exception.Message, StringComparison.Ordinal);
     }
@@ -69,7 +86,11 @@ public sealed class Type2CharStringVerifierTests
         byte[] charString = [139, 139, 1, 19];
 
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            Type2CharStringVerifier.Verify(charString, [], []));
+            Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                [],
+                TestContext.Current.CancellationToken));
 
         Assert.Contains("hintmask", exception.Message, StringComparison.Ordinal);
     }
@@ -80,7 +101,11 @@ public sealed class Type2CharStringVerifierTests
         byte[] charString =
         [139, 140, 251, 0, 12, 29, 12, 18, 12, 18, 12, 18, 19, 14];
 
-        Type2CharStringVerifier.Verify(charString, [], []);
+        Type2CharStringVerifier.Verify(
+            charString,
+            [],
+            [],
+            TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -89,7 +114,11 @@ public sealed class Type2CharStringVerifierTests
     public void Verify_RejectsKnownInvalidArithmetic(byte[] charString, string detail)
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
-            Type2CharStringVerifier.Verify(charString, [], []));
+            Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                [],
+                TestContext.Current.CancellationToken));
 
         Assert.Contains(detail, exception.Message, StringComparison.Ordinal);
     }

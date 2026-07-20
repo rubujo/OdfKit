@@ -25,7 +25,11 @@ public sealed class CharStringBudgetTests
 
         var stopwatch = Stopwatch.StartNew();
         InvalidDataException exception = Assert.Throws<InvalidDataException>(
-            () => Type2CharStringVerifier.Verify(charString, [], locals));
+            () => Type2CharStringVerifier.Verify(
+                charString,
+                [],
+                locals,
+                TestContext.Current.CancellationToken));
         stopwatch.Stop();
 
         Assert.Contains("operation-budget", exception.Message, StringComparison.Ordinal);
@@ -47,7 +51,11 @@ public sealed class CharStringBudgetTests
             .Select(value => new ReadOnlyMemory<byte>(value))
             .ToArray();
 
-        Type2SeacComponents? result = Type2CharStringVerifier.Verify(charString, [], locals);
+        Type2SeacComponents? result = Type2CharStringVerifier.Verify(
+            charString,
+            [],
+            locals,
+            TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }

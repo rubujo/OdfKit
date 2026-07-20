@@ -66,53 +66,43 @@
   "githubActions": [
     {
       "id": "attest",
-      "major": 4,
-      "latestRelease": "v4.2.0"
+      "major": 4
     },
     {
       "id": "cache",
-      "major": 6,
-      "latestRelease": "v6.1.0"
+      "major": 6
     },
     {
       "id": "checkout",
-      "major": 7,
-      "latestRelease": "v7.0.0"
+      "major": 7
     },
     {
       "id": "configure-pages",
-      "major": 6,
-      "latestRelease": "v6.0.0"
+      "major": 6
     },
     {
       "id": "deploy-pages",
-      "major": 5,
-      "latestRelease": "v5.0.0"
+      "major": 5
     },
     {
       "id": "download-artifact",
-      "major": 8,
-      "latestRelease": "v8.0.1"
+      "major": 8
     },
     {
       "id": "setup-dotnet",
-      "major": 6,
-      "latestRelease": "v6.0.0"
+      "major": 6
     },
     {
       "id": "setup-java",
-      "major": 5,
-      "latestRelease": "v5.6.0"
+      "major": 5
     },
     {
       "id": "upload-artifact",
-      "major": 7,
-      "latestRelease": "v7.0.1"
+      "major": 7
     },
     {
       "id": "upload-pages-artifact",
-      "major": 5,
-      "latestRelease": "v5.0.0"
+      "major": 5
     }
   ],
   "prereleaseExceptions": [

@@ -40,7 +40,10 @@ public sealed class WebFontWriterSfntSizeTests
         SfntSubset subset = CreateSubset();
         byte[] woff = WebFontWriters.WriteWoff(subset);
 
-        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff(woff, 1024 * 1024);
+        byte[] decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff(
+            woff,
+            1024 * 1024,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(WebFontWriters.WriteTrueType(subset), decoded);
     }

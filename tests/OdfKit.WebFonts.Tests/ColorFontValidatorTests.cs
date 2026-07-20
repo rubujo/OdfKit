@@ -14,7 +14,10 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionZero()
         };
 
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(ColorFontTechnology.ColrV0, closure.Technologies);
     }
@@ -27,7 +30,10 @@ public sealed class ColorFontValidatorTests
             ["CPAL"] = CreateCpal(),
             ["COLR"] = CreateColrVersionZero()
         };
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken);
         var glyphs = new HashSet<ushort> { 1 };
 
         closure.AddReferencedGlyphs(glyphs);
@@ -44,7 +50,10 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionOne(paintOffset: 10)
         };
 
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(ColorFontTechnology.ColrV1, closure.Technologies);
     }
@@ -58,7 +67,10 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionOne(paintOffset: 11)
         };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 3));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -69,7 +81,10 @@ public sealed class ColorFontValidatorTests
             ["CPAL"] = CreateCpal(),
             ["COLR"] = CreateColrVersionOnePaintGlyph()
         };
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 4);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 4,
+            cancellationToken: TestContext.Current.CancellationToken);
         var glyphs = new HashSet<ushort> { 1 };
 
         closure.AddReferencedGlyphs(glyphs);
@@ -88,7 +103,10 @@ public sealed class ColorFontValidatorTests
             ["COLR"] = CreateColrVersionOneLeaf(paintFormat)
         };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 3));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -96,7 +114,10 @@ public sealed class ColorFontValidatorTests
     {
         var tables = new Dictionary<string, byte[]> { ["COLR"] = CreateColrVersionZero() };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 3));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -108,7 +129,10 @@ public sealed class ColorFontValidatorTests
             ["SVG "] = CreateSvg("<svg xmlns=\"http://www.w3.org/2000/svg\"><g id=\"glyph1\"/></svg>")
         };
 
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 2);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(ColorFontTechnology.Svg, closure.Technologies);
     }
@@ -121,7 +145,10 @@ public sealed class ColorFontValidatorTests
     {
         var tables = new Dictionary<string, byte[]> { ["SVG "] = CreateSvg(document) };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 2));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -129,7 +156,10 @@ public sealed class ColorFontValidatorTests
     {
         var tables = new Dictionary<string, byte[]> { ["CBDT"] = [0, 3, 0, 0] };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 2));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Theory]
@@ -148,7 +178,10 @@ public sealed class ColorFontValidatorTests
             [locationTag] = location
         };
 
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 2);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken);
         ColorFontTechnology expected = dataTag == "CBDT"
             ? ColorFontTechnology.Cbdt
             : ColorFontTechnology.Ebdt;
@@ -166,14 +199,20 @@ public sealed class ColorFontValidatorTests
             ["CBLC"] = location
         };
 
-        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(tables, glyphCount: 2));
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public void Validate_SbixDupeAddsReferencedGlyph()
     {
         var tables = new Dictionary<string, byte[]> { ["sbix"] = CreateSbixDupe() };
-        ColorGlyphClosure closure = ColorFontValidator.Validate(tables, glyphCount: 3);
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 3,
+            cancellationToken: TestContext.Current.CancellationToken);
         var glyphs = new HashSet<ushort> { 1 };
 
         closure.AddReferencedGlyphs(glyphs);
@@ -189,7 +228,10 @@ public sealed class ColorFontValidatorTests
         WriteUInt16(sbix, 2, 5);
 
         Assert.Throws<InvalidDataException>(
-            () => ColorFontValidator.Validate(new Dictionary<string, byte[]> { ["sbix"] = sbix }, glyphCount: 3));
+            () => ColorFontValidator.Validate(
+                new Dictionary<string, byte[]> { ["sbix"] = sbix },
+                glyphCount: 3,
+                cancellationToken: TestContext.Current.CancellationToken));
     }
 
     private static byte[] CreateCpal()
