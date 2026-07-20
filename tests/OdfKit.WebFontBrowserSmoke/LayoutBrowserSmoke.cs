@@ -6,68 +6,91 @@ namespace OdfKit.WebFontBrowserSmoke;
 
 internal static class LayoutBrowserSmoke
 {
+    /// <summary>
+    /// 依名稱取出必要路徑；缺漏時以明確訊息失敗，而非沿用錯誤的位置引數。
+    /// </summary>
+    private static string RequirePath(IReadOnlyDictionary<string, string> named, string name)
+        => named.TryGetValue(name, out string? value) && !string.IsNullOrWhiteSpace(value)
+            ? Path.GetFullPath(value)
+            : throw new ArgumentException($"Missing layout argument: {name}");
+
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 37 || args[0] is not ("chromium" or "firefox" or "webkit"))
+        // 具名而非位置式引數：先前為 37 個位置引數，PowerShell 端的追加順序必須與
+        // 此處的讀取順序精確對齊，任一方漏改會造成靜默錯配（載入到別的字型）而非
+        // 編譯或執行錯誤。改為 name=path 後，缺漏或拼錯會立即以明確訊息失敗，
+        // 新增 script 也不再需要維護跨語言的位置契約。
+        if (args.Length < 2 || args[0] is not ("chromium" or "firefox" or "webkit"))
         {
             Console.Error.WriteLine(
-                "Usage: layout <browser> <arabic-source> <arabic-subset> "
-                + "<devanagari-source> <devanagari-subset> <cff-source> <cff-subset> "
-                + "<name-cff-source> <name-cff-subset> "
-                + "<seac-cff-source> <seac-cff-subset> "
-                + "<static-cff2-source> <static-cff2-subset> "
-                + "<arabic-variable-source> <arabic-variable-subset> "
-                + "<devanagari-variable-source> <devanagari-variable-subset> "
-                + "<bengali-source> <bengali-subset> "
-                + "<khmer-source> <khmer-subset> "
-                + "<thai-source> <thai-subset> "
-                + "<cff2-variable-source> <cff2-variable-subset> "
-                + "<cff-collection-source> <cff-collection-subset> "
-                + "<cff2-collection-source> <cff2-collection-subset> "
-                + "<color-colrv1-source> <color-colrv1-subset> "
-                + "<color-sbix-source> <color-sbix-subset> "
-                + "<color-svg-source> <color-svg-subset> "
-                + "<screenshot> <evidence>");
+                "Usage: layout <chromium|firefox|webkit> <name>=<path> …\n"
+                + "Required names: arabic-source, arabic-subset, devanagari-source, "
+                + "devanagari-subset, cff-source, cff-subset, name-cff-source, name-cff-subset, "
+                + "seac-cff-source, seac-cff-subset, static-cff2-source, static-cff2-subset, "
+                + "arabic-variable-source, arabic-variable-subset, devanagari-variable-source, "
+                + "devanagari-variable-subset, bengali-source, bengali-subset, khmer-source, "
+                + "khmer-subset, thai-source, thai-subset, cff2-variable-source, "
+                + "cff2-variable-subset, cff-collection-source, cff-collection-subset, "
+                + "cff2-collection-source, cff2-collection-subset, color-colrv1-source, "
+                + "color-colrv1-subset, color-sbix-source, color-sbix-subset, color-svg-source, "
+                + "color-svg-subset, screenshot, evidence");
             return 2;
         }
 
         string browserName = args[0];
-        string arabicSourcePath = Path.GetFullPath(args[1]);
-        string arabicSubsetPath = Path.GetFullPath(args[2]);
-        string devanagariSourcePath = Path.GetFullPath(args[3]);
-        string devanagariSubsetPath = Path.GetFullPath(args[4]);
-        string cffSourcePath = Path.GetFullPath(args[5]);
-        string cffSubsetPath = Path.GetFullPath(args[6]);
-        string nameCffSourcePath = Path.GetFullPath(args[7]);
-        string nameCffSubsetPath = Path.GetFullPath(args[8]);
-        string seacCffSourcePath = Path.GetFullPath(args[9]);
-        string seacCffSubsetPath = Path.GetFullPath(args[10]);
-        string staticCff2SourcePath = Path.GetFullPath(args[11]);
-        string staticCff2SubsetPath = Path.GetFullPath(args[12]);
-        string arabicVariableSourcePath = Path.GetFullPath(args[13]);
-        string arabicVariableSubsetPath = Path.GetFullPath(args[14]);
-        string devanagariVariableSourcePath = Path.GetFullPath(args[15]);
-        string devanagariVariableSubsetPath = Path.GetFullPath(args[16]);
-        string bengaliSourcePath = Path.GetFullPath(args[17]);
-        string bengaliSubsetPath = Path.GetFullPath(args[18]);
-        string khmerSourcePath = Path.GetFullPath(args[19]);
-        string khmerSubsetPath = Path.GetFullPath(args[20]);
-        string thaiSourcePath = Path.GetFullPath(args[21]);
-        string thaiSubsetPath = Path.GetFullPath(args[22]);
-        string cff2VariableSourcePath = Path.GetFullPath(args[23]);
-        string cff2VariableSubsetPath = Path.GetFullPath(args[24]);
-        string cffCollectionSourcePath = Path.GetFullPath(args[25]);
-        string cffCollectionSubsetPath = Path.GetFullPath(args[26]);
-        string cff2CollectionSourcePath = Path.GetFullPath(args[27]);
-        string cff2CollectionSubsetPath = Path.GetFullPath(args[28]);
-        string colorColrV1SourcePath = Path.GetFullPath(args[29]);
-        string colorColrV1SubsetPath = Path.GetFullPath(args[30]);
-        string colorSbixSourcePath = Path.GetFullPath(args[31]);
-        string colorSbixSubsetPath = Path.GetFullPath(args[32]);
-        string colorSvgSourcePath = Path.GetFullPath(args[33]);
-        string colorSvgSubsetPath = Path.GetFullPath(args[34]);
-        string screenshotPath = Path.GetFullPath(args[35]);
-        string evidencePath = Path.GetFullPath(args[36]);
+        var named = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (string argument in args.Skip(1))
+        {
+            int separator = argument.IndexOf('=');
+            if (separator <= 0)
+            {
+                Console.Error.WriteLine($"Layout argument must be name=path: {argument}");
+                return 2;
+            }
+
+            if (!named.TryAdd(argument[..separator], argument[(separator + 1)..]))
+            {
+                Console.Error.WriteLine($"Duplicate layout argument: {argument[..separator]}");
+                return 2;
+            }
+        }
+
+        string arabicSourcePath = RequirePath(named, "arabic-source");
+        string arabicSubsetPath = RequirePath(named, "arabic-subset");
+        string devanagariSourcePath = RequirePath(named, "devanagari-source");
+        string devanagariSubsetPath = RequirePath(named, "devanagari-subset");
+        string cffSourcePath = RequirePath(named, "cff-source");
+        string cffSubsetPath = RequirePath(named, "cff-subset");
+        string nameCffSourcePath = RequirePath(named, "name-cff-source");
+        string nameCffSubsetPath = RequirePath(named, "name-cff-subset");
+        string seacCffSourcePath = RequirePath(named, "seac-cff-source");
+        string seacCffSubsetPath = RequirePath(named, "seac-cff-subset");
+        string staticCff2SourcePath = RequirePath(named, "static-cff2-source");
+        string staticCff2SubsetPath = RequirePath(named, "static-cff2-subset");
+        string arabicVariableSourcePath = RequirePath(named, "arabic-variable-source");
+        string arabicVariableSubsetPath = RequirePath(named, "arabic-variable-subset");
+        string devanagariVariableSourcePath = RequirePath(named, "devanagari-variable-source");
+        string devanagariVariableSubsetPath = RequirePath(named, "devanagari-variable-subset");
+        string bengaliSourcePath = RequirePath(named, "bengali-source");
+        string bengaliSubsetPath = RequirePath(named, "bengali-subset");
+        string khmerSourcePath = RequirePath(named, "khmer-source");
+        string khmerSubsetPath = RequirePath(named, "khmer-subset");
+        string thaiSourcePath = RequirePath(named, "thai-source");
+        string thaiSubsetPath = RequirePath(named, "thai-subset");
+        string cff2VariableSourcePath = RequirePath(named, "cff2-variable-source");
+        string cff2VariableSubsetPath = RequirePath(named, "cff2-variable-subset");
+        string cffCollectionSourcePath = RequirePath(named, "cff-collection-source");
+        string cffCollectionSubsetPath = RequirePath(named, "cff-collection-subset");
+        string cff2CollectionSourcePath = RequirePath(named, "cff2-collection-source");
+        string cff2CollectionSubsetPath = RequirePath(named, "cff2-collection-subset");
+        string colorColrV1SourcePath = RequirePath(named, "color-colrv1-source");
+        string colorColrV1SubsetPath = RequirePath(named, "color-colrv1-subset");
+        string colorSbixSourcePath = RequirePath(named, "color-sbix-source");
+        string colorSbixSubsetPath = RequirePath(named, "color-sbix-subset");
+        string colorSvgSourcePath = RequirePath(named, "color-svg-source");
+        string colorSvgSubsetPath = RequirePath(named, "color-svg-subset");
+        string screenshotPath = RequirePath(named, "screenshot");
+        string evidencePath = RequirePath(named, "evidence");
         Directory.CreateDirectory(Path.GetDirectoryName(screenshotPath)!);
         Directory.CreateDirectory(Path.GetDirectoryName(evidencePath)!);
 
