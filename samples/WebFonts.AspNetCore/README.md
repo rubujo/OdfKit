@@ -35,6 +35,12 @@ Invoke-RestMethod `
   -Body $body
 ```
 
+頁面可載入 `wwwroot/webfont-autosubset.js`，它會以 Unicode code point 掃描並去重 Plane 2
+難字，略過「一二三丨ㄩ幹」等一般字。應用程式必須提供
+`window.odfKitRequestWebFonts(route, sequences)`，由已驗證的同源後端代送要求；不得把上述 API
+key 暴露給瀏覽器。即使呼叫端錯送混排或純一般字，Handler 也會按來源字型 `cmap` 再篩選；無
+可用 glyph 時回 204，而不是讓低階引擎例外擴散成 400／503。
+
 endpoint 具 API key authorization、固定窗口 rate limit、來源／face／Profile／format allowlist、
 有界 queue、single-flight、三分鐘工作上限及檔案 durable cache。空的 `AssetRoot` 可直接冷啟動；
 產生後回傳的 hash URL 使用一年 `immutable`。受信任後端應依 POST 回傳 manifest 建立頁面所需的

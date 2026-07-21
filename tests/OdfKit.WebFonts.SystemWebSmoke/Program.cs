@@ -10,7 +10,7 @@ using OdfKit.WebFonts.OpenType;
 
 string? fontPath = GetArgument(args, "--font");
 string? sourceSha256 = GetArgument(args, "--sha256");
-string text = GetArgument(args, "--text") ?? "A𠆩";
+string text = GetArgument(args, "--text") ?? "𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹";
 bool usePostScriptOutline = args.Contains("--postscript", StringComparer.Ordinal);
 string root = Path.Combine(Path.GetTempPath(), "odfkit-systemweb-smoke-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
@@ -25,7 +25,7 @@ try
         AllowPublicCrossOriginAssets = true,
         MaxConcurrentGenerations = 1,
         MaxSequenceCount = 8,
-        MaxUnicodeScalarCount = 32
+        MaxUnicodeScalarCount = 4096
     };
     options.AllowedProfileIds.Add("smoke-profile@1");
     options.AllowedFontFamilies.Add("OdfKit SystemWeb Smoke");
@@ -52,7 +52,7 @@ try
         });
         var engineOptions = new ManagedOpenTypeWebFontEngineOptions
         {
-            MaxUnicodeScalars = 32,
+            MaxUnicodeScalars = 4096,
             MaxOutputBytes = 32L * 1024 * 1024
         };
         engineOptions.FontSources.Add("smoke-source", Path.GetFullPath(fontPath));
@@ -134,6 +134,30 @@ try
     Directory.Delete(root, recursive: true);
     Directory.CreateDirectory(root);
 
+    var normalOnlyJson = JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+    {
+        FontSourceId = "smoke-source",
+        FaceIndex = 0,
+        ProfileId = "smoke-profile@1",
+        FontFamily = "OdfKit SystemWeb Smoke",
+        Sequences = new[] { "一二三丨ㄩ幹" },
+        Formats = new[]
+        {
+            WebFontFormat.Woff,
+            usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType
+        }
+    });
+    var normalOnly = new RecordingWorkerRequest(
+        "POST",
+        "/_odf-fonts/generate",
+        normalOnlyJson,
+        options.ApiKey);
+    var normalOnlyContext = new HttpContext(normalOnly);
+    handler.ProcessRequest(normalOnlyContext);
+    normalOnlyContext.Response.Flush();
+    Require(normalOnlyContext.Response.StatusCode == 204, "System.Web normal-only request did not return no content.");
+    RequireNoStore(normalOnly, "normal-only generation response");
+
     var generated = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, options.ApiKey);
     var generatedContext = new HttpContext(generated);
     handler.ProcessRequest(generatedContext);
@@ -184,11 +208,18 @@ try
 
         if (fontPath is not null)
         {
+            IWebFontTextCoverageFilter coverageFilter = (IWebFontTextCoverageFilter)engine;
+            IReadOnlyList<WebFontTextSequence> supportedSequences = coverageFilter
+                .FilterSupportedSequencesAsync(
+                    options.AllowedFaces.Single(),
+                    new[] { WebFontTextSequence.Create(text) })
+                .GetAwaiter()
+                .GetResult();
             using FileStream stream = File.OpenRead(generatedPath);
             ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(
                 stream,
                 format,
-                new[] { WebFontTextSequence.Create(text) });
+                supportedSequences);
         }
     }
 
@@ -342,8 +373,23 @@ static void Require(bool condition, string message)
     }
 }
 
-internal sealed class DeterministicSmokeEngine : IWebFontSubsetEngine
+internal sealed class DeterministicSmokeEngine : IWebFontSubsetEngine, IWebFontTextCoverageFilter
 {
+    public Task<IReadOnlyList<WebFontTextSequence>> FilterSupportedSequencesAsync(
+        WebFontFaceIdentity face,
+        IReadOnlyList<WebFontTextSequence> sequences,
+        CancellationToken cancellationToken = default)
+    {
+        string supported = string.Concat(sequences
+            .SelectMany(sequence => sequence.UnicodeScalars)
+            .Where(scalar => scalar is >= 0x20000 and <= 0x2FFFF)
+            .Select(char.ConvertFromUtf32));
+        IReadOnlyList<WebFontTextSequence> result = supported.Length == 0
+            ? Array.Empty<WebFontTextSequence>()
+            : new[] { WebFontTextSequence.Create(supported) };
+        return Task.FromResult(result);
+    }
+
     public Task<WebFontManifest> GenerateAsync(
         WebFontSubsetRequest request,
         string destinationDirectory,

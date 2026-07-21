@@ -11,7 +11,7 @@ namespace OdfKit.WebFonts.Worker;
 /// Runs bounded generation jobs and coalesces concurrent identical requests.
 /// 執行有界產生工作，並合併同時提出的相同要求。
 /// </summary>
-public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDisposable
+public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontTextCoverageFilter, IAsyncDisposable
 {
     private readonly IWebFontSubsetEngine _engine;
     private readonly WebFontWorkerOptions _options;
@@ -114,6 +114,15 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         }
     }
 
+    /// <inheritdoc />
+    public Task<IReadOnlyList<WebFontTextSequence>> FilterSupportedSequencesAsync(
+        WebFontFaceIdentity face,
+        IReadOnlyList<WebFontTextSequence> sequences,
+        CancellationToken cancellationToken = default)
+        => _engine is IWebFontTextCoverageFilter coverageFilter
+            ? coverageFilter.FilterSupportedSequencesAsync(face, sequences, cancellationToken)
+            : Task.FromResult(sequences);
+
     /// <summary>
     /// Stops worker consumers and releases owned resources asynchronously.
     /// 以非同步方式停止 worker consumer 並釋放擁有的資源。
@@ -154,8 +163,7 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
         var job = new GenerationJob(key, request, destinationDirectory, completion);
         if (!_queue.Writer.TryWrite(job))
         {
-            completion.SetException(new InvalidOperationException(
-                OdfLocalizer.GetMessage("Err_WebFont_QueueFull")));
+            completion.SetException(new WebFontQueueFullException());
         }
 
         return completion.Task;

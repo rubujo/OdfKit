@@ -8,6 +8,11 @@
 </head>
 <body>
   <h1>多國罕用字</h1>
-  <p>邉󠄐 𠀀 󰀀 العربية हिन्दी</p>
+  <p>𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹</p>
+  <script src="webfont-autosubset.js"
+          data-odf-auto
+          data-odf-font-source-id="cns-ext-b"
+          data-odf-minimum="0x20000"
+          data-odf-maximum="0x2FFFF"></script>
 </body>
 </html>

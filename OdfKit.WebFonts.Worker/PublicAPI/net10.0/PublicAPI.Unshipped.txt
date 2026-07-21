@@ -1,8 +1,11 @@
 ﻿#nullable enable
 OdfKit.WebFonts.Worker.WebFontGenerationWorker
 OdfKit.WebFonts.Worker.WebFontGenerationWorker.DisposeAsync() -> System.Threading.Tasks.ValueTask
+OdfKit.WebFonts.Worker.WebFontGenerationWorker.FilterSupportedSequencesAsync(OdfKit.WebFonts.WebFontFaceIdentity! face, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>! sequences, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!>!
 OdfKit.WebFonts.Worker.WebFontGenerationWorker.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.Worker.WebFontGenerationWorker.WebFontGenerationWorker(OdfKit.WebFonts.IWebFontSubsetEngine! engine, OdfKit.WebFonts.Worker.WebFontWorkerOptions! options) -> void
+OdfKit.WebFonts.Worker.WebFontQueueFullException
+OdfKit.WebFonts.Worker.WebFontQueueFullException.WebFontQueueFullException() -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.get -> System.TimeSpan
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.set -> void

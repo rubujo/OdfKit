@@ -176,13 +176,9 @@ internal sealed class FileSystemGenerationCache
             .Distinct()
             .OrderBy(format => format)
             .ToArray();
-        string[] expectedRanges = request.Sequences
+        IReadOnlyList<string> expectedRanges = CreateUnicodeRanges(request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
-            .Where(RequiresGlyph)
-            .Distinct()
-            .OrderBy(scalar => scalar)
-            .Select(scalar => $"U+{scalar:X}")
-            .ToArray();
+            .Where(RequiresGlyph));
         if (assets.Count != requestedFormats.Length
             || !assets.Select(asset => asset?.Format)
                 .OrderBy(format => format)
@@ -260,6 +256,38 @@ internal sealed class FileSystemGenerationCache
 
     private static bool RequiresGlyph(int scalar)
         => scalar != 0xFEFF && !Rune.IsControl(new Rune(scalar));
+
+    private static IReadOnlyList<string> CreateUnicodeRanges(IEnumerable<int> scalars)
+    {
+        int[] values = scalars.Distinct().OrderBy(value => value).ToArray();
+        if (values.Length == 0)
+        {
+            return Array.Empty<string>();
+        }
+
+        var ranges = new List<string>();
+        int start = values[0];
+        int end = start;
+        for (int index = 1; index < values.Length; index++)
+        {
+            int value = values[index];
+            if (value == end + 1)
+            {
+                end = value;
+                continue;
+            }
+
+            ranges.Add(FormatUnicodeRange(start, end));
+            start = value;
+            end = value;
+        }
+
+        ranges.Add(FormatUnicodeRange(start, end));
+        return ranges;
+    }
+
+    private static string FormatUnicodeRange(int start, int end)
+        => start == end ? $"U+{start:X}" : $"U+{start:X}-{end:X}";
 
     private sealed class FileLease(FileStream stream) : IAsyncDisposable
     {

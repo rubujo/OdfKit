@@ -220,7 +220,7 @@ try {
         faceIndex = 0
         profileId = "cns11643-euc-tw-2026-05-05"
         fontFamily = "OdfKit CNS Ext-B"
-        sequences = @("A𠆩")
+        sequences = @("𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹")
         formats = @("Woff", "TrueType")
     } | ConvertTo-Json -Depth 4
 

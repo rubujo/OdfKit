@@ -80,6 +80,18 @@ internal sealed class OdfWebFontGenerationService
 
         try
         {
+            IReadOnlyList<WebFontTextSequence> supportedSequences = await _worker
+                .FilterSupportedSequencesAsync(
+                    subsetRequest.Face,
+                    subsetRequest.Sequences,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            if (supportedSequences.Count == 0)
+            {
+                return Results.NoContent();
+            }
+
+            subsetRequest = CopyWithSequences(subsetRequest, supportedSequences);
             WebFontManifest manifest = await _worker.GenerateAsync(
                 subsetRequest,
                 _destinationDirectory,
@@ -99,11 +111,29 @@ internal sealed class OdfWebFontGenerationService
         {
             return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
         }
+        catch (WebFontQueueFullException)
+        {
+            request.HttpContext.Response.Headers.RetryAfter = "1";
+            return Results.StatusCode(StatusCodes.Status429TooManyRequests);
+        }
         catch (InvalidOperationException)
         {
             return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
         }
     }
+
+    private static WebFontSubsetRequest CopyWithSequences(
+        WebFontSubsetRequest request,
+        IReadOnlyList<WebFontTextSequence> sequences)
+        => new()
+        {
+            Face = request.Face,
+            ProfileId = request.ProfileId,
+            FontFamily = request.FontFamily,
+            Sequences = sequences,
+            Formats = request.Formats,
+            RequiredBrowserTargets = request.RequiredBrowserTargets
+        };
 
     private async Task<byte[]> ReadBoundedBodyAsync(Stream stream, CancellationToken cancellationToken)
     {

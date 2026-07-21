@@ -300,7 +300,7 @@ public sealed class WebFontWorkerTests
             Path.GetTempPath(),
             TestContext.Current.CancellationToken);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<WebFontQueueFullException>(
             () => rejected.WaitAsync(TestContext.Current.CancellationToken));
 
         engine.Release.TrySetResult();
@@ -572,6 +572,42 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
+    public async Task Worker_DurableCacheAcceptsCanonicalContiguousUnicodeRange()
+    {
+        string root = CreateTemporaryRoot();
+        string assets = Path.Combine(root, "assets");
+        string cache = Path.Combine(root, "cache");
+        try
+        {
+            var engine = new AssetWritingEngine();
+            var options = new WebFontWorkerOptions { DurableCacheDirectory = cache };
+            WebFontSubsetRequest template = CreateRequest();
+            WebFontSubsetRequest request = new()
+            {
+                Face = template.Face,
+                ProfileId = template.ProfileId,
+                FontFamily = template.FontFamily,
+                Sequences = [WebFontTextSequence.Create("ABC")],
+                Formats = template.Formats
+            };
+
+            await PopulateCacheAsync(engine, options, request, assets);
+            await using var worker = new WebFontGenerationWorker(engine, options);
+            WebFontManifest cached = await worker.GenerateAsync(
+                request,
+                assets,
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal("U+41-43", Assert.Single(Assert.Single(cached.Assets).UnicodeRanges));
+            Assert.Equal(1, engine.CallCount);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Worker_DurableCacheRejectsLinkedAssetDirectory()
     {
         string root = CreateTemporaryRoot();
@@ -762,13 +798,29 @@ public sealed class WebFontWorkerTests
         {
             Interlocked.Increment(ref _callCount);
             await Task.Delay(75, cancellationToken);
-            string[] ranges = request.Sequences
+            int[] scalars = request.Sequences
                 .SelectMany(sequence => sequence.UnicodeScalars)
                 .Where(scalar => scalar != 0xFEFF && !Rune.IsControl(new Rune(scalar)))
                 .Distinct()
                 .OrderBy(scalar => scalar)
-                .Select(scalar => $"U+{scalar:X}")
                 .ToArray();
+            var ranges = new List<string>();
+            int start = scalars[0];
+            int end = start;
+            foreach (int scalar in scalars.Skip(1))
+            {
+                if (scalar == end + 1)
+                {
+                    end = scalar;
+                    continue;
+                }
+
+                ranges.Add(start == end ? $"U+{start:X}" : $"U+{start:X}-{end:X}");
+                start = scalar;
+                end = scalar;
+            }
+
+            ranges.Add(start == end ? $"U+{start:X}" : $"U+{start:X}-{end:X}");
             var assets = new List<WebFontAsset>();
             foreach (WebFontFormat format in request.Formats.Distinct())
             {

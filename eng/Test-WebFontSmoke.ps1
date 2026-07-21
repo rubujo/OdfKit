@@ -205,7 +205,7 @@ try {
         faceIndex = 0
         profileId = "dynamic-smoke-v1"
         fontFamily = "OdfKit Dynamic HTTP Smoke"
-        sequences = @("A𠆩")
+        sequences = @("𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹")
         formats = @("Woff2")
     } | ConvertTo-Json -Depth 4
     $unauthorized = Invoke-WebRequest -Uri "$url/_odf-fonts/generate" -Method Post `

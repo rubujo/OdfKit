@@ -85,6 +85,27 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
+    /// 驗證大量 Plane 2 難字與一般字混排時，僅難字使用 Ext-B 字型，BMP 文字維持預設字型。
+    /// </summary>
+    [Fact]
+    public void SegmentText_WithMixedRareAndCommonCharacters_UsesFallbackOnlyForRareCharacters()
+    {
+        const string commonText = "一二三丨ㄩ幹";
+        const string rareText = "𪚥𩙡𦚡𨏿𠆩𡘙𡌂𠀀";
+        const string defaultFont = "TW-Song-98_1";
+
+        IReadOnlyList<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
+            rareText + commonText,
+            defaultFont);
+
+        Assert.Equal(2, segments.Count);
+        Assert.Equal(rareText, segments[0].Text);
+        Assert.Equal("TW-Song-Ext-B-98_1", segments[0].FontName);
+        Assert.Equal(commonText, segments[1].Text);
+        Assert.Equal(defaultFont, segments[1].FontName);
+    }
+
+    /// <summary>
     /// 驗證未註冊自訂規則時，內建規則不處理的增補平面維持基礎字型，Plane 16 則維持既有的 PUA 遞補行為。
     /// </summary>
     [Theory]

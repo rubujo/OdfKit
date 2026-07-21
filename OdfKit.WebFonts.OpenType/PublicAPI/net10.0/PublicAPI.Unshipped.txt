@@ -21,6 +21,7 @@ OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.ValidateSourceCheck
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.VerifyEveryOutputCharString.get -> bool
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions.VerifyEveryOutputCharString.set -> void
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.FilterSupportedSequencesAsync(OdfKit.WebFonts.WebFontFaceIdentity! face, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>! sequences, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!>!
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.ManagedOpenTypeWebFontSubsetEngine(OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions! options) -> void
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier

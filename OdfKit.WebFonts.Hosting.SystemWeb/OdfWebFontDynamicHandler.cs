@@ -197,6 +197,24 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         try
         {
+            if (runtime.Engine is IWebFontTextCoverageFilter coverageFilter)
+            {
+                IReadOnlyList<WebFontTextSequence> supportedSequences = coverageFilter
+                    .FilterSupportedSequencesAsync(
+                        subsetRequest.Face,
+                        subsetRequest.Sequences,
+                        GetClientDisconnectedToken(response))
+                    .GetAwaiter()
+                    .GetResult();
+                if (supportedSequences.Count == 0)
+                {
+                    response.StatusCode = 204;
+                    return;
+                }
+
+                subsetRequest = CopyWithSequences(subsetRequest, supportedSequences);
+            }
+
             WebFontManifest manifest = runtime.Engine.GenerateAsync(
                     subsetRequest,
                     runtime.AssetRootPath,
@@ -227,6 +245,19 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             runtime.GenerationSlots.Release();
         }
     }
+
+    private static WebFontSubsetRequest CopyWithSequences(
+        WebFontSubsetRequest request,
+        IReadOnlyList<WebFontTextSequence> sequences)
+        => new()
+        {
+            Face = request.Face,
+            ProfileId = request.ProfileId,
+            FontFamily = request.FontFamily,
+            Sequences = sequences,
+            Formats = request.Formats,
+            RequiredBrowserTargets = request.RequiredBrowserTargets
+        };
 
     private static void ApplyGenerationResponseHeaders(HttpResponse response)
     {

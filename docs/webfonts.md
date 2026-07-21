@@ -317,6 +317,21 @@ hash。範例設定見
 }
 ```
 
+低階產字引擎維持單一 `FontSourceId` 契約；官方全字庫的 Plane 0 與 Plane 2
+分屬不同字型檔，因此頁面混排文字不得原封不動送到單一來源。瀏覽器端可使用 samples 內的
+`webfont-autosubset.js` 掃描文字節點，透過 JavaScript code point iterator 將 Plane 2 難字去重後，
+再由應用程式提供的 `odfKitRequestWebFonts` callback 交給受信任後端。callback 必須使用既有登入
+身分或同等授權機制；不得把 WebFont API key 寫進 HTML 或 JavaScript。
+
+託管端另有第二道防線：managed engine 會先依實際來源字型的 `cmap` 篩選文字。錯送混排文字時，
+只把該來源確實支援的連續序列交給嚴格的低階引擎；若完全沒有可產生的 glyph，回傳 HTTP 204，
+不建立空資產，也不以 400／503 表示一般字型 fallback。非法 JSON、未允許的來源／格式仍回 400；
+佇列或速率限制回 429；503 僅保留給暫時性基礎設施失敗。所有動態回應仍禁止快取。
+
+產出的每個 `@font-face` 必須帶精確 `unicode-range`。頁面 CSS 將預設字型排在前面，WebFont
+只補上預設字型缺少的難字；瀏覽器依 CSS Fonts 字型比對規則選擇 face，無需把一般字重做成
+WebFont。
+
 要求標頭必須包含 `X-OdfKit-WebFont-Key`。成功回傳 manifest，公開頁面只 GET
 `/{sha256}/{fileName}`；資產會重新驗證 SHA-256、大小與副檔名，再以 immutable cache 與 ETag
 傳送。Handler 重啟後仍可安全讀取內容定址產物，不依賴 process-local registry。

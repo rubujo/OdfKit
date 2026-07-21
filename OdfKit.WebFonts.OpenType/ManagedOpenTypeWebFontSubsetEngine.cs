@@ -7,7 +7,7 @@ namespace OdfKit.WebFonts.OpenType;
 /// Produces deterministic supported OpenType, WOFF, and WOFF2 subsets using only .NET APIs.
 /// 僅使用 .NET API 產生確定性的受支援 OpenType、WOFF 與 WOFF2 子集。
 /// </summary>
-public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
+public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, IWebFontTextCoverageFilter
 {
     private readonly ManagedOpenTypeWebFontEngineOptions _options;
     private readonly object _sourceCacheGate = new();
@@ -126,6 +126,64 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
         };
     }
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<WebFontTextSequence>> FilterSupportedSequencesAsync(
+        WebFontFaceIdentity face,
+        IReadOnlyList<WebFontTextSequence> sequences,
+        CancellationToken cancellationToken = default)
+    {
+        if (face is null || sequences is null || sequences.Any(sequence => sequence is null))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+
+        string sourcePath = ResolveSource(face);
+        CachedSource cachedSource = await GetVerifiedSourceAsync(
+            sourcePath,
+            face.SourceSha256,
+            cancellationToken).ConfigureAwait(false);
+        SfntFont source = cachedSource.GetFont(
+            face.FaceIndex,
+            _options.MaxTableCount,
+            _options.ValidateSourceChecksums,
+            cancellationToken);
+
+        var supported = new List<WebFontTextSequence>();
+        foreach (WebFontTextSequence sequence in sequences)
+        {
+            var run = new System.Text.StringBuilder();
+            int previousScalar = -1;
+            foreach (int scalar in sequence.UnicodeScalars)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (IsVariationSelector(scalar))
+                {
+                    if (previousScalar >= 0
+                        && source.ContainsVariationSequence(new UnicodeVariationSequence(previousScalar, scalar)))
+                    {
+                        run.Append(char.ConvertFromUtf32(scalar));
+                    }
+
+                    continue;
+                }
+
+                if (RequiresGlyph(scalar) && source.ContainsUnicodeScalar(scalar))
+                {
+                    run.Append(char.ConvertFromUtf32(scalar));
+                    previousScalar = scalar;
+                    continue;
+                }
+
+                FlushSupportedRun(run, supported);
+                previousScalar = -1;
+            }
+
+            FlushSupportedRun(run, supported);
+        }
+
+        return supported;
+    }
+
     private static IReadOnlyList<UnicodeVariationSequence> CreateVariationSequences(
         IEnumerable<WebFontTextSequence> sequences)
     {
@@ -151,6 +209,22 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine
             && scalar is not (>= 0xE0100 and <= 0xE01EF)
             && scalar is not (>= 0x0000 and <= 0x001F)
             && scalar is not (>= 0x007F and <= 0x009F);
+
+    private static bool IsVariationSelector(int scalar)
+        => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
+
+    private static void FlushSupportedRun(
+        System.Text.StringBuilder run,
+        ICollection<WebFontTextSequence> supported)
+    {
+        if (run.Length == 0)
+        {
+            return;
+        }
+
+        supported.Add(WebFontTextSequence.Create(run.ToString()));
+        run.Clear();
+    }
 
     private void ValidateOptions()
     {

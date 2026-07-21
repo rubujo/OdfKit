@@ -10,6 +10,8 @@ OdfKit.WebFonts.ITraceableCharacterMappingProvider.SourceSha256.get -> string!
 OdfKit.WebFonts.ITraceableCharacterMappingProvider.SourceUri.get -> string!
 OdfKit.WebFonts.IWebFontSubsetEngine
 OdfKit.WebFonts.IWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
+OdfKit.WebFonts.IWebFontTextCoverageFilter
+OdfKit.WebFonts.IWebFontTextCoverageFilter.FilterSupportedSequencesAsync(OdfKit.WebFonts.WebFontFaceIdentity! face, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>! sequences, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!>!
 OdfKit.WebFonts.WebFontAsset
 OdfKit.WebFonts.WebFontAsset.ByteLength.get -> long
 OdfKit.WebFonts.WebFontAsset.ByteLength.init -> void

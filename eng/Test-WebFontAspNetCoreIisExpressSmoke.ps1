@@ -312,7 +312,7 @@ function Invoke-HostingModelSmoke {
             faceIndex = 0
             profileId = "cns11643-euc-tw-2026-05-05"
             fontFamily = "OdfKit ASP.NET Core IIS"
-            sequences = @("A𠆩")
+            sequences = @("𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹")
             formats = @("Woff2")
         } | ConvertTo-Json -Depth 4
 

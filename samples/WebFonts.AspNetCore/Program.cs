@@ -113,6 +113,7 @@ builder.Services.AddOdfWebFontGeneration(
     });
 
 WebApplication app = builder.Build();
+app.UseStaticFiles();
 app.Use(async (context, next) =>
 {
     if (HttpMethods.IsPost(context.Request.Method)
@@ -153,7 +154,7 @@ app.MapGet(
 app.MapGet(
     "/",
     () => Results.Content(
-        "<!doctype html><html lang=\"zh-Hant-TW\"><head><meta charset=\"utf-8\"><title>OdfKit WebFonts</title></head><body><h1>OdfKit WebFonts dynamic generation service</h1><p>Health: GET /health</p><p>Trusted backend: POST /_odf-fonts/generate</p><p>Browsers load only content-addressed assets from the returned manifest.</p></body></html>",
+        "<!doctype html><html lang=\"zh-Hant-TW\"><head><meta charset=\"utf-8\"><title>OdfKit WebFonts</title><link rel=\"stylesheet\" href=\"/site.css\"></head><body><h1>OdfKit WebFonts dynamic generation service</h1><p>𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹</p><p>Health: GET /health</p><p>Trusted backend: POST /_odf-fonts/generate</p><p>Browsers load only content-addressed assets from the returned manifest.</p><script src=\"/webfont-autosubset.js\" data-odf-auto data-odf-font-source-id=\"cns-ext-b\" data-odf-minimum=\"0x20000\" data-odf-maximum=\"0x2FFFF\"></script></body></html>",
         "text/html; charset=utf-8"));
 
 await app.RunAsync();
