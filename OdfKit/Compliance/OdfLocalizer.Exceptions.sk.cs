@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "Proces WebFont zlyhal: {0}",
             ["Err_WebFont_QueueFull"] = "Front úloh WebFont je plný.",
             ["Err_WebFont_UnmappedByte"] = "Starší bajt na posune {0} nie je namapovaný.",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "Nepodarilo sa spracovať transakčný denník balíka ODF.",
         };
     }
 }

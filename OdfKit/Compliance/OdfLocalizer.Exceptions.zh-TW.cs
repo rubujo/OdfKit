@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "WebFont 處理程序失敗：{0}",
             ["Err_WebFont_QueueFull"] = "WebFont 工作佇列已滿。",
             ["Err_WebFont_UnmappedByte"] = "位移 {0} 的舊式位元組沒有對應。",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "無法處理 ODF 封裝容器交易日誌。",
         };
     }
 }

@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "Proses WebFont gagal: {0}",
             ["Err_WebFont_QueueFull"] = "Baris gilir kerja WebFont penuh.",
             ["Err_WebFont_UnmappedByte"] = "Bait legasi pada ofset {0} tidak dipetakan.",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "Gagal memproses jurnal transaksi pakej ODF.",
         };
     }
 }

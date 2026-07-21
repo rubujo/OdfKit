@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "Der WebFont-Prozess ist fehlgeschlagen: {0}",
             ["Err_WebFont_QueueFull"] = "Die WebFont-Auftragswarteschlange ist voll.",
             ["Err_WebFont_UnmappedByte"] = "Das Legacy-Byte am Offset {0} ist nicht zugeordnet.",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "Das Transaktionsjournal des ODF-Pakets konnte nicht verarbeitet werden.",
         };
     }
 }

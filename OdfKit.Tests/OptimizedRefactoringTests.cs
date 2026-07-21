@@ -1850,7 +1850,7 @@ public partial class OptimizedRefactoringTests
 
             using var package = OdfPackage.Open(tempFile);
             var ex = Assert.Throws<IOException>(() => OdfTransaction.Begin(package));
-            Assert.Equal(OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex.Message);
+            Assert.Equal(OdfLocalizer.GetMessage("Err_OdfPackage_TransactionJournalFailed"), ex.Message);
         }
         finally
         {

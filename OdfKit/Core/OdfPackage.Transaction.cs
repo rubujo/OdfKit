@@ -16,6 +16,8 @@ public sealed partial class OdfPackage
     private bool _inTransaction;
     internal bool InTransaction => _inTransaction;
     private List<IUndoOperation> _undoLog = new();
+    private bool _hasTransactionJournal;
+    private FileStream? _transactionLockStream;
 
     internal static int DirectCentralDirectoryWriteCountForTests { get; private set; }
 
@@ -267,23 +269,28 @@ public sealed partial class OdfPackage
             if (_inTransaction)
                 throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_TransactionAlreadyInProgress"));
 
-            // 建立實體磁碟交易日誌備份
-            if (!string.IsNullOrEmpty(FilePath) && File.Exists(FilePath))
+            // 建立實體磁碟交易日誌備份，並持有跨程序協作鎖直到交易結束。
+            string? filePath = FilePath;
+            if (filePath is not null && filePath.Length > 0 && File.Exists(filePath))
             {
-                string journalPath = FilePath + ".journal";
                 try
                 {
-                    File.Copy(FilePath, journalPath, true);
-                    using (var fs = new FileStream(journalPath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite))
-                    {
-                        fs.Flush(true); // fsync 強制刷入磁碟
-                    }
+                    _transactionLockStream = OdfTransactionJournal.AcquireLock(filePath);
+                    OdfTransactionJournal.Prepare(filePath);
+                    _hasTransactionJournal = true;
                 }
                 catch (Exception ex)
                 {
+                    ReleaseTransactionLock();
                     _undoLog.Clear();
+                    _hasTransactionJournal = false;
                     _inTransaction = false;
-                    throw new IOException(OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
+                    if (ex is IOException ioException &&
+                        string.Equals(ioException.Message, OdfLocalizer.GetMessage("Err_OdfPackage_TransactionJournalFailed"), StringComparison.Ordinal))
+                    {
+                        throw;
+                    }
+                    throw new IOException(OdfLocalizer.GetMessage("Err_OdfPackage_TransactionJournalFailed"), ex);
                 }
             }
 
@@ -307,38 +314,17 @@ public sealed partial class OdfPackage
             if (!_inTransaction)
                 return;
 
-            // 提交變更時，強制將底層檔案串流寫入磁碟 (fsync)
-            if (_underlyingStream is FileStream fs)
+            string? filePath = FilePath;
+            if (_hasTransactionJournal && filePath is not null && filePath.Length > 0)
             {
-                try
-                {
-                    fs.Flush(true);
-                }
-                catch (Exception ex)
-                {
-                    OdfKitDiagnostics.Warn($"[OdfPackage] 提交交易時強制刷入磁碟失敗: {ex.Message}");
-                }
-            }
-
-            // 刪除交易日誌
-            if (!string.IsNullOrEmpty(FilePath))
-            {
-                string journalPath = FilePath + ".journal";
-                if (File.Exists(journalPath))
-                {
-                    try
-                    {
-                        File.Delete(journalPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        OdfKitDiagnostics.Warn($"[OdfPackage] 刪除交易日誌 {journalPath} 失敗: {ex.Message}");
-                    }
-                }
+                // 刷入主檔後才將 journal 原子改名為 committed；失敗時保留可回滾狀態。
+                OdfTransactionJournal.Commit(filePath, _underlyingStream);
             }
 
             _undoLog.Clear();
+            _hasTransactionJournal = false;
             _inTransaction = false;
+            ReleaseTransactionLock();
         }
         finally
         {
@@ -357,51 +343,51 @@ public sealed partial class OdfPackage
             if (!_inTransaction)
                 return;
 
-            // 反向重播撤銷日誌 (Undo Log)
+            // 先還原實體檔案；若失敗則保留 journal 與交易狀態供稍後重試或開檔恢復。
+            string? filePath = FilePath;
+            if (_hasTransactionJournal && filePath is not null && filePath.Length > 0)
+            {
+                if (_underlyingStream is null || !_underlyingStream.CanWrite || !_underlyingStream.CanSeek)
+                    throw new IOException(OdfLocalizer.GetMessage("Err_OdfPackage_TransactionJournalFailed"));
+                OdfTransactionJournal.RecoverIntoOpenStream(
+                    filePath,
+                    _underlyingStream,
+                    transactionLockAlreadyHeld: true,
+                    requireJournal: true);
+            }
+
+            // 反向重播記憶體撤銷日誌。
             for (int i = _undoLog.Count - 1; i >= 0; i--)
             {
                 _undoLog[i].Undo(this);
             }
 
-            // 實體磁碟還原
-            if (!string.IsNullOrEmpty(FilePath))
-            {
-                string journalPath = FilePath + ".journal";
-                if (File.Exists(journalPath))
-                {
-                    try
-                    {
-                        if (_underlyingStream != null && _underlyingStream.CanWrite && _underlyingStream.CanSeek)
-                        {
-                            using (var journalStream = new FileStream(journalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                            {
-                                _underlyingStream.Position = 0;
-                                _underlyingStream.SetLength(0);
-                                journalStream.CopyTo(_underlyingStream);
-                                _underlyingStream.Flush();
-                            }
-                            if (_underlyingStream is FileStream fs)
-                            {
-                                fs.Flush(true); // fsync 強制刷入磁碟
-                            }
-                        }
-                        File.Delete(journalPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        OdfKitDiagnostics.Warn($"[OdfPackage] 回滾交易日誌實體檔案失敗: {ex.Message}");
-                    }
-                }
-            }
-
             _undoLog.Clear();
+            _hasTransactionJournal = false;
             _inTransaction = false;
+            ReleaseTransactionLock();
             OnRollback?.Invoke();
         }
         finally
         {
             _lock.Release();
         }
+    }
+
+    /// <summary>
+    /// 釋放檔案型交易的跨程序協作鎖。
+    /// </summary>
+    internal void ReleaseTransactionLock()
+    {
+        FileStream? transactionLockStream = _transactionLockStream;
+        _transactionLockStream = null;
+        if (transactionLockStream is not null)
+        {
+            transactionLockStream.Dispose();
+        }
+        string? filePath = FilePath;
+        if (transactionLockStream is not null && filePath is not null && filePath.Length > 0)
+            OdfTransactionJournal.ReleaseLockFile(filePath);
     }
 
     internal static bool TryIncrementalZipAppend(

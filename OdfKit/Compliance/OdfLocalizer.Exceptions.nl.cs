@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "Het WebFont-proces is mislukt: {0}",
             ["Err_WebFont_QueueFull"] = "De WebFont-taakwachtrij is vol.",
             ["Err_WebFont_UnmappedByte"] = "De verouderde byte op offset {0} is niet toegewezen.",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "Het transactielogboek van het ODF-pakket kan niet worden verwerkt.",
         };
     }
 }

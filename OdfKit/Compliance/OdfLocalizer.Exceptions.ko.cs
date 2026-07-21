@@ -622,6 +622,7 @@ public static partial class OdfLocalizer
             ["Err_WebFont_ProcessFailedWithDetail"] = "WebFont 프로세스에 실패했습니다: {0}",
             ["Err_WebFont_QueueFull"] = "WebFont 작업 대기열이 가득 찼습니다.",
             ["Err_WebFont_UnmappedByte"] = "오프셋 {0}의 레거시 바이트가 매핑되지 않았습니다.",
+            ["Err_OdfPackage_TransactionJournalFailed"] = "ODF 패키지 트랜잭션 저널을 처리하지 못했습니다.",
         };
     }
 }

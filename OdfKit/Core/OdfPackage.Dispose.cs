@@ -23,6 +23,7 @@ public sealed partial class OdfPackage
         {
             if (disposing)
             {
+                ReleaseTransactionLock();
 #if NET10_0_OR_GREATER
                 _prefetchCts.Cancel();
                 try
@@ -78,6 +79,7 @@ public sealed partial class OdfPackage
     {
         if (!_isDisposed)
         {
+            ReleaseTransactionLock();
 #if NET10_0_OR_GREATER
             _prefetchCts.Cancel();
             if (_prefetchProcessorTask != null)

@@ -603,5 +603,6 @@
   "Err_WebFont_ProcessFailed": "WebFont プロセスが失敗しました。",
   "Err_WebFont_ProcessFailedWithDetail": "WebFont プロセスが失敗しました: {0}",
   "Err_WebFont_QueueFull": "WebFont ジョブキューがいっぱいです。",
-  "Err_WebFont_UnmappedByte": "オフセット {0} のレガシーバイトはマッピングされていません。"
+  "Err_WebFont_UnmappedByte": "オフセット {0} のレガシーバイトはマッピングされていません。",
+  "Err_OdfPackage_TransactionJournalFailed": "ODF パッケージのトランザクションジャーナルを処理できませんでした。"
 }

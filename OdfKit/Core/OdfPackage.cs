@@ -241,27 +241,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// </summary>
     public static OdfPackage Open(string path, OdfLoadOptions? options)
     {
-        string journalPath = path + ".journal";
-        if (File.Exists(journalPath))
-        {
-            try
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-                File.Copy(journalPath, path, true);
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    fs.Flush(true);
-                }
-                File.Delete(journalPath);
-            }
-            catch (Exception ex)
-            {
-                throw new IOException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
-            }
-        }
+        OdfTransactionJournal.RecoverBeforeOpen(path);
 
         Stream stream = options?.EnableDirectIo == true
             ? new OdfDirectIoReadableStream(path)
@@ -367,27 +347,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OdfLoadOptions? options,
         CancellationToken cancellationToken)
     {
-        string journalPath = path + ".journal";
-        if (File.Exists(journalPath))
-        {
-            try
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-                File.Copy(journalPath, path, true);
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    fs.Flush(true);
-                }
-                File.Delete(journalPath);
-            }
-            catch (Exception ex)
-            {
-                throw new IOException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
-            }
-        }
+        cancellationToken.ThrowIfCancellationRequested();
+        OdfTransactionJournal.RecoverBeforeOpen(path);
 
         Stream stream = options?.EnableDirectIo == true
             ? new OdfDirectIoReadableStream(path)
