@@ -129,7 +129,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info report.odt
 | 下一步 | 先讀哪份文件 |
 |--------|--------------|
 | 找更多 API 範例 | [Cookbook](cookbook.md) |
-| 想直接跑整套樣本 | [samples/README.md](../samples/README.md) |
+| 想直接跑整套樣本 | [範例總覽](../samples/README.md) |
 | 確認格式支援深度 | [ODF 格式支援矩陣](odf-format-support.md) |
 | 確認可用 Profile 與規則來源 | [ODF Profile 來源](odf-profile-sources.md) |
 | 確認語系訊息與在地化機制 | [i18n 與在地化](i18n-localization.md) |

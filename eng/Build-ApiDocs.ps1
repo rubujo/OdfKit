@@ -77,7 +77,7 @@ try {
         if ($locale -notin @('en', 'zh-TW') -and $localeContent -match 'Open the API reference|Site notes and compliance|Other languages|This project content is written|Original OdfKit content') {
             throw "$localePath 仍含英文 placeholder，尚未完成本地化。"
         }
-        if ($rootIndex -notmatch [regex]::Escape("$locale/index.md")) { throw "api-docs/index.md 缺少語系連結：$locale。" }
+        if ($rootIndex -notmatch [regex]::Escape("$locale/index.md")) { throw "api-docs/index.md 缺少語系來源連結：$locale。" }
         if ($docfxJson -notmatch [regex]::Escape("$locale/**.{md,yml}")) { throw "api-docs/docfx.json 的 build.content 缺少語系文件集合：$locale/**.{md,yml}。" }
         $fileMetadataLocale = $docfxConfig.build.fileMetadata._lang.PSObject.Properties["$locale/**"].Value
         if ($fileMetadataLocale -ne $locale) { throw "api-docs/docfx.json 的 fileMetadata._lang 缺少或錯誤：$locale。" }
@@ -222,6 +222,34 @@ try {
     if (Test-Path $siteDir) { throw "無法清除 $siteDir（檔案被鎖定或無刪除權限），請關閉占用程式或改用 -OutputDirectory。" }
     dotnet docfx build api-docs/docfx.json --warningsAsErrors --maxParallelism 1 --output $siteDir
     if ($LASTEXITCODE) { throw 'DocFX build 失敗。' }
+
+    # 官方 modern 模板目前未提供 zh-TW UI 字串。全站導覽本來就採中英雙語，
+    # 因此將共用操作字串補成相同形式，避免中文文件中心混入未說明的英文控制項。
+    $uiReplacements = [ordered]@{
+        'content="In this article"' = 'content="本頁內容 / In this article"'
+        '>In this article<' = '>本頁內容 / In this article<'
+        'placeholder="Search"' = 'placeholder="搜尋 / Search"'
+        'aria-label="Search"' = 'aria-label="搜尋 / Search"'
+        'placeholder="Filter by title"' = 'placeholder="依標題篩選 / Filter by title"'
+        'content="Filter by title"' = 'content="依標題篩選 / Filter by title"'
+        '>Table of Contents<' = '>目錄 / Table of Contents<'
+        'aria-label="Show table of contents"' = 'aria-label="顯示目錄 / Show table of contents"'
+        'aria-label="Close"' = 'aria-label="關閉 / Close"'
+    }
+    $localizedUiPages = 0
+    Get-ChildItem $siteDir -Recurse -Filter *.html | ForEach-Object {
+        $html = [IO.File]::ReadAllText($_.FullName)
+        $updated = $html
+        foreach ($entry in $uiReplacements.GetEnumerator()) {
+            $updated = $updated.Replace($entry.Key, $entry.Value, [StringComparison]::Ordinal)
+        }
+        if ($updated -ne $html) {
+            [IO.File]::WriteAllText($_.FullName, $updated)
+            $localizedUiPages++
+        }
+    }
+    if (-not $localizedUiPages) { throw 'DocFX 共用操作介面沒有任何頁面完成雙語化。' }
+    Write-Host "已將 $localizedUiPages 個頁面的 DocFX 共用操作介面補為中英雙語。"
 
     # 同一儲存庫且已發布的文件必須留在靜態網站內，避免導覽跳回 GitHub 原始 Markdown。
     $publishedRepoPaths = [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::OrdinalIgnoreCase)
@@ -447,6 +475,17 @@ try {
     $apiSample = [IO.File]::ReadAllText($apiSamplePath)
     if ($apiSample -notmatch 'Provides the OdsStreamReader API\.' -or $apiSample -notmatch '以低記憶體流式方式逐列讀取 ODS 試算表') {
         throw 'API member 雙語內容驗證失敗：OdsStreamReader 頁面缺少英文或正體中文摘要。'
+    }
+    foreach ($requiredUiText in @('本頁內容 / In this article', '搜尋 / Search', '依標題篩選 / Filter by title')) {
+        if ($apiSample -notmatch [regex]::Escape($requiredUiText)) {
+            throw "API 網站共用介面雙語化驗證失敗：缺少 $requiredUiText。"
+        }
+    }
+    $homePage = [IO.File]::ReadAllText((Join-Path $siteDir 'index.html'))
+    foreach ($requiredHomeToken in @('odfkit-home-hero', 'odfkit-language-grid', 'api/OdfKit.html', 'project-docs/index.html')) {
+        if ($homePage -notmatch [regex]::Escape($requiredHomeToken)) {
+            throw "API 網站首頁體驗驗證失敗：缺少 $requiredHomeToken。"
+        }
     }
     Write-Host "PASS：modern 模板、17 語系 lang、footer、sitemap 與 $($htmlFiles.Count) 個 HTML 頁面驗證通過。"
 }

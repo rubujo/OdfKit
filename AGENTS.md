@@ -130,6 +130,7 @@
 | 在地化 | `Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly` |
 | 公開 API 或 schema | `Generate-PublicApiBaseline.ps1 -Verify` |
 | XML 文件 | `Test-OneLineXmlSummary.ps1 -FailOnIssues` |
+| API／文件網站 | 依 `docs/api-docs-site.md` 執行 `Build-ApiDocs.ps1`；導覽、內容結構或樣式變更另做桌面與窄螢幕瀏覽器檢查 |
 | 封裝或跨套件 TFM 相容性 | `Test-NuGetPack.ps1` |
 | 效能文件數值 | `Benchmark-Competitive.ps1` |
 

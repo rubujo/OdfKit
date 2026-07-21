@@ -1,7 +1,13 @@
 ﻿# OdfKit 文件中心
 
-本文件將 OdfKit 的現有文件整理為常用技術文件的閱讀結構，方便依照
-「評估、導入、營運」三個階段快速找到需要的資訊。
+歡迎來到 OdfKit 文件中心。您可以依照目前的工作階段，從評估、導入到營運與驗證，
+快速找到需要的資訊；若是第一次使用，建議先從快速開始與套件選型著手。
+
+<div class="odfkit-card-grid odfkit-card-grid-three">
+  <a class="odfkit-card" href="getting-started.md"><span class="odfkit-card-kicker">開始導入</span><strong>快速開始</strong><span>安裝套件並建立第一份文件。</span></a>
+  <a class="odfkit-card" href="package-catalog.md"><span class="odfkit-card-kicker">規劃方案</span><strong>套件選型</strong><span>依格式、平台與部署情境選擇套件。</span></a>
+  <a class="odfkit-card" href="evidence-index.md"><span class="odfkit-card-kicker">評估品質</span><strong>證據索引</strong><span>查閱安全、互通、效能與測試證據。</span></a>
+</div>
 
 ## 建議閱讀路徑
 
@@ -9,7 +15,7 @@
 |-----------|----------|------------|
 | 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md)、[智慧財產與合規說明](ip-compliance.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
-| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[samples/README.md](../samples/README.md) |
+| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[範例總覽](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[i18n 詞彙表](i18n-glossary.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [高階 API 遷移指南](migration-high-level-api.md)、[GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [能力宣稱與證據索引](evidence-index.md) | [ODF 格式支援矩陣](odf-format-support.md)、[WebFont 證據矩陣](webfont-evidence-matrix.md)、[LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md) |
@@ -45,8 +51,8 @@
 | [高階 API 遷移指南](migration-high-level-api.md) | 從早期 0.0.1 草稿遷移至四主格式一致生命週期契約 |
 | [NPOI／Independentsoft 遷移指南](migration-npoi-independentsoft.md) | 從常見第三方文件 API 遷移至 OdfKit 的對照與注意事項 |
 | [串流讀取安全限制](security-limits.md) | ODS／ODT Reader 的資源預算、資料流所有權與信任邊界 |
-| [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
-| [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
+| [工具總覽](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
+| [範例總覽](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [渲染後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
 | [Foreign 擴充政策](foreign-extension-policy.md) | 非標準命名空間與相容策略 |
 | [UDX 非功能性目標](udx-non-goals.md) | 明確排除於實作範圍外的功能模組與非目標 |
@@ -86,7 +92,7 @@
 |------|------|
 | [CHANGELOG](../CHANGELOG.md) | 版本變更與破壞性調整紀錄 |
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
-| [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
+| [來源與授權索引](provenance/README.md) | 模組來源、授權與依據 |
 | [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與受控轉換保真度的規格來源、不可複製來源與 golden 測試契約 |
 | [WebFont managed Clean-room 來源](provenance/webfont-managed-clean-room.md) | 字型 parser／writer 的允許規格、禁止實作來源與黑箱 oracle 隔離 |
 | [智慧財產與合規說明](ip-compliance.md) | 複合授權、AI 產製、clean-room、DCO、採用者盡職調查清單（非正式法律意見） |

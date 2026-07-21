@@ -79,8 +79,8 @@ flat／package XML RELAX NG 差異，並以 ODF Validator 阻擋適用 package �
 |------|------|
 | `dotnet run samples/Sample.cs` | 整合展示（含 options API 片段） |
 | Smoke | `$env:ODFKIT_SAMPLE_SMOKE_ONLY='true'` 略過擴充轉檔展示 |
-| 入門 | [getting-started.md](getting-started.md)、[samples/README.md](../samples/README.md) |
-| 食譜 | [cookbook.md](cookbook.md) |
+| 入門 | [快速開始](getting-started.md)、[範例總覽](../samples/README.md) |
+| 食譜 | [實作食譜](cookbook.md) |
 
 ## 與 API 形狀（B 類）的關係
 
