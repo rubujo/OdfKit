@@ -75,3 +75,4 @@ OdfKit.WebFonts.WebFontTextSequence.UnicodeScalars.get -> System.Collections.Gen
 OdfKit.WebFonts.WebFontUnicodePolicy
 static OdfKit.WebFonts.WebFontTextSequence.Create(string! text) -> OdfKit.WebFonts.WebFontTextSequence!
 static OdfKit.WebFonts.WebFontUnicodePolicy.RequiresStandaloneGlyph(int scalar) -> bool
+static OdfKit.WebFonts.WebFontUnicodePolicy.ShouldPreserveWhenMapped(int scalar) -> bool

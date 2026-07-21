@@ -101,9 +101,7 @@ public static class ManagedOpenTypeWebFontVerifier
         }
 
         SfntFont parsed = Parse(font, format, maximumBytes, cancellationToken);
-        foreach (int scalar in unicodeScalars
-                     .Where(WebFontUnicodePolicy.RequiresStandaloneGlyph)
-                     .Distinct())
+        foreach (int scalar in unicodeScalars.Distinct())
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!parsed.ContainsUnicodeScalar(scalar))
@@ -183,10 +181,23 @@ public static class ManagedOpenTypeWebFontVerifier
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 
-        foreach (int scalar in unicodeScalars.Distinct())
+        foreach (int scalar in unicodeScalars
+                     .Where(scalar => RequiresGlyph(scalar)
+                         || WebFontUnicodePolicy.ShouldPreserveWhenMapped(scalar))
+                     .Distinct())
         {
             ushort sourceGlyph = sourceFont.GetGlyphId(scalar);
-            if (sourceGlyph == 0 || sourceGlyph != subsetFont.GetGlyphId(scalar))
+            if (sourceGlyph == 0)
+            {
+                if (RequiresGlyph(scalar))
+                {
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+                }
+
+                continue;
+            }
+
+            if (sourceGlyph != subsetFont.GetGlyphId(scalar))
             {
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             }

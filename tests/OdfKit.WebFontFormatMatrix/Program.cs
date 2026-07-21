@@ -1240,7 +1240,7 @@ internal static class Program
                 faceIndex,
                 stream,
                 asset.Format,
-                sequence.UnicodeScalars.Where(WebFontUnicodePolicy.RequiresStandaloneGlyph));
+                sequence.UnicodeScalars);
             stream.Position = 0;
             ManagedOpenTypeWebFontVerifier.VerifyRetainsLayoutTables(
                 sourceBytes,

@@ -52,4 +52,25 @@ public sealed class WebFontSequenceCoverageTests
 
         Assert.Empty(result);
     }
+
+    [Theory]
+    [InlineData(0x0020)]
+    [InlineData(0x00A0)]
+    [InlineData(0x2003)]
+    [InlineData(0x3000)]
+    public void LayoutSpacingPolicy_PreservesMappedSpaceMetrics(int scalar)
+    {
+        Assert.False(WebFontUnicodePolicy.RequiresStandaloneGlyph(scalar));
+        Assert.True(WebFontUnicodePolicy.ShouldPreserveWhenMapped(scalar));
+    }
+
+    [Theory]
+    [InlineData(0x200D)]
+    [InlineData(0x2060)]
+    [InlineData(0xE0100)]
+    public void LayoutSpacingPolicy_DoesNotPreserveDefaultIgnorables(int scalar)
+    {
+        Assert.False(WebFontUnicodePolicy.RequiresStandaloneGlyph(scalar));
+        Assert.False(WebFontUnicodePolicy.ShouldPreserveWhenMapped(scalar));
+    }
 }

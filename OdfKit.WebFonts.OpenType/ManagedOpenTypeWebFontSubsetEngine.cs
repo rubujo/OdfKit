@@ -62,20 +62,29 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
 
         source.ValidateOutputFormats(request.Formats);
         source.ValidateBrowserTargets(request.RequiredBrowserTargets);
-        IReadOnlyList<int> scalars = request.Sequences
+        IReadOnlyList<int> advertisedScalars = request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
             .Where(RequiresGlyph)
             .Distinct()
             .OrderBy(value => value)
             .ToArray();
-        if (scalars.Count == 0)
+        if (advertisedScalars.Count == 0)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
+        IReadOnlyList<int> subsetScalars = request.Sequences
+            .SelectMany(sequence => sequence.UnicodeScalars)
+            .Where(scalar => RequiresGlyph(scalar)
+                || (WebFontUnicodePolicy.ShouldPreserveWhenMapped(scalar)
+                    && source.ContainsUnicodeScalar(scalar)))
+            .Distinct()
+            .OrderBy(value => value)
+            .ToArray();
+
         IReadOnlyList<UnicodeVariationSequence> variationSequences = CreateVariationSequences(request.Sequences);
         SfntSubset subset = source.CreateSubset(
-            scalars,
+            subsetScalars,
             variationSequences,
             _options.MaxCompositeDepth,
             cancellationToken);
@@ -95,7 +104,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
                 ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(
                     verificationStream,
                     format,
-                    scalars,
+                    subsetScalars,
                     _options.MaxOutputBytes,
                     _options.VerifyEveryOutputCharString,
                     cancellationToken);
@@ -115,7 +124,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
                 ByteLength = output.LongLength,
                 Format = format,
                 FontFamily = request.FontFamily,
-                UnicodeRanges = UnicodeRangeFormatter.Create(scalars)
+                UnicodeRanges = UnicodeRangeFormatter.Create(advertisedScalars)
             });
         }
 

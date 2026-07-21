@@ -7,6 +7,23 @@
 public static class WebFontUnicodePolicy
 {
     /// <summary>
+    /// Determines whether a mapped Unicode scalar affects inline spacing and should be retained with its source metrics.
+    /// 判斷已對應的 Unicode 純量是否會影響行內間距，並應連同來源 metrics 一併保留。
+    /// </summary>
+    /// <param name="scalar">The Unicode scalar value. / Unicode 純量值。</param>
+    /// <returns><see langword="true"/> when a mapped scalar should be retained for layout fidelity; otherwise, <see langword="false"/>. / 已對應的純量應為版面忠實度保留時為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public static bool ShouldPreserveWhenMapped(int scalar)
+        => scalar is 0x0020
+            or 0x00A0
+            or 0x1680
+            or 0x2028
+            or 0x2029
+            or 0x202F
+            or 0x205F
+            or 0x3000
+            or >= 0x2000 and <= 0x200A;
+
+    /// <summary>
     /// Determines whether a Unicode scalar requires a standalone glyph in a subset character map.
     /// 判斷 Unicode 純量是否需要在子集字型字元對照表中具有獨立 glyph。
     /// </summary>
