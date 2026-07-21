@@ -201,7 +201,10 @@ foreach (string browserName in new[] { "chromium", "firefox", "webkit" })
         IResponse? response = await page
             .GotoAsync($"{origin}/{result.Name}.html", new PageGotoOptions
             {
-                WaitUntil = WaitUntilState.NetworkIdle,
+                // 大型字型的下載與 sanitizer 驗證是本證明要量測的工作；不可把它綁在
+                // navigation 的 networkidle，否則較慢的 CI runner 會先耗盡導覽逾時。
+                // DOM 就緒後再由下方 __proof 明確等待完整字型檢查結果。
+                WaitUntil = WaitUntilState.DOMContentLoaded,
                 Timeout = 120_000
             })
             .ConfigureAwait(false);
