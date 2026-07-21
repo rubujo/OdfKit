@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+  <title id="title">OdfKit</title>
+  <rect width="48" height="48" rx="11" fill="#1970c2"/>
+  <path d="M14 11h13l8 8v18H14z" fill="#fff" opacity=".96"/>
+  <path d="M27 11v9h8" fill="none" stroke="#1970c2" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M19 27h11M19 32h8" stroke="#1970c2" stroke-width="3" stroke-linecap="round"/>
+</svg>

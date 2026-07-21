@@ -18,19 +18,17 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
 - **禁止站外手工 HTML**：所有頁面（含語系入口）一律是 DocFX 內容頁，
   確保共用導覽列、搜尋與模板；不得再以腳本產生站外 HTML 落地頁。
 - **以 DocFX 原生能力為界**：使用 `default`＋`modern`、content mapping、TOC、
-  `fileMetadata`、`globalMetadata` 與 Markdown；不建立自製多語系引擎、JavaScript 語系
-  切換器、`hreflang` 注入或模板 partial。
+  `fileMetadata`、`globalMetadata` 與 `template/public/main.css`；不建立自製多語系引擎、
+  JavaScript 語系切換器、`hreflang` 注入或模板 partial。
 - **根路徑是語言選擇頁**：根首頁保留 17 語系入口，不設定 `redirect_url` 強制導向
   `zh-TW`。這可讓每位讀者在進站時自行選擇語系。
 - **權威來源與受控譯文**：正體中文正式文件直接以 DocFX file mapping 納入；其餘 16 語系的
   譯文提交至 `api-docs/<locale>/`，並以來源 SHA-256、必要 token 與 CI 契約防止漂移。
 - **目的語系必須明示**：共用 API 入口標示 `[en + zh-TW]`；各語系正式文件連向同語系譯文，
   並在頁內揭露正體中文權威來源。全站 navbar 維持雙語，不模擬語系 session。
-- **不公開原始維護檔**：`project-docs/` 僅發布九個核准的 HTML 頁面，包含四個
-  合規／證據權威頁與五個 WebFont 權威頁。站台原生的快速開始與套件選型頁提供最小
-  導覽並連回 GitHub 權威全文。這些頁面所引用的
-  次級 repo 文件與機器可讀 manifest 連到 GitHub `blob/main` 渲染頁，不複製成
-  Pages 的 `.md` 或 `.json` 資源。
+- **文件留在靜態站內**：`docs/` 的 Markdown 依 `docs/toc.yml` 建置為分層 HTML，
+  JSON 證據檔與文件引用的儲存庫說明／設定資源一併發布。建置後會把同一儲存庫的
+  GitHub `blob/main` 文件連結改寫成相對靜態連結，並拒絕任何殘留的 `.md` 目的地。
 
 ## 2. 站台結構
 
@@ -49,7 +47,10 @@ api-docs/
   <locale>/project-docs/ # IP、安全、證據及第三方聲明譯文
   articles/           # 站台說明、授權等共用文章
   translations.json  # 權威來源、目的路徑、來源雜湊與不可翻譯 token
+  images/             # OdfKit 導覽列標誌
+  template/public/    # modern 模板的站台 CSS 覆寫
   api/                # docfx metadata 產物（git 忽略，勿手改）
+docs/toc.yml          # project-docs 的分層文件導覽
 ```
 
 `docs/ip-compliance.md`、`docs/security-limits.md`、`docs/evidence-index.md`、根目錄
@@ -84,10 +85,10 @@ api-docs/
 | 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出本地 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
 | `--warningsAsErrors` | DocFX metadata 與 build 警告均視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
-| 原始資源與 xref | 禁止內部 `.md` 連結、`project-docs/` 非核准資源及 modern 輸出殘留的 `xref:*`。 |
+| 原始資源與 xref | 禁止內部 `.md`、同儲存庫 GitHub Markdown、無來源的 `project-docs/` 輸出及 modern 輸出殘留的 `xref:*`。 |
 | DocFX 版本 | 必須與 repo-local tool manifest 固定的 2.78.5 一致。 |
-| modern 輸出 | 驗證 footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
-| 權威文件 | 驗證快速開始、套件選型、IP、安全、證據、WebFont 與第三方聲明均建置為站內頁面。 |
+| modern 輸出 | 驗證自訂 CSS、OdfKit 標誌、footer、sitemap、搜尋索引、頁數及 17 語系 HTML `lang`。 |
+| 權威文件 | 驗證快速開始、套件選型、完整 `docs/`、機器可讀證據與第三方聲明均建置為站內資源。 |
 | 404 頁面 | 驗證 `404.html` 存在、已注入站台根 `<base>`（GitHub Pages 於任意深度缺失路徑回傳其內容，相對資源需以站台根解析）且不進入 sitemap。 |
 | 翻譯契約 | 驗證 80 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
 

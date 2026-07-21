@@ -9,6 +9,8 @@ $sourceRoots = @(
 )
 $sourceRoots += Get-ChildItem -LiteralPath $root -Directory -Filter 'OdfKit.Extensions.*' |
     Select-Object -ExpandProperty FullName
+$sourceRoots += Get-ChildItem -LiteralPath $root -Directory -Filter 'OdfKit.WebFonts.*' |
+    Select-Object -ExpandProperty FullName
 
 $issues = [System.Collections.Generic.List[string]]::new()
 $checkedInitializers = 0

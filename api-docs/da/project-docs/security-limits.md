@@ -2,7 +2,7 @@
 title: Sikkerhedsgrænser for indlæsning og streaminglæsere
 _lang: da
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Sikkerhedsgrænser for indlæsning og streaminglæsere
@@ -26,7 +26,7 @@ nodetekst, ZIP-dekomprimering og XML-læseren. Lavt hukommelsesforbrug gør ikke
 
 Antal poster, poststørrelse, samlet udvidelse og rå pakkestørrelse skal være positive. Nul eller negative værdier udløser straks `ArgumentOutOfRangeException`. Kun `MaxXmlCharactersInDocument = 0` slår XML-tegngrænsen fra; negative værdier er stadig ugyldige.
 
-Alle XML-læsere i kernen skal forbyde eksterne DTD'er og resolvere. Nye indlæsningsveje skal genbruge `OdfLoadOptions` eller tilsvarende dokumenterede budgetter. Grænserne beskytter ressourcer, ikke dokumentindhold; brug `OdfPackageValidator`, `SanitizeMacros`, signaturvalidering eller `pwsh eng/Test-OdfPolicy.ps1` til politikker.
+Alle XML-læsere i kernen skal forbyde eksterne DTD'er og resolvere. Nye indlæsningsveje skal genbruge `OdfLoadOptions` eller tilsvarende dokumenterede budgetter. Valideringsveje for pakker og Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` og profilregler) anvender også `MaxXmlCharactersInDocument`: pakkevalidering bruger `package.LoadOptions`, mens Flat-validering bruger `OdfValidationOptions.LoadOptions` (standarden på 64 MiB fra `OdfLoadOptions`, når den udelades). Signaturer, tidsstempler, certifikatspærringsdata og eksterne netværkssvar har egne mindre grænser; kernepakkens grænse erstatter dem ikke. Grænserne beskytter ressourcer, ikke dokumentindhold; brug `OdfPackageValidator`, `SanitizeMacros`, signaturvalidering eller `pwsh eng/Test-OdfPolicy.ps1` til politikker.
 
 ## Grænser for streaminglæsere
 

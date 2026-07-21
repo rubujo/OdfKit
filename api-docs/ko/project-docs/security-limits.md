@@ -2,7 +2,7 @@
 title: 로드 및 스트리밍 리더 보안 제한
 _lang: ko
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # 로드 및 스트리밍 리더 보안 제한
@@ -25,7 +25,7 @@ ZIP 압축 해제 및 XML 리더를 위한 버퍼를 할당합니다. 낮은 상
 | 검색 불가능한 원시 입력 크기 | 1 GiB | ZIP 확장 전 버퍼링 제한 |
 | 단일 XML 문서 문자 수 | 64 MiB | XML 구문 분석 및 DOM 생성 비용 제한 |
 
-네 ZIP 제한은 양수여야 하며 0 또는 음수는 즉시 `ArgumentOutOfRangeException`을 발생시킵니다. `MaxXmlCharactersInDocument = 0`만 XML 제한을 비활성화합니다. 모든 XML Reader는 외부 DTD와 resolver를 금지해야 합니다. 새 경로는 `OdfLoadOptions`를 재사용하고 콘텐츠 정책에는 `OdfPackageValidator`, `SanitizeMacros`, 서명 검증 또는 `pwsh eng/Test-OdfPolicy.ps1`을 사용하십시오.
+네 ZIP 제한은 양수여야 하며 0 또는 음수는 즉시 `ArgumentOutOfRangeException`을 발생시킵니다. `MaxXmlCharactersInDocument = 0`만 XML 제한을 비활성화합니다. 모든 XML Reader는 외부 DTD와 resolver를 금지해야 합니다. 새 경로는 `OdfLoadOptions`를 재사용해야 합니다. 패키지와 Flat XML 검증 경로(`OdfPackageValidator`, `OdfFlatDocumentValidator`, profile 규칙 검사)에도 `MaxXmlCharactersInDocument`가 적용됩니다. 패키지 검증은 `package.LoadOptions`를 사용하고 Flat 검증은 `OdfValidationOptions.LoadOptions`를 사용하며, 생략하면 `OdfLoadOptions`의 기본값인 64 MiB가 적용됩니다. 서명, 타임스탬프, 인증서 해지 데이터 및 외부 네트워크 응답에는 각각 더 작은 별도 제한이 있으며 코어 패키지 제한으로 대체할 수 없습니다. 콘텐츠 정책에는 `OdfPackageValidator`, `SanitizeMacros`, 서명 검증 또는 `pwsh eng/Test-OdfPolicy.ps1`을 사용하십시오.
 
 ## 스트리밍 리더 제한
 

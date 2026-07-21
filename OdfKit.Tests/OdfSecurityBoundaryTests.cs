@@ -69,6 +69,51 @@ public class OdfSecurityBoundaryTests
     }
 
     /// <summary>
+    /// Verifies flat validation reads the complete XML document before accepting it without a profile.
+    /// 驗證未指定 profile 時，Flat XML 驗證仍會讀完整份文件後才接受結果。
+    /// </summary>
+    [Fact]
+    public void FlatValidationWithoutProfileEnforcesCompleteDocumentCharacterLimit()
+    {
+        string xml = CreateContentXml(new string('x', 2_048));
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var options = new OdfValidationOptions
+        {
+            FileName = "document.fodt",
+            LoadOptions = new OdfLoadOptions { MaxXmlCharactersInDocument = 512 }
+        };
+
+        OdfValidationReport report = OdfFlatDocumentValidator.Validate(stream, options);
+
+        Assert.Contains(report.Issues, issue => issue.Severity == OdfIssueSeverity.Fatal && issue.RuleId == "ODF2000");
+    }
+
+    /// <summary>
+    /// Verifies package validation scans complete XML entries before accepting them without a profile.
+    /// 驗證未指定 profile 時，套件驗證仍會掃描完整 XML 項目後才接受結果。
+    /// </summary>
+    [Fact]
+    public void PackageValidationWithoutProfileEnforcesCompleteDocumentCharacterLimit()
+    {
+        using var source = new MemoryStream();
+        using (OdfPackage package = OdfDocumentFactory.CreatePackage(source, OdfDocumentKind.Text, leaveOpen: true))
+        {
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(CreateContentXml(new string('x', 16_384))), "text/xml");
+            package.Save();
+        }
+
+        source.Position = 0;
+        using OdfPackage reopened = OdfPackage.Open(
+            source,
+            leaveOpen: true,
+            new OdfLoadOptions { MaxXmlCharactersInDocument = 4_096 });
+
+        OdfValidationReport report = OdfPackageValidator.Validate(reopened);
+
+        Assert.Contains(report.Issues, issue => issue.Severity == OdfIssueSeverity.Fatal && issue.RuleId == "ODF0301");
+    }
+
+    /// <summary>
     /// 驗證未編輯內容時，單純封裝保存會保留既有文件簽章專案。
     /// </summary>
     [Fact]

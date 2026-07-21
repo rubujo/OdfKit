@@ -2,7 +2,7 @@
 title: Limites de segurança do carregamento e dos leitores em fluxo
 _lang: pt-BR
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Limites de segurança do carregamento e dos leitores em fluxo
@@ -25,7 +25,7 @@ efeitos do tamanho da entrada.
 | Entrada bruta não pesquisável | 1 GiB | Limita o buffer antes da expansão ZIP |
 | Caracteres em um documento XML | 64 MiB | Limita a análise XML e a criação do DOM |
 
-Os quatro limites ZIP devem ser positivos; zero ou valores negativos geram imediatamente `ArgumentOutOfRangeException`. Somente `MaxXmlCharactersInDocument = 0` desativa o limite XML. Todos os XML Readers devem proibir DTD e resolvers externos. Novos caminhos devem reutilizar `OdfLoadOptions`; para políticas de conteúdo use `OdfPackageValidator`, `SanitizeMacros`, validação de assinaturas ou `pwsh eng/Test-OdfPolicy.ps1`.
+Os quatro limites ZIP devem ser positivos; zero ou valores negativos geram imediatamente `ArgumentOutOfRangeException`. Somente `MaxXmlCharactersInDocument = 0` desativa o limite XML. Todos os XML Readers devem proibir DTD e resolvers externos. Novos caminhos devem reutilizar `OdfLoadOptions`. Os caminhos de validação de pacotes e Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` e varreduras de regras de perfil) também aplicam `MaxXmlCharactersInDocument`: a validação de pacotes usa `package.LoadOptions`, enquanto a validação Flat usa `OdfValidationOptions.LoadOptions` (o padrão de 64 MiB de `OdfLoadOptions` quando omitido). Assinaturas, carimbos de data/hora, dados de revogação de certificados e respostas de rede externas têm limites próprios menores; o limite do pacote principal não os substitui. Para políticas de conteúdo use `OdfPackageValidator`, `SanitizeMacros`, validação de assinaturas ou `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limites dos leitores em fluxo
 

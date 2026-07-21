@@ -2,7 +2,7 @@
 title: Bezpečnostné limity načítania a streamovacích čítačiek
 _lang: sk
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Bezpečnostné limity načítania a streamovacích čítačiek
@@ -25,7 +25,7 @@ veľkosti vstupu.
 | Veľkosť neskenovateľného vstupu | 1 GiB | Obmedzuje vyrovnávaciu pamäť pred rozbalením ZIP |
 | Znaky v jednom dokumente XML | 64 MiB | Obmedzuje spracovanie XML a vytvorenie DOM |
 
-Štyri limity ZIP musia byť kladné; nula alebo záporné hodnoty okamžite vyvolajú `ArgumentOutOfRangeException`. Iba `MaxXmlCharactersInDocument = 0` vypne limit XML. Všetky XML čítačky musia zakázať externé DTD a resolvery. Nové cesty musia použiť `OdfLoadOptions`; pre zásady obsahu použite `OdfPackageValidator`, `SanitizeMacros`, overenie podpisu alebo `pwsh eng/Test-OdfPolicy.ps1`.
+Štyri limity ZIP musia byť kladné; nula alebo záporné hodnoty okamžite vyvolajú `ArgumentOutOfRangeException`. Iba `MaxXmlCharactersInDocument = 0` vypne limit XML. Všetky XML čítačky musia zakázať externé DTD a resolvery. Nové cesty musia použiť `OdfLoadOptions`. Validačné cesty balíkov a Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` a kontroly pravidiel profilov) tiež používajú `MaxXmlCharactersInDocument`: validácia balíka používa `package.LoadOptions`, zatiaľ čo validácia Flat používa `OdfValidationOptions.LoadOptions` (pri vynechaní predvolených 64 MiB z `OdfLoadOptions`). Podpisy, časové pečiatky, údaje o zrušení certifikátov a externé sieťové odpovede majú vlastné menšie limity; limit základného balíka ich nenahrádza. Pre zásady obsahu použite `OdfPackageValidator`, `SanitizeMacros`, overenie podpisu alebo `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limity streamovacích čítačiek
 

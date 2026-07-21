@@ -2,7 +2,7 @@
 title: Límites de seguridad de carga y lectores en flujo
 _lang: es
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Límites de seguridad de carga y lectores en flujo
@@ -25,7 +25,7 @@ elimina los efectos del tamaño de la entrada.
 | Entrada no buscable sin procesar | 1 GiB | Limita el búfer antes de expandir ZIP |
 | Caracteres de un documento XML | 64 MiB | Limita el análisis XML y la creación del DOM |
 
-Los cuatro límites ZIP deben ser positivos; cero o valores negativos producen inmediatamente `ArgumentOutOfRangeException`. Solo `MaxXmlCharactersInDocument = 0` desactiva el límite XML. Todos los XML Reader deben prohibir DTD y resolvers externos. Las rutas nuevas deben reutilizar `OdfLoadOptions`; para políticas de contenido use `OdfPackageValidator`, `SanitizeMacros`, la validación de firmas o `pwsh eng/Test-OdfPolicy.ps1`.
+Los cuatro límites ZIP deben ser positivos; cero o valores negativos producen inmediatamente `ArgumentOutOfRangeException`. Solo `MaxXmlCharactersInDocument = 0` desactiva el límite XML. Todos los XML Reader deben prohibir DTD y resolvers externos. Las rutas nuevas deben reutilizar `OdfLoadOptions`. Las rutas de validación de paquetes y Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` y el análisis de reglas de perfil) también aplican `MaxXmlCharactersInDocument`: la validación de paquetes usa `package.LoadOptions` y la validación Flat usa `OdfValidationOptions.LoadOptions` (el valor predeterminado de 64 MiB de `OdfLoadOptions` si se omite). Las firmas, las marcas de tiempo, los datos de revocación de certificados y las respuestas de red externas tienen límites propios más pequeños; el límite del paquete principal no los sustituye. Para políticas de contenido use `OdfPackageValidator`, `SanitizeMacros`, la validación de firmas o `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Límites de lectores en flujo
 

@@ -2,7 +2,7 @@
 title: Limites de sécurité du chargement et des lecteurs en continu
 _lang: fr
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Limites de sécurité du chargement et des lecteurs en continu
@@ -25,7 +25,7 @@ résidente ne rend pas l’utilisation des ressources indépendante de la taille
 | Entrée brute non recherchable | 1 GiB | Limite la mise en mémoire tampon avant l’expansion ZIP |
 | Caractères d’un document XML | 64 MiB | Limite l’analyse XML et la construction du DOM |
 
-Les quatre limites ZIP doivent être positives ; zéro ou une valeur négative déclenche immédiatement `ArgumentOutOfRangeException`. Seul `MaxXmlCharactersInDocument = 0` désactive la limite XML. Tous les lecteurs XML doivent interdire les DTD et resolvers externes. Les nouveaux chemins doivent réutiliser `OdfLoadOptions` ; pour les règles de contenu, utilisez `OdfPackageValidator`, `SanitizeMacros`, la validation des signatures ou `pwsh eng/Test-OdfPolicy.ps1`.
+Les quatre limites ZIP doivent être positives ; zéro ou une valeur négative déclenche immédiatement `ArgumentOutOfRangeException`. Seul `MaxXmlCharactersInDocument = 0` désactive la limite XML. Tous les lecteurs XML doivent interdire les DTD et resolvers externes. Les nouveaux chemins doivent réutiliser `OdfLoadOptions`. Les chemins de validation des paquets et du Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` et l’analyse des règles de profil) appliquent également `MaxXmlCharactersInDocument` : la validation des paquets utilise `package.LoadOptions`, tandis que la validation Flat utilise `OdfValidationOptions.LoadOptions` (la valeur par défaut de 64 MiB de `OdfLoadOptions` en cas d’omission). Les signatures, horodatages, données de révocation de certificat et réponses réseau externes ont leurs propres limites, plus petites ; la limite du paquet principal ne les remplace pas. Pour les règles de contenu, utilisez `OdfPackageValidator`, `SanitizeMacros`, la validation des signatures ou `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limites des lecteurs en continu
 

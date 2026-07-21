@@ -2,7 +2,7 @@
 title: Limity bezpieczeństwa ładowania i czytników strumieniowych
 _lang: pl
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Limity bezpieczeństwa ładowania i czytników strumieniowych
@@ -25,7 +25,7 @@ rezydentnej nie eliminuje wpływu rozmiaru danych wejściowych.
 | Surowy rozmiar danych bez wyszukiwania | 1 GiB | Ogranicza buforowanie przed rozwinięciem ZIP |
 | Znaki w jednym dokumencie XML | 64 MiB | Ogranicza analizę XML i budowę DOM |
 
-Cztery limity ZIP muszą być dodatnie; zero lub wartości ujemne natychmiast powodują `ArgumentOutOfRangeException`. Tylko `MaxXmlCharactersInDocument = 0` wyłącza limit XML. Wszystkie XML Readery muszą blokować zewnętrzne DTD i resolvery. Nowe ścieżki muszą używać `OdfLoadOptions`; zasady treści realizuj przez `OdfPackageValidator`, `SanitizeMacros`, walidację podpisu lub `pwsh eng/Test-OdfPolicy.ps1`.
+Cztery limity ZIP muszą być dodatnie; zero lub wartości ujemne natychmiast powodują `ArgumentOutOfRangeException`. Tylko `MaxXmlCharactersInDocument = 0` wyłącza limit XML. Wszystkie XML Readery muszą blokować zewnętrzne DTD i resolvery. Nowe ścieżki muszą używać `OdfLoadOptions`. Ścieżki walidacji pakietów i Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` oraz skanowanie reguł profili) także stosują `MaxXmlCharactersInDocument`: walidacja pakietów używa `package.LoadOptions`, a walidacja Flat używa `OdfValidationOptions.LoadOptions` (domyślne 64 MiB z `OdfLoadOptions`, jeśli nie podano). Podpisy, znaczniki czasu, dane o unieważnieniu certyfikatów i zewnętrzne odpowiedzi sieciowe mają własne, mniejsze limity; limit pakietu podstawowego ich nie zastępuje. Zasady treści realizuj przez `OdfPackageValidator`, `SanitizeMacros`, walidację podpisu lub `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limity czytników strumieniowych
 

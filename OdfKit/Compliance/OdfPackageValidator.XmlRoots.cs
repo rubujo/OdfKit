@@ -62,7 +62,9 @@ public static partial class OdfPackageValidator
 
             using XmlReader reader = XmlReader.Create(stream, settings);
             bool insideOfficeBody = false;
+            bool bodyKindResolved = false;
             int bodyDepth = -1;
+            OdfDocumentKind bodyKind = OdfDocumentKind.Unknown;
 
             while (reader.Read())
             {
@@ -74,16 +76,21 @@ public static partial class OdfPackageValidator
                     bodyDepth = reader.Depth;
                     if (reader.IsEmptyElement)
                     {
-                        return OdfDocumentKind.Unknown;
+                        bodyKindResolved = true;
+                        insideOfficeBody = false;
                     }
                     continue;
                 }
 
-                if (insideOfficeBody && reader.NodeType == XmlNodeType.Element && reader.Depth == bodyDepth + 1)
+                if (insideOfficeBody &&
+                    !bodyKindResolved &&
+                    reader.NodeType == XmlNodeType.Element &&
+                    reader.Depth == bodyDepth + 1)
                 {
                     if (reader.NamespaceURI != OdfNamespaces.Office)
                     {
-                        return OdfDocumentKind.Unknown;
+                        bodyKindResolved = true;
+                        continue;
                     }
 
                     OdfElementDefinition? bodyElement = OdfSchemaRegistry.Latest.FindElement(reader.NamespaceURI, reader.LocalName);
@@ -96,17 +103,22 @@ public static partial class OdfPackageValidator
                             "content.xml",
                             "/document-content/body/" + reader.LocalName,
                             profileId: profileId));
-                        return OdfDocumentKind.Unknown;
+                    }
+                    else
+                    {
+                        bodyKind = bodyElement.DocumentKind;
                     }
 
-                    return bodyElement.DocumentKind;
+                    bodyKindResolved = true;
                 }
 
                 if (insideOfficeBody && reader.NodeType == XmlNodeType.EndElement && reader.Depth == bodyDepth)
                 {
-                    return OdfDocumentKind.Unknown;
+                    insideOfficeBody = false;
                 }
             }
+
+            return bodyKind;
         }
         catch (XmlException ex)
         {
@@ -249,16 +261,19 @@ public static partial class OdfPackageValidator
             };
 
             using XmlReader reader = XmlReader.Create(stream, settings);
+            XmlRootInfo? rootInfo = null;
             while (reader.Read())
             {
-                if (reader.NodeType != XmlNodeType.Element)
+                if (rootInfo is not null || reader.NodeType != XmlNodeType.Element)
                 {
                     continue;
                 }
 
                 string? version = reader.GetAttribute("version", OdfNamespaces.Office) ?? reader.GetAttribute("version");
-                return new XmlRootInfo(reader.NamespaceURI, reader.LocalName, version);
+                rootInfo = new XmlRootInfo(reader.NamespaceURI, reader.LocalName, version);
             }
+
+            return rootInfo;
         }
         catch (XmlException ex)
         {

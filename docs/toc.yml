@@ -1,0 +1,132 @@
+- name: 文件首頁
+  href: index.md
+- name: 開始使用
+  items:
+  - name: 快速開始
+    href: getting-started.md
+  - name: 核心快速開始
+    href: core-quickstart.md
+  - name: Cookbook
+    href: cookbook.md
+  - name: 套件目錄
+    href: package-catalog.md
+  - name: NuGet 相容矩陣
+    href: nuget-compatibility-matrix.md
+  - name: 版本與交付
+    href: version-delivery.md
+  - name: 高階 API 遷移
+    href: migration-high-level-api.md
+  - name: NPOI／Independentsoft 遷移
+    href: migration-npoi-independentsoft.md
+- name: API 與格式
+  items:
+  - name: API 參考導覽
+    href: reference/index.md
+  - name: 語意 Facade
+    href: reference/semantic-facades.md
+  - name: 試算表資料
+    href: reference/spreadsheet-data.md
+  - name: 圖表
+    href: reference/charts.md
+  - name: 範本
+    href: reference/templates.md
+  - name: 匯出
+    href: reference/exporting.md
+  - name: 互通性
+    href: reference/interop.md
+  - name: 診斷
+    href: reference/diagnostics.md
+  - name: ODF 格式支援
+    href: odf-format-support.md
+  - name: ODF Toolkit 對標
+    href: odf-toolkit-parity.md
+  - name: API 表面分層
+    href: api-surface-layers.md
+  - name: API 表面清冊
+    href: api-surface-inventory.md
+  - name: API 表面一致性
+    href: api-surface-consistency.md
+  - name: 公開 API 可選參數
+    href: public-api-optional-parameters.md
+- name: WebFont
+  items:
+  - name: WebFont 指南
+    href: webfonts.md
+  - name: 套件 README
+    href: webfonts-package-readme.md
+  - name: 純 .NET 架構
+    href: webfont-managed-architecture.md
+  - name: 證據矩陣
+    href: webfont-evidence-matrix.md
+  - name: IFT 追蹤
+    href: webfont-ift-tracking.md
+  - name: 部署後端
+    href: rendering-backend-deployment.md
+- name: 安全、合規與互通
+  items:
+  - name: 安全限制
+    href: security-limits.md
+  - name: 智慧財產與合規
+    href: ip-compliance.md
+  - name: Foreign 擴充政策
+    href: foreign-extension-policy.md
+  - name: 非目標
+    href: udx-non-goals.md
+  - name: Corpus Manifest
+    href: corpus-manifest.md
+  - name: 官方 Corpus 來源
+    href: odf-official-corpus-sources.md
+  - name: 互通 Corpus
+    href: interop-corpus.md
+  - name: ODF Profile 來源
+    href: odf-profile-sources.md
+  - name: ODF 1.4 覆蓋契約
+    href: odf14-coverage-contract.md
+  - name: ODF 1.4 覆蓋狀態
+    href: odf14-coverage-status.md
+  - name: ODF 1.4 缺口稽核
+    href: odf14-gap-audit.md
+  - name: LibreOffice 互通矩陣
+    href: libreoffice-interop-matrix.md
+  - name: Provenance
+    href: provenance/README.md
+  - name: Clean-room 來源索引
+    href: provenance/clean-room-source-index.md
+  - name: 語意 API Clean-room
+    href: provenance/semantic-api-clean-room.md
+  - name: WebFont Clean-room
+    href: provenance/webfont-managed-clean-room.md
+- name: 品質與效能
+  items:
+  - name: 證據索引
+    href: evidence-index.md
+  - name: 產品品質閘門
+    href: product-quality-gates.md
+  - name: 效能預算
+    href: performance-budgets.md
+  - name: 效能基準線
+    href: performance-baselines.md
+  - name: 效能比較
+    href: performance-comparison.md
+  - name: 標準文件效能
+    href: performance-standard-documents.md
+  - name: OOXML 視覺 Golden
+    href: ooxml-visual-golden-matrix.md
+  - name: CI/CD
+    href: ci-cd.md
+- name: 維護與發布
+  items:
+  - name: 可維護性
+    href: maintainability.md
+  - name: 人機協作可維護性
+    href: human-agent-maintainability.md
+  - name: 協作者架構
+    href: architecture-collaborators.md
+  - name: API 文件站
+    href: api-docs-site.md
+  - name: 在地化流程
+    href: i18n-localization.md
+  - name: 在地化詞彙表
+    href: i18n-glossary.md
+  - name: GitHub Release 發布
+    href: github-release-publishing.md

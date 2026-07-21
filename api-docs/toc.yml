@@ -2,9 +2,9 @@
   href: index.md
 - name: API [en + zh-TW]
   href: api/
-- name: 快速開始 / Getting started
+- name: 開始 / Start
   href: articles/getting-started.md
-- name: 套件選型 / Package catalog
+- name: 套件 / Packages
   href: articles/package-selection.md
-- name: 專案文件 / Project docs
-  href: articles/
+- name: 文件 / Docs
+  href: ../docs/index.md

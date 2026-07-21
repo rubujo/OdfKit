@@ -2,7 +2,7 @@
 title: Limiti di sicurezza del caricamento e dei lettori streaming
 _lang: it
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Limiti di sicurezza del caricamento e dei lettori streaming
@@ -25,7 +25,7 @@ dalla dimensione dell’input.
 | Input grezzo non ricercabile | 1 GiB | Limita il buffering prima dell’espansione ZIP |
 | Caratteri in un documento XML | 64 MiB | Limita l’analisi XML e la costruzione del DOM |
 
-I quattro limiti ZIP devono essere positivi; zero o valori negativi generano subito `ArgumentOutOfRangeException`. Solo `MaxXmlCharactersInDocument = 0` disattiva il limite XML. Tutti i lettori XML devono vietare DTD e resolver esterni. I nuovi percorsi devono riutilizzare `OdfLoadOptions`; per le regole sul contenuto usare `OdfPackageValidator`, `SanitizeMacros`, la verifica delle firme o `pwsh eng/Test-OdfPolicy.ps1`.
+I quattro limiti ZIP devono essere positivi; zero o valori negativi generano subito `ArgumentOutOfRangeException`. Solo `MaxXmlCharactersInDocument = 0` disattiva il limite XML. Tutti i lettori XML devono vietare DTD e resolver esterni. I nuovi percorsi devono riutilizzare `OdfLoadOptions`. I percorsi di convalida dei pacchetti e Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` e le scansioni delle regole dei profili) applicano anche `MaxXmlCharactersInDocument`: la convalida dei pacchetti usa `package.LoadOptions`, mentre quella Flat usa `OdfValidationOptions.LoadOptions` (il valore predefinito di 64 MiB di `OdfLoadOptions` se omesso). Firme, marche temporali, dati di revoca dei certificati e risposte di rete esterne hanno limiti propri più piccoli; il limite del pacchetto principale non li sostituisce. Per le regole sul contenuto usare `OdfPackageValidator`, `SanitizeMacros`, la verifica delle firme o `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limiti dei lettori streaming
 

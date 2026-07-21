@@ -72,10 +72,6 @@ try {
     if ($PublishAot) {
         $publishArgs += "/p:PublishAot=true"
     }
-    else {
-        $publishArgs += "-p:BuildProjectReferences=false"
-    }
-
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
     dotnet @publishArgs 2>&1 | ForEach-Object {
         Write-Host $_

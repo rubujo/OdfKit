@@ -2,7 +2,7 @@
 title: Sicherheitsgrenzen für Laden und Streaming-Reader
 _lang: de
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Sicherheitsgrenzen für Laden und Streaming-Reader
@@ -27,7 +27,7 @@ bedeutet nicht, dass die Eingabegröße ohne Einfluss bleibt.
 
 Eintragsanzahl, Eintragsgröße, Gesamtexpansion und rohe Paketgröße müssen positiv sein. Null oder negative Werte lösen sofort `ArgumentOutOfRangeException` aus. Nur `MaxXmlCharactersInDocument = 0` deaktiviert die XML-Zeichengrenze; negative Werte bleiben ungültig.
 
-Alle XML-Reader des Kerns müssen externe DTDs und Resolver verbieten. Neue Ladepfade müssen `OdfLoadOptions` oder gleichwertige dokumentierte Budgets verwenden. Diese Grenzen schützen Ressourcen, nicht den Dokumentinhalt; verwenden Sie für Richtlinien `OdfPackageValidator`, `SanitizeMacros`, Signaturprüfung oder `pwsh eng/Test-OdfPolicy.ps1`.
+Alle XML-Reader des Kerns müssen externe DTDs und Resolver verbieten. Neue Ladepfade müssen `OdfLoadOptions` oder gleichwertige dokumentierte Budgets verwenden. Die Validierungspfade für Pakete und Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` und Profilregelprüfungen) wenden ebenfalls `MaxXmlCharactersInDocument` an: Die Paketvalidierung verwendet `package.LoadOptions`, die Flat-Validierung `OdfValidationOptions.LoadOptions` (bei fehlender Angabe den Standardwert 64 MiB aus `OdfLoadOptions`). Signaturen, Zeitstempel, Zertifikatswiderrufsdaten und externe Netzwerkantworten besitzen eigene kleinere Grenzen; die Kernpaketgrenze ersetzt diese nicht. Diese Grenzen schützen Ressourcen, nicht den Dokumentinhalt; verwenden Sie für Richtlinien `OdfPackageValidator`, `SanitizeMacros`, Signaturprüfung oder `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Grenzen der Streaming-Reader
 

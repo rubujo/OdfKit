@@ -2,7 +2,7 @@
 title: 読み込みとストリーミングリーダーのセキュリティ制限
 _lang: ja
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # 読み込みとストリーミングリーダーのセキュリティ制限
@@ -25,7 +25,7 @@ translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc881
 | シーク不能な生入力サイズ | 1 GiB | ZIP 展開前のバッファー量を制限 |
 | 1 XML 文書の文字数 | 64 MiB | XML 解析と DOM 構築のコストを制限 |
 
-4 つの ZIP 制限は正の値が必要です。0 または負の値は直ちに `ArgumentOutOfRangeException` を発生させます。`MaxXmlCharactersInDocument = 0` のみが XML 文字数制限を無効化します。すべての XML Reader は外部 DTD と resolver を禁止する必要があります。新しい読み込み経路は `OdfLoadOptions` を再利用し、内容ポリシーには `OdfPackageValidator`、`SanitizeMacros`、署名検証、または `pwsh eng/Test-OdfPolicy.ps1` を使用してください。
+4 つの ZIP 制限は正の値が必要です。0 または負の値は直ちに `ArgumentOutOfRangeException` を発生させます。`MaxXmlCharactersInDocument = 0` のみが XML 文字数制限を無効化します。すべての XML Reader は外部 DTD と resolver を禁止する必要があります。新しい読み込み経路は `OdfLoadOptions` を再利用してください。パッケージと Flat XML の検証経路（`OdfPackageValidator`、`OdfFlatDocumentValidator`、profile ルールのスキャン）にも `MaxXmlCharactersInDocument` が適用されます。パッケージ検証は `package.LoadOptions`、Flat 検証は `OdfValidationOptions.LoadOptions`（省略時は `OdfLoadOptions` の既定値 64 MiB）を使用します。署名、タイムスタンプ、証明書失効データ、外部ネットワーク応答には、それぞれより小さい固有の制限があり、コアパッケージの制限で置き換えることはできません。内容ポリシーには `OdfPackageValidator`、`SanitizeMacros`、署名検証、または `pwsh eng/Test-OdfPolicy.ps1` を使用してください。
 
 ## ストリーミングリーダーの制限
 

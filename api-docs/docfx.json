@@ -15,10 +15,13 @@
       { "files": ["api/**.yml"] },
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
       { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },
-      { "src": "../docs", "files": ["ip-compliance.md", "security-limits.md", "evidence-index.md", "webfonts.md", "webfont-managed-architecture.md", "webfont-evidence-matrix.md", "webfont-ift-tracking.md", "provenance/webfont-managed-clean-room.md"], "dest": "project-docs" },
-      { "src": "..", "files": ["THIRD-PARTY-NOTICES.md"], "dest": "project-docs" }
+      { "src": "../docs", "files": ["**/*.md", "toc.yml"], "dest": "project-docs" },
+      { "src": "..", "files": ["README.md", "CHANGELOG.md", "THIRD-PARTY-NOTICES.md", "AGENTS.md", "eng/README.md", "eng/historical-refactor/README.md", "samples/README.md", "samples/WebFonts.AspNetCore/README.md", "samples/WebFonts.WebForms/README.md", "tools/README.md", "OdfKit/PublicAPI/README.md", "OdfKit/Compliance/i18n/README.md"], "dest": "project-docs" }
     ],
     "resource": [
+      { "files": ["images/**"] },
+      { "src": "../docs", "files": ["**/*.json"], "dest": "project-docs" },
+      { "src": "..", "files": [".editorconfig", ".github/workflows/api-docs.yml", "eng/Build-ApiDocs.ps1", "eng/scripts/PdfVisualDiff.py", "tests/fixtures/ooxml-visual-golden/manifest.json"], "dest": "project-docs" },
       { "src": "../samples/WebFonts.WebForms", "files": ["Web.config", "webfonts.dynamic.example.json"], "dest": "samples/WebFonts.WebForms" }
     ],
     "globalMetadata": {
@@ -27,6 +30,8 @@
       "_enableSearch": true,
       "_disableContribution": true,
       "_lang": "zh-TW",
+      "_appLogoPath": "images/odfkit-mark.svg",
+      "_appLogoUrl": "/OdfKit/index.html",
       "_appFooter": "OdfKit · <a href=\"/OdfKit/index.html\">語言 / Languages</a> · CC0-1.0"
     },
     "fileMetadata": {
@@ -55,7 +60,7 @@
       "changefreq": "weekly",
       "priority": 0.5
     },
-    "template": ["default", "modern"],
+    "template": ["default", "modern", "template"],
     "output": "../artifacts/api-site",
     "xref": []
   }

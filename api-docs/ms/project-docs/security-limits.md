@@ -2,7 +2,7 @@
 title: Had keselamatan pemuatan dan pembaca penstriman
 _lang: ms
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Had keselamatan pemuatan dan pembaca penstriman
@@ -25,7 +25,7 @@ menghapuskan kesan saiz input.
 | Saiz input mentah tidak boleh dicari | 1 GiB | Mengehadkan penimbalan sebelum pengembangan ZIP |
 | Aksara dalam satu dokumen XML | 64 MiB | Mengehadkan kos penghuraian XML dan pembinaan DOM |
 
-Empat had ZIP mesti positif; sifar atau nilai negatif segera menghasilkan `ArgumentOutOfRangeException`. Hanya `MaxXmlCharactersInDocument = 0` mematikan had XML. Semua XML Reader mesti melarang DTD dan resolver luaran. Laluan baharu mesti menggunakan `OdfLoadOptions`; untuk dasar kandungan gunakan `OdfPackageValidator`, `SanitizeMacros`, pengesahan tandatangan atau `pwsh eng/Test-OdfPolicy.ps1`.
+Empat had ZIP mesti positif; sifar atau nilai negatif segera menghasilkan `ArgumentOutOfRangeException`. Hanya `MaxXmlCharactersInDocument = 0` mematikan had XML. Semua XML Reader mesti melarang DTD dan resolver luaran. Laluan baharu mesti menggunakan `OdfLoadOptions`. Laluan pengesahan pakej dan Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` serta imbasan peraturan profile) turut menggunakan `MaxXmlCharactersInDocument`: pengesahan pakej menggunakan `package.LoadOptions`, manakala pengesahan Flat menggunakan `OdfValidationOptions.LoadOptions` (lalai 64 MiB daripada `OdfLoadOptions` jika tidak ditetapkan). Tandatangan, cap masa, data pembatalan sijil dan respons rangkaian luaran mempunyai had tersendiri yang lebih kecil; had pakej teras tidak menggantikannya. Untuk dasar kandungan gunakan `OdfPackageValidator`, `SanitizeMacros`, pengesahan tandatangan atau `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Had pembaca penstriman
 

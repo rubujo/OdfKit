@@ -2,7 +2,7 @@
 title: Loading and streaming reader security limits
 _lang: en
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Loading and streaming reader security limits
@@ -28,7 +28,7 @@ does not make resource use independent of input size.
 
 Entry count, entry size, total expansion, and raw package size must be positive. Zero or negative values immediately throw `ArgumentOutOfRangeException`. Only `MaxXmlCharactersInDocument = 0` disables the XML character limit; negative values remain invalid.
 
-All core XML readers must prohibit external DTDs and resolvers. New loading paths must reuse `OdfLoadOptions` or provide equivalent documented budgets. These loading limits are resource defenses, not document-content policy; use `OdfPackageValidator`, `SanitizeMacros`, signature validation, or `pwsh eng/Test-OdfPolicy.ps1` for policy enforcement.
+All core XML readers must prohibit external DTDs and resolvers. New loading paths must reuse `OdfLoadOptions` or provide equivalent documented budgets. Package and Flat XML validation paths (`OdfPackageValidator`, `OdfFlatDocumentValidator`, and profile rule scans) also apply `MaxXmlCharactersInDocument`: package validation uses `package.LoadOptions`, while Flat validation uses `OdfValidationOptions.LoadOptions` (the `OdfLoadOptions` default of 64 MiB when omitted). Signatures, timestamps, certificate revocation data, and external network responses have their own smaller limits; the core package limit does not replace them. These loading limits are resource defenses, not document-content policy; use `OdfPackageValidator`, `SanitizeMacros`, signature validation, or `pwsh eng/Test-OdfPolicy.ps1` for policy enforcement.
 
 ## Streaming reader limits
 

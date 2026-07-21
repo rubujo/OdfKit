@@ -2,7 +2,7 @@
 title: Bezpečnostní limity načítání a proudových čteček
 _lang: cs
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Bezpečnostní limity načítání a proudových čteček
@@ -27,7 +27,7 @@ vliv velikosti vstupu.
 
 Počet položek, velikost položky, celkové rozbalení a velikost původního balíčku musí být kladné. Nula nebo záporná hodnota okamžitě vyvolá `ArgumentOutOfRangeException`. Pouze `MaxXmlCharactersInDocument = 0` vypne limit znaků XML; záporné hodnoty zůstávají neplatné.
 
-Všechny základní XML Readery musí zakázat externí DTD a resolvery. Nové cesty načítání musí používat `OdfLoadOptions` nebo rovnocenné zdokumentované rozpočty. Tyto limity chrání prostředky, nikoli obsah dokumentu; zásady vynucujte pomocí `OdfPackageValidator`, `SanitizeMacros`, ověření podpisu nebo `pwsh eng/Test-OdfPolicy.ps1`.
+Všechny základní XML Readery musí zakázat externí DTD a resolvery. Nové cesty načítání musí používat `OdfLoadOptions` nebo rovnocenné zdokumentované rozpočty. Validační cesty balíčku a Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` a kontroly pravidel profilů) také používají `MaxXmlCharactersInDocument`: balíček používá `package.LoadOptions`, zatímco Flat XML používá `OdfValidationOptions.LoadOptions` (při vynechání výchozích 64 MiB z `OdfLoadOptions`). Podpisy, časová razítka, data o odvolání certifikátů a externí síťové odpovědi mají vlastní menší limity; základní limit balíčku je nenahrazuje. Tyto limity chrání prostředky, nikoli obsah dokumentu; zásady vynucujte pomocí `OdfPackageValidator`, `SanitizeMacros`, ověření podpisu nebo `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limity proudových čteček
 

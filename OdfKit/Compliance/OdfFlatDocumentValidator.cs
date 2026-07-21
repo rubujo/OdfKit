@@ -132,6 +132,7 @@ public static class OdfFlatDocumentValidator
             using XmlReader reader = XmlReader.Create(stream, settings);
             FlatRootInfo? rootInfo = null;
             bool insideOfficeBody = false;
+            bool bodyKindResolved = false;
             int bodyDepth = -1;
 
             while (reader.Read())
@@ -140,7 +141,7 @@ public static class OdfFlatDocumentValidator
                 {
                     if (insideOfficeBody && reader.NodeType == XmlNodeType.EndElement && reader.Depth == bodyDepth)
                     {
-                        return rootInfo;
+                        insideOfficeBody = false;
                     }
 
                     continue;
@@ -160,12 +161,13 @@ public static class OdfFlatDocumentValidator
                     bodyDepth = reader.Depth;
                     if (reader.IsEmptyElement)
                     {
-                        return rootInfo;
+                        bodyKindResolved = true;
+                        insideOfficeBody = false;
                     }
                     continue;
                 }
 
-                if (insideOfficeBody && reader.Depth == bodyDepth + 1)
+                if (insideOfficeBody && !bodyKindResolved && reader.Depth == bodyDepth + 1)
                 {
                     OdfDocumentKind bodyKind = OdfDocumentKind.Unknown;
                     if (reader.NamespaceURI == OdfNamespaces.Office)
@@ -187,7 +189,8 @@ public static class OdfFlatDocumentValidator
                         }
                     }
 
-                    return new FlatRootInfo(rootInfo.NamespaceUri, rootInfo.LocalName, rootInfo.MimeType, rootInfo.Version, bodyKind);
+                    rootInfo = new FlatRootInfo(rootInfo.NamespaceUri, rootInfo.LocalName, rootInfo.MimeType, rootInfo.Version, bodyKind);
+                    bodyKindResolved = true;
                 }
             }
 

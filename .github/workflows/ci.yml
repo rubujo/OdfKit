@@ -111,7 +111,7 @@ jobs:
         shell: pwsh
         run: ./eng/Test-CiResourcePolicy.ps1
 
-      - name: Localizer key parity (12 cultures)
+      - name: Localizer key parity (17 cultures)
         shell: pwsh
         run: ./eng/Test-LocalizerKeyParity.ps1 -FailOnIssues
 

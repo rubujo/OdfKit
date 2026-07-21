@@ -2,7 +2,7 @@
 title: Sikkerhetsgrenser for lasting og strømlesere
 _lang: nb
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Sikkerhetsgrenser for lasting og strømlesere
@@ -24,7 +24,7 @@ nodetekst, ZIP-dekomprimering og XML-leseren. Lavt minnebruk gjør ikke inndatas
 | Rå størrelse på ikke-søkbare inndata | 1 GiB | Begrenser bufring før ZIP-utvidelse |
 | Tegn i ett XML-dokument | 64 MiB | Begrenser XML-behandling og DOM-bygging |
 
-De fire ZIP-grensene må være positive; null eller negative verdier gir umiddelbart `ArgumentOutOfRangeException`. Bare `MaxXmlCharactersInDocument = 0` slår av XML-grensen. Alle XML-lesere må forby eksterne DTD-er og resolvere. Nye lastebaner må bruke `OdfLoadOptions`; bruk `OdfPackageValidator`, `SanitizeMacros`, signaturvalidering eller `pwsh eng/Test-OdfPolicy.ps1` for innholdspolicy.
+De fire ZIP-grensene må være positive; null eller negative verdier gir umiddelbart `ArgumentOutOfRangeException`. Bare `MaxXmlCharactersInDocument = 0` slår av XML-grensen. Alle XML-lesere må forby eksterne DTD-er og resolvere. Nye lastebaner må bruke `OdfLoadOptions`. Valideringsbaner for pakker og Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` og skanning av profilregler) bruker også `MaxXmlCharactersInDocument`: pakkevalidering bruker `package.LoadOptions`, mens Flat-validering bruker `OdfValidationOptions.LoadOptions` (standardverdien 64 MiB fra `OdfLoadOptions` når den utelates). Signaturer, tidsstempler, sertifikatopphevingsdata og eksterne nettverkssvar har egne mindre grenser; grensen for kjernepakken erstatter dem ikke. Bruk `OdfPackageValidator`, `SanitizeMacros`, signaturvalidering eller `pwsh eng/Test-OdfPolicy.ps1` for innholdspolicy.
 
 ## Grenser for strømlesere
 

@@ -86,8 +86,22 @@ try {
     $rootToc = Get-Content api-docs/toc.yml -Raw
     if ($rootToc -notmatch [regex]::Escape('API [en + zh-TW]')) { throw '根 navbar 的 API 入口缺少內容語系標示。' }
     if (@($docfxConfig.build.template) -notcontains 'modern') { throw 'DocFX 必須使用官方 modern 模板。' }
-    foreach ($mapping in @('ip-compliance.md', 'security-limits.md', 'evidence-index.md', 'THIRD-PARTY-NOTICES.md')) {
-        if ($docfxJson -notmatch [regex]::Escape($mapping)) { throw "DocFX content mapping 缺少權威文件：$mapping。" }
+    if (@($docfxConfig.build.template) -notcontains 'template') { throw 'DocFX 必須套用 api-docs/template 自訂樣式。' }
+    $projectDocsContent = @($docfxConfig.build.content | Where-Object { $_.src -eq '../docs' })
+    if ($projectDocsContent.Count -ne 1 -or
+        @($projectDocsContent[0].files) -notcontains '**/*.md' -or
+        @($projectDocsContent[0].files) -notcontains 'toc.yml' -or
+        $projectDocsContent[0].dest -ne 'project-docs') {
+        throw 'DocFX 必須將 docs 下的 Markdown 與 toc.yml 完整發布到 project-docs。'
+    }
+    $projectDocsResources = @($docfxConfig.build.resource | Where-Object { $_.src -eq '../docs' })
+    if ($projectDocsResources.Count -ne 1 -or
+        @($projectDocsResources[0].files) -notcontains '**/*.json' -or
+        $projectDocsResources[0].dest -ne 'project-docs') {
+        throw 'DocFX 必須將 docs 下的 JSON 證據資源發布到 project-docs。'
+    }
+    if ($docfxConfig.build.globalMetadata._appLogoPath -ne 'images/odfkit-mark.svg') {
+        throw 'modern 導覽列缺少 OdfKit 標誌。'
     }
     if ($docfxConfig.build.globalMetadata._appFooter -notmatch [regex]::Escape('/OdfKit/index.html')) {
         throw 'modern footer 缺少語言選擇頁入口。'
@@ -209,6 +223,60 @@ try {
     dotnet docfx build api-docs/docfx.json --warningsAsErrors --maxParallelism 1 --output $siteDir
     if ($LASTEXITCODE) { throw 'DocFX build 失敗。' }
 
+    # 同一儲存庫且已發布的文件必須留在靜態網站內，避免導覽跳回 GitHub 原始 Markdown。
+    $publishedRepoPaths = [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::OrdinalIgnoreCase)
+    Get-ChildItem docs -Recurse -File | ForEach-Object {
+        $repoPath = [IO.Path]::GetRelativePath($root, $_.FullName).Replace('\', '/')
+        $docsPath = [IO.Path]::GetRelativePath((Join-Path $root 'docs'), $_.FullName).Replace('\', '/')
+        if ($_.Extension -eq '.md') {
+            $publishedRepoPaths[$repoPath] = 'project-docs/' + [IO.Path]::ChangeExtension($docsPath, '.html')
+        }
+        elseif ($_.Extension -eq '.json') {
+            $publishedRepoPaths[$repoPath] = 'project-docs/' + $docsPath
+        }
+        elseif ($_.Name -eq 'toc.yml') {
+            $publishedRepoPaths[$repoPath] = 'project-docs/' + [IO.Path]::ChangeExtension($docsPath, '.html')
+        }
+    }
+    $repositoryContentFiles = @(
+        'README.md',
+        'CHANGELOG.md',
+        'THIRD-PARTY-NOTICES.md',
+        'AGENTS.md',
+        'eng/README.md',
+        'eng/historical-refactor/README.md',
+        'samples/README.md',
+        'samples/WebFonts.AspNetCore/README.md',
+        'samples/WebFonts.WebForms/README.md',
+        'tools/README.md',
+        'OdfKit/PublicAPI/README.md',
+        'OdfKit/Compliance/i18n/README.md'
+    )
+    foreach ($repoPath in $repositoryContentFiles) {
+        $publishedRepoPaths[$repoPath] = 'project-docs/' + [IO.Path]::ChangeExtension($repoPath, '.html')
+    }
+    $rewrittenRepositoryLinks = 0
+    Get-ChildItem $siteDir -Recurse -Filter *.html | ForEach-Object {
+        $page = $_
+        $html = [IO.File]::ReadAllText($page.FullName)
+        $rewritten = [regex]::Replace(
+            $html,
+            'https://github\.com/rubujo/OdfKit/blob/main/([^"?#]+)((?:[?#][^"\s]*)?)',
+            {
+                param($match)
+                $repoPath = [Uri]::UnescapeDataString($match.Groups[1].Value)
+                if (-not $publishedRepoPaths.ContainsKey($repoPath)) { return $match.Value }
+                $target = Join-Path $siteDir $publishedRepoPaths[$repoPath]
+                $relative = [IO.Path]::GetRelativePath($page.DirectoryName, $target).Replace('\', '/')
+                $script:rewrittenRepositoryLinks++
+                return $relative + $match.Groups[2].Value
+            },
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase,
+            [TimeSpan]::FromSeconds(5))
+        if ($rewritten -ne $html) { [IO.File]::WriteAllText($page.FullName, $rewritten) }
+    }
+    Write-Host "已將 $rewrittenRepositoryLinks 條同一儲存庫文件連結改為站內靜態資源。"
+
     # 404 頁面後處理：GitHub Pages 會在任意深度的缺失路徑下回傳 404.html 內容，
     # 模板的相對資源與導覽連結在深層路徑會失效，必須注入 <base> 使其一律以站台根解析；
     # 404 頁也不得進入 sitemap，避免搜尋引擎索引錯誤頁。
@@ -229,15 +297,20 @@ try {
     Write-Host 'PASS：404.html 已注入 <base> 並自 sitemap 移除。'
 
     # 站內連結健檢：掃描全站 HTML 的相對 href／src，任何指向不存在檔案的連結都視為失敗。
-    # Pages 不得以內部連結直接公開 Markdown；次級 repo 文件必須連到 GitHub 渲染頁。
+    # Pages 不得直接連到 Markdown；已發布的同一儲存庫文件也不得繞回 GitHub blob 頁面。
     $broken = [System.Collections.Generic.List[string]]::new()
     $rawMarkdownLinks = [System.Collections.Generic.List[string]]::new()
+    $repositoryMarkdownLinks = [System.Collections.Generic.List[string]]::new()
     $checkedLinks = 0
     Get-ChildItem $siteDir -Recurse -Filter *.html | ForEach-Object {
         $page = $_
         $html = [IO.File]::ReadAllText($page.FullName)
         foreach ($m in [regex]::Matches($html, '(?:href|src)="([^"#]+?)(?:#[^"]*)?"')) {
             $url = $m.Groups[1].Value
+            if ($url -match '^https://github\.com/rubujo/OdfKit/blob/main/[^"?#]+\.md(?:$|[?#])') {
+                $repositoryMarkdownLinks.Add("$($page.FullName.Substring($siteDir.Length + 1)) -> $url")
+                continue
+            }
             if ($url -eq '' -or $url -match '^(https?:|mailto:|javascript:|data:)') { continue }
             if ($url -match '(?i)\.md(?:$|[?#])') {
                 $rawMarkdownLinks.Add("$($page.FullName.Substring($siteDir.Length + 1)) -> $url")
@@ -261,6 +334,10 @@ try {
         $rawMarkdownLinks | Select-Object -First 20 | ForEach-Object { Write-Host "  原始 Markdown：$_" }
         throw "網站仍有 $($rawMarkdownLinks.Count) 條內部連結直接指向 Markdown。"
     }
+    if ($repositoryMarkdownLinks.Count) {
+        $repositoryMarkdownLinks | Select-Object -First 20 | ForEach-Object { Write-Host "  儲存庫 Markdown：$_" }
+        throw "網站仍有 $($repositoryMarkdownLinks.Count) 條連結繞回同一儲存庫的 Markdown。"
+    }
     if ($broken.Count) {
         $broken | Select-Object -First 20 | ForEach-Object { Write-Host "  失效：$_" }
         throw "站內連結健檢失敗：$($broken.Count) 條連結指向不存在的檔案（共檢查 $checkedLinks 條）。"
@@ -273,6 +350,11 @@ try {
         'project-docs/ip-compliance.html',
         'project-docs/security-limits.html',
         'project-docs/evidence-index.html',
+        'project-docs/index.html',
+        'project-docs/migration-high-level-api.html',
+        'project-docs/provenance/semantic-api-clean-room.html',
+        'project-docs/reference/semantic-facades.html',
+        'project-docs/claims.json',
         'project-docs/webfont-managed-architecture.html',
         'project-docs/webfont-evidence-matrix.html',
         'project-docs/webfont-ift-tracking.html',
@@ -286,25 +368,38 @@ try {
     foreach ($requiredOutput in $requiredOutputs) {
         if (-not (Test-Path (Join-Path $siteDir $requiredOutput))) { throw "API 網站缺少必要輸出：$requiredOutput。" }
     }
-    $allowedProjectDocs = @(
-        'THIRD-PARTY-NOTICES.html',
-        'evidence-index.html',
-        'ip-compliance.html',
-        'security-limits.html',
-        'webfont-managed-clean-room.html',
-        'webfont-managed-architecture.html',
-        'webfont-evidence-matrix.html',
-        'webfont-ift-tracking.html',
-        'webfonts.html'
-    )
+    $allowedProjectDocs = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    Get-ChildItem docs -Recurse -File | ForEach-Object {
+        $relative = [IO.Path]::GetRelativePath((Join-Path $root 'docs'), $_.FullName).Replace('\', '/')
+        if ($_.Extension -eq '.md' -or $_.Name -eq 'toc.yml') {
+            [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($relative, '.html'))
+        }
+        elseif ($_.Extension -eq '.json') {
+            [void]$allowedProjectDocs.Add($relative)
+        }
+    }
+    [void]$allowedProjectDocs.Add('THIRD-PARTY-NOTICES.html')
+    [void]$allowedProjectDocs.Add('toc.json')
+    foreach ($repoPath in $repositoryContentFiles) {
+        [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($repoPath, '.html'))
+    }
+    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/scripts/PdfVisualDiff.py', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
+        [void]$allowedProjectDocs.Add($repoPath)
+    }
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'
     $unexpectedProjectDocs = @(
         Get-ChildItem $projectDocsDirectory -Recurse -File |
-            Where-Object { $_.Name -notin $allowedProjectDocs }
+            Where-Object {
+                $relative = [IO.Path]::GetRelativePath($projectDocsDirectory, $_.FullName).Replace('\', '/')
+                -not $allowedProjectDocs.Contains($relative)
+            }
     )
     if ($unexpectedProjectDocs.Count) {
         $unexpectedProjectDocs | ForEach-Object { Write-Host "  未核准資源：$($_.FullName.Substring($siteDir.Length + 1))" }
-        throw 'project-docs 只能發布核准的權威 HTML 頁面。'
+        throw 'project-docs 含有未對應至 docs 來源的輸出。'
+    }
+    foreach ($asset in @('public/main.css', 'images/odfkit-mark.svg')) {
+        if (-not (Test-Path (Join-Path $siteDir $asset))) { throw "API 網站缺少自訂外觀資源：$asset。" }
     }
     $unresolvedXrefs = [System.Collections.Generic.List[string]]::new()
     Get-ChildItem $siteDir -Recurse -File |

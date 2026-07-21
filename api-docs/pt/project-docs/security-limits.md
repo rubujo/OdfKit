@@ -2,7 +2,7 @@
 title: Limites de segurança do carregamento e dos leitores de fluxo
 _lang: pt
 translation_source: docs/security-limits.md
-translation_source_sha256: 09dde6295ea4e123b22dc50b79cabbc8414b1d52ac41e3b1cc8811774341ac95
+translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
 ---
 
 # Limites de segurança do carregamento e dos leitores de fluxo
@@ -24,7 +24,7 @@ texto dos nós, descompressão ZIP e leitor XML. Baixa residência não elimina 
 | Entrada bruta não pesquisável | 1 GiB | Limita o buffer antes da expansão ZIP |
 | Caracteres num documento XML | 64 MiB | Limita a análise XML e a criação do DOM |
 
-Os quatro limites ZIP têm de ser positivos; zero ou valores negativos geram imediatamente `ArgumentOutOfRangeException`. Apenas `MaxXmlCharactersInDocument = 0` desativa o limite XML. Todos os leitores XML devem proibir DTD e resolvers externos. Novos caminhos devem reutilizar `OdfLoadOptions`; para políticas de conteúdo use `OdfPackageValidator`, `SanitizeMacros`, validação de assinaturas ou `pwsh eng/Test-OdfPolicy.ps1`.
+Os quatro limites ZIP têm de ser positivos; zero ou valores negativos geram imediatamente `ArgumentOutOfRangeException`. Apenas `MaxXmlCharactersInDocument = 0` desativa o limite XML. Todos os leitores XML devem proibir DTD e resolvers externos. Novos caminhos devem reutilizar `OdfLoadOptions`. Os caminhos de validação de pacotes e Flat XML (`OdfPackageValidator`, `OdfFlatDocumentValidator` e análise das regras de perfil) também aplicam `MaxXmlCharactersInDocument`: a validação de pacotes usa `package.LoadOptions`, enquanto a validação Flat usa `OdfValidationOptions.LoadOptions` (a predefinição de 64 MiB de `OdfLoadOptions` quando omitida). Assinaturas, carimbos de data e hora, dados de revogação de certificados e respostas de rede externas têm limites próprios mais pequenos; o limite do pacote principal não os substitui. Para políticas de conteúdo use `OdfPackageValidator`, `SanitizeMacros`, validação de assinaturas ou `pwsh eng/Test-OdfPolicy.ps1`.
 
 ## Limites dos leitores de fluxo
 
