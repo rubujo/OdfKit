@@ -37,7 +37,9 @@ Invoke-RestMethod `
 
 頁面可載入 `wwwroot/webfont-autosubset.js`，它會以 grapheme cluster 掃描並去重 Plane 2
 難字，略過「一二三丨ㄩ幹」等一般字；IVS、ZWJ、combining mark 與區域指示符號不會被拆開。
-它也會監看後續 DOM 與 open shadow root、按 scalar 數與 UTF-8 bytes 分批，失敗後可重試；可用
+它也會監看後續 DOM、可見表單值與 open shadow root、按 scalar 數與 UTF-8 bytes 分批，並以
+`maximumConcurrentRoutes`（預設 2）限制來源平行數；重疊 route 會交由各來源的實際 `cmap`
+做最後判定，失敗後可重試。可用
 `data-odf-ignore` 排除不應送出的文字。應用程式必須提供
 `window.odfKitRequestWebFonts(route, sequences)`，由已驗證的同源後端代送要求；不得把上述 API
 key 暴露給瀏覽器。即使呼叫端錯送混排或純一般字，Handler 也會按來源字型 `cmap` 再篩選；無

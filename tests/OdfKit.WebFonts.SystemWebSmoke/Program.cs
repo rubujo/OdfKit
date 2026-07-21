@@ -114,12 +114,12 @@ try
     var classifiedHandler = new OdfWebFontDynamicHandler(new ClassifiedFailureSmokeEngine(), options);
     foreach ((string scenario, int expectedStatus) in new[]
     {
-        ("argument", 400),
+        ("argument", 204),
         ("unsupported", 422),
         ("invalid-data", 500),
         ("io", 503),
         ("invalid-operation", 500),
-        ("timeout", 503),
+        ("timeout", 499),
         ("unexpected", 500)
     })
     {
@@ -195,6 +195,35 @@ try
         normalOnlyContext.Response.StatusCode == expectedNormalOnlyStatus,
         $"System.Web normal-only request returned {normalOnlyContext.Response.StatusCode}, expected {expectedNormalOnlyStatus}.");
     RequireNoStore(normalOnly, "normal-only generation response");
+    Directory.Delete(root, recursive: true);
+    Directory.CreateDirectory(root);
+
+    string largeMixed = string.Concat(
+        Enumerable.Range(0, 4080).Select(index => char.ConvertFromUtf32(0x20000 + index)))
+        + "一二三丨ㄩ幹";
+    string largeJson = JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+    {
+        FontSourceId = "smoke-source",
+        FaceIndex = 0,
+        ProfileId = "smoke-profile@1",
+        FontFamily = "OdfKit SystemWeb Smoke",
+        Sequences = new[] { largeMixed },
+        Formats = new[]
+        {
+            WebFontFormat.Woff,
+            usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType
+        }
+    });
+    var largeRequest = new RecordingWorkerRequest(
+        "POST",
+        "/_odf-fonts/generate",
+        largeJson,
+        options.ApiKey);
+    var largeContext = new HttpContext(largeRequest);
+    handler.ProcessRequest(largeContext);
+    largeContext.Response.Flush();
+    Require(largeContext.Response.StatusCode == 200, "System.Web 4,080-scalar mixed request failed.");
+    RequireNoStore(largeRequest, "4,080-scalar mixed generation response");
     Directory.Delete(root, recursive: true);
     Directory.CreateDirectory(root);
 

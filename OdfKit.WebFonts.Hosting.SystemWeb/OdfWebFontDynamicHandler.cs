@@ -226,7 +226,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         }
         catch (ArgumentException)
         {
-            response.StatusCode = 400;
+            // 要求形狀已驗證完成；有效要求在自訂引擎中找不到 glyph 時視為無內容。
+            response.StatusCode = 204;
         }
         catch (NotSupportedException)
         {
@@ -236,8 +237,11 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         {
             response.StatusCode = 500;
         }
+        catch (OperationCanceledException)
+        {
+            response.StatusCode = 499;
+        }
         catch (Exception exception) when (exception is IOException
-                                          or OperationCanceledException
                                           or UnauthorizedAccessException
                                           or CryptographicException
                                           or SecurityException)

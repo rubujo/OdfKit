@@ -77,6 +77,22 @@ public sealed class WebFontWorkerOptions
     public TimeSpan DurableManifestMaxIdle { get; set; } = TimeSpan.FromDays(30);
 
     /// <summary>
+    /// Gets or sets the soft byte budget for generated assets managed by the durable cache.
+    /// 取得或設定耐久快取所管理產生資產的軟性位元組預算。
+    /// </summary>
+    /// <remarks>
+    /// Assets still referenced by retained manifests are never removed. The budget may be exceeded temporarily while all unreferenced assets are younger than <see cref="DurableAssetMaxIdle"/>.
+    /// 仍由保留 manifest 參照的資產絕不移除；所有未參照資產都比 <see cref="DurableAssetMaxIdle"/> 新時，可能暫時超出預算。
+    /// </remarks>
+    public long MaxDurableAssetBytes { get; set; } = 2L * 1024 * 1024 * 1024;
+
+    /// <summary>
+    /// Gets or sets the minimum idle age before an unreferenced generated asset may be removed.
+    /// 取得或設定未參照產生資產可移除前的最短閒置時間。
+    /// </summary>
+    public TimeSpan DurableAssetMaxIdle { get; set; } = TimeSpan.FromDays(30);
+
+    /// <summary>
     /// Gets or sets the delay between attempts to acquire a cross-process generation lease.
     /// 取得或設定嘗試取得跨處理程序產生 lease 的間隔。
     /// </summary>

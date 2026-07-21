@@ -106,6 +106,40 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
+    /// 驗證增補平面基底字與 IVS selector 不會被拆到不同字型片段。
+    /// </summary>
+    [Fact]
+    public void SegmentText_WithSupplementaryIvs_PreservesClusterAndUsesBaseFontRoute()
+    {
+        const string ivs = "𠆩󠄀";
+
+        IReadOnlyList<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
+            $"前{ivs}後",
+            "TW-Song-98_1");
+
+        Assert.Equal(3, segments.Count);
+        Assert.Equal(ivs, segments[1].Text);
+        Assert.Equal("TW-Song-Ext-B-98_1", segments[1].FontName);
+    }
+
+    /// <summary>
+    /// 驗證增補平面基底字與組合記號維持在同一字型片段。
+    /// </summary>
+    [Fact]
+    public void SegmentText_WithSupplementaryCombiningSequence_PreservesCluster()
+    {
+        const string cluster = "𠆩\u0301";
+
+        IReadOnlyList<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
+            cluster,
+            "TW-Kai-98_1");
+
+        (string text, string fontName) = Assert.Single(segments);
+        Assert.Equal(cluster, text);
+        Assert.Equal("TW-Kai-Ext-B-98_1", fontName);
+    }
+
+    /// <summary>
     /// 驗證未註冊自訂規則時，內建規則不處理的增補平面維持基礎字型，Plane 16 則維持既有的 PUA 遞補行為。
     /// </summary>
     [Theory]

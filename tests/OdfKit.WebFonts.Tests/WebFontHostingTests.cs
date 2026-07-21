@@ -589,12 +589,29 @@ public sealed class WebFontHostingTests
                     Formats = template.Formats
                 },
                 TestContext.Current.CancellationToken);
+            string largeMixed = string.Concat(
+                Enumerable.Range(0, 4080).Select(index => char.ConvertFromUtf32(0x20000 + index)))
+                + "一二三丨ㄩ幹";
+            using HttpResponseMessage large = await client.PostAsJsonAsync(
+                "/_odf-fonts/generate",
+                new OdfWebFontGenerationRequest
+                {
+                    FontSourceId = template.FontSourceId,
+                    FaceIndex = template.FaceIndex,
+                    ProfileId = template.ProfileId,
+                    FontFamily = template.FontFamily,
+                    Sequences = [largeMixed],
+                    Formats = template.Formats
+                },
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.NoContent, normalOnly.StatusCode);
             Assert.True(normalOnly.Headers.CacheControl is { NoStore: true, NoCache: true });
             Assert.Equal(HttpStatusCode.OK, mixed.StatusCode);
-            Assert.Equal(1, engine.CallCount);
-            Assert.Equal("𪚥𩙡𦚡𨏿𠆩𡘙𡌂𠀀", Assert.Single(engine.GeneratedSequences));
+            Assert.Equal(HttpStatusCode.OK, large.StatusCode);
+            Assert.Equal(2, engine.CallCount);
+            Assert.Equal("𪚥𩙡𦚡𨏿𠆩𡘙𡌂𠀀", engine.GeneratedSequences[0]);
+            Assert.Equal(4080, engine.GeneratedSequences[1].EnumerateRunes().Count());
 
             await application.StopAsync(TestContext.Current.CancellationToken);
         }
@@ -666,7 +683,7 @@ public sealed class WebFontHostingTests
             using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
             client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
 
-            await AssertStatusAsync(client, "argument", HttpStatusCode.BadRequest);
+            await AssertStatusAsync(client, "argument", HttpStatusCode.NoContent);
             await AssertStatusAsync(client, "unsupported", HttpStatusCode.UnprocessableEntity);
             await AssertStatusAsync(client, "invalid-data", HttpStatusCode.InternalServerError);
             await AssertStatusAsync(client, "io", HttpStatusCode.ServiceUnavailable);
@@ -1041,7 +1058,9 @@ public sealed class WebFontHostingTests
             CancellationToken cancellationToken = default)
         {
             Interlocked.Increment(ref _callCount);
-            GeneratedSequences = request.Sequences.Select(sequence => sequence.Text).ToArray();
+            GeneratedSequences = GeneratedSequences
+                .Concat(request.Sequences.Select(sequence => sequence.Text))
+                .ToArray();
             byte[] bytes = "wOF2-mixed-text-generation"u8.ToArray();
             string sha256 = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
             const string fileName = "mixed.woff2";

@@ -17,6 +17,13 @@ async function verifyHelper(modulePath) {
     assert.deepEqual(partitioned[0].clusters, [ivs, "𠆩"]);
     const coverageRoute = { fontSourceId: "custom", matches: cluster => cluster === "幹" };
     assert.deepEqual(helper.partition("一幹", [coverageRoute])[0].clusters, ["幹"]);
+    const overlapping = helper.partition("𠆩", [route, route]);
+    assert.equal(overlapping.length, 2);
+    assert.deepEqual(overlapping.map(group => group.text), ["𠆩", "𠆩"]);
+    assert.deepEqual(helper.partition("\uD800𠆩", [
+        { fontSourceId: "invalid", minimum: 0xD800, maximum: 0xDFFF },
+        route
+    ]).map(group => group.text), ["𠆩"]);
 
     const clusters = Array.from({ length: 1200 }, (_, index) =>
         String.fromCodePoint(0x20000 + index));

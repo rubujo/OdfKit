@@ -331,17 +331,33 @@ hash。範例設定見
 不建立空資產，也不以 400／503 表示一般字型 fallback。非法 JSON、未允許的來源／格式仍回 400；
 佇列或速率限制回 429；503 僅保留給暫時性基礎設施失敗。所有動態回應仍禁止快取。
 
+ODF 匯出端若有多個來源，應使用
+`OdfWebFontRequirementCollector.CollectSupportedAsync`，依路由順序與每個來源的實際 `cmap`
+將不重複的 extended grapheme cluster 分配成多個 request；先命中的來源取得該 cluster，所有來源
+皆不支援的文字維持預設字型。舊有 `Collect` 是不判斷來源覆蓋的低階中性收集器，不應把它的結果
+直接送入只接受單一分片字型的引擎。分段遵循 [Unicode UAX #29](https://unicode.org/reports/tr29/)，
+IVS 則依 [OpenType 1.9.1 `cmap` format 14](https://learn.microsoft.com/en-us/typography/opentype/spec/cmap)
+同時檢查基底字與 variation sequence。
+
 產出的每個 `@font-face` 必須帶精確 `unicode-range`。頁面 CSS 將預設字型排在前面，WebFont
 只補上預設字型缺少的難字；瀏覽器依 CSS Fonts 字型比對規則選擇 face，無需把一般字重做成
 WebFont。
+
+同一 grapheme cluster 的基底字、combining mark、variation selector 與 ZWJ 不得拆到不同
+ODF span 或不同 request。這與 [CSS Fonts 4 cluster matching](https://www.w3.org/TR/css-fonts-4/#cluster-matching)
+要求瀏覽器優先尋找完整支援 cluster 的單一字型一致。瀏覽器 helper 在 `Intl.Segmenter` 可用時使用
+其 grapheme 模式，並在舊環境保留 IVS、combining mark、emoji modifier、ZWJ 與區域指示符號的
+保守 fallback。
 
 要求標頭必須包含 `X-OdfKit-WebFont-Key`。成功回傳 manifest，公開頁面只 GET
 `/{sha256}/{fileName}`；資產會重新驗證 SHA-256、大小與副檔名，再以 immutable cache 與 ETag
 傳送。Handler 重啟後仍可安全讀取內容定址產物，不依賴 process-local registry。
 ASP.NET Core 節點若共用同一個受信任資產目錄，可由 hash URL 重新驗證並發現另一節點已產生的
 資產；這只解決公開讀取，不取代跨節點 generation lease 或 fencing。durable manifest cache 另以
-條目數、總 bytes 與閒置時間進行 LRU 清理；內容定址字型本體仍應由共用儲存體或 CDN 的生命週期
-政策管理，不能在要求路徑任意刪除。
+條目數、總 bytes 與閒置時間進行 LRU 清理。Worker 只會在跨處理程序 cleanup lease 內移除超出
+`MaxDurableAssetBytes` 軟性預算、未受任何保留 manifest 參照且早於 `DurableAssetMaxIdle` 的資產；
+仍被參照或可能仍在 CDN 回源安全期內的檔案不會刪除。共用 object store 仍須另設生命週期與租戶
+配額，不能把單機檔案清理宣稱為分散式容量治理。
 動態 POST 產生的成功與錯誤回應使用 `Cache-Control: no-store, no-cache`；manifest、CSS 與字型
 資產皆明確支援 GET／HEAD。System.Web 與 ASP.NET Core 會以實際傳輸 bytes 的 SHA-256 作為
 ETag，收到相符的 `If-None-Match` 時回傳無本文的 304。讀取 CSS 時會拒絕無效 UTF-8，而不是

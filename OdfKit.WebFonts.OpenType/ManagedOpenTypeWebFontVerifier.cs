@@ -101,7 +101,9 @@ public static class ManagedOpenTypeWebFontVerifier
         }
 
         SfntFont parsed = Parse(font, format, maximumBytes, cancellationToken);
-        foreach (int scalar in unicodeScalars.Distinct())
+        foreach (int scalar in unicodeScalars
+                     .Where(WebFontUnicodePolicy.RequiresStandaloneGlyph)
+                     .Distinct())
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!parsed.ContainsUnicodeScalar(scalar))
@@ -230,9 +232,7 @@ public static class ManagedOpenTypeWebFontVerifier
     }
 
     private static bool RequiresGlyph(int scalar)
-        => scalar != 0xFEFF
-            && scalar is not (>= 0x0000 and <= 0x001F)
-            && scalar is not (>= 0x007F and <= 0x009F);
+        => WebFontUnicodePolicy.RequiresStandaloneGlyph(scalar);
 
     private static SfntFont Parse(
         Stream font,

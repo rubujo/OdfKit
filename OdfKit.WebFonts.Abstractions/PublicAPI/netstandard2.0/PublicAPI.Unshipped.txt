@@ -72,4 +72,6 @@ OdfKit.WebFonts.WebFontSubsetRequest.WebFontSubsetRequest() -> void
 OdfKit.WebFonts.WebFontTextSequence
 OdfKit.WebFonts.WebFontTextSequence.Text.get -> string!
 OdfKit.WebFonts.WebFontTextSequence.UnicodeScalars.get -> System.Collections.Generic.IReadOnlyList<int>!
+OdfKit.WebFonts.WebFontUnicodePolicy
 static OdfKit.WebFonts.WebFontTextSequence.Create(string! text) -> OdfKit.WebFonts.WebFontTextSequence!
+static OdfKit.WebFonts.WebFontUnicodePolicy.RequiresStandaloneGlyph(int scalar) -> bool

@@ -1,5 +1,14 @@
 ﻿#nullable enable
 OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.Face.get -> OdfKit.WebFonts.WebFontFaceIdentity!
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.FontFamily.get -> string!
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.Formats.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>!
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.OdfWebFontSourceRoute(OdfKit.WebFonts.WebFontFaceIdentity! face, string! profileId, string! fontFamily, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>! formats) -> void
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.OdfWebFontSourceRoute(OdfKit.WebFonts.WebFontFaceIdentity! face, string! profileId, string! fontFamily, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>! formats, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>! requiredBrowserTargets) -> void
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.ProfileId.get -> string!
+OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute.RequiredBrowserTargets.get -> System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>!
 static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.AddStylesheetLink(string! html, string! stylesheetUrl) -> string!
 static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.Collect(OdfKit.Text.TextDocument! document, OdfKit.WebFonts.WebFontFaceIdentity! face, string! profileId, string! fontFamily, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>! formats) -> OdfKit.WebFonts.WebFontSubsetRequest!
 static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.Collect(OdfKit.Text.TextDocument! document, OdfKit.WebFonts.WebFontFaceIdentity! face, string! profileId, string! fontFamily, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontFormat>! formats, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontBrowserTarget>! requiredBrowserTargets) -> OdfKit.WebFonts.WebFontSubsetRequest!
+static OdfKit.Extensions.Html.WebFonts.OdfWebFontRequirementCollector.CollectSupportedAsync(OdfKit.Text.TextDocument! document, System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Html.WebFonts.OdfWebFontSourceRoute!>! routes, OdfKit.WebFonts.IWebFontTextCoverageFilter! coverageFilter, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontSubsetRequest!>!>!

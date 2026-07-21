@@ -101,7 +101,9 @@ internal sealed class OdfWebFontGenerationService
         }
         catch (ArgumentException)
         {
-            return Results.BadRequest();
+            // 要求形狀已於進入產字前驗證；此處的 ArgumentException 通常表示自訂引擎
+            // 無法處理所選 glyph。視為沒有可補上的字，不把字型 fallback 誤報為 400。
+            return Results.NoContent();
         }
         catch (NotSupportedException)
         {
@@ -115,6 +117,10 @@ internal sealed class OdfWebFontGenerationService
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+        catch (OperationCanceledException)
+        {
+            return Results.StatusCode(499);
         }
         catch (WebFontQueueFullException)
         {

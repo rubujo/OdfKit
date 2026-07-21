@@ -36,30 +36,7 @@ internal static class WebFontSequenceCoverage
     }
 
     internal static bool RequiresGlyph(int scalar)
-        => scalar != 0x0020
-            && scalar != 0x00A0
-            && scalar != 0x00AD
-            && scalar != 0x034F
-            && scalar != 0x061C
-            && scalar != 0x1680
-            && scalar != 0x2028
-            && scalar != 0x2029
-            && scalar != 0x202F
-            && scalar != 0x205F
-            && scalar != 0x3000
-            && scalar != 0xFEFF
-            && scalar is not (>= 0x180B and <= 0x180F)
-            && scalar is not (>= 0x2000 and <= 0x200A)
-            && scalar is not (>= 0x200B and <= 0x200F)
-            && scalar is not (>= 0x202A and <= 0x202E)
-            && scalar is not (>= 0x2060 and <= 0x206F)
-            && scalar is not (>= 0xFE00 and <= 0xFE0F)
-            && scalar is not (>= 0xFFF9 and <= 0xFFFB)
-            && scalar is not (>= 0x1BCA0 and <= 0x1BCAF)
-            && scalar is not (>= 0x1D173 and <= 0x1D17A)
-            && scalar is not (>= 0xE0000 and <= 0xE0FFF)
-            && scalar is not (>= 0x0000 and <= 0x001F)
-            && scalar is not (>= 0x007F and <= 0x009F);
+        => WebFontUnicodePolicy.RequiresStandaloneGlyph(scalar);
 
     private static bool IsSupportedCluster(
         WebFontTextSequence cluster,

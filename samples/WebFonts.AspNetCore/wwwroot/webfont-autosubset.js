@@ -2,7 +2,7 @@
     "use strict";
 
     const loaderScript = document.currentScript;
-    const ignoredParents = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA"]);
+    const ignoredParents = new Set(["SCRIPT", "STYLE", "NOSCRIPT"]);
     const segmenter = typeof Intl === "object" && typeof Intl.Segmenter === "function"
         ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
         : null;
@@ -46,6 +46,12 @@
         for (const element of elements) {
             if (element.shadowRoot && !isIgnoredElement(element, root)) {
                 text += collectText(element.shadowRoot);
+            }
+            if (!isIgnoredElement(element, root)
+                && (element.tagName === "INPUT" || element.tagName === "TEXTAREA")
+                && element.type !== "password"
+                && element.type !== "hidden") {
+                text += element.value || element.placeholder || "";
             }
         }
         return text;
@@ -100,12 +106,18 @@
         const groups = routes.map(route => ({ route, clusters: [], seen: new Set() }));
         for (const cluster of segmentText(text)) {
             const scalars = Array.from(cluster, character => character.codePointAt(0));
-            const index = routes.findIndex(route => typeof route.matches === "function"
-                ? route.matches(cluster, scalars)
-                : scalars.some(scalar => routeMatches(route, scalar)));
-            if (index >= 0 && !groups[index].seen.has(cluster)) {
-                groups[index].seen.add(cluster);
-                groups[index].clusters.push(cluster);
+            if (scalars.some(scalar => scalar >= 0xD800 && scalar <= 0xDFFF)) {
+                continue;
+            }
+            for (let index = 0; index < routes.length; index++) {
+                const route = routes[index];
+                const matches = typeof route.matches === "function"
+                    ? route.matches(cluster, scalars)
+                    : scalars.some(scalar => routeMatches(route, scalar));
+                if (matches && !groups[index].seen.has(cluster)) {
+                    groups[index].seen.add(cluster);
+                    groups[index].clusters.push(cluster);
+                }
             }
         }
         return groups
@@ -161,7 +173,16 @@
             return;
         }
         await Promise.all(manifest.assets.map(async asset => {
-            const key = `${asset.sha256}/${asset.fileName}`;
+            const key = [
+                asset.sha256,
+                asset.fileName,
+                asset.fontFamily,
+                route.fontDisplay ?? "swap",
+                route.fontStyle ?? "normal",
+                route.fontWeight ?? "normal",
+                route.fontStretch ?? "normal",
+                asset.unicodeRanges.join(",")
+            ].join("/");
             if (loadedFaces.has(key)) {
                 return;
             }
@@ -188,6 +209,7 @@
         const maximumScalars = options.maximumScalarsPerRequest ?? 512;
         const maximumTextBytes = options.maximumTextBytesPerRequest ?? 48 * 1024;
         const debounceMilliseconds = options.debounceMilliseconds ?? 100;
+        const maximumConcurrentRoutes = Math.max(1, options.maximumConcurrentRoutes ?? 2);
         let timer = 0;
         let active = Promise.resolve([]);
         let observer = null;
@@ -195,7 +217,10 @@
         async function scan() {
             const groups = partition(collectText(root), options.routes);
             const generated = [];
-            for (const group of groups) {
+            let nextGroup = 0;
+            async function processNextGroup() {
+                while (nextGroup < groups.length) {
+                    const group = groups[nextGroup++];
                 const routeIndex = options.routes.indexOf(group.route);
                 const unseen = group.clusters.filter(cluster =>
                     !completed.get(routeIndex).has(cluster) && !pending.get(routeIndex).has(cluster));
@@ -216,7 +241,11 @@
                 } finally {
                     unseen.forEach(cluster => pending.get(routeIndex).delete(cluster));
                 }
+                }
             }
+            await Promise.all(Array.from(
+                { length: Math.min(maximumConcurrentRoutes, groups.length) },
+                processNextGroup));
             return generated;
         }
 
@@ -239,17 +268,29 @@
                 schedule();
             });
             observeOpenShadowRoots(root, observer);
+            root.addEventListener?.("input", schedule, true);
+            root.addEventListener?.("change", schedule, true);
         }
 
         return {
             scan: () => active = active.catch(() => []).then(scan),
             observe,
-            disconnect: () => observer?.disconnect()
+            disconnect: () => {
+                observer?.disconnect();
+                root.removeEventListener?.("input", schedule, true);
+                root.removeEventListener?.("change", schedule, true);
+            }
         };
     }
 
     function observeOpenShadowRoots(root, observer) {
-        observer.observe(root, { childList: true, characterData: true, subtree: true });
+        observer.observe(root, {
+            attributes: true,
+            attributeFilter: ["data-odf-ignore", "placeholder", "value"],
+            childList: true,
+            characterData: true,
+            subtree: true
+        });
         const elements = root.querySelectorAll?.("*") ?? [];
         for (const element of elements) {
             if (element.shadowRoot && !isIgnoredElement(element, root)) {

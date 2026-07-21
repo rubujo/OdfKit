@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -406,28 +407,13 @@ public sealed class OdfFontContext
         if (string.IsNullOrEmpty(text))
             return result;
 
-        int i = 0;
-        int len = text.Length;
         var sb = new StringBuilder();
         string currentFont = defaultFontName;
         string?[]? planeFontCache = null;
 
-        while (i < len)
+        foreach (string cluster in EnumerateTextClusters(text))
         {
-            int codePoint;
-            int charCount;
-            if (char.IsHighSurrogate(text[i]) && i + 1 < len && char.IsLowSurrogate(text[i + 1]))
-            {
-                codePoint = char.ConvertToUtf32(text[i], text[i + 1]);
-                charCount = 2;
-            }
-            else
-            {
-                codePoint = text[i];
-                charCount = 1;
-            }
-
-            int plane = codePoint >> 16;
+            int plane = GetClusterBasePlane(cluster);
             string targetFont = defaultFontName;
 
             if (plane >= 1)
@@ -449,17 +435,7 @@ public sealed class OdfFontContext
                 currentFont = targetFont;
             }
 
-            if (charCount == 2)
-            {
-                sb.Append(text[i]);
-                sb.Append(text[i + 1]);
-            }
-            else
-            {
-                sb.Append(text[i]);
-            }
-
-            i += charCount;
+            sb.Append(cluster);
         }
 
         if (sb.Length > 0)
@@ -469,6 +445,131 @@ public sealed class OdfFontContext
 
         return result;
     }
+
+    private static IEnumerable<string> EnumerateTextClusters(string text)
+    {
+        TextElementEnumerator elements = StringInfo.GetTextElementEnumerator(text);
+        string? current = null;
+        while (elements.MoveNext())
+        {
+            string next = elements.GetTextElement();
+            if (current is null)
+            {
+                current = next;
+                continue;
+            }
+
+            if (ShouldCoalesceTextElements(current, next))
+            {
+                current = string.Concat(current, next);
+                continue;
+            }
+
+            yield return current;
+            current = next;
+        }
+
+        if (current is not null)
+        {
+            yield return current;
+        }
+    }
+
+    private static bool ShouldCoalesceTextElements(string current, string next)
+    {
+        int first = ReadCodePoint(next, 0, out _);
+        int lastIndex = current.Length - 1;
+        if (char.IsLowSurrogate(current[lastIndex])
+            && lastIndex > 0
+            && char.IsHighSurrogate(current[lastIndex - 1]))
+        {
+            lastIndex--;
+        }
+
+        int last = ReadCodePoint(current, lastIndex, out _);
+        UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(next, 0);
+        if (IsVariationSelector(first)
+            || first == 0x200D
+            || last == 0x200D
+            || first is >= 0x1F3FB and <= 0x1F3FF
+            || first is >= 0xE0020 and <= 0xE007F
+            || category is UnicodeCategory.NonSpacingMark
+                or UnicodeCategory.SpacingCombiningMark
+                or UnicodeCategory.EnclosingMark)
+        {
+            return true;
+        }
+
+        return first is >= 0x1F1E6 and <= 0x1F1FF
+            && CountTrailingRegionalIndicators(current) % 2 == 1;
+    }
+
+    private static int CountTrailingRegionalIndicators(string text)
+    {
+        int count = 0;
+        for (int index = text.Length - 1; index >= 0;)
+        {
+            int scalarIndex = index;
+            if (char.IsLowSurrogate(text[index])
+                && index > 0
+                && char.IsHighSurrogate(text[index - 1]))
+            {
+                scalarIndex--;
+            }
+
+            int scalar = ReadCodePoint(text, scalarIndex, out _);
+            if (scalar is not (>= 0x1F1E6 and <= 0x1F1FF))
+            {
+                break;
+            }
+
+            count++;
+            index = scalarIndex - 1;
+        }
+
+        return count;
+    }
+
+    private static int GetClusterBasePlane(string cluster)
+    {
+        for (int index = 0; index < cluster.Length;)
+        {
+            int scalar = ReadCodePoint(cluster, index, out int length);
+            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(cluster, index);
+            if (!IsVariationSelector(scalar)
+                && scalar != 0x200C
+                && scalar != 0x200D
+                && scalar is not (>= 0xE0020 and <= 0xE007F)
+                && category is not (UnicodeCategory.NonSpacingMark
+                    or UnicodeCategory.SpacingCombiningMark
+                    or UnicodeCategory.EnclosingMark
+                    or UnicodeCategory.Format))
+            {
+                return scalar >> 16;
+            }
+
+            index += length;
+        }
+
+        return 0;
+    }
+
+    private static int ReadCodePoint(string text, int index, out int length)
+    {
+        if (char.IsHighSurrogate(text[index])
+            && index + 1 < text.Length
+            && char.IsLowSurrogate(text[index + 1]))
+        {
+            length = 2;
+            return char.ConvertToUtf32(text[index], text[index + 1]);
+        }
+
+        length = 1;
+        return text[index];
+    }
+
+    private static bool IsVariationSelector(int scalar)
+        => scalar is >= 0xFE00 and <= 0xFE0F or >= 0xE0100 and <= 0xE01EF;
 
     /// <summary>
     /// Gets the font name for a base font family and Unicode plane.

@@ -20,7 +20,8 @@ manifest hash 與 CDN 實際內容不一致。
 
 `webfont-autosubset.js` 會以 grapheme cluster 掃描頁面並只收集 Plane 2 難字，一般字維持頁面
 預設字型；IVS、ZWJ、combining mark 與區域指示符號不會被拆開。它會監看後續 DOM 與 open
-shadow root、分批要求並允許失敗後重試；可用 `data-odf-ignore` 排除不應送出的文字。應用程式須
+shadow root 與可見表單值、分批要求，並以 `maximumConcurrentRoutes`（預設 2）限制來源平行數；
+重疊 route 交由各來源的實際 `cmap` 判定且失敗後可重試。可用 `data-odf-ignore` 排除不應送出的文字。應用程式須
 以既有登入身分在受信任後端實作
 `window.odfKitRequestWebFonts(route, sequences)`；API key 不得進入瀏覽器。Handler 仍會依來源
 字型 `cmap` 做第二次篩選，因此惡意或錯誤送入的混排文字不會拖垮服務；該來源沒有任何可用

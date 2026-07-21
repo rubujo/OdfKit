@@ -608,6 +608,39 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
+    public async Task Worker_DurableCacheUsesSharedPolicyForIvsJoinersAndSpaces()
+    {
+        string root = CreateTemporaryRoot();
+        try
+        {
+            string assets = Path.Combine(root, "assets");
+            var engine = new AssetWritingEngine();
+            var options = new WebFontWorkerOptions
+            {
+                DurableCacheDirectory = Path.Combine(root, "cache")
+            };
+            WebFontSubsetRequest request = CreateRequest();
+            request = new WebFontSubsetRequest
+            {
+                Face = request.Face,
+                ProfileId = request.ProfileId,
+                FontFamily = request.FontFamily,
+                Sequences = [WebFontTextSequence.Create("𠆩󠄀 👨‍👩‍👧")],
+                Formats = request.Formats
+            };
+
+            _ = await GenerateAndDisposeAsync(engine, options, request, assets);
+            _ = await GenerateAndDisposeAsync(engine, options, request, assets);
+
+            Assert.Equal(1, engine.CallCount);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Worker_DurableCachePrunesLeastRecentlyUsedManifests()
     {
         string root = CreateTemporaryRoot();
@@ -638,6 +671,49 @@ public sealed class WebFontWorkerTests
                 TestContext.Current.CancellationToken);
             Assert.Equal(3, engine.CallCount);
             Assert.Single(Directory.EnumerateFiles(cache, "*.json"));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task Worker_DurableCachePrunesOldUnreferencedAssetsWithinBudget()
+    {
+        string root = CreateTemporaryRoot();
+        try
+        {
+            string assets = Path.Combine(root, "assets");
+            var engine = new AssetWritingEngine();
+            var options = new WebFontWorkerOptions
+            {
+                DurableCacheDirectory = Path.Combine(root, "cache"),
+                MaxDurableManifestEntries = 1,
+                MaxCachedAssetBytes = 8,
+                MaxDurableAssetBytes = 8,
+                DurableAssetMaxIdle = TimeSpan.FromMilliseconds(1)
+            };
+            WebFontSubsetRequest firstRequest = CreateRequest();
+            WebFontManifest first = await GenerateAndDisposeAsync(engine, options, firstRequest, assets);
+            string firstAsset = Path.Combine(
+                assets,
+                first.Assets[0].Sha256,
+                first.Assets[0].FileName);
+            File.SetLastWriteTimeUtc(firstAsset, DateTime.UtcNow - TimeSpan.FromDays(1));
+
+            WebFontSubsetRequest secondRequest = new()
+            {
+                Face = firstRequest.Face,
+                ProfileId = firstRequest.ProfileId,
+                FontFamily = firstRequest.FontFamily,
+                Sequences = [WebFontTextSequence.Create("𠀁B")],
+                Formats = firstRequest.Formats
+            };
+            _ = await GenerateAndDisposeAsync(engine, options, secondRequest, assets);
+
+            Assert.False(File.Exists(firstAsset));
+            Assert.Single(Directory.EnumerateFiles(assets, "*", SearchOption.AllDirectories));
         }
         finally
         {
@@ -838,7 +914,7 @@ public sealed class WebFontWorkerTests
             await Task.Delay(75, cancellationToken);
             int[] scalars = request.Sequences
                 .SelectMany(sequence => sequence.UnicodeScalars)
-                .Where(scalar => scalar != 0xFEFF && !Rune.IsControl(new Rune(scalar)))
+                .Where(WebFontUnicodePolicy.RequiresStandaloneGlyph)
                 .Distinct()
                 .OrderBy(scalar => scalar)
                 .ToArray();
@@ -862,7 +938,17 @@ public sealed class WebFontWorkerTests
             var assets = new List<WebFontAsset>();
             foreach (WebFontFormat format in request.Formats.Distinct())
             {
-                byte[] bytes = [0x77, 0x4F, 0x46, (byte)format, 0x01, 0x02, 0x03, 0x04];
+                byte[] bytes =
+                [
+                    0x77,
+                    0x4F,
+                    0x46,
+                    (byte)format,
+                    (byte)scalars[0],
+                    (byte)(scalars[0] >> 8),
+                    (byte)(scalars[0] >> 16),
+                    0x04
+                ];
                 string sha256 = Convert.ToHexString(
                     System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
                 string extension = format == WebFontFormat.Woff2 ? "woff2" : "woff";

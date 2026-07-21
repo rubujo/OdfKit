@@ -147,7 +147,7 @@ internal sealed class FileSystemGenerationCache
             }
 
             File.Move(temporaryPath, path, overwrite: true);
-            PruneDurableManifests(path);
+            PruneDurableManifests(path, destinationDirectory);
         }
         finally
         {
@@ -227,7 +227,7 @@ internal sealed class FileSystemGenerationCache
     private string GetManifestPath(string key)
         => Path.Combine(_cacheDirectory, string.Concat(key, ".json"));
 
-    private void PruneDurableManifests(string currentPath)
+    private void PruneDurableManifests(string currentPath, string destinationDirectory)
     {
         string lockPath = Path.Combine(_cacheDirectory, ".cleanup.lock");
         try
@@ -273,11 +273,89 @@ internal sealed class FileSystemGenerationCache
             {
                 TryDelete(temporary.FullName);
             }
+
+            PruneUnreferencedAssets(
+                manifests,
+                destinationDirectory,
+                DateTime.UtcNow - _options.DurableAssetMaxIdle);
         }
         catch (Exception exception) when (exception is IOException
                                           or UnauthorizedAccessException)
         {
             // 清理屬最佳努力；其它處理程序持有 lease 時不可讓成功的產字要求失敗。
+        }
+    }
+
+    private void PruneUnreferencedAssets(
+        IEnumerable<FileInfo> manifests,
+        string destinationDirectory,
+        DateTime threshold)
+    {
+        var referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (FileInfo manifestFile in manifests.Where(file => file.Exists))
+        {
+            try
+            {
+                if (manifestFile.Length <= 0 || manifestFile.Length > _options.MaxCachedManifestBytes)
+                {
+                    continue;
+                }
+
+                WebFontManifest? manifest = JsonSerializer.Deserialize<WebFontManifest>(
+                    File.ReadAllBytes(manifestFile.FullName),
+                    SerializerOptions);
+                if (manifest?.Assets is null)
+                {
+                    continue;
+                }
+
+                foreach (WebFontAsset asset in manifest.Assets)
+                {
+                    if (asset is not null && IsSha256(asset.Sha256) && IsPlainFileName(asset.FileName))
+                    {
+                        referenced.Add(Path.Combine(asset.Sha256, asset.FileName));
+                    }
+                }
+            }
+            catch (Exception exception) when (exception is IOException
+                                              or UnauthorizedAccessException
+                                              or JsonException)
+            {
+                // 損毀 manifest 由讀取路徑負責拒絕；清理不可影響成功產字。
+            }
+        }
+
+        string root = Path.GetFullPath(destinationDirectory);
+        if (!Directory.Exists(root))
+        {
+            return;
+        }
+
+        FileInfo[] assets = new DirectoryInfo(root)
+            .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
+            .Where(directory => IsSha256(directory.Name) && directory.LinkTarget is null)
+            .SelectMany(directory => directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly))
+            .Where(file => file.LinkTarget is null)
+            .ToArray();
+        long retainedBytes = assets.Sum(file => file.Length);
+        foreach (FileInfo asset in assets
+                     .Where(file => !referenced.Contains(Path.Combine(file.Directory!.Name, file.Name))
+                         && file.LastWriteTimeUtc < threshold)
+                     .OrderBy(file => file.LastWriteTimeUtc))
+        {
+            if (retainedBytes <= _options.MaxDurableAssetBytes)
+            {
+                break;
+            }
+
+            long length = asset.Length;
+            TryDelete(asset.FullName);
+            asset.Refresh();
+            if (!asset.Exists)
+            {
+                retainedBytes -= length;
+                TryDeleteEmptyDirectory(asset.DirectoryName!);
+            }
         }
     }
 
@@ -298,6 +376,21 @@ internal sealed class FileSystemGenerationCache
         try
         {
             File.Delete(path);
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    private static void TryDeleteEmptyDirectory(string path)
+    {
+        try
+        {
+            if (!Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                Directory.Delete(path);
+            }
         }
         catch (Exception exception) when (exception is IOException
                                           or UnauthorizedAccessException)
@@ -335,7 +428,7 @@ internal sealed class FileSystemGenerationCache
     }
 
     private static bool RequiresGlyph(int scalar)
-        => scalar != 0xFEFF && !Rune.IsControl(new Rune(scalar));
+        => WebFontUnicodePolicy.RequiresStandaloneGlyph(scalar);
 
     private static IReadOnlyList<string> CreateUnicodeRanges(IEnumerable<int> scalars)
     {

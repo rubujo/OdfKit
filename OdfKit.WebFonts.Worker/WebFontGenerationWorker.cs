@@ -50,6 +50,8 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
             || options.MaxDurableManifestEntries <= 0
             || options.MaxDurableManifestBytes < options.MaxCachedManifestBytes
             || options.DurableManifestMaxIdle <= TimeSpan.Zero
+            || options.MaxDurableAssetBytes < options.MaxCachedAssetBytes
+            || options.DurableAssetMaxIdle <= TimeSpan.Zero
             || options.CacheLockRetryDelay <= TimeSpan.Zero
             || options.MaxCacheLockRetryDelay < options.CacheLockRetryDelay
             || options.MaxCacheLockRetryDelay > TimeSpan.FromMilliseconds(int.MaxValue)

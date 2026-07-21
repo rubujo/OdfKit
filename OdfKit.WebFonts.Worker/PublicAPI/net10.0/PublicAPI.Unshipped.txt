@@ -9,6 +9,8 @@ OdfKit.WebFonts.Worker.WebFontQueueFullException.WebFontQueueFullException() -> 
 OdfKit.WebFonts.Worker.WebFontWorkerOptions
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.get -> System.TimeSpan
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.CacheLockRetryDelay.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableAssetMaxIdle.get -> System.TimeSpan
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableAssetMaxIdle.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableCacheDirectory.get -> string?
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableCacheDirectory.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.DurableManifestMaxIdle.get -> System.TimeSpan
@@ -25,6 +27,8 @@ OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCacheLockRetryDelay.get -> System
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxCacheLockRetryDelay.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.get -> int
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxConcurrency.set -> void
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxDurableAssetBytes.get -> long
+OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxDurableAssetBytes.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxDurableManifestBytes.get -> long
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxDurableManifestBytes.set -> void
 OdfKit.WebFonts.Worker.WebFontWorkerOptions.MaxDurableManifestEntries.get -> int
