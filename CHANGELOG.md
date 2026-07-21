@@ -4,6 +4,7 @@
 
 ## 尚未發佈
 
+- ASP.NET Core WebFont sample 的 Static File middleware 明確略過 `/_odf-fonts`；先前動態 `AssetRoot` 位於 `wwwroot` 時，IIS InProcess 會由 StaticFileMiddleware 搶先回應並以檔案時間／長度 ETag 取代內容 SHA-256，使安全標頭與條件式端點皆遭繞過。
 - OdfKit 字型分段改以 grapheme cluster 為不可拆單位，增補平面基底字不再與 IVS、combining mark、ZWJ 或區域指示符號分到不同 ODF span。`OdfWebFontRequirementCollector.CollectSupportedAsync` 新增依實際 `cmap` 覆蓋與有序來源優先權的多來源收集，未命中文字維持預設字型。
 - WebFont 引擎、verifier 與耐久快取改共用 `WebFontUnicodePolicy`，修正空白、variation selector 與 default-ignorable 的 glyph 判定漂移；來源有對應的空白會保留 glyph 與 advance width，但不加入供 CSS 遞補的 `unicode-range`，兼顧排版忠實度與「只套用難字」策略。此問題先後讓真實 CFF 矩陣在 `VerifyContainsSequences` 與 `VerifyRetainsGlyphIds` 誤判合法產物，放寬後又由三瀏覽器像素差分抓到名稱式 CFF 空白 metrics 遺失，並可能讓 IVS／ZWJ 耐久快取回 500。
 - ASP.NET Core 與 System.Web 將已通過要求驗證後的引擎 glyph 拒絕視為 204，客戶端中止改為 499，不再誤報 400／500／503。兩個瀏覽器 helper 支援重疊來源後端覆蓋判定、有界來源平行、可見表單值、屬性變更與完整 `FontFace` descriptor 去重，並忽略無效 UTF-16 cluster。

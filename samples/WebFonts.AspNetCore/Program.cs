@@ -113,7 +113,9 @@ builder.Services.AddOdfWebFontGeneration(
     });
 
 WebApplication app = builder.Build();
-app.UseStaticFiles();
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/_odf-fonts"),
+    staticFilesApp => staticFilesApp.UseStaticFiles());
 app.Use(async (context, next) =>
 {
     if (HttpMethods.IsPost(context.Request.Method)

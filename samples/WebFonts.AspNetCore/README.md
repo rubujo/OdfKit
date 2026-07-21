@@ -53,6 +53,8 @@ endpoint 具 API key authorization、固定窗口 rate limit、來源／face／P
 GET／HEAD 與 304 重驗證。指紋 CSS 與字型資產使用一年 `immutable`。generation Handler 的
 成功與輸入錯誤回應使用 `no-store, no-cache`；sample 也在 authentication／rate limiter 前對
 generation POST 套用相同政策，使 401／429 不可被 IIS、WAF 或 CDN 快取。
+sample 的 Static File middleware 明確略過 `/_odf-fonts`，即使 `AssetRoot` 位於 `wwwroot`，
+資產仍由 WebFont endpoint 套用內容 SHA-256 ETag、安全標頭與條件式要求，不會遭靜態檔案處理器攔截。
 
 多個 ASP.NET Core 節點共用同一個資產目錄時，任一節點可依內容 hash 驗證並提供其它節點已
 產生的檔案；產生工作本身仍需外部協調。Worker 的 durable manifest cache 具有條目、bytes 與
