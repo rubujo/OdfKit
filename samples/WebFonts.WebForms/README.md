@@ -18,8 +18,10 @@ WOFF2 改成其它格式。正式部署與 JSON 本文範例見 [`docs/webfonts.
 支援 GET／HEAD、SHA-256 ETag 及 304。Handler 逐 byte 傳送已驗證的 UTF-8 CSS，避免轉碼造成
 manifest hash 與 CDN 實際內容不一致。
 
-`webfont-autosubset.js` 會以 Unicode code point 掃描頁面並只收集 Plane 2 難字，一般字維持頁面
-預設字型。應用程式須以既有登入身分在受信任後端實作
+`webfont-autosubset.js` 會以 grapheme cluster 掃描頁面並只收集 Plane 2 難字，一般字維持頁面
+預設字型；IVS、ZWJ、combining mark 與區域指示符號不會被拆開。它會監看後續 DOM 與 open
+shadow root、分批要求並允許失敗後重試；可用 `data-odf-ignore` 排除不應送出的文字。應用程式須
+以既有登入身分在受信任後端實作
 `window.odfKitRequestWebFonts(route, sequences)`；API key 不得進入瀏覽器。Handler 仍會依來源
 字型 `cmap` 做第二次篩選，因此惡意或錯誤送入的混排文字不會拖垮服務；該來源沒有任何可用
 glyph 時回 204，後續合法要求仍可正常處理。

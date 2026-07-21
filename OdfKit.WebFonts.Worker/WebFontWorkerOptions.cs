@@ -59,6 +59,24 @@ public sealed class WebFontWorkerOptions
     public long MaxCachedAssetBytes { get; set; } = 64L * 1024 * 1024;
 
     /// <summary>
+    /// Gets or sets the maximum durable manifest count retained on disk.
+    /// 取得或設定磁碟上保留的耐久 manifest 數量上限。
+    /// </summary>
+    public int MaxDurableManifestEntries { get; set; } = 4096;
+
+    /// <summary>
+    /// Gets or sets the maximum total byte count of durable manifests retained on disk.
+    /// 取得或設定磁碟上保留之耐久 manifest 的總位元組上限。
+    /// </summary>
+    public long MaxDurableManifestBytes { get; set; } = 64L * 1024 * 1024;
+
+    /// <summary>
+    /// Gets or sets the maximum idle age of one durable manifest.
+    /// 取得或設定單一耐久 manifest 的最長閒置時間。
+    /// </summary>
+    public TimeSpan DurableManifestMaxIdle { get; set; } = TimeSpan.FromDays(30);
+
+    /// <summary>
     /// Gets or sets the delay between attempts to acquire a cross-process generation lease.
     /// 取得或設定嘗試取得跨處理程序產生 lease 的間隔。
     /// </summary>

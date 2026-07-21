@@ -405,8 +405,15 @@ function Invoke-HostingModelSmoke {
                 "ASP.NET Core $HostingModel 未提供動態 WOFF2。"
             Assert-Condition ($assetHash -eq $asset.sha256 -and $assetBytes.Length -eq $asset.byteLength) `
                 "ASP.NET Core $HostingModel WOFF2 與 manifest 不一致。"
-            Assert-Condition ($assetResponse.Headers.ETag.Tag -eq "`"$($asset.sha256)`"") `
-                "ASP.NET Core $HostingModel WOFF2 ETag 不正確。"
+            $expectedAssetEtag = "`"$($asset.sha256)`""
+            $actualAssetEtag = if ($null -eq $assetResponse.Headers.ETag) {
+                "<missing>"
+            }
+            else {
+                $assetResponse.Headers.ETag.ToString()
+            }
+            Assert-Condition ($assetResponse.Headers.ETag.Tag -eq $expectedAssetEtag) `
+                "ASP.NET Core $HostingModel WOFF2 ETag 不正確：預期 $expectedAssetEtag，實際 $actualAssetEtag。"
             Assert-Condition ($assetResponse.Headers.CacheControl.Public) `
                 "ASP.NET Core $HostingModel WOFF2 未宣告 public cache。"
             Assert-Condition ($assetResponse.Headers.CacheControl.Extensions.Name -contains "immutable") `

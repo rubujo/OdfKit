@@ -605,6 +605,84 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
+    public async Task AssetEndpoint_DiscoversSharedGeneratedAssetAcrossApplicationInstances()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            WebFontAsset generatedAsset;
+            var firstEngine = new DynamicAssetEngine();
+            await using (WebApplication first = await StartGenerationApplicationAsync(
+                             rootPath,
+                             firstEngine,
+                             permitLimit: 10,
+                             seedInitialManifest: false))
+            {
+                using var client = new HttpClient { BaseAddress = new Uri(GetAddress(first)) };
+                client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+                using HttpResponseMessage generated = await client.PostAsJsonAsync(
+                    "/_odf-fonts/generate",
+                    CreateGenerationRequest(),
+                    TestContext.Current.CancellationToken);
+                WebFontManifest manifest = await generated.Content.ReadFromJsonAsync<WebFontManifest>(
+                    cancellationToken: TestContext.Current.CancellationToken)
+                    ?? throw new InvalidDataException();
+                generatedAsset = Assert.Single(manifest.Assets);
+                await first.StopAsync(TestContext.Current.CancellationToken);
+            }
+
+            var secondEngine = new DynamicAssetEngine();
+            await using WebApplication second = await StartGenerationApplicationAsync(
+                rootPath,
+                secondEngine,
+                permitLimit: 10,
+                seedInitialManifest: false);
+            using var secondClient = new HttpClient { BaseAddress = new Uri(GetAddress(second)) };
+            using HttpResponseMessage assetResponse = await secondClient.GetAsync(
+                $"/_odf-fonts/{generatedAsset.Sha256}/{generatedAsset.FileName}",
+                TestContext.Current.CancellationToken);
+
+            Assert.Equal(HttpStatusCode.OK, assetResponse.StatusCode);
+            Assert.Equal(0, secondEngine.CallCount);
+            await second.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task GenerationEndpoint_ClassifiesClientIntegrityAndTransientFailures()
+    {
+        string rootPath = CreateTemporaryRoot();
+        try
+        {
+            var engine = new ClassifiedFailureEngine();
+            await using WebApplication application = await StartGenerationApplicationAsync(
+                rootPath,
+                engine,
+                permitLimit: 10);
+            using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
+            client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
+
+            await AssertStatusAsync(client, "argument", HttpStatusCode.BadRequest);
+            await AssertStatusAsync(client, "unsupported", HttpStatusCode.UnprocessableEntity);
+            await AssertStatusAsync(client, "invalid-data", HttpStatusCode.InternalServerError);
+            await AssertStatusAsync(client, "io", HttpStatusCode.ServiceUnavailable);
+            await AssertStatusAsync(client, "invalid-operation", HttpStatusCode.InternalServerError);
+            await AssertStatusAsync(client, "timeout", HttpStatusCode.ServiceUnavailable);
+            await AssertStatusAsync(client, "unexpected", HttpStatusCode.InternalServerError);
+
+            await application.StopAsync(TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
     public async Task GenerationEndpoint_RejectsOversizedChunkedJsonBodyBeforeEngine()
     {
         string rootPath = CreateTemporaryRoot();
@@ -702,6 +780,19 @@ public sealed class WebFontHostingTests
             Sequences = [text],
             Formats = [WebFontFormat.Woff2]
         };
+
+    private static async Task AssertStatusAsync(
+        HttpClient client,
+        string text,
+        HttpStatusCode expected)
+    {
+        using HttpResponseMessage response = await client.PostAsJsonAsync(
+            "/_odf-fonts/generate",
+            CreateGenerationRequest(text),
+            TestContext.Current.CancellationToken);
+        Assert.Equal(expected, response.StatusCode);
+        Assert.True(response.Headers.CacheControl is { NoStore: true, NoCache: true });
+    }
 
     private static async Task<WebApplication> StartGenerationApplicationAsync(
         string rootPath,
@@ -1015,6 +1106,25 @@ public sealed class WebFontHostingTests
                 ]
             };
         }
+    }
+
+    private sealed class ClassifiedFailureEngine : IWebFontSubsetEngine
+    {
+        public Task<WebFontManifest> GenerateAsync(
+            WebFontSubsetRequest request,
+            string destinationDirectory,
+            CancellationToken cancellationToken = default)
+            => Task.FromException<WebFontManifest>(request.Sequences[0].Text switch
+            {
+                "argument" => new ArgumentException(),
+                "unsupported" => new NotSupportedException(),
+                "invalid-data" => new InvalidDataException(),
+                "io" => new IOException(),
+                "invalid-operation" => new InvalidOperationException(),
+                "timeout" => new OperationCanceledException(),
+                "unexpected" => new NullReferenceException(),
+                _ => new InvalidOperationException()
+            });
     }
 
     private sealed class TestAuthenticationHandler(

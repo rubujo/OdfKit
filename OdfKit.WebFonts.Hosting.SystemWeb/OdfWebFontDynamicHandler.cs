@@ -224,21 +224,33 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             response.ContentType = "application/json; charset=utf-8";
             response.Write(JsonSerializer.Serialize(manifest, SerializerOptions));
         }
-        // 與 ASP.NET Core 端點一致：字型缺字、格式不符等輸入問題回 400。
-        catch (Exception exception) when (exception is ArgumentException
-                                          or NotSupportedException
-                                          or InvalidDataException)
+        catch (ArgumentException)
         {
             response.StatusCode = 400;
         }
+        catch (NotSupportedException)
+        {
+            response.StatusCode = 422;
+        }
+        catch (InvalidDataException)
+        {
+            response.StatusCode = 500;
+        }
         catch (Exception exception) when (exception is IOException
-                                          or InvalidOperationException
                                           or OperationCanceledException
                                           or UnauthorizedAccessException
                                           or CryptographicException
                                           or SecurityException)
         {
             response.StatusCode = 503;
+        }
+        catch (InvalidOperationException)
+        {
+            response.StatusCode = 500;
+        }
+        catch (Exception)
+        {
+            response.StatusCode = 500;
         }
         finally
         {

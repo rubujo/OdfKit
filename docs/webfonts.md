@@ -319,9 +319,12 @@ hash。範例設定見
 
 低階產字引擎維持單一 `FontSourceId` 契約；官方全字庫的 Plane 0 與 Plane 2
 分屬不同字型檔，因此頁面混排文字不得原封不動送到單一來源。瀏覽器端可使用 samples 內的
-`webfont-autosubset.js` 掃描文字節點，透過 JavaScript code point iterator 將 Plane 2 難字去重後，
-再由應用程式提供的 `odfKitRequestWebFonts` callback 交給受信任後端。callback 必須使用既有登入
-身分或同等授權機制；不得把 WebFont API key 寫進 HTML 或 JavaScript。
+`webfont-autosubset.js` 掃描文字節點，以 grapheme cluster 為不可拆分單位將設定範圍內的 Plane 2
+難字去重、分批，再由應用程式提供的 `odfKitRequestWebFonts` callback 交給受信任後端。這可避免
+拆散 IVS、ZWJ emoji、combining mark 或區域指示符號。helper 會監看後續 DOM 與 open shadow root
+變更、重試失敗批次，並略過 `script`、`style`、`textarea` 及 `data-odf-ignore` 範圍。callback
+必須使用既有登入身分或同等授權機制；不得把 WebFont API key 寫進 HTML 或 JavaScript，也不得
+記錄原始頁面文字。
 
 託管端另有第二道防線：managed engine 會先依實際來源字型的 `cmap` 篩選文字。錯送混排文字時，
 只把該來源確實支援的連續序列交給嚴格的低階引擎；若完全沒有可產生的 glyph，回傳 HTTP 204，
@@ -335,6 +338,10 @@ WebFont。
 要求標頭必須包含 `X-OdfKit-WebFont-Key`。成功回傳 manifest，公開頁面只 GET
 `/{sha256}/{fileName}`；資產會重新驗證 SHA-256、大小與副檔名，再以 immutable cache 與 ETag
 傳送。Handler 重啟後仍可安全讀取內容定址產物，不依賴 process-local registry。
+ASP.NET Core 節點若共用同一個受信任資產目錄，可由 hash URL 重新驗證並發現另一節點已產生的
+資產；這只解決公開讀取，不取代跨節點 generation lease 或 fencing。durable manifest cache 另以
+條目數、總 bytes 與閒置時間進行 LRU 清理；內容定址字型本體仍應由共用儲存體或 CDN 的生命週期
+政策管理，不能在要求路徑任意刪除。
 動態 POST 產生的成功與錯誤回應使用 `Cache-Control: no-store, no-cache`；manifest、CSS 與字型
 資產皆明確支援 GET／HEAD。System.Web 與 ASP.NET Core 會以實際傳輸 bytes 的 SHA-256 作為
 ETag，收到相符的 `If-None-Match` 時回傳無本文的 304。讀取 CSS 時會拒絕無效 UTF-8，而不是
@@ -522,9 +529,10 @@ depth、sequence、產出、queue、timeout 與 concurrency 上限。timeout 只
 權杖，引擎則將其貫穿至字圖級迴圈，逾時因而能真正回收 consumer 執行緒。GitHub Actions 可以
 證明有限併發與可重現錯誤處理，不能代替真實 CDN、WAF、跨區容量或第三方惡意字型安全審查。
 
-動態產生 endpoint 對用戶端可修正的輸入問題（要求的字元不在字型內、輸出格式與輪廓類型不符、
-保留的 color 技術超出 `RequiredBrowserTargets`）回應 400，不讓例外逸出為 500；佇列已滿、
-逾時與伺服端完整性失敗回應 503。資產回應在來源允許清單非空時一律輸出 `Vary: Origin`，
+動態產生 endpoint 將語法、allowlist 與要求形狀錯誤回應 400；來源沒有要求 glyph 時回 204；
+合法但引擎不支援的格式或技術回應 422；佇列已滿回 429；逾時、I/O、權限與密碼學服務等暫時性
+基礎設施失敗回應 503。產物結構或內部狀態不一致回應 500，不偽裝成用戶端錯誤，也不讓例外
+終止服務。資產回應在來源允許清單非空時一律輸出 `Vary: Origin`，
 避免一年期 `immutable` 快取讓共享快取把缺少 `Access-Control-Allow-Origin` 的回應提供給
 合法跨來源請求（`@font-face` 一律以 CORS 模式抓取）。
 

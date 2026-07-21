@@ -608,6 +608,44 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
+    public async Task Worker_DurableCachePrunesLeastRecentlyUsedManifests()
+    {
+        string root = CreateTemporaryRoot();
+        string assets = Path.Combine(root, "assets");
+        string cache = Path.Combine(root, "cache");
+        try
+        {
+            var engine = new AssetWritingEngine();
+            var options = new WebFontWorkerOptions
+            {
+                DurableCacheDirectory = cache,
+                MaxDurableManifestEntries = 1
+            };
+            await using var worker = new WebFontGenerationWorker(engine, options);
+            await worker.GenerateAsync(
+                CreateRequest("first"),
+                assets,
+                TestContext.Current.CancellationToken);
+            await worker.GenerateAsync(
+                CreateRequest("second"),
+                assets,
+                TestContext.Current.CancellationToken);
+
+            Assert.Single(Directory.EnumerateFiles(cache, "*.json"));
+            await worker.GenerateAsync(
+                CreateRequest("first"),
+                assets,
+                TestContext.Current.CancellationToken);
+            Assert.Equal(3, engine.CallCount);
+            Assert.Single(Directory.EnumerateFiles(cache, "*.json"));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Worker_DurableCacheRejectsLinkedAssetDirectory()
     {
         string root = CreateTemporaryRoot();

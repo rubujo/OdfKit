@@ -73,6 +73,7 @@ internal sealed class FileSystemGenerationCache
         }
 
         ValidateManifest(manifest, request, destinationDirectory);
+        TryTouch(path);
         return manifest;
     }
 
@@ -146,6 +147,7 @@ internal sealed class FileSystemGenerationCache
             }
 
             File.Move(temporaryPath, path, overwrite: true);
+            PruneDurableManifests(path);
         }
         finally
         {
@@ -224,6 +226,84 @@ internal sealed class FileSystemGenerationCache
 
     private string GetManifestPath(string key)
         => Path.Combine(_cacheDirectory, string.Concat(key, ".json"));
+
+    private void PruneDurableManifests(string currentPath)
+    {
+        string lockPath = Path.Combine(_cacheDirectory, ".cleanup.lock");
+        try
+        {
+            using var cleanupLease = new FileStream(
+                lockPath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
+                FileShare.None,
+                bufferSize: 1,
+                FileOptions.DeleteOnClose);
+            DateTime threshold = DateTime.UtcNow - _options.DurableManifestMaxIdle;
+            StringComparison pathComparison = OperatingSystem.IsWindows()
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+            FileInfo[] manifests = new DirectoryInfo(_cacheDirectory)
+                .EnumerateFiles("*.json", SearchOption.TopDirectoryOnly)
+                .OrderByDescending(info => string.Equals(info.FullName, currentPath, pathComparison))
+                .ThenByDescending(info => info.LastWriteTimeUtc)
+                .ToArray();
+            long retainedBytes = 0;
+            int retainedCount = 0;
+            foreach (FileInfo manifest in manifests)
+            {
+                bool isCurrent = string.Equals(manifest.FullName, currentPath, pathComparison);
+                bool retain = isCurrent
+                    || manifest.LastWriteTimeUtc >= threshold
+                    && retainedCount < _options.MaxDurableManifestEntries
+                    && retainedBytes + manifest.Length <= _options.MaxDurableManifestBytes;
+                if (retain)
+                {
+                    retainedCount++;
+                    retainedBytes += manifest.Length;
+                    continue;
+                }
+
+                TryDelete(manifest.FullName);
+            }
+
+            foreach (FileInfo temporary in new DirectoryInfo(_cacheDirectory)
+                         .EnumerateFiles("*.tmp", SearchOption.TopDirectoryOnly)
+                         .Where(info => info.LastWriteTimeUtc < threshold))
+            {
+                TryDelete(temporary.FullName);
+            }
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException)
+        {
+            // 清理屬最佳努力；其它處理程序持有 lease 時不可讓成功的產字要求失敗。
+        }
+    }
+
+    private static void TryTouch(string path)
+    {
+        try
+        {
+            File.SetLastWriteTimeUtc(path, DateTime.UtcNow);
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    private static void TryDelete(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException)
+        {
+        }
+    }
 
     private static bool IsPlainFileName(string? value)
         => !string.IsNullOrWhiteSpace(value)

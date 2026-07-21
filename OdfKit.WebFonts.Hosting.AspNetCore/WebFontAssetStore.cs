@@ -78,7 +78,17 @@ internal sealed class WebFontAssetStore
         if ((!_assets.TryGetValue(key, out asset) && !_generatedAssets.TryGetValue(key, out asset))
             || asset is null)
         {
-            return false;
+            asset = TryDiscoverGeneratedAsset(sha256, fileName);
+            if (asset is null)
+            {
+                return false;
+            }
+
+            if (_generatedAssets.Count >= _options.MaxGeneratedAssetCount)
+            {
+                _generatedAssets.Clear();
+            }
+            _generatedAssets.TryAdd(key, asset);
         }
 
         var info = new FileInfo(asset.FullPath);
@@ -93,6 +103,47 @@ internal sealed class WebFontAssetStore
         }
 
         return true;
+    }
+
+    private StoredWebFontAsset? TryDiscoverGeneratedAsset(string sha256, string fileName)
+    {
+        if (!TryResolveFormat(fileName, out WebFontFormat format))
+        {
+            return null;
+        }
+
+        string normalizedHash = sha256.ToLowerInvariant();
+        string fullPath = Path.GetFullPath(Path.Combine(_rootPath, normalizedHash, fileName));
+        if (!IsContainedPath(_rootPath, fullPath))
+        {
+            return null;
+        }
+
+        var info = new FileInfo(fullPath);
+        if (!info.Exists
+            || info.Length <= 0
+            || info.Length > _options.MaxAssetBytes
+            || info.LinkTarget is not null
+            || info.Directory is null
+            || info.Directory.LinkTarget is not null
+            || !string.Equals(ComputeSha256(fullPath), normalizedHash, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return new StoredWebFontAsset(
+            new WebFontAsset
+            {
+                FileName = fileName,
+                Sha256 = normalizedHash,
+                ByteLength = info.Length,
+                Format = format,
+                FontFamily = "discovered-shared-asset",
+                UnicodeRanges = []
+            },
+            fullPath,
+            ResolveContentType(format),
+            new DateTimeOffset(info.LastWriteTimeUtc));
     }
 
     public void RegisterGeneratedAssets(WebFontManifest manifest)
@@ -364,6 +415,34 @@ internal sealed class WebFontAssetStore
             WebFontFormat.OpenType => "font/otf",
             _ => "application/octet-stream"
         };
+
+    private static bool TryResolveFormat(string fileName, out WebFontFormat format)
+    {
+        string extension = Path.GetExtension(fileName);
+        if (string.Equals(extension, ".woff2", StringComparison.OrdinalIgnoreCase))
+        {
+            format = WebFontFormat.Woff2;
+            return true;
+        }
+        if (string.Equals(extension, ".woff", StringComparison.OrdinalIgnoreCase))
+        {
+            format = WebFontFormat.Woff;
+            return true;
+        }
+        if (string.Equals(extension, ".ttf", StringComparison.OrdinalIgnoreCase))
+        {
+            format = WebFontFormat.TrueType;
+            return true;
+        }
+        if (string.Equals(extension, ".otf", StringComparison.OrdinalIgnoreCase))
+        {
+            format = WebFontFormat.OpenType;
+            return true;
+        }
+
+        format = default;
+        return false;
+    }
 }
 
 internal sealed record LoadedManifest(WebFontManifest Manifest, byte[] Bytes);

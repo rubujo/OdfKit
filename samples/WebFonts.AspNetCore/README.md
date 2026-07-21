@@ -35,8 +35,10 @@ Invoke-RestMethod `
   -Body $body
 ```
 
-頁面可載入 `wwwroot/webfont-autosubset.js`，它會以 Unicode code point 掃描並去重 Plane 2
-難字，略過「一二三丨ㄩ幹」等一般字。應用程式必須提供
+頁面可載入 `wwwroot/webfont-autosubset.js`，它會以 grapheme cluster 掃描並去重 Plane 2
+難字，略過「一二三丨ㄩ幹」等一般字；IVS、ZWJ、combining mark 與區域指示符號不會被拆開。
+它也會監看後續 DOM 與 open shadow root、按 scalar 數與 UTF-8 bytes 分批，失敗後可重試；可用
+`data-odf-ignore` 排除不應送出的文字。應用程式必須提供
 `window.odfKitRequestWebFonts(route, sequences)`，由已驗證的同源後端代送要求；不得把上述 API
 key 暴露給瀏覽器。即使呼叫端錯送混排或純一般字，Handler 也會按來源字型 `cmap` 再篩選；無
 可用 glyph 時回 204，而不是讓低階引擎例外擴散成 400／503。
@@ -49,6 +51,10 @@ endpoint 具 API key authorization、固定窗口 rate limit、來源／face／P
 GET／HEAD 與 304 重驗證。指紋 CSS 與字型資產使用一年 `immutable`。generation Handler 的
 成功與輸入錯誤回應使用 `no-store, no-cache`；sample 也在 authentication／rate limiter 前對
 generation POST 套用相同政策，使 401／429 不可被 IIS、WAF 或 CDN 快取。
+
+多個 ASP.NET Core 節點共用同一個資產目錄時，任一節點可依內容 hash 驗證並提供其它節點已
+產生的檔案；產生工作本身仍需外部協調。Worker 的 durable manifest cache 具有條目、bytes 與
+閒置期限，字型資產本體則交由共用儲存體或 CDN 的生命週期政策治理。
 
 `OdfKit:WebFonts:ApiKey` 可直接放在未提交且受保護的 `appsettings.{Environment}.json`，也可由
 `OdfKit__WebFonts__ApiKey` 環境變數覆寫；舊的 `ODFKIT_WEBFONT_API_KEY` 僅保留為找不到標準組態

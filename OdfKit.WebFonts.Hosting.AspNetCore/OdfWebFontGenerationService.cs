@@ -99,13 +99,18 @@ internal sealed class OdfWebFontGenerationService
             _assetStore.RegisterGeneratedAssets(manifest);
             return Results.Json(manifest);
         }
-        // 要求的字元不在字型內、格式與輪廓類型不符，或保留的色彩技術超出必要瀏覽器
-        // 目標，都是用戶端可修正的輸入問題，必須回 400 而非讓例外逸出成 500。
-        catch (Exception exception) when (exception is ArgumentException
-                                          or InvalidDataException
-                                          or NotSupportedException)
+        catch (ArgumentException)
         {
             return Results.BadRequest();
+        }
+        catch (NotSupportedException)
+        {
+            return Results.StatusCode(StatusCodes.Status422UnprocessableEntity);
+        }
+        // 字型來源、耐久快取或產物驗證失敗屬伺服器資料完整性問題，不可偽裝成用戶端 400。
+        catch (InvalidDataException)
+        {
+            return Results.StatusCode(StatusCodes.Status500InternalServerError);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -116,9 +121,19 @@ internal sealed class OdfWebFontGenerationService
             request.HttpContext.Response.Headers.RetryAfter = "1";
             return Results.StatusCode(StatusCodes.Status429TooManyRequests);
         }
-        catch (InvalidOperationException)
+        catch (Exception exception) when (exception is IOException
+                                          or UnauthorizedAccessException
+                                          or System.Security.Cryptography.CryptographicException)
         {
             return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+        catch (InvalidOperationException)
+        {
+            return Results.StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        catch (Exception)
+        {
+            return Results.StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 

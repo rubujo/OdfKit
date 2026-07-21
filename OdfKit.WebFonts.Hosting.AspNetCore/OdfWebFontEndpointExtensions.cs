@@ -181,13 +181,21 @@ public static class OdfWebFontEndpointExtensions
                     return Results.NotFound();
                 }
 
+                string entityTag = $"\"{asset.Descriptor.Sha256}\"";
+                context.Response.OnStarting(() =>
+                {
+                    // IIS InProcess 可能在建立結果後重寫實體檔案的 ETag，
+                    // 因此於最終回應邊界強制寫回內容定址驗證標記。
+                    context.Response.Headers.ETag = entityTag;
+                    return Task.CompletedTask;
+                });
                 context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
                 context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
                 return Results.File(
                     asset.FullPath,
                     asset.ContentType,
                     lastModified: asset.LastModified,
-                    entityTag: new EntityTagHeaderValue($"\"{asset.Descriptor.Sha256}\""),
+                    entityTag: new EntityTagHeaderValue(entityTag),
                     enableRangeProcessing: false);
             });
 

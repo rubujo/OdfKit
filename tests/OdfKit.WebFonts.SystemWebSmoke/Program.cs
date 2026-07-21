@@ -111,6 +111,41 @@ try
     Require(invalidFormatContext.Response.StatusCode == 400, "System.Web dynamic endpoint did not reject WOFF2 on net48.");
     RequireNoStore(invalidFormat, "invalid generation response");
 
+    var classifiedHandler = new OdfWebFontDynamicHandler(new ClassifiedFailureSmokeEngine(), options);
+    foreach ((string scenario, int expectedStatus) in new[]
+    {
+        ("argument", 400),
+        ("unsupported", 422),
+        ("invalid-data", 500),
+        ("io", 503),
+        ("invalid-operation", 500),
+        ("timeout", 503),
+        ("unexpected", 500)
+    })
+    {
+        string classifiedJson = JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+        {
+            FontSourceId = "smoke-source",
+            FaceIndex = 0,
+            ProfileId = "smoke-profile@1",
+            FontFamily = "OdfKit SystemWeb Smoke",
+            Sequences = new[] { scenario },
+            Formats = new[] { WebFontFormat.Woff }
+        });
+        var classified = new RecordingWorkerRequest(
+            "POST",
+            "/_odf-fonts/generate",
+            classifiedJson,
+            options.ApiKey);
+        var classifiedContext = new HttpContext(classified);
+        classifiedHandler.ProcessRequest(classifiedContext);
+        classifiedContext.Response.Flush();
+        Require(
+            classifiedContext.Response.StatusCode == expectedStatus,
+            $"System.Web classified {scenario} as {classifiedContext.Response.StatusCode}, expected {expectedStatus}.");
+        RequireNoStore(classified, $"{scenario} generation response");
+    }
+
     using (var blockingEngine = new BlockingSmokeEngine())
     {
         var limitedHandler = new OdfWebFontDynamicHandler(blockingEngine, options);
@@ -155,8 +190,13 @@ try
     var normalOnlyContext = new HttpContext(normalOnly);
     handler.ProcessRequest(normalOnlyContext);
     normalOnlyContext.Response.Flush();
-    Require(normalOnlyContext.Response.StatusCode == 204, "System.Web normal-only request did not return no content.");
+    int expectedNormalOnlyStatus = fontPath is not null && usePostScriptOutline ? 200 : 204;
+    Require(
+        normalOnlyContext.Response.StatusCode == expectedNormalOnlyStatus,
+        $"System.Web normal-only request returned {normalOnlyContext.Response.StatusCode}, expected {expectedNormalOnlyStatus}.");
     RequireNoStore(normalOnly, "normal-only generation response");
+    Directory.Delete(root, recursive: true);
+    Directory.CreateDirectory(root);
 
     var generated = new RecordingWorkerRequest("POST", "/_odf-fonts/generate", json, options.ApiKey);
     var generatedContext = new HttpContext(generated);
@@ -428,6 +468,25 @@ internal sealed class DeterministicSmokeEngine : IWebFontSubsetEngine, IWebFontT
             Assets = assets
         });
     }
+}
+
+internal sealed class ClassifiedFailureSmokeEngine : IWebFontSubsetEngine
+{
+    public Task<WebFontManifest> GenerateAsync(
+        WebFontSubsetRequest request,
+        string destinationDirectory,
+        CancellationToken cancellationToken = default)
+        => Task.FromException<WebFontManifest>(request.Sequences[0].Text switch
+        {
+            "argument" => new ArgumentException(),
+            "unsupported" => new NotSupportedException(),
+            "invalid-data" => new InvalidDataException(),
+            "io" => new IOException(),
+            "invalid-operation" => new InvalidOperationException(),
+            "timeout" => new OperationCanceledException(),
+            "unexpected" => new NullReferenceException(),
+            _ => new InvalidOperationException()
+        });
 }
 
 internal sealed class BlockingSmokeEngine : IWebFontSubsetEngine, IDisposable
