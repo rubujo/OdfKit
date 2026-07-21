@@ -117,11 +117,43 @@ try {
         '影像專案',
         '幻燈片',
         '保存',
-        '支持'
+        '支持',
+        '生成',
+        '運行',
+        '進程',
+        '行程',
+        '數據',
+        '代碼生成',
+        '代碼頁',
+        '大數據',
+        '調用',
+        '回退',
+        '單個',
+        '執行程序',
+        '加載',
+        '本地名稱',
+        '本地資料',
+        '本地快取',
+        '本地進程',
+        '本地 LibreOffice',
+        '本地 NuGet',
+        '本地 nupkg',
+        '本地時間',
+        '本地 href',
+        '基於本地'
     )
+    # 術語表會列出其他語言的正式譯名；這些項目不是正體中文內容。
+    $zhTwAllowedOccurrences = @{
+        'docs\i18n-glossary.md|保存' = 1
+    }
     $zhTwContentFiles = @(
         Get-ChildItem api-docs/zh-TW, api-docs/articles -Recurse -File -Include *.md
         Get-Item api-docs/index.md
+        Get-ChildItem docs -Recurse -File -Include *.md
+        Get-Item README.md, CHANGELOG.md, THIRD-PARTY-NOTICES.md, AGENTS.md,
+            eng/README.md, eng/historical-refactor/README.md, samples/README.md,
+            samples/WebFonts.AspNetCore/README.md, samples/WebFonts.WebForms/README.md,
+            tools/README.md, OdfKit/PublicAPI/README.md, OdfKit/Compliance/i18n/README.md
         Get-ChildItem OdfKit, OdfKit.Extensions.*, OdfKit.WebFonts.* -Recurse -File -Filter *.cs |
             Where-Object {
                 $_.FullName -notmatch '[\\/]DOM[\\/]Generated[\\/]' -and
@@ -132,8 +164,15 @@ try {
     foreach ($file in $zhTwContentFiles) {
         $content = [IO.File]::ReadAllText($file.FullName)
         foreach ($term in $zhTwForbiddenTerms) {
-            if ($content.Contains($term, [StringComparison]::Ordinal)) {
-                $relativePath = [IO.Path]::GetRelativePath($root, $file.FullName)
+            $relativePath = [IO.Path]::GetRelativePath($root, $file.FullName)
+            $occurrenceCount = [regex]::Matches($content, [regex]::Escape($term)).Count
+            $allowKey = "$relativePath|$term"
+            $allowedCount = if ($zhTwAllowedOccurrences.ContainsKey($allowKey)) {
+                $zhTwAllowedOccurrences[$allowKey]
+            } else {
+                0
+            }
+            if ($occurrenceCount -gt $allowedCount) {
                 $zhTwIssues.Add("$relativePath：$term")
             }
         }

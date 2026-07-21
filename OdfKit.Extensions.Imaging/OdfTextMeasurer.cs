@@ -176,7 +176,7 @@ public static class OdfTextMeasurer
         }
         catch (Exception ex)
         {
-            // 發生任何例外時回退至 SkiaSharp 量測
+            // 發生任何例外時改用 SkiaSharp 量測
             OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfTextMeasurer_GdiFontMeasurementFallback", ex.Message), ex);
         }
         finally
@@ -187,7 +187,7 @@ public static class OdfTextMeasurer
             }
         }
 
-        // 3. Fallback 回退：使用 SkiaSharp 量測
+        // 3. Fallback 後援：使用 SkiaSharp 量測
         using var paint = new SKPaint();
         var styleWeight = isBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
         var styleSlant = isItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;

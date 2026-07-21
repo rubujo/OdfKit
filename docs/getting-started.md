@@ -62,7 +62,7 @@ var report = OdfPackageValidator.Validate(
 
 | 需求 | 建議元件 |
 |------|----------|
-| ODF 建立、載入、保存、驗證 | `OdfKit` |
+| ODF 建立、載入、儲存、驗證 | `OdfKit` |
 | 匯出 HTML / Markdown / RTF | `OdfKit.Extensions.Html` |
 | 匯出 PDF | `OdfKit.Extensions.Pdf` |
 | 匯出影像或圖表渲染 | `OdfKit.Extensions.Imaging` |

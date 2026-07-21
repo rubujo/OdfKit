@@ -99,7 +99,7 @@ public sealed class OdfPivotTableInfo(
     /// According to the ODF 1.4 schema, <c>table:target-range-address</c> has the <c>cellRangeAddress</c> type. This method first tries to parse the value as a range and returns its start; if the string uses a single-cell address format, such as documents written by earlier versions, it falls back to parsing a single address for backward compatibility.
     /// 依 ODF 1.4 schema，<c>table:target-range-address</c> 的型別為 <c>cellRangeAddress</c>
     /// （範圍），此方法會優先嘗試以範圍格式解析並取其起點；若該字串為單一儲存格位址格式
-    /// （例如舊版本寫入的文件），則回退以單一位址格式解析，以維持向下相容。
+    /// （例如舊版本寫入的文件），則改採以單一位址格式解析，以維持向下相容。
     /// </remarks>
     public bool TryGetTargetStart(out OdfCellAddress address)
     {

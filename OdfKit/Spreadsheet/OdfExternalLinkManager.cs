@@ -5,7 +5,7 @@ namespace OdfKit.Spreadsheet;
 
 /// <summary>
 /// Manages the external document loading delegate and local cache for cross-document spreadsheet formula references.
-/// 管理試算表跨文件公式引用的外部文件載入委派與本地快取。
+/// 管理試算表跨文件公式引用的外部文件載入委派與本機快取。
 /// </summary>
 public sealed class OdfExternalLinkManager
 {

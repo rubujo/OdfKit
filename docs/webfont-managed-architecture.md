@@ -40,7 +40,7 @@
 ## 2. 授權準入
 
 OdfKit 原創程式碼採 CC0-1.0。第三方程式碼不會因此改成 CC0，而是保留原授權、著作權與
-notice；因此「可以安裝」不等於「適合成為 OdfKit 的預設相依」。新增套件前必須保存下列
+notice；因此「可以安裝」不等於「適合成為 OdfKit 的預設相依」。新增套件前必須保留下列
 可重現證據：
 
 - 精確套件版本、NuGet SHA-512、來源 repository commit／tag 與授權全文 permalink。
@@ -383,7 +383,7 @@ Worker 不需要也不得啟動隔離外部程序。
 | Phase | 實作內容 | 升級為已完成的必要證據 |
 | --- | --- | --- |
 | 0 契約與治理 | 移除 FontTools 產品 API；建立 neutral engine、版本化 Profile、CNS provider、license policy 與 managed guard | 所有 WebFont csproj 繼承共同 `0.0.1`／pack；clean package scan；合法 corpus 均有 URI、版本、SHA-256、授權與不散布裁定 |
-| 1 managed engine | 有界 sfnt／TTC parser、TrueType composite closure、`cmap` 4／12／14、TTF writer、`fsType` 與格式拒絕 | C# 生成的最小 fixtures、真實 CNS／多 Plane／IVS／PUA；checksum round-trip、固定種子變異韌性測試、雙 TFM build；不支援矩陣逐項有負向測試 |
+| 1 managed engine | 有界 sfnt／TTC parser、TrueType composite closure、`cmap` 4／12／14、TTF writer、`fsType` 與格式拒絕 | C# 產生的最小 fixtures、真實 CNS／多 Plane／IVS／PUA；checksum round-trip、固定種子變異韌性測試、雙 TFM build；不支援矩陣逐項有負向測試 |
 | 2 build 與格式 | WOFF writer、net10 WOFF2 null-transform writer 與標準 transformed-table decoder、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；W3C 與 production transformed WOFF2 corpus；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
 | 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；manifest、CSS 與字型的 GET／HEAD、原始 bytes SHA-256 ETag 與 304；動態 Handler 回應 `no-store`；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
 | 4 closure 與規模 | 逐 lookup 增加 GSUB output closure；複雜 script 先以完整 glyph ID／`cmap`／layout tables 的 correctness-first 模式支援；有界多節點介面、load 與固定種子變異韌性測試 | 每個新增 script 具合法鎖定 corpus、來源／輸出 layout table 一致性與三瀏覽器 golden；只有具結構驗證與差分證據後才能做 aggressive pruning；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |

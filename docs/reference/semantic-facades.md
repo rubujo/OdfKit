@@ -15,7 +15,7 @@
 - `Get*` 列舉集合；`Find*` 查找單一項目並以 `null` 表示不存在。
 - `Set*`、`Update*`、`Rename*` 修改既有語意，指定移除的 `Remove*` 回傳 `bool`。
 - `Clear*` 清空集合並回傳變更數；只有單一狀態的 clear 操作回傳 `bool`。
-- 保存後重新載入仍可透過同一 facade 讀取及修改，不區分「新建」與「既有」物件模型。
+- 儲存後重新載入仍可透過同一 facade 讀取及修改，不區分「新建」與「既有」物件模型。
 - 跨文件複製與移除由 facade 維護 style、ID、manifest、media 與格式專屬 reference。
 
 ## 版本映射與診斷

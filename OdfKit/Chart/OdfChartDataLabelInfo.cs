@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Represents the data label settings for a chart data series.
-/// 表示圖表資料序列的數據標籤設定。
+/// 表示圖表資料序列的資料標籤設定。
 /// </summary>
 /// <param name="showValue">Whether to show the data value. / 是否顯示資料數值。</param>
 /// <param name="showPercentage">Whether to show the percentage. / 是否顯示百分比。</param>

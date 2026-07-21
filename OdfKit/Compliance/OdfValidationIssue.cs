@@ -16,7 +16,7 @@ namespace OdfKit.Compliance;
 /// <param name="requiredVersion">問題與版本相關時所需的 ODF 版本</param>
 /// <param name="profileId">發出此問題的相容性設定檔識別碼</param>
 /// <param name="details">可供工具處理的結構化診斷細節</param>
-/// <param name="culture">指定此問題生成時使用的文化特性，用於 SuggestedFix 的本地化</param>
+/// <param name="culture">The culture used when creating the issue, for SuggestedFix localization. / 產生此問題時使用的文化特性，用於 SuggestedFix 的在地化。</param>
 public sealed class OdfValidationIssue(
     OdfIssueSeverity severity,
     string ruleId,

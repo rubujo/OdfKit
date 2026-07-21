@@ -274,7 +274,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// 設定儲存格的日期時間值。
     /// </summary>
     /// <param name="date">The date and time value. / 日期時間。</param>
-    /// <param name="useTimezoneNaive">Whether to ignore time zone conversion and use local time formatting. / 是否忽略時區轉換，使用本地時間格式。</param>
+    /// <param name="useTimezoneNaive">Whether to ignore time zone conversion and use local time formatting. / 是否忽略時區轉換，使用當地時間格式。</param>
     public void SetValue(DateTime date, bool useTimezoneNaive)
     {
         ValueType = "date";

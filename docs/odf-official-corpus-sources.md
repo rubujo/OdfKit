@@ -12,7 +12,7 @@
 | ODF Toolkit source | `https://github.com/tdf/odftoolkit` | ODF Toolkit、ODFDOM 與 Validator 原始碼來源。 | no |
 | ODF Validator Maven metadata | `https://mvnrepository.com/artifact/org.odftoolkit/odfvalidator` | 檢查可取得版本與 artifact 名稱。 | no |
 | Jing 20241231 release | `https://github.com/relaxng/jing-trang/releases/tag/V20241231` | 獨立執行 OASIS ODF RELAX NG schema 的固定版驗證器；archive 與必要 JAR 皆以 SHA-256 固定。 | no |
-| OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 獨立保存用途 validator；名稱相近但不是 ODF Toolkit baseline。 | no |
+| OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 獨立數位典藏用途 validator；名稱相近但不是 ODF Toolkit baseline。 | no |
 | OASIS ODF 1.1 RNG schema | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | OASIS Standard（2007-02-01）官方獨立 RELAX NG schema，`OdfSchemaRegistry`／`OdfComplianceProfiles.OasisOdf11` 用以產生真實 ODF 1.1 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.1.rng`） |
 | OASIS ODF 1.2 RNG schema | `https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng` | OASIS Standard（2011-09-29）官方獨立 RELAX NG schema，供 `ISO_IEC_26300` profile 使用真實 ODF 1.2 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng`） |
 | OASIS ODF 1.3 RNG schema | `https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng` | OASIS Standard（2021-04-27）官方獨立 RELAX NG schema，`OdfComplianceProfiles.OasisOdf13` 用以產生真實 ODF 1.3 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-schema.rng`） |

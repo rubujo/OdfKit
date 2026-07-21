@@ -100,7 +100,7 @@ public Task LoadAsync(string path, CancellationToken cancellationToken) { … }
 | **恰好一個**尾端可選參數（**非** CT） | 偏好明確鏈 | `eng/Expand-OptionalParameters.py`（略過僅 CT 的 `= default`） |
 | **僅**尾端 `CancellationToken = default` | **允許保留** | 對齊 .NET SDK；工具不得拆除 |
 | **兩個以上**尾端可選參數 | 明確多載鏈或 **options 物件** | 高頻已用 options；新 API 禁止再加「多可選位置參數」 |
-| 生成 DOM（`DOM/Generated`） | **none**（目錄覆寫）；**禁止手改 `.g.cs`** | 產生器輸出無 `prefix = null` |
+| 產生 DOM（`DOM/Generated`） | **none**（目錄覆寫）；**禁止手改 `.g.cs`** | 產生器輸出無 `prefix = null` |
 | schema provider 產生碼 | **none**（`Compliance/Generated` 覆寫） | 非公開 API 形狀焦點 |
 
 > **RS0026**：同一公開符號名稱下不得有**兩個以上**「皆含可選參數」的多載。  

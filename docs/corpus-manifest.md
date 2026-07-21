@@ -82,7 +82,7 @@ fixture 作為欄位用法範例，並非完整清單。欲取得目前完整、
 
 complex builder corpus 目前包含四個 schema-clean 正向樣本：`complex-annual-report.odt`、
 `complex-financial-model.ods`、`complex-business-deck.odp` 與 `complex-flow-diagram.odg`。
-這些檔案是本儲存庫原創生成資料，授權使用 `generated-no-copyright`。
+這些檔案是本儲存庫原創產生資料，授權使用 `generated-no-copyright`。
 
 ## 外部 corpus 路徑
 

@@ -26,13 +26,13 @@ Strict profile 不允許以 ODF namespace 偽裝擴充；若元素或屬性位�
 
 OdfKit 的 DOM reader / writer 以 `NamespaceURI` 與 `LocalName` 為判斷基準，並保留
 prefix、unknown ODF element、foreign element、foreign attribute、comment 與 processing
-instruction。高階 API 在保存文件時不得主動刪除 foreign namespace 內容。
+instruction。高階 API 在儲存文件時不得主動刪除 foreign namespace 內容。
 
 ## 淨化策略
 
 安全淨化只移除已知高風險內容，例如 macro / script package entry、macro URI 與過期簽章。
 安全的 foreign namespace 內容不應被 macro sanitization 誤刪。若使用者需要移除 foreign
-content，應以明確的文件轉換或專用 policy 實作，不應隱含在一般保存流程中。
+content，應以明確的文件轉換或專用 policy 實作，不應隱含在一般儲存流程中。
 
 ## 可移除性準則
 

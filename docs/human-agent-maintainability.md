@@ -37,13 +37,13 @@
 2. **優先改既有邊界檔**，不要新建 partial。  
 3. 若必須新建：在 PR／提交說明寫清 **領域理由**（給人類審），不是「檔案太大」。  
 4. 診斷用 `Analyze-PartialSplits.ps1`；**MERGE/REVIEW 不應成為為拆而拆的 KPI**。  
-5. 生成碼（`DOM/Generated`、schema provider）**不可手改**；改產生器。
+5. 產生碼（`DOM/Generated`、schema provider）**不可手改**；改產生器。
 
 ## 與 RS0026／RS0027 的關係
 
 可選參數多載收斂是 **API 形狀紀律**，與檔案拆分無關：
 
-- 生成 DOM：產生器輸出無 optional prefix 多載。  
+- 產生 DOM：產生器輸出無 optional prefix 多載。
 - 手寫：同名多載至多一個帶可選參數，且應為參數最多者。  
 - 恰好一個可選參數：明確多載鏈；多可選參數：優先 options 物件。  
 - 見 [`public-api-optional-parameters.md`](public-api-optional-parameters.md)。

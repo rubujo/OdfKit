@@ -94,7 +94,7 @@ internal sealed class XadesSignedXml : SignedXml
             return null;
 
         // 以顯式堆疊取代遞迴：惡意構造的極深層嵌套簽章 XML 不會再引發
-        // 無法攔截的 StackOverflowException 使整個進程崩潰。
+        // 無法攔截的 StackOverflowException 使整個處理程序崩潰。
         var stack = new Stack<XmlNode>();
         stack.Push(node);
 

@@ -52,7 +52,7 @@ gradient、marker、clip 與 z-order 可讀回後修改；例如以 `FindGradien
 
 ## 舊版本與未知內容
 
-ODF 1.1～1.3 載入後映射至同一個 1.4 高階模型。預設保存保留來源版本及無法映射的
+ODF 1.1～1.3 載入後映射至同一個 1.4 高階模型。預設儲存保留來源版本及無法映射的
 未知內容；需要指定目標版本時，先呼叫
 `document.AnalyzeVersionCompatibility(targetVersion)`。回傳的
 `OdfVersionCompatibilityReport` 會列出目標版本無法表示的標準元素與屬性、命名空間、
@@ -64,6 +64,6 @@ DOM 路徑及來源／目標版本。指定 `TargetVersion` 或 `OdfSaveOptions.
 
 ## 遷移驗證
 
-遷移完成後至少執行：建立、載入既有文件、修改、移除、保存重載與未知內容保留測試。
+遷移完成後至少執行：建立、載入既有文件、修改、移除、儲存重載與未知內容保留測試。
 完整能力與測試證據以 [semantic coverage manifest](semantic-coverage.json) 為準；API
 工作流見 [四主格式語意 facade reference](reference/semantic-facades.md)。

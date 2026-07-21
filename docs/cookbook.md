@@ -674,7 +674,7 @@ using OdfDocument document = OdfDocument.Load("vendor-file.odt");
 document.Save("vendor-file-copy.odt");
 ```
 
-此路徑適合在只需要讀取、保存或做有限修改時使用。未知 XML 與未知 package entries 的保真由來回讀寫測試覆蓋。
+此路徑適合在只需要讀取、儲存或做有限修改時使用。未知 XML 與未知 package entries 的保真由來回讀寫測試覆蓋。
 
 ## 串流寫入大型 ODS
 

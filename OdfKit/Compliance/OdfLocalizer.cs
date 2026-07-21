@@ -57,7 +57,7 @@ public static partial class OdfLocalizer
             return fix;
         }
 
-        // 若無匹配，回退到英文 (en) 預設翻譯
+        // 若無匹配，遞補到英文 (en) 預設翻譯
         var enDict = ResolveDictionary(CultureInfo.InvariantCulture);
         if (enDict is not null && enDict.TryGetValue(ruleKey, out var enFix))
         {
@@ -158,7 +158,7 @@ public static partial class OdfLocalizer
     /// 解析指定文化特性的本地化字典。
     /// </summary>
     /// <param name="culture">指定的文化特性</param>
-    /// <returns>對應文化特性的本地化字典；若皆無匹配，則回退至預設英文字典；若仍無則傳回 null</returns>
+    /// <returns>對應文化特性的本地化字典；若皆無匹配，則遞補至預設英文字典；若仍無則傳回 null</returns>
     private static Dictionary<string, string>? ResolveDictionary(CultureInfo culture)
     {
         var current = culture;
@@ -207,7 +207,7 @@ public static partial class OdfLocalizer
             current = current.Parent;
         }
 
-        // 若完全沒有，回退到 en
+        // 若完全沒有，遞補到 en
         if (DictionaryCache.TryGetValue("en", out var cachedEn))
         {
             return cachedEn;

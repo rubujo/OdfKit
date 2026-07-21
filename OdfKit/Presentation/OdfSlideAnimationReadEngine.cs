@@ -224,7 +224,7 @@ internal static class OdfSlideAnimationReadEngine
         if (presetId.Contains("fly", StringComparison.OrdinalIgnoreCase))
             return OdfAnimationEffect.FlyIn;
 
-        // 目前尚無法從 preset-id 推斷更精確的效果，一律回退為 Appear；
+        // 目前尚無法從 preset-id 推斷更精確的效果，一律改採為 Appear；
         // 先前版本以 kind 判斷但兩個分支結果相同，屬於無意義的死碼，已一併移除。
         // No more specific effect can currently be inferred from the preset-id, so it
         // always falls back to Appear; the previous branch on `kind` returned the same

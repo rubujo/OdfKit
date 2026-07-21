@@ -4,7 +4,7 @@ namespace OdfKit.Chart;
 
 /// <summary>
 /// Represents a lazily loaded snapshot of a chart's local data table.
-/// 表示圖表本地資料表的延遲載入快照。
+/// 表示圖表內嵌資料表的延遲載入快照。
 /// </summary>
 public sealed class OdfChartDataCache
 {

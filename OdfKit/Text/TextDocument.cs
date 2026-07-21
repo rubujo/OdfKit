@@ -370,7 +370,7 @@ public partial class TextDocument : OdfDocument
 
     /// <summary>
     /// Inserts a table of contents at the end of the document and immediately updates it to auto-generate heading hyperlinks and outline content.
-    /// 於文件結尾插入目錄，並立即更新以自動生成標題超連結與大綱內容。
+    /// 於文件結尾插入目錄，並立即更新以自動產生標題超連結與大綱內容。
     /// </summary>
     /// <param name="title">The table of contents title. / 目錄標題。</param>
     /// <param name="outlineLevel">The maximum outline level included in the table of contents. / 目錄的大綱階層上限。</param>

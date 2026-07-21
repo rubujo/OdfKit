@@ -47,7 +47,7 @@ Typography、OTS 或瀏覽器字型引擎的實作程式碼。
 
 - 最小結構 fixture 由 C# 測試 builder 原創產生，採 OdfKit 的 CC0-1.0。
 - 真實字型只使用允許測試／修改的版本，下載 URI、版本、SHA-256 與授權均須鎖定。
-- 沒有再散布權的字型不得提交 repository 或放入 nupkg；CI cache／artifact 也依授權與保存期限處理。
+- 沒有再散布權的字型不得提交 repository 或放入 nupkg；CI cache／artifact 也依授權與保留期限處理。
 - 瀏覽器、FontTools 或其它 validator 的輸出不作為原創程式碼來源。
 
 ## 變更稽核

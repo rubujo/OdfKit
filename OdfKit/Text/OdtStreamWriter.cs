@@ -12,7 +12,7 @@ namespace OdfKit.Text;
 
 /// <summary>
 /// Writes ODT text documents paragraph by paragraph with a forward-only streaming API.
-/// 提供以資料流方式逐段落寫入 ODT 文字文件的功能，適用於大型文件生成。
+/// 提供以資料流方式逐段落寫入 ODT 文字文件的功能，適用於大型文件產生。
 /// </summary>
 public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 {

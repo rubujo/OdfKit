@@ -91,7 +91,7 @@ public sealed class OdfTypedDomCoverageReport
 
     /// <summary>
     /// Performs fallback element count.
-    /// 取得仍回退到通用 <see cref="OdfElement"/> 的 schema 元素數。
+    /// 取得仍改採到通用 <see cref="OdfElement"/> 的 schema 元素數。
     /// </summary>
     public int FallbackElementCount => elements.Count(element => !element.HasTypedWrapper);
 

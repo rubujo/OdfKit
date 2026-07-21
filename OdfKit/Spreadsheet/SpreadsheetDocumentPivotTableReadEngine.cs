@@ -54,7 +54,7 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
     /// </summary>
     /// <remarks>
     /// 依 ODF 1.4 schema，該屬性型別為 <c>cellRangeAddress</c>（範圍），優先以範圍格式解析；
-    /// 若為舊版本寫入之單一儲存格位址格式，則回退以單一位址格式解析，以維持向下相容。
+    /// 若為舊版本寫入之單一儲存格位址格式，則改採以單一位址格式解析，以維持向下相容。
     /// </remarks>
     private static string ResolveSheetNameFromTargetRange(string targetRangeAddress)
     {

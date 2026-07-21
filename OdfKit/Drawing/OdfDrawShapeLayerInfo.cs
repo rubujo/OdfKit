@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="pageName">The name of the drawing page. / 所在繪圖頁面名稱。</param>
 /// <param name="shapeId">The shape identifier. / 圖形識別碼。</param>
-/// <param name="shapeType">The local name of the shape element (e.g. frame, rect). / 圖形元素本地名稱（例如 frame、rect）。</param>
+/// <param name="shapeType">The local name of the shape element (e.g. frame, rect). / 圖形元素區域名稱（例如 frame、rect）。</param>
 /// <param name="layerName">The assigned layer name (<c>draw:layer</c>). / 指派的圖層名稱（<c>draw:layer</c>）。</param>
 public sealed class OdfDrawShapeLayerInfo(
     string pageName,
@@ -28,7 +28,7 @@ public sealed class OdfDrawShapeLayerInfo(
 
     /// <summary>
     /// Gets the local name of the shape element.
-    /// 取得圖形元素本地名稱。
+    /// 取得圖形元素區域名稱。
     /// </summary>
     public string ShapeType { get; } = shapeType ?? string.Empty;
 

@@ -351,8 +351,8 @@ probe 驗收，不能僅依產品名稱推定。參考
 | `GET/HEAD /_odf-fonts/manifest.json`、`webfonts.css` | alias 使用 `no-cache`、強 ETag 與 304 重驗證；有指紋的 CSS 使用一年 `immutable`；CDN 必須保留原始 bytes 與 ETag | alias 內容可能在部署後改變，但不需每次重傳本文 |
 | 401／400／413／429／503 | 不快取 | 避免把授權、限流或暫時失敗擴散到所有使用者 |
 
-依 [RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html)，`no-cache` 允許保存回應，但重新使用前
-必須向 origin 驗證；`no-store` 才禁止保存。ASP.NET Core 的
+依 [RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html)，`no-cache` 允許儲存回應，但重新使用前
+必須向 origin 驗證；`no-store` 才禁止儲存。ASP.NET Core 的
 [Minimal API file result](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#file-results)
 在提供 ETag 時會處理 `If-None-Match` 與 304。ASP.NET Core 的 authentication／rate-limiter
 middleware 可能在 generation Handler 執行前就回傳 401／429，因此 sample 會在這些 middleware
@@ -444,7 +444,7 @@ SHA-256、`fsType`、sfnt 結構與輸出上限。`.tte` 只是 Windows 安裝�
 只接受 `.tte`／`.ttf` 路徑及 TrueType outline，color、PostScript outline 或損毀檔案照常
 明確拒絕。
 TrueType Variable Fonts 仍須通過 experimental 閘門。EUDC／PUA 的語意不會
-自動跨電腦保存，部署者必須提供版本化 mapping、字型來源 SHA-256、授權與資料治理；使用者個人
+自動跨電腦保留，部署者必須提供版本化 mapping、字型來源 SHA-256、授權與資料治理；使用者個人
 EUDC 字型不得在未授權時散布或上傳 CDN。
 
 ## 全字庫 CNS 11643 Profile

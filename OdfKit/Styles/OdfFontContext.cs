@@ -58,7 +58,7 @@ public sealed class OdfFontContext
 
     /// <summary>
     /// Gets the process-wide default font context.
-    /// 取得行程層級的預設字型情境。
+    /// 取得處理程序層級的預設字型情境。
     /// </summary>
     public static OdfFontContext Default { get; } = new();
 

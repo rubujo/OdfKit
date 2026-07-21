@@ -264,7 +264,7 @@ public partial class PresentationDocument
             typeAttr = StyleEngine.GetStyleProperty(styleName!, "type", SmilNamespace, "drawing-page");
         }
 
-        // 回退自 draw:page 屬性讀取，以確保舊版本相容性
+        // 改從 draw:page 屬性讀取，以確保舊版本相容性
         if (string.IsNullOrEmpty(typeAttr))
         {
             typeAttr = slide.Node.GetAttribute("type", SmilNamespace);

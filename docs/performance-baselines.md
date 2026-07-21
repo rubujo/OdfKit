@@ -70,4 +70,4 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 - 同一台機器上比較同一個 filter、同一個量測設定檔、同一個電源模式。
 - 對微型基準測試結果保持保守；若 BenchmarkDotNet 提示 minimum iteration time 過短，請提高 `-IterationTime` 或資料量。
 - CI 適合跑煙霧測試與回歸關卡，不適合以單一本機毫秒數作為跨平台硬門檻。
-- 三格式標準工作負載與獨立子行程報告方法見 [ODS、ODT、ODP 標準效能基準](performance-standard-documents.md)。
+- 三格式標準工作負載與獨立子處理程序報告方法見 [ODS、ODT、ODP 標準效能基準](performance-standard-documents.md)。

@@ -26,9 +26,9 @@ public class OdfAlphabeticalIndex : OdfIndex
 
     /// <summary>
     /// Gets the XML local name of the alphabetical index source node.
-    /// 取得字母索引來源節點的 XML 本地名稱。
+    /// 取得字母索引來源節點的 XML 區域名稱。
     /// </summary>
-    /// <returns>The XML local name. / XML 本地名稱。</returns>
+    /// <returns>The XML local name. / XML 區域名稱。</returns>
     protected override string GetSourceLocalName() => "alphabetical-index-source";
 
     /// <summary>

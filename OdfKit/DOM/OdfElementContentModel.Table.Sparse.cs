@@ -856,7 +856,7 @@ public partial class TableTableElement
 
     /// <summary>
     /// Performs materialize sparse cells.
-    /// 將尚未具現化的稀疏儲存格全部加載至 DOM。在文件序列化存檔前呼叫。
+    /// 將尚未具現化的稀疏儲存格全部載入至 DOM。在文件序列化存檔前呼叫。
     /// </summary>
     public void MaterializeSparseCells()
     {

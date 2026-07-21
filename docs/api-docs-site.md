@@ -12,7 +12,7 @@ GitHub Pages。執行期例外訊息的 i18n 機制屬另一套系統，見
   以「每語系一個內容資料夾」承載語系入口，全站共用一份 API reference。
 - **在地化概念內容**：17 個語系均提供各自的入口頁與使用、合規、安全及證據指南，
   不以只有翻譯標題或首句的落地頁視為完成。
-- **API 成員內容回退**：API 成員內容由雙語（英文＋正體中文）XML 文件產生
+- **API 成員內容遞補**：API 成員內容由雙語（英文＋正體中文）XML 文件產生
   （政策見 `AGENTS.md`）。非英文／正體中文語系的指南會明確揭露此範圍，
   不宣稱所有 API 成員已翻譯。
 - **禁止站外手工 HTML**：所有頁面（含語系入口）一律是 DocFX 內容頁，
@@ -79,7 +79,7 @@ docs/toc.yml          # project-docs 的分層文件導覽
 - 新增語系：於 `locales.json` 增列 → 新增 `<locale>/index.md`、`guide.md` 與 `toc.yml`
   （front matter `_lang`）→ 在根層 `index.md` 語言表與 `docfx.json` content 增列。
   缺一步建置即失敗。
-- 語系入口與指南必須使用該語系撰寫；固定內容包含 API 範圍、內容回退揭露、
+- 語系入口與指南必須使用該語系撰寫；固定內容包含 API 範圍、內容遞補揭露、
   AI 產製、授權、第三方權利、非官方關係、無 SLA／indemnity、安全限制、
   互通邊界、能力三維度及可追溯證據。
 
@@ -88,7 +88,7 @@ docs/toc.yml          # project-docs 的分層文件導覽
 | 閘門 | 說明 |
 |------|------|
 | 語系契約驗證 | 見上節；防止語系入口孤立或遺漏。 |
-| 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出本地 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
+| 未渲染頁面 href 修復 | docfx metadata 對被 `filterConfig.yml` 排除的型別（如 `OdfKit.DOM.*`）仍會在 references 輸出站內 href；建置時移除指向未渲染頁面的 href，使其渲染為純文字而非失效連結。 |
 | `--warningsAsErrors` | DocFX metadata 與 build 警告均視為錯誤。 |
 | 站內連結健檢 | 掃描全站 HTML 相對 `href`／`src`，任何指向不存在檔案者即失敗。 |
 | 原始資源與 xref | 禁止內部 `.md`、同儲存庫 GitHub Markdown、無來源的 `project-docs/` 輸出及 modern 輸出殘留的 `xref:*`。 |
@@ -97,6 +97,7 @@ docs/toc.yml          # project-docs 的分層文件導覽
 | 權威文件 | 驗證快速開始、套件選型、完整 `docs/`、機器可讀證據與第三方聲明均建置為站內資源。 |
 | 404 頁面 | 驗證 `404.html` 存在、已注入站台根 `<base>`（GitHub Pages 於任意深度缺失路徑回傳其內容，相對資源需以站台根解析）且不進入 sitemap。 |
 | 翻譯契約 | 驗證 80 份譯文的來源雜湊、metadata、必要技術／法律 token 與同語系導覽。 |
+| 臺灣用語 | 掃描所有發布文件與手寫公開 API 文件，禁止簡體字、陸用詞與已知誤譯。 |
 
 ## 5. 本機建置與預覽
 
@@ -114,7 +115,7 @@ dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽
 - 站台不自動輸出 `hreflang` alternates；語系入口以根層語言總表互連。
 - 單一 DocFX 站共用 API reference；非英文／正體中文語系只翻譯概念頁與 TOC，
   不宣稱 API member 已完整翻譯。
-- DocFX 不保存讀者的語系狀態；navbar 維持全站共用雙語。跨語系目的地以
+- DocFX 不記住讀者的語系狀態；navbar 維持全站共用雙語。跨語系目的地以
   `[en + zh-TW]` 明示，不加入自製 JavaScript 動態切換。Footer 連回語言選擇頁，正式文件由
   各語系 TOC 導覽。
 - 舊版站台（`reference/` 前綴與站外語系落地頁）的 URL 已隨結構重整移除，

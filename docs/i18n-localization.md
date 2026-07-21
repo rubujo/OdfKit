@@ -1,7 +1,7 @@
 # OdfKit i18n 與在地化
 
 本文件說明 OdfKit 目前的 i18n 與在地化機制，包含訊息來源、語系選擇、
-回退規則與已支援語言。API 文件站台（GitHub Pages）的 17 語系入口屬另一套
+遞補規則與已支援語言。API 文件站台（GitHub Pages）的 17 語系入口屬另一套
 機制，見 [api-docs-site.md](api-docs-site.md)。
 
 ## 1. 機制概觀
@@ -10,7 +10,7 @@ OdfKit 透過 `OdfKit.Compliance.OdfLocalizer` 統一管理錯誤訊息、警告
 部分合規建議文字。程式庫內拋出的可在地化訊息，會以訊息鍵值搭配語系字典
 解析，而不是在程式碼中直接寫死文字。
 
-## 2. 語系選擇與回退
+## 2. 語系選擇與遞補
 
 `OdfLocalizer` 解析訊息時的順序如下：
 
@@ -45,8 +45,8 @@ OdfKit 透過 `OdfKit.Compliance.OdfLocalizer` 統一管理錯誤訊息、警告
 | `pt-BR` | 巴西葡萄牙文 |
 
 目前全部 17 種語言的訊息鍵值數量一致（2026-07-11 查證），皆有對應翻譯。`pt-BR` 會優先使用巴西譯文；
-`pt-PT` 與其他葡萄牙語地區則透過父文化特性回退至 `pt`。歷史上曾出現新增
-訊息鍵值時僅同步補上 `en`／`zh-TW`、其餘語言暫時依第 2 節回退規則退回英文的情形；若日後
+`pt-PT` 與其他葡萄牙語地區則透過父文化特性遞補至 `pt`。歷史上曾出現新增
+訊息鍵值時僅同步補上 `en`／`zh-TW`、其餘語言暫時依第 2 節遞補規則退回英文的情形；若日後
 再發生類似落差，應在合併前一併補齊全部語言，而非僅補兩種語言後留待後續處理。
 
 ## 4. 使用方式
@@ -92,7 +92,7 @@ OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
 
 | 檔案 | 用途 |
 |------|------|
-| `OdfKit/Compliance/OdfLocalizer.cs` | 訊息解析、格式化與文化回退 |
+| `OdfKit/Compliance/OdfLocalizer.cs` | 訊息解析、格式化與文化遞補 |
 | `OdfKit/Compliance/OdfLocalizer.Languages.cs` | 語言字典註冊與各語系內容 |
 | `OdfKit/Compliance/i18n/exceptions.<culture>.json` | **例外／診斷訊息來源真相**（17 語系） |
 | `OdfKit/Compliance/OdfLocalizer.Exceptions.<culture>.cs` | 由 JSON **產生**的字典 partial（勿手改） |

@@ -10,7 +10,7 @@
 
 | 層級 | 名稱 | 完成線 | 主要入口 |
 |------|------|--------|----------|
-| L0 | 封裝 API | 所有 ODF package entry、manifest、media、RDF 與 unknown entry 可存取、保存與來回讀寫。 | `OdfPackage`、`OdfDocument` |
+| L0 | 封裝 API | 所有 ODF package entry、manifest、media、RDF 與 unknown entry 可存取、儲存與來回讀寫。 | `OdfPackage`、`OdfDocument` |
 | L1 | 型別化 DOM API | 所有 ODF 1.4 schema element / attribute 可透過產生的 wrapper、型別化屬性 helper 或 schema-aware DOM 存取。 | `OdfNode`、`OdfElement`、generated DOM wrappers、`OdfTypedDomCoverage` |
 | L2 | 語意外觀層 API | 常見文件工作流程具備高階 C# 外觀層，不需要呼叫端理解 XML 細節。 | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、Chart / Formula / Image / Database facade |
 | L3 | 外部引擎邊界 | 需要辦公軟體行為、外部環境或不可穩定受控化的能力，只能作為 extension 或 optional validation。 | `OdfKit.Extensions.Rendering`、LibreOffice / Office interop scripts |

@@ -10,7 +10,7 @@ namespace OdfKit.Text;
 internal static class OdfTrackedChangeDom
 {
     /// <summary>
-    /// 在父節點的直接子節點中，依本地名稱與命名空間 URI 尋找第一個符合的節點。
+    /// 在父節點的直接子節點中，依區域名稱與命名空間 URI 尋找第一個符合的節點。
     /// </summary>
     public static OdfNode? FindDirectChild(OdfNode parent, string localName, string ns)
     {

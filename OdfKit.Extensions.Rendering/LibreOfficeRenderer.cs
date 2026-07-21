@@ -198,8 +198,8 @@ public class LibreOfficeRenderer
     /// <param name="outputPath">The path or URI. / 輸出檔案的目標路徑</param>
     /// <param name="format">The name or identifier. / 要轉換的目標格式，例如 pdf</param>
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當來源文件或輸出路徑為 null 時擲出</exception>
-    /// <exception cref="TimeoutException">Thrown when the documented condition occurs. / 當 LibreOffice 轉檔執行程序超時未回應時擲出</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出</exception>
+    /// <exception cref="TimeoutException">Thrown when the documented condition occurs. / 當 LibreOffice 轉檔處理程序超時未回應時擲出。</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當 LibreOffice 處理程序結束但傳回非零的錯誤碼時擲出。</exception>
     /// <exception cref="FileNotFoundException">Thrown when the documented condition occurs. / 當轉檔完成後找不到預期的目標檔案時擲出</exception>
     public void Convert(OdfDocument document, string outputPath, string format)
     {
@@ -266,8 +266,8 @@ public class LibreOfficeRenderer
     /// <param name="cancellationToken">The cancellation token. / 用於取消轉檔作業的權杖</param>
     /// <returns>The result. / 代表非同步轉檔作業的工作</returns>
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當輸入或輸出路徑為 null 或空字串時擲出</exception>
-    /// <exception cref="TimeoutException">Thrown when the documented condition occurs. / 當 LibreOffice 轉檔執行程序超時未回應時擲出</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出</exception>
+    /// <exception cref="TimeoutException">Thrown when the documented condition occurs. / 當 LibreOffice 轉檔處理程序超時未回應時擲出。</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當 LibreOffice 處理程序結束但傳回非零的錯誤碼時擲出。</exception>
     /// <exception cref="FileNotFoundException">Thrown when the documented condition occurs. / 當轉檔完成後找不到預期的目標檔案時擲出</exception>
     /// <exception cref="OperationCanceledException">Thrown when the documented condition occurs. / 當作業因 <paramref name="cancellationToken"/> 取消時擲出</exception>
     public virtual async Task ConvertFileAsync(
@@ -288,7 +288,7 @@ public class LibreOfficeRenderer
         string? sandboxDir = null;
         try
         {
-            // 在系統臨時路徑中建立一個依行程 ID 隔離的唯一沙盒目錄
+            // 在系統臨時路徑中建立一個依處理程序 ID 隔離的唯一沙盒目錄
             string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + Process.GetCurrentProcess().Id + "_" + Guid.NewGuid().ToString("N"));
             if (!Directory.Exists(tempSandbox))
             {
@@ -302,7 +302,7 @@ public class LibreOfficeRenderer
                 Directory.CreateDirectory(profileDir);
             }
 
-            // 複製輸入檔案至沙盒中以防進程讀取衝突
+            // 複製輸入檔案至沙盒中以防處理程序讀取衝突
             string sandboxInputPath = Path.Combine(sandboxDir, Path.GetFileName(inputFilePath));
             File.Copy(inputFilePath, sandboxInputPath, true);
 

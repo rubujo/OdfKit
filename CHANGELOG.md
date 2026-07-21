@@ -8,7 +8,7 @@
 - 釐清公開 API 可選參數與 `CancellationToken` 政策：公開允許尾端 `= default` 或明確多載鏈兩種等價形狀，內部應必填並傳遞；`eng/Expand-OptionalParameters.py` 略過僅 CT 的 `= default`，避免機械拆除 .NET SDK 慣用便利形狀（見 `docs/public-api-optional-parameters.md`）。
 - WebFont 子集化修正 `cmap` format 4 建構與解析。建構端新增連續範圍合併（`idDelta` 相同的相鄰碼位併為單一 segment），解除先前「每字元一個 segment」導致的 8,188 個 BMP 字元硬性上限——該上限低於各層設定允許的 65,536，且遠低於 Big5 常用字集（13,053 字）與 CNS 11643 第 1、2 面（約 13,000 字），亦即完整繁中字集子集在修正前必定失敗。極端稀疏字集改為依 OpenType 1.9.1「format 12 存在時 format 4 為相容性選配」省略 format 4，不再中止產生。encoding record 改為規格要求的 platformID／encodingID 排序（`(0,3)`、`(0,5)`、`(3,1)`、`(3,10)`）。解析端以 subtable 宣告的 `length` 約束 `segCount`，並強制 segment 依 `endCode` 遞增且不重疊，將惡意 `cmap` 的展開迴圈上界由約 21 億次降至 0x10000 次。
 - 新增 `cmap` 規模路徑的三瀏覽器實機閘門（`eng/Test-WebFontCmapScaleBrowserProof.ps1`／`tests/OdfKit.WebFontCmapScaleProof`）：以鎖定的 Adobe Source Han Sans TC `2.005R` 產生 12,000 字單片子集與 9,000 字稀疏子集（後者依規格省略 format 4，僅保留 `(3,10)`），在 Chromium／Firefox／WebKit 驗證 `FontFace` 實際載入與取樣字元的 canvas 墨跡。同批資產截斷後的負向對照在三個引擎均正確遭拒，用以證明量測不是在觀察 fallback。字型與證據皆不納入 repository。
-- WebFont 產字熱路徑全面貫穿 `CancellationToken`（`SfntFont.Parse`／`CreateSubset`、`cmap` 各 format 解析、GSUB closure、composite closure、CFF／CFF2 subsetter 與 compactor、`gvar`、WOFF2 `glyf` 重建）。修正前 `WebFontGenerationWorker.JobTimeout` 雖會觸發卻無人觀察，單一惡意或損毀字型即可永久占住 consumer 執行緒，佇滿後動態產生端點需重啟行程才能恢復；架構文件宣稱的「工作逾時」界限至此才實際成立。`ColorFontValidator` 依其巡訪次數已由位元組範圍檢查隱含限制，僅在各色彩技術階段之間檢查取消，此取捨記於該方法 `<remarks>`。
+- WebFont 產字熱路徑全面貫穿 `CancellationToken`（`SfntFont.Parse`／`CreateSubset`、`cmap` 各 format 解析、GSUB closure、composite closure、CFF／CFF2 subsetter 與 compactor、`gvar`、WOFF2 `glyf` 重建）。修正前 `WebFontGenerationWorker.JobTimeout` 雖會觸發卻無人觀察，單一惡意或損毀字型即可永久占住 consumer 執行緒，佇滿後動態產生端點需重啟處理程序才能恢復；架構文件宣稱的「工作逾時」界限至此才實際成立。`ColorFontValidator` 依其巡訪次數已由位元組範圍檢查隱含限制，僅在各色彩技術階段之間檢查取消，此取捨記於該方法 `<remarks>`。
 - WebFont 託管層修正：ASP.NET Core 動態端點改將 `InvalidDataException`／`NotSupportedException`（字型缺字、格式與輪廓不符、色彩技術超出瀏覽器目標）對應為 400，不再逸出成 500；System.Web 端點同步對齊。`Vary: Origin` 在來源允許清單非空時無條件輸出，避免 `immutable` 長快取讓共享快取將缺少 `Access-Control-Allow-Origin` 的回應餵給合法跨來源請求。動態產生的資產索引新增 `MaxGeneratedAssetCount` 上限（先前隨每次產生單調成長）。
 - WebFont worker 修正單飛競態：`_inflight` 移除改為連同 value 比對，先前可能誤刪其他呼叫端新登記的項目而讓同鍵工作重複執行；併修正 `TryCacheCompleted` 因短路而遞減未曾遞增之計數器的失衡。
 - WebFont 安全強化：System.Web 資產路徑補上 reparse point（符號連結／junction）檢查，與 ASP.NET Core 端一致；移除會永久快取例外的 `Lazy` 設定載入（暫時性失敗先前會固定回 503 直到 AppDomain 回收）；`WindowsEudcFontSourceResolver` 限制解析結果須位於系統字型目錄內（`HKEY_CURRENT_USER` 對使用者可寫，不應成為任意路徑來源）；建置期 CSS 的字型家族名稱改用標準十六進位逸出，涵蓋換行與 `<` 等可跳出字串或 `<style>` 的字元。
@@ -19,15 +19,15 @@
 - 效能：`SegmentText` 導入每呼叫平面字型快取，將逐字元的內建規則鏈評估攤提為每平面一次；新增 `SegmentTextBenchmarks` 的 125,000 個 UTF-16 碼元混排工作負載，可用 `pwsh eng/Benchmark-Stable.ps1 -Filter "*SegmentTextBenchmarks*"` 重現目前版本的時間與配置量。原始開發環境曾觀察到 fall-through 家族最高約減少 97% 執行時間，但比例取決於硬體、執行階段與基線 commit，不作為固定保證；純 BMP 路徑不配置平面快取。
 - 新增全字庫（CNS 11643 open data）整合：`OdfCns11643MappingTable` 官方對照表解析與聯結、`OdfBig5EEncoding` 資料驅動 Big5E 編碼（可餵入 CSV 匯入匯出）、`OdfDocument.MigrateTextCodePoints` 文件碼位遷移（舊版全字庫 PUA 自造字 → 新版 Unicode 正式碼位，回傳統計報告）。維持「機制內建、資料外部」：對照表由使用者自政府資料開放平臺下載，倉庫不內建資料。新增 cns11643-baseline CI workflow 以釘選版本官方資料驗收 10.4 萬碼位的平面路由、CP950 差異白名單（2 字）與 Big5E 全碼位往返。
 - CNS 11643 字型遞補入口擴及圖表與簡報嵌入表格：新增 `OdfChartDocument.SetChartTitle(title, options)`／`SetAxisTitle(dimension, title, options)`（含 `ChartDocumentBuilder`／`ChartAxisBuilder.WithTitle(title, options)`）與 `OdfEmbeddedTable.SetCellText(row, column, text, options)` 多載，重用同一套分段與 font-face 宣告基礎；至此所有承載 ODF 文字 run 的高階入口皆支援字型遞補選項（頁首頁尾經由 `OdfParagraph` 既有多載涵蓋，MathML 公式內容不適用）。
-- 字型子系統重構為 `OdfFontContext` 單一實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數由情境執行個體承載；**移除** `OdfFontResolver` 與 `OdfFontSegmenter` 靜態類別（0.x 未發佈期間之刻意破壞性重整）。隔離注入點兩層：`OdfDocument.FontContext`（文件層級，含存檔時字型內嵌）與 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級），優先序「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器為行程層級，一律使用 `Default`。
+- 字型子系統重構為 `OdfFontContext` 單一實例模型（實例為核心＋靜態 `Default` 單例，對齊 `JsonSerializerOptions.Default` 業界慣例）：字型註冊、替代對照、平面對應、子集化器與警告快取全數由情境執行個體承載；**移除** `OdfFontResolver` 與 `OdfFontSegmenter` 靜態類別（0.x 未發佈期間之刻意破壞性重整）。隔離注入點兩層：`OdfDocument.FontContext`（文件層級，含存檔時字型內嵌）與 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級），優先序「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器為處理程序層級，一律使用 `Default`。
 - 新增自訂罕字字型擴充點：`OdfFontContext.RegisterSupplementaryPlaneFontMapping` 可註冊「基礎字型 → Unicode 平面（1–16）→ 字型名稱」對應（優先於內建規則、`IDisposable` 還原、無鎖讀取熱路徑）；`OdfFontFaceInfo` 公開化為 `sealed record` 並新增 `OdfTextFontFallbackOptions.Custom` 工廠，讓使用者不修改 OdfKit 即可接上自備的 Ext B–J 罕字字型（如黑體系補字字型）。核心維持字型中立，不內建任何第三方字型名稱。
-- CLI `convert-csv --encoding` 開放 IANA 編碼名稱與代碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。
+- CLI `convert-csv --encoding` 開放 IANA 編碼名稱與字碼頁編號（如 `big5`、`shift_jis`、`gb18030`、`950`），支援舊系統傳統編碼 CSV；UTF-7 維持 .NET 預設封鎖。
 - `docs/odf-format-support.md` 新增 Unicode 版本相容性聲明（平面路由與版本無關，Unicode 17.0 Ext J 自動歸入 Plane 3）與內建對應表 Plane 3 覆蓋現況。
 - 完成第二階段 API 人體工學與效能精修：新增 `OdfDiagnostic` 統一診斷模型（八個 report 類別加掛強型別 `Diagnostics` 檢視，見 `docs/reference/diagnostics.md`）、`ImportRecordsAsync`／`ReadRecordsAsync` 非同步物件繫結、`OdfTextMatch.Paragraph`／`ParagraphOffset` 段落定位資訊與搜尋取代單次 traversal 重構、HTML／PDF 匯出低緩衝寫入；同步擴大效能基準與 CI 迴歸閘門（find/replace、物件繫結、export 記憶體）。
 - 補齊少數 XML 讀取點的 `MaxCharactersInDocument` 上限（Flat XML 二次解析、串流套印範本、簽章檔載入、混合 PDF XMP 中繼資料），使 XXE／DoS 防禦姿態全庫一致。
-- 完成 ODT／ODS／ODP／ODG 高階 facade 的一致 CRUD 生命週期契約，加入逐 topic semantic coverage、隨機 mutation、重複保存載入、clean-room provenance 與 Office 修改另存驗證；同步更新 Public API 基線及破壞性重整遷移指南。
-- 新增 `net48` Windows CLR consumer smoke，從本地 NuGet 套件驗證四主格式 round-trip、binding redirect、native imaging 與 7 個 extensions 最小執行入口。
-- 新增 `OdfVersionCompatibilityReport` 與 `AnalyzeVersionCompatibility`，在 ODF 1.4 語意降版至 1.1～1.3 前後提供元素／屬性、命名空間及 DOM 路徑的結構化診斷；保存仍保留無法映射與 foreign namespace 內容，不捏造等價語意。
+- 完成 ODT／ODS／ODP／ODG 高階 facade 的一致 CRUD 生命週期契約，加入逐 topic semantic coverage、隨機 mutation、重複儲存載入、clean-room provenance 與 Office 修改另存驗證；同步更新 Public API 基線及破壞性重整遷移指南。
+- 新增 `net48` Windows CLR consumer smoke，從本機 NuGet 套件驗證四主格式 round-trip、binding redirect、native imaging 與 7 個 extensions 最小執行入口。
+- 新增 `OdfVersionCompatibilityReport` 與 `AnalyzeVersionCompatibility`，在 ODF 1.4 語意降版至 1.1～1.3 前後提供元素／屬性、命名空間及 DOM 路徑的結構化診斷；儲存仍保留無法映射與 foreign namespace 內容，不捏造等價語意。
 - 新增 ODS／ODT 串流 Reader 資源限制選項與真正非同步讀取；repeat、列欄、節點及文字超限時改為失敗，不再靜默截斷。
 - 修正 `OdsStreamReader.GetValue` 的 `DbDataReader` 語意：空值回傳 `DBNull.Value`，公式儲存格回傳已儲存快取值；新增 `GetCell` 保留公式、值類型、貨幣及顯示文字。這是 1.0 前的刻意破壞性修正。
 - ODS／ODT Writer 新增非同步 flush／complete 路徑；ZIP 中央目錄提交因 BCL `ZipArchive` 限制仍為同步步驟。
@@ -43,7 +43,7 @@ GitHub Release 資產若建立，只代表特定提交的交付快照；目前�
 
 ### 新增
 
-- **核心 ODF 支援**：24 種主要 ODF extension（ODT/ODS/ODP/ODG 及其範本、母片、Flat XML、次格式變體）之偵測、建立、載入、保存、驗證與來回讀寫。
+- **核心 ODF 支援**：24 種主要 ODF extension（ODT/ODS/ODP/ODG 及其範本、母片、Flat XML、次格式變體）之偵測、建立、載入、儲存、驗證與來回讀寫。
 - **四主格式高階 API**：ODT、ODS、ODP、ODG 已達 `complete` 分級，涵蓋常用建立、編輯、樣式、公式、加密、追蹤修訂、條件格式、樞紐分析表等場景。
 - **規範可信度**：ODF 1.1/1.2/1.3/1.4 官方 RELAX NG 衍生的版本化 schema metadata／pattern 驗證、profile 規則（OASIS Strict/Extended、ISO/IEC 26300、EU、ROC Taiwan）、266 筆 corpus fixtures，以及由獨立 CI 以固定版本與 SHA-256 執行的外部 ODF Validator baseline。
 - **安全性**：PBKDF2（≤ 50,000 次迭代）、Argon2id、OpenPGP（RSA/ElGamal/ECDH X25519 與傳統曲線）加密；XAdES 數位簽章與時間戳記驗證；XXE／Zip Slip／OOM DoS 防禦。
@@ -65,7 +65,7 @@ GitHub Release 資產若建立，只代表特定提交的交付快照；目前�
 - **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
 - **可維護性**：`OdfLocalizer.Exceptions` 按 12 語系拆檔；新增 `docs/maintainability.md`、產生碼目錄 README、`eng/Test-OneLineXmlSummary.ps1`；歷史 `Split-*`／`Merge-*` 等腳本移至 `eng/historical-refactor/`；合併弱 partial（`OdfAnimation`、簽章 `Common`）並移除空殼 partial 根檔。
 - **公開 API 形狀與文件完滿基線（v0.0.1）**：
-  - 手寫公開 API 將 RS0026／RS0027 升為 **error**；生成 DOM／schema 目錄覆寫為 none，且禁止手改 `.g.cs`。
+  - 手寫公開 API 將 RS0026／RS0027 升為 **error**；產生 DOM／schema 目錄覆寫為 none，且禁止手改 `.g.cs`。
   - 單一尾端可選參數改明確多載鏈；多可選高頻面改 **options 物件**（`OdfRichTextRunOptions`、`OdsRowWriteOptions`、`OdfValidationOptions`、`OdfFlatXmlWriteOptions`、`OdfSchemaRegistrationOptions`）；其餘展開為短多載轉呼叫（`Expand-OptionalParameters.py --dry-run` = 0）。0.x **不**保留舊多可選相容層。
   - PublicApiAnalyzers 雙 TFM Unshipped 基線與 Package Validation；在地化 JSON 產線（12 語系 × 鍵對等閘門）。
   - 雙語 XML **missing** 清零；`Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`。
@@ -95,7 +95,7 @@ GitHub Release 資產若建立，只代表特定提交的交付快照；目前�
 - 修正 `OdfPackageEntry.OpenReader()` 對以 `Stream` 支援內容的專案直接回傳內部共用資料流本體，導致該資料流於呼叫端 `using` 區塊結束後即被釋放、往後任何存取皆擲出 `ObjectDisposedException` 的問題，改為回傳不會連動釋放底層資料流的包裝資料流。
 - 統一簽章描述檔路徑 `META-INF/documentsignatures.xml` 參照至既有的 `OdfSignerConstants.SignaturePath` 常數，避免多處獨立硬編碼字面值於日後路徑調整時各自失步。
 - 修正 `OdfBouncyCastleOpenPgpProvider` 兩處硬編碼中文例外訊息未透過 `OdfLocalizer.GetMessage` 在地化的問題。
-- 修正 `OdfChartDocument.GetPositiveRepeatCount` 未截斷嵌入圖表本地資料表重複計數上限的問題，改為與 `OdfSpreadsheetLimits.CsvMaxRepeat`／`FormulaMaxRepeat` 一致地截斷至 10,000。
+- 修正 `OdfChartDocument.GetPositiveRepeatCount` 未截斷嵌入圖表內嵌資料表重複計數上限的問題，改為與 `OdfSpreadsheetLimits.CsvMaxRepeat`／`FormulaMaxRepeat` 一致地截斷至 10,000。
 - 修正 `OdfDrawPageShapeReadEngine.CollectGroupsRecursive` 遞迴走訪 `draw:g` 群組無深度上限的問題，比照 `OdfDatabaseDocument` 既有的巢狀深度防護慣例，於超過 64 層時擲出可攔截的例外，避免惡意或損毀文件觸發 `StackOverflowException`。
 - 修正 `SpreadsheetDocumentEmbeddedChartReadEngine.TryReadChartMetadata` 於任何大小限制生效前即以 `ReadToEnd()` 無界讀入嵌入圖表 `content.xml` 的問題，改為透過 `OdfBoundedStreamReader` 以 `OdfLoadOptions.MaxEntrySize` 為上限邊界複製。
 - 修正 `PptxToOdpConverter.ConvertGraphicFrame` 未檢查 PPTX 表格儲存格自帶的 `RowSpan`／`GridSpan` 是否與實際表格列欄數一致，格式不一致時會擲出 `ArgumentOutOfRangeException` 中止整個轉換的問題，改為依實際表格邊界夾限合併範圍。
@@ -115,7 +115,7 @@ GitHub Release 資產若建立，只代表特定提交的交付快照；目前�
 - 修正 `OdfSlide.AddEmbeddedObject` 未將反斜線正規化為正斜線，導致內嵌物件 `href` 不符合 ODF 封裝路徑規範的問題。
 - 修正 `OdfChartDocument` 讀取圖表序列（series）時，若缺少 `values-cell-range-address` 屬性即整筆略過，導致採用內嵌圖表資料的序列完全遺失的問題（`OdfChartSeriesInfo.ValuesCellRangeAddress` 隨之改為可為 `null`）。
 - 修正 `AdvancedSecurityTests` 中 5 個測試方法直接對 `ErrorMessage` 斷言英文子字串、未強制文化特性，導致系統語系為 zh-TW 等非英文環境時測試失敗的問題，比照既有 `SecurityComplianceTests` 慣例暫時切換至 `en-US` 文化特性；另發現並修正僅切換 `Thread.CurrentThread.CurrentCulture`／`CurrentUICulture` 於完整測試套件中仍不穩定的問題——`OdfLocalizer.GetMessage` 實際優先採用靜態的 `OdfLocalizer.DefaultCulture`（會被 `EncryptionTests`／`OdfValidationReportTests` 等其他測試類別設定後即不再還原），因此改為同時暫存並還原 `OdfLocalizer.DefaultCulture`，確保不受其他測試執行順序影響。
-- 修正 `CliTests`／`DomTest`／`EncryptionTests`／`LibreOfficeRendererBoundaryTests`／`LibreOfficeRendererDiagnosticsTests`／`OdfValidationReportTests`／`PresentationAndRenderingTests` 共 7 個測試類別於建構子設定全域靜態的 `OdfLocalizer.DefaultCulture` 後從未還原、污染同一測試行程後續測試的問題，改為實作 `IDisposable`，暫存原始值並於 `Dispose()` 還原。
+- 修正 `CliTests`／`DomTest`／`EncryptionTests`／`LibreOfficeRendererBoundaryTests`／`LibreOfficeRendererDiagnosticsTests`／`OdfValidationReportTests`／`PresentationAndRenderingTests` 共 7 個測試類別於建構子設定全域靜態的 `OdfLocalizer.DefaultCulture` 後從未還原、污染同一測試處理程序後續測試的問題，改為實作 `IDisposable`，暫存原始值並於 `Dispose()` 還原。
 - 統一 XAdES 命名空間 URI `http://uri.etsi.org/01903/v1.3.2#`（原於 `OdfSignatureSigner`／`OdfSignatureX509Utilities`／`OdfSignatureVerifier` 共 23 處硬編碼字面值）至 `OdfNamespaces.Xades` 常數。
 - 合併 `OdfPackageFlatXmlLoader`／`OdfStreamingMailMerge`／`XlsxToOdfConverter`／`UnoserverRestBackend` 各自獨立實作的溢位安全大小檢查邏輯，統一改為呼叫 `OdfBoundedStreamReader.AddBytes`／`EnsureInitialBytes` 的既有多載或新增的 `exceptionFactory` 多載。
 - 移除 `OdfDatabaseFormDesigner` 與 `OdfNamespaces` 重複宣告的 5 個命名空間常數，改為直接參照 `OdfNamespaces` 既有常數。

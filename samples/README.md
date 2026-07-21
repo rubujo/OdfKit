@@ -18,7 +18,7 @@ WebFont 專用範例另見：
 ## 技術背景與最佳實踐
 
 微軟在 .NET 10.0 中引入了單檔 C# 應用程式執行模式：
-- **免專案檔運行**：使用 `dotnet run <file.cs>` 即可直接編譯並執行單個 `.cs` 檔案。
+- **免專案檔執行**：使用 `dotnet run <file.cs>` 即可直接編譯並執行單一 `.cs` 檔案。
 - **檔案指令 (Directives)**：在程式碼頂端使用以 `#:` 開頭的指令，可以直接在程式碼內處理專案相依性。
   - `#:project <path.csproj>`：可用於直接參考本地 C# 專案。
   - `#:package <package>@<version>`：可用於下載並參考 NuGet 套件。

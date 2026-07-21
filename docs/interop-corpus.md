@@ -4,11 +4,11 @@
 
 ## 自動產生的 corpus
 
-- `InteropCorpusTests`：針對主要封裝格式驗證公開驗證器 API、document kind、ODF 版本、保存後重新開啟，以及未知 package entry 保留。
+- `InteropCorpusTests`：針對主要封裝格式驗證公開驗證器 API、document kind、ODF 版本、儲存後重新開啟，以及未知 package entry 保留。
 - `OdfValidatorApiTests`：覆蓋 package 與 Flat XML 驗證 API。
 - `PackageRoundTripTests`：覆蓋 Flat XML / ZIP package 互轉、圖片與嵌入公式來回讀寫；
   `PackageRoundTripMatrixTests.MinimalSupportedFormatRoundTrips` 建立 24 種主要 ODF extension 的最小文件，驗證 MIME、ODF 版本、
-  document kind、載入與保存；`HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions`
+  document kind、載入與儲存；`HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions`
   覆蓋 foreign namespace、未知屬性、comments、processing instructions 與 prefix 保留。
 
 ## ODF 1.4 正向 corpus
@@ -27,7 +27,7 @@
 
 ## 未知內容 corpus
 
-- `OdfPackageUnknownEntryTests` 覆蓋未知 package entries、`Configurations2`、`ObjectReplacements` 與未知 media entry 保存。
+- `OdfPackageUnknownEntryTests` 覆蓋未知 package entries、`Configurations2`、`ObjectReplacements` 與未知 media entry 儲存。
 - `InteropCorpusTests` 確認主要封裝格式在 validator 與 package save 來回讀寫後仍保留未知 binary entry。
 - `PackageRoundTripTests.HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions`
   覆蓋 foreign namespace、未知屬性、comments、processing instructions 與 prefix 保留（見上方
@@ -35,15 +35,15 @@
 
 ## 安全邊界 corpus
 
-- `OdfSecurityBoundaryTests` 覆蓋簽章保存 / 失效、macro sanitize、加密文件 sanitize 後重新保存。
+- `OdfSecurityBoundaryTests` 覆蓋簽章儲存 / 失效、macro sanitize、加密文件 sanitize 後重新儲存。
 - `eng/Test-OdfPolicy.ps1` 與 GitHub Actions `ODF policy` 工作流程會執行 `Category=Policy`
-  測試，固定檢查 macro / script artifact、外部資源 policy 與加密重新保存邊界。
+  測試，固定檢查 macro / script artifact、外部資源 policy 與加密重新儲存邊界。
 - XML reader 與 package loader 另有 XXE、DoS 與 Zip Slip 防禦測試。
 
 ## 渲染 / LibreOffice corpus
 
 - `OdfKit.Extensions.Rendering` 與相關測試使用可替換的 LibreOffice finder。
-- 這部分屬可選渲染擴充，不是核心 OdfKit 建立、載入、保存與驗證能力的必要條件。
+- 這部分屬可選渲染擴充，不是核心 OdfKit 建立、載入、儲存與驗證能力的必要條件。
 - LibreOffice 26.x 實機互通矩陣見 [libreoffice-interop-matrix.md](libreoffice-interop-matrix.md)；
   執行 `pwsh eng/Test-LibreOfficeInterop.ps1`（需本機 LibreOffice 26.x，否則略過）。
 - OOXML 視覺 golden 矩陣見 [ooxml-visual-golden-matrix.md](ooxml-visual-golden-matrix.md)；
@@ -88,7 +88,7 @@
 
 ## 預期行為
 
-- 對支援的結構：建立、載入、保存、驗證應可重複執行。
+- 對支援的結構：建立、載入、儲存、驗證應可重複執行。
 - 對未知但合法的 package / XML：預設保留。
 - 對不安全內容：validator 應回報 issue；sanitize API 可移除巨集與過期簽章等風險內容。
-- 對無法完整語意化的高階內容：不得因保存而破壞未知資料。
+- 對無法完整語意化的高階內容：不得因儲存而破壞未知資料。

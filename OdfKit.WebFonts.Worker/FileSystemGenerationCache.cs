@@ -95,7 +95,7 @@ internal sealed class FileSystemGenerationCache
                 return new FileLease(stream);
             }
             // Windows 在 DeleteOnClose 的 handle 關閉後會讓檔案進入 delete pending 狀態；
-            // 此時其他行程開啟會得到 STATUS_DELETE_PENDING，對應 ERROR_ACCESS_DENIED，
+            // 此時其他處理程序開啟會得到 STATUS_DELETE_PENDING，對應 ERROR_ACCESS_DENIED，
             // .NET 拋出的是 UnauthorizedAccessException 而非 IOException。只攔 IOException
             // 會讓租約在正常競爭下直接失敗，而不是依退避重試。
             catch (Exception exception) when (exception is IOException

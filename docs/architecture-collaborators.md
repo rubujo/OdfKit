@@ -30,7 +30,7 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 |------|------|
 | `OdfElement` 屬性／值 partial | Schema 驅動屬性面，KEEP |
 | `OdfElementSchemaRegistry.*` | 枚舉 token 註冊，KEEP |
-| 生成 DOM 包裝 | 規格覆蓋代價；不可手改 `.g.cs` |
+| 產生 DOM 包裝 | 規格覆蓋代價；不可手改 `.g.cs` |
 | 多版 Official Schema Provider | ODF 實際流通跨版本；體大 ≠ 應拆包 |
 
 ## 後續僅在「改到該區」時小步抽取

@@ -59,7 +59,7 @@ public enum OdfMathTokenKind
 
     /// <summary>
     /// A MathML <c>mrow</c> group row whose children are stored in <see cref="OdfMathToken.Children"/>.
-    /// MathML <c>mrow</c> 群組列，子專案存放於 <see cref="OdfMathToken.Children"/>。
+    /// MathML <c>mrow</c> 群組列，子項目存放於 <see cref="OdfMathToken.Children"/>。
     /// </summary>
     Row,
 

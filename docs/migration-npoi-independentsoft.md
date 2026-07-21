@@ -24,7 +24,7 @@ manifest entry，應先確認是否已有 L1／L2 facade，而不是直接複製
 - 記錄匯入與讀回使用 object binding facade；轉型、重複標頭與未知欄位由 typed
   options 控制，問題寫入 `OdfObjectBindingReport.Diagnostics`。
 - 大量循序資料改用 streaming adapter，避免先建立完整 DOM。
-- OdfKit 保存 OpenFormula；不應假設它等同試算表應用程式的完整計算引擎。
+- OdfKit 儲存 OpenFormula；不應假設它等同試算表應用程式的完整計算引擎。
 
 ## 文字、簡報與繪圖遷移
 

@@ -34,7 +34,7 @@
 
 | 檔案 | 角色 |
 |------|------|
-| `OdfLocalizer.cs` | 查找、快取、文化回退 |
+| `OdfLocalizer.cs` | 查找、快取、語系遞補 |
 | `OdfLocalizer.Languages.cs` | 合規建議等較短語系工廠 |
 | `OdfLocalizer.Exceptions.cs` | 例外字典**入口**（註冊 17 語系） |
 | `OdfLocalizer.Exceptions.<culture>.cs` | **單一語系**例外／診斷字串表 |
@@ -68,7 +68,7 @@
 | 基線路徑 | `OdfKit/PublicAPI/$(TargetFramework)/PublicAPI.{Shipped,Unshipped}.txt` |
 | 0.x 策略 | **全量在 Unshipped**；1.0 發佈時移入 Shipped |
 | RS0016／RS0017 | **error**（阻擋未登錄新增與意外移除） |
-| RS0026／RS0027 | **error**（手寫）；生成 DOM／schema 目錄為 **none**；見 [public-api-optional-parameters.md](public-api-optional-parameters.md) |
+| RS0026／RS0027 | **error**（手寫）；產生 DOM／schema 目錄為 **none**；見 [public-api-optional-parameters.md](public-api-optional-parameters.md) |
 | 重產腳本 | `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify` |
 | 說明 | [OdfKit/PublicAPI/README.md](../OdfKit/PublicAPI/README.md) |
 

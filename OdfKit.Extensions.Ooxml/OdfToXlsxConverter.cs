@@ -822,7 +822,7 @@ public static class OdfToXlsxConverter
     private static string NormalizePivotTargetRef(string targetAddress, string sheetName)
     {
         // 依 ODF 1.4 schema，table:target-range-address 型別為 cellRangeAddress（範圍），
-        // 優先以範圍格式解析其起點；若為舊版本寫入之單一儲存格位址格式則回退解析，以維持
+        // 優先以範圍格式解析其起點；若為舊版本寫入之單一儲存格位址格式則改採單一位址解析，以維持
         // 向下相容。
         OdfCellAddress? address = null;
         if (OdfCellRange.TryParse(targetAddress, out OdfCellRange parsedRange))

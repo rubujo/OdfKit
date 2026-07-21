@@ -12,7 +12,7 @@ namespace OdfKit.Drawing;
 internal static class OdfDrawPageShapeReadEngine
 {
     // 群組巢狀深度上限：防止惡意或損毀的 ODF 以極深層巢狀 <draw:g>
-    // 引發無界遞迴的 StackOverflowException 使進程崩潰。
+    // 引發無界遞迴的 StackOverflowException 使處理程序崩潰。
     private const int MaxGroupNestingDepth = 64;
 
     internal static IReadOnlyList<OdfPathInfo> GetPaths(OdfDrawPage page) =>

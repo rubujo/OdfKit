@@ -120,7 +120,7 @@ public static class OdfHybridPdfHelper
 
     /// <summary>
     /// Embeds an ODF package into a PDF as a hybrid PDF attachment.
-    /// 將 ODF 檔案作為附件注入 PDF 中，生成混合 PDF （Hybrid PDF）。
+    /// 將 ODF 檔案作為附件注入 PDF 中，產生混合 PDF（Hybrid PDF）。
     /// </summary>
     /// <param name="pdfPath">The path or URI. / 來源 PDF 檔案路徑</param>
     /// <param name="odfPath">The path or URI. / 要注入的 ODF 檔案路徑</param>
@@ -137,7 +137,7 @@ public static class OdfHybridPdfHelper
 
     /// <summary>
     /// Embeds an ODF package into a PDF as a hybrid PDF attachment.
-    /// 將 ODF 檔案流作為附件注入 PDF 檔案流中，生成混合 PDF 。
+    /// 將 ODF 檔案串流作為附件注入 PDF 檔案串流中，產生混合 PDF。
     /// </summary>
     /// <param name="pdfStream">The source or target object. / 來源 PDF 檔案的資料流</param>
     /// <param name="odfStream">The source or target object. / 要注入的 ODF 檔案的資料流</param>

@@ -19,6 +19,9 @@ main.container-xxl {
 }
 
 .navbar-brand {
+  display: inline-flex;
+  column-gap: 0.45rem;
+  align-items: center;
   font-weight: 700;
   letter-spacing: -0.015em;
   white-space: nowrap;

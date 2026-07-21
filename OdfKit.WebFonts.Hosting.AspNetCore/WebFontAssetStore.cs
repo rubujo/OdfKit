@@ -21,7 +21,7 @@ internal sealed class WebFontAssetStore
 
     private readonly ConcurrentDictionary<string, StoredWebFontAsset> _assets;
 
-    // 動態產生的資產與 manifest 資產分開保存：manifest 條目在行程存活期間必須恆定，
+    // 動態產生的資產與 manifest 資產分開儲存：manifest 條目在處理程序存活期間必須恆定，
     // 動態條目則會隨每次產生累積，需獨立設界限，否則長時間執行的伺服器記憶體單調成長。
     private readonly ConcurrentDictionary<string, StoredWebFontAsset> _generatedAssets =
         new(StringComparer.Ordinal);

@@ -34,7 +34,7 @@
     {
       "id": "third-party-notices",
       "source": "THIRD-PARTY-NOTICES.md",
-      "sourceSha256": "107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2",
+      "sourceSha256": "1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce",
       "destination": "api-docs/{locale}/project-docs/THIRD-PARTY-NOTICES.md",
       "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Microsoft.Win32.Registry", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "Noto Sans", "Noto Color Emoji", "IPAmj Mincho", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
     }

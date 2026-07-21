@@ -8,7 +8,7 @@ namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
 /// Runs LibreOffice conversions through a local process backend.
-/// 實作基於本地安裝 LibreOffice 進程（soffice）的文件轉檔後端。
+/// 實作以本機安裝的 LibreOffice 處理程序（soffice）進行文件轉檔的後端。
 /// </summary>
 public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
 {

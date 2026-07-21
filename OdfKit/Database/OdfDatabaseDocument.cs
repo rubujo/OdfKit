@@ -395,7 +395,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     }
 
     // component-collection 巢狀深度上限：防止惡意或損毀的 ODB 以極深層巢狀
-    // 引發無界遞迴的 StackOverflowException 使進程崩潰。
+    // 引發無界遞迴的 StackOverflowException 使處理程序崩潰。
     private const int MaxFormComponentDepth = 64;
 
     private static void CollectFormComponents(OdfNode parent, List<OdfDatabaseFormInfo> forms, int depth)

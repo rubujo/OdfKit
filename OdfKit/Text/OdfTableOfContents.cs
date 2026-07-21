@@ -26,9 +26,9 @@ public class OdfTableOfContents : OdfIndex
 
     /// <summary>
     /// Gets the XML local name of the table of contents source node.
-    /// 取得目錄來源節點的 XML 本地名稱。
+    /// 取得目錄來源節點的 XML 區域名稱。
     /// </summary>
-    /// <returns>The XML local name. / XML 本地名稱。</returns>
+    /// <returns>The XML local name. / XML 區域名稱。</returns>
     protected override string GetSourceLocalName() => "table-of-content-source";
 
     /// <summary>

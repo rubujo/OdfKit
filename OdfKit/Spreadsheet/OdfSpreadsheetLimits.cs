@@ -20,7 +20,7 @@ public static class OdfSpreadsheetLimits
 
     /// <summary>
     /// The maximum repeated row or column count allowed while building an embedded chart's local data cache.
-    /// 建立嵌入圖表本地資料快取時允許的最大重複列或欄次數。
+    /// 建立內嵌圖表資料快取時允許的最大重複列或欄次數。
     /// </summary>
     public const int ChartMaxRepeat = 10_000;
 

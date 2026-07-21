@@ -9,7 +9,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 本矩陣的歷史狀態不得單獨解讀為「完整支援」。新的可稽核宣稱拆成三個互不推導的維度：
 
-- `PackageFidelity`：封裝偵測、載入、保存、驗證與未知內容保存。
+- `PackageFidelity`：封裝偵測、載入、儲存、驗證與未知內容儲存。
 - `SemanticApiDepth`：高階 API 能理解及修改的文件語意深度。
 - `InteropEvidence`：schema、corpus 與外部辦公軟體的實測證據。
 
@@ -23,7 +23,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 - `verified`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
 - `validated`：已有驗證或偵測測試證據，但高階 API 仍可能有限。
-- `package-level`：可建立、載入、保存與驗證最小封裝，但高階語意 API 尚未完整。
+- `package-level`：可建立、載入、儲存與驗證最小封裝，但高階語意 API 尚未完整。
 - `partial`：已有部分高階模型或來回讀寫能力，但仍有明確缺口。
 - `planned`：尚未有足夠程式與測試證據支撐。
 
@@ -121,7 +121,7 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
 
 - 字雲（`Jigmo3`）與 Windows `SimSun-ExtG` 有對應字型可接。
 - 全字庫（`TW-Kai-*`／`TW-Song-*`）與花園明朝（HanaMin）無 Plane 3 字面，維持基礎字型
-  （對應字元將依讀取端字型回退機制呈現）。
+  （對應字元將依讀取端字型後援機制呈現）。
 
 若需接上內建規則未涵蓋的罕字字型（例如自備的黑體系 Ext B–J 補字字型），可組合下列公開
 擴充點，全程不需修改 OdfKit：
@@ -136,7 +136,7 @@ Unicode 平面（plane）為單位路由而非以區塊（block）為單位，�
   多租戶或測試隔離場景可建立獨立執行個體，經由 `OdfDocument.FontContext`（文件層級，含存檔
   時的字型內嵌）或 `OdfTextFontFallbackOptions.FontContext`（單次呼叫層級）注入，優先序為
   「選項 → 文件 → Default」。已知限制：PDF 匯出因 PDFsharp 全域字型解析器
-  （`GlobalFontSettings.FontResolver`）為行程層級，一律使用 `Default` 情境；嵌入子文件與
+  （`GlobalFontSettings.FontResolver`）為處理程序層級，一律使用 `Default` 情境；嵌入子文件與
   最外層文件共用封裝時，存檔內嵌以最外層文件的情境為準。
 
 OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何第三方罕字字型檔；字型選擇、實體檔案
@@ -190,7 +190,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 
 ## 矩陣
 
-| 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |
+| 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 儲存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | verified | verified | verified | verified | validated | verified | workflow-verified | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | verified | verified | verified | verified | validated | verified | workflow-verified | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
@@ -261,7 +261,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
 - ODT、ODS、ODP、ODG 高階 API 已達 `semantic-contract-verified`：schema v4 manifest 對每個
-  topic 驗證完整生命週期，並逐 family 驗證既有文件、重複保存載入、未知內容保留、
+  topic 驗證完整生命週期，並逐 family 驗證既有文件、重複儲存載入、未知內容保留、
   ODF 1.1～1.3 映射、結構化降版診斷、非法輸入、隨機 mutation、
   corpus differential 與外部辦公軟體互通證據；使用者工作流不需下沉裸 DOM。明列非目標不屬於
   此分級的未完成項目。

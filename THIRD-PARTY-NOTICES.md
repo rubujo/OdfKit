@@ -24,7 +24,7 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | PDF 相關處理、排版與繪製擴充（於 OdfKit.Extensions.Pdf 中使用） | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | RDF 圖形與 SPARQL 查詢橋接（於 OdfKit.Extensions.Rdf 中使用） | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | 提供 `dynamic` 型別執行期繫結支援（於 OdfKit.Extensions.Ooxml 之 netstandard2.0 目標使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與代碼生成（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |
+| [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與程式碼產生（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |
 | [Noto Sans TC](https://github.com/notofonts/noto-cjk) | WebFont 最小測試使用的繁體中文字型（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/notofonts/noto-cjk/blob/main/LICENSE) |
 | [Noto Sans Arabic／Devanagari](https://github.com/google/fonts) 與 [Noto Sans CJK](https://github.com/notofonts/noto-cjk) | 多國文字、複雜塑形、TTC face 與 OpenType CFF smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://openfontlicense.org/) |
 | [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) | Color／bitmap font 明確拒絕 smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/googlefonts/noto-emoji/blob/main/LICENSE) |

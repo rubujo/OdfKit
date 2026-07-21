@@ -27,7 +27,7 @@ internal static class PresentationDocumentTransitionReadEngine
                 durAttr = document.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page");
             }
 
-            // 回退自 draw:page 屬性讀取，以確保舊版本相容性
+            // 改從 draw:page 屬性讀取，以確保舊版本相容性
             if (string.IsNullOrEmpty(durAttr))
             {
                 durAttr = slide.Node.GetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");

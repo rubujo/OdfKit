@@ -6,7 +6,7 @@
 
 ## 標準矩陣
 
-| 格式 | 標準規模 | 串流讀取 | 串流寫入 | DOM 載入／保存 | 語意檢查碼 |
+| 格式 | 標準規模 | 串流讀取 | 串流寫入 | DOM 載入／儲存 | 語意檢查碼 |
 |------|----------|----------|----------|-----------------|------------|
 | ODS | 寫入 1,000,000 列、讀取 50,000 列 × 10 欄混合型別；另有三工作表複雜 DOM | `OdsStreamReader` | `OdsStreamWriter` | `SpreadsheetDocument` | 列號與所有儲存格值／XML 語意 |
 | ODT | 100,000 個標題、段落與清單節點；另有表格與註解 DOM | `OdtStreamReader` | `OdtStreamWriter` | `TextDocument` | 節點類型、層級、樣式與文字 |
@@ -23,13 +23,13 @@ ODS 串流讀取目前沿用 64 MiB XML 字元安全上限，因此標準讀取�
 - `StandardPackageOpenBenchmarks` 單獨量測 `OdfPackage.Open`，避免把 ZIP 開啟成本混入文件模型。
 - `StandardOdsBenchmarks`、`StandardOdtBenchmarks`、`StandardOdpBenchmarks` 使用 BenchmarkDotNet
   取得穩態耗時與 GC 配置量。
-- `eng/Benchmark-StandardDocuments.ps1` 讓大型情境各自在獨立子行程執行，輸出完整冷啟動
+- `eng/Benchmark-StandardDocuments.ps1` 讓大型情境各自在獨立子處理程序執行，輸出完整冷啟動
   成本、配置量、峰值工作集、封裝大小、解壓 XML 大小及語意檢查碼。
 - 報告外層使用 schema v2，將 commit、量測時間、workflow run、runner、runtime、CPU 型號與 artifact 身分和
-  九個 schema v1 情境結果一起保存，避免不同提交或執行環境的樣本被混為同一基線。
-- 每次讀取與來回保存都必須完成語意檢查碼計算，避免以漏讀內容換取較漂亮數字。
+  九個 schema v1 情境結果一起儲存，避免不同提交或執行環境的樣本被混為同一基線。
+- 每次讀取與來回儲存都必須完成語意檢查碼計算，避免以漏讀內容換取較漂亮數字。
 
-執行完整獨立行程報告：
+執行完整獨立處理程序報告：
 
 ```powershell
 pwsh eng/Benchmark-StandardDocuments.ps1

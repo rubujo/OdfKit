@@ -52,7 +52,7 @@ public static partial class OdfLocalizer
         },
         ["zh-TW"] = new(StringComparer.Ordinal)
         {
-            ["Diag_OdfTextMeasurer_GdiFontMeasurementFallback"] = "GDI+ 字型量測失敗，回退至 SkiaSharp：{0}。",
+            ["Diag_OdfTextMeasurer_GdiFontMeasurementFallback"] = "GDI+ 字型量測失敗，改用 SkiaSharp：{0}。",
             ["Diag_XlsxToOdfConverter_ChartImportSkipped"] = "XLSX 圖表解析失敗，已略過圖表匯入：{0}。",
             ["Diag_XlsxToOdfConverter_PivotTableImportSkipped"] = "XLSX 樞紐分析表解析失敗，已略過樞紐分析表匯入：{0}。",
             ["Diag_XlsxToOdfConverter_SharedStringIndexOutOfRange"] = "XLSX 共用字串索引 {0} 超出範圍（表大小 {1}），已清空該儲存格值。",

@@ -29,7 +29,7 @@
 - 雙 TFM 套件相容性（`EnablePackageValidation`）由 `nuget-pack.yml`／`Test-NuGetPack.ps1` 在 pack 時把關。
 
 Windows 與 `net10.0` 曾在單一 `Category=Smoke` 批次或單一
-`PackageRoundTripTests` 批次中留下 `OdfKit.Tests.exe` 測試子行程，即使個別測試單跑可通過，
+`PackageRoundTripTests` 批次中留下 `OdfKit.Tests.exe` 測試子處理程序，即使個別測試單跑可通過，
 也可能讓 VSTest/testhost 無法結束。煙霧測試分片是針對這個 testhost 收尾風險的必要設計，
 不得合回單一全量煙霧測試步驟，也不得把所有 package round-trip 測試合回單一步驟。
 完整格式矩陣來回讀寫（`PackageRoundTripMatrixTests`）保留在 `Regression` / `Compliance`
@@ -102,7 +102,7 @@ OdfKit 因此採下列可機器驗證的契約：
   不建立 branch-scoped cache；受信任的非 PR workflow 才能儲存。
 - NuGet global-packages 使用 OS 與明確 revision 的穩定 key；nupkg 可同時包含多個 RID，
   不按 runner 架構複製。cache 是 immutable；相依集合變更後，在 revision 尚未調升前會
-  還原既有內容並下載缺少項目，但不會更新既有項目。累積差額或相依變更值得保存時必須調升
+  還原既有內容並下載缺少項目，但不會更新既有項目。累積差額或相依變更值得保留時必須調升
   `nuget-cache-revision`，不得用 commit SHA 或廣泛
   `hashFiles` 複製整份 cache。
 - 外部 corpus／工具 key 只納入會改變該 cache bytes 的版本、face、SHA-256 與小型 metadata；

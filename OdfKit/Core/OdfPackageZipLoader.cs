@@ -537,7 +537,7 @@ internal static class OdfPackageZipLoader
 
     // 靜態快取 BCL 私有欄位的反射結果：只在型別初始化時探測一次，
     // 之後每個 entry 直接讀取；欄位在未來 .NET 版本消失或反射受限（如 AOT）時
-    // 整體回退至長度比對啟發式，且不得讓探測例外升級為 TypeInitializationException。
+    // 整體改採至長度比對啟發式，且不得讓探測例外升級為 TypeInitializationException。
     private static readonly FieldInfo? CompressionMethodField = ProbeCompressionMethodField();
 
     private static FieldInfo? ProbeCompressionMethodField()

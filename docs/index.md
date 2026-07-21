@@ -32,7 +32,7 @@
 | [NuGet 相容矩陣](nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | [ODF 格式支援矩陣](odf-format-support.md) | 功能覆蓋、狀態標記與測試證據 |
 | [ODF Profile 來源](odf-profile-sources.md) | 內建 Profile 的來源、權威層級與驗證狀態 |
-| [i18n 與在地化](i18n-localization.md) | 語系字典、訊息回退與 `OdfLocalizer` 使用方式 |
+| [i18n 與在地化](i18n-localization.md) | 語系字典、訊息遞補與 `OdfLocalizer` 使用方式 |
 | [版本與交付資訊](version-delivery.md) | 交付管道、版本原則與安裝參考 |
 
 ### 2. 導入與開發

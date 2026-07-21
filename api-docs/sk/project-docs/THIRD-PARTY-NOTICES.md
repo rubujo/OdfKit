@@ -2,7 +2,7 @@
 title: Oznámenia tretích strán
 _lang: sk
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 107cfa6e885e599c7eb9ba318d6b91f3b755b99f52c18c2adc6d6314d02f4ad2
+translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
 ---
 
 # Oznámenia tretích strán

@@ -25,7 +25,7 @@
 |------|----------|----------|
 | 常見文件操作，一般使用者應該看得懂 | L1 / L2 | 使用領域詞彙，例如 `AddHeading`、`FindSheet` |
 | 大量資料匯入 / 匯出或不建 DOM 的流程 | L3 | 明確標示串流、緩衝、寫入順序限制 |
-| ZIP 專案、manifest、原始 XML 或未知內容 | L4 | 保留 ODF / ZIP 語意，不把低階行為包裝成高階承諾 |
+| ZIP 項目、manifest、原始 XML 或未知內容 | L4 | 保留 ODF / ZIP 語意，不把低階行為包裝成高階承諾 |
 | 驗證、報告、policy 或 corpus 診斷 | L5 | 優先結構化資料，避免只回傳字串 |
 | 加密、簽章、外部資源或不可信輸入 | L6 | 預設防禦式設定，例外訊息使用 `OdfLocalizer` |
 | 需要 LibreOffice、PDF、OOXML 或大型第三方相依 | L7 | 放在 extension，不進核心套件 |

@@ -87,7 +87,7 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IAsyncDispos
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
         string key = CreateKey(request, destinationDirectory);
-        // 耐久快取每次命中都必須重新驗證檔案、雜湊與連結狀態，避免同一行程內的
+        // 耐久快取每次命中都必須重新驗證檔案、雜湊與連結狀態，避免同一處理程序內的
         // 記憶體捷徑掩蓋部署後遭竄改或遭替換的資產。
         if (_durableCache is null
             && _completed.TryGetValue(key, out WebFontManifest? completed))

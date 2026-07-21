@@ -2,7 +2,7 @@
 
 OdfKit 是純受控 C# / .NET 的 ODF (OpenDocument Format) 文件處理
 SDK。它讓應用程式在不啟動 LibreOffice、OpenOffice、UNO、Microsoft
-Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF 文件內容。
+Office 或 Java 的情況下，建立、載入、儲存、驗證並保留 ODF 文件內容。
 
 目前預設新建文件為 ODF 1.4。核心與可攜式 managed 擴充套件採 `net10.0` 與
 `netstandard2.0` 雙目標框架；WebFont Worker 與 ASP.NET Core 託管套件採 `net10.0`，
@@ -16,12 +16,12 @@ System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `ne
 
 | 面向 | 說明 |
 |------|------|
-| 核心能力 | 支援 24 種主要 ODF extension 的格式偵測、最小建立、載入、保存、驗證與來回讀寫 |
+| 核心能力 | 支援 24 種主要 ODF extension 的格式偵測、最小建立、載入、儲存、驗證與來回讀寫 |
 | 高階 API | ODT、ODS、ODP、ODG 提供常用建立與編輯 API；ODC、ODF、ODI、ODB 提供可用的高階入口 |
 | 資料庫互通 | 透過 `ObjectDataReader<T>` 將任意物件序列或 Entity Framework Core 查詢投影以 `DbDataReader` 邊界串流匯出／匯入，不綁定特定 ORM 或資料庫 provider |
-| 相容性 | Package 與 DOM 來回讀寫會保留未知封裝專案、foreign XML、processing instructions、comments 與 prefix |
+| 相容性 | Package 與 DOM 來回讀寫會保留未知封裝項目、foreign XML、processing instructions、comments 與 prefix |
 | 驗證 | 內建 package / flat XML 檢查、ODF 1.4 schema metadata、profile rules、positive / negative corpus 測試 |
-| 在地化 | 透過 `OdfLocalizer` 提供多語系訊息與文化回退機制 |
+| 在地化 | 透過 `OdfLocalizer` 提供多語系訊息與語系遞補機制 |
 | 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`typed-dom-coverage`、`convert-flat`、`convert-csv` 與 `pack` |
 
 完整支援範圍請見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
@@ -34,7 +34,7 @@ System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `ne
 
 | 類別 | 內容 | 典型用途 |
 |------|------|----------|
-| 核心 SDK | `OdfKit` | ODF 文件建立、載入、保存、驗證、來回讀寫 |
+| 核心 SDK | `OdfKit` | ODF 文件建立、載入、儲存、驗證、來回讀寫 |
 | 匯出與轉換擴充 | `OdfKit.Extensions.Html`、`OdfKit.Extensions.Pdf`、`OdfKit.Extensions.Ooxml` | HTML / Markdown / RTF、PDF、DOCX / XLSX 互通 |
 | 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作匯出 |
 | WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
@@ -112,7 +112,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 | API Reference | [線上 API 文件](https://rubujo.github.io/OdfKit/)（[站台結構說明](docs/api-docs-site.md)） | 17 語系入口、可搜尋的公開 API reference |
 | 相容性 | [NuGet 相容矩陣](docs/nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | 功能邊界 | [ODF 格式支援矩陣](docs/odf-format-support.md) | 支援狀態、測試證據、已知缺口 |
-| 規則與語系 | [ODF Profile 來源](docs/odf-profile-sources.md)、[i18n 與在地化](docs/i18n-localization.md) | 內建 Profile、語系字典與訊息回退 |
+| 規則與語系 | [ODF Profile 來源](docs/odf-profile-sources.md)、[i18n 與在地化](docs/i18n-localization.md) | 內建 Profile、語系字典與訊息遞補 |
 | 版本與交付 | [版本與交付資訊](docs/version-delivery.md) | 交付管道、版本原則與安裝參考 |
 | 效能 | [效能基準線](docs/performance-baselines.md) | 基準測試回歸關卡、穩定量測設定檔與報告產生方式 |
 

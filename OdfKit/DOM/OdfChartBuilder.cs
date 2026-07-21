@@ -28,7 +28,7 @@ public sealed class OdfChartBuilder
 
     /// <summary>
     /// Binds data.
-    /// 將圖表資料來源繫結至指定的試算表表格與儲存格範圍，並自動同步圖表內嵌之本地 ODS 數據。
+    /// 將圖表資料來源繫結至指定的試算表表格與儲存格範圍，並自動同步圖表內嵌之本地 ODS 資料。
     /// </summary>
     /// <param name="table">來源試算表表格元素</param>
     /// <param name="range">儲存格範圍字串（例如 "A1:C5"）</param>

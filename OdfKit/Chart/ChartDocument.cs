@@ -272,7 +272,7 @@ public class ChartDocument : OdfChartDocument
 
     /// <summary>
     /// Updates the chart's embedded local data table (local cached data).
-    /// 更新圖表內嵌的本地資料表格（本地快取資料）。
+    /// 更新圖表內嵌資料表（內嵌快取資料）。
     /// </summary>
     /// <param name="data">The two-dimensional data collection, including labels and values. / 二維資料集合，包含標籤與數值。</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is <see langword="null"/>. / 當 <paramref name="data"/> 為 <see langword="null"/> 時擲出。</exception>

@@ -224,7 +224,7 @@ static void DemoSpreadsheetDocument(string outputDir)
     using var workbook = SpreadsheetDocument.Create();
     
     // 取得或建立工作表
-    OdfTableSheet sheet = workbook.Worksheets.Add("銷售數據");
+    OdfTableSheet sheet = workbook.Worksheets.Add("銷售資料");
 
     // 1. 填入儲存格資料
     sheet.Cells["A1"].CellValue = "月份";
@@ -277,10 +277,10 @@ static void DemoSpreadsheetDocument(string outputDir)
     {
         ChartType = OdfChartType.Bar,
         Title = "每月銷售額柱狀圖",
-        DataRange = new OdfCellRange(0, 0, 4, 1, "銷售數據"), // A1:B5
+        DataRange = new OdfCellRange(0, 0, 4, 1, "銷售資料"), // A1:B5
         HasLegend = true
     };
-    workbook.AddChart("銷售數據", new OdfCellAddress(0, 3, "銷售數據"), chartDef);
+    workbook.AddChart("銷售資料", new OdfCellAddress(0, 3, "銷售資料"), chartDef);
 
     // 8. 新增資料篩選器 (AutoFilter) 展示
     // 針對 A1:B5 的範圍，新增名為「銷售自動篩選」的篩選器，篩選條件為第 2 欄（索引 1）大於等於 200
@@ -292,7 +292,7 @@ static void DemoSpreadsheetDocument(string outputDir)
 
     // 以 A1 起點批次寫入二維資料，再共用 fluent range style。
     OdfRangeWriteReport rangeReport = workbook.SetRangeValues(
-        "銷售數據",
+        "銷售資料",
         "D1",
         new object?[,] { { "狀態" }, { "Ready" } });
     sheet.Ranges["D1:D2"].Bold().Background("#FFF2CC");
@@ -508,7 +508,7 @@ static void DemoProfilesAndLocalization(string presentationPath)
 }
 
 /// <summary>
-/// 示範高效能低記憶體的 OdsStreamWriter 順序寫入 API，適用於產生大數據報表以避免 OOM 崩潰。
+/// 示範高效能低記憶體的 OdsStreamWriter 順序寫入 API，適用於產生大量資料報表以避免 OOM 崩潰。
 /// </summary>
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdsStreamWriter(string outputDir)
@@ -550,7 +550,7 @@ static void DemoOdsStreamWriter(string outputDir)
         writer.WriteCell("交易狀態");
         writer.WriteEndRow();
 
-        // 模擬寫入大量測試數據列
+        // 模擬寫入大量測試資料列
         for (int i = 1; i <= 100; i++)
         {
             writer.WriteStartRow(new OdsRowWriteOptions { UseOptimalHeight = true }); // 展示最佳高度
@@ -778,7 +778,7 @@ static void DemoCns11643RareCharacters(string outputDir)
 
     // 9-3. 自訂罕字字型情境：以獨立 OdfFontContext 註冊「基礎字型 → 平面 → 字型」對應
     //      （例如自備的黑體系 Ext B–J 補字字型），經 Custom 的 fontContext 參數注入即可
-    //      隔離生效，不影響行程層級的 OdfFontContext.Default。
+    //      隔離生效，不影響處理程序層級的 OdfFontContext.Default。
     var customContext = new OdfFontContext();
     using IDisposable planeMapping = customContext.RegisterSupplementaryPlaneFontMapping(
         "CustomGothic",

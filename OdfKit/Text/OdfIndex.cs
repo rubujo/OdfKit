@@ -61,19 +61,19 @@ public abstract class OdfIndex
 
     /// <summary>
     /// Gets the XML local name of the index source node.
-    /// 取得索引來源節點的 XML 本地名稱。
+    /// 取得索引來源節點的 XML 區域名稱。
     /// </summary>
-    /// <returns>The XML local name. / XML 本地名稱。</returns>
+    /// <returns>The XML local name. / XML 區域名稱。</returns>
     protected abstract string GetSourceLocalName();
 
     /// <summary>
     /// Finds the first child matching the specified XML local name and namespace.
-    /// 尋找符合指定 XML 本地名稱與命名空間的第一個子專案。
+    /// 尋找符合指定 XML 區域名稱與命名空間的第一個子項目。
     /// </summary>
     /// <param name="parent">The parent node. / 父節點。</param>
-    /// <param name="localName">The XML local name. / XML 本地名稱。</param>
+    /// <param name="localName">The XML local name. / XML 區域名稱。</param>
     /// <param name="ns">The namespace URI. / 命名空間 URI。</param>
-    /// <returns>The matching child, or <c>null</c> if none exists. / 符合條件的子專案，若無則傳回 <c>null</c>。</returns>
+    /// <returns>The matching child, or <c>null</c> if none exists. / 符合條件的子項目，若無則傳回 <c>null</c>。</returns>
     protected OdfNode? FindChild(OdfNode parent, string localName, string ns)
     {
         foreach (var child in parent.Children)
@@ -86,10 +86,10 @@ public abstract class OdfIndex
 
     /// <summary>
     /// Finds or creates a child matching the specified XML local name and namespace.
-    /// 尋找或建立符合指定 XML 本地名稱與命名空間的子專案。
+    /// 尋找或建立符合指定 XML 區域名稱與命名空間的子項目。
     /// </summary>
     /// <param name="parent">The parent node. / 父節點。</param>
-    /// <param name="localName">The XML local name. / XML 本地名稱。</param>
+    /// <param name="localName">The XML local name. / XML 區域名稱。</param>
     /// <param name="ns">The namespace URI. / 命名空間 URI。</param>
     /// <param name="prefix">The namespace prefix. / 命名空間前綴。</param>
     /// <returns>The existing or newly created child node. / 現有的或新建立的子節點。</returns>
