@@ -4,6 +4,14 @@ namespace OdfKit.WebFonts.Tests;
 
 public sealed class SfntFontTests
 {
+    [Fact]
+    public void RuntimeCapabilitiesKeepUnsupportedLayoutAndIftClaimsClosed()
+    {
+        Assert.False(WebFontRuntimeCapabilities.IsAatLayoutSupported);
+        Assert.False(WebFontRuntimeCapabilities.IsGraphiteLayoutSupported);
+        Assert.False(WebFontRuntimeCapabilities.IsIncrementalFontTransferSupported);
+    }
+
     [Theory]
     [InlineData(0x0627)]
     [InlineData(0x0995)]

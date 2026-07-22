@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using OdfKit.Compliance;
+using OdfKit.Extensions.Scripting;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
 using OdfKit.Text;
@@ -15,6 +17,88 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Interop)]
 public sealed class OfficeGuiSmokeTests
 {
+    /// <summary>
+    /// Verifies that Word opens ODF 1.0 through 1.4 documents containing LibreOffice scripts without executing them.
+    /// 驗證 Word 可開啟含 LibreOffice 指令碼的 ODF 1.0 至 1.4 文件，且不會執行指令碼。
+    /// </summary>
+    /// <param name="version">The ODF version to open. / 要開啟的 ODF 版本。</param>
+    [Theory]
+    [InlineData(OdfVersion.Odf10)]
+    [InlineData(OdfVersion.Odf11)]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void Word_OpensScriptedOdfWithoutExecutingLibreOfficeMacros(OdfVersion version)
+    {
+        Type wordType = FindOfficeComType("Word.Application", "找不到 Microsoft Word COM，略過指令碼 ODF 驗收。");
+        string root = CreateTempDirectory("OdfKitOfficeScriptSmoke");
+        string documentPath = Path.Combine(root, $"scripted-{version}.odt");
+        string markerPath = Path.Combine(root, "macro-executed.marker");
+        using (TextDocument source = TextDocument.Create())
+        {
+            source.TargetVersion = version;
+            source.AddParagraph($"OdfKit Office scripted ODF {version}");
+            OdfScriptManager scripting = source.Scripting();
+            string escaped = markerPath.Replace("\"", "\"\"", StringComparison.Ordinal);
+            scripting.AddOrUpdateLibreOfficeBasicModule(
+                "Standard",
+                "Module1",
+                $"Sub Main{Environment.NewLine}Open \"{escaped}\" For Output As #1{Environment.NewLine}" +
+                $"Print #1, \"executed\"{Environment.NewLine}Close #1{Environment.NewLine}End Sub");
+            scripting.AddOrUpdateLibreOfficePythonModule(
+                "main.py",
+                "def main():\n    raise RuntimeError('must not execute')\n");
+            source.Save(documentPath);
+        }
+
+        dynamic? word = null;
+        dynamic? documents = null;
+        dynamic? document = null;
+        dynamic? content = null;
+        try
+        {
+            word = Activator.CreateInstance(wordType);
+            if (word is null)
+                Assert.Skip("無法啟動 Microsoft Word，略過指令碼 ODF 驗收。");
+            word.Visible = false;
+            word.DisplayAlerts = 0;
+            word.AutomationSecurity = 3;
+            documents = word.Documents;
+            document = documents.Open(
+                FileName: documentPath,
+                ReadOnly: true,
+                AddToRecentFiles: false,
+                Visible: false,
+                OpenAndRepair: true,
+                NoEncodingDialog: true);
+            content = document.Content;
+
+            Assert.Contains("OdfKit Office scripted ODF", Convert.ToString(content.Text), StringComparison.Ordinal);
+            Assert.False(File.Exists(markerPath));
+        }
+        catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+        {
+            Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft Word COM，略過指令碼 ODF 驗收。");
+        }
+        finally
+        {
+            try
+            {
+                document?.Close(false);
+            }
+            finally
+            {
+                word?.Quit(false);
+                ReleaseComObject(content);
+                ReleaseComObject(document);
+                ReleaseComObject(documents);
+                ReleaseComObject(word);
+                CollectComReferences();
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
     /// <summary>
     /// Verifies that Excel can open the representative ODS fixture and expose cell values.
     /// 驗證 Excel 可開啟代表性 ODS fixture 並讀取儲存格值。

@@ -62,6 +62,118 @@ public enum OdfMacroTrustStatus
 }
 
 /// <summary>
+/// Defines certificate revocation behavior for macro signer trust.
+/// 定義巨集簽署者信任的憑證撤銷行為。
+/// </summary>
+public enum OdfMacroRevocationMode
+{
+    /// <summary>
+    /// Does not check certificate revocation.
+    /// 不檢查憑證撤銷狀態。
+    /// </summary>
+    NoCheck,
+
+    /// <summary>
+    /// Performs an online revocation check.
+    /// 執行線上撤銷檢查。
+    /// </summary>
+    Online,
+
+    /// <summary>
+    /// Uses only revocation data already cached by the operating system.
+    /// 僅使用作業系統已快取的撤銷資料。
+    /// </summary>
+    OfflineCache
+}
+
+/// <summary>
+/// Identifies reasons a cryptographically valid macro signer was rejected.
+/// 識別密碼學有效的巨集簽署者遭拒原因。
+/// </summary>
+[Flags]
+public enum OdfMacroTrustFailure
+{
+    /// <summary>
+    /// No trust-policy failure was identified.
+    /// 未識別到信任政策失敗。
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    /// The certificate chain was rejected.
+    /// 憑證鏈遭拒。
+    /// </summary>
+    CertificateChain = 1,
+
+    /// <summary>
+    /// The certificate pin was absent or outside its rotation window.
+    /// 憑證釘選不存在或不在輪替時窗內。
+    /// </summary>
+    CertificatePin = 2,
+
+    /// <summary>
+    /// The signer subject was not allowed.
+    /// 簽署者主體不在允許清單內。
+    /// </summary>
+    Subject = 4,
+
+    /// <summary>
+    /// The signer issuer was not allowed.
+    /// 簽署者簽發者不在允許清單內。
+    /// </summary>
+    Issuer = 8,
+
+    /// <summary>
+    /// The signer did not contain an allowed enhanced key usage.
+    /// 簽署者未包含允許的增強金鑰用途。
+    /// </summary>
+    EnhancedKeyUsage = 16,
+
+    /// <summary>
+    /// Revocation data was missing, stale, or indicated revocation.
+    /// 撤銷資料遺失、過期或指出憑證已撤銷。
+    /// </summary>
+    Revocation = 32
+}
+
+/// <summary>
+/// Defines a certificate pin with an optional activation window for signer rotation.
+/// 定義含選用啟用時窗的憑證釘選，以支援簽署者輪替。
+/// </summary>
+public sealed class OdfMacroSignerPin
+{
+    /// <summary>
+    /// Initializes a rotating signer pin.
+    /// 初始化輪替簽署者釘選。
+    /// </summary>
+    /// <param name="sha256Fingerprint">The SHA-256 certificate fingerprint. / 憑證 SHA-256 指紋。</param>
+    public OdfMacroSignerPin(string sha256Fingerprint)
+    {
+        Sha256Fingerprint = sha256Fingerprint ?? throw new ArgumentNullException(
+            nameof(sha256Fingerprint),
+            OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(sha256Fingerprint)));
+    }
+
+    /// <summary>
+    /// Gets the SHA-256 certificate fingerprint.
+    /// 取得憑證 SHA-256 指紋。
+    /// </summary>
+    public string Sha256Fingerprint { get; }
+
+    /// <summary>
+    /// Gets or sets the inclusive activation time.
+    /// 取得或設定包含端點的啟用時間。
+    /// </summary>
+    public DateTimeOffset? ActiveFrom { get; set; }
+
+    /// <summary>
+    /// Gets or sets the exclusive retirement time.
+    /// 取得或設定不含端點的停用時間。
+    /// </summary>
+    public DateTimeOffset? ActiveUntil { get; set; }
+}
+
+/// <summary>
 /// Configures certificate trust for LibreOffice macro signature validation.
 /// 設定 LibreOffice 巨集簽章驗證的憑證信任政策。
 /// </summary>
@@ -80,6 +192,18 @@ public sealed class OdfMacroTrustPolicy
     public bool CheckRevocation { get; set; }
 
     /// <summary>
+    /// Gets or sets explicit revocation behavior; <see cref="CheckRevocation"/> retains precedence for compatibility.
+    /// 取得或設定明確的撤銷行為；為維持相容性，<see cref="CheckRevocation"/> 具有較高優先權。
+    /// </summary>
+    public OdfMacroRevocationMode RevocationMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the trust evaluation time used by certificate rotation windows.
+    /// 取得或設定憑證輪替時窗所使用的信任評估時間。
+    /// </summary>
+    public DateTimeOffset? VerificationTime { get; set; }
+
+    /// <summary>
     /// Gets custom trust anchors used by <see cref="OdfMacroTrustMode.CustomRoot"/>.
     /// 取得 <see cref="OdfMacroTrustMode.CustomRoot"/> 使用的自訂信任錨點。
     /// </summary>
@@ -96,6 +220,30 @@ public sealed class OdfMacroTrustPolicy
     /// 取得憑證釘選所使用的正規化 SHA-256 簽署憑證指紋。
     /// </summary>
     public ISet<string> PinnedCertificateSha256 { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets time-bounded certificate pins used during signer rotation.
+    /// 取得簽署者輪替期間使用且具時間界線的憑證釘選。
+    /// </summary>
+    public IList<OdfMacroSignerPin> RotatingCertificatePins { get; } = new List<OdfMacroSignerPin>();
+
+    /// <summary>
+    /// Gets exact, case-insensitive distinguished names allowed for signer subjects.
+    /// 取得簽署者主體允許的完整辨別名稱，且比對不分大小寫。
+    /// </summary>
+    public ISet<string> AllowedSubjects { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets exact, case-insensitive distinguished names allowed for certificate issuers.
+    /// 取得憑證簽發者允許的完整辨別名稱，且比對不分大小寫。
+    /// </summary>
+    public ISet<string> AllowedIssuers { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets enhanced-key-usage OIDs of which at least one must appear on a signer.
+    /// 取得簽署者至少須包含一項的增強金鑰用途 OID。
+    /// </summary>
+    public ISet<string> AllowedEnhancedKeyUsages { get; } = new HashSet<string>(StringComparer.Ordinal);
 }
 
 /// <summary>
@@ -106,10 +254,12 @@ public sealed class OdfMacroSignatureValidationResult
 {
     internal OdfMacroSignatureValidationResult(
         OdfSignatureValidationResult cryptographicValidation,
-        OdfMacroTrustStatus trustStatus)
+        OdfMacroTrustStatus trustStatus,
+        OdfMacroTrustFailure trustFailures)
     {
         CryptographicValidation = cryptographicValidation;
         TrustStatus = trustStatus;
+        TrustFailures = trustFailures;
     }
 
     /// <summary>
@@ -123,6 +273,12 @@ public sealed class OdfMacroSignatureValidationResult
     /// 取得信任政策判定。
     /// </summary>
     public OdfMacroTrustStatus TrustStatus { get; }
+
+    /// <summary>
+    /// Gets the accumulated signer-policy rejection reasons.
+    /// 取得累積的簽署者政策拒絕原因。
+    /// </summary>
+    public OdfMacroTrustFailure TrustFailures { get; }
 
     /// <summary>
     /// Gets whether every macro signature is valid and trusted.
@@ -248,12 +404,16 @@ public sealed partial class OdfScriptManager
             throw new ArgumentNullException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(policy)));
         if (!Enum.IsDefined(typeof(OdfMacroTrustMode), policy.Mode))
             throw new ArgumentOutOfRangeException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(policy)));
+        if (!Enum.IsDefined(typeof(OdfMacroRevocationMode), policy.RevocationMode))
+            throw new ArgumentOutOfRangeException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(policy)));
         EnsurePackageScriptsSupported();
+
+        OdfMacroRevocationMode revocationMode = GetRevocationMode(policy);
 
         var options = new OdfSigningOptions
         {
             AllowUntrustedRoot = policy.Mode != OdfMacroTrustMode.System,
-            CheckRevocation = policy.CheckRevocation
+            CheckRevocation = revocationMode == OdfMacroRevocationMode.Online
         };
         options.ExtraCertificates.AddRange(policy.IntermediateCertificates);
         options.ExtraCertificates.AddRange(policy.CustomRoots);
@@ -263,52 +423,149 @@ public sealed partial class OdfScriptManager
             MacroSignatureProfile,
             cancellationToken).ConfigureAwait(false);
 
-        return new OdfMacroSignatureValidationResult(validation, EvaluateTrust(validation, policy));
+        (OdfMacroTrustStatus status, OdfMacroTrustFailure failures) = EvaluateTrust(validation, policy);
+        return new OdfMacroSignatureValidationResult(validation, status, failures);
     }
 
-    private static OdfMacroTrustStatus EvaluateTrust(
+    private static (OdfMacroTrustStatus Status, OdfMacroTrustFailure Failures) EvaluateTrust(
         OdfSignatureValidationResult validation,
         OdfMacroTrustPolicy policy)
     {
         if (validation.Signatures.Count == 0)
-            return OdfMacroTrustStatus.Unsigned;
+            return (OdfMacroTrustStatus.Unsigned, OdfMacroTrustFailure.None);
         if (!validation.IsValid)
-            return OdfMacroTrustStatus.InvalidSignature;
-        if (policy.Mode == OdfMacroTrustMode.System)
-            return OdfMacroTrustStatus.Trusted;
+            return (OdfMacroTrustStatus.InvalidSignature, OdfMacroTrustFailure.None);
 
+        OdfMacroTrustFailure failures = OdfMacroTrustFailure.None;
         foreach (OdfSingleSignatureValidationResult signature in validation.Signatures)
         {
-            if (signature.Certificate is null || !IsSignerTrusted(signature.Certificate, policy))
-                return OdfMacroTrustStatus.Untrusted;
+            failures |= signature.Certificate is null
+                ? OdfMacroTrustFailure.CertificateChain
+                : EvaluateSignerTrust(signature.Certificate, policy);
         }
 
-        return OdfMacroTrustStatus.Trusted;
+        return failures == OdfMacroTrustFailure.None
+            ? (OdfMacroTrustStatus.Trusted, failures)
+            : (OdfMacroTrustStatus.Untrusted, failures);
     }
 
-    private static bool IsSignerTrusted(X509Certificate2 certificate, OdfMacroTrustPolicy policy)
+    private static OdfMacroTrustFailure EvaluateSignerTrust(
+        X509Certificate2 certificate,
+        OdfMacroTrustPolicy policy)
     {
+        OdfMacroTrustFailure failures = EvaluateSignerIdentity(certificate, policy);
         if (policy.Mode == OdfMacroTrustMode.PinnedCertificate)
         {
             using SHA256 sha256 = SHA256.Create();
             string fingerprint = BitConverter.ToString(sha256.ComputeHash(certificate.RawData)).Replace("-", string.Empty);
-            return policy.PinnedCertificateSha256.Any(pin => NormalizeFingerprint(pin) == fingerprint);
+            DateTimeOffset verificationTime = policy.VerificationTime ?? DateTimeOffset.UtcNow;
+            bool isPinned = policy.PinnedCertificateSha256.Any(pin => NormalizeFingerprint(pin) == fingerprint) ||
+                policy.RotatingCertificatePins.Any(pin =>
+                    NormalizeFingerprint(pin.Sha256Fingerprint) == fingerprint &&
+                    (!pin.ActiveFrom.HasValue || verificationTime >= pin.ActiveFrom.Value) &&
+                    (!pin.ActiveUntil.HasValue || verificationTime < pin.ActiveUntil.Value));
+            if (!isPinned)
+                failures |= OdfMacroTrustFailure.CertificatePin;
+            if (GetRevocationMode(policy) != OdfMacroRevocationMode.NoCheck)
+                failures |= EvaluateRevocation(certificate, policy);
+            return failures;
         }
 
         using var chain = new X509Chain();
-        chain.ChainPolicy.RevocationMode = policy.CheckRevocation
-            ? X509RevocationMode.Online
-            : X509RevocationMode.NoCheck;
+        chain.ChainPolicy.RevocationMode = ToX509RevocationMode(GetRevocationMode(policy));
+        chain.ChainPolicy.VerificationTime = (policy.VerificationTime ?? DateTimeOffset.UtcNow).LocalDateTime;
+        chain.ChainPolicy.ExtraStore.AddRange(policy.IntermediateCertificates);
+        chain.ChainPolicy.ExtraStore.AddRange(policy.CustomRoots);
+        bool built = chain.Build(certificate);
+        if (chain.ChainElements.Count == 0)
+            return failures | OdfMacroTrustFailure.CertificateChain;
+
+        failures |= EvaluateChainStatuses(chain, policy.Mode == OdfMacroTrustMode.CustomRoot);
+
+        X509Certificate2 terminal = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
+        if (policy.Mode == OdfMacroTrustMode.CustomRoot)
+        {
+            bool matchesRoot = policy.CustomRoots.Cast<X509Certificate2>()
+                .Any(root => root.RawData.SequenceEqual(terminal.RawData));
+            if (!matchesRoot)
+                failures |= OdfMacroTrustFailure.CertificateChain;
+        }
+        else if (!built)
+        {
+            failures |= OdfMacroTrustFailure.CertificateChain;
+        }
+
+        return failures;
+    }
+
+    private static OdfMacroTrustFailure EvaluateSignerIdentity(
+        X509Certificate2 certificate,
+        OdfMacroTrustPolicy policy)
+    {
+        OdfMacroTrustFailure failures = OdfMacroTrustFailure.None;
+        if (policy.AllowedSubjects.Count != 0 && !policy.AllowedSubjects.Contains(certificate.Subject))
+            failures |= OdfMacroTrustFailure.Subject;
+        if (policy.AllowedIssuers.Count != 0 && !policy.AllowedIssuers.Contains(certificate.Issuer))
+            failures |= OdfMacroTrustFailure.Issuer;
+        if (policy.AllowedEnhancedKeyUsages.Count != 0)
+        {
+            bool matches = certificate.Extensions
+                .OfType<X509EnhancedKeyUsageExtension>()
+                .SelectMany(extension => extension.EnhancedKeyUsages.Cast<Oid>())
+                .Any(oid => oid.Value is not null && policy.AllowedEnhancedKeyUsages.Contains(oid.Value));
+            if (!matches)
+                failures |= OdfMacroTrustFailure.EnhancedKeyUsage;
+        }
+
+        return failures;
+    }
+
+    private static OdfMacroTrustFailure EvaluateRevocation(
+        X509Certificate2 certificate,
+        OdfMacroTrustPolicy policy)
+    {
+        using var chain = new X509Chain();
+        chain.ChainPolicy.RevocationMode = ToX509RevocationMode(GetRevocationMode(policy));
+        chain.ChainPolicy.VerificationTime = (policy.VerificationTime ?? DateTimeOffset.UtcNow).LocalDateTime;
         chain.ChainPolicy.ExtraStore.AddRange(policy.IntermediateCertificates);
         chain.ChainPolicy.ExtraStore.AddRange(policy.CustomRoots);
         _ = chain.Build(certificate);
-        if (chain.ChainElements.Count == 0)
-            return false;
-
-        X509Certificate2 terminal = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
-        return policy.CustomRoots.Cast<X509Certificate2>()
-            .Any(root => root.RawData.SequenceEqual(terminal.RawData));
+        return EvaluateChainStatuses(chain, allowUntrustedRoot: true) & OdfMacroTrustFailure.Revocation;
     }
+
+    private static OdfMacroTrustFailure EvaluateChainStatuses(X509Chain chain, bool allowUntrustedRoot)
+    {
+        OdfMacroTrustFailure failures = OdfMacroTrustFailure.None;
+        foreach (X509ChainStatus status in chain.ChainStatus)
+        {
+            X509ChainStatusFlags flag = status.Status;
+            if (allowUntrustedRoot)
+                flag &= ~X509ChainStatusFlags.UntrustedRoot;
+            if ((flag & (X509ChainStatusFlags.Revoked |
+                    X509ChainStatusFlags.RevocationStatusUnknown |
+                    X509ChainStatusFlags.OfflineRevocation)) != 0)
+            {
+                failures |= OdfMacroTrustFailure.Revocation;
+                flag &= ~(X509ChainStatusFlags.Revoked |
+                    X509ChainStatusFlags.RevocationStatusUnknown |
+                    X509ChainStatusFlags.OfflineRevocation);
+            }
+            if (flag != X509ChainStatusFlags.NoError)
+                failures |= OdfMacroTrustFailure.CertificateChain;
+        }
+        return failures;
+    }
+
+    private static OdfMacroRevocationMode GetRevocationMode(OdfMacroTrustPolicy policy) =>
+        policy.CheckRevocation ? OdfMacroRevocationMode.Online : policy.RevocationMode;
+
+    private static X509RevocationMode ToX509RevocationMode(OdfMacroRevocationMode mode) =>
+        mode switch
+        {
+            OdfMacroRevocationMode.Online => X509RevocationMode.Online,
+            OdfMacroRevocationMode.OfflineCache => X509RevocationMode.Offline,
+            _ => X509RevocationMode.NoCheck
+        };
 
     private static string? NormalizeFingerprint(string? value)
     {

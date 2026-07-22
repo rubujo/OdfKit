@@ -69,4 +69,13 @@ pwsh eng/Test-WebFontIisExpressSmoke.ps1 -Pipeline Classic -FontPath <font> -Sou
 pwsh eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 -FontPath <font> -SourceSha256 <sha256>
 pwsh eng/Test-WebFontIisSustainedLoad.ps1
 pwsh eng/Test-WebFontPackageConsumer.ps1 -FontPath <font> -SourceSha256 <sha256>
+pwsh eng/Test-WebFontAdvancedCorpus.ps1 -CorpusRoot <advanced-font-corpus>
 ```
+
+`Test-WebFontAdvancedCorpus.ps1` 的 manifest 必須至少包含 `aat`、`graphite`、`variable` 與
+`color` 各一個真實 sfnt 字型，且每筆提供相對 `path`、小寫或大寫皆可的 `sha256` 與
+`category`。它會核對實際 table：AAT（`morx`／`mort`／`kerx` 等）、Graphite
+（`Silf`／`Glat`／`Gloc`／`Feat`／`Sill`）、variation（`fvar`／`gvar`／`CFF2`）與 color
+（`COLR`／`CBDT`／`SVG `／`sbix`）。AAT／Graphite 通過此閘門只證明真實 corpus 會進入
+明確拒絕路徑，不代表 shaping 已實作。公開的 `WebFontRuntimeCapabilities` 同步保持 AAT、
+Graphite 與 IFT capability 為 `false`，讓採用端不必依例外文字推測能力。

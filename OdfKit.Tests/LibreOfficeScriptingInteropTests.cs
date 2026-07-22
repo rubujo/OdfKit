@@ -12,6 +12,45 @@ namespace OdfKit.Tests;
 
 public partial class LibreOfficeInteropTests
 {
+    [Fact]
+    public async Task ExternalCompilerWorkersUsePythonAstAndProbeLibreOfficeBasic()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過編譯器診斷測試。");
+
+        string pythonPath = Path.Combine(Path.GetDirectoryName(sofficePath!)!, "python.exe");
+        if (!File.Exists(pythonPath))
+            Assert.Skip("LibreOffice 安裝未包含 Python UNO runtime，略過編譯器診斷測試。");
+
+        var options = new OdfScriptCompilerOptions
+        {
+            PythonExecutablePath = pythonPath,
+            LibreOfficeExecutablePath = sofficePath,
+            LibreOfficePythonExecutablePath = pythonPath,
+            Timeout = TimeSpan.FromSeconds(60)
+        };
+        OdfScriptCompilationResult pythonValid = await OdfExternalScriptCompiler.DiagnoseAsync(
+            "def main():\n    return 1\n",
+            OdfScriptCompilerBackend.PythonAst,
+            options,
+            TestContext.Current.CancellationToken);
+        OdfScriptCompilationResult pythonInvalid = await OdfExternalScriptCompiler.DiagnoseAsync(
+            "def main(\n    return 1\n",
+            OdfScriptCompilerBackend.PythonAst,
+            options,
+            TestContext.Current.CancellationToken);
+        OdfScriptCompilationResult basicSafeProbe = await OdfExternalScriptCompiler.DiagnoseAsync(
+            "Sub Main\nDim Value As Integer\nValue = 1\nEnd Sub\n",
+            OdfScriptCompilerBackend.LibreOfficeBasic,
+            options,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(OdfScriptCompilationStatus.Valid, pythonValid.Status);
+        Assert.Equal(OdfScriptCompilationStatus.Invalid, pythonInvalid.Status);
+        Assert.True(Assert.Single(pythonInvalid.Diagnostics).Line > 0);
+        Assert.Equal(OdfScriptCompilationStatus.Indeterminate, basicSafeProbe.Status);
+    }
+
     /// <summary>
     /// Executes OdfKit-authored Basic and Python document macros for every supported ODF version.
     /// 透過真實 LibreOffice 指令碼提供者，執行每個支援 ODF 版本的 Basic 與 Python 文件巨集。

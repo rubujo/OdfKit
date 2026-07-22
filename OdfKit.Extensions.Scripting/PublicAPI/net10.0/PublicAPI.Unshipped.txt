@@ -1,18 +1,70 @@
 ﻿#nullable enable
+OdfKit.Extensions.Scripting.IOdfScriptScanner
+OdfKit.Extensions.Scripting.IOdfScriptScanner.ScanAsync(OdfKit.Extensions.Scripting.OdfScriptScanRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfScriptScanResult!>!
+OdfKit.Extensions.Scripting.OdfAmsiScriptScanner
+OdfKit.Extensions.Scripting.OdfAmsiScriptScanner.OdfAmsiScriptScanner() -> void
+OdfKit.Extensions.Scripting.OdfAmsiScriptScanner.ScanAsync(OdfKit.Extensions.Scripting.OdfScriptScanRequest! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfScriptScanResult!>!
+OdfKit.Extensions.Scripting.OdfExternalScriptCompiler
 OdfKit.Extensions.Scripting.OdfInlineScript
 OdfKit.Extensions.Scripting.OdfInlineScript.Index.get -> int
 OdfKit.Extensions.Scripting.OdfInlineScript.Language.get -> string!
 OdfKit.Extensions.Scripting.OdfInlineScript.Source.get -> string!
+OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.All = OdfKit.Extensions.Scripting.OdfMacroCapability.AutoExecution | OdfKit.Extensions.Scripting.OdfMacroCapability.FileSystem | OdfKit.Extensions.Scripting.OdfMacroCapability.Network | OdfKit.Extensions.Scripting.OdfMacroCapability.ProcessExecution | OdfKit.Extensions.Scripting.OdfMacroCapability.UnoService | OdfKit.Extensions.Scripting.OdfMacroCapability.DynamicCode -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.AutoExecution = 1 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.DynamicCode = 32 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.FileSystem = 2 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.Network = 4 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.None = 0 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.ProcessExecution = 8 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroCapability.UnoService = 16 -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding.Capability.get -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding.Code.get -> string!
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding.Evidence.get -> string?
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding.Line.get -> int
+OdfKit.Extensions.Scripting.OdfMacroPolicyFinding.Path.get -> string!
+OdfKit.Extensions.Scripting.OdfMacroPolicyResult
+OdfKit.Extensions.Scripting.OdfMacroPolicyResult.Findings.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfMacroPolicyFinding!>!
+OdfKit.Extensions.Scripting.OdfMacroPolicyResult.IsAllowed.get -> bool
+OdfKit.Extensions.Scripting.OdfMacroRevocationMode
+OdfKit.Extensions.Scripting.OdfMacroRevocationMode.NoCheck = 0 -> OdfKit.Extensions.Scripting.OdfMacroRevocationMode
+OdfKit.Extensions.Scripting.OdfMacroRevocationMode.OfflineCache = 2 -> OdfKit.Extensions.Scripting.OdfMacroRevocationMode
+OdfKit.Extensions.Scripting.OdfMacroRevocationMode.Online = 1 -> OdfKit.Extensions.Scripting.OdfMacroRevocationMode
+OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy
+OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy.AllowedUnoServicePrefixes.get -> System.Collections.Generic.ISet<string!>!
+OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy.DeniedCapabilities.get -> OdfKit.Extensions.Scripting.OdfMacroCapability
+OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy.DeniedCapabilities.set -> void
+OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy.OdfMacroSecurityPolicy() -> void
 OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult
 OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult.CryptographicValidation.get -> OdfKit.Core.OdfSignatureValidationResult!
 OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult.IsCodeSafetyEvaluated.get -> bool
 OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult.IsTrusted.get -> bool
+OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult.TrustFailures.get -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
 OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult.TrustStatus.get -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
+OdfKit.Extensions.Scripting.OdfMacroSignerPin
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.ActiveFrom.get -> System.DateTimeOffset?
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.ActiveFrom.set -> void
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.ActiveUntil.get -> System.DateTimeOffset?
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.ActiveUntil.set -> void
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.OdfMacroSignerPin(string! sha256Fingerprint) -> void
+OdfKit.Extensions.Scripting.OdfMacroSignerPin.Sha256Fingerprint.get -> string!
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.CertificateChain = 1 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.CertificatePin = 2 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.EnhancedKeyUsage = 16 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.Issuer = 8 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.None = 0 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.Revocation = 32 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
+OdfKit.Extensions.Scripting.OdfMacroTrustFailure.Subject = 4 -> OdfKit.Extensions.Scripting.OdfMacroTrustFailure
 OdfKit.Extensions.Scripting.OdfMacroTrustMode
 OdfKit.Extensions.Scripting.OdfMacroTrustMode.CustomRoot = 1 -> OdfKit.Extensions.Scripting.OdfMacroTrustMode
 OdfKit.Extensions.Scripting.OdfMacroTrustMode.PinnedCertificate = 2 -> OdfKit.Extensions.Scripting.OdfMacroTrustMode
 OdfKit.Extensions.Scripting.OdfMacroTrustMode.System = 0 -> OdfKit.Extensions.Scripting.OdfMacroTrustMode
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.AllowedEnhancedKeyUsages.get -> System.Collections.Generic.ISet<string!>!
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.AllowedIssuers.get -> System.Collections.Generic.ISet<string!>!
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.AllowedSubjects.get -> System.Collections.Generic.ISet<string!>!
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.CheckRevocation.get -> bool
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.CheckRevocation.set -> void
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.CustomRoots.get -> System.Security.Cryptography.X509Certificates.X509Certificate2Collection!
@@ -21,6 +73,11 @@ OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.Mode.get -> OdfKit.Extensions.Sc
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.Mode.set -> void
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.OdfMacroTrustPolicy() -> void
 OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.PinnedCertificateSha256.get -> System.Collections.Generic.ISet<string!>!
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.RevocationMode.get -> OdfKit.Extensions.Scripting.OdfMacroRevocationMode
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.RevocationMode.set -> void
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.RotatingCertificatePins.get -> System.Collections.Generic.IList<OdfKit.Extensions.Scripting.OdfMacroSignerPin!>!
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.VerificationTime.get -> System.DateTimeOffset?
+OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.VerificationTime.set -> void
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus.InvalidSignature = 1 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus.Trusted = 3 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
@@ -37,6 +94,39 @@ OdfKit.Extensions.Scripting.OdfPackageScriptKind
 OdfKit.Extensions.Scripting.OdfPackageScriptKind.LibreOfficeBasicModule = 0 -> OdfKit.Extensions.Scripting.OdfPackageScriptKind
 OdfKit.Extensions.Scripting.OdfPackageScriptKind.LibreOfficePythonModule = 1 -> OdfKit.Extensions.Scripting.OdfPackageScriptKind
 OdfKit.Extensions.Scripting.OdfPackageScriptKind.Other = 2 -> OdfKit.Extensions.Scripting.OdfPackageScriptKind
+OdfKit.Extensions.Scripting.OdfPackageScriptScanReport
+OdfKit.Extensions.Scripting.OdfPackageScriptScanReport.Language.get -> OdfKit.Extensions.Scripting.OdfScriptSyntaxLanguage
+OdfKit.Extensions.Scripting.OdfPackageScriptScanReport.Path.get -> string!
+OdfKit.Extensions.Scripting.OdfPackageScriptScanReport.Results.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptScanResult!>!
+OdfKit.Extensions.Scripting.OdfScriptCompilationResult
+OdfKit.Extensions.Scripting.OdfScriptCompilationResult.Backend.get -> OdfKit.Extensions.Scripting.OdfScriptCompilerBackend
+OdfKit.Extensions.Scripting.OdfScriptCompilationResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic!>!
+OdfKit.Extensions.Scripting.OdfScriptCompilationResult.Status.get -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.Indeterminate = 1 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.Invalid = 2 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.TimedOut = 4 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.Unavailable = 3 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.Valid = 0 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilationStatus.WorkerFailed = 5 -> OdfKit.Extensions.Scripting.OdfScriptCompilationStatus
+OdfKit.Extensions.Scripting.OdfScriptCompilerBackend
+OdfKit.Extensions.Scripting.OdfScriptCompilerBackend.LibreOfficeBasic = 1 -> OdfKit.Extensions.Scripting.OdfScriptCompilerBackend
+OdfKit.Extensions.Scripting.OdfScriptCompilerBackend.PythonAst = 0 -> OdfKit.Extensions.Scripting.OdfScriptCompilerBackend
+OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic
+OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Code.get -> string!
+OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Column.get -> int
+OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Detail.get -> string?
+OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Line.get -> int
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficeExecutablePath.get -> string?
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficeExecutablePath.set -> void
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficePythonExecutablePath.get -> string?
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficePythonExecutablePath.set -> void
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.OdfScriptCompilerOptions() -> void
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.PythonExecutablePath.get -> string?
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.PythonExecutablePath.set -> void
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.Timeout.get -> System.TimeSpan
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.Timeout.set -> void
 OdfKit.Extensions.Scripting.OdfScriptDiagnosticSeverity
 OdfKit.Extensions.Scripting.OdfScriptDiagnosticSeverity.Error = 1 -> OdfKit.Extensions.Scripting.OdfScriptDiagnosticSeverity
 OdfKit.Extensions.Scripting.OdfScriptDiagnosticSeverity.Warning = 0 -> OdfKit.Extensions.Scripting.OdfScriptDiagnosticSeverity
@@ -59,6 +149,7 @@ OdfKit.Extensions.Scripting.OdfScriptManager.AddOrUpdateLibreOfficeBasicModule(s
 OdfKit.Extensions.Scripting.OdfScriptManager.AddOrUpdateLibreOfficePythonModule(string! relativePath, string! source) -> string!
 OdfKit.Extensions.Scripting.OdfScriptManager.Capabilities.get -> OdfKit.Extensions.Scripting.OdfScriptingCapabilities!
 OdfKit.Extensions.Scripting.OdfScriptManager.DiagnosePackageScripts() -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfPackageScriptDiagnostics!>!
+OdfKit.Extensions.Scripting.OdfScriptManager.EvaluateMacroPolicy(OdfKit.Extensions.Scripting.OdfMacroSecurityPolicy! policy) -> OdfKit.Extensions.Scripting.OdfMacroPolicyResult!
 OdfKit.Extensions.Scripting.OdfScriptManager.GetDocumentEventBindings() -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptEventBinding!>!
 OdfKit.Extensions.Scripting.OdfScriptManager.GetInlineScripts() -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfInlineScript!>!
 OdfKit.Extensions.Scripting.OdfScriptManager.GetPackageScripts() -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfPackageScriptEntry!>!
@@ -69,6 +160,7 @@ OdfKit.Extensions.Scripting.OdfScriptManager.RemoveLibreOfficeBasicLibrary(strin
 OdfKit.Extensions.Scripting.OdfScriptManager.RemoveLibreOfficeBasicModule(string! libraryName, string! moduleName) -> bool
 OdfKit.Extensions.Scripting.OdfScriptManager.RemoveLibreOfficeMacroSignatures() -> bool
 OdfKit.Extensions.Scripting.OdfScriptManager.RemoveLibreOfficePythonModule(string! relativePath) -> bool
+OdfKit.Extensions.Scripting.OdfScriptManager.ScanPackageScriptsAsync(OdfKit.Extensions.Scripting.OdfScriptScannerPipeline! pipeline, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfPackageScriptScanReport!>!>!
 OdfKit.Extensions.Scripting.OdfScriptManager.SignLibreOfficeMacrosAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate) -> System.Threading.Tasks.Task!
 OdfKit.Extensions.Scripting.OdfScriptManager.SignLibreOfficeMacrosAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate, OdfKit.Core.OdfSigningOptions! options) -> System.Threading.Tasks.Task!
 OdfKit.Extensions.Scripting.OdfScriptManager.SignLibreOfficeMacrosAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate, OdfKit.Core.OdfSigningOptions! options, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
@@ -79,6 +171,26 @@ OdfKit.Extensions.Scripting.OdfScriptManager.VerifyLibreOfficeMacroSignaturesAsy
 OdfKit.Extensions.Scripting.OdfScriptManager.VerifyLibreOfficeMacroSignaturesAsync(OdfKit.Extensions.Scripting.OdfMacroTrustPolicy! policy) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult!>!
 OdfKit.Extensions.Scripting.OdfScriptManager.VerifyLibreOfficeMacroSignaturesAsync(OdfKit.Extensions.Scripting.OdfMacroTrustPolicy! policy, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult!>!
 OdfKit.Extensions.Scripting.OdfScriptManager.VerifyLibreOfficeMacroSignaturesAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfMacroSignatureValidationResult!>!
+OdfKit.Extensions.Scripting.OdfScriptScannerPipeline
+OdfKit.Extensions.Scripting.OdfScriptScannerPipeline.OdfScriptScannerPipeline(System.Collections.Generic.IEnumerable<OdfKit.Extensions.Scripting.IOdfScriptScanner!>! scanners) -> void
+OdfKit.Extensions.Scripting.OdfScriptScannerPipeline.ScanAsync(OdfKit.Extensions.Scripting.OdfScriptScanRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptScanResult!>!>!
+OdfKit.Extensions.Scripting.OdfScriptScanRequest
+OdfKit.Extensions.Scripting.OdfScriptScanRequest.Language.get -> OdfKit.Extensions.Scripting.OdfScriptSyntaxLanguage
+OdfKit.Extensions.Scripting.OdfScriptScanRequest.OdfScriptScanRequest(string! path, OdfKit.Extensions.Scripting.OdfScriptSyntaxLanguage language, string! source) -> void
+OdfKit.Extensions.Scripting.OdfScriptScanRequest.Path.get -> string!
+OdfKit.Extensions.Scripting.OdfScriptScanRequest.Source.get -> string!
+OdfKit.Extensions.Scripting.OdfScriptScanResult
+OdfKit.Extensions.Scripting.OdfScriptScanResult.NativeResult.get -> int?
+OdfKit.Extensions.Scripting.OdfScriptScanResult.OdfScriptScanResult(string! providerName, OdfKit.Extensions.Scripting.OdfScriptScanVerdict verdict, int? nativeResult) -> void
+OdfKit.Extensions.Scripting.OdfScriptScanResult.ProviderName.get -> string!
+OdfKit.Extensions.Scripting.OdfScriptScanResult.Verdict.get -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.Clean = 0 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.Error = 5 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.Malware = 3 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.NotDetected = 1 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.Suspicious = 2 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
+OdfKit.Extensions.Scripting.OdfScriptScanVerdict.Unavailable = 4 -> OdfKit.Extensions.Scripting.OdfScriptScanVerdict
 OdfKit.Extensions.Scripting.OdfScriptSyntaxDiagnostic
 OdfKit.Extensions.Scripting.OdfScriptSyntaxDiagnostic.Code.get -> string!
 OdfKit.Extensions.Scripting.OdfScriptSyntaxDiagnostic.Column.get -> int
@@ -92,6 +204,8 @@ OdfKit.Extensions.Scripting.OdfScriptSyntaxValidator
 OdfKit.Extensions.Scripting.OdfScriptTargetKind
 OdfKit.Extensions.Scripting.OdfScriptTargetKind.MacroName = 0 -> OdfKit.Extensions.Scripting.OdfScriptTargetKind
 OdfKit.Extensions.Scripting.OdfScriptTargetKind.Uri = 1 -> OdfKit.Extensions.Scripting.OdfScriptTargetKind
+static OdfKit.Extensions.Scripting.OdfAmsiScriptScanner.IsSupported.get -> bool
+static OdfKit.Extensions.Scripting.OdfExternalScriptCompiler.DiagnoseAsync(string! source, OdfKit.Extensions.Scripting.OdfScriptCompilerBackend backend, OdfKit.Extensions.Scripting.OdfScriptCompilerOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.Extensions.Scripting.OdfScriptCompilationResult!>!
 static OdfKit.Extensions.Scripting.OdfScriptingExtensions.Scripting(this OdfKit.Core.OdfDocument! document) -> OdfKit.Extensions.Scripting.OdfScriptManager!
 static OdfKit.Extensions.Scripting.OdfScriptingExtensions.Scripting(this OdfKit.Core.OdfPackage! package) -> OdfKit.Extensions.Scripting.OdfScriptManager!
 static OdfKit.Extensions.Scripting.OdfScriptSyntaxValidator.Diagnose(string! source, OdfKit.Extensions.Scripting.OdfScriptSyntaxLanguage language) -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptSyntaxDiagnostic!>!

@@ -61,19 +61,7 @@ public sealed partial class OdfScriptManager
         List<OdfPackageScriptDiagnostics> results = [];
         foreach (OdfPackageScriptEntry entry in GetPackageScripts())
         {
-            string stored = ReadPackageScript(entry.Path);
-            OdfScriptSyntaxLanguage language;
-            string source;
-            if (entry.Kind == OdfPackageScriptKind.LibreOfficeBasicModule)
-            {
-                language = OdfScriptSyntaxLanguage.LibreOfficeBasic;
-                source = LoadXml(Encoding.UTF8.GetBytes(stored)).Root?.Value ?? string.Empty;
-            }
-            else
-            {
-                language = OdfScriptSyntaxLanguage.Python;
-                source = stored;
-            }
+            (OdfScriptSyntaxLanguage language, string source) = ReadPackageScriptSource(entry);
 
             results.Add(new OdfPackageScriptDiagnostics(
                 entry.Path,
@@ -81,6 +69,16 @@ public sealed partial class OdfScriptManager
                 OdfScriptSyntaxValidator.Diagnose(source, language)));
         }
         return results;
+    }
+
+    private (OdfScriptSyntaxLanguage Language, string Source) ReadPackageScriptSource(
+        OdfPackageScriptEntry entry)
+    {
+        string stored = ReadPackageScript(entry.Path);
+        return entry.Kind == OdfPackageScriptKind.LibreOfficeBasicModule
+            ? (OdfScriptSyntaxLanguage.LibreOfficeBasic,
+                LoadXml(Encoding.UTF8.GetBytes(stored)).Root?.Value ?? string.Empty)
+            : (OdfScriptSyntaxLanguage.Python, stored);
     }
 
     /// <summary>

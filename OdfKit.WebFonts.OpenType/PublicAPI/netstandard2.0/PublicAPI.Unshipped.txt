@@ -32,4 +32,7 @@ static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.Verify(System.IO.
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<int>! unicodeScalars) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<int>! unicodeScalars, long maximumBytes, bool validateEveryCharString, System.Threading.CancellationToken cancellationToken) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<OdfKit.WebFonts.WebFontTextSequence!>! sequences) -> void
+static OdfKit.WebFonts.OpenType.WebFontRuntimeCapabilities.IsAatLayoutSupported.get -> bool
+static OdfKit.WebFonts.OpenType.WebFontRuntimeCapabilities.IsGraphiteLayoutSupported.get -> bool
+static OdfKit.WebFonts.OpenType.WebFontRuntimeCapabilities.IsIncrementalFontTransferSupported.get -> bool
 static OdfKit.WebFonts.OpenType.WebFontRuntimeCapabilities.IsWoff2Available.get -> bool

@@ -38,6 +38,11 @@ WebFont 專用範例另見：
 因此它是**整合展示範例**，不是最小入門範例。若只需要最短上手流程，請先讀
 [docs/getting-started.md](../docs/getting-started.md)。
 
+範例第 8 節會建立 LibreOffice Basic／Python 文件巨集，並示範以
+`OdfScriptScannerPipeline` 呼叫 Windows AMSI（非 Windows 回報 `Unavailable`）及以
+`OdfMacroSecurityPolicy` 取得靜態能力發現。掃描結果、憑證信任與程式碼政策是三項獨立訊號；
+任何單一綠燈都不代表巨集安全。
+
 範例第 9 節示範 CNS 11643 罕字支援：全字庫字型遞補分段（`OdfTextFontFallbackOptions.Cns11643()`）、
 自訂罕字字型情境（`OdfFontContext` + `Custom(baseFont, fontFaces, fontContext)`）、PUA 自造字
 碼位遷移（`MigrateTextCodePoints`）與 Big5E 編碼 CSV 匯出（`OdfCns11643MappingTable` +

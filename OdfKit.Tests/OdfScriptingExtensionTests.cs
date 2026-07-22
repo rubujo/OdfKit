@@ -345,6 +345,77 @@ public sealed class OdfScriptingExtensionTests
 
         Assert.True(result.CryptographicValidation.IsValid);
         Assert.Equal(OdfMacroTrustStatus.Untrusted, result.TrustStatus);
+        Assert.True(result.TrustFailures.HasFlag(OdfMacroTrustFailure.CertificatePin));
+    }
+
+    [Fact]
+    public async Task RotatingPinAndSignerIdentityPolicyUseExplicitEvaluationTime()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        using X509Certificate2 certificate = CreateMacroSigningCertificate();
+        await manager.SignLibreOfficeMacrosAsync(certificate, TestContext.Current.CancellationToken);
+        string fingerprint = Convert.ToHexString(SHA256.HashData(certificate.RawData));
+        DateTimeOffset evaluationTime = DateTimeOffset.UtcNow;
+        var pin = new OdfMacroSignerPin(fingerprint)
+        {
+            ActiveFrom = evaluationTime.AddMinutes(-1),
+            ActiveUntil = evaluationTime.AddMinutes(1)
+        };
+        var policy = new OdfMacroTrustPolicy
+        {
+            Mode = OdfMacroTrustMode.PinnedCertificate,
+            VerificationTime = evaluationTime
+        };
+        policy.RotatingCertificatePins.Add(pin);
+        policy.AllowedSubjects.Add(certificate.Subject);
+        policy.AllowedIssuers.Add(certificate.Issuer);
+
+        OdfMacroSignatureValidationResult trusted = await manager.VerifyLibreOfficeMacroSignaturesAsync(
+            policy,
+            TestContext.Current.CancellationToken);
+        Assert.True(trusted.IsTrusted);
+
+        policy.VerificationTime = evaluationTime.AddMinutes(2);
+        OdfMacroSignatureValidationResult retired = await manager.VerifyLibreOfficeMacroSignaturesAsync(
+            policy,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(OdfMacroTrustStatus.Untrusted, retired.TrustStatus);
+        Assert.True(retired.TrustFailures.HasFlag(OdfMacroTrustFailure.CertificatePin));
+    }
+
+    [Fact]
+    public async Task SignerPolicyRejectsMissingEnhancedKeyUsageAndWrongSubject()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        using X509Certificate2 certificate = CreateMacroSigningCertificate();
+        await manager.SignLibreOfficeMacrosAsync(certificate, TestContext.Current.CancellationToken);
+        string fingerprint = Convert.ToHexString(SHA256.HashData(certificate.RawData));
+        var policy = new OdfMacroTrustPolicy { Mode = OdfMacroTrustMode.PinnedCertificate };
+        policy.PinnedCertificateSha256.Add(fingerprint);
+        policy.AllowedSubjects.Add("CN=Different Signer");
+        policy.AllowedEnhancedKeyUsages.Add("1.3.6.1.5.5.7.3.3");
+
+        OdfMacroSignatureValidationResult result = await manager.VerifyLibreOfficeMacroSignaturesAsync(
+            policy,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(OdfMacroTrustStatus.Untrusted, result.TrustStatus);
+        Assert.True(result.TrustFailures.HasFlag(OdfMacroTrustFailure.Subject));
+        Assert.True(result.TrustFailures.HasFlag(OdfMacroTrustFailure.EnhancedKeyUsage));
     }
 
     [Fact]
@@ -371,6 +442,88 @@ public sealed class OdfScriptingExtensionTests
         Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_MISSING_COLON");
         Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_MIXED_INDENTATION");
         Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_UNCLOSED_DELIMITER");
+    }
+
+    [Fact]
+    public async Task ScannerPipelinePreservesIndependentProviderDecisions()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf10,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        manager.AddOrUpdateLibreOfficePythonModule("main.py", "def main():\n    pass");
+        var pipeline = new OdfScriptScannerPipeline(
+        [
+            new FixedScanner("Enterprise AV", OdfScriptScanVerdict.Clean),
+            new FixedScanner("Sandbox", OdfScriptScanVerdict.NotDetected)
+        ]);
+
+        IReadOnlyList<OdfPackageScriptScanReport> reports = await manager.ScanPackageScriptsAsync(
+            pipeline,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, reports.Count);
+        Assert.All(reports, report => Assert.Equal(2, report.Results.Count));
+        Assert.All(reports, report => Assert.Contains(
+            report.Results,
+            result => result.ProviderName == "Enterprise AV" && result.Verdict == OdfScriptScanVerdict.Clean));
+    }
+
+    [Fact]
+    public void MacroPolicyFlagsEventsAndHighRiskBasicAndPythonCapabilities()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf11,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddDocumentEventBinding(
+            "dom:load",
+            "ooo:script",
+            "Standard.Module1.Main",
+            OdfScriptTargetKind.MacroName);
+        manager.AddOrUpdateLibreOfficeBasicModule(
+            "Standard",
+            "Module1",
+            "Sub Main\nShell(\"tool\")\nOpen \"data\" For Input As #1\n" +
+            "CreateUnoService(\"com.sun.star.system.SystemShellExecute\")\nEnd Sub");
+        manager.AddOrUpdateLibreOfficePythonModule(
+            "main.py",
+            "import socket, subprocess\ndef main():\n    eval('1 + 1')\n");
+
+        OdfMacroPolicyResult result = manager.EvaluateMacroPolicy(new OdfMacroSecurityPolicy());
+
+        Assert.False(result.IsAllowed);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.AutoExecution);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.ProcessExecution);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.FileSystem);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.Network);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.UnoService);
+        Assert.Contains(result.Findings, finding => finding.Capability == OdfMacroCapability.DynamicCode);
+    }
+
+    [Fact]
+    public async Task ExternalCompilerReportsUnavailableExecutableWithoutFallback()
+    {
+        var options = new OdfScriptCompilerOptions
+        {
+            PythonExecutablePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "python")
+        };
+
+        OdfScriptCompilationResult result = await OdfExternalScriptCompiler.DiagnoseAsync(
+            "def main(): pass",
+            OdfScriptCompilerBackend.PythonAst,
+            options,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(OdfScriptCompilationStatus.Unavailable, result.Status);
+        Assert.Empty(result.Diagnostics);
     }
 
     [Fact]
@@ -409,5 +562,17 @@ public sealed class OdfScriptingExtensionTests
 #else
         return new X509Certificate2(pfx);
 #endif
+    }
+
+    private sealed class FixedScanner(string providerName, OdfScriptScanVerdict verdict) : IOdfScriptScanner
+    {
+        public Task<OdfScriptScanResult> ScanAsync(
+            OdfScriptScanRequest request,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Assert.False(string.IsNullOrEmpty(request.Source));
+            return Task.FromResult(new OdfScriptScanResult(providerName, verdict, nativeResult: null));
+        }
     }
 }

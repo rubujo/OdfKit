@@ -15,7 +15,7 @@
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | 中繼資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | 協作擴充 | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程整合 |
-| `OdfKit.Extensions.Scripting` | 指令碼擴充 | `net10.0;netstandard2.0` | ODF 1.0～1.4 標準 script／event CRUD、LibreOffice Basic／Python 管理、巨集 XMLDSig／XAdES、簽署者信任政策與結構式語法診斷 | 不執行巨集；憑證信任不等於程式碼安全 |
+| `OdfKit.Extensions.Scripting` | 指令碼擴充 | `net10.0;netstandard2.0` | ODF 1.0～1.4 script／event CRUD、LibreOffice Basic／Python 管理、巨集簽章、信任、掃描 provider、能力政策與語法診斷 | 管理路徑不執行巨集；Basic headless probe 為 `Indeterminate`；憑證信任不等於安全 |
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |

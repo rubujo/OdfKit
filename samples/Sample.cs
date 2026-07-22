@@ -756,6 +756,15 @@ static void DemoScripting(string outputDir)
         "interop.py",
         "def main():\n    return 'OdfKit Python document macro'\n\ng_exportedScripts = (main,)\n");
 
+    var scanPipeline = new OdfScriptScannerPipeline([new OdfAmsiScriptScanner()]);
+    IReadOnlyList<OdfPackageScriptScanReport> scanReports = scripting
+        .ScanPackageScriptsAsync(scanPipeline)
+        .GetAwaiter()
+        .GetResult();
+    OdfMacroPolicyResult policy = scripting.EvaluateMacroPolicy(new OdfMacroSecurityPolicy());
+    Console.WriteLine(
+        $"   指令碼掃描 {scanReports.Count} 項；靜態政策發現 {policy.Findings.Count} 項（掃描與信任各自獨立）。");
+
     string outputPath = Path.Combine(outputDir, "output_scripting.odt");
     document.Save(outputPath);
     Console.WriteLine($"   已建立巨集管理範例：{outputPath}");
