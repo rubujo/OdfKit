@@ -94,8 +94,8 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
                 baseDir += Path.DirectorySeparatorChar;
             }
 
-            Uri baseUri = new Uri(baseDir);
-            Uri fullUri = new Uri(fullPath);
+            Uri baseUri = new(baseDir);
+            Uri fullUri = new(fullPath);
             if (baseUri.Scheme != fullUri.Scheme)
                 return null;
 

@@ -401,24 +401,28 @@ public static class OdfXmlReader
             return;
         }
 
-        string fullName = Encoding.UTF8.GetString(
-#if NETSTANDARD2_0
-            name.ToArray()
-#else
-            name
-#endif
-        );
-        prefix = string.Empty;
-        localName = fullName;
-        int colonIdx = fullName.IndexOf(':');
-        if (colonIdx >= 0)
+        int colonIdx = name.IndexOf((byte)':');
+        if (colonIdx < 0)
         {
-            prefix = fullName.Substring(0, colonIdx);
-            localName = fullName.Substring(colonIdx + 1);
+            prefix = string.Empty;
+            localName = DecodeUtf8(name);
+        }
+        else
+        {
+            prefix = DecodeUtf8(name.Slice(0, colonIdx));
+            localName = DecodeUtf8(name.Slice(colonIdx + 1));
         }
 
         namespaceUri = prefix.Length == 0 ? string.Empty : LookupNamespaceUri(prefix, namespaces);
     }
+
+    private static string DecodeUtf8(ReadOnlySpan<byte> value) => Encoding.UTF8.GetString(
+#if NETSTANDARD2_0
+        value.ToArray()
+#else
+        value
+#endif
+    );
 
     private static bool IsNamespaceDeclaration(ReadOnlySpan<byte> name)
     {

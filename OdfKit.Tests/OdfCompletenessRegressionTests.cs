@@ -74,6 +74,8 @@ namespace OdfKit.Tests
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph();
                 Assert.Throws<ArgumentException>(() => p.AddFormula("<math><mi>x</mi></unclosed>"));
+                Assert.Throws<ArgumentException>(() => p.AddFormula(
+                    "<!DOCTYPE math [<!ENTITY value \"expanded\">]><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>&value;</mi></math>"));
             }
 
             // 3. Zip Slip Defense

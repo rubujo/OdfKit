@@ -18,6 +18,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 {
     private const string MimeType = "application/vnd.oasis.opendocument.text";
     private const string PageBreakStyleName = "OdtStreamPageBreak";
+    private static readonly byte[] MimeTypeBytes = Encoding.UTF8.GetBytes(MimeType);
+    private static readonly string[] OutlineLevels = ["1", "2", "3", "4", "5", "6"];
 
     private readonly Stream? _ownedStream;
     private readonly ZipArchive _zip;
@@ -446,8 +448,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     {
         var entry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
         using var stream = entry.Open();
-        byte[] bytes = Encoding.UTF8.GetBytes(MimeType);
-        stream.Write(bytes, 0, bytes.Length);
+        stream.Write(MimeTypeBytes, 0, MimeTypeBytes.Length);
     }
 
     private void WriteManifest()
@@ -552,7 +553,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
         if (headingLevel.HasValue)
         {
-            string levelText = headingLevel.Value.ToString(CultureInfo.InvariantCulture);
+            string levelText = OutlineLevels[headingLevel.Value - 1];
             _rawWriter.WriteAttribute("text:outline-level", levelText.AsSpan());
         }
 

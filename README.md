@@ -36,11 +36,12 @@ System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `ne
 |------|------|----------|
 | 核心 SDK | `OdfKit` | ODF 文件建立、載入、儲存、驗證、來回讀寫 |
 | 匯出與轉換擴充 | `OdfKit.Extensions.Html`、`OdfKit.Extensions.Pdf`、`OdfKit.Extensions.Ooxml` | HTML / Markdown / RTF、PDF、DOCX / XLSX 互通 |
-| 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作匯出 |
+| 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration`、`OdfKit.Extensions.Scripting` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作與選用巨集管理 |
 | WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
 | 工具 | `OdfKit.Cli`、samples、測試與 corpus 工具 | 自動化驗證、批次轉檔、範例與工程驗證 |
 
 套件挑選與相依說明請見 [套件目錄與選型指南](docs/package-catalog.md)；
+指令碼與巨集安全邊界請見 [ODF 指令碼與巨集管理](docs/scripting.md)；
 工具與範例導覽請見 [tools/README.md](tools/README.md) 與
 [samples/README.md](samples/README.md)。
 

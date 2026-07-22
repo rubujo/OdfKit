@@ -30,6 +30,7 @@
   <Project Path="OdfKit.Extensions.Html.WebFonts/OdfKit.Extensions.Html.WebFonts.csproj" />
   <Project Path="OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj" />
   <Project Path="OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj" />
+  <Project Path="OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
   <Project Path="OdfKit.Tests/MockSoffice/MockSoffice.csproj" />
   <Project Path="tools/OdfKit.Cli/OdfKit.Cli.csproj" />

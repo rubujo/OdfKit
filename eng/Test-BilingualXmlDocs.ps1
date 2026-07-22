@@ -12,6 +12,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $sourceRoots = @(
     'OdfKit',
     'OdfKit.Extensions.Collaboration',
+    'OdfKit.Extensions.Scripting',
     'OdfKit.Extensions.Html',
     'OdfKit.Extensions.Imaging',
     'OdfKit.Extensions.Ooxml',

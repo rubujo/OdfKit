@@ -15,6 +15,7 @@
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | 中繼資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | 協作擴充 | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程整合 |
+| `OdfKit.Extensions.Scripting` | 指令碼擴充 | `net10.0;netstandard2.0` | ODF 1.0～1.4 標準 script／event CRUD 與 LibreOffice Basic／Python 文件巨集管理 | 不執行巨集；修改時移除失效簽章 |
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
@@ -50,6 +51,7 @@
 | 必須依賴 LibreOffice 視覺後端 | `OdfKit` + `OdfKit.Extensions.Rendering` |
 | 要保留或查詢 RDF 中繼資料 | `OdfKit` + `OdfKit.Extensions.Rdf` |
 | 協作編輯或操作序列輸出 | `OdfKit` + `OdfKit.Extensions.Collaboration` |
+| 管理 ODF 指令碼或 LibreOffice 文件巨集 | `OdfKit` + `OdfKit.Extensions.Scripting` |
 | 在 CI / 批次流程中做驗證或轉檔 | `OdfKit.Cli` |
 | 將資料庫查詢（含 Entity Framework Core）或任意物件序列匯出成 ODS，或反向以 `DbDataReader` 邊界串流灌入 `SqlBulkCopy` 等 bulk copy API | `OdfKit`（核心即可，透過 `ObjectDataReader<T>` 與 `OdsStreamWriter.WriteDataAsync<T>`，無需額外擴充套件） |
 | 在 ASP.NET Core／Web Forms 顯示多國罕用字、IVS 或機構 PUA | `OdfKit.WebFonts.Build` + `OdfKit.WebFonts.Hosting.AspNetCore`／`OdfKit.WebFonts.Hosting.SystemWeb`；Big5／Big5E 或 SQL bytes 再加入對應 Encoding／Data 套件 |
@@ -68,6 +70,7 @@
 - [NuGet 相容矩陣](nuget-compatibility-matrix.md)
 - [工具總覽](../tools/README.md)
 - [Rendering 後端部署](rendering-backend-deployment.md)
+- [ODF 指令碼與巨集管理](scripting.md)
 - [WebFont 多國罕用字套件](webfonts.md)
 - [WebFont 純 .NET 架構契約](webfont-managed-architecture.md)
 - [版本與交付資訊](version-delivery.md)

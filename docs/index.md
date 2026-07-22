@@ -41,6 +41,7 @@
 |------|------|
 | [快速開始](getting-started.md) | 第一個專案、第一個文件、CLI 驗證 |
 | [核心 SDK 快速開始](core-quickstart.md) | 核心 SDK 的純受控建立、載入、驗證與低記憶體匯出路徑 |
+| [ODF 指令碼與巨集管理](scripting.md) | ODF 1.0～1.4 script／event CRUD、LibreOffice profile 與安全邊界 |
 | [實作食譜](cookbook.md) | 常見操作片段與實作範例 |
 | [WebFont 多國罕用字套件](webfonts.md) | ASP.NET Core／Web Forms、CSP、CDN、自動內容掃描、Big5／Big5E 與 ORM 整合 |
 | [WebFont 純 .NET 架構契約](webfont-managed-architecture.md) | 純 C#／.NET 產品邊界、格式與授權準入、Phase 0～5 驗收 |

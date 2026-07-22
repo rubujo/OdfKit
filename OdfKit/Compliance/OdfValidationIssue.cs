@@ -114,7 +114,7 @@ public sealed class OdfValidationIssue(
         {
             string defaultLoc = "相關 XML 節點";
             var current = Culture ?? CultureInfo.CurrentUICulture;
-            if (current != null && !current.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+            if (current is not null && !current.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
             {
                 defaultLoc = "relevant XML node";
             }

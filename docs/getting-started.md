@@ -70,6 +70,7 @@ var report = OdfPackageValidator.Validate(
 | 需要 LibreOffice 後端渲染 | `OdfKit.Extensions.Rendering` |
 | RDF / SPARQL 中繼資料橋接 | `OdfKit.Extensions.Rdf` |
 | 協作操作匯出 | `OdfKit.Extensions.Collaboration` |
+| 管理 ODF 指令碼或 LibreOffice 文件巨集 | `OdfKit.Extensions.Scripting` |
 
 更完整的選型說明請見 [套件目錄與選型指南](package-catalog.md)。
 

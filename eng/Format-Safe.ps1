@@ -28,6 +28,7 @@ $libraryProjects = @(
     'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj',
     'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj',
     'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj',
+    'OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj',
     'OdfKit.WebFonts.Abstractions/OdfKit.WebFonts.Abstractions.csproj',
     'OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj',
     'OdfKit.WebFonts.Data.SqlServer/OdfKit.WebFonts.Data.SqlServer.csproj',

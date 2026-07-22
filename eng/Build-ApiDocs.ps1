@@ -187,6 +187,7 @@ try {
         $projects = @(
             @{ Path = 'OdfKit/OdfKit.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj'; Framework = 'net10.0' },
+            @{ Path = 'OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj'; Framework = 'net10.0' },
             @{ Path = 'OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj'; Framework = 'net10.0' },

@@ -11,6 +11,17 @@ namespace OdfKit.DOM;
 /// </summary>
 public partial class OdfNode
 {
+    private static readonly byte[] WrapperPrefixBytes = Encoding.UTF8.GetBytes(
+        "<wrapper" +
+        " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
+        " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
+        " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
+        " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
+        " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
+        " xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"" +
+        " xmlns:xlink=\"http://www.w3.org/1999/xlink\">");
+    private static readonly byte[] WrapperSuffixBytes = Encoding.UTF8.GetBytes("</wrapper>");
+
     /// <summary>
     /// Gets the type of the node.
     /// 取得節點的類型。
@@ -339,18 +350,7 @@ public partial class OdfNode
 
     private void MaterializeChildren(ReadOnlyMemory<byte> xmlData)
     {
-        byte[] prefixBytes = Encoding.UTF8.GetBytes("<wrapper" +
-            " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
-            " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
-            " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
-            " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
-            " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
-            " xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"" +
-            " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
-            ">");
-        byte[] suffixBytes = Encoding.UTF8.GetBytes("</wrapper>");
-
-        using var seqStream = new OdfSequenceStream(prefixBytes, xmlData, suffixBytes);
+        using var seqStream = new OdfSequenceStream(WrapperPrefixBytes, xmlData, WrapperSuffixBytes);
         OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions { AllowLazyLoading = false });
         if (tempRoot is not null)
         {

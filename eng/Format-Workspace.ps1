@@ -19,6 +19,7 @@ $projects = @(
     'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj'
     'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj',
     'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj'
+    'OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj'
     'tools/OdfKit.Cli/OdfKit.Cli.csproj'
     'tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj'
 )

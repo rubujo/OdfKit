@@ -48,6 +48,8 @@
     href: api-surface-consistency.md
   - name: 公開 API 可選參數
     href: public-api-optional-parameters.md
+  - name: 指令碼與巨集管理
+    href: scripting.md
 - name: WebFont
   items:
   - name: WebFont 指南

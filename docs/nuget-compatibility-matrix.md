@@ -15,6 +15,7 @@
 | `OdfKit.Extensions.Rendering` | `net10.0;netstandard2.0` | LibreOffice 後端渲染 | 需本機 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | `net10.0;netstandard2.0` | `manifest.rdf` 與 RDF / SPARQL 橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程 |
+| `OdfKit.Extensions.Scripting` | `net10.0;netstandard2.0` | ODF 1.0～1.4 指令碼、事件與 LibreOffice 文件巨集 CRUD | 純 managed；不執行巨集或重新簽章 |
 | `OdfKit.WebFonts.Abstractions` | `net10.0;netstandard2.0` | WebFont 契約、manifest 與 Profile 模型 | 不綁定特定字型引擎或網站框架 |
 | `OdfKit.WebFonts.OpenType` | `net10.0;netstandard2.0` | 純 managed OpenType 解析與有界子集化 | 不依賴 Python、Node.js 或原生 FontTools |
 | `OdfKit.WebFonts.Profiles` | `net10.0;netstandard2.0` | 版本化 CNS 11643 與自訂 Profile 載入 | 字型及外部對照資料不隨套件再散布 |

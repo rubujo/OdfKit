@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Buffers;
 using System.Net.Http;
 using System.Security;
 using System.Threading;
@@ -23,15 +24,22 @@ internal static class OdfBoundedStreamReader
         string errorMessageKey,
         long initialBytes = 0)
     {
-        byte[] buffer = new byte[DefaultBufferSize];
-        long totalBytes = initialBytes;
-        EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
-        int bytesRead;
-        while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
+        try
         {
-            totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
+            long totalBytes = initialBytes;
+            EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
+            int bytesRead;
+            while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
 
-            destination.Write(buffer, 0, bytesRead);
+                destination.Write(buffer, 0, bytesRead);
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 
@@ -43,15 +51,22 @@ internal static class OdfBoundedStreamReader
         CancellationToken cancellationToken = default,
         long initialBytes = 0)
     {
-        byte[] buffer = new byte[DefaultBufferSize];
-        long totalBytes = initialBytes;
-        EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
-        int bytesRead;
-        while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
+        try
         {
-            totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
+            long totalBytes = initialBytes;
+            EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
+            int bytesRead;
+            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+            {
+                totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
 
-            await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 

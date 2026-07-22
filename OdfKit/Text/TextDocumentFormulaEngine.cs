@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System;
-using System.Xml.Linq;
+using System.IO;
+using System.Xml;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -24,7 +25,20 @@ internal static class TextDocumentFormulaEngine
 
         try
         {
-            XElement.Parse(mathMlXmlString);
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null,
+                MaxCharactersFromEntities = 0,
+                MaxCharactersInDocument = ctx.Package.LoadOptions.MaxXmlCharactersInDocument > 0
+                    ? ctx.Package.LoadOptions.MaxXmlCharactersInDocument
+                    : 0
+            };
+            using var stringReader = new StringReader(mathMlXmlString);
+            using XmlReader reader = XmlReader.Create(stringReader, settings);
+            while (reader.Read())
+            {
+            }
         }
         catch (Exception ex)
         {

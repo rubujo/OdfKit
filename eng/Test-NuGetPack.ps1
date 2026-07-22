@@ -49,6 +49,7 @@ $expectedPackages = @(
     @{ Id = "OdfKit.Extensions.Rendering"; Assembly = "OdfKit.Extensions.Rendering.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
     @{ Id = "OdfKit.Extensions.Rdf"; Assembly = "OdfKit.Extensions.Rdf.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
     @{ Id = "OdfKit.Extensions.Collaboration"; Assembly = "OdfKit.Extensions.Collaboration.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Scripting"; Assembly = "OdfKit.Extensions.Scripting.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $false },
     @{ Id = "OdfKit.WebFonts.Abstractions"; Assembly = "OdfKit.WebFonts.Abstractions.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Encoding.Legacy"; Assembly = "OdfKit.WebFonts.Encoding.Legacy.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Data.SqlServer"; Assembly = "OdfKit.WebFonts.Data.SqlServer.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
@@ -288,6 +289,7 @@ using OdfKit.Export;
 using OdfKit.Extensions.Imaging;
 using OdfKit.Extensions.Rdf;
 using OdfKit.Extensions.Rendering;
+using OdfKit.Extensions.Scripting;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Encoding.Legacy;
 using OdfKit.WebFonts.Profiles;
@@ -296,6 +298,7 @@ using System.Runtime.InteropServices;
 
 using var doc = TextDocument.Create();
 doc.AddParagraph("NuGet smoke");
+_ = doc.Scripting().Capabilities;
 _ = new OdfHtmlExportOptions();
 _ = typeof(OdfToXlsxConverter);
 _ = new OdfPdfRenderer();

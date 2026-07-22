@@ -25,6 +25,7 @@ $roots = @(
     (Join-Path $repoRoot 'OdfKit.Extensions.Rdf'),
     (Join-Path $repoRoot 'OdfKit.Extensions.Rendering'),
     (Join-Path $repoRoot 'OdfKit.Extensions.Collaboration'),
+    (Join-Path $repoRoot 'OdfKit.Extensions.Scripting'),
     (Join-Path $repoRoot 'OdfKit.Extensions.Html.WebFonts'),
     (Join-Path $repoRoot 'OdfKit.WebFonts.Abstractions'),
     (Join-Path $repoRoot 'OdfKit.WebFonts.Build'),

@@ -12,7 +12,7 @@
 | L4 封裝與 DOM | `OdfPackage`、`OdfPackageEntry`、`OdfNode`、`OdfElement` | 需要保留未知內容或做低階互通的進階使用者 | 保留來回讀寫行為與 XML / ZIP 安全邊界 |
 | L5 合規與診斷 | `OdfValidator`、`OdfValidationReport`、`OdfLocalizer`、診斷型別 | 驗證、CI、匯入閘門 | 診斷資料應穩定且可供機器讀取 |
 | L6 安全性與簽章 | `OdfLoadOptions`、`OdfSaveOptions`、`OdfSigner`、密碼學提供者 | 加密、簽章、安全敏感工作流程 | 預設安全，錯誤訊息在地化，取消語意明確 |
-| L7 擴充套件 | `OdfKit.Extensions.*` | 需要 HTML、PDF、OOXML、Rendering、RDF、Collaboration 的使用者 | 與核心解耦，避免把執行階段較重的相依帶入核心 |
+| L7 擴充套件 | `OdfKit.Extensions.*` | 需要 HTML、PDF、OOXML、Rendering、RDF、Collaboration 或 Scripting 的使用者 | 與核心解耦，隔離選用功能與其安全邊界 |
 | L8 工具與工程 | `tools/OdfKit.Cli`、`eng/*.ps1`、基準測試 | 維護者、CI、發佈流程 | 可重跑、可稽核，避免本機狀態污染儲存庫 |
 
 ## 建議使用路徑

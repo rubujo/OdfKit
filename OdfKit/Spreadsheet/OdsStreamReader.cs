@@ -28,9 +28,9 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private Stream? _contentStream;
     private int _rowRepeatRemaining;
     private int _rowIndex = -1;
-    private readonly List<object?> _currentRowData = new List<object?>();
-    private readonly List<OdsCellValue> _currentRowCells = new List<OdsCellValue>();
-    private readonly List<string> _sheetNames = new List<string>();
+    private readonly List<object?> _currentRowData = [];
+    private readonly List<OdsCellValue> _currentRowCells = [];
+    private readonly List<string> _sheetNames = [];
     private int _readInProgress;
 
     /// <summary>

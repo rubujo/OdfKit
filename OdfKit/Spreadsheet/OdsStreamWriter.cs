@@ -26,6 +26,8 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 {
+    private static readonly byte[] MimeTypeBytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet");
+
     #region Stream Writing
     private readonly Stream _outputStream;
     private readonly ZipArchive _zip;
@@ -98,8 +100,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         var mimeEntry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
         using (var s = mimeEntry.Open())
         {
-            byte[] bytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet");
-            s.Write(bytes, 0, bytes.Length);
+            s.Write(MimeTypeBytes, 0, MimeTypeBytes.Length);
         }
 
         // 2. 寫入預設的中階資料、樣式與資訊清單專案
