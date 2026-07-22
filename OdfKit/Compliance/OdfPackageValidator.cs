@@ -93,9 +93,9 @@ public static partial class OdfPackageValidator
         ValidateBodyKind(mimeKind, bodyKind, profileId, issues);
         ValidateExtensionKind(extensionKind, mimeKind, fileName, profileId, issues);
         ValidateEntryPaths(package, profileId, issues);
-        ValidateManifest(package, mimeType, profileId, issues);
 
         OdfVersion detectedVersion = DetectVersion(package, issues, profileId);
+        ValidateManifest(package, mimeType, detectedVersion, profileId, issues);
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
         if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)
         {

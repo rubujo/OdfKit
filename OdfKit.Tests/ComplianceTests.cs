@@ -95,6 +95,40 @@ namespace OdfKit.Tests
                 rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
         }
 
+        [Theory]
+        [InlineData("1.2", "OASIS_ODF_1_2_Strict", "OASIS_ODF_1_2_Extended")]
+        [InlineData("1.3", "OASIS_ODF_1_3_Strict", "OASIS_ODF_1_3_Extended")]
+        public void VersionedConformanceProfilesSeparateStrictAndExtendedRules(
+            string version,
+            string strictId,
+            string extendedId)
+        {
+            OdfComplianceProfile strict = version == "1.2"
+                ? OdfComplianceProfiles.OasisOdf12Strict
+                : OdfComplianceProfiles.OasisOdf13Strict;
+            OdfComplianceProfile extended = version == "1.2"
+                ? OdfComplianceProfiles.OasisOdf12Extended
+                : OdfComplianceProfiles.OasisOdf13Extended;
+
+            Assert.Equal(strictId, strict.Id);
+            Assert.Equal(extendedId, extended.Id);
+            Assert.Contains(strict.Rules, rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
+            Assert.DoesNotContain(strict.Rules, rule => rule.Id == "RequireForeignExtensionIsolation");
+            Assert.Contains(extended.Rules, rule => rule.Id == "RequireForeignExtensionIsolation");
+            Assert.DoesNotContain(extended.Rules, rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
+            Assert.Contains(strict.Rules, rule => rule.Id == "RequireSchemaPatternValidation");
+            Assert.Contains(extended.Rules, rule => rule.Id == "RequireSchemaPatternValidation");
+        }
+
+        [Fact]
+        public void VersionedValidationOptionsUseExplicitConformanceProfiles()
+        {
+            Assert.Same(OdfComplianceProfiles.OasisOdf12Strict, OdfValidationOptions.Odf12Strict.Profile);
+            Assert.Same(OdfComplianceProfiles.OasisOdf12Extended, OdfValidationOptions.Odf12Extended.Profile);
+            Assert.Same(OdfComplianceProfiles.OasisOdf13Strict, OdfValidationOptions.Odf13Strict.Profile);
+            Assert.Same(OdfComplianceProfiles.OasisOdf13Extended, OdfValidationOptions.Odf13Extended.Profile);
+        }
+
         [Fact]
         public void ProfileSemanticsKeepDraftAndCompatibilityProfilesPolicyScoped()
         {
@@ -1388,6 +1422,41 @@ namespace OdfKit.Tests
             Assert.Contains(report.Issues, issue =>
                 issue.RuleId == "ODF0112" &&
                 issue.PackagePath == "META-INF/manifest.xml");
+        }
+
+        [Fact]
+        public void ValidatorDoesNotRequireManifestVersionBeforeOdf12()
+        {
+            using MemoryStream ms = CreateZipWithRawManifest(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.1"),
+                "<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\">" +
+                "<manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\" />" +
+                "<manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\" />" +
+                "</manifest:manifest>");
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf11);
+
+            Assert.DoesNotContain(report.Issues, issue => issue.RuleId == "ODF0112");
+        }
+
+        [Fact]
+        public void ValidatorReportsUnrecognizedManifestVersion()
+        {
+            using MemoryStream ms = CreateZipWithRawManifest(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.3"),
+                "<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"2.0\">" +
+                "<manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\" />" +
+                "<manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\" />" +
+                "</manifest:manifest>");
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf13Strict);
+
+            OdfValidationIssue issue = Assert.Single(report.Issues, issue => issue.RuleId == "ODF0113");
+            Assert.Equal("2.0", issue.Details["actualVersion"]);
         }
 
         [Fact]

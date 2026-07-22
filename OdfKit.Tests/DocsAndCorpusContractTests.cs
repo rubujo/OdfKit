@@ -19,6 +19,29 @@ namespace OdfKit.Tests;
 public class DocsAndCorpusContractTests
 {
     /// <summary>
+    /// Verifies the specification support document states version, layer, and intentional non-goal boundaries.
+    /// 驗證規格支援文件明列版本、層級及刻意排除的邊界。
+    /// </summary>
+    [Fact]
+    public void OdfSpecificationSupportDocumentDeclaresAuditableBoundaries()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-specification-support.md"));
+        string index = File.ReadAllText(Path.Combine(repoRoot, "docs", "index.md"));
+
+        foreach (string version in new[] { "ODF 1.0", "ODF 1.1", "ODF 1.2", "ODF 1.3", "ODF 1.4" })
+        {
+            Assert.Contains(version, support, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("結構性支援", support, StringComparison.Ordinal);
+        Assert.Contains("僅保留", support, StringComparison.Ordinal);
+        Assert.Contains("外部引擎", support, StringComparison.Ordinal);
+        Assert.Contains("刻意不支援", support, StringComparison.Ordinal);
+        Assert.Contains("odf-specification-support.md", index, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Verifies the scripting extension is wired into the API site and executable sample.
     /// 驗證指令碼擴充已接入 API 網站與可執行範例。
     /// </summary>

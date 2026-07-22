@@ -82,6 +82,7 @@ public static partial class OdfPackageValidator
     private static void ValidateManifest(
         OdfPackage package,
         string? mimeType,
+        OdfVersion detectedVersion,
         string? profileId,
         List<OdfValidationIssue> issues)
     {
@@ -96,7 +97,7 @@ public static partial class OdfPackageValidator
             return;
         }
 
-        ValidateManifestRoot(package.ManifestRootInfo, profileId, issues);
+        ValidateManifestRoot(package.ManifestRootInfo, detectedVersion, profileId, issues);
 
         foreach (string duplicateManifestPath in package.DuplicateManifestPaths)
         {
@@ -348,6 +349,7 @@ public static partial class OdfPackageValidator
 
     private static void ValidateManifestRoot(
         OdfManifestRootInfo? rootInfo,
+        OdfVersion detectedVersion,
         string? profileId,
         List<OdfValidationIssue> issues)
     {
@@ -375,14 +377,34 @@ public static partial class OdfPackageValidator
 
         if (string.IsNullOrWhiteSpace(rootInfo.Version))
         {
+            if (detectedVersion >= OdfVersion.Odf12)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Warning,
+                    "ODF0112",
+                    "Manifest XML root is missing manifest:version.",
+                    "META-INF/manifest.xml",
+                    "/" + rootInfo.LocalName,
+                    requiredVersion: OdfVersion.Odf12,
+                    profileId: profileId));
+            }
+
+            return;
+        }
+
+        if (!OdfVersionInfo.TryParseVersionString(rootInfo.Version, out _))
+        {
             issues.Add(new OdfValidationIssue(
-                OdfIssueSeverity.Warning,
-                "ODF0112",
-                "Manifest XML root is missing manifest:version.",
+                OdfIssueSeverity.Error,
+                "ODF0113",
+                "Manifest version is not a recognized ODF package specification version.",
                 "META-INF/manifest.xml",
-                "/" + rootInfo.LocalName,
-                requiredVersion: OdfVersion.Odf12,
-                profileId: profileId));
+                "/" + rootInfo.LocalName + "/@manifest:version",
+                profileId: profileId,
+                details: new Dictionary<string, string?>(StringComparer.Ordinal)
+                {
+                    ["actualVersion"] = rootInfo.Version
+                }));
         }
     }
 

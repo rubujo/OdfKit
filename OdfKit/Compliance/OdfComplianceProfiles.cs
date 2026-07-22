@@ -106,6 +106,42 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.2 Strict compliance profile.
+    /// 取得 OASIS OpenDocument v1.2 嚴格 (Strict) 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf12Strict { get; } = new(
+        "OASIS_ODF_1_2_Strict",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html"),
+        "2011-09-29",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf12),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        null);
+
+    /// <summary>
+    /// Gets the OASIS OpenDocument v1.2 Extended compliance profile.
+    /// 取得 OASIS OpenDocument v1.2 擴充 (Extended) 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf12Extended { get; } = new(
+        "OASIS_ODF_1_2_Extended",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html"),
+        "2011-09-29",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf12),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        null);
+
+    /// <summary>
     /// Gets the OASIS OpenDocument v1.3 compliance profile.
     /// 取得 OASIS OpenDocument v1.3 一致性規範。
     /// </summary>
@@ -121,6 +157,42 @@ public static class OdfComplianceProfiles
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
         [.. StandardRules, Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        null);
+
+    /// <summary>
+    /// Gets the OASIS OpenDocument v1.3 Strict compliance profile.
+    /// 取得 OASIS OpenDocument v1.3 嚴格 (Strict) 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf13Strict { get; } = new(
+        "OASIS_ODF_1_3_Strict",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.3/os/"),
+        "2021-04-27",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf13),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        null);
+
+    /// <summary>
+    /// Gets the OASIS OpenDocument v1.3 Extended compliance profile.
+    /// 取得 OASIS OpenDocument v1.3 擴充 (Extended) 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf13Extended { get; } = new(
+        "OASIS_ODF_1_3_Extended",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.3/os/"),
+        "2021-04-27",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf13),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
     /// <summary>
@@ -686,7 +758,11 @@ public static class OdfComplianceProfiles
         OasisOdf10,
         OasisOdf11,
         OasisOdf12,
+        OasisOdf12Strict,
+        OasisOdf12Extended,
         OasisOdf13,
+        OasisOdf13Strict,
+        OasisOdf13Extended,
         OasisOdf14Strict,
         OasisOdf14Extended,
         IsoIec26300_2006,

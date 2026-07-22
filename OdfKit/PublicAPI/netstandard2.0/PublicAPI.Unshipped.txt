@@ -18596,7 +18596,11 @@ static OdfKit.Compliance.OdfComplianceProfiles.NoGovernmentOdf.get -> OdfKit.Com
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf10.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf11.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf12.get -> OdfKit.Compliance.OdfComplianceProfile!
+static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf12Extended.get -> OdfKit.Compliance.OdfComplianceProfile!
+static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf12Strict.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf13.get -> OdfKit.Compliance.OdfComplianceProfile!
+static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf13Extended.get -> OdfKit.Compliance.OdfComplianceProfile!
+static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf13Strict.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf14Extended.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.OasisOdf14Strict.get -> OdfKit.Compliance.OdfComplianceProfile!
 static OdfKit.Compliance.OdfComplianceProfiles.PtGovernmentOdf.get -> OdfKit.Compliance.OdfComplianceProfile!
@@ -18659,6 +18663,10 @@ static OdfKit.Compliance.OdfSchemaRegistry.Odf14.get -> OdfKit.Compliance.OdfSch
 static OdfKit.Compliance.OdfSchemaRegistry.RegisterSchema(OdfKit.Compliance.OdfSchemaSet! schema) -> System.IDisposable!
 static OdfKit.Compliance.OdfSchemaRegistry.RegisterSchema(OdfKit.Compliance.OdfSchemaSet! schema, OdfKit.Compliance.OdfSchemaRegistrationOptions! options) -> System.IDisposable!
 static OdfKit.Compliance.OdfValidationOptions.Default.get -> OdfKit.Compliance.OdfValidationOptions!
+static OdfKit.Compliance.OdfValidationOptions.Odf12Extended.get -> OdfKit.Compliance.OdfValidationOptions!
+static OdfKit.Compliance.OdfValidationOptions.Odf12Strict.get -> OdfKit.Compliance.OdfValidationOptions!
+static OdfKit.Compliance.OdfValidationOptions.Odf13Extended.get -> OdfKit.Compliance.OdfValidationOptions!
+static OdfKit.Compliance.OdfValidationOptions.Odf13Strict.get -> OdfKit.Compliance.OdfValidationOptions!
 static OdfKit.Compliance.OdfValidationOptions.Odf14Extended.get -> OdfKit.Compliance.OdfValidationOptions!
 static OdfKit.Compliance.OdfValidationOptions.Odf14Strict.get -> OdfKit.Compliance.OdfValidationOptions!
 static OdfKit.Compliance.OdfValidator.Validate(OdfKit.Core.OdfPackage! package) -> OdfKit.Compliance.OdfValidationReport!

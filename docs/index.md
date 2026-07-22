@@ -13,7 +13,7 @@
 
 | 如果您要… | 建議先讀 | 再延伸閱讀 |
 |-----------|----------|------------|
-| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md)、[智慧財產與合規說明](ip-compliance.md) |
+| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [ODF 規範支援邊界](odf-specification-support.md)、[套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md)、[智慧財產與合規說明](ip-compliance.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[範例總覽](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[i18n 詞彙表](i18n-glossary.md)、[ODF 格式支援矩陣](odf-format-support.md) |
@@ -31,6 +31,7 @@
 | [套件目錄與選型指南](package-catalog.md) | 依情境挑選核心套件、擴充套件與工具 |
 | [NuGet 相容矩陣](nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | [ODF 格式支援矩陣](odf-format-support.md) | 功能覆蓋、狀態標記與測試證據 |
+| [ODF 規範支援邊界](odf-specification-support.md) | ODF 1.0～1.4 各規格層、支援深度與刻意排除項目 |
 | [ODF Profile 來源](odf-profile-sources.md) | 內建 Profile 的來源、權威層級與驗證狀態 |
 | [i18n 與在地化](i18n-localization.md) | 語系字典、訊息遞補與 `OdfLocalizer` 使用方式 |
 | [版本與交付資訊](version-delivery.md) | 交付管道、版本原則與安裝參考 |

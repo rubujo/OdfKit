@@ -20,6 +20,42 @@ public sealed class OdfValidationOptions
     public static OdfValidationOptions Default { get; } = new();
 
     /// <summary>
+    /// Gets the Odf12Strict value.
+    /// 取得 ODF 1.2 嚴格一致性驗證選項。
+    /// </summary>
+    public static OdfValidationOptions Odf12Strict { get; } = new()
+    {
+        Profile = OdfComplianceProfiles.OasisOdf12Strict
+    };
+
+    /// <summary>
+    /// Gets the Odf12Extended value.
+    /// 取得 ODF 1.2 擴充一致性驗證選項。
+    /// </summary>
+    public static OdfValidationOptions Odf12Extended { get; } = new()
+    {
+        Profile = OdfComplianceProfiles.OasisOdf12Extended
+    };
+
+    /// <summary>
+    /// Gets the Odf13Strict value.
+    /// 取得 ODF 1.3 嚴格一致性驗證選項。
+    /// </summary>
+    public static OdfValidationOptions Odf13Strict { get; } = new()
+    {
+        Profile = OdfComplianceProfiles.OasisOdf13Strict
+    };
+
+    /// <summary>
+    /// Gets the Odf13Extended value.
+    /// 取得 ODF 1.3 擴充一致性驗證選項。
+    /// </summary>
+    public static OdfValidationOptions Odf13Extended { get; } = new()
+    {
+        Profile = OdfComplianceProfiles.OasisOdf13Extended
+    };
+
+    /// <summary>
     /// Gets the Odf14Strict value.
     /// 取得 ODF 1.4 嚴格一致性驗證選項。
     /// </summary>
