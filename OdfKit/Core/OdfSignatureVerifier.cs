@@ -27,6 +27,17 @@ internal static partial class OdfSignatureVerifier
         OdfPackage package,
         OdfSigningOptions? options = null,
         CancellationToken cancellationToken = default)
+        => await VerifySignaturesAsync(
+            package,
+            options,
+            OdfSignatureProfile.Document,
+            cancellationToken).ConfigureAwait(false);
+
+    internal static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(
+        OdfPackage package,
+        OdfSigningOptions? options,
+        OdfSignatureProfile profile,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -36,7 +47,7 @@ internal static partial class OdfSignatureVerifier
         if (package == null)
             throw new ArgumentNullException(nameof(package));
 
-        if (!package.HasEntry(OdfSignerConstants.SignaturePath))
+        if (!package.HasEntry(profile.SignaturePath))
         {
             result.IsValid = false;
             return result;
@@ -45,7 +56,7 @@ internal static partial class OdfSignatureVerifier
         try
         {
             var doc = new XmlDocument { XmlResolver = null };
-            using (var stream = package.GetEntryStream(OdfSignerConstants.SignaturePath))
+            using (var stream = package.GetEntryStream(profile.SignaturePath))
             {
                 var readerSettings = new XmlReaderSettings
                 {
@@ -88,7 +99,7 @@ internal static partial class OdfSignatureVerifier
                 result.Signatures.Add(singleResult);
                 singleResult.ValidationSteps.Add($"Starting verification for signature ID: {singleResult.SignatureId}");
 
-                if (!await VerifySingleSignatureAsync(signatureNode, doc, package, options, nsManager, singleResult, cancellationToken)
+                if (!await VerifySingleSignatureAsync(signatureNode, doc, package, options, profile, nsManager, singleResult, cancellationToken)
                     .ConfigureAwait(false))
                     overallValid = false;
             }

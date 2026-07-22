@@ -34,6 +34,19 @@ internal static class OdfSignatureSigner
         X509Certificate2 certificate,
         OdfSigningOptions options,
         CancellationToken cancellationToken = default)
+        => await SignAsync(
+            package,
+            certificate,
+            options,
+            OdfSignatureProfile.Document,
+            cancellationToken).ConfigureAwait(false);
+
+    internal static async Task SignAsync(
+        OdfPackage package,
+        X509Certificate2 certificate,
+        OdfSigningOptions options,
+        OdfSignatureProfile profile,
+        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -45,6 +58,8 @@ internal static class OdfSignatureSigner
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_CertificateContainPrivateKey"), nameof(certificate));
         if (options is null)
             throw new ArgumentNullException(nameof(options));
+        if (profile is null)
+            throw new ArgumentNullException(nameof(profile));
 
         using AsymmetricAlgorithm? privateKey = certificate.GetRSAPrivateKey() ?? (AsymmetricAlgorithm?)certificate.GetECDsaPrivateKey();
         if (privateKey is null)
@@ -61,9 +76,9 @@ internal static class OdfSignatureSigner
                 : 0
         };
 
-        if (package.HasEntry(OdfSignerConstants.SignaturePath))
+        if (package.HasEntry(profile.SignaturePath))
         {
-            using Stream stream = package.GetEntryStream(OdfSignerConstants.SignaturePath);
+            using Stream stream = package.GetEntryStream(profile.SignaturePath);
             using var reader = XmlReader.Create(stream, settings);
             doc.Load(reader);
             root = doc.DocumentElement ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_InvalidSignatureFileStructure"));
@@ -75,7 +90,7 @@ internal static class OdfSignatureSigner
             doc.AppendChild(root);
         }
 
-        package.WriteEntry(OdfSignerConstants.SignaturePath, Array.Empty<byte>(), "text/xml");
+        package.WriteEntry(profile.SignaturePath, Array.Empty<byte>(), "text/xml");
         package.SaveManifestToEntries();
 
         var signedXml = new XadesSignedXml(doc)
@@ -160,7 +175,7 @@ internal static class OdfSignatureSigner
         List<string> filesToSign = [];
         foreach (string entryName in package.Entries.Keys)
         {
-            if (ShouldSignPackageEntry(entryName))
+            if (ShouldSignPackageEntry(entryName, profile))
                 filesToSign.Add(entryName.Replace('\\', '/'));
         }
         filesToSign.Sort(StringComparer.Ordinal);
@@ -314,7 +329,7 @@ internal static class OdfSignatureSigner
         using (var writer = XmlWriter.Create(ms, writerSettings))
             doc.Save(writer);
 
-        package.WriteEntry(OdfSignerConstants.SignaturePath, ms.ToArray(), "text/xml");
+        package.WriteEntry(profile.SignaturePath, ms.ToArray(), "text/xml");
         OdfKitDiagnostics.Info($"Added digital signature to package using certificate: {certificate.Subject}");
     }
 
@@ -326,9 +341,9 @@ internal static class OdfSignatureSigner
             _ => OdfVersionInfo.ToVersionString(OdfVersion.Odf10)
         };
 
-    private static bool ShouldSignPackageEntry(string entryName)
+    private static bool ShouldSignPackageEntry(string entryName, OdfSignatureProfile profile)
     {
         string normalized = entryName.Replace('\\', '/').TrimStart('/');
-        return OdfSignerConstants.IsCoverableEntry(normalized);
+        return profile.IsCoverableEntry(normalized);
     }
 }

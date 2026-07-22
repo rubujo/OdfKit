@@ -225,12 +225,10 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-#if !NET10_0_OR_GREATER
-        if (request.Formats.Contains(WebFontFormat.Woff2))
+        if (request.Formats.Contains(WebFontFormat.Woff2) && !RuntimeBrotliCodec.IsAvailable)
         {
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
-#endif
     }
 
     private string ResolveSource(WebFontFaceIdentity face)
@@ -393,7 +391,6 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
                             cancellationToken);
                         decodedFaceIndex = faceIndex;
                     }
-#if NET10_0_OR_GREATER
                     else if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOF2"u8))
                     {
                         decoded = ManagedOpenTypeWebFontVerifier.DecodeWoff2(
@@ -403,12 +400,6 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
                             cancellationToken);
                         decodedFaceIndex = 0;
                     }
-#else
-                    else if (Bytes.Length >= 4 && Bytes.AsSpan(0, 4).SequenceEqual("wOF2"u8))
-                    {
-                        throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
-                    }
-#endif
 
                     font = SfntFont.Parse(
                         decoded,

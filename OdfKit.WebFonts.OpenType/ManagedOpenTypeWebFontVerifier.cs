@@ -1,7 +1,4 @@
 ﻿using System.Buffers.Binary;
-#if NET10_0_OR_GREATER
-using System.IO.Compression;
-#endif
 using System.Text;
 using OdfKit.Compliance;
 
@@ -230,13 +227,11 @@ public static class ManagedOpenTypeWebFontVerifier
     private static SfntFont ParseSourceFace(byte[] source, int faceIndex)
     {
         int maximumBytes = checked((int)Math.Min(source.LongLength * 16, 256L * 1024 * 1024));
-#if NET10_0_OR_GREATER
         if (source.Length >= 4 && source.AsSpan(0, 4).SequenceEqual("wOF2"u8))
         {
             byte[] selectedFace = DecodeWoff2(source, maximumBytes, faceIndex);
             return SfntFont.Parse(selectedFace, 0, 256, validateChecksums: true);
         }
-#endif
 
         byte[] sourceSfnt = DecodeSource(source, maximumBytes);
         return SfntFont.Parse(sourceSfnt, faceIndex, 256, validateChecksums: true);
@@ -266,11 +261,7 @@ public static class ManagedOpenTypeWebFontVerifier
         {
             WebFontFormat.TrueType or WebFontFormat.OpenType => bytes,
             WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumBytes, cancellationToken),
-#if NET10_0_OR_GREATER
             WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumBytes, 0, cancellationToken),
-#else
-            WebFontFormat.Woff2 => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")),
-#endif
             _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
         };
         return SfntFont.Parse(sfnt, 0, 256, validateChecksums: true, cancellationToken);
@@ -289,17 +280,10 @@ public static class ManagedOpenTypeWebFontVerifier
             return DecodeWoff(bytes, maximumExpandedBytes);
         }
 
-#if NET10_0_OR_GREATER
         if (signature.SequenceEqual("wOF2"u8))
         {
             return DecodeWoff2(bytes, maximumExpandedBytes);
         }
-#else
-        if (signature.SequenceEqual("wOF2"u8))
-        {
-            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
-        }
-#endif
 
         return bytes;
     }
@@ -371,7 +355,6 @@ public static class ManagedOpenTypeWebFontVerifier
         return sfnt;
     }
 
-#if NET10_0_OR_GREATER
     internal static byte[] DecodeWoff2(byte[] bytes, int maximumExpandedBytes)
         => DecodeWoff2(bytes, maximumExpandedBytes, 0, CancellationToken.None);
 
@@ -506,7 +489,7 @@ public static class ManagedOpenTypeWebFontVerifier
             privateLength);
 
         var uncompressed = new byte[uncompressedLength];
-        if (!BrotliDecoder.TryDecompress(
+        if (!RuntimeBrotliCodec.TryDecompress(
                 data.Slice(position, compressedLength),
                 uncompressed,
                 out int written)
@@ -640,7 +623,7 @@ public static class ManagedOpenTypeWebFontVerifier
 
         int trailingLength = data.Length - cursor;
         if (trailingLength is < 0 or > 3
-            || data.Slice(cursor, trailingLength).ContainsAnyExcept((byte)0))
+            || ContainsNonZero(data.Slice(cursor, trailingLength)))
         {
             throw SfntFont.DataInvalid("WOFF2-trailingData");
         }
@@ -661,7 +644,7 @@ public static class ManagedOpenTypeWebFontVerifier
         if (alignedOffset > data.Length
             || offset != alignedOffset
             || alignedOffset - cursor > 3
-            || data.Slice(cursor, alignedOffset - cursor).ContainsAnyExcept((byte)0))
+            || ContainsNonZero(data.Slice(cursor, alignedOffset - cursor)))
         {
             throw SfntFont.DataInvalid(detail);
         }
@@ -964,7 +947,6 @@ public static class ManagedOpenTypeWebFontVerifier
                 _ => false
             };
     }
-#endif
 
     private static byte[] ReadBounded(Stream stream, int maximumBytes)
     {
@@ -998,7 +980,6 @@ public static class ManagedOpenTypeWebFontVerifier
         return memory.ToArray();
     }
 
-#if NET10_0_OR_GREATER
     private static uint ReadUIntBase128(ReadOnlySpan<byte> data, ref int position)
     {
         uint result = 0;
@@ -1037,7 +1018,17 @@ public static class ManagedOpenTypeWebFontVerifier
 
         return WebFontWriters.Woff2KnownTags[index];
     }
-#endif
+
+    private static bool ContainsNonZero(ReadOnlySpan<byte> data)
+    {
+        foreach (byte value in data)
+        {
+            if (value != 0)
+                return true;
+        }
+
+        return false;
+    }
 
     private static int CheckedInt(uint value, string detail)
     {

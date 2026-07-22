@@ -72,10 +72,10 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 ### 3.1 輸入與輸出契約
 
 - 輸入是來源容器：standalone TTF／OTF、TTC／OTC 的指定 face、Windows EUDC `.tte`，以及
-  可安全展開的 standalone WOFF；`net10.0` 另接受 null 或標準 transformed-table 的 standalone
+  可安全展開的 standalone WOFF；執行期具 Brotli 時另接受 null 或標準 transformed-table 的 standalone
   WOFF2，並以 experimental 路徑接受 WOFF2 collection 的指定 face。來源副檔名不作
   信任依據，均以 signature、table directory、checksum、展開上限與 `faceIndex` 驗證。
-- 輸出是瀏覽器部署資產：獨立 TTF／OTF、WOFF 1.0；`net10.0` 另提供 WOFF2。TTC／OTC
+- 輸出是瀏覽器部署資產：獨立 TTF／OTF、WOFF 1.0；執行期具 Brotli 時另提供 WOFF2。TTC／OTC
   只作輸入，不作產品輸出；每次先抽出指定 face，再產生內容定址的獨立 WebFont。
 - 一般工具產生的 WOFF2 可使用 `glyf`／`loca` version 0 或 `hmtx` version 1 transform；目前
   clean-room decoder 已有界重建上述標準 transform。WOFF2 collection 另解析 collection directory、
@@ -97,10 +97,10 @@ FreeType、HarfBuzz、SixLabors 或其它實作移植程式碼。
 | --- | --- | --- |
 | TTF／OTF standalone | 已實作 | 依 outline 產生 TTF 或 OTF，另可產生 WOFF／WOFF2 |
 | TTC／OTC | 已實作，指定 `faceIndex` | 抽出單一 face 後產生獨立瀏覽器資產 |
-| Windows EUDC `.tte` | 已實作，內容仍須為合法 sfnt | 產生獨立 TTF／WOFF；`net10.0` 可產生 WOFF2 |
+| Windows EUDC `.tte` | 已實作，內容仍須為合法 sfnt | 產生獨立 TTF／WOFF；執行期具 Brotli 時可產生 WOFF2 |
 | WOFF 1.0 standalone | 已實作有界 zlib 展開 | 重新子集化後產生獨立瀏覽器資產 |
-| WOFF2 standalone | `net10.0` 已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
-| WOFF2 collection | `net10.0` 已實作；指定 `faceIndex`，有界解析 collection directory、共享 transformed `glyf`／`loca` 配對與 `hmtx`；以 W3C 官方多 face corpus 逐表比對 reference | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
+| WOFF2 standalone | 執行期具 Brotli 時已實作 null transform、`glyf`／`loca` v0 與 `hmtx` v1 有界反轉換 | 重新子集化後產生獨立瀏覽器資產 |
+| WOFF2 collection | 執行期具 Brotli 時已實作；指定 `faceIndex`，有界解析 collection directory、共享 transformed `glyf`／`loca` 配對與 `hmtx`；以 W3C 官方多 face corpus 逐表比對 reference | 抽出指定 face，重新子集化為獨立瀏覽器資產；不直接輸出 collection |
 | TrueType／CFF／CFF2 variable，以及省略 VariationStore 的非變動 CFF2 | 已實作有界 correctness-first 路徑；只承諾鎖定 corpus 與已驗證 operator | 保留必要 metadata 的獨立資產 |
 | COLR／CPAL、CBDT／CBLC、EBDT／EBLC、SVG、sbix | 已實作有界 correctness-first 路徑；color 來源必須鎖定 SHA-256 | 保留 color table 的獨立資產；實際可部署性依瀏覽器模型矩陣 |
 | Type 1 PFA／PFB、bare CFF／CFF2、Mac suitcase／dfont、EOT、SVG Fonts | 非現代 sfnt WebFont 輸入，明確拒絕 | 無；不得以副檔名猜測或靜默 fallback |
@@ -174,12 +174,15 @@ managed 結構驗證、合法 corpus 與 Chromium／Firefox／WebKit golden 一�
 WOFF 1.0 允許 table 保持未壓縮，因此第一版 writer 不需要額外 zlib 套件；後續壓縮只能使用
 通過本文件授權與 managed 稽核的實作。
 
-WOFF2 使用 Brotli。`net10.0` 可透過 `System.IO.Compression.BrotliEncoder` 產生標準 Brotli
-bitstream；但 .NET Runtime 官方來源顯示該 API 呼叫 runtime native encoder，文件與證據矩陣
-必須標示為「沒有額外 native 產品相依」，不得標示為「Brotli 純 managed 實作」。
+WOFF2 使用 Brotli。`net10.0` 資產直接透過 `System.IO.Compression.BrotliEncoder`／
+`BrotliDecoder`；`netstandard2.0` 資產不以編譯 TFM 推斷功能，而是在執行時偵測
+`System.IO.Compression.BrotliStream`。因此同一份 `netstandard2.0` 資產在 .NET 8 Runtime
+可完整產生及讀取 WOFF2，在未提供該型別的 net48 Runtime 則明確拒絕。公開能力可由
+`WebFontRuntimeCapabilities.IsWoff2Available` 查詢。
 
-`netstandard2.0`／`net48` 第一階段只承諾 TTF／WOFF。若未來找到授權相容且可稽核的純
-managed Brotli encoder，才可增加舊 TFM 的 WOFF2；不得為追求格式一致性而引入 native package。
+.NET Runtime 官方來源顯示上述 API 呼叫 runtime native encoder，文件與證據矩陣必須標示為
+「沒有額外 native 產品相依」，不得標示為「Brotli 純 managed 實作」。OdfKit 不為舊 Runtime
+引入額外 native package。
 
 **2026-07-20 候選調查結論：閘門維持關閉。** 目前唯一符合「純 managed C#＋encoder」的
 現成套件是 [BrotliSharpLib](https://www.nuget.org/packages/BrotliSharpLib/)（MIT、
@@ -189,10 +192,9 @@ managed Brotli encoder，才可增加舊 TFM 的 WOFF2；不得為追求格式�
 邊界」，故不採用。壓縮器位於字型產生管線上，若移植碼日後出現漏洞將無上游修補可循，
 這使維護落差成為安全風險而非單純的新鮮度問題。
 
-此缺口的實際影響比表面窄：舊 TFM 只是無法**動態產生** WOFF2。以 `net10.0` 於建置期
-預產生 WOFF2 資產、再由 `net48` 主機以靜態內容定址路徑供應，是既有且已驗證的部署形態
-（見第 5 節 Phase 3 的「Web Forms config／handler 與離線預產生」）。因此舊 TFM 的
-WOFF2 缺口僅限於「每次請求即時產生」的情境。
+此缺口現在是 Runtime 能力缺口，不再是 `netstandard2.0` 編譯資產缺口。net48 若未提供
+`BrotliStream`，仍可由現代 .NET 於建置期預產生 WOFF2 資產，再以靜態內容定址路徑供應
+（見第 5 節 Phase 3 的「Web Forms config／handler 與離線預產生」）。
 
 WOFF 依 W3C WOFF 1.0 規則逐 table 使用 zlib；壓縮結果未小於原 table 時保留未壓縮 bytes。
 WOFF2 writer 目前維持規格允許的 `glyf`／`loca` null transform；decoder 則依 W3C WOFF2
@@ -384,7 +386,7 @@ Worker 不需要也不得啟動隔離外部程序。
 | --- | --- | --- |
 | 0 契約與治理 | 移除 FontTools 產品 API；建立 neutral engine、版本化 Profile、CNS provider、license policy 與 managed guard | 所有 WebFont csproj 繼承共同 `0.0.1`／pack；clean package scan；合法 corpus 均有 URI、版本、SHA-256、授權與不散布裁定 |
 | 1 managed engine | 有界 sfnt／TTC parser、TrueType composite closure、`cmap` 4／12／14、TTF writer、`fsType` 與格式拒絕 | C# 產生的最小 fixtures、真實 CNS／多 Plane／IVS／PUA；checksum round-trip、固定種子變異韌性測試、雙 TFM build；不支援矩陣逐項有負向測試 |
-| 2 build 與格式 | WOFF writer、net10 WOFF2 null-transform writer 與標準 transformed-table decoder、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；W3C 與 production transformed WOFF2 corpus；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
+| 2 build 與格式 | WOFF writer、具 Brotli Runtime 的 WOFF2 null-transform writer 與標準 transformed-table decoder、CLI／MSBuild、manifest、CSS／HTML integration 與一致 hash | 無 Python／Node 的 pack consumer 完成 TTF／WOFF／WOFF2；net8 consumer 實際載入 `netstandard2.0` 資產完成 Brotli round-trip；W3C 與 production transformed WOFF2 corpus；重複建置 byte-identical；Chromium／Firefox／WebKit 載入與截圖 artifact |
 | 3 Web 託管 | ASP.NET Core 少量設定的 CNS Profile、受控 dynamic endpoint、durable cache；Web Forms config／handler 與離線預產生 | 真實 HTTP auth／429／hash GET／CSP／CORS；manifest、CSS 與字型的 GET／HEAD、原始 bytes SHA-256 ETag 與 304；動態 Handler 回應 `no-store`；net48 consumer；256 並行 GET、同鍵 single-flight 與 process restart 復原 |
 | 4 closure 與規模 | 逐 lookup 增加 GSUB output closure；複雜 script 先以完整 glyph ID／`cmap`／layout tables 的 correctness-first 模式支援；有界多節點介面、load 與固定種子變異韌性測試 | 每個新增 script 具合法鎖定 corpus、來源／輸出 layout table 一致性與三瀏覽器 golden；只有具結構驗證與差分證據後才能做 aggressive pruning；跨節點只在本機／CI 可重現時啟用，否則保留閘門 |
 | 5 工程發布 | NuGet／DocFX／Public API／SBOM／授權漂移、安全與證據矩陣 | 同一批 nupkg 通過 net10、netstandard2.0、net48 consumer；無額外 native／tool／process path；pack、文件、SBOM、provenance 與復原演練均由 repository 閘門重現 |

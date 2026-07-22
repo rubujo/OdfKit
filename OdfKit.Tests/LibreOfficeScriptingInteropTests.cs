@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using OdfKit.Compliance;
 using OdfKit.Extensions.Scripting;
@@ -60,6 +62,10 @@ public partial class LibreOfficeInteropTests
                 scripting.AddOrUpdateLibreOfficePythonModule(
                     "interop.py",
                     CreatePythonMarkerScript(pythonMarkerPath));
+                using X509Certificate2 certificate = CreateInteropMacroSigningCertificate();
+                scripting.SignLibreOfficeMacrosAsync(
+                    certificate,
+                    TestContext.Current.CancellationToken).GetAwaiter().GetResult();
                 document.Save(documentPath);
             }
 
@@ -93,7 +99,7 @@ public partial class LibreOfficeInteropTests
 
             if (Directory.Exists(tempRoot))
             {
-                Directory.Delete(tempRoot, recursive: true);
+                DeleteScriptingInteropDirectory(tempRoot);
             }
         }
     }
@@ -106,6 +112,26 @@ public partial class LibreOfficeInteropTests
             $"    Print #1, \"OdfKit-Basic-Executed\"{Environment.NewLine}" +
             $"    Close #1{Environment.NewLine}" +
             $"End Sub{Environment.NewLine}";
+    }
+
+    private static void DeleteScriptingInteropDirectory(string path)
+    {
+        for (int attempt = 0; attempt < 50; attempt++)
+        {
+            try
+            {
+                Directory.Delete(path, recursive: true);
+                return;
+            }
+            catch (IOException) when (attempt < 49)
+            {
+                Thread.Sleep(100);
+            }
+            catch (UnauthorizedAccessException) when (attempt < 49)
+            {
+                Thread.Sleep(100);
+            }
+        }
     }
 
     private static string CreatePythonMarkerScript(string markerPath)
@@ -124,6 +150,29 @@ public partial class LibreOfficeInteropTests
         "<item oor:path=\"/org.openoffice.Office.Common/Security/Scripting\">" +
         "<prop oor:name=\"MacroSecurityLevel\" oor:op=\"fuse\"><value>0</value></prop>" +
         "</item></oor:items>";
+
+    private static X509Certificate2 CreateInteropMacroSigningCertificate()
+    {
+        using RSA rsa = RSA.Create(2048);
+        var request = new CertificateRequest(
+            "CN=OdfKit LibreOffice Interop",
+            rsa,
+            HashAlgorithmName.SHA256,
+            RSASignaturePadding.Pkcs1);
+        request.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, false, 0, true));
+        request.CertificateExtensions.Add(new X509KeyUsageExtension(
+            X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyCertSign,
+            true));
+        using X509Certificate2 certificate = request.CreateSelfSigned(
+            DateTimeOffset.UtcNow.AddDays(-1),
+            DateTimeOffset.UtcNow.AddDays(1));
+        byte[] pfx = certificate.Export(X509ContentType.Pfx);
+#if NET10_0_OR_GREATER
+        return X509CertificateLoader.LoadPkcs12(pfx, password: null);
+#else
+        return new X509Certificate2(pfx);
+#endif
+    }
 
     private static string CreateUnoBridgeScript() =>
         """

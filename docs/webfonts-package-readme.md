@@ -4,8 +4,8 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
 
 - ASP.NET Core 與 ASP.NET Web Forms 均提供須經授權、有界且以內容定址的動態產生路徑；
   CLI／MSBuild 預產生作為暖機與 fallback。
-- 接受 TTF／OTF／TTC／OTC 指定 face、`.tte`、WOFF，以及 net10 standalone WOFF2 null／
-  `glyf`／`loca`／`hmtx` transform；net10 WOFF2 collection 可指定 face，輸出瀏覽器部署用
+- 接受 TTF／OTF／TTC／OTC 指定 face、`.tte`、WOFF，以及執行期具 Brotli 時的 standalone WOFF2 null／
+  `glyf`／`loca`／`hmtx` transform；WOFF2 collection 可指定 face，輸出瀏覽器部署用
   WOFF2／WOFF／TTF／OTF；支援 Unicode、Big5、明確 Big5E 與版本化 PUA Profile；TrueType
   Variable Fonts、standalone／OTC face 的 CID-keyed／名稱式靜態 CFF 1.0、含 VariationStore 的
   CFF2 variable `OTTO` 與不含 VariationStore 的非變動 CFF2 採鎖定 corpus 的有界契約；名稱式 CFF 的

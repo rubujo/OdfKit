@@ -15,11 +15,11 @@
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
 | `OdfKit.Extensions.Rdf` | 中繼資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | 協作擴充 | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程整合 |
-| `OdfKit.Extensions.Scripting` | 指令碼擴充 | `net10.0;netstandard2.0` | ODF 1.0～1.4 標準 script／event CRUD 與 LibreOffice Basic／Python 文件巨集管理 | 不執行巨集；修改時移除失效簽章 |
+| `OdfKit.Extensions.Scripting` | 指令碼擴充 | `net10.0;netstandard2.0` | ODF 1.0～1.4 標準 script／event CRUD、LibreOffice Basic／Python 管理、巨集 XMLDSig／XAdES、簽署者信任政策與結構式語法診斷 | 不執行巨集；憑證信任不等於程式碼安全 |
 | `OdfKit.WebFonts.Abstractions` | WebFont 契約 | `net10.0;netstandard2.0` | Unicode sequence、manifest、Profile 與子集引擎契約 | 不相依 Web 或 ORM |
 | `OdfKit.WebFonts.Encoding.Legacy` | 編碼擴充 | `net10.0;netstandard2.0` | 嚴格 Big5、明確 Big5E 與 PUA mapping | 不猜測來源 code page |
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
-| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TTF／OTF／TTC／OTC／TTE／WOFF 輸入、net10 transformed／collection WOFF2 指定 face、compact CID-keyed／名稱式 CFF、`seac` closure、variable／非變動 CFF2 與 color correctness-first 路徑；輸出 TTF／OTF／WOFF、net10 WOFF2 | 只承諾鎖定 corpus 的有界格式矩陣；EBDT／EBLC 與 SVG 不作細粒度 pruning，AAT／Graphite、非法 `seac`／CFF2 及直接 collection 輸出明確拒絕 |
+| `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TTF／OTF／TTC／OTC／TTE／WOFF 輸入、執行期具 Brotli 時的 transformed／collection WOFF2 指定 face、compact CID-keyed／名稱式 CFF、`seac` closure、variable／非變動 CFF2 與 color correctness-first 路徑；輸出 TTF／OTF／WOFF，執行期具 Brotli 時輸出 WOFF2 | 只承諾鎖定 corpus 的有界格式矩陣；EBDT／EBLC 與 SVG 不作細粒度 pruning，AAT／Graphite、非法 `seac`／CFF2 及直接 collection 輸出明確拒絕 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 須經授權及限流的動態產生、唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |

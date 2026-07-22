@@ -37,14 +37,14 @@ tool，再以鎖定的 CNS 真字型產生 TTF／WOFF／WOFF2；consumer build �
 `--no-restore`，不以 project reference 或開發環境工具代替套件內容。
 
 第一個可交付 engine 支援 TrueType outline、Unicode scalar、
-Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在 `net10.0` 增加 WOFF2。TrueType
+Supplementary Plane、PUA、IVS、TTF／WOFF 輸出，並在執行期提供 Brotli 時增加 WOFF2。TrueType
 Variable Fonts 的 retain-GIDs／`gvar` 重建，以及 standalone CID-keyed／名稱式靜態 CFF 1.0 的
 retain-GIDs 路徑已有鎖定 corpus。靜態 CFF OTC face 可依 `faceIndex` 抽出 standalone
 OTF／WOFF／WOFF2；含 `fvar`／VariationStore 的 standalone 或 OTC CFF2 variable `OTTO`，以及
 依規格省略 VariationStore 且不使用 `vsindex`／`blend` 的非變動 CFF2，亦有真實 corpus 的
 retain-GIDs 路徑。輸入容器另接受 TTC／OTC 指定 face、Windows `.tte`、WOFF，
-以及 `net10.0` standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
-`hmtx` version 1 transform，也接受規格合法的 null transform。`net10.0` 另以 experimental
+以及執行期提供 Brotli 時的 standalone WOFF2；WOFF2 decoder 會有界重建標準 `glyf`／`loca` version 0 與
+`hmtx` version 1 transform，也接受規格合法的 null transform。同一執行期能力另以 experimental
 路徑接受 WOFF2 collection 的指定 face，驗證 collection directory、table index 與共享
 transformed `glyf`／`loca` 配對後，才正規化成獨立 sfnt。輸出只產生瀏覽器部署用的獨立
 TTF／OTF／WOFF／WOFF2，不輸出 collection。名稱式 CFF 的 `seac` 會依 StandardEncoding 與
@@ -62,9 +62,11 @@ VariationStore 與 subroutine 結構使用以 table byte array 為生命週期�
 無界靜態字典。輸出 bytes、選字 closure 與 verifier
 仍依每個 canonical request 重新產生及驗證。
 
-WOFF2 的 .NET `BrotliEncoder` API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native
-encoder。因此正確宣稱是「OdfKit 不帶入額外 native 相依」，不是「Brotli 演算法由純 managed
-C# 實作」。`net48` 第一階段使用 TTF／WOFF，不為 WOFF2 引入 native 套件。
+WOFF2 的 Brotli API 由 Runtime 提供，但官方 Runtime 原始碼顯示底層使用 native encoder。
+`net10.0` 資產直接使用 `BrotliEncoder`／`BrotliDecoder`；`netstandard2.0` 資產會在執行時偵測
+`BrotliStream`，因此在 .NET 8 等現代 Runtime 可產生及讀取 WOFF2，在未提供該型別的 net48
+則明確拒絕。可先查詢 `WebFontRuntimeCapabilities.IsWoff2Available`。正確宣稱是「OdfKit
+不帶入額外 native 相依」，不是「Brotli 演算法由純 managed C# 實作」。
 
 transformed WOFF2 輸入的 table 反轉換本身是 OdfKit 依 W3C WOFF2 規格 clean-room 撰寫的
 純 C#：包含 triplet 座標、simple／composite glyph、bbox、instructions、short／long `loca`

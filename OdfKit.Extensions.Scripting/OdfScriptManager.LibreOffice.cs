@@ -52,6 +52,38 @@ public sealed partial class OdfScriptManager
     }
 
     /// <summary>
+    /// Diagnoses recognized LibreOffice Basic and Python entries without executing them.
+    /// 在不執行程式碼的前提下診斷已辨識的 LibreOffice Basic 與 Python 項目。
+    /// </summary>
+    /// <returns>One result for each recognized package script. / 每個已辨識封裝指令碼各一筆結果。</returns>
+    public IReadOnlyList<OdfPackageScriptDiagnostics> DiagnosePackageScripts()
+    {
+        List<OdfPackageScriptDiagnostics> results = [];
+        foreach (OdfPackageScriptEntry entry in GetPackageScripts())
+        {
+            string stored = ReadPackageScript(entry.Path);
+            OdfScriptSyntaxLanguage language;
+            string source;
+            if (entry.Kind == OdfPackageScriptKind.LibreOfficeBasicModule)
+            {
+                language = OdfScriptSyntaxLanguage.LibreOfficeBasic;
+                source = LoadXml(Encoding.UTF8.GetBytes(stored)).Root?.Value ?? string.Empty;
+            }
+            else
+            {
+                language = OdfScriptSyntaxLanguage.Python;
+                source = stored;
+            }
+
+            results.Add(new OdfPackageScriptDiagnostics(
+                entry.Path,
+                language,
+                OdfScriptSyntaxValidator.Diagnose(source, language)));
+        }
+        return results;
+    }
+
+    /// <summary>
     /// Adds or replaces a LibreOffice Basic module and maintains its library metadata.
     /// 新增或取代 LibreOffice Basic 模組，並維護其程式庫中繼資料。
     /// </summary>

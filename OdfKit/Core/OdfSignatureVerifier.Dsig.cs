@@ -210,6 +210,7 @@ internal static partial class OdfSignatureVerifier
         XmlDocument doc,
         OdfPackage package,
         OdfSigningOptions options,
+        OdfSignatureProfile profile,
         XmlNamespaceManager nsManager,
         OdfSingleSignatureValidationResult singleResult,
         CancellationToken cancellationToken = default)
@@ -262,7 +263,7 @@ internal static partial class OdfSignatureVerifier
                 return false;
 
             CollectCheckedReferences(signedXml, singleResult);
-            if (!VerifyPackageEntryCoverage(package, singleResult))
+            if (!VerifyPackageEntryCoverage(package, profile, singleResult))
                 return false;
             return true;
         }
@@ -294,13 +295,14 @@ internal static partial class OdfSignatureVerifier
 
     private static bool VerifyPackageEntryCoverage(
         OdfPackage package,
+        OdfSignatureProfile profile,
         OdfSingleSignatureValidationResult singleResult)
     {
         HashSet<string> covered = new(singleResult.CheckedReferences, StringComparer.Ordinal);
         foreach (string entryName in package.Entries.Keys)
         {
             string normalized = entryName.Replace('\\', '/').TrimStart('/');
-            if (!ShouldRequireSignatureCoverage(normalized))
+            if (!profile.IsCoverableEntry(normalized))
                 continue;
 
             if (covered.Contains(normalized))
@@ -317,8 +319,4 @@ internal static partial class OdfSignatureVerifier
         return true;
     }
 
-    private static bool ShouldRequireSignatureCoverage(string entryName)
-    {
-        return OdfSignerConstants.IsCoverableEntry(entryName);
-    }
 }

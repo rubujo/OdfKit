@@ -1,5 +1,4 @@
-﻿#if NET10_0_OR_GREATER
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 
 namespace OdfKit.WebFonts.OpenType;
 
@@ -89,8 +88,8 @@ internal static class Woff2GlyfReconstructor
             throw SfntFont.DataInvalid("WOFF2-glyf-length");
         }
 
-        ReadOnlySpan<byte> bboxBitmap = bboxData[..bitmapLength];
-        ReadOnlySpan<byte> bboxStream = bboxData[bitmapLength..];
+        ReadOnlySpan<byte> bboxBitmap = bboxData.Slice(0, bitmapLength);
+        ReadOnlySpan<byte> bboxStream = bboxData.Slice(bitmapLength);
         int nPointsPosition = 0;
         int flagPosition = 0;
         int glyphPosition = 0;
@@ -284,9 +283,9 @@ internal static class Woff2GlyfReconstructor
         }
 
         WriteUInt16(output, instructionLength);
-        output.Write(instructionStream.Slice(instructionPosition, instructionLength));
+        WriteSpan(output, instructionStream.Slice(instructionPosition, instructionLength));
         instructionPosition += instructionLength;
-        output.Write(flags);
+        WriteSpan(output, flags);
         WriteCoordinateDeltas(output, xDeltas);
         WriteCoordinateDeltas(output, yDeltas);
         EnsureOutput(output, 0, maximumExpandedBytes);
@@ -357,7 +356,7 @@ internal static class Woff2GlyfReconstructor
                 componentLength,
                 "WOFF2-glyf-component");
             EnsureOutput(output, componentLength, maximumExpandedBytes);
-            output.Write(compositeStream.Slice(compositePosition, componentLength));
+            WriteSpan(output, compositeStream.Slice(compositePosition, componentLength));
             compositePosition += componentLength;
             instructions |= (flags & HaveInstructions) != 0;
         }
@@ -373,7 +372,7 @@ internal static class Woff2GlyfReconstructor
                 "WOFF2-glyf-instructions");
             EnsureOutput(output, checked(2 + instructionLength), maximumExpandedBytes);
             WriteUInt16(output, instructionLength);
-            output.Write(instructionStream.Slice(instructionPosition, instructionLength));
+            WriteSpan(output, instructionStream.Slice(instructionPosition, instructionLength));
             instructionPosition += instructionLength;
         }
     }
@@ -573,14 +572,24 @@ internal static class Woff2GlyfReconstructor
     {
         Span<byte> bytes = stackalloc byte[2];
         BinaryPrimitives.WriteUInt16BigEndian(bytes, value);
-        stream.Write(bytes);
+        WriteSpan(stream, bytes);
     }
 
     private static void WriteInt16(Stream stream, short value)
     {
         Span<byte> bytes = stackalloc byte[2];
         BinaryPrimitives.WriteInt16BigEndian(bytes, value);
+        WriteSpan(stream, bytes);
+    }
+
+    private static void WriteSpan(Stream stream, ReadOnlySpan<byte> bytes)
+    {
+#if NET10_0_OR_GREATER
         stream.Write(bytes);
+#else
+        byte[] buffer = bytes.ToArray();
+        stream.Write(buffer, 0, buffer.Length);
+#endif
     }
 
     private static int CheckedInt(uint value, string detail)
@@ -589,4 +598,3 @@ internal static class Woff2GlyfReconstructor
     private static uint CheckedUInt(long value, string detail)
         => value is >= 0 and <= uint.MaxValue ? (uint)value : throw SfntFont.DataInvalid(detail);
 }
-#endif

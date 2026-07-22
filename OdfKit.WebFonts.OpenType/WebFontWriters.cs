@@ -24,11 +24,7 @@ internal static class WebFontWriters
         {
             WebFontFormat.TrueType or WebFontFormat.OpenType => WriteTrueType(subset),
             WebFontFormat.Woff => WriteWoff(subset),
-#if NET10_0_OR_GREATER
             WebFontFormat.Woff2 => WriteWoff2(subset),
-#else
-            WebFontFormat.Woff2 => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid")),
-#endif
             _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
         };
 
@@ -217,7 +213,6 @@ internal static class WebFontWriters
         return (second << 16) | first;
     }
 
-#if NET10_0_OR_GREATER
     internal static byte[] WriteWoff2(SfntSubset subset)
     {
         KeyValuePair<string, byte[]>[] tables = OrderWoff2Tables(subset.Tables);
@@ -242,17 +237,8 @@ internal static class WebFontWriters
         }
 
         byte[] uncompressed = tableStream.ToArray();
-        int maximumLength = BrotliEncoder.GetMaxCompressedLength(uncompressed.Length);
-        var compressedBuffer = new byte[maximumLength];
-        if (!BrotliEncoder.TryCompress(
-                uncompressed,
-                compressedBuffer,
-                out int compressedLength,
-                quality: 11,
-                window: 22))
-        {
-            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
-        }
+        byte[] compressedBuffer = RuntimeBrotliCodec.Compress(uncompressed);
+        int compressedLength = compressedBuffer.Length;
 
         byte[] directory = directoryStream.ToArray();
         int compressedEnd = checked(48 + directory.Length + compressedLength);
@@ -289,7 +275,6 @@ internal static class WebFontWriters
 
         return ordered.ToArray();
     }
-#endif
 
     private static void WriteSfntHeader(Span<byte> output, uint flavor, ushort tableCount)
     {
@@ -316,7 +301,6 @@ internal static class WebFontWriters
         return sum;
     }
 
-#if NET10_0_OR_GREATER
     private static void WriteUIntBase128(Stream stream, uint value)
     {
         Span<byte> buffer = stackalloc byte[5];
@@ -339,7 +323,6 @@ internal static class WebFontWriters
             stream.WriteByte(current);
         }
     }
-#endif
 
     private static void WriteTag(Span<byte> output, int offset, string tag)
     {

@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -283,6 +285,94 @@ public sealed class OdfScriptingExtensionTests
         Assert.Equal(2, manager.GetPackageScripts().Count);
     }
 
+    [Theory]
+    [InlineData(OdfVersion.Odf10)]
+    [InlineData(OdfVersion.Odf11)]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public async Task LibreOfficeMacroSignaturesRoundTripAcrossOdfVersions(OdfVersion version)
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            version,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        manager.AddOrUpdateLibreOfficePythonModule("hello.py", "def hello():\n    return 'hello'");
+        using X509Certificate2 certificate = CreateMacroSigningCertificate();
+
+        await manager.SignLibreOfficeMacrosAsync(certificate, TestContext.Current.CancellationToken);
+
+        Assert.True(package.HasEntry("META-INF/macrosignatures.xml"));
+        var policy = new OdfMacroTrustPolicy { Mode = OdfMacroTrustMode.CustomRoot };
+        policy.CustomRoots.Add(certificate);
+        OdfMacroSignatureValidationResult result = await manager.VerifyLibreOfficeMacroSignaturesAsync(
+            policy,
+            TestContext.Current.CancellationToken);
+        Assert.True(result.CryptographicValidation.IsValid);
+        Assert.True(result.IsTrusted);
+        Assert.False(result.IsCodeSafetyEvaluated);
+        OdfSingleSignatureValidationResult signature = Assert.Single(result.CryptographicValidation.Signatures);
+        Assert.Contains("Basic/Standard/Module1.xml", signature.CheckedReferences);
+        Assert.Contains("Scripts/python/hello.py", signature.CheckedReferences);
+        Assert.True(manager.RemoveLibreOfficeMacroSignatures());
+        Assert.False(package.HasEntry("META-INF/macrosignatures.xml"));
+        Assert.False(manager.RemoveLibreOfficeMacroSignatures());
+    }
+
+    [Fact]
+    public async Task MacroCertificatePinningRejectsUnknownFingerprint()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        using X509Certificate2 certificate = CreateMacroSigningCertificate();
+        await manager.SignLibreOfficeMacrosAsync(certificate, TestContext.Current.CancellationToken);
+        var policy = new OdfMacroTrustPolicy { Mode = OdfMacroTrustMode.PinnedCertificate };
+        policy.PinnedCertificateSha256.Add(new string('0', 64));
+
+        OdfMacroSignatureValidationResult result = await manager.VerifyLibreOfficeMacroSignaturesAsync(
+            policy,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.CryptographicValidation.IsValid);
+        Assert.Equal(OdfMacroTrustStatus.Untrusted, result.TrustStatus);
+    }
+
+    [Fact]
+    public void PackageSyntaxDiagnosticsFindBasicAndPythonStructuralErrors()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nPrint \"unterminated\n");
+        manager.AddOrUpdateLibreOfficePythonModule("broken.py", "def broken()\n \treturn (1");
+
+        IReadOnlyList<OdfPackageScriptDiagnostics> results = manager.DiagnosePackageScripts();
+
+        Assert.Equal(2, results.Count);
+        Assert.Contains(
+            results.Single(result => result.Language == OdfScriptSyntaxLanguage.LibreOfficeBasic).Diagnostics,
+            diagnostic => diagnostic.Code == "ODFSCRIPT_BASIC_UNCLOSED_BLOCK");
+        IReadOnlyList<OdfScriptSyntaxDiagnostic> python = results.Single(
+            result => result.Language == OdfScriptSyntaxLanguage.Python).Diagnostics;
+        Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_MISSING_COLON");
+        Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_MIXED_INDENTATION");
+        Assert.Contains(python, diagnostic => diagnostic.Code == "ODFSCRIPT_PYTHON_UNCLOSED_DELIMITER");
+    }
+
     [Fact]
     public void FlatDocumentsSupportInlineScriptsButRejectPackageScripts()
     {
@@ -296,5 +386,28 @@ public sealed class OdfScriptingExtensionTests
         Assert.Throws<NotSupportedException>(() =>
             manager.AddOrUpdateLibreOfficePythonModule("hello.py", "def hello(): pass"));
         Assert.Throws<NotSupportedException>(() => manager.GetPackageScripts());
+    }
+
+    private static X509Certificate2 CreateMacroSigningCertificate()
+    {
+        using RSA rsa = RSA.Create(2048);
+        var request = new CertificateRequest(
+            "CN=OdfKit Macro Test",
+            rsa,
+            HashAlgorithmName.SHA256,
+            RSASignaturePadding.Pkcs1);
+        request.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, false, 0, true));
+        request.CertificateExtensions.Add(new X509KeyUsageExtension(
+            X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyCertSign,
+            true));
+        using X509Certificate2 certificate = request.CreateSelfSigned(
+            DateTimeOffset.UtcNow.AddDays(-1),
+            DateTimeOffset.UtcNow.AddDays(1));
+        byte[] pfx = certificate.Export(X509ContentType.Pfx);
+#if NET10_0_OR_GREATER
+        return X509CertificateLoader.LoadPkcs12(pfx, password: null);
+#else
+        return new X509Certificate2(pfx);
+#endif
     }
 }
