@@ -30,6 +30,13 @@ internal static partial class OdfGeneratedSchemaProvider
         return generated ?? baseSchema;
     }
 
+    public static OdfSchemaSet CreateOdf10(OdfSchemaSet baseSchema)
+    {
+        OdfSchemaSet? generated = null;
+        TryCreateOdf10Core(baseSchema, ref generated);
+        return generated ?? baseSchema;
+    }
+
     static partial void TryCreateOdf14Core(OdfSchemaSet baseSchema, ref OdfSchemaSet? generated);
 
     static partial void TryCreateOdf13Core(OdfSchemaSet baseSchema, ref OdfSchemaSet? generated);
@@ -37,4 +44,6 @@ internal static partial class OdfGeneratedSchemaProvider
     static partial void TryCreateOdf12Core(OdfSchemaSet baseSchema, ref OdfSchemaSet? generated);
 
     static partial void TryCreateOdf11Core(OdfSchemaSet baseSchema, ref OdfSchemaSet? generated);
+
+    static partial void TryCreateOdf10Core(OdfSchemaSet baseSchema, ref OdfSchemaSet? generated);
 }

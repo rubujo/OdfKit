@@ -56,7 +56,7 @@
 - OdfKit 允許用外部 ODF Validator 作為選用 baseline。
 - 獨立的 `odf-external-baseline.yml` 會在 PR、main 與手動觸發時，以固定 SHA-256 的 Jing
   20241231 驗證通用 ODF schema 適用的 flat 與 package XML streams，再以 ODF Validator 0.13.0 對適用的
-  ODF 1.1～1.4 package fixtures 執行外部比對與正／負 canary。本機與自備 corpus 仍可用
+  ODF 1.0～1.4 package fixtures 執行外部比對與正／負 canary。本機與自備 corpus 仍可用
   `ODFKIT_ODFVALIDATOR_JAR` 或 CLI
   `--baseline-jar` 明確啟用。
 - 分類不一致必須透過 `--baseline-exceptions` 指定的 JSON manifest 記錄為 documented exception，否則視為對標失敗。
@@ -68,7 +68,7 @@
 - `eng/Test-OdfCorpus.ps1 -InternalBaselineJar` 會以版本篩選後的暫存 manifest 對 repo corpus
   執行 baseline；CI 再加上 `-InternalBaselinePackageOnly`，避免用 ZIP package loader 開啟
   flat ODF，並以 `-InternalBaselineExcludedKinds` 表達該外部工具已確認的適用性限制。預設版本
-  為 1.1～1.4。Database 仍由 Jing 驗證；Formula／FormulaTemplate／FlatFormula 因通用 schema
+  為 1.0～1.4。Database 仍由 Jing 驗證；Formula／FormulaTemplate／FlatFormula 因通用 schema
   未定義 `office:formula` 而由 Jing 報告明列排除，並保留在內部 package gate。
 - `validate-corpus` 會拒絕逃出 corpus root 的 fixture 路徑、重複 fixture id / path 與未知 round-trip 策略。
 - `eng/Test-OdfCorpus.ps1` 與 GitHub Actions `ODF corpus` 工作流程會固定驗證內建 corpus；設定 `ODFKIT_PARITY_CORPUS_ROOT` 時可同時驗證外部 corpus。

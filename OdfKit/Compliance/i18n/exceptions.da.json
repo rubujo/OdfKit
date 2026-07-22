@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "WebFont-processen mislykkedes: {0}",
   "Err_WebFont_QueueFull": "WebFont-arbejdskøen er fuld.",
   "Err_WebFont_UnmappedByte": "Den ældre byte ved forskydning {0} har ingen tilknytning.",
-  "Err_OdfPackage_TransactionJournalFailed": "ODF-pakkens transaktionsjournal kunne ikke behandles."
+  "Err_OdfPackage_TransactionJournalFailed": "ODF-pakkens transaktionsjournal kunne ikke behandles.",
+  "Err_OdfScriptManager_ArgumentNull": "Argumentet {0} må ikke være null.",
+  "Err_OdfScriptManager_InvalidArgument": "Argumentet {0} er ugyldigt til scripthåndtering.",
+  "Err_OdfScriptManager_UnsupportedOperation": "Dette dokument understøtter ikke den ønskede scripthåndtering.",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "Dokumentets scriptmetadata mangler den påkrævede struktur.",
+  "Err_OdfScriptManager_IndexOutOfRange": "Der findes intet scriptelement ved indeks {0}.",
+  "Err_OdfScriptManager_UnsupportedVersion": "Dokumentet bruger en ODF-version, som ikke understøttes til scripthåndtering."
 }

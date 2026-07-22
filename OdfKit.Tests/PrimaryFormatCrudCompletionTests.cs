@@ -22,7 +22,7 @@ public class PrimaryFormatCrudCompletionTests
     /// </summary>
     public static IEnumerable<object[]> LegacyVersionCases()
     {
-        OdfVersion[] versions = [OdfVersion.Odf11, OdfVersion.Odf12, OdfVersion.Odf13];
+        OdfVersion[] versions = [OdfVersion.Odf10, OdfVersion.Odf11, OdfVersion.Odf12, OdfVersion.Odf13];
         OdfDocumentKind[] kinds =
             [OdfDocumentKind.Text, OdfDocumentKind.Spreadsheet, OdfDocumentKind.Presentation, OdfDocumentKind.Graphics];
         foreach (OdfVersion version in versions)
@@ -1589,8 +1589,8 @@ public class PrimaryFormatCrudCompletionTests
     }
 
     /// <summary>
-    /// Verifies ODF 1.1 through 1.3 primary documents use the same high-level model and preserve foreign content.
-    /// 驗證 ODF 1.1～1.3 主要文件使用相同高階模型，並保留 foreign content。
+    /// Verifies ODF 1.0 through 1.3 primary documents use the same high-level model and preserve foreign content.
+    /// 驗證 ODF 1.0～1.3 主要文件使用相同高階模型，並保留 foreign content。
     /// </summary>
     /// <param name="version">The source and target ODF version. / 來源與目標 ODF 版本。</param>
     /// <param name="kind">The primary document kind. / 主要文件種類。</param>

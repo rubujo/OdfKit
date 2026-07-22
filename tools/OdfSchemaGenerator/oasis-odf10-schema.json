@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "schemaPath": "tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.0-os.rng",
+  "sourceUrl": "https://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng",
+  "sourceDate": "2005-05-01",
+  "outputPath": "OdfKit/Compliance/Generated/Odf10OfficialSchemaProvider.g.cs",
+  "className": "Odf10OfficialSchemaMetadata",
+  "format": "csharp-provider"
+}

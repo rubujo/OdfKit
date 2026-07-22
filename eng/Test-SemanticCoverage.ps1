@@ -16,8 +16,8 @@ if ($manifest.legacyVersionPolicy -ne 'normalize-to-1.4-preserve-unknown') {
 }
 
 $legacyEvidence = $manifest.legacyVersionEvidence
-if (@($legacyEvidence.versions) -join ',' -ne '1.1,1.2,1.3') {
-    throw 'semantic coverage 舊版本證據必須覆蓋 ODF 1.1～1.3。'
+if (@($legacyEvidence.versions) -join ',' -ne '1.0,1.1,1.2,1.3') {
+    throw 'semantic coverage 舊版本證據必須覆蓋 ODF 1.0～1.3。'
 }
 if (@($legacyEvidence.formats | Sort-Object) -join ',' -ne 'ODG,ODP,ODS,ODT') {
     throw 'semantic coverage 舊版本證據必須覆蓋四種主要格式。'

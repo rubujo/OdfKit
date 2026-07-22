@@ -12,6 +12,30 @@ namespace OdfKit.Tests;
 public class OdfSchemaGeneratorTests
 {
     [Fact]
+    public void ReaderExtractsDirectChildNameDeclarations()
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
+            "<define name=\"page-count\"><element><choice><name>text:page-count</name>" +
+            "<name>text:word-count</name></choice>" +
+            "<attribute><name>text:style-name</name><text /></attribute><empty /></element></define>")));
+
+        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "fixture.rng");
+
+        Assert.Contains(metadata.Elements, item =>
+            item.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            item.LocalName == "page-count");
+        Assert.Contains(metadata.Elements, item =>
+            item.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            item.LocalName == "word-count");
+        Assert.Contains(metadata.Attributes, item =>
+            item.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            item.LocalName == "style-name");
+        SchemaPatternMetadata pattern = Assert.Single(metadata.Patterns, item => item.Name == "page-count");
+        Assert.Contains(pattern.ChildElements, item => item.LocalName == "page-count");
+        Assert.Contains(pattern.Attributes, item => item.LocalName == "style-name");
+    }
+
+    [Fact]
     public void ReaderExtractsQualifiedNamesDeterministically()
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
@@ -705,6 +729,8 @@ public class OdfSchemaGeneratorTests
     public void ReaderPreservesRelaxNgDefineCombineSemantics()
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
+            "<define name=\"sequence\"><element name=\"text:p\"><empty /></element>" +
+            "<element name=\"table:table\"><empty /></element></define>" +
             "<define name=\"combined\" combine=\"interleave\"><element name=\"text:p\"><empty /></element></define>" +
             "<define name=\"combined\" combine=\"interleave\"><element name=\"table:table\"><empty /></element></define>" +
             "<define name=\"choice-combined\" combine=\"choice\"><element name=\"text:p\"><empty /></element></define>" +
@@ -712,6 +738,7 @@ public class OdfSchemaGeneratorTests
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata combined = metadata.Patterns.Single(pattern => pattern.Name == "combined");
         SchemaPatternMetadata choiceCombined = metadata.Patterns.Single(pattern => pattern.Name == "choice-combined");
+        SchemaPatternMetadata sequence = metadata.Patterns.Single(pattern => pattern.Name == "sequence");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
@@ -720,6 +747,9 @@ public class OdfSchemaGeneratorTests
         Assert.Equal("interleave", root.Kind);
         Assert.Equal(new[] { "p", "table" }, root.Children.Select(child => child.LocalName).ToArray());
         Assert.Equal(2, choiceCombined.PatternTree.Count);
+        SchemaPatternNodeMetadata sequenceRoot = Assert.Single(sequence.PatternTree);
+        Assert.Equal("group", sequenceRoot.Kind);
+        Assert.Equal(new[] { "p", "table" }, sequenceRoot.Children.Select(child => child.LocalName).ToArray());
         string code = writer.ToString();
         Assert.Contains("new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Interleave", code);
         Assert.Contains("new OdfSchemaPatternDefinition(\"choice-combined\", new[]", code);

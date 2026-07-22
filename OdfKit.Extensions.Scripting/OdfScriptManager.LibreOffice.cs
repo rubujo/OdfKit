@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using OdfKit.Compliance;
 using OdfKit.Core;
 
 namespace OdfKit.Extensions.Scripting;
@@ -62,7 +63,11 @@ public sealed partial class OdfScriptManager
         ValidatePathSegment(libraryName, nameof(libraryName));
         ValidatePathSegment(moduleName, nameof(moduleName));
         if (source is null)
-            throw new ArgumentNullException(nameof(source));
+        {
+            throw new ArgumentNullException(
+                nameof(source),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
+        }
         EnsurePackageScriptsSupported();
 
         string libraryPath = $"Basic/{libraryName}/script-lb.xml";
@@ -94,14 +99,22 @@ public sealed partial class OdfScriptManager
 
         string libraryPath = $"Basic/{libraryName}/script-lb.xml";
         string modulePath = $"Basic/{libraryName}/{moduleName}.xml";
+        XDocument? library = null;
+        XElement? libraryRoot = null;
+        if (_package.HasEntry(libraryPath))
+        {
+            library = LoadXml(_package.ReadEntry(libraryPath));
+            XNamespace libraryNs = LibraryNamespace;
+            libraryRoot = GetRequiredMetadataRoot(library, libraryNs + "library");
+        }
+
         if (!_package.RemoveEntry(modulePath))
             return false;
 
-        if (_package.HasEntry(libraryPath))
+        if (library is not null && libraryRoot is not null)
         {
-            XDocument library = LoadXml(_package.ReadEntry(libraryPath));
             XNamespace libraryNs = LibraryNamespace;
-            library.Root?.Elements(libraryNs + "element")
+            libraryRoot.Elements(libraryNs + "element")
                 .FirstOrDefault(element => (string?)element.Attribute(libraryNs + "name") == moduleName)
                 ?.Remove();
             _package.WriteEntry(libraryPath, SerializeXml(library), "text/xml");
@@ -122,20 +135,28 @@ public sealed partial class OdfScriptManager
         ValidatePathSegment(libraryName, nameof(libraryName));
         EnsurePackageScriptsSupported();
 
+        XDocument? container = null;
+        XElement? containerRoot = null;
+        if (_package.HasEntry(BasicContainerPath))
+        {
+            container = LoadXml(_package.ReadEntry(BasicContainerPath));
+            XNamespace libraryNs = LibraryNamespace;
+            containerRoot = GetRequiredMetadataRoot(container, libraryNs + "libraries");
+        }
+
         bool removed = false;
         string prefix = $"Basic/{libraryName}/";
         string[] paths = _package.GetEntries()
             .Select(entry => entry.Path)
-            .Where(path => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .Where(path => path.StartsWith(prefix, StringComparison.Ordinal))
             .ToArray();
         foreach (string path in paths)
             removed |= _package.RemoveEntry(path);
 
-        if (_package.HasEntry(BasicContainerPath))
+        if (container is not null && containerRoot is not null)
         {
-            XDocument container = LoadXml(_package.ReadEntry(BasicContainerPath));
             XNamespace libraryNs = LibraryNamespace;
-            XElement? reference = container.Root?.Elements(libraryNs + "library")
+            XElement? reference = containerRoot.Elements(libraryNs + "library")
                 .FirstOrDefault(element => (string?)element.Attribute(libraryNs + "name") == libraryName);
             if (reference is not null)
             {
@@ -160,9 +181,17 @@ public sealed partial class OdfScriptManager
     public string AddOrUpdateLibreOfficePythonModule(string relativePath, string source)
     {
         if (relativePath is null)
-            throw new ArgumentNullException(nameof(relativePath));
+        {
+            throw new ArgumentNullException(
+                nameof(relativePath),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(relativePath)));
+        }
         if (source is null)
-            throw new ArgumentNullException(nameof(source));
+        {
+            throw new ArgumentNullException(
+                nameof(source),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
+        }
         EnsurePackageScriptsSupported();
 
         string path = NormalizePythonPath(relativePath);
@@ -180,7 +209,11 @@ public sealed partial class OdfScriptManager
     public bool RemoveLibreOfficePythonModule(string relativePath)
     {
         if (relativePath is null)
-            throw new ArgumentNullException(nameof(relativePath));
+        {
+            throw new ArgumentNullException(
+                nameof(relativePath),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(relativePath)));
+        }
         EnsurePackageScriptsSupported();
 
         bool removed = _package.RemoveEntry(NormalizePythonPath(relativePath));
@@ -191,13 +224,13 @@ public sealed partial class OdfScriptManager
 
     private static OdfPackageScriptKind? ClassifyPackageScript(string path)
     {
-        if (path.StartsWith(PythonRoot, StringComparison.OrdinalIgnoreCase) &&
+        if (path.StartsWith(PythonRoot, StringComparison.Ordinal) &&
             path.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
         {
             return OdfPackageScriptKind.LibreOfficePythonModule;
         }
 
-        if (path.StartsWith(BasicRoot, StringComparison.OrdinalIgnoreCase) &&
+        if (path.StartsWith(BasicRoot, StringComparison.Ordinal) &&
             path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
             !path.EndsWith("script-lc.xml", StringComparison.OrdinalIgnoreCase) &&
             !path.EndsWith("script-lb.xml", StringComparison.OrdinalIgnoreCase))
@@ -211,17 +244,25 @@ public sealed partial class OdfScriptManager
     private string ValidateScriptingEntryPath(string path)
     {
         if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        {
+            throw new ArgumentNullException(
+                nameof(path),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(path)));
+        }
         string normalized = OdfPackage.SanitizeEntryName(path);
         if (ClassifyPackageScript(normalized) is null)
-            throw new ArgumentException(null, nameof(path));
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(path)),
+                nameof(path));
+        }
         return normalized;
     }
 
     private void EnsurePackageScriptsSupported()
     {
         if (!Capabilities.SupportsPackageScripts)
-            throw new NotSupportedException();
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfScriptManager_UnsupportedOperation"));
     }
 
     private static string NormalizePythonPath(string relativePath)
@@ -231,7 +272,9 @@ public sealed partial class OdfScriptManager
             !combined.EndsWith(".py", StringComparison.OrdinalIgnoreCase) ||
             combined.Length == PythonRoot.Length + 3)
         {
-            throw new ArgumentException(null, nameof(relativePath));
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(relativePath)),
+                nameof(relativePath));
         }
 
         return combined;
@@ -240,13 +283,23 @@ public sealed partial class OdfScriptManager
     private static void ValidatePathSegment(string? value, string parameterName)
     {
         if (value is null)
-            throw new ArgumentNullException(parameterName);
+        {
+            throw new ArgumentNullException(
+                parameterName,
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", parameterName));
+        }
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException(null, parameterName);
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", parameterName),
+                parameterName);
+        }
         if (value is "." or ".." || value.Any(character =>
                 character is '/' or '\\' or ':' || char.IsControl(character)))
         {
-            throw new ArgumentException(null, parameterName);
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", parameterName),
+                parameterName);
         }
     }
 
@@ -282,7 +335,7 @@ public sealed partial class OdfScriptManager
     private static void EnsureBasicLibraryReference(XDocument container, string libraryName)
     {
         XNamespace libraryNs = LibraryNamespace;
-        XElement root = container.Root ?? throw new XmlException();
+        XElement root = GetRequiredMetadataRoot(container, libraryNs + "libraries");
         if (!root.Elements(libraryNs + "library")
             .Any(element => (string?)element.Attribute(libraryNs + "name") == libraryName))
         {
@@ -297,7 +350,7 @@ public sealed partial class OdfScriptManager
     private static void EnsureBasicModuleReference(XDocument library, string moduleName)
     {
         XNamespace libraryNs = LibraryNamespace;
-        XElement root = library.Root ?? throw new XmlException();
+        XElement root = GetRequiredMetadataRoot(library, libraryNs + "library");
         if (!root.Elements(libraryNs + "element")
             .Any(element => (string?)element.Attribute(libraryNs + "name") == moduleName))
         {
@@ -324,12 +377,20 @@ public sealed partial class OdfScriptManager
         using var stream = new MemoryStream(bytes, writable: false);
         using XmlReader reader = XmlReader.Create(stream, new XmlReaderSettings
         {
-            DtdProcessing = DtdProcessing.Ignore,
+            DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             MaxCharactersFromEntities = 0,
             MaxCharactersInDocument = MaxMetadataCharacters
         });
         return XDocument.Load(reader, LoadOptions.PreserveWhitespace);
+    }
+
+    private static XElement GetRequiredMetadataRoot(XDocument document, XName expectedName)
+    {
+        XElement? root = document.Root;
+        if (root is null || root.Name != expectedName)
+            throw new XmlException(OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidDocumentStructure"));
+        return root;
     }
 
     private static byte[] SerializeXml(XDocument document)

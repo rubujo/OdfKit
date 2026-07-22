@@ -236,12 +236,8 @@ public static partial class OdfSchemaPatternValidator
 
     private static bool IsAnyUri(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) || value.Any(char.IsWhiteSpace))
-        {
-            return false;
-        }
-
-        return Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out _);
+        XmlConvert.VerifyXmlChars(value ?? string.Empty);
+        return true;
     }
 
     private static bool TryParseXmlInteger(string value, out BigInteger integer)

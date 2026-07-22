@@ -11,6 +11,324 @@ namespace OdfKit.Tests;
 
 public partial class ComplianceTests
 {
+    [Fact]
+    public void SchemaPatternAttributeFrontierHandlesManyIndependentOptionals()
+    {
+        const string ns = "urn:example:attributes";
+        OdfSchemaPatternNode[] optionalAttributes = Enumerable.Range(0, 30)
+            .Select(index => new OdfSchemaPatternNode(
+                OdfSchemaPatternNodeKind.Optional,
+                "optional",
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                nameClasses: null,
+                children:
+                [
+                    new OdfSchemaPatternNode(
+                        OdfSchemaPatternNodeKind.Attribute,
+                        "optional",
+                        ns,
+                        $"value-{index}",
+                        string.Empty,
+                        string.Empty,
+                        string.Empty)
+                ]))
+            .ToArray();
+        var pattern = new OdfSchemaPatternDefinition(
+            "root",
+            [
+                new OdfSchemaPatternNode(
+                    OdfSchemaPatternNodeKind.Element,
+                    "exactlyOne",
+                    ns,
+                    "root",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    nameClasses: null,
+                    children: optionalAttributes)
+            ]);
+        var schema = new OdfSchemaSet(
+            OdfVersion.Odf12,
+            new Uri("https://example.invalid/attributes.rng"),
+            "generated",
+            [],
+            [],
+            [],
+            [pattern]);
+        XElement element = new(
+            XName.Get("root", ns),
+            Enumerable.Range(0, 30).Select(index => new XAttribute(XName.Get($"value-{index}", ns), index)));
+
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "root").IsMatch);
+    }
+
+    [Fact]
+    public void SchemaPatternInterleaveFlattensReferencedInterleaveBranches()
+    {
+        const string ns = "urn:example:interleave";
+        static OdfSchemaPatternNode Element(string localName) => new(
+            OdfSchemaPatternNodeKind.Element,
+            "exactlyOne",
+            ns,
+            localName,
+            string.Empty,
+            string.Empty,
+            string.Empty);
+
+        var inner = new OdfSchemaPatternDefinition(
+            "inner",
+            [
+                new OdfSchemaPatternNode(
+                    OdfSchemaPatternNodeKind.Interleave,
+                    "exactlyOne",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    nameClasses: null,
+                    children:
+                    [
+                        new OdfSchemaPatternNode(
+                            OdfSchemaPatternNodeKind.ZeroOrMore,
+                            "zeroOrMore",
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            nameClasses: null,
+                            children: [Element("a")]),
+                        new OdfSchemaPatternNode(
+                            OdfSchemaPatternNodeKind.ZeroOrMore,
+                            "zeroOrMore",
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            nameClasses: null,
+                            children: [Element("b")])
+                    ])
+            ]);
+        var root = new OdfSchemaPatternDefinition(
+            "root",
+            [
+                new OdfSchemaPatternNode(
+                    OdfSchemaPatternNodeKind.Element,
+                    "exactlyOne",
+                    ns,
+                    "root",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    nameClasses: null,
+                    children:
+                    [
+                        new OdfSchemaPatternNode(
+                            OdfSchemaPatternNodeKind.Interleave,
+                            "exactlyOne",
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            string.Empty,
+                            nameClasses: null,
+                            children:
+                            [
+                                new OdfSchemaPatternNode(
+                                    OdfSchemaPatternNodeKind.Ref,
+                                    "optional",
+                                    string.Empty,
+                                    string.Empty,
+                                    "inner",
+                                    string.Empty,
+                                    string.Empty),
+                                new OdfSchemaPatternNode(
+                                    OdfSchemaPatternNodeKind.Optional,
+                                    "optional",
+                                    string.Empty,
+                                    string.Empty,
+                                    string.Empty,
+                                    string.Empty,
+                                    string.Empty,
+                                    nameClasses: null,
+                                    children: [Element("divider")])
+                            ])
+                    ])
+            ]);
+        var schema = new OdfSchemaSet(
+            OdfVersion.Odf12,
+            new Uri("https://example.invalid/interleave.rng"),
+            "generated",
+            [],
+            [],
+            [],
+            [inner, root]);
+        XElement element = new(
+            XName.Get("root", ns),
+            new XElement(XName.Get("a", ns)),
+            new XElement(XName.Get("divider", ns)),
+            new XElement(XName.Get("b", ns)));
+
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "root").IsMatch);
+    }
+
+    [Fact]
+    public void Odf12DocumentStylesPatternAcceptsOptionalSections()
+    {
+        XNamespace office = OdfNamespaces.Office;
+        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(OdfVersion.Odf12);
+        string[] sectionNames = ["font-face-decls", "styles", "automatic-styles", "master-styles"];
+
+        foreach (string sectionName in sectionNames)
+        {
+            XElement singleSection = new(
+                office + "document-styles",
+                new XAttribute(office + "version", "1.2"),
+                new XElement(office + sectionName));
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(
+                singleSection,
+                schema,
+                "office-document-styles").IsMatch,
+                $"An empty office:{sectionName} section must match.");
+        }
+
+        XElement allSections = new(
+            office + "document-styles",
+            new XAttribute(office + "version", "1.2"),
+            sectionNames.Select(sectionName => new XElement(office + sectionName)));
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(
+            allSections,
+            schema,
+            "office-document-styles").IsMatch,
+            "The ordered optional styles sections must match.");
+    }
+
+    [Fact]
+    public void Odf12DocumentMetaPatternAcceptsOptionalMetaContent()
+    {
+        XNamespace office = OdfNamespaces.Office;
+        XNamespace meta = OdfNamespaces.Meta;
+        XNamespace dc = OdfNamespaces.Dc;
+        XElement documentMeta = new(
+            office + "document-meta",
+            new XAttribute(office + "version", "1.2"),
+            new XElement(
+                office + "meta",
+                new XElement(meta + "generator", "ODFDOM"),
+                new XElement(
+                    meta + "user-defined",
+                    new XAttribute(meta + "name", "License"),
+                    new XAttribute(meta + "value-type", "string"),
+                    "Apache-2.0"),
+                new XElement(dc + "creator", "ODFDOM"),
+                new XElement(dc + "date", "2026-07-22T00:00:00"),
+                new XElement(meta + "editing-cycles", "1"),
+                new XElement(meta + "editing-duration", "PT0S")));
+
+        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(OdfVersion.Odf12);
+        XElement rootOnly = new(
+            office + "document-meta",
+            new XAttribute(office + "version", "1.2"));
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(
+            rootOnly,
+            schema,
+            "office-document-meta").IsMatch,
+            "A document-meta root without the optional office:meta element must match.");
+        XElement emptyMeta = new(
+            office + "document-meta",
+            new XAttribute(office + "version", "1.2"),
+            new XElement(office + "meta"));
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(
+            emptyMeta,
+            schema,
+            "office-document-meta").IsMatch,
+            "An empty office:meta element must match.");
+        foreach (XElement child in documentMeta.Element(office + "meta")!.Elements())
+        {
+            XElement singleChild = new(
+                office + "document-meta",
+                new XAttribute(office + "version", "1.2"),
+                new XElement(office + "meta", new XElement(child)));
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(
+                singleChild,
+                schema,
+                "office-document-meta").IsMatch,
+                $"A standalone {child.Name} metadata child must match.");
+        }
+
+        OdfSchemaPatternValidationResult result = OdfSchemaPatternValidator.ValidateElement(
+            documentMeta,
+            schema,
+            "office-document-meta");
+
+        Assert.True(result.IsMatch, string.Join(Environment.NewLine, result.Issues.Select(issue => issue.Message)));
+    }
+
+    [Fact]
+    public void SchemaPatternNameProbeHonorsDirectChildNameClass()
+    {
+        var nameClass = new OdfSchemaNameClass(
+            OdfSchemaNameClassKind.Name,
+            OdfNamespaces.Office,
+            "document-styles",
+            isExcept: false);
+        var nameNode = new OdfSchemaPatternNode(
+            OdfSchemaPatternNodeKind.Name,
+            "exactlyOne",
+            OdfNamespaces.Office,
+            "document-styles",
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            [nameClass]);
+        var elementNode = new OdfSchemaPatternNode(
+            OdfSchemaPatternNodeKind.Element,
+            "exactlyOne",
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            nameClasses: null,
+            children:
+            [
+                new OdfSchemaPatternNode(
+                    OdfSchemaPatternNodeKind.Choice,
+                    "exactlyOne",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    nameClasses: null,
+                    children: [nameNode])
+            ]);
+        var pattern = new OdfSchemaPatternDefinition("office-document-styles", [elementNode]);
+        var schema = new OdfSchemaSet(
+            OdfVersion.Odf12,
+            new Uri("https://example.invalid/child-name-class.rng"),
+            "generated",
+            elements: [],
+            attributes: [],
+            nameClasses: [],
+            patterns: [pattern]);
+
+        Assert.True(OdfSchemaPatternValidator.PatternMatchesElementName(
+            pattern,
+            new XElement(XName.Get("document-styles", OdfNamespaces.Office)),
+            schema));
+        Assert.False(OdfSchemaPatternValidator.PatternMatchesElementName(
+            pattern,
+            new XElement(XName.Get("document-meta", OdfNamespaces.Office)),
+            schema));
+    }
+
     /// <summary>
     /// 迴歸測試：<c>draw:image</c> 的內容模型為
     /// <c>Choice(common-draw-data-attlist | office-binary-data)</c> 後接 <c>draw-text</c>。

@@ -157,6 +157,30 @@
       "notes": "Small repo-local negative fixture covering an invalid draw:decorative boolean value (\"yes\" instead of \"true\"/\"false\") on style:graphic-properties."
     },
     {
+      "id": "repo-generated-odf10-minimal-text",
+      "path": "generated/odf10-minimal-text.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.0",
+      "profile": "OASIS_ODF_1_0",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture validating against the official OASIS ODF 1.0 RNG."
+    },
+    {
+      "id": "repo-generated-odf10-invalid-table-inside-paragraph",
+      "path": "generated/odf10-invalid-table-inside-paragraph.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.0",
+      "profile": "OASIS_ODF_1_0",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Negative fixture proving the official ODF 1.0 schema rejects a block table nested inside text:p."
+    },
+    {
       "id": "repo-generated-odf11-minimal-text",
       "path": "generated/odf11-minimal-text.fodt",
       "source": "generated",

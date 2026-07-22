@@ -3,6 +3,7 @@
 #:project ../OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj
 #:project ../OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj
 #:project ../OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj
+#:project ../OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj
 #:project ../OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj
 #:project ../OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj
 
@@ -29,6 +30,7 @@ using OdfKit.Csv;
 using OdfKit.Conversion;
 using OdfKit.Collaboration;
 using OdfKit.Extensions.Rdf;
+using OdfKit.Extensions.Scripting;
 
 // =====================================================================
 // OdfKit .NET 10.0 單檔整合展示應用程式
@@ -65,6 +67,7 @@ DemoOdsStreamWriter(outputDir);
 DemoMetadataAndSecurity(outputDir);
 if (!smokeOnly)
 {
+    DemoScripting(outputDir);
     DemoExtensions(outputDir);
 }
 
@@ -642,7 +645,7 @@ static void DemoMetadataAndSecurity(string outputDir)
 
 static void DemoExtensions(string outputDir)
 {
-    Console.WriteLine(" 8. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
+    Console.WriteLine(" 9. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
 
     // 建立臨時文字文件做為轉換來源
     using var tempDoc = TextDocument.Create();
@@ -735,6 +738,30 @@ static void DemoExtensions(string outputDir)
 }
 
 /// <summary>
+/// 示範以選用擴充套件管理 LibreOffice Basic 與 Python 文件巨集。
+/// </summary>
+/// <param name="outputDir">輸出的目標目錄。</param>
+static void DemoScripting(string outputDir)
+{
+    Console.WriteLine(" 8. 正在建立含文件巨集的 ODT（不自動執行）⋯⋯");
+
+    using TextDocument document = TextDocument.Create();
+    document.AddParagraph("此文件示範 OdfKit 選用巨集管理擴充；開啟時不會自動執行巨集。");
+    OdfScriptManager scripting = document.Scripting();
+    scripting.AddOrUpdateLibreOfficeBasicModule(
+        "Standard",
+        "Module1",
+        "Sub Main\n    MsgBox \"OdfKit Basic document macro\"\nEnd Sub\n");
+    scripting.AddOrUpdateLibreOfficePythonModule(
+        "interop.py",
+        "def main():\n    return 'OdfKit Python document macro'\n\ng_exportedScripts = (main,)\n");
+
+    string outputPath = Path.Combine(outputDir, "output_scripting.odt");
+    document.Save(outputPath);
+    Console.WriteLine($"   已建立巨集管理範例：{outputPath}");
+}
+
+/// <summary>
 /// 輔助方法：產生一個最基本的 1 像素 PNG 圖片 Byte 陣列，以供範例測試插入圖片。
 /// </summary>
 /// <returns> PNG 圖片二進位資料 </returns>
@@ -751,7 +778,7 @@ static byte[] CreatePngBytes()
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoCns11643RareCharacters(string outputDir)
 {
-    Console.WriteLine(" 9. 正在示範 CNS 11643 罕字分段、碼位遷移與 Big5E 編碼 ⋯⋯");
+    Console.WriteLine("10. 正在示範 CNS 11643 罕字分段、碼位遷移與 Big5E 編碼 ⋯⋯");
 
     // Unicode Plane 2（Ext-B）罕字與 Plane 15 PUA 自造字示範字元
     string plane2Char = char.ConvertFromUtf32(0x20BB7); // 𠮷
@@ -824,7 +851,7 @@ static void DemoCns11643RareCharacters(string outputDir)
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdtStreamWriter(string outputDir)
 {
-    Console.WriteLine("10. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
+    Console.WriteLine("11. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.odt");
     FileStream fileStream;

@@ -21,3 +21,21 @@
 * **目前範圍**：JSON Collaboration 不再是純 non-goal。OdfKit 將其限定為 extension-scoped compatibility subset，由選用套件 `OdfKit.Extensions.Collaboration` 對標 TDF ODF Toolkit 的公開 operation 名稱、wire shape 與 reference JSON；核心 `OdfKit` 不新增依賴。
 * **已納入範圍**：匯入端接受裸陣列與 TDF 相容的 `{ "changes": [...] }` 封包，並以 typed operation log 保留未知 wire 欄位做 round-trip。`OdfKit.Extensions.Collaboration` 明確宣告 TDF 公開 ODF Text operation 名稱，支援 `addParagraph`、`addText`、`addTab`、`addLineBreak`、基本 `format` range 字元屬性（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、單段落 `delete`／`move`、最上層 `splitParagraph`／`mergeParagraph`、基本清單段落與 metadata-only `addListStyle`、固定尺寸文字表格 `addTable`／`addRows`／`addCells`／`addColumn`／`deleteColumns`、`addField`／`updateField`、`addNote` comment、`addHeaderFooter`／`deleteHeaderFooterContent`、`addFontDecl` 與安全 `addDrawing` placeholder replay；`addStyle`、`changeStyle`、`deleteStyle`、`documentLayout` 等 metadata-only operation 會進入 import report 診斷而不靜默失敗。
 * **仍屬非目標**：完整多人協同演算法、任意衝突合併、undo stack、OT、CRDT、跨段落刪除／移動、完整 drawing DOM 語意、動態表格擴張，以及 header/footer/note selection 的完整語意，仍不納入核心與本輪承諾。授權策略採 clean-room：只使用 TDF 公開文件、operation 名稱、wire shape 與 reference JSON 作行為對標，不複製 Java 原始碼。
+
+## 5. 重要缺口的產品決策
+
+下列項目是巨集管理以外最容易被誤認為「完整 ODF 工具包必須內建」的能力；處理方式以
+互通性、安全邊界與可維護性為判準，而不是把辦公軟體執行階段搬進核心庫：
+
+| 項目 | 決策 | 目前完成線 |
+|------|------|------------|
+| ODF 1.0 存量文件驗證 | 納入核心 | 已內建 OASIS ODF 1.0～1.4 官方 schema provider，並加入 1.0 正／負 corpus canary 與 Jing 外部驗證矩陣 |
+| 巨集管理 | 選用擴充 | `OdfKit.Extensions.Scripting` 管理標準 script、事件繫結及 LibreOffice Basic／Python package profile；核心仍只保留淨化能力 |
+| 巨集執行與簽章 | 不納入執行階段 | 由 LibreOffice 等 consumer 執行；OdfKit 修改巨集後移除失效簽章，不假裝重新簽署或判定原始碼安全 |
+| 高保真渲染與物理分頁 | 後端介面 | 維持第 1 節決策，以 LibreOffice 或其它可替換 renderer 實作，不在核心重建排版器 |
+| 公式與樞紐表完整重算 | consumer 負責 | 維持第 2 節決策；核心可讀寫結構與快取值，但不宣稱具備完整 Calc／Excel 計算語意 |
+| 多人協同與衝突合併 | 限定擴充子集 | 維持第 4 節所列相容 operations；OT、CRDT、任意衝突合併及完整 undo 仍為明確非目標 |
+
+因此，近期實作優先順序是補齊可由規格、corpus 與真實 consumer 驗證的封裝與互通缺口；
+需要完整辦公軟體 runtime 的重算、排版、協同合併及巨集信任判定，則維持清楚的介面或非目標
+邊界，避免核心套件產生無法可靠驗證的「全功能」承諾。

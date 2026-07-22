@@ -54,6 +54,7 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeHeadless_LoadsMasterDocument` | ODM | 段落、子文件參照、互通標記 | `txt` / `odm` | LibreOffice 識別為 Writer master document（`writerglobal8`）；轉出文字含互通標記；往返後子文件參照保留 | ✅ |
 | `LibreOfficeHeadless_LoadsWebTemplateDocument` | OTH | 標題、段落、互通標記 | `txt` / `odt` | LibreOffice 識別為 Writer/Web document（`writerweb8_writer`）；轉出文字含互通標記；轉出 ODT 內容保留 | ✅ |
 | `DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType` | ODB | 資料表、查詢、表單封裝 | （封裝層級，無 CLI 轉換） | mimetype／manifest media-type 與真實 LibreOffice 自建 ODB 完全一致；另以 UNO API `desktop.loadComponentFromURL` 人工驗證可成功載入 | ✅ |
+| `LibreOfficeHeadless_ExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
 
 ## 已知上游限制（非 OdfKit 缺陷）
 
@@ -127,6 +128,7 @@ ODB 資料庫文件的失效模式比 Chart／Image 更隱晦——並非乾淨�
 | 類別 | 說明 |
 |------|------|
 | `LibreOfficeInteropTests` | 本矩陣的實機 headless 測試 |
+| `LibreOfficeScriptingInteropTests` | 使用隔離 profile 實際執行 Basic／Python 文件巨集 |
 | `TrackedChangesInteropTests` | 追蹤修訂語意（非必須 LO） |
 | `LoExtInteropTests` | `loext:decorative` 載入映射 |
 | `LibreOfficeRenderer*Tests` | `Extensions.Rendering` 可替換 backend |

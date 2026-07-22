@@ -356,7 +356,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
 
     internal static List<OdfSchemaPatternNode> GetNameClassNodes(IReadOnlyList<OdfSchemaPatternNode> nodes)
     {
-        return nodes.Where(IsNameClassSyntaxNode).ToList();
+        return nodes.Where(IsAttributeNameClassPattern).ToList();
     }
 
     private static List<OdfSchemaPatternNode> GetAttributeValueNodes(IReadOnlyList<OdfSchemaPatternNode> nodes)

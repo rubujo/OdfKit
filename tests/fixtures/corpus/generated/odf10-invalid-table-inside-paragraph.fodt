@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.0">
+  <office:body>
+    <office:text>
+      <text:p>
+        Invalid block table inside a paragraph.
+        <table:table table:name="InvalidNestedTable">
+          <table:table-row>
+            <table:table-cell office:value-type="string">
+              <text:p>This table must not appear inside text:p.</text:p>
+            </table:table-cell>
+          </table:table-row>
+        </table:table>
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document>

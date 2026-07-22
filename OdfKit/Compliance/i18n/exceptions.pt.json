@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "O processo WebFont falhou: {0}",
   "Err_WebFont_QueueFull": "A fila de tarefas WebFont está cheia.",
   "Err_WebFont_UnmappedByte": "O byte legado no deslocamento {0} não está mapeado.",
-  "Err_OdfPackage_TransactionJournalFailed": "Não foi possível processar o diário de transações do pacote ODF."
+  "Err_OdfPackage_TransactionJournalFailed": "Não foi possível processar o diário de transações do pacote ODF.",
+  "Err_OdfScriptManager_ArgumentNull": "O argumento {0} não pode ser nulo.",
+  "Err_OdfScriptManager_InvalidArgument": "O argumento {0} é inválido para a gestão de scripts.",
+  "Err_OdfScriptManager_UnsupportedOperation": "Este documento não suporta a operação de gestão de scripts pedida.",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "Falta a estrutura necessária nos metadados de scripts do documento.",
+  "Err_OdfScriptManager_IndexOutOfRange": "Não existe nenhum item de script no índice {0}.",
+  "Err_OdfScriptManager_UnsupportedVersion": "O documento utiliza uma versão ODF não suportada para a gestão de scripts."
 }

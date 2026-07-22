@@ -119,7 +119,14 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Returns contiguous text sequences supported by the selected face.
+    /// 回傳所選 face 支援的連續文字序列。
+    /// </summary>
+    /// <param name="face">The trusted font face. / 受信任的字型 face。</param>
+    /// <param name="sequences">The requested text sequences. / 要求的文字序列。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The supported contiguous sequences; an empty collection means the face has no requested glyphs. / 支援的連續序列；空集合表示該 face 不含任何要求的 glyph。</returns>
     public Task<IReadOnlyList<WebFontTextSequence>> FilterSupportedSequencesAsync(
         WebFontFaceIdentity face,
         IReadOnlyList<WebFontTextSequence> sequences,

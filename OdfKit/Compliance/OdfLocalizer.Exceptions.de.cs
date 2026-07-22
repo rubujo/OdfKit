@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "Die WebFont-Auftragswarteschlange ist voll.",
             ["Err_WebFont_UnmappedByte"] = "Das Legacy-Byte am Offset {0} ist nicht zugeordnet.",
             ["Err_OdfPackage_TransactionJournalFailed"] = "Das Transaktionsjournal des ODF-Pakets konnte nicht verarbeitet werden.",
+            ["Err_OdfScriptManager_ArgumentNull"] = "Das Argument {0} darf nicht NULL sein.",
+            ["Err_OdfScriptManager_InvalidArgument"] = "Das Argument {0} ist für die Skriptverwaltung ungültig.",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "Dieses Dokument unterstützt den angeforderten Skriptverwaltungsvorgang nicht.",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Den Skriptmetadaten des Dokuments fehlt die erforderliche Struktur.",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "Am Index {0} ist kein Skriptelement vorhanden.",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "Das Dokument verwendet eine ODF-Version, die für die Skriptverwaltung nicht unterstützt wird.",
         };
     }
 }

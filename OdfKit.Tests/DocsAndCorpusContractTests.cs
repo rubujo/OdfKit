@@ -19,6 +19,33 @@ namespace OdfKit.Tests;
 public class DocsAndCorpusContractTests
 {
     /// <summary>
+    /// Verifies the scripting extension is wired into the API site and executable sample.
+    /// 驗證指令碼擴充已接入 API 網站與可執行範例。
+    /// </summary>
+    [Fact]
+    public void ScriptingExtensionIsPublishedAndDemonstrated()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string docfx = File.ReadAllText(Path.Combine(repoRoot, "api-docs", "docfx.json"));
+        string packageSelection = File.ReadAllText(
+            Path.Combine(repoRoot, "api-docs", "articles", "package-selection.md"));
+        string sample = File.ReadAllText(Path.Combine(repoRoot, "samples", "Sample.cs"));
+        string sampleReadme = File.ReadAllText(Path.Combine(repoRoot, "samples", "README.md"));
+
+        Assert.Contains(
+            "OdfKit.Extensions.Scripting/bin/Release/net10.0/OdfKit.Extensions.Scripting.dll",
+            docfx,
+            StringComparison.Ordinal);
+        Assert.Contains("OdfKit.Extensions.Scripting", packageSelection, StringComparison.Ordinal);
+        Assert.Contains(
+            "#:project ../OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj",
+            sample,
+            StringComparison.Ordinal);
+        Assert.Contains("DemoScripting(outputDir)", sample, StringComparison.Ordinal);
+        Assert.Contains("output_scripting.odt", sampleReadme, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Verifies the documented package resource budgets match the public loading defaults.
     /// 驗證文件所載封裝資源預算符合公開載入預設值。
     /// </summary>

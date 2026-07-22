@@ -96,7 +96,7 @@
 - 建置效能：本機可關 analyzer（`Directory.Build.props`）；CI 維持檢查。  
 - Trim analyzer 對巨型產生碼關閉，改以 `eng/Test-TrimSmoke.ps1` 實機把關。  
 - schema 重產後若公開表面變動，須重跑 `Generate-PublicApiBaseline.ps1`。  
-- **非目標（0.x）**：將 ODF 1.1～1.4 schema provider **拆成可選 NuGet**（見下方「Schema 與流通性」）。
+- **非目標（0.x）**：將 ODF 1.0～1.4 schema provider **拆成可選 NuGet**（見下方「Schema 與流通性」）。
 
 ## 5. XML 文件與註解
 
@@ -143,7 +143,7 @@ ODF 實務流通並非「全站只活在最新 1.4」：
 - **LibreOffice** 長期以 1.2／1.3（含 Extended）為日常寫出主力，近版才強化 1.4。  
 - **互通與歸檔**敘事依賴「能打開舊版 ODF」，而非只產生最新版。
 
-因此核心套件**預設內建多版官方 schema provider（1.1～1.4）是產品選擇**，體積大是規格覆蓋代價，**不是**待清的架構缺陷。
+因此核心套件**預設內建多版官方 schema provider（1.0～1.4）是產品選擇**，體積大是規格覆蓋代價，**不是**待清的架構缺陷。
 
 | 政策 | 說明 |
 |------|------|

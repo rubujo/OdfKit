@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "WebFont 處理程序失敗：{0}",
   "Err_WebFont_QueueFull": "WebFont 工作佇列已滿。",
   "Err_WebFont_UnmappedByte": "位移 {0} 的舊式位元組沒有對應。",
-  "Err_OdfPackage_TransactionJournalFailed": "無法處理 ODF 封裝容器交易日誌。"
+  "Err_OdfPackage_TransactionJournalFailed": "無法處理 ODF 封裝容器交易日誌。",
+  "Err_OdfScriptManager_ArgumentNull": "引數「{0}」不得為 null。",
+  "Err_OdfScriptManager_InvalidArgument": "引數「{0}」不適用於指令碼管理。",
+  "Err_OdfScriptManager_UnsupportedOperation": "此文件不支援要求的指令碼管理作業。",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "文件的指令碼中繼資料缺少必要結構。",
+  "Err_OdfScriptManager_IndexOutOfRange": "索引 {0} 沒有對應的指令碼項目。",
+  "Err_OdfScriptManager_UnsupportedVersion": "文件使用的 ODF 版本不支援指令碼管理。"
 }

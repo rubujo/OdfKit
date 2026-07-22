@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "Baris gilir kerja WebFont penuh.",
             ["Err_WebFont_UnmappedByte"] = "Bait legasi pada ofset {0} tidak dipetakan.",
             ["Err_OdfPackage_TransactionJournalFailed"] = "Gagal memproses jurnal transaksi pakej ODF.",
+            ["Err_OdfScriptManager_ArgumentNull"] = "Argumen {0} tidak boleh null.",
+            ["Err_OdfScriptManager_InvalidArgument"] = "Argumen {0} tidak sah untuk pengurusan skrip.",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "Dokumen ini tidak menyokong operasi pengurusan skrip yang diminta.",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Metadata skrip dokumen tiada struktur yang diperlukan.",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "Tiada item skrip pada indeks {0}.",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokumen menggunakan versi ODF yang tidak disokong untuk pengurusan skrip.",
         };
     }
 }

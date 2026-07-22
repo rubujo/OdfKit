@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "A fila de trabalhos WebFont está cheia.",
             ["Err_WebFont_UnmappedByte"] = "O byte legado no deslocamento {0} não está mapeado.",
             ["Err_OdfPackage_TransactionJournalFailed"] = "Não foi possível processar o diário de transações do pacote ODF.",
+            ["Err_OdfScriptManager_ArgumentNull"] = "O argumento {0} não pode ser nulo.",
+            ["Err_OdfScriptManager_InvalidArgument"] = "O argumento {0} é inválido para o gerenciamento de scripts.",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "Este documento não oferece suporte à operação de gerenciamento de scripts solicitada.",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Os metadados de script do documento não contêm a estrutura necessária.",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "Não existe nenhum item de script no índice {0}.",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "O documento usa uma versão ODF sem suporte para gerenciamento de scripts.",
         };
     }
 }

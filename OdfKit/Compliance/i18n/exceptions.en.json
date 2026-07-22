@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "The WebFont process failed: {0}",
   "Err_WebFont_QueueFull": "The WebFont job queue is full.",
   "Err_WebFont_UnmappedByte": "The legacy byte at offset {0} is unmapped.",
-  "Err_OdfPackage_TransactionJournalFailed": "Failed to process the ODF package transaction journal."
+  "Err_OdfPackage_TransactionJournalFailed": "Failed to process the ODF package transaction journal.",
+  "Err_OdfScriptManager_ArgumentNull": "Argument {0} cannot be null.",
+  "Err_OdfScriptManager_InvalidArgument": "Argument {0} is invalid for script management.",
+  "Err_OdfScriptManager_UnsupportedOperation": "This document does not support the requested script management operation.",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "The document script metadata is missing required structure.",
+  "Err_OdfScriptManager_IndexOutOfRange": "No script item exists at index {0}.",
+  "Err_OdfScriptManager_UnsupportedVersion": "The document uses an ODF version that is unsupported for script management."
 }

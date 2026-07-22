@@ -41,11 +41,11 @@ BouncyCastle 或其他 OpenPGP 實作（例如 GnuPG、RNP）的原始碼；僅�
 
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
-| ODF 1.1 / 1.2 / 1.3 / 1.4 RELAX NG schema | OASIS OpenDocument schema artifacts | `OdfSchemaGenerator`、`Odf*OfficialSchemaProvider.g.cs`、`OdfSchemaPatternValidator.*` | `OdfSchemaGeneratorTests`、`TypedDomParityTests`、`DocsAndCorpusContractTests` |
+| ODF 1.0 / 1.1 / 1.2 / 1.3 / 1.4 RELAX NG schema | OASIS OpenDocument schema artifacts | `OdfSchemaGenerator`、`Odf*OfficialSchemaProvider.g.cs`、`OdfSchemaPatternValidator.*` | `OdfSchemaGeneratorTests`、`TypedDomParityTests`、`DocsAndCorpusContractTests` |
 | RELAX NG pattern 語意 | RELAX NG Specification | `OdfSchemaPatternValidator.Content.*`、`OdfSchemaPatternValidator.NameClasses.cs`、`OdfSchemaPatternValidator.Attributes.*` | `ComplianceTests.SchemaPatternValidator*` |
 | XML Schema datatypes 與 facets | W3C XML Schema Part 2 Datatypes | `OdfSchemaPatternValidator.DataTypes.*` | `ComplianceTests.SchemaPatternValidatorHandlesTextDataAndValueNodes`、`ComplianceTests.SchemaPatternValidatorHandlesAttributeDataTypeNodes` |
 | ODF package / Flat XML corpus gate | OASIS ODF package 與 schema 規範、自有 generated corpus | `OdfProfileRuleValidator.SchemaPatterns.cs`、CLI `validate-corpus` | `CorpusComplianceTests`、`tests/fixtures/corpus/manifest.json`、`eng/Test-OdfCorpus.ps1` |
-| ODF 1.4 語意降版診斷 | OASIS ODF 1.1／1.2／1.3／1.4 官方 RNG schema 的限定名稱差異 | `OdfVersionCompatibilityAnalyzer`、`OdfVersionCompatibilityReport` | `OdfSaveOptionsVersionTests.VersionCompatibilityReport_*` |
+| ODF 1.4 語意降版診斷 | OASIS ODF 1.0／1.1／1.2／1.3／1.4 官方 RNG schema 的限定名稱差異 | `OdfVersionCompatibilityAnalyzer`、`OdfVersionCompatibilityReport` | `OdfSaveOptionsVersionTests.VersionCompatibilityReport_*` |
 
 Schema pattern validator 目標是支援 OdfKit 內建 profile 的可驗證 ODF XML 結構，而不是通用
 RELAX NG validator。若需要對外部 schema 做完整 RELAX NG 驗證，應新增獨立 validator 或接外部工具，

@@ -35,7 +35,7 @@ public class SemanticCoverageContractTests
             manifest.GetProperty("legacyVersionPolicy").GetString());
         JsonElement legacyEvidence = manifest.GetProperty("legacyVersionEvidence");
         Assert.Equal(
-            ["1.1", "1.2", "1.3"],
+            ["1.0", "1.1", "1.2", "1.3"],
             legacyEvidence.GetProperty("versions").EnumerateArray().Select(item => item.GetString()!).ToArray());
         Assert.Equal(
             ["ODG", "ODP", "ODS", "ODT"],

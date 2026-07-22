@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "Proces WebFont selhal: {0}",
   "Err_WebFont_QueueFull": "Fronta úloh WebFont je plná.",
   "Err_WebFont_UnmappedByte": "Bajt starší znakové sady na posunu {0} není namapován.",
-  "Err_OdfPackage_TransactionJournalFailed": "Nepodařilo se zpracovat transakční žurnál balíčku ODF."
+  "Err_OdfPackage_TransactionJournalFailed": "Nepodařilo se zpracovat transakční žurnál balíčku ODF.",
+  "Err_OdfScriptManager_ArgumentNull": "Argument {0} nesmí mít hodnotu null.",
+  "Err_OdfScriptManager_InvalidArgument": "Argument {0} není platný pro správu skriptů.",
+  "Err_OdfScriptManager_UnsupportedOperation": "Tento dokument nepodporuje požadovanou operaci správy skriptů.",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "V metadatech skriptů dokumentu chybí požadovaná struktura.",
+  "Err_OdfScriptManager_IndexOutOfRange": "Na indexu {0} neexistuje žádná položka skriptu.",
+  "Err_OdfScriptManager_UnsupportedVersion": "Dokument používá verzi ODF která není podporována pro správu skriptů."
 }

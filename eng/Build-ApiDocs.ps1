@@ -9,7 +9,7 @@
 .PARAMETER NoRestore
     略過 dotnet tool restore（本機反覆執行時使用）。
 .PARAMETER SkipProjectBuild
-    略過 19 個公開套件組件的 dotnet build（組件輸出已存在且未變更時使用）。
+    略過 20 個公開套件組件的 dotnet build（組件輸出已存在且未變更時使用）。
 .PARAMETER OutputDirectory
     網站輸出目錄；預設為 Pages workflow 使用的 artifacts/api-site。
 #>

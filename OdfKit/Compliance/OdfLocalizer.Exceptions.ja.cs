@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "WebFont ジョブキューがいっぱいです。",
             ["Err_WebFont_UnmappedByte"] = "オフセット {0} のレガシーバイトはマッピングされていません。",
             ["Err_OdfPackage_TransactionJournalFailed"] = "ODF パッケージのトランザクションジャーナルを処理できませんでした。",
+            ["Err_OdfScriptManager_ArgumentNull"] = "引数 {0} を null にすることはできません。",
+            ["Err_OdfScriptManager_InvalidArgument"] = "引数 {0} はスクリプト管理では無効です。",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "このドキュメントは要求されたスクリプト管理操作をサポートしていません。",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "ドキュメントのスクリプトメタデータに必要な構造がありません。",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "インデックス {0} にスクリプト項目はありません。",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "ドキュメントはスクリプト管理でサポートされていない ODF バージョンを使用しています。",
         };
     }
 }

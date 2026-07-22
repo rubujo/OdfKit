@@ -144,7 +144,7 @@ jobs:
         run: |
           ./eng/Test-OdfCorpus.ps1 `
             -InternalBaselineJar '${{ steps.install.outputs.jar_path }}' `
-            -InternalBaselineVersions '1.1', '1.2', '1.3', '1.4' `
+            -InternalBaselineVersions '1.0', '1.1', '1.2', '1.3', '1.4' `
             -InternalBaselineExcludedKinds 'Database', 'Formula', 'FormulaTemplate' `
             -InternalBaselinePackageOnly `
             -SkipBuild `

@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "WebFont 작업 대기열이 가득 찼습니다.",
             ["Err_WebFont_UnmappedByte"] = "오프셋 {0}의 레거시 바이트가 매핑되지 않았습니다.",
             ["Err_OdfPackage_TransactionJournalFailed"] = "ODF 패키지 트랜잭션 저널을 처리하지 못했습니다.",
+            ["Err_OdfScriptManager_ArgumentNull"] = "인수 {0}은 null일 수 없습니다.",
+            ["Err_OdfScriptManager_InvalidArgument"] = "인수 {0}은 스크립트 관리에 유효하지 않습니다.",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "이 문서는 요청한 스크립트 관리 작업을 지원하지 않습니다.",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "문서 스크립트 메타데이터에 필수 구조가 없습니다.",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "인덱스 {0}에 스크립트 항목이 없습니다.",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "문서가 스크립트 관리에서 지원되지 않는 ODF 버전을 사용합니다.",
         };
     }
 }

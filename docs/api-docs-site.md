@@ -102,7 +102,7 @@ docs/toc.yml          # project-docs 的分層文件導覽
 ## 5. 本機建置與預覽
 
 ```powershell
-pwsh eng/Build-ApiDocs.ps1                    # 完整建置（含 19 個公開套件組件）
+pwsh eng/Build-ApiDocs.ps1                    # 完整建置（含 20 個公開套件組件）
 pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild  # 組件未變更時的快速重建
 pwsh eng/Build-ApiDocs.ps1 -NoRestore -SkipProjectBuild -OutputDirectory artifacts/api-site-check
 dotnet docfx serve artifacts/api-site -p 8899 # 本機預覽

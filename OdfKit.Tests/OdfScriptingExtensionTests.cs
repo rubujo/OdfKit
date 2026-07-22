@@ -10,6 +10,33 @@ namespace OdfKit.Tests;
 public sealed class OdfScriptingExtensionTests
 {
     [Theory]
+    [InlineData("Err_OdfScriptManager_ArgumentNull")]
+    [InlineData("Err_OdfScriptManager_InvalidArgument")]
+    [InlineData("Err_OdfScriptManager_UnsupportedOperation")]
+    [InlineData("Err_OdfScriptManager_InvalidDocumentStructure")]
+    [InlineData("Err_OdfScriptManager_IndexOutOfRange")]
+    [InlineData("Err_OdfScriptManager_UnsupportedVersion")]
+    public void ScriptingExceptionMessagesAreLocalizedAcrossSupportedCultures(string key)
+    {
+        string english = OdfLocalizer.GetMessage(
+            key,
+            System.Globalization.CultureInfo.GetCultureInfo("en"),
+            "value");
+        foreach (string cultureName in new[]
+                 {
+                     "zh-TW", "da", "de", "fr", "it", "ko", "ms", "nb", "nl", "pt", "sk",
+                     "ja", "es", "cs", "pl", "pt-BR"
+                 })
+        {
+            string localized = OdfLocalizer.GetMessage(
+                key,
+                System.Globalization.CultureInfo.GetCultureInfo(cultureName),
+                "value");
+            Assert.NotEqual(english, localized);
+        }
+    }
+
+    [Theory]
     [InlineData(OdfVersion.Odf10, "1.0")]
     [InlineData(OdfVersion.Odf11, "1.1")]
     [InlineData(OdfVersion.Odf12, "1.2")]
@@ -168,6 +195,69 @@ public sealed class OdfScriptingExtensionTests
         Assert.Equal(OdfPackageScriptKind.LibreOfficePythonModule, entry.Kind);
         Assert.Contains("def hello", reopenedManager.ReadPackageScript(entry.Path), StringComparison.Ordinal);
         Assert.True(reopenedManager.RemoveLibreOfficePythonModule("Automation/hello.py"));
+    }
+
+    [Fact]
+    public void LibreOfficeBasicMetadataRejectsDtdDeclarations()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        package.WriteEntry(
+            "Basic/script-lc.xml",
+            Encoding.UTF8.GetBytes(
+                "<!DOCTYPE libraries [<!ENTITY payload 'blocked'>]>" +
+                "<library:libraries xmlns:library='http://openoffice.org/2000/library'>" +
+                "&payload;</library:libraries>"),
+            "text/xml");
+
+        Assert.Throws<System.Xml.XmlException>(() =>
+            package.Scripting().AddOrUpdateLibreOfficeBasicModule(
+                "Standard",
+                "Module1",
+                "Sub Main\nEnd Sub"));
+    }
+
+    [Fact]
+    public void LibreOfficeBasicRemovalRejectsMalformedMetadataWithoutPartialMutation()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        package.WriteEntry(
+            "Basic/Standard/script-lb.xml",
+            Encoding.UTF8.GetBytes("<invalid-root/>"),
+            "text/xml");
+
+        Assert.Throws<System.Xml.XmlException>(() =>
+            manager.RemoveLibreOfficeBasicModule("Standard", "Module1"));
+        Assert.True(package.HasEntry("Basic/Standard/Module1.xml"));
+    }
+
+    [Fact]
+    public void LibreOfficeBasicLibraryRemovalUsesCaseSensitivePackagePaths()
+    {
+        using var backing = new MemoryStream();
+        using OdfPackage package = OdfDocumentFactory.CreatePackage(
+            backing,
+            OdfDocumentKind.Text,
+            OdfVersion.Odf14,
+            leaveOpen: true);
+        OdfScriptManager manager = package.Scripting();
+        manager.AddOrUpdateLibreOfficeBasicModule("Standard", "Module1", "Sub Main\nEnd Sub");
+        manager.AddOrUpdateLibreOfficeBasicModule("standard", "Module1", "Sub Main\nEnd Sub");
+
+        Assert.True(manager.RemoveLibreOfficeBasicLibrary("Standard"));
+        Assert.False(package.HasEntry("Basic/Standard/Module1.xml"));
+        Assert.True(package.HasEntry("Basic/standard/Module1.xml"));
     }
 
     [Theory]

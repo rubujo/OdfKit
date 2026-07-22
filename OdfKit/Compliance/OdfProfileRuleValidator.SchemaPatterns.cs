@@ -177,10 +177,9 @@ internal static partial class OdfProfileRuleValidator
                 }
             }
 
-            // 當 schema 並非該版本的官方真實 schema 時（目前僅 ODF 1.0／Unknown，因 OASIS
-            // 未發布獨立 RNG，退回以 ODF 1.4 schema 過濾近似），暫時將 root 的 version 改寫為
-            // 實際 pattern 內容所屬的 1.4，以便正確匹配 pattern。原生 1.1/1.2/1.3/1.4 驗證時
-            // schema 本身就是該版本的真實 schema，此處為 no-op。
+            // 當 schema 並非該版本的官方真實 schema 時（目前僅 Unknown），暫時將 root 的
+            // version 改寫為實際 pattern 內容所屬的 1.4，以便正確匹配 pattern。
+            // 原生 1.0～1.4 驗證時 schema 本身就是該版本的真實 schema，此處為 no-op。
             string schemaVersionString = OdfSchemaRegistry.HasNativeSchema(schema.Version)
                 ? OdfVersionInfo.ToVersionString(schema.Version)
                 : OdfVersionInfo.ToVersionString(OdfVersion.Odf14);
@@ -287,8 +286,6 @@ internal static partial class OdfProfileRuleValidator
 
     private static IEnumerable<string> GetRootPatternCandidates(XElement root, string? packagePath)
     {
-        yield return "start";
-
         string localName = root.Name.LocalName;
         yield return localName;
 
@@ -314,6 +311,7 @@ internal static partial class OdfProfileRuleValidator
         }
 
         yield return "root";
+        yield return "start";
     }
 
 

@@ -20,7 +20,7 @@
 以下檔案由 `tools/OdfSchemaGenerator` 與 `eng/Generate-OdfSchemaProvider.ps1` 從 OASIS RNG 產生，**不可手動編輯**：
 
 - `OdfKit/DOM/Generated/*.g.cs`：typed DOM wrapper、factory case、typed attribute 與 schema child collection。
-- `OdfKit/Compliance/Generated/Odf*OfficialSchemaProvider.g.cs`：ODF 1.1/1.2/1.3/1.4 官方 schema metadata provider。
+- `OdfKit/Compliance/Generated/Odf*OfficialSchemaProvider.g.cs`：ODF 1.0/1.1/1.2/1.3/1.4 官方 schema metadata provider。
 
 重產流程：
 

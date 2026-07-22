@@ -209,7 +209,13 @@ public static partial class OdfSchemaPatternValidator
         {
             if (string.IsNullOrEmpty(node.LocalName) && string.IsNullOrEmpty(node.NamespaceUri))
             {
-                return true;
+                List<OdfSchemaPatternNode> nameClassNodes =
+                    OdfSchemaPatternAttributeMatcher.GetNameClassNodes(node.Children);
+                return nameClassNodes.Count > 0 &&
+                    nameClassNodes.Any(child => MatchesNameClassNode(
+                        child,
+                        element.Name.NamespaceName,
+                        element.Name.LocalName));
             }
 
             return string.Equals(node.NamespaceUri, element.Name.NamespaceName, StringComparison.Ordinal) &&

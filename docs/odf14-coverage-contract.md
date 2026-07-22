@@ -7,7 +7,7 @@ foreign extension 的低階存取路徑。本契約是持續維護的 `v0.0.1` �
 
 | 層級 | 範圍 | 完滿條件 | 永久非目標 |
 | --- | --- | --- | --- |
-| L0 | schema coverage / typed DOM | ODF 1.1～1.4 官方元素與屬性可由 schema provider 盤點，並可透過 generated wrapper 或 schema-aware DOM 表達、讀寫、保留及 round-trip | 每個元素都有專屬高階 C# API |
+| L0 | schema coverage / typed DOM | ODF 1.0～1.4 官方元素與屬性可由 schema provider 盤點，並可透過 generated wrapper 或 schema-aware DOM 表達、讀寫、保留及 round-trip | 每個元素都有專屬高階 C# API |
 | L1 | package lifecycle | 24 種主要 extension 可偵測、建立、載入、儲存、驗證與 round-trip | 內建完整 Office layout、rendering 或 calculation engine |
 | L2 | high-level facade | Text、Spreadsheet、Presentation、Drawing、Chart、Image、Formula、Database 的列明常用工作流可直接由 C# API 完成 | 完整動畫引擎、ODB 執行引擎、CAS、完整 TeX parser 與 3D 設計器 |
 | L3 | interop behavior | 對 LibreOffice、Microsoft Office ODF 與 portable editing 提供可追溯的真機證據或實務風險提示 | 宣稱跨套件像素級一致 |

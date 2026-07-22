@@ -623,6 +623,12 @@ public static partial class OdfLocalizer
             ["Err_WebFont_QueueFull"] = "De WebFont-taakwachtrij is vol.",
             ["Err_WebFont_UnmappedByte"] = "De verouderde byte op offset {0} is niet toegewezen.",
             ["Err_OdfPackage_TransactionJournalFailed"] = "Het transactielogboek van het ODF-pakket kan niet worden verwerkt.",
+            ["Err_OdfScriptManager_ArgumentNull"] = "Argument {0} mag niet null zijn.",
+            ["Err_OdfScriptManager_InvalidArgument"] = "Argument {0} is ongeldig voor scriptbeheer.",
+            ["Err_OdfScriptManager_UnsupportedOperation"] = "Dit document ondersteunt de gevraagde scriptbeheerbewerking niet.",
+            ["Err_OdfScriptManager_InvalidDocumentStructure"] = "De scriptmetagegevens van het document missen de vereiste structuur.",
+            ["Err_OdfScriptManager_IndexOutOfRange"] = "Er bestaat geen scriptitem op index {0}.",
+            ["Err_OdfScriptManager_UnsupportedVersion"] = "Het document gebruikt een ODF-versie die niet wordt ondersteund voor scriptbeheer.",
         };
     }
 }

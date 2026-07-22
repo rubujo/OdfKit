@@ -30,6 +30,7 @@ WebFont 專用範例另見：
 #:project ../OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj
 #:project ../OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj
 #:project ../OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj
+#:project ../OdfKit.Extensions.Scripting/OdfKit.Extensions.Scripting.csproj
 #:project ../OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj
 #:project ../OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj
 ```
@@ -88,8 +89,8 @@ dotnet run samples/TaiwanGovernmentLetter.cs -- <範本.ott> <輸出.odt>
 ### Smoke 模式
 
 若只想確認範例能編譯執行並產生核心 ODF 文件，可使用環境變數切換到 smoke
-模式。此模式會完整略過 `DemoExtensions`（PDF、HTML、CSV、OOXML 轉檔、
-Collaboration JSON 往返與 RDF-SPARQL、影像渲染等展示），但仍會建立
+模式。此模式會完整略過 `DemoScripting` 與 `DemoExtensions`（文件巨集管理、PDF、HTML、
+CSV、OOXML 轉檔、Collaboration JSON 往返與 RDF-SPARQL、影像渲染等展示），但仍會建立
 ODT、ODS、ODP、ODG、ODC、ODF、ODI、ODB 與串流輸出文件：
 
 ```powershell
@@ -142,6 +143,7 @@ dotnet run samples/Sample.cs
 7. **中繼資料 (Metadata) 讀取與更新**：
    - 展示如何載入既有檔案、讀取文件 metadata 標題與建立者資訊，並進行修改更新與二次存檔。
 8. **進階轉檔與擴充套件整合**：
+   - 使用 `OdfScriptManager` 寫入不自動執行的 LibreOffice Basic／Python 文件巨集。
    - 使用 `OdfPdfExporter` 將 ODT 轉換並渲染匯出為 PDF 檔案。
    - 使用 `OdfHtmlExporter` 將 ODT 轉換並匯出為 HTML 網頁。
    - 使用 `OdfToDocxConverter` / `OdfToXlsxConverter` 轉出 OOXML。
@@ -180,6 +182,7 @@ dotnet run samples/Sample.cs
 | **`output_docx.docx`** | Word 文件 | 由 ODT 轉出的 DOCX。 |
 | **`output_xlsx.xlsx`** | Excel 文件 | 由 ODS 轉出的 XLSX。 |
 | **`output_collaboration_imported.odt`** | ODF 文字文件 | 由協作操作 JSON 重新匯入產生。 |
+| **`output_scripting.odt`** | ODF 文字文件 | 含 Basic／Python 文件巨集，但未繫結自動執行事件。 |
 | **`output_sheet_rendering.png`** | PNG 圖片 | 由工作表格線渲染出的影像。 |
 
 若目標檔名已被占用，`Sample.cs` 也可能建立 `output_stream_backup.ods` 或

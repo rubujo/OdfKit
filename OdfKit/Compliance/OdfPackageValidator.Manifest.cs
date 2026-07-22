@@ -171,7 +171,9 @@ public static partial class OdfPackageValidator
 
         foreach (string entryName in package.Entries.Keys)
         {
-            if (entryName == "mimetype" || entryName == "META-INF/manifest.xml")
+            if (entryName == "mimetype" ||
+                entryName == "META-INF/manifest.xml" ||
+                entryName.EndsWith("/", StringComparison.Ordinal))
             {
                 continue;
             }

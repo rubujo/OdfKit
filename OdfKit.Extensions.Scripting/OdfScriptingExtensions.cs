@@ -18,7 +18,11 @@ public static class OdfScriptingExtensions
     public static OdfScriptManager Scripting(this OdfPackage package)
     {
         if (package is null)
-            throw new ArgumentNullException(nameof(package));
+        {
+            throw new ArgumentNullException(
+                nameof(package),
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(package)));
+        }
 
         return new OdfScriptManager(package);
     }
@@ -33,7 +37,11 @@ public static class OdfScriptingExtensions
     public static OdfScriptManager Scripting(this OdfDocument document)
     {
         if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        {
+            throw new ArgumentNullException(
+                nameof(document),
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(document)));
+        }
 
         bool supportsPackageScripts = document.DocumentKind is not (
             OdfKit.Compliance.OdfDocumentKind.FlatText or

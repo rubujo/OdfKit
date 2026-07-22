@@ -131,12 +131,13 @@ public class OdfCoverageContractTests
         Assert.Contains("System.IO.Compression.ZipFile", jingBaseline);
         Assert.Contains("ArgumentList.Add(\"-i\")", jingBaseline);
         Assert.Contains("FormulaTemplate\", \"FlatFormula", jingBaseline);
+        Assert.Contains("OpenDocument-schema-v1.0-os.rng", jingBaseline);
         Assert.Contains("OpenDocument-schema-v1.1.rng", jingBaseline);
         Assert.Contains("OpenDocument-v1.4-schema.rng", jingBaseline);
         Assert.Contains("InternalBaselineVersions", corpusScript);
         Assert.Contains("InternalBaselineExcludedKinds", corpusScript);
         Assert.Contains("InternalBaselinePackageOnly", corpusScript);
-        Assert.Contains("-InternalBaselineVersions '1.1', '1.2', '1.3', '1.4'", workflow);
+        Assert.Contains("-InternalBaselineVersions '1.0', '1.1', '1.2', '1.3', '1.4'", workflow);
         Assert.Contains("-InternalBaselineExcludedKinds 'Database', 'Formula', 'FormulaTemplate'", workflow);
         Assert.Contains("Test-OdfRelaxNgBaseline.ps1", workflow);
         Assert.Contains("OdfCorpusGenerator", workflow);

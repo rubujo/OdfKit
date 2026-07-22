@@ -125,7 +125,7 @@ OdfKit 因此採下列可機器驗證的契約：
 pwsh eng/Test-CiResourcePolicy.ps1
 ```
 
-Jing 20241231 會直接以 repo 內 OASIS ODF 1.1～1.4 schema 驗證該 schema 適用的 flat 文件，
+Jing 20241231 會直接以 repo 內 OASIS ODF 1.0～1.4 schema 驗證該 schema 適用的 flat 文件，
 以及 ZIP package 的 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml`。通用 schema
 未定義 `office:formula`，所以 Formula／FormulaTemplate／FlatFormula 由 Jing 報告明列排除，
 並保留在內部 package gate。ODF Validator 0.13.0

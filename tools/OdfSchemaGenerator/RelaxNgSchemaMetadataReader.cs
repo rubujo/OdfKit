@@ -289,6 +289,7 @@ public sealed class RelaxNgSchemaMetadataReader
             roots.Add(CreatePatternNode(child, "exactlyOne", insideExcept: false));
         }
 
+        WrapSequenceRoots(roots);
         AddPatternRoots(pattern, roots, combine);
 
         ReadDefineElement(document.Root, pattern, state, "exactlyOne", insideExcept: false);
@@ -376,6 +377,19 @@ public sealed class RelaxNgSchemaMetadataReader
         combined.Children.AddRange(roots);
         pattern.PatternTree.Clear();
         pattern.PatternTree.Add(combined);
+    }
+
+    private static void WrapSequenceRoots(List<SchemaPatternNodeMetadata> roots)
+    {
+        if (roots.Count <= 1)
+        {
+            return;
+        }
+
+        var group = new SchemaPatternNodeMetadata { Kind = "group" };
+        group.Children.AddRange(roots);
+        roots.Clear();
+        roots.Add(group);
     }
 
     private static SchemaPatternNodeMetadata CreatePatternNode(
@@ -627,49 +641,72 @@ public sealed class RelaxNgSchemaMetadataReader
 
     private static void AddName(XElement element, Dictionary<string, SchemaNameMetadata> names)
     {
-        string? name = (string?)element.Attribute("name");
-        if (string.IsNullOrWhiteSpace(name))
+        foreach (SchemaNameMetadata parsed in ParseDeclaredNames(element))
         {
-            return;
+            names[parsed.NamespaceUri + "\u001f" + parsed.LocalName] = parsed;
         }
-
-        SchemaNameMetadata? parsed = ParseName(element, name);
-        if (parsed == null)
-        {
-            return;
-        }
-
-        names[parsed.NamespaceUri + "\u001f" + parsed.LocalName] = parsed;
     }
 
     private static void AddPatternNameUse(XElement element, List<SchemaPatternNameUseMetadata> names, string occurrence)
     {
-        string? name = (string?)element.Attribute("name");
-        if (string.IsNullOrWhiteSpace(name))
+        foreach (SchemaNameMetadata parsed in ParseDeclaredNames(element))
         {
-            return;
+            if (names.Any(item =>
+                string.Equals(item.NamespaceUri, parsed.NamespaceUri, StringComparison.Ordinal) &&
+                string.Equals(item.LocalName, parsed.LocalName, StringComparison.Ordinal) &&
+                string.Equals(item.Occurrence, occurrence, StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
+            names.Add(new SchemaPatternNameUseMetadata
+            {
+                NamespaceUri = parsed.NamespaceUri,
+                LocalName = parsed.LocalName,
+                Occurrence = occurrence
+            });
+        }
+    }
+
+    private static IEnumerable<SchemaNameMetadata> ParseDeclaredNames(XElement element)
+    {
+        string? attributeName = (string?)element.Attribute("name");
+        if (!string.IsNullOrWhiteSpace(attributeName))
+        {
+            SchemaNameMetadata? parsedAttribute = ParseName(element, attributeName);
+            if (parsedAttribute is not null)
+            {
+                yield return parsedAttribute;
+            }
+
+            yield break;
         }
 
-        SchemaNameMetadata? parsed = ParseName(element, name);
-        if (parsed == null)
+        XElement? nameClassRoot = element.Elements().FirstOrDefault();
+        if (nameClassRoot is null ||
+            nameClassRoot.Name.NamespaceName != RelaxNgNamespace ||
+            (nameClassRoot.Name.LocalName != "name" &&
+             nameClassRoot.Name.LocalName != "choice"))
         {
-            return;
+            yield break;
         }
 
-        if (names.Any(item =>
-            string.Equals(item.NamespaceUri, parsed.NamespaceUri, StringComparison.Ordinal) &&
-            string.Equals(item.LocalName, parsed.LocalName, StringComparison.Ordinal) &&
-            string.Equals(item.Occurrence, occurrence, StringComparison.Ordinal)))
+        foreach (XElement nameElement in nameClassRoot.DescendantsAndSelf().Where(candidate =>
+            candidate.Name.NamespaceName == RelaxNgNamespace &&
+            candidate.Name.LocalName == "name" &&
+            !candidate.Ancestors().TakeWhile(ancestor => ancestor != element).Any(ancestor =>
+                ancestor.Name.NamespaceName == RelaxNgNamespace &&
+                ancestor.Name.LocalName == "except")))
         {
-            return;
+            string childName = nameElement.Value.Trim();
+            SchemaNameMetadata? parsedName = string.IsNullOrWhiteSpace(childName)
+                ? null
+                : ParseName(nameElement, childName);
+            if (parsedName is not null)
+            {
+                yield return parsedName;
+            }
         }
-
-        names.Add(new SchemaPatternNameUseMetadata
-        {
-            NamespaceUri = parsed.NamespaceUri,
-            LocalName = parsed.LocalName,
-            Occurrence = occurrence
-        });
     }
 
     private static SchemaNameMetadata? ParseName(XElement element, string name)

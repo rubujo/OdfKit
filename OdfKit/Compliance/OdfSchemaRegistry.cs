@@ -16,16 +16,19 @@ public static class OdfSchemaRegistry
     private static readonly Uri Odf13SchemaSource = new("https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng");
     private static readonly Uri Odf12SchemaSource = new("https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng");
     private static readonly Uri Odf11SchemaSource = new("https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng");
+    private static readonly Uri Odf10SchemaSource = new("https://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng");
     private static readonly OdfSchemaSet Odf14Seed = CreateOdf14Seed();
     private static readonly OdfSchemaSet Odf14Default = OdfGeneratedSchemaProvider.CreateOdf14(Odf14Seed);
 
-    // ODF 1.1/1.2/1.3：以官方獨立 RNG 衍生的真實版本專屬 schema（非從 1.4 過濾的近似值）。
+    // ODF 1.0/1.1/1.2/1.3：以官方獨立 RNG 衍生的真實版本專屬 schema（非從 1.4 過濾的近似值）。
     private static readonly OdfSchemaSet Odf13Default = OdfGeneratedSchemaProvider.CreateOdf13(
         CreateSeed(OdfVersion.Odf13, Odf13SchemaSource, "2026-06-16"));
     private static readonly OdfSchemaSet Odf12Default = OdfGeneratedSchemaProvider.CreateOdf12(
         CreateSeed(OdfVersion.Odf12, Odf12SchemaSource, "2026-06-16"));
     private static readonly OdfSchemaSet Odf11Default = OdfGeneratedSchemaProvider.CreateOdf11(
         CreateSeed(OdfVersion.Odf11, Odf11SchemaSource, "2026-06-16"));
+    private static readonly OdfSchemaSet Odf10Default = OdfGeneratedSchemaProvider.CreateOdf10(
+        CreateSeed(OdfVersion.Odf10, Odf10SchemaSource, "2005-05-01"));
 
     private static readonly Dictionary<OdfVersion, OdfSchemaSet> RegisteredSchemas = [];
 
@@ -48,12 +51,11 @@ public static class OdfSchemaRegistry
 
     /// <summary>
     /// 指出指定版本是否有官方獨立 RNG 衍生的真實 schema（而非以 1.4 schema 近似的 best-effort 結果）。
-    /// 目前 ODF 1.1/1.2/1.3/1.4 皆有官方 RNG；ODF 1.0 因 OASIS 未發布獨立 RNG，
-    /// 仍維持以 1.4 schema 近似驗證。
+    /// 目前 ODF 1.0～1.4 皆有官方 RNG。
     /// </summary>
     internal static bool HasNativeSchema(OdfVersion version)
     {
-        return version is OdfVersion.Odf11 or OdfVersion.Odf12 or OdfVersion.Odf13 or OdfVersion.Odf14;
+        return version is OdfVersion.Odf10 or OdfVersion.Odf11 or OdfVersion.Odf12 or OdfVersion.Odf13 or OdfVersion.Odf14;
     }
 
     /// <summary>
@@ -123,10 +125,9 @@ public static class OdfSchemaRegistry
                 return Odf12Default;
             case OdfVersion.Odf11:
                 return Odf11Default;
+            case OdfVersion.Odf10:
+                return Odf10Default;
             default:
-                // ODF 1.0：OASIS 從未發布獨立 RNG schema 檔案（官方目錄僅提供規格 PDF），
-                // 因此沒有真實 schema 可用。此處維持既有的已知限制：以 ODF 1.4 schema
-                // 進行 best-effort 近似驗證（過濾掉不支援該版本的元素與屬性）。
                 var schema = CreateApproximateSchema(version, Odf14Default);
                 RegisteredSchemas[version] = schema;
                 return schema;

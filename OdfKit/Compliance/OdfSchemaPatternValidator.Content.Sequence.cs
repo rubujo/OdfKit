@@ -160,7 +160,15 @@ internal static partial class OdfSchemaPatternContentMatcher
         var matches = new HashSet<int>();
         foreach (OdfSchemaPatternNode root in pattern.Roots)
         {
-            foreach (int matched in MatchContentNode(root, parent, childElements, index, context))
+            OdfSchemaPatternNode? contentRoot =
+                OdfSchemaPatternAttributeMatcher.StripAttributePatterns(root, context);
+            if (contentRoot is null)
+            {
+                matches.Add(index);
+                continue;
+            }
+
+            foreach (int matched in MatchContentNode(contentRoot, parent, childElements, index, context))
             {
                 matches.Add(matched);
             }
@@ -194,12 +202,14 @@ internal static partial class OdfSchemaPatternContentMatcher
         int index,
         OdfSchemaPatternMatchContext context)
     {
+        IReadOnlyList<OdfSchemaPatternNode> interleavedNodes =
+            ExpandInterleaveReferences(node.Children, context);
         var matches = new HashSet<int>();
-        var used = new bool[node.Children.Count];
-        var oneOrMoreSatisfied = new bool[node.Children.Count];
+        var used = new bool[interleavedNodes.Count];
+        var oneOrMoreSatisfied = new bool[interleavedNodes.Count];
         var visited = new HashSet<string>();
         MatchInterleaveRecursive(
-            node.Children,
+            interleavedNodes,
             parent,
             childElements,
             index,
@@ -209,6 +219,43 @@ internal static partial class OdfSchemaPatternContentMatcher
             visited,
             matches);
         return matches;
+    }
+
+    private static IReadOnlyList<OdfSchemaPatternNode> ExpandInterleaveReferences(
+        IReadOnlyList<OdfSchemaPatternNode> nodes,
+        OdfSchemaPatternMatchContext context)
+    {
+        var expanded = new List<OdfSchemaPatternNode>(nodes.Count);
+        foreach (OdfSchemaPatternNode node in nodes)
+        {
+            if (node.Kind != OdfSchemaPatternNodeKind.Ref ||
+                string.IsNullOrWhiteSpace(node.ReferenceName) ||
+                !context.EnterReference(node.ReferenceName))
+            {
+                expanded.Add(node);
+                continue;
+            }
+
+            try
+            {
+                OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
+                if (pattern?.Roots.Count == 1 &&
+                    pattern.Roots[0].Kind == OdfSchemaPatternNodeKind.Interleave)
+                {
+                    expanded.AddRange(ExpandInterleaveReferences(pattern.Roots[0].Children, context));
+                }
+                else
+                {
+                    expanded.Add(node);
+                }
+            }
+            finally
+            {
+                context.LeaveReference(node.ReferenceName);
+            }
+        }
+
+        return expanded;
     }
 
     #endregion

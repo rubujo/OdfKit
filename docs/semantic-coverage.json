@@ -4,7 +4,7 @@
   "legacyVersionPolicy": "normalize-to-1.4-preserve-unknown",
   "operations": ["Create", "Get", "Find", "Set", "Update", "Remove", "Clear", "RoundTrip", "Interop"],
   "legacyVersionEvidence": {
-    "versions": ["1.1", "1.2", "1.3"],
+    "versions": ["1.0", "1.1", "1.2", "1.3"],
     "formats": ["ODT", "ODS", "ODP", "ODG"],
     "test": "OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs",
     "symbol": "LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent"

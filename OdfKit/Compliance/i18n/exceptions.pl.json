@@ -604,5 +604,11 @@
   "Err_WebFont_ProcessFailedWithDetail": "Proces WebFont nie powiódł się: {0}",
   "Err_WebFont_QueueFull": "Kolejka zadań WebFont jest pełna.",
   "Err_WebFont_UnmappedByte": "Starszy bajt pod przesunięciem {0} nie jest zmapowany.",
-  "Err_OdfPackage_TransactionJournalFailed": "Nie udało się przetworzyć dziennika transakcji pakietu ODF."
+  "Err_OdfPackage_TransactionJournalFailed": "Nie udało się przetworzyć dziennika transakcji pakietu ODF.",
+  "Err_OdfScriptManager_ArgumentNull": "Argument {0} nie może mieć wartości null.",
+  "Err_OdfScriptManager_InvalidArgument": "Argument {0} jest nieprawidłowy dla zarządzania skryptami.",
+  "Err_OdfScriptManager_UnsupportedOperation": "Ten dokument nie obsługuje żądanej operacji zarządzania skryptami.",
+  "Err_OdfScriptManager_InvalidDocumentStructure": "W metadanych skryptu dokumentu brakuje wymaganej struktury.",
+  "Err_OdfScriptManager_IndexOutOfRange": "Pod indeksem {0} nie istnieje żaden element skryptu.",
+  "Err_OdfScriptManager_UnsupportedVersion": "Dokument używa wersji ODF nieobsługiwanej przez zarządzanie skryptami."
 }

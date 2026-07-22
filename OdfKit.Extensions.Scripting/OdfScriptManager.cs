@@ -76,7 +76,9 @@ public sealed partial class OdfScriptManager
     {
         ValidateRequired(language, nameof(language));
         if (source is null)
-            throw new ArgumentNullException(nameof(source));
+            throw new ArgumentNullException(
+                nameof(source),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
 
         int addedIndex = -1;
         MutateContent(root =>
@@ -102,11 +104,13 @@ public sealed partial class OdfScriptManager
     {
         ValidateRequired(language, nameof(language));
         if (source is null)
-            throw new ArgumentNullException(nameof(source));
+            throw new ArgumentNullException(
+                nameof(source),
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
 
         MutateContent(root =>
         {
-            OdfNode script = GetIndexedChild(GetRequiredScripts(root), "script", OdfNamespaces.Office, index);
+            OdfNode script = GetIndexedChild(GetRequiredScripts(root, index), "script", OdfNamespaces.Office, index);
             script.SetAttribute("language", OdfNamespaces.Script, language, "script");
             script.TextContent = source;
         });
@@ -121,7 +125,7 @@ public sealed partial class OdfScriptManager
     {
         MutateContent(root =>
         {
-            OdfNode scripts = GetRequiredScripts(root);
+            OdfNode scripts = GetRequiredScripts(root, index);
             OdfNode script = GetIndexedChild(scripts, "script", OdfNamespaces.Office, index);
             scripts.RemoveChild(script);
             RemoveEmptyScriptContainers(root, scripts);
@@ -216,9 +220,9 @@ public sealed partial class OdfScriptManager
 
         MutateContent(root =>
         {
-            OdfNode scripts = GetRequiredScripts(root);
+            OdfNode scripts = GetRequiredScripts(root, index);
             OdfNode listeners = scripts.FindChildElement("event-listeners", OdfNamespaces.Office)
-                ?? throw new ArgumentOutOfRangeException(nameof(index));
+                ?? throw CreateIndexOutOfRangeException(index);
             OdfNode existing = GetIndexedChild(listeners, "event-listener", OdfNamespaces.Script, index);
             listeners.InsertBefore(CreateEventListener(eventName, language, target, targetKind), existing);
             listeners.RemoveChild(existing);
@@ -234,9 +238,9 @@ public sealed partial class OdfScriptManager
     {
         MutateContent(root =>
         {
-            OdfNode scripts = GetRequiredScripts(root);
+            OdfNode scripts = GetRequiredScripts(root, index);
             OdfNode listeners = scripts.FindChildElement("event-listeners", OdfNamespaces.Office)
-                ?? throw new ArgumentOutOfRangeException(nameof(index));
+                ?? throw CreateIndexOutOfRangeException(index);
             OdfNode listener = GetIndexedChild(listeners, "event-listener", OdfNamespaces.Script, index);
             listeners.RemoveChild(listener);
             if (listeners.Children.Count == 0)
@@ -248,7 +252,12 @@ public sealed partial class OdfScriptManager
     private static void ValidateTargetKind(OdfScriptTargetKind targetKind)
     {
         if (targetKind is not OdfScriptTargetKind.MacroName and not OdfScriptTargetKind.Uri)
-            throw new ArgumentOutOfRangeException(nameof(targetKind));
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(targetKind),
+                targetKind,
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(targetKind)));
+        }
     }
 
     private static OdfNode CreateEventListener(
@@ -294,13 +303,13 @@ public sealed partial class OdfScriptManager
     private static void EnsureSupportedVersion(OdfNode root)
     {
         if (root.GetDocumentVersion() is not (OdfVersion.Odf10 or OdfVersion.Odf11 or OdfVersion.Odf12 or OdfVersion.Odf13 or OdfVersion.Odf14))
-            throw new NotSupportedException();
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfScriptManager_UnsupportedVersion"));
     }
 
     private static OdfNode? FindScripts(OdfNode root) => root.FindChildElement("scripts", OdfNamespaces.Office);
 
-    private static OdfNode GetRequiredScripts(OdfNode root) =>
-        FindScripts(root) ?? throw new ArgumentOutOfRangeException("index");
+    private static OdfNode GetRequiredScripts(OdfNode root, int index) =>
+        FindScripts(root) ?? throw CreateIndexOutOfRangeException(index);
 
     private static OdfNode GetOrCreateScripts(OdfNode root)
     {
@@ -342,7 +351,7 @@ public sealed partial class OdfScriptManager
     private static OdfNode GetIndexedChild(OdfNode parent, string localName, string namespaceUri, int index)
     {
         if (index < 0)
-            throw new ArgumentOutOfRangeException(nameof(index));
+            throw CreateIndexOutOfRangeException(index);
 
         int current = 0;
         foreach (OdfNode child in parent.Children)
@@ -353,7 +362,7 @@ public sealed partial class OdfScriptManager
                 return child;
         }
 
-        throw new ArgumentOutOfRangeException(nameof(index));
+        throw CreateIndexOutOfRangeException(index);
     }
 
     private static bool IsElement(OdfNode node, string localName, string namespaceUri) =>
@@ -370,10 +379,24 @@ public sealed partial class OdfScriptManager
     private static void ValidateRequired(string? value, string parameterName)
     {
         if (value is null)
-            throw new ArgumentNullException(parameterName);
+        {
+            throw new ArgumentNullException(
+                parameterName,
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", parameterName));
+        }
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException(null, parameterName);
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", parameterName),
+                parameterName);
+        }
     }
+
+    private static ArgumentOutOfRangeException CreateIndexOutOfRangeException(int index) =>
+        new(
+            nameof(index),
+            index,
+            OdfLocalizer.GetMessage("Err_OdfScriptManager_IndexOutOfRange", index));
 
     private void RemoveInvalidatedMacroSignatures()
     {

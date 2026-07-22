@@ -44,12 +44,28 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         OdfSchemaPatternMatchContext context)
     {
         var states = new HashSet<BigInteger> { state };
-        foreach (OdfSchemaPatternNode node in nodes)
+        for (int nodeIndex = 0; nodeIndex < nodes.Count; nodeIndex++)
         {
+            OdfSchemaPatternNode node = nodes[nodeIndex];
             var next = new HashSet<BigInteger>();
             foreach (BigInteger current in states)
             {
-                foreach (BigInteger matched in MatchAttributePatternNode(node, attributes, current, context))
+                HashSet<BigInteger> nodeMatches =
+                    MatchAttributePatternNode(node, attributes, current, context);
+                if (nodeMatches.Contains(current) &&
+                    nodeMatches.Any(matched => matched != current &&
+                        NewlyConsumedAttributesCannotMatchLater(
+                            nodes,
+                            nodeIndex + 1,
+                            attributes,
+                            current,
+                            matched,
+                            context)))
+                {
+                    nodeMatches.Remove(current);
+                }
+
+                foreach (BigInteger matched in nodeMatches)
                 {
                     next.Add(matched);
                 }
@@ -64,6 +80,36 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         }
 
         return states;
+    }
+
+    private static bool NewlyConsumedAttributesCannotMatchLater(
+        IReadOnlyList<OdfSchemaPatternNode> nodes,
+        int nextNodeIndex,
+        IReadOnlyList<XAttribute> attributes,
+        BigInteger previousState,
+        BigInteger matchedState,
+        OdfSchemaPatternMatchContext context)
+    {
+        BigInteger newlyConsumed = matchedState & ~previousState;
+        for (int attributeIndex = 0; attributeIndex < attributes.Count; attributeIndex++)
+        {
+            BigInteger bit = BigInteger.One << attributeIndex;
+            if ((newlyConsumed & bit) == BigInteger.Zero)
+            {
+                continue;
+            }
+
+            XAttribute attribute = attributes[attributeIndex];
+            for (int nodeIndex = nextNodeIndex; nodeIndex < nodes.Count; nodeIndex++)
+            {
+                if (AttributePatternAllowsAttribute(nodes[nodeIndex], attribute, context))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return newlyConsumed != BigInteger.Zero;
     }
 
     private static HashSet<BigInteger> MatchAttributePatternNode(
@@ -96,7 +142,10 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             case OdfSchemaPatternNodeKind.Empty:
                 return new HashSet<BigInteger> { state };
             default:
-                return new HashSet<BigInteger>();
+                // 元素、文字與資料型別節點描述內容，不會消耗屬性。它們可能與屬性節點
+                // 同處於 group 或 choice；在屬性投影中必須保留目前狀態，否則合法的
+                // 「屬性 + 文字值」分支會被誤判為無法匹配。
+                return new HashSet<BigInteger> { state };
         }
     }
 

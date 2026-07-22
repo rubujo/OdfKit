@@ -3,12 +3,12 @@
 .SYNOPSIS
     依 OASIS schema manifest 產生官方 schema provider 與／或 typed DOM wrappers。
 .DESCRIPTION
-    預設重產 ODF 1.1～1.4 schema provider，以及 ODF 1.4 typed DOM wrappers
+    預設重產 ODF 1.0～1.4 schema provider，以及 ODF 1.4 typed DOM wrappers
     （OdfKit/DOM/Generated）。DOM wrappers 禁止手改；ctor／多載形狀僅能改
     tools/OdfSchemaGenerator 後重跑本腳本。
 
 .PARAMETER ManifestPath
-    Manifest 相對路徑清單。省略時使用內建預設（四版 schema + DOM wrappers）。
+    Manifest 相對路徑清單。省略時使用內建預設（五版 schema + DOM wrappers）。
 #>
 param(
     [string[]] $ManifestPath = @(
@@ -16,6 +16,7 @@ param(
         "tools/OdfSchemaGenerator/oasis-odf13-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf12-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf11-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf10-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf14-dom-wrappers.json"
     )
 )

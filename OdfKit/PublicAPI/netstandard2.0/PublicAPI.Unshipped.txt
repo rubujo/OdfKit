@@ -11847,6 +11847,10 @@ OdfKit.DOM.TextBookmarkEndElement.Name.set -> void
 OdfKit.DOM.TextBookmarkEndElement.TextBookmarkEndElement() -> void
 OdfKit.DOM.TextBookmarkEndElement.TextBookmarkEndElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextBookmarkEndElement.TextBookmarkEndElement(string? prefix) -> void
+OdfKit.DOM.TextBookmarkRefElement
+OdfKit.DOM.TextBookmarkRefElement.TextBookmarkRefElement() -> void
+OdfKit.DOM.TextBookmarkRefElement.TextBookmarkRefElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextBookmarkRefElement.TextBookmarkRefElement(string? prefix) -> void
 OdfKit.DOM.TextBookmarkStartElement
 OdfKit.DOM.TextBookmarkStartElement.About.get -> string?
 OdfKit.DOM.TextBookmarkStartElement.About.set -> void
@@ -11900,6 +11904,10 @@ OdfKit.DOM.TextChapterElement.OutlineLevel.set -> void
 OdfKit.DOM.TextChapterElement.TextChapterElement() -> void
 OdfKit.DOM.TextChapterElement.TextChapterElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextChapterElement.TextChapterElement(string? prefix) -> void
+OdfKit.DOM.TextCharacterCountElement
+OdfKit.DOM.TextCharacterCountElement.TextCharacterCountElement() -> void
+OdfKit.DOM.TextCharacterCountElement.TextCharacterCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextCharacterCountElement.TextCharacterCountElement(string? prefix) -> void
 OdfKit.DOM.TextConditionalTextElement
 OdfKit.DOM.TextConditionalTextElement.Condition.get -> string?
 OdfKit.DOM.TextConditionalTextElement.Condition.set -> void
@@ -12351,6 +12359,10 @@ OdfKit.DOM.TextIllustrationIndexSourceElement.TextIllustrationIndexSourceElement
 OdfKit.DOM.TextIllustrationIndexSourceElement.TextIndexTitleTemplateChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.TextIndexTitleTemplateElement!>!
 OdfKit.DOM.TextIllustrationIndexSourceElement.UseCaption.get -> bool?
 OdfKit.DOM.TextIllustrationIndexSourceElement.UseCaption.set -> void
+OdfKit.DOM.TextImageCountElement
+OdfKit.DOM.TextImageCountElement.TextImageCountElement() -> void
+OdfKit.DOM.TextImageCountElement.TextImageCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextImageCountElement.TextImageCountElement(string? prefix) -> void
 OdfKit.DOM.TextIndexBodyElement
 OdfKit.DOM.TextIndexBodyElement.Dr3dSceneChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.Dr3dSceneElement!>!
 OdfKit.DOM.TextIndexBodyElement.DrawAChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.DrawAElement!>!
@@ -13052,6 +13064,10 @@ OdfKit.DOM.TextNumberElement
 OdfKit.DOM.TextNumberElement.TextNumberElement() -> void
 OdfKit.DOM.TextNumberElement.TextNumberElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextNumberElement.TextNumberElement(string? prefix) -> void
+OdfKit.DOM.TextObjectCountElement
+OdfKit.DOM.TextObjectCountElement.TextObjectCountElement() -> void
+OdfKit.DOM.TextObjectCountElement.TextObjectCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextObjectCountElement.TextObjectCountElement(string? prefix) -> void
 OdfKit.DOM.TextObjectIndexElement
 OdfKit.DOM.TextObjectIndexElement.Id.get -> OdfKit.DOM.OdfXmlName?
 OdfKit.DOM.TextObjectIndexElement.Id.set -> void
@@ -13142,6 +13158,10 @@ OdfKit.DOM.TextPageContinuationElement.StringValue.set -> void
 OdfKit.DOM.TextPageContinuationElement.TextPageContinuationElement() -> void
 OdfKit.DOM.TextPageContinuationElement.TextPageContinuationElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextPageContinuationElement.TextPageContinuationElement(string? prefix) -> void
+OdfKit.DOM.TextPageCountElement
+OdfKit.DOM.TextPageCountElement.TextPageCountElement() -> void
+OdfKit.DOM.TextPageCountElement.TextPageCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextPageCountElement.TextPageCountElement(string? prefix) -> void
 OdfKit.DOM.TextPageElement
 OdfKit.DOM.TextPageElement.MasterPageName.get -> OdfKit.DOM.OdfStyleName?
 OdfKit.DOM.TextPageElement.MasterPageName.set -> void
@@ -13183,6 +13203,10 @@ OdfKit.DOM.TextPageVariableSetElement.PageAdjust.set -> void
 OdfKit.DOM.TextPageVariableSetElement.TextPageVariableSetElement() -> void
 OdfKit.DOM.TextPageVariableSetElement.TextPageVariableSetElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextPageVariableSetElement.TextPageVariableSetElement(string? prefix) -> void
+OdfKit.DOM.TextParagraphCountElement
+OdfKit.DOM.TextParagraphCountElement.TextParagraphCountElement() -> void
+OdfKit.DOM.TextParagraphCountElement.TextParagraphCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextParagraphCountElement.TextParagraphCountElement(string? prefix) -> void
 OdfKit.DOM.TextPElement
 OdfKit.DOM.TextPElement.Dr3dSceneChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.Dr3dSceneElement!>!
 OdfKit.DOM.TextPElement.DrawAChildElements.get -> System.Collections.Generic.IEnumerable<OdfKit.DOM.DrawAElement!>!
@@ -13359,6 +13383,10 @@ OdfKit.DOM.TextReferenceMarkStartElement.Name.set -> void
 OdfKit.DOM.TextReferenceMarkStartElement.TextReferenceMarkStartElement() -> void
 OdfKit.DOM.TextReferenceMarkStartElement.TextReferenceMarkStartElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextReferenceMarkStartElement.TextReferenceMarkStartElement(string? prefix) -> void
+OdfKit.DOM.TextReferenceRefElement
+OdfKit.DOM.TextReferenceRefElement.TextReferenceRefElement() -> void
+OdfKit.DOM.TextReferenceRefElement.TextReferenceRefElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextReferenceRefElement.TextReferenceRefElement(string? prefix) -> void
 OdfKit.DOM.TextRubyBaseElement
 OdfKit.DOM.TextRubyBaseElement.TextRubyBaseElement() -> void
 OdfKit.DOM.TextRubyBaseElement.TextRubyBaseElement(params OdfKit.DOM.OdfNode![]! children) -> void
@@ -13729,6 +13757,10 @@ OdfKit.DOM.TextTabElement.TabRef.set -> void
 OdfKit.DOM.TextTabElement.TextTabElement() -> void
 OdfKit.DOM.TextTabElement.TextTabElement(params OdfKit.DOM.OdfNode![]! children) -> void
 OdfKit.DOM.TextTabElement.TextTabElement(string? prefix) -> void
+OdfKit.DOM.TextTableCountElement
+OdfKit.DOM.TextTableCountElement.TextTableCountElement() -> void
+OdfKit.DOM.TextTableCountElement.TextTableCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextTableCountElement.TextTableCountElement(string? prefix) -> void
 OdfKit.DOM.TextTableFormulaElement
 OdfKit.DOM.TextTableFormulaElement.DataStyleName.get -> OdfKit.DOM.OdfStyleName?
 OdfKit.DOM.TextTableFormulaElement.DataStyleName.set -> void
@@ -14113,6 +14145,10 @@ OdfKit.DOM.TextVariableSetElement.Value.get -> decimal?
 OdfKit.DOM.TextVariableSetElement.Value.set -> void
 OdfKit.DOM.TextVariableSetElement.ValueType.get -> string?
 OdfKit.DOM.TextVariableSetElement.ValueType.set -> void
+OdfKit.DOM.TextWordCountElement
+OdfKit.DOM.TextWordCountElement.TextWordCountElement() -> void
+OdfKit.DOM.TextWordCountElement.TextWordCountElement(params OdfKit.DOM.OdfNode![]! children) -> void
+OdfKit.DOM.TextWordCountElement.TextWordCountElement(string? prefix) -> void
 OdfKit.DOM.XformsModelElement
 OdfKit.DOM.XformsModelElement.XformsModelElement() -> void
 OdfKit.DOM.XformsModelElement.XformsModelElement(params OdfKit.DOM.OdfNode![]! children) -> void

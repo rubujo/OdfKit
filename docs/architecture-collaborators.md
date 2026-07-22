@@ -22,7 +22,7 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 | 串流郵件合併 | `OdfStreamingMailMerge` | 本體；`.Segments`；`.ExpressionCache` |
 | 文字 | `TextDocument` | TrackChanges／FormFields／Html*／*Collaborators* |
 | 在地化 | `OdfLocalizer` | JSON `Compliance/i18n` → 產生 `Exceptions.<culture>.cs` |
-| Schema | `Odf*OfficialSchemaProvider`（1.1～1.4） | **產生碼**；多版內建以利 ODF **封存／存量流通**；**非目標**拆成可選 NuGet（見 [maintainability.md](maintainability.md)「Schema 與流通性」） |
+| Schema | `Odf*OfficialSchemaProvider`（1.0～1.4） | **產生碼**；多版內建以利 ODF **封存／存量流通**；**非目標**拆成可選 NuGet（見 [maintainability.md](maintainability.md)「Schema 與流通性」） |
 
 ## 刻意保留的大型面
 

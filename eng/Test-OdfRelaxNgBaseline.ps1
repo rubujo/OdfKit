@@ -14,6 +14,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $schemas = @{
+    "1.0" = "OpenDocument-schema-v1.0-os.rng"
     "1.1" = "OpenDocument-schema-v1.1.rng"
     "1.2" = "OpenDocument-v1.2-os-schema.rng"
     "1.3" = "OpenDocument-v1.3-schema.rng"

@@ -26,3 +26,6 @@ LICENSE text eol=crlf
 *.zip binary
 *.dll binary
 *.exe binary
+
+# 逐位元組保留 OASIS 官方 schema，包括來源中的行尾空白。
+tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.0-os.rng -text whitespace=-blank-at-eol

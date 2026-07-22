@@ -804,7 +804,7 @@ namespace OdfKit.Tests
                 "<text:sequence-ref xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">P1DT2H</text:sequence-ref>");
             XElement validUri = XElement.Parse(
                 "<draw:image xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"Pictures/image.png\" />");
-            XElement invalidUri = XElement.Parse(
+            XElement validUriWithSpace = XElement.Parse(
                 "<draw:image xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"bad uri\" />");
             XElement validNCName = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">Style_1</text:span>");
@@ -848,7 +848,7 @@ namespace OdfKit.Tests
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validTime, schema, "time-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidTime, schema, "time-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validUri, schema, "uri-attribute").IsMatch);
-            Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidUri, schema, "uri-attribute").IsMatch);
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(validUriWithSpace, schema, "uri-attribute").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validNCName, schema, "ncname-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidNCName, schema, "ncname-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validQName, schema, "qname-text").IsMatch);
@@ -882,6 +882,22 @@ namespace OdfKit.Tests
                 provided.SourceUrl.ToString());
             Assert.Equal("2025-10-06", provided.SourceDate);
             Assert.NotNull(provided.FindPattern("start"));
+        }
+
+        [Fact]
+        public void SchemaRegistryUsesOfficialOdf10GeneratedProvider()
+        {
+            OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(OdfVersion.Odf10);
+            OdfSchemaSet provided = OdfGeneratedSchemaProvider.CreateOdf10(schema);
+
+            Assert.NotSame(schema, provided);
+            Assert.Equal(OdfVersion.Odf10, provided.Version);
+            Assert.Equal(
+                "https://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng",
+                provided.SourceUrl.ToString());
+            Assert.Equal("2005-05-01", provided.SourceDate);
+            Assert.NotNull(provided.FindPattern("start"));
+            Assert.NotNull(provided.FindElement(OdfNamespaces.Office, "document-content"));
         }
 
         [Fact]
@@ -1249,6 +1265,26 @@ namespace OdfKit.Tests
             Assert.DoesNotContain(report.Issues, issue =>
                 issue.RuleId == "ODF0104" &&
                 issue.PackagePath == "Object 1/");
+        }
+
+        [Fact]
+        public void ValidatorDoesNotRequireZipDirectoryEntriesInManifest()
+        {
+            using MemoryStream ms = CreateZipWithCustomManifestEntries(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.4"),
+                [],
+                extraPackageEntries:
+                [
+                    new KeyValuePair<string, string>("META-INF/", string.Empty)
+                ]);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            Assert.DoesNotContain(report.Issues, issue =>
+                issue.RuleId == "ODF0102" &&
+                issue.PackagePath == "META-INF/");
         }
 
         [Fact]
