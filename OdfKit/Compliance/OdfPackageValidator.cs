@@ -95,6 +95,7 @@ public static partial class OdfPackageValidator
         ValidateEntryPaths(package, profileId, issues);
 
         OdfVersion detectedVersion = DetectVersion(package, issues, profileId);
+        ValidateCoreXmlVersions(package, detectedVersion, issues, profileId);
         ValidateManifest(package, mimeType, detectedVersion, profileId, issues);
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
         if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)

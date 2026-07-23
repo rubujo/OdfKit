@@ -275,14 +275,55 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         var context = new ExtendedEvaluationContext();
 
         object[,] coefficients = Assert.IsType<object[,]>(
-            evaluator.Evaluate("LINEST({3|4|8};{1;0|0;1|2;1})", context));
+            evaluator.Evaluate("LINEST({3|4|8|9};{1;0|0;1|2;1|1;2})", context));
         Assert.Equal(3d, Assert.IsType<double>(coefficients[0, 0]), 8);
         Assert.Equal(2d, Assert.IsType<double>(coefficients[0, 1]), 8);
         Assert.Equal(1d, Assert.IsType<double>(coefficients[0, 2]), 8);
 
         object[,] predictions = Assert.IsType<object[,]>(
-            evaluator.Evaluate("TREND({3|4|8};{1;0|0;1|2;1};{3;1})", context));
+            evaluator.Evaluate("TREND({3|4|8|9};{1;0|0;1|2;1|1;2};{3;1})", context));
         Assert.Equal(10d, Assert.IsType<double>(predictions[0, 0]), 8);
+    }
+
+    /// <summary>
+    /// Verifies the complete five-row LINEST statistics result.
+    /// 驗證 LINEST 完整五列統計結果。
+    /// </summary>
+    [Fact]
+    public void LinestReturnsCompleteStatistics()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        object[,] statistics = Assert.IsType<object[,]>(evaluator.Evaluate(
+            "LINEST({3|4|8|9|12};{1;0|0;1|2;1|1;2|2;2};TRUE();TRUE())",
+            context));
+
+        Assert.Equal(5, statistics.GetLength(0));
+        Assert.Equal(3, statistics.GetLength(1));
+        Assert.InRange(Assert.IsType<double>(statistics[2, 0]), 0, 1);
+        Assert.True(Assert.IsType<double>(statistics[2, 1]) > 0);
+        Assert.True(Assert.IsType<double>(statistics[3, 0]) > 0);
+        Assert.Equal(2d, Assert.IsType<double>(statistics[3, 1]));
+        Assert.True(Assert.IsType<double>(statistics[4, 0]) > 0);
+        Assert.True(Assert.IsType<double>(statistics[4, 1]) > 0);
+        Assert.Equal(OdfFormulaError.NA, statistics[2, 2]);
+        Assert.Equal(OdfFormulaError.NA, statistics[4, 2]);
+    }
+
+    /// <summary>
+    /// Verifies regression rejects a model with no residual degrees of freedom.
+    /// 驗證迴歸模型會拒絕沒有殘差自由度的輸入。
+    /// </summary>
+    [Fact]
+    public void RegressionRejectsZeroResidualDegreesOfFreedom()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(
+            OdfFormulaError.Num,
+            evaluator.Evaluate("LINEST({3|4|8};{1;0|0;1|2;1})", context));
     }
 
     /// <summary>

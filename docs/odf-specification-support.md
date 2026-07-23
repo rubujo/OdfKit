@@ -35,7 +35,7 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 | 規格層 | 支援狀態 | 已實作 | 不代表 |
 |--------|----------|--------|--------|
 | 文件 XML／schema（ODF 1.0～1.4） | 結構性支援 | 版本偵測、官方 RELAX NG metadata、元素／屬性／pattern 驗證、Strict／Extended 命名空間診斷、flat document 驗證。 | 每一種應用程式語意都有高階 facade，或畫面能像素級一致。 |
-| ZIP 封裝與 manifest | 完整支援 | `mimetype`、安全相對路徑、重複項目、root file-entry、payload 對應、media type、目錄路徑、加密 metadata，以及 ODF 1.0～1.4 官方 manifest RNG 機械驗證；ODF 1.2～1.4 另區分一般 Package 與 Extended Package 的 `META-INF` 規則。 | 具備任意第三方 RNG 的通用編譯器，也不能破解加密或證明內容沒有惡意行為。manifest schema 版本不必等同內容 XML 版本。 |
+| ZIP 封裝與 manifest | 完整支援 | `mimetype`、安全相對路徑、重複項目、root file-entry、payload 對應、media type、目錄路徑、加密 metadata、核心 XML 的 `office:version` 一致性，以及 ODF 1.0～1.4 官方 manifest RNG 機械驗證；ODF 1.2～1.4 另區分一般 Package 與 Extended Package 的 `META-INF` 規則。 | 具備任意第三方 RNG 的通用編譯器，也不能破解加密或證明內容沒有惡意行為。manifest schema 版本不必等同內容 XML 版本。 |
 | 數位簽章 XML | 結構性支援 | ODF 1.2～1.4 官方 dsig RNG、任意 `META-INF/*signatures*` 入口驗證、XMLDSIG 建立／驗證、封裝引用與選配指令碼簽署工作流程。 | 作業系統或企業 PKI 信任；信任政策必須由呼叫端明確提供。ODF 1.0／1.1 規範沒有獨立 dsig RNG。 |
 | OpenFormula | 結構性支援＋受控評估 | ODF 1.2～1.4 的 `of:=` 與 ODF 1.0／1.1 常見的 `oooc:=` 語法剖析、參照轉換、inline array、矩陣、複數、Small 110／110、Medium 272／272、Large 388／388 累計強制函式名稱覆蓋、完整求值與 Best Effort 分級、活頁簿內容模型，以及執行個體範圍自訂函式與整式後援；未知函式仍可原樣保留並產生診斷。 | 函式名稱覆蓋不等於正式 Small／Medium／Large 一致性；`BestEffortFunctions` 明確揭露長尾安全邊界，且須驗證完整語法、型別轉換、限制、陣列及每個函式的規範語意。 |
 | RDF／metadata | 結構性支援 | 封裝 RDF、文件 metadata 與未知 XML 內容保留。 | RDF 推論器、SPARQL 伺服器或網路資源擷取。 |

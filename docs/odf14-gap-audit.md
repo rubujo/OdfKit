@@ -39,10 +39,11 @@ Part 2 附錄 D 明確聲明：
 - 數位簽章（`ds:Signature`／`dsig:document-signatures`）已由
   `OdfSignatureSigner`／`OdfSignatureVerifier` 處理。
 
-**結論：功能面無缺口。** 目前 manifest／dsig schema 未如主要內容 schema
-（Part 3）納入 `OdfSchemaGenerator` 自動化產生管線，而是採手寫解析／寫入；
-由於 Part 2 本次無任何規格異動，此非 ODF 1.4 造成的新缺口，暫列為後續可選的
-架構強化項目（機械化 RNG 對照），不影響目前功能正確性或相容性。
+**結論：功能面無缺口。** Manifest 與 dsig 已與主要內容 schema 一樣納入
+`OdfSchemaGenerator` 自動化產生管線：ODF 1.0～1.4 manifest 及 ODF 1.2～1.4
+dsig 均使用版本化官方 RNG metadata 驗證。文件驗證另會檢查各核心 XML 的
+`office:version` 一致性；`manifest:version` 則依 Part 2 自身版本化 schema 驗證，
+不會誤當成內容 XML 版本。
 
 ## Part 3（Schema）
 
@@ -98,7 +99,7 @@ Part 4 附錄 A 列出以下異動：
 | Part | 是否有新增元素／函式 | OdfKit 是否已涵蓋 | 本次動作 |
 |---|---|---|---|
 | Part 1 Introduction | 無（非 schema 承載文件） | N/A | 無需行動 |
-| Part 2 Packages | 官方聲明零技術變更 | 是（功能面） | 無需行動；機械化 RNG 對照列為後續可選強化 |
+| Part 2 Packages | 官方聲明零技術變更 | 是（功能面與官方 RNG metadata） | 已納入版本化產生管線與跨檔案版本一致性驗證 |
 | Part 3 Schema | 599 元素、屬性全數核對 | 是（100% 相符） | 無需行動 |
 | Part 4 OpenFormula | 1 新函式＋12 項定義變更 | 修復前有 4 項缺口 | 已修復 `EASTERSUNDAY`／`ISFORMULA`／`ISNONTEXT`／`CONVERT`，測試通過 |
 

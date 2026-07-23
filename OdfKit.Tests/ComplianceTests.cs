@@ -1463,6 +1463,73 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void ValidatorSelectsManifestSchemaIndependentlyFromContentVersion()
+        {
+            using MemoryStream ms = CreateZipWithRawManifest(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.4"),
+                "<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.3\">" +
+                "<manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\" />" +
+                "<manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\" />" +
+                "</manifest:manifest>");
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.OasisOdf14Strict);
+
+            Assert.DoesNotContain(
+                report.Issues,
+                issue => issue.RuleId == "ODF3111" &&
+                    issue.PackagePath == "META-INF/manifest.xml");
+        }
+
+        [Fact]
+        public void ValidatorReportsCoreXmlVersionMismatch()
+        {
+            using MemoryStream ms = CreatePackage(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.4"),
+                [
+                    new KeyValuePair<string, string>(
+                        "styles.xml",
+                        "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.3\" />")
+                ]);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.OasisOdf14Strict);
+
+            OdfValidationIssue issue = Assert.Single(report.Issues, item => item.RuleId == "ODF0402");
+            Assert.Equal("styles.xml", issue.PackagePath);
+            Assert.Equal("1.4", issue.Details["expectedVersion"]);
+            Assert.Equal("1.3", issue.Details["actualVersion"]);
+        }
+
+        [Fact]
+        public void ValidatorReportsUnrecognizedCoreXmlVersion()
+        {
+            using MemoryStream ms = CreatePackage(
+                "application/vnd.oasis.opendocument.text",
+                CreateDocumentContent("1.4"),
+                [
+                    new KeyValuePair<string, string>(
+                        "styles.xml",
+                        "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"2.0\" />")
+                ]);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.OasisOdf14Strict);
+
+            OdfValidationIssue issue = Assert.Single(report.Issues, item => item.RuleId == "ODF0401");
+            Assert.Equal("styles.xml", issue.PackagePath);
+            Assert.Equal("2.0", issue.Details["actualVersion"]);
+        }
+
+        [Fact]
         public void ValidatorReportsDirectoryManifestEntryWithoutTrailingSlash()
         {
             using MemoryStream ms = CreateZipWithCustomManifestEntries(

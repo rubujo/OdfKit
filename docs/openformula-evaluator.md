@@ -52,7 +52,9 @@ document.EvaluateFormulas(evaluator);
 `SHEET`／`SHEETS` 不再以固定值模擬；應用程式或外部引擎可實作其餘兩項服務，
 未提供服務時安全傳回 `#N/A`。奇數首期／末期債券函式已依實際 stub 天數、應計利息與
 票息日期折現；多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 以最小平方法求值。
-這些函式在完整統計輸出、所有日期慣例與極端數值 corpus 完成前仍標記為 Best Effort。
+`LINEST`／`LOGEST` 的 `Stats=TRUE` 會回傳五列係數、標準誤、決定係數、估計標準誤、
+F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由度的模型依規範回傳錯誤。
+這些函式在所有日期慣例、奇異矩陣策略與極端數值 corpus 完成前仍標記為 Best Effort。
 `INFO` 也只揭露安全且跨平台可取得的執行環境資訊。
 
 ```csharp

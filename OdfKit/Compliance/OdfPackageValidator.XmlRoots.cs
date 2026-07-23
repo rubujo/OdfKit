@@ -40,6 +40,57 @@ public static partial class OdfPackageValidator
         return OdfVersion.Unknown;
     }
 
+    private static void ValidateCoreXmlVersions(
+        OdfPackage package,
+        OdfVersion detectedVersion,
+        List<OdfValidationIssue> issues,
+        string? profileId)
+    {
+        foreach (string entryName in (string[])["content.xml", "styles.xml", "meta.xml", "settings.xml"])
+        {
+            if (!package.HasEntry(entryName))
+                continue;
+
+            XmlRootInfo? rootInfo = ReadRootInfo(package, entryName, issues, profileId);
+            if (rootInfo?.Version is not string entryVersionText ||
+                string.IsNullOrWhiteSpace(entryVersionText))
+                continue;
+
+            OdfVersion entryVersion = ParseVersion(entryVersionText);
+            if (entryVersion == OdfVersion.Unknown)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Error,
+                    "ODF0401",
+                    "Core ODF XML entry declares an unrecognized office:version.",
+                    entryName,
+                    "/" + rootInfo.LocalName + "/@office:version",
+                    profileId: profileId,
+                    details: new Dictionary<string, string?>(StringComparer.Ordinal)
+                    {
+                        ["actualVersion"] = entryVersionText
+                    }));
+                continue;
+            }
+
+            if (detectedVersion == OdfVersion.Unknown || entryVersion == detectedVersion)
+                continue;
+
+            issues.Add(new OdfValidationIssue(
+                OdfIssueSeverity.Error,
+                "ODF0402",
+                "Core ODF XML entries must declare the same office:version.",
+                entryName,
+                "/" + rootInfo.LocalName + "/@office:version",
+                profileId: profileId,
+                details: new Dictionary<string, string?>(StringComparer.Ordinal)
+                {
+                    ["expectedVersion"] = OdfVersionInfo.ToVersionString(detectedVersion),
+                    ["actualVersion"] = entryVersionText
+                }));
+        }
+    }
+
     private static OdfDocumentKind DetectBodyKind(OdfPackage package, List<OdfValidationIssue> issues, string? profileId)
     {
         if (!package.HasEntry("content.xml"))

@@ -552,21 +552,31 @@ internal static class FormulaConformanceFunctionHandlers
                 return formulaError;
             includeIntercept = FormulaCoercion.CoerceToBool(interceptValue);
         }
-        if (!TryFitLinearModel(xs, ys, includeIntercept, out double[] coefficients))
+        bool includeStatistics = false;
+        if (name is "LINEST" or "LOGEST" && arguments.Count == 4)
+        {
+            object statisticsValue = arguments[3].Evaluate(context);
+            if (statisticsValue is OdfFormulaError formulaError)
+                return formulaError;
+            includeStatistics = FormulaCoercion.CoerceToBool(statisticsValue);
+        }
+        if (!TryFitLinearModel(
+            xs,
+            ys,
+            includeIntercept,
+            out double[] coefficients,
+            out double[,] inverseNormal))
             return OdfFormulaError.Num;
         if (name is "LINEST" or "LOGEST")
         {
-            var result = new object[1, coefficients.Length];
-            int predictorCount = xs.GetLength(1);
-            for (int column = 0; column < predictorCount; column++)
-            {
-                double coefficient = coefficients[predictorCount - column - 1];
-                result[0, column] = exponential ? Math.Exp(coefficient) : coefficient;
-            }
-            result[0, coefficients.Length - 1] = exponential
-                ? Math.Exp(coefficients[coefficients.Length - 1])
-                : coefficients[coefficients.Length - 1];
-            return result;
+            return CreateRegressionResult(
+                xs,
+                ys,
+                coefficients,
+                inverseNormal,
+                includeIntercept,
+                exponential,
+                includeStatistics);
         }
         double[,] predictionX = xs;
         if (arguments.Count >= 3 &&
@@ -1381,23 +1391,26 @@ internal static class FormulaConformanceFunctionHandlers
         double[,] predictors,
         double[] outcomes,
         bool includeIntercept,
-        out double[] coefficients)
+        out double[] coefficients,
+        out double[,] inverseNormal)
     {
         int rows = predictors.GetLength(0);
         int predictorCount = predictors.GetLength(1);
         int parameterCount = predictorCount + (includeIntercept ? 1 : 0);
-        if (rows < parameterCount || outcomes.Length != rows)
+        if (rows <= parameterCount || outcomes.Length != rows)
         {
             coefficients = [];
+            inverseNormal = new double[0, 0];
             return false;
         }
-        var normal = new double[parameterCount, parameterCount + 1];
+        var normal = new double[parameterCount, parameterCount];
+        var rightHandSide = new double[parameterCount];
         for (int row = 0; row < rows; row++)
         {
             for (int left = 0; left < parameterCount; left++)
             {
                 double leftValue = left < predictorCount ? predictors[row, left] : 1;
-                normal[left, parameterCount] += leftValue * outcomes[row];
+                rightHandSide[left] += leftValue * outcomes[row];
                 for (int right = 0; right < parameterCount; right++)
                 {
                     double rightValue = right < predictorCount ? predictors[row, right] : 1;
@@ -1405,15 +1418,126 @@ internal static class FormulaConformanceFunctionHandlers
                 }
             }
         }
-        if (!TrySolveLinearSystem(normal, parameterCount, out double[] fitted))
+        if (!TrySolveLinearSystem(
+            CreateAugmentedMatrix(normal, rightHandSide),
+            parameterCount,
+            out double[] fitted) ||
+            !TryInvertMatrix(normal, out inverseNormal))
         {
             coefficients = [];
+            inverseNormal = new double[0, 0];
             return false;
         }
         coefficients = new double[predictorCount + 1];
         for (int index = 0; index < predictorCount; index++)
             coefficients[index] = fitted[index];
         coefficients[predictorCount] = includeIntercept ? fitted[predictorCount] : 0;
+        return true;
+    }
+
+    private static object[,] CreateRegressionResult(
+        double[,] predictors,
+        double[] outcomes,
+        double[] coefficients,
+        double[,] inverseNormal,
+        bool includeIntercept,
+        bool exponential,
+        bool includeStatistics)
+    {
+        int predictorCount = predictors.GetLength(1);
+        int resultRows = includeStatistics ? 5 : 1;
+        var result = new object[resultRows, predictorCount + 1];
+        for (int row = 0; row < resultRows; row++)
+        {
+            for (int column = 0; column <= predictorCount; column++)
+                result[row, column] = OdfFormulaError.NA;
+        }
+        for (int column = 0; column < predictorCount; column++)
+        {
+            double coefficient = coefficients[predictorCount - column - 1];
+            result[0, column] = exponential ? Math.Exp(coefficient) : coefficient;
+        }
+        result[0, predictorCount] = exponential
+            ? Math.Exp(coefficients[predictorCount])
+            : coefficients[predictorCount];
+        if (!includeStatistics)
+            return result;
+
+        int observations = outcomes.Length;
+        int parameterCount = predictorCount + (includeIntercept ? 1 : 0);
+        double degreesOfFreedom = observations - parameterCount;
+        double mean = Mean(outcomes);
+        double residualSumSquares = 0;
+        double regressionSumSquares = 0;
+        for (int row = 0; row < observations; row++)
+        {
+            double prediction = coefficients[predictorCount];
+            for (int column = 0; column < predictorCount; column++)
+                prediction += coefficients[column] * predictors[row, column];
+            double residual = outcomes[row] - prediction;
+            residualSumSquares += residual * residual;
+            double regressionDelta = includeIntercept ? prediction - mean : prediction;
+            regressionSumSquares += regressionDelta * regressionDelta;
+        }
+        double variance = residualSumSquares / degreesOfFreedom;
+        for (int column = 0; column < predictorCount; column++)
+        {
+            int coefficientIndex = predictorCount - column - 1;
+            result[1, column] = Math.Sqrt(
+                Math.Max(0, variance * inverseNormal[coefficientIndex, coefficientIndex]));
+        }
+        if (includeIntercept)
+        {
+            result[1, predictorCount] = Math.Sqrt(
+                Math.Max(0, variance * inverseNormal[parameterCount - 1, parameterCount - 1]));
+        }
+
+        double totalSumSquares = regressionSumSquares + residualSumSquares;
+        result[2, 0] = totalSumSquares == 0
+            ? OdfFormulaError.Div0
+            : regressionSumSquares / totalSumSquares;
+        result[2, 1] = Math.Sqrt(variance);
+        result[3, 0] = residualSumSquares == 0
+            ? OdfFormulaError.Div0
+            : (regressionSumSquares / predictorCount) / variance;
+        result[3, 1] = degreesOfFreedom;
+        result[4, 0] = regressionSumSquares;
+        result[4, 1] = residualSumSquares;
+        return result;
+    }
+
+    private static double[,] CreateAugmentedMatrix(double[,] matrix, double[] rightHandSide)
+    {
+        int size = matrix.GetLength(0);
+        var augmented = new double[size, size + 1];
+        for (int row = 0; row < size; row++)
+        {
+            for (int column = 0; column < size; column++)
+                augmented[row, column] = matrix[row, column];
+            augmented[row, size] = rightHandSide[row];
+        }
+        return augmented;
+    }
+
+    private static bool TryInvertMatrix(double[,] matrix, out double[,] inverse)
+    {
+        int size = matrix.GetLength(0);
+        inverse = new double[size, size];
+        for (int column = 0; column < size; column++)
+        {
+            var rightHandSide = new double[size];
+            rightHandSide[column] = 1;
+            if (!TrySolveLinearSystem(
+                CreateAugmentedMatrix(matrix, rightHandSide),
+                size,
+                out double[] solution))
+            {
+                inverse = new double[0, 0];
+                return false;
+            }
+            for (int row = 0; row < size; row++)
+                inverse[row, column] = solution[row];
+        }
         return true;
     }
 
