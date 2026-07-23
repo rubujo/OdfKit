@@ -209,11 +209,11 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.True(small.HasCompleteFunctionSet);
         Assert.Equal(272, medium.RequiredFunctions.Count);
         Assert.False(medium.HasCompleteFunctionSet);
-        Assert.Equal(91, medium.MissingFunctions.Count);
+        Assert.Equal(78, medium.MissingFunctions.Count);
         Assert.DoesNotContain("MMULT", medium.MissingFunctions);
         Assert.Equal(388, large.RequiredFunctions.Count);
         Assert.False(large.HasCompleteFunctionSet);
-        Assert.Equal(145, large.MissingFunctions.Count);
+        Assert.Equal(105, large.MissingFunctions.Count);
         Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
         Assert.Contains("DDE", large.MissingFunctions);
     }
@@ -272,6 +272,61 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.Equal("𠮷", evaluator.Evaluate("UNICHAR(134071)", context));
         Assert.Equal("00FF", evaluator.Evaluate("BASE(255;16;4)", context));
         Assert.Equal(255d, evaluator.Evaluate("DECIMAL(\"FF\";16)", context));
+    }
+
+    /// <summary>
+    /// Verifies additional Large-group engineering, statistical, and financial functions.
+    /// 驗證額外的 Large Group 工程、統計及財務函式。
+    /// </summary>
+    [Fact]
+    public void LargeCompatibilityFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(-1d, evaluator.Evaluate("BIN2DEC(\"1111111111\")", context));
+        Assert.Equal("FFFFFFFFFF", evaluator.Evaluate("DEC2HEX(-1)", context));
+        Assert.Equal(-1d, evaluator.Evaluate("HEX2DEC(\"FFFFFFFFFF\")", context));
+        Assert.Equal("000000FF", evaluator.Evaluate("DEC2HEX(255;8)", context));
+        Assert.Equal(1999d, evaluator.Evaluate("ARABIC(\"MCMXCIX\")", context));
+        Assert.Equal(15d, evaluator.Evaluate("COMBINA(3;4)", context));
+        Assert.Equal(24d, Assert.IsType<double>(evaluator.Evaluate("GAMMA(5)", context)), 10);
+        Assert.Equal(0d, Assert.IsType<double>(evaluator.Evaluate("GAUSS(0)", context)), 10);
+        Assert.Equal(132d, Assert.IsType<double>(
+            evaluator.Evaluate("FVSCHEDULE(100;{0.1;0.2})", context)), 10);
+        Assert.Equal(0.1d, Assert.IsType<double>(
+            evaluator.Evaluate("RRI(2;100;121)", context)), 10);
+        Assert.Equal(1234.5d, evaluator.Evaluate(
+            "NUMBERVALUE(\"1.234,5\";\",\";\".\")",
+            context));
+        Assert.Equal(2d, evaluator.Evaluate("ERROR.TYPE(1/0)", context));
+    }
+
+    /// <summary>
+    /// Verifies probability distributions and special functions required by Medium and Large groups.
+    /// 驗證 Medium 與 Large Group 要求的機率分佈及特殊函式。
+    /// </summary>
+    [Fact]
+    public void DistributionFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(0d, Assert.IsType<double>(evaluator.Evaluate("ERF(0)", context)), 10);
+        Assert.Equal(Math.Log(24), Assert.IsType<double>(
+            evaluator.Evaluate("GAMMALN(5)", context)), 10);
+        Assert.Equal(0.5d, Assert.IsType<double>(
+            evaluator.Evaluate("FISHERINV(FISHER(0.5))", context)), 10);
+        Assert.Equal(0.375d, Assert.IsType<double>(
+            evaluator.Evaluate("BINOMDIST(2;4;0.5;FALSE())", context)), 10);
+        Assert.Equal(Math.Exp(-1), Assert.IsType<double>(
+            evaluator.Evaluate("POISSON(0;1;FALSE())", context)), 10);
+        Assert.Equal(0.5d, Assert.IsType<double>(
+            evaluator.Evaluate("NORMDIST(0;0;1;TRUE())", context)), 6);
+        Assert.Equal(10d, Assert.IsType<double>(
+            evaluator.Evaluate("NORMINV(0.5;10;2)", context)), 10);
+        Assert.InRange(Assert.IsType<double>(
+            evaluator.Evaluate("NORMINV(0.975;0;1)", context)), 1.95996398d, 1.959964d);
     }
 
     /// <summary>

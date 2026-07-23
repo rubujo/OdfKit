@@ -119,6 +119,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["CLEAN"] = FormulaCompatibilityFunctionHandlers.EvaluateClean,
             ["UNICHAR"] = FormulaCompatibilityFunctionHandlers.EvaluateUniChar,
             ["UNICODE"] = FormulaCompatibilityFunctionHandlers.EvaluateUnicode,
+            ["NUMBERVALUE"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateNumberValue,
 
             // 統計
             ["SUM"] = FormulaStatisticalFunctionHandlers.EvaluateSum,
@@ -166,6 +167,21 @@ internal static class FormulaBuiltinFunctionRegistry
             ["MAXA"] = FormulaExtendedStatisticalFunctionHandlers.EvaluateMaxA,
             ["MINA"] = FormulaExtendedStatisticalFunctionHandlers.EvaluateMinA,
             ["VARPA"] = FormulaExtendedStatisticalFunctionHandlers.EvaluateVarPA,
+            ["BINOM.DIST.RANGE"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateBinomialRange,
+            ["PHI"] = FormulaLargeCompatibilityFunctionHandlers.EvaluatePhi,
+            ["GAUSS"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateGauss,
+            ["BINOMDIST"] = FormulaDistributionFunctionHandlers.EvaluateBinomDist,
+            ["CONFIDENCE"] = FormulaDistributionFunctionHandlers.EvaluateConfidence,
+            ["EXPONDIST"] = FormulaDistributionFunctionHandlers.EvaluateExponDist,
+            ["FISHER"] = FormulaDistributionFunctionHandlers.EvaluateFisher,
+            ["FISHERINV"] = FormulaDistributionFunctionHandlers.EvaluateFisherInv,
+            ["LEGACY.NORMSDIST"] = FormulaDistributionFunctionHandlers.EvaluateNormSdist,
+            ["LEGACY.NORMSINV"] = FormulaDistributionFunctionHandlers.EvaluateNormSInv,
+            ["NEGBINOMDIST"] = FormulaDistributionFunctionHandlers.EvaluateNegBinomDist,
+            ["NORMDIST"] = FormulaDistributionFunctionHandlers.EvaluateNormDist,
+            ["NORMINV"] = FormulaDistributionFunctionHandlers.EvaluateNormInv,
+            ["POISSON"] = FormulaDistributionFunctionHandlers.EvaluatePoisson,
+            ["WEIBULL"] = FormulaDistributionFunctionHandlers.EvaluateWeibull,
 
             // 查閱
             ["VLOOKUP"] = FormulaLookupFunctionHandlers.EvaluateVLookup,
@@ -241,6 +257,25 @@ internal static class FormulaBuiltinFunctionRegistry
             ["SQRTPI"] = FormulaExtendedMathFunctionHandlers.EvaluateSqrtPi,
             ["BASE"] = FormulaCompatibilityFunctionHandlers.EvaluateBase,
             ["DECIMAL"] = FormulaCompatibilityFunctionHandlers.EvaluateDecimal,
+            ["ARABIC"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateArabic,
+            ["COMBINA"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateCombina,
+            ["PERMUTATIONA"] = FormulaLargeCompatibilityFunctionHandlers.EvaluatePermutationA,
+            ["GAMMA"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateGamma,
+            ["ERF"] = FormulaDistributionFunctionHandlers.EvaluateErf,
+            ["ERFC"] = FormulaDistributionFunctionHandlers.EvaluateErfc,
+            ["GAMMALN"] = FormulaDistributionFunctionHandlers.EvaluateGammaLn,
+            ["BIN2DEC"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateBin2Dec,
+            ["BIN2HEX"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateBin2Hex,
+            ["BIN2OCT"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateBin2Oct,
+            ["DEC2BIN"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateDec2Bin,
+            ["DEC2HEX"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateDec2Hex,
+            ["DEC2OCT"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateDec2Oct,
+            ["HEX2BIN"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateHex2Bin,
+            ["HEX2DEC"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateHex2Dec,
+            ["HEX2OCT"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateHex2Oct,
+            ["OCT2BIN"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateOct2Bin,
+            ["OCT2DEC"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateOct2Dec,
+            ["OCT2HEX"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateOct2Hex,
 
             // 複數
             ["COMPLEX"] = FormulaComplexFunctionHandlers.EvaluateComplex,
@@ -329,6 +364,13 @@ internal static class FormulaBuiltinFunctionRegistry
             ["DDB"] = FormulaFinancialFunctionHandlers.EvaluateDdb,
             ["NPV"] = FormulaFinancialFunctionHandlers.EvaluateNpv,
             ["SYD"] = FormulaFinancialFunctionHandlers.EvaluateSyd,
+            ["FVSCHEDULE"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateFvSchedule,
+            ["ISPMT"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateIsPmt,
+            ["PDURATION"] = FormulaLargeCompatibilityFunctionHandlers.EvaluatePDuration,
+            ["RRI"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateRri,
+
+            // 資訊
+            ["ERROR.TYPE"] = FormulaLargeCompatibilityFunctionHandlers.EvaluateErrorType,
         };
     }
 }

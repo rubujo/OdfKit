@@ -12,8 +12,8 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 | ODF 1.2～1.4 OpenFormula | 部分實作 | 辨識 `of:=`、剖析常用運算式與參照，並提供受控重算。 |
 | Small Group 強制函式名稱 | 110／110 | `OdfFormulaSupport.GetConformanceReport(Small)` 可機械化確認內建函式清單沒有名稱缺口。 |
 | Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
-| Medium Group 強制函式名稱 | 181／272 | 已有參照聯集／交集、命名運算式、矩陣與常用統計函式；尚缺 91 個累計強制函式。 |
-| Large Group 強制函式名稱 | 243／388 | 已有 inline array 求值、矩陣與複數函式；尚缺 145 個累計強制函式，以及完整陣列公式、自動交集、外部名稱與區域名稱求值。 |
+| Medium Group 強制函式名稱 | 194／272 | 已有參照聯集／交集、命名運算式、矩陣、機率分佈與常用統計函式；尚缺 78 個累計強制函式。 |
+| Large Group 強制函式名稱 | 283／388 | 已有 inline array、矩陣、複數、進位轉換與額外統計／財務函式；尚缺 105 個累計強制函式，以及完整陣列公式、自動交集、外部名稱與區域名稱求值。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large

@@ -66,6 +66,7 @@ public static class OdfFormulaSupport
         new("CLEAN", "Text", OdfFormulaSupportLevel.Evaluated),
         new("UNICHAR", "Text", OdfFormulaSupportLevel.Evaluated),
         new("UNICODE", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("NUMBERVALUE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("SUBSTITUTE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("FIND", "Text", OdfFormulaSupportLevel.Evaluated),
         new("SEARCH", "Text", OdfFormulaSupportLevel.Evaluated),
@@ -122,6 +123,21 @@ public static class OdfFormulaSupport
         new("MAXA", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("MINA", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("VARPA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("BINOM.DIST.RANGE", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("GAUSS", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("PHI", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("BINOMDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("CONFIDENCE", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("EXPONDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("FISHER", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("FISHERINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("LEGACY.NORMSDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("LEGACY.NORMSINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("NEGBINOMDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("NORMDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("NORMINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("POISSON", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("WEIBULL", "Statistical", OdfFormulaSupportLevel.Evaluated),
 
         // 查閱函數
         new("VLOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
@@ -197,6 +213,25 @@ public static class OdfFormulaSupport
         new("TANH", "Math", OdfFormulaSupportLevel.Evaluated),
         new("BASE", "Math", OdfFormulaSupportLevel.Evaluated),
         new("DECIMAL", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ARABIC", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COMBINA", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("PERMUTATIONA", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("GAMMA", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ERF", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ERFC", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("GAMMALN", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("BIN2DEC", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("BIN2HEX", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("BIN2OCT", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("DEC2BIN", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("DEC2HEX", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("DEC2OCT", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("HEX2BIN", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("HEX2DEC", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("HEX2OCT", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("OCT2BIN", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("OCT2DEC", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("OCT2HEX", "Engineering", OdfFormulaSupportLevel.Evaluated),
 
         // 複數函數
         new("COMPLEX", "Complex", OdfFormulaSupportLevel.Evaluated),
@@ -286,7 +321,14 @@ public static class OdfFormulaSupport
         new("SLN", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("DDB", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("NPV", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("SYD", "Financial", OdfFormulaSupportLevel.Evaluated)
+        new("SYD", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("FVSCHEDULE", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("ISPMT", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("PDURATION", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("RRI", "Financial", OdfFormulaSupportLevel.Evaluated),
+
+        // 資訊函數（Large Group）
+        new("ERROR.TYPE", "Information", OdfFormulaSupportLevel.Evaluated)
     ];
 
     private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
