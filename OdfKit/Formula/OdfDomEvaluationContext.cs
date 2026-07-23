@@ -636,11 +636,16 @@ internal class OdfDomEvaluationContext :
         IReadOnlyDictionary<string, object> filters,
         out object result)
     {
-        foreach (OdfNode pivot in EnumerateElements(
-            _contentRoot,
-            "data-pilot-table",
-            OdfNamespaces.Table))
+        List<OdfNode> pivots =
+        [
+            .. EnumerateElements(
+                _contentRoot,
+                "data-pilot-table",
+                OdfNamespaces.Table)
+        ];
+        for (int pivotIndex = pivots.Count - 1; pivotIndex >= 0; pivotIndex--)
         {
+            OdfNode pivot = pivots[pivotIndex];
             string? targetText = pivot.GetAttribute(
                 "target-range-address",
                 OdfNamespaces.Table);
@@ -651,65 +656,72 @@ internal class OdfDomEvaluationContext :
                 continue;
             }
 
-            OdfNode? sourceNode = FindDirectChild(
+            if (TryLoadPivotSource(pivot, out object[,] values) &&
+                TryAggregatePivot(
+                    pivot,
+                    values,
+                    dataField,
+                    filters,
+                    null,
+                    out result))
+            {
+                return true;
+            }
+        }
+
+        result = OdfFormulaError.NA;
+        return false;
+    }
+
+    internal bool TryGetPivotDataAlternative(
+        OdfCellAddress pivotAnchor,
+        string constraints,
+        out object result)
+    {
+        if (!TryTokenizePivotConstraints(constraints, out IReadOnlyList<string> tokens))
+        {
+            result = OdfFormulaError.Value;
+            return false;
+        }
+
+        List<OdfNode> pivots =
+        [
+            .. EnumerateElements(
+                _contentRoot,
+                "data-pilot-table",
+                OdfNamespaces.Table)
+        ];
+        for (int pivotIndex = pivots.Count - 1; pivotIndex >= 0; pivotIndex--)
+        {
+            OdfNode pivot = pivots[pivotIndex];
+            string? targetText = pivot.GetAttribute(
+                "target-range-address",
+                OdfNamespaces.Table);
+            if (string.IsNullOrEmpty(targetText) ||
+                !OdfCellRange.TryParse(targetText!, out OdfCellRange target) ||
+                !ContainsResolved(target, pivotAnchor) ||
+                !TryLoadPivotSource(pivot, out object[,] values) ||
+                !TryResolveAlternativePivotQuery(
+                    pivot,
+                    values,
+                    tokens,
+                    out string dataField,
+                    out IReadOnlyDictionary<string, object> filters,
+                    out string? subtotalFunction))
+            {
+                continue;
+            }
+
+            if (TryAggregatePivot(
                 pivot,
-                "source-cell-range",
-                OdfNamespaces.Table);
-            string? sourceText = sourceNode?.GetAttribute(
-                "cell-range-address",
-                OdfNamespaces.Table);
-            if (string.IsNullOrEmpty(sourceText) ||
-                !OdfCellRange.TryParse(sourceText!, out OdfCellRange source))
+                values,
+                dataField,
+                filters,
+                subtotalFunction,
+                out result))
             {
-                continue;
+                return true;
             }
-
-            object[,] values = GetRangeValues(source);
-            if (values.GetLength(0) < 2 ||
-                !TryFindHeader(values, dataField, out int dataColumn))
-            {
-                continue;
-            }
-
-            var filterColumns = new List<KeyValuePair<int, object>>();
-            bool validFilters = true;
-            foreach (KeyValuePair<string, object> filter in filters)
-            {
-                if (!TryFindHeader(values, filter.Key, out int filterColumn))
-                {
-                    validFilters = false;
-                    break;
-                }
-
-                filterColumns.Add(new KeyValuePair<int, object>(
-                    filterColumn,
-                    filter.Value));
-            }
-            if (!validFilters)
-                continue;
-
-            string aggregation = FindPivotAggregation(pivot, dataField);
-            var matched = new List<object>();
-            for (int row = 1; row < values.GetLength(0); row++)
-            {
-                bool matches = true;
-                foreach (KeyValuePair<int, object> filter in filterColumns)
-                {
-                    if (FormulaCoercion.CompareValues(
-                        values[row, filter.Key],
-                        filter.Value) != 0)
-                    {
-                        matches = false;
-                        break;
-                    }
-                }
-
-                if (matches)
-                    matched.Add(values[row, dataColumn]);
-            }
-
-            result = AggregatePivotValues(matched, aggregation);
-            return result is not OdfFormulaError;
         }
 
         result = OdfFormulaError.NA;
@@ -922,6 +934,343 @@ internal class OdfDomEvaluationContext :
         }
 
         column = -1;
+        return false;
+    }
+
+    private bool TryLoadPivotSource(OdfNode pivot, out object[,] values)
+    {
+        OdfNode? sourceNode = FindDirectChild(
+            pivot,
+            "source-cell-range",
+            OdfNamespaces.Table);
+        string? sourceText = sourceNode?.GetAttribute(
+            "cell-range-address",
+            OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(sourceText) &&
+            OdfCellRange.TryParse(sourceText!, out OdfCellRange source))
+        {
+            values = GetRangeValues(source);
+            return values.GetLength(0) >= 2;
+        }
+
+        values = new object[0, 0];
+        return false;
+    }
+
+    private static bool TryAggregatePivot(
+        OdfNode pivot,
+        object[,] values,
+        string dataField,
+        IReadOnlyDictionary<string, object> filters,
+        string? requiredAggregation,
+        out object result)
+    {
+        if (!TryFindHeader(values, dataField, out int dataColumn))
+        {
+            result = OdfFormulaError.NA;
+            return false;
+        }
+
+        string aggregation = FindPivotAggregation(pivot, dataField);
+        if (!string.IsNullOrEmpty(requiredAggregation) &&
+            !string.Equals(
+                aggregation,
+                requiredAggregation,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            result = OdfFormulaError.NA;
+            return false;
+        }
+
+        var filterColumns = new List<KeyValuePair<int, object>>();
+        foreach (KeyValuePair<string, object> filter in filters)
+        {
+            if (!TryFindHeader(values, filter.Key, out int filterColumn))
+            {
+                result = OdfFormulaError.NA;
+                return false;
+            }
+
+            filterColumns.Add(new KeyValuePair<int, object>(
+                filterColumn,
+                filter.Value));
+        }
+
+        var matched = new List<object>();
+        for (int row = 1; row < values.GetLength(0); row++)
+        {
+            bool matches = true;
+            foreach (KeyValuePair<int, object> filter in filterColumns)
+            {
+                if (FormulaCoercion.CompareValues(
+                    values[row, filter.Key],
+                    filter.Value) != 0)
+                {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if (matches)
+                matched.Add(values[row, dataColumn]);
+        }
+
+        result = AggregatePivotValues(matched, aggregation);
+        return result is not OdfFormulaError;
+    }
+
+    private static bool TryResolveAlternativePivotQuery(
+        OdfNode pivot,
+        object[,] values,
+        IReadOnlyList<string> tokens,
+        out string dataField,
+        out IReadOnlyDictionary<string, object> filters,
+        out string? subtotalFunction)
+    {
+        var dataFields = new List<string>();
+        var pivotFields = new List<string>();
+        foreach (OdfNode field in pivot.Children)
+        {
+            if (field.NodeType is not OdfNodeType.Element ||
+                field.LocalName != "data-pilot-field" ||
+                field.NamespaceUri != OdfNamespaces.Table)
+            {
+                continue;
+            }
+
+            string? fieldName = field.GetAttribute(
+                "source-field-name",
+                OdfNamespaces.Table);
+            if (string.IsNullOrEmpty(fieldName))
+                continue;
+            pivotFields.Add(fieldName!);
+            if (string.Equals(
+                field.GetAttribute("orientation", OdfNamespaces.Table),
+                "data",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                dataFields.Add(fieldName!);
+            }
+        }
+
+        string? selectedDataField = null;
+        string? selectedFunction = null;
+        var resolvedFilters = new Dictionary<string, object>(
+            StringComparer.OrdinalIgnoreCase);
+        foreach (string token in tokens)
+        {
+            if (TryParsePivotFieldConstraint(
+                token,
+                out string fieldName,
+                out string member,
+                out string? function))
+            {
+                if (!ContainsIgnoreCase(pivotFields, fieldName) ||
+                    (resolvedFilters.TryGetValue(fieldName, out object? previous) &&
+                        !string.Equals(
+                            Convert.ToString(previous, CultureInfo.InvariantCulture),
+                            member,
+                            StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(function) &&
+                        !string.IsNullOrEmpty(selectedFunction) &&
+                        !string.Equals(
+                            selectedFunction,
+                            function,
+                            StringComparison.OrdinalIgnoreCase)))
+                {
+                    dataField = string.Empty;
+                    filters = resolvedFilters;
+                    subtotalFunction = null;
+                    return false;
+                }
+
+                resolvedFilters[fieldName] = member;
+                if (!string.IsNullOrEmpty(function))
+                    selectedFunction = function;
+                continue;
+            }
+
+            if (ContainsIgnoreCase(dataFields, token))
+            {
+                if (!string.IsNullOrEmpty(selectedDataField) &&
+                    !string.Equals(
+                        selectedDataField,
+                        token,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    dataField = string.Empty;
+                    filters = resolvedFilters;
+                    subtotalFunction = null;
+                    return false;
+                }
+
+                selectedDataField = token;
+                continue;
+            }
+
+            string? memberField = null;
+            foreach (string pivotField in pivotFields)
+            {
+                if (ContainsIgnoreCase(dataFields, pivotField) ||
+                    !TryFindHeader(values, pivotField, out int column) ||
+                    !ColumnContains(values, column, token))
+                {
+                    continue;
+                }
+
+                if (memberField is not null)
+                {
+                    dataField = string.Empty;
+                    filters = resolvedFilters;
+                    subtotalFunction = null;
+                    return false;
+                }
+
+                memberField = pivotField;
+            }
+
+            if (memberField is null)
+            {
+                dataField = string.Empty;
+                filters = resolvedFilters;
+                subtotalFunction = null;
+                return false;
+            }
+
+            resolvedFilters[memberField] = token;
+        }
+
+        if (string.IsNullOrEmpty(selectedDataField))
+        {
+            if (dataFields.Count != 1)
+            {
+                dataField = string.Empty;
+                filters = resolvedFilters;
+                subtotalFunction = null;
+                return false;
+            }
+
+            selectedDataField = dataFields[0];
+        }
+
+        dataField = selectedDataField!;
+        filters = resolvedFilters;
+        subtotalFunction = selectedFunction;
+        return true;
+    }
+
+    private static bool TryTokenizePivotConstraints(
+        string constraints,
+        out IReadOnlyList<string> tokens)
+    {
+        var result = new List<string>();
+        var token = new System.Text.StringBuilder();
+        bool quoted = false;
+        for (int index = 0; index < constraints.Length; index++)
+        {
+            char current = constraints[index];
+            if (current == '\'')
+            {
+                if (quoted &&
+                    index + 1 < constraints.Length &&
+                    constraints[index + 1] == '\'')
+                {
+                    token.Append('\'');
+                    index++;
+                }
+                else
+                {
+                    quoted = !quoted;
+                }
+
+                continue;
+            }
+            if (char.IsWhiteSpace(current) && !quoted)
+            {
+                if (token.Length > 0)
+                {
+                    result.Add(token.ToString());
+                    token.Clear();
+                }
+
+                continue;
+            }
+
+            token.Append(current);
+        }
+
+        if (quoted)
+        {
+            tokens = [];
+            return false;
+        }
+        if (token.Length > 0)
+            result.Add(token.ToString());
+        tokens = result;
+        return true;
+    }
+
+    private static bool TryParsePivotFieldConstraint(
+        string token,
+        out string fieldName,
+        out string member,
+        out string? function)
+    {
+        int opening = token.IndexOf('[');
+        int closing = token.LastIndexOf(']');
+        if (opening <= 0 || closing != token.Length - 1 || closing <= opening + 1)
+        {
+            fieldName = string.Empty;
+            member = string.Empty;
+            function = null;
+            return false;
+        }
+
+        fieldName = token.Substring(0, opening);
+        string content = token.Substring(opening + 1, closing - opening - 1);
+        int separator = content.LastIndexOf(';');
+        if (separator < 0)
+        {
+            member = content;
+            function = null;
+        }
+        else
+        {
+            member = content.Substring(0, separator);
+            function = content.Substring(separator + 1);
+        }
+
+        return fieldName.Length > 0 &&
+            member.Length > 0 &&
+            (function is null || function.Length > 0);
+    }
+
+    private static bool ContainsIgnoreCase(
+        IReadOnlyList<string> values,
+        string candidate)
+    {
+        foreach (string value in values)
+        {
+            if (string.Equals(value, candidate, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool ColumnContains(object[,] values, int column, string candidate)
+    {
+        for (int row = 1; row < values.GetLength(0); row++)
+        {
+            if (string.Equals(
+                Convert.ToString(values[row, column], CultureInfo.InvariantCulture),
+                candidate,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
         return false;
     }
 

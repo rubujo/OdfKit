@@ -178,7 +178,12 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
 /// <param name="right">The right AST node. / 右側 AST 節點。</param>
 public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the ranges produced by the reference-range operator.
+    /// 取得參照範圍運算子產生的範圍。
+    /// </summary>
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The resolved cell ranges. / 已解析的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         List<OdfCellRange> leftRanges = left.GetRanges(context);
@@ -295,7 +300,12 @@ public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
         return -1;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Evaluates the reference-range expression.
+    /// 求值參照範圍運算式。
+    /// </summary>
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The referenced values or a formula error. / 參照值或公式錯誤。</returns>
     public override object Evaluate(IEvaluationContext context)
     {
         List<OdfCellRange> ranges = GetRanges(context);
@@ -309,7 +319,11 @@ public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
         return references;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Serializes the reference-range expression.
+    /// 序列化參照範圍運算式。
+    /// </summary>
+    /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
     public override string Serialize() =>
         $"{left.Serialize()}:{right.Serialize()}";
 }
@@ -323,10 +337,11 @@ public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
 public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 {
     /// <summary>
-    /// Gets ranges.
-    /// 取得 Ranges。
+    /// Gets the ranges produced by the reference-union operator.
+    /// 取得參照聯集運算子產生的範圍。
     /// </summary>
-    /// <inheritdoc />
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The combined cell ranges. / 合併後的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var list = new List<OdfCellRange>();
@@ -336,10 +351,11 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
     }
 
     /// <summary>
-    /// Performs evaluate.
-    /// 執行 Evaluate。
+    /// Evaluates the reference-union expression.
+    /// 求值參照聯集運算式。
     /// </summary>
-    /// <inheritdoc />
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The referenced value collections. / 參照值集合。</returns>
     public override object Evaluate(IEvaluationContext context)
     {
         var ranges = GetRanges(context);
@@ -352,10 +368,10 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
     }
 
     /// <summary>
-    /// Performs serialize.
-    /// 執行 Serialize。
+    /// Serializes the reference-union expression.
+    /// 序列化參照聯集運算式。
     /// </summary>
-    /// <inheritdoc />
+    /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
     public override string Serialize() => $"{left.Serialize()}~{right.Serialize()}";
 }
 
@@ -431,7 +447,12 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
 /// <param name="right">The right quoted-label expression. / 右側引號標籤運算式。</param>
 public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : AstNode
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the single-cell intersections produced by the label expressions.
+    /// 取得標籤運算式產生的單一儲存格交集。
+    /// </summary>
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The intersecting cell ranges. / 相交的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var intersections = new List<OdfCellRange>();
@@ -452,7 +473,12 @@ public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : Ast
         return intersections;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Evaluates the automatic-intersection expression.
+    /// 求值自動交集運算式。
+    /// </summary>
+    /// <param name="context">The evaluation context. / 求值內容。</param>
+    /// <returns>The intersecting cell value or a formula error. / 相交的儲存格值或公式錯誤。</returns>
     public override object Evaluate(IEvaluationContext context)
     {
         List<OdfCellRange> ranges = GetRanges(context);
@@ -461,7 +487,11 @@ public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : Ast
             : OdfFormulaError.Value;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Serializes the automatic-intersection expression.
+    /// 序列化自動交集運算式。
+    /// </summary>
+    /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
     public override string Serialize() =>
         $"{left.Serialize()}!!{right.Serialize()}";
 }

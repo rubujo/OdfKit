@@ -14,7 +14,7 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 | Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
 | Medium Group 強制函式名稱 | 272／272 | 強制函式皆可由預設評估器派送，包含參照、矩陣、機率分佈、統計及財務函式。 |
 | Large Group 強制函式名稱 | 388／388 | 強制函式名稱皆可派送，並包含 inline array、矩陣、複數、進位轉換與東亞位元組文字函式。 |
-| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出 Best Effort 函式。內嵌陣列、矩陣公式寫回、自動交集、文件／工作表名稱及由解析器提供的外部名稱皆已有執行測試；仍須擴充規範 corpus，以涵蓋所有函式的限制、locale／主機屬性、數值誤差及極端邊界。 |
+| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出刻意安全拒絕的 `DDE`。內嵌陣列、矩陣公式寫回、自動交集、文件／工作表名稱、外部名稱、Bessel 高階數值、奇數票息及 pivot 替代語法皆已有執行測試；仍須持續擴充逐函式 corpus，以涵蓋所有限制、locale／主機屬性、數值誤差及極端邊界。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
@@ -52,17 +52,18 @@ document.EvaluateFormulas(evaluator);
 彙總的 `GETPIVOTDATA` 慣用語法，以及以暫時輸入替代值重新評估公式的
 `MULTIPLE.OPERATIONS`。`SHEET`／`SHEETS` 不再以固定值模擬。
 `IOdfFormulaEnvironmentContext` 可覆寫 `INFO` 類別；未覆寫時，評估器仍提供規範要求的
-十個環境類別。奇數首期／末期債券函式已依實際 stub 天數、應計利息與
-票息日期折現；多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 使用具欄位樞紐的
+十個環境類別。奇數首期／末期債券函式已依實際 stub 天數、應計利息、票息日期及
+日期基準折現，並以公開範例驗證價格與殖利率反算；Bessel 函式採用級數、漸近展開、
+穩定遞迴及自適應積分，涵蓋高階、極小結果、負引數奇偶性與定義域邊界。
+`GETPIVOTDATA` 支援慣用語法，以及包含引號、`Field[Member]`、唯一成員省略欄位名稱、
+省略唯一資料欄位、subtotal 函式和重疊目標範圍文件順序的相容性替代語法；無法唯一
+解析的成員會傳回 `#N/A`。多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 使用具欄位樞紐的
 QR 最小平方法求值，共線欄位會以秩不足模型處理，而不再直接反解容易失穩的一般方程式。
 `LINEST`／`LOGEST` 的 `Stats=TRUE` 會回傳五列係數、標準誤、決定係數、估計標準誤、
 F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由度的模型依規範回傳錯誤。
-目前 Best Effort 清單已縮減為十項：
-`BESSELI`、`BESSELJ`、`BESSELK`、`BESSELY`、`GETPIVOTDATA`、
-`ODDFPRICE`、`ODDFYIELD`、`ODDLPRICE`、`ODDLYIELD` 與 `DDE`。
-Bessel 函式仍需更大的高階數值 corpus；`GETPIVOTDATA` 尚未涵蓋相容性替代語法的所有
-歧義規則；奇數票息債券仍需完整日期基準與極端日期 corpus；`DDE` 則是刻意不執行，
-不是待補的安全缺陷。
+目前 Large Group 能力報告中的 Best Effort 清單只剩 `DDE`。核心會驗證三個必要引數
+及一個選用模式引數的形狀，但不會求值引數，也不會建立外部程序、網路或資料連線；
+合法呼叫固定傳回 `#N/A`。這是刻意的安全政策，不是待補的演算法缺陷。
 
 ```csharp
 public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
@@ -108,9 +109,9 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 ## 一致性證據策略
 
 專案內的 `OpenFormulaConformanceCorpusTests` 以 ODF 1.2～1.4 分組驗證科學記號、
-強制重算、常數錯誤、左側錯誤傳播、型別比較、陣列形狀、矩陣、Unicode 與代表性
-Small／Medium／Large 函式。這是專案依正式文本自行撰寫的可稽核 corpus，不冒充
-OASIS 官方測試套件。
+強制重算、常數錯誤、左側錯誤傳播、型別比較、陣列形狀、矩陣、Unicode、Bessel
+數值邊界、奇數票息公開範例、pivot 替代語法歧義與 `DDE` 安全拒絕。這是專案依正式
+文本自行撰寫的可稽核 corpus，不冒充 OASIS 官方測試套件。
 
 後續證據工作應持續擴充每個函式的限制、空值、locale、日期基準、浮點容許誤差及
 極端輸入案例；同時保留 OdfKit Extended 註冊表與後援，讓應用程式在 Large 清單之外
@@ -118,4 +119,10 @@ OASIS 官方測試套件。
 一致性，應以整份 corpus 的可重現通過證據決定，而不是只看 388／388 名稱覆蓋。
 
 規範依據為 OASIS
-[ODF 1.4 Part 4: OpenFormula](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html)。
+[ODF 1.4 Part 4: OpenFormula](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html)；
+Bessel 數值方法另依
+[NIST DLMF Chapter 10](https://dlmf.nist.gov/10) 的公開數學定義與計算方法實作；
+奇數首期公式、日期基準名詞與公開範例另以 Microsoft Support 的
+[ODDFPRICE](https://support.microsoft.com/en-us/excel/functions/oddfprice-function) 與
+[ODDLPRICE](https://support.microsoft.com/en-us/excel/functions/oddlprice-function)
+文件交叉驗證。

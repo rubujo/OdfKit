@@ -42,8 +42,14 @@ public sealed class OpenFormulaConformanceCorpusTests
     [InlineData("1.4", "of:=UNICODE(\"𠮷\")", "number", "134071")]
     [InlineData("1.4", "of:=FTEST({1;1};{2;2})", "error", "#DIV/0!")]
     [InlineData("1.4", "of:=ZTEST({1;2;3};2;1)", "number", "0.5")]
+    [InlineData("1.4", "of:=BESSELI(0;0)", "number", "1")]
+    [InlineData("1.4", "of:=BESSELJ(0;10000)", "number", "0")]
     [InlineData("1.4", "of:=BESSELJ(1;0.5)", "error", "#NUM!")]
+    [InlineData("1.4", "of:=BESSELK(0;0)", "error", "#NUM!")]
+    [InlineData("1.4", "of:=BESSELY(0;0)", "error", "#NUM!")]
     [InlineData("1.4", "of:=DDE(\"service\";\"topic\";\"item\")", "error", "#N/A")]
+    [InlineData("1.4", "of:=DDE(1/0;1/0;1/0)", "error", "#N/A")]
+    [InlineData("1.4", "of:=DDE(\"service\";\"topic\")", "error", "#VALUE!")]
     public void ScalarCorpusMatchesExpectedResult(
         string version,
         string formula,

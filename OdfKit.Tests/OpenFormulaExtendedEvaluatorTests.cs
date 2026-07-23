@@ -216,15 +216,15 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.Equal(272, medium.RequiredFunctions.Count);
         Assert.True(medium.HasCompleteFunctionSet);
         Assert.Empty(medium.MissingFunctions);
-        Assert.False(medium.HasOnlyFullyEvaluatedFunctions);
-        Assert.Contains("BESSELI", medium.BestEffortFunctions);
+        Assert.True(medium.HasOnlyFullyEvaluatedFunctions);
+        Assert.Empty(medium.BestEffortFunctions);
         Assert.DoesNotContain("MMULT", medium.MissingFunctions);
         Assert.Equal(388, large.RequiredFunctions.Count);
         Assert.True(large.HasCompleteFunctionSet);
         Assert.Empty(large.MissingFunctions);
         Assert.False(large.HasOnlyFullyEvaluatedFunctions);
         Assert.Contains("DDE", large.BestEffortFunctions);
-        Assert.Contains("GETPIVOTDATA", large.BestEffortFunctions);
+        Assert.DoesNotContain("GETPIVOTDATA", large.BestEffortFunctions);
         Assert.DoesNotContain("INFO", large.BestEffortFunctions);
         Assert.DoesNotContain("LINEST", large.BestEffortFunctions);
         Assert.DoesNotContain("MULTIPLE.OPERATIONS", large.BestEffortFunctions);
@@ -388,6 +388,153 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             ";100;2;1)";
         Assert.Equal(0.06d, Assert.IsType<double>(
             evaluator.Evaluate(oddLastYieldFormula, context)), 7);
+    }
+
+    /// <summary>
+    /// Verifies Bessel functions against independent high-precision reference values.
+    /// 依獨立的高精度參考值驗證 Bessel 函式。
+    /// </summary>
+    [Fact]
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
+    public void BesselFunctionsMatchIndependentReferenceValues()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        AssertRelative(0.765197686557967, EvaluateNumber("BESSELJ(1;0)"), 2e-13);
+        AssertRelative(0.130670933554863, EvaluateNumber("BESSELJ(20;4)"), 2e-11);
+        AssertRelative(-0.0215287573445057, EvaluateNumber("BESSELJ(100;2)"), 2e-11);
+        AssertRelative(
+            0.09636667329586156,
+            EvaluateNumber("BESSELJ(100;100)"),
+            2e-11);
+        AssertRelative(
+            1.1159273690838093e-21,
+            EvaluateNumber("BESSELJ(50;100)"),
+            2e-11);
+        AssertRelative(1.26606587775201, EvaluateNumber("BESSELI(1;0)"), 2e-13);
+        AssertRelative(28935060.3187649, EvaluateNumber("BESSELI(20;4)"), 2e-13);
+        AssertRelative(
+            2.2551205757604039e-14,
+            EvaluateNumber("BESSELI(20;50)"),
+            2e-12);
+        AssertRelative(
+            5.4420084027529975e18,
+            EvaluateNumber("BESSELI(50;20)"),
+            2e-12);
+        AssertRelative(0.421024438240708333, EvaluateNumber("BESSELK(1;0)"), 2e-12);
+        AssertRelative(
+            8.47423361989687325e-10,
+            EvaluateNumber("BESSELK(20;4)"),
+            2e-12);
+        AssertRelative(
+            4.1171120912201772e11,
+            EvaluateNumber("BESSELK(20;50)"),
+            2e-11);
+        AssertRelative(
+            1.7061483797220351e-21,
+            EvaluateNumber("BESSELK(50;20)"),
+            2e-11);
+        AssertRelative(0.088256964215677, EvaluateNumber("BESSELY(1;0)"), 2e-12);
+        AssertRelative(0.124093737059654, EvaluateNumber("BESSELY(20;4)"), 2e-11);
+        AssertRelative(0.0768368671250279, EvaluateNumber("BESSELY(100;2)"), 2e-11);
+        AssertRelative(
+            -0.1669214114175765,
+            EvaluateNumber("BESSELY(100;100)"),
+            2e-10);
+        AssertRelative(
+            0.016442633948115778,
+            EvaluateNumber("BESSELY(50;20)"),
+            2e-11);
+        Assert.Equal(
+            -EvaluateNumber("BESSELY(1;1)"),
+            EvaluateNumber("BESSELY(-1;1)"),
+            12);
+
+        double EvaluateNumber(string formula) =>
+            Assert.IsType<double>(evaluator.Evaluate(formula, context));
+    }
+
+    /// <summary>
+    /// Verifies published odd-coupon examples and the inverse yield calculation.
+    /// 驗證已發布的奇數票息範例與反向殖利率計算。
+    /// </summary>
+    [Fact]
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
+    public void OddCouponFunctionsMatchPublishedReferenceExamples()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        double oddFirstPrice = Assert.IsType<double>(evaluator.Evaluate(
+            "ODDFPRICE(DATE(2008;11;11);DATE(2021;3;1);DATE(2008;10;15);" +
+            "DATE(2009;3;1);0.0785;0.0625;100;2;1)",
+            context));
+        Assert.Equal(113.597717474078, oddFirstPrice, 9);
+        Assert.Equal(0.0625, Assert.IsType<double>(evaluator.Evaluate(
+            "ODDFYIELD(DATE(2008;11;11);DATE(2021;3;1);DATE(2008;10;15);" +
+            "DATE(2009;3;1);0.0785;113.597717474078;100;2;1)",
+            context)), 9);
+
+        Assert.Equal(99.8782860147213, Assert.IsType<double>(evaluator.Evaluate(
+            "ODDLPRICE(DATE(2008;2;7);DATE(2008;6;15);DATE(2007;10;15);" +
+            "0.0375;0.0405;100;2;0)",
+            context)), 10);
+        Assert.Equal(0.0404998874758287, Assert.IsType<double>(evaluator.Evaluate(
+            "ODDLYIELD(DATE(2008;2;7);DATE(2008;6;15);DATE(2007;10;15);" +
+            "0.0375;99.87829;100;2;0)",
+            context)), 10);
+        Assert.Same(OdfFormulaError.Num, evaluator.Evaluate(
+            "ODDFPRICE(DATE(2024;1;1);DATE(2025;1;1);DATE(2024;2;1);" +
+            "DATE(2024;7;1);0.05;0.06;100;2)",
+            context));
+    }
+
+    /// <summary>
+    /// Verifies long odd coupon periods across every OpenFormula day-count basis.
+    /// 驗證長奇數票息期間在所有 OpenFormula 日期基準下的結果。
+    /// </summary>
+    /// <param name="basis">The OpenFormula day-count basis. / OpenFormula 日期基準。</param>
+    /// <param name="expectedFirstPrice">The expected odd-first price. / 預期的奇數首期價格。</param>
+    /// <param name="expectedLastPrice">The expected odd-last price. / 預期的奇數末期價格。</param>
+    [Theory]
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
+    [InlineData(0, 98.09254160075565, 99.30219937160811)]
+    [InlineData(1, 98.09454497479267, 99.30776395062905)]
+    [InlineData(2, 98.0057924949512, 99.30776395062905)]
+    [InlineData(3, 98.08256440779863, 99.30776395062905)]
+    [InlineData(4, 98.09254160075565, 99.30219937160811)]
+    public void OddCouponFunctionsMatchEveryDateBasis(
+        int basis,
+        double expectedFirstPrice,
+        double expectedLastPrice)
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+        string basisText = basis.ToString(CultureInfo.InvariantCulture);
+
+        double firstPrice = Assert.IsType<double>(evaluator.Evaluate(
+            "ODDFPRICE(DATE(2024;2;1);DATE(2026;1;1);DATE(2023;1;15);" +
+            "DATE(2024;7;1);0.05;0.06;100;2;" + basisText + ")",
+            context));
+        double lastPrice = Assert.IsType<double>(evaluator.Evaluate(
+            "ODDLPRICE(DATE(2025;8;1);DATE(2026;3;15);DATE(2025;1;15);" +
+            "0.05;0.06;100;2;" + basisText + ")",
+            context));
+
+        AssertRelative(expectedFirstPrice, firstPrice, 2e-11);
+        AssertRelative(expectedLastPrice, lastPrice, 2e-11);
+        Assert.Equal(0.06, Assert.IsType<double>(evaluator.Evaluate(
+            "ODDFYIELD(DATE(2024;2;1);DATE(2026;1;1);DATE(2023;1;15);" +
+            "DATE(2024;7;1);0.05;" +
+            firstPrice.ToString("R", CultureInfo.InvariantCulture) +
+            ";100;2;" + basisText + ")",
+            context)), 8);
+        Assert.Equal(0.06, Assert.IsType<double>(evaluator.Evaluate(
+            "ODDLYIELD(DATE(2025;8;1);DATE(2026;3;15);DATE(2025;1;15);" +
+            "0.05;" + lastPrice.ToString("R", CultureInfo.InvariantCulture) +
+            ";100;2;" + basisText + ")",
+            context)), 8);
     }
 
     /// <summary>
@@ -752,26 +899,42 @@ public sealed class OpenFormulaExtendedEvaluatorTests
     /// 驗證 ODF DOM 不需外部引擎即可評估樞紐彙總與多重運算。
     /// </summary>
     [Fact]
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
     public void DocumentContextEvaluatesPivotAndMultipleOperations()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
         sheet.Cells["A1"].CellValue = "Region";
-        sheet.Cells["B1"].CellValue = "Sales";
+        sheet.Cells["B1"].CellValue = "Category";
+        sheet.Cells["C1"].CellValue = "Sales";
         sheet.Cells["A2"].CellValue = "North";
-        sheet.Cells["B2"].CellValue = 10d;
+        sheet.Cells["B2"].CellValue = "North";
+        sheet.Cells["C2"].CellValue = 10d;
         sheet.Cells["A3"].CellValue = "South";
-        sheet.Cells["B3"].CellValue = 20d;
-        sheet.Cells["A4"].CellValue = "North";
-        sheet.Cells["B4"].CellValue = 30d;
+        sheet.Cells["B3"].CellValue = "Retail";
+        sheet.Cells["C3"].CellValue = 20d;
+        sheet.Cells["A4"].CellValue = "North West";
+        sheet.Cells["B4"].CellValue = "Wholesale";
+        sheet.Cells["C4"].CellValue = 30d;
         sheet.CreatePivotTable(
-            new OdfCellRange(0, 0, 3, 1, "Data"),
+            new OdfCellRange(0, 0, 3, 2, "Data"),
             new OdfCellAddress(0, 4, "Data"),
             pivot => pivot
                 .AddRowField("Region")
+                .AddRowField("Category")
                 .AddDataField("Sales", OdfPivotFunction.Sum));
         sheet.Cells["F1"].Formula =
             "of:=GETPIVOTDATA(\"Sales\";[Data.E1];\"Region\";\"North\")";
+        sheet.Cells["F2"].Formula =
+            "of:=GETPIVOTDATA([Data.E1];\"Sales Region[North]\")";
+        sheet.Cells["F3"].Formula =
+            "of:=GETPIVOTDATA([Data.E1];\"Region[North]\")";
+        sheet.Cells["F4"].Formula =
+            "of:=GETPIVOTDATA([Data.E1];\"Sales 'North West'\")";
+        sheet.Cells["F5"].Formula =
+            "of:=GETPIVOTDATA([Data.E1];\"Sales Region[North;sum]\")";
+        sheet.Cells["F6"].Formula =
+            "of:=GETPIVOTDATA([Data.E1];\"Sales North\")";
         sheet.Cells["H1"].CellValue = 2d;
         sheet.Cells["I1"].Formula = "of:=[.H1]*10";
         sheet.Cells["J1"].Formula =
@@ -779,9 +942,54 @@ public sealed class OpenFormulaExtendedEvaluatorTests
 
         document.EvaluateFormulas();
 
-        Assert.Equal(40d, sheet.Cells["F1"].CellValue);
+        Assert.Equal(10d, sheet.Cells["F1"].CellValue);
+        Assert.Equal(10d, sheet.Cells["F2"].CellValue);
+        Assert.Equal(10d, sheet.Cells["F3"].CellValue);
+        Assert.Equal(30d, sheet.Cells["F4"].CellValue);
+        Assert.Equal(10d, sheet.Cells["F5"].CellValue);
+        Assert.Equal("#N/A", sheet.Cells["F6"].CellValue);
         Assert.Equal(70d, sheet.Cells["J1"].CellValue);
         Assert.Equal(2d, sheet.Cells["H1"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies the last pivot in document order wins when target ranges overlap.
+    /// 驗證樞紐分析表目標範圍重疊時，會採用文件順序中的最後一個樞紐分析表。
+    /// </summary>
+    [Fact]
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
+    public void GetPivotDataUsesLastOverlappingPivotInDocumentOrder()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "Region";
+        sheet.Cells["B1"].CellValue = "Sales";
+        sheet.Cells["A2"].CellValue = "North";
+        sheet.Cells["B2"].CellValue = 10d;
+        sheet.Cells["D1"].CellValue = "Region";
+        sheet.Cells["E1"].CellValue = "Sales";
+        sheet.Cells["D2"].CellValue = "North";
+        sheet.Cells["E2"].CellValue = 99d;
+
+        OdfCellAddress target = new(0, 6, "Data");
+        sheet.CreatePivotTable(
+            new OdfCellRange(0, 0, 1, 1, "Data"),
+            target,
+            pivot => pivot
+                .AddRowField("Region")
+                .AddDataField("Sales", OdfPivotFunction.Sum));
+        sheet.CreatePivotTable(
+            new OdfCellRange(0, 3, 1, 4, "Data"),
+            target,
+            pivot => pivot
+                .AddRowField("Region")
+                .AddDataField("Sales", OdfPivotFunction.Sum));
+        sheet.Cells["I1"].Formula =
+            "of:=GETPIVOTDATA(\"Sales\";[Data.G1];\"Region\";\"North\")";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(99d, sheet.Cells["I1"].CellValue);
     }
 
     /// <summary>
@@ -1015,6 +1223,19 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         public object GetNamedRangeOrExpressionValue(string name) => OdfFormulaError.Name;
 
         public double NextRandomDouble() => randomValues[_randomIndex++];
+    }
+
+    private static void AssertRelative(
+        double expected,
+        double actual,
+        double relativeTolerance)
+    {
+        double scale = Math.Max(1e-300, Math.Abs(expected));
+        double relativeError = Math.Abs(actual - expected) / scale;
+        Assert.True(
+            relativeError <= relativeTolerance,
+            $"Expected {expected:R}, actual {actual:R}, relative error " +
+            $"{relativeError:R}, tolerance {relativeTolerance:R}.");
     }
 
     private sealed class WorkbookEvaluationContext : IOdfFormulaWorkbookContext

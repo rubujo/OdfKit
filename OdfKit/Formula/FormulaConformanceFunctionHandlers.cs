@@ -73,7 +73,9 @@ internal static class FormulaConformanceFunctionHandlers
             "EUROCONVERT" => EvaluateEuroConvert(arguments, context),
             "GETPIVOTDATA" => EvaluateGetPivotData(arguments, context),
             "MULTIPLE.OPERATIONS" => EvaluateMultipleOperations(arguments, context),
-            "DDE" => OdfFormulaError.NA,
+            "DDE" => arguments.Count is 3 or 4
+                ? OdfFormulaError.NA
+                : OdfFormulaError.Value,
             _ => OdfFormulaError.Name
         };
     }
@@ -90,27 +92,22 @@ internal static class FormulaConformanceFunctionHandlers
         if (double.IsNaN(x) ||
             double.IsInfinity(x) ||
             orderValue < 0 ||
-            orderValue > int.MaxValue ||
+            orderValue > 10000 ||
             orderValue != Math.Truncate(orderValue) ||
             (kind == 2 && x <= 0) ||
-            (kind == 3 && x <= 0))
+            (kind == 3 && x == 0))
         {
             return OdfFormulaError.Num;
         }
 
         int order = (int)orderValue;
-        double result;
-        if (kind == 0)
-            result = BesselSeries(x, order, false);
-        else if (kind == 1)
-            result = BesselSeries(x, order, true);
-        else if (kind == 2)
-            result = Integrate(
-                t => Math.Exp(-x * Math.Cosh(t)) * Math.Cosh(order * t),
-                0,
-                20);
-        else
-            result = BesselY(x, order);
+        double result = kind switch
+        {
+            0 => OpenFormulaBessel.I(x, order),
+            1 => OpenFormulaBessel.J(x, order),
+            2 => OpenFormulaBessel.K(x, order),
+            _ => OpenFormulaBessel.Y(x, order)
+        };
         return double.IsNaN(result) || double.IsInfinity(result)
             ? OdfFormulaError.Num
             : result;
@@ -1035,8 +1032,36 @@ internal static class FormulaConformanceFunctionHandlers
             frequency = (int)Math.Truncate(v[4]);
             basis = v.Length == 6 ? (int)Math.Truncate(v[5]) : 0;
         }
-        if (settlement >= maturity || frequency is not (1 or 2 or 4))
+        if (settlement >= maturity ||
+            frequency is not (1 or 2 or 4) ||
+            basis is < 0 or > 4 ||
+            couponRate < 0 ||
+            redemption <= 0 ||
+            (priceFunction ? marketValue < 0 : marketValue <= 0) ||
+            !IsFinite(couponRate) ||
+            !IsFinite(marketValue) ||
+            !IsFinite(redemption))
+        {
             return OdfFormulaError.Num;
+        }
+        if (oddFirst &&
+            (!issue.HasValue ||
+                !firstCoupon.HasValue ||
+                issue.Value >= settlement ||
+                settlement >= firstCoupon.Value ||
+                firstCoupon.Value >= maturity ||
+                !IsCouponAligned(firstCoupon.Value, maturity, 12 / frequency)))
+        {
+            return OdfFormulaError.Num;
+        }
+        if (oddLast &&
+            (!lastInterest.HasValue ||
+                lastInterest.Value >= settlement ||
+                settlement >= maturity))
+        {
+            return OdfFormulaError.Num;
+        }
+
         double Price(double yield)
             => CalculateBondPrice(
                 settlement,
@@ -1050,11 +1075,45 @@ internal static class FormulaConformanceFunctionHandlers
                 firstCoupon,
                 lastInterest);
         if (priceFunction)
-            return Price(marketValue);
+        {
+            double price = Price(marketValue);
+            return IsFinite(price) ? price : OdfFormulaError.Num;
+        }
+        if (name == "ODDLYIELD" && lastInterest.HasValue)
+        {
+            double frequencyValue = frequency;
+            double coupon = 100 * couponRate / frequencyValue;
+            double couponPeriods = ForwardOddLastCouponFraction(
+                lastInterest.Value,
+                maturity,
+                lastInterest.Value,
+                12 / frequency,
+                basis);
+            double remainingPeriods = ForwardOddLastCouponFraction(
+                settlement,
+                maturity,
+                lastInterest.Value,
+                12 / frequency,
+                basis);
+            double accruedPeriods = ForwardOddLastCouponFraction(
+                lastInterest.Value,
+                settlement,
+                lastInterest.Value,
+                12 / frequency,
+                basis);
+            double adjustedPrice = marketValue + (coupon * accruedPeriods);
+            if (remainingPeriods <= 0 || adjustedPrice <= 0)
+                return OdfFormulaError.Num;
+            double oddLastYield = frequencyValue / remainingPeriods *
+                (((redemption + (coupon * couponPeriods)) / adjustedPrice) - 1);
+            return IsFinite(oddLastYield) && oddLastYield > -frequency
+                ? oddLastYield
+                : OdfFormulaError.Num;
+        }
         if (name is "YIELD" or "ODDFYIELD" or "ODDLYIELD")
         {
             double targetPrice = marketValue;
-            return SolveRoot(yield => Price(yield) - targetPrice, 0.05);
+            return SolveMonotonicBondYield(Price, targetPrice, frequency);
         }
         double bondYield = marketValue;
         int count = Math.Max(1, (int)Math.Ceiling(
@@ -1088,25 +1147,38 @@ internal static class FormulaConformanceFunctionHandlers
     {
         if (arguments.Count < 2 || arguments.Count % 2 != 0)
             return OdfFormulaError.Value;
+        if (arguments.Count == 2 &&
+            TryGetPivotAnchor(arguments[0], out OdfKit.Spreadsheet.OdfCellAddress alternativeAnchor))
+        {
+            object constraintsValue = arguments[1].Evaluate(context);
+            if (constraintsValue is OdfFormulaError constraintsError)
+                return constraintsError;
+            string constraints = Convert.ToString(
+                constraintsValue,
+                CultureInfo.InvariantCulture) ?? string.Empty;
+            if (context is OdfFormulaDispatchContext dispatch &&
+                dispatch.InnerContext is OdfDomEvaluationContext dom &&
+                dom.TryGetPivotDataAlternative(
+                    alternativeAnchor,
+                    constraints,
+                    out object alternativeResult))
+            {
+                return alternativeResult;
+            }
+
+            return OdfFormulaError.NA;
+        }
+
         object fieldValue = arguments[0].Evaluate(context);
         if (fieldValue is OdfFormulaError error)
             return error;
         string field = Convert.ToString(fieldValue, CultureInfo.InvariantCulture) ?? string.Empty;
         if (field.Length == 0)
             return OdfFormulaError.Value;
-        OdfKit.Spreadsheet.OdfCellAddress anchor;
-        if (arguments[1] is CellAddressNode cell)
-        {
-            anchor = cell.Address;
-        }
-        else if (arguments[1] is RangeReferenceNode range)
-        {
-            anchor = range.Range.StartAddress;
-        }
-        else
-        {
+        if (!TryGetPivotAnchor(
+                arguments[1],
+                out OdfKit.Spreadsheet.OdfCellAddress anchor))
             return OdfFormulaError.Value;
-        }
         var filters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         for (int index = 2; index < arguments.Count; index += 2)
         {
@@ -1136,6 +1208,25 @@ internal static class FormulaConformanceFunctionHandlers
         {
             return OdfFormulaError.NA;
         }
+    }
+
+    private static bool TryGetPivotAnchor(
+        AstNode argument,
+        out OdfKit.Spreadsheet.OdfCellAddress anchor)
+    {
+        if (argument is CellAddressNode cell)
+        {
+            anchor = cell.Address;
+            return true;
+        }
+        if (argument is RangeReferenceNode range)
+        {
+            anchor = range.Range.StartAddress;
+            return true;
+        }
+
+        anchor = default;
+        return false;
     }
 
     private static object EvaluateMultipleOperations(
@@ -1807,66 +1898,6 @@ internal static class FormulaConformanceFunctionHandlers
         return true;
     }
 
-    private static double BesselSeries(double x, int order, bool alternating)
-    {
-        double term = Math.Pow(x / 2, order) / Math.Exp(LogGamma(order + 1));
-        double sum = term;
-        for (int k = 1; k < 200; k++)
-        {
-            term *= (x * x / 4) / (k * (order + k));
-            if (alternating)
-                term = -term;
-            sum += term;
-            if (Math.Abs(term) <= Math.Abs(sum) * 1e-15)
-                break;
-        }
-        return sum;
-    }
-
-    private static double BesselY(double x, int order)
-    {
-        if (x > 20)
-        {
-            double phase = x - ((order * Math.PI / 2) + (Math.PI / 4));
-            return Math.Sqrt(2 / (Math.PI * x)) * Math.Sin(phase);
-        }
-        const double EulerGamma = 0.5772156649015329;
-        double q = x * x / 4;
-        double term = 1;
-        double harmonic = 0;
-        double series = 0;
-        double derivativeSeries = 0;
-        for (int k = 1; k < 200; k++)
-        {
-            harmonic += 1d / k;
-            term *= -q / (k * k);
-            double contribution = -harmonic * term;
-            series += contribution;
-            derivativeSeries += (2d * k / x) * contribution;
-            if (Math.Abs(contribution) <= Math.Max(1, Math.Abs(series)) * 1e-15)
-                break;
-        }
-        double j0 = BesselSeries(x, 0, true);
-        double j1 = BesselSeries(x, 1, true);
-        double logarithm = Math.Log(x / 2) + EulerGamma;
-        double y0 = (2 / Math.PI) * ((logarithm * j0) + series);
-        if (order == 0)
-            return y0;
-        double y1 = -(2 / Math.PI) *
-            ((j0 / x) - (logarithm * j1) + derivativeSeries);
-        if (order == 1)
-            return y1;
-        double previous = y0;
-        double current = y1;
-        for (int n = 1; n < order; n++)
-        {
-            double next = (2d * n / x * current) - previous;
-            previous = current;
-            current = next;
-        }
-        return current;
-    }
-
     private static double RegularizedBeta(double x, double a, double b)
     {
         if (x <= 0)
@@ -2211,45 +2242,72 @@ internal static class FormulaConformanceFunctionHandlers
         if (yield <= -frequency || couponRate < 0 || redemption <= 0)
             return double.NaN;
         int months = 12 / frequency;
-        double coupon = redemption * couponRate / frequency;
+        double coupon = 100 * couponRate / frequency;
         if (lastInterest.HasValue)
         {
-            DateTime previousNormal = maturity.AddMonths(-months);
-            double normalDays = Math.Max(1, DayCount(previousNormal, maturity, basis));
-            double stubDays = DayCount(lastInterest.Value, maturity, basis);
-            double accruedDays = DayCount(lastInterest.Value, settlement, basis);
-            double remainingDays = DayCount(settlement, maturity, basis);
-            double exponent = remainingDays / normalDays;
-            double finalCash = redemption + (coupon * stubDays / normalDays);
-            return (finalCash / Math.Pow(1 + (yield / frequency), exponent)) -
-                (coupon * accruedDays / normalDays);
+            double frequencyValue = frequency;
+            double couponPeriods = ForwardOddLastCouponFraction(
+                lastInterest.Value,
+                maturity,
+                lastInterest.Value,
+                months,
+                basis);
+            double remainingPeriods = ForwardOddLastCouponFraction(
+                settlement,
+                maturity,
+                lastInterest.Value,
+                months,
+                basis);
+            double accruedPeriods = ForwardOddLastCouponFraction(
+                lastInterest.Value,
+                settlement,
+                lastInterest.Value,
+                months,
+                basis);
+            double finalCash = redemption + (coupon * couponPeriods);
+            return (finalCash / (1 + ((yield / frequencyValue) * remainingPeriods))) -
+                (coupon * accruedPeriods);
         }
         if (issue.HasValue && firstCoupon.HasValue)
         {
-            DateTime previousNormal = firstCoupon.Value.AddMonths(-months);
-            double normalDays = Math.Max(
-                1,
-                DayCount(previousNormal, firstCoupon.Value, basis));
-            double firstCouponDays = DayCount(issue.Value, firstCoupon.Value, basis);
-            double accruedDays = DayCount(issue.Value, settlement, basis);
-            double firstExponent = DayCount(
+            double firstCouponPeriods = BackwardCouponFraction(
+                issue.Value,
+                firstCoupon.Value,
+                firstCoupon.Value,
+                months,
+                frequency,
+                basis,
+                true);
+            double accruedPeriods = BackwardCouponFraction(
+                issue.Value,
                 settlement,
                 firstCoupon.Value,
-                basis) / normalDays;
-            double price = coupon * firstCouponDays / normalDays /
+                months,
+                frequency,
+                basis,
+                false);
+            double firstExponent = BackwardCouponFraction(
+                settlement,
+                firstCoupon.Value,
+                firstCoupon.Value,
+                months,
+                frequency,
+                basis,
+                true);
+            double price = coupon * firstCouponPeriods /
                 Math.Pow(1 + (yield / frequency), firstExponent);
-            DateTime paymentDate = firstCoupon.Value.AddMonths(months);
             int period = 1;
+            DateTime paymentDate = firstCoupon.Value.AddMonths(period * months);
             while (paymentDate <= maturity)
             {
                 double cash = coupon + (paymentDate == maturity ? redemption : 0);
                 price += cash / Math.Pow(
                     1 + (yield / frequency),
                     firstExponent + period);
-                paymentDate = paymentDate.AddMonths(months);
                 period++;
+                paymentDate = firstCoupon.Value.AddMonths(period * months);
             }
-            return price - (coupon * accruedDays / normalDays);
+            return price - (coupon * accruedPeriods);
         }
         DateTime previous = maturity;
         while (previous > settlement)
@@ -2272,6 +2330,146 @@ internal static class FormulaConformanceFunctionHandlers
             index++;
         }
         return standardPrice - (coupon * accrued / couponDays);
+    }
+
+    private static bool IsCouponAligned(DateTime first, DateTime maturity, int months)
+    {
+        for (int period = 1; period < 10000; period++)
+        {
+            DateTime coupon = first.AddMonths(period * months);
+            if (coupon == maturity)
+                return true;
+            if (coupon > maturity)
+                return false;
+        }
+
+        return false;
+    }
+
+    private static double BackwardCouponFraction(
+        DateTime start,
+        DateTime end,
+        DateTime anchor,
+        int months,
+        int frequency,
+        int basis,
+        bool normalizeFullPeriods)
+    {
+        if (end <= start)
+            return 0;
+        double result = 0;
+        DateTime periodEnd = anchor;
+        for (int period = 1; period < 10000 && periodEnd > start; period++)
+        {
+            DateTime periodStart = anchor.AddMonths(-period * months);
+            DateTime overlapStart = start > periodStart ? start : periodStart;
+            DateTime overlapEnd = end < periodEnd ? end : periodEnd;
+            if (overlapEnd > overlapStart)
+            {
+                result += normalizeFullPeriods &&
+                    overlapStart == periodStart &&
+                    overlapEnd == periodEnd
+                    ? 1
+                    : DayCount(overlapStart, overlapEnd, basis) /
+                        CouponPeriodDays(periodStart, periodEnd, frequency, basis);
+            }
+
+            periodEnd = periodStart;
+        }
+
+        return result;
+    }
+
+    private static double ForwardOddLastCouponFraction(
+        DateTime start,
+        DateTime end,
+        DateTime anchor,
+        int months,
+        int basis)
+    {
+        if (end <= start)
+            return 0;
+        double result = 0;
+        DateTime periodStart = anchor;
+        for (int period = 1; period < 10000 && periodStart < end; period++)
+        {
+            DateTime periodEnd = anchor.AddMonths(period * months);
+            DateTime overlapStart = start > periodStart ? start : periodStart;
+            DateTime overlapEnd = end < periodEnd ? end : periodEnd;
+            if (overlapEnd > overlapStart)
+            {
+                double numerator = basis is 0 or 4
+                    ? DayCount(overlapStart, overlapEnd, basis)
+                    : (overlapEnd - overlapStart).TotalDays;
+                double denominator = basis is 0 or 4
+                    ? Math.Max(1, DayCount(periodStart, periodEnd, basis))
+                    : Math.Max(1, (periodEnd - periodStart).TotalDays);
+                result += numerator / denominator;
+            }
+
+            periodStart = periodEnd;
+        }
+
+        return result;
+    }
+
+    private static double CouponPeriodDays(
+        DateTime start,
+        DateTime end,
+        int frequency,
+        int basis)
+    {
+        return basis switch
+        {
+            2 => 360d / frequency,
+            3 => 365d / frequency,
+            _ => Math.Max(1, DayCount(start, end, basis))
+        };
+    }
+
+    private static object SolveMonotonicBondYield(
+        Func<double, double> price,
+        double targetPrice,
+        int frequency)
+    {
+        double low = (-frequency) + 1e-10;
+        double high = 1;
+        double lowDifference = price(low) - targetPrice;
+        double highDifference = price(high) - targetPrice;
+        while (IsFinite(highDifference) &&
+            Math.Sign(lowDifference) == Math.Sign(highDifference) &&
+            high < 1e10)
+        {
+            high *= 2;
+            highDifference = price(high) - targetPrice;
+        }
+        if (!IsFinite(lowDifference) ||
+            !IsFinite(highDifference) ||
+            Math.Sign(lowDifference) == Math.Sign(highDifference))
+        {
+            return OdfFormulaError.Num;
+        }
+
+        for (int iteration = 0; iteration < 200; iteration++)
+        {
+            double middle = low + ((high - low) / 2);
+            double difference = price(middle) - targetPrice;
+            if (!IsFinite(difference))
+                return OdfFormulaError.Num;
+            if (Math.Abs(difference) <= Math.Max(1, targetPrice) * 1e-12)
+                return middle;
+            if (Math.Sign(difference) == Math.Sign(lowDifference))
+            {
+                low = middle;
+                lowDifference = difference;
+            }
+            else
+            {
+                high = middle;
+            }
+        }
+
+        return low + ((high - low) / 2);
     }
 
     private static double Integrate(Func<double, double> function, double start, double end)
