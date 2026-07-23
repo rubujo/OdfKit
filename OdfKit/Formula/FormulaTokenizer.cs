@@ -33,6 +33,12 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
         { _index++; return new(FormulaTokenType.OpenParen, _formula.Slice(_index - 1, 1)); }
         if (current == ')')
         { _index++; return new(FormulaTokenType.CloseParen, _formula.Slice(_index - 1, 1)); }
+        if (current == '{')
+        { _index++; return new(FormulaTokenType.OpenBrace, _formula.Slice(_index - 1, 1)); }
+        if (current == '}')
+        { _index++; return new(FormulaTokenType.CloseBrace, _formula.Slice(_index - 1, 1)); }
+        if (current == '|')
+        { _index++; return new(FormulaTokenType.RowSeparator, _formula.Slice(_index - 1, 1)); }
         if (current == ',' || current == ';')
         { _index++; return new(FormulaTokenType.Separator, _formula.Slice(_index - 1, 1)); }
         if (current == ':')

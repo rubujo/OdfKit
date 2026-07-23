@@ -66,5 +66,23 @@ public enum FormulaTokenType
     /// The end of the formula.
     /// 公式結尾。
     /// </summary>
-    EndOfFormula
+    EndOfFormula,
+
+    /// <summary>
+    /// An opening inline-array brace.
+    /// 內嵌陣列的左大括號。
+    /// </summary>
+    OpenBrace,
+
+    /// <summary>
+    /// A closing inline-array brace.
+    /// 內嵌陣列的右大括號。
+    /// </summary>
+    CloseBrace,
+
+    /// <summary>
+    /// An inline-array row separator.
+    /// 內嵌陣列的資料列分隔符號。
+    /// </summary>
+    RowSeparator
 }

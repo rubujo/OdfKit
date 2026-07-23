@@ -221,6 +221,11 @@ public ref struct FormulaParser
             return new ParenthesizedNode(node);
         }
 
+        if (_currentToken.Type == FormulaTokenType.OpenBrace)
+        {
+            return ParseInlineArray();
+        }
+
         if (_currentToken.Type == FormulaTokenType.Identifier)
         {
             string ident = _currentToken.Span.ToString();
@@ -282,5 +287,49 @@ public ref struct FormulaParser
         }
 
         throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_UnexpectedTokenTypeDuring", _currentToken.Type));
+    }
+
+    private AstNode ParseInlineArray()
+    {
+        Consume();
+        List<IReadOnlyList<AstNode>> rows = [];
+        List<AstNode> currentRow = [];
+
+        while (_currentToken.Type != FormulaTokenType.CloseBrace)
+        {
+            if (_currentToken.Type == FormulaTokenType.EndOfFormula)
+            {
+                throw new InvalidOperationException(
+                    OdfLocalizer.GetMessage(
+                        "Err_FormulaParser_UnexpectedTokenTypeDuring",
+                        _currentToken.Type));
+            }
+
+            currentRow.Add(ParseExpression());
+            if (_currentToken.Type == FormulaTokenType.Separator)
+            {
+                Consume();
+                continue;
+            }
+
+            rows.Add(currentRow);
+            if (_currentToken.Type == FormulaTokenType.RowSeparator)
+            {
+                Consume();
+                currentRow = [];
+                continue;
+            }
+
+            if (_currentToken.Type != FormulaTokenType.CloseBrace)
+            {
+                throw new InvalidOperationException(
+                    OdfLocalizer.GetMessage(
+                        "Err_FormulaParser_UnexpectedTokenTypeDuring",
+                        _currentToken.Type));
+            }
+        }
+
+        Consume();
+        return new InlineArrayNode(rows);
     }
 }

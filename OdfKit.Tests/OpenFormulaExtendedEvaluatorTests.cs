@@ -142,6 +142,183 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.Equal(42d, sheet.Cells["A1"].CellValue);
     }
 
+    /// <summary>
+    /// Verifies OpenFormula inline-array parsing, evaluation, and serialization.
+    /// 驗證 OpenFormula 內嵌陣列的剖析、求值及序列化。
+    /// </summary>
+    [Fact]
+    public void InlineArraysEvaluateAndSerialize()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(10d, evaluator.Evaluate("SUM({1;2|3;4})", context));
+
+        var parser = new FormulaParser("{1;2|3;4}");
+        Assert.Equal("{1;2|3;4}", parser.Parse().Serialize());
+    }
+
+    /// <summary>
+    /// Verifies matrix functions required by the Medium and Large groups.
+    /// 驗證 Medium 與 Large Group 要求的矩陣函式。
+    /// </summary>
+    [Fact]
+    public void MatrixFunctionsEvaluateInlineArrays()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(-2d, Assert.IsType<double>(evaluator.Evaluate("MDETERM({1;2|3;4})", context)), 10);
+
+        object[,] inverse = Assert.IsType<object[,]>(
+            evaluator.Evaluate("MINVERSE({1;2|3;4})", context));
+        Assert.Equal(-2d, Assert.IsType<double>(inverse[0, 0]), 10);
+        Assert.Equal(1d, Assert.IsType<double>(inverse[0, 1]), 10);
+        Assert.Equal(1.5d, Assert.IsType<double>(inverse[1, 0]), 10);
+        Assert.Equal(-0.5d, Assert.IsType<double>(inverse[1, 1]), 10);
+
+        object[,] product = Assert.IsType<object[,]>(
+            evaluator.Evaluate("MMULT({1;2|3;4};{5;6|7;8})", context));
+        Assert.Equal(19d, product[0, 0]);
+        Assert.Equal(22d, product[0, 1]);
+        Assert.Equal(43d, product[1, 0]);
+        Assert.Equal(50d, product[1, 1]);
+
+        object[,] identity = Assert.IsType<object[,]>(evaluator.Evaluate("MUNIT(2)", context));
+        Assert.Equal(1d, identity[0, 0]);
+        Assert.Equal(0d, identity[0, 1]);
+        Assert.Equal(0d, identity[1, 0]);
+        Assert.Equal(1d, identity[1, 1]);
+    }
+
+    /// <summary>
+    /// Verifies the cumulative OASIS mandatory-function catalogs and current gaps.
+    /// 驗證 OASIS 累計強制函式目錄與目前缺口。
+    /// </summary>
+    [Fact]
+    public void ConformanceReportsUseCumulativeOfficialFunctionCatalogs()
+    {
+        OdfFormulaConformanceReport small =
+            OdfFormulaSupport.GetConformanceReport(OdfFormulaConformanceGroup.Small);
+        OdfFormulaConformanceReport medium =
+            OdfFormulaSupport.GetConformanceReport(OdfFormulaConformanceGroup.Medium);
+        OdfFormulaConformanceReport large =
+            OdfFormulaSupport.GetConformanceReport(OdfFormulaConformanceGroup.Large);
+
+        Assert.Equal(110, small.RequiredFunctions.Count);
+        Assert.True(small.HasCompleteFunctionSet);
+        Assert.Equal(272, medium.RequiredFunctions.Count);
+        Assert.False(medium.HasCompleteFunctionSet);
+        Assert.Equal(91, medium.MissingFunctions.Count);
+        Assert.DoesNotContain("MMULT", medium.MissingFunctions);
+        Assert.Equal(388, large.RequiredFunctions.Count);
+        Assert.False(large.HasCompleteFunctionSet);
+        Assert.Equal(145, large.MissingFunctions.Count);
+        Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
+        Assert.Contains("DDE", large.MissingFunctions);
+    }
+
+    /// <summary>
+    /// Verifies added Medium and Large mathematical functions.
+    /// 驗證新增的 Medium 與 Large Group 數學函式。
+    /// </summary>
+    [Fact]
+    public void ExtendedMathematicalFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(6d, Assert.IsType<double>(evaluator.Evaluate("GCD(12;18)", context)));
+        Assert.Equal(36d, Assert.IsType<double>(evaluator.Evaluate("LCM(12;18)", context)));
+        Assert.Equal(10d, Assert.IsType<double>(evaluator.Evaluate("COMBIN(5;2)", context)));
+        Assert.Equal(3d, Assert.IsType<double>(evaluator.Evaluate("QUOTIENT(10;3)", context)));
+        Assert.Equal(15d, Assert.IsType<double>(evaluator.Evaluate("FACTDOUBLE(5)", context)));
+        Assert.Equal(1d, Assert.IsType<double>(evaluator.Evaluate("DELTA(4;4)", context)));
+        Assert.Equal(1d, Assert.IsType<double>(evaluator.Evaluate("GESTEP(4;3)", context)));
+        Assert.Equal(Math.Cosh(1), Assert.IsType<double>(evaluator.Evaluate("COSH(1)", context)), 10);
+    }
+
+    /// <summary>
+    /// Verifies OpenFormula complex construction, arithmetic, and analysis functions.
+    /// 驗證 OpenFormula 複數建立、運算及分析函式。
+    /// </summary>
+    [Fact]
+    public void ComplexFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal("3+4i", evaluator.Evaluate("COMPLEX(3;4)", context));
+        Assert.Equal(5d, Assert.IsType<double>(evaluator.Evaluate("IMABS(\"3+4i\")", context)));
+        Assert.Equal(3d, evaluator.Evaluate("IMREAL(\"3+4i\")", context));
+        Assert.Equal(4d, evaluator.Evaluate("IMAGINARY(\"3+4i\")", context));
+        Assert.Equal("4+2i", evaluator.Evaluate("IMSUM(\"3+4i\";\"1-2i\")", context));
+        Assert.Equal("11-2i", evaluator.Evaluate("IMPRODUCT(\"3+4i\";\"1-2i\")", context));
+        Assert.Equal("3-4i", evaluator.Evaluate("IMCONJUGATE(\"3+4i\")", context));
+    }
+
+    /// <summary>
+    /// Verifies text cleanup, Unicode scalar, and radix conversion functions.
+    /// 驗證文字清理、Unicode 純量及基數轉換函式。
+    /// </summary>
+    [Fact]
+    public void CompatibilityConversionFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal("AB", evaluator.Evaluate("CLEAN(\"A\"&CHAR(10)&\"B\")", context));
+        Assert.Equal(134071d, evaluator.Evaluate("UNICODE(\"𠮷\")", context));
+        Assert.Equal("𠮷", evaluator.Evaluate("UNICHAR(134071)", context));
+        Assert.Equal("00FF", evaluator.Evaluate("BASE(255;16;4)", context));
+        Assert.Equal(255d, evaluator.Evaluate("DECIMAL(\"FF\";16)", context));
+    }
+
+    /// <summary>
+    /// Verifies extended statistical functions over inline arrays.
+    /// 驗證內嵌陣列的擴充統計函式。
+    /// </summary>
+    [Fact]
+    public void ExtendedStatisticalFunctionsEvaluateInlineArrays()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(2d / 3d, Assert.IsType<double>(
+            evaluator.Evaluate("AVEDEV({1;2;3})", context)), 10);
+        Assert.Equal(1d, evaluator.Evaluate("CORREL({1;2;3};{2;4;6})", context));
+        Assert.Equal(2d / 3d, Assert.IsType<double>(
+            evaluator.Evaluate("COVAR({1;2;3};{2;3;4})", context)), 10);
+        Assert.Equal(2d, evaluator.Evaluate("DEVSQ({1;2;3})", context));
+        Assert.Equal(2d, Assert.IsType<double>(
+            evaluator.Evaluate("GEOMEAN({1;2;4})", context)), 10);
+        Assert.Equal(12d / 7d, Assert.IsType<double>(
+            evaluator.Evaluate("HARMEAN({1;2;4})", context)), 10);
+        Assert.Equal(2d, evaluator.Evaluate("SLOPE({2;4;6};{1;2;3})", context));
+        Assert.Equal(0d, evaluator.Evaluate("INTERCEPT({2;4;6};{1;2;3})", context));
+        Assert.Equal(1d, evaluator.Evaluate("RSQ({2;4;6};{1;2;3})", context));
+        Assert.Equal(14d, evaluator.Evaluate("SUMSQ({1;2;3})", context));
+        Assert.Equal(1d, evaluator.Evaluate("AVERAGEA({TRUE;2;\"x\"})", context));
+    }
+
+    /// <summary>
+    /// Verifies additional date functions required by Medium and Large groups.
+    /// 驗證 Medium 與 Large Group 要求的額外日期函式。
+    /// </summary>
+    [Fact]
+    public void ExtendedDateFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(9d, evaluator.Evaluate(
+            "DAYS(DATE(2024;1;10);DATE(2024;1;1))",
+            context));
+        Assert.Equal(1d, evaluator.Evaluate(
+            "ISOWEEKNUM(DATE(2024;1;4))",
+            context));
+    }
+
     private sealed class RecordingFallback(object result) : IOdfFormulaEvaluationFallback
     {
         public string? Formula { get; private set; }

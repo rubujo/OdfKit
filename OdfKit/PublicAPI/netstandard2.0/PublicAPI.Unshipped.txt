@@ -14574,6 +14574,8 @@ OdfKit.Formula.AST.FunctionNode
 OdfKit.Formula.AST.FunctionNode.Arguments.get -> System.Collections.Generic.List<OdfKit.Formula.AST.AstNode!>!
 OdfKit.Formula.AST.FunctionNode.FunctionNode(string! name, System.Collections.Generic.List<OdfKit.Formula.AST.AstNode!>! arguments) -> void
 OdfKit.Formula.AST.FunctionNode.Name.get -> string!
+OdfKit.Formula.AST.InlineArrayNode
+OdfKit.Formula.AST.InlineArrayNode.InlineArrayNode(System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyList<OdfKit.Formula.AST.AstNode!>!>! rows) -> void
 OdfKit.Formula.AST.LiteralNode
 OdfKit.Formula.AST.LiteralNode.LiteralNode(object! value) -> void
 OdfKit.Formula.AST.NamedRangeNode
@@ -14638,13 +14640,16 @@ OdfKit.Formula.FormulaToken.Type.get -> OdfKit.Formula.TokenType
 OdfKit.Formula.FormulaToken.Value.get -> string!
 OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Bool = 2 -> OdfKit.Formula.FormulaTokenType
+OdfKit.Formula.FormulaTokenType.CloseBrace = 11 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.CloseParen = 6 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Colon = 8 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.EndOfFormula = 9 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Identifier = 3 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Number = 0 -> OdfKit.Formula.FormulaTokenType
+OdfKit.Formula.FormulaTokenType.OpenBrace = 10 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.OpenParen = 5 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Operator = 4 -> OdfKit.Formula.FormulaTokenType
+OdfKit.Formula.FormulaTokenType.RowSeparator = 12 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.Separator = 7 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.FormulaTokenType.String = 1 -> OdfKit.Formula.FormulaTokenType
 OdfKit.Formula.IEvaluationContext
@@ -14671,6 +14676,15 @@ OdfKit.Formula.OdfFormulaBuilder.Build() -> OdfKit.Formula.OdfFormulaDocument!
 OdfKit.Formula.OdfFormulaBuilder.WithIdentifierEquation(string! leftIdentifier, string! rightIdentifier) -> OdfKit.Formula.OdfFormulaBuilder!
 OdfKit.Formula.OdfFormulaBuilder.WithMathML(string! mathMlXml) -> OdfKit.Formula.OdfFormulaBuilder!
 OdfKit.Formula.OdfFormulaBuilder.WithTokens(params OdfKit.Formula.OdfMathToken![]! tokens) -> OdfKit.Formula.OdfFormulaBuilder!
+OdfKit.Formula.OdfFormulaConformanceGroup
+OdfKit.Formula.OdfFormulaConformanceGroup.Large = 2 -> OdfKit.Formula.OdfFormulaConformanceGroup
+OdfKit.Formula.OdfFormulaConformanceGroup.Medium = 1 -> OdfKit.Formula.OdfFormulaConformanceGroup
+OdfKit.Formula.OdfFormulaConformanceGroup.Small = 0 -> OdfKit.Formula.OdfFormulaConformanceGroup
+OdfKit.Formula.OdfFormulaConformanceReport
+OdfKit.Formula.OdfFormulaConformanceReport.Group.get -> OdfKit.Formula.OdfFormulaConformanceGroup
+OdfKit.Formula.OdfFormulaConformanceReport.HasCompleteFunctionSet.get -> bool
+OdfKit.Formula.OdfFormulaConformanceReport.MissingFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Formula.OdfFormulaConformanceReport.RequiredFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Formula.OdfFormulaDependencyGraph
 OdfKit.Formula.OdfFormulaDependencyGraph.CircularCells.get -> System.Collections.Generic.IReadOnlyCollection<OdfKit.Spreadsheet.OdfCellAddress>!
 OdfKit.Formula.OdfFormulaDependencyGraph.Clear() -> void
@@ -18384,6 +18398,8 @@ override OdfKit.Formula.AST.CellAddressNode.Serialize() -> string!
 override OdfKit.Formula.AST.FunctionNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
 override OdfKit.Formula.AST.FunctionNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
 override OdfKit.Formula.AST.FunctionNode.Serialize() -> string!
+override OdfKit.Formula.AST.InlineArrayNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
+override OdfKit.Formula.AST.InlineArrayNode.Serialize() -> string!
 override OdfKit.Formula.AST.LiteralNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
 override OdfKit.Formula.AST.LiteralNode.Serialize() -> string!
 override OdfKit.Formula.AST.NamedRangeNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
@@ -19161,8 +19177,11 @@ static OdfKit.Formula.OdfFormulaLatexConverter.Convert(string! latex) -> string!
 static OdfKit.Formula.OdfFormulaLatexConverter.ToLatex(System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfMathToken!>! tokens) -> string!
 static OdfKit.Formula.OdfFormulaSupport.Analyze(string! formula) -> OdfKit.Formula.OdfFormulaAnalysis!
 static OdfKit.Formula.OdfFormulaSupport.Analyze(string! formula, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> OdfKit.Formula.OdfFormulaAnalysis!
+static OdfKit.Formula.OdfFormulaSupport.GetConformanceReport(OdfKit.Formula.OdfFormulaConformanceGroup group) -> OdfKit.Formula.OdfFormulaConformanceReport!
+static OdfKit.Formula.OdfFormulaSupport.GetConformanceReport(OdfKit.Formula.OdfFormulaConformanceGroup group, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> OdfKit.Formula.OdfFormulaConformanceReport!
 static OdfKit.Formula.OdfFormulaSupport.GetMissingSmallGroupFunctions() -> System.Collections.Generic.IReadOnlyList<string!>!
 static OdfKit.Formula.OdfFormulaSupport.GetMissingSmallGroupFunctions(OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> System.Collections.Generic.IReadOnlyList<string!>!
+static OdfKit.Formula.OdfFormulaSupport.GetRequiredFunctions(OdfKit.Formula.OdfFormulaConformanceGroup group) -> System.Collections.Generic.IReadOnlyList<string!>!
 static OdfKit.Formula.OdfFormulaSupport.IsFunctionSupported(string! name) -> bool
 static OdfKit.Formula.OdfFormulaSupport.IsFunctionSupported(string! name, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> bool
 static OdfKit.Formula.OdfFormulaSupport.SerializePreservingUnsupported(string! formula) -> string!

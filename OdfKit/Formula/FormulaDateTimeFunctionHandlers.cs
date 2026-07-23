@@ -573,5 +573,36 @@ internal static class FormulaDateTimeFunctionHandlers
             return OdfFormulaError.Value;
         }
     }
+
+    internal static object EvaluateDays(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 2)
+            return OdfFormulaError.Value;
+        object endValue = arguments[0].Evaluate(context);
+        object startValue = arguments[1].Evaluate(context);
+        if (endValue is OdfFormulaError endError)
+            return endError;
+        if (startValue is OdfFormulaError startError)
+            return startError;
+        if (!TryCoerceDateTime(endValue, out DateTime end) ||
+            !TryCoerceDateTime(startValue, out DateTime start))
+        {
+            return OdfFormulaError.Value;
+        }
+
+        return (end.Date - start.Date).TotalDays;
+    }
+
+    internal static object EvaluateIsoWeekNum(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 1)
+            return OdfFormulaError.Value;
+        object value = arguments[0].Evaluate(context);
+        if (value is OdfFormulaError error)
+            return error;
+        return TryCoerceDateTime(value, out DateTime date)
+            ? (double)GetIso8601WeekOfYear(date)
+            : OdfFormulaError.Value;
+    }
 }
 

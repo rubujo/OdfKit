@@ -63,6 +63,9 @@ public static class OdfFormulaSupport
         new("UPPER", "Text", OdfFormulaSupportLevel.Evaluated),
         new("TRIM", "Text", OdfFormulaSupportLevel.Evaluated),
         new("REPLACE", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("CLEAN", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("UNICHAR", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("UNICODE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("SUBSTITUTE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("FIND", "Text", OdfFormulaSupportLevel.Evaluated),
         new("SEARCH", "Text", OdfFormulaSupportLevel.Evaluated),
@@ -97,6 +100,28 @@ public static class OdfFormulaSupport
         new("COUNTIF", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("MAX", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("MIN", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("AVEDEV", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("CORREL", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("COVAR", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("DEVSQ", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("GEOMEAN", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("HARMEAN", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("INTERCEPT", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("PEARSON", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("RSQ", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SLOPE", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("STANDARDIZE", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("STDEVA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("STDEVPA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SUMSQ", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SUMX2MY2", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SUMX2PY2", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SUMXMY2", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("VARA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("AVERAGEA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("MAXA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("MINA", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("VARPA", "Statistical", OdfFormulaSupportLevel.Evaluated),
 
         // 查閱函數
         new("VLOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
@@ -147,6 +172,57 @@ public static class OdfFormulaSupport
         new("LOG10", "Math", OdfFormulaSupportLevel.Evaluated),
         new("SUMPRODUCT", "Math", OdfFormulaSupportLevel.Evaluated),
         new("CONVERT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ACOSH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ACOT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ACOTH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ASINH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ATANH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COMBIN", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COSH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COTH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("CSC", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("CSCH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("DELTA", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("FACTDOUBLE", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("GCD", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("GESTEP", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("LCM", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("MULTINOMIAL", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("QUOTIENT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SEC", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SECH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SINH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SQRTPI", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("TANH", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("BASE", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("DECIMAL", "Math", OdfFormulaSupportLevel.Evaluated),
+
+        // 複數函數
+        new("COMPLEX", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMABS", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMAGINARY", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMARGUMENT", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMCONJUGATE", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMCOS", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMCOT", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMCSC", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMCSCH", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMDIV", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMEXP", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMLN", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMLOG10", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMLOG2", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMPOWER", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMPRODUCT", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMREAL", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSEC", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSECH", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSIN", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSQRT", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSUB", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMSUM", "Complex", OdfFormulaSupportLevel.Evaluated),
+        new("IMTAN", "Complex", OdfFormulaSupportLevel.Evaluated),
 
         // 日期／時間函數
         new("DATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
@@ -168,6 +244,8 @@ public static class OdfFormulaSupport
         new("NETWORKDAYS", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EDATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EOMONTH", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("DAYS", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("ISOWEEKNUM", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EASTERSUNDAY", "DateTime", OdfFormulaSupportLevel.Evaluated),
 
         // LibreOffice 擴充函數（ORG.OPENOFFICE.EASTERSUNDAY 為 ODF 1.4 標準化 EASTERSUNDAY 前的舊版供應商前綴名稱，保留以維持回溯相容）
@@ -175,6 +253,10 @@ public static class OdfFormulaSupport
         new("ORG.OPENOFFICE.ISOMITTED", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
 
         // 矩陣函數
+        new("MDETERM", "Matrix", OdfFormulaSupportLevel.Evaluated),
+        new("MINVERSE", "Matrix", OdfFormulaSupportLevel.Evaluated),
+        new("MMULT", "Matrix", OdfFormulaSupportLevel.Evaluated),
+        new("MUNIT", "Matrix", OdfFormulaSupportLevel.Evaluated),
         new("TRANSPOSE", "Matrix", OdfFormulaSupportLevel.Evaluated),
 
         // 資料庫函數
@@ -229,6 +311,63 @@ public static class OdfFormulaSupport
     private static readonly IReadOnlyList<string> SmallGroupFunctions =
         Array.AsReadOnly(SmallGroupFunctionTable);
 
+    private static readonly string[] MediumGroupAdditionalFunctionTable =
+    [
+        "ACCRINT", "ACCRINTM", "ACOSH", "ACOT", "ACOTH", "ADDRESS", "ASINH", "ATANH",
+        "AVEDEV", "BESSELI", "BESSELJ", "BESSELK", "BESSELY", "BETADIST", "BETAINV",
+        "BINOMDIST", "CEILING", "CHAR", "CLEAN", "CODE", "COLUMN", "COMBIN", "CONCATENATE",
+        "CONFIDENCE", "CONVERT", "CORREL", "COSH", "COT", "COTH", "COUPDAYBS", "COUPDAYS",
+        "COUPDAYSNC", "COUPNCD", "COUPNUM", "COUPPCD", "COVAR", "CRITBINOM", "CUMIPMT",
+        "CUMPRINC", "DATEVALUE", "DAYS360", "DB", "DEVSQ", "DISC", "DOLLARDE", "DOLLARFR",
+        "DURATION", "EFFECT", "EOMONTH", "ERF", "ERFC", "EXPONDIST", "FISHER", "FISHERINV",
+        "FIXED", "FLOOR", "FORECAST", "FTEST", "GAMMADIST", "GAMMAINV", "GAMMALN", "GCD",
+        "GEOMEAN", "HARMEAN", "HYPGEOMDIST", "INTERCEPT", "INTRATE", "ISEVEN", "ISODD",
+        "ISOWEEKNUM", "KURT", "LARGE", "LCM", "LEGACY.CHIDIST", "LEGACY.CHIINV",
+        "LEGACY.CHITEST", "LEGACY.FDIST", "LEGACY.FINV", "LEGACY.NORMSDIST",
+        "LEGACY.NORMSINV", "LEGACY.TDIST", "LINEST", "LOGEST", "LOGINV", "LOGNORMDIST",
+        "LOOKUP", "MDURATION", "MEDIAN", "MINVERSE", "MIRR", "MMULT", "MODE", "MROUND",
+        "MULTINOMIAL", "NEGBINOMDIST", "NETWORKDAYS", "NOMINAL", "ODDFPRICE", "ODDFYIELD",
+        "ODDLPRICE", "ODDLYIELD", "OFFSET", "PEARSON", "PERCENTILE", "PERCENTRANK",
+        "PERMUT", "POISSON", "PRICE", "PRICEMAT", "PROB", "QUARTILE", "QUOTIENT", "RAND",
+        "RANDBETWEEN", "RANK", "RECEIVED", "ROMAN", "ROUNDDOWN", "ROUNDUP", "ROW", "RSQ",
+        "SERIESSUM", "SIGN", "SINH", "SKEW", "SKEWP", "SLOPE", "SMALL", "SQRTPI",
+        "STANDARDIZE", "STDEVA", "STDEVPA", "STEYX", "SUBTOTAL", "SUMPRODUCT", "SUMSQ",
+        "SUMX2MY2", "SUMX2PY2", "SUMXMY2", "TANH", "TBILLEQ", "TBILLPRICE", "TBILLYIELD",
+        "TIMEVALUE", "TINV", "TRANSPOSE", "TREND", "TRIMMEAN", "TTEST", "TYPE", "VARA",
+        "VDB", "WEEKNUM", "WEIBULL", "WORKDAY", "XIRR", "XNPV", "YEARFRAC", "YIELD",
+        "YIELDDISC", "YIELDMAT", "ZTEST"
+    ];
+
+    private static readonly string[] LargeGroupAdditionalFunctionTable =
+    [
+        "AMORLINC", "ARABIC", "AREAS", "ASC", "AVERAGEA", "AVERAGEIFS", "BASE", "BIN2DEC",
+        "BIN2HEX", "BIN2OCT", "BINOM.DIST.RANGE", "BITAND", "BITLSHIFT", "BITOR",
+        "BITRSHIFT", "BITXOR", "CHISQDIST", "CHISQINV", "COMBINA", "COMPLEX", "COUNTIFS",
+        "CSC", "CSCH", "DATEDIF", "DAYS", "DDE", "DEC2BIN", "DEC2HEX", "DEC2OCT", "DECIMAL",
+        "DELTA", "EDATE", "ERROR.TYPE", "EUROCONVERT", "FACTDOUBLE", "FDIST", "FINDB", "FINV",
+        "FORMULA", "FREQUENCY", "FVSCHEDULE", "GAMMA", "GAUSS", "GESTEP", "GETPIVOTDATA",
+        "GROWTH", "HEX2BIN", "HEX2DEC", "HEX2OCT", "HYPERLINK", "IFERROR", "IFNA", "IMABS",
+        "IMAGINARY", "IMARGUMENT", "IMCONJUGATE", "IMCOS", "IMCOT", "IMCSC", "IMCSCH",
+        "IMDIV", "IMEXP", "IMLN", "IMLOG10", "IMLOG2", "IMPOWER", "IMPRODUCT", "IMREAL",
+        "IMSEC", "IMSECH", "IMSIN", "IMSQRT", "IMSUB", "IMSUM", "IMTAN", "INDIRECT",
+        "INFO", "IPMT", "ISFORMULA", "ISPMT", "ISREF", "JIS", "LEFTB", "LENB", "MAXA",
+        "MDETERM", "MULTIPLE.OPERATIONS", "MUNIT", "MIDB", "MINA", "NORMDIST", "NORMINV",
+        "NUMBERVALUE", "OCT2BIN", "OCT2DEC", "OCT2HEX", "PDURATION", "PERMUTATIONA", "PHI",
+        "PPMT", "PRICEDISC", "REPLACEB", "RIGHTB", "RRI", "SEARCH", "SEARCHB", "SEC", "SECH",
+        "SHEET", "SHEETS", "SUMIFS", "TEXT", "UNICHAR", "UNICODE", "VARPA", "XOR"
+    ];
+
+    private static readonly IReadOnlyList<string> MediumGroupRequiredFunctionNames =
+        Array.AsReadOnly(CreateCumulativeFunctionTable(
+            SmallGroupFunctionTable,
+            MediumGroupAdditionalFunctionTable));
+
+    private static readonly IReadOnlyList<string> LargeGroupRequiredFunctionNames =
+        Array.AsReadOnly(CreateCumulativeFunctionTable(
+            SmallGroupFunctionTable,
+            MediumGroupAdditionalFunctionTable,
+            LargeGroupAdditionalFunctionTable));
+
     /// <summary>
     /// Gets the table of functions supported by the default formula evaluator.
     /// 取得預設公式評估器支援的函式表。
@@ -244,6 +383,46 @@ public static class OdfFormulaSupport
     /// 僅有函式名稱涵蓋並不代表評估器合規；語法、限制、型別轉換及語意仍須分別驗證。
     /// </remarks>
     public static IReadOnlyList<string> SmallGroupRequiredFunctions => SmallGroupFunctions;
+
+    /// <summary>
+    /// Gets cumulative mandatory function names for an OpenFormula evaluator group.
+    /// 取得 OpenFormula 評估器群組的累計強制函式名稱。
+    /// </summary>
+    /// <param name="group">The conformance group. / 一致性群組。</param>
+    /// <returns>The immutable mandatory-function list. / 不可變的強制函式清單。</returns>
+    public static IReadOnlyList<string> GetRequiredFunctions(OdfFormulaConformanceGroup group)
+        => GetRequiredFunctionsCore(group);
+
+    /// <summary>
+    /// Reports cumulative mandatory-function coverage for the built-in evaluator.
+    /// 報告內建評估器的累計強制函式覆蓋情形。
+    /// </summary>
+    /// <param name="group">The conformance group. / 一致性群組。</param>
+    /// <returns>The function coverage report. / 函式覆蓋報告。</returns>
+    public static OdfFormulaConformanceReport GetConformanceReport(
+        OdfFormulaConformanceGroup group)
+        => GetConformanceReportCore(group, null);
+
+    /// <summary>
+    /// Reports cumulative mandatory-function coverage for the built-in evaluator and an application registry.
+    /// 報告內建評估器與應用程式註冊表的累計強制函式覆蓋情形。
+    /// </summary>
+    /// <param name="group">The conformance group. / 一致性群組。</param>
+    /// <param name="functions">The application-defined function registry. / 應用程式自訂函式註冊表。</param>
+    /// <returns>The function coverage report. / 函式覆蓋報告。</returns>
+    public static OdfFormulaConformanceReport GetConformanceReport(
+        OdfFormulaConformanceGroup group,
+        OdfFormulaFunctionRegistry functions)
+    {
+        if (functions is null)
+        {
+            throw new ArgumentNullException(
+                nameof(functions),
+                OdfLocalizer.GetMessage("Err_OdfFormulaSupport_FunctionRegistryNull"));
+        }
+
+        return GetConformanceReportCore(group, functions);
+    }
 
     /// <summary>
     /// Returns mandatory Small-group functions that are unavailable from the built-in evaluator.
@@ -436,6 +615,54 @@ public static class OdfFormulaSupport
 
         return set;
     }
+
+    private static string[] CreateCumulativeFunctionTable(params string[][] tables)
+    {
+        var functions = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string[] table in tables)
+        {
+            foreach (string functionName in table)
+            {
+                if (seen.Add(functionName))
+                {
+                    functions.Add(functionName);
+                }
+            }
+        }
+
+        return functions.ToArray();
+    }
+
+    private static OdfFormulaConformanceReport GetConformanceReportCore(
+        OdfFormulaConformanceGroup group,
+        OdfFormulaFunctionRegistry? functions)
+    {
+        IReadOnlyList<string> requiredFunctions = GetRequiredFunctionsCore(group);
+        var missingFunctions = new List<string>();
+        foreach (string functionName in requiredFunctions)
+        {
+            if (!IsFunctionSupportedCore(functionName, functions))
+            {
+                missingFunctions.Add(functionName);
+            }
+        }
+
+        return new OdfFormulaConformanceReport(
+            group,
+            requiredFunctions,
+            Array.AsReadOnly(missingFunctions.ToArray()));
+    }
+
+    private static IReadOnlyList<string> GetRequiredFunctionsCore(
+        OdfFormulaConformanceGroup group)
+        => group switch
+        {
+            OdfFormulaConformanceGroup.Small => SmallGroupFunctions,
+            OdfFormulaConformanceGroup.Medium => MediumGroupRequiredFunctionNames,
+            OdfFormulaConformanceGroup.Large => LargeGroupRequiredFunctionNames,
+            _ => throw new ArgumentOutOfRangeException(nameof(group))
+        };
 
     private static IReadOnlyList<string> GetMissingSmallGroupFunctionsCore(
         OdfFormulaFunctionRegistry? functions)

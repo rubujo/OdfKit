@@ -38,6 +38,67 @@ public class LiteralNode(object value) : AstNode
 }
 
 /// <summary>
+/// Represents an OpenFormula inline array.
+/// 代表 OpenFormula 內嵌陣列。
+/// </summary>
+/// <param name="rows">The array rows. / 陣列資料列。</param>
+public sealed class InlineArrayNode(IReadOnlyList<IReadOnlyList<AstNode>> rows) : AstNode
+{
+    /// <summary>
+    /// Evaluates the inline array.
+    /// 評估內嵌陣列。
+    /// </summary>
+    /// <param name="context">The evaluation context. / 評估內容模型。</param>
+    /// <returns>The rectangular array value. / 矩形陣列值。</returns>
+    public override object Evaluate(IEvaluationContext context)
+    {
+        if (rows.Count == 0 || rows[0].Count == 0)
+        {
+            return OdfFormulaError.Value;
+        }
+
+        int columnCount = rows[0].Count;
+        var values = new object[rows.Count, columnCount];
+        for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+        {
+            if (rows[rowIndex].Count != columnCount)
+            {
+                return OdfFormulaError.Value;
+            }
+
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+            {
+                values[rowIndex, columnIndex] = rows[rowIndex][columnIndex].Evaluate(context);
+            }
+        }
+
+        return values;
+    }
+
+    /// <summary>
+    /// Serializes the inline array.
+    /// 序列化內嵌陣列。
+    /// </summary>
+    /// <returns>The OpenFormula inline-array text. / OpenFormula 內嵌陣列文字。</returns>
+    public override string Serialize()
+    {
+        var serializedRows = new string[rows.Count];
+        for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+        {
+            var serializedColumns = new string[rows[rowIndex].Count];
+            for (int columnIndex = 0; columnIndex < rows[rowIndex].Count; columnIndex++)
+            {
+                serializedColumns[columnIndex] = rows[rowIndex][columnIndex].Serialize();
+            }
+
+            serializedRows[rowIndex] = string.Join(";", serializedColumns);
+        }
+
+        return "{" + string.Join("|", serializedRows) + "}";
+    }
+}
+
+/// <summary>
 /// Represents an AST node for a cell address.
 /// 代表儲存格位址的 AST 節點。
 /// </summary>
