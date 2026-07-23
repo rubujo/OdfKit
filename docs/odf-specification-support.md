@@ -25,8 +25,9 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 | ODF 1.4 | 官方 RELAX NG 內建並產生版本化 metadata | `OasisOdf14Strict`、`OasisOdf14Extended` | 使用 ODF 1.4 正式標準的 schema、封裝與版本限制。 |
 
 所有版本都以 `NamespaceURI` 與 `LocalName` 比對 XML，不依賴文件使用的前綴。
-版本化 schema provider 的來源、日期及輸出由
-`tools/OdfSchemaGenerator/oasis-odf*-schema.json` 管理；外部 Jing corpus 是補充證據，
+版本化文件、manifest 與 dsig schema provider 的來源、日期及輸出由
+`tools/OdfSchemaGenerator/oasis-odf*-schema.json`、`oasis-odf*-manifest-schema.json`
+與 `oasis-odf*-dsig-schema.json` 管理；外部 Jing corpus 是補充證據，
 不是執行期相依套件。
 
 ## 按規格層分解
@@ -34,8 +35,8 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 | 規格層 | 支援狀態 | 已實作 | 不代表 |
 |--------|----------|--------|--------|
 | 文件 XML／schema（ODF 1.0～1.4） | 結構性支援 | 版本偵測、官方 RELAX NG metadata、元素／屬性／pattern 驗證、Strict／Extended 命名空間診斷、flat document 驗證。 | 每一種應用程式語意都有高階 facade，或畫面能像素級一致。 |
-| ZIP 封裝與 manifest | 結構性支援 | `mimetype`、安全相對路徑、重複項目、root file-entry、payload 對應、media type、目錄路徑、加密 metadata、簽章 entry，以及 ODF 1.2～1.4 所需的 `manifest:version` 與可辨識版本值。 | 具備通用 RELAX NG 驗證器或逐節涵蓋 Part 2 manifest／dsig schema；也不能破解加密、判定簽署者可信，或證明內容沒有惡意行為。manifest schema 版本不必等同內容 XML 版本。 |
-| 數位簽章 XML | 結構性支援 | XMLDSIG 建立／驗證、封裝引用與選配指令碼簽署工作流程。 | 作業系統或企業 PKI 信任；信任政策必須由呼叫端明確提供。 |
+| ZIP 封裝與 manifest | 完整支援 | `mimetype`、安全相對路徑、重複項目、root file-entry、payload 對應、media type、目錄路徑、加密 metadata，以及 ODF 1.0～1.4 官方 manifest RNG 機械驗證；ODF 1.2～1.4 另區分一般 Package 與 Extended Package 的 `META-INF` 規則。 | 具備任意第三方 RNG 的通用編譯器，也不能破解加密或證明內容沒有惡意行為。manifest schema 版本不必等同內容 XML 版本。 |
+| 數位簽章 XML | 結構性支援 | ODF 1.2～1.4 官方 dsig RNG、任意 `META-INF/*signatures*` 入口驗證、XMLDSIG 建立／驗證、封裝引用與選配指令碼簽署工作流程。 | 作業系統或企業 PKI 信任；信任政策必須由呼叫端明確提供。ODF 1.0／1.1 規範沒有獨立 dsig RNG。 |
 | OpenFormula | 結構性支援＋僅保留 | `of:=`／舊版 `oooc:=` 語法剖析、參照轉換、函式能力查詢、部分受控評估；未知或未支援函式原樣保留並產生診斷。 | 完整試算表重算、volatile／locale／外部資料來源語意，或與任一辦公軟體逐位元相同。 |
 | RDF／metadata | 結構性支援 | 封裝 RDF、文件 metadata 與未知 XML 內容保留。 | RDF 推論器、SPARQL 伺服器或網路資源擷取。 |
 | 指令碼與事件 | 結構性支援＋僅保留 | 選配 Scripting 套件提供 ODF 1.0～1.4 巨集 CRUD、簽章、靜態政策與診斷。 | 在核心或 Scripting 套件內執行巨集；實際編譯／執行交由隔離的 LibreOffice／Python worker。 |

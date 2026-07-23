@@ -17,6 +17,14 @@ param(
         "tools/OdfSchemaGenerator/oasis-odf12-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf11-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf10-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf14-manifest-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf14-dsig-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf13-manifest-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf13-dsig-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf12-manifest-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf12-dsig-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf11-manifest-schema.json",
+        "tools/OdfSchemaGenerator/oasis-odf10-manifest-schema.json",
         "tools/OdfSchemaGenerator/oasis-odf14-dom-wrappers.json"
     )
 )

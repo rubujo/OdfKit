@@ -4,8 +4,9 @@
 此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔應用程式 (File-based apps)** 特性，
 不需要建立傳統 `.csproj`，即可直接執行。
 
-WebFont 專用範例另見：
+其它專用範例另見：
 
+- [`OdfKit.HighLevelApi`](OdfKit.HighLevelApi/README.md)：文件層級純文字擷取與內嵌 ODF 子文件管理。
 - [`WebFonts.AspNetCore`](WebFonts.AspNetCore/README.md)：可執行的 ASP.NET Core、嚴格 CSP、
   同源或 CDN 託管範例。
 - [`WebFonts.WebForms`](WebFonts.WebForms/README.md)：ASP.NET Web Forms Handler、

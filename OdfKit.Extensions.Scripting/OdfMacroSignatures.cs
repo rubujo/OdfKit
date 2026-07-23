@@ -293,6 +293,10 @@ public sealed class OdfMacroSignatureValidationResult
     public bool IsCodeSafetyEvaluated => false;
 }
 
+/// <summary>
+/// Provides macro-signing and trust-verification operations.
+/// 提供巨集簽署與信任驗證作業。
+/// </summary>
 public sealed partial class OdfScriptManager
 {
     private static readonly OdfSignatureProfile MacroSignatureProfile = new(

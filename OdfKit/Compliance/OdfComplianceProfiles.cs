@@ -47,6 +47,7 @@ public static class OdfComplianceProfiles
     private static readonly OdfPolicyRule[] StandardRules = [
         Rule("RequireOdfNamespaceValidity", "ODF namespace elements and attributes must be valid for the selected ODF version.", OdfIssueSeverity.Error),
         Rule("RequireManifestIntegrity", "The package manifest must describe the package root and all stored payload entries.", OdfIssueSeverity.Error),
+        Rule("RequirePackageSchemaValidation", "Package manifest and digital-signature XML must validate against the normative version-specific schemas.", OdfIssueSeverity.Error),
         Rule("RequireSafePackagePaths", "Package entries must use safe relative ZIP paths with forward slash separators.", OdfIssueSeverity.Fatal),
         Rule("RequireDeclaredOdfVersion", "ODF XML root elements should declare the office:version attribute.", OdfIssueSeverity.Warning)
     ];
@@ -120,7 +121,7 @@ public static class OdfComplianceProfiles
         OdfVersionRange.Exact(OdfVersion.Odf12),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        [.. StandardRules, Rule("RequireStrictPackageConformance", "Strict package conformance permits only the manifest and signature XML files below META-INF.", OdfIssueSeverity.Error), Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
     /// <summary>
@@ -174,7 +175,7 @@ public static class OdfComplianceProfiles
         OdfVersionRange.Exact(OdfVersion.Odf13),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        [.. StandardRules, Rule("RequireStrictPackageConformance", "Strict package conformance permits only the manifest and signature XML files below META-INF.", OdfIssueSeverity.Error), Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
     /// <summary>
@@ -210,7 +211,7 @@ public static class OdfComplianceProfiles
         OdfVersionRange.Exact(OdfVersion.Odf14),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
+        [.. StandardRules, Rule("RequireStrictPackageConformance", "Strict package conformance permits only the manifest and signature XML files below META-INF.", OdfIssueSeverity.Error), Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
     /// <summary>

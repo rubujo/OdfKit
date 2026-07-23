@@ -1405,7 +1405,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void ValidatorReportsMissingManifestVersion()
+        public void ValidatorRejectsMissingManifestVersion()
         {
             using MemoryStream ms = CreateZipWithRawManifest(
                 "application/vnd.oasis.opendocument.text",
@@ -1418,9 +1418,12 @@ namespace OdfKit.Tests
 
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
 
-            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+            Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue =>
                 issue.RuleId == "ODF0112" &&
+                issue.PackagePath == "META-INF/manifest.xml");
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "ODF3111" &&
                 issue.PackagePath == "META-INF/manifest.xml");
         }
 

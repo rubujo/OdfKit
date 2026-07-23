@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Metadata skrip dokumen tiada struktur yang diperlukan.",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "Tiada item skrip pada indeks {0}.",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokumen menggunakan versi ODF yang tidak disokong untuk pengurusan skrip.",
+            ["Err_OdfPackage_EntryNameEmpty"] = "Laluan entri pakej tidak boleh kosong.",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "Laluan entri pakej '{0}' sudah wujud.",
         };
     }
 }

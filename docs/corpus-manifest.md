@@ -147,6 +147,16 @@ package-only 依 manifest 的 `kind` 是否以 `Flat` 開頭判斷，不依可�
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
 或未文件化的外部 baseline mismatch，都會讓 exit code 為 `1`。
 
+對宣告為 valid 的 fixture，CLI 也會依 `roundTrip` 實際載入、儲存並重新載入文件：
+
+- `semantic-equivalent` 比對文件種類、ODF 版本及 `ExtractText()` 的邏輯文字結果。
+- `preserve-unknown` 除上述語意外，亦逐項比對非核心 XML 的 ZIP entry 名稱與 SHA-256，
+  因此圖片、內嵌物件、供應商擴充與未知 payload 遺失時會讓 corpus gate 失敗。
+- `byte-identical` 另要求完整輸出位元組相同，只適合明確承諾不重寫封裝的情境。
+
+JSON 與文字報告會輸出 round-trip 檢查數、失敗數、文字是否一致及保留 entry 數量；invalid
+fixture 不執行 round-trip，避免把刻意損毀的輸入當成可儲存文件。
+
 `--metadata-only` 只檢查 manifest 與 baseline exception manifest 的結構與中繼資料
 規則，不要求 fixture 檔案存在，也不執行 OdfKit 或外部 validator。這可用於官方或授權待確認
 corpus 在下載樣本前的來源、授權與 baseline 例外格式檢查。

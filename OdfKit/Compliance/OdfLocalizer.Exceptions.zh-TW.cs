@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "文件的指令碼中繼資料缺少必要結構。",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "索引 {0} 沒有對應的指令碼項目。",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "文件使用的 ODF 版本不支援指令碼管理。",
+            ["Err_OdfPackage_EntryNameEmpty"] = "封裝項目路徑不可為空白。",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "封裝項目路徑「{0}」已存在。",
         };
     }
 }

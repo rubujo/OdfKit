@@ -2,6 +2,50 @@
 
 本文件提供可直接改寫的常見 ODF 操作範例。範例只描述目前已有測試支撐的能力。
 
+## 擷取跨格式純文字
+
+`ExtractText` 是 ODT、ODS、ODP、ODG 與其它 ODF 文件共用的內容擷取入口。預設保留段落、
+儲存格、投影片與頁面邊界，但不包含註解、已刪除的追蹤修訂內容或簡報備忘稿。
+
+```csharp
+using OdfKit.Core;
+
+using OdfDocument document = OdfDocument.Load("input.odt");
+string visibleText = document.ExtractText();
+string auditText = document.ExtractText(new OdfTextExtractionOptions
+{
+    IncludeAnnotations = true,
+    IncludeTrackedChanges = true,
+    IncludePresentationNotes = true
+});
+```
+
+## 管理內嵌 ODF 子文件
+
+```csharp
+using OdfKit.Core;
+using OdfKit.Spreadsheet;
+using OdfKit.Text;
+
+using TextDocument host = TextDocument.Create();
+using SpreadsheetDocument worksheet = SpreadsheetDocument.Create();
+worksheet.Worksheets.Add("Data");
+worksheet.SetValue("Data", "A1", "Embedded");
+
+OdfEmbeddedObjectInfo added = host.Package.AddEmbeddedDocument("Object 1", worksheet);
+using Stream contentXml = added.OpenContent();
+
+foreach (OdfEmbeddedObjectInfo item in host.Package.GetEmbeddedObjectInfos())
+{
+    Console.WriteLine($"{item.Path}: {item.DocumentKind} ({item.MediaType})");
+}
+
+host.Package.RemoveEmbeddedObject("Object 1");
+```
+
+`AddEmbeddedDocument` 會複製子文件的核心 XML 與資源並建立 manifest 目錄項目；
+`ReplaceEmbeddedDocument` 以相同路徑執行移除後新增的生命週期。
+
 ## 複雜文件場景總覽
 
 四主格式高階 API 採相同的集合生命週期：用 `Get*` 取得集合、`Find*` 查找單項、

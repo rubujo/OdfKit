@@ -743,10 +743,13 @@ public class CliTests : IDisposable
             Assert.Equal(1, summary.GetProperty("fixtureCount").GetInt32());
             Assert.Equal(1, summary.GetProperty("passedCount").GetInt32());
             Assert.Equal(0, summary.GetProperty("failedCount").GetInt32());
+            Assert.Equal(1, summary.GetProperty("roundTripCheckedCount").GetInt32());
+            Assert.Equal(0, summary.GetProperty("roundTripFailureCount").GetInt32());
             JsonElement result = json.RootElement.GetProperty("fixtures")[0];
             Assert.Equal("generated-valid", result.GetProperty("id").GetString());
             Assert.True(result.GetProperty("kindMatches").GetBoolean());
             Assert.True(result.GetProperty("versionMatches").GetBoolean());
+            Assert.True(result.GetProperty("roundTrip").GetProperty("passed").GetBoolean());
         }
         finally
         {

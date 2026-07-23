@@ -30,14 +30,14 @@ public class TextHighLevelApiTests
         using MemoryStream template = CreateStreamingTemplateZip(
             """
             <?xml version="1.0" encoding="utf-8"?>
-            <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-                                     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
-              <office:body>
-                <office:text>
-                  <text:p>Hello {{Name}}</text:p>
-                </office:text>
-              </office:body>
-            </office:document-content>
+            <odf:document-content xmlns:odf="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                                  xmlns:t="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+              <odf:body>
+                <odf:text>
+                  <t:p>Hello {{Name}}</t:p>
+                </odf:text>
+              </odf:body>
+            </odf:document-content>
             """);
         using MemoryStream output = new();
 

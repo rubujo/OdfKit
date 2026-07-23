@@ -158,13 +158,16 @@ public static class OdfKitCli
                 });
 
             ValidateBaselineResult? baseline = ValidateWithBaseline(path, parsedOptions.BaselineOptions);
+            ValidateCorpusRoundTripResult? roundTrip = report.IsValid
+                ? RunCorpusRoundTrip(path, fixture)
+                : null;
             bool documentedException = baselineExceptions.Contains(
                 path,
                 parsedOptions.Baseline,
                 report.IsValid,
                 baseline?.IsValid,
                 fixture.Profile.Id);
-            results.Add(new ValidateCorpusFixtureResult(fixture, path, actualSha256, report, baseline, documentedException));
+            results.Add(new ValidateCorpusFixtureResult(fixture, path, actualSha256, report, baseline, roundTrip, documentedException));
         }
 
         ValidateCorpusSummary summary = ValidateCorpusSummary.Create(results);
@@ -481,6 +484,80 @@ public static class OdfKitCli
         using FileStream stream = File.OpenRead(path);
         byte[] hash = SHA256.HashData(stream);
         return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static ValidateCorpusRoundTripResult RunCorpusRoundTrip(
+        string path,
+        ValidateCorpusFixture fixture)
+    {
+        try
+        {
+            using OdfDocument source = OdfDocument.Load(path);
+            string sourceText = source.ExtractText();
+            Dictionary<string, string> preservedEntries = GetPreservedEntryHashes(source.Package);
+            byte[] saved = source.SaveToBytes();
+
+            using var stream = new MemoryStream(saved, writable: false);
+            using OdfDocument reopened = OdfDocument.Load(stream, path);
+            bool textMatches = string.Equals(sourceText, reopened.ExtractText(), StringComparison.Ordinal);
+            bool kindMatches = source.DocumentKind == reopened.DocumentKind;
+            bool versionMatches = source.Package.Version == reopened.Package.Version;
+            bool entriesMatch = PreservedEntryHashesMatch(preservedEntries, reopened.Package);
+            bool packageBytesMatch = string.Equals(fixture.RoundTrip, "byte-identical", StringComparison.OrdinalIgnoreCase)
+                ? File.ReadAllBytes(path).AsSpan().SequenceEqual(saved)
+                : true;
+
+            bool policyMatches = fixture.RoundTrip switch
+            {
+                string value when value.Equals("preserve-unknown", StringComparison.OrdinalIgnoreCase) => entriesMatch,
+                string value when value.Equals("byte-identical", StringComparison.OrdinalIgnoreCase) => packageBytesMatch,
+                _ => true
+            };
+
+            return new ValidateCorpusRoundTripResult(
+                textMatches && kindMatches && versionMatches && policyMatches,
+                textMatches,
+                preservedEntries.Count,
+                null);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException)
+        {
+            return new ValidateCorpusRoundTripResult(false, false, 0, ex.Message);
+        }
+    }
+
+    private static Dictionary<string, string> GetPreservedEntryHashes(OdfPackage package)
+    {
+        Dictionary<string, string> hashes = new(StringComparer.Ordinal);
+        foreach (OdfPackage.OdfPackageEntryInfo entry in package.GetEntries())
+        {
+            if (IsMutableCoreEntry(entry.Path))
+            {
+                continue;
+            }
+
+            using Stream stream = package.GetEntryStream(entry.Path);
+            hashes[entry.Path] = Convert.ToHexString(SHA256.HashData(stream));
+        }
+
+        return hashes;
+    }
+
+    private static bool PreservedEntryHashesMatch(
+        IReadOnlyDictionary<string, string> expected,
+        OdfPackage package)
+    {
+        Dictionary<string, string> actual = GetPreservedEntryHashes(package);
+        return expected.Count == actual.Count && expected.All(item =>
+            actual.TryGetValue(item.Key, out string? hash) &&
+            string.Equals(item.Value, hash, StringComparison.Ordinal));
+    }
+
+    private static bool IsMutableCoreEntry(string path)
+    {
+        string normalized = path.Replace('\\', '/');
+        return normalized is "mimetype" or "META-INF/manifest.xml" ||
+            normalized is "content.xml" or "styles.xml" or "meta.xml" or "settings.xml";
     }
 
     private static string EnsureTrailingDirectorySeparator(string path)
@@ -1314,6 +1391,17 @@ public static class OdfKitCli
             output.WriteLine("expected-version: " + result.Fixture.Version);
             output.WriteLine("actual-version: " + FormatVersion(result.Report.DetectedVersion));
             output.WriteLine("version-matches: " + result.VersionMatches.ToString(CultureInfo.InvariantCulture));
+            if (result.RoundTrip is not null)
+            {
+                output.WriteLine("round-trip-policy: " + result.Fixture.RoundTrip);
+                output.WriteLine("round-trip-passed: " + result.RoundTrip.Passed.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("round-trip-text-matches: " + result.RoundTrip.TextMatches.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("round-trip-preserved-entry-count: " + result.RoundTrip.PreservedEntryCount.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(result.RoundTrip.Error))
+                {
+                    output.WriteLine("round-trip-error: " + result.RoundTrip.Error);
+                }
+            }
             output.WriteLine("profile: " + result.Fixture.Profile.Id);
             output.WriteLine("issues: " + result.Report.Issues.Count.ToString(CultureInfo.InvariantCulture));
             if (result.Baseline is not null)
@@ -1332,6 +1420,8 @@ public static class OdfKitCli
             " version-mismatches=" + summary.VersionMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " sha256-checked=" + summary.Sha256CheckedCount.ToString(CultureInfo.InvariantCulture) +
             " sha256-mismatches=" + summary.Sha256MismatchCount.ToString(CultureInfo.InvariantCulture) +
+            " round-trip-checked=" + summary.RoundTripCheckedCount.ToString(CultureInfo.InvariantCulture) +
+            " round-trip-failures=" + summary.RoundTripFailureCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-documented-exceptions=" + summary.BaselineDocumentedExceptionCount.ToString(CultureInfo.InvariantCulture));
     }
@@ -1356,7 +1446,9 @@ public static class OdfKitCli
                 baselineMismatchCount = summary.BaselineMismatchCount,
                 baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount,
                 sha256CheckedCount = summary.Sha256CheckedCount,
-                sha256MismatchCount = summary.Sha256MismatchCount
+                sha256MismatchCount = summary.Sha256MismatchCount,
+                roundTripCheckedCount = summary.RoundTripCheckedCount,
+                roundTripFailureCount = summary.RoundTripFailureCount
             },
             fixtures = results.Select(result => new
             {
@@ -1374,6 +1466,14 @@ public static class OdfKitCli
                 detectedVersion = result.Report.DetectedVersion.ToString(),
                 version = FormatVersion(result.Report.DetectedVersion),
                 versionMatches = result.VersionMatches,
+                roundTripPolicy = result.Fixture.RoundTrip,
+                roundTrip = result.RoundTrip is null ? null : new
+                {
+                    passed = result.RoundTrip.Passed,
+                    textMatches = result.RoundTrip.TextMatches,
+                    preservedEntryCount = result.RoundTrip.PreservedEntryCount,
+                    error = result.RoundTrip.Error
+                },
                 isValid = result.Report.IsValid,
                 profileId = result.Fixture.Profile.Id,
                 blockingIssueCount = result.Report.BlockingIssueCount,
@@ -1625,6 +1725,7 @@ public static class OdfKitCli
         string? ActualSha256,
         OdfValidationReport Report,
         ValidateBaselineResult? Baseline,
+        ValidateCorpusRoundTripResult? RoundTrip,
         bool BaselineExceptionDocumented)
     {
         public bool ClassificationMatches => Fixture.Expected == ValidateCorpusExpected.Valid
@@ -1641,7 +1742,8 @@ public static class OdfKitCli
         public bool Sha256Matches => (Fixture.Sha256 is null && !Fixture.RequiresSha256) ||
             (Fixture.Sha256 is not null && string.Equals(Fixture.Sha256, ActualSha256, StringComparison.OrdinalIgnoreCase));
 
-        public bool Passed => ClassificationMatches && KindMatches && VersionMatches && Sha256Matches && BaselineMatches;
+        public bool Passed => ClassificationMatches && KindMatches && VersionMatches && Sha256Matches &&
+            (RoundTrip?.Passed ?? true) && BaselineMatches;
 
         public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
 
@@ -1693,6 +1795,10 @@ public static class OdfKitCli
 
         public int Sha256MismatchCount { get; private init; }
 
+        public int RoundTripCheckedCount { get; private init; }
+
+        public int RoundTripFailureCount { get; private init; }
+
         public static ValidateCorpusSummary Create(IReadOnlyList<ValidateCorpusFixtureResult> results)
         {
             return new ValidateCorpusSummary
@@ -1708,10 +1814,18 @@ public static class OdfKitCli
                 BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
                 BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented),
                 Sha256CheckedCount = results.Count(result => result.Fixture.Sha256 is not null),
-                Sha256MismatchCount = results.Count(result => !result.Sha256Matches)
+                Sha256MismatchCount = results.Count(result => !result.Sha256Matches),
+                RoundTripCheckedCount = results.Count(result => result.RoundTrip is not null),
+                RoundTripFailureCount = results.Count(result => result.RoundTrip is { Passed: false })
             };
         }
     }
+
+    private sealed record ValidateCorpusRoundTripResult(
+        bool Passed,
+        bool TextMatches,
+        int PreservedEntryCount,
+        string? Error);
 
     private sealed class ValidateCorpusManifest
     {

@@ -610,5 +610,7 @@
   "Err_OdfScriptManager_UnsupportedOperation": "Este documento não suporta a operação de gestão de scripts pedida.",
   "Err_OdfScriptManager_InvalidDocumentStructure": "Falta a estrutura necessária nos metadados de scripts do documento.",
   "Err_OdfScriptManager_IndexOutOfRange": "Não existe nenhum item de script no índice {0}.",
-  "Err_OdfScriptManager_UnsupportedVersion": "O documento utiliza uma versão ODF não suportada para a gestão de scripts."
+  "Err_OdfScriptManager_UnsupportedVersion": "O documento utiliza uma versão ODF não suportada para a gestão de scripts.",
+  "Err_OdfPackage_EntryNameEmpty": "O caminho da entrada do pacote não pode estar vazio.",
+  "Err_OdfPackage_EntryAlreadyExists": "O caminho da entrada do pacote '{0}' já existe."
 }

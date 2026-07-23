@@ -355,8 +355,9 @@ public static partial class OdfStreamingMailMerge
                 }
                 sb.Append(reader.LocalName);
 
-                // 如果是 office:document-content 或 office:document-styles 根節點，補齊常用 namespace 宣告
-                bool isRoot = reader.Prefix == "office" && (reader.LocalName == "document-content" || reader.LocalName == "document-styles");
+                // 如果是 ODF 文件內容或樣式根節點，補齊常用 namespace 宣告。
+                bool isRoot = reader.NamespaceURI == OdfNamespaces.Office &&
+                    reader.LocalName is "document-content" or "document-styles";
                 var declaredPrefixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 if (reader.MoveToFirstAttribute())
@@ -1031,8 +1032,9 @@ public static partial class OdfStreamingMailMerge
             }
             sb.Append(node.LocalName);
 
-            // 如果是 office:document-content 或 office:document-styles 根節點，補齊常用 namespace 宣告
-            bool isRoot = node.Prefix == "office" && (node.LocalName == "document-content" || node.LocalName == "document-styles");
+            // 如果是 ODF 文件內容或樣式根節點，補齊常用 namespace 宣告。
+            bool isRoot = node.NamespaceUri == OdfNamespaces.Office &&
+                node.LocalName is "document-content" or "document-styles";
             var declaredPrefixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var attr in node.Attributes)

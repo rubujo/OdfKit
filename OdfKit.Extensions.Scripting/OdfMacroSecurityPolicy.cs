@@ -153,6 +153,10 @@ public sealed class OdfMacroPolicyResult
     public IReadOnlyList<OdfMacroPolicyFinding> Findings { get; }
 }
 
+/// <summary>
+/// Provides static macro-policy evaluation operations.
+/// 提供靜態巨集政策評估作業。
+/// </summary>
 public sealed partial class OdfScriptManager
 {
     private static readonly string[] AutoExecutionEvents =

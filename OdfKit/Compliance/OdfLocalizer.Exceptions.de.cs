@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Den Skriptmetadaten des Dokuments fehlt die erforderliche Struktur.",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "Am Index {0} ist kein Skriptelement vorhanden.",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Das Dokument verwendet eine ODF-Version, die für die Skriptverwaltung nicht unterstützt wird.",
+            ["Err_OdfPackage_EntryNameEmpty"] = "Der Pfad des Paketeintrags darf nicht leer sein.",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "Der Pfad des Paketeintrags '{0}' ist bereits vorhanden.",
         };
     }
 }

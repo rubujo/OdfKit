@@ -314,6 +314,7 @@ try {
         'eng/README.md',
         'eng/historical-refactor/README.md',
         'samples/README.md',
+        'samples/OdfKit.HighLevelApi/README.md',
         'samples/WebFonts.AspNetCore/README.md',
         'samples/WebFonts.WebForms/README.md',
         'tools/README.md',

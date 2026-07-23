@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "V metadatech skriptů dokumentu chybí požadovaná struktura.",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "Na indexu {0} neexistuje žádná položka skriptu.",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokument používá verzi ODF která není podporována pro správu skriptů.",
+            ["Err_OdfPackage_EntryNameEmpty"] = "Cesta položky balíčku nesmí být prázdná.",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "Cesta položky balíčku '{0}' již existuje.",
         };
     }
 }

@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "ドキュメントのスクリプトメタデータに必要な構造がありません。",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "インデックス {0} にスクリプト項目はありません。",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "ドキュメントはスクリプト管理でサポートされていない ODF バージョンを使用しています。",
+            ["Err_OdfPackage_EntryNameEmpty"] = "パッケージエントリのパスを空にすることはできません。",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "パッケージエントリのパス '{0}' は既に存在します。",
         };
     }
 }

@@ -277,9 +277,12 @@ try {
 "@ | Set-Content -LiteralPath (Join-Path $smokeDir "NuGet.Config") -Encoding utf8
 
     foreach ($pkg in $expectedPackages | Where-Object { $_.Consumer }) {
-        dotnet add $smokeDir package $pkg.Id --version $packageVersion
+        dotnet add $smokeDir package $pkg.Id --version $packageVersion --no-restore
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
+
+    dotnet restore $smokeDir
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     @"
 using OdfKit.Text;
@@ -327,7 +330,7 @@ Console.WriteLine("ok");
     dotnet build $smokeDir -c $Configuration
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet run --project $smokeDir -c $Configuration --no-build
+    dotnet (Join-Path $smokeDir "bin/$Configuration/net8.0/NuGetConsumerSmoke.dll")
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     $net10SmokeDir = Join-Path $smokeDir "net10-webfonts"
@@ -338,9 +341,12 @@ Console.WriteLine("ok");
         "OdfKit.WebFonts.OpenType",
         "OdfKit.WebFonts.Worker",
         "OdfKit.WebFonts.Hosting.AspNetCore")) {
-        dotnet add $net10SmokeDir package $packageId --version $packageVersion
+        dotnet add $net10SmokeDir package $packageId --version $packageVersion --no-restore
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
+
+    dotnet restore $net10SmokeDir
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     @"
 using OdfKit.WebFonts.Hosting.AspNetCore;
@@ -390,7 +396,7 @@ Console.WriteLine("WebFont net10 package consumer smoke passed.");
     dotnet build $net10SmokeDir -c $Configuration
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet run --project $net10SmokeDir -c $Configuration --no-build
+    dotnet (Join-Path $net10SmokeDir "bin/$Configuration/net10.0/WebFontNet10ConsumerSmoke.dll")
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     if ($IsWindows -and -not $SkipNetFrameworkSmoke) {

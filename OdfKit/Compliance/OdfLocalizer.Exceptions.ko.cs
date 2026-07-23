@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "문서 스크립트 메타데이터에 필수 구조가 없습니다.",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "인덱스 {0}에 스크립트 항목이 없습니다.",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "문서가 스크립트 관리에서 지원되지 않는 ODF 버전을 사용합니다.",
+            ["Err_OdfPackage_EntryNameEmpty"] = "패키지 항목 경로는 비워 둘 수 없습니다.",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "패키지 항목 경로 '{0}'이(가) 이미 있습니다.",
         };
     }
 }

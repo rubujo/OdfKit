@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/samples/" />
+  <Folder Name="/samples/OdfKit.HighLevelApi/">
+    <Project Path="samples/OdfKit.HighLevelApi/OdfKit.HighLevelApi.Sample.csproj" />
+  </Folder>
   <Folder Name="/方案項目/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />

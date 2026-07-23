@@ -1,0 +1,9 @@
+{
+  "version": "1.1",
+  "schemaPath": "tools/OdfSchemaGenerator/schemas/OpenDocument-manifest-schema-v1.1.rng",
+  "sourceUrl": "https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-manifest-schema-v1.1.rng",
+  "sourceDate": "2007-02-07",
+  "outputPath": "OdfKit/Compliance/Generated/Odf11ManifestSchema.g.cs",
+  "className": "Odf11ManifestSchemaMetadata",
+  "format": "csharp"
+}

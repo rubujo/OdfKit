@@ -16,7 +16,7 @@
       { "files": ["articles/**.md", "articles/**/toc.yml"] },
       { "files": ["zh-TW/**.{md,yml}", "en/**.{md,yml}", "cs/**.{md,yml}", "da/**.{md,yml}", "de/**.{md,yml}", "es/**.{md,yml}", "fr/**.{md,yml}", "it/**.{md,yml}", "ja/**.{md,yml}", "ko/**.{md,yml}", "ms/**.{md,yml}", "nb/**.{md,yml}", "nl/**.{md,yml}", "pl/**.{md,yml}", "pt/**.{md,yml}", "pt-BR/**.{md,yml}", "sk/**.{md,yml}"] },
       { "src": "../docs", "files": ["**/*.md", "toc.yml"], "dest": "project-docs" },
-      { "src": "..", "files": ["README.md", "CHANGELOG.md", "THIRD-PARTY-NOTICES.md", "AGENTS.md", "eng/README.md", "eng/historical-refactor/README.md", "samples/README.md", "samples/WebFonts.AspNetCore/README.md", "samples/WebFonts.WebForms/README.md", "tools/README.md", "OdfKit/PublicAPI/README.md", "OdfKit/Compliance/i18n/README.md"], "dest": "project-docs" }
+      { "src": "..", "files": ["README.md", "CHANGELOG.md", "THIRD-PARTY-NOTICES.md", "AGENTS.md", "eng/README.md", "eng/historical-refactor/README.md", "samples/README.md", "samples/OdfKit.HighLevelApi/README.md", "samples/WebFonts.AspNetCore/README.md", "samples/WebFonts.WebForms/README.md", "tools/README.md", "OdfKit/PublicAPI/README.md", "OdfKit/Compliance/i18n/README.md"], "dest": "project-docs" }
     ],
     "resource": [
       { "files": ["images/**"] },

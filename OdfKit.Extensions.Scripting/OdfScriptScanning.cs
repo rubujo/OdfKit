@@ -238,7 +238,13 @@ public sealed class OdfAmsiScriptScanner : IOdfScriptScanner
     /// </summary>
     public static bool IsSupported => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Scans script text through Windows AMSI.
+    /// 透過 Windows AMSI 掃描指令碼文字。
+    /// </summary>
+    /// <param name="request">The script scan request. / 指令碼掃描要求。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>The AMSI scan result. / AMSI 掃描結果。</returns>
     public Task<OdfScriptScanResult> ScanAsync(
         OdfScriptScanRequest request,
         CancellationToken cancellationToken)
@@ -376,6 +382,10 @@ public sealed class OdfPackageScriptScanReport
     public IReadOnlyList<OdfScriptScanResult> Results { get; }
 }
 
+/// <summary>
+/// Provides package-script scanning operations.
+/// 提供封裝指令碼掃描作業。
+/// </summary>
 public sealed partial class OdfScriptManager
 {
     /// <summary>

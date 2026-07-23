@@ -629,6 +629,8 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_InvalidDocumentStructure"] = "Dokumentets skriptmetadata mangler nødvendig struktur.",
             ["Err_OdfScriptManager_IndexOutOfRange"] = "Det finnes ikke noe skriptelement ved indeks {0}.",
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokumentet bruker en ODF-versjon som ikke støttes for skriptbehandling.",
+            ["Err_OdfPackage_EntryNameEmpty"] = "Banen til pakkeoppføringen kan ikke være tom.",
+            ["Err_OdfPackage_EntryAlreadyExists"] = "Banen til pakkeoppføringen '{0}' finnes allerede.",
         };
     }
 }

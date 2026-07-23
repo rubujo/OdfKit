@@ -902,6 +902,8 @@ OdfKit.Core.OdfDocument.DocumentKind.get -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Core.OdfDocument.EndUpdate() -> void
 OdfKit.Core.OdfDocument.ExportToPdf(System.IO.Stream! pdfStream) -> void
 OdfKit.Core.OdfDocument.ExportToPdf(System.IO.Stream! pdfStream, System.Security.Cryptography.X509Certificates.X509Certificate2? certificate) -> void
+OdfKit.Core.OdfDocument.ExtractText() -> string!
+OdfKit.Core.OdfDocument.ExtractText(OdfKit.Core.OdfTextExtractionOptions! options) -> string!
 OdfKit.Core.OdfDocument.FindCustomProperty(string! name) -> object?
 OdfKit.Core.OdfDocument.FindCustomProperty<T>(string! name) -> T?
 OdfKit.Core.OdfDocument.FindOrCreateChild(OdfKit.DOM.OdfNode! parent, string! localName, string! ns, string! prefix) -> OdfKit.DOM.OdfNode!
@@ -1009,6 +1011,13 @@ OdfKit.Core.OdfDoubleBufferedWritableStream
 OdfKit.Core.OdfDoubleBufferedWritableStream.OdfDoubleBufferedWritableStream(System.IO.Stream! underlyingStream) -> void
 OdfKit.Core.OdfDoubleBufferedWritableStream.OdfDoubleBufferedWritableStream(System.IO.Stream! underlyingStream, int bufferSize) -> void
 OdfKit.Core.OdfDoubleBufferedWritableStream.OdfDoubleBufferedWritableStream(System.IO.Stream! underlyingStream, int bufferSize, bool leaveOpen) -> void
+OdfKit.Core.OdfEmbeddedObjectInfo
+OdfKit.Core.OdfEmbeddedObjectInfo.DocumentKind.get -> OdfKit.Compliance.OdfDocumentKind
+OdfKit.Core.OdfEmbeddedObjectInfo.Entries.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Core.OdfEmbeddedObjectInfo.MediaType.get -> string!
+OdfKit.Core.OdfEmbeddedObjectInfo.OpenContent() -> System.IO.Stream!
+OdfKit.Core.OdfEmbeddedObjectInfo.OpenEntry(string! relativePath) -> System.IO.Stream!
+OdfKit.Core.OdfEmbeddedObjectInfo.Path.get -> string!
 OdfKit.Core.OdfEncryption
 OdfKit.Core.OdfEncryptionAlgorithm
 OdfKit.Core.OdfEncryptionAlgorithm.Aes256 = 0 -> OdfKit.Core.OdfEncryptionAlgorithm
@@ -1128,6 +1137,7 @@ OdfKit.Core.OdfOpenPgpRecipient.PublicKey.set -> void
 OdfKit.Core.OdfOpenPgpRecipient.Recipient.get -> string?
 OdfKit.Core.OdfOpenPgpRecipient.Recipient.set -> void
 OdfKit.Core.OdfPackage
+OdfKit.Core.OdfPackage.AddEmbeddedDocument(string! path, OdfKit.Core.OdfDocument! document) -> OdfKit.Core.OdfEmbeddedObjectInfo!
 OdfKit.Core.OdfPackage.AddEntry(string! name, byte[]! content) -> void
 OdfKit.Core.OdfPackage.AddEntry(string! name, byte[]! content, string? mediaType) -> void
 OdfKit.Core.OdfPackage.AddEntry(string! name, System.IO.Stream! contentStream) -> void
@@ -1137,6 +1147,7 @@ OdfKit.Core.OdfPackage.DisposeAsync() -> System.Threading.Tasks.ValueTask
 OdfKit.Core.OdfPackage.DumpVfsLayout() -> string!
 OdfKit.Core.OdfPackage.ExtractObjectStream(string! objectName) -> System.IO.Stream!
 OdfKit.Core.OdfPackage.FindEntryEncryptionInfo(string! name) -> OdfKit.Core.OdfEncryptionInfo?
+OdfKit.Core.OdfPackage.GetEmbeddedObjectInfos() -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfEmbeddedObjectInfo!>!
 OdfKit.Core.OdfPackage.GetEmbeddedObjects() -> System.Collections.Generic.IEnumerable<string!>!
 OdfKit.Core.OdfPackage.GetEntries() -> System.Collections.Generic.IEnumerable<OdfKit.Core.OdfPackage.OdfPackageEntryInfo!>!
 OdfKit.Core.OdfPackage.GetEntryStream(string! name) -> System.IO.Stream!
@@ -1155,7 +1166,9 @@ OdfKit.Core.OdfPackage.PruneUnusedMedia(System.Collections.Generic.IEnumerable<s
 OdfKit.Core.OdfPackage.RawEntryPatch(string! entryName, OdfKit.Core.OdfRawEntryPatcher! patcher) -> bool
 OdfKit.Core.OdfPackage.RdfMetadata.get -> OdfKit.Core.OdfRdfMetadata!
 OdfKit.Core.OdfPackage.ReadEntry(string! path) -> byte[]!
+OdfKit.Core.OdfPackage.RemoveEmbeddedObject(string! path) -> bool
 OdfKit.Core.OdfPackage.RemoveEntry(string! name) -> bool
+OdfKit.Core.OdfPackage.ReplaceEmbeddedDocument(string! path, OdfKit.Core.OdfDocument! document) -> OdfKit.Core.OdfEmbeddedObjectInfo!
 OdfKit.Core.OdfPackage.SanitizeMacros() -> void
 OdfKit.Core.OdfPackage.Save() -> void
 OdfKit.Core.OdfPackage.Save(OdfKit.Core.OdfSaveOptions? options) -> void
@@ -1305,6 +1318,16 @@ OdfKit.Core.OdfTemplateMetadata.Href.set -> void
 OdfKit.Core.OdfTemplateMetadata.OdfTemplateMetadata() -> void
 OdfKit.Core.OdfTemplateMetadata.Title.get -> string?
 OdfKit.Core.OdfTemplateMetadata.Title.set -> void
+OdfKit.Core.OdfTextExtractionOptions
+OdfKit.Core.OdfTextExtractionOptions.BlockSeparator.get -> string!
+OdfKit.Core.OdfTextExtractionOptions.BlockSeparator.set -> void
+OdfKit.Core.OdfTextExtractionOptions.IncludeAnnotations.get -> bool
+OdfKit.Core.OdfTextExtractionOptions.IncludeAnnotations.set -> void
+OdfKit.Core.OdfTextExtractionOptions.IncludePresentationNotes.get -> bool
+OdfKit.Core.OdfTextExtractionOptions.IncludePresentationNotes.set -> void
+OdfKit.Core.OdfTextExtractionOptions.IncludeTrackedChanges.get -> bool
+OdfKit.Core.OdfTextExtractionOptions.IncludeTrackedChanges.set -> void
+OdfKit.Core.OdfTextExtractionOptions.OdfTextExtractionOptions() -> void
 OdfKit.Core.OdfTransaction
 OdfKit.Core.OdfTransaction.Commit() -> void
 OdfKit.Core.OdfTransaction.Dispose() -> void
@@ -18852,6 +18875,7 @@ static OdfKit.Core.OdfSigner.VerifySignaturesAsync(OdfKit.Core.OdfPackage! packa
 static OdfKit.Core.OdfSigner.VerifySignaturesAsync(OdfKit.Core.OdfPackage! package, OdfKit.Core.OdfSigningOptions? options) -> System.Threading.Tasks.Task<OdfKit.Core.OdfSignatureValidationResult!>!
 static OdfKit.Core.OdfSigner.VerifySignaturesAsync(OdfKit.Core.OdfPackage! package, OdfKit.Core.OdfSigningOptions? options, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Core.OdfSignatureValidationResult!>!
 static OdfKit.Core.OdfSigner.VerifySignaturesAsync(OdfKit.Core.OdfPackage! package, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Core.OdfSignatureValidationResult!>!
+static OdfKit.Core.OdfTextExtractionOptions.Default.get -> OdfKit.Core.OdfTextExtractionOptions!
 static OdfKit.Core.OdfTransaction.Begin(OdfKit.Core.OdfPackage! package) -> OdfKit.Core.OdfTransaction!
 static OdfKit.Core.OdfVersionInfo.DefaultVersion.get -> OdfKit.Compliance.OdfVersion
 static OdfKit.Core.OdfVersionInfo.ToVersionString(OdfKit.Compliance.OdfVersion version) -> string!
