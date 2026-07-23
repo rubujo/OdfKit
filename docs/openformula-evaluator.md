@@ -12,8 +12,9 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 | ODF 1.2～1.4 OpenFormula | 部分實作 | 辨識 `of:=`、剖析常用運算式與參照，並提供受控重算。 |
 | Small Group 強制函式名稱 | 110／110 | `OdfFormulaSupport.GetConformanceReport(Small)` 可機械化確認內建函式清單沒有名稱缺口。 |
 | Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
-| Medium Group 強制函式名稱 | 201／272 | 已有參照聯集／交集、命名運算式、矩陣、機率分佈與常用統計函式；尚缺 71 個累計強制函式。 |
-| Large Group 強制函式名稱 | 300／388 | 已有 inline array、矩陣、複數、進位轉換、東亞位元組文字函式與額外統計／財務函式；尚缺 88 個累計強制函式，以及完整陣列公式、自動交集、外部名稱與區域名稱求值。 |
+| Medium Group 強制函式名稱 | 272／272 | 強制函式皆可由預設評估器派送，包含參照、矩陣、機率分佈、統計及財務函式。 |
+| Large Group 強制函式名稱 | 388／388 | 強制函式名稱皆可派送，並包含 inline array、矩陣、複數、進位轉換與東亞位元組文字函式。 |
+| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成，但部分長尾函式採 Best Effort；仍須以規範 corpus 驗證完整陣列公式、自動交集、外部名稱、區域名稱、型別轉換、數值誤差及全部邊界語意。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
@@ -42,6 +43,12 @@ document.EvaluateFormulas(evaluator);
 累計強制函式清單回報缺口。報告只證明函式名稱可派送，不會把名稱覆蓋誤當成完整
 語法、限制、型別轉換與函式語意的一致性證明。
 
+`DDE` 不會由核心建立外部程序或網路連線，而是依安全政策傳回 `#N/A`。
+`GETPIVOTDATA`、`MULTIPLE.OPERATIONS`、奇數首期／末期債券函式及多工作表
+`SHEET(S)` 的完整語意需要目前內容模型尚未提供的 pivot、資料表重算、票息排程或
+工作表目錄內容模型；其名稱可安全派送，但目前屬 Best Effort，不應視為正式
+Large Group 一致性證據。`INFO` 也只揭露安全且跨平台可取得的執行環境資訊。
+
 ## 外部後援
 
 `IOdfFormulaEvaluationFallback` 接收完整公式與目前的 `IEvaluationContext`。
@@ -62,7 +69,8 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 
 1. 先建立 Small 的語法、限制、轉換與函式語意 corpus，達成可稽核的正式基線。
 2. 依 Medium 要求補齊參照聯集、命名運算式及其強制函式，避免只追求函式數量。
-3. 依 Large 要求加入 inline array、陣列公式、自動交集、複數型別、區域名稱與完整強制函式。
+3. 以 OASIS corpus 驗證已完成的 388／388 名稱覆蓋，補強完整陣列公式、
+   自動交集、區域名稱與長尾函式邊界語意。
 4. 保留 OdfKit Extended 註冊表與後援，讓應用程式在正式 Large 之上加入領域函式，
    同時個別揭露外部引擎與安全邊界。
 

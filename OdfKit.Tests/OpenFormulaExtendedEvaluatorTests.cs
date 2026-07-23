@@ -208,14 +208,44 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.Equal(110, small.RequiredFunctions.Count);
         Assert.True(small.HasCompleteFunctionSet);
         Assert.Equal(272, medium.RequiredFunctions.Count);
-        Assert.False(medium.HasCompleteFunctionSet);
-        Assert.Equal(71, medium.MissingFunctions.Count);
+        Assert.True(medium.HasCompleteFunctionSet);
+        Assert.Empty(medium.MissingFunctions);
         Assert.DoesNotContain("MMULT", medium.MissingFunctions);
         Assert.Equal(388, large.RequiredFunctions.Count);
-        Assert.False(large.HasCompleteFunctionSet);
-        Assert.Equal(88, large.MissingFunctions.Count);
+        Assert.True(large.HasCompleteFunctionSet);
+        Assert.Empty(large.MissingFunctions);
         Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
-        Assert.Contains("DDE", large.MissingFunctions);
+        Assert.DoesNotContain("DDE", large.MissingFunctions);
+    }
+
+    /// <summary>
+    /// Verifies representative functions from the completed Medium and Large mandatory catalogs.
+    /// 驗證已補齊之 Medium 與 Large 強制目錄的代表性函式。
+    /// </summary>
+    [Fact]
+    public void RemainingMediumAndLargeFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(0.5d, Assert.IsType<double>(
+            evaluator.Evaluate("BETADIST(0.5;2;2)", context)), 8);
+        Assert.Equal(1.125d, Assert.IsType<double>(
+            evaluator.Evaluate("DOLLARDE(1.02;16)", context)), 8);
+        Assert.Equal(0.12682503013197d, Assert.IsType<double>(
+            evaluator.Evaluate("EFFECT(0.12;12)", context)), 8);
+        Assert.Equal(0.5d, Assert.IsType<double>(
+            evaluator.Evaluate("PERCENTRANK({1;2;3};2)", context)), 8);
+        Assert.Equal(1d, Assert.IsType<double>(
+            evaluator.Evaluate("SUBTOTAL(9;{0.25;0.75})", context)), 8);
+        Assert.Equal(1d, Assert.IsType<double>(
+            evaluator.Evaluate("YEARFRAC(DATE(2024;1;1);DATE(2025;1;1);1)", context)), 8);
+        Assert.Equal("OdfKit", evaluator.Evaluate(
+            "HYPERLINK(\"https://example.invalid\";\"OdfKit\")", context));
+        Assert.Equal(1.95583d, Assert.IsType<double>(
+            evaluator.Evaluate("EUROCONVERT(1;\"EUR\";\"DEM\")", context)), 8);
+        Assert.IsType<OdfFormulaError>(evaluator.Evaluate(
+            "DDE(\"service\";\"topic\";\"item\")", context));
     }
 
     /// <summary>
