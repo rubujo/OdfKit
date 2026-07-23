@@ -8,7 +8,9 @@ using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
-internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
+internal class OdfDomEvaluationContext :
+    IOdfFormulaWorkbookContext,
+    IOdfBlankCheckableContext
 {
     /// <summary>
     /// Short overload of IsBlank that accepts address; remaining optional parameters use defaults and forward to the full overload.
@@ -21,6 +23,7 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     private readonly Dictionary<OdfCellAddress, OdfNode> _cellNodes = new();
     private readonly Dictionary<OdfCellAddress, string> _cellFormulas = new();
     private readonly Dictionary<OdfCellAddress, object> _cellValues = new();
+    private readonly List<string> _sheetNames = [];
     private readonly DefaultFormulaEvaluator _evaluator;
     private readonly OdfNode _contentRoot;
     private readonly OdfExternalLinkManager? _externalLinks;
@@ -48,11 +51,15 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     public Dictionary<OdfCellAddress, string> CellFormulas => _cellFormulas;
     public Dictionary<OdfCellAddress, object> CellValues => _cellValues;
 
+    public IReadOnlyList<string> SheetNames => _sheetNames;
+
     private void TraverseTable(OdfNode node)
     {
         if (node.NodeType == OdfNodeType.Element && node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table)
         {
             string sheetName = node.GetAttribute("name", OdfNamespaces.Table) ?? "";
+            if (!_sheetNames.Contains(sheetName))
+                _sheetNames.Add(sheetName);
 
             int currentRow = 0;
             foreach (var rowChild in node.Children)
@@ -327,6 +334,24 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
         }
 
         return OdfFormulaError.Name;
+    }
+
+    public bool TryGetPivotData(
+        string dataField,
+        OdfCellAddress pivotAnchor,
+        IReadOnlyDictionary<string, object> filters,
+        out object result)
+    {
+        result = OdfFormulaError.NA;
+        return false;
+    }
+
+    public bool TryEvaluateMultipleOperations(
+        IReadOnlyList<object> arguments,
+        out object result)
+    {
+        result = OdfFormulaError.NA;
+        return false;
     }
 
     private OdfNode? FindSheetNode(OdfNode node, string? sheetName)

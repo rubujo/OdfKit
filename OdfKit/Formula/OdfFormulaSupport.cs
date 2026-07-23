@@ -351,10 +351,10 @@ public static class OdfFormulaSupport
         new("ACCRINT", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("ACCRINTM", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("AMORLINC", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("BESSELI", "Engineering", OdfFormulaSupportLevel.Evaluated),
-        new("BESSELJ", "Engineering", OdfFormulaSupportLevel.Evaluated),
-        new("BESSELK", "Engineering", OdfFormulaSupportLevel.Evaluated),
-        new("BESSELY", "Engineering", OdfFormulaSupportLevel.Evaluated),
+        new("BESSELI", "Engineering", OdfFormulaSupportLevel.BestEffort),
+        new("BESSELJ", "Engineering", OdfFormulaSupportLevel.BestEffort),
+        new("BESSELK", "Engineering", OdfFormulaSupportLevel.BestEffort),
+        new("BESSELY", "Engineering", OdfFormulaSupportLevel.BestEffort),
         new("BETADIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("BETAINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("CHISQDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
@@ -370,7 +370,7 @@ public static class OdfFormulaSupport
         new("CUMPRINC", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("DAYS360", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("DB", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("DDE", "External", OdfFormulaSupportLevel.Evaluated),
+        new("DDE", "External", OdfFormulaSupportLevel.BestEffort),
         new("DISC", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("DOLLARDE", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("DOLLARFR", "Financial", OdfFormulaSupportLevel.Evaluated),
@@ -381,14 +381,14 @@ public static class OdfFormulaSupport
         new("FINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("FORMULA", "Information", OdfFormulaSupportLevel.Evaluated),
         new("FREQUENCY", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("FTEST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("FTEST", "Statistical", OdfFormulaSupportLevel.BestEffort),
         new("GAMMADIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("GAMMAINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("GETPIVOTDATA", "Lookup", OdfFormulaSupportLevel.Evaluated),
-        new("GROWTH", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("GETPIVOTDATA", "Lookup", OdfFormulaSupportLevel.BestEffort),
+        new("GROWTH", "Statistical", OdfFormulaSupportLevel.BestEffort),
         new("HYPERLINK", "Lookup", OdfFormulaSupportLevel.Evaluated),
         new("HYPGEOMDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("INFO", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("INFO", "Information", OdfFormulaSupportLevel.BestEffort),
         new("INTRATE", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("KURT", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("LEGACY.CHIDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
@@ -397,26 +397,26 @@ public static class OdfFormulaSupport
         new("LEGACY.FDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("LEGACY.FINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("LEGACY.TDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("LINEST", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("LOGEST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("LINEST", "Statistical", OdfFormulaSupportLevel.BestEffort),
+        new("LOGEST", "Statistical", OdfFormulaSupportLevel.BestEffort),
         new("LOGINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("LOGNORMDIST", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("LOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
         new("MDURATION", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("MULTIPLE.OPERATIONS", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("MULTIPLE.OPERATIONS", "Information", OdfFormulaSupportLevel.BestEffort),
         new("NOMINAL", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("ODDFPRICE", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("ODDFYIELD", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("ODDLPRICE", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("ODDLYIELD", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("ODDFPRICE", "Financial", OdfFormulaSupportLevel.BestEffort),
+        new("ODDFYIELD", "Financial", OdfFormulaSupportLevel.BestEffort),
+        new("ODDLPRICE", "Financial", OdfFormulaSupportLevel.BestEffort),
+        new("ODDLYIELD", "Financial", OdfFormulaSupportLevel.BestEffort),
         new("PERCENTRANK", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("PRICE", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("PRICEDISC", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("PRICEMAT", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("PROB", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("RECEIVED", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("SHEET", "Information", OdfFormulaSupportLevel.Evaluated),
-        new("SHEETS", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("SHEET", "Information", OdfFormulaSupportLevel.BestEffort),
+        new("SHEETS", "Information", OdfFormulaSupportLevel.BestEffort),
         new("SKEW", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("SKEWP", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("STEYX", "Statistical", OdfFormulaSupportLevel.Evaluated),
@@ -425,9 +425,9 @@ public static class OdfFormulaSupport
         new("TBILLPRICE", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("TBILLYIELD", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("TINV", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("TREND", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("TREND", "Statistical", OdfFormulaSupportLevel.BestEffort),
         new("TRIMMEAN", "Statistical", OdfFormulaSupportLevel.Evaluated),
-        new("TTEST", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("TTEST", "Statistical", OdfFormulaSupportLevel.BestEffort),
         new("VDB", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("XIRR", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("XNPV", "Financial", OdfFormulaSupportLevel.Evaluated),
@@ -435,10 +435,12 @@ public static class OdfFormulaSupport
         new("YIELD", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("YIELDDISC", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("YIELDMAT", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("ZTEST", "Statistical", OdfFormulaSupportLevel.Evaluated)
+        new("ZTEST", "Statistical", OdfFormulaSupportLevel.BestEffort)
     ];
 
     private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
+    private static readonly HashSet<string> BestEffortFunctionNames =
+        CreateFunctionSet(OdfFormulaSupportLevel.BestEffort);
 
     private static readonly string[] SmallGroupFunctionTable =
     [
@@ -765,6 +767,17 @@ public static class OdfFormulaSupport
         return set;
     }
 
+    private static HashSet<string> CreateFunctionSet(OdfFormulaSupportLevel supportLevel)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (OdfFormulaFunctionInfo function in FunctionTable)
+        {
+            if (function.SupportLevel == supportLevel)
+                set.Add(function.Name);
+        }
+        return set;
+    }
+
     private static string[] CreateCumulativeFunctionTable(params string[][] tables)
     {
         var functions = new List<string>();
@@ -789,18 +802,24 @@ public static class OdfFormulaSupport
     {
         IReadOnlyList<string> requiredFunctions = GetRequiredFunctionsCore(group);
         var missingFunctions = new List<string>();
+        var bestEffortFunctions = new List<string>();
         foreach (string functionName in requiredFunctions)
         {
             if (!IsFunctionSupportedCore(functionName, functions))
             {
                 missingFunctions.Add(functionName);
             }
+            else if (BestEffortFunctionNames.Contains(functionName))
+            {
+                bestEffortFunctions.Add(functionName);
+            }
         }
 
         return new OdfFormulaConformanceReport(
             group,
             requiredFunctions,
-            Array.AsReadOnly(missingFunctions.ToArray()));
+            Array.AsReadOnly(missingFunctions.ToArray()),
+            Array.AsReadOnly(bestEffortFunctions.ToArray()));
     }
 
     private static IReadOnlyList<string> GetRequiredFunctionsCore(

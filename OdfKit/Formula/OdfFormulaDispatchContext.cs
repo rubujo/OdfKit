@@ -13,6 +13,7 @@ internal sealed class OdfFormulaDispatchContext(
     IEvaluationContext inner,
     OdfFormulaFunctionRegistry functions) :
     IEvaluationContext,
+    IOdfFormulaWorkbookContext,
     IOdfBlankCheckableContext,
     IOdfFormulaFunctionDispatchContext
 {
@@ -25,6 +26,34 @@ internal sealed class OdfFormulaDispatchContext(
     public string? GetCellFormula(OdfCellAddress address) => inner.GetCellFormula(address);
 
     public object GetNamedRangeOrExpressionValue(string name) => inner.GetNamedRangeOrExpressionValue(name);
+
+    public IReadOnlyList<string> SheetNames => inner is IOdfFormulaWorkbookContext workbook
+        ? workbook.SheetNames
+        : string.IsNullOrEmpty(inner.CurrentCell.SheetName)
+            ? []
+            : [inner.CurrentCell.SheetName!];
+
+    public bool TryGetPivotData(
+        string dataField,
+        OdfCellAddress pivotAnchor,
+        IReadOnlyDictionary<string, object> filters,
+        out object result)
+    {
+        if (inner is IOdfFormulaWorkbookContext workbook)
+            return workbook.TryGetPivotData(dataField, pivotAnchor, filters, out result);
+        result = OdfFormulaError.NA;
+        return false;
+    }
+
+    public bool TryEvaluateMultipleOperations(
+        IReadOnlyList<object> arguments,
+        out object result)
+    {
+        if (inner is IOdfFormulaWorkbookContext workbook)
+            return workbook.TryEvaluateMultipleOperations(arguments, out result);
+        result = OdfFormulaError.NA;
+        return false;
+    }
 
     public bool IsBlank(OdfCellAddress address) => inner is IOdfBlankCheckableContext blankCheckable
         ? blankCheckable.IsBlank(address)

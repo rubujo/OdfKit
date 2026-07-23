@@ -71,9 +71,7 @@ internal static class FormulaConformanceFunctionHandlers
             "INFO" => EvaluateInfo(arguments, context),
             "EUROCONVERT" => EvaluateEuroConvert(arguments, context),
             "GETPIVOTDATA" => EvaluateGetPivotData(arguments, context),
-            "MULTIPLE.OPERATIONS" => arguments.Count > 0
-                ? arguments[0].Evaluate(context)
-                : OdfFormulaError.Value,
+            "MULTIPLE.OPERATIONS" => EvaluateMultipleOperations(arguments, context),
             "DDE" => OdfFormulaError.NA,
             _ => OdfFormulaError.Name
         };
@@ -96,8 +94,7 @@ internal static class FormulaConformanceFunctionHandlers
             return BesselSeries(x, order, true);
         if (kind == 2)
             return Integrate(t => Math.Exp(-x * Math.Cosh(t)) * Math.Cosh(order * t), 0, 20);
-        double phase = x - ((order * Math.PI / 2) + (Math.PI / 4));
-        return Math.Sqrt(2 / (Math.PI * x)) * Math.Sin(phase);
+        return BesselY(x, order);
     }
 
     private static object EvaluateBetaDist(List<AstNode> arguments, IEvaluationContext context)
@@ -457,18 +454,54 @@ internal static class FormulaConformanceFunctionHandlers
             }
             return 1 - RegularizedGammaP((first.Length - 1) / 2d, statistic / 2);
         }
-        int tails = 2;
-        if (arguments.Count >= 3)
+        if (arguments.Count != 4)
+            return OdfFormulaError.Value;
+        if (!TryGetNumber(arguments[2], context, out double tailsValue, out firstError) ||
+            !TryGetNumber(arguments[3], context, out double typeValue, out firstError))
+            return firstError;
+        int tails = (int)Math.Truncate(tailsValue);
+        int type = (int)Math.Truncate(typeValue);
+        if (tails is not (1 or 2) || type is < 1 or > 3)
+            return OdfFormulaError.Num;
+        double t;
+        double degrees;
+        if (type == 1)
         {
-            if (!TryGetNumber(arguments[2], context, out double tailsValue, out firstError))
-                return firstError;
-            tails = (int)Math.Truncate(tailsValue);
+            if (first.Length != second.Length || first.Length < 2)
+                return OdfFormulaError.NA;
+            var differences = new double[first.Length];
+            for (int index = 0; index < first.Length; index++)
+                differences[index] = first[index] - second[index];
+            double standardError = StandardDeviation(differences, false) /
+                Math.Sqrt(differences.Length);
+            if (standardError == 0)
+                return OdfFormulaError.Div0;
+            t = Math.Abs(Mean(differences) / standardError);
+            degrees = differences.Length - 1;
         }
-        double difference = Mean(first) - Mean(second);
-        double variance = (Math.Pow(StandardDeviation(first, false), 2) / first.Length) +
-            (Math.Pow(StandardDeviation(second, false), 2) / second.Length);
-        double t = Math.Abs(difference) / Math.Sqrt(variance);
-        double degrees = Math.Min(first.Length, second.Length) - 1;
+        else
+        {
+            double firstVariance = Math.Pow(StandardDeviation(first, false), 2);
+            double secondVariance = Math.Pow(StandardDeviation(second, false), 2);
+            double difference = Mean(first) - Mean(second);
+            if (type == 2)
+            {
+                degrees = first.Length + second.Length - 2;
+                double pooled = (((first.Length - 1) * firstVariance) +
+                    ((second.Length - 1) * secondVariance)) / degrees;
+                t = Math.Abs(difference) /
+                    Math.Sqrt(pooled * ((1d / first.Length) + (1d / second.Length)));
+            }
+            else
+            {
+                double firstTerm = firstVariance / first.Length;
+                double secondTerm = secondVariance / second.Length;
+                t = Math.Abs(difference) / Math.Sqrt(firstTerm + secondTerm);
+                degrees = Math.Pow(firstTerm + secondTerm, 2) /
+                    ((Math.Pow(firstTerm, 2) / (first.Length - 1)) +
+                        (Math.Pow(secondTerm, 2) / (second.Length - 1)));
+            }
+        }
         double tail = 0.5 * RegularizedBeta(degrees / (degrees + (t * t)), degrees / 2, 0.5);
         return tails == 1 ? tail : 2 * tail;
     }
@@ -482,19 +515,23 @@ internal static class FormulaConformanceFunctionHandlers
             return OdfFormulaError.Value;
         if (!TryGetNumbers(arguments[0].Evaluate(context), out double[] ys, out object error))
             return error;
-        double[] xs;
+        double[,] xs;
         if (arguments.Count >= 2)
         {
-            if (!TryGetNumbers(arguments[1].Evaluate(context), out xs, out error))
+            if (!TryGetRegressionMatrix(
+                arguments[1].Evaluate(context),
+                ys.Length,
+                out xs,
+                out error))
                 return error;
         }
         else
         {
-            xs = new double[ys.Length];
-            for (int i = 0; i < xs.Length; i++)
-                xs[i] = i + 1;
+            xs = new double[ys.Length, 1];
+            for (int row = 0; row < ys.Length; row++)
+                xs[row, 0] = row + 1;
         }
-        if (xs.Length != ys.Length || xs.Length < 2)
+        if (ys.Length < 2 || xs.GetLength(0) != ys.Length)
             return OdfFormulaError.NA;
         bool exponential = name is "LOGEST" or "GROWTH";
         if (exponential)
@@ -506,26 +543,50 @@ internal static class FormulaConformanceFunctionHandlers
                 ys[i] = Math.Log(ys[i]);
             }
         }
-        (double slope, double intercept) = LinearFit(xs, ys);
-        if (exponential)
+        bool includeIntercept = true;
+        int interceptArgument = name is "LINEST" or "LOGEST" ? 2 : 3;
+        if (arguments.Count > interceptArgument)
         {
-            slope = Math.Exp(slope);
-            intercept = Math.Exp(intercept);
+            object interceptValue = arguments[interceptArgument].Evaluate(context);
+            if (interceptValue is OdfFormulaError formulaError)
+                return formulaError;
+            includeIntercept = FormulaCoercion.CoerceToBool(interceptValue);
         }
+        if (!TryFitLinearModel(xs, ys, includeIntercept, out double[] coefficients))
+            return OdfFormulaError.Num;
         if (name is "LINEST" or "LOGEST")
-            return new object[,] { { slope, intercept } };
-        double[] predictionX = xs;
-        if (arguments.Count >= 3 &&
-            !TryGetNumbers(arguments[2].Evaluate(context), out predictionX, out error))
-            return error;
-        var result = new object[predictionX.Length, 1];
-        for (int i = 0; i < predictionX.Length; i++)
         {
-            result[i, 0] = exponential
-                ? intercept * Math.Pow(slope, predictionX[i])
-                : intercept + (slope * predictionX[i]);
+            var result = new object[1, coefficients.Length];
+            int predictorCount = xs.GetLength(1);
+            for (int column = 0; column < predictorCount; column++)
+            {
+                double coefficient = coefficients[predictorCount - column - 1];
+                result[0, column] = exponential ? Math.Exp(coefficient) : coefficient;
+            }
+            result[0, coefficients.Length - 1] = exponential
+                ? Math.Exp(coefficients[coefficients.Length - 1])
+                : coefficients[coefficients.Length - 1];
+            return result;
         }
-        return result;
+        double[,] predictionX = xs;
+        if (arguments.Count >= 3 &&
+            !TryGetRegressionMatrix(
+                arguments[2].Evaluate(context),
+                null,
+                out predictionX,
+                out error))
+            return error;
+        if (predictionX.GetLength(1) != xs.GetLength(1))
+            return OdfFormulaError.NA;
+        var predictions = new object[predictionX.GetLength(0), 1];
+        for (int row = 0; row < predictionX.GetLength(0); row++)
+        {
+            double prediction = coefficients[coefficients.Length - 1];
+            for (int column = 0; column < predictionX.GetLength(1); column++)
+                prediction += coefficients[column] * predictionX[row, column];
+            predictions[row, 0] = exponential ? Math.Exp(prediction) : prediction;
+        }
+        return predictions;
     }
 
     private static object EvaluateSteyx(List<AstNode> arguments, IEvaluationContext context)
@@ -882,6 +943,9 @@ internal static class FormulaConformanceFunctionHandlers
         bool priceFunction = name is "PRICE" or "ODDFPRICE" or "ODDLPRICE";
         bool oddFirst = name is "ODDFPRICE" or "ODDFYIELD";
         bool oddLast = name is "ODDLPRICE" or "ODDLYIELD";
+        DateTime? issue = null;
+        DateTime? firstCoupon = null;
+        DateTime? lastInterest = null;
         double couponRate = v[2];
         double marketValue = v[3];
         double redemption = 100;
@@ -889,6 +953,13 @@ internal static class FormulaConformanceFunctionHandlers
         int basis;
         if (oddFirst)
         {
+            if (!TryDate(v[2], out DateTime issueDate) ||
+                !TryDate(v[3], out DateTime firstCouponDate))
+            {
+                return OdfFormulaError.Num;
+            }
+            issue = issueDate;
+            firstCoupon = firstCouponDate;
             couponRate = v[4];
             marketValue = v[5];
             redemption = v[6];
@@ -897,6 +968,9 @@ internal static class FormulaConformanceFunctionHandlers
         }
         else if (oddLast)
         {
+            if (!TryDate(v[2], out DateTime lastInterestDate))
+                return OdfFormulaError.Num;
+            lastInterest = lastInterestDate;
             couponRate = v[3];
             marketValue = v[4];
             redemption = v[5];
@@ -917,15 +991,17 @@ internal static class FormulaConformanceFunctionHandlers
         if (settlement >= maturity || frequency is not (1 or 2 or 4))
             return OdfFormulaError.Num;
         double Price(double yield)
-        {
-            int periods = Math.Max(1, (int)Math.Ceiling(
-                YearFraction(settlement, maturity, basis) * frequency));
-            double coupon = redemption * couponRate / frequency;
-            double price = 0;
-            for (int i = 1; i <= periods; i++)
-                price += coupon / Math.Pow(1 + (yield / frequency), i);
-            return price + (redemption / Math.Pow(1 + (yield / frequency), periods));
-        }
+            => CalculateBondPrice(
+                settlement,
+                maturity,
+                couponRate,
+                yield,
+                redemption,
+                frequency,
+                basis,
+                issue,
+                firstCoupon,
+                lastInterest);
         if (priceFunction)
             return Price(marketValue);
         if (name is "YIELD" or "ODDFYIELD" or "ODDLYIELD")
@@ -971,6 +1047,40 @@ internal static class FormulaConformanceFunctionHandlers
         string field = Convert.ToString(fieldValue, CultureInfo.InvariantCulture) ?? string.Empty;
         if (field.Length == 0)
             return OdfFormulaError.Value;
+        OdfKit.Spreadsheet.OdfCellAddress anchor;
+        if (arguments[1] is CellAddressNode cell)
+        {
+            anchor = cell.Address;
+        }
+        else if (arguments[1] is RangeReferenceNode range)
+        {
+            anchor = range.Range.StartAddress;
+        }
+        else
+        {
+            return OdfFormulaError.Value;
+        }
+        var filters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        for (int index = 2; index < arguments.Count; index += 2)
+        {
+            object filterNameValue = arguments[index].Evaluate(context);
+            if (filterNameValue is OdfFormulaError filterError)
+                return filterError;
+            string filterName = Convert.ToString(
+                filterNameValue,
+                CultureInfo.InvariantCulture) ?? string.Empty;
+            if (filterName.Length == 0)
+                return OdfFormulaError.Value;
+            object filterValue = arguments[index + 1].Evaluate(context);
+            if (filterValue is OdfFormulaError valueError)
+                return valueError;
+            filters[filterName] = filterValue;
+        }
+        if (context is IOdfFormulaWorkbookContext workbook &&
+            workbook.TryGetPivotData(field, anchor, filters, out object pivotResult))
+        {
+            return pivotResult;
+        }
         try
         {
             return context.GetNamedRangeOrExpressionValue(field);
@@ -981,14 +1091,47 @@ internal static class FormulaConformanceFunctionHandlers
         }
     }
 
+    private static object EvaluateMultipleOperations(
+        List<AstNode> arguments,
+        IEvaluationContext context)
+    {
+        if (arguments.Count is not (3 or 5))
+            return OdfFormulaError.Value;
+        var values = new object[arguments.Count];
+        for (int index = 0; index < arguments.Count; index++)
+        {
+            values[index] = arguments[index].Evaluate(context);
+            if (values[index] is OdfFormulaError error)
+                return error;
+        }
+        return context is IOdfFormulaWorkbookContext workbook &&
+            workbook.TryEvaluateMultipleOperations(values, out object result)
+            ? result
+            : OdfFormulaError.NA;
+    }
+
     private static object EvaluateSheet(List<AstNode> arguments, IEvaluationContext context)
     {
         if (arguments.Count > 1)
             return OdfFormulaError.Value;
-        if (arguments.Count == 0)
-            return 1d;
-        List<OdfKit.Spreadsheet.OdfCellRange> ranges = arguments[0].GetRanges(context);
-        return ranges.Count == 0 ? OdfFormulaError.NA : 1d;
+        string? sheetName = arguments.Count == 0
+            ? context.CurrentCell.SheetName
+            : GetReferencedSheetName(arguments[0], context);
+        if (context is not IOdfFormulaWorkbookContext workbook)
+            return string.IsNullOrEmpty(sheetName) ? 1d : OdfFormulaError.NA;
+        if (string.IsNullOrEmpty(sheetName))
+            return workbook.SheetNames.Count > 0 ? 1d : OdfFormulaError.NA;
+        for (int index = 0; index < workbook.SheetNames.Count; index++)
+        {
+            if (string.Equals(
+                workbook.SheetNames[index],
+                sheetName,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return (double)(index + 1);
+            }
+        }
+        return OdfFormulaError.NA;
     }
 
     private static object EvaluateSheets(List<AstNode> arguments, IEvaluationContext context)
@@ -996,9 +1139,26 @@ internal static class FormulaConformanceFunctionHandlers
         if (arguments.Count > 1)
             return OdfFormulaError.Value;
         if (arguments.Count == 0)
-            return 1d;
-        List<OdfKit.Spreadsheet.OdfCellRange> ranges = arguments[0].GetRanges(context);
-        return ranges.Count == 0 ? OdfFormulaError.NA : 1d;
+        {
+            return context is IOdfFormulaWorkbookContext workbook
+                ? (double)workbook.SheetNames.Count
+                : 1d;
+        }
+        return arguments[0].GetRanges(context).Count > 0 ? 1d : OdfFormulaError.NA;
+    }
+
+    private static string? GetReferencedSheetName(
+        AstNode argument,
+        IEvaluationContext context)
+    {
+        if (argument is CellAddressNode cell)
+            return cell.Address.SheetName ?? context.CurrentCell.SheetName;
+        if (argument is RangeReferenceNode range)
+            return range.Range.StartAddress.SheetName ?? context.CurrentCell.SheetName;
+        List<OdfKit.Spreadsheet.OdfCellRange> ranges = argument.GetRanges(context);
+        return ranges.Count == 0
+            ? null
+            : ranges[0].StartAddress.SheetName ?? context.CurrentCell.SheetName;
     }
 
     private static object EvaluateHyperlink(List<AstNode> arguments, IEvaluationContext context)
@@ -1156,6 +1316,152 @@ internal static class FormulaConformanceFunctionHandlers
         return values.Length > 0;
     }
 
+    private static bool TryGetRegressionMatrix(
+        object value,
+        int? expectedRows,
+        out double[,] matrix,
+        out object error)
+    {
+        if (value is OdfFormulaError formulaError)
+        {
+            matrix = new double[0, 0];
+            error = formulaError;
+            return false;
+        }
+        if (value is object[,] array)
+        {
+            int rows = array.GetLength(0);
+            int columns = array.GetLength(1);
+            bool transpose = expectedRows.HasValue &&
+                rows != expectedRows.Value &&
+                columns == expectedRows.Value;
+            int outputRows = transpose ? columns : rows;
+            int outputColumns = transpose ? rows : columns;
+            if (expectedRows.HasValue && outputRows != expectedRows.Value)
+            {
+                matrix = new double[0, 0];
+                error = OdfFormulaError.NA;
+                return false;
+            }
+            matrix = new double[outputRows, outputColumns];
+            for (int row = 0; row < outputRows; row++)
+            {
+                for (int column = 0; column < outputColumns; column++)
+                {
+                    object item = transpose ? array[column, row] : array[row, column];
+                    if (!FormulaCoercion.TryCoerceDouble(item, out matrix[row, column]))
+                    {
+                        error = OdfFormulaError.Value;
+                        return false;
+                    }
+                }
+            }
+            error = 0d;
+            return outputRows > 0 && outputColumns > 0;
+        }
+        if (!TryGetNumbers(value, out double[] values, out error))
+        {
+            matrix = new double[0, 0];
+            return false;
+        }
+        if (expectedRows.HasValue && values.Length != expectedRows.Value)
+        {
+            matrix = new double[0, 0];
+            error = OdfFormulaError.NA;
+            return false;
+        }
+        matrix = new double[values.Length, 1];
+        for (int row = 0; row < values.Length; row++)
+            matrix[row, 0] = values[row];
+        error = 0d;
+        return true;
+    }
+
+    private static bool TryFitLinearModel(
+        double[,] predictors,
+        double[] outcomes,
+        bool includeIntercept,
+        out double[] coefficients)
+    {
+        int rows = predictors.GetLength(0);
+        int predictorCount = predictors.GetLength(1);
+        int parameterCount = predictorCount + (includeIntercept ? 1 : 0);
+        if (rows < parameterCount || outcomes.Length != rows)
+        {
+            coefficients = [];
+            return false;
+        }
+        var normal = new double[parameterCount, parameterCount + 1];
+        for (int row = 0; row < rows; row++)
+        {
+            for (int left = 0; left < parameterCount; left++)
+            {
+                double leftValue = left < predictorCount ? predictors[row, left] : 1;
+                normal[left, parameterCount] += leftValue * outcomes[row];
+                for (int right = 0; right < parameterCount; right++)
+                {
+                    double rightValue = right < predictorCount ? predictors[row, right] : 1;
+                    normal[left, right] += leftValue * rightValue;
+                }
+            }
+        }
+        if (!TrySolveLinearSystem(normal, parameterCount, out double[] fitted))
+        {
+            coefficients = [];
+            return false;
+        }
+        coefficients = new double[predictorCount + 1];
+        for (int index = 0; index < predictorCount; index++)
+            coefficients[index] = fitted[index];
+        coefficients[predictorCount] = includeIntercept ? fitted[predictorCount] : 0;
+        return true;
+    }
+
+    private static bool TrySolveLinearSystem(
+        double[,] augmented,
+        int size,
+        out double[] solution)
+    {
+        for (int column = 0; column < size; column++)
+        {
+            int pivot = column;
+            for (int row = column + 1; row < size; row++)
+            {
+                if (Math.Abs(augmented[row, column]) > Math.Abs(augmented[pivot, column]))
+                    pivot = row;
+            }
+            if (Math.Abs(augmented[pivot, column]) < 1e-14)
+            {
+                solution = [];
+                return false;
+            }
+            if (pivot != column)
+            {
+                for (int item = column; item <= size; item++)
+                {
+                    double temporary = augmented[column, item];
+                    augmented[column, item] = augmented[pivot, item];
+                    augmented[pivot, item] = temporary;
+                }
+            }
+            double divisor = augmented[column, column];
+            for (int item = column; item <= size; item++)
+                augmented[column, item] /= divisor;
+            for (int row = 0; row < size; row++)
+            {
+                if (row == column)
+                    continue;
+                double factor = augmented[row, column];
+                for (int item = column; item <= size; item++)
+                    augmented[row, item] -= factor * augmented[column, item];
+            }
+        }
+        solution = new double[size];
+        for (int row = 0; row < size; row++)
+            solution[row] = augmented[row, size];
+        return true;
+    }
+
     private static double BesselSeries(double x, int order, bool alternating)
     {
         double term = Math.Pow(x / 2, order) / Math.Exp(LogGamma(order + 1));
@@ -1170,6 +1476,50 @@ internal static class FormulaConformanceFunctionHandlers
                 break;
         }
         return sum;
+    }
+
+    private static double BesselY(double x, int order)
+    {
+        if (x > 20)
+        {
+            double phase = x - ((order * Math.PI / 2) + (Math.PI / 4));
+            return Math.Sqrt(2 / (Math.PI * x)) * Math.Sin(phase);
+        }
+        const double EulerGamma = 0.5772156649015329;
+        double q = x * x / 4;
+        double term = 1;
+        double harmonic = 0;
+        double series = 0;
+        double derivativeSeries = 0;
+        for (int k = 1; k < 200; k++)
+        {
+            harmonic += 1d / k;
+            term *= -q / (k * k);
+            double contribution = -harmonic * term;
+            series += contribution;
+            derivativeSeries += (2d * k / x) * contribution;
+            if (Math.Abs(contribution) <= Math.Max(1, Math.Abs(series)) * 1e-15)
+                break;
+        }
+        double j0 = BesselSeries(x, 0, true);
+        double j1 = BesselSeries(x, 1, true);
+        double logarithm = Math.Log(x / 2) + EulerGamma;
+        double y0 = (2 / Math.PI) * ((logarithm * j0) + series);
+        if (order == 0)
+            return y0;
+        double y1 = -(2 / Math.PI) *
+            ((j0 / x) - (logarithm * j1) + derivativeSeries);
+        if (order == 1)
+            return y1;
+        double previous = y0;
+        double current = y1;
+        for (int n = 1; n < order; n++)
+        {
+            double next = (2d * n / x * current) - previous;
+            previous = current;
+            current = next;
+        }
+        return current;
     }
 
     private static double RegularizedBeta(double x, double a, double b)
@@ -1499,6 +1849,84 @@ internal static class FormulaConformanceFunctionHandlers
         double factor = Math.Pow(1 + rate, periods);
         return -(present * factor + future) * rate /
             ((factor - 1) * (1 + (rate * type)));
+    }
+
+    private static double CalculateBondPrice(
+        DateTime settlement,
+        DateTime maturity,
+        double couponRate,
+        double yield,
+        double redemption,
+        int frequency,
+        int basis,
+        DateTime? issue,
+        DateTime? firstCoupon,
+        DateTime? lastInterest)
+    {
+        if (yield <= -frequency || couponRate < 0 || redemption <= 0)
+            return double.NaN;
+        int months = 12 / frequency;
+        double coupon = redemption * couponRate / frequency;
+        if (lastInterest.HasValue)
+        {
+            DateTime previousNormal = maturity.AddMonths(-months);
+            double normalDays = Math.Max(1, DayCount(previousNormal, maturity, basis));
+            double stubDays = DayCount(lastInterest.Value, maturity, basis);
+            double accruedDays = DayCount(lastInterest.Value, settlement, basis);
+            double remainingDays = DayCount(settlement, maturity, basis);
+            double exponent = remainingDays / normalDays;
+            double finalCash = redemption + (coupon * stubDays / normalDays);
+            return (finalCash / Math.Pow(1 + (yield / frequency), exponent)) -
+                (coupon * accruedDays / normalDays);
+        }
+        if (issue.HasValue && firstCoupon.HasValue)
+        {
+            DateTime previousNormal = firstCoupon.Value.AddMonths(-months);
+            double normalDays = Math.Max(
+                1,
+                DayCount(previousNormal, firstCoupon.Value, basis));
+            double firstCouponDays = DayCount(issue.Value, firstCoupon.Value, basis);
+            double accruedDays = DayCount(issue.Value, settlement, basis);
+            double firstExponent = DayCount(
+                settlement,
+                firstCoupon.Value,
+                basis) / normalDays;
+            double price = coupon * firstCouponDays / normalDays /
+                Math.Pow(1 + (yield / frequency), firstExponent);
+            DateTime paymentDate = firstCoupon.Value.AddMonths(months);
+            int period = 1;
+            while (paymentDate <= maturity)
+            {
+                double cash = coupon + (paymentDate == maturity ? redemption : 0);
+                price += cash / Math.Pow(
+                    1 + (yield / frequency),
+                    firstExponent + period);
+                paymentDate = paymentDate.AddMonths(months);
+                period++;
+            }
+            return price - (coupon * accruedDays / normalDays);
+        }
+        DateTime previous = maturity;
+        while (previous > settlement)
+            previous = previous.AddMonths(-months);
+        DateTime next = previous.AddMonths(months);
+        double couponDays = Math.Max(1, DayCount(previous, next, basis));
+        double accrued = DayCount(previous, settlement, basis);
+        double remaining = DayCount(settlement, next, basis);
+        double firstPeriod = remaining / couponDays;
+        double standardPrice = 0;
+        DateTime date = next;
+        int index = 0;
+        while (date <= maturity)
+        {
+            double cash = coupon + (date == maturity ? redemption : 0);
+            standardPrice += cash / Math.Pow(
+                1 + (yield / frequency),
+                firstPeriod + index);
+            date = date.AddMonths(months);
+            index++;
+        }
+        return standardPrice - (coupon * accrued / couponDays);
     }
 
     private static double Integrate(Func<double, double> function, double start, double end)

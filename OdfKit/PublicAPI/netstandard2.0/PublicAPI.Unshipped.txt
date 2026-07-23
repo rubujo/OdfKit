@@ -14662,6 +14662,10 @@ OdfKit.Formula.IOdfFormulaEvaluationFallback
 OdfKit.Formula.IOdfFormulaEvaluationFallback.TryEvaluate(string! formula, OdfKit.Formula.IEvaluationContext! context, out object! result) -> bool
 OdfKit.Formula.IOdfFormulaEvaluator
 OdfKit.Formula.IOdfFormulaEvaluator.Evaluate(string! formula, OdfKit.Formula.IEvaluationContext! context) -> object!
+OdfKit.Formula.IOdfFormulaWorkbookContext
+OdfKit.Formula.IOdfFormulaWorkbookContext.SheetNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Formula.IOdfFormulaWorkbookContext.TryEvaluateMultipleOperations(System.Collections.Generic.IReadOnlyList<object!>! arguments, out object! result) -> bool
+OdfKit.Formula.IOdfFormulaWorkbookContext.TryGetPivotData(string! dataField, OdfKit.Spreadsheet.OdfCellAddress pivotAnchor, System.Collections.Generic.IReadOnlyDictionary<string!, object!>! filters, out object! result) -> bool
 OdfKit.Formula.OdfFormulaAnalysis
 OdfKit.Formula.OdfFormulaAnalysis.CanParse.get -> bool
 OdfKit.Formula.OdfFormulaAnalysis.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfFormulaDiagnostic!>!
@@ -14681,8 +14685,10 @@ OdfKit.Formula.OdfFormulaConformanceGroup.Large = 2 -> OdfKit.Formula.OdfFormula
 OdfKit.Formula.OdfFormulaConformanceGroup.Medium = 1 -> OdfKit.Formula.OdfFormulaConformanceGroup
 OdfKit.Formula.OdfFormulaConformanceGroup.Small = 0 -> OdfKit.Formula.OdfFormulaConformanceGroup
 OdfKit.Formula.OdfFormulaConformanceReport
+OdfKit.Formula.OdfFormulaConformanceReport.BestEffortFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Formula.OdfFormulaConformanceReport.Group.get -> OdfKit.Formula.OdfFormulaConformanceGroup
 OdfKit.Formula.OdfFormulaConformanceReport.HasCompleteFunctionSet.get -> bool
+OdfKit.Formula.OdfFormulaConformanceReport.HasOnlyFullyEvaluatedFunctions.get -> bool
 OdfKit.Formula.OdfFormulaConformanceReport.MissingFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Formula.OdfFormulaConformanceReport.RequiredFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Formula.OdfFormulaDependencyGraph
@@ -14753,6 +14759,7 @@ OdfKit.Formula.OdfFormulaFunctionRegistry.Remove(string! name) -> bool
 OdfKit.Formula.OdfFormulaLatexConverter
 OdfKit.Formula.OdfFormulaSupport
 OdfKit.Formula.OdfFormulaSupportLevel
+OdfKit.Formula.OdfFormulaSupportLevel.BestEffort = 2 -> OdfKit.Formula.OdfFormulaSupportLevel
 OdfKit.Formula.OdfFormulaSupportLevel.Evaluated = 0 -> OdfKit.Formula.OdfFormulaSupportLevel
 OdfKit.Formula.OdfFormulaSupportLevel.PreservedOnly = 1 -> OdfKit.Formula.OdfFormulaSupportLevel
 OdfKit.Formula.OdfFormulaTranslator

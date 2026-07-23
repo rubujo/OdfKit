@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OdfKit.Formula;
 using OdfKit.Spreadsheet;
@@ -207,15 +208,115 @@ public sealed class OpenFormulaExtendedEvaluatorTests
 
         Assert.Equal(110, small.RequiredFunctions.Count);
         Assert.True(small.HasCompleteFunctionSet);
+        Assert.True(small.HasOnlyFullyEvaluatedFunctions);
+        Assert.Empty(small.BestEffortFunctions);
         Assert.Equal(272, medium.RequiredFunctions.Count);
         Assert.True(medium.HasCompleteFunctionSet);
         Assert.Empty(medium.MissingFunctions);
+        Assert.False(medium.HasOnlyFullyEvaluatedFunctions);
+        Assert.Contains("BESSELI", medium.BestEffortFunctions);
         Assert.DoesNotContain("MMULT", medium.MissingFunctions);
         Assert.Equal(388, large.RequiredFunctions.Count);
         Assert.True(large.HasCompleteFunctionSet);
         Assert.Empty(large.MissingFunctions);
+        Assert.False(large.HasOnlyFullyEvaluatedFunctions);
+        Assert.Contains("DDE", large.BestEffortFunctions);
+        Assert.Contains("GETPIVOTDATA", large.BestEffortFunctions);
         Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
         Assert.DoesNotContain("DDE", large.MissingFunctions);
+    }
+
+    /// <summary>
+    /// Verifies workbook-aware sheet, pivot, and multiple-operation evaluation.
+    /// 驗證可感知活頁簿的工作表、樞紐分析表與多重運算求值。
+    /// </summary>
+    [Fact]
+    public void WorkbookAwareFunctionsUseOptionalContextServices()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new WorkbookEvaluationContext();
+
+        Assert.Equal(3d, evaluator.Evaluate("SHEETS()", context));
+        Assert.Equal(2d, evaluator.Evaluate("SHEET()", context));
+        Assert.Equal(3d, evaluator.Evaluate("SHEET(Third!A1)", context));
+        Assert.Equal(42d, evaluator.Evaluate(
+            "GETPIVOTDATA(\"Sales\";Second!A1;\"Region\";\"North\")",
+            context));
+        Assert.Equal(99d, evaluator.Evaluate("MULTIPLE.OPERATIONS(1;2;3)", context));
+    }
+
+    /// <summary>
+    /// Verifies that document recalculation exposes the real worksheet catalog.
+    /// 驗證文件重算會提供實際工作表目錄。
+    /// </summary>
+    [Fact]
+    public void DocumentEvaluationUsesActualWorksheetCatalog()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet first = document.AddSheet("First");
+        OdfTableSheet second = document.AddSheet("Second");
+        first.Cells["A1"].Formula = "of:=SHEETS()";
+        second.Cells["A1"].Formula = "of:=SHEET()";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(2d, first.Cells["A1"].CellValue);
+        Assert.Equal(2d, second.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies multi-predictor linear regression and prediction.
+    /// 驗證多自變數線性迴歸與預測。
+    /// </summary>
+    [Fact]
+    public void RegressionFunctionsSupportMultiplePredictors()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        object[,] coefficients = Assert.IsType<object[,]>(
+            evaluator.Evaluate("LINEST({3|4|8};{1;0|0;1|2;1})", context));
+        Assert.Equal(3d, Assert.IsType<double>(coefficients[0, 0]), 8);
+        Assert.Equal(2d, Assert.IsType<double>(coefficients[0, 1]), 8);
+        Assert.Equal(1d, Assert.IsType<double>(coefficients[0, 2]), 8);
+
+        object[,] predictions = Assert.IsType<object[,]>(
+            evaluator.Evaluate("TREND({3|4|8};{1;0|0;1|2;1};{3;1})", context));
+        Assert.Equal(10d, Assert.IsType<double>(predictions[0, 0]), 8);
+    }
+
+    /// <summary>
+    /// Verifies odd first and last coupon prices can be inverted back to their yields.
+    /// 驗證奇數首期與末期票息價格可反算回殖利率。
+    /// </summary>
+    [Fact]
+    public void OddCouponBondPricesAndYieldsRoundTrip()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        double oddFirstPrice = Assert.IsType<double>(evaluator.Evaluate(
+            "ODDFPRICE(DATE(2024;2;1);DATE(2026;1;1);DATE(2023;10;1);" +
+            "DATE(2024;7;1);0.05;0.06;100;2;1)",
+            context));
+        string oddFirstYieldFormula =
+            "ODDFYIELD(DATE(2024;2;1);DATE(2026;1;1);DATE(2023;10;1);" +
+            "DATE(2024;7;1);0.05;" +
+            oddFirstPrice.ToString("R", CultureInfo.InvariantCulture) +
+            ";100;2;1)";
+        Assert.Equal(0.06d, Assert.IsType<double>(
+            evaluator.Evaluate(oddFirstYieldFormula, context)), 7);
+
+        double oddLastPrice = Assert.IsType<double>(evaluator.Evaluate(
+            "ODDLPRICE(DATE(2025;8;1);DATE(2026;3;15);DATE(2025;7;1);" +
+            "0.05;0.06;100;2;1)",
+            context));
+        string oddLastYieldFormula =
+            "ODDLYIELD(DATE(2025;8;1);DATE(2026;3;15);DATE(2025;7;1);0.05;" +
+            oddLastPrice.ToString("R", CultureInfo.InvariantCulture) +
+            ";100;2;1)";
+        Assert.Equal(0.06d, Assert.IsType<double>(
+            evaluator.Evaluate(oddLastYieldFormula, context)), 7);
     }
 
     /// <summary>
@@ -244,6 +345,12 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             "HYPERLINK(\"https://example.invalid\";\"OdfKit\")", context));
         Assert.Equal(1.95583d, Assert.IsType<double>(
             evaluator.Evaluate("EUROCONVERT(1;\"EUR\";\"DEM\")", context)), 8);
+        Assert.Equal(0.0882569642d, Assert.IsType<double>(
+            evaluator.Evaluate("BESSELY(1;0)", context)), 7);
+        Assert.Equal(0.4210244382d, Assert.IsType<double>(
+            evaluator.Evaluate("BESSELK(1;0)", context)), 7);
+        Assert.InRange(Assert.IsType<double>(
+            evaluator.Evaluate("TTEST({1;2;3};{1;2;4};2;1)", context)), 0, 1);
         Assert.IsType<OdfFormulaError>(evaluator.Evaluate(
             "DDE(\"service\";\"topic\";\"item\")", context));
     }
@@ -477,5 +584,42 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             "ONE" => OneCriteria,
             _ => OdfFormulaError.Name
         };
+    }
+
+    private sealed class WorkbookEvaluationContext : IOdfFormulaWorkbookContext
+    {
+        public OdfCellAddress CurrentCell => new(0, 0, "Second");
+
+        public IReadOnlyList<string> SheetNames { get; } = ["First", "Second", "Third"];
+
+        public object GetCellValue(OdfCellAddress address) => 0d;
+
+        public object[,] GetRangeValues(OdfCellRange range) => new object[1, 1];
+
+        public string? GetCellFormula(OdfCellAddress address) => null;
+
+        public object GetNamedRangeOrExpressionValue(string name) => OdfFormulaError.Name;
+
+        public bool TryGetPivotData(
+            string dataField,
+            OdfCellAddress pivotAnchor,
+            IReadOnlyDictionary<string, object> filters,
+            out object result)
+        {
+            bool matches = dataField == "Sales" &&
+                pivotAnchor.SheetName == "Second" &&
+                filters.TryGetValue("Region", out object? region) &&
+                Equals(region, "North");
+            result = matches ? 42d : OdfFormulaError.NA;
+            return matches;
+        }
+
+        public bool TryEvaluateMultipleOperations(
+            IReadOnlyList<object> arguments,
+            out object result)
+        {
+            result = 99d;
+            return arguments.Count == 3;
+        }
     }
 }

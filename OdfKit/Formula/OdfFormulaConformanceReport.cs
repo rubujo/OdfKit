@@ -15,11 +15,13 @@ public sealed class OdfFormulaConformanceReport
     internal OdfFormulaConformanceReport(
         OdfFormulaConformanceGroup group,
         IReadOnlyList<string> requiredFunctions,
-        IReadOnlyList<string> missingFunctions)
+        IReadOnlyList<string> missingFunctions,
+        IReadOnlyList<string> bestEffortFunctions)
     {
         Group = group;
         RequiredFunctions = requiredFunctions;
         MissingFunctions = missingFunctions;
+        BestEffortFunctions = bestEffortFunctions;
     }
 
     /// <summary>
@@ -41,8 +43,21 @@ public sealed class OdfFormulaConformanceReport
     public IReadOnlyList<string> MissingFunctions { get; }
 
     /// <summary>
+    /// Gets mandatory functions whose built-in implementations are explicitly classified as best effort.
+    /// 取得內建實作明確分類為 Best Effort 的強制函式。
+    /// </summary>
+    public IReadOnlyList<string> BestEffortFunctions { get; }
+
+    /// <summary>
     /// Gets a value indicating whether every mandatory function name is available.
     /// 取得是否已提供全部強制函式名稱。
     /// </summary>
     public bool HasCompleteFunctionSet => MissingFunctions.Count == 0;
+
+    /// <summary>
+    /// Gets a value indicating whether every available mandatory function is classified as fully evaluated.
+    /// 取得所有可用強制函式是否皆分類為完整求值。
+    /// </summary>
+    public bool HasOnlyFullyEvaluatedFunctions =>
+        MissingFunctions.Count == 0 && BestEffortFunctions.Count == 0;
 }
