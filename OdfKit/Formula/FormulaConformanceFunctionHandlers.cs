@@ -565,7 +565,8 @@ internal static class FormulaConformanceFunctionHandlers
             ys,
             includeIntercept,
             out double[] coefficients,
-            out double[,] inverseNormal))
+            out double[,] inverseNormal,
+            out int modelRank))
             return OdfFormulaError.Num;
         if (name is "LINEST" or "LOGEST")
         {
@@ -574,6 +575,7 @@ internal static class FormulaConformanceFunctionHandlers
                 ys,
                 coefficients,
                 inverseNormal,
+                modelRank,
                 includeIntercept,
                 exponential,
                 includeStatistics);
@@ -1392,37 +1394,35 @@ internal static class FormulaConformanceFunctionHandlers
         double[] outcomes,
         bool includeIntercept,
         out double[] coefficients,
-        out double[,] inverseNormal)
+        out double[,] inverseNormal,
+        out int modelRank)
     {
         int rows = predictors.GetLength(0);
         int predictorCount = predictors.GetLength(1);
         int parameterCount = predictorCount + (includeIntercept ? 1 : 0);
-        if (rows <= parameterCount || outcomes.Length != rows)
+        if (rows < 2 || outcomes.Length != rows || parameterCount == 0)
         {
             coefficients = [];
             inverseNormal = new double[0, 0];
+            modelRank = 0;
             return false;
         }
-        var normal = new double[parameterCount, parameterCount];
-        var rightHandSide = new double[parameterCount];
+
+        var design = new double[rows, parameterCount];
         for (int row = 0; row < rows; row++)
         {
-            for (int left = 0; left < parameterCount; left++)
-            {
-                double leftValue = left < predictorCount ? predictors[row, left] : 1;
-                rightHandSide[left] += leftValue * outcomes[row];
-                for (int right = 0; right < parameterCount; right++)
-                {
-                    double rightValue = right < predictorCount ? predictors[row, right] : 1;
-                    normal[left, right] += leftValue * rightValue;
-                }
-            }
+            for (int column = 0; column < predictorCount; column++)
+                design[row, column] = predictors[row, column];
+            if (includeIntercept)
+                design[row, predictorCount] = 1;
         }
-        if (!TrySolveLinearSystem(
-            CreateAugmentedMatrix(normal, rightHandSide),
-            parameterCount,
-            out double[] fitted) ||
-            !TryInvertMatrix(normal, out inverseNormal))
+
+        if (!TrySolveLeastSquares(
+            design,
+            outcomes,
+            out double[] fitted,
+            out inverseNormal,
+            out modelRank))
         {
             coefficients = [];
             inverseNormal = new double[0, 0];
@@ -1435,11 +1435,145 @@ internal static class FormulaConformanceFunctionHandlers
         return true;
     }
 
+    private static bool TrySolveLeastSquares(
+        double[,] design,
+        double[] outcomes,
+        out double[] solution,
+        out double[,] inverseNormal,
+        out int rank)
+    {
+        int rows = design.GetLength(0);
+        int columns = design.GetLength(1);
+        var work = (double[,])design.Clone();
+        var q = new double[rows, columns];
+        var r = new double[columns, columns];
+        var permutation = new int[columns];
+        var norms = new double[columns];
+        double largestNorm = 0;
+        for (int column = 0; column < columns; column++)
+        {
+            permutation[column] = column;
+            norms[column] = ColumnSquaredNorm(work, column);
+            largestNorm = Math.Max(largestNorm, Math.Sqrt(norms[column]));
+        }
+
+        rank = 0;
+        double tolerance = Math.Max(rows, columns) * Math.Max(1, largestNorm) * 1e-12;
+        for (int step = 0; step < columns; step++)
+        {
+            int pivot = step;
+            for (int column = step + 1; column < columns; column++)
+            {
+                if (norms[column] > norms[pivot])
+                    pivot = column;
+            }
+            if (Math.Sqrt(Math.Max(0, norms[pivot])) <= tolerance)
+                break;
+
+            if (pivot != step)
+            {
+                SwapColumns(work, pivot, step);
+                (norms[pivot], norms[step]) = (norms[step], norms[pivot]);
+                (permutation[pivot], permutation[step]) =
+                    (permutation[step], permutation[pivot]);
+                for (int previous = 0; previous < step; previous++)
+                    (r[previous, pivot], r[previous, step]) =
+                        (r[previous, step], r[previous, pivot]);
+            }
+
+            double norm = Math.Sqrt(ColumnSquaredNorm(work, step));
+            if (norm <= tolerance)
+                break;
+            r[step, step] = norm;
+            for (int row = 0; row < rows; row++)
+                q[row, step] = work[row, step] / norm;
+
+            for (int column = step + 1; column < columns; column++)
+            {
+                double projection = 0;
+                for (int row = 0; row < rows; row++)
+                    projection += q[row, step] * work[row, column];
+                r[step, column] = projection;
+                for (int row = 0; row < rows; row++)
+                    work[row, column] -= projection * q[row, step];
+                norms[column] = ColumnSquaredNorm(work, column);
+            }
+            rank++;
+        }
+
+        if (rank == 0 || rows <= rank)
+        {
+            solution = [];
+            inverseNormal = new double[0, 0];
+            return false;
+        }
+
+        var projected = new double[rank];
+        for (int column = 0; column < rank; column++)
+        {
+            for (int row = 0; row < rows; row++)
+                projected[column] += q[row, column] * outcomes[row];
+        }
+        var pivotedSolution = new double[columns];
+        for (int row = rank - 1; row >= 0; row--)
+        {
+            double value = projected[row];
+            for (int column = row + 1; column < rank; column++)
+                value -= r[row, column] * pivotedSolution[column];
+            pivotedSolution[row] = value / r[row, row];
+        }
+
+        solution = new double[columns];
+        for (int column = 0; column < columns; column++)
+            solution[permutation[column]] = pivotedSolution[column];
+
+        var inverseR = new double[rank, rank];
+        for (int target = 0; target < rank; target++)
+        {
+            for (int row = rank - 1; row >= 0; row--)
+            {
+                double value = row == target ? 1 : 0;
+                for (int column = row + 1; column < rank; column++)
+                    value -= r[row, column] * inverseR[column, target];
+                inverseR[row, target] = value / r[row, row];
+            }
+        }
+
+        inverseNormal = new double[columns, columns];
+        for (int left = 0; left < rank; left++)
+        {
+            for (int right = 0; right < rank; right++)
+            {
+                double value = 0;
+                for (int column = 0; column < rank; column++)
+                    value += inverseR[left, column] * inverseR[right, column];
+                inverseNormal[permutation[left], permutation[right]] = value;
+            }
+        }
+        return true;
+    }
+
+    private static double ColumnSquaredNorm(double[,] matrix, int column)
+    {
+        double result = 0;
+        for (int row = 0; row < matrix.GetLength(0); row++)
+            result += matrix[row, column] * matrix[row, column];
+        return result;
+    }
+
+    private static void SwapColumns(double[,] matrix, int left, int right)
+    {
+        for (int row = 0; row < matrix.GetLength(0); row++)
+            (matrix[row, left], matrix[row, right]) =
+                (matrix[row, right], matrix[row, left]);
+    }
+
     private static object[,] CreateRegressionResult(
         double[,] predictors,
         double[] outcomes,
         double[] coefficients,
         double[,] inverseNormal,
+        int modelRank,
         bool includeIntercept,
         bool exponential,
         bool includeStatistics)
@@ -1465,7 +1599,7 @@ internal static class FormulaConformanceFunctionHandlers
 
         int observations = outcomes.Length;
         int parameterCount = predictorCount + (includeIntercept ? 1 : 0);
-        double degreesOfFreedom = observations - parameterCount;
+        double degreesOfFreedom = observations - modelRank;
         double mean = Mean(outcomes);
         double residualSumSquares = 0;
         double regressionSumSquares = 0;
@@ -1493,13 +1627,14 @@ internal static class FormulaConformanceFunctionHandlers
         }
 
         double totalSumSquares = regressionSumSquares + residualSumSquares;
+        int regressionDegreesOfFreedom = modelRank - (includeIntercept ? 1 : 0);
         result[2, 0] = totalSumSquares == 0
             ? OdfFormulaError.Div0
             : regressionSumSquares / totalSumSquares;
         result[2, 1] = Math.Sqrt(variance);
-        result[3, 0] = residualSumSquares == 0
+        result[3, 0] = residualSumSquares == 0 || regressionDegreesOfFreedom == 0
             ? OdfFormulaError.Div0
-            : (regressionSumSquares / predictorCount) / variance;
+            : (regressionSumSquares / regressionDegreesOfFreedom) / variance;
         result[3, 1] = degreesOfFreedom;
         result[4, 0] = regressionSumSquares;
         result[4, 1] = residualSumSquares;

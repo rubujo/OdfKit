@@ -547,6 +547,25 @@ depth、sequence、產出、queue、timeout 與 concurrency 上限。timeout 只
 權杖，引擎則將其貫穿至字圖級迴圈，逾時因而能真正回收 consumer 執行緒。GitHub Actions 可以
 證明有限併發與可重現錯誤處理，不能代替真實 CDN、WAF、跨區容量或第三方惡意字型安全審查。
 
+採用端驗證不受信任字型時，可用
+`ManagedOpenTypeWebFontVerificationOptions` 將輸入大小、WOFF／WOFF2 展開大小及單一
+face 的 sfnt table 數量分開設限。這能在壓縮資料很小但宣告展開量很大時提早拒絕，
+也能依租戶或工作負載縮小預設的 32 MiB 邊界。
+
+```csharp
+var limits = new ManagedOpenTypeWebFontVerificationOptions
+{
+    MaximumInputBytes = 8 * 1024 * 1024,
+    MaximumExpandedBytes = 32 * 1024 * 1024,
+    MaximumTableCount = 128
+};
+ManagedOpenTypeWebFontVerifier.Verify(
+    stream,
+    WebFontFormat.Woff2,
+    limits,
+    cancellationToken);
+```
+
 動態產生 endpoint 將語法、allowlist 與要求形狀錯誤回應 400；來源沒有要求 glyph 時回 204；
 合法但引擎不支援的格式或技術回應 422；佇列已滿回 429；逾時、I/O、權限與密碼學服務等暫時性
 基礎設施失敗回應 503。產物結構或內部狀態不一致回應 500，不偽裝成用戶端錯誤，也不讓例外

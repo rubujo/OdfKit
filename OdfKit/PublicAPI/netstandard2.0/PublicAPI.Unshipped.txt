@@ -14662,6 +14662,9 @@ OdfKit.Formula.IOdfFormulaEvaluationFallback
 OdfKit.Formula.IOdfFormulaEvaluationFallback.TryEvaluate(string! formula, OdfKit.Formula.IEvaluationContext! context, out object! result) -> bool
 OdfKit.Formula.IOdfFormulaEvaluator
 OdfKit.Formula.IOdfFormulaEvaluator.Evaluate(string! formula, OdfKit.Formula.IEvaluationContext! context) -> object!
+OdfKit.Formula.IOdfFormulaVolatileContext
+OdfKit.Formula.IOdfFormulaVolatileContext.EvaluationTimestamp.get -> System.DateTime
+OdfKit.Formula.IOdfFormulaVolatileContext.NextRandomDouble() -> double
 OdfKit.Formula.IOdfFormulaWorkbookContext
 OdfKit.Formula.IOdfFormulaWorkbookContext.SheetNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Formula.IOdfFormulaWorkbookContext.TryEvaluateMultipleOperations(System.Collections.Generic.IReadOnlyList<object!>! arguments, out object! result) -> bool

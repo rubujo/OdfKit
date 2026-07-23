@@ -24,11 +24,20 @@ OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.FilterSupportedSequencesAsync(OdfKit.WebFonts.WebFontFaceIdentity! face, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>! sequences, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!>!
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontSubsetEngine.ManagedOpenTypeWebFontSubsetEngine(OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontEngineOptions! options) -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.ManagedOpenTypeWebFontVerificationOptions() -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumExpandedBytes.get -> long
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumExpandedBytes.init -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumInputBytes.get -> long
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumInputBytes.init -> void
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumTableCount.get -> int
+OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions.MaximumTableCount.init -> void
 OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier
 OdfKit.WebFonts.OpenType.WebFontRuntimeCapabilities
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.Verify(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.Verify(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, long maximumBytes) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.Verify(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, long maximumBytes, System.Threading.CancellationToken cancellationToken) -> void
+static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.Verify(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerificationOptions! options, System.Threading.CancellationToken cancellationToken) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<int>! unicodeScalars) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsScalars(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<int>! unicodeScalars, long maximumBytes, bool validateEveryCharString, System.Threading.CancellationToken cancellationToken) -> void
 static OdfKit.WebFonts.OpenType.ManagedOpenTypeWebFontVerifier.VerifyContainsSequences(System.IO.Stream! font, OdfKit.WebFonts.WebFontFormat format, System.Collections.Generic.IEnumerable<OdfKit.WebFonts.WebFontTextSequence!>! sequences) -> void

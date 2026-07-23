@@ -158,7 +158,10 @@ internal static class FormulaDateTimeFunctionHandlers
     {
         if (arguments.Count != 0)
             return OdfFormulaError.Value;
-        return (DateTime.Now - Epoch).TotalDays;
+        DateTime timestamp = context is IOdfFormulaVolatileContext volatileContext
+            ? volatileContext.EvaluationTimestamp
+            : DateTime.Now;
+        return (timestamp - Epoch).TotalDays;
     }
 
     internal static object EvaluateSecond(List<AstNode> arguments, IEvaluationContext context)
@@ -198,7 +201,10 @@ internal static class FormulaDateTimeFunctionHandlers
     {
         if (arguments.Count != 0)
             return OdfFormulaError.Value;
-        return (DateTime.Today - Epoch).TotalDays;
+        DateTime timestamp = context is IOdfFormulaVolatileContext volatileContext
+            ? volatileContext.EvaluationTimestamp
+            : DateTime.Now;
+        return (timestamp.Date - Epoch).TotalDays;
     }
 
     internal static object EvaluateYear(List<AstNode> arguments, IEvaluationContext context)

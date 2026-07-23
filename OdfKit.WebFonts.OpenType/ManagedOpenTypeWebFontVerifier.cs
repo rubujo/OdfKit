@@ -47,6 +47,37 @@ public static class ManagedOpenTypeWebFontVerifier
         parsed.ValidateAllCffGlyphs(cancellationToken);
     }
 
+    /// <summary>
+    /// Verifies a WebFont with independent input, expansion, and table-count limits.
+    /// 使用彼此獨立的輸入、展開及 table 數量限制驗證 WebFont。
+    /// </summary>
+    /// <param name="font">The readable font stream. / 可讀取的字型資料流。</param>
+    /// <param name="format">The declared WebFont format. / 宣告的 WebFont 格式。</param>
+    /// <param name="options">The verification resource limits. / 驗證資源限制。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    public static void Verify(
+        Stream font,
+        WebFontFormat format,
+        ManagedOpenTypeWebFontVerificationOptions options,
+        CancellationToken cancellationToken)
+    {
+        if (options is null)
+        {
+            throw new ArgumentNullException(
+                nameof(options),
+                OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+
+        SfntFont parsed = Parse(
+            font,
+            format,
+            options.MaximumInputBytes,
+            options.MaximumExpandedBytes,
+            options.MaximumTableCount,
+            cancellationToken);
+        parsed.ValidateAllCffGlyphs(cancellationToken);
+    }
+
     internal static void VerifyStructure(Stream font, WebFontFormat format)
     {
         SfntFont parsed = Parse(font, format, 32L * 1024 * 1024, CancellationToken.None);
@@ -245,26 +276,56 @@ public static class ManagedOpenTypeWebFontVerifier
         WebFontFormat format,
         long maximumBytes,
         CancellationToken cancellationToken)
+        => Parse(
+            font,
+            format,
+            maximumBytes,
+            maximumBytes,
+            256,
+            cancellationToken);
+
+    private static SfntFont Parse(
+        Stream font,
+        WebFontFormat format,
+        long maximumInputBytes,
+        long maximumExpandedBytes,
+        int maximumTableCount,
+        CancellationToken cancellationToken)
     {
         if (font is null)
         {
             throw new ArgumentNullException(nameof(font), OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        if (!font.CanRead || maximumBytes <= 0 || maximumBytes > int.MaxValue)
+        if (!font.CanRead ||
+            maximumInputBytes <= 0 ||
+            maximumInputBytes > int.MaxValue ||
+            maximumExpandedBytes <= 0 ||
+            maximumExpandedBytes > int.MaxValue ||
+            maximumTableCount is < 1 or > 256)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
 
-        byte[] bytes = ReadBounded(font, (int)maximumBytes);
+        byte[] bytes = ReadBounded(font, (int)maximumInputBytes);
         byte[] sfnt = format switch
         {
             WebFontFormat.TrueType or WebFontFormat.OpenType => bytes,
-            WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumBytes, cancellationToken),
-            WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumBytes, 0, cancellationToken),
+            WebFontFormat.Woff => DecodeWoff(bytes, (int)maximumExpandedBytes, cancellationToken),
+            WebFontFormat.Woff2 => DecodeWoff2(bytes, (int)maximumExpandedBytes, 0, cancellationToken),
             _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"))
         };
-        return SfntFont.Parse(sfnt, 0, 256, validateChecksums: true, cancellationToken);
+        if (sfnt.LongLength > maximumExpandedBytes)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+        }
+
+        return SfntFont.Parse(
+            sfnt,
+            0,
+            maximumTableCount,
+            validateChecksums: true,
+            cancellationToken);
     }
 
     internal static byte[] DecodeSource(byte[] bytes, int maximumExpandedBytes)

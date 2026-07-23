@@ -24,6 +24,8 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
   路徑；其它 complex script 必須先有合法 corpus 與三瀏覽器差分證據。
 - AAT layout 與 Graphite layout 不支援；辨識到其核心 layout table 時明確拒絕，不靜默 fallback。
 - 提供 CLI／MSBuild 自動內容掃描、CSP/CDN URL、精確 CORS allowlist 與有界背景 Worker。
+- managed verifier 可分別限制輸入 bytes、WOFF／WOFF2 展開 bytes 與 sfnt table 數量，
+  避免只用單一檔案大小限制掩蓋壓縮展開風險。
 - 核心不綁定 ADO.NET、Dapper、EF Core 或其它 ORM。
 
 快速開始、套件選型、安全界線與完整範例請參閱

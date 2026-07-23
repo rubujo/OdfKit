@@ -31,6 +31,25 @@ public class UnaryNode(char op, AstNode child) : AstNode
         if (val is OdfFormulaError err)
             return err;
 
+        if (val is object[,] array)
+        {
+            var result = new object[array.GetLength(0), array.GetLength(1)];
+            for (int row = 0; row < array.GetLength(0); row++)
+            {
+                for (int column = 0; column < array.GetLength(1); column++)
+                    result[row, column] = EvaluateScalar(array[row, column]);
+            }
+            return result;
+        }
+
+        return EvaluateScalar(val);
+    }
+
+    private object EvaluateScalar(object val)
+    {
+        if (val is OdfFormulaError)
+            return val;
+
         if (op == '%')
         {
             if (val is double d)
@@ -99,6 +118,62 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
             return leftVal;
 
         var rightVal = right.Evaluate(context);
+        if (rightVal is OdfFormulaError)
+            return rightVal;
+
+        if (leftVal is object[,] || rightVal is object[,])
+            return EvaluateArrays(leftVal, rightVal);
+
+        return EvaluateScalar(leftVal, rightVal);
+    }
+
+    private object EvaluateArrays(object leftValue, object rightValue)
+    {
+        object[,]? leftArray = leftValue as object[,];
+        object[,]? rightArray = rightValue as object[,];
+        int rows = Math.Max(leftArray?.GetLength(0) ?? 1, rightArray?.GetLength(0) ?? 1);
+        int columns = Math.Max(leftArray?.GetLength(1) ?? 1, rightArray?.GetLength(1) ?? 1);
+        if (!HasCompatibleShape(leftArray, rows, columns) ||
+            !HasCompatibleShape(rightArray, rows, columns))
+        {
+            return OdfFormulaError.NA;
+        }
+
+        var result = new object[rows, columns];
+        for (int row = 0; row < rows; row++)
+        {
+            for (int column = 0; column < columns; column++)
+            {
+                object leftItem = GetArrayItem(leftArray, leftValue, row, column);
+                object rightItem = GetArrayItem(rightArray, rightValue, row, column);
+                result[row, column] = EvaluateScalar(leftItem, rightItem);
+            }
+        }
+        return result;
+    }
+
+    private static bool HasCompatibleShape(object[,]? array, int rows, int columns)
+        => array is null ||
+            (array.GetLength(0) is 1 || array.GetLength(0) == rows) &&
+            (array.GetLength(1) is 1 || array.GetLength(1) == columns);
+
+    private static object GetArrayItem(
+        object[,]? array,
+        object scalar,
+        int row,
+        int column)
+    {
+        if (array is null)
+            return scalar;
+        int sourceRow = array.GetLength(0) == 1 ? 0 : row;
+        int sourceColumn = array.GetLength(1) == 1 ? 0 : column;
+        return array[sourceRow, sourceColumn];
+    }
+
+    private object EvaluateScalar(object leftVal, object rightVal)
+    {
+        if (leftVal is OdfFormulaError)
+            return leftVal;
         if (rightVal is OdfFormulaError)
             return rightVal;
 

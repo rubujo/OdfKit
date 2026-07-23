@@ -576,6 +576,87 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             context));
     }
 
+    /// <summary>
+    /// Verifies volatile functions use caller-controlled calculation-session state.
+    /// 驗證 volatile 函式會使用呼叫端控制的計算工作階段狀態。
+    /// </summary>
+    [Fact]
+    public void VolatileFunctionsUseCalculationSessionContext()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new VolatileEvaluationContext(
+            new DateTime(2024, 2, 3, 12, 0, 0, DateTimeKind.Local),
+            [0.25, 0.75, 0.75]);
+
+        Assert.Equal(
+            (context.EvaluationTimestamp - new DateTime(1899, 12, 30)).TotalDays,
+            evaluator.Evaluate("NOW()", context));
+        Assert.Equal(
+            (context.EvaluationTimestamp.Date - new DateTime(1899, 12, 30)).TotalDays,
+            evaluator.Evaluate("TODAY()", context));
+        Assert.Equal(1d, evaluator.Evaluate("RAND()+RAND()", context));
+        Assert.Equal(4d, evaluator.Evaluate("RANDBETWEEN(1;4)", context));
+    }
+
+    /// <summary>
+    /// Verifies array operators evaluate element-wise and support scalar broadcasting.
+    /// 驗證陣列運算子會逐元素求值並支援純量廣播。
+    /// </summary>
+    [Fact]
+    public void ArrayOperatorsEvaluateElementWise()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        object[,] result = Assert.IsType<object[,]>(
+            evaluator.Evaluate("-({1;2|3;4}+1)*2", context));
+
+        Assert.Equal(-4d, result[0, 0]);
+        Assert.Equal(-6d, result[0, 1]);
+        Assert.Equal(-8d, result[1, 0]);
+        Assert.Equal(-10d, result[1, 1]);
+    }
+
+    /// <summary>
+    /// Verifies regression handles rank-deficient predictor matrices without unstable normal equations.
+    /// 驗證迴歸可穩定處理秩不足的預測矩陣，而不依賴不穩定的一般方程式。
+    /// </summary>
+    [Fact]
+    public void RegressionHandlesRankDeficientPredictors()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        object[,] coefficients = Assert.IsType<object[,]>(evaluator.Evaluate(
+            "LINEST({3|5|7|9|11};{1;2|2;4|3;6|4;8|5;10})",
+            context));
+        object[,] predictions = Assert.IsType<object[,]>(evaluator.Evaluate(
+            "TREND({3|5|7|9|11};{1;2|2;4|3;6|4;8|5;10};{6;12})",
+            context));
+
+        Assert.Contains(
+            new[] { Assert.IsType<double>(coefficients[0, 0]), Assert.IsType<double>(coefficients[0, 1]) },
+            coefficient => coefficient == 0);
+        Assert.Equal(13d, Assert.IsType<double>(predictions[0, 0]), 8);
+    }
+
+    /// <summary>
+    /// Verifies document recalculation captures one timestamp for all volatile formulas.
+    /// 驗證文件重算會為所有 volatile 公式擷取同一個時間戳記。
+    /// </summary>
+    [Fact]
+    public void DocumentRecalculationSharesVolatileTimestamp()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        sheet.Cells["A1"].Formula = "of:=NOW()";
+        sheet.Cells["B1"].Formula = "of:=NOW()";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(sheet.Cells["A1"].CellValue, sheet.Cells["B1"].CellValue);
+    }
+
     private sealed class RecordingFallback(object result) : IOdfFormulaEvaluationFallback
     {
         public string? Formula { get; private set; }
@@ -625,6 +706,29 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             "ONE" => OneCriteria,
             _ => OdfFormulaError.Name
         };
+    }
+
+    private sealed class VolatileEvaluationContext(
+        DateTime evaluationTimestamp,
+        IReadOnlyList<double> randomValues) :
+        IEvaluationContext,
+        IOdfFormulaVolatileContext
+    {
+        private int _randomIndex;
+
+        public OdfCellAddress CurrentCell => default;
+
+        public DateTime EvaluationTimestamp { get; } = evaluationTimestamp;
+
+        public object GetCellValue(OdfCellAddress address) => 0d;
+
+        public object[,] GetRangeValues(OdfCellRange range) => new object[0, 0];
+
+        public string? GetCellFormula(OdfCellAddress address) => null;
+
+        public object GetNamedRangeOrExpressionValue(string name) => OdfFormulaError.Name;
+
+        public double NextRandomDouble() => randomValues[_randomIndex++];
     }
 
     private sealed class WorkbookEvaluationContext : IOdfFormulaWorkbookContext

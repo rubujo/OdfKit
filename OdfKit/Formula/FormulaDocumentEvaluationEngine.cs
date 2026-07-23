@@ -28,7 +28,12 @@ internal static class FormulaDocumentEvaluationEngine
         DefaultFormulaEvaluator evaluator,
         OdfExternalLinkManager? externalLinks = null)
     {
-        var context = new OdfDomEvaluationContext(contentRoot, evaluator, externalLinks);
+        var volatileSession = new OdfFormulaVolatileSession();
+        var context = new OdfDomEvaluationContext(
+            contentRoot,
+            evaluator,
+            externalLinks,
+            volatileSession);
         var graph = new OdfFormulaDependencyGraph();
 
         foreach (var kvp in context.CellFormulas)
@@ -65,7 +70,13 @@ internal static class FormulaDocumentEvaluationEngine
                 {
                     object result = graph.CircularCells.Contains(addr)
                         ? OdfFormulaError.Ref
-                        : EvaluateCellWithCompletedResults(contentRoot, evaluator, externalLinks, completed, addr);
+                        : EvaluateCellWithCompletedResults(
+                            contentRoot,
+                            evaluator,
+                            externalLinks,
+                            volatileSession,
+                            completed,
+                            addr);
                     levelResults[addr] = result;
                 });
 
@@ -101,11 +112,16 @@ internal static class FormulaDocumentEvaluationEngine
         OdfNode contentRoot,
         DefaultFormulaEvaluator evaluator,
         OdfExternalLinkManager? externalLinks,
+        IOdfFormulaVolatileContext volatileContext,
         ConcurrentDictionary<OdfCellAddress, object> completed,
         OdfCellAddress addr)
     {
         var localEvaluator = new DefaultFormulaEvaluator(evaluator.Functions, evaluator.Fallback);
-        var localContext = new OdfDomEvaluationContext(contentRoot, localEvaluator, externalLinks);
+        var localContext = new OdfDomEvaluationContext(
+            contentRoot,
+            localEvaluator,
+            externalLinks,
+            volatileContext);
         foreach (KeyValuePair<OdfCellAddress, object> pair in completed)
         {
             localContext.CellFormulas.Remove(pair.Key);

@@ -14,7 +14,7 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 | Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
 | Medium Group 強制函式名稱 | 272／272 | 強制函式皆可由預設評估器派送，包含參照、矩陣、機率分佈、統計及財務函式。 |
 | Large Group 強制函式名稱 | 388／388 | 強制函式名稱皆可派送，並包含 inline array、矩陣、複數、進位轉換與東亞位元組文字函式。 |
-| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出 Best Effort 函式。仍須以規範 corpus 驗證完整陣列公式、自動交集、外部名稱、區域名稱、型別轉換、數值誤差及全部邊界語意。 |
+| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出 Best Effort 函式。內嵌陣列已支援逐元素運算與純量／單列／單欄廣播，仍須以規範 corpus 驗證自動交集、外部名稱、區域名稱、型別轉換、數值誤差及全部邊界語意。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
@@ -51,10 +51,11 @@ document.EvaluateFormulas(evaluator);
 `MULTIPLE.OPERATIONS` 的選配求值服務。內建 ODF DOM 已提供真實工作表目錄，因此
 `SHEET`／`SHEETS` 不再以固定值模擬；應用程式或外部引擎可實作其餘兩項服務，
 未提供服務時安全傳回 `#N/A`。奇數首期／末期債券函式已依實際 stub 天數、應計利息與
-票息日期折現；多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 以最小平方法求值。
+票息日期折現；多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 使用具欄位樞紐的
+QR 最小平方法求值，共線欄位會以秩不足模型處理，而不再直接反解容易失穩的一般方程式。
 `LINEST`／`LOGEST` 的 `Stats=TRUE` 會回傳五列係數、標準誤、決定係數、估計標準誤、
 F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由度的模型依規範回傳錯誤。
-這些函式在所有日期慣例、奇異矩陣策略與極端數值 corpus 完成前仍標記為 Best Effort。
+這些函式在所有日期慣例與極端數值 corpus 完成前仍標記為 Best Effort。
 `INFO` 也只揭露安全且跨平台可取得的執行環境資訊。
 
 ```csharp
@@ -64,6 +65,13 @@ public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
     // 與 TryEvaluateMultipleOperations。
 }
 ```
+
+## Volatile 計算工作階段
+
+`NOW`、`TODAY`、`RAND` 與 `RANDBETWEEN` 會使用 `IOdfFormulaVolatileContext`。
+同一次文件重算會共用一個時間戳記與執行緒安全的隨機序列，因此平行工作表求值不會讓
+`NOW` 在不同儲存格漂移。直接呼叫評估器的應用程式也可提供固定時鐘與隨機來源，
+建立可重現測試或受稽核的批次計算；未提供介面時維持系統時鐘與程序內隨機來源。
 
 ## 外部後援
 
@@ -85,8 +93,8 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 
 1. 先建立 Small 的語法、限制、轉換與函式語意 corpus，達成可稽核的正式基線。
 2. 依 Medium 要求補齊參照聯集、命名運算式及其強制函式，避免只追求函式數量。
-3. 以 OASIS corpus 驗證已完成的 388／388 名稱覆蓋，補強完整陣列公式、
-   自動交集、區域名稱與長尾函式邊界語意。
+3. 以 OASIS corpus 驗證已完成的 388／388 名稱覆蓋，補強自動交集、
+   區域名稱與長尾函式邊界語意，並擴大目前逐元素陣列運算的形狀 corpus。
 4. 保留 OdfKit Extended 註冊表與後援，讓應用程式在正式 Large 之上加入領域函式，
    同時個別揭露外部引擎與安全邊界。
 

@@ -10,6 +10,7 @@ namespace OdfKit.Formula;
 
 internal class OdfDomEvaluationContext :
     IOdfFormulaWorkbookContext,
+    IOdfFormulaVolatileContext,
     IOdfBlankCheckableContext
 {
     /// <summary>
@@ -27,6 +28,9 @@ internal class OdfDomEvaluationContext :
     private readonly DefaultFormulaEvaluator _evaluator;
     private readonly OdfNode _contentRoot;
     private readonly OdfExternalLinkManager? _externalLinks;
+    private readonly IOdfFormulaVolatileContext _volatileContext;
+
+    public DateTime EvaluationTimestamp => _volatileContext.EvaluationTimestamp;
     /// <summary>
     /// Short overload of OdfDomEvaluationContext that accepts contentRoot and evaluator; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 contentRoot 與 evaluator；其餘可選參數使用預設值並轉呼叫最長 OdfDomEvaluationContext 多載。
@@ -39,10 +43,20 @@ internal class OdfDomEvaluationContext :
     /// OdfDomEvaluationContext 完整多載：接受 contentRoot、evaluator 與 externalLinks。
     /// </summary>
     public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator, OdfExternalLinkManager? externalLinks)
+        : this(contentRoot, evaluator, externalLinks, new OdfFormulaVolatileSession())
+    {
+    }
+
+    internal OdfDomEvaluationContext(
+        OdfNode contentRoot,
+        DefaultFormulaEvaluator evaluator,
+        OdfExternalLinkManager? externalLinks,
+        IOdfFormulaVolatileContext volatileContext)
     {
         _contentRoot = contentRoot;
         _evaluator = evaluator;
         _externalLinks = externalLinks;
+        _volatileContext = volatileContext;
         TraverseTable(contentRoot);
     }
 
@@ -52,6 +66,8 @@ internal class OdfDomEvaluationContext :
     public Dictionary<OdfCellAddress, object> CellValues => _cellValues;
 
     public IReadOnlyList<string> SheetNames => _sheetNames;
+
+    public double NextRandomDouble() => _volatileContext.NextRandomDouble();
 
     private void TraverseTable(OdfNode node)
     {

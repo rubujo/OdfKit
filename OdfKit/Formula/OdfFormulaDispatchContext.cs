@@ -14,9 +14,13 @@ internal sealed class OdfFormulaDispatchContext(
     OdfFormulaFunctionRegistry functions) :
     IEvaluationContext,
     IOdfFormulaWorkbookContext,
+    IOdfFormulaVolatileContext,
     IOdfBlankCheckableContext,
     IOdfFormulaFunctionDispatchContext
 {
+    private readonly DateTime _evaluationTimestamp = DateTime.Now;
+    private readonly Random _random = new();
+
     public OdfCellAddress CurrentCell => inner.CurrentCell;
 
     public object GetCellValue(OdfCellAddress address) => inner.GetCellValue(address);
@@ -32,6 +36,18 @@ internal sealed class OdfFormulaDispatchContext(
         : string.IsNullOrEmpty(inner.CurrentCell.SheetName)
             ? []
             : [inner.CurrentCell.SheetName!];
+
+    public DateTime EvaluationTimestamp => inner is IOdfFormulaVolatileContext volatileContext
+        ? volatileContext.EvaluationTimestamp
+        : _evaluationTimestamp;
+
+    public double NextRandomDouble()
+    {
+        if (inner is IOdfFormulaVolatileContext volatileContext)
+            return volatileContext.NextRandomDouble();
+        lock (_random)
+            return _random.NextDouble();
+    }
 
     public bool TryGetPivotData(
         string dataField,

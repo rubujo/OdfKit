@@ -563,6 +563,8 @@ internal static class FormulaMathFunctionHandlers
     {
         if (arguments.Count != 0)
             return OdfFormulaError.Value;
+        if (context is IOdfFormulaVolatileContext volatileContext)
+            return volatileContext.NextRandomDouble();
         lock (RandGenerator)
         {
             return RandGenerator.NextDouble();
@@ -583,15 +585,26 @@ internal static class FormulaMathFunctionHandlers
 
         if (!FormulaCoercion.TryCoerceDouble(bottomVal, out double bottom) || !FormulaCoercion.TryCoerceDouble(topVal, out double top))
             return OdfFormulaError.Value;
-        if (bottom > top)
+        double lower = Math.Ceiling(bottom);
+        double upper = Math.Floor(top);
+        if (lower > upper ||
+            double.IsNaN(lower) ||
+            double.IsInfinity(lower) ||
+            double.IsNaN(upper) ||
+            double.IsInfinity(upper))
             return OdfFormulaError.Num;
 
-        lock (RandGenerator)
-        {
-            return (double)RandGenerator.Next((int)bottom, (int)top + 1);
-        }
+        double random = context is IOdfFormulaVolatileContext volatileContext
+            ? volatileContext.NextRandomDouble()
+            : NextSharedRandomDouble();
+        return Math.Floor(random * (upper - lower + 1)) + lower;
     }
 
+    private static double NextSharedRandomDouble()
+    {
+        lock (RandGenerator)
+            return RandGenerator.NextDouble();
+    }
 
 
     internal static object EvaluateAsin(List<AstNode> arguments, IEvaluationContext context)
