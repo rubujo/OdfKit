@@ -16,7 +16,7 @@
 
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
-| OpenFormula 表達式、型別、函式與 evaluator conformance | OASIS OpenDocument v1.4 Part 4 OpenFormula | `DefaultFormulaEvaluator.*`、`FormulaParser`、`FormulaTokenizer`、`OdfFormulaSupport` | `OpenFormulaSupportTests`、`FormulaHighLevelApiTests`、`FormulaEvaluatorStressTests`、`FormulaTranslationStressTests` |
+| OpenFormula 表達式、型別、函式與 evaluator conformance | OASIS OpenDocument v1.4 Part 4 OpenFormula，並交叉驗證 v1.2～1.3 | `DefaultFormulaEvaluator.*`、`FormulaParser`、`FormulaTokenizer`、`OdfFormulaSupport` | `OpenFormulaConformanceCorpusTests`、`OpenFormulaExtendedEvaluatorTests`、`OpenFormulaSupportTests`、`FormulaHighLevelApiTests`、`FormulaEvaluatorStressTests`、`FormulaTranslationStressTests` |
 | ODS 儲存格公式來回讀寫與 unsupported formula 保真 | OASIS OpenDocument v1.4 Part 3 schema 與 Part 4 OpenFormula | `SpreadsheetDocument.Formulas.cs`、`OdfTableSheet.Formulas.cs`、`FormulaPrefixNormalizer` | `OpenFormulaSupportTests.SpreadsheetFormulaRoundTripPreservesUnsupportedFormula`、`SpreadsheetApiUsabilityTests` |
 | ODF / OOXML 公式語法轉換 | OASIS OpenFormula 與 ISO / ECMA OOXML 公開格式語法 | `OdfFormulaTranslator.*` | `OoxmlConversionTests`、`FormulaTranslationStressTests` |
 | LibreOffice 相容擴充函式 | LibreOffice 公開文件與自有互通測試輸出 | `OdfFormulaSupport`、`DefaultFormulaEvaluator` | `OpenFormulaSupportTests.LibreOfficeEasterSundayEvaluatesToDateSerial`、`OpenFormulaSupportTests.LibreOfficeIsOmittedEvaluatesByArgumentCount` |

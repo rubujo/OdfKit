@@ -90,11 +90,40 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
 
         if (current == '+' || current == '-' || current == '*' || current == '/' || current == '^' || current == '&' || current == '%' || current == '~' || current == '!')
         {
+            if (current == '!' &&
+                _index + 1 < _formula.Length &&
+                _formula[_index + 1] == '!')
+            {
+                _index += 2;
+                return new(
+                    FormulaTokenType.Operator,
+                    _formula.Slice(_index - 2, 2));
+            }
+
             _index++;
             return new(FormulaTokenType.Operator, _formula.Slice(_index - 1, 1));
         }
 
-        // 4. 數字常值
+        // 4. 常數錯誤
+        if (current == '#')
+        {
+            int start = _index++;
+            while (_index < _formula.Length)
+            {
+                char c = _formula[_index];
+                if (char.IsLetterOrDigit(c) || c is '/' or '!' or '?' or '.')
+                {
+                    _index++;
+                    continue;
+                }
+
+                break;
+            }
+
+            return new(FormulaTokenType.Identifier, _formula.Slice(start, _index - start));
+        }
+
+        // 5. 數字常值
         if (char.IsDigit(current) || current == '.')
         {
             int start = _index;
@@ -117,12 +146,27 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
                     break;
                 }
             }
+
+            if (_index < _formula.Length && _formula[_index] is 'e' or 'E')
+            {
+                int exponentStart = _index++;
+                if (_index < _formula.Length && _formula[_index] is '+' or '-')
+                    _index++;
+
+                int digitStart = _index;
+                while (_index < _formula.Length && char.IsDigit(_formula[_index]))
+                    _index++;
+
+                if (_index == digitStart)
+                    _index = exponentStart;
+            }
+
             var numSpan = _formula.Slice(start, _index - start);
             double val = ParseDouble(numSpan);
             return new(FormulaTokenType.Number, numSpan, val);
         }
 
-        // 5. 識別碼、函式、座標
+        // 6. 識別碼、函式、座標
         if (char.IsLetter(current) || current == '$' || current == '_' || current == '\'')
         {
             int start = _index;
@@ -141,8 +185,38 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
             while (_index < _formula.Length)
             {
                 char c = _formula[_index];
+                if (c == '\'')
+                {
+                    _index++;
+                    while (_index < _formula.Length)
+                    {
+                        if (_formula[_index] != '\'')
+                        {
+                            _index++;
+                            continue;
+                        }
+
+                        if (_index + 1 < _formula.Length &&
+                            _formula[_index + 1] == '\'')
+                        {
+                            _index += 2;
+                            continue;
+                        }
+
+                        _index++;
+                        break;
+                    }
+                    continue;
+                }
+
                 if (c == '!')
                 {
+                    if (_index + 1 < _formula.Length &&
+                        _formula[_index + 1] == '!')
+                    {
+                        break;
+                    }
+
                     // 檢查目前掃描的內容是否為有效的儲存格位址。
                     // 如果是，則 '!' 為交集運算子，而非工作表分隔符號。
                     string prefix = _formula.Slice(start, _index - start).ToString();
@@ -152,7 +226,8 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
                     }
                 }
 
-                if (char.IsLetterOrDigit(c) || c == '$' || c == '_' || c == '.' || c == '!')
+                if (char.IsLetterOrDigit(c) ||
+                    c is '$' or '_' or '.' or '!' or '#')
                 {
                     _index++;
                 }

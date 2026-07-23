@@ -134,6 +134,14 @@ public class NamedRangeNode(string name) : AstNode
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        if (context is IOdfFormulaReferenceContext referenceContext &&
+            referenceContext.TryGetNamedRanges(
+                Name,
+                out IReadOnlyList<OdfCellRange>? ranges))
+        {
+            return [.. ranges];
+        }
+
         var val = context.GetNamedRangeOrExpressionValue(Name);
         if (val is OdfCellRange r)
             return [r];

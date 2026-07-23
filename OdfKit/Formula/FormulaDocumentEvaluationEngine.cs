@@ -83,14 +83,32 @@ internal static class FormulaDocumentEvaluationEngine
             foreach (OdfCellAddress addr in level)
             {
                 object result = levelResults[addr];
-                completed[addr] = result;
-                evaluator.SetCachedValue(addr, result);
-
                 if (context.CellNodes.TryGetValue(addr, out var cellNode))
                 {
-                    ApplyResultToCell(cellNode, addr, result);
+                    if (result is object[,] array)
+                    {
+                        ApplyArrayResult(
+                            context,
+                            evaluator,
+                            completed,
+                            cellNode,
+                            addr,
+                            array);
+                    }
+                    else
+                    {
+                        completed[addr] = result;
+                        evaluator.SetCachedValue(addr, result);
+                        ApplyResultToCell(cellNode, addr, result);
+                        context.CellValues[addr] = result;
+                    }
+
                     context.CellFormulas.Remove(addr);
-                    context.CellValues[addr] = result;
+                }
+                else
+                {
+                    completed[addr] = result;
+                    evaluator.SetCachedValue(addr, result);
                 }
             }
         }
@@ -106,6 +124,103 @@ internal static class FormulaDocumentEvaluationEngine
                 ApplyResultToCell(cellNode, addr, result);
             }
         }
+    }
+
+    private static void ApplyArrayResult(
+        OdfDomEvaluationContext context,
+        DefaultFormulaEvaluator evaluator,
+        ConcurrentDictionary<OdfCellAddress, object> completed,
+        OdfNode anchorNode,
+        OdfCellAddress anchor,
+        object[,] result)
+    {
+        int declaredColumns = ParsePositiveSpan(
+            anchorNode,
+            "number-matrix-columns-spanned");
+        int declaredRows = ParsePositiveSpan(
+            anchorNode,
+            "number-matrix-rows-spanned");
+        if (declaredRows != result.GetLength(0) ||
+            declaredColumns != result.GetLength(1))
+        {
+            ApplyArrayCell(
+                context,
+                evaluator,
+                completed,
+                anchorNode,
+                anchor,
+                OdfFormulaError.NA);
+            return;
+        }
+
+        for (int row = 0; row < declaredRows; row++)
+        {
+            for (int column = 0; column < declaredColumns; column++)
+            {
+                var address = new OdfCellAddress(
+                    anchor.Row + row,
+                    anchor.Column + column,
+                    anchor.SheetName);
+                if (!context.CellNodes.ContainsKey(address) ||
+                    address != anchor &&
+                    context.CellFormulas.ContainsKey(address))
+                {
+                    ApplyArrayCell(
+                        context,
+                        evaluator,
+                        completed,
+                        anchorNode,
+                        anchor,
+                        OdfFormulaError.Ref);
+                    return;
+                }
+            }
+        }
+
+        for (int row = 0; row < declaredRows; row++)
+        {
+            for (int column = 0; column < declaredColumns; column++)
+            {
+                var address = new OdfCellAddress(
+                    anchor.Row + row,
+                    anchor.Column + column,
+                    anchor.SheetName);
+                ApplyArrayCell(
+                    context,
+                    evaluator,
+                    completed,
+                    context.CellNodes[address],
+                    address,
+                    result[row, column]);
+            }
+        }
+    }
+
+    private static int ParsePositiveSpan(OdfNode cellNode, string localName)
+    {
+        string? text = cellNode.GetAttribute(localName, OdfNamespaces.Table);
+        return int.TryParse(
+            text,
+            NumberStyles.None,
+            CultureInfo.InvariantCulture,
+            out int value) &&
+            value > 0
+            ? value
+            : 1;
+    }
+
+    private static void ApplyArrayCell(
+        OdfDomEvaluationContext context,
+        DefaultFormulaEvaluator evaluator,
+        ConcurrentDictionary<OdfCellAddress, object> completed,
+        OdfNode cellNode,
+        OdfCellAddress address,
+        object value)
+    {
+        completed[address] = value;
+        evaluator.SetCachedValue(address, value);
+        context.CellValues[address] = value;
+        ApplyResultToCell(cellNode, address, value);
     }
 
     private static object EvaluateCellWithCompletedResults(

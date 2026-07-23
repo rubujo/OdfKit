@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using OdfKit.Core;
 using OdfKit.Formula;
 using OdfKit.Spreadsheet;
 using Xunit;
@@ -12,6 +14,7 @@ namespace OdfKit.Tests;
 /// Verifies the extensible evaluator and the mandatory Small-group function baseline.
 /// 驗證可擴充評估器與 Small Group 強制函式基線。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public sealed class OpenFormulaExtendedEvaluatorTests
 {
     private static readonly string[] SmallBaselineAdditions =
@@ -222,6 +225,11 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.False(large.HasOnlyFullyEvaluatedFunctions);
         Assert.Contains("DDE", large.BestEffortFunctions);
         Assert.Contains("GETPIVOTDATA", large.BestEffortFunctions);
+        Assert.DoesNotContain("INFO", large.BestEffortFunctions);
+        Assert.DoesNotContain("LINEST", large.BestEffortFunctions);
+        Assert.DoesNotContain("MULTIPLE.OPERATIONS", large.BestEffortFunctions);
+        Assert.DoesNotContain("SHEET", large.BestEffortFunctions);
+        Assert.DoesNotContain("TTEST", large.BestEffortFunctions);
         Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
         Assert.DoesNotContain("DDE", large.MissingFunctions);
     }
@@ -262,6 +270,28 @@ public sealed class OpenFormulaExtendedEvaluatorTests
 
         Assert.Equal(2d, first.Cells["A1"].CellValue);
         Assert.Equal(2d, second.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies sheet-range references retain workbook order for SHEET and SHEETS.
+    /// 驗證跨工作表參照會為 SHEET 與 SHEETS 保留活頁簿順序。
+    /// </summary>
+    [Fact]
+    public void SheetFunctionsEvaluateThreeDimensionalReferences()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet first = document.AddSheet("First");
+        document.AddSheet("Second");
+        document.AddSheet("Third");
+        first.Cells["A1"].Formula =
+            "of:=SHEETS([First.A2]:[Third.A2])";
+        first.Cells["A2"].Formula =
+            "of:=SHEET([Second.A2]:[Third.A2])";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(3d, first.Cells["A1"].CellValue);
+        Assert.Equal(2d, first.Cells["A2"].CellValue);
     }
 
     /// <summary>
@@ -394,6 +424,28 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             evaluator.Evaluate("TTEST({1;2;3};{1;2;4};2;1)", context)), 0, 1);
         Assert.IsType<OdfFormulaError>(evaluator.Evaluate(
             "DDE(\"service\";\"topic\";\"item\")", context));
+    }
+
+    /// <summary>
+    /// Verifies every required INFO category and host-controlled overrides.
+    /// 驗證所有必要 INFO 類別及由主機控制的覆寫值。
+    /// </summary>
+    [Fact]
+    public void InfoSupportsRequiredCategoriesAndHostOverrides()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal("virtual:/", evaluator.Evaluate("INFO(\"directory\")", context));
+        Assert.IsType<double>(evaluator.Evaluate("INFO(\"memavail\")", context));
+        Assert.IsType<double>(evaluator.Evaluate("INFO(\"memused\")", context));
+        Assert.IsType<double>(evaluator.Evaluate("INFO(\"numfile\")", context));
+        Assert.IsType<string>(evaluator.Evaluate("INFO(\"osversion\")", context));
+        Assert.IsType<string>(evaluator.Evaluate("INFO(\"origin\")", context));
+        Assert.IsType<string>(evaluator.Evaluate("INFO(\"recalc\")", context));
+        Assert.IsType<string>(evaluator.Evaluate("INFO(\"release\")", context));
+        Assert.IsType<string>(evaluator.Evaluate("INFO(\"system\")", context));
+        Assert.IsType<double>(evaluator.Evaluate("INFO(\"totmem\")", context));
     }
 
     /// <summary>
@@ -618,6 +670,190 @@ public sealed class OpenFormulaExtendedEvaluatorTests
     }
 
     /// <summary>
+    /// Verifies matrix formulas write rectangular results to their declared range.
+    /// 驗證矩陣公式會將矩形結果寫回宣告的範圍。
+    /// </summary>
+    [Fact]
+    public void DocumentRecalculationWritesArrayFormulaResults()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Ranges["A1:B2"].SetArrayFormula("of:={1;2|3;4}+10");
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(11d, sheet.Cells["A1"].CellValue);
+        Assert.Equal(12d, sheet.Cells["B1"].CellValue);
+        Assert.Equal(13d, sheet.Cells["A2"].CellValue);
+        Assert.Equal(14d, sheet.Cells["B2"].CellValue);
+        Assert.Equal(
+            "2",
+            sheet.Cells["A1"].Node.GetAttribute(
+                "number-matrix-columns-spanned",
+                OdfNamespaces.Table));
+
+        using var stream = new MemoryStream();
+        document.Save();
+        document.Package.Save(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(
+            stream,
+            "array-formula.ods");
+        Assert.Equal(14d, reloaded.Worksheets[0].Cells["B2"].CellValue);
+        Assert.Equal(
+            "2",
+            reloaded.Worksheets[0].Cells["A1"].Node.GetAttribute(
+                "number-matrix-rows-spanned",
+                OdfNamespaces.Table));
+
+        sheet.Ranges["A1:B2"].ClearArrayFormula();
+
+        Assert.Equal(string.Empty, sheet.Cells["A1"].Formula);
+        Assert.Null(sheet.Cells["A1"].Node.GetAttribute(
+            "number-matrix-columns-spanned",
+            OdfNamespaces.Table));
+    }
+
+    /// <summary>
+    /// Verifies constant errors, scientific notation, type-sensitive comparisons, and numeric limits.
+    /// 驗證常數錯誤、科學記號、型別感知比較與數值限制。
+    /// </summary>
+    [Fact]
+    public void CoreExpressionSemanticsFollowOpenFormulaScalarRules()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(125.25d, evaluator.Evaluate("1.25E2+2.5e-1", context));
+        Assert.Same(OdfFormulaError.NA, evaluator.Evaluate("#N/A", context));
+        Assert.False(Assert.IsType<bool>(evaluator.Evaluate("1=TRUE", context)));
+        Assert.True(Assert.IsType<bool>(evaluator.Evaluate("1<\"2\"", context)));
+        Assert.True(Assert.IsType<bool>(evaluator.Evaluate("+TRUE", context)));
+        Assert.Same(OdfFormulaError.Num, evaluator.Evaluate("0^0", context));
+    }
+
+    /// <summary>
+    /// Verifies implied intersection selects one cell from a row or column reference.
+    /// 驗證隱含交集會從單列或單欄參照選取一個儲存格。
+    /// </summary>
+    [Fact]
+    public void ScalarOperatorsApplyImpliedIntersection()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new IntersectionEvaluationContext();
+
+        Assert.Equal(21d, evaluator.Evaluate("A2:C2+1", context));
+        Assert.Equal(21d, evaluator.Evaluate("B1:B3+1", context));
+        Assert.Same(OdfFormulaError.Value, evaluator.Evaluate("A1:C3+1", context));
+    }
+
+    /// <summary>
+    /// Verifies the ODF DOM evaluates pivot aggregation and multiple operations without an external engine.
+    /// 驗證 ODF DOM 不需外部引擎即可評估樞紐彙總與多重運算。
+    /// </summary>
+    [Fact]
+    public void DocumentContextEvaluatesPivotAndMultipleOperations()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "Region";
+        sheet.Cells["B1"].CellValue = "Sales";
+        sheet.Cells["A2"].CellValue = "North";
+        sheet.Cells["B2"].CellValue = 10d;
+        sheet.Cells["A3"].CellValue = "South";
+        sheet.Cells["B3"].CellValue = 20d;
+        sheet.Cells["A4"].CellValue = "North";
+        sheet.Cells["B4"].CellValue = 30d;
+        sheet.CreatePivotTable(
+            new OdfCellRange(0, 0, 3, 1, "Data"),
+            new OdfCellAddress(0, 4, "Data"),
+            pivot => pivot
+                .AddRowField("Region")
+                .AddDataField("Sales", OdfPivotFunction.Sum));
+        sheet.Cells["F1"].Formula =
+            "of:=GETPIVOTDATA(\"Sales\";[Data.E1];\"Region\";\"North\")";
+        sheet.Cells["H1"].CellValue = 2d;
+        sheet.Cells["I1"].Formula = "of:=[.H1]*10";
+        sheet.Cells["J1"].Formula =
+            "of:=MULTIPLE.OPERATIONS([.I1];[.H1];7)";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(40d, sheet.Cells["F1"].CellValue);
+        Assert.Equal(70d, sheet.Cells["J1"].CellValue);
+        Assert.Equal(2d, sheet.Cells["H1"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies sheet-local and external named expressions resolve case-insensitively.
+    /// 驗證工作表區域與外部命名運算式會以不區分大小寫方式解析。
+    /// </summary>
+    [Fact]
+    public void DocumentContextResolvesQualifiedAndExternalNamedExpressions()
+    {
+        using SpreadsheetDocument external = SpreadsheetDocument.Create();
+        OdfTableSheet externalSheet = external.AddSheet("External");
+        externalSheet.AddNamedExpression(
+            "Answer",
+            "of:=40+2",
+            new OdfCellAddress(0, 0, "External"));
+
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet first = document.AddSheet("First");
+        OdfTableSheet second = document.AddSheet("Second");
+        second.AddNamedExpression(
+            "Rate",
+            "of:=6*7",
+            new OdfCellAddress(0, 0, "Second"));
+        first.Cells["A1"].Formula = "of:='Second'.rate";
+        first.Cells["A2"].Formula =
+            "of:='memory:book'#$'External'.answer";
+        document.ExternalLinks.DocumentResolver = id =>
+            id == "memory:book" ? external : null;
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(42d, first.Cells["A1"].CellValue);
+        Assert.Equal(42d, first.Cells["A2"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies reference ranges, named endpoints, quoted labels, and automatic intersection.
+    /// 驗證參照範圍、具名端點、引號標籤及自動交集。
+    /// </summary>
+    [Fact]
+    public void DocumentContextEvaluatesReferenceAndLabelOperators()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["B1"].CellValue = "Q1";
+        sheet.Cells["C1"].CellValue = "Q2";
+        sheet.Cells["A2"].CellValue = "North";
+        sheet.Cells["B2"].CellValue = 10d;
+        sheet.Cells["C2"].CellValue = 20d;
+        sheet.Cells["A3"].CellValue = "South";
+        sheet.Cells["B3"].CellValue = 30d;
+        sheet.Cells["C3"].CellValue = 40d;
+        sheet.AddNamedRange(
+            "First",
+            new OdfCellRange(1, 1, 1, 1, "Data"));
+        sheet.AddNamedRange(
+            "Last",
+            new OdfCellRange(2, 2, 2, 2, "Data"));
+        sheet.Cells["E1"].Formula = "of:=SUM([.B2]:[.C3])";
+        sheet.Cells["E2"].Formula = "of:=SUM(First:Last)";
+        sheet.Cells["E3"].Formula = "of:=SUM('Q1')";
+        sheet.Cells["E4"].Formula = "of:='Q1'!!'North'";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(100d, sheet.Cells["E1"].CellValue);
+        Assert.Equal(100d, sheet.Cells["E2"].CellValue);
+        Assert.Equal(40d, sheet.Cells["E3"].CellValue);
+        Assert.Equal(10d, sheet.Cells["E4"].CellValue);
+    }
+
+    /// <summary>
     /// Verifies regression handles rank-deficient predictor matrices without unstable normal equations.
     /// 驗證迴歸可穩定處理秩不足的預測矩陣，而不依賴不穩定的一般方程式。
     /// </summary>
@@ -669,7 +905,9 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         }
     }
 
-    private sealed class ExtendedEvaluationContext : IEvaluationContext
+    private sealed class ExtendedEvaluationContext :
+        IEvaluationContext,
+        IOdfFormulaEnvironmentContext
     {
         private static readonly object[,] Database =
         {
@@ -706,6 +944,54 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             "ONE" => OneCriteria,
             _ => OdfFormulaError.Name
         };
+
+        public bool TryGetFormulaEnvironmentInfo(
+            string category,
+            out object result)
+        {
+            if (category.Equals("directory", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "virtual:/";
+                return true;
+            }
+
+            result = OdfFormulaError.NA;
+            return false;
+        }
+    }
+
+    private sealed class IntersectionEvaluationContext : IEvaluationContext
+    {
+        public OdfCellAddress CurrentCell => new(1, 1, null);
+
+        public object GetCellValue(OdfCellAddress address) =>
+            (address.Column + 1) * 10d;
+
+        public object[,] GetRangeValues(OdfCellRange range)
+        {
+            int rows = Math.Abs(range.EndAddress.Row - range.StartAddress.Row) + 1;
+            int columns = Math.Abs(
+                range.EndAddress.Column - range.StartAddress.Column) + 1;
+            var values = new object[rows, columns];
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    values[row, column] = GetCellValue(new OdfCellAddress(
+                        Math.Min(range.StartAddress.Row, range.EndAddress.Row) + row,
+                        Math.Min(
+                            range.StartAddress.Column,
+                            range.EndAddress.Column) + column));
+                }
+            }
+
+            return values;
+        }
+
+        public string? GetCellFormula(OdfCellAddress address) => null;
+
+        public object GetNamedRangeOrExpressionValue(string name) =>
+            OdfFormulaError.Name;
     }
 
     private sealed class VolatileEvaluationContext(

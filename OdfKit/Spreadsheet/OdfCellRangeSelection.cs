@@ -221,6 +221,76 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Sets an ODF matrix formula on this range.
+    /// 在此範圍設定 ODF 矩陣公式。
+    /// </summary>
+    /// <param name="formula">The ODF formula, including its namespace prefix. / 包含命名空間前綴的 ODF 公式。</param>
+    /// <returns>The current range selection. / 目前的範圍選取。</returns>
+    public OdfCellRangeSelection SetArrayFormula(string formula)
+    {
+        int minRow = Math.Min(Range.StartAddress.Row, Range.EndAddress.Row);
+        int maxRow = Math.Max(Range.StartAddress.Row, Range.EndAddress.Row);
+        int minColumn = Math.Min(
+            Range.StartAddress.Column,
+            Range.EndAddress.Column);
+        int maxColumn = Math.Max(
+            Range.StartAddress.Column,
+            Range.EndAddress.Column);
+        OdfCell anchor = _sheet.GetCell(minRow, minColumn);
+        anchor.Formula = formula;
+        anchor.Node.SetAttribute(
+            "number-matrix-columns-spanned",
+            OdfNamespaces.Table,
+            (maxColumn - minColumn + 1).ToString(
+                System.Globalization.CultureInfo.InvariantCulture),
+            "table");
+        anchor.Node.SetAttribute(
+            "number-matrix-rows-spanned",
+            OdfNamespaces.Table,
+            (maxRow - minRow + 1).ToString(
+                System.Globalization.CultureInfo.InvariantCulture),
+            "table");
+
+        for (int row = minRow; row <= maxRow; row++)
+        {
+            for (int column = minColumn; column <= maxColumn; column++)
+            {
+                if (row != minRow || column != minColumn)
+                {
+                    OdfCell cell = _sheet.GetCell(row, column);
+                    cell.Formula = string.Empty;
+                    if (cell.CellValue is null)
+                        cell.CellValue = string.Empty;
+                }
+            }
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Clears the ODF matrix formula metadata from this range.
+    /// 清除此範圍的 ODF 矩陣公式中繼資料。
+    /// </summary>
+    /// <returns>The current range selection. / 目前的範圍選取。</returns>
+    public OdfCellRangeSelection ClearArrayFormula()
+    {
+        int minRow = Math.Min(Range.StartAddress.Row, Range.EndAddress.Row);
+        int minColumn = Math.Min(
+            Range.StartAddress.Column,
+            Range.EndAddress.Column);
+        OdfCell anchor = _sheet.GetCell(minRow, minColumn);
+        anchor.Formula = string.Empty;
+        anchor.Node.RemoveAttribute(
+            "number-matrix-columns-spanned",
+            OdfNamespaces.Table);
+        anchor.Node.RemoveAttribute(
+            "number-matrix-rows-spanned",
+            OdfNamespaces.Table);
+        return this;
+    }
+
+    /// <summary>
     /// Merges the cells in this range.
     /// 合併此範圍的儲存格。
     /// </summary>

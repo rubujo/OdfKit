@@ -9,12 +9,12 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 | 項目 | 狀態 | 說明 |
 |------|------|------|
 | ODF 1.0／1.1 公式互通 | 支援 | 辨識及評估常見的 `oooc:=` 前綴；這兩版早於標準化的 OpenFormula 一致性群組。 |
-| ODF 1.2～1.4 OpenFormula | 部分實作 | 辨識 `of:=`、剖析常用運算式與參照，並提供受控重算。 |
+| ODF 1.2～1.4 OpenFormula | 廣泛實作 | 辨識 `of:=` 與強制重算標記，支援科學記號、常數錯誤、參照範圍／交集／聯集、引號標籤、自動交集、命名運算式、外部名稱、inline array、矩陣公式寫回及受控重算。 |
 | Small Group 強制函式名稱 | 110／110 | `OdfFormulaSupport.GetConformanceReport(Small)` 可機械化確認內建函式清單沒有名稱缺口。 |
 | Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
 | Medium Group 強制函式名稱 | 272／272 | 強制函式皆可由預設評估器派送，包含參照、矩陣、機率分佈、統計及財務函式。 |
 | Large Group 強制函式名稱 | 388／388 | 強制函式名稱皆可派送，並包含 inline array、矩陣、複數、進位轉換與東亞位元組文字函式。 |
-| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出 Best Effort 函式。內嵌陣列已支援逐元素運算與純量／單列／單欄廣播，仍須以規範 corpus 驗證自動交集、外部名稱、區域名稱、型別轉換、數值誤差及全部邊界語意。 |
+| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出 Best Effort 函式。內嵌陣列、矩陣公式寫回、自動交集、文件／工作表名稱及由解析器提供的外部名稱皆已有執行測試；仍須擴充規範 corpus，以涵蓋所有函式的限制、locale／主機屬性、數值誤差及極端邊界。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
@@ -48,15 +48,21 @@ document.EvaluateFormulas(evaluator);
 
 `DDE` 不會由核心建立外部程序或網路連線，而是依安全政策傳回 `#N/A`。
 `IOdfFormulaWorkbookContext` 提供依文件順序排列的工作表目錄，以及 pivot 與
-`MULTIPLE.OPERATIONS` 的選配求值服務。內建 ODF DOM 已提供真實工作表目錄，因此
-`SHEET`／`SHEETS` 不再以固定值模擬；應用程式或外部引擎可實作其餘兩項服務，
-未提供服務時安全傳回 `#N/A`。奇數首期／末期債券函式已依實際 stub 天數、應計利息與
+`MULTIPLE.OPERATIONS` 的求值服務。內建 ODF DOM 已提供真實工作表目錄、依來源範圍
+彙總的 `GETPIVOTDATA` 慣用語法，以及以暫時輸入替代值重新評估公式的
+`MULTIPLE.OPERATIONS`。`SHEET`／`SHEETS` 不再以固定值模擬。
+`IOdfFormulaEnvironmentContext` 可覆寫 `INFO` 類別；未覆寫時，評估器仍提供規範要求的
+十個環境類別。奇數首期／末期債券函式已依實際 stub 天數、應計利息與
 票息日期折現；多自變數 `LINEST`／`LOGEST`／`TREND`／`GROWTH` 使用具欄位樞紐的
 QR 最小平方法求值，共線欄位會以秩不足模型處理，而不再直接反解容易失穩的一般方程式。
 `LINEST`／`LOGEST` 的 `Stats=TRUE` 會回傳五列係數、標準誤、決定係數、估計標準誤、
 F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由度的模型依規範回傳錯誤。
-這些函式在所有日期慣例與極端數值 corpus 完成前仍標記為 Best Effort。
-`INFO` 也只揭露安全且跨平台可取得的執行環境資訊。
+目前 Best Effort 清單已縮減為十項：
+`BESSELI`、`BESSELJ`、`BESSELK`、`BESSELY`、`GETPIVOTDATA`、
+`ODDFPRICE`、`ODDFYIELD`、`ODDLPRICE`、`ODDLYIELD` 與 `DDE`。
+Bessel 函式仍需更大的高階數值 corpus；`GETPIVOTDATA` 尚未涵蓋相容性替代語法的所有
+歧義規則；奇數票息債券仍需完整日期基準與極端日期 corpus；`DDE` 則是刻意不執行，
+不是待補的安全缺陷。
 
 ```csharp
 public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
@@ -64,6 +70,16 @@ public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
     // 實作一般儲存格存取，以及 SheetNames、TryGetPivotData
     // 與 TryEvaluateMultipleOperations。
 }
+```
+
+矩陣公式使用範圍 facade 宣告輸出形狀；重算時，二維結果會逐格寫回，形狀不符或
+輸出範圍與其它公式衝突時會回傳公式錯誤，避免靜默覆寫。
+
+```csharp
+OdfTableSheet sheet = document.Worksheets.Add("Data");
+sheet.Ranges["A1:B2"].SetArrayFormula("of:={1;2|3;4}+10");
+document.EvaluateFormulas();
+sheet.Ranges["A1:B2"].ClearArrayFormula();
 ```
 
 ## Volatile 計算工作階段
@@ -89,14 +105,17 @@ object result = evaluator.Evaluate("of:=XLOOKUP(1;[.A1:.A3];[.B1:.B3])", context
 LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代表 OASIS 規範逐位元
 定義相同結果，也不代表巨集或外部連結可以安全執行。
 
-## 邁向並超出 Large 的順序
+## 一致性證據策略
 
-1. 先建立 Small 的語法、限制、轉換與函式語意 corpus，達成可稽核的正式基線。
-2. 依 Medium 要求補齊參照聯集、命名運算式及其強制函式，避免只追求函式數量。
-3. 以 OASIS corpus 驗證已完成的 388／388 名稱覆蓋，補強自動交集、
-   區域名稱與長尾函式邊界語意，並擴大目前逐元素陣列運算的形狀 corpus。
-4. 保留 OdfKit Extended 註冊表與後援，讓應用程式在正式 Large 之上加入領域函式，
-   同時個別揭露外部引擎與安全邊界。
+專案內的 `OpenFormulaConformanceCorpusTests` 以 ODF 1.2～1.4 分組驗證科學記號、
+強制重算、常數錯誤、左側錯誤傳播、型別比較、陣列形狀、矩陣、Unicode 與代表性
+Small／Medium／Large 函式。這是專案依正式文本自行撰寫的可稽核 corpus，不冒充
+OASIS 官方測試套件。
+
+後續證據工作應持續擴充每個函式的限制、空值、locale、日期基準、浮點容許誤差及
+極端輸入案例；同時保留 OdfKit Extended 註冊表與後援，讓應用程式在 Large 清單之外
+加入領域函式，並個別揭露外部引擎與安全邊界。是否正式宣稱 Small、Medium 或 Large
+一致性，應以整份 corpus 的可重現通過證據決定，而不是只看 388／388 名稱覆蓋。
 
 規範依據為 OASIS
 [ODF 1.4 Part 4: OpenFormula](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html)。

@@ -28,6 +28,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
     public override object Evaluate(IEvaluationContext context)
     {
         var val = child.Evaluate(context);
+        val = FormulaCoercion.ToScalar(child, val, context);
         if (val is OdfFormulaError err)
             return err;
 
@@ -59,17 +60,17 @@ public class UnaryNode(char op, AstNode child) : AstNode
             return OdfFormulaError.Value;
         }
 
-        if (val is double num)
-            return op == '-' ? -num : num;
+        if (op == '+')
+            return val;
 
-        if (val is bool b)
-            return op == '-' ? -(b ? 1.0 : 0.0) : (b ? 1.0 : 0.0);
-
-        if (val is string str && double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedNum))
-            return op == '-' ? -parsedNum : parsedNum;
+        if (FormulaCoercion.TryCoerceDouble(val, out double number))
+            return IsFinite(-number) ? -number : OdfFormulaError.Num;
 
         return OdfFormulaError.Value;
     }
+
+    private static bool IsFinite(double value) =>
+        !double.IsNaN(value) && !double.IsInfinity(value);
 
     /// <summary>
     /// Performs serialize.
@@ -114,10 +115,12 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     public override object Evaluate(IEvaluationContext context)
     {
         var leftVal = left.Evaluate(context);
+        leftVal = FormulaCoercion.ToScalar(left, leftVal, context);
         if (leftVal is OdfFormulaError)
             return leftVal;
 
         var rightVal = right.Evaluate(context);
+        rightVal = FormulaCoercion.ToScalar(right, rightVal, context);
         if (rightVal is OdfFormulaError)
             return rightVal;
 
@@ -191,15 +194,21 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
             if (!TryCoerceDouble(leftVal, out double leftNum) || !TryCoerceDouble(rightVal, out double rightNum))
                 return OdfFormulaError.Value;
 
-            return op switch
+            object result = op switch
             {
                 "+" => leftNum + rightNum,
                 "-" => leftNum - rightNum,
                 "*" => leftNum * rightNum,
                 "/" => rightNum == 0 ? OdfFormulaError.Div0 : leftNum / rightNum,
-                "^" => Math.Pow(leftNum, rightNum),
+                "^" => leftNum == 0 && rightNum == 0
+                    ? OdfFormulaError.Num
+                    : Math.Pow(leftNum, rightNum),
                 _ => OdfFormulaError.Value
             };
+            return result is double number &&
+                (double.IsNaN(number) || double.IsInfinity(number))
+                ? OdfFormulaError.Num
+                : result;
         }
 
         // 比較運算子
@@ -229,7 +238,16 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 
     private static object EvaluateComparison(object left, string op, object right)
     {
-        // 強制轉換型別以進行比較
+        if (left.GetType() != right.GetType())
+        {
+            if (op == "=")
+                return false;
+            if (op == "<>")
+                return true;
+
+            return EvaluateOrderedComparison(FormulaCoercion.CompareValues(left, right), op);
+        }
+
         int comp;
         if (left is double d1 && right is double d2)
         {
@@ -239,24 +257,25 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         {
             comp = b1.CompareTo(b2);
         }
-        else if (TryCoerceDouble(left, out double nd1) && TryCoerceDouble(right, out double nd2))
-        {
-            comp = nd1.CompareTo(nd2);
-        }
         else
         {
             // 字串比較（不區分大小寫）
             comp = string.Compare(left.ToString(), right.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
+        return EvaluateOrderedComparison(comp, op);
+    }
+
+    private static object EvaluateOrderedComparison(int comparison, string op)
+    {
         return op switch
         {
-            "=" => comp == 0,
-            "<" => comp < 0,
-            ">" => comp > 0,
-            "<=" => comp <= 0,
-            ">=" => comp >= 0,
-            "<>" => comp != 0,
+            "=" => comparison == 0,
+            "<" => comparison < 0,
+            ">" => comparison > 0,
+            "<=" => comparison <= 0,
+            ">=" => comparison >= 0,
+            "<>" => comparison != 0,
             _ => OdfFormulaError.Value
         };
     }

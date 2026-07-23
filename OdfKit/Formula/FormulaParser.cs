@@ -174,17 +174,74 @@ public ref struct FormulaParser
 
     private AstNode ParseIntersectionExpression()
     {
-        var node = ParsePrimary();
-        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("!", StringComparison.Ordinal))
+        var node = ParseRangeExpression();
+        while (_currentToken.Type == FormulaTokenType.Operator &&
+            (_currentToken.Span.Equals("!", StringComparison.Ordinal) ||
+                _currentToken.Span.Equals("!!", StringComparison.Ordinal)))
         {
+            bool automatic = _currentToken.Span.Equals(
+                "!!",
+                StringComparison.Ordinal);
             Consume();
-            var right = ParsePrimary();
-            node = new ReferenceIntersectionNode(node, right);
+            var right = ParseRangeExpression();
+            node = automatic
+                ? new AutomaticIntersectionNode(node, right)
+                : new ReferenceIntersectionNode(node, right);
         }
         return node;
     }
 
-    // 優先權 7：主要運算式（常值、括號、函式、儲存格／範圍）
+    private AstNode ParseRangeExpression()
+    {
+        var node = ParsePrimary();
+        while (_currentToken.Type == FormulaTokenType.Colon)
+        {
+            Consume();
+            AstNode right = ParsePrimary();
+            node = CreateRangeNode(node, right);
+        }
+
+        return node;
+    }
+
+    private static AstNode CreateRangeNode(AstNode left, AstNode right)
+    {
+        if (left is not CellAddressNode leftCell ||
+            right is not CellAddressNode rightCell)
+        {
+            return new ReferenceRangeNode(left, right);
+        }
+
+        string? leftSheet = leftCell.Address.SheetName;
+        string? rightSheet = rightCell.Address.SheetName;
+        if (!string.IsNullOrEmpty(leftSheet) &&
+            !string.IsNullOrEmpty(rightSheet) &&
+            !string.Equals(
+                leftSheet,
+                rightSheet,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return new ReferenceRangeNode(left, right);
+        }
+
+        string? sheetName = leftSheet ?? rightSheet;
+        OdfCellAddress start = WithSheetName(leftCell.Address, sheetName);
+        OdfCellAddress end = WithSheetName(rightCell.Address, sheetName);
+        return new RangeReferenceNode(new OdfCellRange(start, end));
+    }
+
+    private static OdfCellAddress WithSheetName(
+        OdfCellAddress address,
+        string? sheetName) =>
+        new(
+            address.Row,
+            address.Column,
+            sheetName,
+            address.IsRowAbsolute,
+            address.IsColumnAbsolute,
+            address.IsSheetAbsolute);
+
+    // 優先權 8：主要運算式（常值、括號、函式、儲存格／範圍）
     private AstNode ParsePrimary()
     {
         if (_currentToken.Type == FormulaTokenType.Number)
@@ -231,6 +288,9 @@ public ref struct FormulaParser
             string ident = _currentToken.Span.ToString();
             Consume();
 
+            if (TryParseError(ident, out OdfFormulaError? error))
+                return new LiteralNode(error!);
+
             // 1. 檢查是否為函式呼叫
             if (_currentToken.Type == FormulaTokenType.OpenParen)
             {
@@ -253,27 +313,7 @@ public ref struct FormulaParser
                 return new FunctionNode(ident, args);
             }
 
-            // 2. 檢查是否為範圍或儲存格參照
-            if (_currentToken.Type == FormulaTokenType.Colon)
-            {
-                // 範圍情況：A1:B10
-                Consume(); // 消耗 ':'
-                if (_currentToken.Type != FormulaTokenType.Identifier)
-                {
-                    throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_InvalidNotFound"));
-                }
-                string endIdent = _currentToken.Span.ToString();
-                Consume();
-
-                string fullRangeStr = $"{ident}:{endIdent}";
-                if (OdfCellRange.TryParse(fullRangeStr, out var range))
-                {
-                    return new RangeReferenceNode(range);
-                }
-                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_FailedToParseRangeString", fullRangeStr));
-            }
-
-            // 單一儲存格或單一工作表限定之儲存格 A1 或 Sheet1.A1
+            // 2. 檢查是否為儲存格參照
             if (OdfCellRange.TryParse(ident, out var cellRange))
             {
                 if (cellRange.StartAddress == cellRange.EndAddress)
@@ -287,6 +327,22 @@ public ref struct FormulaParser
         }
 
         throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_UnexpectedTokenTypeDuring", _currentToken.Type));
+    }
+
+    private static bool TryParseError(string text, out OdfFormulaError? error)
+    {
+        error = text.ToUpperInvariant() switch
+        {
+            "#NULL!" => OdfFormulaError.Null,
+            "#DIV/0!" => OdfFormulaError.Div0,
+            "#VALUE!" => OdfFormulaError.Value,
+            "#REF!" => OdfFormulaError.Ref,
+            "#NAME?" => OdfFormulaError.Name,
+            "#NUM!" => OdfFormulaError.Num,
+            "#N/A" => OdfFormulaError.NA,
+            _ => null
+        };
+        return error is not null;
     }
 
     private AstNode ParseInlineArray()

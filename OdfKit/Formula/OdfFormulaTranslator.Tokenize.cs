@@ -120,6 +120,17 @@ public static partial class OdfFormulaTranslator
                     else
                         break;
                 }
+                if (i < length && formula[i] is 'e' or 'E')
+                {
+                    int exponentStart = i++;
+                    if (i < length && formula[i] is '+' or '-')
+                        i++;
+                    int digitStart = i;
+                    while (i < length && char.IsDigit(formula[i]))
+                        i++;
+                    if (i == digitStart)
+                        i = exponentStart;
+                }
                 tokens.Add(new(TokenType.Number, formula.Substring(start, i - start), start));
                 continue;
             }
@@ -134,8 +145,7 @@ public static partial class OdfFormulaTranslator
                 }
                 else
                 {
-                    while (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_'))
-                        i++;
+                    i = ScanIdentifier(formula, start);
                     tokens.Add(new(TokenType.Identifier, formula.Substring(start, i - start), start));
                 }
                 continue;
@@ -144,6 +154,49 @@ public static partial class OdfFormulaTranslator
             tokens.Add(new(TokenType.Unknown, c.ToString(), i++));
         }
         return tokens;
+    }
+
+    private static int ScanIdentifier(string formula, int start)
+    {
+        int index = start;
+        while (index < formula.Length)
+        {
+            char current = formula[index];
+            if (current == '\'')
+            {
+                index++;
+                while (index < formula.Length)
+                {
+                    if (formula[index] != '\'')
+                    {
+                        index++;
+                        continue;
+                    }
+
+                    if (index + 1 < formula.Length &&
+                        formula[index + 1] == '\'')
+                    {
+                        index += 2;
+                        continue;
+                    }
+
+                    index++;
+                    break;
+                }
+                continue;
+            }
+
+            if (char.IsLetterOrDigit(current) ||
+                current is '_' or '.' or '$' or '#')
+            {
+                index++;
+                continue;
+            }
+
+            break;
+        }
+
+        return Math.Max(start + 1, index);
     }
 
     private static bool TryScanExcelReference(string formula, int start, out int consumed)

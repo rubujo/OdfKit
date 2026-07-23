@@ -33,6 +33,8 @@ public class LiteralNode(object value) : AstNode
             return b ? "TRUE" : "FALSE";
         if (value is double d)
             return d.ToString(CultureInfo.InvariantCulture);
+        if (value is OdfFormulaError error)
+            return error.ToErrorString();
         return value?.ToString() ?? string.Empty;
     }
 }
@@ -169,11 +171,155 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
 }
 
 /// <summary>
-/// Represents an AST node for a reference union.
-/// 代表聯集參照 (Union) 的 AST 節點。
+/// Represents the OpenFormula reference-range operator.
+/// 代表 OpenFormula 參照範圍運算子。
 /// </summary>
 /// <param name="left">The left AST node. / 左側 AST 節點。</param>
 /// <param name="right">The right AST node. / 右側 AST 節點。</param>
+public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
+{
+    /// <inheritdoc />
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        List<OdfCellRange> leftRanges = left.GetRanges(context);
+        List<OdfCellRange> rightRanges = right.GetRanges(context);
+        var result = new List<OdfCellRange>();
+        foreach (OdfCellRange leftRange in leftRanges)
+        {
+            foreach (OdfCellRange rightRange in rightRanges)
+            {
+                string? leftSheet = leftRange.StartAddress.SheetName ??
+                    context.CurrentCell.SheetName;
+                string? rightSheet = rightRange.EndAddress.SheetName ??
+                    context.CurrentCell.SheetName;
+                if (!string.Equals(
+                    leftSheet,
+                    rightSheet,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    AddSheetRanges(
+                        context,
+                        result,
+                        leftRange,
+                        rightRange,
+                        leftSheet,
+                        rightSheet);
+                    continue;
+                }
+
+                int minRow = Math.Min(
+                    Math.Min(leftRange.StartAddress.Row, leftRange.EndAddress.Row),
+                    Math.Min(rightRange.StartAddress.Row, rightRange.EndAddress.Row));
+                int maxRow = Math.Max(
+                    Math.Max(leftRange.StartAddress.Row, leftRange.EndAddress.Row),
+                    Math.Max(rightRange.StartAddress.Row, rightRange.EndAddress.Row));
+                int minColumn = Math.Min(
+                    Math.Min(leftRange.StartAddress.Column, leftRange.EndAddress.Column),
+                    Math.Min(rightRange.StartAddress.Column, rightRange.EndAddress.Column));
+                int maxColumn = Math.Max(
+                    Math.Max(leftRange.StartAddress.Column, leftRange.EndAddress.Column),
+                    Math.Max(rightRange.StartAddress.Column, rightRange.EndAddress.Column));
+                result.Add(new OdfCellRange(
+                    minRow,
+                    minColumn,
+                    maxRow,
+                    maxColumn,
+                    leftSheet));
+            }
+        }
+
+        return result;
+    }
+
+    private static void AddSheetRanges(
+        IEvaluationContext context,
+        List<OdfCellRange> result,
+        OdfCellRange leftRange,
+        OdfCellRange rightRange,
+        string? leftSheet,
+        string? rightSheet)
+    {
+        if (context is not IOdfFormulaWorkbookContext workbook ||
+            string.IsNullOrEmpty(leftSheet) ||
+            string.IsNullOrEmpty(rightSheet))
+        {
+            return;
+        }
+
+        int leftIndex = IndexOfSheet(workbook.SheetNames, leftSheet!);
+        int rightIndex = IndexOfSheet(workbook.SheetNames, rightSheet!);
+        if (leftIndex < 0 || rightIndex < 0)
+            return;
+
+        int minRow = Math.Min(
+            Math.Min(leftRange.StartAddress.Row, leftRange.EndAddress.Row),
+            Math.Min(rightRange.StartAddress.Row, rightRange.EndAddress.Row));
+        int maxRow = Math.Max(
+            Math.Max(leftRange.StartAddress.Row, leftRange.EndAddress.Row),
+            Math.Max(rightRange.StartAddress.Row, rightRange.EndAddress.Row));
+        int minColumn = Math.Min(
+            Math.Min(leftRange.StartAddress.Column, leftRange.EndAddress.Column),
+            Math.Min(rightRange.StartAddress.Column, rightRange.EndAddress.Column));
+        int maxColumn = Math.Max(
+            Math.Max(leftRange.StartAddress.Column, leftRange.EndAddress.Column),
+            Math.Max(rightRange.StartAddress.Column, rightRange.EndAddress.Column));
+        int step = leftIndex <= rightIndex ? 1 : -1;
+        for (int index = leftIndex; ; index += step)
+        {
+            result.Add(new OdfCellRange(
+                minRow,
+                minColumn,
+                maxRow,
+                maxColumn,
+                workbook.SheetNames[index]));
+            if (index == rightIndex)
+                break;
+        }
+    }
+
+    private static int IndexOfSheet(
+        IReadOnlyList<string> sheetNames,
+        string name)
+    {
+        for (int index = 0; index < sheetNames.Count; index++)
+        {
+            if (string.Equals(
+                sheetNames[index],
+                name,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <inheritdoc />
+    public override object Evaluate(IEvaluationContext context)
+    {
+        List<OdfCellRange> ranges = GetRanges(context);
+        if (ranges.Count == 0)
+            return OdfFormulaError.Ref;
+        if (ranges.Count == 1)
+            return context.GetRangeValues(ranges[0]);
+        var references = new OdfReferenceList();
+        foreach (OdfCellRange range in ranges)
+            references.References.Add(context.GetRangeValues(range));
+        return references;
+    }
+
+    /// <inheritdoc />
+    public override string Serialize() =>
+        $"{left.Serialize()}:{right.Serialize()}";
+}
+
+/// <summary>
+/// Represents an AST node for a reference union.
+/// 代表聯集參照 (Union) 的 AST 節點。
+/// </summary>
+/// <param name="left">The left reference expression. / 左側參照運算式。</param>
+/// <param name="right">The right reference expression. / 右側參照運算式。</param>
 public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 {
     /// <summary>
@@ -275,4 +421,47 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
     /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}!{right.Serialize()}";
+}
+
+/// <summary>
+/// Represents OpenFormula automatic intersection between two quoted labels.
+/// 代表兩個 OpenFormula 引號標籤之間的自動交集。
+/// </summary>
+/// <param name="left">The left quoted-label expression. / 左側引號標籤運算式。</param>
+/// <param name="right">The right quoted-label expression. / 右側引號標籤運算式。</param>
+public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : AstNode
+{
+    /// <inheritdoc />
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        var intersections = new List<OdfCellRange>();
+        foreach (OdfCellRange leftRange in left.GetRanges(context))
+        {
+            foreach (OdfCellRange rightRange in right.GetRanges(context))
+            {
+                OdfCellRange? intersection = leftRange.Intersect(rightRange);
+                if (intersection.HasValue &&
+                    intersection.Value.StartAddress ==
+                    intersection.Value.EndAddress)
+                {
+                    intersections.Add(intersection.Value);
+                }
+            }
+        }
+
+        return intersections;
+    }
+
+    /// <inheritdoc />
+    public override object Evaluate(IEvaluationContext context)
+    {
+        List<OdfCellRange> ranges = GetRanges(context);
+        return ranges.Count == 1
+            ? context.GetCellValue(ranges[0].StartAddress)
+            : OdfFormulaError.Value;
+    }
+
+    /// <inheritdoc />
+    public override string Serialize() =>
+        $"{left.Serialize()}!!{right.Serialize()}";
 }

@@ -11,6 +11,7 @@ namespace OdfKit.Formula;
 internal class OdfDomEvaluationContext :
     IOdfFormulaWorkbookContext,
     IOdfFormulaVolatileContext,
+    IOdfFormulaReferenceContext,
     IOdfBlankCheckableContext
 {
     /// <summary>
@@ -24,6 +25,8 @@ internal class OdfDomEvaluationContext :
     private readonly Dictionary<OdfCellAddress, OdfNode> _cellNodes = new();
     private readonly Dictionary<OdfCellAddress, string> _cellFormulas = new();
     private readonly Dictionary<OdfCellAddress, object> _cellValues = new();
+    private readonly HashSet<string> _evaluatingNames =
+        new(StringComparer.OrdinalIgnoreCase);
     private readonly List<string> _sheetNames = [];
     private readonly DefaultFormulaEvaluator _evaluator;
     private readonly OdfNode _contentRoot;
@@ -289,7 +292,25 @@ internal class OdfDomEvaluationContext :
     /// </summary>
     public object GetNamedRangeOrExpressionValue(string name)
     {
-        string? currentSheet = CurrentCell.SheetName;
+        ParseNamedExpression(
+            name,
+            out string? source,
+            out string? qualifiedSheet,
+            out string simpleName);
+        if (!string.IsNullOrEmpty(source))
+        {
+            return _externalLinks is not null &&
+                _externalLinks.TryGetNamedExpressionValue(
+                    source!,
+                    qualifiedSheet,
+                    simpleName,
+                    _evaluator,
+                    out object externalResult)
+                ? externalResult
+                : OdfFormulaError.Name;
+        }
+
+        string? currentSheet = qualifiedSheet ?? CurrentCell.SheetName;
         OdfNode? targetNode = null;
 
         if (!string.IsNullOrEmpty(currentSheet))
@@ -297,18 +318,21 @@ internal class OdfDomEvaluationContext :
             var sheetNode = FindSheetNode(_contentRoot, currentSheet);
             if (sheetNode != null)
             {
-                targetNode = FindNamedNodeUnderParent(sheetNode, name);
+                targetNode = FindNamedNodeUnderParent(sheetNode, simpleName);
             }
         }
 
         if (targetNode == null)
         {
-            targetNode = FindGlobalNamedNode(_contentRoot, name);
+            targetNode = FindGlobalNamedNode(_contentRoot, simpleName);
         }
 
         if (targetNode == null)
         {
-            return OdfFormulaError.Name;
+            return IsSimpleQuotedLabel(name) &&
+                TryResolveLabelRange(simpleName, currentSheet, out OdfCellRange labelRange)
+                ? GetRangeValues(labelRange)
+                : OdfFormulaError.Name;
         }
 
         if (targetNode.LocalName == "named-range")
@@ -346,10 +370,264 @@ internal class OdfDomEvaluationContext :
             else if (expression.StartsWith("="))
                 expression = expression.Substring(1);
 
-            return _evaluator.Evaluate(expression!, this);
+            string scopeKey = string.Concat(currentSheet, "\n", simpleName);
+            if (!_evaluatingNames.Add(scopeKey))
+                return OdfFormulaError.Ref;
+
+            OdfCellAddress previousCell = CurrentCell;
+            try
+            {
+                string? baseAddress = targetNode.GetAttribute(
+                    "base-cell-address",
+                    OdfNamespaces.Table);
+                if (!string.IsNullOrEmpty(baseAddress) &&
+                    OdfCellAddress.TryParse(baseAddress!, out OdfCellAddress parsedBase))
+                {
+                    CurrentCell = parsedBase;
+                }
+
+                return _evaluator.Evaluate(expression!, this);
+            }
+            finally
+            {
+                CurrentCell = previousCell;
+                _evaluatingNames.Remove(scopeKey);
+            }
         }
 
         return OdfFormulaError.Name;
+    }
+
+    private static void ParseNamedExpression(
+        string value,
+        out string? source,
+        out string? sheetName,
+        out string name)
+    {
+        source = null;
+        sheetName = null;
+        value = value.Trim();
+        int sourceMarker = FindUnquoted(value, '#');
+        if (sourceMarker >= 0)
+        {
+            source = UnquoteName(value.Substring(0, sourceMarker));
+            value = value.Substring(sourceMarker + 1);
+        }
+
+        int sheetMarker = FindUnquoted(value, '.');
+        if (sheetMarker >= 0)
+        {
+            sheetName = UnquoteName(value.Substring(0, sheetMarker));
+            value = value.Substring(sheetMarker + 1);
+        }
+
+        if (value.StartsWith("$$", StringComparison.Ordinal))
+            value = value.Substring(2);
+        name = UnquoteName(value);
+    }
+
+    private static int FindUnquoted(string value, char target)
+    {
+        bool quoted = false;
+        for (int index = 0; index < value.Length; index++)
+        {
+            if (value[index] == '\'')
+            {
+                if (quoted &&
+                    index + 1 < value.Length &&
+                    value[index + 1] == '\'')
+                {
+                    index++;
+                    continue;
+                }
+
+                quoted = !quoted;
+            }
+            else if (!quoted && value[index] == target)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private static string UnquoteName(string value)
+    {
+        value = value.Trim();
+        if (value.StartsWith("$", StringComparison.Ordinal))
+            value = value.Substring(1);
+        if (value.Length >= 2 &&
+            value[0] == '\'' &&
+            value[value.Length - 1] == '\'')
+        {
+            return value.Substring(1, value.Length - 2).Replace("''", "'");
+        }
+
+        return value;
+    }
+
+    public bool TryGetNamedRanges(
+        string name,
+        out IReadOnlyList<OdfCellRange> ranges)
+    {
+        ParseNamedExpression(
+            name,
+            out string? source,
+            out string? qualifiedSheet,
+            out string simpleName);
+        if (!string.IsNullOrEmpty(source))
+        {
+            ranges = [];
+            return false;
+        }
+
+        string? currentSheet = qualifiedSheet ?? CurrentCell.SheetName;
+        OdfNode? target = null;
+        if (!string.IsNullOrEmpty(currentSheet))
+        {
+            OdfNode? sheet = FindSheetNode(_contentRoot, currentSheet);
+            if (sheet is not null)
+                target = FindNamedNodeUnderParent(sheet, simpleName);
+        }
+
+        target ??= FindGlobalNamedNode(_contentRoot, simpleName);
+        if (target is null &&
+            IsSimpleQuotedLabel(name) &&
+            TryResolveLabelRange(
+                simpleName,
+                currentSheet,
+                out OdfCellRange labelRange))
+        {
+            ranges = [labelRange];
+            return true;
+        }
+
+        string? address = target?.LocalName == "named-range"
+            ? target.GetAttribute("cell-range-address", OdfNamespaces.Table)
+            : null;
+        if (!string.IsNullOrEmpty(address) &&
+            OdfCellRange.TryParse(address!, out OdfCellRange range))
+        {
+            ranges = [range];
+            return true;
+        }
+
+        ranges = [];
+        return false;
+    }
+
+    private static bool IsSimpleQuotedLabel(string value)
+    {
+        value = value.Trim();
+        return value.Length >= 2 &&
+            value[0] == '\'' &&
+            value[value.Length - 1] == '\'' &&
+            FindUnquoted(value, '#') < 0 &&
+            FindUnquoted(value, '.') < 0;
+    }
+
+    private bool TryResolveLabelRange(
+        string label,
+        string? sheetName,
+        out OdfCellRange range)
+    {
+        foreach (KeyValuePair<OdfCellAddress, object> cell in _cellValues)
+        {
+            if (!string.Equals(
+                    cell.Key.SheetName,
+                    sheetName,
+                    StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(
+                    Convert.ToString(cell.Value, CultureInfo.InvariantCulture),
+                    label,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            int columnEnd = FindLabelExtent(cell.Key, rowStep: 1, columnStep: 0);
+            int rowEnd = FindLabelExtent(cell.Key, rowStep: 0, columnStep: 1);
+            int columnLength = columnEnd - cell.Key.Row;
+            int rowLength = rowEnd - cell.Key.Column;
+            if (columnLength <= 0 && rowLength <= 0)
+                continue;
+
+            range = columnLength >= rowLength
+                ? new OdfCellRange(
+                    cell.Key.Row + 1,
+                    cell.Key.Column,
+                    columnEnd,
+                    cell.Key.Column,
+                    cell.Key.SheetName)
+                : new OdfCellRange(
+                    cell.Key.Row,
+                    cell.Key.Column + 1,
+                    cell.Key.Row,
+                    rowEnd,
+                    cell.Key.SheetName);
+            return true;
+        }
+
+        range = default;
+        return false;
+    }
+
+    private int FindLabelExtent(
+        OdfCellAddress label,
+        int rowStep,
+        int columnStep)
+    {
+        int maxRow = label.Row;
+        int maxColumn = label.Column;
+        foreach (OdfCellAddress address in _cellValues.Keys)
+        {
+            if (!string.Equals(
+                address.SheetName,
+                label.SheetName,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            maxRow = Math.Max(maxRow, address.Row);
+            maxColumn = Math.Max(maxColumn, address.Column);
+        }
+
+        int row = label.Row + rowStep;
+        int column = label.Column + columnStep;
+        bool skippedInitialBlank = false;
+        bool foundValue = false;
+        int end = rowStep == 1 ? label.Row : label.Column;
+        while (row <= maxRow && column <= maxColumn)
+        {
+            var address = new OdfCellAddress(row, column, label.SheetName);
+            bool hasValue = _cellValues.TryGetValue(address, out object? value) &&
+                value is not null &&
+                !string.IsNullOrEmpty(
+                    Convert.ToString(value, CultureInfo.InvariantCulture));
+            if (!hasValue)
+            {
+                if (!foundValue && !skippedInitialBlank)
+                {
+                    skippedInitialBlank = true;
+                    row += rowStep;
+                    column += columnStep;
+                    continue;
+                }
+
+                break;
+            }
+
+            foundValue = true;
+            end = rowStep == 1 ? row : column;
+            row += rowStep;
+            column += columnStep;
+        }
+
+        return foundValue
+            ? end
+            : rowStep == 1 ? label.Row : label.Column;
     }
 
     public bool TryGetPivotData(
@@ -358,6 +636,82 @@ internal class OdfDomEvaluationContext :
         IReadOnlyDictionary<string, object> filters,
         out object result)
     {
+        foreach (OdfNode pivot in EnumerateElements(
+            _contentRoot,
+            "data-pilot-table",
+            OdfNamespaces.Table))
+        {
+            string? targetText = pivot.GetAttribute(
+                "target-range-address",
+                OdfNamespaces.Table);
+            if (string.IsNullOrEmpty(targetText) ||
+                !OdfCellRange.TryParse(targetText!, out OdfCellRange target) ||
+                !ContainsResolved(target, pivotAnchor))
+            {
+                continue;
+            }
+
+            OdfNode? sourceNode = FindDirectChild(
+                pivot,
+                "source-cell-range",
+                OdfNamespaces.Table);
+            string? sourceText = sourceNode?.GetAttribute(
+                "cell-range-address",
+                OdfNamespaces.Table);
+            if (string.IsNullOrEmpty(sourceText) ||
+                !OdfCellRange.TryParse(sourceText!, out OdfCellRange source))
+            {
+                continue;
+            }
+
+            object[,] values = GetRangeValues(source);
+            if (values.GetLength(0) < 2 ||
+                !TryFindHeader(values, dataField, out int dataColumn))
+            {
+                continue;
+            }
+
+            var filterColumns = new List<KeyValuePair<int, object>>();
+            bool validFilters = true;
+            foreach (KeyValuePair<string, object> filter in filters)
+            {
+                if (!TryFindHeader(values, filter.Key, out int filterColumn))
+                {
+                    validFilters = false;
+                    break;
+                }
+
+                filterColumns.Add(new KeyValuePair<int, object>(
+                    filterColumn,
+                    filter.Value));
+            }
+            if (!validFilters)
+                continue;
+
+            string aggregation = FindPivotAggregation(pivot, dataField);
+            var matched = new List<object>();
+            for (int row = 1; row < values.GetLength(0); row++)
+            {
+                bool matches = true;
+                foreach (KeyValuePair<int, object> filter in filterColumns)
+                {
+                    if (FormulaCoercion.CompareValues(
+                        values[row, filter.Key],
+                        filter.Value) != 0)
+                    {
+                        matches = false;
+                        break;
+                    }
+                }
+
+                if (matches)
+                    matched.Add(values[row, dataColumn]);
+            }
+
+            result = AggregatePivotValues(matched, aggregation);
+            return result is not OdfFormulaError;
+        }
+
         result = OdfFormulaError.NA;
         return false;
     }
@@ -368,6 +722,324 @@ internal class OdfDomEvaluationContext :
     {
         result = OdfFormulaError.NA;
         return false;
+    }
+
+    internal bool TryEvaluateMultipleOperations(
+        IReadOnlyList<AstNode> arguments,
+        out object result)
+    {
+        result = OdfFormulaError.NA;
+        if (arguments.Count is not (3 or 5) ||
+            arguments[0] is not CellAddressNode formulaNode ||
+            arguments[1] is not CellAddressNode rowInputNode ||
+            arguments.Count == 5 && arguments[3] is not CellAddressNode)
+        {
+            return false;
+        }
+
+        OdfCellAddress formulaAddress = ResolveAddress(formulaNode.Address);
+        OdfCellAddress rowInput = ResolveAddress(rowInputNode.Address);
+        OdfCellAddress? columnInput = arguments.Count == 5
+            ? ResolveAddress(((CellAddressNode)arguments[3]).Address)
+            : null;
+        object rowReplacement = arguments[2].Evaluate(this);
+        if (rowReplacement is OdfFormulaError)
+        {
+            result = rowReplacement;
+            return true;
+        }
+
+        object? columnReplacement = null;
+        if (arguments.Count == 5)
+        {
+            columnReplacement = arguments[4].Evaluate(this);
+            if (columnReplacement is OdfFormulaError)
+            {
+                result = columnReplacement;
+                return true;
+            }
+        }
+
+        var backups = new List<CellOverrideBackup>(2);
+        OdfCellAddress previousCell = CurrentCell;
+        try
+        {
+            backups.Add(OverrideCell(rowInput, rowReplacement));
+            if (columnInput.HasValue)
+                backups.Add(OverrideCell(columnInput.Value, columnReplacement ?? 0d));
+            _evaluator.ClearCache();
+            string? formula = GetOriginalFormula(formulaAddress);
+            if (string.IsNullOrEmpty(formula))
+            {
+                result = OdfFormulaError.NA;
+                return true;
+            }
+
+            CurrentCell = formulaAddress;
+            result = _evaluator.Evaluate(formula!, this);
+            return true;
+        }
+        finally
+        {
+            CurrentCell = previousCell;
+            for (int index = backups.Count - 1; index >= 0; index--)
+                RestoreCell(backups[index]);
+            _evaluator.ClearCache();
+        }
+    }
+
+    private string? GetOriginalFormula(OdfCellAddress address)
+    {
+        if (_cellFormulas.TryGetValue(address, out string? formula))
+            return formula;
+        return _cellNodes.TryGetValue(address, out OdfNode? node)
+            ? node.GetAttribute("formula", OdfNamespaces.Table)
+            : null;
+    }
+
+    private OdfCellAddress ResolveAddress(OdfCellAddress address) =>
+        string.IsNullOrEmpty(address.SheetName)
+            ? new OdfCellAddress(
+                address.Row,
+                address.Column,
+                CurrentCell.SheetName,
+                address.IsRowAbsolute,
+                address.IsColumnAbsolute,
+                address.IsSheetAbsolute)
+            : address;
+
+    private CellOverrideBackup OverrideCell(OdfCellAddress address, object value)
+    {
+        bool hadValue = _cellValues.TryGetValue(address, out object? oldValue);
+        bool hadFormula = _cellFormulas.TryGetValue(address, out string? oldFormula);
+        _cellValues[address] = value;
+        _cellFormulas.Remove(address);
+        return new CellOverrideBackup(
+            address,
+            hadValue,
+            oldValue,
+            hadFormula,
+            oldFormula);
+    }
+
+    private void RestoreCell(CellOverrideBackup backup)
+    {
+        if (backup.HadValue)
+            _cellValues[backup.Address] = backup.Value ?? 0d;
+        else
+            _cellValues.Remove(backup.Address);
+        if (backup.HadFormula)
+            _cellFormulas[backup.Address] = backup.Formula!;
+        else
+            _cellFormulas.Remove(backup.Address);
+    }
+
+    private static IEnumerable<OdfNode> EnumerateElements(
+        OdfNode node,
+        string localName,
+        string namespaceUri)
+    {
+        if (node.NodeType == OdfNodeType.Element &&
+            node.LocalName == localName &&
+            node.NamespaceUri == namespaceUri)
+        {
+            yield return node;
+        }
+
+        foreach (OdfNode child in node.Children)
+        {
+            foreach (OdfNode match in EnumerateElements(
+                child,
+                localName,
+                namespaceUri))
+            {
+                yield return match;
+            }
+        }
+    }
+
+    private static OdfNode? FindDirectChild(
+        OdfNode parent,
+        string localName,
+        string namespaceUri)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool ContainsResolved(
+        OdfCellRange range,
+        OdfCellAddress address)
+    {
+        string? rangeSheet = range.StartAddress.SheetName;
+        string? addressSheet = address.SheetName ?? rangeSheet;
+        if (!string.Equals(
+            rangeSheet,
+            addressSheet,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return address.Row >= Math.Min(
+                range.StartAddress.Row,
+                range.EndAddress.Row) &&
+            address.Row <= Math.Max(
+                range.StartAddress.Row,
+                range.EndAddress.Row) &&
+            address.Column >= Math.Min(
+                range.StartAddress.Column,
+                range.EndAddress.Column) &&
+            address.Column <= Math.Max(
+                range.StartAddress.Column,
+                range.EndAddress.Column);
+    }
+
+    private static bool TryFindHeader(
+        object[,] values,
+        string name,
+        out int column)
+    {
+        for (int index = 0; index < values.GetLength(1); index++)
+        {
+            if (string.Equals(
+                Convert.ToString(values[0, index], CultureInfo.InvariantCulture),
+                name,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                column = index;
+                return true;
+            }
+        }
+
+        column = -1;
+        return false;
+    }
+
+    private static string FindPivotAggregation(
+        OdfNode pivot,
+        string dataField)
+    {
+        foreach (OdfNode field in pivot.Children)
+        {
+            if (field.NodeType == OdfNodeType.Element &&
+                field.LocalName == "data-pilot-field" &&
+                field.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(
+                    field.GetAttribute("source-field-name", OdfNamespaces.Table),
+                    dataField,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return field.GetAttribute("function", OdfNamespaces.Table) ??
+                    "sum";
+            }
+        }
+
+        return "sum";
+    }
+
+    private static object AggregatePivotValues(
+        IReadOnlyList<object> values,
+        string aggregation)
+    {
+        var numbers = new List<double>();
+        foreach (object value in values)
+        {
+            if (FormulaCoercion.TryCoerceDouble(value, out double number))
+                numbers.Add(number);
+        }
+
+        string normalized = aggregation.ToLowerInvariant();
+        if (normalized is "count")
+            return (double)values.Count;
+        if (normalized is "countnums")
+            return (double)numbers.Count;
+        if (numbers.Count == 0)
+            return OdfFormulaError.NA;
+        if (normalized is "max")
+            return Max(numbers);
+        if (normalized is "min")
+            return Min(numbers);
+        if (normalized is "average")
+            return Sum(numbers) / numbers.Count;
+        if (normalized is "product")
+            return Product(numbers);
+        if (normalized is "stdev" or "stdevp" or "var" or "varp")
+        {
+            bool population = normalized.EndsWith("p", StringComparison.Ordinal);
+            if (!population && numbers.Count < 2)
+                return OdfFormulaError.Div0;
+            double mean = Sum(numbers) / numbers.Count;
+            double sumSquares = 0;
+            foreach (double number in numbers)
+                sumSquares += (number - mean) * (number - mean);
+            double variance = sumSquares /
+                (population ? numbers.Count : numbers.Count - 1);
+            return normalized.StartsWith("stdev", StringComparison.Ordinal)
+                ? Math.Sqrt(variance)
+                : variance;
+        }
+
+        return Sum(numbers);
+    }
+
+    private static double Sum(IReadOnlyList<double> values)
+    {
+        double result = 0;
+        foreach (double value in values)
+            result += value;
+        return result;
+    }
+
+    private static double Product(IReadOnlyList<double> values)
+    {
+        double result = 1;
+        foreach (double value in values)
+            result *= value;
+        return result;
+    }
+
+    private static double Min(IReadOnlyList<double> values)
+    {
+        double result = values[0];
+        for (int index = 1; index < values.Count; index++)
+            result = Math.Min(result, values[index]);
+        return result;
+    }
+
+    private static double Max(IReadOnlyList<double> values)
+    {
+        double result = values[0];
+        for (int index = 1; index < values.Count; index++)
+            result = Math.Max(result, values[index]);
+        return result;
+    }
+
+    private readonly struct CellOverrideBackup(
+        OdfCellAddress address,
+        bool hadValue,
+        object? value,
+        bool hadFormula,
+        string? formula)
+    {
+        internal OdfCellAddress Address { get; } = address;
+
+        internal bool HadValue { get; } = hadValue;
+
+        internal object? Value { get; } = value;
+
+        internal bool HadFormula { get; } = hadFormula;
+
+        internal string? Formula { get; } = formula;
     }
 
     private OdfNode? FindSheetNode(OdfNode node, string? sheetName)
@@ -399,7 +1071,10 @@ internal class OdfDomEvaluationContext :
                     if (exprChild.NodeType == OdfNodeType.Element &&
                         (exprChild.LocalName == "named-range" || exprChild.LocalName == "named-expression") &&
                         exprChild.NamespaceUri == OdfNamespaces.Table &&
-                        exprChild.GetAttribute("name", OdfNamespaces.Table) == name)
+                        string.Equals(
+                            exprChild.GetAttribute("name", OdfNamespaces.Table),
+                            name,
+                            StringComparison.OrdinalIgnoreCase))
                     {
                         return exprChild;
                     }
@@ -423,7 +1098,10 @@ internal class OdfDomEvaluationContext :
                 if (exprChild.NodeType == OdfNodeType.Element &&
                     (exprChild.LocalName == "named-range" || exprChild.LocalName == "named-expression") &&
                     exprChild.NamespaceUri == OdfNamespaces.Table &&
-                    exprChild.GetAttribute("name", OdfNamespaces.Table) == name)
+                    string.Equals(
+                        exprChild.GetAttribute("name", OdfNamespaces.Table),
+                        name,
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     return exprChild;
                 }

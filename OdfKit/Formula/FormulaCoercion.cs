@@ -83,6 +83,84 @@ internal static class FormulaCoercion
     }
 
     /// <summary>
+    /// Applies OpenFormula implied intersection when an operator requires a scalar value.
+    /// 當運算子需要純量值時，套用 OpenFormula 隱含交集。
+    /// </summary>
+    public static object ToScalar(AstNode source, object value, IEvaluationContext context)
+    {
+        if (value is OdfFormulaError)
+            return value;
+        if (!IsReferenceExpression(source))
+            return value;
+
+        List<OdfKit.Spreadsheet.OdfCellRange> ranges = source.GetRanges(context);
+        if (ranges.Count == 0)
+            return value;
+        if (ranges.Count == 1 &&
+            ranges[0].StartAddress == ranges[0].EndAddress)
+        {
+            return value;
+        }
+
+        OdfKit.Spreadsheet.OdfCellAddress current = context.CurrentCell;
+        object? selected = null;
+        int selectedCount = 0;
+        foreach (OdfKit.Spreadsheet.OdfCellRange range in ranges)
+        {
+            int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+            int maxRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+            int minColumn = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+            int maxColumn = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+            string? sheetName = range.StartAddress.SheetName ?? current.SheetName;
+            if (!string.Equals(sheetName, current.SheetName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (minRow == maxRow && minColumn == maxColumn)
+            {
+                selected = context.GetCellValue(new OdfKit.Spreadsheet.OdfCellAddress(
+                    minRow,
+                    minColumn,
+                    sheetName));
+                selectedCount++;
+                continue;
+            }
+
+            if (minColumn == maxColumn && current.Row >= minRow && current.Row <= maxRow)
+            {
+                selected = context.GetCellValue(new OdfKit.Spreadsheet.OdfCellAddress(
+                    current.Row,
+                    minColumn,
+                    sheetName));
+                selectedCount++;
+            }
+            else if (minRow == maxRow &&
+                current.Column >= minColumn &&
+                current.Column <= maxColumn)
+            {
+                selected = context.GetCellValue(new OdfKit.Spreadsheet.OdfCellAddress(
+                    minRow,
+                    current.Column,
+                    sheetName));
+                selectedCount++;
+            }
+        }
+
+        return selectedCount == 1 ? selected ?? 0d : OdfFormulaError.Value;
+    }
+
+    private static bool IsReferenceExpression(AstNode source)
+    {
+        return source switch
+        {
+            CellAddressNode or RangeReferenceNode or ReferenceRangeNode or
+                ReferenceUnionNode or ReferenceIntersectionNode or
+                AutomaticIntersectionNode or NamedRangeNode => true,
+            ParenthesizedNode parenthesized => IsReferenceExpression(parenthesized.Inner),
+            _ => false
+        };
+    }
+
+    /// <summary>
     /// Coerces a value to a Boolean value, returning <see langword="false"/> for unsupported inputs.
     /// 將值強制轉換為布林值（非布林／數值／TRUE/FALSE 字串時回傳 false）。
     /// </summary>

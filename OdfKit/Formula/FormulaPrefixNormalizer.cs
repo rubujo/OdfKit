@@ -13,10 +13,13 @@ internal static class FormulaPrefixNormalizer
     internal static string RemovePrefix(string formula)
     {
         if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
-            return formula.Substring(6);
-        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
-            return formula.Substring(4);
-        if (formula.StartsWith("="))
+            formula = formula.Substring(6);
+        else if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+            formula = formula.Substring(4);
+        else if (formula.StartsWith("=", StringComparison.Ordinal))
+            formula = formula.Substring(1);
+
+        if (formula.StartsWith("=", StringComparison.Ordinal))
             return formula.Substring(1);
         return formula;
     }

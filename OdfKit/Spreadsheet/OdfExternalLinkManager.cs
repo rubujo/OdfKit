@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Formula;
 
 namespace OdfKit.Spreadsheet;
 
@@ -164,6 +165,31 @@ public sealed class OdfExternalLinkManager
         }
 
         return true;
+    }
+
+    internal bool TryGetNamedExpressionValue(
+        string documentId,
+        string? sheetName,
+        string name,
+        DefaultFormulaEvaluator evaluator,
+        out object result)
+    {
+        result = OdfFormulaError.Name;
+        SpreadsheetDocument? document = DocumentResolver?.Invoke(documentId);
+        if (document is null)
+            return false;
+
+        var context = new OdfDomEvaluationContext(
+            document.SheetsRoot,
+            new DefaultFormulaEvaluator(evaluator.Functions, evaluator.Fallback),
+            null);
+        if (!string.IsNullOrEmpty(sheetName))
+            context.CurrentCell = new OdfCellAddress(0, 0, sheetName);
+        result = context.GetNamedRangeOrExpressionValue(name);
+        return result is not OdfFormulaError
+        {
+            ErrorType: OdfFormulaErrorType.Name
+        };
     }
 
     internal static bool TryParseExternalSheet(string? sheetToken, out string documentId, out string sheetName)

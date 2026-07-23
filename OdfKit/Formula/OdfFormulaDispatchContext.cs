@@ -14,10 +14,14 @@ internal sealed class OdfFormulaDispatchContext(
     OdfFormulaFunctionRegistry functions) :
     IEvaluationContext,
     IOdfFormulaWorkbookContext,
+    IOdfFormulaEnvironmentContext,
     IOdfFormulaVolatileContext,
+    IOdfFormulaReferenceContext,
     IOdfBlankCheckableContext,
     IOdfFormulaFunctionDispatchContext
 {
+    internal IEvaluationContext InnerContext => inner;
+
     private readonly DateTime _evaluationTimestamp = DateTime.Now;
     private readonly Random _random = new();
 
@@ -30,6 +34,34 @@ internal sealed class OdfFormulaDispatchContext(
     public string? GetCellFormula(OdfCellAddress address) => inner.GetCellFormula(address);
 
     public object GetNamedRangeOrExpressionValue(string name) => inner.GetNamedRangeOrExpressionValue(name);
+
+    public bool TryGetNamedRanges(
+        string name,
+        out IReadOnlyList<OdfCellRange> ranges)
+    {
+        if (inner is IOdfFormulaReferenceContext reference &&
+            reference.TryGetNamedRanges(name, out ranges))
+        {
+            return true;
+        }
+
+        ranges = [];
+        return false;
+    }
+
+    public bool TryGetFormulaEnvironmentInfo(
+        string category,
+        out object result)
+    {
+        if (inner is IOdfFormulaEnvironmentContext environment &&
+            environment.TryGetFormulaEnvironmentInfo(category, out result))
+        {
+            return true;
+        }
+
+        result = OdfFormulaError.NA;
+        return false;
+    }
 
     public IReadOnlyList<string> SheetNames => inner is IOdfFormulaWorkbookContext workbook
         ? workbook.SheetNames

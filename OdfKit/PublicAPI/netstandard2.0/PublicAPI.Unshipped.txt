@@ -14565,6 +14565,8 @@ OdfKit.Forms.OdfFormControl.Y.get -> OdfKit.Styles.OdfLength
 OdfKit.Forms.OdfFormControl.Y.init -> void
 OdfKit.Formula.AST.AstNode
 OdfKit.Formula.AST.AstNode.AstNode() -> void
+OdfKit.Formula.AST.AutomaticIntersectionNode
+OdfKit.Formula.AST.AutomaticIntersectionNode.AutomaticIntersectionNode(OdfKit.Formula.AST.AstNode! left, OdfKit.Formula.AST.AstNode! right) -> void
 OdfKit.Formula.AST.BinaryNode
 OdfKit.Formula.AST.BinaryNode.BinaryNode(string! op, OdfKit.Formula.AST.AstNode! left, OdfKit.Formula.AST.AstNode! right) -> void
 OdfKit.Formula.AST.CellAddressNode
@@ -14592,6 +14594,8 @@ OdfKit.Formula.AST.RangeReferenceNode.Range.get -> OdfKit.Spreadsheet.OdfCellRan
 OdfKit.Formula.AST.RangeReferenceNode.RangeReferenceNode(OdfKit.Spreadsheet.OdfCellRange range) -> void
 OdfKit.Formula.AST.ReferenceIntersectionNode
 OdfKit.Formula.AST.ReferenceIntersectionNode.ReferenceIntersectionNode(OdfKit.Formula.AST.AstNode! left, OdfKit.Formula.AST.AstNode! right) -> void
+OdfKit.Formula.AST.ReferenceRangeNode
+OdfKit.Formula.AST.ReferenceRangeNode.ReferenceRangeNode(OdfKit.Formula.AST.AstNode! left, OdfKit.Formula.AST.AstNode! right) -> void
 OdfKit.Formula.AST.ReferenceUnionNode
 OdfKit.Formula.AST.ReferenceUnionNode.ReferenceUnionNode(OdfKit.Formula.AST.AstNode! left, OdfKit.Formula.AST.AstNode! right) -> void
 OdfKit.Formula.AST.UnaryNode
@@ -14658,6 +14662,8 @@ OdfKit.Formula.IEvaluationContext.GetCellFormula(OdfKit.Spreadsheet.OdfCellAddre
 OdfKit.Formula.IEvaluationContext.GetCellValue(OdfKit.Spreadsheet.OdfCellAddress address) -> object!
 OdfKit.Formula.IEvaluationContext.GetNamedRangeOrExpressionValue(string! name) -> object!
 OdfKit.Formula.IEvaluationContext.GetRangeValues(OdfKit.Spreadsheet.OdfCellRange range) -> object![,]!
+OdfKit.Formula.IOdfFormulaEnvironmentContext
+OdfKit.Formula.IOdfFormulaEnvironmentContext.TryGetFormulaEnvironmentInfo(string! category, out object! result) -> bool
 OdfKit.Formula.IOdfFormulaEvaluationFallback
 OdfKit.Formula.IOdfFormulaEvaluationFallback.TryEvaluate(string! formula, OdfKit.Formula.IEvaluationContext! context, out object! result) -> bool
 OdfKit.Formula.IOdfFormulaEvaluator
@@ -15723,6 +15729,7 @@ OdfKit.Spreadsheet.OdfCellRangeSelection.AutoFilter() -> OdfKit.Spreadsheet.OdfC
 OdfKit.Spreadsheet.OdfCellRangeSelection.Background(string! color) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.Bold() -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.Borders.get -> OdfKit.Spreadsheet.OdfRangeBorderProxy!
+OdfKit.Spreadsheet.OdfCellRangeSelection.ClearArrayFormula() -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.HorizontalAlignment.get -> string?
 OdfKit.Spreadsheet.OdfCellRangeSelection.HorizontalAlignment.set -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.IsProtected.get -> bool
@@ -15730,6 +15737,7 @@ OdfKit.Spreadsheet.OdfCellRangeSelection.Merge() -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.NameAs(string! name) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Protect(string! password) -> void
 OdfKit.Spreadsheet.OdfCellRangeSelection.Range.get -> OdfKit.Spreadsheet.OdfCellRange
+OdfKit.Spreadsheet.OdfCellRangeSelection.SetArrayFormula(string! formula) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.Sort(params (int fieldNumber, bool ascending)[]! rules) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.Style(System.Action<OdfKit.Styles.OdfCellStyleProxy!>! configure) -> OdfKit.Spreadsheet.OdfCellRangeSelection!
 OdfKit.Spreadsheet.OdfCellRangeSelection.TryUnprotect(string! password) -> bool
@@ -18399,6 +18407,9 @@ override OdfKit.Drawing.DrawingDocument.ReplaceText(string! search, string! repl
 override OdfKit.Drawing.OdfFlowStepRequest.Equals(object? obj) -> bool
 override OdfKit.Drawing.OdfFlowStepRequest.GetHashCode() -> int
 override OdfKit.Drawing.OdfFlowStepRequest.ToString() -> string!
+override OdfKit.Formula.AST.AutomaticIntersectionNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
+override OdfKit.Formula.AST.AutomaticIntersectionNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
+override OdfKit.Formula.AST.AutomaticIntersectionNode.Serialize() -> string!
 override OdfKit.Formula.AST.BinaryNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
 override OdfKit.Formula.AST.BinaryNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
 override OdfKit.Formula.AST.BinaryNode.Serialize() -> string!
@@ -18424,6 +18435,9 @@ override OdfKit.Formula.AST.RangeReferenceNode.Serialize() -> string!
 override OdfKit.Formula.AST.ReferenceIntersectionNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
 override OdfKit.Formula.AST.ReferenceIntersectionNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
 override OdfKit.Formula.AST.ReferenceIntersectionNode.Serialize() -> string!
+override OdfKit.Formula.AST.ReferenceRangeNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
+override OdfKit.Formula.AST.ReferenceRangeNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
+override OdfKit.Formula.AST.ReferenceRangeNode.Serialize() -> string!
 override OdfKit.Formula.AST.ReferenceUnionNode.Evaluate(OdfKit.Formula.IEvaluationContext! context) -> object!
 override OdfKit.Formula.AST.ReferenceUnionNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
 override OdfKit.Formula.AST.ReferenceUnionNode.Serialize() -> string!

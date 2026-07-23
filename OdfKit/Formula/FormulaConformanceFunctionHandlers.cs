@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using OdfKit.Formula.AST;
 
 namespace OdfKit.Formula;
@@ -85,16 +86,34 @@ internal static class FormulaConformanceFunctionHandlers
         if (!TryGetScalars(arguments, context, 2, 2, out double[] values, out object error))
             return error;
         double x = values[0];
-        int order = (int)Math.Truncate(values[1]);
-        if (order < 0 || (kind == 2 && x <= 0) || (kind == 3 && x <= 0))
+        double orderValue = values[1];
+        if (double.IsNaN(x) ||
+            double.IsInfinity(x) ||
+            orderValue < 0 ||
+            orderValue > int.MaxValue ||
+            orderValue != Math.Truncate(orderValue) ||
+            (kind == 2 && x <= 0) ||
+            (kind == 3 && x <= 0))
+        {
             return OdfFormulaError.Num;
+        }
+
+        int order = (int)orderValue;
+        double result;
         if (kind == 0)
-            return BesselSeries(x, order, false);
-        if (kind == 1)
-            return BesselSeries(x, order, true);
-        if (kind == 2)
-            return Integrate(t => Math.Exp(-x * Math.Cosh(t)) * Math.Cosh(order * t), 0, 20);
-        return BesselY(x, order);
+            result = BesselSeries(x, order, false);
+        else if (kind == 1)
+            result = BesselSeries(x, order, true);
+        else if (kind == 2)
+            result = Integrate(
+                t => Math.Exp(-x * Math.Cosh(t)) * Math.Cosh(order * t),
+                0,
+                20);
+        else
+            result = BesselY(x, order);
+        return double.IsNaN(result) || double.IsInfinity(result)
+            ? OdfFormulaError.Num
+            : result;
     }
 
     private static object EvaluateBetaDist(List<AstNode> arguments, IEvaluationContext context)
@@ -419,11 +438,15 @@ internal static class FormulaConformanceFunctionHandlers
             if (!TryGetNumbers(arguments[0].Evaluate(context), out double[] values, out object error) ||
                 !TryGetNumber(arguments[1], context, out double mean, out error))
                 return error;
-            double sigma = StandardDeviation(values, true);
+            if (values.Length == 0)
+                return OdfFormulaError.Div0;
+            double sigma = arguments.Count == 3
+                ? 0
+                : StandardDeviation(values, true);
             if (arguments.Count == 3 &&
                 !TryGetNumber(arguments[2], context, out sigma, out error))
                 return error;
-            if (values.Length == 0 || sigma <= 0)
+            if (sigma <= 0 || double.IsNaN(sigma) || double.IsInfinity(sigma))
                 return OdfFormulaError.Div0;
             return 1 - NormalCdf((Mean(values) - mean) / (sigma / Math.Sqrt(values.Length)));
         }
@@ -436,8 +459,13 @@ internal static class FormulaConformanceFunctionHandlers
             return OdfFormulaError.Div0;
         if (name == "FTEST")
         {
-            double ratio = Math.Pow(StandardDeviation(first, false), 2) /
-                Math.Pow(StandardDeviation(second, false), 2);
+            if (arguments.Count != 2)
+                return OdfFormulaError.Value;
+            double firstVariance = Math.Pow(StandardDeviation(first, false), 2);
+            double secondVariance = Math.Pow(StandardDeviation(second, false), 2);
+            if (firstVariance == 0 || secondVariance == 0)
+                return OdfFormulaError.Div0;
+            double ratio = firstVariance / secondVariance;
             double cdf = FCdf(ratio, first.Length - 1, second.Length - 1);
             return 2 * Math.Min(cdf, 1 - cdf);
         }
@@ -489,14 +517,21 @@ internal static class FormulaConformanceFunctionHandlers
                 degrees = first.Length + second.Length - 2;
                 double pooled = (((first.Length - 1) * firstVariance) +
                     ((second.Length - 1) * secondVariance)) / degrees;
-                t = Math.Abs(difference) /
-                    Math.Sqrt(pooled * ((1d / first.Length) + (1d / second.Length)));
+                double denominator = Math.Sqrt(
+                    pooled *
+                    ((1d / first.Length) + (1d / second.Length)));
+                if (denominator == 0)
+                    return OdfFormulaError.Div0;
+                t = Math.Abs(difference) / denominator;
             }
             else
             {
                 double firstTerm = firstVariance / first.Length;
                 double secondTerm = secondVariance / second.Length;
-                t = Math.Abs(difference) / Math.Sqrt(firstTerm + secondTerm);
+                double denominator = Math.Sqrt(firstTerm + secondTerm);
+                if (denominator == 0)
+                    return OdfFormulaError.Div0;
+                t = Math.Abs(difference) / denominator;
                 degrees = Math.Pow(firstTerm + secondTerm, 2) /
                     ((Math.Pow(firstTerm, 2) / (first.Length - 1)) +
                         (Math.Pow(secondTerm, 2) / (second.Length - 1)));
@@ -1109,6 +1144,12 @@ internal static class FormulaConformanceFunctionHandlers
     {
         if (arguments.Count is not (3 or 5))
             return OdfFormulaError.Value;
+        if (context is OdfFormulaDispatchContext dispatch &&
+            dispatch.InnerContext is OdfDomEvaluationContext dom &&
+            dom.TryEvaluateMultipleOperations(arguments, out object domResult))
+        {
+            return domResult;
+        }
         var values = new object[arguments.Count];
         for (int index = 0; index < arguments.Count; index++)
         {
@@ -1156,7 +1197,20 @@ internal static class FormulaConformanceFunctionHandlers
                 ? (double)workbook.SheetNames.Count
                 : 1d;
         }
-        return arguments[0].GetRanges(context).Count > 0 ? 1d : OdfFormulaError.NA;
+        List<OdfKit.Spreadsheet.OdfCellRange> ranges =
+            arguments[0].GetRanges(context);
+        if (ranges.Count == 0)
+            return OdfFormulaError.NA;
+        var sheets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (OdfKit.Spreadsheet.OdfCellRange range in ranges)
+        {
+            sheets.Add(
+                range.StartAddress.SheetName ??
+                context.CurrentCell.SheetName ??
+                string.Empty);
+        }
+
+        return (double)sheets.Count;
     }
 
     private static string? GetReferencedSheetName(
@@ -1192,19 +1246,51 @@ internal static class FormulaConformanceFunctionHandlers
     {
         if (arguments.Count != 1)
             return OdfFormulaError.Value;
-        string key = Convert.ToString(arguments[0].Evaluate(context), CultureInfo.InvariantCulture) ??
-            string.Empty;
+        object category = arguments[0].Evaluate(context);
+        if (category is OdfFormulaError error)
+            return error;
+        if (category is not string key)
+            return OdfFormulaError.Value;
+        if (context is IOdfFormulaEnvironmentContext environment &&
+            environment.TryGetFormulaEnvironmentInfo(key, out object result))
+        {
+            return result;
+        }
+
+        long memoryUsed = GC.GetTotalMemory(forceFullCollection: false);
+        double memoryAvailable = Math.Max(1d, long.MaxValue - memoryUsed);
         return key.ToLowerInvariant() switch
         {
-            "system" => "pcdos",
+            "directory" => EnsureTrailingDirectorySeparator(Environment.CurrentDirectory),
+            "memavail" => memoryAvailable,
+            "memused" => (double)memoryUsed,
+            "numfile" => context is IOdfFormulaWorkbookContext workbook
+                ? (double)workbook.SheetNames.Count
+                : 1d,
+            "origin" => "$A:$A$1",
             "osversion" => Environment.OSVersion.VersionString,
             "recalc" => "Automatic",
             "release" => Environment.Version.ToString(),
-            "directory" or "origin" or "memavail" or "memused" or "numfile" or
-            "totmem" => OdfFormulaError.NA,
+            "system" => GetFormulaSystemName(),
+            "totmem" => memoryAvailable + memoryUsed,
             _ => OdfFormulaError.Value
         };
     }
+
+    private static string EnsureTrailingDirectorySeparator(string path) =>
+        path.EndsWith(
+            Path.DirectorySeparatorChar.ToString(),
+            StringComparison.Ordinal)
+            ? path
+            : path + Path.DirectorySeparatorChar;
+
+    private static string GetFormulaSystemName() =>
+        Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => "unix",
+            PlatformID.MacOSX => "mac",
+            _ => "pcdos"
+        };
 
     private static object EvaluateEuroConvert(List<AstNode> arguments, IEvaluationContext context)
     {
