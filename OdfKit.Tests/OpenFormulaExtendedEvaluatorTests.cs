@@ -209,11 +209,11 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.True(small.HasCompleteFunctionSet);
         Assert.Equal(272, medium.RequiredFunctions.Count);
         Assert.False(medium.HasCompleteFunctionSet);
-        Assert.Equal(78, medium.MissingFunctions.Count);
+        Assert.Equal(71, medium.MissingFunctions.Count);
         Assert.DoesNotContain("MMULT", medium.MissingFunctions);
         Assert.Equal(388, large.RequiredFunctions.Count);
         Assert.False(large.HasCompleteFunctionSet);
-        Assert.Equal(105, large.MissingFunctions.Count);
+        Assert.Equal(88, large.MissingFunctions.Count);
         Assert.DoesNotContain("COMPLEX", large.MissingFunctions);
         Assert.Contains("DDE", large.MissingFunctions);
     }
@@ -327,6 +327,30 @@ public sealed class OpenFormulaExtendedEvaluatorTests
             evaluator.Evaluate("NORMINV(0.5;10;2)", context)), 10);
         Assert.InRange(Assert.IsType<double>(
             evaluator.Evaluate("NORMINV(0.975;0;1)", context)), 1.95996398d, 1.959964d);
+    }
+
+    /// <summary>
+    /// Verifies remaining compatibility functions for text, references, sequences, and regression.
+    /// 驗證文字、參照、序列及迴歸的剩餘相容函式。
+    /// </summary>
+    [Fact]
+    public void RemainingCompatibilityFunctionsEvaluate()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal("$A$1", evaluator.Evaluate("ADDRESS(1;1)", context));
+        Assert.Equal("1,234.50", evaluator.Evaluate("FIXED(1234.5;2;FALSE())", context));
+        Assert.Equal(8d, evaluator.Evaluate("FORECAST(4;{2;4;6};{1;2;3})", context));
+        Assert.Equal(2d, evaluator.Evaluate("MODE({1;2;2;3})", context));
+        Assert.Equal(60d, evaluator.Evaluate("PERMUT(5;3)", context));
+        Assert.Equal("MCMXCIX", evaluator.Evaluate("ROMAN(1999)", context));
+        Assert.Equal(17d, evaluator.Evaluate("SERIESSUM(2;0;1;{1;2;3})", context));
+        Assert.Equal("ＡＢＣ１２３", evaluator.Evaluate("JIS(\"ABC123\")", context));
+        Assert.Equal("ABC123", evaluator.Evaluate("ASC(\"ＡＢＣ１２３\")", context));
+        Assert.Equal(4d, evaluator.Evaluate("LENB(\"A中B\")", context));
+        Assert.Equal("A中", evaluator.Evaluate("LEFTB(\"A中B\";3)", context));
+        Assert.Equal(4d, evaluator.Evaluate("FINDB(\"B\";\"A中B\")", context));
     }
 
     /// <summary>
