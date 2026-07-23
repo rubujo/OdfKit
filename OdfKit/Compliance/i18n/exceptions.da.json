@@ -612,5 +612,11 @@
   "Err_OdfScriptManager_IndexOutOfRange": "Der findes intet scriptelement ved indeks {0}.",
   "Err_OdfScriptManager_UnsupportedVersion": "Dokumentet bruger en ODF-version, som ikke understøttes til scripthåndtering.",
   "Err_OdfPackage_EntryNameEmpty": "Pakkeelementets sti må ikke være tom.",
-  "Err_OdfPackage_EntryAlreadyExists": "Pakkeelementets sti '{0}' findes allerede."
+  "Err_OdfPackage_EntryAlreadyExists": "Pakkeelementets sti '{0}' findes allerede.",
+  "Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered": "Funktionen {0} er allerede registreret.",
+  "Err_OdfFormulaFunctionRegistry_HandlerNull": "Formelfunktionshandleren må ikke være null.",
+  "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Formelfunktionsnavnet {0} er ugyldigt.",
+  "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Formelfunktionsregistret må ikke være null.",
+  "Err_OdfFormulaSupport_FunctionRegistryNull": "Formelfunktionsregistret må ikke være null.",
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Formelevaluatoren må ikke være null."
 }

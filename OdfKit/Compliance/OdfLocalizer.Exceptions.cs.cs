@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokument používá verzi ODF která není podporována pro správu skriptů.",
             ["Err_OdfPackage_EntryNameEmpty"] = "Cesta položky balíčku nesmí být prázdná.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "Cesta položky balíčku '{0}' již existuje.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "Funkce {0} je již zaregistrována.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "Obslužná rutina funkce vzorce nesmí být null.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "Název funkce vzorce {0} je neplatný.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Registr funkcí vzorce nesmí být null.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Registr funkcí vzorce nesmí být null.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Vyhodnocovač vzorců nesmí být null.",
         };
     }
 }

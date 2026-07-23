@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "ドキュメントはスクリプト管理でサポートされていない ODF バージョンを使用しています。",
             ["Err_OdfPackage_EntryNameEmpty"] = "パッケージエントリのパスを空にすることはできません。",
             ["Err_OdfPackage_EntryAlreadyExists"] = "パッケージエントリのパス '{0}' は既に存在します。",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "関数 {0} は既に登録されています。",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "数式関数ハンドラーを null にすることはできません。",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "数式関数名 {0} は無効です。",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "数式関数レジストリを null にすることはできません。",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "数式関数レジストリを null にすることはできません。",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "数式エバリュエーターを null にすることはできません。",
         };
     }
 }

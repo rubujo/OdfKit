@@ -37,7 +37,7 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 | 文件 XML／schema（ODF 1.0～1.4） | 結構性支援 | 版本偵測、官方 RELAX NG metadata、元素／屬性／pattern 驗證、Strict／Extended 命名空間診斷、flat document 驗證。 | 每一種應用程式語意都有高階 facade，或畫面能像素級一致。 |
 | ZIP 封裝與 manifest | 完整支援 | `mimetype`、安全相對路徑、重複項目、root file-entry、payload 對應、media type、目錄路徑、加密 metadata，以及 ODF 1.0～1.4 官方 manifest RNG 機械驗證；ODF 1.2～1.4 另區分一般 Package 與 Extended Package 的 `META-INF` 規則。 | 具備任意第三方 RNG 的通用編譯器，也不能破解加密或證明內容沒有惡意行為。manifest schema 版本不必等同內容 XML 版本。 |
 | 數位簽章 XML | 結構性支援 | ODF 1.2～1.4 官方 dsig RNG、任意 `META-INF/*signatures*` 入口驗證、XMLDSIG 建立／驗證、封裝引用與選配指令碼簽署工作流程。 | 作業系統或企業 PKI 信任；信任政策必須由呼叫端明確提供。ODF 1.0／1.1 規範沒有獨立 dsig RNG。 |
-| OpenFormula | 結構性支援＋僅保留 | `of:=`／舊版 `oooc:=` 語法剖析、參照轉換、函式能力查詢、部分受控評估；未知或未支援函式原樣保留並產生診斷。 | 完整試算表重算、volatile／locale／外部資料來源語意，或與任一辦公軟體逐位元相同。 |
+| OpenFormula | 結構性支援＋受控評估 | ODF 1.2～1.4 的 `of:=` 與 ODF 1.0／1.1 常見的 `oooc:=` 語法剖析、參照轉換、Small Group 強制函式名稱覆蓋、執行個體範圍自訂函式及整式後援；未知函式仍可原樣保留並產生診斷。 | 函式名稱覆蓋不等於正式 Small／Medium／Large 一致性；仍須驗證完整語法、型別轉換、限制、陣列及每個函式的規範語意。 |
 | RDF／metadata | 結構性支援 | 封裝 RDF、文件 metadata 與未知 XML 內容保留。 | RDF 推論器、SPARQL 伺服器或網路資源擷取。 |
 | 指令碼與事件 | 結構性支援＋僅保留 | 選配 Scripting 套件提供 ODF 1.0～1.4 巨集 CRUD、簽章、靜態政策與診斷。 | 在核心或 Scripting 套件內執行巨集；實際編譯／執行交由隔離的 LibreOffice／Python worker。 |
 | 樣式、繪圖、簡報動畫 | 結構性支援 | 常用高階 API 與 XML 來回讀寫；未知合法內容盡量保留。 | 字型 shaping、分頁、動畫播放、SmartArt 佈局或像素級渲染。 |
@@ -49,7 +49,7 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 
 - 巨集、Python、Java、UNO、SQL 或嵌入物件的程式碼執行。
 - 任意外部 URI 的自動下載、外部資料來源刷新與連線憑證管理。
-- 完整 OpenFormula／pivot 重算引擎及辦公軟體相容的 volatile 狀態。
+- 內建完整 OpenFormula Medium／Large 重算引擎、pivot 重算及辦公軟體相容的 volatile 狀態；應用程式可透過明確註冊表或隔離的外部後援擴充，但不因此取得正式一致性宣稱。
 - 字型 shaping、物理分頁、列印、動畫播放及像素級版面配置。
 - 憑證信任、撤銷可用性或惡意程式碼安全性的最終判定。
 - 通用 RELAX NG 編譯器；核心使用由官方 ODF 1.0～1.4 schema 產生的受控 metadata。
@@ -66,6 +66,7 @@ ZIP／XML 函式庫，不是辦公軟體執行環境；因此「能安全載入�
 - ODF 1.4 逐章稽核：[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md)
 - 高階 API 語意範圍：[`semantic-coverage.json`](semantic-coverage.json)
 - LibreOffice 真機證據：[LibreOffice 互通矩陣](libreoffice-interop-matrix.md)
+- OpenFormula 等級與擴充邊界：[OpenFormula 評估器支援](openformula-evaluator.md)
 
 規範來源以 OASIS 正式文本為準：ODF 1.0、1.1、1.2、1.3 及
 [ODF 1.4 正式標準](https://docs.oasis-open.org/office/OpenDocument/v1.4/)。

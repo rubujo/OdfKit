@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokumentet bruker en ODF-versjon som ikke støttes for skriptbehandling.",
             ["Err_OdfPackage_EntryNameEmpty"] = "Banen til pakkeoppføringen kan ikke være tom.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "Banen til pakkeoppføringen '{0}' finnes allerede.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "Funksjonen {0} er allerede registrert.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "Formelfunksjonsbehandleren kan ikke være null.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "Formelfunksjonsnavnet {0} er ugyldig.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Formelfunksjonsregisteret kan ikke være null.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Formelfunksjonsregisteret kan ikke være null.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Formelevaluatoren kan ikke være null.",
         };
     }
 }

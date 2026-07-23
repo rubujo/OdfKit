@@ -40,6 +40,7 @@ public static class OdfFormulaSupport
         new("ISFORMULA", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISBLANK", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISERROR", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("ISERR", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISNA", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISREF", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISLOGICAL", "Information", OdfFormulaSupportLevel.Evaluated),
@@ -47,6 +48,9 @@ public static class OdfFormulaSupport
         new("ISODD", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISEVEN", "Information", OdfFormulaSupportLevel.Evaluated),
         new("NA", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("N", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("T", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("VALUE", "Information", OdfFormulaSupportLevel.Evaluated),
 
         // 文字函數
         new("CONCAT", "Text", OdfFormulaSupportLevel.Evaluated),
@@ -67,6 +71,7 @@ public static class OdfFormulaSupport
         new("CODE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("CHAR", "Text", OdfFormulaSupportLevel.Evaluated),
         new("TEXT", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("PROPER", "Text", OdfFormulaSupportLevel.Evaluated),
 
         // 統計函數
         new("SUM", "Statistical", OdfFormulaSupportLevel.Evaluated),
@@ -176,6 +181,13 @@ public static class OdfFormulaSupport
         new("DSUM", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DAVERAGE", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DCOUNT", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DCOUNTA", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DGET", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DPRODUCT", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DSTDEV", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DSTDEVP", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DVAR", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DVARP", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DMAX", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DMIN", "Database", OdfFormulaSupportLevel.Evaluated),
 
@@ -190,10 +202,32 @@ public static class OdfFormulaSupport
         new("IRR", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("MIRR", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("SLN", "Financial", OdfFormulaSupportLevel.Evaluated),
-        new("DDB", "Financial", OdfFormulaSupportLevel.Evaluated)
+        new("DDB", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("NPV", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("SYD", "Financial", OdfFormulaSupportLevel.Evaluated)
     ];
 
     private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
+
+    private static readonly string[] SmallGroupFunctionTable =
+    [
+        "ABS", "ACOS", "AND", "ASIN", "ATAN", "ATAN2", "AVERAGE", "AVERAGEIF",
+        "CHOOSE", "COLUMNS", "COS", "COUNT", "COUNTA", "COUNTBLANK", "COUNTIF",
+        "DATE", "DAVERAGE", "DAY", "DCOUNT", "DCOUNTA", "DDB", "DEGREES", "DGET",
+        "DMAX", "DMIN", "DPRODUCT", "DSTDEV", "DSTDEVP", "DSUM", "DVAR", "DVARP",
+        "EVEN", "EXACT", "EXP", "FACT", "FALSE", "FIND", "FV", "HLOOKUP", "HOUR",
+        "IF", "INDEX", "INT", "IRR", "ISBLANK", "ISERR", "ISERROR", "ISLOGICAL",
+        "ISNA", "ISNONTEXT", "ISNUMBER", "ISTEXT", "LEFT", "LEN", "LN", "LOG",
+        "LOG10", "LOWER", "MATCH", "MAX", "MID", "MIN", "MINUTE", "MOD", "MONTH",
+        "N", "NA", "NOT", "NOW", "NPER", "NPV", "ODD", "OR", "PI", "PMT", "POWER",
+        "PRODUCT", "PROPER", "PV", "RADIANS", "RATE", "REPLACE", "REPT", "RIGHT",
+        "ROUND", "ROWS", "SECOND", "SIN", "SLN", "SQRT", "STDEV", "STDEVP",
+        "SUBSTITUTE", "SUM", "SUMIF", "SYD", "T", "TAN", "TIME", "TODAY", "TRIM",
+        "TRUE", "TRUNC", "UPPER", "VALUE", "VAR", "VARP", "VLOOKUP", "WEEKDAY", "YEAR"
+    ];
+
+    private static readonly IReadOnlyList<string> SmallGroupFunctions =
+        Array.AsReadOnly(SmallGroupFunctionTable);
 
     /// <summary>
     /// Gets the table of functions supported by the default formula evaluator.
@@ -202,19 +236,76 @@ public static class OdfFormulaSupport
     public static IReadOnlyList<OdfFormulaFunctionInfo> SupportedFunctions => FunctionTable;
 
     /// <summary>
+    /// Gets the mandatory function names for the OASIS OpenFormula Small Group evaluator.
+    /// 取得 OASIS OpenFormula Small Group 評估器的強制函式名稱。
+    /// </summary>
+    /// <remarks>
+    /// Function-name coverage alone does not prove evaluator conformance; syntax, limits, conversions, and semantics require separate verification.
+    /// 僅有函式名稱涵蓋並不代表評估器合規；語法、限制、型別轉換及語意仍須分別驗證。
+    /// </remarks>
+    public static IReadOnlyList<string> SmallGroupRequiredFunctions => SmallGroupFunctions;
+
+    /// <summary>
+    /// Returns mandatory Small-group functions that are unavailable from the built-in evaluator.
+    /// 傳回預設評估器尚未提供的 Small Group 強制函式。
+    /// </summary>
+    /// <returns>The missing function names. / 缺少的函式名稱。</returns>
+    public static IReadOnlyList<string> GetMissingSmallGroupFunctions()
+        => GetMissingSmallGroupFunctionsCore(null);
+
+    /// <summary>
+    /// Returns mandatory Small-group functions unavailable from both the built-in evaluator and an application registry.
+    /// 傳回預設評估器與應用程式註冊表皆未提供的 Small Group 強制函式。
+    /// </summary>
+    /// <param name="functions">The application-defined function registry. / 應用程式自訂函式註冊表。</param>
+    /// <returns>The missing function names. / 缺少的函式名稱。</returns>
+    public static IReadOnlyList<string> GetMissingSmallGroupFunctions(OdfFormulaFunctionRegistry functions)
+    {
+        if (functions is null)
+        {
+            throw new ArgumentNullException(
+                nameof(functions),
+                OdfLocalizer.GetMessage("Err_OdfFormulaSupport_FunctionRegistryNull"));
+        }
+
+        return GetMissingSmallGroupFunctionsCore(functions);
+    }
+
+    /// <summary>
     /// Determines whether the default evaluator supports the specified function.
     /// 判斷預設評估器是否支援指定函式。
     /// </summary>
     /// <param name="name">The function name. / 函式名稱。</param>
     /// <returns>True when the function is supported; otherwise, false. / 若支援則為 true，否則為 false。</returns>
     public static bool IsFunctionSupported(string name)
+        => IsFunctionSupportedCore(name, null);
+
+    /// <summary>
+    /// Determines whether the default evaluator or an application registry supports the specified function.
+    /// 判斷預設評估器或應用程式註冊表是否支援指定函式。
+    /// </summary>
+    /// <param name="name">The function name. / 函式名稱。</param>
+    /// <param name="functions">The application-defined function registry. / 應用程式自訂函式註冊表。</param>
+    /// <returns>True when the function is supported; otherwise, false. / 若支援則為 true，否則為 false。</returns>
+    public static bool IsFunctionSupported(string name, OdfFormulaFunctionRegistry functions)
+    {
+        if (functions is null)
+            throw new ArgumentNullException(
+                nameof(functions),
+                OdfLocalizer.GetMessage("Err_OdfFormulaSupport_FunctionRegistryNull"));
+
+        return IsFunctionSupportedCore(name, functions);
+    }
+
+    private static bool IsFunctionSupportedCore(string name, OdfFormulaFunctionRegistry? functions)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             return false;
         }
 
-        return SupportedFunctionNames.Contains(name.Trim());
+        string normalizedName = name.Trim();
+        return SupportedFunctionNames.Contains(normalizedName) || functions?.Contains(normalizedName) == true;
     }
 
     /// <summary>
@@ -224,13 +315,33 @@ public static class OdfFormulaSupport
     /// <param name="formula">The formula to analyze. / 要分析的公式。</param>
     /// <returns>The formula analysis result. / 公式分析結果。</returns>
     public static OdfFormulaAnalysis Analyze(string formula)
+        => AnalyzeCore(formula, null);
+
+    /// <summary>
+    /// Analyzes formula support against the default evaluator and an application-defined function registry.
+    /// 依預設評估器與應用程式自訂函式註冊表分析公式支援範圍。
+    /// </summary>
+    /// <param name="formula">The formula to analyze. / 要分析的公式。</param>
+    /// <param name="functions">The application-defined function registry. / 應用程式自訂函式註冊表。</param>
+    /// <returns>The formula analysis result. / 公式分析結果。</returns>
+    public static OdfFormulaAnalysis Analyze(string formula, OdfFormulaFunctionRegistry functions)
+    {
+        if (functions is null)
+            throw new ArgumentNullException(
+                nameof(functions),
+                OdfLocalizer.GetMessage("Err_OdfFormulaSupport_FunctionRegistryNull"));
+
+        return AnalyzeCore(formula, functions);
+    }
+
+    private static OdfFormulaAnalysis AnalyzeCore(string formula, OdfFormulaFunctionRegistry? functions)
     {
         if (formula is null)
             throw new ArgumentNullException(nameof(formula));
 
         string normalized = NormalizeForParsing(formula);
         var diagnostics = new List<OdfFormulaDiagnostic>();
-        List<string> functions = ExtractFunctionNames(normalized, diagnostics);
+        List<string> extractedFunctions = ExtractFunctionNames(normalized, diagnostics);
         string? serialized = null;
 
         try
@@ -247,9 +358,9 @@ public static class OdfFormulaSupport
                 OdfFormulaDiagnosticSeverity.Error));
         }
 
-        foreach (string functionName in functions)
+        foreach (string functionName in extractedFunctions)
         {
-            if (!IsFunctionSupported(functionName))
+            if (!IsFunctionSupportedCore(functionName, functions))
             {
                 diagnostics.Add(new OdfFormulaDiagnostic(
                     UnsupportedFunctionCode,
@@ -258,7 +369,7 @@ public static class OdfFormulaSupport
             }
         }
 
-        return new OdfFormulaAnalysis(formula, normalized, serialized, functions, diagnostics);
+        return new OdfFormulaAnalysis(formula, normalized, serialized, extractedFunctions, diagnostics);
     }
 
     /// <summary>
@@ -268,8 +379,30 @@ public static class OdfFormulaSupport
     /// <param name="formula">The formula to serialize. / 要序列化的公式。</param>
     /// <returns>A preservation-safe formula string. / 安全的公式字串。</returns>
     public static string SerializePreservingUnsupported(string formula)
+        => SerializePreservingUnsupportedCore(formula, null);
+
+    /// <summary>
+    /// Returns a preservation-safe serialized formula while recognizing application-defined functions.
+    /// 在辨識應用程式自訂函式的情況下，傳回可安全保真的序列化公式。
+    /// </summary>
+    /// <param name="formula">The formula to serialize. / 要序列化的公式。</param>
+    /// <param name="functions">The application-defined function registry. / 應用程式自訂函式註冊表。</param>
+    /// <returns>A preservation-safe formula string. / 安全的公式字串。</returns>
+    public static string SerializePreservingUnsupported(string formula, OdfFormulaFunctionRegistry functions)
     {
-        OdfFormulaAnalysis analysis = Analyze(formula);
+        if (functions is null)
+            throw new ArgumentNullException(
+                nameof(functions),
+                OdfLocalizer.GetMessage("Err_OdfFormulaSupport_FunctionRegistryNull"));
+
+        return SerializePreservingUnsupportedCore(formula, functions);
+    }
+
+    private static string SerializePreservingUnsupportedCore(
+        string formula,
+        OdfFormulaFunctionRegistry? functions)
+    {
+        OdfFormulaAnalysis analysis = AnalyzeCore(formula, functions);
         if (!analysis.CanParse || analysis.HasUnsupportedFunctions || analysis.SerializedFormula is null)
         {
             return formula;
@@ -302,6 +435,21 @@ public static class OdfFormulaSupport
         }
 
         return set;
+    }
+
+    private static IReadOnlyList<string> GetMissingSmallGroupFunctionsCore(
+        OdfFormulaFunctionRegistry? functions)
+    {
+        var missingFunctions = new List<string>();
+        foreach (string functionName in SmallGroupFunctionTable)
+        {
+            if (!IsFunctionSupportedCore(functionName, functions))
+            {
+                missingFunctions.Add(functionName);
+            }
+        }
+
+        return missingFunctions;
     }
 
     private static string NormalizeForParsing(string formula)

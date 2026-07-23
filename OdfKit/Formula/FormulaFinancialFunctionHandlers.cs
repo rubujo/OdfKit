@@ -674,5 +674,66 @@ internal static class FormulaFinancialFunctionHandlers
             return OdfFormulaError.Num;
         }
     }
+
+    internal static object EvaluateNpv(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count < 2)
+            return OdfFormulaError.Value;
+
+        object rateValue = arguments[0].Evaluate(context);
+        if (rateValue is OdfFormulaError rateError)
+            return rateError;
+        if (!FormulaCoercion.TryCoerceDouble(rateValue, out double rate) || rate == -1)
+            return OdfFormulaError.Value;
+
+        double result = 0;
+        int period = 1;
+        for (int argumentIndex = 1; argumentIndex < arguments.Count; argumentIndex++)
+        {
+            object argumentValue = arguments[argumentIndex].Evaluate(context);
+            if (argumentValue is OdfFormulaError argumentError)
+                return argumentError;
+
+            foreach (object value in FormulaCoercion.FlattenValues(argumentValue))
+            {
+                if (FormulaCoercion.TryCoerceDouble(value, out double cashFlow))
+                {
+                    result += cashFlow / Math.Pow(1 + rate, period);
+                    period++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    internal static object EvaluateSyd(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 4)
+            return OdfFormulaError.Value;
+
+        object costValue = arguments[0].Evaluate(context);
+        object salvageValue = arguments[1].Evaluate(context);
+        object lifeValue = arguments[2].Evaluate(context);
+        object periodValue = arguments[3].Evaluate(context);
+        if (costValue is OdfFormulaError costError)
+            return costError;
+        if (salvageValue is OdfFormulaError salvageError)
+            return salvageError;
+        if (lifeValue is OdfFormulaError lifeError)
+            return lifeError;
+        if (periodValue is OdfFormulaError periodError)
+            return periodError;
+        if (!FormulaCoercion.TryCoerceDouble(costValue, out double cost) ||
+            !FormulaCoercion.TryCoerceDouble(salvageValue, out double salvage) ||
+            !FormulaCoercion.TryCoerceDouble(lifeValue, out double life) ||
+            !FormulaCoercion.TryCoerceDouble(periodValue, out double period) ||
+            life <= 0 || period <= 0 || period > life)
+        {
+            return OdfFormulaError.Value;
+        }
+
+        return (cost - salvage) * (life - period + 1) * 2 / (life * (life + 1));
+    }
 }
 

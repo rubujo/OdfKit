@@ -25,8 +25,8 @@ internal static class FormulaBuiltinFunctionRegistry
     {
         try
         {
-            if (s_registry.Value.TryGetValue(name, out FormulaBuiltinHandler? handler))
-                return handler(arguments, context);
+            if (TryEvaluate(name, arguments, context, out object result))
+                return result;
 
             return OdfFormulaError.Name;
         }
@@ -35,6 +35,22 @@ internal static class FormulaBuiltinFunctionRegistry
             OdfKitDiagnostics.Warn($"Formula function '{name}' threw unexpected exception: {ex.GetType().Name}");
             return OdfFormulaError.Value;
         }
+    }
+
+    internal static bool TryEvaluate(
+        string name,
+        List<AstNode> arguments,
+        IEvaluationContext context,
+        out object result)
+    {
+        if (s_registry.Value.TryGetValue(name, out FormulaBuiltinHandler? handler))
+        {
+            result = handler(arguments, context);
+            return true;
+        }
+
+        result = OdfFormulaError.Name;
+        return false;
     }
 
     private static Dictionary<string, FormulaBuiltinHandler> CreateBuiltinRegistry()
@@ -62,6 +78,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["ISFORMULA"] = FormulaLogicalFunctionHandlers.EvaluateIsFormula,
             ["ISBLANK"] = FormulaLogicalFunctionHandlers.EvaluateIsBlank,
             ["ISERROR"] = static (args, ctx) => args.Count == 1 ? args[0].Evaluate(ctx) is OdfFormulaError : OdfFormulaError.Value,
+            ["ISERR"] = FormulaInformationFunctionHandlers.EvaluateIsErr,
             ["ISNA"] = static (args, ctx) => args.Count == 1
                 ? args[0].Evaluate(ctx) is OdfFormulaError err && err.ErrorType == OdfFormulaErrorType.NA
                 : OdfFormulaError.Value,
@@ -70,6 +87,9 @@ internal static class FormulaBuiltinFunctionRegistry
             ["TYPE"] = FormulaLogicalFunctionHandlers.EvaluateType,
             ["ISODD"] = FormulaLogicalFunctionHandlers.EvaluateIsOdd,
             ["ISEVEN"] = FormulaLogicalFunctionHandlers.EvaluateIsEven,
+            ["N"] = FormulaInformationFunctionHandlers.EvaluateN,
+            ["T"] = FormulaInformationFunctionHandlers.EvaluateT,
+            ["VALUE"] = FormulaInformationFunctionHandlers.EvaluateValue,
             ["BITAND"] = FormulaLogicalFunctionHandlers.EvaluateBitAnd,
             ["BITOR"] = FormulaLogicalFunctionHandlers.EvaluateBitOr,
             ["BITXOR"] = FormulaLogicalFunctionHandlers.EvaluateBitXor,
@@ -87,6 +107,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["CODE"] = FormulaStringFunctionHandlers.EvaluateCode,
             ["CHAR"] = FormulaStringFunctionHandlers.EvaluateChar,
             ["TEXT"] = FormulaStringFunctionHandlers.EvaluateText,
+            ["PROPER"] = FormulaStringFunctionHandlers.EvaluateProper,
             ["LEFT"] = FormulaStringFunctionHandlers.EvaluateLeft,
             ["RIGHT"] = FormulaStringFunctionHandlers.EvaluateRight,
             ["MID"] = FormulaStringFunctionHandlers.EvaluateMid,
@@ -202,6 +223,13 @@ internal static class FormulaBuiltinFunctionRegistry
             ["DSUM"] = FormulaDatabaseFunctionHandlers.EvaluateDSum,
             ["DAVERAGE"] = FormulaDatabaseFunctionHandlers.EvaluateDAverage,
             ["DCOUNT"] = FormulaDatabaseFunctionHandlers.EvaluateDCount,
+            ["DCOUNTA"] = FormulaDatabaseFunctionHandlers.EvaluateDCountA,
+            ["DGET"] = FormulaDatabaseFunctionHandlers.EvaluateDGet,
+            ["DPRODUCT"] = FormulaDatabaseFunctionHandlers.EvaluateDProduct,
+            ["DSTDEV"] = FormulaDatabaseFunctionHandlers.EvaluateDStDev,
+            ["DSTDEVP"] = FormulaDatabaseFunctionHandlers.EvaluateDStDevP,
+            ["DVAR"] = FormulaDatabaseFunctionHandlers.EvaluateDVar,
+            ["DVARP"] = FormulaDatabaseFunctionHandlers.EvaluateDVarP,
             ["DMAX"] = FormulaDatabaseFunctionHandlers.EvaluateDMax,
             ["DMIN"] = FormulaDatabaseFunctionHandlers.EvaluateDMin,
 
@@ -217,6 +245,8 @@ internal static class FormulaBuiltinFunctionRegistry
             ["MIRR"] = FormulaFinancialFunctionHandlers.EvaluateMirr,
             ["SLN"] = FormulaFinancialFunctionHandlers.EvaluateSln,
             ["DDB"] = FormulaFinancialFunctionHandlers.EvaluateDdb,
+            ["NPV"] = FormulaFinancialFunctionHandlers.EvaluateNpv,
+            ["SYD"] = FormulaFinancialFunctionHandlers.EvaluateSyd,
         };
     }
 }

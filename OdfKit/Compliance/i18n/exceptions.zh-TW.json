@@ -612,5 +612,11 @@
   "Err_OdfScriptManager_IndexOutOfRange": "索引 {0} 沒有對應的指令碼項目。",
   "Err_OdfScriptManager_UnsupportedVersion": "文件使用的 ODF 版本不支援指令碼管理。",
   "Err_OdfPackage_EntryNameEmpty": "封裝項目路徑不可為空白。",
-  "Err_OdfPackage_EntryAlreadyExists": "封裝項目路徑「{0}」已存在。"
+  "Err_OdfPackage_EntryAlreadyExists": "封裝項目路徑「{0}」已存在。",
+  "Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered": "函式 {0} 已註冊。",
+  "Err_OdfFormulaFunctionRegistry_HandlerNull": "公式函式處理常式不可為 null。",
+  "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "公式函式名稱 {0} 無效。",
+  "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "公式函式註冊表不可為 null。",
+  "Err_OdfFormulaSupport_FunctionRegistryNull": "公式函式註冊表不可為 null。",
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "公式評估器不可為 null。"
 }

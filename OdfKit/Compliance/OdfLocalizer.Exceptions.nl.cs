@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Het document gebruikt een ODF-versie die niet wordt ondersteund voor scriptbeheer.",
             ["Err_OdfPackage_EntryNameEmpty"] = "Het pad van het pakketitem mag niet leeg zijn.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "Het pad van het pakketitem '{0}' bestaat al.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "Functie {0} is al geregistreerd.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "De formulefunctiehandler mag niet null zijn.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "De formulefunctienaam {0} is ongeldig.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Het formulefunctieregister mag niet null zijn.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Het formulefunctieregister mag niet null zijn.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "De formule-evaluator mag niet null zijn.",
         };
     }
 }

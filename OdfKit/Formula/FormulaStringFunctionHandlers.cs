@@ -339,6 +339,36 @@ internal static class FormulaStringFunctionHandlers
         return str.ToUpperInvariant();
     }
 
+    internal static object EvaluateProper(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 1)
+            return OdfFormulaError.Value;
+        object value = arguments[0].Evaluate(context);
+        if (value is OdfFormulaError error)
+            return error;
+
+        string text = value.ToString() ?? string.Empty;
+        var result = new StringBuilder(text.Length);
+        bool capitalizeNextLetter = true;
+        foreach (char character in text)
+        {
+            if (char.IsLetter(character))
+            {
+                result.Append(capitalizeNextLetter
+                    ? char.ToUpperInvariant(character)
+                    : char.ToLowerInvariant(character));
+                capitalizeNextLetter = false;
+            }
+            else
+            {
+                result.Append(character);
+                capitalizeNextLetter = true;
+            }
+        }
+
+        return result.ToString();
+    }
+
     internal static object EvaluateTrim(List<AstNode> arguments, IEvaluationContext context)
     {
         if (arguments.Count != 1)

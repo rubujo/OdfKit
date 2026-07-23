@@ -14597,10 +14597,14 @@ OdfKit.Formula.AST.UnaryNode.UnaryNode(char op, OdfKit.Formula.AST.AstNode! chil
 OdfKit.Formula.DefaultFormulaEvaluator
 OdfKit.Formula.DefaultFormulaEvaluator.ClearCache() -> void
 OdfKit.Formula.DefaultFormulaEvaluator.DefaultFormulaEvaluator() -> void
+OdfKit.Formula.DefaultFormulaEvaluator.DefaultFormulaEvaluator(OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> void
+OdfKit.Formula.DefaultFormulaEvaluator.DefaultFormulaEvaluator(OdfKit.Formula.OdfFormulaFunctionRegistry! functions, OdfKit.Formula.IOdfFormulaEvaluationFallback? fallback) -> void
 OdfKit.Formula.DefaultFormulaEvaluator.Evaluate(string! formula, OdfKit.Formula.IEvaluationContext! context) -> object!
 OdfKit.Formula.DefaultFormulaEvaluator.EvaluateCell(OdfKit.Spreadsheet.OdfCellAddress cellAddress, OdfKit.Formula.IEvaluationContext! context) -> object!
 OdfKit.Formula.DefaultFormulaEvaluator.EvaluateFormulasInDocument(OdfKit.DOM.OdfNode! contentRoot) -> void
 OdfKit.Formula.DefaultFormulaEvaluator.EvaluateFormulasInDocument(OdfKit.DOM.OdfNode! contentRoot, OdfKit.Spreadsheet.OdfExternalLinkManager? externalLinks) -> void
+OdfKit.Formula.DefaultFormulaEvaluator.Fallback.get -> OdfKit.Formula.IOdfFormulaEvaluationFallback?
+OdfKit.Formula.DefaultFormulaEvaluator.Functions.get -> OdfKit.Formula.OdfFormulaFunctionRegistry!
 OdfKit.Formula.FlatFormulaDocument
 OdfKit.Formula.FlatFormulaDocument.FlatFormulaDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Formula.FlatFormulaDocument.FlatFormulaDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
@@ -14649,6 +14653,8 @@ OdfKit.Formula.IEvaluationContext.GetCellFormula(OdfKit.Spreadsheet.OdfCellAddre
 OdfKit.Formula.IEvaluationContext.GetCellValue(OdfKit.Spreadsheet.OdfCellAddress address) -> object!
 OdfKit.Formula.IEvaluationContext.GetNamedRangeOrExpressionValue(string! name) -> object!
 OdfKit.Formula.IEvaluationContext.GetRangeValues(OdfKit.Spreadsheet.OdfCellRange range) -> object![,]!
+OdfKit.Formula.IOdfFormulaEvaluationFallback
+OdfKit.Formula.IOdfFormulaEvaluationFallback.TryEvaluate(string! formula, OdfKit.Formula.IEvaluationContext! context, out object! result) -> bool
 OdfKit.Formula.IOdfFormulaEvaluator
 OdfKit.Formula.IOdfFormulaEvaluator.Evaluate(string! formula, OdfKit.Formula.IEvaluationContext! context) -> object!
 OdfKit.Formula.OdfFormulaAnalysis
@@ -14717,11 +14723,19 @@ OdfKit.Formula.OdfFormulaErrorType.Null = 0 -> OdfKit.Formula.OdfFormulaErrorTyp
 OdfKit.Formula.OdfFormulaErrorType.Num = 5 -> OdfKit.Formula.OdfFormulaErrorType
 OdfKit.Formula.OdfFormulaErrorType.Ref = 3 -> OdfKit.Formula.OdfFormulaErrorType
 OdfKit.Formula.OdfFormulaErrorType.Value = 2 -> OdfKit.Formula.OdfFormulaErrorType
+OdfKit.Formula.OdfFormulaFunctionHandler
 OdfKit.Formula.OdfFormulaFunctionInfo
 OdfKit.Formula.OdfFormulaFunctionInfo.Category.get -> string!
 OdfKit.Formula.OdfFormulaFunctionInfo.Name.get -> string!
 OdfKit.Formula.OdfFormulaFunctionInfo.OdfFormulaFunctionInfo(string! name, string! category, OdfKit.Formula.OdfFormulaSupportLevel supportLevel) -> void
 OdfKit.Formula.OdfFormulaFunctionInfo.SupportLevel.get -> OdfKit.Formula.OdfFormulaSupportLevel
+OdfKit.Formula.OdfFormulaFunctionRegistry
+OdfKit.Formula.OdfFormulaFunctionRegistry.AddOrUpdate(string! name, OdfKit.Formula.OdfFormulaFunctionHandler! handler) -> void
+OdfKit.Formula.OdfFormulaFunctionRegistry.Contains(string! name) -> bool
+OdfKit.Formula.OdfFormulaFunctionRegistry.Names.get -> System.Collections.Generic.IReadOnlyList<string!>!
+OdfKit.Formula.OdfFormulaFunctionRegistry.OdfFormulaFunctionRegistry() -> void
+OdfKit.Formula.OdfFormulaFunctionRegistry.Register(string! name, OdfKit.Formula.OdfFormulaFunctionHandler! handler) -> void
+OdfKit.Formula.OdfFormulaFunctionRegistry.Remove(string! name) -> bool
 OdfKit.Formula.OdfFormulaLatexConverter
 OdfKit.Formula.OdfFormulaSupport
 OdfKit.Formula.OdfFormulaSupportLevel
@@ -16727,6 +16741,7 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ClearPivotTables() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfSpreadsheetTableOptions? options) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.EvaluateFormulas() -> void
+OdfKit.Spreadsheet.SpreadsheetDocument.EvaluateFormulas(OdfKit.Formula.DefaultFormulaEvaluator! evaluator) -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.ExternalLinks.get -> OdfKit.Spreadsheet.OdfExternalLinkManager!
 OdfKit.Spreadsheet.SpreadsheetDocument.FindDatabaseRange(string! name) -> OdfKit.Spreadsheet.OdfDatabaseRange?
 OdfKit.Spreadsheet.SpreadsheetDocument.FindDataValidation(string! name) -> OdfKit.Spreadsheet.OdfDataValidationInfo?
@@ -19145,8 +19160,14 @@ static OdfKit.Formula.OdfFormulaDocument.LoadAsync(System.IO.Stream! stream, Sys
 static OdfKit.Formula.OdfFormulaLatexConverter.Convert(string! latex) -> string!
 static OdfKit.Formula.OdfFormulaLatexConverter.ToLatex(System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfMathToken!>! tokens) -> string!
 static OdfKit.Formula.OdfFormulaSupport.Analyze(string! formula) -> OdfKit.Formula.OdfFormulaAnalysis!
+static OdfKit.Formula.OdfFormulaSupport.Analyze(string! formula, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> OdfKit.Formula.OdfFormulaAnalysis!
+static OdfKit.Formula.OdfFormulaSupport.GetMissingSmallGroupFunctions() -> System.Collections.Generic.IReadOnlyList<string!>!
+static OdfKit.Formula.OdfFormulaSupport.GetMissingSmallGroupFunctions(OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> System.Collections.Generic.IReadOnlyList<string!>!
 static OdfKit.Formula.OdfFormulaSupport.IsFunctionSupported(string! name) -> bool
+static OdfKit.Formula.OdfFormulaSupport.IsFunctionSupported(string! name, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> bool
 static OdfKit.Formula.OdfFormulaSupport.SerializePreservingUnsupported(string! formula) -> string!
+static OdfKit.Formula.OdfFormulaSupport.SerializePreservingUnsupported(string! formula, OdfKit.Formula.OdfFormulaFunctionRegistry! functions) -> string!
+static OdfKit.Formula.OdfFormulaSupport.SmallGroupRequiredFunctions.get -> System.Collections.Generic.IReadOnlyList<string!>!
 static OdfKit.Formula.OdfFormulaSupport.SupportedFunctions.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfFormulaFunctionInfo!>!
 static OdfKit.Formula.OdfFormulaTranslator.ExcelToOdfFormula(string! excelFormula) -> string!
 static OdfKit.Formula.OdfFormulaTranslator.OdfToExcelFormula(string! odfFormula) -> string!
@@ -19518,6 +19539,7 @@ virtual OdfKit.DOM.OdfNode.TextContent.get -> string!
 virtual OdfKit.DOM.OdfNode.TextContent.set -> void
 virtual OdfKit.DOM.OdfNode.TryWriteOverride(System.Xml.XmlWriter! writer, System.Collections.Generic.Dictionary<string!, string!>! nsDict) -> bool
 virtual OdfKit.Formula.AST.AstNode.GetRanges(OdfKit.Formula.IEvaluationContext! context) -> System.Collections.Generic.List<OdfKit.Spreadsheet.OdfCellRange>!
+virtual OdfKit.Formula.OdfFormulaFunctionHandler.Invoke(System.Collections.Generic.IReadOnlyList<object!>! arguments, OdfKit.Formula.IEvaluationContext! context) -> object!
 virtual OdfKit.Spreadsheet.OdsStreamWriter.Dispose(bool disposing) -> void
 virtual OdfKit.Text.OdfMediaOptimizer.Invoke(OdfKit.Text.OdfMediaOptimizationRequest! request) -> OdfKit.Text.OdfOptimizedMedia?
 ~override OdfKit.DOM.OdfXmlByteRange.Equals(object obj) -> bool

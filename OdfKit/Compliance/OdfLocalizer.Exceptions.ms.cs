@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "Dokumen menggunakan versi ODF yang tidak disokong untuk pengurusan skrip.",
             ["Err_OdfPackage_EntryNameEmpty"] = "Laluan entri pakej tidak boleh kosong.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "Laluan entri pakej '{0}' sudah wujud.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "Fungsi {0} telah didaftarkan.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "Pengendali fungsi formula tidak boleh null.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "Nama fungsi formula {0} tidak sah.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Daftar fungsi formula tidak boleh null.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Daftar fungsi formula tidak boleh null.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Penilai formula tidak boleh null.",
         };
     }
 }

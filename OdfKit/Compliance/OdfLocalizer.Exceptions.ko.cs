@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "문서가 스크립트 관리에서 지원되지 않는 ODF 버전을 사용합니다.",
             ["Err_OdfPackage_EntryNameEmpty"] = "패키지 항목 경로는 비워 둘 수 없습니다.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "패키지 항목 경로 '{0}'이(가) 이미 있습니다.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "함수 {0}은(는) 이미 등록되어 있습니다.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "수식 함수 처리기는 null일 수 없습니다.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "수식 함수 이름 {0}이(가) 잘못되었습니다.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "수식 함수 레지스트리는 null일 수 없습니다.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "수식 함수 레지스트리는 null일 수 없습니다.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "수식 평가기는 null일 수 없습니다.",
         };
     }
 }

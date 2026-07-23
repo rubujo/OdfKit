@@ -631,6 +631,12 @@ public static partial class OdfLocalizer
             ["Err_OdfScriptManager_UnsupportedVersion"] = "The document uses an ODF version that is unsupported for script management.",
             ["Err_OdfPackage_EntryNameEmpty"] = "The package entry path cannot be empty.",
             ["Err_OdfPackage_EntryAlreadyExists"] = "Package entry path '{0}' already exists.",
+            ["Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered"] = "Function {0} is already registered.",
+            ["Err_OdfFormulaFunctionRegistry_HandlerNull"] = "The formula function handler cannot be null.",
+            ["Err_OdfFormulaFunctionRegistry_InvalidFunctionName"] = "Formula function name {0} is invalid.",
+            ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "The formula function registry cannot be null.",
+            ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "The formula function registry cannot be null.",
+            ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "The formula evaluator cannot be null.",
         };
     }
 }

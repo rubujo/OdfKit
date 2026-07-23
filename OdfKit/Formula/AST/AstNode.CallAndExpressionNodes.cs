@@ -47,6 +47,12 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
+        if (context is IOdfFormulaFunctionDispatchContext dispatchContext &&
+            dispatchContext.TryEvaluateFunction(Name, Arguments, out object result))
+        {
+            return result;
+        }
+
         return DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context);
     }
 

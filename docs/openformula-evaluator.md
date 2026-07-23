@@ -1,0 +1,65 @@
+# OpenFormula 評估器支援
+
+OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行個體範圍的函式註冊表
+或外部後援擴充能力。這些擴充可以處理 OASIS Large Group 清單以外的函式，
+但「功能超集合」與「正式 Large Group 一致性」是兩件不同的事。
+
+## 目前等級
+
+| 項目 | 狀態 | 說明 |
+|------|------|------|
+| ODF 1.0／1.1 公式互通 | 支援 | 辨識及評估常見的 `oooc:=` 前綴；這兩版早於標準化的 OpenFormula 一致性群組。 |
+| ODF 1.2～1.4 OpenFormula | 部分實作 | 辨識 `of:=`、剖析常用運算式與參照，並提供受控重算。 |
+| Small Group 強制函式名稱 | 已覆蓋 | `OdfFormulaSupport.GetMissingSmallGroupFunctions()` 可機械化確認內建函式清單沒有名稱缺口。 |
+| Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
+| Medium／Large Group | 尚未完成 | 仍缺完整陣列公式、inline array、自動交集、外部及工作表區域名稱、複數型別，以及多項強制函式。 |
+| OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
+
+OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
+其中一個群組；它可以另外實作規範的子集或超集合。OdfKit 因此不會用自訂函式數量
+取代群組要求，也不會把 LibreOffice 重算結果誤標為核心評估器已符合 Large。
+
+## 執行個體範圍自訂函式
+
+註冊表不使用全域靜態狀態，不同租戶或文件可以有不同的函式集合。內建標準函式永遠
+優先，應用程式無法以同名註冊覆寫其行為。
+
+```csharp
+var functions = new OdfFormulaFunctionRegistry();
+functions.Register("ACME.DOUBLE", static (arguments, context) =>
+    (double)arguments[0] * 2);
+
+var evaluator = new DefaultFormulaEvaluator(functions);
+document.EvaluateFormulas(evaluator);
+```
+
+`OdfFormulaSupport.Analyze(formula, functions)` 與
+`OdfFormulaSupport.IsFunctionSupported(name, functions)` 會納入指定註冊表，
+因此寫入前診斷與實際求值使用同一份能力描述。
+
+## 外部後援
+
+`IOdfFormulaEvaluationFallback` 接收完整公式與目前的 `IEvaluationContext`。
+只有當純 .NET 評估結果為不受支援名稱錯誤時才會呼叫後援；後援拒絕處理時，
+原始錯誤會保持不變。介面可以連接 LibreOffice worker、企業試算服務或領域專用引擎，
+OdfKit 核心不會自行啟動程序、存取網路或執行巨集。
+
+```csharp
+var evaluator = new DefaultFormulaEvaluator(functions, fallback);
+object result = evaluator.Evaluate("of:=XLOOKUP(1;[.A1:.A3];[.B1:.B3])", context);
+```
+
+外部實作必須自行處理隔離、逾時、取消、資源限制、資料外洩與版本固定。若使用
+LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代表 OASIS 規範逐位元
+定義相同結果，也不代表巨集或外部連結可以安全執行。
+
+## 邁向並超出 Large 的順序
+
+1. 先建立 Small 的語法、限制、轉換與函式語意 corpus，達成可稽核的正式基線。
+2. 依 Medium 要求補齊參照聯集、命名運算式及其強制函式，避免只追求函式數量。
+3. 依 Large 要求加入 inline array、陣列公式、自動交集、複數型別、區域名稱與完整強制函式。
+4. 保留 OdfKit Extended 註冊表與後援，讓應用程式在正式 Large 之上加入領域函式，
+   同時個別揭露外部引擎與安全邊界。
+
+規範依據為 OASIS
+[ODF 1.4 Part 4: OpenFormula](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html)。

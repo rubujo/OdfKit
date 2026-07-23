@@ -612,5 +612,11 @@
   "Err_OdfScriptManager_IndexOutOfRange": "Non esiste alcun elemento script all’indice {0}.",
   "Err_OdfScriptManager_UnsupportedVersion": "Il documento usa una versione ODF non supportata per la gestione degli script.",
   "Err_OdfPackage_EntryNameEmpty": "Il percorso della voce del pacchetto non può essere vuoto.",
-  "Err_OdfPackage_EntryAlreadyExists": "Il percorso della voce del pacchetto '{0}' esiste già."
+  "Err_OdfPackage_EntryAlreadyExists": "Il percorso della voce del pacchetto '{0}' esiste già.",
+  "Err_OdfFormulaFunctionRegistry_FunctionAlreadyRegistered": "La funzione {0} è già registrata.",
+  "Err_OdfFormulaFunctionRegistry_HandlerNull": "Il gestore della funzione formula non può essere null.",
+  "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Il nome della funzione formula {0} non è valido.",
+  "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Il registro delle funzioni formula non può essere null.",
+  "Err_OdfFormulaSupport_FunctionRegistryNull": "Il registro delle funzioni formula non può essere null.",
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Il valutatore di formule non può essere null."
 }

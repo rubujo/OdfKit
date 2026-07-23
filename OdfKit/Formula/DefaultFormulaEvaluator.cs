@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
@@ -21,6 +22,51 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
 
     // 剖析樹快取的筆數上限；達到上限時整批清除，避免長時間執行時無上限累積。
     private const int AstCacheCapacity = 4096;
+
+    /// <summary>
+    /// Initializes an evaluator with an empty application-defined function registry.
+    /// 使用空白的應用程式自訂函式註冊表初始化評估器。
+    /// </summary>
+    public DefaultFormulaEvaluator() : this(new OdfFormulaFunctionRegistry(), null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes an evaluator with application-defined functions.
+    /// 使用應用程式自訂函式初始化評估器。
+    /// </summary>
+    /// <param name="functions">The instance-scoped function registry. / 執行個體範圍的函式註冊表。</param>
+    public DefaultFormulaEvaluator(OdfFormulaFunctionRegistry functions) : this(functions, null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes an evaluator with application-defined functions and an unsupported-formula fallback.
+    /// 使用應用程式自訂函式與不受支援公式的後援初始化評估器。
+    /// </summary>
+    /// <param name="functions">The instance-scoped function registry. / 執行個體範圍的函式註冊表。</param>
+    /// <param name="fallback">The unsupported-formula fallback, or <see langword="null"/>. / 不受支援公式的後援，或為 <see langword="null"/>。</param>
+    public DefaultFormulaEvaluator(
+        OdfFormulaFunctionRegistry functions,
+        IOdfFormulaEvaluationFallback? fallback)
+    {
+        Functions = functions ?? throw new ArgumentNullException(
+            nameof(functions),
+            OdfLocalizer.GetMessage("Err_DefaultFormulaEvaluator_FunctionRegistryNull"));
+        Fallback = fallback;
+    }
+
+    /// <summary>
+    /// Gets the instance-scoped application-defined function registry.
+    /// 取得執行個體範圍的應用程式自訂函式註冊表。
+    /// </summary>
+    public OdfFormulaFunctionRegistry Functions { get; }
+
+    /// <summary>
+    /// Gets the fallback used when the in-process evaluator returns an unsupported-name error.
+    /// 取得處理程序內評估器傳回不受支援名稱錯誤時使用的後援。
+    /// </summary>
+    public IOdfFormulaEvaluationFallback? Fallback { get; }
 
     /// <summary>
     /// Evaluates the formula for a specific cell with circular-reference checks and caching.
@@ -101,6 +147,13 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     {
         try
         {
+            if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase) ||
+                formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+            {
+                formula = OdfFormulaTranslator.OdfToExcelFormula(formula);
+            }
+
+            formula = FormulaPrefixNormalizer.RemovePrefix(formula);
             if (!_astCache.TryGetValue(formula, out var ast))
             {
                 var parser = new FormulaParser(formula);
@@ -112,7 +165,16 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
                 _astCache[formula] = ast;
             }
 
-            return ast.Evaluate(context);
+            var dispatchContext = new OdfFormulaDispatchContext(context, Functions);
+            object result = ast.Evaluate(dispatchContext);
+            if (result is OdfFormulaError { ErrorType: OdfFormulaErrorType.Name } &&
+                Fallback is not null &&
+                Fallback.TryEvaluate(formula, context, out object fallbackResult))
+            {
+                return fallbackResult;
+            }
+
+            return result;
         }
         catch (Exception ex)
         {

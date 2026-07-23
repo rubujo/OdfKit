@@ -1,7 +1,9 @@
 ﻿using OdfKit.Formula;
 
+using OdfKit.Compliance;
 using OdfKit.Core;
 
+using System;
 using System.Threading;
 
 namespace OdfKit.Spreadsheet;
@@ -29,6 +31,23 @@ public partial class SpreadsheetDocument
     public void EvaluateFormulas()
     {
         var evaluator = new DefaultFormulaEvaluator();
+        evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
+    }
+
+    /// <summary>
+    /// Evaluates formulas with a configured evaluator, including its custom functions and fallback.
+    /// 使用已設定的評估器計算公式，包含其自訂函式與後援。
+    /// </summary>
+    /// <param name="evaluator">The configured formula evaluator. / 已設定的公式評估器。</param>
+    public void EvaluateFormulas(DefaultFormulaEvaluator evaluator)
+    {
+        if (evaluator is null)
+        {
+            throw new ArgumentNullException(
+                nameof(evaluator),
+                OdfLocalizer.GetMessage("Err_SpreadsheetDocument_FormulaEvaluatorNull"));
+        }
+
         evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
     }
     /// <summary>

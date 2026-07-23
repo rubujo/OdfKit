@@ -65,7 +65,7 @@ internal static class FormulaDocumentEvaluationEngine
                 {
                     object result = graph.CircularCells.Contains(addr)
                         ? OdfFormulaError.Ref
-                        : EvaluateCellWithCompletedResults(contentRoot, externalLinks, completed, addr);
+                        : EvaluateCellWithCompletedResults(contentRoot, evaluator, externalLinks, completed, addr);
                     levelResults[addr] = result;
                 });
 
@@ -99,11 +99,12 @@ internal static class FormulaDocumentEvaluationEngine
 
     private static object EvaluateCellWithCompletedResults(
         OdfNode contentRoot,
+        DefaultFormulaEvaluator evaluator,
         OdfExternalLinkManager? externalLinks,
         ConcurrentDictionary<OdfCellAddress, object> completed,
         OdfCellAddress addr)
     {
-        var localEvaluator = new DefaultFormulaEvaluator();
+        var localEvaluator = new DefaultFormulaEvaluator(evaluator.Functions, evaluator.Fallback);
         var localContext = new OdfDomEvaluationContext(contentRoot, localEvaluator, externalLinks);
         foreach (KeyValuePair<OdfCellAddress, object> pair in completed)
         {

@@ -26,6 +26,8 @@
     href: reference/semantic-facades.md
   - name: 試算表資料
     href: reference/spreadsheet-data.md
+  - name: OpenFormula 評估器
+    href: openformula-evaluator.md
   - name: 圖表
     href: reference/charts.md
   - name: 範本
