@@ -192,9 +192,18 @@ WOFF2 使用 Brotli。`net10.0` 資產直接透過 `System.IO.Compression.Brotli
 邊界」，故不採用。壓縮器位於字型產生管線上，若移植碼日後出現漏洞將無上游修補可循，
 這使維護落差成為安全風險而非單純的新鮮度問題。
 
-此缺口現在是 Runtime 能力缺口，不再是 `netstandard2.0` 編譯資產缺口。net48 若未提供
-`BrotliStream`，仍可由現代 .NET 於建置期預產生 WOFF2 資產，再以靜態內容定址路徑供應
-（見第 5 節 Phase 3 的「Web Forms config／handler 與離線預產生」）。
+此缺口是處理程序內 Runtime 能力缺口，不是 `netstandard2.0` 編譯資產缺口。net48 若未提供
+`BrotliStream`，可由現代 .NET 於建置期預產生 WOFF2 資產，再以靜態內容定址路徑供應；需要
+request-time WOFF2 時，則安裝 `OdfKit.WebFonts.Sidecar` 用戶端，並部署
+`OdfKit.WebFonts.Sidecar.Host` 的 Windows x64 或 ARM64 NativeAOT 執行檔。Host 是 self-contained
+原生程式，不要求伺服器另裝 .NET 10 Runtime；net48 與 Host 可採不同處理器架構，透過同機具名
+pipe 及共同資產目錄協作，因此 32-bit IIS application pool 仍可連線至 x64 Host。
+
+Sidecar 使用版本化、長度有界的二進位協定與每次要求都驗證的高熵預先共用權杖；預設另套用
+目前 Windows 使用者限制。服務帳號不同時才可明確啟用跨使用者 pipe，並須以 ACL 保護共同資產
+目錄與環境變數 secret。Host 不接受 HTTP 傳入的字型路徑，只接受啟動時設定的 opaque source
+ID。CI 會以 net48 用戶端及 System.Web Handler 對 win-x64 NativeAOT Host 真實產生 WOFF2，
+另交叉發布 win-arm64；這不等於正式 IIS、服務帳號與組織 secret store 的部署驗收。
 
 WOFF 依 W3C WOFF 1.0 規則逐 table 使用 zlib；壓縮結果未小於原 table 時保留未壓縮 bytes。
 WOFF2 writer 目前維持規格允許的 `glyf`／`loca` null transform；decoder 則依 W3C WOFF2

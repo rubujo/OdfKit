@@ -37,6 +37,7 @@ $roots = @(
     (Join-Path $repoRoot 'OdfKit.WebFonts.Profiles'),
     (Join-Path $repoRoot 'OdfKit.WebFonts.Windows'),
     (Join-Path $repoRoot 'OdfKit.WebFonts.Worker'),
+    (Join-Path $repoRoot 'OdfKit.WebFonts.Sidecar'),
     (Join-Path $repoRoot 'tools/OdfKit.Cli')
 )
 

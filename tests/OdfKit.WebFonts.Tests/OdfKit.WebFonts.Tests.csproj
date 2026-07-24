@@ -33,5 +33,7 @@
     <ProjectReference Include="..\..\OdfKit.Extensions.Html.WebFonts\OdfKit.Extensions.Html.WebFonts.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.AspNetCore\OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Sidecar\OdfKit.WebFonts.Sidecar.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Sidecar.Server\OdfKit.WebFonts.Sidecar.Server.csproj" />
   </ItemGroup>
 </Project>

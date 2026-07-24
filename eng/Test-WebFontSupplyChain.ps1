@@ -40,6 +40,7 @@ $projectPaths = @(
     "OdfKit.WebFonts.Encoding.Legacy/OdfKit.WebFonts.Encoding.Legacy.csproj",
     "OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj",
     "OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj",
+    "OdfKit.WebFonts.Sidecar/OdfKit.WebFonts.Sidecar.csproj",
     "OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj",
     "OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj",
     "OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj",
@@ -54,6 +55,7 @@ $expectedPackageIds = @(
     "OdfKit.WebFonts.Encoding.Legacy",
     "OdfKit.WebFonts.Hosting.AspNetCore",
     "OdfKit.WebFonts.Hosting.SystemWeb",
+    "OdfKit.WebFonts.Sidecar",
     "OdfKit.WebFonts.OpenType",
     "OdfKit.WebFonts.Profiles",
     "OdfKit.WebFonts.Windows",
@@ -93,7 +95,7 @@ if (-not (Test-Path -LiteralPath $packageRoot -PathType Container)) {
 }
 
 $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json -Depth 20
-if ($policy.schemaVersion -ne 1) {
+if ($policy.schemaVersion -ne 2) {
     throw "不支援的 WebFont 相依政策版本：$($policy.schemaVersion)"
 }
 if ($SkipRestoreClosureValidation -and -not $VerifyExisting) {
@@ -111,6 +113,9 @@ foreach ($entry in $policy.packages) {
     }
     if (-not $allowedLicenses.Contains([string]$entry.license)) {
         throw "WebFont 相依政策含未允許授權：$($entry.id) $($entry.license)"
+    }
+    if ($null -ne $entry.scope -and [string]$entry.scope -notin @("runtime", "build")) {
+        throw "WebFont 相依政策含無效 scope：$($entry.id) $($entry.scope)"
     }
 }
 
@@ -208,6 +213,8 @@ if (-not $SkipRestoreClosureValidation) {
 }
 
 $internalPackages = @()
+$publishedDependencyIds = [System.Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::OrdinalIgnoreCase)
 foreach ($id in $expectedPackageIds) {
     $packagePath = Join-Path $packageRoot "$id.$packageVersion.nupkg"
     if (-not (Test-Path -LiteralPath $packagePath -PathType Leaf)) {
@@ -217,6 +224,10 @@ foreach ($id in $expectedPackageIds) {
     if ([string]$nuspecXml.package.metadata.id -ne $id `
         -or [string]$nuspecXml.package.metadata.version -ne $packageVersion) {
         throw "SBOM 套件識別與檔名不一致：$packagePath"
+    }
+    foreach ($dependency in $nuspecXml.SelectNodes(
+            "/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='dependencies']//*[local-name()='dependency']")) {
+        [void]$publishedDependencyIds.Add([string]$dependency.id)
     }
 
     $internalPackages += [ordered]@{
@@ -239,6 +250,12 @@ foreach ($id in $expectedPackageIds) {
             referenceType = "purl"
             referenceLocator = "pkg:nuget/$id@$packageVersion"
         })
+    }
+}
+
+foreach ($entry in $policy.packages) {
+    if ([string]$entry.scope -eq "build" -and $publishedDependencyIds.Contains([string]$entry.id)) {
+        throw "建置期 WebFont 相依不得出現在發布套件 dependency：$($entry.id)"
     }
 }
 
@@ -284,10 +301,20 @@ foreach ($package in $internalPackages) {
     }
 }
 foreach ($package in $externalPackages) {
-    $relationships += [ordered]@{
-        spdxElementId = $rootId
-        relationshipType = "DEPENDS_ON"
-        relatedSpdxElement = $package.SPDXID
+    $policyEntry = $policyById[$package.name]
+    if ([string]$policyEntry.scope -eq "build") {
+        $relationships += [ordered]@{
+            spdxElementId = $package.SPDXID
+            relationshipType = "BUILD_DEPENDENCY_OF"
+            relatedSpdxElement = $rootId
+        }
+    }
+    else {
+        $relationships += [ordered]@{
+            spdxElementId = $rootId
+            relationshipType = "DEPENDS_ON"
+            relatedSpdxElement = $package.SPDXID
+        }
     }
 }
 

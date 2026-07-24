@@ -62,7 +62,7 @@ public partial class LibreOfficeInteropTests
     [InlineData(OdfVersion.Odf12)]
     [InlineData(OdfVersion.Odf13)]
     [InlineData(OdfVersion.Odf14)]
-    public void LibreOfficeHeadless_ExecutesManagedDocumentMacros(OdfVersion version)
+    public async Task LibreOfficeHeadless_ExecutesManagedDocumentMacros(OdfVersion version)
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -102,9 +102,9 @@ public partial class LibreOfficeInteropTests
                     "interop.py",
                     CreatePythonMarkerScript(pythonMarkerPath));
                 using X509Certificate2 certificate = CreateInteropMacroSigningCertificate();
-                scripting.SignLibreOfficeMacrosAsync(
+                await scripting.SignLibreOfficeMacrosAsync(
                     certificate,
-                    TestContext.Current.CancellationToken).GetAwaiter().GetResult();
+                    TestContext.Current.CancellationToken);
                 document.Save(documentPath);
             }
 

@@ -7,12 +7,17 @@ using System.Web;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Hosting.SystemWeb;
 using OdfKit.WebFonts.OpenType;
+using OdfKit.WebFonts.Sidecar;
 
 string? fontPath = GetArgument(args, "--font");
 string? sourceSha256 = GetArgument(args, "--sha256");
+string? sidecarPipeName = GetArgument(args, "--sidecar-pipe");
 string text = GetArgument(args, "--text") ?? "𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹";
 bool usePostScriptOutline = args.Contains("--postscript", StringComparer.Ordinal);
-string root = Path.Combine(Path.GetTempPath(), "odfkit-systemweb-smoke-" + Guid.NewGuid().ToString("N"));
+bool sidecarOnly = args.Contains("--sidecar-only", StringComparer.Ordinal);
+string root = Path.GetFullPath(
+    GetArgument(args, "--asset-root")
+        ?? Path.Combine(Path.GetTempPath(), "odfkit-systemweb-smoke-" + Guid.NewGuid().ToString("N")));
 Directory.CreateDirectory(root);
 
 try
@@ -71,6 +76,51 @@ try
     }
 
     var handler = new OdfWebFontDynamicHandler(engine, options);
+    if (sidecarPipeName is not null)
+    {
+        string sidecarToken = Environment.GetEnvironmentVariable("ODFKIT_WEBFONT_SIDECAR_TOKEN")
+            ?? throw new InvalidOperationException("The sidecar token environment variable is missing.");
+        options.AllowedFormats.Add(WebFontFormat.Woff2);
+        var sidecarHandler = new OdfWebFontDynamicHandler(
+            new OdfWebFontSidecarClient(new WebFontSidecarClientOptions
+            {
+                PipeName = sidecarPipeName,
+                AuthenticationToken = sidecarToken,
+                AssetRootPath = root,
+                ConnectTimeout = TimeSpan.FromSeconds(10),
+                RequestTimeout = TimeSpan.FromMinutes(3)
+            }),
+            options);
+        var sidecarRequest = new RecordingWorkerRequest(
+            "POST",
+            "/_odf-fonts/generate",
+            JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+            {
+                FontSourceId = "smoke-source",
+                FaceIndex = 0,
+                ProfileId = "smoke-profile@1",
+                FontFamily = "OdfKit SystemWeb Smoke",
+                Sequences = new[] { "OdfKit" },
+                Formats = new[] { WebFontFormat.Woff2 }
+            }),
+            options.ApiKey);
+        var sidecarContext = new HttpContext(sidecarRequest);
+        sidecarHandler.ProcessRequest(sidecarContext);
+        sidecarContext.Response.Flush();
+        Require(sidecarContext.Response.StatusCode == 200, "System.Web did not generate WOFF2 through the sidecar.");
+        Require(
+            Directory.GetFiles(root, "*.woff2", SearchOption.AllDirectories).Length == 1,
+            "System.Web sidecar generation returned no WOFF2 asset.");
+        options.AllowedFormats.Remove(WebFontFormat.Woff2);
+        Directory.Delete(root, recursive: true);
+        Directory.CreateDirectory(root);
+        if (sidecarOnly)
+        {
+            Console.WriteLine("PASS: System.Web generated WOFF2 through the NativeAOT sidecar.");
+            return 0;
+        }
+    }
+
     string json = JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
     {
         FontSourceId = "smoke-source",

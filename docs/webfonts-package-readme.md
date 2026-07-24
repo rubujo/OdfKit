@@ -37,6 +37,7 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
 |------|----------|--------|
 | ASP.NET Core 動態優先與靜態 fallback | `OdfKit.WebFonts.Hosting.AspNetCore` | [執行 ASP.NET Core 範例](https://github.com/rubujo/OdfKit/tree/main/samples/WebFonts.AspNetCore) |
 | ASP.NET Web Forms／System.Web | `OdfKit.WebFonts.Hosting.SystemWeb` | [執行 Web Forms 範例](https://github.com/rubujo/OdfKit/tree/main/samples/WebFonts.WebForms) |
+| net48 request-time WOFF2 | `OdfKit.WebFonts.Hosting.SystemWeb` + `OdfKit.WebFonts.Sidecar` | [部署 NativeAOT sidecar](https://github.com/rubujo/OdfKit/blob/main/docs/webfonts.md#aspnet-web-forms) |
 | CLI／MSBuild 預產生 | `OdfKit.WebFonts.Build` | [查看最短使用方式](https://github.com/rubujo/OdfKit/blob/main/docs/webfonts.md#預定最短使用方式) |
 | 純 managed 字型解析與子集化 | `OdfKit.WebFonts.OpenType` | [查看格式與拒絕矩陣](https://github.com/rubujo/OdfKit/blob/main/docs/webfont-managed-architecture.md) |
 | CNS 11643／JSON／C# Profile | `OdfKit.WebFonts.Profiles` | [查看全字庫 Profile 與來源鎖定](https://github.com/rubujo/OdfKit/blob/main/docs/webfonts.md#全字庫-cns-11643-profile) |

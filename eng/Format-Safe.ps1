@@ -35,6 +35,9 @@ $libraryProjects = @(
     'OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj',
     'OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj',
     'OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj',
+    'OdfKit.WebFonts.Sidecar/OdfKit.WebFonts.Sidecar.csproj',
+    'OdfKit.WebFonts.Sidecar.Server/OdfKit.WebFonts.Sidecar.Server.csproj',
+    'OdfKit.WebFonts.Sidecar.Host/OdfKit.WebFonts.Sidecar.Host.csproj',
     'OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj',
     'OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj',
     'OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj',
@@ -92,6 +95,7 @@ if ($IncludeTests) {
         'tests/OdfKit.WebFontFormatMatrix/OdfKit.WebFontFormatMatrix.csproj',
         'tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj',
         'tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj',
+        'tests/OdfKit.WebFonts.Sidecar.Net48Smoke/OdfKit.WebFonts.Sidecar.Net48Smoke.csproj',
         'tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj',
         'tests/OdfKit.NetFramework48Smoke/OdfKit.NetFramework48Smoke.csproj',
         'samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj')) {

@@ -17,10 +17,12 @@
   <ItemGroup Condition="'$(UseLocalPackages)' == 'true'">
     <PackageReference Include="OdfKit.WebFonts.Hosting.SystemWeb" Version="$(OdfKitPackageVersion)" />
     <PackageReference Include="OdfKit.WebFonts.OpenType" Version="$(OdfKitPackageVersion)" />
+    <PackageReference Include="OdfKit.WebFonts.Sidecar" Version="$(OdfKitPackageVersion)" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseLocalPackages)' != 'true'">
     <ProjectReference Include="..\..\OdfKit.WebFonts.Hosting.SystemWeb\OdfKit.WebFonts.Hosting.SystemWeb.csproj" />
     <ProjectReference Include="..\..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
+    <ProjectReference Include="..\..\OdfKit.WebFonts.Sidecar\OdfKit.WebFonts.Sidecar.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />

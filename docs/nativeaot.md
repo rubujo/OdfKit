@@ -1,0 +1,54 @@
+# NativeAOT 支援與部署邊界
+
+OdfKit 將「可由 NativeAOT 發布」與「整個公開 API 已具靜態一致性保證」分開描述。不能因單一
+smoke 執行成功，就把所有核心、擴充套件及第三方相依一併宣稱為完全支援。
+
+## 支援矩陣
+
+| 範圍 | 狀態 | 證據與限制 |
+|------|------|------------|
+| ODF 核心主要 API 根 | 支援有界 NativeAOT smoke | `eng/Test-TrimSmoke.ps1 -PublishAot` 在 Windows x64、Linux x64 與 macOS ARM64 建立原生程式，驗證 ODT／ODS／ODP／ODG／ODC／ODF、ZIP／XML、公式與 OpenPGP 主要路徑 |
+| 完整 `OdfKit` 公開 API 表面 | 尚未宣稱完全 AOT 相容 | `OdfTypedDomCoverage.Build` 仍以反射取得 wrapper 公開屬性，已明確標示 `RequiresUnreferencedCode`；此診斷 API 不應由 AOT 應用程式呼叫 |
+| `OdfKit.WebFonts.Abstractions` | `net10.0` AOT-compatible | 專案啟用 `IsAotCompatible` |
+| `OdfKit.WebFonts.OpenType` | `net10.0` AOT-compatible | 有界 parser、子集化、WOFF／WOFF2 與 source-generated／無反射熱路徑 |
+| `OdfKit.WebFonts.Worker` | AOT-compatible | durable manifest 改用 `System.Text.Json` source generation |
+| `OdfKit.WebFonts.Sidecar` | `net10.0` AOT-compatible；`net48` 用戶端 | 版本化具名 pipe 協定不依賴 reflection serialization |
+| `OdfKit.WebFonts.Sidecar.Host` | Windows x64／ARM64 NativeAOT | x64 在 CI 實際執行；ARM64 交叉發布。Host 是 self-contained，不要求部署 .NET Runtime |
+| 其它擴充套件 | 逐套件評估 | SkiaSharp、ClosedXML、PDF、RDF、LibreOffice／Office 互通及其它第三方相依，不由核心 smoke 推定為 AOT-compatible |
+
+## net48 WOFF2 sidecar
+
+ASP.NET Web Forms 安裝 `OdfKit.WebFonts.Hosting.SystemWeb` 後，會傳遞取得
+`OdfKit.WebFonts.Sidecar`。處理程序內引擎仍維持 TTF／OTF／WOFF；只有在 JSON 明確加入
+`sidecar` 且 allowlist 包含 `Woff2` 時，Handler 才委派至 NativeAOT Host。
+
+Host 與 net48 用戶端須符合以下部署不變量：
+
+- 使用相同 pipe 名稱、共同資產根目錄及至少 32-byte 高熵權杖。
+- 權杖只從環境變數或受控 secret store 取得，不寫入 JSON、命令列、記錄或原始碼。
+- Host 啟動參數固定允許的 `fontSourceId=path`；HTTP 要求不能提供檔案路徑。
+- 預設採目前使用者限定的 Windows pipe。只有服務帳號分離時才使用
+  `--allow-cross-user`，並另以 ACL 限制 pipe 使用者、Host 執行檔、字型及資產根目錄。
+- IIS application pool 與 Host 不必採相同 CPU 架構；32-bit net48 可連線至 x64 Host。
+- 每個 frame、sequence、scalar、連線、queue、資產大小與工作時間均有上限；協定錯誤不回傳
+  內部例外文字。
+
+本機完整閘門：
+
+```powershell
+pwsh eng/Test-WebFontSidecarAot.ps1 -RuntimeIdentifier win-x64
+pwsh eng/Test-WebFontSidecarAot.ps1 -RuntimeIdentifier win-arm64 -PublishOnly
+```
+
+第一個命令會發布及執行 x64 NativeAOT Host，再由 net48 用戶端與真正的 System.Web Handler
+產生 WOFF2。第二個命令只驗證 ARM64 交叉發布；ARM64 實機執行仍屬部署環境驗收項目。
+
+## 為何不要求安裝 .NET 10 Runtime
+
+NativeAOT publish 會把受控程式與所需 Runtime 元件編譯成平台原生、self-contained
+執行檔。部署者下載符合 Windows 架構的 Host 產物即可，不應另以全機 Runtime 安裝作為
+前置條件。建置 Host 的 CI 或開發機仍需 .NET 10 SDK 與對應 NativeAOT 工具鏈。
+
+標籤發布流程會以 `eng/Publish-WebFontSidecar.ps1` 建立 x64／ARM64 ZIP、授權檔、第三方聲明
+與獨立 SHA-256 manifest，並和 NuGet 套件一起附加至 GitHub Release。採用者應下載與
+`OdfKit.WebFonts.Sidecar` 套件相同版本及正確 RID 的 ZIP，部署前核對 manifest。

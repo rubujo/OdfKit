@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Hosting;
 using OdfKit.Compliance;
 using OdfKit.WebFonts.OpenType;
+using OdfKit.WebFonts.Sidecar;
 
 namespace OdfKit.WebFonts.Hosting.SystemWeb;
 
@@ -510,7 +511,37 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             options.AllowedFormats.Add(format);
         }
 
-        return new DynamicRuntime(new ManagedOpenTypeWebFontSubsetEngine(engineOptions), options);
+        IWebFontSubsetEngine engine = configuration.Sidecar is null
+            ? new ManagedOpenTypeWebFontSubsetEngine(engineOptions)
+            : CreateSidecarClient(configuration.Sidecar, options.AssetRootPath);
+        return new DynamicRuntime(engine, options);
+    }
+
+    private static OdfWebFontSidecarClient CreateSidecarClient(
+        DynamicSidecarConfiguration configuration,
+        string assetRootPath)
+    {
+        if (string.IsNullOrWhiteSpace(configuration.PipeName)
+            || string.IsNullOrWhiteSpace(configuration.TokenEnvironmentVariable))
+        {
+            throw ConfigurationInvalid();
+        }
+
+        string? token = Environment.GetEnvironmentVariable(configuration.TokenEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw ConfigurationInvalid();
+        }
+
+        return new OdfWebFontSidecarClient(new WebFontSidecarClientOptions
+        {
+            PipeName = configuration.PipeName,
+            AuthenticationToken = token,
+            AssetRootPath = assetRootPath,
+            ConnectTimeout = TimeSpan.FromSeconds(configuration.ConnectTimeoutSeconds),
+            RequestTimeout = TimeSpan.FromSeconds(configuration.RequestTimeoutSeconds),
+            MaxMessageBytes = configuration.MaxMessageBytes
+        });
     }
 
     private static string MapTrustedPath(string value, string baseDirectory)
@@ -569,6 +600,12 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         if (string.Equals(extension, ".woff", StringComparison.OrdinalIgnoreCase))
         {
             contentType = "font/woff";
+            return true;
+        }
+
+        if (string.Equals(extension, ".woff2", StringComparison.OrdinalIgnoreCase))
+        {
+            contentType = "font/woff2";
             return true;
         }
 
@@ -762,12 +799,9 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
                 || options.AllowedFaces.Count is <= 0 or > 256
                 || options.AllowedProfileIds.Count is <= 0 or > 256
                 || options.AllowedFontFamilies.Count is <= 0 or > 256
-                // net48 可用的輸出格式為 TrueType、OpenType 與 WOFF 三種。
-                || options.AllowedFormats.Count is <= 0 or > 3
+                || options.AllowedFormats.Count is <= 0 or > 4
                 || options.AllowedFormats.Distinct().Count() != options.AllowedFormats.Count
-                || options.AllowedFormats.Any(format => format is not WebFontFormat.Woff
-                    and not WebFontFormat.TrueType
-                    and not WebFontFormat.OpenType)
+                || options.AllowedFormats.Any(format => !Enum.IsDefined(typeof(WebFontFormat), format))
                 || options.AllowedProfileIds.Any(value => string.IsNullOrWhiteSpace(value) || value.Length > 256)
                 || options.AllowedFontFamilies.Any(value => string.IsNullOrWhiteSpace(value) || value.Length > 256)
                 || options.AllowedFaces.Any(face => !IsValidFace(face, options.FontSources)))
@@ -815,6 +849,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         public List<string> AllowedProfileIds { get; set; } = new();
 
         public List<WebFontFormat> AllowedFormats { get; set; } = new();
+
+        public DynamicSidecarConfiguration? Sidecar { get; set; }
     }
 
     private sealed class DynamicFontSource
@@ -828,5 +864,18 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         public int FaceIndex { get; set; }
 
         public string FontFamily { get; set; } = string.Empty;
+    }
+
+    private sealed class DynamicSidecarConfiguration
+    {
+        public string PipeName { get; set; } = string.Empty;
+
+        public string TokenEnvironmentVariable { get; set; } = "ODFKIT_WEBFONT_SIDECAR_TOKEN";
+
+        public int ConnectTimeoutSeconds { get; set; } = 5;
+
+        public int RequestTimeoutSeconds { get; set; } = 180;
+
+        public int MaxMessageBytes { get; set; } = 4 * 1024 * 1024;
     }
 }

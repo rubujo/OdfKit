@@ -10,6 +10,7 @@ title: 套件選型 / Package selection
   `OdfKit.Extensions.Scripting`；套件不執行巨集或重新簽章。
 - ASP.NET Core 動態 WebFont：`OdfKit.WebFonts.Hosting.AspNetCore`。
 - ASP.NET Web Forms／System.Web 動態 WebFont：`OdfKit.WebFonts.Hosting.SystemWeb`。
+- net48 request-time WOFF2：另加入 `OdfKit.WebFonts.Sidecar`，並部署 NativeAOT Host。
 - 預產生工具：`OdfKit.WebFonts.Build`；底層純 managed 子集引擎：
   `OdfKit.WebFonts.OpenType`。
 

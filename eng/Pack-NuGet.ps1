@@ -34,6 +34,7 @@ $packableProjects = @(
     "OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj",
     "OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj",
     "OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj",
+    "OdfKit.WebFonts.Sidecar/OdfKit.WebFonts.Sidecar.csproj",
     "OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj",
     "OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj",
     "OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj",

@@ -1,0 +1,28 @@
+﻿#nullable enable
+OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient
+OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.FilterSupportedSequencesAsync(OdfKit.WebFonts.WebFontFaceIdentity! face, System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>! sequences, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<OdfKit.WebFonts.WebFontTextSequence!>!>!
+OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
+OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.GetHealthAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.Sidecar.WebFontSidecarHealth!>!
+OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.OdfWebFontSidecarClient(OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions! options) -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AssetRootPath.get -> string!
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AssetRootPath.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AuthenticationToken.get -> string!
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AuthenticationToken.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.ConnectTimeout.get -> System.TimeSpan
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.ConnectTimeout.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.MaxMessageBytes.get -> int
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.MaxMessageBytes.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.PipeName.get -> string!
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.PipeName.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.RequestTimeout.get -> System.TimeSpan
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.RequestTimeout.set -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.WebFontSidecarClientOptions() -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.IsWoff2Available.get -> bool
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.IsWoff2Available.init -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.ProtocolVersion.get -> int
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.ProtocolVersion.init -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.RuntimeIdentifier.get -> string!
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.RuntimeIdentifier.init -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarHealth.WebFontSidecarHealth() -> void

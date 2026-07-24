@@ -47,7 +47,7 @@ testhost 收尾不穩。
 | `odf-external-baseline.yml` | 以固定版本 Jing 與 ODF Validator 驗證完整 RELAX NG／package 對標 | PR / main / 手動 |
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
-| `trim-smoke.yml` | Native AOT / trim smoke | PR / main |
+| `trim-smoke.yml` | 核心 NativeAOT／trim smoke，以及 net48 WebFont sidecar NativeAOT 實測 | PR / main |
 | `nuget-pack.yml` | 十九個 NuGet 套件的單次封裝、WebFont 發布演練與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
 | `performance-benchmark.yml` | DOM 與 ODS 串流效能／配置量回歸基準 | 每週 / 手動 |
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |

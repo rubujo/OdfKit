@@ -10,6 +10,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Description>Bounded managed OpenType subsetting engine for deterministic OdfKit WebFont assets.</Description>
+    <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />

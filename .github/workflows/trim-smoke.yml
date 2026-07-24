@@ -5,7 +5,17 @@ on:
     paths:
       - 'OdfKit/**'
       - 'tools/OdfKit.TrimSmoke/**'
+      - 'OdfKit.WebFonts.Abstractions/**'
+      - 'OdfKit.WebFonts.OpenType/**'
+      - 'OdfKit.WebFonts.Worker/**'
+      - 'OdfKit.WebFonts.Sidecar/**'
+      - 'OdfKit.WebFonts.Sidecar.Server/**'
+      - 'OdfKit.WebFonts.Sidecar.Host/**'
+      - 'OdfKit.WebFonts.Hosting.SystemWeb/**'
+      - 'tests/OdfKit.WebFonts.Sidecar.Net48Smoke/**'
+      - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
+      - 'eng/Test-WebFontSidecarAot.ps1'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   push:
@@ -14,7 +24,17 @@ on:
     paths:
       - 'OdfKit/**'
       - 'tools/OdfKit.TrimSmoke/**'
+      - 'OdfKit.WebFonts.Abstractions/**'
+      - 'OdfKit.WebFonts.OpenType/**'
+      - 'OdfKit.WebFonts.Worker/**'
+      - 'OdfKit.WebFonts.Sidecar/**'
+      - 'OdfKit.WebFonts.Sidecar.Server/**'
+      - 'OdfKit.WebFonts.Sidecar.Host/**'
+      - 'OdfKit.WebFonts.Hosting.SystemWeb/**'
+      - 'tests/OdfKit.WebFonts.Sidecar.Net48Smoke/**'
+      - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
+      - 'eng/Test-WebFontSidecarAot.ps1'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   workflow_dispatch:
@@ -54,3 +74,13 @@ jobs:
       - name: Run trim smoke (blocking)
         shell: pwsh
         run: ./eng/Test-TrimSmoke.ps1 -Configuration Release -PublishAot -RuntimeIdentifier ${{ matrix.rid }}
+
+      - name: Run net48 to NativeAOT WebFont sidecar smoke
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: ./eng/Test-WebFontSidecarAot.ps1 -Configuration Release -RuntimeIdentifier win-x64
+
+      - name: Cross-publish Windows ARM64 WebFont sidecar
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: ./eng/Test-WebFontSidecarAot.ps1 -Configuration Release -RuntimeIdentifier win-arm64 -PublishOnly

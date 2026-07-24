@@ -52,6 +52,7 @@ jobs:
         run: |
           ./eng/Test-WebFontSupplyChain.ps1
           ./eng/Test-WebFontReleaseRehearsal.ps1
+          ./eng/Publish-WebFontSidecar.ps1
           ./eng/Publish-GitHubRelease.ps1 -SkipValidation -Tag "${{ github.ref_name }}"
 
       - name: Attest release provenance
@@ -62,6 +63,8 @@ jobs:
             artifacts/nuget/*.snupkg
             artifacts/nuget/SHA256SUMS
             artifacts/webfont-sbom/manifest.spdx.json
+            artifacts/webfont-sidecar/*.zip
+            artifacts/webfont-sidecar/OdfKit.WebFonts.Sidecar.Host-SHA256SUMS
             artifacts/OdfKit-nuget-packages.zip
 
       - name: Attest WebFont SBOM

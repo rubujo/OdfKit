@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
     <ProjectReference Include="..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj" />
+    <ProjectReference Include="..\OdfKit.WebFonts.Sidecar\OdfKit.WebFonts.Sidecar.csproj" />
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="10.0.10" />

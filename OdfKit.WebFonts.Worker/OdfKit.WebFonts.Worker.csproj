@@ -10,6 +10,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Description>Bounded single-flight background worker for isolated OdfKit WebFont generation.</Description>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />

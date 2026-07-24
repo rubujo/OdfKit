@@ -6,7 +6,8 @@ Office 或 Java 的情況下，建立、載入、儲存、驗證並保留 ODF �
 
 目前預設新建文件為 ODF 1.4。核心與可攜式 managed 擴充套件採 `net10.0` 與
 `netstandard2.0` 雙目標框架；WebFont Worker 與 ASP.NET Core 託管套件採 `net10.0`，
-System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
+System.Web 託管套件採 `net48`；舊 Runtime 的動態 WOFF2 可選用不需安裝 .NET Runtime 的
+Windows NativeAOT sidecar。CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
 
 > **AI 產製聲明**
 > 本專案目前公開之原始碼、文件、範例、測試與相關內容，均為使用
@@ -26,6 +27,7 @@ System.Web 託管套件採 `net48`，CLI 與測試專案覆蓋 `net10.0` 與 `ne
 
 完整支援範圍請見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
 [能力宣稱與證據索引](docs/evidence-index.md)、
+[NativeAOT 支援與部署邊界](docs/nativeaot.md)、
 [ODF Profile 來源](docs/odf-profile-sources.md)、
 [LibreOffice 互通矩陣](docs/libreoffice-interop-matrix.md) 與
 [i18n 與在地化](docs/i18n-localization.md)。

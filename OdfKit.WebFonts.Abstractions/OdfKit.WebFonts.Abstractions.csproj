@@ -12,6 +12,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Description>Framework-neutral contracts for secure, international WebFont assets and Unicode sequences.</Description>
+    <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>

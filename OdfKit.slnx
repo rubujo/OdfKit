@@ -22,6 +22,9 @@
   <Project Path="OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj" />
   <Project Path="OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj" />
   <Project Path="OdfKit.WebFonts.Worker/OdfKit.WebFonts.Worker.csproj" />
+  <Project Path="OdfKit.WebFonts.Sidecar/OdfKit.WebFonts.Sidecar.csproj" />
+  <Project Path="OdfKit.WebFonts.Sidecar.Server/OdfKit.WebFonts.Sidecar.Server.csproj" />
+  <Project Path="OdfKit.WebFonts.Sidecar.Host/OdfKit.WebFonts.Sidecar.Host.csproj" />
   <Project Path="OdfKit.WebFonts.Profiles/OdfKit.WebFonts.Profiles.csproj" />
   <Project Path="OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj" />
   <Project Path="OdfKit.WebFonts.Hosting.AspNetCore/OdfKit.WebFonts.Hosting.AspNetCore.csproj" />
@@ -49,5 +52,6 @@
   <Project Path="tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj" />
   <Project Path="tests/OdfKit.WebFontCmapScaleProof/OdfKit.WebFontCmapScaleProof.csproj" />
   <Project Path="tests/OdfKit.WebFonts.RuntimeSmoke/OdfKit.WebFonts.RuntimeSmoke.csproj" />
+  <Project Path="tests/OdfKit.WebFonts.Sidecar.Net48Smoke/OdfKit.WebFonts.Sidecar.Net48Smoke.csproj" />
   <Project Path="samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj" />
 </Solution>

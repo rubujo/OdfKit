@@ -26,3 +26,4 @@ document.Save("report.odt");
 - [完整快速開始](https://github.com/rubujo/OdfKit/blob/main/docs/getting-started.md)
 - [可執行範例](https://github.com/rubujo/OdfKit/tree/main/samples)
 - [WebFont 多國罕字套件](../../docs/webfonts.md)
+- [NativeAOT 支援與部署邊界](../../docs/nativeaot.md)

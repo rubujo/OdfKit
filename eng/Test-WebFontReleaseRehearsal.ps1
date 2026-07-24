@@ -81,6 +81,7 @@ $expectedConsumerPackages = @(
     "OdfKit.WebFonts.Encoding.Legacy",
     "OdfKit.WebFonts.Hosting.AspNetCore",
     "OdfKit.WebFonts.Hosting.SystemWeb",
+    "OdfKit.WebFonts.Sidecar",
     "OdfKit.WebFonts.OpenType",
     "OdfKit.WebFonts.Profiles",
     "OdfKit.WebFonts.Windows",

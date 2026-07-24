@@ -75,6 +75,7 @@ $projects = @(
     "OdfKit.WebFonts.OpenType/OdfKit.WebFonts.OpenType.csproj",
     "OdfKit.WebFonts.Windows/OdfKit.WebFonts.Windows.csproj",
     "OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj",
+    "OdfKit.WebFonts.Sidecar/OdfKit.WebFonts.Sidecar.csproj",
     "OdfKit.WebFonts.Build/OdfKit.WebFonts.Build.csproj"
 )
 foreach ($project in $projects) {

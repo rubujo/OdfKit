@@ -272,12 +272,13 @@ JSON 本文可能含姓名、PUA 或機關資料，不得放入 URL、metric lab
 
 Web Forms 的 `net48` 提供 `OdfWebFontDynamicHandler`。它只接受 API key 授權、JSON 本文、精確
 face／Profile／font-family／format allowlist，並以非阻塞 semaphore 限制 request-time 產字數；
-容量已滿回傳 429，不建立無界 queue。`net48` 可由 managed engine 產生 TrueType TTF／WOFF，
+容量已滿回傳 429，不建立無界 queue。`net48` 可由處理程序內 managed engine 產生 TrueType TTF／WOFF，
 以及 standalone／OTC face 的 CID-keyed／名稱式靜態 CFF、有 VariationStore 的 CFF2 variable 或省略
 VariationStore 的非變動 CFF2 WOFF；這些能力只承諾鎖定 corpus 的有界格式矩陣。`net48` 要求
 WOFF2、缺少或巢狀元件的名稱式 CFF `seac`、缺少 VariationStore
 卻使用 `vsindex`／`blend` 的 CFF2、未知 color table 版本或
-直接輸出 collection 會明確失敗。
+直接輸出 collection 會明確失敗。若 JSON 加入 `sidecar` 設定，Handler 會改將產字與來源
+coverage 篩選委派至同機 NativeAOT Host，因而可於 net48 request time 產生 WOFF2。
 
 API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiKeyAppSettingName` 指定的
 `web.config/appSettings` 鍵，預設為 `OdfKit.WebFonts.ApiKey`。環境變數優先序是明確契約。
@@ -287,6 +288,26 @@ API key 先由 JSON 指定的環境變數載入；若未設定，再讀取 `apiK
 JSON 設定可放在 `App_Data`，來源字型路徑只由部署端設定，HTTP 用戶端不能傳入路徑、URL 或
 hash。範例設定見
 [`samples/WebFonts.WebForms/webfonts.dynamic.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.example.json)。
+Sidecar 版本見
+[`samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json)。
+
+NativeAOT Host 是 self-contained 原生執行檔，部署時不需另行安裝 .NET 10 Runtime。以高熵
+`ODFKIT_WEBFONT_SIDECAR_TOKEN` 啟動 Host，且 IIS application pool 必須取得相同值；字型來源、
+資產根目錄與 pipe 名稱由部署端固定：
+
+```powershell
+$env:ODFKIT_WEBFONT_SIDECAR_TOKEN = '<secret-store-value>'
+OdfKit.WebFonts.Sidecar.Host.exe `
+  --pipe odfkit-webfonts-production `
+  --asset-root C:\Sites\App_Data\OdfWebFonts `
+  --font-source cns-ext-b=C:\Sites\App_Data\Fonts\TW-Sung-Ext-B-98_1.ttf
+```
+
+預設 pipe 只允許同一 Windows 使用者。IIS 與 sidecar 採不同服務帳號時，才加
+`--allow-cross-user`，並另以檔案 ACL、服務控制管理員權限及 secret store 隔離；僅有權杖不能
+取代作業系統存取控制。Host 與 net48 可使用不同架構，因此 32-bit application pool 可連線至
+x64 Host。`pwsh eng/Test-WebFontSidecarAot.ps1` 會發布 Host，並以 net48 用戶端及 System.Web
+Handler 真實產生 WOFF2。
 
 ```xml
 <appSettings>

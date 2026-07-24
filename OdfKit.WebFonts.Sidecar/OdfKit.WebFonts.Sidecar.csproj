@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <Import Project="..\eng\OdfKit.WebFonts.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.WebFonts.Sidecar</PackageId>
+    <TargetFrameworks>net10.0;net48</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Authenticated named-pipe client for delegating legacy-runtime WebFont generation to an OdfKit NativeAOT sidecar.</Description>
+    <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

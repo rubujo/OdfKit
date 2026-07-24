@@ -29,7 +29,8 @@ $sourceRoots = @(
     'OdfKit.WebFonts.OpenType',
     'OdfKit.WebFonts.Profiles',
     'OdfKit.WebFonts.Windows',
-    'OdfKit.WebFonts.Worker'
+    'OdfKit.WebFonts.Worker',
+    'OdfKit.WebFonts.Sidecar'
 )
 
 $declarationPattern = '^\s*(public|protected|protected\s+internal|private\s+protected)\s+(?!const\b)(?!readonly\b)(?!event\b).+'

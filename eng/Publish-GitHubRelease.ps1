@@ -48,6 +48,7 @@ if ([string]::IsNullOrWhiteSpace($Title)) {
 $outDir = Join-Path $repoRoot "artifacts/nuget"
 $bundlePath = Join-Path $repoRoot "artifacts/OdfKit-nuget-packages.zip"
 $sbomPath = Join-Path $repoRoot "artifacts/webfont-sbom/manifest.spdx.json"
+$sidecarRoot = Join-Path $repoRoot "artifacts/webfont-sidecar"
 
 Push-Location $repoRoot
 try {
@@ -70,7 +71,16 @@ try {
     if (-not (Test-Path -LiteralPath $sbomPath -PathType Leaf)) {
         throw "找不到已驗證 WebFont SPDX SBOM：$sbomPath"
     }
-    $bundleInputs = @($packages | ForEach-Object { $_.FullName }) + @($hashManifest, $sbomPath)
+    $sidecarAssets = @(
+        Get-ChildItem -LiteralPath $sidecarRoot -Filter *.zip -File
+        Get-Item -LiteralPath (Join-Path $sidecarRoot "OdfKit.WebFonts.Sidecar.Host-SHA256SUMS")
+    )
+    if ($sidecarAssets.Count -ne 3) {
+        throw "NativeAOT WebFont sidecar 發布資產不完整：$sidecarRoot"
+    }
+    $bundleInputs = @($packages | ForEach-Object { $_.FullName }) +
+        @($hashManifest, $sbomPath) +
+        @($sidecarAssets | ForEach-Object { $_.FullName })
 
     $bundleDir = Split-Path -Parent $bundlePath
     if (-not (Test-Path -LiteralPath $bundleDir)) {
@@ -138,6 +148,9 @@ try {
     Write-Host "  $(Split-Path -Leaf $bundlePath)"
     Write-Host "  $(Split-Path -Leaf $hashManifest)"
     Write-Host "  $(Split-Path -Leaf $sbomPath)"
+    foreach ($asset in $sidecarAssets) {
+        Write-Host "  $($asset.Name)"
+    }
 
     if (-not $CreateRelease) {
         Write-Host ""
@@ -151,7 +164,9 @@ try {
         throw "找不到 gh CLI。請安裝 GitHub CLI 並執行 gh auth login。"
     }
 
-    $assetPaths = @($bundlePath, $hashManifest, $sbomPath) + ($packages | ForEach-Object { $_.FullName })
+    $assetPaths = @($bundlePath, $hashManifest, $sbomPath) +
+        @($sidecarAssets | ForEach-Object { $_.FullName }) +
+        ($packages | ForEach-Object { $_.FullName })
     $ghArgs = @("release", "create", $Tag, "--title", $Title)
     if (-not [string]::IsNullOrWhiteSpace($NotesFile)) {
         $ghArgs += @("--notes-file", $NotesFile)

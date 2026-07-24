@@ -46,6 +46,7 @@ HTML anchor；外部 HTTP 連結不在此離線閘門的責任範圍。
 | `pwsh eng/Test-OoxmlVisualGolden.ps1` | OOXML 轉換視覺 golden |
 | `pwsh eng/Test-OdfPolicy.ps1` | 巨集淨化、外部資源 policy、加密邊界等 |
 | `pwsh eng/Test-NetFramework48Smoke.ps1` | Windows CLR 4.x 上執行四主格式與全部可封裝 extensions 的 net48 consumer smoke；pack 閘門會改用本機 nupkg |
+| `pwsh eng/Test-WebFontSidecarAot.ps1` | 發布 Windows NativeAOT WebFont Host，並由 net48 用戶端及 System.Web Handler 以真實字型產生 WOFF2 |
 | `pwsh eng/Test-RenderingBackends.ps1` | Rendering 擴充單元測試 |
 | `pwsh eng/Test-OfficeGuiSmoke.ps1` | 可選 GUI 煙霧（環境依賴較重） |
 

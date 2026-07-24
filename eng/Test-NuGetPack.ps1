@@ -56,6 +56,7 @@ $expectedPackages = @(
     @{ Id = "OdfKit.WebFonts.OpenType"; Assembly = "OdfKit.WebFonts.OpenType.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Build"; Tool = $true; Tfms = @(); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Worker"; Assembly = "OdfKit.WebFonts.Worker.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },
+    @{ Id = "OdfKit.WebFonts.Sidecar"; Assembly = "OdfKit.WebFonts.Sidecar.dll"; Tfms = @("net10.0", "net48"); Consumer = $false; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Profiles"; Assembly = "OdfKit.WebFonts.Profiles.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Windows"; Assembly = "OdfKit.WebFonts.Windows.dll"; Tfms = @("net10.0", "netstandard2.0"); Consumer = $true; RequireSnupkg = $true },
     @{ Id = "OdfKit.WebFonts.Hosting.AspNetCore"; Assembly = "OdfKit.WebFonts.Hosting.AspNetCore.dll"; Tfms = @("net10.0"); Consumer = $false; RequireSnupkg = $true },

@@ -7,15 +7,6 @@ namespace OdfKit.WebFonts.Worker;
 
 internal sealed class FileSystemGenerationCache
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        AllowTrailingCommas = false,
-        MaxDepth = 32,
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Disallow,
-        WriteIndented = false
-    };
-
     private readonly string _cacheDirectory;
     private readonly WebFontWorkerOptions _options;
 
@@ -64,7 +55,7 @@ internal sealed class FileSystemGenerationCache
         WebFontManifest manifest;
         try
         {
-            manifest = JsonSerializer.Deserialize<WebFontManifest>(bytes, SerializerOptions)
+            manifest = JsonSerializer.Deserialize(bytes, WebFontJsonContext.Default.WebFontManifest)
                 ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
         catch (JsonException exception)
@@ -122,7 +113,9 @@ internal sealed class FileSystemGenerationCache
         CancellationToken cancellationToken)
     {
         ValidateManifest(manifest, request, destinationDirectory);
-        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(manifest, SerializerOptions);
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(
+            manifest,
+            WebFontJsonContext.Default.WebFontManifest);
         if (bytes.Length <= 0 || bytes.Length > _options.MaxCachedManifestBytes)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
@@ -301,9 +294,9 @@ internal sealed class FileSystemGenerationCache
                     continue;
                 }
 
-                WebFontManifest? manifest = JsonSerializer.Deserialize<WebFontManifest>(
+                WebFontManifest? manifest = JsonSerializer.Deserialize(
                     File.ReadAllBytes(manifestFile.FullName),
-                    SerializerOptions);
+                    WebFontJsonContext.Default.WebFontManifest);
                 if (manifest?.Assets is null)
                 {
                     continue;

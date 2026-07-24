@@ -20,9 +20,9 @@ internal static class Program
     private static int Main()
     {
         string root = Path.Combine(Path.GetTempPath(), "OdfKitNet48_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(root);
         try
         {
+            Directory.CreateDirectory(root);
             VerifyText(Path.Combine(root, "smoke.odt"));
             VerifySpreadsheet(Path.Combine(root, "smoke.ods"));
             VerifyPresentation(Path.Combine(root, "smoke.odp"));
@@ -31,9 +31,27 @@ internal static class Program
             Console.WriteLine("OdfKit net48 smoke passed on CLR " + Environment.Version + ".");
             return 0;
         }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(exception.GetType().FullName);
+            Console.Error.WriteLine(exception.Message);
+            Console.Error.WriteLine(exception.StackTrace);
+            return 1;
+        }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            try
+            {
+                if (Directory.Exists(root))
+                {
+                    Directory.Delete(root, recursive: true);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine(exception.GetType().FullName);
+                Console.Error.WriteLine(exception.Message);
+            }
         }
     }
 

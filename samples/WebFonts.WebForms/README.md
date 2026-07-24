@@ -12,8 +12,10 @@
 
 受信任後端以 `POST /_odf-fonts/generate` 與 `X-OdfKit-WebFont-Key` 要求動態產字；公開頁面只
 GET 回傳 manifest 中的內容定址資產。Handler 使用有界並行、face／Profile／format allowlist，
-並在相同路徑保留預產生 manifest／CSS fallback。`net48` 明確只產生 TTF／WOFF，不會靜默把
-WOFF2 改成其它格式。正式部署與 JSON 本文範例見 [`docs/webfonts.md`](../../docs/webfonts.md)。
+並在相同路徑保留預產生 manifest／CSS fallback。`net48` 的處理程序內引擎明確只產生
+TTF／WOFF，不會靜默把 WOFF2 改成其它格式；需要 request-time WOFF2 時，可改用
+`webfonts.dynamic.sidecar.example.json`，連線至不需安裝 .NET Runtime 的 NativeAOT sidecar。
+正式部署與 JSON 本文範例見 [`docs/webfonts.md`](../../docs/webfonts.md)。
 動態 POST 的成功、授權、格式、限流與暫時失敗回應皆禁止快取；manifest、CSS 與內容定址字型
 支援 GET／HEAD、SHA-256 ETag 及 304。Handler 逐 byte 傳送已驗證的 UTF-8 CSS，避免轉碼造成
 manifest hash 與 CDN 實際內容不一致。

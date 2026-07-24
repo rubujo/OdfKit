@@ -24,8 +24,9 @@
 | `OdfKit.WebFonts.Windows` | `net10.0;netstandard2.0` | Windows EUDC／`.tte` 輸入整合 | 僅在合法且明確設定的來源上使用 |
 | `OdfKit.WebFonts.Build` | `net10.0` | CLI 與 MSBuild 預產生工具 | 以 .NET tool 形式封裝 |
 | `OdfKit.WebFonts.Worker` | `net10.0` | 有界背景產生與內容定址快取 | 不代表多節點 durable store 已內建 |
+| `OdfKit.WebFonts.Sidecar` | `net10.0;net48` | 具名 pipe 用戶端與版本化協定 | Host 以同版 Windows NativeAOT 執行檔另行部署 |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | `net10.0` | ASP.NET Core 動態與靜態 WebFont 託管 | 支援授權、CSP、CORS 與反向代理部署設定 |
-| `OdfKit.WebFonts.Hosting.SystemWeb` | `net48` | ASP.NET Web Forms／System.Web Handler | 支援 `Web.config` 設定與靜態 fallback |
+| `OdfKit.WebFonts.Hosting.SystemWeb` | `net48` | ASP.NET Web Forms／System.Web Handler | 處理程序內 TTF／WOFF；選用 sidecar 可動態產生 WOFF2 |
 | `OdfKit.Extensions.Html.WebFonts` | `net10.0;netstandard2.0` | HTML exporter 的 WebFont integration | WebFont 是獨立產品能力，HTML 僅為整合之一 |
 
 **非套件發佈**：`OdfKit.Cli`、`OdfSchemaGenerator`、`OdfCorpusGenerator`、
@@ -38,6 +39,7 @@
 | 核心與可攜式 managed 程式庫 | `net10.0;netstandard2.0` | 最新 .NET 與最大消費端相容面 |
 | WebFont Build／Worker／ASP.NET Core | `net10.0` | 建置工具、背景工作與現代網站託管 |
 | WebFont System.Web | `net48` | ASP.NET Web Forms 與傳統 IIS 網站託管 |
+| WebFont NativeAOT sidecar Host | `net10.0` 發布工具鏈；Windows x64／ARM64 原生產物 | net48 request-time WOFF2；部署端不需 .NET Runtime |
 | `OdfKit.Cli` | `net10.0;net8.0` | 命令列工具 |
 | `OdfKit.Tests` | `net10.0;net8.0` | 單元、整合與互通驗證 |
 
