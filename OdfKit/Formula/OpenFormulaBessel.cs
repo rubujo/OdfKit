@@ -11,6 +11,13 @@ internal static class OpenFormulaBessel
     private const double LogDoubleMax = 709.782712893384;
     private const double LogDoubleMin = -745.133219101941;
 
+    private static readonly double[] LogGammaCoefficients =
+    [
+        676.5203681218851, -1259.1392167224028, 771.32342877765313,
+        -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+        9.9843695780195716e-6, 1.5056327351493116e-7
+    ];
+
     internal static double I(double x, int order)
     {
         if (x == 0)
@@ -437,17 +444,11 @@ internal static class OpenFormulaBessel
 
     private static double LogGamma(double value)
     {
-        double[] coefficients =
-        [
-            676.5203681218851, -1259.1392167224028, 771.32342877765313,
-            -176.61502916214059, 12.507343278686905, -0.13857109526572012,
-            9.9843695780195716e-6, 1.5056327351493116e-7
-        ];
         value--;
         double sum = 0.99999999999980993;
-        for (int index = 0; index < coefficients.Length; index++)
-            sum += coefficients[index] / (value + index + 1);
-        double shifted = value + coefficients.Length - 0.5;
+        for (int index = 0; index < LogGammaCoefficients.Length; index++)
+            sum += LogGammaCoefficients[index] / (value + index + 1);
+        double shifted = value + LogGammaCoefficients.Length - 0.5;
         return (0.5 * Math.Log(2 * Math.PI)) +
             ((value + 0.5) * Math.Log(shifted)) -
             shifted +

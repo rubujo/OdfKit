@@ -467,6 +467,23 @@ public static class OdfExternalScriptCompiler
         return port;
     }
 
+    // 關鍵字後的分隔字元不保證是半形空白，也可能是 Tab；一併比對避免中和邏輯被繞過。
+    private static bool TryMatchDeclarationKeyword(string declaration, string lower, string keyword, out int nameStart)
+    {
+        if (lower.Length > keyword.Length &&
+            lower.StartsWith(keyword, StringComparison.Ordinal) &&
+            char.IsWhiteSpace(declaration[keyword.Length]))
+        {
+            nameStart = keyword.Length;
+            while (nameStart < declaration.Length && char.IsWhiteSpace(declaration[nameStart]))
+                nameStart++;
+            return true;
+        }
+
+        nameStart = 0;
+        return false;
+    }
+
     private static string PrepareBasicCompileModule(string source, out string entryPoint)
     {
         string[] lines = source.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
@@ -476,27 +493,23 @@ public static class OdfExternalScriptCompiler
             string lower = declaration.ToLowerInvariant();
             string kind;
             int nameStart;
-            if (lower.StartsWith("sub ", StringComparison.Ordinal))
+            if (TryMatchDeclarationKeyword(declaration, lower, "sub", out nameStart))
             {
                 kind = "Sub";
-                nameStart = 4;
             }
-            else if (lower.StartsWith("function ", StringComparison.Ordinal))
+            else if (TryMatchDeclarationKeyword(declaration, lower, "function", out nameStart))
             {
                 kind = "Function";
-                nameStart = 9;
             }
-            else if (lower.StartsWith("public sub ", StringComparison.Ordinal) ||
-                lower.StartsWith("private sub ", StringComparison.Ordinal))
+            else if (TryMatchDeclarationKeyword(declaration, lower, "public sub", out nameStart) ||
+                TryMatchDeclarationKeyword(declaration, lower, "private sub", out nameStart))
             {
                 kind = "Sub";
-                nameStart = declaration.IndexOf("sub ", StringComparison.OrdinalIgnoreCase) + 4;
             }
-            else if (lower.StartsWith("public function ", StringComparison.Ordinal) ||
-                lower.StartsWith("private function ", StringComparison.Ordinal))
+            else if (TryMatchDeclarationKeyword(declaration, lower, "public function", out nameStart) ||
+                TryMatchDeclarationKeyword(declaration, lower, "private function", out nameStart))
             {
                 kind = "Function";
-                nameStart = declaration.IndexOf("function ", StringComparison.OrdinalIgnoreCase) + 9;
             }
             else
             {
