@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Daftar fungsi formula tidak boleh null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Daftar fungsi formula tidak boleh null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Penilai formula tidak boleh null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL belum sah: thisUpdate ({0}) adalah selepas masa semasa ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRL tiada medan nextUpdate, yang diperlukan untuk mewujudkan kepercayaan bagi CRL daripada sumber yang tidak dipercayai.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRL telah tamat tempoh: nextUpdate ({0}) adalah sebelum masa semasa ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "CRL terbenam gagal semakan tempoh sah laku: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "CRL yang dimuat turun gagal semakan tempoh sah laku: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "Elemen CertDigest XAdES-BES tiada.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Algoritma digest sijil tidak disokong: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Digest sijil penandatangan tidak sepadan dengan nilai CertDigest XAdES.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Nombor siri sijil {0} tidak sepadan dengan XAdES IssuerSerial {1}.",
         };
     }
 }

@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Rejestr funkcji formuły nie może mieć wartości null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Rejestr funkcji formuły nie może mieć wartości null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Ewaluator formuł nie może mieć wartości null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL nie jest jeszcze wazny: thisUpdate ({0}) jest pozniejszy niz biezacy czas ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "W CRL brakuje pola nextUpdate, ktore jest wymagane do ustalenia zaufania dla CRL pochodzacych z niezaufanych zrodel.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRL wygasl: nextUpdate ({0}) jest wczesniejszy niz biezacy czas ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "Osadzony CRL nie przeszedl sprawdzenia okresu waznosci: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "Pobrany CRL nie przeszedl sprawdzenia okresu waznosci: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "Brak elementow CertDigest XAdES-BES.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Nieobslugiwany algorytm skrotu certyfikatu: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Skrot certyfikatu podpisujacego nie zgadza sie z wartoscia CertDigest XAdES.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Numer seryjny certyfikatu {0} nie zgadza sie z XAdES IssuerSerial {1}.",
         };
     }
 }

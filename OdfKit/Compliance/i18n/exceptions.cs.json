@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Název funkce vzorce {0} je neplatný.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Registr funkcí vzorce nesmí být null.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "Registr funkcí vzorce nesmí být null.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Vyhodnocovač vzorců nesmí být null."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Vyhodnocovač vzorců nesmí být null.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "CRL jeste neni platny: thisUpdate ({0}) je pozdejsi nez aktualni cas ({1}).",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "CRL neobsahuje pole nextUpdate, ktere je nutne k overeni duveryhodnosti CRL z neduveryhodnych zdroju.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "Platnost CRL vyprsela: nextUpdate ({0}) je drivejsi nez aktualni cas ({1}).",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "Vlozeny CRL neprosel kontrolou doby platnosti: {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "Stazeny CRL neprosel kontrolou doby platnosti: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "Chybi prvky CertDigest XAdES-BES.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Nepodporovany algoritmus otisku certifikatu: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Otisk podepisujiciho certifikatu neodpovida hodnote CertDigest XAdES.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Seriove cislo certifikatu {0} neodpovida XAdES IssuerSerial {1}."
 }

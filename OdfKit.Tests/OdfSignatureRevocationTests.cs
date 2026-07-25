@@ -25,6 +25,15 @@ namespace OdfKit.Tests;
 /// 一般驗證失敗結果），以精準鎖定這三個檔案本身的行為語意；TSA／CRL HTTP 用戶端則因其成員為
 /// internal static，直接呼叫即可，不需反射。
 /// </summary>
+// 依 DocsAndCorpusContractTests.LargeTestFilesDeclareCategoryTrait 的門檻（>= 700 行且含
+// [Fact]/[Theory]）宣告分類。選擇 Boundary 而非 Smoke：本檔測試 CRL／TSA 有效期、簽章鏈與撤銷
+// 檢查等安全邊界條件（缺少 nextUpdate、序號 0、偽造時間戳等），性質與同樣標記 Boundary 的
+// AdvancedSecurityTests.cs（本檔涵蓋範圍的姊妹檔）一致，而非 Windows smoke 矩陣鎖定的
+// 快速好路徑子集。.github/workflows/ci.yml 的 Windows smoke 矩陣以
+// Category=Smoke&FullyQualifiedName~<特定類別> 篩選，目前沒有任何條目引用
+// OdfSignatureRevocationTests，因此標記 Boundary 不會、也不需要把本檔拉進該矩陣；
+// 本檔仍由不加篩選的完整回歸套件（同工作流程的 full regression job，兩個 TFM）每次涵蓋。
+[Trait(TestCategories.Kind, TestCategories.Boundary)]
 public class OdfSignatureRevocationTests
 {
     private static readonly MethodInfo s_verifyRevocationMethod =
@@ -312,6 +321,155 @@ public class OdfSignatureRevocationTests
 
     #endregion
 
+    #region CRL 有效期檢查（修正 1：簽章合法但已過期／尚未生效／缺少 nextUpdate 的 CRL 不可被採信）
+
+    /// <summary>
+    /// 修正 1 的核心攻擊情境：攻擊者取得憑證撤銷之前、由 CA 正式簽發、簽章完全合法的舊 CRL
+    /// （issuer 與簽章皆通過驗證，且不含該憑證序號），嵌入文件企圖繞過撤銷檢查。
+    /// 在加入 thisUpdate／nextUpdate 有效期檢查之前，這會讓 checkedAnyCrl 被設為 true，
+    /// 使第 207 行附近的保險絲被跳過，最終被誤判為「已成功檢查且未撤銷」而通過驗證——
+    /// 即使 options.CheckRevocation 為 true 也擋不住。修正後必須視同撤銷檢查失敗。
+    /// </summary>
+    [Fact]
+    public async Task EmbeddedCrlExpired_SignatureValidIssuerMatches_TreatedAsRevocationCheckFailedNotUnrevoked()
+    {
+        var (root, leaf) = GenerateCertificateChain("RevRootExpired", "RevLeafExpired");
+        using var rootCert = root;
+        using var leafCert = leaf;
+
+        // UTCTime 兩位數年份規則（RFC 5280 §4.1.2.5.1，BouncyCastle 亦採此規則）：YY >= 50 對應 19YY。
+        // 990101／990201 因此代表 1999 年，確保在任何執行時間點都早已過期，不含該憑證序號，
+        // 藉此排除「因序號比對而判定撤銷」的可能，單純鎖定「有效期檢查」本身。
+        byte[] expiredCrl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            thisUpdateDer: "990101000000Z",
+            nextUpdateDer: "990201000000Z");
+
+        var options = new OdfSigningOptions { CheckRevocation = true };
+        var singleResult = new OdfSingleSignatureValidationResult { IsRevocationValid = true };
+        var chainCerts = new List<X509Certificate2> { leafCert, rootCert };
+        var embeddedCrls = new List<byte[]> { expiredCrl };
+
+        bool result = await InvokeVerifyRevocationStatusAsync(
+            chainCerts, embeddedCrls, options, singleResult, TestContext.Current.CancellationToken);
+
+        Assert.False(result);
+        Assert.False(singleResult.IsRevocationValid);
+        Assert.Equal("REVOCATION_CHECK_FAILED", singleResult.ErrorCode);
+    }
+
+    [Fact]
+    public async Task EmbeddedCrlNotYetValid_TreatedAsRevocationCheckFailed()
+    {
+        var (root, leaf) = GenerateCertificateChain("RevRootNotYet", "RevLeafNotYet");
+        using var rootCert = root;
+        using var leafCert = leaf;
+
+        // YY < 50 對應 20YY：48／49 代表 2048／2049，確保 thisUpdate 落在任何執行時間點的未來。
+        byte[] notYetValidCrl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            thisUpdateDer: "480101000000Z",
+            nextUpdateDer: "491231235959Z");
+
+        var options = new OdfSigningOptions { CheckRevocation = true };
+        var singleResult = new OdfSingleSignatureValidationResult { IsRevocationValid = true };
+        var chainCerts = new List<X509Certificate2> { leafCert, rootCert };
+        var embeddedCrls = new List<byte[]> { notYetValidCrl };
+
+        bool result = await InvokeVerifyRevocationStatusAsync(
+            chainCerts, embeddedCrls, options, singleResult, TestContext.Current.CancellationToken);
+
+        Assert.False(result);
+        Assert.False(singleResult.IsRevocationValid);
+        Assert.Equal("REVOCATION_CHECK_FAILED", singleResult.ErrorCode);
+    }
+
+    /// <summary>
+    /// nextUpdate 為選用欄位，但對不可信來源的內嵌 CRL 從嚴解讀：省略 nextUpdate 一律視為
+    /// 「無法確認有效期」而拒絕採信，不得放行為「永久有效」。
+    /// </summary>
+    [Fact]
+    public async Task EmbeddedCrlMissingNextUpdate_TreatedAsRevocationCheckFailed()
+    {
+        var (root, leaf) = GenerateCertificateChain("RevRootNoNextUpdate", "RevLeafNoNextUpdate");
+        using var rootCert = root;
+        using var leafCert = leaf;
+
+        byte[] missingNextUpdateCrl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            nextUpdateDer: null);
+
+        var options = new OdfSigningOptions { CheckRevocation = true };
+        var singleResult = new OdfSingleSignatureValidationResult { IsRevocationValid = true };
+        var chainCerts = new List<X509Certificate2> { leafCert, rootCert };
+        var embeddedCrls = new List<byte[]> { missingNextUpdateCrl };
+
+        bool result = await InvokeVerifyRevocationStatusAsync(
+            chainCerts, embeddedCrls, options, singleResult, TestContext.Current.CancellationToken);
+
+        Assert.False(result);
+        Assert.False(singleResult.IsRevocationValid);
+        Assert.Equal("REVOCATION_CHECK_FAILED", singleResult.ErrorCode);
+    }
+
+    /// <summary>
+    /// 線上下載 CRL 路徑必須與內嵌 CRL 路徑受到相同的有效期檢查涵蓋。
+    /// </summary>
+    [Fact]
+    public async Task OnlineCrlExpired_TreatedAsDistributionPointFailure()
+    {
+        byte[] cdp = BuildCdpExtension("http://crl.example.test/expired.crl");
+        var (root, leaf) = GenerateCertificateChain("RevRootOnlineExpired", "RevLeafOnlineExpired", cdp);
+        using var rootCert = root;
+        using var leafCert = leaf;
+
+        byte[] expiredCrl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            thisUpdateDer: "990101000000Z",
+            nextUpdateDer: "990201000000Z");
+
+        var handler = new MockHttpMessageHandler((request, ct) =>
+            Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(expiredCrl)
+            }));
+        using var httpClient = new HttpClient(handler);
+
+        var options = new OdfSigningOptions { CheckRevocation = true, HttpClient = httpClient };
+        var singleResult = new OdfSingleSignatureValidationResult { IsRevocationValid = true };
+        var chainCerts = new List<X509Certificate2> { leafCert, rootCert };
+
+        bool result = await InvokeVerifyRevocationStatusAsync(
+            chainCerts, new List<byte[]>(), options, singleResult, TestContext.Current.CancellationToken);
+
+        Assert.False(result);
+        Assert.False(singleResult.IsRevocationValid);
+        Assert.Equal("REVOCATION_CHECK_FAILED", singleResult.ErrorCode);
+        Assert.Contains(singleResult.Warnings, w => w.Contains("expired.crl", StringComparison.Ordinal));
+    }
+
+    #endregion
+
+    #region GetRevokedSerialNumbers 解析失敗不可靜默吞掉（修正 2）
+
+    /// <summary>
+    /// 修正前：GetRevokedSerialNumbers 內部有空的 catch { }，任何解析例外都會被吞掉並靜默回傳
+    /// （可能是部分或完全空的）撤銷序號集合，導致呼叫端誤判為「未撤銷」。
+    /// 修正後：解析失敗必須向外拋出，交由呼叫端轉為撤銷檢查失敗，而非被靜默吞掉。
+    /// </summary>
+    [Fact]
+    public void GetRevokedSerialNumbers_MalformedCrlContent_ThrowsInsteadOfSilentlyReturningEmpty()
+    {
+        byte[] garbage = { 0x01, 0x02, 0x03 };
+        Assert.ThrowsAny<Exception>(() => OdfSignatureCrlUtilities.GetRevokedSerialNumbers(garbage));
+    }
+
+    #endregion
+
     #region 外部 CancellationToken 取消傳遞
 
     /// <summary>
@@ -408,6 +566,70 @@ public class OdfSignatureRevocationTests
         Assert.Equal(2, urls.Count);
         Assert.Equal("http://crl.example.test/one.crl", urls[0]);
         Assert.Equal("http://crl.example.test/two.crl", urls[1]);
+    }
+
+    [Fact]
+    public void IsCrlTimeValid_WithinThisUpdateAndNextUpdate_ReturnsTrue()
+    {
+        var (root, _) = GenerateCertificateChain("RevRootTimeValidUnit", "RevLeafTimeValidUnit");
+        using var rootCert = root;
+
+        byte[] crl = CreateMockCrlBytes(rootCert, new List<string>());
+
+        bool isValid = OdfSignatureCrlUtilities.IsCrlTimeValid(crl, DateTime.UtcNow, out string? invalidReason);
+
+        Assert.True(isValid);
+        Assert.Null(invalidReason);
+    }
+
+    [Fact]
+    public void IsCrlTimeValid_NextUpdateBeforeNow_ReturnsFalseWithReason()
+    {
+        var (root, _) = GenerateCertificateChain("RevRootExpiredUnit", "RevLeafExpiredUnit");
+        using var rootCert = root;
+
+        byte[] crl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            thisUpdateDer: "990101000000Z",
+            nextUpdateDer: "990201000000Z");
+
+        bool isValid = OdfSignatureCrlUtilities.IsCrlTimeValid(crl, DateTime.UtcNow, out string? invalidReason);
+
+        Assert.False(isValid);
+        Assert.False(string.IsNullOrEmpty(invalidReason));
+    }
+
+    [Fact]
+    public void IsCrlTimeValid_ThisUpdateAfterNow_ReturnsFalseWithReason()
+    {
+        var (root, _) = GenerateCertificateChain("RevRootNotYetUnit", "RevLeafNotYetUnit");
+        using var rootCert = root;
+
+        byte[] crl = CreateMockCrlBytes(
+            rootCert,
+            new List<string>(),
+            thisUpdateDer: "480101000000Z",
+            nextUpdateDer: "491231235959Z");
+
+        bool isValid = OdfSignatureCrlUtilities.IsCrlTimeValid(crl, DateTime.UtcNow, out string? invalidReason);
+
+        Assert.False(isValid);
+        Assert.False(string.IsNullOrEmpty(invalidReason));
+    }
+
+    [Fact]
+    public void IsCrlTimeValid_MissingNextUpdate_ReturnsFalseWithReason()
+    {
+        var (root, _) = GenerateCertificateChain("RevRootNoNextUpdateUnit", "RevLeafNoNextUpdateUnit");
+        using var rootCert = root;
+
+        byte[] crl = CreateMockCrlBytes(rootCert, new List<string>(), nextUpdateDer: null);
+
+        bool isValid = OdfSignatureCrlUtilities.IsCrlTimeValid(crl, DateTime.UtcNow, out string? invalidReason);
+
+        Assert.False(isValid);
+        Assert.False(string.IsNullOrEmpty(invalidReason));
     }
 
     #endregion
@@ -587,18 +809,31 @@ public class OdfSignatureRevocationTests
         return WrapTlv(0x30, statusInfo);
     }
 
-    private static byte[] CreateMockCrlBytes(X509Certificate2 issuerCert, List<string> revokedSerials, bool useInvalidSignature = false)
+    /// <summary>
+    /// 建立測試用 CRL 位元組。<paramref name="thisUpdateDer"/>／<paramref name="nextUpdateDer"/> 採 UTCTime
+    /// 內容格式（YYMMDDHHMMSSZ）；<paramref name="nextUpdateDer"/> 傳入 <see langword="null"/> 代表完全省略
+    /// nextUpdate 欄位（用於驗證「缺少 nextUpdate 一律視為無法採信」的從嚴語意）。預設值刻意選在測試執行時
+    /// 的合理有效期間內（thisUpdate 為過去、nextUpdate 為遠未來），確保未特別指定日期的既有測試案例
+    /// 不受 CRL 有效期檢查影響。
+    /// </summary>
+    private static byte[] CreateMockCrlBytes(
+        X509Certificate2 issuerCert,
+        List<string> revokedSerials,
+        bool useInvalidSignature = false,
+        string thisUpdateDer = "260611000000Z",
+        string? nextUpdateDer = "270611000000Z")
     {
         byte[] sigAlg = { 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b, 0x05, 0x00 };
         byte[] issuerName = issuerCert.IssuerName.RawData;
-        byte[] thisUpdate = { 0x17, 0x0d, (byte)'2', (byte)'6', (byte)'0', (byte)'6', (byte)'1', (byte)'1', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'Z' };
+        byte[] thisUpdate = EncodeUtcTime(thisUpdateDer);
+        byte[] nextUpdate = nextUpdateDer != null ? EncodeUtcTime(nextUpdateDer) : Array.Empty<byte>();
 
         var revokedItemsList = new List<byte[]>();
         foreach (string serialHex in revokedSerials)
         {
             byte[] serialBytes = ParseHex(serialHex);
             byte[] integerBytes = WrapTlv(0x02, serialBytes);
-            byte[] dateBytes = { 0x17, 0x0d, (byte)'2', (byte)'6', (byte)'0', (byte)'6', (byte)'1', (byte)'1', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'Z' };
+            byte[] dateBytes = EncodeUtcTime("260611000000Z");
 
             byte[] itemInner = Concat(new[] { integerBytes, dateBytes });
             revokedItemsList.Add(WrapTlv(0x30, itemInner));
@@ -608,7 +843,7 @@ public class OdfSignatureRevocationTests
             ? WrapTlv(0x30, Concat(revokedItemsList))
             : Array.Empty<byte>();
 
-        byte[] tbsInner = Concat(new[] { sigAlg, issuerName, thisUpdate, revokedSeq });
+        byte[] tbsInner = Concat(new[] { sigAlg, issuerName, thisUpdate, nextUpdate, revokedSeq });
         byte[] tbsCertList = WrapTlv(0x30, tbsInner);
 
         byte[] sigValueBytes;
@@ -636,6 +871,11 @@ public class OdfSignatureRevocationTests
         byte[] outerInner = Concat(new[] { tbsCertList, sigAlg, sigValueBytes });
         return WrapTlv(0x30, outerInner);
     }
+
+    /// <summary>
+    /// 將 UTCTime 內容字串（YYMMDDHHMMSSZ）編碼為 DER UTCTime（tag 0x17）。
+    /// </summary>
+    private static byte[] EncodeUtcTime(string yyMmDdHhMmSsZ) => WrapTlv(0x17, Encoding.ASCII.GetBytes(yyMmDdHhMmSsZ));
 
     private static byte[] WrapTlv(byte tag, byte[] inner)
     {

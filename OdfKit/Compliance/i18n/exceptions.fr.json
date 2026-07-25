@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Le nom de fonction de formule {0} est incorrect.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Le registre des fonctions de formule ne peut pas être null.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "Le registre des fonctions de formule ne peut pas être null.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Le moteur de calcul de formule ne peut pas être null."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Le moteur de calcul de formule ne peut pas être null.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "Le CRL n'est pas encore valide : thisUpdate ({0}) est posterieur a l'heure actuelle ({1}).",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "Le CRL ne contient pas le champ nextUpdate, requis pour etablir la confiance des CRL provenant de sources non fiables.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "Le CRL a expire : nextUpdate ({0}) est anterieur a l'heure actuelle ({1}).",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "Le CRL integre a echoue a la verification de sa periode de validite : {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "Le CRL telecharge a echoue a la verification de sa periode de validite : {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "Les elements CertDigest XAdES-BES sont manquants.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Algorithme de condense de certificat non pris en charge : {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Le condense du certificat de signature ne correspond pas a la valeur CertDigest XAdES.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Le numero de serie du certificat {0} ne correspond pas a l'IssuerSerial XAdES {1}."
 }

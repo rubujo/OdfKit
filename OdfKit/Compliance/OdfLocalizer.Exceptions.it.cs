@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Il registro delle funzioni formula non può essere null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Il registro delle funzioni formula non può essere null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Il valutatore di formule non può essere null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "Il CRL non e ancora valido: thisUpdate ({0}) e successivo all'ora corrente ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "Al CRL manca il campo nextUpdate, necessario per stabilire l'affidabilita dei CRL provenienti da fonti non attendibili.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "Il CRL e scaduto: nextUpdate ({0}) e precedente all'ora corrente ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "Il CRL incorporato non ha superato il controllo del periodo di validita: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "Il CRL scaricato non ha superato il controllo del periodo di validita: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "Mancano gli elementi CertDigest XAdES-BES.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Algoritmo di digest del certificato non supportato: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Il digest del certificato di firma non corrisponde al valore CertDigest XAdES.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Il numero di serie del certificato {0} non corrisponde all'IssuerSerial XAdES {1}.",
         };
     }
 }

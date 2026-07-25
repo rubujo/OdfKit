@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "De formulefunctienaam {0} is ongeldig.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Het formulefunctieregister mag niet null zijn.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "Het formulefunctieregister mag niet null zijn.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "De formule-evaluator mag niet null zijn."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "De formule-evaluator mag niet null zijn.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "De CRL is nog niet geldig: thisUpdate ({0}) ligt na de huidige tijd ({1}).",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "De CRL mist het veld nextUpdate, dat vereist is om vertrouwen vast te stellen voor CRL's van niet-vertrouwde bronnen.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "De CRL is verlopen: nextUpdate ({0}) ligt voor de huidige tijd ({1}).",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "De ingesloten CRL heeft de geldigheidscontrole niet doorstaan: {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "De gedownloade CRL heeft de geldigheidscontrole niet doorstaan: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "De XAdES-BES CertDigest-elementen ontbreken.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Niet-ondersteund certificaat-digestalgoritme: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "De digest van het ondertekeningscertificaat komt niet overeen met de XAdES CertDigest-waarde.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Het certificaatserienummer {0} komt niet overeen met de XAdES IssuerSerial {1}."
 }

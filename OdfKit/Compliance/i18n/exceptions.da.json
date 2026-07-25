@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Formelfunktionsnavnet {0} er ugyldigt.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Formelfunktionsregistret må ikke være null.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "Formelfunktionsregistret må ikke være null.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Formelevaluatoren må ikke være null."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Formelevaluatoren må ikke være null.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "CRL'en er endnu ikke gyldig: thisUpdate ({0}) er senere end det aktuelle tidspunkt ({1}).",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "CRL'en mangler feltet nextUpdate, som er noedvendigt for at fastslaa tilliden til CRL'er fra ubetroede kilder.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "CRL'en er udloebet: nextUpdate ({0}) er tidligere end det aktuelle tidspunkt ({1}).",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "Den indlejrede CRL bestod ikke kontrollen af gyldighedsperioden: {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "Den downloadede CRL bestod ikke kontrollen af gyldighedsperioden: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "XAdES-BES CertDigest-elementerne mangler.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Ikke-understoettet certifikat-digest-algoritme: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Signeringscertifikatets digest stemmer ikke overens med XAdES CertDigest-vaerdien.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Certifikatets serienummer {0} stemmer ikke overens med XAdES IssuerSerial {1}."
 }

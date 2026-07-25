@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "公式函式註冊表不可為 null。",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "公式函式註冊表不可為 null。",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "公式評估器不可為 null。",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL 尚未生效：thisUpdate（{0}）晚於目前時間（{1}）。",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRL 缺少 nextUpdate 欄位；對不可信來源的 CRL 而言，此欄位為判定可信度所必需。",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRL 已過期：nextUpdate（{0}）早於目前時間（{1}）。",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "內嵌 CRL 未通過有效期檢查：{0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "下載的 CRL 未通過有效期檢查：{0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "缺少 XAdES-BES CertDigest 元素。",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "不支援的憑證摘要演算法：{0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "簽章憑證的摘要值與 XAdES CertDigest 不符。",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "憑證序號 {0} 與 XAdES IssuerSerial {1} 不符。",
         };
     }
 }

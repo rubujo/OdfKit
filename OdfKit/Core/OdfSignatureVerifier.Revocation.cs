@@ -66,8 +66,23 @@ internal static partial class OdfSignatureVerifier
                             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_InvalidEmbeddedCrlSignature"));
                         }
 
-                        checkedAnyCrl = true;
+                        // 簽章合法只代表這份 CRL 確實由該發行者簽發，不代表它「現在」仍可採信：
+                        // 攻擊者可嵌入憑證撤銷之前、簽章完全合法的舊 CRL 來規避撤銷檢查（RFC 5280 §6.3.3）。
+                        // 因此在採信其撤銷內容之前，必須先確認目前時間落在 thisUpdate／nextUpdate 之間。
+                        if (!OdfSignatureCrlUtilities.IsCrlTimeValid(crlBytes, DateTime.UtcNow, out string? embeddedCrlTimeInvalidReason))
+                        {
+                            singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
+                            throw new CryptographicException(OdfLocalizer.GetMessage(
+                                "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid",
+                                embeddedCrlTimeInvalidReason ?? string.Empty));
+                        }
+
+                        // checkedAnyCrl 必須在撤銷清單解析成功「之後」才設為 true：若 GetRevokedSerialNumbers
+                        // 擲出例外（例如 CRL 內容格式異常），下方的 catch 會依 options.CheckRevocation 轉為
+                        // REVOCATION_CHECK_FAILED，而不會讓第 207 行附近的保險絲因 checkedAnyCrl 已為 true
+                        // 而被跳過，避免撤銷檢查失敗被誤判為「已成功檢查且未撤銷」。
                         var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
+                        checkedAnyCrl = true;
                         if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
                         {
                             isRevoked = true;
@@ -163,8 +178,20 @@ internal static partial class OdfSignatureVerifier
                                     throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_InvalidDownloadedCrlSignature"));
                                 }
 
-                                onlineCrlCheckedSuccessfully = true;
+                                // 與內嵌 CRL 相同的道理：簽章合法不代表這份 CRL 目前仍在有效期內，
+                                // 必須先通過 thisUpdate／nextUpdate 檢查才可採信其撤銷內容（RFC 5280 §6.3.3）。
+                                if (!OdfSignatureCrlUtilities.IsCrlTimeValid(crlBytes, DateTime.UtcNow, out string? downloadedCrlTimeInvalidReason))
+                                {
+                                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
+                                    throw new CryptographicException(OdfLocalizer.GetMessage(
+                                        "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid",
+                                        downloadedCrlTimeInvalidReason ?? string.Empty));
+                                }
+
+                                // onlineCrlCheckedSuccessfully 同樣延後到撤銷清單解析成功之後才設為 true，
+                                // 理由與內嵌 CRL 路徑相同：避免解析失敗被誤判為「已成功檢查」。
                                 var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
+                                onlineCrlCheckedSuccessfully = true;
                                 if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
                                 {
                                     isRevoked = true;

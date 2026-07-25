@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "Der Formelfunktionsname {0} ist ungültig.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "Die Formelfunktionsregistrierung darf nicht null sein.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "Die Formelfunktionsregistrierung darf nicht null sein.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Der Formelauswerter darf nicht null sein."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "Der Formelauswerter darf nicht null sein.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "Die CRL ist noch nicht gueltig: thisUpdate ({0}) liegt nach der aktuellen Zeit ({1}).",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "Der CRL fehlt das Feld nextUpdate, das erforderlich ist, um die Vertrauenswuerdigkeit von CRLs aus nicht vertrauenswuerdigen Quellen festzustellen.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "Die CRL ist abgelaufen: nextUpdate ({0}) liegt vor der aktuellen Zeit ({1}).",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "Die eingebettete CRL hat die Gueltigkeitspruefung nicht bestanden: {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "Die heruntergeladene CRL hat die Gueltigkeitspruefung nicht bestanden: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "XAdES-BES-CertDigest-Elemente fehlen.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Nicht unterstuetzter Zertifikats-Digest-Algorithmus: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Der Digest des Signaturzertifikats stimmt nicht mit dem XAdES-CertDigest-Wert ueberein.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Die Zertifikatsseriennummer {0} stimmt nicht mit der XAdES-IssuerSerial {1} ueberein."
 }

@@ -618,5 +618,14 @@
   "Err_OdfFormulaFunctionRegistry_InvalidFunctionName": "수식 함수 이름 {0}이(가) 잘못되었습니다.",
   "Err_DefaultFormulaEvaluator_FunctionRegistryNull": "수식 함수 레지스트리는 null일 수 없습니다.",
   "Err_OdfFormulaSupport_FunctionRegistryNull": "수식 함수 레지스트리는 null일 수 없습니다.",
-  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "수식 평가기는 null일 수 없습니다."
+  "Err_SpreadsheetDocument_FormulaEvaluatorNull": "수식 평가기는 null일 수 없습니다.",
+  "Err_OdfSignatureCrlUtilities_CrlNotYetValid": "CRL이 아직 유효하지 않습니다: thisUpdate({0})가 현재 시간({1})보다 이후입니다.",
+  "Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate": "CRL에 nextUpdate 필드가 없습니다. 신뢰할 수 없는 출처의 CRL에 대한 신뢰를 확립하는 데 필요합니다.",
+  "Err_OdfSignatureCrlUtilities_CrlExpired": "CRL이 만료되었습니다: nextUpdate({0})가 현재 시간({1})보다 이전입니다.",
+  "Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid": "포함된 CRL이 유효 기간 검사를 통과하지 못했습니다: {0}",
+  "Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid": "다운로드한 CRL이 유효 기간 검사를 통과하지 못했습니다: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "XAdES-BES CertDigest 요소가 없습니다.",
+  "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "지원되지 않는 인증서 다이제스트 알고리즘: {0}",
+  "Err_OdfSignatureX509Utilities_CertDigestMismatch": "서명 인증서 다이제스트가 XAdES CertDigest 값과 일치하지 않습니다.",
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "인증서 일련번호 {0}이(가) XAdES IssuerSerial {1}과(와) 일치하지 않습니다."
 }

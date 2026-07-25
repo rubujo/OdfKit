@@ -904,14 +904,20 @@ namespace OdfKit.Tests
         {
             byte[] sigAlg = { 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b, 0x05, 0x00 };
             byte[] issuerName = issuerCert.IssuerName.RawData;
-            byte[] thisUpdate = { 0x17, 0x0d, (byte)'2', (byte)'6', (byte)'0', (byte)'6', (byte)'1', (byte)'1', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'Z' };
+            // thisUpdate/nextUpdate 皆相對於目前時間動態產生（而非寫死日期），避免測試在未來某個
+            // 日期突然開始失敗；同時必須包含 nextUpdate（RFC 5280 TBSCertList 中緊接於 thisUpdate
+            // 之後的選用欄位），因為 OdfSignatureCrlUtilities.IsCrlTimeValid 對「缺少 nextUpdate」
+            // 採從嚴拒絕（H-2 修正的一部分，見該方法註解），省略會讓本測試的合法 CRL 被誤判為無效。
+            DateTime nowUtc = DateTime.UtcNow;
+            byte[] thisUpdate = EncodeUtcTime(nowUtc.AddDays(-1));
+            byte[] nextUpdate = EncodeUtcTime(nowUtc.AddYears(1));
 
             var revokedItemsList = new List<byte[]>();
             foreach (var serialHex in revokedSerials)
             {
                 byte[] serialBytes = ParseHex(serialHex);
                 byte[] integerBytes = BuildDerInteger(serialBytes);
-                byte[] dateBytes = { 0x17, 0x0d, (byte)'2', (byte)'6', (byte)'0', (byte)'6', (byte)'1', (byte)'1', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'0', (byte)'Z' };
+                byte[] dateBytes = EncodeUtcTime(nowUtc.AddDays(-1));
 
                 byte[] itemInner = new byte[integerBytes.Length + dateBytes.Length];
                 Buffer.BlockCopy(integerBytes, 0, itemInner, 0, integerBytes.Length);
@@ -939,7 +945,10 @@ namespace OdfKit.Tests
                 revokedSeq = Array.Empty<byte>();
             }
 
-            int tbsLen = sigAlg.Length + issuerName.Length + thisUpdate.Length + revokedSeq.Length;
+            // TBSCertList ::= SEQUENCE { signature, issuer, thisUpdate, nextUpdate OPTIONAL,
+            // revokedCertificates OPTIONAL, ... } — nextUpdate 必須緊接在 thisUpdate 之後，
+            // 早於 revokedCertificates。
+            int tbsLen = sigAlg.Length + issuerName.Length + thisUpdate.Length + nextUpdate.Length + revokedSeq.Length;
             byte[] tbsInner = new byte[tbsLen];
             int tbsOffset = 0;
             Buffer.BlockCopy(sigAlg, 0, tbsInner, tbsOffset, sigAlg.Length);
@@ -948,6 +957,8 @@ namespace OdfKit.Tests
             tbsOffset += issuerName.Length;
             Buffer.BlockCopy(thisUpdate, 0, tbsInner, tbsOffset, thisUpdate.Length);
             tbsOffset += thisUpdate.Length;
+            Buffer.BlockCopy(nextUpdate, 0, tbsInner, tbsOffset, nextUpdate.Length);
+            tbsOffset += nextUpdate.Length;
             if (revokedSeq.Length > 0)
             {
                 Buffer.BlockCopy(revokedSeq, 0, tbsInner, tbsOffset, revokedSeq.Length);
@@ -1000,6 +1011,24 @@ namespace OdfKit.Tests
             Buffer.BlockCopy(lenBytes, 0, seq, 1, lenBytes.Length);
             Buffer.BlockCopy(inner, 0, seq, 1 + lenBytes.Length, inner.Length);
             return seq;
+        }
+
+        /// <summary>
+        /// 依 X.680／RFC 5280 的 UTCTime 內容格式（YYMMDDHHMMSSZ，兩位數年份）將指定 UTC 時間
+        /// 編碼為 DER UTCTime（tag 0x17）。兩位數年份的世紀判定：YY&gt;=50 代表 19xx，
+        /// YY&lt;50 代表 20xx；本方法只用於測試 fixture 產生 2020～2030 年代的日期，落於
+        /// 「YY&lt;50 → 20xx」區間，與 BouncyCastle 剖析端的判讀一致。
+        /// </summary>
+        private static byte[] EncodeUtcTime(DateTime momentUtc)
+        {
+            string content = momentUtc.ToString("yyMMddHHmmss", CultureInfo.InvariantCulture) + "Z";
+            byte[] contentBytes = Encoding.ASCII.GetBytes(content);
+            byte[] lenBytes = EncodeDerLength(contentBytes.Length);
+            byte[] result = new byte[1 + lenBytes.Length + contentBytes.Length];
+            result[0] = 0x17;
+            Buffer.BlockCopy(lenBytes, 0, result, 1, lenBytes.Length);
+            Buffer.BlockCopy(contentBytes, 0, result, 1 + lenBytes.Length, contentBytes.Length);
+            return result;
         }
 
         private static byte[] BuildDerInteger(byte[] val)

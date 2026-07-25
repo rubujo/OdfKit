@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Register funkcií vzorca nesmie byť null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Register funkcií vzorca nesmie byť null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Vyhodnocovač vzorcov nesmie byť null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL este nie je platny: thisUpdate ({0}) je neskor ako aktualny cas ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRL neobsahuje pole nextUpdate, ktore je potrebne na urcenie doveryhodnosti CRL z nedoveryhodnych zdrojov.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "Platnost CRL vyprsala: nextUpdate ({0}) je skor ako aktualny cas ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "Vlozeny CRL neprešiel kontrolou doby platnosti: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "Stiahnuty CRL neprešiel kontrolou doby platnosti: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "Chybaju prvky CertDigest XAdES-BES.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Nepodporovany algoritmus odtlacku certifikatu: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Odtlacok podpisujuceho certifikatu sa nezhoduje s hodnotou CertDigest XAdES.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Seriove cislo certifikatu {0} sa nezhoduje s XAdES IssuerSerial {1}.",
         };
     }
 }

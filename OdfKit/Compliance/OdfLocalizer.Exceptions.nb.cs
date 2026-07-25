@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "Formelfunksjonsregisteret kan ikke være null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "Formelfunksjonsregisteret kan ikke være null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "Formelevaluatoren kan ikke være null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL-en er ikke gyldig ennaa: thisUpdate ({0}) er etter gjeldende tidspunkt ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRL-en mangler feltet nextUpdate, som kreves for aa fastslaa tilliten til CRL-er fra ubetrodde kilder.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRL-en er utloept: nextUpdate ({0}) er foer gjeldende tidspunkt ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "Den innebygde CRL-en bestod ikke kontrollen av gyldighetsperioden: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "Den nedlastede CRL-en bestod ikke kontrollen av gyldighetsperioden: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "XAdES-BES CertDigest-elementene mangler.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Ikke-stoettet sertifikat-digest-algoritme: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Digesten til signeringssertifikatet samsvarer ikke med XAdES CertDigest-verdien.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Sertifikatets serienummer {0} samsvarer ikke med XAdES IssuerSerial {1}.",
         };
     }
 }

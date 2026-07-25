@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "数式関数レジストリを null にすることはできません。",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "数式関数レジストリを null にすることはできません。",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "数式エバリュエーターを null にすることはできません。",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRLはまだ有効ではありません:thisUpdate({0})は現在時刻({1})より後です。",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRLにnextUpdateフィールドがありません。信頼できない発信元のCRLの信頼性を判定するにはこのフィールドが必要です。",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRLは期限切れです:nextUpdate({0})は現在時刻({1})より前です。",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "内蔵CRLは有効期間チェックに失敗しました:{0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "ダウンロードしたCRLは有効期間チェックに失敗しました:{0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "XAdES-BESのCertDigest要素がありません。",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "サポートされていない証明書ダイジェストアルゴリズム:{0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "署名証明書のダイジェストがXAdESのCertDigest値と一致しません。",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "証明書のシリアル番号{0}がXAdESのIssuerSerial{1}と一致しません。",
         };
     }
 }

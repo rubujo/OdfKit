@@ -67,7 +67,7 @@ internal static class OdfSignatureX509Utilities
         var digestValueNode = certNode.SelectSingleNode("xades:CertDigest/ds:DigestValue", nsManager);
         if (digestMethodNode == null || digestValueNode == null)
         {
-            errorMessage = "XAdES-BES CertDigest elements are missing.";
+            errorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureX509Utilities_CertDigestElementsMissing");
             return false;
         }
 
@@ -89,14 +89,14 @@ internal static class OdfSignatureX509Utilities
         }
         else
         {
-            errorMessage = $"Unsupported certificate digest algorithm: {alg}";
+            errorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm", alg);
             return false;
         }
 
         string actualB64 = Convert.ToBase64String(actualDigest);
         if (actualB64 != expectedB64)
         {
-            errorMessage = "Signing certificate digest does not match the XAdES CertDigest value.";
+            errorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureX509Utilities_CertDigestMismatch");
             return false;
         }
 
@@ -110,7 +110,10 @@ internal static class OdfSignatureX509Utilities
 
             if (actualSerialBase10 != expectedSerialBase10)
             {
-                errorMessage = $"Certificate serial number {actualSerialBase10} does not match XAdES IssuerSerial {expectedSerialBase10}.";
+                errorMessage = OdfLocalizer.GetMessage(
+                    "Err_OdfSignatureX509Utilities_SerialNumberMismatch",
+                    actualSerialBase10,
+                    expectedSerialBase10);
                 return false;
             }
         }

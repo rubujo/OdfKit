@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Text;
 using System.Xml;
 using OdfKit.Chart;
@@ -104,13 +105,21 @@ internal static class SpreadsheetDocumentEmbeddedChartReadEngine
                 boundedStream,
                 package.LoadOptions.MaxEntrySize,
                 "Err_SpreadsheetDocumentEmbeddedChartReadEngine_ChartXmlSizeLimitExceeded");
+
+            EnsureLengthFitsInInt32(boundedStream.Length, "Err_SpreadsheetDocumentEmbeddedChartReadEngine_ChartXmlSizeLimitExceeded");
+
             string xml = Encoding.UTF8.GetString(boundedStream.GetBuffer(), 0, (int)boundedStream.Length);
 
             using var reader = XmlReader.Create(new StringReader(xml), new XmlReaderSettings
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
-                MaxCharactersInDocument = package.LoadOptions.MaxEntrySize,
+                // 修正單位混淆：MaxCharactersInDocument 是「字元數」上限，先前誤用了以位元組為單位的
+                // MaxEntrySize。比照 OdfManifestLoader.cs 的寫法：0 或負值代表停用字元數上限
+                // （交由上方的位元組層級 CopyTo 上限與本檔案的 int.MaxValue 防護把關）。
+                MaxCharactersInDocument = package.LoadOptions.MaxXmlCharactersInDocument > 0
+                    ? package.LoadOptions.MaxXmlCharactersInDocument
+                    : 0,
             });
 
             bool chartFound = false;
@@ -154,6 +163,24 @@ internal static class SpreadsheetDocumentEmbeddedChartReadEngine
         catch
         {
             return false;
+        }
+    }
+
+    /// <summary>
+    /// 確認位元組長度可安全轉型為 <see langword="int"/>。<c>MaxEntrySize</c> 是 <see langword="long"/>，
+    /// 使用者可將其調高到遠超過 <see cref="int.MaxValue"/>；上面的 <see cref="OdfBoundedStreamReader.CopyTo"/>
+    /// 只保證不超過 <c>MaxEntrySize</c>，並不保證能安全轉型為 <see langword="int"/>。若未在此攔截，
+    /// 後續的 <c>(int)</c> 轉型會靜默溢位並截斷實際讀取到的字元數，而非丟出例外。這裡重用既有的
+    /// 「大小超限」在地化例外鍵（呼叫端的 <see cref="OdfBoundedStreamReader.CopyTo"/> 亦使用相同鍵），
+    /// 不新增沉默路徑。
+    /// </summary>
+    /// <param name="length">實際讀取到的位元組長度。</param>
+    /// <param name="errorMessageKey">超過限制時使用的在地化訊息鍵。</param>
+    internal static void EnsureLengthFitsInInt32(long length, string errorMessageKey)
+    {
+        if (length > int.MaxValue)
+        {
+            throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, length, int.MaxValue));
         }
     }
 

@@ -637,6 +637,15 @@ public static partial class OdfLocalizer
             ["Err_DefaultFormulaEvaluator_FunctionRegistryNull"] = "The formula function registry cannot be null.",
             ["Err_OdfFormulaSupport_FunctionRegistryNull"] = "The formula function registry cannot be null.",
             ["Err_SpreadsheetDocument_FormulaEvaluatorNull"] = "The formula evaluator cannot be null.",
+            ["Err_OdfSignatureCrlUtilities_CrlNotYetValid"] = "CRL is not yet valid: thisUpdate ({0}) is after the current time ({1}).",
+            ["Err_OdfSignatureCrlUtilities_CrlMissingNextUpdate"] = "CRL is missing the nextUpdate field, which is required to establish trust for CRLs from untrusted sources.",
+            ["Err_OdfSignatureCrlUtilities_CrlExpired"] = "CRL has expired: nextUpdate ({0}) is before the current time ({1}).",
+            ["Err_OdfSignatureVerifier_EmbeddedCrlNotTimeValid"] = "Embedded CRL failed its validity period check: {0}",
+            ["Err_OdfSignatureVerifier_DownloadedCrlNotTimeValid"] = "Downloaded CRL failed its validity period check: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestElementsMissing"] = "XAdES-BES CertDigest elements are missing.",
+            ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Unsupported certificate digest algorithm: {0}",
+            ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Signing certificate digest does not match the XAdES CertDigest value.",
+            ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Certificate serial number {0} does not match XAdES IssuerSerial {1}.",
         };
     }
 }
