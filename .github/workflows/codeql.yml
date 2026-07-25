@@ -1,0 +1,78 @@
+name: CodeQL
+
+# 這個 repo 解析大量不可信輸入（ODF／ZIP／XML／字型），是 SAST 投報率最高的場景，
+# 但先前完全沒有任何 SAST 覆蓋。新增本工作流程補上 C# 的 CodeQL 靜態分析。
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # 每週一次的完整掃描，補齊 push／PR 觸發間可能被略過的路徑。
+    - cron: '31 4 * * 4'
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            # 建置模式取捨：OdfKit.csproj 明確關閉 EnableTrimAnalyzer，因為對本專案
+            # 約 28.7 萬行產生碼（DOM/Generated 606 檔、Compliance/Generated 13 檔，
+            # 佔 .cs 檔案 62%）做資料流分析會讓 VBCSCompiler 記憶體衝上 7GB 以上。
+            # 若在此改用手動建置（`dotnet build` 43 個專案並開啟分析器），會複現
+            # 同一種資源壓力，且逐一建置每個專案的 CI 成本也偏高。
+            #
+            # build-mode: none 自 CodeQL 2.18（2024）起以 public beta 形式支援 C#，
+            # 並已於 CodeQL 2.24（2026-01）對 .NET 10 專案在 buildless 模式下正式提供
+            # 完整擷取（含 traced 模式）。buildless 擷取只做原始碼解析與
+            # `dotnet restore`，不會觸發 Roslyn 分析器管線，因此不會重現
+            # EnableTrimAnalyzer 那種以分析器驅動、隨產生碼行數線性增加記憶體的問題。
+            # 這是本 repo 現有資源限制下唯一能負擔、涵蓋全部 43 個專案的建置模式。
+            build-mode: none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # 產生碼是 schema provider 對應官方 ODF 1.0～1.4 規格逐字轉譯的結果，
+          # 不是手寫攻擊面；掃描聚焦在人工撰寫程式碼，與既有程式碼審查範圍規則
+          # （機器生成檔案略過不審查）一致，也避免掃描時間隨產生碼行數暴增。
+          paths-ignore:
+            - "OdfKit/DOM/Generated/**"
+            - "OdfKit/Compliance/Generated/**"
+            - "**/*.g.cs"
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

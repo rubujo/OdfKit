@@ -1,0 +1,66 @@
+# Dependabot 版本更新設定。
+#
+# 這個 repo 有 43 個 .csproj、約 70 筆內嵌版本的 PackageReference，先前完全沒有
+# 自動相依更新。新增本檔只涵蓋「版本更新」（version updates）；安全性告警仍由
+# GitHub 預設的 Dependabot security updates 處理，不在此檔設定範圍內。
+#
+# 分組理由：本 repo 大量套件會連動升版——所有 System.* / Microsoft.* 的 10.0.x
+# runtime 套件通常同一天發布同一個修訂版號，所有 actions/* 也常同批發版。若不分組，
+# 每週會針對同一次上游發布開出數十個各自獨立的 PR，審查與合併成本失控。
+version: 2
+
+updates:
+  # .NET／NuGet 相依套件。directory 設為 "/" 時，Dependabot 會展開根目錄的
+  # OdfKit.slnx 以找出全部 43 個專案，不需要逐一列出子目錄。
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+    groups:
+      # .NET 10 runtime／BCL 套件同批發版；合併成單一 PR 以免洗版。
+      dotnet-runtime:
+        patterns:
+          - "System.*"
+          - "Microsoft.*"
+          - "Microsoft.NET.*"
+      # 其餘第三方套件（CSharpMath、字型／壓縮相關等）各自獨立審查，
+      # 不與 runtime 套件混在同一個 PR 內，避免無關變更互相拖累審查。
+      third-party:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "System.*"
+          - "Microsoft.*"
+    commit-message:
+      # 對齊 docs/agent-guides/commits.md 的 Conventional Commits 慣例
+      # （type(scope): subject）；Dependabot 產生的提交不會經人工 GPG 簽署流程，
+      # 仍套用相同前綴以維持提交歷史風格一致。
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # GitHub Actions workflow 相依套件。
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      # 官方 actions/* 與 github/* 通常同批發版（例如本次新增的
+      # actions/checkout、actions/upload-artifact、github/codeql-action），
+      # 合併成單一 PR 以免每週重複開出高度相關的更新。
+      actions-official:
+        patterns:
+          - "actions/*"
+          - "github/*"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"

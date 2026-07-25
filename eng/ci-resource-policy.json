@@ -4,5 +4,5 @@
   "cacheSoftTargetBytes": 8589934592,
   "maxArtifactRetentionDays": 14,
   "maxJobTimeoutMinutes": 90,
-  "maxScheduledWorkflowCount": 2
+  "maxScheduledWorkflowCount": 3
 }

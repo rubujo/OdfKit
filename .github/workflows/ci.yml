@@ -4,13 +4,31 @@ on:
   push:
     branches:
       - main
+    # OdfKit.Tests.csproj 除了 OdfKit 本體外，還 ProjectReference 了
+    # tools/OdfKit.Cli、tools/OdfSchemaGenerator 與 tests/OdfKit.PerformanceFixtures。
+    # OdfKit.Benchmarks 與 samples/OdfKit.HighLevelApi 雖未被測試專案參照，
+    # 但分別是 OdfKit 的效能基準與官方高階 API 範例，改壞了不該無聲息通過。
+    # 這些路徑目前只在 ci.yml 缺席（odf-corpus.yml／odf-external-baseline.yml／
+    # typed-dom-coverage.yml 已涵蓋 tools/OdfKit.Cli 與 tools/OdfSchemaGenerator，
+    # 但那三個工作流程跑的是 corpus／DOM coverage，不會執行 CliTests 等單元測試）。
+    # 補上後會與既有的 docs/**、README.md 等路徑一樣，觸發整個 workflow（含
+    # webfont-validation），而不是只觸發 full-regression／test。GitHub Actions 的
+    # path filter 是 workflow 層級，無法只讓單一 job 生效；要做到 job 級別範圍
+    # 需要額外的 paths-filter action 判斷後再決定是否執行各 job，這超出本次
+    # 「只改 ci.yml」的範圍，故維持現有「整個 workflow 一起觸發」的既有慣例，
+    # 不引入新機制。
     paths:
       - 'OdfKit/**'
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.WebFonts.*/**'
       - 'OdfKit.Tests/**'
+      - 'OdfKit.Benchmarks/**'
+      - 'tools/OdfKit.Cli/**'
+      - 'tools/OdfSchemaGenerator/**'
       - 'tests/OdfKit.WebFont*/**'
+      - 'tests/OdfKit.PerformanceFixtures/**'
       - 'samples/WebFonts.*/**'
+      - 'samples/OdfKit.HighLevelApi/**'
       - 'eng/**'
       - 'docs/**'
       - 'README.md'
@@ -24,8 +42,13 @@ on:
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.WebFonts.*/**'
       - 'OdfKit.Tests/**'
+      - 'OdfKit.Benchmarks/**'
+      - 'tools/OdfKit.Cli/**'
+      - 'tools/OdfSchemaGenerator/**'
       - 'tests/OdfKit.WebFont*/**'
+      - 'tests/OdfKit.PerformanceFixtures/**'
       - 'samples/WebFonts.*/**'
+      - 'samples/OdfKit.HighLevelApi/**'
       - 'eng/**'
       - 'docs/**'
       - 'README.md'
@@ -361,6 +384,9 @@ jobs:
             -c Release `
             -f ${{ matrix.framework }}
 
+          # coverlet.collector 10.0.1 已由 OdfKit.Tests.csproj PackageReference 帶入，
+          # --collect 只是啟用它作為 VSTest data collector，不需要額外還原或建置，
+          # 與既有的 --no-build --no-restore 相容。
           dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
             -c Release `
             -f ${{ matrix.framework }} `
@@ -369,6 +395,7 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --logger "trx;LogFileName=full-${{ matrix.framework }}.trx" `
+            --collect:"XPlat Code Coverage" `
             --blame-hang `
             --blame-hang-timeout 10m `
             --blame-hang-dump-type none
@@ -380,6 +407,20 @@ jobs:
           name: full-regression-${{ matrix.framework }}
           path: artifacts/test-results/full-${{ matrix.framework }}/
           if-no-files-found: ignore
+          retention-days: 7
+
+      # 這階段只量測、不設閘門：2,210 個測試目前完全沒有行覆蓋率基線，
+      # 在沒有實際數據前設定失敗門檻只是憑空猜測的數字，之後有了至少一輪
+      # 真實資料再回頭討論門檻與趨勢追蹤。coverlet 會在 results-directory 底下
+      # 用隨機 GUID 子目錄輸出 cobertura 檔（每個 TFM 各自的 $resultsDir 已用
+      # matrix.framework 區分，避免 net8.0／net10.0 兩個矩陣分支互相覆蓋）。
+      - name: Upload code coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: code-coverage-full-${{ matrix.framework }}
+          path: artifacts/test-results/full-${{ matrix.framework }}/**/coverage.cobertura.xml
+          if-no-files-found: warn
           retention-days: 7
 
   test:
