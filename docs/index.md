@@ -93,6 +93,7 @@
 
 | 文件 | 用途 |
 |------|------|
+| [Agent 按需開發指南](agent-guides/README.md) | 手寫 C#、XML 文件、測試與 Git 提交的條件式規範入口 |
 | [CHANGELOG](../CHANGELOG.md) | 版本變更與破壞性調整紀錄 |
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
 | [來源與授權索引](provenance/README.md) | 模組來源、授權與依據 |

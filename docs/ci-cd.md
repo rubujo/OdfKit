@@ -1,4 +1,4 @@
-# CI/CD 驗證設計
+﻿# CI/CD 驗證設計
 
 本文件是 OdfKit GitHub Actions 驗證與交付流程的長期說明。它不是臨時計畫檔，
 而是維護 CI/CD 分層、逾時與診斷輸出的規則來源。
@@ -10,6 +10,7 @@
 - **`maintainability` job**（先跑、ubuntu）：靜態閘門，失敗則不啟動完整測試矩陣。
   - `Test-MergeConflictMarkers.ps1`
   - `Test-OneLineXmlSummary.ps1 -FailOnIssues`
+  - `Test-BilingualXmlDocs.ps1 -FailOnNewIssues`
   - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
   - `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`（JSON ↔ C# 一致）
   - `dotnet build OdfKit`（`RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers）

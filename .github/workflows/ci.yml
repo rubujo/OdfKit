@@ -1,4 +1,4 @@
-name: CI Build & Test
+﻿name: CI Build & Test
 
 on:
   push:
@@ -69,6 +69,10 @@ jobs:
       - name: One-line XML summary ban
         shell: pwsh
         run: ./eng/Test-OneLineXmlSummary.ps1 -FailOnIssues
+
+      - name: Bilingual XML documentation
+        shell: pwsh
+        run: ./eng/Test-BilingualXmlDocs.ps1 -FailOnNewIssues
 
       - name: Markdown local links
         shell: pwsh

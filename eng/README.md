@@ -1,4 +1,4 @@
-# eng 目錄總覽
+﻿# eng 目錄總覽
 
 本目錄收錄 OdfKit 的建置、測試、封裝與開發輔助腳本。多數為 PowerShell 7+
 (`#Requires -Version 7.0`)，少數為 Python（視覺差異比對）。
@@ -24,7 +24,7 @@
 
 | 腳本 | 用途 |
 |------|------|
-| `Format-Safe.ps1` | 安全格式化：避免全方案 `dotnet format` 污染 `OdfKit.Tests`（雙 TFM + analyzer 修正）。 |
+| `Format-Safe.ps1` | 安全格式化與共用靜態閘門：避免全方案 `dotnet format` 污染雙 TFM 測試專案，並檢查衝突標記、環境變數隔離、一行式 summary 與雙語 XML 文件。 |
 | `Format-Workspace.ps1` | 格式化 OdfKit 工作區，排除會觸發 Visual Studio 合併標記的 `OdfKit.Tests` 專案。 |
 
 ### 測試與驗證

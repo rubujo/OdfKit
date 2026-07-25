@@ -1,11 +1,14 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
-    安全格式化：避免全方案 dotnet format 污染 OdfKit.Tests（雙 TFM + analyzer 修正）。
+    安全格式化與共用靜態閘門。
+.DESCRIPTION
+    避免全方案 dotnet format 污染雙 TFM 測試專案，並檢查衝突標記、環境變數隔離、
+    一行式 XML summary 與雙語 XML 文件。
 .PARAMETER IncludeTests
     一併格式化測試專案（僅 whitespace，不執行 analyzer 程式碼修正）。
 .PARAMETER VerifyOnly
-    僅驗證格式與衝突標記，不寫入變更。
+    僅驗證格式與共用靜態閘門，不寫入變更。
 #>
 param(
     [switch]$IncludeTests,
@@ -107,6 +110,12 @@ if ($IncludeTests) {
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & (Join-Path $PSScriptRoot 'Test-EnvironmentVariableIsolation.ps1') -Root $root
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+& (Join-Path $PSScriptRoot 'Test-OneLineXmlSummary.ps1') -FailOnIssues
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+& (Join-Path $PSScriptRoot 'Test-BilingualXmlDocs.ps1') -FailOnNewIssues
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host 'Format-Safe 完成。'
