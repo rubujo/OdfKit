@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Xml.Linq;
 
 namespace OdfKit.Tests;
@@ -25,7 +25,7 @@ internal static class CsprojImportResolver
     /// </summary>
     public static string ReadProjectTextWithImports(string repoRoot, string projectRelativePath)
     {
-        string projectPath = Path.Combine(repoRoot, projectRelativePath);
+        string projectPath = CombineMsBuildPath(repoRoot, projectRelativePath);
         return ReadProjectTextWithImports(projectPath, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
     }
 
@@ -44,7 +44,7 @@ internal static class CsprojImportResolver
     /// </summary>
     public static string? GetEffectivePropertyValue(string repoRoot, string projectRelativePath, string propertyName)
     {
-        string projectPath = Path.Combine(repoRoot, projectRelativePath);
+        string projectPath = CombineMsBuildPath(repoRoot, projectRelativePath);
         string? value = null;
         CollectPropertyValue(projectPath, propertyName, new HashSet<string>(StringComparer.OrdinalIgnoreCase), ref value);
         return value;
@@ -69,7 +69,7 @@ internal static class CsprojImportResolver
                 continue;
             }
 
-            string importPath = Path.Combine(directory, importProject);
+            string importPath = CombineMsBuildPath(directory, importProject);
             builder.Append('\n');
             builder.Append(ReadProjectTextWithImports(importPath, visited));
         }
@@ -105,7 +105,7 @@ internal static class CsprojImportResolver
                 string? importProject = child.Attribute("Project")?.Value;
                 if (!string.IsNullOrWhiteSpace(importProject) && directory is not null)
                 {
-                    CollectPropertyValue(Path.Combine(directory, importProject), propertyName, visited, ref value);
+                    CollectPropertyValue(CombineMsBuildPath(directory, importProject), propertyName, visited, ref value);
                 }
             }
             else if (string.Equals(child.Name.LocalName, "PropertyGroup", StringComparison.Ordinal))
@@ -118,6 +118,14 @@ internal static class CsprojImportResolver
                 }
             }
         }
+    }
+
+    private static string CombineMsBuildPath(string basePath, string relativePath)
+    {
+        string normalizedPath = relativePath
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+        return Path.Combine(basePath, normalizedPath);
     }
 
     private static IEnumerable<string> EnumerateImportTargets(string projectText)
