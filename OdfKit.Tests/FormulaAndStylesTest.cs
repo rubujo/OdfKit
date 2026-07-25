@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Numerics;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -363,6 +364,33 @@ namespace OdfKit.Tests
 
             Assert.Equal(300.0, result);
             Assert.True(FormulaNumericAggregation.LastSumProductUsedVectorizedPathForTests);
+        }
+
+        [Fact]
+        public void TestNumericConditionalAggregationsHandleVectorTail()
+        {
+            int length = Vector<double>.Count + 1;
+            var criteria = new object[length, 1];
+            var values = new object[length, 1];
+            for (int i = 0; i < length; i++)
+            {
+                criteria[i, 0] = i % 2 == 0 ? 1.0 : 2.0;
+                values[i, 0] = i + 1.0;
+            }
+
+            Assert.True(FormulaNumericAggregation.TrySumIfNumericEqual(criteria, values, 1.0, out double sum));
+            Assert.True(FormulaNumericAggregation.TryCountIfNumericEqual(criteria, 1.0, out int count));
+
+            double expectedSum = 0;
+            int expectedCount = 0;
+            for (int i = 0; i < length; i += 2)
+            {
+                expectedSum += i + 1.0;
+                expectedCount++;
+            }
+
+            Assert.Equal(expectedSum, sum);
+            Assert.Equal(expectedCount, count);
         }
 
         [Fact]

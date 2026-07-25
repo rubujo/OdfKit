@@ -80,6 +80,8 @@ public class DocsAndCorpusContractTests
         string packageSelection = File.ReadAllText(
             Path.Combine(repoRoot, "api-docs", "articles", "package-selection.md"));
         string buildScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Build-ApiDocs.ps1"));
+        string webFormsConfig = File.ReadAllText(
+            Path.Combine(repoRoot, "samples", "WebFonts.WebForms", "Web.config"));
 
         foreach (string samplePath in new[]
         {
@@ -102,6 +104,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("sidecar.autoStart: true", packageSelection, StringComparison.Ordinal);
         Assert.Contains("unsafe-inline", packageSelection, StringComparison.Ordinal);
         Assert.Contains("只有實際缺字", packageSelection, StringComparison.Ordinal);
+        Assert.Contains("<add name=\"X-Frame-Options\" value=\"DENY\" />", webFormsConfig, StringComparison.Ordinal);
     }
 
     /// <summary>

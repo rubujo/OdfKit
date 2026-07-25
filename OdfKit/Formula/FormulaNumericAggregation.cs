@@ -349,7 +349,7 @@ internal static class FormulaNumericAggregation
     /// <summary>
     /// 當兩個範圍皆為純數值矩陣時，以連續緩衝區與 SIMD / Tensor dot product 加速 SUMPRODUCT。
     /// </summary>
-    internal static unsafe bool TrySumProduct(object[,] left, object[,] right, out double sum)
+    internal static bool TrySumProduct(object[,] left, object[,] right, out double sum)
     {
         LastSumProductUsedVectorizedPathForTests = false;
         sum = 0;
@@ -406,15 +406,11 @@ internal static class FormulaNumericAggregation
             {
                 var sumVector = Vector<double>.Zero;
                 int vectorLimit = total - (total % Vector<double>.Count);
-                fixed (double* pLeft = leftBuffer)
-                fixed (double* pRight = rightBuffer)
+                for (; i < vectorLimit; i += Vector<double>.Count)
                 {
-                    for (; i < vectorLimit; i += Vector<double>.Count)
-                    {
-                        var leftVec = Unsafe.Read<Vector<double>>(pLeft + i);
-                        var rightVec = Unsafe.Read<Vector<double>>(pRight + i);
-                        sumVector += leftVec * rightVec;
-                    }
+                    var leftVec = new Vector<double>(leftBuffer, i);
+                    var rightVec = new Vector<double>(rightBuffer, i);
+                    sumVector += leftVec * rightVec;
                 }
 
                 for (int lane = 0; lane < Vector<double>.Count; lane++)
@@ -442,7 +438,7 @@ internal static class FormulaNumericAggregation
     /// <summary>
     /// 當條件欄與加總欄皆為純數值矩陣且條件為等號時，以配置池化緩衝區加速 SUMIF。
     /// </summary>
-    internal static unsafe bool TrySumIfNumericEqual(
+    internal static bool TrySumIfNumericEqual(
         object[,] criteriaRange,
         object[,] sumRange,
         double criterion,
@@ -497,18 +493,14 @@ internal static class FormulaNumericAggregation
                 var sumVec = Vector<double>.Zero;
                 int vectorLimit = total - (total % Vector<double>.Count);
 
-                fixed (double* pCriteria = criteriaBuffer)
-                fixed (double* pSum = sumBuffer)
+                for (; i < vectorLimit; i += Vector<double>.Count)
                 {
-                    for (; i < vectorLimit; i += Vector<double>.Count)
-                    {
-                        var critVal = Unsafe.Read<Vector<double>>(pCriteria + i);
-                        var sumVal = Unsafe.Read<Vector<double>>(pSum + i);
+                    var critVal = new Vector<double>(criteriaBuffer, i);
+                    var sumVal = new Vector<double>(sumBuffer, i);
 
-                        var mask = Vector.Equals(critVal, criterionVec);
-                        var matchedSum = Vector.ConditionalSelect(mask, sumVal, Vector<double>.Zero);
-                        sumVec += matchedSum;
-                    }
+                    var mask = Vector.Equals(critVal, criterionVec);
+                    var matchedSum = Vector.ConditionalSelect(mask, sumVal, Vector<double>.Zero);
+                    sumVec += matchedSum;
                 }
 
                 for (int lane = 0; lane < Vector<double>.Count; lane++)
@@ -537,7 +529,7 @@ internal static class FormulaNumericAggregation
     /// <summary>
     /// 當範圍為純數值矩陣且條件為等號時，加速 COUNTIF 計數。
     /// </summary>
-    internal static unsafe bool TryCountIfNumericEqual(object[,] range, double criterion, out int count)
+    internal static bool TryCountIfNumericEqual(object[,] range, double criterion, out int count)
     {
         count = 0;
         int rows = range.GetLength(0);
@@ -574,15 +566,12 @@ internal static class FormulaNumericAggregation
                 var oneVec = new Vector<double>(1.0);
                 int vectorLimit = total - (total % Vector<double>.Count);
 
-                fixed (double* pBuffer = buffer)
+                for (; i < vectorLimit; i += Vector<double>.Count)
                 {
-                    for (; i < vectorLimit; i += Vector<double>.Count)
-                    {
-                        var val = Unsafe.Read<Vector<double>>(pBuffer + i);
-                        var mask = Vector.Equals(val, criterionVec);
-                        var matchOne = Vector.ConditionalSelect(mask, oneVec, Vector<double>.Zero);
-                        matchCountVec += matchOne;
-                    }
+                    var val = new Vector<double>(buffer, i);
+                    var mask = Vector.Equals(val, criterionVec);
+                    var matchOne = Vector.ConditionalSelect(mask, oneVec, Vector<double>.Zero);
+                    matchCountVec += matchOne;
                 }
 
                 for (int lane = 0; lane < Vector<double>.Count; lane++)
