@@ -64,13 +64,16 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          # 產生碼是 schema provider 對應官方 ODF 1.0～1.4 規格逐字轉譯的結果，
-          # 不是手寫攻擊面；掃描聚焦在人工撰寫程式碼，與既有程式碼審查範圍規則
-          # （機器生成檔案略過不審查）一致，也避免掃描時間隨產生碼行數暴增。
-          paths-ignore:
-            - "OdfKit/DOM/Generated/**"
-            - "OdfKit/Compliance/Generated/**"
-            - "**/*.g.cs"
+          # 此處刻意不設定 paths-ignore 來排除產生碼，原因有二：
+          #   1) paths-ignore 不是 codeql-action/init 的合法 with 輸入。action 輸入
+          #      必須是純量字串，傳入 YAML 清單會讓整個 workflow 檔無法通過 schema
+          #      驗證，GitHub 直接以「workflow file issue」拒絕載入（連 job 都不會
+          #      建立）。若要用，須改寫在 config 輸入的行內 YAML 或 config-file 內。
+          #   2) 即使改寫到 config，paths／paths-ignore 依官方文件僅適用於
+          #      Python、Ruby、JavaScript/TypeScript 等直譯語言，對 C# 這類編譯語言
+          #      無效——即便採 build-mode: none 亦然。
+          # 因此產生碼的雜訊改由檢視結果時過濾，而非在擷取階段排除。
+          # 參考：https://docs.github.com/en/code-security/reference/code-scanning/workflow-configuration-options
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4

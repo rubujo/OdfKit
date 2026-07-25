@@ -66,7 +66,7 @@ internal static class OdfSignatureCrlUtilities
 
             // BouncyCastle 將 ASN.1 UTCTime／GeneralizedTime 解析為 DateTime，其 Kind 不保證為 Utc；
             // RFC 5280 規定憑證與 CRL 的時間欄位一律採 UTC（Zulu），這裡明確標記 Kind 以避免與
-            // referenceTimeUtc 比對時被 .NET 誤判為本地時間而產生時區偏移。
+            // referenceTimeUtc 比對時被 .NET 誤判為當地時間而產生時區偏移。
             var thisUpdateUtc = DateTime.SpecifyKind(crl.ThisUpdate, DateTimeKind.Utc);
             if (thisUpdateUtc > referenceTimeUtc)
             {

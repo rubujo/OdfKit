@@ -175,6 +175,17 @@ Console.WriteLine("PASS: OdfKit WebFont release-feed consumer loaded.");
   </PropertyGroup>
 </Project>
 "@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Directory.Build.props") -Encoding utf8NoBOM
+# 必須同時放一份 Directory.Packages.props：2026-07-26 實測，只在 Directory.Build.props
+# 設定 ManagePackageVersionsCentrally=false 並不足以退出 CPM——NuGet 仍會沿目錄向上
+# 尋獲根目錄的 Directory.Packages.props 並套用 CPM，還原時擲出 NU1008。在本目錄放一份
+# 同名檔可讓向上搜尋止步於此，兩者並用才會真正生效。
+@"
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
+"@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Directory.Packages.props") -Encoding utf8NoBOM
 
 $previousNugetPackages = $env:NUGET_PACKAGES
 $succeeded = $false

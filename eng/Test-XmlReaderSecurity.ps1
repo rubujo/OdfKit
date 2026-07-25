@@ -25,6 +25,7 @@ $sourceRoots = $sourceRoots | Where-Object { Test-Path -LiteralPath $_ } | Selec
 
 # --- new XmlDocument() 豁免清單 -------------------------------------------
 # 每一筆豁免都以「相對路徑 + 行號」鎖定，並附上理由，供稽核追溯。
+# 路徑一律使用正斜線，與下方正規化後的 $relativePath 一致（跨 Windows／Linux）。
 # 這些都是 OdfKit.Tests/AdvancedSecurityTests.cs 內刻意建構、供負向測試使用的
 # XmlDocument（讀取測試流程自行產生的簽章 XML，非解析外部不受信任輸入）。
 # 豁免清單採「行號 + 內容雙重比對」：掃描時若某筆豁免對應的行已不再包含
@@ -33,20 +34,20 @@ $sourceRoots = $sourceRoots | Where-Object { Test-Path -LiteralPath $_ } | Selec
 # 新增任何未列於此清單、且未在同運算式內設定 XmlResolver = null 的
 # `new XmlDocument`，都會被下方的檢查攔截。
 $xmlDocumentWaivers = @(
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 60; Reason = '讀取測試自行簽署之 documentsignatures.xml，驗證版本屬性，非解析不受信任輸入。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 158; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 250; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 361; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1340; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1394; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1526; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1627; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1641; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1664; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1676; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML（第二份套件）。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1685; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1778; Reason = '時間戳交叉驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests\AdvancedSecurityTests.cs'; Line = 1788; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 60; Reason = '讀取測試自行簽署之 documentsignatures.xml，驗證版本屬性，非解析不受信任輸入。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 158; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 250; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 361; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1340; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1394; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1526; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1627; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1641; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1664; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1676; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML（第二份套件）。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1685; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1778; Reason = '時間戳交叉驗證負向測試：讀取測試自行產生之簽章 XML。' }
+    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1788; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
 )
 $xmlDocumentWaiversMatched = [System.Collections.Generic.HashSet[string]]::new()
 
@@ -59,7 +60,11 @@ foreach ($sourceRoot in $sourceRoots) {
         if ($file.FullName -match '[\\/]Generated[\\/]' -or $file.Name.EndsWith('.g.cs')) { continue }
 
         $source = Get-Content -LiteralPath $file.FullName -Raw
-        $relativePath = [IO.Path]::GetRelativePath($root, $file.FullName)
+        # 一律正規化為正斜線：[IO.Path]::GetRelativePath 在 Windows 回傳反斜線、在 Linux
+        # 回傳正斜線，而 CI 的 maintainability job 跑在 ubuntu-latest。若不正規化，下方
+        # 以路徑字串比對的豁免清單會在 Linux 上完全比不中，導致每一筆豁免同時被判為
+        # 「未豁免」與「已過期」，本機通過、CI 卻整批失敗。
+        $relativePath = [IO.Path]::GetRelativePath($root, $file.FullName).Replace('\', '/')
 
         # --- 檢查一：手寫 XmlReaderSettings 必須明確禁止 DTD 與外部 resolver ---
         $readerMatches = [regex]::Matches(

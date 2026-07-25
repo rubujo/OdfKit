@@ -10,7 +10,7 @@
     <IsPackable>false</IsPackable>
     <SelfContained>true</SelfContained>
     <NuGetAudit>false</NuGetAudit>
-    <NoWarn>$(NoWarn);IL2104</NoWarn>
+    <NoWarn>$(NoWarn);IL2104;IL3053</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
