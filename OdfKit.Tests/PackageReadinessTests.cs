@@ -20,7 +20,7 @@ public class PackageReadinessTests
     {
         string repoRoot = FindRepositoryRoot();
         const string projectRelativePath = @"OdfKit\OdfKit.csproj";
-        string projectPath = Path.Combine(repoRoot, projectRelativePath);
+        string projectPath = Path.Combine(repoRoot, "OdfKit", "OdfKit.csproj");
 
         // 中繼資料（PackageLicenseExpression、RepositoryUrl、IncludeSymbols 等）自 M-2 起改由
         // eng/OdfKit.Package.props 以 <Import> 提供，不再內嵌於本檔；GetValue 因此改為求值
