@@ -11,6 +11,10 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <UseLocalPackages Condition="'$(UseLocalPackages)' == ''">false</UseLocalPackages>
     <OdfKitPackageVersion Condition="'$(OdfKitPackageVersion)' == ''">0.0.1</OdfKitPackageVersion>
+    <!-- 本專案模擬「外部消費者安裝已發佈 OdfKit.* 套件」，版本來自建置時注入的
+         $(OdfKitPackageVersion)（見 eng/Test-NetFramework48Smoke.ps1），不屬於 repo 內部
+         相依版本治理範圍，故退出 Central Package Management，維持內嵌 Version。 -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>

@@ -166,6 +166,16 @@ $($packageReferences -join "`n")
 Console.WriteLine("PASS: OdfKit WebFont release-feed consumer loaded.");
 '@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Program.cs") -Encoding utf8NoBOM
 
+# $consumerRoot 位於方案目錄內，會被根目錄 Directory.Packages.props 的 Central Package
+# Management 波及；此處以明確版本安裝已發佈套件，需退出 CPM 才能還原成功。
+@"
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
+"@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Directory.Build.props") -Encoding utf8NoBOM
+
 $previousNugetPackages = $env:NUGET_PACKAGES
 $succeeded = $false
 try {

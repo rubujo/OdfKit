@@ -75,12 +75,32 @@ $projectFiles = @(
 $packageReferenceFiles = @($projectFiles.FullName) + @(
     Join-Path $PSScriptRoot "OdfKit.WebFonts.Package.props"
 )
+
+# Central Package Management：多數 PackageReference 已移除內嵌 Version，改由方案根目錄
+# Directory.Packages.props 的 PackageVersion 集中管理。此處先建立 id -> 版本對照，
+# 供下方 PackageReference 缺少 Version 屬性時回退查詢，維持本腳本的相依版本稽核能力。
+$centralPackageVersionsPath = Join-Path $repoRoot "Directory.Packages.props"
+$centralVersionsById = @{}
+if (Test-Path -LiteralPath $centralPackageVersionsPath) {
+    [xml]$centralPackageVersionsXml = Get-Content -LiteralPath $centralPackageVersionsPath -Raw
+    foreach ($packageVersion in $centralPackageVersionsXml.Project.ItemGroup.PackageVersion) {
+        $centralId = [string]$packageVersion.Include
+        $centralVersion = [string]$packageVersion.Version
+        if (-not [string]::IsNullOrWhiteSpace($centralId) -and -not [string]::IsNullOrWhiteSpace($centralVersion)) {
+            $centralVersionsById[$centralId] = $centralVersion
+        }
+    }
+}
+
 $declaredVersions = @{}
 foreach ($file in $packageReferenceFiles) {
     [xml]$project = Get-Content -LiteralPath $file -Raw
     foreach ($reference in $project.Project.ItemGroup.PackageReference) {
         $id = [string]$reference.Include
         $version = [string]$reference.Version
+        if ([string]::IsNullOrWhiteSpace($version) -and -not [string]::IsNullOrWhiteSpace($id)) {
+            $version = $centralVersionsById[$id]
+        }
         if ([string]::IsNullOrWhiteSpace($id) -or [string]::IsNullOrWhiteSpace($version)) {
             continue
         }

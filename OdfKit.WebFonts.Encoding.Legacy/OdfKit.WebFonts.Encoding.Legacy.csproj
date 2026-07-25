@@ -14,6 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.10" />
+    <PackageReference Include="System.Text.Encoding.CodePages" />
   </ItemGroup>
 </Project>

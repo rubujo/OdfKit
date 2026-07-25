@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>OdfKit.PerformanceFixtures</AssemblyName>
     <RootNamespace>OdfKit.Benchmarks</RootNamespace>
   </PropertyGroup>

@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
 
   <PropertyGroup>
     <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
@@ -9,23 +10,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-    <!-- CC0 1.0 通用授權條款設定 -->
     <PackageId>OdfKit</PackageId>
-    <Version>0.0.1</Version>
-    <Authors>OdfKit Contributors</Authors>
-    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <Description>A managed, high-performance ODF (OpenDocument Format) processing library for .NET.</Description>
-    <PackageProjectUrl>https://github.com/rubujo/OdfKit</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/rubujo/OdfKit</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>ODF;OpenDocument;ODT;ODS;ODP;ODG</PackageTags>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Deterministic>true</Deterministic>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <RootNamespace>OdfKit</RootNamespace>
     <AssemblyName>OdfKit</AssemblyName>
     <!-- CSharpMath 1.0.0-pre.1 由 eng/Test-NuGetPack.ps1 明確允許。 -->
@@ -34,17 +22,26 @@
          讓 RS0016/RS0017 暫不視為錯誤以便 code fix 寫入 Unshipped.txt。
          日常 CI 請勿設定；詳見 PublicAPI/README.md 與 eng/Generate-PublicApiBaseline.ps1。 -->
     <WarningsNotAsErrors Condition="'$(ODFKIT_PUBLICAPI_BASELINE)' == '1'">$(WarningsNotAsErrors);RS0016;RS0017</WarningsNotAsErrors>
-    <!-- 業界雙 TFM 套件相容性閘門（.NET Package Validation / ApiCompat）。
-         Pack 時檢查 netstandard2.0 與 net10.0 公開表面是否相容。
-         詳見 docs/maintainability.md 與 learn.microsoft.com package-validation。 -->
-    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
     <IsTrimmable>true</IsTrimmable>
-    <!-- 裁剪相容性已由 eng/Test-TrimSmoke.ps1 的實機發佈+執行驗證把關；
-         此分析器對 OdfKit/DOM/Generated/GeneratedDomWrappers.g.cs（156 萬行生成碼）
-         做資料流分析會讓 CI 建置耗時失控（VBCSCompiler 衝上 7GB+ 記憶體），故關閉。 -->
+    <!-- 裁剪相容性已由 eng/Test-TrimSmoke.ps1 的實機發佈+執行驗證把關；此分析器須對本專案
+         619 個檔案、約 28.7 萬行生成碼（DOM/Generated 606 檔 69,841 行；
+         Compliance/Generated 13 檔 217,523 行；合計佔本專案 .cs 的 62%）做資料流分析，
+         耗時完全不可用，故關閉。
+
+         2026-07-26 實測（Release／net10.0／-t:Rebuild／UseSharedCompilation=false，
+         獨立 git worktree 避免與其他建置互相污染）：
+           關閉：35.7 秒完成，csc 工作集峰值 2,098 MB
+           開啟：連續執行 4 小時 21 分（36,054 CPU 秒）仍未完成而被中止，
+                 csc 工作集峰值 2,520 MB，全程無成長趨勢
+
+         結論：記憶體不再是問題（僅 +20%，遠低於本註解舊版所述的「7GB+」——該數字量測於
+         OdfKit/DOM/Generated/GeneratedDomWrappers.g.cs 單一巨檔時期，該檔已於
+         commit 09640fb5 拆為 606 個獨立檔案，舊量測條件已不存在）。真正的阻礙是耗時：
+         已達基準線 400 倍以上，而 CI maintainability job 的 timeout-minutes 僅 10 分鐘。
+         若日後要重新開啟，須先解決的是耗時，不是記憶體。 -->
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
 
@@ -56,15 +53,15 @@
 
   <!-- 通用套件參照 -->
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.2" />
-    <PackageReference Include="CSharpMath" Version="1.0.0-pre.1" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.10" />
-    <PackageReference Include="Sylvan.Data.Csv" Version="1.4.4" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" />
+    <PackageReference Include="CSharpMath" />
+    <PackageReference Include="System.Security.Cryptography.Xml" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
+    <PackageReference Include="Sylvan.Data.Csv" />
     <!-- 業界公開 API 凍結慣例（Microsoft.CodeAnalysis.PublicApiAnalyzers 最新穩定版）：
          .NET 執行階段／Azure SDK／Roslyn 等同款。變更公開表面時須更新 PublicAPI.*.txt。 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -78,19 +75,19 @@
 
   <!-- .NET 10.0 特定套件參照 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageReference Include="System.Numerics.Tensors" Version="10.0.10" />
-    <PackageReference Include="System.IO.Hashing" Version="10.0.10" />
+    <PackageReference Include="System.Numerics.Tensors" />
+    <PackageReference Include="System.IO.Hashing" />
   </ItemGroup>
 
   <!-- .NET Standard 2.0 特定套件參照 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Text.Json" Version="10.0.10" />
-    <PackageReference Include="System.Memory" Version="4.6.3" />
-    <PackageReference Include="System.Buffers" Version="4.6.1" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.10" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Memory" />
+    <PackageReference Include="System.Buffers" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" />
+    <PackageReference Include="System.Text.Encoding.CodePages" />
   </ItemGroup>
 
 </Project>

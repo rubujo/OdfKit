@@ -11,6 +11,7 @@
     <SelfContained>true</SelfContained>
     <NuGetAudit>false</NuGetAudit>
     <NoWarn>$(NoWarn);IL2104</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PublishAot)' == 'true'">
@@ -29,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
   </ItemGroup>
 
   <!-- Sylvan.Data.Csv 尚未完全 trimming / AOT 化；整包保留以避免 IL 連結器誤裁。

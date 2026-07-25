@@ -161,20 +161,12 @@ public class NuGetPackagingTests
 
     private static string ReadProperty(string projectRelativePath, string propertyName)
     {
-        string projectPath = Path.Combine(RepoRoot, projectRelativePath);
-        XDocument document = XDocument.Load(projectPath);
-        XNamespace msbuild = document.Root!.Name.Namespace;
-
-        foreach (XElement group in document.Root.Elements(msbuild + "PropertyGroup"))
-        {
-            XElement? element = group.Element(msbuild + propertyName);
-            if (element is not null && !string.IsNullOrWhiteSpace(element.Value))
-            {
-                return element.Value.Trim();
-            }
-        }
-
-        return string.Empty;
+        // 部分屬性（例如 OdfKit.csproj 的 PackageLicenseExpression）自 M-2 起改由
+        // <Import Project="..\eng\OdfKit.Package.props" /> 提供，不再內嵌於各專案檔本身；
+        // 因此改為求值有效屬性（本檔＋其 Import 鏈），而非只掃描本檔自己的 PropertyGroup。
+        // 若屬性從整條鏈消失（真實退化），此處仍回傳空字串，讓呼叫端 Assert.Equal/Contains 失敗。
+        string? value = CsprojImportResolver.GetEffectivePropertyValue(RepoRoot, projectRelativePath, propertyName);
+        return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
     }
 
     private static string FindRepoRoot()

@@ -89,8 +89,23 @@ try {
     Remove-Item -LiteralPath $consumerRoot -Recurse -Force -ErrorAction SilentlyContinue
     dotnet new console -n WebFontPackageConsumer -o $consumerRoot -f net10.0 --force
     if ($LASTEXITCODE -ne 0) { throw "WebFont package consumer 建立失敗。" }
+
+    # $consumerRoot 位於方案目錄內，會被根目錄 Directory.Packages.props 的 Central Package
+    # Management 波及；此處以明確版本安裝已發佈套件，需退出 CPM 才能還原成功。
+    @"
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
+"@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Directory.Build.props") -Encoding utf8
+
     $nugetConfigPath = Join-Path $destinationPath "NuGet.consumer.config"
     $escapedPackageRoot = [Security.SecurityElement]::Escape($packageRoot)
+    # packageSourceMapping 屬於階層式合併（<clear /> 只清空 packageSources，不會清空繼承自
+    # 根目錄 nuget.config 的 packageSourceMapping）；此處必須明確覆寫，否則根目錄「*」→
+    # nuget.org 的萬用對應會蓋過本機 odfkit-local，讓剛封裝好的 OdfKit.* 套件被誤判為
+    # 「應從 nuget.org 解析」而觸發 NU1101。
     @"
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -99,6 +114,15 @@ try {
     <add key="odfkit-local" value="$escapedPackageRoot" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
   </packageSources>
+  <packageSourceMapping>
+    <packageSource key="odfkit-local">
+      <package pattern="OdfKit" />
+      <package pattern="OdfKit.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+  </packageSourceMapping>
 </configuration>
 "@ | Set-Content -LiteralPath $nugetConfigPath -Encoding utf8NoBOM
     dotnet add $consumerRoot package OdfKit.WebFonts.OpenType `

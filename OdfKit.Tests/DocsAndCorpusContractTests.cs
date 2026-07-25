@@ -722,7 +722,10 @@ public class DocsAndCorpusContractTests
         string ciYml = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "ci.yml"));
         string ciCd = File.ReadAllText(Path.Combine(repoRoot, "docs", "ci-cd.md"));
         string packageProps = File.ReadAllText(Path.Combine(repoRoot, "eng", "OdfKit.Package.props"));
-        string odfKitCsproj = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "OdfKit.csproj"));
+        // OdfKit.csproj 自 M-2 起以 <Import Project="..\eng\OdfKit.Package.props" /> 取得
+        // EnablePackageValidation 等中繼資料，不再內嵌於本檔；改讀「本檔＋其 Import 鏈」的
+        // 原始文字合併結果，讓下方 Assert.Contains 仍能偵測「兩處都真的沒有該屬性」的退化。
+        string odfKitCsproj = CsprojImportResolver.ReadProjectTextWithImports(repoRoot, @"OdfKit\OdfKit.csproj");
         string genJsonScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Generate-LocalizerExceptionsFromJson.ps1"));
         string optionalParamsDoc = File.ReadAllText(Path.Combine(repoRoot, "docs", "public-api-optional-parameters.md"));
         string collaboratorsDoc = File.ReadAllText(Path.Combine(repoRoot, "docs", "architecture-collaborators.md"));
