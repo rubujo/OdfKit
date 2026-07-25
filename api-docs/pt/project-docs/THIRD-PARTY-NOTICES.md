@@ -2,7 +2,7 @@
 title: Avisos de terceiros
 _lang: pt
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # Avisos de terceiros
@@ -24,6 +24,7 @@ OdfKit usa CC0-1.0 Universal. Estas dependências mantêm as suas licenças:
 | System.IO.Hashing | CRC-32 em net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | Compatibilidade netstandard2.0 | MIT |
 | Microsoft.Win32.Registry | Compatibilidade netstandard2.0 para resolver origens do Registo do Windows EUDC | MIT |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | Markdig | Análise AST de Markdown | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Desenho e composição de texto | MIT |
 | ScottPlot | Gráficos e visualização alternativa | MIT |

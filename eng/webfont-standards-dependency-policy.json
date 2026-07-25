@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-07-18",
+  "reviewedAt": "2026-07-25",
   "maximumReviewAgeDays": 90,
   "standards": [
     {
@@ -45,6 +45,10 @@
     {
       "id": "Microsoft.CodeAnalysis.PublicApiAnalyzers",
       "version": "5.6.0"
+    },
+    {
+      "id": "Microsoft.Extensions.Hosting.WindowsServices",
+      "version": "10.0.10"
     },
     {
       "id": "Microsoft.NETFramework.ReferenceAssemblies.net48",

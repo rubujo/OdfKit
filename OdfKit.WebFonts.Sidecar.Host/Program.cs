@@ -1,7 +1,8 @@
-﻿using OdfKit.Compliance;
-using OdfKit.WebFonts.OpenType;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using OdfKit.Compliance;
 using OdfKit.WebFonts.Sidecar.Server;
-using OdfKit.WebFonts.Worker;
 
 namespace OdfKit.WebFonts.Sidecar.Host;
 
@@ -41,36 +42,35 @@ internal static class Program
             return configuration.Server.IsWoff2Available ? 0 : 3;
         }
 
-        Directory.CreateDirectory(configuration.Server.AssetRootPath);
-        if (configuration.Worker.DurableCacheDirectory is not null)
+        HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(
+            new HostApplicationBuilderSettings
+            {
+                Args = [],
+                ApplicationName = "OdfKit.WebFonts.Sidecar.Host"
+            });
+        builder.Logging.SetMinimumLevel(LogLevel.Warning);
+        builder.Services.AddWindowsService(options =>
         {
-            Directory.CreateDirectory(configuration.Worker.DurableCacheDirectory);
-        }
-
-        using var shutdown = new CancellationTokenSource();
-        Console.CancelKeyPress += (_, eventArgs) =>
+            options.ServiceName = configuration.ServiceName;
+        });
+        builder.Services.Configure<HostOptions>(options =>
         {
-            eventArgs.Cancel = true;
-            shutdown.Cancel();
-        };
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => shutdown.Cancel();
+            options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
+            options.ShutdownTimeout = TimeSpan.FromSeconds(30);
+        });
+        builder.Services.AddSingleton(configuration);
+        builder.Services.AddHostedService<SidecarHostedService>();
 
-        var subsetEngine = new ManagedOpenTypeWebFontSubsetEngine(configuration.Engine);
-        await using var worker = new WebFontGenerationWorker(subsetEngine, configuration.Worker);
-        var server = new WebFontSidecarServer(worker, configuration.Server);
+        using IHost host = builder.Build();
         try
         {
-            await server.RunAsync(shutdown.Token).ConfigureAwait(false);
+            await host.RunAsync().ConfigureAwait(false);
         }
-        catch (OperationCanceledException) when (shutdown.IsCancellationRequested)
+        catch (OperationCanceledException)
         {
-        }
-        finally
-        {
-            shutdown.Cancel();
-            await server.DrainAsync().ConfigureAwait(false);
+            return 0;
         }
 
-        return 0;
+        return Environment.ExitCode;
     }
 }

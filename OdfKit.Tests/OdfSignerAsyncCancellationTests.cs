@@ -139,9 +139,15 @@ public class OdfSignerAsyncCancellationTests
             DateTimeOffset.UtcNow.AddDays(5));
 
 #if NET9_0_OR_GREATER
-        return X509CertificateLoader.LoadPkcs12(cert.Export(X509ContentType.Pfx), null, X509KeyStorageFlags.Exportable);
+        return X509CertificateLoader.LoadPkcs12(
+            cert.Export(X509ContentType.Pfx),
+            null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
 #else
-        return new X509Certificate2(cert.Export(X509ContentType.Pfx), (string?)null, X509KeyStorageFlags.Exportable);
+        return new X509Certificate2(
+            cert.Export(X509ContentType.Pfx),
+            (string?)null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
 #endif
     }
 }

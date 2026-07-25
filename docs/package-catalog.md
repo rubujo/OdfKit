@@ -21,10 +21,10 @@
 | `OdfKit.WebFonts.Data.SqlServer` | 資料存取橋接 | `net10.0;netstandard2.0` | 有界讀取 SQL Unicode／legacy bytes | 可搭配 ADO.NET、Dapper 或 ORM |
 | `OdfKit.WebFonts.OpenType` | 字型引擎 | `net10.0;netstandard2.0` | 純 .NET TTF／OTF／TTC／OTC／TTE／WOFF 輸入、執行期具 Brotli 時的 transformed／collection WOFF2 指定 face、compact CID-keyed／名稱式 CFF、`seac` closure、variable／非變動 CFF2 與 color correctness-first 路徑；輸出 TTF／OTF／WOFF，執行期具 Brotli 時輸出 WOFF2 | 只承諾鎖定 corpus 的有界格式矩陣；EBDT／EBLC 與 SVG 不作細粒度 pruning，AAT／Graphite、非法 `seac`／CFF2 及直接 collection 輸出明確拒絕 |
 | `OdfKit.WebFonts.Worker` | 背景工作 | `net10.0` | 有界 queue、timeout 與 single-flight | 不提供公開同步 generation endpoint |
-| `OdfKit.WebFonts.Sidecar` | 舊 Runtime 橋接 | `net10.0;net48` | 經驗證的具名 pipe 用戶端，將 WOFF2 產字委派至本機 NativeAOT Host | 須部署同版 Host、共同資產目錄與高熵權杖 |
+| `OdfKit.WebFonts.Sidecar` | 舊 Runtime 橋接 | `net10.0;net48` | 經驗證的具名 pipe 用戶端，將 WOFF2 產字委派至本機 NativeAOT Host | NuGet 不含 Host；須部署同版 Release ZIP、共同資產目錄與高熵權杖 |
 | `OdfKit.WebFonts.Profiles` | Profile 擴充 | `net10.0;netstandard2.0` | 有界、版本化 JSON mapping | PUA 必須明確選擇 Profile |
 | `OdfKit.WebFonts.Hosting.AspNetCore` | Web 託管 | `net10.0` | 須經授權及限流的動態產生、唯讀 hash 資產、CSP/CDN URL、CORS 與 cache headers | 大規模部署應置於 CDN 後方 |
-| `OdfKit.WebFonts.Hosting.SystemWeb` | Web Forms 託管 | `net48` | API key、allowlist 與有界並行的動態產生、不可變資產、靜態 fallback 及 HTML helper | 處理程序內支援 TTF／WOFF；選用 NativeAOT sidecar 可產生 WOFF2 |
+| `OdfKit.WebFonts.Hosting.SystemWeb` | Web Forms 託管 | `net48` | API key、allowlist、有界並行、開發用 Sidecar 自動啟動、不可變資產、靜態 fallback 及 HTML helper | 處理程序內支援 TTF／WOFF；選用 NativeAOT Sidecar 可產生 WOFF2 |
 | `OdfKit.WebFonts.Windows` | Windows EUDC 來源 | `net10.0;netstandard2.0` | 唯讀解析目前使用者 EUDC 登錄關聯與 `.tte`／`.ttf` 路徑；相容 ASP.NET Core 與 net48 consumer | 不寫登錄、不從 HTTP request 接受來源 |
 | `OdfKit.Extensions.Html.WebFonts` | HTML 整合 | `net10.0;netstandard2.0` | ODF 文字需求收集與外部 CSS link | 不掃描瀏覽器 DOM |
 
@@ -40,7 +40,7 @@
 | `OdfKit.Tests` | 測試套件 | 單元、整合、互通與 packaging 驗證 |
 | `OdfKit.Benchmarks` | 基準測試 | 效能與資源使用量量測 |
 | `OdfKit.WebFonts.Build` | .NET Tool／MSBuild | 自動掃描受信任內容並產生 content-addressed WebFont 資產 |
-| `OdfKit.WebFonts.Sidecar.Host` | NativeAOT 部署工具 | Windows x64／ARM64 self-contained WOFF2 產字服務；不要求安裝 .NET Runtime |
+| `OdfKit.WebFonts.Sidecar.Host` | NativeAOT 部署工具 | Windows x64／ARM64 self-contained WOFF2 產字服務；支援主控台、IIS Express 自動啟動與原生 Windows Service，不要求安裝 .NET Runtime |
 
 ## 3. 依情境選型
 

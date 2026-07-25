@@ -4,6 +4,8 @@ OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.FilterSupportedSequencesAsync(Od
 OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.GenerateAsync(OdfKit.WebFonts.WebFontSubsetRequest! request, string! destinationDirectory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.WebFontManifest!>!
 OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.GetHealthAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<OdfKit.WebFonts.Sidecar.WebFontSidecarHealth!>!
 OdfKit.WebFonts.Sidecar.OdfWebFontSidecarClient.OdfWebFontSidecarClient(OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions! options) -> void
+OdfKit.WebFonts.Sidecar.WebFontSidecarQueueFullException
+OdfKit.WebFonts.Sidecar.WebFontSidecarQueueFullException.WebFontSidecarQueueFullException() -> void
 OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions
 OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AssetRootPath.get -> string!
 OdfKit.WebFonts.Sidecar.WebFontSidecarClientOptions.AssetRootPath.set -> void

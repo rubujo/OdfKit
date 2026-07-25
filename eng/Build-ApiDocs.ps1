@@ -208,7 +208,11 @@ try {
             @{ Path = 'OdfKit.WebFonts.Hosting.SystemWeb/OdfKit.WebFonts.Hosting.SystemWeb.csproj'; Framework = 'net48' }
         )
         foreach ($project in $projects) {
-            dotnet build $project.Path -c Release -f $project.Framework /p:ODFKIT_PUBLICAPI_BASELINE=1
+            dotnet build $project.Path `
+                -c Release `
+                -f $project.Framework `
+                -p:NuGetAudit=false `
+                -p:ODFKIT_PUBLICAPI_BASELINE=1
             if ($LASTEXITCODE) { throw "API 文件組件建置失敗：$($project.Path)" }
         }
     }
@@ -426,11 +430,27 @@ try {
         'project-docs/reference/semantic-facades.html',
         'project-docs/claims.json',
         'project-docs/webfont-managed-architecture.html',
+        'project-docs/webfont-sidecar-deployment.html',
         'project-docs/webfont-evidence-matrix.html',
         'project-docs/webfont-ift-tracking.html',
         'project-docs/webfonts.html',
         'project-docs/provenance/webfont-managed-clean-room.html',
         'project-docs/THIRD-PARTY-NOTICES.html',
+        'samples/WebFonts.AspNetCore/OdfKit.WebFonts.AspNetCore.Sample.csproj',
+        'samples/WebFonts.AspNetCore/Program.cs',
+        'samples/WebFonts.AspNetCore/appsettings.WebFont.example.json',
+        'samples/WebFonts.AspNetCore/wwwroot/site.css',
+        'samples/WebFonts.AspNetCore/wwwroot/webfont-autosubset.js',
+        'samples/WebFonts.AspNetCore/wwwroot/webfont-sample.js',
+        'samples/WebFonts.WebForms/Default.aspx',
+        'samples/WebFonts.WebForms/Web.config',
+        'samples/WebFonts.WebForms/WebFontGenerate.ashx',
+        'samples/WebFonts.WebForms/webfont-autosubset.js',
+        'samples/WebFonts.WebForms/webfont-sample.css',
+        'samples/WebFonts.WebForms/webfont-sample.js',
+        'samples/WebFonts.WebForms/webfonts.dynamic.example.json',
+        'samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json',
+        'project-docs/eng/Manage-WebFontSidecarService.ps1',
         'sitemap.xml',
         'index.json',
         '404.html'
@@ -453,7 +473,7 @@ try {
     foreach ($repoPath in $repositoryContentFiles) {
         [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($repoPath, '.html'))
     }
-    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/scripts/PdfVisualDiff.py', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
+    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/Manage-WebFontSidecarService.ps1', 'eng/scripts/PdfVisualDiff.py', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
         [void]$allowedProjectDocs.Add($repoPath)
     }
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'

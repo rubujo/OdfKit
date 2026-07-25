@@ -16,6 +16,8 @@ on:
       - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
       - 'eng/Test-WebFontSidecarAot.ps1'
+      - 'eng/Manage-WebFontSidecarService.ps1'
+      - 'eng/Test-WebFontSidecarWindowsService.ps1'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   push:
@@ -35,6 +37,8 @@ on:
       - 'tests/OdfKit.WebFonts.SystemWebSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
       - 'eng/Test-WebFontSidecarAot.ps1'
+      - 'eng/Manage-WebFontSidecarService.ps1'
+      - 'eng/Test-WebFontSidecarWindowsService.ps1'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   workflow_dispatch:
@@ -79,6 +83,14 @@ jobs:
         if: matrix.rid == 'win-x64'
         shell: pwsh
         run: ./eng/Test-WebFontSidecarAot.ps1 -Configuration Release -RuntimeIdentifier win-x64
+
+      - name: Run NativeAOT WebFont sidecar as a Windows Service
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: >-
+          ./eng/Test-WebFontSidecarWindowsService.ps1
+          -Configuration Release
+          -HostExecutablePath artifacts/webfont-sidecar-aot-win-x64/OdfKit.WebFonts.Sidecar.Host.exe
 
       - name: Cross-publish Windows ARM64 WebFont sidecar
         if: matrix.rid == 'win-x64'

@@ -2,7 +2,7 @@
 title: Hinweise zu Drittanbietern
 _lang: de
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # Hinweise zu Drittanbietern
@@ -25,6 +25,7 @@ OdfKit nutzt CC0-1.0 Universal. Folgende Abhängigkeiten behalten ihre Lizenzen:
 | System.IO.Hashing | CRC-32-Prüfsummen unter net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0-Kompatibilität | MIT |
 | Microsoft.Win32.Registry | netstandard2.0-Kompatibilität für die Auflösung von Windows-EUDC-Registrierungsquellen | MIT |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | Markdig | Markdown-AST-Parser für OdfKit.Extensions.Html | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Zeichnen und Textformung | MIT |
 | ScottPlot | Diagramme und Ersatzvisualisierung | MIT |

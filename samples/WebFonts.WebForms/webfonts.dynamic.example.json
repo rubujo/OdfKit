@@ -11,11 +11,11 @@
   "allowPublicCrossOriginAssets": false,
   "fontSources": [
     {
-      "id": "cns-ext-b",
-      "path": "Fonts/TW-Sung-Ext-B-98_1.ttf",
-      "sha256": "eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583",
+      "id": "cns-sung-plus",
+      "path": "Fonts/TW-Sung-Plus-98_1.ttf",
+      "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
       "faceIndex": 0,
-      "fontFamily": "OdfKit CNS Ext-B"
+      "fontFamily": "OdfKit CNS Sung Plus"
     }
   ],
   "allowedProfileIds": [

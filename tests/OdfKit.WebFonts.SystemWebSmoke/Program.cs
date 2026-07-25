@@ -76,6 +76,74 @@ try
     }
 
     var handler = new OdfWebFontDynamicHandler(engine, options);
+    options.AllowedFormats.Add(WebFontFormat.Woff2);
+    var managedFallbackHandler = new OdfWebFontDynamicHandler(
+        new FailIfCalledSmokeEngine(),
+        engine,
+        options);
+    foreach ((WebFontFormat requested, WebFontFormat expected) in new[]
+             {
+                 (WebFontFormat.Woff2, WebFontFormat.Woff),
+                 (WebFontFormat.Woff, WebFontFormat.Woff),
+                 (usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType,
+                     usePostScriptOutline ? WebFontFormat.OpenType : WebFontFormat.TrueType)
+             })
+    {
+        var fallbackRequest = new RecordingWorkerRequest(
+            "POST",
+            "/_odf-fonts/generate",
+            JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+            {
+                FontSourceId = "smoke-source",
+                FaceIndex = 0,
+                ProfileId = "smoke-profile@1",
+                FontFamily = "OdfKit SystemWeb Smoke",
+                Sequences = new[] { "A𠆩" },
+                Formats = new[] { requested }
+            }),
+            options.ApiKey,
+            backend: "managed");
+        var fallbackContext = new HttpContext(fallbackRequest);
+        managedFallbackHandler.ProcessRequest(fallbackContext);
+        fallbackContext.Response.Flush();
+        Require(
+            fallbackContext.Response.StatusCode == 200,
+            $"Managed fallback did not generate {requested}.");
+        WebFontManifest fallbackManifest = JsonSerializer.Deserialize<WebFontManifest>(
+            fallbackRequest.ResponseText,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            })!;
+        Require(
+            fallbackManifest.Assets.Count > 0
+            && fallbackManifest.Assets.All(asset => asset.Format == expected),
+            $"Managed fallback returned the wrong format for {requested}.");
+    }
+
+    var unavailableFallbackRequest = new RecordingWorkerRequest(
+        "POST",
+        "/_odf-fonts/generate",
+        JsonSerializer.Serialize(new OdfWebFontSystemWebGenerationRequest
+        {
+            FontSourceId = "smoke-source",
+            FaceIndex = 0,
+            ProfileId = "smoke-profile@1",
+            FontFamily = "OdfKit SystemWeb Smoke",
+            Sequences = new[] { "A" },
+            Formats = new[] { WebFontFormat.Woff }
+        }),
+        options.ApiKey,
+        backend: "managed");
+    var unavailableFallbackContext = new HttpContext(unavailableFallbackRequest);
+    handler.ProcessRequest(unavailableFallbackContext);
+    unavailableFallbackContext.Response.Flush();
+    Require(
+        unavailableFallbackContext.Response.StatusCode == 400,
+        "Managed fallback was accepted when it was not configured.");
+    options.AllowedFormats.Remove(WebFontFormat.Woff2);
+
     if (sidecarPipeName is not null)
     {
         string sidecarToken = Environment.GetEnvironmentVariable("ODFKIT_WEBFONT_SIDECAR_TOKEN")
@@ -169,7 +237,9 @@ try
         ("invalid-data", 500),
         ("io", 503),
         ("invalid-operation", 500),
-        ("timeout", 499),
+        ("queue-full", 429),
+        ("cancelled", 499),
+        ("timeout", 503),
         ("unexpected", 500)
     })
     {
@@ -549,6 +619,15 @@ internal sealed class DeterministicSmokeEngine : IWebFontSubsetEngine, IWebFontT
     }
 }
 
+internal sealed class FailIfCalledSmokeEngine : IWebFontSubsetEngine
+{
+    public Task<WebFontManifest> GenerateAsync(
+        WebFontSubsetRequest request,
+        string outputDirectory,
+        CancellationToken cancellationToken = default)
+        => throw new InvalidOperationException("The primary engine must not run for a managed fallback request.");
+}
+
 internal sealed class ClassifiedFailureSmokeEngine : IWebFontSubsetEngine
 {
     public Task<WebFontManifest> GenerateAsync(
@@ -562,7 +641,9 @@ internal sealed class ClassifiedFailureSmokeEngine : IWebFontSubsetEngine
             "invalid-data" => new InvalidDataException(),
             "io" => new IOException(),
             "invalid-operation" => new InvalidOperationException(),
-            "timeout" => new OperationCanceledException(),
+            "queue-full" => new WebFontSidecarQueueFullException(),
+            "cancelled" => new OperationCanceledException(),
+            "timeout" => new TimeoutException(),
             "unexpected" => new NullReferenceException(),
             _ => new InvalidOperationException()
         });
@@ -599,6 +680,7 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
     private readonly string _method;
     private readonly string _path;
     private readonly string? _apiKey;
+    private readonly string? _backend;
     private readonly string? _ifNoneMatch;
     private readonly MemoryStream _responseBody = new();
 
@@ -607,13 +689,15 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
         string path,
         string? body,
         string? apiKey,
-        string? ifNoneMatch = null)
+        string? ifNoneMatch = null,
+        string? backend = null)
     {
         _method = method;
         _path = path;
         _body = body is null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body);
         _apiKey = apiKey;
         _ifNoneMatch = ifNoneMatch;
+        _backend = backend;
     }
 
     public int StatusCode { get; private set; } = 200;
@@ -669,6 +753,11 @@ internal sealed class RecordingWorkerRequest : HttpWorkerRequest
         if (_ifNoneMatch is not null)
         {
             headers.Add(new[] { "If-None-Match", _ifNoneMatch });
+        }
+
+        if (_backend is not null)
+        {
+            headers.Add(new[] { "X-OdfKit-WebFont-Backend", _backend });
         }
 
         return headers.ToArray();

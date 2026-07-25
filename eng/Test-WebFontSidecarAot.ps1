@@ -27,6 +27,7 @@ $smokeProject = Join-Path $repoRoot "tests/OdfKit.WebFonts.Sidecar.Net48Smoke/Od
 $systemWebSmokeProject = Join-Path $repoRoot "tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj"
 $publishRoot = Join-Path $repoRoot "artifacts/webfont-sidecar-aot-$RuntimeIdentifier"
 $assetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("odfkit-sidecar-assets-" + [guid]::NewGuid().ToString("N"))
+$hostArtifacts = Join-Path ([System.IO.Path]::GetTempPath()) ("odfkit-sidecar-host-" + [guid]::NewGuid().ToString("N"))
 $smokeArtifacts = Join-Path ([System.IO.Path]::GetTempPath()) ("odfkit-sidecar-build-" + [guid]::NewGuid().ToString("N"))
 $pipeName = "odfkit-webfont-" + [guid]::NewGuid().ToString("N")
 $token = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
@@ -48,12 +49,17 @@ $FontPath = (Resolve-Path -LiteralPath $FontPath).Path
 
 Push-Location $repoRoot
 try {
-    dotnet restore $hostProject -r $RuntimeIdentifier
+    dotnet restore $hostProject -r $RuntimeIdentifier --artifacts-path $hostArtifacts
     if ($LASTEXITCODE -ne 0) {
         throw "NativeAOT sidecar 還原失敗，結束碼 $LASTEXITCODE。"
     }
 
-    dotnet publish $hostProject -c $Configuration -r $RuntimeIdentifier --no-restore -o $publishRoot
+    dotnet publish $hostProject `
+        -c $Configuration `
+        -r $RuntimeIdentifier `
+        --no-restore `
+        --artifacts-path $hostArtifacts `
+        -o $publishRoot
     if ($LASTEXITCODE -ne 0) {
         throw "NativeAOT sidecar 發布失敗，結束碼 $LASTEXITCODE。"
     }
@@ -160,6 +166,9 @@ finally {
     }
     if (Test-Path -LiteralPath $smokeArtifacts) {
         Remove-Item -LiteralPath $smokeArtifacts -Recurse -Force
+    }
+    if (Test-Path -LiteralPath $hostArtifacts) {
+        Remove-Item -LiteralPath $hostArtifacts -Recurse -Force
     }
     Pop-Location
 }

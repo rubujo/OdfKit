@@ -8,6 +8,10 @@ async function verifyHelper(modulePath) {
     await import(modulePath);
 
     const helper = globalThis.OdfKitWebFontAutoSubset;
+    assert.equal(typeof helper.verifyGlyphRendering, "function");
+    assert.equal(typeof helper.createSystemGlyphDetector, "function");
+    assert.equal(typeof helper.clearLoadedFaces, "function");
+    assert.equal(helper.clearLoadedFaces(), 0);
     const ivs = "𠆩󠄀";
     assert.deepEqual(helper.segmentText(`${ivs}一`), [ivs, "一"]);
 
@@ -42,6 +46,45 @@ async function verifyHelper(modulePath) {
     assert.deepEqual(
         await helper.normalizeManifest({ ok: true, status: 200, json: async () => ({ assets: [] }) }),
         { assets: [] });
+
+    const originalCreateTreeWalker = document.createTreeWalker;
+    const originalNodeFilter = globalThis.NodeFilter;
+    globalThis.NodeFilter = { SHOW_TEXT: 4 };
+    document.createTreeWalker = () => {
+        let emitted = false;
+        return {
+            nextNode() {
+                if (emitted) {
+                    return null;
+                }
+                emitted = true;
+                return {
+                    nodeValue: `A${String.fromCodePoint(0xF04E1)}`,
+                    parentElement: null
+                };
+            }
+        };
+    };
+    const requested = [];
+    const root = {
+        addEventListener() {},
+        querySelectorAll: () => [],
+        removeEventListener() {}
+    };
+    const controller = helper.createController({
+        root,
+        routes: [{ fontSourceId: "missing", minimum: 0x20, maximum: 0x10FFFF }],
+        isSystemGlyphAvailable: cluster => cluster === "A",
+        request: async (_route, sequences) => {
+            requested.push(...sequences);
+            return { assets: [] };
+        }
+    });
+    await controller.scan();
+    assert.deepEqual(requested, [String.fromCodePoint(0xF04E1)]);
+    controller.disconnect();
+    document.createTreeWalker = originalCreateTreeWalker;
+    globalThis.NodeFilter = originalNodeFilter;
 }
 
 await verifyHelper("../samples/WebFonts.AspNetCore/wwwroot/webfont-autosubset.js");

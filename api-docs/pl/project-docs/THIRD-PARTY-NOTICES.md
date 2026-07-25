@@ -2,7 +2,7 @@
 title: Informacje o składnikach innych firm
 _lang: pl
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # Informacje o składnikach innych firm
@@ -24,6 +24,7 @@ Projekt OdfKit jest udostępniany na podstawie licencji [CC0-1.0 Universal](http
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Obliczanie sumy kontrolnej CRC-32; tylko element docelowy net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Memory](https://github.com/dotnet/runtime) / [System.Buffers](https://github.com/dotnet/runtime) / [System.Threading.Tasks.Extensions](https://github.com/dotnet/runtime) / [Microsoft.Bcl.AsyncInterfaces](https://github.com/dotnet/runtime) / [Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) / [System.Text.Encoding.CodePages](https://github.com/dotnet/runtime) | Obsługa zgodności platformy netstandard2.0 uzupełniająca typy i API wbudowane w net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Microsoft.Win32.Registry](https://github.com/dotnet/runtime) | Obsługa zgodności netstandard2.0 do rozpoznawania źródeł rejestru Windows EUDC | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Markdig](https://github.com/xoofx/markdig) | Mechanizm analizy AST Markdown używany w OdfKit.Extensions.Html | [BSD-2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | Wieloplatformowe rysowanie obrazów i skład tekstu używane w OdfKit.Extensions.Imaging | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | Rysowanie wykresów w pamięci i rezerwowa wizualizacja obrazów używane w OdfKit.Extensions.Imaging | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |

@@ -112,7 +112,7 @@ public sealed class SidecarTests
                 AuthenticationToken = new string('b', 64),
                 AssetRootPath = root
             });
-            await Assert.ThrowsAsync<ArgumentException>(
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(
                 () => client.GetHealthAsync(TestContext.Current.CancellationToken));
         }
         finally

@@ -290,6 +290,9 @@ hash。範例設定見
 [`samples/WebFonts.WebForms/webfonts.dynamic.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.example.json)。
 Sidecar 版本見
 [`samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json`](../samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json)。
+Windows Server、Windows 10／11、Linux／macOS 的完整平台決策、Host 參數、程序生命週期、
+監控及升級回復見
+[`WebFont Sidecar 部署與維運`](webfont-sidecar-deployment.md)。
 
 NativeAOT Host 是 self-contained 原生執行檔，部署時不需另行安裝 .NET 10 Runtime。以高熵
 `ODFKIT_WEBFONT_SIDECAR_TOKEN` 啟動 Host，且 IIS application pool 必須取得相同值；字型來源、
@@ -300,8 +303,48 @@ $env:ODFKIT_WEBFONT_SIDECAR_TOKEN = '<secret-store-value>'
 OdfKit.WebFonts.Sidecar.Host.exe `
   --pipe odfkit-webfonts-production `
   --asset-root C:\Sites\App_Data\OdfWebFonts `
-  --font-source cns-ext-b=C:\Sites\App_Data\Fonts\TW-Sung-Ext-B-98_1.ttf
+  --font-source cns-sung-plus=C:\Sites\App_Data\Fonts\TW-Sung-Plus-98_1.ttf
 ```
+
+System.Web JSON 的 `sidecar.tokenEnvironmentVariable` 優先讀取環境變數；若未設定，可再由
+`sidecar.tokenAppSettingName` 指向受 Protected Configuration 保護的 `web.config/appSettings`
+鍵。這個 fallback 適合無法可靠把自訂環境變數傳入 IIS application pool 的部署，但 Host 與
+IIS 仍必須使用同一個高熵 token。授權失敗會回傳服務暫時不可用，不會偽裝成「字型不含目標
+glyph」的 204。
+
+VS／IIS Express 的本機開發可使用明確 opt-in 的 Host 自動啟動：
+
+```json
+{
+  "sidecar": {
+    "pipeName": "odfkit-webfonts-development",
+    "tokenAppSettingName": "OdfKit.WebFonts.SidecarToken",
+    "autoStart": true,
+    "hostExecutablePath": "Sidecar/OdfKit.WebFonts.Sidecar.Host.exe",
+    "startupTimeoutSeconds": 15,
+    "stopWithApplicationProcess": true
+  }
+}
+```
+
+Handler 先以短逾時 health check 探測既有 pipe，僅在不存在時啟動隱藏 Host；權杖只寫入子程序
+環境，不出現在命令列。`stopWithApplicationProcess` 會把目前 IIS Express／worker PID 傳給
+Host，父程序結束後 Host 也會結束。`OdfKit.WebFonts.Sidecar` NuGet 只包含 client library；
+`hostExecutablePath` 必須指向同版本 GitHub Release ZIP 或 `eng/Publish-WebFontSidecar.ps1`
+建立的 NativeAOT Host；相對路徑以 JSON 設定檔所在目錄為基準，因此
+`App_Data/webfonts.dynamic.json` 可使用 `Sidecar/OdfKit.WebFonts.Sidecar.Host.exe`。
+
+診斷頁若需要比較 Sidecar 與處理程序內 managed 引擎，可在 System.Web JSON 根層設定
+`allowManagedFallback: true`。已通過 API key 驗證的產生要求加入
+`X-OdfKit-WebFont-Backend: managed` 後，Handler 會改用 managed 引擎；WOFF 與 TrueType
+維持原格式，WOFF2 則自動降級成 WOFF。未啟用此設定時，Handler 會拒絕該 header，避免公開
+呼叫端任意改變部署端選定的引擎。這是測試與故障診斷功能，不是 Sidecar 失敗時的靜默遞補。
+
+這個自動啟動模式只供單一使用者的本機開發或單 worker 受控部署。正式 IIS、web garden、
+多站台共用服務仍應設定 `autoStart: false`，使用 Release 內的
+`Manage-WebFontSidecarService.ps1` 安裝原生 Windows Service，或由部署平台管理 Host。連線失敗、
+Host 啟動失敗或逾時會回 `503 Service Unavailable`；Sidecar queue full 會回
+`429 Too Many Requests` 與 `Retry-After`。
 
 預設 pipe 只允許同一 Windows 使用者。IIS 與 sidecar 採不同服務帳號時，才加
 `--allow-cross-user`，並另以檔案 ACL、服務控制管理員權限及 secret store 隔離；僅有權杖不能
@@ -331,23 +374,43 @@ Handler 真實產生 WOFF2。
 
 ```json
 {
-  "fontSourceId": "cns-ext-b",
+  "fontSourceId": "cns-sung-plus",
   "faceIndex": 0,
   "profileId": "cns11643-euc-tw-2026-05-05",
-  "fontFamily": "OdfKit CNS Ext-B",
-  "sequences": ["A𠆩", "邉󠄐"],
+  "fontFamily": "OdfKit CNS Sung Plus",
+  "sequences": ["󿫠"],
   "formats": ["Woff", "TrueType"]
 }
 ```
 
-低階產字引擎維持單一 `FontSourceId` 契約；官方全字庫的 Plane 0 與 Plane 2
-分屬不同字型檔，因此頁面混排文字不得原封不動送到單一來源。瀏覽器端可使用 samples 內的
-`webfont-autosubset.js` 掃描文字節點，以 grapheme cluster 為不可拆分單位將設定範圍內的 Plane 2
-難字去重、分批，再由應用程式提供的 `odfKitRequestWebFonts` callback 交給受信任後端。這可避免
+低階產字引擎維持單一 `FontSourceId` 契約；瀏覽器端可使用 samples 內的
+`webfont-autosubset.js` 掃描文字節點，以 grapheme cluster 為不可拆分單位，先用
+`isSystemGlyphAvailable` 排除系統字型已有的字，再將實際缺字去重、分批，交由應用程式提供的
+`odfKitRequestWebFonts` callback 送至受信任後端。route 的 Unicode 範圍只是候選範圍，不等於
+範圍內每個字都必須下載 WebFont。這可避免
 拆散 IVS、ZWJ emoji、combining mark 或區域指示符號。helper 會監看後續 DOM 與 open shadow root
 變更、重試失敗批次，並略過 `script`、`style`、`textarea` 及 `data-odf-ignore` 範圍。callback
 必須使用既有登入身分或同等授權機制；不得把 WebFont API key 寫進 HTML 或 JavaScript，也不得
 記錄原始頁面文字。
+
+`createSystemGlyphDetector({ fontFamily })` 提供 Canvas 字形指紋的 best-effort 實作；缺字基準
+只計算一次，結果亦依 grapheme cluster 快取。瀏覽器沒有標準 API 可回報每個 cluster 最後實際
+選到的本機 fallback face，因此對高風險應用程式，應以已知系統映像的字型覆蓋資料覆寫
+`isSystemGlyphAvailable`。已知測試環境未安裝 EUDC／PUA 字型時，可設定
+`assumePrivateUseMissing: true`，避免對數百個 PUA 逐字執行 Canvas 偵測；若企業環境可能安裝
+EUDC，則不可使用此捷徑。
+
+helper 與 generation API 對 Unicode script 中立，但 CNS Plus 來源只會產生其 `cmap` 實際具有
+的 glyph。若網站還要補 Arabic、Devanagari、Bengali、Khmer、Thai 或其它語言缺字，必須為
+各 script 配置合法來源字型與 route；後端仍會逐來源做 `cmap` 篩選。需要 GSUB／GPOS 的文字
+會進入前述 correctness-first 模式，不能因為前端 detector 接受該 cluster 就推定任意來源字型
+支援該語言。
+
+helper 本身不需要 inline script、字串形式的動態程式碼、`data:` 或 `blob:`，可搭配
+`default-src 'none'`、同源 `script-src`／`connect-src`／`font-src` 與
+`require-trusted-types-for 'script'`。應用程式的 `odfKitRequestWebFonts` callback 也應放在
+CSP 允許的外部腳本中。跨來源部署時只把實際 API 與字型來源分別加入 `connect-src` 與
+`font-src`，不要使用 `*` 或 `unsafe-*` 放寬政策。
 
 託管端另有第二道防線：managed engine 會先依實際來源字型的 `cmap` 篩選文字。錯送混排文字時，
 只把該來源確實支援的連續序列交給嚴格的低階引擎；若完全沒有可產生的 glyph，回傳 HTTP 204，
@@ -362,9 +425,11 @@ ODF 匯出端若有多個來源，應使用
 IVS 則依 [OpenType 1.9.1 `cmap` format 14](https://learn.microsoft.com/en-us/typography/opentype/spec/cmap)
 同時檢查基底字與 variation sequence。
 
-產出的每個 `@font-face` 必須帶精確 `unicode-range`。頁面 CSS 將預設字型排在前面，WebFont
-只補上預設字型缺少的難字；瀏覽器依 CSS Fonts 字型比對規則選擇 face，無需把一般字重做成
-WebFont。
+產出的每個 `@font-face` 必須帶精確 `unicode-range`。頁面 CSS 依序放具名系統字型、WebFont、
+最後才放 `serif`／`sans-serif` 等 generic family；不可把 generic family 放在 WebFont 前面，
+否則瀏覽器可能畫出缺字方框後停止 fallback。WebFont 因此只補上具名系統字型缺少的難字，
+無需把一般字重做成 WebFont。這個 CSS 順序才是顯示行為的主要保證；前端 detector 是減少
+POST、子集運算與下載量的最佳化，不得把 detector 的猜測當成唯一 fallback 保證。
 
 同一 grapheme cluster 的基底字、combining mark、variation selector 與 ZWJ 不得拆到不同
 ODF span 或不同 request。這與 [CSS Fonts 4 cluster matching](https://www.w3.org/TR/css-fonts-4/#cluster-matching)
@@ -517,6 +582,47 @@ EUDC 字型不得在未授權時散布或上傳 CDN。
 ```text
 f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659
 ```
+
+### 下載與私有部署 Plus 字型
+
+從[政府資料開放平臺的全字庫資料集](https://data.gov.tw/dataset/5961)下載官方「全字庫宋體
+字型檔」或「全字庫楷體字型檔」。網站的 PUA 造字案例應選用封存檔內的
+`TW-Sung-Plus-98_1.ttf` 或 `TW-Kai-Plus-98_1.ttf`；Ext-B 字型主要涵蓋已配置到 Unicode
+補充平面的字，不足以取代 Plus 字型的 PUA 對應。
+
+不要為了網站測試安裝字型、寫入 Windows 字型登錄或複製到 `%WINDIR%\Fonts`。只將需要的 TTF
+解壓到應用程式私有且不可由靜態檔案 middleware 直接列出的目錄，例如
+`App_Data/Fonts` 或容器唯讀掛載，再由 WebFont endpoint 提供產生後的內容定址 WOFF2：
+
+```powershell
+Get-FileHash .\App_Data\Fonts\TW-Sung-Plus-98_1.ttf -Algorithm SHA256
+```
+
+將每次實際取得的 SHA-256 寫入受信任設定；官方封存檔更新後雜湊可能改變，不得直接沿用文件
+或另一台機器的值。`TW-Sung-Plus-98_1.ttf` 與 `TW-Kai-Plus-98_1.ttf` 也不可共用雜湊。
+OdfKit 會在讀取前重新驗證來源檔，且 nupkg、sample 與 API 文件網站都不再散布第三方字型。
+
+PUA 的碼位不是跨版本的永久字元身分。例如
+[CNS 17-2174](https://www.cns11643.gov.tw/wordView.jsp?ID=1122676) 目前以 U+FFAE0
+展示；部署時必須把 CNS 碼、暫用 Unicode、Profile 版本、Plus 字型檔與 SHA-256 視為同一份
+資料契約。sample 以此造字作主要驗證，Ext-B 僅保留為補充平面對照。
+
+楷宋動態切換不能假設兩個 Plus 檔具有完全相同的 PUA `cmap`。目前實機案例以兩者的非零
+glyph 交集 U+F04E1～U+F0800 共 800 字執行宋體 Plus → 楷體 Plus → 宋體 Plus 的 WOFF2
+往返切換；CNS 17-2174／U+FFAE0 在本案例使用的宋體檔可用，但楷體檔沒有非零 glyph，因此只
+列入宋體驗收。這是來源字型資料契約的差異，不得由 fallback 掩蓋。
+
+輸出格式與 Sidecar 啟用狀態是兩個不同控制。停用 WOFF2 時，應依已允許的格式明確要求 WOFF
+或 TrueType，並繼續驗證實際 manifest 格式與 glyph 像素；只有停用整個動態產字路徑且沒有
+預產生資產可用時，才會落到系統字型。網站 smoke 會執行 WOFF2 → WOFF → TrueType → WOFF2
+往返切換，三種格式都必須顯示相同的目標 PUA，而非以豆腐字代表格式切換。
+
+瀏覽器端驗收不得只使用 `document.fonts.check()`：當指定 family 不存在，但 fallback 字型可完成
+排版時，該 API 仍可能回傳 `true`。應先確認 `FontFaceSet` 內存在且已載入 manifest 指定的
+family，再以 `webfont-autosubset.js` 的 `verifyGlyphRendering(fontFamily, text)` 逐
+grapheme cluster 比較目標字型與 fallback 的 canvas 像素；任一 cluster 未由目標 face 畫出
+即失敗。網站 smoke 另須保留實際預覽區截圖。更新 helper 後也必須更換檔名
+指紋或查詢版本，例如 `webfont-autosubset.js?v=20260724-1`，避免瀏覽器沿用修正前的長效快取。
 
 字型須由部署者依授權合法取得並設定 `FontSourceId`、路徑與 SHA-256。引擎在子集化前必須檢查
 `OS/2.fsType`，拒絕禁止 embedding、禁止 subsetting 或 bitmap-only 的來源。全字庫資料要求的

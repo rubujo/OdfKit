@@ -19,6 +19,10 @@ internal sealed class HostConfiguration
 
     public WebFontWorkerOptions Worker { get; private init; } = new();
 
+    public int? ParentProcessId { get; private init; }
+
+    public string ServiceName { get; private init; } = "OdfKit WebFonts Sidecar";
+
     public static HostConfiguration Parse(string[] args)
     {
         var values = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -60,6 +64,7 @@ internal sealed class HostConfiguration
             values,
             "--token-environment-variable",
             required: false);
+        string tokenFile = GetSingle(values, "--token-file", required: false);
         if (string.IsNullOrWhiteSpace(tokenEnvironmentVariable))
         {
             tokenEnvironmentVariable = DefaultTokenEnvironmentVariable;
@@ -67,8 +72,12 @@ internal sealed class HostConfiguration
 
         string authenticationToken = probeOnly
             ? new string('0', 32)
-            : Environment.GetEnvironmentVariable(tokenEnvironmentVariable)
-                ?? throw ConfigurationInvalid();
+            : ResolveAuthenticationToken(tokenEnvironmentVariable, tokenFile);
+        string serviceName = GetSingle(values, "--service-name", required: false);
+        if (string.IsNullOrWhiteSpace(serviceName))
+        {
+            serviceName = "OdfKit WebFonts Sidecar";
+        }
         int maxMessageBytes = GetInt(values, "--max-message-bytes", 4 * 1024 * 1024, 4096, 16 * 1024 * 1024);
         int maxConnections = GetInt(values, "--max-connections", 8, 1, 64);
         int maxConcurrency = GetInt(values, "--max-concurrency", 1, 1, 32);
@@ -81,6 +90,7 @@ internal sealed class HostConfiguration
             1,
             256L * 1024 * 1024);
         int timeoutSeconds = GetInt(values, "--job-timeout-seconds", 180, 1, 1800);
+        int parentProcessId = GetInt(values, "--parent-process-id", 0, 0, int.MaxValue);
 
         if (!probeOnly)
         {
@@ -141,8 +151,29 @@ internal sealed class HostConfiguration
                 MaxConcurrency = maxConcurrency,
                 JobTimeout = TimeSpan.FromSeconds(timeoutSeconds),
                 MaxCachedAssetBytes = maxAssetBytes
-            }
+            },
+            ParentProcessId = parentProcessId == 0 ? null : parentProcessId,
+            ServiceName = serviceName
         };
+    }
+
+    private static string ResolveAuthenticationToken(
+        string tokenEnvironmentVariable,
+        string tokenFile)
+    {
+        string? token = Environment.GetEnvironmentVariable(tokenEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(token) && !string.IsNullOrWhiteSpace(tokenFile))
+        {
+            string path = Path.GetFullPath(tokenFile);
+            if (!File.Exists(path))
+            {
+                throw ConfigurationInvalid();
+            }
+
+            token = File.ReadAllText(path, Encoding.UTF8).Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(token) ? throw ConfigurationInvalid() : token;
     }
 
     private static string GetSingle(
@@ -237,6 +268,8 @@ internal sealed class HostConfiguration
             or "--asset-root"
             or "--cache-root"
             or "--token-environment-variable"
+            or "--token-file"
+            or "--service-name"
             or "--font-source"
             or "--max-message-bytes"
             or "--max-connections"
@@ -244,7 +277,8 @@ internal sealed class HostConfiguration
             or "--queue-capacity"
             or "--max-unicode-scalars"
             or "--max-asset-bytes"
-            or "--job-timeout-seconds";
+            or "--job-timeout-seconds"
+            or "--parent-process-id";
 
     private static ArgumentException ConfigurationInvalid()
         => new(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));

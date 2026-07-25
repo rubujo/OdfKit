@@ -47,6 +47,12 @@ OdfKit WebFonts 是供 C#／.NET 使用的多國罕用字 WebFont 動態產生�
 | 有界背景工作與快取 | `OdfKit.WebFonts.Worker` | [查看完整 WebFont 用法](https://github.com/rubujo/OdfKit/blob/main/docs/webfonts.md) |
 | HTML exporter 整合 | `OdfKit.Extensions.Html.WebFonts` | [查看完整 WebFont 用法](https://github.com/rubujo/OdfKit/blob/main/docs/webfonts.md) |
 
+`OdfKit.WebFonts.Sidecar` NuGet 是具名 pipe client，不包含 NativeAOT Host 執行檔。請從同版本
+GitHub Release ZIP 部署 Host；VS／IIS Express 可使用 System.Web JSON 的明確
+`sidecar.autoStart` opt-in。正式 IIS 使用 Release 內的 `Manage-WebFontSidecarService.ps1`
+安裝原生 Windows Service，或由部署平台管理 Host。完整設定見
+[Sidecar 部署與維運](https://github.com/rubujo/OdfKit/blob/main/docs/webfont-sidecar-deployment.md)。
+
 底層契約型別位於 `OdfKit.WebFonts.Abstractions`。一般網站應從對應 Hosting 套件開始，
 不要只安裝底層套件後自行重建授權、限流、內容定址與快取邊界。
 

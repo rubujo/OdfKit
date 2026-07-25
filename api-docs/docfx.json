@@ -21,8 +21,9 @@
     "resource": [
       { "files": ["images/**"] },
       { "src": "../docs", "files": ["**/*.json"], "dest": "project-docs" },
-      { "src": "..", "files": [".editorconfig", ".github/workflows/api-docs.yml", "eng/Build-ApiDocs.ps1", "eng/scripts/PdfVisualDiff.py", "tests/fixtures/ooxml-visual-golden/manifest.json"], "dest": "project-docs" },
-      { "src": "../samples/WebFonts.WebForms", "files": ["Web.config", "webfonts.dynamic.example.json", "webfonts.dynamic.sidecar.example.json"], "dest": "samples/WebFonts.WebForms" }
+      { "src": "..", "files": [".editorconfig", ".github/workflows/api-docs.yml", "eng/Build-ApiDocs.ps1", "eng/Manage-WebFontSidecarService.ps1", "eng/scripts/PdfVisualDiff.py", "tests/fixtures/ooxml-visual-golden/manifest.json"], "dest": "project-docs" },
+      { "src": "../samples/WebFonts.WebForms", "files": ["Default.aspx", "Web.config", "WebFontGenerate.ashx", "webfont-autosubset.js", "webfont-sample.css", "webfont-sample.js", "webfonts.dynamic.example.json", "webfonts.dynamic.sidecar.example.json"], "dest": "samples/WebFonts.WebForms" },
+      { "src": "../samples/WebFonts.AspNetCore", "files": ["OdfKit.WebFonts.AspNetCore.Sample.csproj", "Program.cs", "appsettings.WebFont.example.json", "wwwroot/site.css", "wwwroot/webfont-autosubset.js", "wwwroot/webfont-sample.js"], "dest": "samples/WebFonts.AspNetCore" }
     ],
     "globalMetadata": {
       "_appName": "OdfKit API Reference",

@@ -155,7 +155,7 @@ public sealed class OdfWebFontSidecarClient : IWebFontSubsetEngine, IWebFontText
         catch (Exception exception) when (exception is IOException
                                           or UnauthorizedAccessException)
         {
-            throw new InvalidOperationException(
+            throw new IOException(
                 OdfLocalizer.GetMessage("Err_WebFont_ProcessFailed"),
                 exception);
         }
@@ -168,17 +168,18 @@ public sealed class OdfWebFontSidecarClient : IWebFontSubsetEngine, IWebFontText
             case SidecarStatus.Success:
                 return;
             case SidecarStatus.InvalidRequest:
-            case SidecarStatus.Unauthorized:
             case SidecarStatus.VersionMismatch:
                 throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+            case SidecarStatus.Unauthorized:
+                throw new UnauthorizedAccessException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
             case SidecarStatus.Unsupported:
                 throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
             case SidecarStatus.QueueFull:
-                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_WebFont_QueueFull"));
+                throw new WebFontSidecarQueueFullException();
             case SidecarStatus.Cancelled:
                 throw new OperationCanceledException(OdfLocalizer.GetMessage("Err_WebFont_ProcessFailed"));
             default:
-                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_WebFont_ProcessFailed"));
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_ProcessFailed"));
         }
     }
 

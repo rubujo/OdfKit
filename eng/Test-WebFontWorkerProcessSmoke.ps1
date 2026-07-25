@@ -39,6 +39,7 @@ New-Item -ItemType Directory -Path $runPath -Force | Out-Null
 $projectPath = Join-Path $repoRoot "tests/OdfKit.WebFontWorkerProcessSmoke/OdfKit.WebFontWorkerProcessSmoke.csproj"
 $intermediateRoot = Join-Path $runPath "obj"
 dotnet restore $projectPath --nologo `
+    -p:NuGetAudit=false `
     -p:OdfKitWebFontWorkerProcessSmokeIntermediateRoot="$intermediateRoot\"
 if ($LASTEXITCODE -ne 0) {
     throw "WebFont Worker process smoke helper 還原失敗。"

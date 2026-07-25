@@ -13,7 +13,7 @@ smoke 執行成功，就把所有核心、擴充套件及第三方相依一併�
 | `OdfKit.WebFonts.OpenType` | `net10.0` AOT-compatible | 有界 parser、子集化、WOFF／WOFF2 與 source-generated／無反射熱路徑 |
 | `OdfKit.WebFonts.Worker` | AOT-compatible | durable manifest 改用 `System.Text.Json` source generation |
 | `OdfKit.WebFonts.Sidecar` | `net10.0` AOT-compatible；`net48` 用戶端 | 版本化具名 pipe 協定不依賴 reflection serialization |
-| `OdfKit.WebFonts.Sidecar.Host` | Windows x64／ARM64 NativeAOT | x64 在 CI 實際執行；ARM64 交叉發布。Host 是 self-contained，不要求部署 .NET Runtime |
+| `OdfKit.WebFonts.Sidecar.Host` | Windows x64／ARM64 NativeAOT | x64 以主控台及 net48 用戶端執行，原生 Windows Service 由提升權限的 CI smoke 驗證；ARM64 交叉發布。Host 是 self-contained，不要求部署 .NET Runtime |
 | 其它擴充套件 | 逐套件評估 | SkiaSharp、ClosedXML、PDF、RDF、LibreOffice／Office 互通及其它第三方相依，不由核心 smoke 推定為 AOT-compatible |
 
 ## net48 WOFF2 sidecar

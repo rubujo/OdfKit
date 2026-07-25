@@ -9,20 +9,27 @@
   "maxUnicodeScalarCount": 4096,
   "maxAssetBytes": 33554432,
   "allowPublicCrossOriginAssets": false,
+  "allowManagedFallback": true,
   "sidecar": {
     "pipeName": "odfkit-webfonts-production",
     "tokenEnvironmentVariable": "ODFKIT_WEBFONT_SIDECAR_TOKEN",
+    "tokenAppSettingName": "OdfKit.WebFonts.SidecarToken",
+    "tokenFilePath": "",
     "connectTimeoutSeconds": 5,
     "requestTimeoutSeconds": 180,
-    "maxMessageBytes": 4194304
+    "maxMessageBytes": 4194304,
+    "autoStart": false,
+    "hostExecutablePath": "Sidecar/OdfKit.WebFonts.Sidecar.Host.exe",
+    "startupTimeoutSeconds": 15,
+    "stopWithApplicationProcess": true
   },
   "fontSources": [
     {
-      "id": "cns-ext-b",
-      "path": "Fonts/TW-Sung-Ext-B-98_1.ttf",
-      "sha256": "eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583",
+      "id": "cns-sung-plus",
+      "path": "Fonts/TW-Sung-Plus-98_1.ttf",
+      "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
       "faceIndex": 0,
-      "fontFamily": "OdfKit CNS Ext-B"
+      "fontFamily": "OdfKit CNS Sung Plus"
     }
   ],
   "allowedProfileIds": [

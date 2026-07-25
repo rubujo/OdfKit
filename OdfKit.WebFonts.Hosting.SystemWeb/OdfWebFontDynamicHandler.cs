@@ -25,6 +25,8 @@ namespace OdfKit.WebFonts.Hosting.SystemWeb;
 public sealed class OdfWebFontDynamicHandler : IHttpHandler
 {
     private const string ApiKeyHeader = "X-OdfKit-WebFont-Key";
+    private const string BackendHeader = "X-OdfKit-WebFont-Backend";
+    private const string ManagedBackend = "managed";
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         AllowTrailingCommas = false,
@@ -61,6 +63,14 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         OdfWebFontSystemWebGenerationOptions options)
     {
         _runtime = new DynamicRuntime(engine, options);
+    }
+
+    internal OdfWebFontDynamicHandler(
+        IWebFontSubsetEngine engine,
+        IWebFontSubsetEngine managedFallbackEngine,
+        OdfWebFontSystemWebGenerationOptions options)
+    {
+        _runtime = new DynamicRuntime(engine, options, managedFallbackEngine);
     }
 
     /// <summary>
@@ -189,6 +199,17 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             return;
         }
 
+        string? requestedBackend = request.Headers[BackendHeader];
+        if (!runtime.TrySelectEngine(
+                requestedBackend,
+                subsetRequest,
+                out IWebFontSubsetEngine selectedEngine,
+                out subsetRequest))
+        {
+            response.StatusCode = 400;
+            return;
+        }
+
         if (!runtime.GenerationSlots.Wait(0))
         {
             response.StatusCode = 429;
@@ -198,7 +219,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         try
         {
-            if (runtime.Engine is IWebFontTextCoverageFilter coverageFilter)
+            if (selectedEngine is IWebFontTextCoverageFilter coverageFilter)
             {
                 IReadOnlyList<WebFontTextSequence> supportedSequences = coverageFilter
                     .FilterSupportedSequencesAsync(
@@ -216,7 +237,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
                 subsetRequest = CopyWithSequences(subsetRequest, supportedSequences);
             }
 
-            WebFontManifest manifest = runtime.Engine.GenerateAsync(
+            WebFontManifest manifest = selectedEngine.GenerateAsync(
                     subsetRequest,
                     runtime.AssetRootPath,
                     GetClientDisconnectedToken(response))
@@ -234,6 +255,11 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         {
             response.StatusCode = 422;
         }
+        catch (WebFontSidecarQueueFullException)
+        {
+            response.StatusCode = 429;
+            response.AddHeader("Retry-After", "1");
+        }
         catch (InvalidDataException)
         {
             response.StatusCode = 500;
@@ -245,7 +271,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         catch (Exception exception) when (exception is IOException
                                           or UnauthorizedAccessException
                                           or CryptographicException
-                                          or SecurityException)
+                                          or SecurityException
+                                          or TimeoutException)
         {
             response.StatusCode = 503;
         }
@@ -273,6 +300,19 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             FontFamily = request.FontFamily,
             Sequences = sequences,
             Formats = request.Formats,
+            RequiredBrowserTargets = request.RequiredBrowserTargets
+        };
+
+    private static WebFontSubsetRequest CopyWithFormats(
+        WebFontSubsetRequest request,
+        IReadOnlyList<WebFontFormat> formats)
+        => new()
+        {
+            Face = request.Face,
+            ProfileId = request.ProfileId,
+            FontFamily = request.FontFamily,
+            Sequences = request.Sequences,
+            Formats = formats,
             RequiredBrowserTargets = request.RequiredBrowserTargets
         };
 
@@ -511,37 +551,98 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             options.AllowedFormats.Add(format);
         }
 
-        IWebFontSubsetEngine engine = configuration.Sidecar is null
-            ? new ManagedOpenTypeWebFontSubsetEngine(engineOptions)
-            : CreateSidecarClient(configuration.Sidecar, options.AssetRootPath);
-        return new DynamicRuntime(engine, options);
+        var managedEngine = new ManagedOpenTypeWebFontSubsetEngine(engineOptions);
+        if (configuration.Sidecar is null)
+        {
+            return new DynamicRuntime(managedEngine, options);
+        }
+
+        IWebFontSubsetEngine sidecarEngine = CreateSidecarEngine(
+            configuration.Sidecar,
+            options,
+            baseDirectory);
+        return new DynamicRuntime(
+            sidecarEngine,
+            options,
+            configuration.AllowManagedFallback ? managedEngine : null);
     }
 
-    private static OdfWebFontSidecarClient CreateSidecarClient(
+    private static IWebFontSubsetEngine CreateSidecarEngine(
         DynamicSidecarConfiguration configuration,
-        string assetRootPath)
+        OdfWebFontSystemWebGenerationOptions generationOptions,
+        string baseDirectory)
     {
         if (string.IsNullOrWhiteSpace(configuration.PipeName)
-            || string.IsNullOrWhiteSpace(configuration.TokenEnvironmentVariable))
+            || (string.IsNullOrWhiteSpace(configuration.TokenEnvironmentVariable)
+                && string.IsNullOrWhiteSpace(configuration.TokenAppSettingName)
+                && string.IsNullOrWhiteSpace(configuration.TokenFilePath)))
         {
             throw ConfigurationInvalid();
         }
 
-        string? token = Environment.GetEnvironmentVariable(configuration.TokenEnvironmentVariable);
+        string? token = string.IsNullOrWhiteSpace(configuration.TokenEnvironmentVariable)
+            ? null
+            : Environment.GetEnvironmentVariable(configuration.TokenEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(token) && !string.IsNullOrWhiteSpace(configuration.TokenAppSettingName))
+        {
+            token = ConfigurationManager.AppSettings[configuration.TokenAppSettingName];
+        }
+        if (string.IsNullOrWhiteSpace(token) && !string.IsNullOrWhiteSpace(configuration.TokenFilePath))
+        {
+            string tokenFilePath = MapTrustedPath(configuration.TokenFilePath, baseDirectory);
+            if (!File.Exists(tokenFilePath))
+            {
+                throw ConfigurationInvalid();
+            }
+
+            token = File.ReadAllText(tokenFilePath, Encoding.UTF8).Trim();
+        }
+
         if (string.IsNullOrWhiteSpace(token))
         {
             throw ConfigurationInvalid();
         }
 
-        return new OdfWebFontSidecarClient(new WebFontSidecarClientOptions
+        var clientOptions = new WebFontSidecarClientOptions
         {
             PipeName = configuration.PipeName,
-            AuthenticationToken = token,
-            AssetRootPath = assetRootPath,
+            AuthenticationToken = token!,
+            AssetRootPath = generationOptions.AssetRootPath,
             ConnectTimeout = TimeSpan.FromSeconds(configuration.ConnectTimeoutSeconds),
             RequestTimeout = TimeSpan.FromSeconds(configuration.RequestTimeoutSeconds),
             MaxMessageBytes = configuration.MaxMessageBytes
-        });
+        };
+        if (!configuration.AutoStart)
+        {
+            return new OdfWebFontSidecarClient(clientOptions);
+        }
+
+        string hostExecutablePath = MapTrustedPath(configuration.HostExecutablePath, baseDirectory);
+        if (!File.Exists(hostExecutablePath)
+            || configuration.StartupTimeoutSeconds is <= 0 or > 120
+            || generationOptions.FontSources.Keys.Any(id => id.Contains("=", StringComparison.Ordinal)))
+        {
+            throw ConfigurationInvalid();
+        }
+
+        return new AutoStartingSidecarSubsetEngine(
+            clientOptions,
+            new AutoStartSidecarOptions
+            {
+                HostExecutablePath = hostExecutablePath,
+                PipeName = configuration.PipeName,
+                AuthenticationToken = token!,
+                AssetRootPath = generationOptions.AssetRootPath,
+                MaxMessageBytes = configuration.MaxMessageBytes,
+                MaxUnicodeScalars = generationOptions.MaxUnicodeScalarCount,
+                MaxAssetBytes = generationOptions.MaxAssetBytes,
+                JobTimeoutSeconds = configuration.RequestTimeoutSeconds,
+                StartupTimeout = TimeSpan.FromSeconds(configuration.StartupTimeoutSeconds),
+                StopWithApplicationProcess = configuration.StopWithApplicationProcess,
+                FontSources = new Dictionary<string, string>(
+                    generationOptions.FontSources,
+                    StringComparer.Ordinal)
+            });
     }
 
     private static string MapTrustedPath(string value, string baseDirectory)
@@ -665,7 +766,10 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         private readonly ConcurrentDictionary<string, VerifiedAsset> _verifiedAssets =
             new(StringComparer.OrdinalIgnoreCase);
 
-        public DynamicRuntime(IWebFontSubsetEngine engine, OdfWebFontSystemWebGenerationOptions options)
+        public DynamicRuntime(
+            IWebFontSubsetEngine engine,
+            OdfWebFontSystemWebGenerationOptions options,
+            IWebFontSubsetEngine? managedFallbackEngine = null)
         {
             Engine = engine ?? throw new ArgumentNullException(
                 nameof(engine),
@@ -678,9 +782,12 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
             Directory.CreateDirectory(AssetRootPath);
             ApiKey = options.ApiKey;
             GenerationSlots = new SemaphoreSlim(options.MaxConcurrentGenerations, options.MaxConcurrentGenerations);
+            ManagedFallbackEngine = managedFallbackEngine;
         }
 
         public IWebFontSubsetEngine Engine { get; }
+
+        public IWebFontSubsetEngine? ManagedFallbackEngine { get; }
 
         public OdfWebFontSystemWebGenerationOptions Options { get; }
 
@@ -689,6 +796,45 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         public string ApiKey { get; }
 
         public SemaphoreSlim GenerationSlots { get; }
+
+        public bool TrySelectEngine(
+            string? requestedBackend,
+            WebFontSubsetRequest request,
+            out IWebFontSubsetEngine engine,
+            out WebFontSubsetRequest effectiveRequest)
+        {
+            engine = Engine;
+            effectiveRequest = request;
+            if (string.IsNullOrWhiteSpace(requestedBackend))
+            {
+                return true;
+            }
+
+            if (!string.Equals(requestedBackend, ManagedBackend, StringComparison.OrdinalIgnoreCase)
+                || ManagedFallbackEngine is null)
+            {
+                return false;
+            }
+
+            engine = ManagedFallbackEngine;
+            if (!request.Formats.Contains(WebFontFormat.Woff2))
+            {
+                return true;
+            }
+
+            if (!Options.AllowedFormats.Contains(WebFontFormat.Woff))
+            {
+                return false;
+            }
+
+            effectiveRequest = CopyWithFormats(
+                request,
+                request.Formats
+                    .Select(format => format == WebFontFormat.Woff2 ? WebFontFormat.Woff : format)
+                    .Distinct()
+                    .ToArray());
+            return true;
+        }
 
         public bool TryVerifyAsset(FileInfo info, string expectedHash, out string actualHash)
         {
@@ -844,6 +990,8 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         public bool AllowPublicCrossOriginAssets { get; set; }
 
+        public bool AllowManagedFallback { get; set; }
+
         public List<DynamicFontSource> FontSources { get; set; } = new();
 
         public List<string> AllowedProfileIds { get; set; } = new();
@@ -872,10 +1020,22 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
         public string TokenEnvironmentVariable { get; set; } = "ODFKIT_WEBFONT_SIDECAR_TOKEN";
 
+        public string TokenAppSettingName { get; set; } = string.Empty;
+
+        public string TokenFilePath { get; set; } = string.Empty;
+
         public int ConnectTimeoutSeconds { get; set; } = 5;
 
         public int RequestTimeoutSeconds { get; set; } = 180;
 
         public int MaxMessageBytes { get; set; } = 4 * 1024 * 1024;
+
+        public bool AutoStart { get; set; }
+
+        public string HostExecutablePath { get; set; } = string.Empty;
+
+        public int StartupTimeoutSeconds { get; set; } = 15;
+
+        public bool StopWithApplicationProcess { get; set; } = true;
     }
 }

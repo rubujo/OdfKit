@@ -2,7 +2,7 @@
 title: Avis relatifs aux tiers
 _lang: fr
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # Avis relatifs aux tiers
@@ -24,6 +24,7 @@ OdfKit utilise CC0-1.0 Universal. Les dépendances suivantes conservent leur lic
 | System.IO.Hashing | Sommes CRC-32 sous net10.0 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | Compatibilité netstandard2.0 | MIT |
 | Microsoft.Win32.Registry | Compatibilité netstandard2.0 pour la résolution des sources de Registre Windows EUDC | MIT |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | Markdig | Analyse d’AST Markdown pour OdfKit.Extensions.Html | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | Dessin et façonnage du texte | MIT |
 | ScottPlot | Graphiques et visualisation de secours | MIT |

@@ -88,6 +88,10 @@ Get-ChildItem -LiteralPath $buildOutput -File |
     Copy-Item -Destination $binPath -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/Default.aspx") -Destination $sitePath
 Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/Web.config") -Destination $sitePath
+Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/WebFontGenerate.ashx") -Destination $sitePath
+Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/webfont-autosubset.js") -Destination $sitePath
+Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/webfont-sample.css") -Destination $sitePath
+Copy-Item -LiteralPath (Join-Path $repoRoot "samples/WebFonts.WebForms/webfont-sample.js") -Destination $sitePath
 
 $fontFileName = [IO.Path]::GetFileName($resolvedFontPath)
 Copy-Item -LiteralPath $resolvedFontPath -Destination (Join-Path $fontDirectory $fontFileName)
@@ -135,6 +139,14 @@ if ($apiKeySetting.Count -ne 1) {
     throw "Web Forms sample 缺少 web.config API key 設定。"
 }
 $apiKeySetting[0].SetAttribute("value", $apiKey)
+$sampleEndpointSetting = @(@($siteWebConfig.configuration.appSettings.add) |
+        Where-Object key -EQ "OdfKit.WebFonts.SampleInternalGenerateUrl")
+if ($sampleEndpointSetting.Count -ne 1) {
+    throw "Web Forms sample 缺少內部 WebFont BFF endpoint 設定。"
+}
+$sampleEndpointSetting[0].SetAttribute(
+    "value",
+    ([Uri]::new($baseUri, "_odf-fonts/generate").AbsoluteUri))
 $siteWebConfig.Save((Join-Path $sitePath "Web.config"))
 $applicationHostPath = Join-Path $destinationPath "applicationhost.config"
 Copy-Item -LiteralPath $applicationHostSource -Destination $applicationHostPath
@@ -259,6 +271,39 @@ try {
     finally {
         $generationResponse.Dispose()
         $generationRequest.Dispose()
+    }
+
+    $proxyRequest = [Net.Http.HttpRequestMessage]::new(
+        [Net.Http.HttpMethod]::Post,
+        [Uri]::new($baseUri, "WebFontGenerate.ashx"))
+    $proxyRequest.Headers.Add("X-OdfKit-WebFont-Backend", "sidecar")
+    $proxyRequest.Content = [Net.Http.StringContent]::new(
+        $requestBody,
+        [Text.Encoding]::UTF8,
+        "application/json")
+    $proxyResponse = $client.Send($proxyRequest)
+    try {
+        $proxyBytes = Read-ResponseBytes $proxyResponse
+        $proxyErrorValues = $null
+        $proxyError = if ($proxyResponse.Headers.TryGetValues(
+                "X-OdfKit-Sample-Error",
+                [ref]$proxyErrorValues)) {
+            @($proxyErrorValues) -join ","
+        }
+        else {
+            [Text.Encoding]::UTF8.GetString($proxyBytes)
+        }
+        Assert-Condition ($proxyResponse.StatusCode -eq [Net.HttpStatusCode]::OK) `
+            "Web Forms sample BFF 動態產字失敗：$([int]$proxyResponse.StatusCode)，$proxyError。"
+        Assert-Condition ($proxyResponse.Headers.CacheControl.NoStore) `
+            "Web Forms sample BFF 回應缺少 no-store。"
+        $proxyManifest = [Text.Encoding]::UTF8.GetString($proxyBytes) | ConvertFrom-Json
+        Assert-Condition (@($proxyManifest.Assets).Count -eq 2) `
+            "Web Forms sample BFF 未回傳兩種格式。"
+    }
+    finally {
+        $proxyResponse.Dispose()
+        $proxyRequest.Dispose()
     }
 
     Assert-Condition (@($manifest.Assets).Count -eq 2) "IIS Express 動態產字未回傳兩種格式。"

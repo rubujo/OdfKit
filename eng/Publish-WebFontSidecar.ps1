@@ -58,6 +58,8 @@ foreach ($rid in $rids) {
     Copy-Item -LiteralPath (Join-Path $repoRoot "LICENSE") -Destination $staging
     Copy-Item -LiteralPath (Join-Path $repoRoot "THIRD-PARTY-NOTICES.md") -Destination $staging
     Copy-Item -LiteralPath (Join-Path $repoRoot "docs/nativeaot.md") -Destination $staging
+    Copy-Item -LiteralPath (Join-Path $repoRoot "docs/webfont-sidecar-deployment.md") -Destination $staging
+    Copy-Item -LiteralPath (Join-Path $repoRoot "eng/Manage-WebFontSidecarService.ps1") -Destination $staging
     Set-Content -LiteralPath (Join-Path $staging "VERSION.txt") -Value $packageVersion -Encoding utf8NoBOM
 
     $archive = Join-Path $outputRoot "OdfKit.WebFonts.Sidecar.Host-$packageVersion-$rid.zip"

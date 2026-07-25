@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Globalization;
+using System.Security.Cryptography;
 using OdfKit.WebFonts;
 using OdfKit.WebFonts.Sidecar;
 
@@ -10,6 +11,14 @@ try
         ?? throw new InvalidOperationException("The sidecar token environment variable is missing.");
     string assetRoot = Path.GetFullPath(RequireArgument(args, "--asset-root"));
     string fontPath = Path.GetFullPath(RequireArgument(args, "--font"));
+    string fontSourceId = GetArgument(args, "--font-source-id") ?? "smoke-source";
+    string? scalarHex = GetArgument(args, "--scalar");
+    string smokeText = scalarHex is null
+        ? "OdfKit"
+        : char.ConvertFromUtf32(int.Parse(
+            scalarHex,
+            NumberStyles.AllowHexSpecifier,
+            CultureInfo.InvariantCulture));
     string sourceSha256 = ComputeSha256(fontPath);
 
     Directory.CreateDirectory(assetRoot);
@@ -28,13 +37,13 @@ try
 
     var face = new WebFontFaceIdentity
     {
-        FontSourceId = "smoke-source",
+        FontSourceId = fontSourceId,
         SourceSha256 = sourceSha256,
         FaceIndex = 0
     };
     IReadOnlyList<WebFontTextSequence> supported = await client.FilterSupportedSequencesAsync(
         face,
-        [WebFontTextSequence.Create("OdfKit")]);
+        [WebFontTextSequence.Create(smokeText)]);
     Require(supported.Count > 0, "The source font supports none of the smoke sequence.");
 
     WebFontManifest manifest = await client.GenerateAsync(

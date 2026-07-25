@@ -558,9 +558,15 @@ public sealed class OdfScriptingExtensionTests
             DateTimeOffset.UtcNow.AddDays(1));
         byte[] pfx = certificate.Export(X509ContentType.Pfx);
 #if NET10_0_OR_GREATER
-        return X509CertificateLoader.LoadPkcs12(pfx, password: null);
+        return X509CertificateLoader.LoadPkcs12(
+            pfx,
+            password: null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
 #else
-        return new X509Certificate2(pfx);
+        return new X509Certificate2(
+            pfx,
+            (string?)null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
 #endif
     }
 

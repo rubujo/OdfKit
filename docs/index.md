@@ -45,6 +45,7 @@
 | [ODF 指令碼與巨集管理](scripting.md) | ODF 1.0～1.4 script／event CRUD、LibreOffice 巨集簽章、信任政策、結構式診斷與安全邊界 |
 | [實作食譜](cookbook.md) | 常見操作片段與實作範例 |
 | [WebFont 多國罕用字套件](webfonts.md) | ASP.NET Core／Web Forms、CSP、CDN、自動內容掃描、Big5／Big5E 與 ORM 整合 |
+| [WebFont Sidecar 部署與維運](webfont-sidecar-deployment.md) | Windows Server、IIS Express、非 Windows 平台、程序生命週期、監控與升級回復 |
 | [NativeAOT 支援與部署邊界](nativeaot.md) | 核心 AOT 證據、套件矩陣與 net48 WOFF2 sidecar 部署 |
 | [WebFont 純 .NET 架構契約](webfont-managed-architecture.md) | 純 C#／.NET 產品邊界、格式與授權準入、Phase 0～5 驗收 |
 | [API 表面分層](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |

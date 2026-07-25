@@ -2,7 +2,7 @@
 title: Oznámení třetích stran
 _lang: cs
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # Oznámení třetích stran
@@ -24,6 +24,7 @@ Projekt OdfKit je poskytován pod licencí [CC0-1.0 Universal](https://creativec
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Výpočet kontrolního součtu CRC-32; pouze cíl net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Memory](https://github.com/dotnet/runtime) / [System.Buffers](https://github.com/dotnet/runtime) / [System.Threading.Tasks.Extensions](https://github.com/dotnet/runtime) / [Microsoft.Bcl.AsyncInterfaces](https://github.com/dotnet/runtime) / [Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) / [System.Text.Encoding.CodePages](https://github.com/dotnet/runtime) | Podpora kompatibility platformy netstandard2.0, která doplňuje typy a API integrované v net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Microsoft.Win32.Registry](https://github.com/dotnet/runtime) | Podpora kompatibility netstandard2.0 pro rozlišení zdrojů registru Windows EUDC | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Markdig](https://github.com/xoofx/markdig) | Backend pro analýzu AST Markdown používaný v OdfKit.Extensions.Html | [BSD-2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | Multiplatformní kreslení obrázků a sazba textu používané v OdfKit.Extensions.Imaging | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | Kreslení grafů v paměti a záložní vizualizace obrázků používané v OdfKit.Extensions.Imaging | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |

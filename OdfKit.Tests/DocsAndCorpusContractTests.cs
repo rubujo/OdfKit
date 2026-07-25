@@ -69,6 +69,42 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// Verifies WebFont guidance and runnable sample sources are published by the API site.
+    /// 驗證 API 網站會發布 WebFont 指南及可執行範例原始碼。
+    /// </summary>
+    [Fact]
+    public void WebFontGuidanceAndSampleSourcesArePublished()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string docfx = File.ReadAllText(Path.Combine(repoRoot, "api-docs", "docfx.json"));
+        string packageSelection = File.ReadAllText(
+            Path.Combine(repoRoot, "api-docs", "articles", "package-selection.md"));
+        string buildScript = File.ReadAllText(Path.Combine(repoRoot, "eng", "Build-ApiDocs.ps1"));
+
+        foreach (string samplePath in new[]
+        {
+            "samples/WebFonts.AspNetCore/wwwroot/webfont-autosubset.js",
+            "samples/WebFonts.AspNetCore/wwwroot/webfont-sample.js",
+            "samples/WebFonts.WebForms/Default.aspx",
+            "samples/WebFonts.WebForms/WebFontGenerate.ashx",
+            "samples/WebFonts.WebForms/webfont-autosubset.js",
+            "samples/WebFonts.WebForms/webfont-sample.js",
+            "samples/WebFonts.WebForms/webfonts.dynamic.sidecar.example.json",
+        })
+        {
+            Assert.Contains(samplePath, buildScript, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("wwwroot/webfont-autosubset.js", docfx, StringComparison.Ordinal);
+        Assert.Contains("webfont-sample.css", docfx, StringComparison.Ordinal);
+        Assert.Contains("TW-Sung-Plus-98_1.ttf", packageSelection, StringComparison.Ordinal);
+        Assert.Contains("TW-Kai-Plus-98_1.ttf", packageSelection, StringComparison.Ordinal);
+        Assert.Contains("sidecar.autoStart: true", packageSelection, StringComparison.Ordinal);
+        Assert.Contains("unsafe-inline", packageSelection, StringComparison.Ordinal);
+        Assert.Contains("只有實際缺字", packageSelection, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Verifies the documented package resource budgets match the public loading defaults.
     /// 驗證文件所載封裝資源預算符合公開載入預設值。
     /// </summary>
@@ -699,13 +735,11 @@ public class DocsAndCorpusContractTests
             Assert.True(File.Exists(jsonPath), "缺少 i18n JSON：" + culture);
         }
 
-        Assert.Contains("PublicApiAnalyzers", agents, StringComparison.Ordinal);
-        Assert.Contains("Test-LocalizerKeyParity", agents, StringComparison.Ordinal);
-        Assert.Contains("Add-LocalizerKey", agents, StringComparison.Ordinal);
-        Assert.Contains("Generate-LocalizerExceptionsFromJson", agents, StringComparison.Ordinal);
-        Assert.Contains("EnablePackageValidation", agents, StringComparison.Ordinal);
-        Assert.Contains("public-api-optional-parameters", agents, StringComparison.Ordinal);
-        Assert.Contains("architecture-collaborators", agents, StringComparison.Ordinal);
+        Assert.Contains("docs/maintainability.md", agents, StringComparison.Ordinal);
+        Assert.Contains("OdfKit/PublicAPI/README.md", agents, StringComparison.Ordinal);
+        Assert.Contains("OdfKit/Compliance/i18n/README.md", agents, StringComparison.Ordinal);
+        Assert.Contains("docs/public-api-optional-parameters.md", agents, StringComparison.Ordinal);
+        Assert.Contains("architecture-collaborators", maintainability, StringComparison.Ordinal);
         Assert.Contains("maintainability:", ciYml, StringComparison.Ordinal);
         Assert.Contains("Test-LocalizerKeyParity.ps1", ciYml, StringComparison.Ordinal);
         Assert.Contains("Generate-LocalizerExceptionsFromJson.ps1", ciYml, StringComparison.Ordinal);
@@ -721,7 +755,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("public-api-optional-parameters.md", docsIndex, StringComparison.Ordinal);
         Assert.Contains("Schema 與流通性", maintainability, StringComparison.Ordinal);
         Assert.Contains("非目標", maintainability, StringComparison.Ordinal);
-        Assert.Contains("Schema 與流通性", agents, StringComparison.Ordinal);
+        Assert.Contains("ODF 1.0～1.4", agents, StringComparison.Ordinal);
         Assert.DoesNotContain("Schema 可選套件", maintainability, StringComparison.Ordinal);
         // 歷史 Split 腳本不得再留在 eng/ 根目錄（應在 historical-refactor/）。
         Assert.Empty(

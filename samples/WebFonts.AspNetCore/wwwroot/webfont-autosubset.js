@@ -7,7 +7,7 @@
         ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
         : null;
     const utf8 = typeof TextEncoder === "function" ? new TextEncoder() : null;
-    const loadedFaces = new Set();
+    const loadedFaces = new Map();
 
     function isIgnored(node, root) {
         for (let element = node.parentElement; element; element = element.parentElement) {
@@ -159,13 +159,174 @@
         if (value?.status === 204) {
             return null;
         }
+        let data;
         if (typeof value?.json === "function") {
             if (value.ok === false) {
                 throw new Error(`WebFont generation failed with HTTP ${value.status}.`);
             }
-            return await value.json();
+            data = await value.json();
+        } else {
+            data = value ?? null;
         }
-        return value ?? null;
+        if (data === null) {
+            return null;
+        }
+
+        const rawAssets = data.assets ?? data.Assets ?? [];
+        if (!Array.isArray(rawAssets)) {
+            throw new TypeError("The WebFont manifest assets value must be an array.");
+        }
+        const assets = rawAssets.map((asset, index) => {
+            const fileName = asset?.fileName ?? asset?.FileName;
+            const sha256 = asset?.sha256 ?? asset?.Sha256;
+            const fontFamily = asset?.fontFamily ?? asset?.FontFamily;
+            const format = asset?.format ?? asset?.Format;
+            const unicodeRanges = asset?.unicodeRanges ?? asset?.UnicodeRanges ?? [];
+            if (typeof fileName !== "string"
+                || fileName.length === 0
+                || typeof sha256 !== "string"
+                || sha256.length === 0
+                || typeof fontFamily !== "string"
+                || fontFamily.length === 0
+                || typeof format !== "string"
+                || format.length === 0
+                || !Array.isArray(unicodeRanges)
+                || unicodeRanges.some(range => typeof range !== "string")) {
+                throw new TypeError(`WebFont manifest asset ${index} is invalid.`);
+            }
+            return { fileName, sha256, fontFamily, format, unicodeRanges };
+        });
+        return { ...data, assets };
+    }
+
+    function createAssetSource(publicBaseUrl, asset) {
+        const base = new URL(publicBaseUrl, document.baseURI);
+        if (base.protocol !== "http:" && base.protocol !== "https:") {
+            throw new TypeError("The WebFont public base URL must use HTTP or HTTPS.");
+        }
+        base.hash = "";
+        base.search = "";
+        if (!base.pathname.endsWith("/")) {
+            base.pathname += "/";
+        }
+        const path = `${encodeURIComponent(asset.sha256)}/${encodeURIComponent(asset.fileName)}`;
+        const assetUrl = new URL(path, base);
+        const format = asset.format.toLowerCase();
+        if (!/^[a-z0-9-]+$/.test(format)) {
+            throw new TypeError("The WebFont asset format is invalid.");
+        }
+        return `url("${assetUrl.href}") format("${format}")`;
+    }
+
+    function quoteFontFamily(fontFamily) {
+        return `"${fontFamily.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"")}"`;
+    }
+
+    function renderGlyphFingerprint(font, text, fontSize) {
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(256, Math.ceil(fontSize * Math.max(1, Array.from(text).length) * 1.5));
+        canvas.height = Math.max(256, Math.ceil(fontSize * 1.5));
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        if (!context) {
+            return null;
+        }
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#000";
+        context.font = `${fontSize}px ${font}`;
+        context.textBaseline = "top";
+        context.fillText(text, 8, 8);
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        let hash = 2166136261;
+        let ink = 0;
+        for (let index = 3; index < pixels.length; index += 4) {
+            const alpha = pixels[index];
+            hash ^= alpha;
+            hash = Math.imul(hash, 16777619);
+            ink += alpha;
+        }
+        return { hash: hash >>> 0, ink };
+    }
+
+    function createSystemGlyphDetector(options = {}) {
+        const fontFamily = options.fontFamily ?? "system-ui, sans-serif";
+        const fontSize = options.fontSize ?? 48;
+        const missingGlyphs = options.missingGlyphs ?? [
+            "\u0378",
+            "\uFFFF",
+            String.fromCodePoint(0x10FFFF)
+        ];
+        const assumePrivateUseMissing = options.assumePrivateUseMissing === true;
+        const cache = new Map();
+        let missingFingerprints = null;
+        return async cluster => {
+            if (cache.has(cluster)) {
+                return cache.get(cluster);
+            }
+            const detection = (async () => {
+                if (!/\S/u.test(cluster)) {
+                    return true;
+                }
+                if (assumePrivateUseMissing
+                    && Array.from(cluster).every(character => {
+                        const scalar = character.codePointAt(0);
+                        return (scalar >= 0xE000 && scalar <= 0xF8FF)
+                            || (scalar >= 0xF0000 && scalar <= 0xFFFFD)
+                            || (scalar >= 0x100000 && scalar <= 0x10FFFD);
+                    })) {
+                    return false;
+                }
+                await document.fonts?.load(`${fontSize}px ${fontFamily}`, cluster);
+                const target = renderGlyphFingerprint(fontFamily, cluster, fontSize);
+                missingFingerprints ??= missingGlyphs.map(glyph =>
+                    renderGlyphFingerprint(fontFamily, glyph, fontSize));
+                return target !== null
+                    && target.ink > 0
+                    && missingFingerprints.every(control => control !== null
+                        && (target.hash !== control.hash || target.ink !== control.ink));
+            })();
+            cache.set(cluster, detection);
+            return detection;
+        };
+    }
+
+    async function verifyGlyphRendering(
+        fontFamily,
+        text,
+        { fallbackFamily = "serif", fontSize = 160 } = {}) {
+        if (typeof fontFamily !== "string"
+            || fontFamily.length === 0
+            || typeof text !== "string"
+            || text.length === 0
+            || !document.fonts
+            || typeof document.createElement !== "function") {
+            return false;
+        }
+
+        const quotedFamily = quoteFontFamily(fontFamily);
+        await document.fonts.load(`${fontSize}px ${quotedFamily}`, text);
+        await document.fonts.ready;
+        const loadedFace = Array.from(document.fonts).some(face =>
+            face.family.replace(/^["']|["']$/g, "") === fontFamily
+            && face.status === "loaded");
+        if (!loadedFace) {
+            return false;
+        }
+
+        return segmentText(text).every(cluster => {
+            const target = renderGlyphFingerprint(
+                `${quotedFamily}, ${fallbackFamily}`,
+                cluster,
+                fontSize);
+            const fallback = renderGlyphFingerprint(
+                `"OdfKit Missing Glyph Proof", ${fallbackFamily}`,
+                cluster,
+                fontSize);
+            return target !== null
+                && fallback !== null
+                && target.ink > 0
+                && (target.hash !== fallback.hash || target.ink !== fallback.ink);
+        });
     }
 
     async function injectManifest(manifest, publicBaseUrl, route = {}) {
@@ -186,9 +347,7 @@
             if (loadedFaces.has(key)) {
                 return;
             }
-            const format = String(asset.format).toLowerCase();
-            const base = publicBaseUrl.replace(/\/$/, "");
-            const source = `url("${base}/${asset.sha256}/${asset.fileName}") format("${format}")`;
+            const source = createAssetSource(publicBaseUrl, asset);
             const face = new FontFace(asset.fontFamily, source, {
                 display: route.fontDisplay ?? "swap",
                 style: route.fontStyle ?? "normal",
@@ -198,8 +357,25 @@
             });
             await face.load();
             document.fonts.add(face);
-            loadedFaces.add(key);
+            loadedFaces.set(key, face);
         }));
+    }
+
+    function clearLoadedFaces(fontFamily) {
+        const expectedFamily = typeof fontFamily === "string"
+            ? fontFamily.replace(/^["']|["']$/g, "")
+            : null;
+        let removed = 0;
+        for (const [key, face] of loadedFaces) {
+            const actualFamily = face.family.replace(/^["']|["']$/g, "");
+            if (expectedFamily !== null && actualFamily !== expectedFamily) {
+                continue;
+            }
+            document.fonts?.delete(face);
+            loadedFaces.delete(key);
+            removed++;
+        }
+        return removed;
     }
 
     function createController(options) {
@@ -210,37 +386,76 @@
         const maximumTextBytes = options.maximumTextBytesPerRequest ?? 48 * 1024;
         const debounceMilliseconds = options.debounceMilliseconds ?? 100;
         const maximumConcurrentRoutes = Math.max(1, options.maximumConcurrentRoutes ?? 2);
+        const systemCoverage = new Map(
+            options.routes.map((route, index) => [index, new Map()]));
         let timer = 0;
         let active = Promise.resolve([]);
         let observer = null;
+        let disconnected = false;
 
         async function scan() {
+            if (disconnected) {
+                return [];
+            }
             const groups = partition(collectText(root), options.routes);
             const generated = [];
             let nextGroup = 0;
             async function processNextGroup() {
                 while (nextGroup < groups.length) {
-                    const group = groups[nextGroup++];
-                const routeIndex = options.routes.indexOf(group.route);
-                const unseen = group.clusters.filter(cluster =>
-                    !completed.get(routeIndex).has(cluster) && !pending.get(routeIndex).has(cluster));
-                if (unseen.length === 0) {
-                    continue;
-                }
-                unseen.forEach(cluster => pending.get(routeIndex).add(cluster));
-                try {
-                    for (const text of createBatches(unseen, maximumScalars, maximumTextBytes)) {
-                        const manifest = await normalizeManifest(await options.request(group.route, [text]));
-                        await injectManifest(
-                            manifest,
-                            options.publicBaseUrl ?? "/_odf-fonts",
-                            group.route);
-                        generated.push(text);
+                    if (disconnected) {
+                        return;
                     }
-                    unseen.forEach(cluster => completed.get(routeIndex).add(cluster));
-                } finally {
-                    unseen.forEach(cluster => pending.get(routeIndex).delete(cluster));
-                }
+                    const group = groups[nextGroup++];
+                    const routeIndex = options.routes.indexOf(group.route);
+                    const candidates = group.clusters.filter(cluster =>
+                        !completed.get(routeIndex).has(cluster)
+                        && !pending.get(routeIndex).has(cluster));
+                    const routeCoverage = systemCoverage.get(routeIndex);
+                    const coverage = typeof options.isSystemGlyphAvailable === "function"
+                        ? await Promise.all(candidates.map(cluster => {
+                            if (!routeCoverage.has(cluster)) {
+                                routeCoverage.set(
+                                    cluster,
+                                    Promise.resolve(
+                                        options.isSystemGlyphAvailable(cluster, group.route)));
+                            }
+                            return routeCoverage.get(cluster);
+                        }))
+                        : candidates.map(() => false);
+                    const unseen = candidates.filter((cluster, index) => {
+                        if (coverage[index]) {
+                            completed.get(routeIndex).add(cluster);
+                            return false;
+                        }
+                        return true;
+                    });
+                    if (unseen.length === 0) {
+                        continue;
+                    }
+                    unseen.forEach(cluster => pending.get(routeIndex).add(cluster));
+                    try {
+                        for (const text of createBatches(
+                            unseen,
+                            maximumScalars,
+                            maximumTextBytes)) {
+                            if (disconnected) {
+                                return;
+                            }
+                            const manifest = await normalizeManifest(
+                                await options.request(group.route, [text]));
+                            if (disconnected) {
+                                return;
+                            }
+                            await injectManifest(
+                                manifest,
+                                options.publicBaseUrl ?? "/_odf-fonts",
+                                group.route);
+                            generated.push(text);
+                        }
+                        unseen.forEach(cluster => completed.get(routeIndex).add(cluster));
+                    } finally {
+                        unseen.forEach(cluster => pending.get(routeIndex).delete(cluster));
+                    }
                 }
             }
             await Promise.all(Array.from(
@@ -250,6 +465,9 @@
         }
 
         function schedule() {
+            if (disconnected) {
+                return;
+            }
             global.clearTimeout(timer);
             timer = global.setTimeout(() => {
                 active = active.then(scan).catch(error => {
@@ -276,6 +494,9 @@
             scan: () => active = active.catch(() => []).then(scan),
             observe,
             disconnect: () => {
+                disconnected = true;
+                global.clearTimeout(timer);
+                timer = 0;
                 observer?.disconnect();
                 root.removeEventListener?.("input", schedule, true);
                 root.removeEventListener?.("change", schedule, true);
@@ -310,6 +531,10 @@
         partition,
         createBatches,
         normalizeManifest,
+        injectManifest,
+        clearLoadedFaces,
+        createSystemGlyphDetector,
+        verifyGlyphRendering,
         createController,
         scanAndGenerate
     };
@@ -336,6 +561,7 @@
             if (!configuredRoot) {
                 return;
             }
+            const systemFontFamily = loaderScript.dataset.odfSystemFontFamily;
             const controller = createController({
                 root: configuredRoot,
                 routes: [{
@@ -343,6 +569,13 @@
                     minimum,
                     maximum
                 }],
+                isSystemGlyphAvailable: systemFontFamily
+                    ? createSystemGlyphDetector({
+                        fontFamily: systemFontFamily,
+                        assumePrivateUseMissing:
+                            loaderScript.dataset.odfAssumePrivateUseMissing === "true"
+                    })
+                    : undefined,
                 request: global.odfKitRequestWebFonts,
                 publicBaseUrl: loaderScript.dataset.odfPublicBaseUrl,
                 maximumScalarsPerRequest: Number(loaderScript.dataset.odfMaximumScalars) || 512

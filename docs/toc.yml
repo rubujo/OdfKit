@@ -56,6 +56,8 @@
   items:
   - name: WebFont 指南
     href: webfonts.md
+  - name: Sidecar 部署與維運
+    href: webfont-sidecar-deployment.md
   - name: 套件 README
     href: webfonts-package-readme.md
   - name: 純 .NET 架構

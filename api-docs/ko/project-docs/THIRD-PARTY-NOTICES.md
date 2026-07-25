@@ -2,7 +2,7 @@
 title: 제3자 고지
 _lang: ko
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: 1f6420f237bd28ad1fd71200b41661ef336448631262196c5601841160e7b2ce
+translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
 ---
 
 # 제3자 고지
@@ -24,6 +24,7 @@ OdfKit은 CC0-1.0 Universal을 사용합니다. 다음 종속성에는 각각의
 | System.IO.Hashing | net10.0 CRC-32 체크섬 | MIT |
 | System.Memory / System.Buffers / System.Threading.Tasks.Extensions / Microsoft.Bcl.AsyncInterfaces / Microsoft.Bcl.HashCode / System.Text.Encoding.CodePages | netstandard2.0 호환성 | MIT |
 | Microsoft.Win32.Registry | Windows EUDC 레지스트리 원본 확인을 위한 netstandard2.0 호환성 지원 | MIT |
+| [Microsoft.Extensions.Hosting.WindowsServices](https://github.com/dotnet/runtime) and Microsoft.Extensions Hosting / Logging dependencies | Windows Service Control Manager lifecycle and Event Log integration for the NativeAOT WebFont Sidecar | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | Markdig | Markdown AST 구문 분석 | BSD-2-Clause |
 | SkiaSharp / HarfBuzzSharp | 그래픽 그리기 및 텍스트 조판 | MIT |
 | ScottPlot | 차트 및 대체 시각화 | MIT |

@@ -514,12 +514,18 @@ public class OdfSignatureRevocationTests
 #if NET9_0_OR_GREATER
     private static X509Certificate2 LoadCertificateFromPfx(byte[] pfxData)
     {
-        return X509CertificateLoader.LoadPkcs12Collection(pfxData, (string?)null, X509KeyStorageFlags.Exportable)[0];
+        return X509CertificateLoader.LoadPkcs12Collection(
+            pfxData,
+            (string?)null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet)[0];
     }
 #else
     private static X509Certificate2 LoadCertificateFromPfx(byte[] pfxData)
     {
-        return new X509Certificate2(pfxData, (string?)null, X509KeyStorageFlags.Exportable);
+        return new X509Certificate2(
+            pfxData,
+            (string?)null,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
     }
 #endif
 

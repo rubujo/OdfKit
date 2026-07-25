@@ -2,6 +2,8 @@
 <#
 .SYNOPSIS
 以真實 CNS 11643 字型驗證純 .NET 子集、HTTP 動態產字與三瀏覽器載入。
+.PARAMETER SkipBrowserInstall
+使用已安裝的 Playwright 瀏覽器，不執行下載。
 #>
 [CmdletBinding()]
 param(
@@ -10,6 +12,7 @@ param(
     [string]$CnsFontArchivePath,
     [string]$MappingTablesRoot,
     [switch]$RunBrowser,
+    [switch]$SkipBrowserInstall,
     [ValidateSet("chromium", "firefox", "webkit")]
     [string[]]$Browsers = @("chromium", "firefox", "webkit")
 )
@@ -105,7 +108,7 @@ $buildProject = Join-Path $repoRoot "OdfKit.WebFonts.Build/OdfKit.WebFonts.Build
 $contentRoot = Join-Path $repoRoot "tests/OdfKit.WebFontSmoke/product-content"
 foreach ($output in @($assetPath, $reproPath)) {
     Remove-Item -LiteralPath $output -Recurse -Force -ErrorAction SilentlyContinue
-    dotnet run --project $buildProject -c Release -- `
+    dotnet run --project $buildProject -c Release -p:NuGetAudit=false -- `
         build `
         --font $resolvedFontPath `
         --content-root $contentRoot `
@@ -221,11 +224,15 @@ try {
 
     if ($RunBrowser) {
         $browserProject = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/OdfKit.WebFontBrowserSmoke.csproj"
-        dotnet build $browserProject -c Release
+        dotnet restore $browserProject -p:NuGetAudit=false
+        if ($LASTEXITCODE -ne 0) { throw "Playwright browser smoke 還原失敗。" }
+        dotnet build $browserProject -c Release --no-restore
         if ($LASTEXITCODE -ne 0) { throw "Playwright browser smoke 建置失敗。" }
         $installer = Join-Path $repoRoot "tests/OdfKit.WebFontBrowserSmoke/bin/Release/net10.0/playwright.ps1"
-        & $installer install @Browsers
-        if ($LASTEXITCODE -ne 0) { throw "Playwright 瀏覽器安裝失敗。" }
+        if (-not $SkipBrowserInstall) {
+            & $installer install @Browsers
+            if ($LASTEXITCODE -ne 0) { throw "Playwright 瀏覽器安裝失敗。" }
+        }
         if ($IsWindows) {
             $browserRoot = if ([string]::IsNullOrWhiteSpace($env:PLAYWRIGHT_BROWSERS_PATH)) {
                 Join-Path $env:LOCALAPPDATA 'ms-playwright'
