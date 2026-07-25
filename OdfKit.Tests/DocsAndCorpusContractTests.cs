@@ -520,7 +520,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("SmokeOpenPgpRoundTrip", File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "Program.cs")), StringComparison.Ordinal);
         Assert.DoesNotContain("<TrimmerRootAssembly Include=\"BouncyCastle.Cryptography\" />", trimProject, StringComparison.Ordinal);
         Assert.Contains("<NuGetAudit>false</NuGetAudit>", trimProject, StringComparison.Ordinal);
-        Assert.Contains("<NoWarn>$(NoWarn);IL2104</NoWarn>", trimProject, StringComparison.Ordinal);
+        Assert.Contains("<NoWarn>$(NoWarn);IL2104;IL3053</NoWarn>", trimProject, StringComparison.Ordinal);
         Assert.DoesNotContain("RequiresDynamicCode", openPgpProvider, StringComparison.Ordinal);
     }
 

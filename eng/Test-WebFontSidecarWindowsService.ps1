@@ -186,6 +186,12 @@ finally {
         if (-not $resolvedTestRoot.StartsWith($expectedRoot, [StringComparison]::OrdinalIgnoreCase)) {
             throw "拒絕清理非暫存目錄：$resolvedTestRoot"
         }
+        # 安裝流程會刻意移除權杖檔案的繼承權限；服務解除安裝後先還原暫存樹的 ACL，
+        # 避免系統管理員只有讀取權限而無法刪除 sidecar.token。
+        & "$env:SystemRoot\System32\icacls.exe" $resolvedTestRoot /reset /T /C *> $null
+        if ($LASTEXITCODE -ne 0) {
+            throw "無法還原 Sidecar Windows Service 測試暫存目錄的 ACL：$resolvedTestRoot"
+        }
         Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force
     }
 }
