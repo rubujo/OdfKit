@@ -51,6 +51,17 @@ $FontPath = (Resolve-Path -LiteralPath $FontPath).Path
 
 New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
 try {
+    # 將字型複製到本次 smoke 自有、清理時會一併移除的暫存目錄，再交給 Manage 腳本。
+    # C:\Windows\Fonts 由 TrustedInstaller 擁有，即使是系統管理員，icacls /grant:r
+    # 在未取得擁有權前也必然失敗；服務仍需要對「它實際讀取的字型檔」設定唯讀 ACL
+    # 這件事本身是正確且不應弱化的安全語意，因此改為對自有複本授權，而不是放寬
+    # 或省略 Grant-FileAccess 這一步。
+    $fontStagingRoot = Join-Path $testRoot "fonts"
+    New-Item -ItemType Directory -Path $fontStagingRoot -Force | Out-Null
+    $stagedFontPath = Join-Path $fontStagingRoot ([IO.Path]::GetFileName($FontPath))
+    Copy-Item -LiteralPath $FontPath -Destination $stagedFontPath -Force
+    $FontPath = (Resolve-Path -LiteralPath $stagedFontPath).Path
+
     Push-Location $repoRoot
     try {
         if ([string]::IsNullOrWhiteSpace($HostExecutablePath)) {

@@ -36,6 +36,10 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot "WebFontIisSmoke.Common.ps1")
+# 固定窗口限流 smoke 門檻：透過 OdfKit__WebFonts__RateLimitPermitLimit 覆寫範例預設值（32），
+# 讓「第 rateLimitPermitLimit+1 次要求應被限流」這個判斷式與實際注入的門檻保持同步，
+# 不再需要每次隨產品預設值調整而手動校正請求次數。
+$rateLimitPermitLimit = 10
 $destinationPath = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
 $repoPrefix = [IO.Path]::GetFullPath($repoRoot).TrimEnd(
     [IO.Path]::DirectorySeparatorChar,
@@ -84,6 +88,7 @@ $previousFontSourceId = $env:OdfKit__WebFonts__FontSourceId
 $previousSourceSha256 = $env:OdfKit__WebFonts__SourceSha256
 $previousProfileId = $env:OdfKit__WebFonts__ProfileId
 $previousFaceIndex = $env:OdfKit__WebFonts__FaceIndex
+$previousRateLimitPermitLimit = $env:OdfKit__WebFonts__RateLimitPermitLimit
 
 function Assert-Condition {
     param([bool]$Condition, [string]$Message)
@@ -167,6 +172,8 @@ function Invoke-HostingModelSmoke {
     $env:OdfKit__WebFonts__SourceSha256 = $actualSourceSha256
     $env:OdfKit__WebFonts__ProfileId = "cns11643-euc-tw-2026-05-05"
     $env:OdfKit__WebFonts__FaceIndex = "0"
+    $env:OdfKit__WebFonts__RateLimitPermitLimit = $rateLimitPermitLimit.ToString(
+        [Globalization.CultureInfo]::InvariantCulture)
 
     $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $listener.Start()
@@ -354,7 +361,7 @@ function Invoke-HostingModelSmoke {
             $generationRequest.Dispose()
         }
 
-        for ($requestIndex = 1; $requestIndex -lt 10; $requestIndex++) {
+        for ($requestIndex = 1; $requestIndex -lt $rateLimitPermitLimit; $requestIndex++) {
             $allowedRequest = [Net.Http.HttpRequestMessage]::new(
                 [Net.Http.HttpMethod]::Post,
                 [Uri]::new($baseUri, "_odf-fonts/generate"))
@@ -549,4 +556,5 @@ finally {
     $env:OdfKit__WebFonts__SourceSha256 = $previousSourceSha256
     $env:OdfKit__WebFonts__ProfileId = $previousProfileId
     $env:OdfKit__WebFonts__FaceIndex = $previousFaceIndex
+    $env:OdfKit__WebFonts__RateLimitPermitLimit = $previousRateLimitPermitLimit
 }

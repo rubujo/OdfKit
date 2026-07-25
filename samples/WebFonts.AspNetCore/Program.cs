@@ -24,6 +24,18 @@ string assetRoot = ResolvePath(
 string profileId = settings["ProfileId"] ?? "cns11643-euc-tw-2026-05-05";
 string? publicBaseUrl = settings["PublicBaseUrl"];
 string? apiKey = settings["ApiKey"];
+
+// 固定窗口限流門檻可由設定／環境變數（OdfKit__WebFonts__RateLimitPermitLimit）覆寫，
+// 讓 smoke 測試能以確定性的低門檻執行，而不必調降此範例的正式預設值。
+// Fixed-window rate-limit threshold is overridable via configuration/environment
+// (OdfKit__WebFonts__RateLimitPermitLimit) so smoke tests can run against a
+// deterministic low threshold without lowering this sample's production default.
+int rateLimitPermitLimit = settings.GetValue("RateLimitPermitLimit", 32);
+if (rateLimitPermitLimit < 1)
+{
+    Console.Error.WriteLine("OdfKit:WebFonts:RateLimitPermitLimit must be a positive integer.");
+    return;
+}
 if (string.IsNullOrWhiteSpace(apiKey))
 {
     apiKey = Environment.GetEnvironmentVariable("ODFKIT_WEBFONT_API_KEY");
@@ -109,7 +121,7 @@ builder.Services.AddRateLimiter(options =>
         RateLimiterPolicy,
         limiter =>
         {
-            limiter.PermitLimit = 32;
+            limiter.PermitLimit = rateLimitPermitLimit;
             limiter.QueueLimit = 0;
             limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
             limiter.Window = TimeSpan.FromMinutes(1);
