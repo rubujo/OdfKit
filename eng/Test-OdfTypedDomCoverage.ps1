@@ -8,13 +8,14 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$cliProject = Join-Path $repoRoot "tools/OdfKit.Cli/OdfKit.Cli.csproj"
 Push-Location $repoRoot
 try {
-    dotnet restore
+    dotnet restore $cliProject
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet restore failed with exit code $LASTEXITCODE."
     }
-    dotnet build -c $Configuration --no-restore
+    dotnet build $cliProject -c $Configuration -f $Framework --no-restore
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet build failed with exit code $LASTEXITCODE."
     }
@@ -26,7 +27,7 @@ try {
     }
 
     $report = dotnet run `
-        --project tools/OdfKit.Cli `
+        --project $cliProject `
         --framework $Framework `
         --configuration $Configuration `
         --no-build `
