@@ -186,6 +186,21 @@ try {
                 $stream.Dispose()
             }
 
+            $description = [string]$nuspecXml.package.metadata.description
+            $descriptionSeparator = $description.LastIndexOf(' / ', [StringComparison]::Ordinal)
+            if ($descriptionSeparator -lt 1) {
+                throw "套件 $($pkg.Id) 的 Description 必須採 English / 正體中文雙語格式"
+            }
+
+            $englishDescription = $description.Substring(0, $descriptionSeparator).Trim()
+            $traditionalChineseDescription = $description.Substring($descriptionSeparator + 3).Trim()
+            if ([string]::IsNullOrWhiteSpace($englishDescription) `
+                    -or $englishDescription -notmatch '[A-Za-z]' `
+                    -or [string]::IsNullOrWhiteSpace($traditionalChineseDescription) `
+                    -or $traditionalChineseDescription -notmatch '[\u3400-\u9fff]') {
+                throw "套件 $($pkg.Id) 的 Description 必須採 English / 正體中文雙語格式"
+            }
+
             $dependencies = $nuspecXml.package.metadata.dependencies.group.dependency + $nuspecXml.package.metadata.dependencies.dependency
             $dependencyIds = @($dependencies | Where-Object { $null -ne $_ } | ForEach-Object { [string]$_.id })
             if ($pkg.Id -like '*WebFonts*') {

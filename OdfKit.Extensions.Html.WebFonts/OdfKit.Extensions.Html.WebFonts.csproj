@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>ODF-to-HTML WebFont requirement collection and stylesheet integration for OdfKit.</Description>
+    <Description>ODF-to-HTML WebFont requirement collection and stylesheet integration for OdfKit. / OdfKit 的 ODF 轉 HTML WebFont 需求收集與樣式表整合套件。</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />

@@ -11,7 +11,7 @@
     <AssemblyName>OdfKit.Extensions.Rendering</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>LibreOffice rendering extension for OdfKit.</Description>
+    <Description>LibreOffice rendering extension for OdfKit. / OdfKit 的 LibreOffice 後端渲染擴充套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

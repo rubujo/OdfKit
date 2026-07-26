@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Scripting</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Opt-in ODF 1.0-1.4 script and LibreOffice macro management for OdfKit.</Description>
+    <Description>Opt-in ODF 1.0-1.4 script and LibreOffice macro management for OdfKit. / OdfKit 的選用 ODF 1.0～1.4 指令碼與 LibreOffice 巨集管理套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <WarningsNotAsErrors Condition="'$(ODFKIT_PUBLICAPI_BASELINE)' == '1'">$(WarningsNotAsErrors);RS0016;RS0017</WarningsNotAsErrors>
   </PropertyGroup>

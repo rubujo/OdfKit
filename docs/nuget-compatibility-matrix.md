@@ -109,6 +109,9 @@ pwsh eng/Test-NuGetPack.ps1 -Configuration Release
 
 - **版本**：`0.0.1`（權威來源：`eng/OdfKit.Package.props`）
 - **授權**：CC0-1.0（專案原創程式碼）；第三方套件維持各自授權
+- **套件描述**：所有可發佈套件的 NuGet `Description` 採
+  `English description. / 正體中文描述。` 格式，英文在前、正體中文在後；
+  `eng/Test-NuGetPack.ps1` 會直接檢查封裝後 `.nuspec` 的中英文內容。
 - **版本與交付資訊**：見 [版本與交付資訊](version-delivery.md)
 
 ## 7. 已知限制

@@ -11,7 +11,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <PackageId>OdfKit</PackageId>
-    <Description>A managed, high-performance ODF (OpenDocument Format) processing library for .NET.</Description>
+    <Description>A managed, high-performance ODF (OpenDocument Format) processing library for .NET. / 適用於 .NET 的受控高效能 ODF（OpenDocument Format）處理程式庫。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>ODF;OpenDocument;ODT;ODS;ODP;ODG</PackageTags>
     <RootNamespace>OdfKit</RootNamespace>

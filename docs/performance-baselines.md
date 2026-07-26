@@ -24,6 +24,23 @@ pwsh eng/Benchmark-Regression.ps1 -Configuration Release
 pwsh eng/Benchmark-Regression.ps1 -Configuration Release -UpdateBaseline
 ```
 
+## 最新本機跨套件重新驗證
+
+2026-07-26 以 Release 組件重新執行一百萬列 × 十欄的手動跨套件量測；
+這是單機單次重新驗證，不取代回歸關卡，也不構成跨機器效能承諾。
+
+| 情境 | 耗時 | GC 累積配置量 | 峰值工作集 |
+|------|------|----------------|------------|
+| `OdsStreamWriter` | `6,608 ms` | `472.4 MB` | `36.6 MB` |
+| `MiniExcel` | `6,720 ms` | `3,354.3 MB` | `46.7 MB` |
+| `ClosedXml` | `47,505 ms` | `10,949.9 MB` | `2,207.2 MB` |
+
+完整環境、方法、輸出檔案大小與歷史結果見
+[OdfKit 與同類套件的串流寫入效能對比](performance-comparison.md)。
+同日亦完成 ODT 串流寫入、ODS／ODT 串流讀取、ODP 結構讀取及三格式 DOM
+來回讀寫的九情境本機重新驗證，結果見
+[ODS、ODT、ODP 標準效能基準](performance-standard-documents.md)。
+
 ## 穩定本機量測設定檔
 
 正式比較效能變更時，使用較長且時間導向的穩定量測設定檔：

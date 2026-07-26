@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Html</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Managed HTML, Markdown, and RTF export extension for OdfKit.</Description>
+    <Description>Managed HTML, Markdown, and RTF export extension for OdfKit. / OdfKit 的受控 HTML、Markdown 與 RTF 匯出擴充套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

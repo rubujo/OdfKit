@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Bounded single-flight background worker for isolated OdfKit WebFont generation.</Description>
+    <Description>Bounded single-flight background worker for isolated OdfKit WebFont generation. / 用於隔離 OdfKit WebFont 產生工作的有界 single-flight 背景 worker。</Description>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>

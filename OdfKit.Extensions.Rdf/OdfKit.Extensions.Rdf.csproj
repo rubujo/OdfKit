@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Rdf</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>dotNetRDF SPARQL bridge for OdfKit manifest.rdf metadata.</Description>
+    <Description>dotNetRDF SPARQL bridge for OdfKit manifest.rdf metadata. / OdfKit manifest.rdf 中繼資料的 dotNetRDF SPARQL 橋接套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

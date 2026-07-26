@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Imaging</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Image rendering extension for OdfKit using SkiaSharp.</Description>
+    <Description>Image rendering extension for OdfKit using SkiaSharp. / 使用 SkiaSharp 的 OdfKit 影像渲染擴充套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

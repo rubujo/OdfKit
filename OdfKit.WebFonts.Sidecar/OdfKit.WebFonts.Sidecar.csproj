@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Authenticated named-pipe client for delegating legacy-runtime WebFont generation to an OdfKit NativeAOT sidecar.</Description>
+    <Description>Authenticated named-pipe client for delegating legacy-runtime WebFont generation to an OdfKit NativeAOT sidecar. / 透過已驗證具名管道將舊版 runtime WebFont 產生工作委派給 OdfKit NativeAOT sidecar 的用戶端。</Description>
     <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>

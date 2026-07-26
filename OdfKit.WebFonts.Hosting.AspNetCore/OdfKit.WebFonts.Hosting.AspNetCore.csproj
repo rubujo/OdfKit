@@ -11,7 +11,7 @@
     <AssemblyName>OdfKit.WebFonts.Hosting.AspNetCore</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Secure immutable WebFont asset hosting for ASP.NET Core.</Description>
+    <Description>Secure immutable WebFont asset hosting for ASP.NET Core. / 適用 ASP.NET Core 的安全不可變 WebFont 資產託管套件。</Description>
   </PropertyGroup>
 
   <ItemGroup>

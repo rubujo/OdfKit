@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Trusted Windows EUDC registry source resolution for OdfKit WebFonts.</Description>
+    <Description>Trusted Windows EUDC registry source resolution for OdfKit WebFonts. / 解析可信任 Windows EUDC 登錄來源的 OdfKit WebFonts 套件。</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />

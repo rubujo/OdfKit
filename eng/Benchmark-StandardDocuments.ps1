@@ -12,12 +12,15 @@
     JSON output path. Defaults to artifacts/performance/standard-documents.json.
 .PARAMETER ArtifactName
     Stable artifact identity recorded in the report metadata.
+.PARAMETER NoRestore
+    Builds with the existing restored dependency graph without contacting package sources.
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
     [string]$OutputPath = "artifacts/performance/standard-documents.json",
-    [string]$ArtifactName = "standard-document-performance-local"
+    [string]$ArtifactName = "standard-document-performance-local",
+    [switch]$NoRestore
 )
 
 $ErrorActionPreference = "Stop"
@@ -42,7 +45,11 @@ function Get-ProcessorDescription {
 
 Push-Location $repoRoot
 try {
-    dotnet build $project -c $Configuration
+    $buildArguments = @("build", $project, "-c", $Configuration)
+    if ($NoRestore) {
+        $buildArguments += "--no-restore"
+    }
+    dotnet @buildArguments
     if ($LASTEXITCODE -ne 0) { throw "Benchmark project build failed with exit code $LASTEXITCODE." }
     $dll = Join-Path $repoRoot "OdfKit.Benchmarks/bin/$Configuration/net10.0/OdfKit.Benchmarks.dll"
     $json = dotnet $dll --manual-standard

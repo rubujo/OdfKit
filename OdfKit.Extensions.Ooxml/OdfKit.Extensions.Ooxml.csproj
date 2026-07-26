@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Ooxml</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>OOXML (XLSX / DOCX) conversion extension for OdfKit using ClosedXML and Open XML SDK.</Description>
+    <Description>OOXML (XLSX / DOCX) conversion extension for OdfKit using ClosedXML and Open XML SDK. / 使用 ClosedXML 與 Open XML SDK 的 OdfKit OOXML（XLSX／DOCX）轉換擴充套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

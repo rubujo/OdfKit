@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Strict Big5, Big5E, and private-use character mapping adapters for OdfKit WebFonts.</Description>
+    <Description>Strict Big5, Big5E, and private-use character mapping adapters for OdfKit WebFonts. / OdfKit WebFonts 的嚴格 Big5、Big5E 與私用字元對映配接器。</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />

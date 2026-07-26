@@ -11,7 +11,7 @@
     <AssemblyName>OdfKit.WebFonts.Abstractions</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Framework-neutral contracts for secure, international WebFont assets and Unicode sequences.</Description>
+    <Description>Framework-neutral contracts for secure, international WebFont assets and Unicode sequences. / 安全多國語系 WebFont 資產與 Unicode 序列的框架中立契約。</Description>
     <IsAotCompatible Condition="'$(TargetFramework)' == 'net10.0'">true</IsAotCompatible>
   </PropertyGroup>
 

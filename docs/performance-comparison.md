@@ -89,21 +89,38 @@ BenchmarkDotNet 預設的多次暖身 + 多次迭代統計工作，單一情境�
 | 作業系統 | Windows 11 Pro for Workstations（組建 10.0.26200） |
 | CPU | Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz（6 實體核心 / 12 邏輯核心） |
 | 記憶體 | 約 31.8 GB |
-| .NET SDK | `10.0.301` |
-| .NET 執行階段 | `.NET 10.0.9`（`X64 RyuJIT AVX2`） |
+| .NET SDK | `10.0.302` |
+| .NET 執行階段 | `.NET 10.0.10`（`X64 RyuJIT AVX2`） |
 | BenchmarkDotNet | `0.15.8` |
 | MiniExcel | `1.45.0`（`Apache-2.0`） |
 | ClosedXML | `0.105.0`（`MIT`） |
 
-專案直接參照的 .NET 10 套件已更新至 `10.0.10`，但本次執行時本機安裝的
-.NET Host／Runtime 仍為 `10.0.9`；環境欄記錄實際執行階段，不以 NuGet
-套件版本替代。
+專案直接參照的 .NET 10 套件與本次本機安裝的 .NET Host／Runtime 均為
+`10.0.10`；環境欄記錄實際執行階段，不以 NuGet 套件版本替代。
 
 本機單次量測結果會受 CPU、記憶體、磁碟、電源模式與背景負載影響，因此本
 文件記錄「如何量測」與「本機實測結果」，不作為跨機器的服務等級承諾；
 方針與 [效能基準線](performance-baselines.md) 一致。
 
 ## 3. 實測結果表
+
+### 3.1 最新本機重新驗證（2026-07-26）
+
+情境：`1,000,000` 列 × `10` 欄混合型別資料，手動計時模式，各情境獨立子
+處理程序執行一次。先以 `dotnet build ... --no-restore` 完成 Release 建置
+（0 警告、0 錯誤），再直接呼叫相同的 `--manual-competitive` runner；這與
+`eng/Benchmark-Competitive.ps1` 的量測階段相同。
+
+| 情境 | 套件（授權） | 輸出格式 | 耗時 | GC 累積配置量 | 峰值工作集 | 輸出檔案大小 |
+|------|--------------|----------|------|----------------|------------|--------------|
+| `OdsStreamWriter` | OdfKit（CC0-1.0） | `.ods` | **6,608 ms** | **472.4 MB** | **36.6 MB** | 95.3 MB |
+| `MiniExcel` | MiniExcel 1.45.0（Apache-2.0） | `.xlsx` | 6,720 ms | 3,354.3 MB | 46.7 MB | 111.0 MB |
+| `ClosedXml` | ClosedXML 0.105.0（MIT，DOM 對照組） | `.xlsx` | 47,505 ms | 10,949.9 MB | 2,207.2 MB | **65.2 MB** |
+
+（粗體標示各欄位表現最佳者。本次單次重新驗證中，`OdsStreamWriter` 耗時比
+MiniExcel 約少 1.7%。）
+
+### 3.2 v0.0.1 完滿基線（2026-07-16）
 
 情境：`1,000,000` 列 × `10` 欄混合型別資料，手動計時模式，各情境獨立子
 處理程序執行一次。量測日期 **2026-07-16**（v0.0.1 完滿基線），於導入共用
@@ -114,7 +131,7 @@ BenchmarkDotNet 預設的多次暖身 + 多次迭代統計工作，單一情境�
 |------|--------------|----------|------|----------------|------------|--------------|
 | `OdsStreamWriter` | OdfKit（CC0-1.0） | `.ods` | **5,068 ms** | **472.7 MB** | **39.4 MB** | 95.3 MB |
 | `MiniExcel` | MiniExcel 1.45.0（Apache-2.0） | `.xlsx` | 6,160 ms | 3,359.6 MB | 49.1 MB | 111.0 MB |
-| `ClosedXml` | ClosedXML 0.105.0（MIT，DOM 對照組） | `.xlsx` | 42,405 ms | 10,947.9 MB | 2,206.5 MB | 65.2 MB |
+| `ClosedXml` | ClosedXML 0.105.0（MIT，DOM 對照組） | `.xlsx` | 42,405 ms | 10,947.9 MB | 2,206.5 MB | **65.2 MB** |
 
 （粗體標示各欄位表現最佳者。本次第 3 次量測中，`OdsStreamWriter` 耗時比
 MiniExcel 約少 17.7%。）
@@ -148,21 +165,22 @@ dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStream
 
 ## 5. 結果解讀
 
-- **記憶體（峰值工作集）：OdsStreamWriter 仍明顯領先 DOM 路徑。** 第 3 次
-  `39.4 MB` 對 `ClosedXml` 的 `2,206.5 MB`，約 56 倍；主因是串流寫入不把整份
-  活頁簿常駐為物件圖。`MiniExcel` 同屬串流路線，峰值約 `49.1 MB`，與
-  `OdsStreamWriter` 差距約 1.25 倍。公開敘事應強調「遠低於 DOM 方案的峰值
+- **記憶體（峰值工作集）：OdsStreamWriter 仍明顯領先 DOM 路徑。** 最新
+  `36.6 MB` 對 `ClosedXml` 的 `2,207.2 MB`，約 60 倍；主因是串流寫入不把整份
+  活頁簿常駐為物件圖。`MiniExcel` 同屬串流路線，峰值約 `46.7 MB`，與
+  `OdsStreamWriter` 差距約 1.28 倍。公開敘事應強調「遠低於 DOM 方案的峰值
   工作集」，而非未加限定的「小於 1MB」口號（見 `AGENTS.md` 與本文件方針）。
-- **耗時：本次三次量測均優於 MiniExcel。** 第 3 次 `OdsStreamWriter`
-  （`5,068 ms`）比 `MiniExcel`（`6,160 ms`）約少 **17.7%**。相對 2026-07
+- **耗時：最新單次重新驗證仍略優於 MiniExcel。** `OdsStreamWriter`
+  （`6,608 ms`）比 `MiniExcel`（`6,720 ms`）約少 **1.7%**；方向與
+  2026-07-16 三次量測一致，但本次差距較小。相對 2026-07
   初版（`XmlWriter` 逐格路徑約慢 20%）已明顯
   收斂，主因是共用 `OdfRawXmlWriter` 批次組裝標記、關閉內建 `CheckCharacters`，
   並以 `OdfXmlCharacterGuard` 維持非法字元快速失敗（同路徑已套用至
-  `OdtStreamWriter` 段落／標題／清單熱迴圈）。第 1 次兩套件耗時皆偏高但相對
-  比例接近後兩次，顯示相對關係穩定、絕對值易受冷啟動影響。
-- **GC 累積配置量：`OdsStreamWriter` 明顯優於兩組對照。** 第 3 次約
-  `472.7 MB`，約為 MiniExcel（`3,359.6 MB`）的七分之一、ClosedXML
-  （`10,947.9 MB`）的二十三分之一；亦低於熱路徑前約 `770 MB` 的舊量測。累積
+  `OdtStreamWriter` 段落／標題／清單熱迴圈）。歷史第 1 次兩套件耗時皆偏高但
+  相對比例接近後兩次，顯示絕對值易受冷啟動與背景負載影響。
+- **GC 累積配置量：`OdsStreamWriter` 明顯優於兩組對照。** 最新量測為
+  `472.4 MB`，約為 MiniExcel（`3,354.3 MB`）的七分之一、ClosedXML
+  （`10,949.9 MB`）的二十三分之一；亦低於熱路徑前約 `770 MB` 的舊量測。累積
   配置量仍高於峰值工作集，代表配置後可被世代 GC 回收，不可與常駐記憶體混談。
 - **輸出檔案大小僅供參考，不代表壓縮效率排名。** 如第 1.2 節所述，ODS
   與 XLSX 是不同 schema，`ClosedXml` 輸出的 `.xlsx`（`65.2 MB`）小於
@@ -171,9 +189,9 @@ dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStream
 
 ## 6. 已知限制
 
-- 本文件僅涵蓋「單一情境、單一機器、三次手動量測」，非長期追蹤的效能
-  回歸關卡；長期回歸偵測請見 [效能基準線](performance-baselines.md) 中的
-  `eng/Benchmark-Regression.ps1`。
+- 本文件僅涵蓋單一情境與單一機器：2026-07-16 三次手動量測，加上
+  2026-07-26 一次重新驗證；並非長期追蹤的效能回歸關卡。長期回歸偵測請見
+  [效能基準線](performance-baselines.md) 中的 `eng/Benchmark-Regression.ps1`。
 - 手動計時模式的耗時量測未排除子處理程序啟動（JIT 暖身、組件載入）的一次性
   成本；`OdsStreamWriter`、`MiniExcel`、`ClosedXml` 三者皆同樣受此影響，
   相對比較仍具參考價值，但不宜視為「穩態吞吐量」的精確數字。

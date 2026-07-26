@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Secure bounded dynamic generation and static fallback hosting for ASP.NET Web Forms and System.Web.</Description>
+    <Description>Secure bounded dynamic generation and static fallback hosting for ASP.NET Web Forms and System.Web. / 適用 ASP.NET Web Forms 與 System.Web 的安全有界動態產生與靜態後援託管套件。</Description>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>

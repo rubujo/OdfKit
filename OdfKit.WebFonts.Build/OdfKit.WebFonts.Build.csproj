@@ -12,7 +12,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Reproducible CLI and MSBuild integration for prebuilt OdfKit WebFont assets.</Description>
+    <Description>Reproducible CLI and MSBuild integration for prebuilt OdfKit WebFont assets. / 用於預先建立 OdfKit WebFont 資產的可重現 CLI 與 MSBuild 整合套件。</Description>
   </PropertyGroup>
   <ItemGroup>
     <None Include="buildTransitive\OdfKit.WebFonts.Build.targets" Pack="true" PackagePath="buildTransitive\OdfKit.WebFonts.Build.targets" />

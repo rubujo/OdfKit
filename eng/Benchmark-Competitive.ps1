@@ -25,6 +25,9 @@ Push-Location $repoRoot
 try {
     Write-Host "建置 OdfKit.Benchmarks ($Configuration)…"
     dotnet build $benchmarkProject -c $Configuration
+    if ($LASTEXITCODE -ne 0) {
+        throw "OdfKit.Benchmarks 建置失敗（exit code $LASTEXITCODE）"
+    }
 
     $assemblyPath = Join-Path $repoRoot "OdfKit.Benchmarks/bin/$Configuration/net10.0/OdfKit.Benchmarks.dll"
     if (-not (Test-Path $assemblyPath)) {
@@ -34,6 +37,9 @@ try {
     Write-Host ""
     Write-Host "執行跨套件對比（手動計時模式，各情境獨立子行程執行一次）…"
     dotnet $assemblyPath --manual-competitive
+    if ($LASTEXITCODE -ne 0) {
+        throw "跨套件效能對比執行失敗（exit code $LASTEXITCODE）"
+    }
 
     Write-Host ""
     Write-Host "提示：若需要 BenchmarkDotNet 統計工作（較長執行時間），可改用："

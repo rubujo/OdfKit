@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Pdf</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>PDF export extension for OdfKit using PDFsharp-MigraDoc.</Description>
+    <Description>PDF export extension for OdfKit using PDFsharp-MigraDoc. / 使用 PDFsharp-MigraDoc 的 OdfKit PDF 匯出擴充套件。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Versioned, country-neutral legacy and private character mapping profiles for OdfKit WebFonts.</Description>
+    <Description>Versioned, country-neutral legacy and private character mapping profiles for OdfKit WebFonts. / OdfKit WebFonts 的版本化、國家中立舊式與私用字元對映 Profile。</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />

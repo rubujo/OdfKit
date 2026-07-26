@@ -10,7 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Collaboration</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>ODF Toolkit 相容 JSON operations 匯出延伸，供協作編輯場景使用。</Description>
+    <Description>ODF Toolkit-compatible JSON operations export extension for collaborative editing scenarios. / ODF Toolkit 相容 JSON operations 匯出擴充套件，供協作編輯情境使用。</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

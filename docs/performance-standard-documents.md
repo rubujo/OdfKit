@@ -35,6 +35,12 @@ ODS 串流讀取目前沿用 64 MiB XML 字元安全上限，因此標準讀取�
 pwsh eng/Benchmark-StandardDocuments.ps1
 ```
 
+相依套件已事先還原而目前不宜連線套件來源時，可使用既有 dependency graph：
+
+```powershell
+pwsh eng/Benchmark-StandardDocuments.ps1 -NoRestore
+```
+
 執行同格式 BenchmarkDotNet 穩定量測：
 
 ```powershell
@@ -43,6 +49,30 @@ pwsh eng/Benchmark-Stable.ps1 -Filter "*StandardOdtBenchmarks*"
 pwsh eng/Benchmark-Stable.ps1 -Filter "*StandardOdpBenchmarks*"
 pwsh eng/Benchmark-Stable.ps1 -Filter "*StandardPackageOpenBenchmarks*"
 ```
+
+## 最新本機重新驗證
+
+2026-07-26 於 Windows 10.0.26200、.NET 10.0.10 執行
+`pwsh eng/Benchmark-StandardDocuments.ps1 -NoRestore`。Release 建置為
+0 警告、0 錯誤；下列九個大型情境各自在獨立子處理程序執行一次，且都完成
+決定性語意檢查碼驗證。這些是單機冷啟動量測，不是跨機器效能承諾。
+
+| 情境 | API／模型 | 規模 | 耗時 | GC 累積配置量 | 峰值工作集 |
+|------|----------|------|------|----------------|------------|
+| ODS 串流寫入 | `OdsStreamWriter` | 1,000,000 列 × 10 欄 | `5,793.4 ms` | `716.4 MB` | `316.0 MB` |
+| ODS 串流讀取 | `OdsStreamReader` | 50,000 列 × 10 欄 | `2,758.3 ms` | `699.0 MB` | `56.8 MB` |
+| ODS DOM 來回讀寫 | `SpreadsheetDocument` | 三工作表複雜 DOM | `2,154.5 ms` | `330.4 MB` | `220.3 MB` |
+| ODT 串流寫入 | `OdtStreamWriter` | 100,000 個結構節點 | `281.3 ms` | `9.2 MB` | `39.5 MB` |
+| ODT 串流讀取 | `OdtStreamReader` | 100,000 個結構節點 | `320.2 ms` | `101.2 MB` | `46.0 MB` |
+| ODT DOM 來回讀寫 | `TextDocument` | 20,000 個複合節點 | `1,313.3 ms` | `337.2 MB` | `86.5 MB` |
+| ODP 結構寫入 | `PresentationDocument` | 500 張結構密集投影片 | `373.5 ms` | `49.4 MB` | `58.2 MB` |
+| ODP 結構讀取 | `PresentationDocument` | 500 張結構密集投影片 | `297.3 ms` | `56.9 MB` | `70.1 MB` |
+| ODP 媒體 DOM 來回讀寫 | `PresentationDocument` | 100 張媒體密集投影片 | `223.1 ms` | `22.8 MB` | `63.6 MB` |
+
+Reader 覆蓋依產品 API 分層：ODS 與 ODT 使用專用串流 Reader；ODP 目前沒有串流
+Reader，因此以 `PresentationDocument` 載入及遍歷完整結構。三種格式另由
+`StandardPackageOpenBenchmarks` 分離量測 `OdfPackage.Open` 的 ZIP 封裝開啟成本，
+避免把封裝與文件模型讀取混為同一指標。
 
 ## 結果政策
 

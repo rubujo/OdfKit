@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Provider-neutral SQL Server Unicode and bounded legacy-byte ingestion for OdfKit WebFonts.</Description>
+    <Description>Provider-neutral SQL Server Unicode and bounded legacy-byte ingestion for OdfKit WebFonts. / OdfKit WebFonts 的 provider 中立 SQL Server Unicode 與有界舊式位元組資料擷取套件。</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj" />
