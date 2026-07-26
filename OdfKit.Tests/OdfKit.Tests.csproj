@@ -25,6 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="FsCheck.Xunit.v3" />
     <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="xunit.v3.mtp-off" />
     <PackageReference Include="CSharpMath" />

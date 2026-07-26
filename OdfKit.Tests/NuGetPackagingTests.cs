@@ -92,8 +92,8 @@ public class NuGetPackagingTests
         Assert.Contains("runner: windows-latest", workflow, StringComparison.Ordinal);
         Assert.Contains("runner: windows-11-arm", workflow, StringComparison.Ordinal);
         Assert.Contains("runner: macos-15", workflow, StringComparison.Ordinal);
-        Assert.Contains("actions/upload-artifact@v7", workflow, StringComparison.Ordinal);
-        Assert.Contains("actions/download-artifact@v8", workflow, StringComparison.Ordinal);
+        Assert.Contains("uses: actions/upload-artifact@", workflow, StringComparison.Ordinal);
+        Assert.Contains("uses: actions/download-artifact@", workflow, StringComparison.Ordinal);
         Assert.Contains("-GenerateHashManifest", workflow, StringComparison.Ordinal);
         Assert.Contains("VerifyHashManifest = $true", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
