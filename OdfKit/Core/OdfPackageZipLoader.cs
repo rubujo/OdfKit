@@ -262,13 +262,7 @@ internal static class OdfPackageZipLoader
             {
                 foreach (OdfPackageEntry entry in entriesToPreload)
                 {
-                    try
-                    {
-                        using Stream stream = entry.OpenReader();
-                    }
-                    catch
-                    {
-                    }
+                    using Stream stream = entry.OpenReader();
                 }
             });
         }

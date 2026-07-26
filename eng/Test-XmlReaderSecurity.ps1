@@ -9,7 +9,7 @@ $root = Split-Path -Parent $PSScriptRoot
 # 以及輔助程式碼（tools/、tests/、samples/、OdfKit.Tests）。
 # 輔助程式碼一併掃描的原因：tools/OdfSchemaGenerator 等目錄內含會被實際執行的
 # XML 解析邏輯，同樣需要防退化；OdfKit.Tests 內含刻意建構的不安全 XmlDocument
-# 測試素材，透過下方的 $xmlDocumentWaivers 明確豁免，而非整目錄跳過。
+# 測試素材，透過緊鄰程式碼的 ODFKIT_XMLDOCUMENT_WAIVER marker 明確豁免。
 $sourceRoots = @(
     (Join-Path $root 'OdfKit')
     (Join-Path $root 'OdfKit.Tests')
@@ -23,33 +23,9 @@ $sourceRoots += Get-ChildItem -LiteralPath $root -Directory -Filter 'OdfKit.WebF
     Select-Object -ExpandProperty FullName
 $sourceRoots = $sourceRoots | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -Unique
 
-# --- new XmlDocument() 豁免清單 -------------------------------------------
-# 每一筆豁免都以「相對路徑 + 行號」鎖定，並附上理由，供稽核追溯。
-# 路徑一律使用正斜線，與下方正規化後的 $relativePath 一致（跨 Windows／Linux）。
-# 這些都是 OdfKit.Tests/AdvancedSecurityTests.cs 內刻意建構、供負向測試使用的
-# XmlDocument（讀取測試流程自行產生的簽章 XML，非解析外部不受信任輸入）。
-# 豁免清單採「行號 + 內容雙重比對」：掃描時若某筆豁免對應的行已不再包含
-# `new XmlDocument`（代表程式碼已搬移或修改），該筆豁免視為過期，腳本會直接
-# 失敗並要求更新此清單──藉此避免豁免清單長期漂移、掩護新的不安全用法。
-# 新增任何未列於此清單、且未在同運算式內設定 XmlResolver = null 的
-# `new XmlDocument`，都會被下方的檢查攔截。
-$xmlDocumentWaivers = @(
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 60; Reason = '讀取測試自行簽署之 documentsignatures.xml，驗證版本屬性，非解析不受信任輸入。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 158; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 250; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 361; Reason = 'XML-DSig 簽章驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1340; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1394; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1526; Reason = '時間戳竄改負向測試：讀取測試自行產生之簽章 XML 以擷取欄位後竄改。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1627; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1641; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1664; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1676; Reason = '雙套件時間戳比對測試：讀取測試自行產生之簽章 XML（第二份套件）。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1685; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1778; Reason = '時間戳交叉驗證負向測試：讀取測試自行產生之簽章 XML。' }
-    @{ Path = 'OdfKit.Tests/AdvancedSecurityTests.cs'; Line = 1788; Reason = '以乾淨 XmlDocument 匯入既有節點以計算 C14N 雜湊，內容來自本測試流程。' }
-)
-$xmlDocumentWaiversMatched = [System.Collections.Generic.HashSet[string]]::new()
+$waiverMarkerPattern = '^\s*//\s*ODFKIT_XMLDOCUMENT_WAIVER:\s*(?<reason>\S.+)\s*$'
+$waiverMarkersFound = 0
+$waiverMarkersMatched = 0
 
 $issues = [System.Collections.Generic.List[string]]::new()
 $checkedReaderSettings = 0
@@ -60,6 +36,14 @@ foreach ($sourceRoot in $sourceRoots) {
         if ($file.FullName -match '[\\/]Generated[\\/]' -or $file.Name.EndsWith('.g.cs')) { continue }
 
         $source = Get-Content -LiteralPath $file.FullName -Raw
+        $sourceLines = Get-Content -LiteralPath $file.FullName
+        $markerLines = [Collections.Generic.HashSet[int]]::new()
+        for ($index = 0; $index -lt $sourceLines.Count; $index++) {
+            if ($sourceLines[$index] -match $waiverMarkerPattern) {
+                $waiverMarkersFound++
+                [void]$markerLines.Add($index + 1)
+            }
+        }
         # 一律正規化為正斜線：[IO.Path]::GetRelativePath 在 Windows 回傳反斜線、在 Linux
         # 回傳正斜線，而 CI 的 maintainability job 跑在 ubuntu-latest。若不正規化，下方
         # 以路徑字串比對的豁免清單會在 Linux 上完全比不中，導致每一筆豁免同時被判為
@@ -129,26 +113,19 @@ foreach ($sourceRoot in $sourceRoots) {
             }
 
             if (-not $isSafe) {
-                $waiver = $xmlDocumentWaivers | Where-Object {
-                    $_.Path -eq $relativePath -and $_.Line -eq $lineNumber
-                } | Select-Object -First 1
-
-                if ($null -ne $waiver) {
-                    $xmlDocumentWaiversMatched.Add("$($waiver.Path):$($waiver.Line)") | Out-Null
+                $markerLine = $lineNumber - 1
+                if ($markerLines.Remove($markerLine)) {
+                    $waiverMarkersMatched++
                 }
                 else {
-                    $issues.Add("${relativePath}:$lineNumber new XmlDocument 未明確停用外部 XML resolver（XmlResolver = null），且未列於豁免清單。")
+                    $issues.Add("${relativePath}:$lineNumber new XmlDocument 未明確停用外部 XML resolver（XmlResolver = null），且前一行沒有具理由的 ODFKIT_XMLDOCUMENT_WAIVER marker。")
                 }
             }
         }
-    }
-}
 
-# --- 豁免清單過期偵測：清單中未被實際比對到的項目視為失效設定 -------------
-foreach ($waiver in $xmlDocumentWaivers) {
-    $key = "$($waiver.Path):$($waiver.Line)"
-    if (-not $xmlDocumentWaiversMatched.Contains($key)) {
-        $issues.Add("豁免清單項目已過期或位置不符：$key（該行已不含未受保護的 new XmlDocument，請更新或移除此豁免）。")
+        foreach ($unusedMarkerLine in $markerLines) {
+            $issues.Add("${relativePath}:$unusedMarkerLine XML waiver marker 未緊鄰未受保護的 new XmlDocument，請更新或移除。")
+        }
     }
 }
 
@@ -168,4 +145,4 @@ if ($issues.Count -gt 0) {
     throw "XML Reader 安全設定驗證失敗：$($issues.Count) 個問題。"
 }
 
-Write-Host "XML Reader 安全設定驗證成功：$checkedReaderSettings 個手寫 XmlReaderSettings、$checkedXmlDocuments 個手寫 XmlDocument（其中 $($xmlDocumentWaivers.Count) 個依豁免清單放行）。"
+Write-Host "XML Reader 安全設定驗證成功：$checkedReaderSettings 個手寫 XmlReaderSettings、$checkedXmlDocuments 個手寫 XmlDocument（$waiverMarkersMatched/$waiverMarkersFound 個 inline waiver marker 已精確套用）。"

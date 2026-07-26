@@ -107,11 +107,13 @@ public class OdfExternalValidatorAsyncTests
             if (File.Exists(path))
                 File.Delete(path);
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 

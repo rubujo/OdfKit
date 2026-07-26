@@ -564,8 +564,9 @@ public partial class OptimizedRefactoringTests
             reader.CopyValueTo(writer, chunkSize: 0);
             Assert.Fail("chunkSize 為 0 時應擲出 ArgumentOutOfRangeException。");
         }
-        catch (ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
 
         try
@@ -573,8 +574,9 @@ public partial class OptimizedRefactoringTests
             reader.CopyValueTo(null!);
             Assert.Fail("writer 為 null 時應擲出 ArgumentNullException。");
         }
-        catch (ArgumentNullException)
+        catch (ArgumentNullException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 
@@ -2076,13 +2078,13 @@ public partial class OptimizedRefactoringTests
             {
                 try
                 { File.Delete(tempFile); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
             if (File.Exists(tempFile + ".journal"))
             {
                 try
                 { File.Delete(tempFile + ".journal"); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
         }
     }

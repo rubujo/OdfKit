@@ -47,7 +47,9 @@ if ([string]::IsNullOrWhiteSpace($Title)) {
 
 $outDir = Join-Path $repoRoot "artifacts/nuget"
 $bundlePath = Join-Path $repoRoot "artifacts/OdfKit-nuget-packages.zip"
-$sbomPath = Join-Path $repoRoot "artifacts/webfont-sbom/manifest.spdx.json"
+$webFontSbomPath = Join-Path $repoRoot "artifacts/webfont-sbom/manifest.spdx.json"
+$spdx3SbomPath = Join-Path $repoRoot "artifacts/sbom/OdfKit.spdx3.jsonld"
+$spdx23SbomPath = Join-Path $repoRoot "artifacts/sbom/OdfKit.spdx.json"
 $sidecarRoot = Join-Path $repoRoot "artifacts/webfont-sidecar"
 
 Push-Location $repoRoot
@@ -68,8 +70,10 @@ try {
     if (-not (Test-Path -LiteralPath $hashManifest -PathType Leaf)) {
         throw "找不到已驗證套件的 SHA-256 manifest：$hashManifest"
     }
-    if (-not (Test-Path -LiteralPath $sbomPath -PathType Leaf)) {
-        throw "找不到已驗證 WebFont SPDX SBOM：$sbomPath"
+    foreach ($sbomPath in @($spdx3SbomPath, $spdx23SbomPath, $webFontSbomPath)) {
+        if (-not (Test-Path -LiteralPath $sbomPath -PathType Leaf)) {
+            throw "找不到已驗證 SPDX SBOM：$sbomPath"
+        }
     }
     $sidecarAssets = @(
         Get-ChildItem -LiteralPath $sidecarRoot -Filter *.zip -File
@@ -79,7 +83,7 @@ try {
         throw "NativeAOT WebFont sidecar 發布資產不完整：$sidecarRoot"
     }
     $bundleInputs = @($packages | ForEach-Object { $_.FullName }) +
-        @($hashManifest, $sbomPath) +
+        @($hashManifest, $spdx3SbomPath, $spdx23SbomPath, $webFontSbomPath) +
         @($sidecarAssets | ForEach-Object { $_.FullName })
 
     $bundleDir = Split-Path -Parent $bundlePath
@@ -140,14 +144,16 @@ try {
     Write-Host ""
     Write-Host "GitHub Release 標籤：$Tag"
     Write-Host "標題：$Title"
-    Write-Host "NuGet 資產（$($packages.Count) 個套件、SHA256SUMS、SPDX SBOM 與 1 個 zip 彙整）："
+    Write-Host "NuGet 資產（$($packages.Count) 個套件、SHA256SUMS、完整 SPDX 3.0.1／2.3 相容 SBOM、WebFont SBOM 與 1 個 zip 彙整）："
     foreach ($pkg in $packages) {
         Write-Host "  $($pkg.Name)"
     }
 
     Write-Host "  $(Split-Path -Leaf $bundlePath)"
     Write-Host "  $(Split-Path -Leaf $hashManifest)"
-    Write-Host "  $(Split-Path -Leaf $sbomPath)"
+    Write-Host "  $(Split-Path -Leaf $spdx3SbomPath)"
+    Write-Host "  $(Split-Path -Leaf $spdx23SbomPath)"
+    Write-Host "  $(Split-Path -Leaf $webFontSbomPath)"
     foreach ($asset in $sidecarAssets) {
         Write-Host "  $($asset.Name)"
     }
@@ -164,7 +170,7 @@ try {
         throw "找不到 gh CLI。請安裝 GitHub CLI 並執行 gh auth login。"
     }
 
-    $assetPaths = @($bundlePath, $hashManifest, $sbomPath) +
+    $assetPaths = @($bundlePath, $hashManifest, $spdx3SbomPath, $spdx23SbomPath, $webFontSbomPath) +
         @($sidecarAssets | ForEach-Object { $_.FullName }) +
         ($packages | ForEach-Object { $_.FullName })
     $ghArgs = @("release", "create", $Tag, "--title", $Title)

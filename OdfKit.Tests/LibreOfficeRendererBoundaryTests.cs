@@ -123,7 +123,7 @@ namespace OdfKit.Tests
             {
                 try
                 { Directory.Delete(sandboxDir, true); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
 
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on timeout.");
@@ -163,7 +163,7 @@ namespace OdfKit.Tests
             {
                 try
                 { Directory.Delete(sandboxDir, true); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
 
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on process exit code error.");
@@ -279,7 +279,7 @@ namespace OdfKit.Tests
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                         if (detectedDir != null)
                             break;
                         await Task.Delay(10, token);
@@ -315,7 +315,7 @@ namespace OdfKit.Tests
             {
                 try
                 { Directory.Delete(detectedDir, true); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
 
             // Assert that the sandbox directory was leaked on active lock during cleanup
@@ -405,7 +405,7 @@ namespace OdfKit.Tests
                 string logPath = Path.Combine(Path.GetTempPath(), "OdfKit_test_debug_log.txt");
                 File.AppendAllText(logPath, $"[{DateTime.UtcNow:O}] {message}\n");
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
         }
 
         private async Task<string?> CaptureSandboxDirAsync(Action runAction)
@@ -610,7 +610,7 @@ namespace OdfKit.Tests
             {
                 try
                 { Directory.Delete(detectedDir, true); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
 
             try
@@ -618,7 +618,7 @@ namespace OdfKit.Tests
                 if (File.Exists(capturePath))
                     File.Delete(capturePath);
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
 
             LogDebug($"CaptureArgumentsAsync finished, returning {(capturedArgs != null ? capturedArgs.Count.ToString() : "null")} arguments");
             return capturedArgs ?? new List<string>();

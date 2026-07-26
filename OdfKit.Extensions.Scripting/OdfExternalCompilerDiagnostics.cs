@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using OdfKit.Compliance;
+using OdfKit.Core;
 using OdfKit.Text;
 
 namespace OdfKit.Extensions.Scripting;
@@ -587,8 +588,9 @@ public static class OdfExternalScriptCompiler
                 process.WaitForExit(5000);
             }
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
         {
+            OdfKitDiagnostics.Warn("清理外部編譯器子程序時，程序已不再可用。", ex);
         }
     }
 

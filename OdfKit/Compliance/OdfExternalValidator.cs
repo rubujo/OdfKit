@@ -51,7 +51,8 @@ public static class OdfExternalValidator
     /// </remarks>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds)
     {
-        return ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds).GetAwaiter().GetResult();
+        return OdfSynchronousTask.Run(
+            () => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds));
     }
 
     /// <summary>
@@ -142,7 +143,8 @@ public static class OdfExternalValidator
     /// </remarks>
     public static OdfExternalValidatorResult ValidateWithCommand(string commandPath, string filePath, int timeoutMilliseconds)
     {
-        return ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds).GetAwaiter().GetResult();
+        return OdfSynchronousTask.Run(
+            () => ValidateWithCommandAsync(commandPath, filePath, timeoutMilliseconds));
     }
     /// <summary>
     /// Short overload of ValidateWithCommandAsync that accepts commandPath and filePath; remaining optional parameters use defaults and forward to the full overload.

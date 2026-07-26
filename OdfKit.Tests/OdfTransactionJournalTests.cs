@@ -233,8 +233,9 @@ public sealed class OdfTransactionJournalTests
             if (File.Exists(path))
                 File.Delete(path);
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 }

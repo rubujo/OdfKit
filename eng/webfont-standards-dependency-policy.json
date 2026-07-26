@@ -67,48 +67,6 @@
       "version": "10.0.10"
     }
   ],
-  "githubActions": [
-    {
-      "id": "attest",
-      "major": 4
-    },
-    {
-      "id": "cache",
-      "major": 6
-    },
-    {
-      "id": "checkout",
-      "major": 7
-    },
-    {
-      "id": "configure-pages",
-      "major": 6
-    },
-    {
-      "id": "deploy-pages",
-      "major": 5
-    },
-    {
-      "id": "download-artifact",
-      "major": 8
-    },
-    {
-      "id": "setup-dotnet",
-      "major": 6
-    },
-    {
-      "id": "setup-java",
-      "major": 5
-    },
-    {
-      "id": "upload-artifact",
-      "major": 7
-    },
-    {
-      "id": "upload-pages-artifact",
-      "major": 5
-    }
-  ],
   "prereleaseExceptions": [
     {
       "id": "CSharpMath",

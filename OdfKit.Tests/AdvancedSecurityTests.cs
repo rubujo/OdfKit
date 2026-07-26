@@ -57,6 +57,7 @@ namespace OdfKit.Tests
             await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
 
             using var signatureStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+            // ODFKIT_XMLDOCUMENT_WAIVER: 讀取本測試自行簽署的 XML，非外部不受信任輸入。
             var document = new XmlDocument();
             document.Load(signatureStream);
 
@@ -155,6 +156,7 @@ namespace OdfKit.Tests
                 // Verify META-INF/documentsignatures.xml contains the BES QualifyingProperties
                 using (var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml"))
                 {
+                    // ODFKIT_XMLDOCUMENT_WAIVER: XMLDSig 負向測試只讀取本測試自行產生的簽章 XML。
                     var doc = new XmlDocument();
                     doc.Load(sigStream);
 
@@ -247,6 +249,7 @@ namespace OdfKit.Tests
                 // Verify XML contains SignatureTimeStamp and EncapsulatedTimeStamp
                 using (var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml"))
                 {
+                    // ODFKIT_XMLDOCUMENT_WAIVER: XMLDSig 負向測試只讀取本測試自行產生的簽章 XML。
                     var doc = new XmlDocument();
                     doc.Load(sigStream);
 
@@ -358,6 +361,7 @@ namespace OdfKit.Tests
                     // Verify XML contains EncapsulatedCertificate and EncapsulatedCRLValue
                     using (var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml"))
                     {
+                        // ODFKIT_XMLDOCUMENT_WAIVER: XMLDSig 負向測試只讀取本測試自行產生的簽章 XML。
                         var doc = new XmlDocument();
                         doc.Load(sigStream);
 
@@ -1337,6 +1341,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 時間戳竄改測試只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
 
@@ -1391,6 +1396,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 時間戳竄改測試只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
 
@@ -1523,6 +1529,7 @@ namespace OdfKit.Tests
                 using (var package = OdfPackage.Open(ms, leaveOpen: true))
                 {
                     using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+                    // ODFKIT_XMLDOCUMENT_WAIVER: 時間戳竄改測試只讀取本測試自行產生的簽章 XML。
                     var doc = new XmlDocument();
                     doc.Load(sigStream);
 
@@ -1624,6 +1631,7 @@ namespace OdfKit.Tests
             using (var packageB = OdfPackage.Open(msB))
             {
                 using var sigStream = packageB.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 雙套件比對只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
                 var ns = new XmlNamespaceManager(doc.NameTable);
@@ -1638,6 +1646,7 @@ namespace OdfKit.Tests
             using (var packageA = OdfPackage.Open(msA, leaveOpen: true))
             {
                 using var sigStream = packageA.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 雙套件比對只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
                 var ns = new XmlNamespaceManager(doc.NameTable);
@@ -1661,6 +1670,7 @@ namespace OdfKit.Tests
             using (var packageA = OdfPackage.Open(msA))
             {
                 using var sigStream = packageA.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 雙套件比對只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
                 var ns = new XmlNamespaceManager(doc.NameTable);
@@ -1673,6 +1683,7 @@ namespace OdfKit.Tests
                 using var msB2 = new MemoryStream(msB.ToArray());
                 using var packageB = OdfPackage.Open(msB2);
                 using var sigStreamB = packageB.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 雙套件比對只讀取本測試自行產生的第二份簽章 XML。
                 var docB = new XmlDocument();
                 docB.Load(sigStreamB);
                 var sigValB = docB.SelectSingleNode("//ds:SignatureValue", ns)?.InnerText;
@@ -1682,6 +1693,7 @@ namespace OdfKit.Tests
                 var result = await OdfSigner.VerifySignaturesAsync(packageA, options, cancellationToken: TestContext.Current.CancellationToken);
 
                 var sigValElem = doc.SelectSingleNode("//ds:SignatureValue", ns) as XmlElement;
+                // ODFKIT_XMLDOCUMENT_WAIVER: 乾淨容器只匯入本測試既有節點以計算 C14N 雜湊。
                 var cleanDoc = new XmlDocument();
                 var imported = (XmlElement)cleanDoc.ImportNode(sigValElem!, true);
                 cleanDoc.AppendChild(imported);
@@ -1775,6 +1787,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+                // ODFKIT_XMLDOCUMENT_WAIVER: 交叉驗證只讀取本測試自行產生的簽章 XML。
                 var doc = new XmlDocument();
                 doc.Load(sigStream);
 
@@ -1785,6 +1798,7 @@ namespace OdfKit.Tests
                 var sigValElem = doc.SelectSingleNode("//ds:SignatureValue", nsManager) as XmlElement;
                 Assert.NotNull(sigValElem);
 
+                // ODFKIT_XMLDOCUMENT_WAIVER: 乾淨容器只匯入本測試既有節點以計算 C14N 雜湊。
                 var cleanDoc = new XmlDocument();
                 var imported = (XmlElement)cleanDoc.ImportNode(sigValElem, true);
                 cleanDoc.AppendChild(imported);

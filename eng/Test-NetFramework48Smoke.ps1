@@ -35,7 +35,32 @@ else {
     }
 
     $properties += "-p:UseLocalPackages=true"
-    dotnet restore $project @properties --source $resolvedPackages --source "https://api.nuget.org/v3/index.json"
+    $nugetConfig = Join-Path $resolvedPackages ".net48-smoke.NuGet.Config"
+    @"
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="odfkit-local" value="$resolvedPackages" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="odfkit-local">
+      <package pattern="OdfKit" />
+      <package pattern="OdfKit.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+"@ | Set-Content -LiteralPath $nugetConfig -Encoding utf8
+    try {
+        dotnet restore $project @properties --configfile $nugetConfig
+    }
+    finally {
+        Remove-Item -LiteralPath $nugetConfig -Force -ErrorAction SilentlyContinue
+    }
 }
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

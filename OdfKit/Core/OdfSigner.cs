@@ -32,7 +32,7 @@ public static partial class OdfSigner
     /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SignAsync(OdfPackage, X509Certificate2, OdfSigningOptions, CancellationToken)"/> 以避免阻塞執行緒</remarks>
     public static void Sign(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
     {
-        SignAsync(package, certificate, options).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(() => SignAsync(package, certificate, options));
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public static partial class OdfSigner
     /// </summary>
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options)
     {
-        return VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
+        return OdfSynchronousTask.Run(() => VerifySignaturesAsync(package, options));
     }
 
     /// <summary>

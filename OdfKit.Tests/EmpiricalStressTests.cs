@@ -350,7 +350,7 @@ namespace OdfKit.Tests
             {
                 File.AppendAllText(logPath, $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ssZ} - {message}\n");
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             Console.WriteLine(message);
         }
     }

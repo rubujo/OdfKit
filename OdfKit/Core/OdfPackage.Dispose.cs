@@ -30,7 +30,10 @@ public sealed partial class OdfPackage
                 {
                     _prefetchProcessorTask?.GetAwaiter().GetResult();
                 }
-                catch { }
+                catch (OperationCanceledException) when (_prefetchCts.IsCancellationRequested)
+                {
+                    OdfKitDiagnostics.Info("背景預讀處理器已在同步處置期間停止。");
+                }
                 _prefetchCts.Dispose();
 #endif
 
@@ -38,8 +41,9 @@ public sealed partial class OdfPackage
                 {
                     PreloadTask?.GetAwaiter().GetResult();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    OdfKitDiagnostics.Warn("同步處置封裝時，背景預載工作未能完成。", ex);
                 }
                 _lock.Dispose();
                 _archive?.Dispose();
@@ -88,7 +92,10 @@ public sealed partial class OdfPackage
                 {
                     await _prefetchProcessorTask.ConfigureAwait(false);
                 }
-                catch { }
+                catch (OperationCanceledException) when (_prefetchCts.IsCancellationRequested)
+                {
+                    OdfKitDiagnostics.Info("背景預讀處理器已在非同步處置期間停止。");
+                }
             }
             _prefetchCts.Dispose();
 #endif
@@ -99,8 +106,9 @@ public sealed partial class OdfPackage
                 {
                     await PreloadTask.ConfigureAwait(false);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    OdfKitDiagnostics.Warn("非同步處置封裝時，背景預載工作未能完成。", ex);
                 }
             }
             _lock.Dispose();

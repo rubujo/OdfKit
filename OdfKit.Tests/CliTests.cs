@@ -1866,8 +1866,9 @@ public class CliTests : IDisposable
                 File.Delete(path);
             }
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 
@@ -1880,8 +1881,9 @@ public class CliTests : IDisposable
                 Directory.Delete(path, recursive: true);
             }
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 }

@@ -59,7 +59,14 @@ internal static class FormulaDateTimeFunctionHandlers
                 dt = Epoch.Add(ts);
                 return true;
             }
-            catch { }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
         }
 
         if (DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))

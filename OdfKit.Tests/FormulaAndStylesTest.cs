@@ -953,7 +953,7 @@ namespace OdfKit.Tests
             {
                 try
                 { File.Delete(dummyPath); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
 
             // 2. Test Font Embedding ZIP package writing mock
@@ -985,7 +985,7 @@ namespace OdfKit.Tests
                 {
                     try
                     { File.Delete(tempArialPath); }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                 }
             }
         }
@@ -1013,10 +1013,10 @@ namespace OdfKit.Tests
             {
                 try
                 { File.Delete(ttcPath); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                 try
                 { File.Delete(ttfPath); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
         }
 
@@ -1061,7 +1061,7 @@ namespace OdfKit.Tests
             {
                 try
                 { File.Delete(dummyPath); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
         }
 
@@ -1108,7 +1108,7 @@ namespace OdfKit.Tests
             {
                 try
                 { Directory.Delete(customDir, recursive: true); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
         }
 
@@ -1240,7 +1240,7 @@ namespace OdfKit.Tests
             {
                 try
                 { File.Delete(dummyArialPath); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
             }
         }
 

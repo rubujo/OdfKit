@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
 
@@ -131,7 +132,8 @@ public sealed class ObjectDataReader<
         }
         else
         {
-            _hasCurrentRow = _asyncEnumerator!.MoveNextAsync().AsTask().GetAwaiter().GetResult();
+            _hasCurrentRow = OdfSynchronousTask.Run(
+                () => _asyncEnumerator!.MoveNextAsync().AsTask());
         }
 
         if (_hasCurrentRow)
@@ -481,7 +483,8 @@ public sealed class ObjectDataReader<
             _syncEnumerator?.Dispose();
             if (_asyncEnumerator is not null)
             {
-                _asyncEnumerator.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                OdfSynchronousTask.Run(
+                    () => _asyncEnumerator.DisposeAsync().AsTask());
             }
         }
         base.Dispose(disposing);

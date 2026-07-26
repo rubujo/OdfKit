@@ -226,7 +226,7 @@ namespace OdfKit.Tests
                 {
                     try
                     { Directory.Delete(sandboxDir, true); }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                 }
 
                 Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on invalid output path failure.");

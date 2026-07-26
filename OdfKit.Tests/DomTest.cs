@@ -302,7 +302,7 @@ namespace OdfKit.Tests
                             using var sr = new StreamReader(s);
                             sigXml = sr.ReadToEnd();
                         }
-                        catch { }
+                        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                         throw new Exception("Signature verification failed. Logs:\n" + string.Join("\n", logs) + "\nSignature XML:\n" + sigXml);
                     }
                     Assert.Single(certs);

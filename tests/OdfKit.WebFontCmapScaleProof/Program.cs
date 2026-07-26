@@ -277,14 +277,17 @@ try
 {
     await serverTask.ConfigureAwait(false);
 }
-catch (OperationCanceledException)
+catch (OperationCanceledException ex)
 {
+    System.Diagnostics.Debug.WriteLine(ex);
 }
-catch (HttpListenerException)
+catch (HttpListenerException ex)
 {
+    System.Diagnostics.Debug.WriteLine(ex);
 }
-catch (ObjectDisposedException)
+catch (ObjectDisposedException ex)
 {
+    System.Diagnostics.Debug.WriteLine(ex);
 }
 
 string evidencePath = Path.Combine(evidenceRoot, "cmap-scale-browser-proof.json");

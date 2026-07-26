@@ -2218,8 +2218,9 @@ public partial class LibreOfficeInteropTests
             {
                 process.Kill(entireProcessTree: true);
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
 
             Assert.Fail("LibreOffice 轉換逾時。輸出：" + output);

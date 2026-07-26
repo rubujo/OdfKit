@@ -431,7 +431,11 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
                 return roundedPoints.GetHashCode() ^ OdfUnit.Points.GetHashCode();
             }
         }
-        catch { }
+        catch (NotSupportedException)
+        {
+            return Math.Round(Value, 4).GetHashCode() ^ Unit.GetHashCode();
+        }
+
         return Math.Round(Value, 4).GetHashCode() ^ Unit.GetHashCode();
     }
 

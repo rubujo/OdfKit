@@ -36,8 +36,11 @@
 |------|------|
 | `Test-GpgSignatures.ps1` | 驗證此 repo 所有提交皆為有效 GPG 簽署，且僅使用 repo 專屬金鑰。 |
 | `Test-CiResourcePolicy.ps1` | 驗證 GitHub Actions cache、artifact、timeout、排程與高成本工作 opt-in 的資源治理契約。 |
+| `Test-CodeCoverage.ps1` | 驗證 Cobertura 全專案 line／branch coverage 最低門檻。 |
+| `Test-GitHubActionsPolicy.ps1` | 驗證第三方 Actions 皆以完整 SHA 固定、附版本註解並由 Dependabot 每週追蹤最新版；`-Online` 會與官方 GitHub API 對照。 |
 | `Test-LibreOfficeInterop.ps1` | 執行 LibreOffice headless 實機互通性測試。 |
 | `Test-MergeConflictMarkers.ps1` | 掃描原始碼中的合併衝突標記（CS8300 成因）。 |
+| `Test-NoEmptyCatch.ps1` | 掃描所有手寫 C#，拒絕會靜默吞掉例外的空白 `catch`。 |
 | `Test-MarkdownLinks.ps1` | 驗證 `README.md`、`AGENTS.md`、`docs/` 與 eng 文件的本機連結目標及 Markdown anchor 存在，且未越出工作區。 |
 | `Test-XmlReaderSecurity.ps1` | 掃描手寫 `XmlReaderSettings`，要求明確禁止 DTD 並停用外部 XML resolver。 |
 | `Test-NuGetPack.ps1` | 驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置。 |
@@ -81,6 +84,7 @@
 |------|------|
 | `Pack-NuGet.ps1` | 建置並封裝所有可發佈的 OdfKit NuGet 套件。 |
 | `Publish-GitHubRelease.ps1` | 將已驗證的 NuGet 套件附加至 GitHub Release，詳見 [github-release-publishing.md](../docs/github-release-publishing.md)。 |
+| `Test-ReleaseSbom.ps1` | 由完整方案 restore closure 與發布 nupkg 產生 SPDX 3.0.1 JSON-LD 主 SBOM，並產生 GitHub attestation 專用 SPDX 2.3 相容檔。 |
 
 ### Schema 與 Corpus 產生
 

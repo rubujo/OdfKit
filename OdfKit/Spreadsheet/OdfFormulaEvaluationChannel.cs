@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Channels;
 #endif
 using System.Threading.Tasks;
+using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
 
@@ -157,8 +158,9 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         {
             _worker.GetAwaiter().GetResult();
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (_cts.IsCancellationRequested)
         {
+            OdfKitDiagnostics.Info("公式評估背景工作已在同步處置期間停止。");
         }
         _cts.Dispose();
 #if !NET10_0_OR_GREATER
@@ -187,8 +189,9 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         {
             await _worker.ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (_cts.IsCancellationRequested)
         {
+            OdfKitDiagnostics.Info("公式評估背景工作已在非同步處置期間停止。");
         }
         _cts.Dispose();
 #if !NET10_0_OR_GREATER

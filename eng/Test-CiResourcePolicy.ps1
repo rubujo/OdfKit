@@ -21,7 +21,7 @@ $workflowRoot = Join-Path $repoRoot ".github/workflows"
 $workflowFiles = @(Get-ChildItem -LiteralPath $workflowRoot -Filter "*.yml" -File)
 $cacheActionPath = Join-Path $repoRoot ".github/actions/cache-odfkit/action.yml"
 $cacheAction = Get-Content -LiteralPath $cacheActionPath -Raw
-if (-not $cacheAction.Contains("actions/cache/restore@v6", [StringComparison]::Ordinal) -or
+if ($cacheAction -notmatch 'actions/cache/restore@[0-9a-f]{40}\s+# v6\.1\.0' -or
     -not $cacheAction.Contains("github.event_name == 'pull_request'", [StringComparison]::Ordinal) -or
     -not $cacheAction.Contains("github.event_name != 'pull_request'", [StringComparison]::Ordinal)) {
     throw "共用 cache action 未維持 PR 僅還原、受信任分支才儲存的契約。"

@@ -628,11 +628,13 @@ public sealed class OfficeInteropConversionTests
                 Directory.Delete(path, recursive: true);
             }
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
         }
     }
 }

@@ -265,11 +265,13 @@ public class OdfBouncyCastleOpenPgpProviderTests
             {
                 provider.DecryptSessionKey(packet, "test");
             }
-            catch (CryptographicException)
+            catch (CryptographicException ex)
             {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,13 @@
     <UseSharedCompilation>true</UseSharedCompilation>
     <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
 
+    <!-- 全專案固定採目前 SDK 的建議規則集；是否在 build 執行仍由下方環境條件控制。 -->
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <!-- 保留各專案的編譯器 warnings-as-errors；新增的整套 CA 規則先作可見診斷，
+         明確在 .editorconfig 升為 error 的安全與契約規則仍會阻擋建置。 -->
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+
     <!-- 本機關閉 build-time analyzer；CI（GitHub Actions / CI 環境變數）維持完整 CA 檢查。 -->
     <RunAnalyzersDuringBuild Condition="'$(GITHUB_ACTIONS)' == 'true' OR '$(CI)' == 'true'">true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringBuild Condition="'$(GITHUB_ACTIONS)' != 'true' AND '$(CI)' != 'true'">false</RunAnalyzersDuringBuild>

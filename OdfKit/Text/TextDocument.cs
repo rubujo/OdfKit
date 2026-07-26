@@ -823,7 +823,7 @@ public partial class TextDocument : OdfDocument
     /// </remarks>
     public void StreamingMailMerge(Stream outputStream, IDictionary<string, object?> dataSource)
     {
-        StreamingMailMergeAsync(outputStream, dataSource).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(() => StreamingMailMergeAsync(outputStream, dataSource));
     }
 
     /// <summary>
@@ -855,7 +855,8 @@ public partial class TextDocument : OdfDocument
         }
 
         using var templateStream = File.OpenRead(templatePath);
-        OdfStreamingMailMerge.ApplyTemplateAsync(templateStream, outputStream, dataSource).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(
+            () => OdfStreamingMailMerge.ApplyTemplateAsync(templateStream, outputStream, dataSource));
     }
 
 

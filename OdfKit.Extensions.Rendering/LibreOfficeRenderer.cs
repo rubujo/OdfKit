@@ -203,7 +203,7 @@ public class LibreOfficeRenderer
     /// <exception cref="FileNotFoundException">Thrown when the documented condition occurs. / 當轉檔完成後找不到預期的目標檔案時擲出</exception>
     public void Convert(OdfDocument document, string outputPath, string format)
     {
-        ConvertAsync(document, outputPath, format, default).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(() => ConvertAsync(document, outputPath, format, default));
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public class LibreOfficeRenderer
     /// <param name="format">The name or identifier. / 要轉換的目標格式（例如 <c>pdf</c>）</param>
     public void ConvertFile(string inputFilePath, string outputPath, string format)
     {
-        ConvertFileAsync(inputFilePath, outputPath, format, default).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(() => ConvertFileAsync(inputFilePath, outputPath, format, default));
     }
 
     /// <summary>

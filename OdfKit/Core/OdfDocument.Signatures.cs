@@ -29,7 +29,7 @@ public abstract partial class OdfDocument
     /// </remarks>
     public void Sign(X509Certificate2 certificate)
     {
-        SignAsync(certificate).GetAwaiter().GetResult();
+        OdfSynchronousTask.Run(() => SignAsync(certificate));
     }
 
     /// <summary>

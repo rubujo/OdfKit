@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-驗證 WebFont 規範基準、相依政策與 GitHub Actions 穩定大版本。
+驗證 WebFont 規範基準、相依政策與全專案 GitHub Actions 供應鏈政策。
 .PARAMETER Online
 向 NuGet 與 GitHub 官方 API 查詢最新穩定版本；連線失敗時採 fail closed。
 #>
@@ -158,41 +158,7 @@ foreach ($exception in $exceptionsById.GetEnumerator()) {
     }
 }
 
-$actionsById = @{}
-foreach ($action in $policy.githubActions) {
-    $id = [string]$action.id
-    $major = [int]$action.major
-    if ([string]::IsNullOrWhiteSpace($id) -or $actionsById.ContainsKey($id) `
-        -or $major -le 0) {
-        throw "WebFont GitHub Actions 政策含無效項目。"
-    }
-    $actionsById[$id] = $action
-}
-
-$actionFiles = Get-ChildItem -LiteralPath (Join-Path $repoRoot ".github") `
-    -Recurse -File -Include "*.yml", "*.yaml"
-$usedActions = @{}
-foreach ($file in $actionFiles) {
-    foreach ($match in [regex]::Matches(
-            (Get-Content -LiteralPath $file.FullName -Raw),
-            'uses:\s*actions/(?<id>[a-z0-9-]+)@v(?<major>\d+)',
-            [Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
-        $id = $match.Groups['id'].Value.ToLowerInvariant()
-        $major = [int]$match.Groups['major'].Value
-        if (-not $actionsById.ContainsKey($id)) {
-            throw "CI 使用未納入穩定版政策的 GitHub Action：actions/$id@v$major"
-        }
-        if ($major -ne [int]$actionsById[$id].major) {
-            throw "CI GitHub Action 不是已稽核的穩定 major：actions/$id@v$major"
-        }
-        $usedActions[$id] = $major
-    }
-}
-foreach ($action in $actionsById.GetEnumerator()) {
-    if (-not $usedActions.ContainsKey($action.Key)) {
-        throw "GitHub Actions 政策含未使用或已過期項目：actions/$($action.Key)"
-    }
-}
+& (Join-Path $PSScriptRoot "Test-GitHubActionsPolicy.ps1") -Online:$Online
 
 if ($Online) {
     foreach ($package in $trackedPackages.GetEnumerator()) {
@@ -214,30 +180,7 @@ if ($Online) {
         }
     }
 
-    $githubHeaders = @{
-        Accept = "application/vnd.github+json"
-        "X-GitHub-Api-Version" = "2026-03-10"
-    }
-    if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)) {
-        $githubHeaders.Authorization = "Bearer $($env:GITHUB_TOKEN)"
-    }
-    foreach ($action in $actionsById.GetEnumerator()) {
-        $release = Invoke-RestMethod `
-            -Uri "https://api.github.com/repos/actions/$($action.Key)/releases/latest" `
-            -Headers $githubHeaders `
-            -MaximumRetryCount 3 `
-            -RetryIntervalSec 2 `
-            -TimeoutSec 60
-        $latestRelease = [string]$release.tag_name
-        if ($latestRelease -notmatch '^v(?<major>\d+)(?:\.\d+){2}$') {
-            throw "GitHub Action 官方最新 release 標籤格式無效：actions/$($action.Key) $latestRelease"
-        }
-        $latestMajor = [int]$Matches['major']
-        if ($latestMajor -ne [int]$action.Value.major) {
-            throw "GitHub Action 政策不是官方最新穩定 major：actions/$($action.Key)@v$($action.Value.major) → $latestRelease"
-        }
-    }
 }
 
 $mode = if ($Online) { "官方 NuGet／GitHub 線上" } else { "鎖定政策離線" }
-Write-Host "OK：WebFont 規範、相依、GitHub Actions major 與 Preview 例外通過（$mode）。"
+Write-Host "OK：WebFont 規範、相依、GitHub Actions SHA 與 Preview 例外通過（$mode）。"

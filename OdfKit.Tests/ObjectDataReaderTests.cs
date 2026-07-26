@@ -109,6 +109,28 @@ public class ObjectDataReaderTests
     }
 
     /// <summary>
+    /// 驗證同步相容 API 不會捕捉呼叫端的同步內容而形成死結。
+    /// </summary>
+    [Fact]
+    public void FromAsyncEnumerable_SynchronousReadDoesNotCaptureCallerContext()
+    {
+        SynchronizationContext? original = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new RejectingSynchronizationContext());
+        try
+        {
+            using var reader = new ObjectDataReader<Widget>(
+                ToAsyncEnumerable(SampleWidgets, TestContext.Current.CancellationToken));
+
+            Assert.True(reader.Read());
+            Assert.Equal("Alice", reader.GetValue(reader.GetOrdinal("Name")));
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(original);
+        }
+    }
+
+    /// <summary>
     /// 驗證來源為 <see langword="null"/> 時擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
@@ -194,5 +216,13 @@ public class ObjectDataReaderTests
         Assert.Contains("Alice", contentXml);
         Assert.Contains("Bob", contentXml);
         Assert.Contains("office:boolean-value=\"true\"", contentXml);
+    }
+
+    private sealed class RejectingSynchronizationContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state)
+        {
+            throw new InvalidOperationException("The caller synchronization context must not be captured.");
+        }
     }
 }

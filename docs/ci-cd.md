@@ -13,10 +13,12 @@
   - `Test-BilingualXmlDocs.ps1 -FailOnNewIssues`
   - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
   - `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`（JSON ↔ C# 一致）
-  - `dotnet build OdfKit`（`RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers）
+  - `dotnet build OdfKit`（全域 `AnalysisLevel=latest`、`AnalysisMode=Recommended`、
+    `RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers；只有明確升為 error 的規則阻擋建置）
 - `full-regression` job 依賴 `maintainability`，在 Ubuntu 對 `net8.0` 與 `net10.0`
   執行完整測試套件；它是每次 PR 與 main push 的必要回歸證據。TRX 與 blame diagnostics
-  只在失敗時上傳。
+  只在失敗時上傳。Cobertura 報表各自必須通過 line 88% 與 branch 57% 最低門檻，
+  不得以另一個 TFM 的較高數值抵銷退化。
 - `test` job 依賴 `maintainability`，在 `windows-latest` 執行。Ubuntu 的雙 TFM 覆蓋由
   `full-regression` 提供，不再重複建立相同 Smoke 矩陣。
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
@@ -49,11 +51,12 @@ testhost 收尾不穩。
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | 核心 NativeAOT／trim smoke，以及 net48 WebFont sidecar NativeAOT 實測 | PR / main |
-| `nuget-pack.yml` | 十九個 NuGet 套件的單次封裝、WebFont 發布演練與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
+| `nuget-pack.yml` | 二十一個 NuGet 套件的單次封裝、完整 SPDX 3.0.1 SBOM、WebFont 發布演練與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
 | `performance-benchmark.yml` | DOM 與 ODS 串流效能／配置量回歸基準 | 每週 / 手動 |
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
 | `api-docs.yml` | 17 語系 GitHub Pages API reference 建置（DocFX）與部署；結構與閘門見 [api-docs-site.md](api-docs-site.md) | PR（僅建置）/ main / 手動 |
 | `github-release.yml` | tag 驅動的發佈流程 | tag |
+| `scorecard.yml` | OpenSSF Scorecard 供應鏈檢查與 SARIF 上傳 | main、每週、branch protection 變更 |
 
 發行 workflow 只負責交付快照，不是 `v0.0.1` 完滿條件。完滿狀態由每個 `main` 提交的必要
 CI 與專用排程證據持續維持；不得把契約內缺口延後到下一個 tag。
@@ -66,6 +69,8 @@ Microsoft Office COM 與像素級比對仍依可用環境手動執行。
 informational benchmark 與四種 IIS hosting model 的 WebFont 持續負載必須由
 `workflow_dispatch` 明確 opt-in；不得為了取得額外綠燈自動排程。LibreOffice 雙 TFM
 則在同一個 Windows job 安裝一次後依序執行，避免為相同外部程式建立兩台 runner。
+自動排程 workflow 上限為四個；新增的每週 OpenSSF Scorecard 是第四個，沿用短期 SARIF
+artifact 與 10 分鐘 job timeout，不得再以未評估的排程擴大 runner 用量。
 
 外部 RELAX NG baseline 與快速 corpus job 分離。工作流程從
 `eng/external-tools.json` 讀取 Jing 與 ODF Validator 的固定版本、來源 URL 與 SHA-256；各自的

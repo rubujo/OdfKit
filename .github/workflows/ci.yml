@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
@@ -104,6 +104,10 @@ jobs:
       - name: XML reader security settings
         shell: pwsh
         run: ./eng/Test-XmlReaderSecurity.ps1
+
+      - name: Reject empty catch blocks
+        shell: pwsh
+        run: ./eng/Test-NoEmptyCatch.ps1
 
       - name: Performance budget contract
         shell: pwsh
@@ -161,7 +165,7 @@ jobs:
     timeout-minutes: 70
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
@@ -335,7 +339,7 @@ jobs:
 
       - name: Upload WebFont real evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: webfont-real-evidence
           path: |
@@ -367,7 +371,7 @@ jobs:
         framework: [net8.0, net10.0]
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
@@ -402,21 +406,23 @@ jobs:
 
       - name: Upload full regression diagnostics
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: full-regression-${{ matrix.framework }}
           path: artifacts/test-results/full-${{ matrix.framework }}/
           if-no-files-found: ignore
           retention-days: 7
 
-      # 這階段只量測、不設閘門：2,210 個測試目前完全沒有行覆蓋率基線，
-      # 在沒有實際數據前設定失敗門檻只是憑空猜測的數字，之後有了至少一輪
-      # 真實資料再回頭討論門檻與趨勢追蹤。coverlet 會在 results-directory 底下
-      # 用隨機 GUID 子目錄輸出 cobertura 檔（每個 TFM 各自的 $resultsDir 已用
-      # matrix.framework 區分，避免 net8.0／net10.0 兩個矩陣分支互相覆蓋）。
+      # 2026-07-26 成功 main 基線：net8.0 line 88.82% / branch 57.17%，
+      # net10.0 line 88.80% / branch 57.17%。門檻保留小幅 runner 漂移空間，
+      # 並由兩個 TFM 各自 fail closed；不能以另一個 TFM 的較高數值抵銷退化。
+      - name: Enforce code coverage baseline
+        shell: pwsh
+        run: ./eng/Test-CodeCoverage.ps1 -SearchRoot 'artifacts/test-results/full-${{ matrix.framework }}'
+
       - name: Upload code coverage
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: code-coverage-full-${{ matrix.framework }}
           path: artifacts/test-results/full-${{ matrix.framework }}/**/coverage.cobertura.xml
@@ -439,7 +445,7 @@ jobs:
       TEST_RESULTS_DIR: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
@@ -616,7 +622,7 @@ jobs:
 
       - name: Upload test diagnostics
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.framework }}
           path: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}/

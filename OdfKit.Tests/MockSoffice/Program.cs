@@ -22,8 +22,9 @@ namespace MockSoffice
 
                     File.WriteAllLines(capturePath, args);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine(ex);
                 }
             }
 
@@ -71,7 +72,7 @@ namespace MockSoffice
                         Thread.Sleep(10000); // Hold lock for 10 seconds
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                 return 0;
             }
 
@@ -97,7 +98,7 @@ namespace MockSoffice
                             Process.Start(psi);
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
                 }
 
                 Thread.Sleep(5000); // Sleep to trigger timeout (test timeout is shorter, e.g. 1s)

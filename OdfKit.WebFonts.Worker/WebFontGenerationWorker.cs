@@ -149,12 +149,11 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
 
         _queue.Writer.TryComplete();
         _shutdown.Cancel();
-        try
+        Task consumers = Task.WhenAll(_consumers);
+        await consumers.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+        if (consumers.IsFaulted)
         {
-            await Task.WhenAll(_consumers).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
+            await consumers.ConfigureAwait(false);
         }
 
         while (_queue.Reader.TryRead(out GenerationJob? job))
