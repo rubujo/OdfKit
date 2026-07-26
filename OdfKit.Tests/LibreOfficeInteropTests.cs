@@ -2632,9 +2632,9 @@ public partial class LibreOfficeInteropTests
                 database.SetConnection("sdbc:embedded:hsqldb");
 
                 var customersTable = new OdfKit.Database.OdfSchemaTable("Customers");
-                customersTable.Columns.Add(new OdfKit.Database.OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
-                customersTable.Columns.Add(new OdfKit.Database.OdfSchemaColumn("Name", "VARCHAR", isNullable: true));
-                customersTable.PrimaryKey = new OdfKit.Database.OdfSchemaPrimaryKey("PK_Customers", ["Id"]);
+                customersTable.AddColumn(new OdfKit.Database.OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
+                customersTable.AddColumn(new OdfKit.Database.OdfSchemaColumn("Name", "VARCHAR", isNullable: true));
+                customersTable.SetPrimaryKey(new OdfKit.Database.OdfSchemaPrimaryKey("PK_Customers", ["Id"]));
                 database.Schema.AddTable(customersTable);
 
                 database.AddForm("CustomerForm", "forms/CustomerForm", "客戶表單");

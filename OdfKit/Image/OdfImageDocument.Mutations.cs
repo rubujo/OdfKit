@@ -134,7 +134,7 @@ public partial class OdfImageDocument
     /// </summary>
     /// <param name="name">The frame name (<c>draw:name</c>). / 框架名稱（<c>draw:name</c>）。</param>
     /// <returns>The matching frame summary, or <see langword="null"/> if not found. / 符合名稱的框架摘要；找不到時為 <see langword="null"/>。</returns>
-    public OdfImageFrameInfo? TryGetImageFrame(string name)
+    public OdfImageFrameInfo? FindImageFrame(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -193,6 +193,61 @@ public partial class OdfImageDocument
         image.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
         return true;
     }
+
+    /// <summary>
+    /// Replaces image content for multiple named frames in request order.
+    /// 依要求順序替換多個具名框架的影像內容。
+    /// </summary>
+    /// <remarks>
+    /// Every request is validated before package resources are changed. Layout, metadata, and unrelated frame content are preserved.
+    /// 所有要求都會在變更封裝資源前完成驗證；版面、中繼資料與無關框架內容都會保留。
+    /// </remarks>
+    /// <param name="updates">The image content replacement requests. / 影像內容替換要求。</param>
+    /// <returns>The batch update result. / 批次更新結果。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="updates"/>, an update, or its image bytes are <see langword="null"/>. / 當 <paramref name="updates"/>、任一更新要求或其影像位元組為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When an update frame name is blank. / 當任一更新要求的框架名稱為空白時擲出。</exception>
+    public OdfImageBatchUpdateResult ReplaceImageFrameContents(
+        IEnumerable<OdfImageContentUpdate> updates)
+    {
+        if (updates is null)
+        {
+            throw new ArgumentNullException(nameof(updates));
+        }
+
+        var requests = new List<OdfImageContentUpdate>();
+        foreach (OdfImageContentUpdate update in updates)
+        {
+            if (update is null || update.ImageBytes is null)
+            {
+                throw new ArgumentNullException(nameof(updates));
+            }
+
+            if (string.IsNullOrWhiteSpace(update.Name))
+            {
+                throw new ArgumentException(
+                    OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"),
+                    nameof(updates));
+            }
+
+            requests.Add(update);
+        }
+
+        var result = new OdfImageBatchUpdateResult();
+        foreach (OdfImageContentUpdate update in requests)
+        {
+            if (ReplaceImageFrameContent(update.Name, update.ImageBytes, update.PreferredName))
+            {
+                result.UpdatedCount++;
+            }
+            else
+            {
+                result.MissingNames.Add(update.Name);
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Short overload of UpdateImageFrame that accepts name, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 name、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 UpdateImageFrame 多載。

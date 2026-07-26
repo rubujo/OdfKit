@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using OdfKit.Compliance;
@@ -23,8 +24,10 @@ public sealed class OdfMathToken
         Text = text ?? string.Empty;
         Base = baseToken;
         Script = scriptToken;
-        Children = children;
-        Attributes = attributes;
+        Children = children is null
+            ? null
+            : new List<OdfMathToken>(children).AsReadOnly();
+        Attributes = CopyAttributes(attributes);
     }
 
     /// <summary>
@@ -118,6 +121,53 @@ public sealed class OdfMathToken
     }
 
     /// <summary>
+    /// Creates a new token without the specified MathML attribute, leaving the original token unchanged.
+    /// 建立一個移除指定 MathML 屬性的新 token，且不修改原 token。
+    /// </summary>
+    /// <param name="name">The attribute name. / 屬性名稱。</param>
+    /// <returns>A new token without the attribute, or the current token when the attribute does not exist. / 移除屬性後的新 token；若屬性不存在則回傳目前 token。</returns>
+    /// <exception cref="ArgumentException">When <paramref name="name"/> is blank. / 當 <paramref name="name"/> 為空白時擲出。</exception>
+    public OdfMathToken WithoutAttribute(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_PropertyCannotBeEmpty"), nameof(name));
+        }
+
+        if (Attributes is null || !Attributes.ContainsKey(name))
+        {
+            return this;
+        }
+
+        var remaining = new Dictionary<string, string>();
+        foreach (KeyValuePair<string, string> attribute in Attributes)
+        {
+            if (!string.Equals(attribute.Key, name, StringComparison.Ordinal))
+            {
+                remaining[attribute.Key] = attribute.Value;
+            }
+        }
+
+        return new OdfMathToken(
+            Kind,
+            Text,
+            Base,
+            Script,
+            Children,
+            remaining.Count == 0 ? null : remaining);
+    }
+
+    /// <summary>
+    /// Creates a new token without any MathML attributes, leaving the original token unchanged.
+    /// 建立一個清除所有 MathML 屬性的新 token，且不修改原 token。
+    /// </summary>
+    /// <returns>A new token without attributes, or the current token when no attributes are set. / 清除屬性後的新 token；若原本沒有屬性則回傳目前 token。</returns>
+    public OdfMathToken ClearAttributes() =>
+        Attributes is null || Attributes.Count == 0
+            ? this
+            : new OdfMathToken(Kind, Text, Base, Script, Children);
+
+    /// <summary>
     /// Recursively finds the first token matching the specified kind.
     /// 遞迴尋找第一個符合指定種類的 token。
     /// </summary>
@@ -149,9 +199,24 @@ public sealed class OdfMathToken
     /// </summary>
     /// <param name="kind">The target token kind. / 目標 token 種類。</param>
     /// <returns>The matching token sequence. / 符合條件的 token 序列。</returns>
-    public IEnumerable<OdfMathToken> GetAll(OdfMathTokenKind kind)
+    public IEnumerable<OdfMathToken> GetAll(OdfMathTokenKind kind) =>
+        GetAll(token => token.Kind == kind);
+
+    /// <summary>
+    /// Recursively enumerates all tokens matching the specified predicate.
+    /// 遞迴列舉所有符合指定條件的 token。
+    /// </summary>
+    /// <param name="predicate">The delegate that determines whether a token is included. / 判斷 token 是否納入結果的委派。</param>
+    /// <returns>The matching token sequence. / 符合條件的 token 序列。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> is <see langword="null"/>. / 當 <paramref name="predicate"/> 為 <see langword="null"/> 時擲出。</exception>
+    public IEnumerable<OdfMathToken> GetAll(Func<OdfMathToken, bool> predicate)
     {
-        if (Kind == kind)
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        if (predicate(this))
         {
             yield return this;
         }
@@ -159,7 +224,7 @@ public sealed class OdfMathToken
         int childCount = GetChildCount();
         for (int index = 0; index < childCount; index++)
         {
-            foreach (OdfMathToken match in GetChild(index).GetAll(kind))
+            foreach (OdfMathToken match in GetChild(index).GetAll(predicate))
             {
                 yield return match;
             }
@@ -858,6 +923,23 @@ public sealed class OdfMathToken
         }
 
         return children.ToList();
+    }
+
+    private static IReadOnlyDictionary<string, string>? CopyAttributes(
+        IReadOnlyDictionary<string, string>? attributes)
+    {
+        if (attributes is null || attributes.Count == 0)
+        {
+            return null;
+        }
+
+        var copy = new Dictionary<string, string>();
+        foreach (KeyValuePair<string, string> attribute in attributes)
+        {
+            copy[attribute.Key] = attribute.Value;
+        }
+
+        return new ReadOnlyDictionary<string, string>(copy);
     }
 
     private int GetChildCount() =>

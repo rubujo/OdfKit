@@ -12,6 +12,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定公式文件高階 API 的整合測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class FormulaHighLevelApiTests
 {
     /// <summary>
@@ -671,5 +672,61 @@ public class FormulaHighLevelApiTests
         Assert.DoesNotContain(
             loaded.GetMathTokens(),
             token => token.FindFirst(OdfMathTokenKind.Operator) is not null);
+    }
+
+    /// <summary>
+    /// 驗證 predicate rewrite、屬性移除及 token 集合維持真正不可變。
+    /// </summary>
+    [Fact]
+    public void PredicateRewriteAndAttributes_PreserveImmutableTokenTree()
+    {
+        OdfMathToken original = OdfMathToken.Row(
+            OdfMathToken.Identifier("alpha")
+                .WithAttribute("mathvariant", "bold")
+                .WithAttribute("mathcolor", "#FF0000"),
+            OdfMathToken.Operator("+"),
+            OdfMathToken.Identifier("beta"));
+
+        OdfMathToken first = original.GetAll(token => token.Text == "alpha").Single();
+        OdfMathToken withoutColor = first.WithoutAttribute("mathcolor");
+        OdfMathToken withoutAttributes = withoutColor.ClearAttributes();
+
+        Assert.Equal("bold", first.Attributes?["mathvariant"]);
+        Assert.NotNull(withoutColor.Attributes);
+        Assert.False(withoutColor.Attributes!.ContainsKey("mathcolor"));
+        Assert.Null(withoutAttributes.Attributes);
+        Assert.Throws<NotSupportedException>(() =>
+            ((System.Collections.Generic.IList<OdfMathToken>)original.Children!)
+                .Add(OdfMathToken.Number("1")));
+        Assert.Throws<NotSupportedException>(() =>
+            ((System.Collections.Generic.IDictionary<string, string>)first.Attributes!)
+                .Add("stretchy", "true"));
+
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(original)
+            .Build();
+
+        int replaced = formula.ReplaceAll(
+            token => token.Kind == OdfMathTokenKind.Identifier &&
+                token.Text.StartsWith('a'),
+            token => token.WithAttribute("mathvariant", "italic"));
+        int removed = formula.RemoveAll(
+            token => token.Kind == OdfMathTokenKind.Identifier && token.Text == "beta");
+
+        Assert.Equal(1, replaced);
+        Assert.Equal(1, removed);
+        OdfMathToken rewritten = Assert.Single(formula.GetMathTokens());
+        OdfMathToken alpha = rewritten.GetAll(token => token.Text == "alpha").Single();
+        Assert.Equal("italic", alpha.Attributes?["mathvariant"]);
+        Assert.Empty(rewritten.GetAll(token => token.Text == "beta"));
+        Assert.Contains(rewritten.Children!, token =>
+            token.Kind == OdfMathTokenKind.Row &&
+            token.Children!.Count == 1 &&
+            token.Children[0].Kind == OdfMathTokenKind.Text &&
+            token.Children[0].Text.Length == 0);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        Assert.NotEmpty(stream.ToArray());
     }
 }

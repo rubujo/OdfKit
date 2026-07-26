@@ -31,20 +31,20 @@ public class DatabaseSchemaAndFormTests
 
         // 1. 建立 Customers 表格
         var customersTable = new OdfSchemaTable("Customers");
-        customersTable.Columns.Add(new OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
-        customersTable.Columns.Add(new OdfSchemaColumn("Name", "VARCHAR", isNullable: true));
-        customersTable.PrimaryKey = new OdfSchemaPrimaryKey("PK_Customers", ["Id"]);
+        customersTable.AddColumn(new OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
+        customersTable.AddColumn(new OdfSchemaColumn("Name", "VARCHAR", isNullable: true));
+        customersTable.SetPrimaryKey(new OdfSchemaPrimaryKey("PK_Customers", ["Id"]));
         schema.AddTable(customersTable);
 
         // 2. 建立 Orders 表格，並設定外鍵關聯到 Customers
         var ordersTable = new OdfSchemaTable("Orders");
-        ordersTable.Columns.Add(new OdfSchemaColumn("OrderId", "INTEGER", isNullable: false));
-        ordersTable.Columns.Add(new OdfSchemaColumn("CustomerId", "INTEGER", isNullable: false));
-        ordersTable.Columns.Add(new OdfSchemaColumn("Amount", "DECIMAL", isNullable: true));
-        ordersTable.PrimaryKey = new OdfSchemaPrimaryKey("PK_Orders", ["OrderId"]);
+        ordersTable.AddColumn(new OdfSchemaColumn("OrderId", "INTEGER", isNullable: false));
+        ordersTable.AddColumn(new OdfSchemaColumn("CustomerId", "INTEGER", isNullable: false));
+        ordersTable.AddColumn(new OdfSchemaColumn("Amount", "DECIMAL", isNullable: true));
+        ordersTable.SetPrimaryKey(new OdfSchemaPrimaryKey("PK_Orders", ["OrderId"]));
 
         var fkMapping = new OdfSchemaKeyMapping("CustomerId", "Id");
-        ordersTable.ForeignKeys.Add(new OdfSchemaForeignKey(
+        ordersTable.AddForeignKey(new OdfSchemaForeignKey(
             "FK_Orders_Customers",
             "Customers",
             [fkMapping],
@@ -91,6 +91,47 @@ public class DatabaseSchemaAndFormTests
         var map = Assert.Single(loadedFk.KeyColumns);
         Assert.Equal("CustomerId", map.Column);
         Assert.Equal("Id", map.RelatedColumn);
+    }
+
+    /// <summary>
+    /// 驗證 Schema table 只透過受控方法修改欄位、主鍵、外鍵與索引。
+    /// </summary>
+    [Fact]
+    public void SchemaTable_ControlledEditors_RejectDirectCollectionMutation()
+    {
+        var table = new OdfSchemaTable("Orders");
+        var id = new OdfSchemaColumn("Id", "INTEGER");
+        table.AddColumn(id);
+        table.SetPrimaryKey(new OdfSchemaPrimaryKey("PK_Orders", ["Id"]));
+        table.AddForeignKey(new OdfSchemaForeignKey(
+            "FK_Orders_Customers",
+            "Customers",
+            [new OdfSchemaKeyMapping("CustomerId", "Id")]));
+        table.AddIndex(new OdfSchemaIndex("IX_Orders_Id", true, ["Id"]));
+
+        Assert.Same(id, table.FindColumn("id"));
+        Assert.NotNull(table.FindIndex("ix_orders_id"));
+        Assert.Throws<InvalidOperationException>(() => table.AddColumn(new OdfSchemaColumn("ID")));
+        Assert.Throws<InvalidOperationException>(() =>
+            table.AddIndex(new OdfSchemaIndex("ix_orders_id", false, ["Id"])));
+        Assert.Throws<InvalidOperationException>(() =>
+            table.AddForeignKey(new OdfSchemaForeignKey(
+                "fk_orders_customers",
+                "Customers",
+                [new OdfSchemaKeyMapping("CustomerId", "Id")])));
+        Assert.Throws<NotSupportedException>(() =>
+            ((System.Collections.Generic.IList<OdfSchemaColumn>)table.Columns)
+                .Add(new OdfSchemaColumn("Unsafe")));
+
+        Assert.True(table.RemoveColumn("Id"));
+        Assert.True(table.RemoveIndex("IX_Orders_Id"));
+        Assert.True(table.RemoveForeignKey("FK_Orders_Customers"));
+        table.SetPrimaryKey(null);
+
+        Assert.Empty(table.Columns);
+        Assert.Empty(table.Indexes);
+        Assert.Empty(table.ForeignKeys);
+        Assert.Null(table.PrimaryKey);
     }
 
     /// <summary>

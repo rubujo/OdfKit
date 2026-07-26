@@ -182,7 +182,7 @@ public partial class OdfFormulaDocument
 
             OdfMathToken rewrittenRoot = root.ReplaceFirst(
                 token => ReferenceEquals(token, target),
-                _ => OdfMathToken.Row());
+                _ => CreateEmptyRow());
             var rewrittenTokens = new OdfMathToken[tokens.Count];
             for (int tokenIndex = 0; tokenIndex < tokens.Count; tokenIndex++)
             {
@@ -215,14 +215,48 @@ public partial class OdfFormulaDocument
             throw new ArgumentNullException(nameof(replacement));
         }
 
+        return ReplaceAll(token => token.Kind == kind, _ => replacement);
+    }
+
+    /// <summary>
+    /// Replaces every token matching the specified predicate in the current formula tree.
+    /// 替換目前公式樹中所有符合指定條件的 token。
+    /// </summary>
+    /// <param name="predicate">The delegate that selects replacement targets. / 選取替換目標的委派。</param>
+    /// <param name="replacementFactory">The delegate that creates a replacement from each matched token. / 根據每個命中 token 建立替換 token 的委派。</param>
+    /// <returns>The number of replaced tokens. / 已替換的 token 數量。</returns>
+    /// <remarks>
+    /// Matching is evaluated against the original tree; newly inserted replacement subtrees are not searched again.
+    /// 比對以原始樹為準；不會再次搜尋新插入的替換子樹。
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> or <paramref name="replacementFactory"/> is <see langword="null"/>, or the factory returns <see langword="null"/>. / 當 <paramref name="predicate"/> 或 <paramref name="replacementFactory"/> 為 <see langword="null"/>，或 factory 回傳 <see langword="null"/> 時擲出。</exception>
+    public int ReplaceAll(
+        Func<OdfMathToken, bool> predicate,
+        Func<OdfMathToken, OdfMathToken> replacementFactory)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        if (replacementFactory is null)
+        {
+            throw new ArgumentNullException(nameof(replacementFactory));
+        }
+
         IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
         int replacedCount = 0;
         var rewritten = new OdfMathToken[tokens.Count];
         for (int index = 0; index < tokens.Count; index++)
         {
             OdfMathToken token = tokens[index];
-            replacedCount += token.GetAll(kind).Count();
-            rewritten[index] = token.ReplaceAll(kind, replacement);
+            rewritten[index] = token.ReplaceAll(
+                predicate,
+                matched =>
+                {
+                    replacedCount++;
+                    return replacementFactory(matched);
+                });
         }
 
         if (replacedCount > 0)
@@ -245,22 +279,47 @@ public partial class OdfFormulaDocument
     /// </remarks>
     public int RemoveAll(OdfMathTokenKind kind)
     {
+        return RemoveAll(token => token.Kind == kind);
+    }
+
+    /// <summary>
+    /// Removes every token matching the specified predicate from the current formula tree.
+    /// 從目前公式樹移除所有符合指定條件的 token。
+    /// </summary>
+    /// <param name="predicate">The delegate that selects removal targets. / 選取移除目標的委派。</param>
+    /// <returns>The number of matched tokens removed from the original tree. / 從原始樹移除的符合 token 數量。</returns>
+    /// <remarks>
+    /// Required children of composite MathML constructs are replaced with empty rows so their containers remain structurally valid.
+    /// MathML 複合結構的必要子節點會替換為空白 row，使其容器維持結構有效。
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> is <see langword="null"/>. / 當 <paramref name="predicate"/> 為 <see langword="null"/> 時擲出。</exception>
+    public int RemoveAll(Func<OdfMathToken, bool> predicate)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
         IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
         int removedCount = 0;
         List<OdfMathToken> rewritten = [];
         foreach (OdfMathToken token in tokens)
         {
-            if (token.Kind == kind)
+            List<OdfMathToken> matches = token.GetAll(predicate).ToList();
+            if (matches.Count == 0)
             {
-                removedCount += token.GetAll(kind).Count();
+                rewritten.Add(token);
                 continue;
             }
 
-            int nestedCount = token.GetAll(kind).Count();
-            removedCount += nestedCount;
-            rewritten.Add(nestedCount == 0
-                ? token
-                : token.ReplaceAll(kind, OdfMathToken.Row()));
+            removedCount += matches.Count;
+            if (ReferenceEquals(matches[0], token))
+            {
+                continue;
+            }
+
+            var targets = new HashSet<OdfMathToken>(matches);
+            rewritten.Add(token.ReplaceAll(targets.Contains, _ => CreateEmptyRow()));
         }
 
         if (removedCount == 0)
@@ -279,6 +338,9 @@ public partial class OdfFormulaDocument
 
         return removedCount;
     }
+
+    private static OdfMathToken CreateEmptyRow() =>
+        OdfMathToken.Row(OdfMathToken.TextToken(string.Empty));
 
     /// <summary>
     /// Clears all presentation tokens while retaining a valid MathML row.

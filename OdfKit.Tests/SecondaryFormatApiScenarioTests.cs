@@ -197,7 +197,7 @@ public class SecondaryFormatApiScenarioTests
             OdfLength.FromCentimeters(4),
             "更新附圖"));
 
-        OdfImageFrameInfo? secondaryFrame = loaded.TryGetImageFrame("SecondaryFrame");
+        OdfImageFrameInfo? secondaryFrame = loaded.FindImageFrame("SecondaryFrame");
         Assert.NotNull(secondaryFrame);
         Assert.Equal("更新附圖", secondaryFrame!.Title);
         Assert.True(secondaryFrame.TryGetX(out OdfLength x));

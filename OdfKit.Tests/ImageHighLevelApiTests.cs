@@ -109,7 +109,7 @@ public class ImageHighLevelApiTests
             "更新附圖",
             "已調整版面。"));
 
-        OdfImageFrameInfo? updated = image.TryGetImageFrame("SecondaryFrame");
+        OdfImageFrameInfo? updated = image.FindImageFrame("SecondaryFrame");
         Assert.NotNull(updated);
         Assert.Equal("更新附圖", updated!.Title);
         Assert.Equal("已調整版面。", updated.Description);
@@ -124,7 +124,7 @@ public class ImageHighLevelApiTests
 
         Assert.True(image.RemoveImageFrame("SecondaryFrame"));
         Assert.Single(image.GetImageFrames());
-        Assert.Null(image.TryGetImageFrame("SecondaryFrame"));
+        Assert.Null(image.FindImageFrame("SecondaryFrame"));
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public class ImageHighLevelApiTests
         updatedStream.Position = 0;
 
         using var reloaded = ImageDocument.Load(updatedStream, "gallery.odi");
-        OdfImageFrameInfo? frame = reloaded.TryGetImageFrame("SecondaryFrame");
+        OdfImageFrameInfo? frame = reloaded.FindImageFrame("SecondaryFrame");
         Assert.NotNull(frame);
         Assert.Equal("更新附圖", frame!.Title);
         Assert.True(frame.TryGetX(out OdfLength x));
@@ -369,5 +369,43 @@ public class ImageHighLevelApiTests
         Assert.Equal(replacement.Length, reloaded.Size);
         Assert.Equal("主要照片", reloaded.Title);
         Assert.Equal(replacement, loaded.GetImageBytes());
+    }
+
+    /// <summary>
+    /// 驗證具名框架可批次替換影像內容，並回報不存在的框架。
+    /// </summary>
+    [Fact]
+    public void ReplaceImageFrameContents_UpdatesFoundFramesAndReportsMissingNames()
+    {
+        using var image = ImageDocument.Create();
+        image.SetImageLayout(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(4),
+            "PrimaryFrame",
+            "主要照片",
+            "保留描述。");
+        image.SetImage(CreatePngBytes(), "Primary.png");
+
+        OdfImageBatchUpdateResult result = image.ReplaceImageFrameContents(
+        [
+            new OdfImageContentUpdate(
+                "PrimaryFrame",
+                CreateAlternatePngBytes(),
+                "Replacement.png"),
+            new OdfImageContentUpdate(
+                "MissingFrame",
+                CreatePngBytes(),
+                null),
+        ]);
+
+        Assert.Equal(1, result.UpdatedCount);
+        Assert.Equal(["MissingFrame"], result.MissingNames);
+        OdfImageFrameInfo? frame = image.FindImageFrame("PrimaryFrame");
+        Assert.NotNull(frame);
+        Assert.Equal("主要照片", frame!.Title);
+        Assert.Equal("保留描述。", frame.Description);
+        Assert.Equal(CreateAlternatePngBytes().Length, frame.Size);
     }
 }

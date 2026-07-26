@@ -70,6 +70,7 @@ rg -n "public .* Find[A-Z]|public .* Find\(" OdfKit\<domain> -g "*.cs"
 | Chart document optional lookups | `FindSeriesDataLabels`、`FindAxisInfo`、`FindAxisTitle` |
 | Presentation page layout lookup | `FindPresentationPageLayout` |
 | Image frame filter lookup | `FindImageFilter` |
+| Image frame summary lookup | `FindImageFrame` |
 | Package entry encryption lookup | `FindEntryEncryptionInfo` |
 | Custom metadata property lookup | `FindCustomProperty` |
 
@@ -86,8 +87,12 @@ rg -n "public .* Find[A-Z]|public .* Find\(" OdfKit\<domain> -g "*.cs"
 No bilingual XML documentation issues found.
 ```
 
-## 下一批建議
+## 收尾後維護原則
 
 - 剩餘 nullable `Get*` 目前歸類為低階 DOM / 型別化屬性 accessor、無 key 的目前狀態 getter、集合快照或必要讀取，不列入本輪 `Find*` rename。
 - `Clear*` 維持 no-op 命令語意；指定項目移除已由 `Remove*` 統一回傳 `bool`。
-- Database / Image 暫列領域特定 builder 例外；未來若出現高重複 fluent 建立工作流程，再另案補 builder。
+- Database / Image 維持領域特定 builder 例外；只有出現高重複且已有真實使用案例的 fluent
+  建立工作流程時才另案補 builder。
+- ODB schema collection 已改為唯讀快照並由具名 editor 修改；Chart series snapshot、
+  Formula predicate rewrite 與 ODI image-content batch 已完成。後續不再進行無案例驅動的
+  API「加厚」。

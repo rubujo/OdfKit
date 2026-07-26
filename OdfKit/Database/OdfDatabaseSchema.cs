@@ -143,7 +143,7 @@ public sealed class OdfDatabaseSchema
                             var defaultValue = colChild.GetAttribute("default-value", DatabaseNamespace);
                             var checkConstraint = colChild.GetAttribute("check-constraint", DatabaseNamespace);
 
-                            table.Columns.Add(new OdfSchemaColumn(colName, typeName, isNullable, isAutoInc)
+                            table.AddColumn(new OdfSchemaColumn(colName, typeName, isNullable, isAutoInc)
                             {
                                 IsUnique = isUnique,
                                 DefaultValue = string.IsNullOrEmpty(defaultValue) ? null : defaultValue,
@@ -185,9 +185,9 @@ public sealed class OdfDatabaseSchema
 
                             if (string.Equals(keyType, "primary", StringComparison.OrdinalIgnoreCase))
                             {
-                                table.PrimaryKey = new OdfSchemaPrimaryKey(
+                                table.SetPrimaryKey(new OdfSchemaPrimaryKey(
                                     keyName,
-                                    keyCols.Select(c => c.Column).ToList());
+                                    keyCols.Select(c => c.Column).ToList()));
                             }
                             else if (string.Equals(keyType, "foreign", StringComparison.OrdinalIgnoreCase))
                             {
@@ -195,7 +195,7 @@ public sealed class OdfDatabaseSchema
                                 var updateRule = keyChild.GetAttribute("update-rule", DatabaseNamespace);
                                 var deleteRule = keyChild.GetAttribute("delete-rule", DatabaseNamespace);
 
-                                table.ForeignKeys.Add(new OdfSchemaForeignKey(
+                                table.AddForeignKey(new OdfSchemaForeignKey(
                                     keyName,
                                     refTable,
                                     keyCols,
@@ -244,7 +244,7 @@ public sealed class OdfDatabaseSchema
                                 }
                             }
 
-                            table.Indexes.Add(new OdfSchemaIndex(indexName, isUniqueIndex, indexColumns));
+                            table.AddIndex(new OdfSchemaIndex(indexName, isUniqueIndex, indexColumns));
                         }
                     }
                 }
@@ -463,6 +463,10 @@ public sealed class OdfDatabaseSchema
 /// </summary>
 public sealed class OdfSchemaTable
 {
+    private readonly List<OdfSchemaColumn> _columns = [];
+    private readonly List<OdfSchemaForeignKey> _foreignKeys = [];
+    private readonly List<OdfSchemaIndex> _indexes = [];
+
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfSchemaTable"/> class.
     /// 初始化 <see cref="OdfSchemaTable"/> 類別的新執行個體。
@@ -488,25 +492,192 @@ public sealed class OdfSchemaTable
     /// Gets the list of table columns.
     /// 取得資料表欄位清單。
     /// </summary>
-    public List<OdfSchemaColumn> Columns { get; } = [];
+    public IReadOnlyList<OdfSchemaColumn> Columns => _columns.AsReadOnly();
 
     /// <summary>
-    /// Gets or sets the primary key definition of the table.
-    /// 取得或設定資料表的主鍵定義。
+    /// Gets the primary key definition of the table.
+    /// 取得資料表的主鍵定義。
     /// </summary>
-    public OdfSchemaPrimaryKey? PrimaryKey { get; set; }
+    public OdfSchemaPrimaryKey? PrimaryKey { get; private set; }
 
     /// <summary>
     /// Gets the list of foreign key relationship definitions of the table.
     /// 取得資料表的外鍵關聯定義清單。
     /// </summary>
-    public List<OdfSchemaForeignKey> ForeignKeys { get; } = [];
+    public IReadOnlyList<OdfSchemaForeignKey> ForeignKeys => _foreignKeys.AsReadOnly();
 
     /// <summary>
     /// Gets the list of index definitions of the table.
     /// 取得資料表的索引定義清單。
     /// </summary>
-    public List<OdfSchemaIndex> Indexes { get; } = [];
+    public IReadOnlyList<OdfSchemaIndex> Indexes => _indexes.AsReadOnly();
+
+    /// <summary>
+    /// Finds a column definition by name.
+    /// 依名稱尋找欄位定義。
+    /// </summary>
+    /// <param name="name">The column name. / 欄位名稱。</param>
+    /// <returns>The matching column, or <see langword="null"/> when it does not exist. / 符合的欄位；不存在時為 <see langword="null"/>。</returns>
+    /// <exception cref="ArgumentException">When <paramref name="name"/> is blank. / 當 <paramref name="name"/> 為空白時擲出。</exception>
+    public OdfSchemaColumn? FindColumn(string name)
+    {
+        ValidateName(name, nameof(name), "Err_OdfDatabaseSchema_FieldCannotBeEmpty");
+        return _columns.FirstOrDefault(column =>
+            string.Equals(column.Name, name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Adds a column definition.
+    /// 新增欄位定義。
+    /// </summary>
+    /// <param name="column">The column definition. / 欄位定義。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="column"/> is <see langword="null"/>. / 當 <paramref name="column"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">When a column with the same name already exists. / 當同名欄位已存在時擲出。</exception>
+    public void AddColumn(OdfSchemaColumn column)
+    {
+        if (column is null)
+        {
+            throw new ArgumentNullException(nameof(column));
+        }
+
+        if (_columns.Any(existing =>
+            string.Equals(existing.Name, column.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", column.Name));
+        }
+
+        _columns.Add(column);
+    }
+
+    /// <summary>
+    /// Removes a column definition by name.
+    /// 依名稱移除欄位定義。
+    /// </summary>
+    /// <param name="name">The column name. / 欄位名稱。</param>
+    /// <returns><see langword="true"/> if the column was removed; otherwise <see langword="false"/>. / 若已移除欄位則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveColumn(string name)
+    {
+        OdfSchemaColumn? column = FindColumn(name);
+        return column is not null && _columns.Remove(column);
+    }
+
+    /// <summary>
+    /// Sets or clears the primary key definition.
+    /// 設定或清除主鍵定義。
+    /// </summary>
+    /// <param name="primaryKey">The primary key definition, or <see langword="null"/> to clear it. / 主鍵定義；傳入 <see langword="null"/> 表示清除。</param>
+    public void SetPrimaryKey(OdfSchemaPrimaryKey? primaryKey)
+    {
+        PrimaryKey = primaryKey;
+    }
+
+    /// <summary>
+    /// Adds a foreign key definition.
+    /// 新增外鍵定義。
+    /// </summary>
+    /// <param name="foreignKey">The foreign key definition. / 外鍵定義。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="foreignKey"/> is <see langword="null"/>. / 當 <paramref name="foreignKey"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">When a named foreign key with the same name already exists. / 當同名具名外鍵已存在時擲出。</exception>
+    public void AddForeignKey(OdfSchemaForeignKey foreignKey)
+    {
+        if (foreignKey is null)
+        {
+            throw new ArgumentNullException(nameof(foreignKey));
+        }
+
+        if (!string.IsNullOrWhiteSpace(foreignKey.Name) &&
+            _foreignKeys.Any(existing =>
+                string.Equals(existing.Name, foreignKey.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", foreignKey.Name!));
+        }
+
+        _foreignKeys.Add(foreignKey);
+    }
+
+    /// <summary>
+    /// Removes a named foreign key definition.
+    /// 移除具名外鍵定義。
+    /// </summary>
+    /// <param name="name">The foreign key name. / 外鍵名稱。</param>
+    /// <returns><see langword="true"/> if the foreign key was removed; otherwise <see langword="false"/>. / 若已移除外鍵則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveForeignKey(string name)
+    {
+        ValidateName(name, nameof(name), "Err_OdfDatabaseSchema_NameCannotBeEmpty");
+        OdfSchemaForeignKey? foreignKey = _foreignKeys.FirstOrDefault(existing =>
+            string.Equals(existing.Name, name, StringComparison.OrdinalIgnoreCase));
+        return foreignKey is not null && _foreignKeys.Remove(foreignKey);
+    }
+
+    /// <summary>
+    /// Removes a foreign key definition at the specified index, including unnamed definitions.
+    /// 移除指定索引的外鍵定義，包括未具名的定義。
+    /// </summary>
+    /// <param name="index">The zero-based foreign key index. / 外鍵索引（從 0 起算）。</param>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="index"/> is outside the collection. / 當 <paramref name="index"/> 超出集合範圍時擲出。</exception>
+    public void RemoveForeignKeyAt(int index)
+    {
+        _foreignKeys.RemoveAt(index);
+    }
+
+    /// <summary>
+    /// Finds an index definition by name.
+    /// 依名稱尋找索引定義。
+    /// </summary>
+    /// <param name="name">The index name. / 索引名稱。</param>
+    /// <returns>The matching index, or <see langword="null"/> when it does not exist. / 符合的索引；不存在時為 <see langword="null"/>。</returns>
+    public OdfSchemaIndex? FindIndex(string name)
+    {
+        ValidateName(name, nameof(name), "Err_OdfDatabaseSchema_IndexCannotBeEmpty");
+        return _indexes.FirstOrDefault(index =>
+            string.Equals(index.Name, name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Adds an index definition.
+    /// 新增索引定義。
+    /// </summary>
+    /// <param name="index">The index definition. / 索引定義。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="index"/> is <see langword="null"/>. / 當 <paramref name="index"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">When an index with the same name already exists. / 當同名索引已存在時擲出。</exception>
+    public void AddIndex(OdfSchemaIndex index)
+    {
+        if (index is null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+
+        if (_indexes.Any(existing =>
+            string.Equals(existing.Name, index.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", index.Name));
+        }
+
+        _indexes.Add(index);
+    }
+
+    /// <summary>
+    /// Removes an index definition by name.
+    /// 依名稱移除索引定義。
+    /// </summary>
+    /// <param name="name">The index name. / 索引名稱。</param>
+    /// <returns><see langword="true"/> if the index was removed; otherwise <see langword="false"/>. / 若已移除索引則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveIndex(string name)
+    {
+        OdfSchemaIndex? index = FindIndex(name);
+        return index is not null && _indexes.Remove(index);
+    }
+
+    private static void ValidateName(string name, string parameterName, string messageKey)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage(messageKey), parameterName);
+        }
+    }
 }
 
 /// <summary>
@@ -622,7 +793,7 @@ public sealed class OdfSchemaIndex
 
         Name = name;
         IsUnique = isUnique;
-        Columns = columns?.ToList() ?? throw new ArgumentNullException(nameof(columns));
+        Columns = columns?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(columns));
     }
 
     /// <summary>
@@ -641,7 +812,7 @@ public sealed class OdfSchemaIndex
     /// Gets the list of column names included in the index.
     /// 取得索引所包含的欄位名稱清單。
     /// </summary>
-    public List<string> Columns { get; }
+    public IReadOnlyList<string> Columns { get; }
 }
 
 /// <summary>
@@ -660,7 +831,7 @@ public sealed class OdfSchemaPrimaryKey
     public OdfSchemaPrimaryKey(string? name, IEnumerable<string> columns)
     {
         Name = name;
-        Columns = columns?.ToList() ?? throw new ArgumentNullException(nameof(columns));
+        Columns = columns?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(columns));
     }
 
     /// <summary>
@@ -673,7 +844,7 @@ public sealed class OdfSchemaPrimaryKey
     /// Gets the list of column names included in the primary key.
     /// 取得主鍵所包含的欄位名稱清單。
     /// </summary>
-    public List<string> Columns { get; }
+    public IReadOnlyList<string> Columns { get; }
 }
 
 /// <summary>
@@ -714,7 +885,7 @@ public sealed class OdfSchemaForeignKey
 
         Name = name;
         ReferencedTable = referencedTable;
-        KeyColumns = keyColumns?.ToList() ?? throw new ArgumentNullException(nameof(keyColumns));
+        KeyColumns = keyColumns?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(keyColumns));
         UpdateRule = updateRule;
         DeleteRule = deleteRule;
     }
@@ -736,7 +907,7 @@ public sealed class OdfSchemaForeignKey
     /// Gets the list of foreign-key-to-primary-key column mappings.
     /// 取得外鍵與主鍵欄位的對應清單。
     /// </summary>
-    public List<OdfSchemaKeyMapping> KeyColumns { get; }
+    public IReadOnlyList<OdfSchemaKeyMapping> KeyColumns { get; }
 
     /// <summary>
     /// Gets the update rule.

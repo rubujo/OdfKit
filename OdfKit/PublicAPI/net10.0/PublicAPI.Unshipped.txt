@@ -186,6 +186,8 @@ OdfKit.Chart.OdfChartDocument.AddSeries(string! valuesCellRangeAddress) -> OdfKi
 OdfKit.Chart.OdfChartDocument.AddSeries(string! valuesCellRangeAddress, string? labelCellAddress) -> OdfKit.DOM.OdfNode!
 OdfKit.Chart.OdfChartDocument.Apply3DOptions(OdfKit.Chart.OdfChart3DOptions! options) -> void
 OdfKit.Chart.OdfChartDocument.ApplyDefinition(OdfKit.Spreadsheet.OdfChartDefinition! definition) -> void
+OdfKit.Chart.OdfChartDocument.ApplySeriesSnapshot(int index, OdfKit.Chart.OdfChartSeriesInfo! snapshot) -> bool
+OdfKit.Chart.OdfChartDocument.ApplySeriesSnapshots(System.Collections.Generic.IEnumerable<OdfKit.Chart.OdfChartSeriesUpdate!>! updates) -> OdfKit.OdfBatchUpdateResult!
 OdfKit.Chart.OdfChartDocument.ApplyStockMarkerStyle(OdfKit.Chart.OdfStockMarkerStyle! style) -> void
 OdfKit.Chart.OdfChartDocument.CategoriesCellRangeAddress.get -> string?
 OdfKit.Chart.OdfChartDocument.CategoriesCellRangeAddress.set -> void
@@ -370,6 +372,10 @@ OdfKit.Chart.OdfChartSeriesInfo.OdfChartSeriesInfo(string? valuesCellRangeAddres
 OdfKit.Chart.OdfChartSeriesInfo.SeriesClass.get -> string?
 OdfKit.Chart.OdfChartSeriesInfo.StyleName.get -> string?
 OdfKit.Chart.OdfChartSeriesInfo.ValuesCellRangeAddress.get -> string?
+OdfKit.Chart.OdfChartSeriesUpdate
+OdfKit.Chart.OdfChartSeriesUpdate.Index.get -> int
+OdfKit.Chart.OdfChartSeriesUpdate.OdfChartSeriesUpdate(int index, OdfKit.Chart.OdfChartSeriesInfo! snapshot) -> void
+OdfKit.Chart.OdfChartSeriesUpdate.Snapshot.get -> OdfKit.Chart.OdfChartSeriesInfo!
 OdfKit.Chart.OdfChartStyle
 OdfKit.Chart.OdfChartStyle.AngleOffset.get -> int?
 OdfKit.Chart.OdfChartStyle.AngleOffset.set -> void
@@ -1443,8 +1449,10 @@ OdfKit.Database.OdfDatabaseDocument.SetQueryUpdateTable(string! queryName, strin
 OdfKit.Database.OdfDatabaseDocument.Tables.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfDatabaseTableInfo!>!
 OdfKit.Database.OdfDatabaseDocument.UpdateDataSourceSetting(OdfKit.Database.OdfDatabaseDataSourceSettingInfo! setting) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateForm(OdfKit.Database.OdfDatabaseFormInfo! form) -> bool
+OdfKit.Database.OdfDatabaseDocument.UpdateQuery(OdfKit.Database.OdfDatabaseQueryInfo! query) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateQuery(string! name, string! command) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateReport(OdfKit.Database.OdfDatabaseReportInfo! report) -> bool
+OdfKit.Database.OdfDatabaseDocument.UpdateTable(OdfKit.Database.OdfDatabaseTableInfo! table) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateTable(string! name, string? command) -> bool
 OdfKit.Database.OdfDatabaseDriverSettingsInfo
 OdfKit.Database.OdfDatabaseDriverSettingsInfo.BaseDn.get -> string?
@@ -1611,7 +1619,7 @@ OdfKit.Database.OdfSchemaColumn.TypeName.get -> string!
 OdfKit.Database.OdfSchemaColumn.TypeName.set -> void
 OdfKit.Database.OdfSchemaForeignKey
 OdfKit.Database.OdfSchemaForeignKey.DeleteRule.get -> string?
-OdfKit.Database.OdfSchemaForeignKey.KeyColumns.get -> System.Collections.Generic.List<OdfKit.Database.OdfSchemaKeyMapping!>!
+OdfKit.Database.OdfSchemaForeignKey.KeyColumns.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfSchemaKeyMapping!>!
 OdfKit.Database.OdfSchemaForeignKey.Name.get -> string?
 OdfKit.Database.OdfSchemaForeignKey.OdfSchemaForeignKey(string? name, string! referencedTable, System.Collections.Generic.IEnumerable<OdfKit.Database.OdfSchemaKeyMapping!>! keyColumns) -> void
 OdfKit.Database.OdfSchemaForeignKey.OdfSchemaForeignKey(string? name, string! referencedTable, System.Collections.Generic.IEnumerable<OdfKit.Database.OdfSchemaKeyMapping!>! keyColumns, string? updateRule) -> void
@@ -1619,7 +1627,7 @@ OdfKit.Database.OdfSchemaForeignKey.OdfSchemaForeignKey(string? name, string! re
 OdfKit.Database.OdfSchemaForeignKey.ReferencedTable.get -> string!
 OdfKit.Database.OdfSchemaForeignKey.UpdateRule.get -> string?
 OdfKit.Database.OdfSchemaIndex
-OdfKit.Database.OdfSchemaIndex.Columns.get -> System.Collections.Generic.List<string!>!
+OdfKit.Database.OdfSchemaIndex.Columns.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Database.OdfSchemaIndex.IsUnique.get -> bool
 OdfKit.Database.OdfSchemaIndex.IsUnique.set -> void
 OdfKit.Database.OdfSchemaIndex.Name.get -> string!
@@ -1629,17 +1637,26 @@ OdfKit.Database.OdfSchemaKeyMapping.Column.get -> string!
 OdfKit.Database.OdfSchemaKeyMapping.OdfSchemaKeyMapping(string! column, string! relatedColumn) -> void
 OdfKit.Database.OdfSchemaKeyMapping.RelatedColumn.get -> string!
 OdfKit.Database.OdfSchemaPrimaryKey
-OdfKit.Database.OdfSchemaPrimaryKey.Columns.get -> System.Collections.Generic.List<string!>!
+OdfKit.Database.OdfSchemaPrimaryKey.Columns.get -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Database.OdfSchemaPrimaryKey.Name.get -> string?
 OdfKit.Database.OdfSchemaPrimaryKey.OdfSchemaPrimaryKey(string? name, System.Collections.Generic.IEnumerable<string!>! columns) -> void
 OdfKit.Database.OdfSchemaTable
-OdfKit.Database.OdfSchemaTable.Columns.get -> System.Collections.Generic.List<OdfKit.Database.OdfSchemaColumn!>!
-OdfKit.Database.OdfSchemaTable.ForeignKeys.get -> System.Collections.Generic.List<OdfKit.Database.OdfSchemaForeignKey!>!
-OdfKit.Database.OdfSchemaTable.Indexes.get -> System.Collections.Generic.List<OdfKit.Database.OdfSchemaIndex!>!
+OdfKit.Database.OdfSchemaTable.AddColumn(OdfKit.Database.OdfSchemaColumn! column) -> void
+OdfKit.Database.OdfSchemaTable.AddForeignKey(OdfKit.Database.OdfSchemaForeignKey! foreignKey) -> void
+OdfKit.Database.OdfSchemaTable.AddIndex(OdfKit.Database.OdfSchemaIndex! index) -> void
+OdfKit.Database.OdfSchemaTable.Columns.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfSchemaColumn!>!
+OdfKit.Database.OdfSchemaTable.FindColumn(string! name) -> OdfKit.Database.OdfSchemaColumn?
+OdfKit.Database.OdfSchemaTable.FindIndex(string! name) -> OdfKit.Database.OdfSchemaIndex?
+OdfKit.Database.OdfSchemaTable.ForeignKeys.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfSchemaForeignKey!>!
+OdfKit.Database.OdfSchemaTable.Indexes.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfSchemaIndex!>!
 OdfKit.Database.OdfSchemaTable.Name.get -> string!
 OdfKit.Database.OdfSchemaTable.OdfSchemaTable(string! name) -> void
 OdfKit.Database.OdfSchemaTable.PrimaryKey.get -> OdfKit.Database.OdfSchemaPrimaryKey?
-OdfKit.Database.OdfSchemaTable.PrimaryKey.set -> void
+OdfKit.Database.OdfSchemaTable.RemoveColumn(string! name) -> bool
+OdfKit.Database.OdfSchemaTable.RemoveForeignKey(string! name) -> bool
+OdfKit.Database.OdfSchemaTable.RemoveForeignKeyAt(int index) -> void
+OdfKit.Database.OdfSchemaTable.RemoveIndex(string! name) -> bool
+OdfKit.Database.OdfSchemaTable.SetPrimaryKey(OdfKit.Database.OdfSchemaPrimaryKey? primaryKey) -> void
 OdfKit.DOM.AnimationAnimateColorElement
 OdfKit.DOM.AnimationAnimateColorElement.Accelerate.get -> decimal?
 OdfKit.DOM.AnimationAnimateColorElement.Accelerate.set -> void
@@ -14748,8 +14765,10 @@ OdfKit.Formula.OdfFormulaDocument.MathTokens.get -> System.Collections.Generic.I
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
 OdfKit.Formula.OdfFormulaDocument.RemoveAll(OdfKit.Formula.OdfMathTokenKind kind) -> int
+OdfKit.Formula.OdfFormulaDocument.RemoveAll(System.Func<OdfKit.Formula.OdfMathToken!, bool>! predicate) -> int
 OdfKit.Formula.OdfFormulaDocument.RemoveFirst(OdfKit.Formula.OdfMathTokenKind kind) -> bool
 OdfKit.Formula.OdfFormulaDocument.ReplaceAll(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> int
+OdfKit.Formula.OdfFormulaDocument.ReplaceAll(System.Func<OdfKit.Formula.OdfMathToken!, bool>! predicate, System.Func<OdfKit.Formula.OdfMathToken!, OdfKit.Formula.OdfMathToken!>! replacementFactory) -> int
 OdfKit.Formula.OdfFormulaDocument.ReplaceFirst(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> bool
 OdfKit.Formula.OdfFormulaDocument.SetAnnotation(string! encoding, string? content) -> void
 OdfKit.Formula.OdfFormulaDocument.SetIdentifierEquation(string! leftIdentifier, string! rightIdentifier) -> OdfKit.DOM.OdfNode!
@@ -14815,10 +14834,12 @@ OdfKit.Formula.OdfMathToken.AddRow(OdfKit.Formula.OdfMathToken! row) -> OdfKit.F
 OdfKit.Formula.OdfMathToken.Attributes.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
 OdfKit.Formula.OdfMathToken.Base.get -> OdfKit.Formula.OdfMathToken?
 OdfKit.Formula.OdfMathToken.Children.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfMathToken!>?
+OdfKit.Formula.OdfMathToken.ClearAttributes() -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.Denominator.get -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.Exponent.get -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.FindFirst(OdfKit.Formula.OdfMathTokenKind kind) -> OdfKit.Formula.OdfMathToken?
 OdfKit.Formula.OdfMathToken.GetAll(OdfKit.Formula.OdfMathTokenKind kind) -> System.Collections.Generic.IEnumerable<OdfKit.Formula.OdfMathToken!>!
+OdfKit.Formula.OdfMathToken.GetAll(System.Func<OdfKit.Formula.OdfMathToken!, bool>! predicate) -> System.Collections.Generic.IEnumerable<OdfKit.Formula.OdfMathToken!>!
 OdfKit.Formula.OdfMathToken.GetCell(int rowIndex, int columnIndex) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.GetRow(int rowIndex) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.Kind.get -> OdfKit.Formula.OdfMathTokenKind
@@ -14840,6 +14861,7 @@ OdfKit.Formula.OdfMathToken.WithChild(int index, OdfKit.Formula.OdfMathToken! re
 OdfKit.Formula.OdfMathToken.WithDenominator(OdfKit.Formula.OdfMathToken! denominator) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.WithExponent(OdfKit.Formula.OdfMathToken! exponent) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.WithNumerator(OdfKit.Formula.OdfMathToken! numerator) -> OdfKit.Formula.OdfMathToken!
+OdfKit.Formula.OdfMathToken.WithoutAttribute(string! name) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.WithRadicand(OdfKit.Formula.OdfMathToken! radicand) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.WithRootIndex(OdfKit.Formula.OdfMathToken? rootIndex) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.WithRow(int rowIndex, OdfKit.Formula.OdfMathToken! row) -> OdfKit.Formula.OdfMathToken!
@@ -14891,6 +14913,12 @@ OdfKit.Image.OdfImageBatchUpdateResult.OdfImageBatchUpdateResult() -> void
 OdfKit.Image.OdfImageBatchUpdateResult.UpdatedCount.get -> int
 OdfKit.Image.OdfImageBatchUpdateResult.UpdatedCount.set -> void
 OdfKit.Image.OdfImageCompatibility
+OdfKit.Image.OdfImageContentUpdate
+OdfKit.Image.OdfImageContentUpdate.ImageBytes.get -> byte[]!
+OdfKit.Image.OdfImageContentUpdate.Name.get -> string!
+OdfKit.Image.OdfImageContentUpdate.OdfImageContentUpdate(string! name, byte[]! imageBytes) -> void
+OdfKit.Image.OdfImageContentUpdate.OdfImageContentUpdate(string! name, byte[]! imageBytes, string? preferredName) -> void
+OdfKit.Image.OdfImageContentUpdate.PreferredName.get -> string?
 OdfKit.Image.OdfImageCropInfo
 OdfKit.Image.OdfImageCropInfo.Bottom.get -> string!
 OdfKit.Image.OdfImageCropInfo.Left.get -> string!
@@ -14906,6 +14934,7 @@ OdfKit.Image.OdfImageDocument.AddImageFrame(byte[]! imageBytes, OdfKit.Styles.Od
 OdfKit.Image.OdfImageDocument.AddImageFrames(System.Collections.Generic.IEnumerable<OdfKit.Image.OdfImageFrameRequest!>! requests) -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Image.OdfImageDocument.AddImages(System.Collections.Generic.IEnumerable<OdfKit.Image.OdfImageFrameRequest!>! requests) -> System.Collections.Generic.IReadOnlyList<string!>!
 OdfKit.Image.OdfImageDocument.FindImageFilter(string! name) -> OdfKit.Image.OdfImageFilterInfo?
+OdfKit.Image.OdfImageDocument.FindImageFrame(string! name) -> OdfKit.Image.OdfImageFrameInfo?
 OdfKit.Image.OdfImageDocument.FrameDescription.get -> string?
 OdfKit.Image.OdfImageDocument.FrameDescription.set -> void
 OdfKit.Image.OdfImageDocument.FrameHeight.get -> OdfKit.Styles.OdfLength?
@@ -14934,6 +14963,7 @@ OdfKit.Image.OdfImageDocument.RemoveImageFrame(string! name) -> bool
 OdfKit.Image.OdfImageDocument.RemoveImageFrames(System.Collections.Generic.IEnumerable<string!>! names) -> int
 OdfKit.Image.OdfImageDocument.ReplaceImageFrameContent(string! name, byte[]! imageBytes) -> bool
 OdfKit.Image.OdfImageDocument.ReplaceImageFrameContent(string! name, byte[]! imageBytes, string? preferredName) -> bool
+OdfKit.Image.OdfImageDocument.ReplaceImageFrameContents(System.Collections.Generic.IEnumerable<OdfKit.Image.OdfImageContentUpdate!>! updates) -> OdfKit.Image.OdfImageBatchUpdateResult!
 OdfKit.Image.OdfImageDocument.SetImage(byte[]! imageBytes) -> string!
 OdfKit.Image.OdfImageDocument.SetImage(byte[]! imageBytes, string? preferredName) -> string!
 OdfKit.Image.OdfImageDocument.SetImageCrop(string! name, OdfKit.Image.OdfImageCropInfo? crop) -> bool
@@ -14945,7 +14975,6 @@ OdfKit.Image.OdfImageDocument.SetImageLayout(OdfKit.Styles.OdfLength x, OdfKit.S
 OdfKit.Image.OdfImageDocument.SetImageLayout(OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength width, OdfKit.Styles.OdfLength height, string? name, string? title, string? description) -> void
 OdfKit.Image.OdfImageDocument.SetImageRotation(string! name, double? degrees) -> bool
 OdfKit.Image.OdfImageDocument.SetImageRotations(System.Collections.Generic.IEnumerable<string!>! names, double? degrees) -> OdfKit.Image.OdfImageBatchUpdateResult!
-OdfKit.Image.OdfImageDocument.TryGetImageFrame(string! name) -> OdfKit.Image.OdfImageFrameInfo?
 OdfKit.Image.OdfImageDocument.UpdateImageFrame(string! name, OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength width, OdfKit.Styles.OdfLength height) -> bool
 OdfKit.Image.OdfImageDocument.UpdateImageFrame(string! name, OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength width, OdfKit.Styles.OdfLength height, string? title) -> bool
 OdfKit.Image.OdfImageDocument.UpdateImageFrame(string! name, OdfKit.Styles.OdfLength x, OdfKit.Styles.OdfLength y, OdfKit.Styles.OdfLength width, OdfKit.Styles.OdfLength height, string? title, string? description) -> bool

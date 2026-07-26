@@ -43,13 +43,19 @@ ODC、ODB、ODF 與 ODI 的高階 API 以「能完成安全工作流」而非方
 
 | 格式 | 已完成的受控工作流 | 邊界 |
 |------|--------------------|------|
-| ODC | 序列新增、editor 更新、移除、清除與重排；重排直接移動既有節點，保留 style、error indicator 及未知子內容。 | 不暴露可直接修改的 backing list。 |
-| ODB | table/query/form/report/data-source setting 的查找、新增、更新、移除與清除；form/report 可使用讀回的 immutable info 物件作 desired-state 更新。 | 只管理 ODF 資料庫描述，不連線或執行 SQL。 |
-| ODF | immutable token tree 的單一／全樹替換、文件層移除與清除；全樹替換只巡覽原始樹，不再次處理 replacement subtree。 | 移除必要複合子節點時以空 `mrow` 維持 MathML 結構。 |
-| ODI | bytes 替換、layout／metadata、rotation、crop、filter、批次更新與檢查報告。 | strict ODF 1.4 只有單一 `draw:frame`／`draw:image`，不建立虛構的多圖文件模型。 |
+| ODC | 序列新增、editor 更新、移除、清除、重排，以及 immutable snapshot 的單筆／批次套用；操作既有節點並保留 style、已知子項與未知內容。 | 不暴露可直接修改的 backing list。 |
+| ODB | table/query/form/report/data-source setting 的查找、新增、desired-state 更新、移除與清除；schema 欄位、主鍵、外鍵與索引只透過受控 editor 修改。 | 只管理 ODF 資料庫描述，不連線或執行 SQL。 |
+| ODF | 真正唯讀的 immutable token tree、predicate/factory 單一／全樹替換、屬性移除／清除、文件層移除與清除。 | 全樹替換不再次處理 replacement subtree；移除必要複合子節點時以空 `mrow` 維持結構。 |
+| ODI | `FindImageFrame` nullable lookup、bytes 單筆／批次替換、layout／metadata、rotation、crop、filter、批次更新與檢查報告。 | strict ODF 1.4 只有單一 `draw:frame`／`draw:image`，不建立虛構的多圖文件模型。 |
 
 集合重排、desired-state 更新與 immutable tree rewrite 都必須保留無關及 foreign
 namespace 內容；公開 API 基線與 round-trip 測試是此工作流契約的一部分。
+
+上述四項是高階 API 結構性加厚的完成線。完成線之後，不再以公開方法數量、
+競品型別數量或 schema 元素數量驅動 facade 擴張；新高階 API 必須由可重現的真實使用案例、
+ODF 規格更新或已確認缺陷觸發，並在同一變更中補齊工作流證據。Options、結果 DTO、
+公式 AST 與 evaluation context 的可修改集合不屬於文件 DOM backing collection，
+不得被機械改寫成 editor。
 
 ## 2. 命名契約
 

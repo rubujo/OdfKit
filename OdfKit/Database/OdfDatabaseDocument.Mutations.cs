@@ -163,6 +163,24 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Updates an existing table description to match the specified immutable snapshot.
+    /// 將既有資料表描述更新為指定的不可變快照。
+    /// </summary>
+    /// <param name="table">The desired table snapshot; its name identifies the existing table. / 目標資料表快照；其名稱用於識別既有資料表。</param>
+    /// <returns><see langword="true"/> if the table was updated; otherwise <see langword="false"/>. / 若成功更新資料表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="table"/> is <see langword="null"/>. / 當 <paramref name="table"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the table name is blank. / 當資料表名稱為空白時擲出。</exception>
+    public bool UpdateTable(OdfDatabaseTableInfo table)
+    {
+        if (table is null)
+        {
+            throw new ArgumentNullException(nameof(table));
+        }
+
+        return UpdateTable(table.Name, table.Command);
+    }
+
+    /// <summary>
     /// Updates the command of an existing query description.
     /// 更新既有查詢描述的命令。
     /// </summary>
@@ -189,6 +207,61 @@ public partial class OdfDatabaseDocument
         }
 
         query.SetAttribute("command", DatabaseNamespace, command, "db");
+        return true;
+    }
+
+    /// <summary>
+    /// Updates an existing query description to match the specified immutable snapshot.
+    /// 將既有查詢描述更新為指定的不可變快照。
+    /// </summary>
+    /// <param name="query">The desired query snapshot; its name identifies the existing query. / 目標查詢快照；其名稱用於識別既有查詢。</param>
+    /// <returns><see langword="true"/> if the query was updated; otherwise <see langword="false"/>. / 若成功更新查詢則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="query"/> is <see langword="null"/>. / 當 <paramref name="query"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the query name or command is blank. / 當查詢名稱或命令為空白時擲出。</exception>
+    public bool UpdateQuery(OdfDatabaseQueryInfo query)
+    {
+        if (query is null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
+
+        if (string.IsNullOrWhiteSpace(query.Name))
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_4"),
+                nameof(query));
+        }
+
+        if (string.IsNullOrWhiteSpace(query.Command))
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_3"),
+                nameof(query));
+        }
+
+        OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
+        OdfNode? node = queries is null ? null : FindNamedChild(queries, "query", query.Name);
+        if (node is null)
+        {
+            return false;
+        }
+
+        node.SetAttribute("command", DatabaseNamespace, query.Command, "db");
+        SetOrRemoveDatabaseAttribute(node, "title", query.Title);
+        SetOrRemoveDatabaseAttribute(node, "description", query.Description);
+        if (query.EscapeProcessing is null)
+        {
+            node.RemoveAttribute("escape-processing", DatabaseNamespace);
+        }
+        else
+        {
+            node.SetAttribute(
+                "escape-processing",
+                DatabaseNamespace,
+                query.EscapeProcessing.Value ? "true" : "false",
+                "db");
+        }
+
         return true;
     }
 

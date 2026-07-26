@@ -1089,4 +1089,49 @@ public class ChartHighLevelApiTests
             loaded.Series.Select(series => series.ValuesCellRangeAddress));
         Assert.Equal("SeriesA", loaded.GetSeriesEditor(1).StyleName);
     }
+
+    /// <summary>
+    /// 驗證不可變序列快照可單筆及批次套用，並保留既有序列子內容。
+    /// </summary>
+    [Fact]
+    public void ApplySeriesSnapshots_UpdatesKnownAttributesAndPreservesChildren()
+    {
+        using var chart = ChartDocument.Create();
+        chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");
+        chart.AddSeries("LocalTable.B2:B4", "LocalTable.B1");
+        chart.GetSeriesEditor(0).SetMeanValue(new OdfChartMeanValueInfo("MeanStyle"));
+
+        Assert.True(chart.ApplySeriesSnapshot(
+            0,
+            new OdfChartSeriesInfo(
+                "LocalTable.C2:C4",
+                "LocalTable.C1",
+                "chart:line",
+                "SeriesC",
+                "secondary-y")));
+
+        OdfBatchUpdateResult result = chart.ApplySeriesSnapshots(
+        [
+            new OdfChartSeriesUpdate(
+                1,
+                new OdfChartSeriesInfo(
+                    "LocalTable.D2:D4",
+                    "LocalTable.D1",
+                    "chart:bar",
+                    "SeriesD",
+                    "primary-y")),
+            new OdfChartSeriesUpdate(
+                8,
+                new OdfChartSeriesInfo(null, null, null, null, null)),
+        ]);
+
+        Assert.Equal(1, result.UpdatedCount);
+        Assert.Equal(["1"], result.UpdatedNames);
+        Assert.Equal(["8"], result.MissingNames);
+        Assert.Equal("LocalTable.C2:C4", chart.Series[0].ValuesCellRangeAddress);
+        Assert.Equal("secondary-y", chart.Series[0].AttachedAxis);
+        Assert.Equal("MeanStyle", chart.GetSeriesEditor(0).FindMeanValue()?.StyleName);
+        Assert.Equal("LocalTable.D2:D4", chart.Series[1].ValuesCellRangeAddress);
+        Assert.False(chart.ApplySeriesSnapshot(9, chart.Series[0]));
+    }
 }

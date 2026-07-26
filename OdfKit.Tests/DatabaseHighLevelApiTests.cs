@@ -170,8 +170,8 @@ public class DatabaseHighLevelApiTests
         var schema = new OdfDatabaseSchema(database);
 
         var table = new OdfSchemaTable("Customers");
-        table.Columns.Add(new OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
-        table.Columns.Add(new OdfSchemaColumn("Email", "VARCHAR")
+        table.AddColumn(new OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
+        table.AddColumn(new OdfSchemaColumn("Email", "VARCHAR")
         {
             IsUnique = true,
             DefaultValue = "unknown@example.com",
@@ -203,9 +203,9 @@ public class DatabaseHighLevelApiTests
         var schema = new OdfDatabaseSchema(database);
 
         var table = new OdfSchemaTable("Customers");
-        table.Columns.Add(new OdfSchemaColumn("Id", "INTEGER"));
-        table.Columns.Add(new OdfSchemaColumn("Email", "VARCHAR"));
-        table.Indexes.Add(new OdfSchemaIndex("IX_Customers_Email", isUnique: true, new List<string> { "Email" }));
+        table.AddColumn(new OdfSchemaColumn("Id", "INTEGER"));
+        table.AddColumn(new OdfSchemaColumn("Email", "VARCHAR"));
+        table.AddIndex(new OdfSchemaIndex("IX_Customers_Email", isUnique: true, new List<string> { "Email" }));
         schema.AddTable(table);
 
         using var stream = new MemoryStream();
@@ -484,5 +484,54 @@ public class DatabaseHighLevelApiTests
         Assert.Equal(OdfDatabaseDataSourceSettingType.String, setting.Type);
         Assert.False(setting.IsList);
         Assert.Equal(["old.Driver"], setting.Values);
+    }
+
+    /// <summary>
+    /// 驗證資料表與查詢可由不可變快照完整更新，並保留查詢子內容。
+    /// </summary>
+    [Fact]
+    public void TableAndQuerySnapshots_ApplyDesiredStateAndRoundTrip()
+    {
+        using var database = DatabaseDocument.Create();
+        database.AddTable("Customers", "customers_v1");
+        database.AddQuery(
+            "ActiveCustomers",
+            "SELECT * FROM customers",
+            "舊標題",
+            "舊描述",
+            true);
+        database.SetQueryOrderStatement("ActiveCustomers", "name ASC");
+
+        Assert.True(database.UpdateTable(
+            new OdfDatabaseTableInfo("Customers", "customers_v2")));
+        Assert.True(database.UpdateQuery(
+            new OdfDatabaseQueryInfo(
+                "ActiveCustomers",
+                "SELECT * FROM customers WHERE active = TRUE",
+                "啟用客戶",
+                null,
+                false)));
+
+        OdfDatabaseQueryInfo query = Assert.Single(database.GetQueries());
+        Assert.Equal("啟用客戶", query.Title);
+        Assert.Null(query.Description);
+        Assert.False(query.EscapeProcessing);
+        Assert.Equal(
+            "name ASC",
+            database.FindQueryOrderStatement("ActiveCustomers")?.Command);
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using DatabaseDocument loaded = DatabaseDocument.Load(stream, "snapshot.odb");
+        Assert.Equal("customers_v2", Assert.Single(loaded.GetTables()).Command);
+        OdfDatabaseQueryInfo loadedQuery = Assert.Single(loaded.GetQueries());
+        Assert.Equal("啟用客戶", loadedQuery.Title);
+        Assert.Null(loadedQuery.Description);
+        Assert.False(loadedQuery.EscapeProcessing);
+        Assert.Equal(
+            "name ASC",
+            loaded.FindQueryOrderStatement("ActiveCustomers")?.Command);
     }
 }
