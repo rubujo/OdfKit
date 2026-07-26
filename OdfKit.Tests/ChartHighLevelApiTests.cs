@@ -1029,4 +1029,31 @@ public class ChartHighLevelApiTests
         Assert.Equal("y", indicator!.Dimension);
         Assert.Equal("ErrorStyle1", indicator.StyleName);
     }
+
+    /// <summary>
+    /// 驗證資料序列可依索引移除，且剩餘順序於儲存／載入後保持穩定。
+    /// </summary>
+    [Fact]
+    public void RemoveSeriesAt_RemovesOnlySelectedSeriesAndRoundTrips()
+    {
+        using var chart = ChartDocument.Create();
+        chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");
+        chart.AddSeries("LocalTable.B2:B4", "LocalTable.B1");
+        chart.AddSeries("LocalTable.C2:C4", "LocalTable.C1");
+
+        chart.RemoveSeriesAt(1);
+
+        Assert.Equal(2, chart.SeriesCount);
+        Assert.Equal("LocalTable.A2:A4", chart.Series[0].ValuesCellRangeAddress);
+        Assert.Equal("LocalTable.C2:C4", chart.Series[1].ValuesCellRangeAddress);
+        Assert.Throws<ArgumentOutOfRangeException>(() => chart.RemoveSeriesAt(2));
+
+        using var stream = new MemoryStream();
+        chart.SaveToStream(stream);
+        stream.Position = 0;
+
+        using ChartDocument loaded = ChartDocument.Load(stream, "series.odc");
+        Assert.Equal(2, loaded.SeriesCount);
+        Assert.Equal("LocalTable.C2:C4", loaded.Series[1].ValuesCellRangeAddress);
+    }
 }

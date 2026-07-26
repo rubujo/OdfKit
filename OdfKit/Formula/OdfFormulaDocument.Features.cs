@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using OdfKit.DOM;
+
 namespace OdfKit.Formula;
 /// <summary>
 /// Provides the OdfFormulaDocument API.
@@ -137,5 +139,77 @@ public partial class OdfFormulaDocument
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Removes the first token of the specified kind from the current formula tree.
+    /// 從目前公式樹移除第一個符合指定種類的 token。
+    /// </summary>
+    /// <param name="kind">The target token kind. / 目標 token 種類。</param>
+    /// <returns><see langword="true"/> if a token was removed; otherwise <see langword="false"/>. / 若成功移除 token 則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <remarks>
+    /// Removing a required child of a composite MathML construct leaves an empty row in that slot so the containing construct remains structurally valid.
+    /// 若移除的是 MathML 複合結構的必要子節點，該位置會保留空白 row，使外層結構維持有效。
+    /// </remarks>
+    public bool RemoveFirst(OdfMathTokenKind kind)
+    {
+        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        for (int index = 0; index < tokens.Count; index++)
+        {
+            OdfMathToken root = tokens[index];
+            if (root.Kind == kind)
+            {
+                var rewritten = new List<OdfMathToken>(tokens);
+                rewritten.RemoveAt(index);
+                if (rewritten.Count == 0)
+                {
+                    ClearMathTokens();
+                }
+                else
+                {
+                    SetMathRow(rewritten.ToArray());
+                }
+
+                return true;
+            }
+
+            OdfMathToken? target = root.FindFirst(kind);
+            if (target is null)
+            {
+                continue;
+            }
+
+            OdfMathToken rewrittenRoot = root.ReplaceFirst(
+                token => ReferenceEquals(token, target),
+                _ => OdfMathToken.Row());
+            var rewrittenTokens = new OdfMathToken[tokens.Count];
+            for (int tokenIndex = 0; tokenIndex < tokens.Count; tokenIndex++)
+            {
+                rewrittenTokens[tokenIndex] = tokenIndex == index ? rewrittenRoot : tokens[tokenIndex];
+            }
+
+            SetMathRow(rewrittenTokens);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Clears all presentation tokens while retaining a valid MathML row.
+    /// 清除所有呈現 token，同時保留有效的 MathML row。
+    /// </summary>
+    public void ClearMathTokens()
+    {
+        OdfNode math = OdfNodeFactory.CreateElement("math", MathMlNamespace, "math");
+        math.AppendChild(OdfNodeFactory.CreateElement("mrow", MathMlNamespace, "math"));
+
+        OdfNode formula = GetFormulaNode();
+        foreach (OdfNode child in new List<OdfNode>(formula.Children))
+        {
+            formula.RemoveChild(child);
+        }
+
+        formula.AppendChild(math);
     }
 }

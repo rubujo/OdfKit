@@ -127,6 +127,85 @@ public partial class OdfDatabaseDocument
         return query;
     }
 
+    /// <summary>
+    /// Updates the command of an existing table description.
+    /// 更新既有資料表描述的命令。
+    /// </summary>
+    /// <param name="name">The table name. / 資料表名稱。</param>
+    /// <param name="command">The table command; a blank value removes the command. / 資料表命令；空白值會移除命令。</param>
+    /// <returns><see langword="true"/> if the table was updated; otherwise <see langword="false"/>. / 若成功更新資料表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool UpdateTable(string name, string? command)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_7"), nameof(name));
+        }
+
+        OdfNode? tableRepresentations = FindChildElement(GetDatabaseNode(), "table-representations", DatabaseNamespace);
+        OdfNode? table = tableRepresentations is null
+            ? null
+            : FindNamedChild(tableRepresentations, "table-representation", name);
+        if (table is null)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            table.RemoveAttribute("command", DatabaseNamespace);
+        }
+        else
+        {
+            table.SetAttribute("command", DatabaseNamespace, command!, "db");
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Updates the command of an existing query description.
+    /// 更新既有查詢描述的命令。
+    /// </summary>
+    /// <param name="name">The query name. / 查詢名稱。</param>
+    /// <param name="command">The non-empty query command or SQL content. / 非空白的查詢命令或 SQL 內容。</param>
+    /// <returns><see langword="true"/> if the query was updated; otherwise <see langword="false"/>. / 若成功更新查詢則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool UpdateQuery(string name, string command)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_4"), nameof(name));
+        }
+
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_3"), nameof(command));
+        }
+
+        OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
+        OdfNode? query = queries is null ? null : FindNamedChild(queries, "query", name);
+        if (query is null)
+        {
+            return false;
+        }
+
+        query.SetAttribute("command", DatabaseNamespace, command, "db");
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all table descriptions.
+    /// 移除所有資料表描述。
+    /// </summary>
+    /// <returns>The number of removed table descriptions. / 已移除的資料表描述數量。</returns>
+    public int ClearTables() => ClearNamedChildren("table-representations", "table-representation");
+
+    /// <summary>
+    /// Removes all query descriptions.
+    /// 移除所有查詢描述。
+    /// </summary>
+    /// <returns>The number of removed query descriptions. / 已移除的查詢描述數量。</returns>
+    public int ClearQueries() => ClearNamedChildren("queries", "query");
+
 
     /// <summary>
     /// Adds a data source setting.
@@ -531,6 +610,45 @@ public partial class OdfDatabaseDocument
         }
 
         return false;
+    }
+
+    private static OdfNode? FindNamedChild(OdfNode parent, string localName, string name)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == DatabaseNamespace &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private int ClearNamedChildren(string containerLocalName, string childLocalName)
+    {
+        OdfNode? container = FindChildElement(GetDatabaseNode(), containerLocalName, DatabaseNamespace);
+        if (container is null)
+        {
+            return 0;
+        }
+
+        int removedCount = 0;
+        foreach (OdfNode child in new List<OdfNode>(container.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == childLocalName &&
+                child.NamespaceUri == DatabaseNamespace)
+            {
+                container.RemoveChild(child);
+                removedCount++;
+            }
+        }
+
+        return removedCount;
     }
 
     #endregion

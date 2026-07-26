@@ -19,6 +19,24 @@
 一級 C# 物件模型」表示 L2 必須覆蓋高價值使用情境。L3 不屬於核心 API
 完成條件。
 
+### L2 外觀層設計基準
+
+- 高階物件必須直接組合既有 `OdfNode`／typed DOM 與 package resource，不維護另一份平行狀態。
+  ODF Toolkit 的舊 Simple API 因大量重複 ODFDOM 程式碼及脫節的清單模型而被棄用；OdfKit
+  不採用相同 fork 式架構。
+- 集合公開為唯讀快照或受控 editor；新增、更新、移除與清除使用具名方法，不讓呼叫端直接
+  修改 backing list。Apache POI 的 `XDDFChartData` 同樣要求使用 `addSeries`／
+  `removeSeries(index)`，並明確警告直接修改回傳 List 可能破壞文件；LibreOffice Chart2
+  `XDataSeriesContainer` 亦分別定義 add／get／set／remove。
+- 外觀層完成度以工作流程與逐操作證據衡量，不以公開型別或方法總數衡量。若 ODF 規格本身
+  限制結構（例如嚴格 ODI 僅有一個 `draw:frame` 且其中僅有一個 `draw:image`），不得為增加
+  API 數量而虛構圖層、群組或其他 schema 不存在的模型。
+
+參考：[ODF Toolkit Simple API deprecation](https://odftoolkit.org/simple/)、
+[Apache POI XDDFChartData](https://poi.apache.org/apidocs/dev/org/apache/poi/xddf/usermodel/chart/XDDFChartData.html)、
+[LibreOffice XDataSeriesContainer](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1chart2_1_1XDataSeriesContainer.html)、
+[OASIS ODF 1.4 Part 3](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part3-schema/OpenDocument-v1.4-os-part3-schema.html)。
+
 ## 2. 命名契約
 
 新增或破壞性重新命名公開 API 時，請使用以下規則；本專案尚未正式發佈

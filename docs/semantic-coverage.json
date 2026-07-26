@@ -57,6 +57,36 @@
       "formats": ["ODG"],
       "test": "OdfKit.Tests/DrawingApiUsabilityTests.cs",
       "symbol": "LoadRejectsNonDrawingDocument"
+    },
+    {
+      "dimension": "ExistingDocument",
+      "formats": ["ODC", "ODB", "ODF", "ODI"],
+      "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
+      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+    },
+    {
+      "dimension": "UnknownContentPreservation",
+      "formats": ["ODC", "ODB", "ODF", "ODI"],
+      "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
+      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+    },
+    {
+      "dimension": "LegacyVersions",
+      "formats": ["ODC", "ODB", "ODF", "ODI"],
+      "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
+      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+    },
+    {
+      "dimension": "DowngradeDiagnostics",
+      "formats": ["ODC", "ODB", "ODF", "ODI"],
+      "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
+      "symbol": "VersionCompatibilityReport_CoversEverySecondaryFormat"
+    },
+    {
+      "dimension": "InvalidInput",
+      "formats": ["ODC", "ODB", "ODF", "ODI"],
+      "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
+      "symbol": "SecondaryLoaders_RejectMismatchedDocumentKinds"
     }
   ],
   "mutationEvidence": {
@@ -307,6 +337,70 @@
         {"topics":["gradient"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGradients_CompleteLifecycleAndReferenceSafety"},
         {"topics":["marker"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgMarkers_CompleteLifecycleAndReferenceSafety"},
         {"topics":["clip"],"operations":["Get","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgClips_UpdateClearAndRoundTrip"}
+      ]
+    },
+    {
+      "id": "ODC-CHART-MODEL",
+      "format": "ODC",
+      "topics": ["chart-model"],
+      "specification": ["ODF 1.4 Part 3, clauses 3.8, 11, 19 and 20"],
+      "operations": {"Create":"verified","Get":"verified","Find":"verified","Set":"verified","Update":"verified","Remove":"verified","Clear":"verified","RoundTrip":"verified","Interop":"interop-tested"},
+      "implementation": ["OdfKit/Chart/OdfChartDocument.cs", "OdfKit/Chart/OdfChartDocument.SeriesAdvanced.cs", "OdfKit/Chart/OdfChartDocument.Styles.cs"],
+      "tests": ["OdfKit.Tests/ChartHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
+      "limitations": "LibreOffice does not open standalone ODC as a main document; interoperability is verified through embedded ODF charts and package structure.",
+      "operationEvidence": [
+        {"topics":["chart-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ChartScenario_AxisAdvancedEditingSurvivesRoundTrip"},
+        {"topics":["chart-model"],"operations":["Remove"],"test":"OdfKit.Tests/ChartHighLevelApiTests.cs","symbol":"RemoveSeriesAt_RemovesOnlySelectedSeriesAndRoundTrips"},
+        {"topics":["chart-model"],"operations":["Clear","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_ChartApplyDefinitionAndClearSeriesRoundTripsOds"}
+      ]
+    },
+    {
+      "id": "ODB-DATABASE-MODEL",
+      "format": "ODB",
+      "topics": ["database-model"],
+      "specification": ["ODF 1.4 Part 3, clause 12"],
+      "operations": {"Create":"verified","Get":"verified","Find":"verified","Set":"verified","Update":"verified","Remove":"verified","Clear":"verified","RoundTrip":"verified","Interop":"interop-tested"},
+      "implementation": ["OdfKit/Database/OdfDatabaseDocument.cs", "OdfKit/Database/OdfDatabaseDocument.Mutations.cs", "OdfKit/Database/OdfDatabaseSchema.cs"],
+      "tests": ["OdfKit.Tests/DatabaseHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
+      "limitations": "Headless conversion is not a reliable ODB interoperability path; package conformance and manual UNO loading remain the available evidence.",
+      "operationEvidence": [
+        {"topics":["database-model"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DatabaseHighLevelApiTests.cs","symbol":"TableAndQueryCrud_UpdateRemoveAndClearRoundTrips"},
+        {"topics":["database-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType"}
+      ]
+    },
+    {
+      "id": "ODF-FORMULA-MODEL",
+      "format": "ODF",
+      "topics": ["formula-model"],
+      "specification": ["ODF 1.4 Part 3, clauses 2.2.9 and 14.6", "MathML Core"],
+      "operations": {"Create":"verified","Get":"verified","Find":"verified","Set":"verified","Update":"verified","Remove":"verified","Clear":"verified","RoundTrip":"verified","Interop":"interop-tested"},
+      "implementation": ["OdfKit/Formula/OdfFormulaDocument.cs", "OdfKit/Formula/OdfFormulaDocument.Features.cs", "OdfKit/Formula/OdfMathToken.cs"],
+      "tests": ["OdfKit.Tests/FormulaHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
+      "limitations": "LaTeX reconstruction without a source annotation remains best-effort because MathML and LaTeX are not one-to-one.",
+      "operationEvidence": [
+        {"topics":["formula-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists"},
+        {"topics":["formula-model"],"operations":["Remove","Clear"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"RemoveFirstAndClearMathTokens_PreserveEditableMathContainer"},
+        {"topics":["formula-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsFormulaDocument"}
+      ]
+    },
+    {
+      "id": "ODI-IMAGE-MODEL",
+      "format": "ODI",
+      "topics": ["image-model"],
+      "specification": ["ODF 1.4 Part 3, clauses 3.9, 10.4.2 and 10.4.4"],
+      "operations": {"Create":"verified","Get":"verified","Find":"verified","Set":"verified","Update":"verified","Remove":"verified","Clear":"verified","RoundTrip":"verified","Interop":"interop-tested"},
+      "implementation": ["OdfKit/Image/OdfImageDocument.cs", "OdfKit/Image/OdfImageDocument.Mutations.cs", "OdfKit/Image/OdfImageDocument.Effects.cs"],
+      "tests": ["OdfKit.Tests/ImageHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
+      "limitations": "ODF 1.4 defines a standalone image document as one frame containing one image; multi-frame APIs are extended-document workflows and are not claimed as strict ODI conformance.",
+      "operationEvidence": [
+        {"topics":["image-model"],"operations":["Create","Get","Find","Set","Update","Remove","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ImageScenario_MultiFrameLayoutSurvivesRoundTrip"},
+        {"topics":["image-model"],"operations":["Update"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ReplaceImageFrameContent_PreservesFrameMetadataAndRoundTrips"},
+        {"topics":["image-model"],"operations":["Clear"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ImageRotationAndCrop_RoundTripAfterSaveAndLoad"},
+        {"topics":["image-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"ImageDocument_PackageStructureMatchesOdf14Schema"}
       ]
     }
   ]

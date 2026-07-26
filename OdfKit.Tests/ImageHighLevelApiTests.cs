@@ -331,4 +331,43 @@ public class ImageHighLevelApiTests
     private static byte[] CreateAlternatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVR42mNkYGD4z0ABYBw1KgBvXQV0AAAAAElFTkSuQmCC");
+    /// <summary>
+    /// 驗證替換具名框架的影像內容時會保留版面、標題與描述，並於儲存後讀回新內容。
+    /// </summary>
+    [Fact]
+    public void ReplaceImageFrameContent_PreservesFrameMetadataAndRoundTrips()
+    {
+        using var image = ImageDocument.Create();
+        image.SetImageLayout(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(4),
+            "PrimaryFrame",
+            "主要照片",
+            "替換後仍應保留。");
+        image.SetImage(CreatePngBytes(), "Primary.png");
+
+        byte[] replacement = CreateAlternatePngBytes();
+        Assert.True(image.ReplaceImageFrameContent("PrimaryFrame", replacement, "Replacement.png"));
+        Assert.False(image.ReplaceImageFrameContent("MissingFrame", replacement));
+
+        OdfImageFrameInfo current = Assert.Single(image.GetImageFrames());
+        Assert.Equal("PrimaryFrame", current.Name);
+        Assert.Equal("主要照片", current.Title);
+        Assert.Equal("替換後仍應保留。", current.Description);
+        Assert.Equal(replacement.Length, current.Size);
+        Assert.True(current.TryGetWidth(out OdfLength width));
+        Assert.Equal(OdfLength.FromCentimeters(6), width);
+
+        using var stream = new MemoryStream();
+        image.SaveToStream(stream);
+        stream.Position = 0;
+
+        using ImageDocument loaded = ImageDocument.Load(stream, "image.odi");
+        OdfImageFrameInfo reloaded = Assert.Single(loaded.GetImageFrames());
+        Assert.Equal(replacement.Length, reloaded.Size);
+        Assert.Equal("主要照片", reloaded.Title);
+        Assert.Equal(replacement, loaded.GetImageBytes());
+    }
 }

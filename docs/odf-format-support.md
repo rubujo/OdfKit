@@ -39,14 +39,17 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   專屬 typed 文件類別但語意 API 仍完全繼承基底格式。
 - `package-only`：僅封裝層來回讀寫；高階語意模型尚未專屬化或仍共用基底 wrapper。
 
-**重要說明（避免過度宣稱）**：對 ODT、ODS、ODP、ODG，`workflow-verified` 另受
-[`semantic-coverage.json`](semantic-coverage.json) schema v4 約束；12 個 family 的每個 topic
+**重要說明（避免過度宣稱）**：對 ODT、ODS、ODP、ODG、ODC、ODB、ODF、ODI，
+`workflow-verified` 另受 [`semantic-coverage.json`](semantic-coverage.json) schema v4
+約束；16 個 family 的每個 topic
 都必須連結 `Create`、`Get`、`Find`、`Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、
-`Interop`、規格、實作、測試、限制與 clean-room provenance。其他格式的 `workflow-verified` 仍只表示
-滿足本文件 5 項通用完成標準，不推導為相同的深度語意 facade。物理分頁、像素級渲染、完整公式
+`Interop`、規格、實作、測試、限制與 clean-room provenance。範本、Flat XML、主控文件及
+Web 文件等變體的 `workflow-verified` 仍表示沿用其基底格式語意模型並滿足本文件 5 項通用
+完成標準，不推導為另一套重複的深度 facade。物理分頁、像素級渲染、完整公式
 與 pivot 重算、SmartArt 佈局、Office 專屬效果模擬及完整協同演算法，均為明列非目標。
-Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
-語意編輯 helper；這項既有完成聲明不等同於完整公式重算引擎。
+Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst`／`RemoveFirst`／
+`ClearMathTokens` 等「尋找→取得→更新→移除／清除」語意編輯 helper；這項完成聲明
+不等同於完整公式重算引擎。
 
 凡標示為「真機」的互通證據，均指已有 `LibreOfficeInteropTests` 與
 `eng/Test-LibreOfficeInterop.ps1` 驗收路徑；一般 `dotnet test` 不會自動啟動真實
@@ -455,11 +458,11 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
-- `.odc`、`.odf`、`.odi`（曾標為 `usable`，2026-06-24 已升級為 `workflow-verified`，詳見下方
-  Batch 3-5 說明）：已有摘要與常用編輯 API，`SecondaryFormatApiScenarioTests` 已背書連線／
-  圖表軸／公式 token／多框架影像等場景；完整深度語意模型（例如 ODC chart style 物件模型）
-  仍屬不在 `workflow-verified` 最低標準內的延伸工作。`.odb` 已於
-  Batch 6（2026-06-23）升級為 `workflow-verified`，詳見下方說明。
+- `.odc`、`.odb`、`.odf`、`.odi` 已納入 schema v4 深度語意證據契約：
+  ODC 補齊單一序列移除，ODB 補齊 table／query 更新與集合清除，ODF 補齊 token 移除與清除，
+  ODI 補齊保留框架版面／替代文字時的影像內容替換；既有圖表樣式、資料庫 schema、
+  MathML 符號樹與影像效果 API 均納入逐操作證據。ODI 的多框架操作屬 extended-document
+  工作流；ODF 1.4 嚴格 ODI 仍是單一 `draw:frame` 包含單一 `draw:image`，不宣稱圖層或群組。
 - 次要格式與變體高階物件模型補完工作（原 Batch 1-6 + 測試補強，已於 2026-06-23 全數完成並移除
   追蹤文件）：ODC／ODB／ODI／ODF 公式四項次要格式高階物件模型，以及範本變數系統
   （`text:user-field-decls`）、範本清除使用者資料、範本區段唯讀標記、ODM 主控文件子文件

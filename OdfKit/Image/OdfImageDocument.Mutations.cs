@@ -151,6 +151,48 @@ public partial class OdfImageDocument
 
         return null;
     }
+
+    /// <summary>
+    /// Replaces the image content of the named frame while preserving its layout and metadata.
+    /// 替換具名框架的影像內容，同時保留其版面與中繼資料。
+    /// </summary>
+    /// <param name="name">The frame name. / 框架名稱。</param>
+    /// <param name="imageBytes">The replacement image bytes. / 替換用的影像位元組。</param>
+    /// <returns><see langword="true"/> if the frame was updated; otherwise <see langword="false"/>. / 若成功更新框架則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool ReplaceImageFrameContent(string name, byte[] imageBytes) =>
+        ReplaceImageFrameContent(name, imageBytes, null);
+
+    /// <summary>
+    /// Replaces the image content of the named frame while preserving its layout and metadata.
+    /// 替換具名框架的影像內容，同時保留其版面與中繼資料。
+    /// </summary>
+    /// <param name="name">The frame name. / 框架名稱。</param>
+    /// <param name="imageBytes">The replacement image bytes. / 替換用的影像位元組。</param>
+    /// <param name="preferredName">The preferred package file name. / 偏好的封裝檔名。</param>
+    /// <returns><see langword="true"/> if the frame was updated; otherwise <see langword="false"/>. / 若成功更新框架則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool ReplaceImageFrameContent(string name, byte[] imageBytes, string? preferredName)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"), nameof(name));
+        }
+
+        if (imageBytes is null)
+        {
+            throw new ArgumentNullException(nameof(imageBytes));
+        }
+
+        OdfNode? frame = FindFrameByName(name);
+        OdfNode? image = frame is null ? null : FindChild(frame, "image", OdfNamespaces.Draw);
+        if (image is null)
+        {
+            return false;
+        }
+
+        string href = new OdfMediaManager(Package).AddImage(imageBytes, preferredName);
+        image.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
+        return true;
+    }
     /// <summary>
     /// Short overload of UpdateImageFrame that accepts name, x, y, width, and height; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 name、x、y、width 與 height；其餘可選參數使用預設值並轉呼叫最長 UpdateImageFrame 多載。

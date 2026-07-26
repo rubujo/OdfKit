@@ -90,6 +90,34 @@
       "fixtureSources": ["OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs", "OdfKit.Tests/DrawingApiUsabilityTests.cs"],
       "behaviorObservations": ["Appearance resources are compared through package XML and supported office conversions."],
       "implementationBoundary": "Gradients, markers, clips and media relations are implemented from public ODF semantics."
+    },
+    {
+      "id": "ODC-CHART-MODEL",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 3.8, 11, 19 and 20"],
+      "fixtureSources": ["OdfKit.Tests/ChartHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "behaviorObservations": ["LibreOffice chart behavior is observed through public embedded-chart document I/O only."],
+      "implementationBoundary": "Chart collections and editors are independently implemented over the shared ODF DOM."
+    },
+    {
+      "id": "ODB-DATABASE-MODEL",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clause 12"],
+      "fixtureSources": ["OdfKit.Tests/DatabaseHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "behaviorObservations": ["ODB behavior is compared through package conformance and public UNO loading observations."],
+      "implementationBoundary": "Database metadata APIs model only structures defined by ODF and do not copy a database engine."
+    },
+    {
+      "id": "ODF-FORMULA-MODEL",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clause 14.6", "MathML Core"],
+      "fixtureSources": ["OdfKit.Tests/FormulaHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "behaviorObservations": ["LibreOffice Math is observed through public load and save behavior."],
+      "implementationBoundary": "Formula token editing is independently composed over MathML nodes and documented syntax."
+    },
+    {
+      "id": "ODI-IMAGE-MODEL",
+      "specificationSources": ["OASIS ODF 1.4 Part 3 clauses 3.9, 10.4.2 and 10.4.4"],
+      "fixtureSources": ["OdfKit.Tests/ImageHighLevelApiTests.cs", "OdfKit.Tests/SecondaryFormatApiScenarioTests.cs"],
+      "behaviorObservations": ["Standalone ODI support is evaluated from public package validation and office load behavior."],
+      "implementationBoundary": "Image frame operations reuse the shared DOM and media manager without a parallel object store."
     }
   ]
 }

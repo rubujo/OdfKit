@@ -367,4 +367,37 @@ public class DatabaseHighLevelApiTests
         Assert.Contains("<form:frame", xml);
         Assert.Contains("form:label=\"聯絡資訊\"", xml);
     }
+
+    /// <summary>
+    /// 驗證資料表與查詢支援更新、個別移除及集合清除，並可正確往返。
+    /// </summary>
+    [Fact]
+    public void TableAndQueryCrud_UpdateRemoveAndClearRoundTrips()
+    {
+        using var database = DatabaseDocument.Create();
+        database.AddTable("Customers", "customers_v1");
+        database.AddTable("Orders", "orders_v1");
+        database.AddQuery("ActiveCustomers", "SELECT * FROM customers");
+        database.AddQuery("RecentOrders", "SELECT * FROM orders");
+
+        Assert.True(database.UpdateTable("Customers", "customers_v2"));
+        Assert.True(database.UpdateQuery("ActiveCustomers", "SELECT * FROM customers WHERE active = TRUE"));
+        Assert.False(database.UpdateTable("Missing", "ignored"));
+        Assert.False(database.UpdateQuery("Missing", "SELECT 1"));
+        Assert.True(database.RemoveTable("Orders"));
+        Assert.True(database.RemoveQuery("RecentOrders"));
+        Assert.Equal(1, database.ClearQueries());
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using DatabaseDocument loaded = DatabaseDocument.Load(stream, "database.odb");
+        OdfDatabaseTableInfo table = Assert.Single(loaded.GetTables());
+        Assert.Equal("Customers", table.Name);
+        Assert.Equal("customers_v2", table.Command);
+        Assert.Empty(loaded.GetQueries());
+        Assert.Equal(1, loaded.ClearTables());
+        Assert.Empty(loaded.GetTables());
+    }
 }

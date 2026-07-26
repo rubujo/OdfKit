@@ -34,6 +34,25 @@ public partial class OdfChartDocument
         return new OdfChartSeries(this, nodes[index], index);
     }
 
+    /// <summary>
+    /// Removes the data series at the specified index.
+    /// 移除指定索引的資料序列。
+    /// </summary>
+    /// <param name="index">The zero-based series index. / 序列索引（從 0 起算）。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時擲出。</exception>
+    public void RemoveSeriesAt(int index)
+    {
+        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        if (index < 0 || index >= nodes.Count)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(index),
+                OdfLocalizer.GetMessage("Err_OdfChartDocument_SequenceIndexOutRange_2", index, nodes.Count));
+        }
+
+        nodes[index].Parent!.RemoveChild(nodes[index]);
+    }
+
     private IReadOnlyList<OdfNode> GetSeriesNodes()
     {
         OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);

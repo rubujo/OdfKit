@@ -10,15 +10,16 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class SemanticCoverageContractTests
 {
-    private static readonly string[] RequiredFormats = ["ODT", "ODS", "ODP", "ODG"];
+    private static readonly string[] RequiredFormats =
+        ["ODT", "ODS", "ODP", "ODG", "ODC", "ODB", "ODF", "ODI"];
     private static readonly string[] RequiredOperations =
         ["Create", "Get", "Find", "Set", "Update", "Remove", "Clear", "RoundTrip", "Interop"];
     private static readonly string[] RequiredQualityDimensions =
         ["ExistingDocument", "UnknownContentPreservation", "LegacyVersions", "DowngradeDiagnostics", "InvalidInput"];
 
     /// <summary>
-    /// Verifies every primary format has evidence-backed semantic families and operations.
-    /// 驗證每個主要格式都具備證據支撐的語意族群與操作。
+    /// Verifies every ODF document format has evidence-backed semantic families and operations.
+    /// 驗證每種 ODF 文件格式都具備證據支撐的語意族群與操作。
     /// </summary>
     [Fact]
     public void Manifest_CoversEveryPrimaryFormatAndOperation()

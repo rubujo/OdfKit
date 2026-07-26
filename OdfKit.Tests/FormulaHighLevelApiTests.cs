@@ -592,4 +592,36 @@ public class FormulaHighLevelApiTests
             _ = OdfMathToken.Matrix(OdfMathToken.Row(OdfMathToken.Number("1"))).RemoveRow(0);
         });
     }
+    /// <summary>
+    /// 驗證公式 token 可移除及清除，且清除後仍保留有效的 MathML 容器。
+    /// </summary>
+    [Fact]
+    public void RemoveFirstAndClearMathTokens_PreserveEditableMathContainer()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Identifier("x"),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Fraction(
+                    OdfMathToken.Number("1"),
+                    OdfMathToken.Number("2")))
+            .Build();
+
+        Assert.True(formula.RemoveFirst(OdfMathTokenKind.Operator));
+        Assert.DoesNotContain(formula.GetMathTokens(), token => token.Kind == OdfMathTokenKind.Operator);
+        Assert.True(formula.RemoveFirst(OdfMathTokenKind.Fraction));
+        Assert.False(formula.RemoveFirst(OdfMathTokenKind.Fraction));
+
+        formula.ClearMathTokens();
+
+        Assert.Empty(formula.GetMathTokens());
+        Assert.Contains(":mrow", formula.GetMathML(), StringComparison.Ordinal);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "empty.odf");
+        Assert.Empty(loaded.GetMathTokens());
+    }
 }

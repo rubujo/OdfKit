@@ -231,6 +231,7 @@ OdfKit.Chart.OdfChartDocument.OdfChartDocument(OdfKit.Core.OdfPackage! package, 
 OdfKit.Chart.OdfChartDocument.PlotAreaStyle.get -> OdfKit.Chart.OdfChartStyle!
 OdfKit.Chart.OdfChartDocument.PlotAreaStyle.set -> void
 OdfKit.Chart.OdfChartDocument.RemoveChartStyle(string! name) -> bool
+OdfKit.Chart.OdfChartDocument.RemoveSeriesAt(int index) -> void
 OdfKit.Chart.OdfChartDocument.Series.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Chart.OdfChartSeriesInfo!>!
 OdfKit.Chart.OdfChartDocument.SeriesCount.get -> int
 OdfKit.Chart.OdfChartDocument.SetAxisDisplayLabels(string! dimension, bool? displayLabels) -> void
@@ -1384,6 +1385,8 @@ OdfKit.Database.OdfDatabaseDocument.AddReport(string! name, string? href, string
 OdfKit.Database.OdfDatabaseDocument.AddTable(string! name) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.AddTable(string! name, string? command) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.AddTableSchema(string! name, System.Collections.Generic.IEnumerable<string!>! columns) -> OdfKit.DOM.OdfNode!
+OdfKit.Database.OdfDatabaseDocument.ClearQueries() -> int
+OdfKit.Database.OdfDatabaseDocument.ClearTables() -> int
 OdfKit.Database.OdfDatabaseDocument.ConfigureConnection(string! href) -> OdfKit.Database.OdfDatabaseDocument!
 OdfKit.Database.OdfDatabaseDocument.ConnectionHref.get -> string?
 OdfKit.Database.OdfDatabaseDocument.DatabaseNode.get -> OdfKit.DOM.OdfNode!
@@ -1434,6 +1437,8 @@ OdfKit.Database.OdfDatabaseDocument.SetQueryOrderStatement(string! queryName, st
 OdfKit.Database.OdfDatabaseDocument.SetQueryOrderStatement(string! queryName, string! command, bool? applyCommand) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.SetQueryUpdateTable(string! queryName, string! tableName) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.Tables.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfDatabaseTableInfo!>!
+OdfKit.Database.OdfDatabaseDocument.UpdateQuery(string! name, string! command) -> bool
+OdfKit.Database.OdfDatabaseDocument.UpdateTable(string! name, string? command) -> bool
 OdfKit.Database.OdfDatabaseDriverSettingsInfo
 OdfKit.Database.OdfDatabaseDriverSettingsInfo.BaseDn.get -> string?
 OdfKit.Database.OdfDatabaseDriverSettingsInfo.IsFirstRowHeaderLine.get -> bool?
@@ -14722,6 +14727,7 @@ OdfKit.Formula.OdfFormulaDiagnosticSeverity.Error = 2 -> OdfKit.Formula.OdfFormu
 OdfKit.Formula.OdfFormulaDiagnosticSeverity.Info = 0 -> OdfKit.Formula.OdfFormulaDiagnosticSeverity
 OdfKit.Formula.OdfFormulaDiagnosticSeverity.Warning = 1 -> OdfKit.Formula.OdfFormulaDiagnosticSeverity
 OdfKit.Formula.OdfFormulaDocument
+OdfKit.Formula.OdfFormulaDocument.ClearMathTokens() -> void
 OdfKit.Formula.OdfFormulaDocument.FindAnnotation(string! encoding) -> string?
 OdfKit.Formula.OdfFormulaDocument.FormulaNode.get -> OdfKit.DOM.OdfNode!
 OdfKit.Formula.OdfFormulaDocument.GetMathML() -> string!
@@ -14734,6 +14740,7 @@ OdfKit.Formula.OdfFormulaDocument.MathText.get -> string!
 OdfKit.Formula.OdfFormulaDocument.MathTokens.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfMathToken!>!
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
+OdfKit.Formula.OdfFormulaDocument.RemoveFirst(OdfKit.Formula.OdfMathTokenKind kind) -> bool
 OdfKit.Formula.OdfFormulaDocument.ReplaceFirst(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> bool
 OdfKit.Formula.OdfFormulaDocument.SetAnnotation(string! encoding, string? content) -> void
 OdfKit.Formula.OdfFormulaDocument.SetIdentifierEquation(string! leftIdentifier, string! rightIdentifier) -> OdfKit.DOM.OdfNode!
@@ -14914,6 +14921,8 @@ OdfKit.Image.OdfImageDocument.InspectImages(OdfKit.Image.OdfImageInspectionOptio
 OdfKit.Image.OdfImageDocument.OdfImageDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Image.OdfImageDocument.RemoveImageFrame(string! name) -> bool
 OdfKit.Image.OdfImageDocument.RemoveImageFrames(System.Collections.Generic.IEnumerable<string!>! names) -> int
+OdfKit.Image.OdfImageDocument.ReplaceImageFrameContent(string! name, byte[]! imageBytes) -> bool
+OdfKit.Image.OdfImageDocument.ReplaceImageFrameContent(string! name, byte[]! imageBytes, string? preferredName) -> bool
 OdfKit.Image.OdfImageDocument.SetImage(byte[]! imageBytes) -> string!
 OdfKit.Image.OdfImageDocument.SetImage(byte[]! imageBytes, string? preferredName) -> string!
 OdfKit.Image.OdfImageDocument.SetImageCrop(string! name, OdfKit.Image.OdfImageCropInfo? crop) -> bool

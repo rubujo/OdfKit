@@ -50,7 +50,7 @@ foreach ($symbol in $mutationSymbols) {
     }
 }
 
-$requiredFormats = @('ODT', 'ODS', 'ODP', 'ODG')
+$requiredFormats = @('ODT', 'ODS', 'ODP', 'ODG', 'ODC', 'ODB', 'ODF', 'ODI')
 $requiredOperations = @('Create', 'Get', 'Find', 'Set', 'Update', 'Remove', 'Clear', 'RoundTrip', 'Interop')
 $requiredQualityDimensions = @('ExistingDocument', 'UnknownContentPreservation', 'LegacyVersions', 'DowngradeDiagnostics', 'InvalidInput')
 $qualityEvidence = @($manifest.qualityEvidence)
