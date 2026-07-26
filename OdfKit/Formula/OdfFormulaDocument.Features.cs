@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using OdfKit.DOM;
 
@@ -193,6 +194,90 @@ public partial class OdfFormulaDocument
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Replaces every token of the specified kind in the current formula tree.
+    /// 替換目前公式樹中所有指定種類的 token。
+    /// </summary>
+    /// <param name="kind">The target token kind. / 目標 token 種類。</param>
+    /// <param name="replacement">The replacement token. / 替換後的新 token。</param>
+    /// <returns>The number of replaced tokens. / 已替換的 token 數量。</returns>
+    /// <remarks>
+    /// Matching is evaluated against the original tree; newly inserted replacement subtrees are not searched again.
+    /// 比對以原始樹為準；不會再次搜尋新插入的替換子樹。
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
+    public int ReplaceAll(OdfMathTokenKind kind, OdfMathToken replacement)
+    {
+        if (replacement is null)
+        {
+            throw new ArgumentNullException(nameof(replacement));
+        }
+
+        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        int replacedCount = 0;
+        var rewritten = new OdfMathToken[tokens.Count];
+        for (int index = 0; index < tokens.Count; index++)
+        {
+            OdfMathToken token = tokens[index];
+            replacedCount += token.GetAll(kind).Count();
+            rewritten[index] = token.ReplaceAll(kind, replacement);
+        }
+
+        if (replacedCount > 0)
+        {
+            SetMathRow(rewritten);
+        }
+
+        return replacedCount;
+    }
+
+    /// <summary>
+    /// Removes every token of the specified kind from the current formula tree.
+    /// 從目前公式樹移除所有指定種類的 token。
+    /// </summary>
+    /// <param name="kind">The target token kind. / 目標 token 種類。</param>
+    /// <returns>The number of removed tokens. / 已移除的 token 數量。</returns>
+    /// <remarks>
+    /// Required children of composite MathML constructs are replaced with empty rows so their containers remain structurally valid.
+    /// MathML 複合結構的必要子節點會替換為空白 row，使其容器維持結構有效。
+    /// </remarks>
+    public int RemoveAll(OdfMathTokenKind kind)
+    {
+        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        int removedCount = 0;
+        List<OdfMathToken> rewritten = [];
+        foreach (OdfMathToken token in tokens)
+        {
+            if (token.Kind == kind)
+            {
+                removedCount += token.GetAll(kind).Count();
+                continue;
+            }
+
+            int nestedCount = token.GetAll(kind).Count();
+            removedCount += nestedCount;
+            rewritten.Add(nestedCount == 0
+                ? token
+                : token.ReplaceAll(kind, OdfMathToken.Row()));
+        }
+
+        if (removedCount == 0)
+        {
+            return 0;
+        }
+
+        if (rewritten.Count == 0)
+        {
+            ClearMathTokens();
+        }
+        else
+        {
+            SetMathRow(rewritten.ToArray());
+        }
+
+        return removedCount;
     }
 
     /// <summary>

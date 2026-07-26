@@ -1056,4 +1056,37 @@ public class ChartHighLevelApiTests
         Assert.Equal(2, loaded.SeriesCount);
         Assert.Equal("LocalTable.C2:C4", loaded.Series[1].ValuesCellRangeAddress);
     }
+
+    /// <summary>
+    /// 驗證資料序列可向前或向後重排，且完整序列內容於往返後保持一致。
+    /// </summary>
+    [Fact]
+    public void MoveSeries_ReordersCompleteSeriesAndRoundTrips()
+    {
+        using var chart = ChartDocument.Create();
+        chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");
+        chart.AddSeries("LocalTable.B2:B4", "LocalTable.B1");
+        chart.AddSeries("LocalTable.C2:C4", "LocalTable.C1");
+        chart.GetSeriesEditor(0).StyleName = "SeriesA";
+
+        chart.MoveSeries(0, 2);
+        chart.MoveSeries(2, 1);
+
+        Assert.Equal(
+            ["LocalTable.B2:B4", "LocalTable.A2:A4", "LocalTable.C2:C4"],
+            chart.Series.Select(series => series.ValuesCellRangeAddress));
+        Assert.Equal("SeriesA", chart.GetSeriesEditor(1).StyleName);
+        Assert.Throws<ArgumentOutOfRangeException>(() => chart.MoveSeries(-1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => chart.MoveSeries(0, 3));
+
+        using var stream = new MemoryStream();
+        chart.SaveToStream(stream);
+        stream.Position = 0;
+
+        using ChartDocument loaded = ChartDocument.Load(stream, "reordered.odc");
+        Assert.Equal(
+            ["LocalTable.B2:B4", "LocalTable.A2:A4", "LocalTable.C2:C4"],
+            loaded.Series.Select(series => series.ValuesCellRangeAddress));
+        Assert.Equal("SeriesA", loaded.GetSeriesEditor(1).StyleName);
+    }
 }

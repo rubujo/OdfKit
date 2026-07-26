@@ -37,6 +37,20 @@
 [LibreOffice XDataSeriesContainer](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1chart2_1_1XDataSeriesContainer.html)、
 [OASIS ODF 1.4 Part 3](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part3-schema/OpenDocument-v1.4-os-part3-schema.html)。
 
+### 次要格式深度工作流
+
+ODC、ODB、ODF 與 ODI 的高階 API 以「能完成安全工作流」而非方法數量判定深度：
+
+| 格式 | 已完成的受控工作流 | 邊界 |
+|------|--------------------|------|
+| ODC | 序列新增、editor 更新、移除、清除與重排；重排直接移動既有節點，保留 style、error indicator 及未知子內容。 | 不暴露可直接修改的 backing list。 |
+| ODB | table/query/form/report/data-source setting 的查找、新增、更新、移除與清除；form/report 可使用讀回的 immutable info 物件作 desired-state 更新。 | 只管理 ODF 資料庫描述，不連線或執行 SQL。 |
+| ODF | immutable token tree 的單一／全樹替換、文件層移除與清除；全樹替換只巡覽原始樹，不再次處理 replacement subtree。 | 移除必要複合子節點時以空 `mrow` 維持 MathML 結構。 |
+| ODI | bytes 替換、layout／metadata、rotation、crop、filter、批次更新與檢查報告。 | strict ODF 1.4 只有單一 `draw:frame`／`draw:image`，不建立虛構的多圖文件模型。 |
+
+集合重排、desired-state 更新與 immutable tree rewrite 都必須保留無關及 foreign
+namespace 內容；公開 API 基線與 round-trip 測試是此工作流契約的一部分。
+
 ## 2. 命名契約
 
 新增或破壞性重新命名公開 API 時，請使用以下規則；本專案尚未正式發佈

@@ -53,6 +53,48 @@ public partial class OdfChartDocument
         nodes[index].Parent!.RemoveChild(nodes[index]);
     }
 
+    /// <summary>
+    /// Moves a data series to another position while preserving the series node and its unknown content.
+    /// 將資料序列移至另一個位置，同時保留序列節點及其未知內容。
+    /// </summary>
+    /// <param name="sourceIndex">The zero-based source series index. / 來源序列索引（從 0 起算）。</param>
+    /// <param name="destinationIndex">The zero-based destination series index. / 目的序列索引（從 0 起算）。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when either index is out of range. / 任一索引超出範圍時擲出。</exception>
+    public void MoveSeries(int sourceIndex, int destinationIndex)
+    {
+        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        if (sourceIndex < 0 || sourceIndex >= nodes.Count)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(sourceIndex),
+                OdfLocalizer.GetMessage("Err_OdfChartDocument_SequenceIndexOutRange_2", sourceIndex, nodes.Count));
+        }
+
+        if (destinationIndex < 0 || destinationIndex >= nodes.Count)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(destinationIndex),
+                OdfLocalizer.GetMessage("Err_OdfChartDocument_SequenceIndexOutRange_2", destinationIndex, nodes.Count));
+        }
+
+        if (sourceIndex == destinationIndex)
+        {
+            return;
+        }
+
+        OdfNode series = nodes[sourceIndex];
+        OdfNode parent = series.Parent!;
+        parent.RemoveChild(series);
+        if (destinationIndex < sourceIndex)
+        {
+            parent.InsertBefore(series, nodes[destinationIndex]);
+        }
+        else
+        {
+            parent.InsertAfter(series, nodes[destinationIndex]);
+        }
+    }
+
     private IReadOnlyList<OdfNode> GetSeriesNodes()
     {
         OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);

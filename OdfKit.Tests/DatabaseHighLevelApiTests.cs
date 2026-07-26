@@ -400,4 +400,89 @@ public class DatabaseHighLevelApiTests
         Assert.Equal(1, loaded.ClearTables());
         Assert.Empty(loaded.GetTables());
     }
+
+    /// <summary>
+    /// 驗證表單、報表與資料來源設定可用描述物件完整更新、往返及清除。
+    /// </summary>
+    [Fact]
+    public void ComponentsAndSettings_UpdateRoundTripAndClear()
+    {
+        using var database = DatabaseDocument.Create();
+        database.SetConnection("sdbc:embedded:firebird");
+        database.AddForm("CustomerForm", "Forms/customer", "客戶", "舊表單", true);
+        database.AddReport("CustomerReport", "Reports/customer", "客戶報表", "舊報表", false);
+        database.AddDataSourceSetting(
+            "JavaDriverClass",
+            OdfDatabaseDataSourceSettingType.String,
+            false,
+            "old.Driver");
+
+        Assert.True(database.UpdateForm(
+            new OdfDatabaseFormInfo("CustomerForm", "Forms/customer-v2", "客戶維護", null, false)));
+        Assert.True(database.UpdateReport(
+            new OdfDatabaseReportInfo("CustomerReport", null, "客戶清單", "新版報表", true)));
+        Assert.True(database.UpdateDataSourceSetting(
+            new OdfDatabaseDataSourceSettingInfo(
+                "JavaDriverClass",
+                OdfDatabaseDataSourceSettingType.String,
+                true,
+                ["new.Driver", "fallback.Driver"])));
+        Assert.False(database.UpdateForm(
+            new OdfDatabaseFormInfo("Missing", null, null, null, null)));
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using DatabaseDocument loaded = DatabaseDocument.Load(stream, "components.odb");
+        OdfDatabaseFormInfo form = Assert.Single(loaded.GetForms());
+        Assert.Equal("Forms/customer-v2", form.Href);
+        Assert.Equal("客戶維護", form.Title);
+        Assert.Null(form.Description);
+        Assert.False(form.AsTemplate);
+
+        OdfDatabaseReportInfo report = Assert.Single(loaded.GetReports());
+        Assert.Null(report.Href);
+        Assert.Equal("客戶清單", report.Title);
+        Assert.Equal("新版報表", report.Description);
+        Assert.True(report.AsTemplate);
+
+        OdfDatabaseDataSourceSettingInfo setting = Assert.Single(loaded.GetDataSourceSettings());
+        Assert.True(setting.IsList);
+        Assert.Equal(["new.Driver", "fallback.Driver"], setting.Values);
+
+        Assert.Equal(1, loaded.ClearForms());
+        Assert.Equal(1, loaded.ClearReports());
+        Assert.Equal(1, loaded.ClearDataSourceSettings());
+        Assert.Empty(loaded.GetForms());
+        Assert.Empty(loaded.GetReports());
+        Assert.Empty(loaded.GetDataSourceSettings());
+    }
+
+    /// <summary>
+    /// 驗證無效的設定值會在修改文件前被拒絕，避免留下部分更新。
+    /// </summary>
+    [Fact]
+    public void UpdateDataSourceSetting_NullValue_DoesNotPartiallyUpdate()
+    {
+        using var database = DatabaseDocument.Create();
+        database.SetConnection("sdbc:embedded:firebird");
+        database.AddDataSourceSetting(
+            "JavaDriverClass",
+            OdfDatabaseDataSourceSettingType.String,
+            false,
+            "old.Driver");
+
+        Assert.Throws<ArgumentException>(() => database.UpdateDataSourceSetting(
+            new OdfDatabaseDataSourceSettingInfo(
+                "JavaDriverClass",
+                OdfDatabaseDataSourceSettingType.Boolean,
+                true,
+                ["new.Driver", null!])));
+
+        OdfDatabaseDataSourceSettingInfo setting = Assert.Single(database.GetDataSourceSettings());
+        Assert.Equal(OdfDatabaseDataSourceSettingType.String, setting.Type);
+        Assert.False(setting.IsList);
+        Assert.Equal(["old.Driver"], setting.Values);
+    }
 }

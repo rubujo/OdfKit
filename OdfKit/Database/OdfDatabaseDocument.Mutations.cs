@@ -206,6 +206,189 @@ public partial class OdfDatabaseDocument
     /// <returns>The number of removed query descriptions. / 已移除的查詢描述數量。</returns>
     public int ClearQueries() => ClearNamedChildren("queries", "query");
 
+    /// <summary>
+    /// Updates an existing form component to match the specified description.
+    /// 將既有表單元件更新為指定描述。
+    /// </summary>
+    /// <param name="form">The desired form description; its name identifies the existing component. / 目標表單描述；其名稱用於識別既有元件。</param>
+    /// <returns><see langword="true"/> if the form was updated; otherwise <see langword="false"/>. / 若成功更新表單則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="form"/> is <see langword="null"/>. / 當 <paramref name="form"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the form name is blank. / 當表單名稱為空白時擲出。</exception>
+    public bool UpdateForm(OdfDatabaseFormInfo form)
+    {
+        if (form is null)
+        {
+            throw new ArgumentNullException(nameof(form));
+        }
+
+        if (string.IsNullOrWhiteSpace(form.Name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormCannotBeEmpty_3"), nameof(form));
+        }
+
+        return UpdateComponent("forms", form.Name, form.Href, form.Title, form.Description, form.AsTemplate);
+    }
+
+    /// <summary>
+    /// Updates an existing report component to match the specified description.
+    /// 將既有報表元件更新為指定描述。
+    /// </summary>
+    /// <param name="report">The desired report description; its name identifies the existing component. / 目標報表描述；其名稱用於識別既有元件。</param>
+    /// <returns><see langword="true"/> if the report was updated; otherwise <see langword="false"/>. / 若成功更新報表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="report"/> is <see langword="null"/>. / 當 <paramref name="report"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the report name is blank. / 當報表名稱為空白時擲出。</exception>
+    public bool UpdateReport(OdfDatabaseReportInfo report)
+    {
+        if (report is null)
+        {
+            throw new ArgumentNullException(nameof(report));
+        }
+
+        if (string.IsNullOrWhiteSpace(report.Name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_ReportCannotBeEmpty_2"), nameof(report));
+        }
+
+        return UpdateComponent("reports", report.Name, report.Href, report.Title, report.Description, report.AsTemplate);
+    }
+
+    /// <summary>
+    /// Updates an existing data source setting to match the specified description.
+    /// 將既有資料來源設定更新為指定描述。
+    /// </summary>
+    /// <param name="setting">The desired setting description; its name identifies the existing setting. / 目標設定描述；其名稱用於識別既有設定。</param>
+    /// <returns><see langword="true"/> if the setting was updated; otherwise <see langword="false"/>. / 若成功更新設定則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="setting"/> is <see langword="null"/>. / 當 <paramref name="setting"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the setting name or values are empty. / 當設定名稱或值清單為空時擲出。</exception>
+    public bool UpdateDataSourceSetting(OdfDatabaseDataSourceSettingInfo setting)
+    {
+        if (setting is null)
+        {
+            throw new ArgumentNullException(nameof(setting));
+        }
+
+        if (string.IsNullOrWhiteSpace(setting.Name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_8"), nameof(setting));
+        }
+
+        if (setting.Values.Count == 0)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_5"), nameof(setting));
+        }
+
+        foreach (string value in setting.Values)
+        {
+            if (value is null)
+            {
+                throw new ArgumentException(
+                    OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_6"),
+                    nameof(setting));
+            }
+        }
+
+        OdfNode? settings = FindDataSourceSettings();
+        if (settings is null)
+        {
+            return false;
+        }
+
+        foreach (OdfNode child in settings.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != "data-source-setting" ||
+                child.NamespaceUri != DatabaseNamespace ||
+                !string.Equals(
+                    child.GetAttribute("data-source-setting-name", DatabaseNamespace),
+                    setting.Name,
+                    StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            child.SetAttribute(
+                "data-source-setting-type",
+                DatabaseNamespace,
+                ToDataSourceSettingTypeToken(setting.Type),
+                "db");
+            if (setting.IsList is null)
+            {
+                child.RemoveAttribute("data-source-setting-is-list", DatabaseNamespace);
+            }
+            else
+            {
+                child.SetAttribute(
+                    "data-source-setting-is-list",
+                    DatabaseNamespace,
+                    setting.IsList.Value ? "true" : "false",
+                    "db");
+            }
+
+            foreach (OdfNode valueNode in new List<OdfNode>(child.Children))
+            {
+                if (valueNode.NodeType is OdfNodeType.Element &&
+                    valueNode.LocalName == "data-source-setting-value" &&
+                    valueNode.NamespaceUri == DatabaseNamespace)
+                {
+                    child.RemoveChild(valueNode);
+                }
+            }
+
+            foreach (string value in setting.Values)
+            {
+                OdfNode valueNode = OdfNodeFactory.CreateElement("data-source-setting-value", DatabaseNamespace, "db");
+                valueNode.TextContent = value;
+                child.AppendChild(valueNode);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Removes all form component descriptions, including components in nested collections.
+    /// 移除所有表單元件描述，包括巢狀集合中的元件。
+    /// </summary>
+    /// <returns>The number of removed form components. / 已移除的表單元件數量。</returns>
+    public int ClearForms() => ClearComponents("forms");
+
+    /// <summary>
+    /// Removes all report component descriptions, including components in nested collections.
+    /// 移除所有報表元件描述，包括巢狀集合中的元件。
+    /// </summary>
+    /// <returns>The number of removed report components. / 已移除的報表元件數量。</returns>
+    public int ClearReports() => ClearComponents("reports");
+
+    /// <summary>
+    /// Removes all data source settings while preserving unrelated and foreign children.
+    /// 移除所有資料來源設定，同時保留無關與外來子節點。
+    /// </summary>
+    /// <returns>The number of removed data source settings. / 已移除的資料來源設定數量。</returns>
+    public int ClearDataSourceSettings()
+    {
+        OdfNode? settings = FindDataSourceSettings();
+        if (settings is null)
+        {
+            return 0;
+        }
+
+        int removedCount = 0;
+        foreach (OdfNode child in new List<OdfNode>(settings.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-source-setting" &&
+                child.NamespaceUri == DatabaseNamespace)
+            {
+                settings.RemoveChild(child);
+                removedCount++;
+            }
+        }
+
+        return removedCount;
+    }
+
 
     /// <summary>
     /// Adds a data source setting.
@@ -626,6 +809,132 @@ public partial class OdfDatabaseDocument
         }
 
         return null;
+    }
+
+    private bool UpdateComponent(
+        string containerLocalName,
+        string name,
+        string? href,
+        string? title,
+        string? description,
+        bool? asTemplate)
+    {
+        OdfNode? container = FindChildElement(GetDatabaseNode(), containerLocalName, DatabaseNamespace);
+        OdfNode? component = container is null ? null : FindNamedComponent(container, name, depth: 0);
+        if (component is null)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(href))
+        {
+            component.RemoveAttribute("href", OdfNamespaces.XLink);
+            component.RemoveAttribute("type", OdfNamespaces.XLink);
+            component.RemoveAttribute("show", OdfNamespaces.XLink);
+            component.RemoveAttribute("actuate", OdfNamespaces.XLink);
+        }
+        else
+        {
+            component.SetAttribute("href", OdfNamespaces.XLink, href!, "xlink");
+            component.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            component.SetAttribute("show", OdfNamespaces.XLink, "none", "xlink");
+            component.SetAttribute("actuate", OdfNamespaces.XLink, "onRequest", "xlink");
+        }
+
+        SetOrRemoveDatabaseAttribute(component, "title", title);
+        SetOrRemoveDatabaseAttribute(component, "description", description);
+        if (asTemplate is null)
+        {
+            component.RemoveAttribute("as-template", DatabaseNamespace);
+        }
+        else
+        {
+            component.SetAttribute("as-template", DatabaseNamespace, asTemplate.Value ? "true" : "false", "db");
+        }
+
+        return true;
+    }
+
+    private static OdfNode? FindNamedComponent(OdfNode parent, string name, int depth)
+    {
+        if (depth > MaxFormComponentDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormComponentNestingTooDeep", MaxFormComponentDepth));
+        }
+
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
+            {
+                continue;
+            }
+
+            if (child.LocalName == "component" &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                return child;
+            }
+
+            if (child.LocalName == "component-collection")
+            {
+                OdfNode? found = FindNamedComponent(child, name, depth + 1);
+                if (found is not null)
+                {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private int ClearComponents(string containerLocalName)
+    {
+        OdfNode? container = FindChildElement(GetDatabaseNode(), containerLocalName, DatabaseNamespace);
+        return container is null ? 0 : ClearComponents(container, depth: 0);
+    }
+
+    private static int ClearComponents(OdfNode parent, int depth)
+    {
+        if (depth > MaxFormComponentDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormComponentNestingTooDeep", MaxFormComponentDepth));
+        }
+
+        int removedCount = 0;
+        foreach (OdfNode child in new List<OdfNode>(parent.Children))
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
+            {
+                continue;
+            }
+
+            if (child.LocalName == "component")
+            {
+                parent.RemoveChild(child);
+                removedCount++;
+            }
+            else if (child.LocalName == "component-collection")
+            {
+                removedCount += ClearComponents(child, depth + 1);
+            }
+        }
+
+        return removedCount;
+    }
+
+    private static void SetOrRemoveDatabaseAttribute(OdfNode node, string localName, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            node.RemoveAttribute(localName, DatabaseNamespace);
+        }
+        else
+        {
+            node.SetAttribute(localName, DatabaseNamespace, value!, "db");
+        }
     }
 
     private int ClearNamedChildren(string containerLocalName, string childLocalName)

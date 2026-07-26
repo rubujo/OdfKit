@@ -226,6 +226,7 @@ OdfKit.Chart.OdfChartDocument.LegendPosition.get -> string?
 OdfKit.Chart.OdfChartDocument.LegendPosition.set -> void
 OdfKit.Chart.OdfChartDocument.LegendStyle.get -> OdfKit.Chart.OdfChartStyle!
 OdfKit.Chart.OdfChartDocument.LegendStyle.set -> void
+OdfKit.Chart.OdfChartDocument.MoveSeries(int sourceIndex, int destinationIndex) -> void
 OdfKit.Chart.OdfChartDocument.OdfChartDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Chart.OdfChartDocument.OdfChartDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
 OdfKit.Chart.OdfChartDocument.PlotAreaStyle.get -> OdfKit.Chart.OdfChartStyle!
@@ -1385,7 +1386,10 @@ OdfKit.Database.OdfDatabaseDocument.AddReport(string! name, string? href, string
 OdfKit.Database.OdfDatabaseDocument.AddTable(string! name) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.AddTable(string! name, string? command) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.AddTableSchema(string! name, System.Collections.Generic.IEnumerable<string!>! columns) -> OdfKit.DOM.OdfNode!
+OdfKit.Database.OdfDatabaseDocument.ClearDataSourceSettings() -> int
+OdfKit.Database.OdfDatabaseDocument.ClearForms() -> int
 OdfKit.Database.OdfDatabaseDocument.ClearQueries() -> int
+OdfKit.Database.OdfDatabaseDocument.ClearReports() -> int
 OdfKit.Database.OdfDatabaseDocument.ClearTables() -> int
 OdfKit.Database.OdfDatabaseDocument.ConfigureConnection(string! href) -> OdfKit.Database.OdfDatabaseDocument!
 OdfKit.Database.OdfDatabaseDocument.ConnectionHref.get -> string?
@@ -1437,7 +1441,10 @@ OdfKit.Database.OdfDatabaseDocument.SetQueryOrderStatement(string! queryName, st
 OdfKit.Database.OdfDatabaseDocument.SetQueryOrderStatement(string! queryName, string! command, bool? applyCommand) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.SetQueryUpdateTable(string! queryName, string! tableName) -> OdfKit.DOM.OdfNode!
 OdfKit.Database.OdfDatabaseDocument.Tables.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Database.OdfDatabaseTableInfo!>!
+OdfKit.Database.OdfDatabaseDocument.UpdateDataSourceSetting(OdfKit.Database.OdfDatabaseDataSourceSettingInfo! setting) -> bool
+OdfKit.Database.OdfDatabaseDocument.UpdateForm(OdfKit.Database.OdfDatabaseFormInfo! form) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateQuery(string! name, string! command) -> bool
+OdfKit.Database.OdfDatabaseDocument.UpdateReport(OdfKit.Database.OdfDatabaseReportInfo! report) -> bool
 OdfKit.Database.OdfDatabaseDocument.UpdateTable(string! name, string? command) -> bool
 OdfKit.Database.OdfDatabaseDriverSettingsInfo
 OdfKit.Database.OdfDatabaseDriverSettingsInfo.BaseDn.get -> string?
@@ -14740,7 +14747,9 @@ OdfKit.Formula.OdfFormulaDocument.MathText.get -> string!
 OdfKit.Formula.OdfFormulaDocument.MathTokens.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Formula.OdfMathToken!>!
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package) -> void
 OdfKit.Formula.OdfFormulaDocument.OdfFormulaDocument(OdfKit.Core.OdfPackage! package, string! subPath) -> void
+OdfKit.Formula.OdfFormulaDocument.RemoveAll(OdfKit.Formula.OdfMathTokenKind kind) -> int
 OdfKit.Formula.OdfFormulaDocument.RemoveFirst(OdfKit.Formula.OdfMathTokenKind kind) -> bool
+OdfKit.Formula.OdfFormulaDocument.ReplaceAll(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> int
 OdfKit.Formula.OdfFormulaDocument.ReplaceFirst(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> bool
 OdfKit.Formula.OdfFormulaDocument.SetAnnotation(string! encoding, string? content) -> void
 OdfKit.Formula.OdfFormulaDocument.SetIdentifierEquation(string! leftIdentifier, string! rightIdentifier) -> OdfKit.DOM.OdfNode!
@@ -14816,6 +14825,8 @@ OdfKit.Formula.OdfMathToken.Kind.get -> OdfKit.Formula.OdfMathTokenKind
 OdfKit.Formula.OdfMathToken.Numerator.get -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.Radicand.get -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.RemoveRow(int rowIndex) -> OdfKit.Formula.OdfMathToken!
+OdfKit.Formula.OdfMathToken.ReplaceAll(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> OdfKit.Formula.OdfMathToken!
+OdfKit.Formula.OdfMathToken.ReplaceAll(System.Func<OdfKit.Formula.OdfMathToken!, bool>! predicate, System.Func<OdfKit.Formula.OdfMathToken!, OdfKit.Formula.OdfMathToken!>! replacementFactory) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.ReplaceFirst(OdfKit.Formula.OdfMathTokenKind kind, OdfKit.Formula.OdfMathToken! replacement) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.ReplaceFirst(System.Func<OdfKit.Formula.OdfMathToken!, bool>! predicate, System.Func<OdfKit.Formula.OdfMathToken!, OdfKit.Formula.OdfMathToken!>! replacementFactory) -> OdfKit.Formula.OdfMathToken!
 OdfKit.Formula.OdfMathToken.RootIndex.get -> OdfKit.Formula.OdfMathToken?

@@ -255,6 +255,67 @@ public sealed class OdfMathToken
     }
 
     /// <summary>
+    /// Recursively replaces every token matching the specified predicate without traversing newly created replacement subtrees.
+    /// 遞迴替換所有符合指定條件的 token，且不會繼續巡覽新建立的替換子樹。
+    /// </summary>
+    /// <param name="predicate">The delegate that determines whether a token is a replacement target. / 判斷 token 是否為替換目標的委派。</param>
+    /// <param name="replacementFactory">The delegate that creates a replacement token from each matched token. / 根據每個命中 token 建立替換 token 的委派。</param>
+    /// <returns>The rewritten token, or the current token when no token is matched. / 重寫後的 token；若未命中任何 token，則回傳目前 token。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> or <paramref name="replacementFactory"/> is <see langword="null"/>, or the factory returns <see langword="null"/>. / 當 <paramref name="predicate"/> 或 <paramref name="replacementFactory"/> 為 <see langword="null"/>，或 factory 回傳 <see langword="null"/> 時擲出。</exception>
+    public OdfMathToken ReplaceAll(
+        Func<OdfMathToken, bool> predicate,
+        Func<OdfMathToken, OdfMathToken> replacementFactory)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        if (replacementFactory is null)
+        {
+            throw new ArgumentNullException(nameof(replacementFactory));
+        }
+
+        if (predicate(this))
+        {
+            OdfMathToken replacement = replacementFactory(this);
+            return replacement ?? throw new ArgumentNullException(nameof(replacementFactory));
+        }
+
+        OdfMathToken rewritten = this;
+        int childCount = GetChildCount();
+        for (int index = 0; index < childCount; index++)
+        {
+            OdfMathToken child = GetChild(index);
+            OdfMathToken replaced = child.ReplaceAll(predicate, replacementFactory);
+            if (!ReferenceEquals(child, replaced))
+            {
+                rewritten = rewritten.WithChild(index, replaced);
+            }
+        }
+
+        return rewritten;
+    }
+
+    /// <summary>
+    /// Recursively replaces every token of the specified kind without traversing the replacement subtree.
+    /// 遞迴替換所有指定種類的 token，且不會繼續巡覽替換子樹。
+    /// </summary>
+    /// <param name="kind">The target token kind. / 目標 token 種類。</param>
+    /// <param name="replacement">The replacement token. / 替換後的新 token。</param>
+    /// <returns>The rewritten token, or the current token when no token is matched. / 重寫後的 token；若未命中任何 token，則回傳目前 token。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
+    public OdfMathToken ReplaceAll(OdfMathTokenKind kind, OdfMathToken replacement)
+    {
+        if (replacement is null)
+        {
+            throw new ArgumentNullException(nameof(replacement));
+        }
+
+        return ReplaceAll(token => token.Kind == kind, _ => replacement);
+    }
+
+    /// <summary>
     /// Creates a MathML <c>mi</c> identifier token.
     /// 建立 MathML <c>mi</c> 識別名稱 token。
     /// </summary>

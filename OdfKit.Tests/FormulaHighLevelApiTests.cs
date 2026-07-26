@@ -624,4 +624,52 @@ public class FormulaHighLevelApiTests
         using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "empty.odf");
         Assert.Empty(loaded.GetMathTokens());
     }
+
+    /// <summary>
+    /// 驗證公式可一次替換或移除所有目標 token，且替換內容不會被重複巡覽。
+    /// </summary>
+    [Fact]
+    public void ReplaceAllAndRemoveAll_RewriteOriginalTreeAndRoundTrip()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Fraction(
+                    OdfMathToken.Identifier("a"),
+                    OdfMathToken.Identifier("b")),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Identifier("c"),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Identifier("d"))
+            .Build();
+
+        int replaced = formula.ReplaceAll(
+            OdfMathTokenKind.Identifier,
+            OdfMathToken.Identifier("x"));
+        int removed = formula.RemoveAll(OdfMathTokenKind.Operator);
+
+        Assert.Equal(4, replaced);
+        Assert.Equal(2, removed);
+        Assert.Equal(
+            4,
+            formula.GetMathTokens().Sum(token => token.GetAll(OdfMathTokenKind.Identifier).Count()));
+        Assert.All(
+            formula.GetMathTokens().SelectMany(token => token.GetAll(OdfMathTokenKind.Identifier)),
+            token => Assert.Equal("x", token.Text));
+        Assert.DoesNotContain(
+            formula.GetMathTokens(),
+            token => token.FindFirst(OdfMathTokenKind.Operator) is not null);
+        Assert.Equal(0, formula.RemoveAll(OdfMathTokenKind.Operator));
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "rewritten.odf");
+        Assert.Equal(
+            4,
+            loaded.GetMathTokens().Sum(token => token.GetAll(OdfMathTokenKind.Identifier).Count()));
+        Assert.DoesNotContain(
+            loaded.GetMathTokens(),
+            token => token.FindFirst(OdfMathTokenKind.Operator) is not null);
+    }
 }
