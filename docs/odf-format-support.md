@@ -501,7 +501,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 `manifest:initialisation-vector` 為重複資訊），解密後為 deflate 過的內層完整 ODF 封裝，
 inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), salt)`，不使用逐項目 checksum——
 完整性由 AEAD tag 提供。OdfKit 在載入時偵測此形狀並展開內層封裝，之後的操作與一般封裝相同；
-**寫入仍採規範定義的逐項目加密**。
+寫入時選用 `OdfEncryptionAlgorithm.Aes256Gcm` 會建立相同的 wholesome 外層封裝。
 
 **LibreOffice 讀取 OdfKit 的加密文件**
 
@@ -509,7 +509,7 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
 |---|---|
 | `Blowfish CFB`（`--encryption blowfish`） | ✅ 可開啟並取得完整內容 |
 | AES-256-CBC（`--encryption aes256`，預設） | ✅ 可開啟並取得完整內容 |
-| AES-256-GCM ＋ Argon2id | ❌ 屬 extended package，LibreOffice 只在 wholesome 封裝下使用 GCM |
+| AES-256-GCM ＋ Argon2id（wholesome） | ✅ 產出單一 `encrypted-package`，可由 LibreOffice 開啟 |
 
 達成雙向互通的關鍵有兩項，兩者都是規範明確、OdfKit 先前實作錯誤：
 
@@ -528,8 +528,6 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
 
 已知缺口：
 
-- **寫入** wholesome 形狀尚未支援：OdfKit 產生加密文件時一律採規範定義的逐項目加密。
-  讀入 wholesome 文件後重新儲存會得到逐項目加密（或未加密）的封裝，不會還原成整包加密。
 - **反向**（LibreOffice 開啟 OdfKit 產出）與 manifest 的 Jing schema 驗證仍需本機 LibreOffice
   與 Jing，屬手動或排程工作流程，不在主 CI 的守備範圍。
 - OpenPGP 路徑由 `IOdfCryptographyProvider` 提供，其 checksum 維持 OdfKit 自洽形狀。

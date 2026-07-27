@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using OdfKit.Cli;
@@ -179,6 +180,64 @@ public class CliTests : IDisposable
             Assert.False(sanitized.HasEntry("Scripts/python/hello.py"));
             Assert.False(sanitized.HasEntry("META-INF/macrosignatures.xml"));
             Assert.False(sanitized.HasEntry("META-INF/documentsignatures.xml"));
+            Assert.True(sanitized.HasEntry("content.xml"));
+        }
+        finally
+        {
+            TryDelete(sourcePath);
+            TryDelete(outputPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 sanitize 可將輸出重新加密成 LibreOffice wholesome encryption 封裝。
+    /// </summary>
+    [Fact]
+    public void SanitizeEncryptedPackageCanWriteWholesomeOutput()
+    {
+        const string inputPassword = "CliInputSecret";
+        const string outputPassword = "CliWholesomeSecret";
+        string sourcePath = CreateTempPath(".odt");
+        string outputPath = CreateTempPath(".odt");
+        try
+        {
+            CreateMacroPackage(sourcePath, inputPassword);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "sanitize",
+                    sourcePath,
+                    outputPath,
+                    "--password",
+                    inputPassword,
+                    "--output-password",
+                    outputPassword,
+                    "--encryption",
+                    "aes256-gcm"
+                ],
+                output,
+                error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("encryption-algorithm: aes256-gcm", output.ToString());
+
+            using (FileStream stream = File.OpenRead(outputPath))
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
+            {
+                Assert.Equal(
+                    ["mimetype", "encrypted-package", "META-INF/manifest.xml"],
+                    archive.Entries.Select(entry => entry.FullName).ToArray());
+            }
+
+            using OdfPackage sanitized = OdfPackage.Open(
+                outputPath,
+                new OdfLoadOptions { Password = outputPassword });
+            Assert.False(sanitized.HasEntry("Basic/script.xlb"));
+            Assert.False(sanitized.HasEntry("Scripts/python/hello.py"));
             Assert.True(sanitized.HasEntry("content.xml"));
         }
         finally

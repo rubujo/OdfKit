@@ -581,7 +581,7 @@ public static class OdfKitCli
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-timeout-ms milliseconds] [--baseline-exceptions path]");
         output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--metadata-only] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-timeout-ms milliseconds] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
-        output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|blowfish]");
+        output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|aes256-gcm|blowfish]");
         output.WriteLine("  typed-dom-coverage [--format text|json]");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  convert-csv input.ods output.csv [--delimiter ,] [--sheet 0] [--sheet-name Sheet1]");
@@ -1050,7 +1050,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--encryption", out string? algorithmValue) ||
                         !TryParseEncryptionAlgorithm(algorithmValue, out encryptionAlgorithm))
                     {
-                        error.WriteLine("supported encryption algorithms: aes256, blowfish");
+                        error.WriteLine("supported encryption algorithms: aes256, aes256-gcm, blowfish");
                         return false;
                     }
                     break;
@@ -1139,13 +1139,26 @@ public static class OdfKitCli
             return true;
         }
 
+        if (string.Equals(value, "aes256-gcm", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "aes-256-gcm", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "wholesome", StringComparison.OrdinalIgnoreCase))
+        {
+            algorithm = OdfEncryptionAlgorithm.Aes256Gcm;
+            return true;
+        }
+
         algorithm = OdfEncryptionAlgorithm.Aes256;
         return false;
     }
 
     private static string FormatEncryptionAlgorithm(OdfEncryptionAlgorithm algorithm)
     {
-        return algorithm == OdfEncryptionAlgorithm.Blowfish ? "blowfish" : "aes256";
+        return algorithm switch
+        {
+            OdfEncryptionAlgorithm.Blowfish => "blowfish",
+            OdfEncryptionAlgorithm.Aes256Gcm => "aes256-gcm",
+            _ => "aes256"
+        };
     }
 
     private static bool TryParseFailOn(string? value, out ValidateFailOn failOn)

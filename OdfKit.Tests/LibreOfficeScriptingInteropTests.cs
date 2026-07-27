@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using OdfKit.Compliance;
+using OdfKit.Core;
 using OdfKit.Extensions.Scripting;
 using OdfKit.Text;
 using Xunit;
@@ -12,6 +13,76 @@ namespace OdfKit.Tests;
 
 public partial class LibreOfficeInteropTests
 {
+    /// <summary>
+    /// Verifies that LibreOffice can decrypt and read an OdfKit-authored wholesome encrypted document.
+    /// 驗證 LibreOffice 可解密並讀取 OdfKit 產生的 wholesome 加密文件。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeUno_OpensOdfKitWholesomeEncryptedDocument()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 wholesome 加密實機互通性測試。");
+
+        string pythonPath = Path.Combine(Path.GetDirectoryName(sofficePath!)!, "python.exe");
+        if (!File.Exists(pythonPath))
+            Assert.Skip("LibreOffice 安裝未包含 Python UNO runtime，略過 wholesome 加密實機互通性測試。");
+
+        const string password = "OdfKit-Wholesome-Interop";
+        const string expectedText = "OdfKit wholesome encryption LibreOffice interop";
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitWholesomeInterop_" + Guid.NewGuid().ToString("N"));
+        string profileDirectory = Path.Combine(tempRoot, "profile");
+        string documentPath = Path.Combine(tempRoot, "wholesome.odt");
+        string resultPath = Path.Combine(tempRoot, "result.txt");
+        string bridgePath = Path.Combine(tempRoot, "open-encrypted-document.py");
+        Directory.CreateDirectory(tempRoot);
+        Directory.CreateDirectory(Path.Combine(profileDirectory, "user"));
+
+        Process? soffice = null;
+        try
+        {
+            using (TextDocument document = TextDocument.Create())
+            {
+                document.Body.Paragraphs.Add(expectedText);
+                document.Save(documentPath, new OdfSaveOptions
+                {
+                    Password = password,
+                    EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256Gcm
+                });
+            }
+
+            File.WriteAllText(bridgePath, CreateEncryptedDocumentUnoBridgeScript(), new UTF8Encoding(false));
+            int port = Random.Shared.Next(20_000, 40_000);
+            soffice = StartUnoSoffice(sofficePath!, profileDirectory, port);
+            string output = InvokeEncryptedDocumentRead(
+                pythonPath,
+                bridgePath,
+                port,
+                documentPath,
+                password,
+                resultPath);
+
+            Assert.True(File.Exists(resultPath), $"LibreOffice 未產生 wholesome 解密結果。UNO 輸出：{output}");
+            Assert.Contains(expectedText, File.ReadAllText(resultPath), StringComparison.Ordinal);
+        }
+        finally
+        {
+            if (soffice is not null)
+            {
+                if (!soffice.HasExited)
+                {
+                    soffice.Kill(entireProcessTree: true);
+                    soffice.WaitForExit(10_000);
+                }
+
+                soffice.Dispose();
+            }
+
+            if (Directory.Exists(tempRoot))
+                DeleteScriptingInteropDirectory(tempRoot);
+        }
+    }
+
     [Fact]
     public async Task ExternalCompilerWorkersUsePythonAstAndProbeLibreOfficeBasic()
     {
@@ -274,6 +345,60 @@ public partial class LibreOfficeInteropTests
         desktop.terminate()
         """;
 
+    private static string CreateEncryptedDocumentUnoBridgeScript() =>
+        """
+        import sys
+        import time
+        import uno
+
+        def property_value(name, value):
+            item = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+            item.Name = name
+            item.Value = value
+            return item
+
+        port = int(sys.argv[1])
+        document_path = sys.argv[2]
+        password = sys.argv[3]
+        result_path = sys.argv[4]
+        local_context = uno.getComponentContext()
+        resolver = local_context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.bridge.UnoUrlResolver", local_context)
+        context = None
+        last_error = None
+        for _ in range(100):
+            try:
+                context = resolver.resolve(
+                    f"uno:socket,host=127.0.0.1,port={port};urp;StarOffice.ComponentContext")
+                break
+            except Exception as error:
+                last_error = error
+                time.sleep(0.1)
+        if context is None:
+            raise RuntimeError(f"Unable to connect to LibreOffice UNO: {last_error}")
+
+        desktop = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.frame.Desktop", context)
+        document = desktop.loadComponentFromURL(
+            uno.systemPathToFileUrl(document_path),
+            "_blank",
+            0,
+            (
+                property_value("Hidden", True),
+                property_value("ReadOnly", True),
+                property_value("Password", password),
+            ))
+        if document is None:
+            raise RuntimeError("LibreOffice did not load the encrypted ODF document")
+
+        text = document.getText().getString()
+        with open(result_path, "w", encoding="utf-8") as result:
+            result.write(text)
+        print(f"characters={len(text)}")
+        document.close(True)
+        desktop.terminate()
+        """;
+
     private static Process StartUnoSoffice(string sofficePath, string profileDirectory, int port)
     {
         var startInfo = new ProcessStartInfo
@@ -317,6 +442,38 @@ public partial class LibreOfficeInteropTests
         Assert.True(process.WaitForExit(60_000), "LibreOffice Python UNO bridge 執行逾時。");
         string output = stdout.GetAwaiter().GetResult() + stderr.GetAwaiter().GetResult();
         Assert.True(process.ExitCode == 0, $"LibreOffice Python UNO bridge 執行失敗：{output}");
+        return output;
+    }
+
+    private static string InvokeEncryptedDocumentRead(
+        string pythonPath,
+        string bridgePath,
+        int port,
+        string documentPath,
+        string password,
+        string resultPath)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = pythonPath,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        startInfo.ArgumentList.Add(bridgePath);
+        startInfo.ArgumentList.Add(port.ToString(CultureInfo.InvariantCulture));
+        startInfo.ArgumentList.Add(documentPath);
+        startInfo.ArgumentList.Add(password);
+        startInfo.ArgumentList.Add(resultPath);
+
+        using Process? process = Process.Start(startInfo);
+        Assert.NotNull(process);
+        Task<string> stdout = process.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
+        Task<string> stderr = process.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
+        Assert.True(process.WaitForExit(60_000), "LibreOffice wholesome UNO bridge 執行逾時。");
+        string output = stdout.GetAwaiter().GetResult() + stderr.GetAwaiter().GetResult();
+        Assert.True(process.ExitCode == 0, $"LibreOffice wholesome UNO bridge 執行失敗：{output}");
         return output;
     }
 }

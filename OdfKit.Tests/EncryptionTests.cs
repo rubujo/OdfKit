@@ -223,9 +223,6 @@ namespace OdfKit.Tests
                     password,
                     OdfEncryptionAlgorithm.Aes256Gcm,
                     TestContext.Current.CancellationToken);
-
-                Assert.True(OdfEncryption.LastParallelEncryptedEntryCountForTests >= 4);
-                Assert.True(OdfEncryption.LastParallelEncryptionMaxDegreeForTests >= 1);
             }
 
             ms.Position = 0;
@@ -1455,10 +1452,22 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Read, true))
             {
+                Assert.Equal(
+                    ["mimetype", "encrypted-package", "META-INF/manifest.xml"],
+                    zip.Entries.Select(entry => entry.FullName).ToArray());
+
+                ZipArchiveEntry encryptedPackage = zip.GetEntry("encrypted-package")!;
+                Assert.NotNull(encryptedPackage);
+                Assert.Equal(encryptedPackage.Length, encryptedPackage.CompressedLength);
+
                 var manifestEntry = zip.GetEntry("META-INF/manifest.xml")!;
                 using var sr = new StreamReader(manifestEntry.Open());
                 string manifest = sr.ReadToEnd();
                 Assert.Contains("aes256-gcm", manifest);
+                Assert.Contains("manifest:full-path=\"encrypted-package\"", manifest);
+                Assert.DoesNotContain("manifest:full-path=\"/\"", manifest);
+                Assert.DoesNotContain("manifest:checksum", manifest);
+                Assert.Contains("http://www.w3.org/2001/04/xmlenc#sha256", manifest);
 
                 // key-derivation-name 與 loext 參數名稱對標 LibreOffice 的
                 // OpenDocument-v1.4+libreoffice-manifest-schema.rng Argon2id 分支。
@@ -1474,6 +1483,58 @@ namespace OdfKit.Tests
             using var loadedDoc = OdfDocument.Load(ms, loadOpts);
             Assert.NotNull(loadedDoc);
             Assert.Equal(OdfDocumentKind.Text, loadedDoc.DocumentKind);
+        }
+
+        /// <summary>
+        /// 測試 wholesome encryption 外層密文遭竄改或密碼錯誤時，AEAD 驗證會拒絕載入。
+        /// </summary>
+        [Fact]
+        public void WholesomeEncryption_WrongPasswordOrTamperedCiphertext_Throws()
+        {
+            const string password = "wholesome-secret";
+            using var document = TextDocument.Create();
+            document.Body.Paragraphs.Add("wholesome authentication");
+            using var saved = new MemoryStream();
+            document.SaveToStream(saved, new OdfSaveOptions
+            {
+                Password = password,
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256Gcm
+            });
+            byte[] savedBytes = saved.ToArray();
+
+            using (var wrongPasswordStream = new MemoryStream(savedBytes))
+            {
+                Assert.Throws<CryptographicException>(() =>
+                    OdfDocument.Load(wrongPasswordStream, new OdfLoadOptions { Password = "wrong-password" }));
+            }
+
+            byte[] tampered;
+            using (var savedPackageStream = new MemoryStream(savedBytes))
+            using (var source = new ZipArchive(savedPackageStream, ZipArchiveMode.Read))
+            using (var output = new MemoryStream())
+            {
+                using (var target = new ZipArchive(output, ZipArchiveMode.Create, leaveOpen: true))
+                {
+                    foreach (ZipArchiveEntry sourceEntry in source.Entries)
+                    {
+                        ZipArchiveEntry targetEntry = target.CreateEntry(sourceEntry.FullName, CompressionLevel.NoCompression);
+                        using Stream sourceStream = sourceEntry.Open();
+                        using Stream targetStream = targetEntry.Open();
+                        using var content = new MemoryStream();
+                        sourceStream.CopyTo(content);
+                        byte[] bytes = content.ToArray();
+                        if (sourceEntry.FullName == "encrypted-package")
+                            bytes[bytes.Length - 1] ^= 0x40;
+                        targetStream.Write(bytes, 0, bytes.Length);
+                    }
+                }
+
+                tampered = output.ToArray();
+            }
+
+            using var tamperedStream = new MemoryStream(tampered);
+            Assert.Throws<CryptographicException>(() =>
+                OdfDocument.Load(tamperedStream, new OdfLoadOptions { Password = password }));
         }
 
         /// <summary>

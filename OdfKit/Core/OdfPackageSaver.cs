@@ -50,20 +50,30 @@ internal static class OdfPackageSaver
             package.Mmf = null;
             package.MmfEntries = null;
         }
-        RunEncryptedPipeline(package, () =>
-        {
-            PrepareMetadata(ctx, includeRdfMetadata);
-            Stream? underlying = ctx.UnderlyingStream;
-            if (underlying is null || !underlying.CanWrite)
-                return;
+        RunEncryptedPipeline(
+            package,
+            () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                Stream? underlying = ctx.UnderlyingStream;
+                if (underlying is null || !underlying.CanWrite)
+                    return;
 
-            using Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize());
-            ctx.WriteToArchive(temp);
-            underlying.SetLength(0);
-            temp.Position = 0;
-            temp.CopyTo(underlying);
-            underlying.Flush();
-        });
+                using Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize());
+                ctx.WriteToArchive(temp);
+                ReplaceUnderlyingStream(underlying, temp);
+            },
+            () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                Stream? underlying = ctx.UnderlyingStream;
+                if (underlying is null || !underlying.CanWrite)
+                    return;
+
+                using Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize());
+                OdfWholesomeEncryption.WritePackage(ctx, temp);
+                ReplaceUnderlyingStream(underlying, temp);
+            });
     }
 
     /// <summary>
@@ -110,30 +120,44 @@ internal static class OdfPackageSaver
             package.Mmf = null;
             package.MmfEntries = null;
         }
-        await RunEncryptedPipelineAsync(package, async () =>
-        {
-            PrepareMetadata(ctx, includeRdfMetadata);
-            Stream? underlying = ctx.UnderlyingStream;
-            if (underlying is null || !underlying.CanWrite)
-                return;
+        await RunEncryptedPipelineAsync(
+            package,
+            async () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                Stream? underlying = ctx.UnderlyingStream;
+                if (underlying is null || !underlying.CanWrite)
+                    return;
 
-            Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
-            try
+                Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
+                try
+                {
+                    await ctx.WriteToArchiveAsync(temp, cancellationToken).ConfigureAwait(false);
+                    await ReplaceUnderlyingStreamAsync(underlying, temp, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await DisposeStreamAsync(temp).ConfigureAwait(false);
+                }
+            },
+            async () =>
             {
-                await ctx.WriteToArchiveAsync(temp, cancellationToken).ConfigureAwait(false);
-                underlying.SetLength(0);
-                temp.Position = 0;
-                await temp.CopyToAsync(underlying, 81920, cancellationToken).ConfigureAwait(false);
-                await underlying.FlushAsync(cancellationToken).ConfigureAwait(false);
-            }
-            finally
-            {
-                if (temp is IAsyncDisposable asyncDisposable)
-                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-                else
-                    temp.Dispose();
-            }
-        }).ConfigureAwait(false);
+                PrepareMetadata(ctx, includeRdfMetadata);
+                Stream? underlying = ctx.UnderlyingStream;
+                if (underlying is null || !underlying.CanWrite)
+                    return;
+
+                Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
+                try
+                {
+                    await OdfWholesomeEncryption.WritePackageAsync(ctx, temp, cancellationToken).ConfigureAwait(false);
+                    await ReplaceUnderlyingStreamAsync(underlying, temp, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await DisposeStreamAsync(temp).ConfigureAwait(false);
+                }
+            }).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -145,11 +169,18 @@ internal static class OdfPackageSaver
             throw new ArgumentNullException(nameof(destination));
 
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
-        RunEncryptedPipeline(package, () =>
-        {
-            PrepareMetadata(ctx, includeRdfMetadata);
-            ctx.WriteToArchive(destination);
-        });
+        RunEncryptedPipeline(
+            package,
+            () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                ctx.WriteToArchive(destination);
+            },
+            () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                OdfWholesomeEncryption.WritePackage(ctx, destination);
+            });
     }
 
     /// <summary>
@@ -165,11 +196,18 @@ internal static class OdfPackageSaver
             throw new ArgumentNullException(nameof(destination));
 
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
-        await RunEncryptedPipelineAsync(package, async () =>
-        {
-            PrepareMetadata(ctx, includeRdfMetadata);
-            await ctx.WriteToArchiveAsync(destination, cancellationToken).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+        await RunEncryptedPipelineAsync(
+            package,
+            async () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                await ctx.WriteToArchiveAsync(destination, cancellationToken).ConfigureAwait(false);
+            },
+            async () =>
+            {
+                PrepareMetadata(ctx, includeRdfMetadata);
+                await OdfWholesomeEncryption.WritePackageAsync(ctx, destination, cancellationToken).ConfigureAwait(false);
+            }).ConfigureAwait(false);
     }
 
     private static void PrepareMetadata(OdfPackage.OdfPackageSaveCollaborators ctx, bool includeRdfMetadata)
@@ -182,10 +220,16 @@ internal static class OdfPackageSaver
         ctx.SaveManifest();
     }
 
-    private static void RunEncryptedPipeline(OdfPackage package, Action body)
+    private static void RunEncryptedPipeline(OdfPackage package, Action body, Action wholesomeBody)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         ctx.ProcessSaveHooks();
+        if (UsesWholesomeEncryption(ctx))
+        {
+            wholesomeBody();
+            return;
+        }
+
         Dictionary<OdfPackageEntry, EntrySnapshot>? snapshots = null;
         bool encrypted = false;
 
@@ -235,10 +279,19 @@ internal static class OdfPackageSaver
         }
     }
 
-    private static async Task RunEncryptedPipelineAsync(OdfPackage package, Func<Task> body)
+    private static async Task RunEncryptedPipelineAsync(
+        OdfPackage package,
+        Func<Task> body,
+        Func<Task> wholesomeBody)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         ctx.ProcessSaveHooks();
+        if (UsesWholesomeEncryption(ctx))
+        {
+            await wholesomeBody().ConfigureAwait(false);
+            return;
+        }
+
         Dictionary<OdfPackageEntry, EntrySnapshot>? snapshots = null;
         bool encrypted = false;
 
@@ -412,4 +465,36 @@ internal static class OdfPackageSaver
 
     internal static Stream CreateTempStream(OdfPackage.OdfPackageSaveCollaborators ctx, long estimatedSize, bool async = false)
         => OdfTempStreamFactory.Create(estimatedSize, ctx.SaveOptions.TemporaryDirectory, async, TempFileThresholdBytes);
+
+    private static bool UsesWholesomeEncryption(OdfPackage.OdfPackageSaveCollaborators ctx) =>
+        ctx.SaveOptions.Password is not null
+        && ctx.SaveOptions.CryptographyProvider is null
+        && ctx.SaveOptions.EncryptionAlgorithm == OdfEncryptionAlgorithm.Aes256Gcm;
+
+    private static void ReplaceUnderlyingStream(Stream underlying, Stream content)
+    {
+        underlying.SetLength(0);
+        content.Position = 0;
+        content.CopyTo(underlying);
+        underlying.Flush();
+    }
+
+    private static async Task ReplaceUnderlyingStreamAsync(
+        Stream underlying,
+        Stream content,
+        CancellationToken cancellationToken)
+    {
+        underlying.SetLength(0);
+        content.Position = 0;
+        await content.CopyToAsync(underlying, 81920, cancellationToken).ConfigureAwait(false);
+        await underlying.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async ValueTask DisposeStreamAsync(Stream stream)
+    {
+        if (stream is IAsyncDisposable asyncDisposable)
+            await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+        else
+            stream.Dispose();
+    }
 }

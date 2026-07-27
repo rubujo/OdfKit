@@ -32,8 +32,8 @@ public enum OdfEncryptionAlgorithm
     OpenPgp,
 
     /// <summary>
-    /// Uses AES-256-GCM authenticated encryption compatible with LibreOffice 25.8 and later.
-    /// 使用與 LibreOffice 25.8 以上版本相容的 AES-256-GCM 認證加密。
+    /// Uses LibreOffice-compatible wholesome encryption with AES-256-GCM and Argon2id.
+    /// 使用與 LibreOffice 相容的 AES-256-GCM 與 Argon2id 整包加密。
     /// </summary>
     Aes256Gcm
 }

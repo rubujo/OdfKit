@@ -4,6 +4,9 @@ using System.IO.Compression;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Generators;
@@ -14,8 +17,8 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Reads packages that encrypt the whole ODF container into a single <c>encrypted-package</c> entry.
-/// 讀取將整份 ODF 容器加密為單一 <c>encrypted-package</c> 項目的封裝。
+/// Reads and writes packages that encrypt the whole ODF container into a single <c>encrypted-package</c> entry.
+/// 讀寫將整份 ODF 容器加密為單一 <c>encrypted-package</c> 項目的封裝。
 /// </summary>
 /// <remarks>
 /// <para>
@@ -33,9 +36,6 @@ namespace OdfKit.Core;
 ///   <item><description>start key 為 <c>SHA-256(密碼)</c>，衍生金鑰為 <c>Argon2id(start key, salt)</c>。</description></item>
 /// </list>
 /// </para>
-/// <para>
-/// 目前只支援讀取；OdfKit 寫入時仍採規範定義的逐項目加密。
-/// </para>
 /// </remarks>
 internal static class OdfWholesomeEncryption
 {
@@ -49,6 +49,14 @@ internal static class OdfWholesomeEncryption
     private const int GcmTagLengthBits = 128;
 
     private const int GcmTagLength = GcmTagLengthBits / 8;
+
+    private const int Argon2Iterations = 3;
+
+    private const int Argon2MemoryKib = 65536;
+
+    private const int Argon2Lanes = 4;
+
+    private const string Sha256StartKeyUri = "http://www.w3.org/2001/04/xmlenc#sha256";
 
     /// <summary>
     /// 判斷封裝是否為整包加密形狀。
@@ -101,15 +109,107 @@ internal static class OdfWholesomeEncryption
     }
 
     /// <summary>
+    /// 將目前封裝寫成 LibreOffice wholesome encryption 外層封裝。
+    /// </summary>
+    internal static void WritePackage(OdfPackage.OdfPackageSaveCollaborators ctx, Stream destination)
+    {
+        using Stream innerPackage = OdfPackageSaver.CreateTempStream(ctx, ctx.EstimateArchiveSize());
+        ctx.WriteToArchive(innerPackage);
+        innerPackage.Position = 0;
+
+        using Stream deflatedPackage = OdfPackageSaver.CreateTempStream(ctx, innerPackage.Length);
+        using (var deflater = new DeflateStream(
+            deflatedPackage,
+            ctx.SaveOptions.CompressionLevel,
+            leaveOpen: true))
+        {
+            innerPackage.CopyTo(deflater);
+        }
+
+        deflatedPackage.Position = 0;
+        byte[] deflated = ReadAllBytes(deflatedPackage);
+        byte[] ciphertext = EncryptDeflatedPackage(
+            deflated,
+            ctx.SaveOptions.Password ?? string.Empty,
+            out byte[] iv,
+            out byte[] salt);
+        try
+        {
+            WriteOuterArchive(ctx, destination, innerPackage.Length, ciphertext, iv, salt);
+        }
+        finally
+        {
+            Array.Clear(deflated, 0, deflated.Length);
+            Array.Clear(ciphertext, 0, ciphertext.Length);
+        }
+    }
+
+    /// <summary>
+    /// 非同步將目前封裝寫成 LibreOffice wholesome encryption 外層封裝。
+    /// </summary>
+    internal static async Task WritePackageAsync(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream destination,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        Stream innerPackage = OdfPackageSaver.CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
+        try
+        {
+            await ctx.WriteToArchiveAsync(innerPackage, cancellationToken).ConfigureAwait(false);
+            innerPackage.Position = 0;
+
+            Stream deflatedPackage = OdfPackageSaver.CreateTempStream(ctx, innerPackage.Length, async: true);
+            try
+            {
+                using (var deflater = new DeflateStream(
+                    deflatedPackage,
+                    ctx.SaveOptions.CompressionLevel,
+                    leaveOpen: true))
+                {
+                    await innerPackage.CopyToAsync(deflater, 81920, cancellationToken).ConfigureAwait(false);
+                }
+
+                deflatedPackage.Position = 0;
+                byte[] deflated = await ReadAllBytesAsync(deflatedPackage, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+                byte[] ciphertext = EncryptDeflatedPackage(
+                    deflated,
+                    ctx.SaveOptions.Password ?? string.Empty,
+                    out byte[] iv,
+                    out byte[] salt);
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    WriteOuterArchive(ctx, destination, innerPackage.Length, ciphertext, iv, salt);
+                }
+                finally
+                {
+                    Array.Clear(deflated, 0, deflated.Length);
+                    Array.Clear(ciphertext, 0, ciphertext.Length);
+                }
+            }
+            finally
+            {
+                await DisposeStreamAsync(deflatedPackage).ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            await DisposeStreamAsync(innerPackage).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
     /// 以 start key 與 Argon2id 參數衍生 AES-256-GCM 的金鑰。
     /// </summary>
     private static byte[] DeriveKey(OdfEncryptionInfo info, string password)
     {
         byte[] startKey = ComputeStartKey(info.StartKeyGenerationName, password);
 
-        int iterations = ReadArgon2Parameter(info, "argon2-iterations", "argon2-t", 3);
-        int memoryKib = ReadArgon2Parameter(info, "argon2-memory", "argon2-m", 65536);
-        int lanes = ReadArgon2Parameter(info, "argon2-lanes", "argon2-p", 4);
+        int iterations = ReadArgon2Parameter(info, "argon2-iterations", "argon2-t", Argon2Iterations);
+        int memoryKib = ReadArgon2Parameter(info, "argon2-memory", "argon2-m", Argon2MemoryKib);
+        int lanes = ReadArgon2Parameter(info, "argon2-lanes", "argon2-p", Argon2Lanes);
         int keySize = info.KeySize > 0 ? info.KeySize : OdfEncryption.Aes256KeySizeBytes;
 
         var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
@@ -213,6 +313,150 @@ internal static class OdfWholesomeEncryption
         {
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_GcmDecryptionFailed"), ex);
         }
+    }
+
+    /// <summary>
+    /// 加密已 deflate 的內層封裝並組成 <c>IV ‖ ciphertext ‖ tag</c>。
+    /// </summary>
+    private static byte[] EncryptDeflatedPackage(
+        byte[] deflated,
+        string password,
+        out byte[] iv,
+        out byte[] salt)
+    {
+        byte[] ciphertext = OdfEncryption.EncryptEntry(
+            deflated,
+            password,
+            OdfEncryptionAlgorithm.Aes256Gcm,
+            out iv,
+            out salt,
+            out _);
+
+        byte[] container = new byte[iv.Length + ciphertext.Length];
+        Buffer.BlockCopy(iv, 0, container, 0, iv.Length);
+        Buffer.BlockCopy(ciphertext, 0, container, iv.Length, ciphertext.Length);
+        Array.Clear(ciphertext, 0, ciphertext.Length);
+        return container;
+    }
+
+    /// <summary>
+    /// 寫出只包含 mimetype、encrypted-package 與 manifest.xml 的外層 ZIP。
+    /// </summary>
+    private static void WriteOuterArchive(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream destination,
+        long innerPackageSize,
+        byte[] ciphertext,
+        byte[] iv,
+        byte[] salt)
+    {
+        string mimeType = ctx.MimeType ?? "application/vnd.oasis.opendocument.text";
+        byte[] manifest = CreateOuterManifest(ctx, mimeType, innerPackageSize, iv, salt);
+
+        using var archive = new ZipArchive(destination, ZipArchiveMode.Create, leaveOpen: true, Encoding.UTF8);
+        WriteOuterEntry(archive, "mimetype", Encoding.UTF8.GetBytes(mimeType), CompressionLevel.NoCompression, ctx.SaveOptions.Deterministic);
+        WriteOuterEntry(archive, EncryptedPackageEntryName, ciphertext, CompressionLevel.NoCompression, ctx.SaveOptions.Deterministic);
+        WriteOuterEntry(archive, "META-INF/manifest.xml", manifest, ctx.SaveOptions.CompressionLevel, ctx.SaveOptions.Deterministic);
+    }
+
+    /// <summary>
+    /// 建立 wholesome 外層 manifest；其根目錄由內嵌 package 取代，因此不輸出 `/` 項目。
+    /// </summary>
+    private static byte[] CreateOuterManifest(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        string mimeType,
+        long innerPackageSize,
+        byte[] iv,
+        byte[] salt)
+    {
+        using var output = new MemoryStream();
+        var settings = new XmlWriterSettings
+        {
+            Encoding = new UTF8Encoding(false),
+            Indent = ctx.SaveOptions.IndentXml
+        };
+
+        using (XmlWriter writer = XmlWriter.Create(output, settings))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("xmlns", "loext", null, OdfNamespaces.LoExt);
+            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, "1.4");
+
+            writer.WriteStartElement("manifest", "file-entry", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, EncryptedPackageEntryName);
+            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, mimeType);
+            writer.WriteAttributeString(
+                "manifest",
+                "size",
+                OdfNamespaces.Manifest,
+                innerPackageSize.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+            writer.WriteStartElement("manifest", "encryption-data", OdfNamespaces.Manifest);
+
+            writer.WriteStartElement("manifest", "algorithm", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, OdfEncryption.Aes256GcmAlgorithmUri);
+            writer.WriteAttributeString("manifest", "initialisation-vector", OdfNamespaces.Manifest, Convert.ToBase64String(iv));
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("manifest", "start-key-generation", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "start-key-generation-name", OdfNamespaces.Manifest, Sha256StartKeyUri);
+            writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, OdfEncryption.Aes256KeySizeBytes.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("manifest", "key-derivation", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, OdfEncryption.Argon2idDerivationUri);
+            writer.WriteAttributeString("loext", "argon2-iterations", OdfNamespaces.LoExt, Argon2Iterations.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("loext", "argon2-memory", OdfNamespaces.LoExt, Argon2MemoryKib.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("loext", "argon2-lanes", OdfNamespaces.LoExt, Argon2Lanes.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(salt));
+            writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, OdfEncryption.Aes256KeySizeBytes.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+        }
+
+        return output.ToArray();
+    }
+
+    private static void WriteOuterEntry(
+        ZipArchive archive,
+        string name,
+        byte[] content,
+        CompressionLevel compressionLevel,
+        bool deterministic)
+    {
+        ZipArchiveEntry entry = archive.CreateEntry(name, compressionLevel);
+        if (deterministic)
+            entry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+        using Stream stream = entry.Open();
+        stream.Write(content, 0, content.Length);
+    }
+
+    private static byte[] ReadAllBytes(Stream stream)
+    {
+        using var output = new MemoryStream();
+        stream.CopyTo(output);
+        return output.ToArray();
+    }
+
+    private static async Task<byte[]> ReadAllBytesAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        using var output = new MemoryStream();
+        await stream.CopyToAsync(output, 81920, cancellationToken).ConfigureAwait(false);
+        return output.ToArray();
+    }
+
+    private static async ValueTask DisposeStreamAsync(Stream stream)
+    {
+        if (stream is IAsyncDisposable asyncDisposable)
+            await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+        else
+            stream.Dispose();
     }
 
     /// <summary>
