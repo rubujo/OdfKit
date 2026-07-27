@@ -57,10 +57,7 @@ public partial class PresentationDocument
     /// <returns>The number of changed text boxes. / 已變更的文字方塊數量。</returns>
     public int ReplaceTextInTextBoxes(string search, string replacement)
     {
-        if (search is null)
-        {
-            throw new ArgumentNullException(nameof(search));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(search, nameof(search));
 
         int changed = 0;
         foreach (OdfTextBox textBox in GetTextBoxes())
@@ -82,10 +79,7 @@ public partial class PresentationDocument
     /// <returns>The batch update result. / 批次更新結果。</returns>
     public OdfBatchUpdateResult UpdatePictures(IEnumerable<OdfPictureUpdateRequest> requests)
     {
-        if (requests is null)
-        {
-            throw new ArgumentNullException(nameof(requests));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(requests, nameof(requests));
 
         var result = new OdfBatchUpdateResult();
         foreach (OdfPictureUpdateRequest request in requests)
@@ -125,10 +119,7 @@ public partial class PresentationDocument
     /// <returns>The batch update result. / 批次更新結果。</returns>
     public OdfBatchUpdateResult UpdateShapes(IEnumerable<OdfShapeUpdateRequest> requests)
     {
-        if (requests is null)
-        {
-            throw new ArgumentNullException(nameof(requests));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(requests, nameof(requests));
 
         var result = new OdfBatchUpdateResult();
         IReadOnlyList<OdfShape> shapes = GetShapes();

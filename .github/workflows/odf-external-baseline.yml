@@ -193,7 +193,7 @@ jobs:
             --framework net10.0 `
             --no-build `
             --no-restore `
-            --filter 'FullyQualifiedName=OdfKit.Tests.OpenPgpExternalInteropTests.GnuPg_DecryptsOdfKitSessionKey_AndPackageRoundTrips'
+            --filter 'FullyQualifiedName=OdfKit.Tests.OpenPgpExternalInteropTests.GnuPgDecryptsOdfKitSessionKeyAndPackageRoundTrips'
           java -jar '${{ steps.install-jing.outputs.jar_path }}' `
             -i '${{ steps.install-libreoffice-schema.outputs.schema_path }}' `
             "$env:ODFKIT_OPENPGP_OUTPUT_DIR/openpgp-manifest.xml"
@@ -220,4 +220,4 @@ jobs:
             --framework net10.0 `
             --no-build `
             --no-restore `
-            --filter 'FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments'
+            --filter 'FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidatorRealJarDetectsValidAndInvalidDocuments'

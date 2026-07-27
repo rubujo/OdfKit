@@ -30,7 +30,7 @@ public partial class OdfSlide
     public OdfPlaceholder AddPlaceholder(OdfPlaceholderType type, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "rect", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -62,11 +62,11 @@ public partial class OdfSlide
         OdfNode objNode = new(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
 
         string href = subPath.Replace('\\', '/');
-        if (!href.StartsWith("./"))
+        if (!href.StartsWith("./", System.StringComparison.Ordinal))
         {
             href = "./" + href;
         }
-        if (href.Length > 2 && href.EndsWith("/"))
+        if (href.Length > 2 && global::OdfKit.Internal.OdfStringHelper.EndsWith(href, '/'))
         {
             href = href.Substring(0, href.Length - 1);
         }
@@ -106,8 +106,7 @@ public partial class OdfSlide
     /// <returns>The added text box shape instance. / 新增的文字方塊圖形執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, IEnumerable<string> paragraphs)
     {
-        if (paragraphs is null)
-            throw new ArgumentNullException(nameof(paragraphs));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraphs, nameof(paragraphs));
 
         var frame = CreateDrawingFrame(x, y, w, h);
         OdfNode textBoxNode = new(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");
@@ -220,7 +219,7 @@ public partial class OdfSlide
         };
 
         OdfNode shapeNode = new(OdfNodeType.Element, localName, OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -244,7 +243,7 @@ public partial class OdfSlide
     public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "line", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x1", OdfNamespaces.Svg, x1.ToString(), "svg");
@@ -271,7 +270,7 @@ public partial class OdfSlide
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_EndCannotBeEmpty"), nameof(endShapeId));
 
         var connector = new OdfNode(OdfNodeType.Element, "connector", OdfNamespaces.Draw, "draw");
-        string id = "con_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("con_");
         connector.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         connector.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         connector.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
@@ -294,7 +293,7 @@ public partial class OdfSlide
     public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "polyline", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -418,10 +417,10 @@ public partial class OdfSlide
         Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "duration", OdfNamespaces.Presentation, isoDurStr, "presentation", deferSave: false);
     }
 
-    private OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+    private static OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        var id = "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_");
         frame.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         frame.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -431,7 +430,7 @@ public partial class OdfSlide
         return frame;
     }
 
-    private IReadOnlyList<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
+    private System.Collections.ObjectModel.ReadOnlyCollection<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
     {
         List<T> objects = [];
         foreach (OdfNode child in Node.Children)

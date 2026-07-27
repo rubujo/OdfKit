@@ -88,8 +88,7 @@ public partial class TextDocument
     /// <returns>The ODT mutation report. / ODT 變更報告。</returns>
     public OdtMutationReport ReplaceImage(string imageName, byte[] imageBytes)
     {
-        if (imageBytes is null)
-            throw new ArgumentNullException(nameof(imageBytes));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(imageBytes, nameof(imageBytes));
 
         var report = new OdtMutationReport("ReplaceImage");
         OdfImage[] matches = Body.Images.Items

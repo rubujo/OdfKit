@@ -21,7 +21,7 @@ public class SecondaryFormatApiScenarioTests
     /// 驗證 ODC 圖表軸與序列進階寫入 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void ChartScenario_AxisAdvancedEditingSurvivesRoundTrip()
+    public void ChartScenarioAxisAdvancedEditingSurvivesRoundTrip()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.ChartClass = "chart:bar";
@@ -72,7 +72,7 @@ public class SecondaryFormatApiScenarioTests
     /// 驗證 ODB 連線、資料表、查詢、表單與資料來源設定 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void DatabaseScenario_ConnectionTablesQueriesFormsSurviveRoundTrip()
+    public void DatabaseScenarioConnectionTablesQueriesFormsSurviveRoundTrip()
     {
         using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
@@ -120,7 +120,7 @@ public class SecondaryFormatApiScenarioTests
     /// 驗證 ODF 公式 token 與 MathML 寫入 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void FormulaScenario_MathTokensSurviveRoundTrip()
+    public void FormulaScenarioMathTokensSurviveRoundTrip()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -150,7 +150,7 @@ public class SecondaryFormatApiScenarioTests
     /// 驗證 ODI 多框架影像與版面 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void ImageScenario_MultiFrameLayoutSurvivesRoundTrip()
+    public void ImageScenarioMultiFrameLayoutSurvivesRoundTrip()
     {
         byte[] primary = CreatePngBytes();
         byte[] secondary = CreateAlternatePngBytes();

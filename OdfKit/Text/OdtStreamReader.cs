@@ -43,10 +43,7 @@ public sealed class OdtStreamReader : IDisposable
     /// <param name="options">The reader options. / 讀取器選項。</param>
     public OdtStreamReader(Stream stream, OdtStreamReaderOptions options)
     {
-        if (stream is null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         _options = ValidateOptions(options);
         _zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: _options.LeaveOpen);
@@ -70,10 +67,7 @@ public sealed class OdtStreamReader : IDisposable
     /// <param name="options">The reader options. / 讀取器選項。</param>
     public OdtStreamReader(string path, OdtStreamReaderOptions options)
     {
-        if (path is null)
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         _options = ValidateOptions(options);
         _zip = ZipFile.OpenRead(path);
@@ -368,8 +362,7 @@ public sealed class OdtStreamReader : IDisposable
 
     private static OdtStreamReaderOptions ValidateOptions(OdtStreamReaderOptions options)
     {
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
         return options;
     }
 }

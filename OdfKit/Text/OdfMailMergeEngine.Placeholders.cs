@@ -23,10 +23,10 @@ public partial class OdfMailMergeEngine
             string text = node.TextContent;
             if (text.Contains("{{") && text.Contains("}}"))
             {
-                int start = text.IndexOf("{{");
+                int start = text.IndexOf("{{", System.StringComparison.Ordinal);
                 while (start != -1)
                 {
-                    int end = text.IndexOf("}}", start);
+                    int end = text.IndexOf("}}", start, System.StringComparison.Ordinal);
                     if (end == -1)
                         break;
 
@@ -36,7 +36,7 @@ public partial class OdfMailMergeEngine
                     if (placeholder.StartsWith("TableStart:", StringComparison.OrdinalIgnoreCase) ||
                         placeholder.StartsWith("TableEnd:", StringComparison.OrdinalIgnoreCase))
                     {
-                        start = text.IndexOf("{{", end);
+                        start = text.IndexOf("{{", end, System.StringComparison.Ordinal);
                         continue;
                     }
 
@@ -53,8 +53,8 @@ public partial class OdfMailMergeEngine
                     }
 
                     string valStr = val?.ToString() ?? string.Empty;
-                    text = text.Substring(0, start) + valStr + text.Substring(end + 2);
-                    start = text.IndexOf("{{", start + valStr.Length);
+                    text = global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, start, end + 2, valStr);
+                    start = text.IndexOf("{{", start + valStr.Length, System.StringComparison.Ordinal);
                 }
                 node.TextContent = text;
             }
@@ -120,10 +120,10 @@ public partial class OdfMailMergeEngine
             string text = node.TextContent;
             if (text.Contains("{{") && text.Contains("}}"))
             {
-                int start = text.IndexOf("{{");
+                int start = text.IndexOf("{{", System.StringComparison.Ordinal);
                 while (start != -1)
                 {
-                    int end = text.IndexOf("}}", start);
+                    int end = text.IndexOf("}}", start, System.StringComparison.Ordinal);
                     if (end == -1)
                         break;
 
@@ -152,8 +152,8 @@ public partial class OdfMailMergeEngine
                     }
 
                     string valStr = val?.ToString() ?? string.Empty;
-                    text = text.Substring(0, start) + valStr + text.Substring(end + 2);
-                    start = text.IndexOf("{{", start + valStr.Length);
+                    text = global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, start, end + 2, valStr);
+                    start = text.IndexOf("{{", start + valStr.Length, System.StringComparison.Ordinal);
                 }
                 node.TextContent = text;
             }
@@ -166,7 +166,7 @@ public partial class OdfMailMergeEngine
         }
     }
 
-    private void ShiftFormulasInRow(OdfNode node, int rowIndex)
+    private static void ShiftFormulasInRow(OdfNode node, int rowIndex)
     {
         if (node.NodeType == OdfNodeType.Element)
         {
@@ -184,12 +184,12 @@ public partial class OdfMailMergeEngine
         }
     }
 
-    private string? FindCollectionName(string text)
+    private static string? FindCollectionName(string text)
     {
-        int start = text.IndexOf("{{");
+        int start = text.IndexOf("{{", System.StringComparison.Ordinal);
         while (start != -1)
         {
-            int end = text.IndexOf("}}", start);
+            int end = text.IndexOf("}}", start, System.StringComparison.Ordinal);
             if (end == -1)
                 break;
             string path = text.Substring(start + 2, end - start - 2).Trim();
@@ -198,17 +198,17 @@ public partial class OdfMailMergeEngine
             {
                 return path.Substring(0, dotIdx);
             }
-            start = text.IndexOf("{{", end);
+            start = text.IndexOf("{{", end, System.StringComparison.Ordinal);
         }
         return null;
     }
 
     private string ReplaceTextWithDataSource(string text, object dataSource)
     {
-        int start = text.IndexOf("{{");
+        int start = text.IndexOf("{{", System.StringComparison.Ordinal);
         while (start != -1)
         {
-            int end = text.IndexOf("}}", start);
+            int end = text.IndexOf("}}", start, System.StringComparison.Ordinal);
             if (end == -1)
                 break;
 
@@ -216,8 +216,8 @@ public partial class OdfMailMergeEngine
             TryResolveValuePath(dataSource, placeholder, out object? val);
             string valStr = val?.ToString() ?? string.Empty;
 
-            text = text.Substring(0, start) + valStr + text.Substring(end + 2);
-            start = text.IndexOf("{{", start + valStr.Length);
+            text = global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, start, end + 2, valStr);
+            start = text.IndexOf("{{", start + valStr.Length, System.StringComparison.Ordinal);
         }
         return text;
     }

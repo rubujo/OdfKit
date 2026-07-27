@@ -15,7 +15,7 @@ namespace OdfKit.Tests;
 public class CellAccessCacheEquivalenceTests
 {
     [Fact]
-    public void RandomAccess_AfterBulkInsertRowsCreatesRepeatedBlock_ReadsAndWritesStayCorrect()
+    public void RandomAccessAfterBulkInsertRowsCreatesRepeatedBlockReadsAndWritesStayCorrect()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");
@@ -69,7 +69,7 @@ public class CellAccessCacheEquivalenceTests
     }
 
     [Fact]
-    public void RandomAccess_WithManuallyInjectedTrailingRepeatedRow_ReadsMatchEngineFallback()
+    public void RandomAccessWithManuallyInjectedTrailingRepeatedRowReadsMatchEngineFallback()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");
@@ -107,7 +107,7 @@ public class CellAccessCacheEquivalenceTests
     }
 
     [Fact]
-    public void RandomAccess_WithRepeatedColumnsWithinRow_ReadsMatchEngineFallback()
+    public void RandomAccessWithRepeatedColumnsWithinRowReadsMatchEngineFallback()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");

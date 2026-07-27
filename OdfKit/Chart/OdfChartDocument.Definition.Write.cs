@@ -63,8 +63,7 @@ public partial class OdfChartDocument
     /// <param name="definition">The chart definition. / 圖表定義。</param>
     public void ApplyDefinition(OdfChartDefinition definition)
     {
-        if (definition is null)
-            throw new ArgumentNullException(nameof(definition));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(definition, nameof(definition));
 
         SetChartType(definition.ChartType);
         ChartTitle = definition.Title;

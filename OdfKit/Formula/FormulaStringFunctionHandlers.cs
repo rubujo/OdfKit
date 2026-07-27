@@ -144,7 +144,7 @@ internal static class FormulaStringFunctionHandlers
             }
             if (pos == -1)
                 return text;
-            return text.Substring(0, pos) + newText + text.Substring(pos + oldText.Length);
+            return global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, pos, pos + oldText.Length, newText);
         }
         return text.Replace(oldText, newText);
     }

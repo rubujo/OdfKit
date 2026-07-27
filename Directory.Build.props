@@ -29,6 +29,26 @@
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfAssemblyInfo.cs"
+             Link="OdfAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'OdfKit'">
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfStringHelper.cs"
+             Link="OdfStringHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfHashHelper.cs"
+             Link="OdfHashHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfEnumHelper.cs"
+             Link="OdfEnumHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfThrowHelper.cs"
+             Link="OdfThrowHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfStreamHelper.cs"
+             Link="OdfStreamHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfParsingHelper.cs"
+             Link="OdfParsingHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfAsyncHelper.cs"
+             Link="OdfAsyncHelper.cs" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'OdfKit.WebFontSmoke' AND '$(OdfKitWebFontSmokeIntermediateRoot)' != ''">
     <BaseIntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(OdfKitWebFontSmokeIntermediateRoot)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>

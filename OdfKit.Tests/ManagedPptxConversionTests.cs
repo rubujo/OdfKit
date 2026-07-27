@@ -22,6 +22,7 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Regression)]
 public class ManagedPptxConversionTests
 {
+    private static readonly string[] ParagraphTexts = ["First paragraph", "Second paragraph"];
     [Fact]
     public void OdpToPptxConverterWritesSlidesTextShapesAndImages()
     {
@@ -288,7 +289,7 @@ public class ManagedPptxConversionTests
             OdfLength.FromCentimeters(1),
             OdfLength.FromCentimeters(8),
             OdfLength.FromCentimeters(3),
-            new[] { "First paragraph", "Second paragraph" });
+            ParagraphTexts);
 
         using var pptxStream = new MemoryStream();
         OdpToPptxConverter.Convert(source, pptxStream);
@@ -319,7 +320,7 @@ public class ManagedPptxConversionTests
         Assert.Equal("First paragraph", convertedParagraphs[0].TextContent);
         Assert.Equal("Second paragraph", convertedParagraphs[1].TextContent);
         OdfTextBox convertedApiTextBox = Assert.Single(Assert.Single(converted.Slides).TextBoxes);
-        Assert.Equal(new[] { "First paragraph", "Second paragraph" }, convertedApiTextBox.Paragraphs);
+        Assert.Equal(ParagraphTexts, convertedApiTextBox.Paragraphs);
         Assert.Equal("First paragraph" + Environment.NewLine + "Second paragraph", convertedApiTextBox.Text);
     }
     [Fact]

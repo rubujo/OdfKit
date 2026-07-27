@@ -14,7 +14,7 @@ namespace OdfKit.Tests;
 /// </summary>
 public class CsvImportExportTests
 {
-    private static Stream MakeCsvStream(string content)
+    private static MemoryStream MakeCsvStream(string content)
     {
         return new MemoryStream(Encoding.UTF8.GetBytes(content));
     }
@@ -23,7 +23,7 @@ public class CsvImportExportTests
     /// 驗證 ImportFromStream 可正確讀取標題列與資料列。
     /// </summary>
     [Fact]
-    public void ImportFromStream_WithHeaders_SetsHeadersAndDataCells()
+    public void ImportFromStreamWithHeadersSetsHeadersAndDataCells()
     {
         const string csv = "名稱,數量,價格\n蘋果,10,25.5\n香蕉,5,12.0";
         using var stream = MakeCsvStream(csv);
@@ -42,7 +42,7 @@ public class CsvImportExportTests
     /// 驗證自訂分隔字元（Tab）可正確解析。
     /// </summary>
     [Fact]
-    public void ImportFromStream_TabDelimiter_ParsesCorrectly()
+    public void ImportFromStreamTabDelimiterParsesCorrectly()
     {
         const string tsv = "A\tB\tC\n1\t2\t3";
         using var stream = MakeCsvStream(tsv);
@@ -57,7 +57,7 @@ public class CsvImportExportTests
     /// 驗證 ExportToStream 輸出正確的 CSV 內容。
     /// </summary>
     [Fact]
-    public void ExportToStream_RoundTripsCsvData()
+    public void ExportToStreamRoundTripsCsvData()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Test");
@@ -80,7 +80,7 @@ public class CsvImportExportTests
     /// 驗證當 ODS 含有極大的 row 或 column 重複次數時， CSV 匯出器不會發生 OOM 且能在合理時間內傳回。
     /// </summary>
     [Fact]
-    public void ScanCellValues_LargeRepeatCount_DoesNotOOM()
+    public void ScanCellValuesLargeRepeatCountDoesNotOOM()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Sheet1");
@@ -114,7 +114,7 @@ public class CsvImportExportTests
     /// 驗證 <see cref="OdfCsvExporter.ExportToFile"/> 可正確寫入實體檔案路徑，內容與 ExportToStream 一致。
     /// </summary>
     [Fact]
-    public void ExportToFile_WritesCsvContentToDisk()
+    public void ExportToFileWritesCsvContentToDisk()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Test");
@@ -146,7 +146,7 @@ public class CsvImportExportTests
     /// 驗證 <see cref="OdfCsvExporter.ExportToFile"/> 對 Null 路徑擲回 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void ExportToFile_NullPath_ThrowsArgumentNullException()
+    public void ExportToFileNullPathThrowsArgumentNullException()
     {
         using var workbook = SpreadsheetDocument.Create();
         workbook.Worksheets.Add("Test");
@@ -159,7 +159,7 @@ public class CsvImportExportTests
     /// 驗證 ExportToStream 預設會為具危險起始字元的儲存格加上單引號前綴，符合 OWASP CSV 注入防護建議。
     /// </summary>
     [Fact]
-    public void ExportToStream_SanitizesFormulaInjectionCharactersByDefault()
+    public void ExportToStreamSanitizesFormulaInjectionCharactersByDefault()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Test");
@@ -186,7 +186,7 @@ public class CsvImportExportTests
     /// 驗證將 SanitizeFormulas 設為 false 時，會保留原始起始字元而不做修改。
     /// </summary>
     [Fact]
-    public void ExportToStream_SanitizeFormulasDisabled_PreservesOriginalValue()
+    public void ExportToStreamSanitizeFormulasDisabledPreservesOriginalValue()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Test");
@@ -204,7 +204,7 @@ public class CsvImportExportTests
     /// 驗證 <see cref="OdfCsvImporter.ImportFromFile"/> 可正確從實體檔案路徑讀取並建立試算表文件。
     /// </summary>
     [Fact]
-    public void ImportFromFile_ReadsCsvContentFromDisk()
+    public void ImportFromFileReadsCsvContentFromDisk()
     {
         string tempPath = Path.Combine(Path.GetTempPath(), "OdfKitCsvImport_" + Guid.NewGuid().ToString("N") + ".csv");
         try
@@ -230,7 +230,7 @@ public class CsvImportExportTests
     /// 驗證 <see cref="OdfCsvImporter.ImportFromFile"/> 對 Null 路徑擲回 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void ImportFromFile_NullPath_ThrowsArgumentNullException()
+    public void ImportFromFileNullPathThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => OdfCsvImporter.ImportFromFile(null!));
     }

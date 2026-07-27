@@ -210,15 +210,9 @@ public ref struct OdfUtf8XmlReader
     /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="chunkSize"/> 小於 1 時擲出</exception>
     public int CopyValueTo(IBufferWriter<byte> writer, int chunkSize)
     {
-        if (writer is null)
-        {
-            throw new ArgumentNullException(nameof(writer));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writer, nameof(writer));
 
-        if (chunkSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(chunkSize));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(chunkSize, nameof(chunkSize));
 
         int total = 0;
         while (!_currentValue.IsEmpty && _valueChunkPosition < _currentValue.Length)

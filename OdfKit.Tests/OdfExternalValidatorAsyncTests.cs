@@ -20,7 +20,7 @@ public class OdfExternalValidatorAsyncTests
     /// 預先取消的語彙應使 ValidateWithCommandAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task ValidateWithCommandAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task ValidateWithCommandAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         string commandPath = CreateNoOpCommand();
         string filePath = CreateTempOdfFile();
@@ -45,7 +45,7 @@ public class OdfExternalValidatorAsyncTests
     /// 未取消時 ValidateWithCommandAsync 應成功執行並回傳有效結果。
     /// </summary>
     [Fact]
-    public async Task ValidateWithCommandAsync_DefaultToken_CompletesSuccessfully()
+    public async Task ValidateWithCommandAsyncDefaultTokenCompletesSuccessfully()
     {
         string commandPath = CreateNoOpCommand();
         string filePath = CreateTempOdfFile();
@@ -71,7 +71,7 @@ public class OdfExternalValidatorAsyncTests
     /// 驗證外部程序錯誤視窗抑制 scope 可安全進出，避免 corpus baseline 工具崩潰時卡住桌面工作階段。
     /// </summary>
     [Fact]
-    public void NativeProcessErrorModeScope_CanBeEnteredAndDisposed()
+    public void NativeProcessErrorModeScopeCanBeEnteredAndDisposed()
     {
         Assert.Equal(OperatingSystem.IsWindows(), OdfNativeProcessErrorMode.IsWindows);
 
@@ -119,11 +119,11 @@ public class OdfExternalValidatorAsyncTests
 
     /// <summary>
     /// 驗證同步包裝方法 <see cref="OdfExternalValidator.ValidateWithCommand"/> 能成功委派至非同步管線並回傳正確結果，
-    /// 鎖定 <see cref="OdfExternalValidatorAsyncTests.ValidateWithCommandAsync_DefaultToken_CompletesSuccessfully"/>
+    /// 鎖定 <see cref="OdfExternalValidatorAsyncTests.ValidateWithCommandAsyncDefaultTokenCompletesSuccessfully"/>
     /// 已涵蓋的非同步路徑之外，同步呼叫端（無 <c>async</c>／<c>await</c>）的呼叫慣例仍正確運作。
     /// </summary>
     [Fact]
-    public void ValidateWithCommand_SyncWrapper_DelegatesToAsyncAndCompletesSuccessfully()
+    public void ValidateWithCommandSyncWrapperDelegatesToAsyncAndCompletesSuccessfully()
     {
         string commandPath = CreateNoOpCommand();
         string filePath = CreateTempOdfFile();
@@ -147,7 +147,7 @@ public class OdfExternalValidatorAsyncTests
     /// （本機未安裝 ODF Validator JAR，故僅能驗證參數防禦邏輯，無法驗證真實 JAR 執行結果）。
     /// </summary>
     [Fact]
-    public void ValidateWithOdfValidator_MissingJarPath_ThrowsArgumentException()
+    public void ValidateWithOdfValidatorMissingJarPathThrowsArgumentException()
     {
         string? originalEnv = Environment.GetEnvironmentVariable(OdfExternalValidator.OdfValidatorJarEnvironmentVariable);
         string filePath = CreateTempOdfFile();
@@ -169,7 +169,7 @@ public class OdfExternalValidatorAsyncTests
     /// 實際不存在時，正確擲出 <see cref="FileNotFoundException"/>。
     /// </summary>
     [Fact]
-    public void ValidateWithOdfValidator_NonexistentJarPath_ThrowsFileNotFoundException()
+    public void ValidateWithOdfValidatorNonexistentJarPathThrowsFileNotFoundException()
     {
         string filePath = CreateTempOdfFile();
         string nonexistentJarPath = Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_" + Guid.NewGuid().ToString("N") + ".jar");
@@ -188,7 +188,7 @@ public class OdfExternalValidatorAsyncTests
     /// 正確擲出 <see cref="FileNotFoundException"/>（在檢查 JAR 路徑之前即先驗證文件是否存在）。
     /// </summary>
     [Fact]
-    public async Task ValidateWithOdfValidatorAsync_NonexistentDocumentPath_ThrowsFileNotFoundException()
+    public async Task ValidateWithOdfValidatorAsyncNonexistentDocumentPathThrowsFileNotFoundException()
     {
         string nonexistentDocumentPath = Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_" + Guid.NewGuid().ToString("N") + ".odt");
 
@@ -209,7 +209,7 @@ public class OdfExternalValidatorAsyncTests
     /// 文件為無效（含實際的錯誤訊息內容），驗證真實 JAR 呼叫路徑，而非僅停留在參數防護邏輯。
     /// </summary>
     [Fact]
-    public void ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments()
+    public void ValidateWithOdfValidatorRealJarDetectsValidAndInvalidDocuments()
     {
         string? jarPath = Environment.GetEnvironmentVariable(OdfExternalValidator.OdfValidatorJarEnvironmentVariable);
         if (string.IsNullOrWhiteSpace(jarPath) || !File.Exists(jarPath))

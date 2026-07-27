@@ -212,7 +212,7 @@ internal static class Cff2TableCompactor
 
     private static byte[] RewriteFontDict(
         FontDictLayout layout,
-        IReadOnlyDictionary<int, int> privateLengths,
+        Dictionary<int, int> privateLengths,
         CffTableCompactor.RelocationMap? offsetMap)
     {
         var values = new Dictionary<int, int[]>
@@ -243,7 +243,7 @@ internal static class Cff2TableCompactor
     }
 
     private static void AddMappedOffset(
-        IDictionary<int, int[]> values,
+        Dictionary<int, int[]> values,
         IReadOnlyList<DictEntry> entries,
         int operation,
         CffTableCompactor.RelocationMap? offsetMap)
@@ -261,7 +261,7 @@ internal static class Cff2TableCompactor
 
     private static byte[] RewriteDict(
         IReadOnlyList<DictEntry> entries,
-        IReadOnlyDictionary<int, int[]> replacementValues)
+        Dictionary<int, int[]> replacementValues)
     {
         var output = new List<byte>();
         var encoded = new byte[4];
@@ -313,7 +313,7 @@ internal static class Cff2TableCompactor
         return BuildIndex(objects);
     }
 
-    private static byte[] BuildIndex(IReadOnlyList<byte[]> objects)
+    private static byte[] BuildIndex(byte[][] objects)
     {
         int dataLength = 0;
         foreach (byte[] value in objects)
@@ -321,7 +321,7 @@ internal static class Cff2TableCompactor
             dataLength = checked(dataLength + value.Length);
         }
 
-        if (objects.Count == 0)
+        if (objects.Length == 0)
         {
             return [0, 0, 0, 0];
         }
@@ -334,13 +334,13 @@ internal static class Cff2TableCompactor
                 : maximumOffset <= 0x00FF_FFFF
                     ? 3
                     : 4;
-        int headerLength = checked(5 + ((objects.Count + 1) * offSize));
+        int headerLength = checked(5 + ((objects.Length + 1) * offSize));
         var output = new byte[checked(headerLength + dataLength)];
-        BinaryPrimitives.WriteUInt32BigEndian(output, checked((uint)objects.Count));
+        BinaryPrimitives.WriteUInt32BigEndian(output, checked((uint)objects.Length));
         output[4] = checked((byte)offSize);
         int offset = 1;
         int dataPosition = headerLength;
-        for (int index = 0; index < objects.Count; index++)
+        for (int index = 0; index < objects.Length; index++)
         {
             WriteOffset(output, 5 + (index * offSize), offSize, checked((uint)offset));
             byte[] value = objects[index];
@@ -349,7 +349,7 @@ internal static class Cff2TableCompactor
             dataPosition = checked(dataPosition + value.Length);
         }
 
-        WriteOffset(output, 5 + (objects.Count * offSize), offSize, checked((uint)offset));
+        WriteOffset(output, 5 + (objects.Length * offSize), offSize, checked((uint)offset));
         return output;
     }
 
@@ -412,7 +412,7 @@ internal static class Cff2TableCompactor
         return new IndexLayout(offset, length, objects);
     }
 
-    private static IReadOnlyList<DictEntry> ReadDict(
+    private static List<DictEntry> ReadDict(
         ReadOnlySpan<byte> data,
         string detail,
         int[]? variationRegionCounts)

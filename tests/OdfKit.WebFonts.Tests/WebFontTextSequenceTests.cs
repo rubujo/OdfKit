@@ -5,7 +5,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class WebFontTextSequenceTests
 {
     [Fact]
-    public void Create_PreservesIvsAndSupplementaryPuaOrder()
+    public void CreatePreservesIvsAndSupplementaryPuaOrder()
     {
         string text = "邉\U000E0110\U000F0000";
 
@@ -16,7 +16,7 @@ public sealed class WebFontTextSequenceTests
     }
 
     [Fact]
-    public void Create_RejectsUnpairedSurrogate()
+    public void CreateRejectsUnpairedSurrogate()
     {
         Assert.Throws<ArgumentException>(() => WebFontTextSequence.Create(new string((char)0xD800, 1)));
         Assert.Throws<ArgumentException>(() => WebFontTextSequence.Create(new string((char)0xDC00, 1)));

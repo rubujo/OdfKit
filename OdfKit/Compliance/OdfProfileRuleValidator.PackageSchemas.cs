@@ -100,7 +100,7 @@ internal static partial class OdfProfileRuleValidator
 
         string fileName = entryName.Substring("META-INF/".Length);
         return fileName.IndexOf('/') < 0 &&
-            fileName.IndexOf("signatures", StringComparison.Ordinal) >= 0;
+            global::OdfKit.Internal.OdfStringHelper.Contains(fileName, "signatures", StringComparison.Ordinal);
     }
 
     private static void ValidatePackageMetadataEntry(

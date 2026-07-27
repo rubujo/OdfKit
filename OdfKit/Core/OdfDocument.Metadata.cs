@@ -153,7 +153,7 @@ public abstract partial class OdfDocument
         if (val is null)
             return default;
         try
-        { return (T)Convert.ChangeType(val, typeof(T)); }
+        { return (T)Convert.ChangeType(val, typeof(T), System.Globalization.CultureInfo.InvariantCulture); }
         catch { return default; }
     }
 

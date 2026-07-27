@@ -18,12 +18,9 @@ internal static class OdfPdfSignatureWriter
 
     internal static void Sign(Stream unsignedPdfStream, Stream destination, X509Certificate2 certificate)
     {
-        if (unsignedPdfStream is null)
-            throw new ArgumentNullException(nameof(unsignedPdfStream));
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
-        if (certificate is null)
-            throw new ArgumentNullException(nameof(certificate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(unsignedPdfStream, nameof(unsignedPdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(certificate, nameof(certificate));
 
         byte[] originalPdf = ReadAllBytes(unsignedPdfStream);
         string originalText = Encoding.ASCII.GetString(originalPdf);

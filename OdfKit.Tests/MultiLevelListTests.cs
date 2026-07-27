@@ -36,7 +36,7 @@ public class MultiLevelListTests
     /// 驗證 AddListWithStyle 將 text:list-style 寫入 styles.xml 的 office:styles 節點。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_WritesListStyleToStylesXml()
+    public void AddListWithStyleWritesListStyleToStylesXml()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -58,7 +58,7 @@ public class MultiLevelListTests
     /// 驗證多層級清單樣式的各層級 text:level 屬性正確。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_ThreeLevels_WritesAllLevelAttributes()
+    public void AddListWithStyleThreeLevelsWritesAllLevelAttributes()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -84,7 +84,7 @@ public class MultiLevelListTests
     /// 驗證專案符號層級寫入 text:list-level-style-bullet 及 text:bullet-char。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_BulletLevel_WritesBulletElement()
+    public void AddListWithStyleBulletLevelWritesBulletElement()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -106,7 +106,7 @@ public class MultiLevelListTests
     /// 驗證回傳的 OdfList 已套用正確樣式名稱，並可新增第 1 層專案。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_ReturnedList_HasCorrectStyleNameAndCanAddItems()
+    public void AddListWithStyleReturnedListHasCorrectStyleNameAndCanAddItems()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -130,7 +130,7 @@ public class MultiLevelListTests
     /// 驗證 AddItem(text, level=2) 在清單中建立正確的巢狀結構。
     /// </summary>
     [Fact]
-    public void AddItem_Level2_CreatesNestedListStructure()
+    public void AddItemLevel2CreatesNestedListStructure()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -156,7 +156,7 @@ public class MultiLevelListTests
     /// 驗證三層巢狀結構能建立三層嵌套的 text:list 節點。
     /// </summary>
     [Fact]
-    public void AddItem_ThreeLevels_CreatesThreeNestedLists()
+    public void AddItemThreeLevelsCreatesThreeNestedLists()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -191,7 +191,7 @@ public class MultiLevelListTests
     /// 驗證 NumPrefix 寫入正確的 text:num-prefix 屬性。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_WithNumPrefix_WritesNumPrefix()
+    public void AddListWithStyleWithNumPrefixWritesNumPrefix()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -209,7 +209,7 @@ public class MultiLevelListTests
     /// 驗證 list-level-label-alignment 節點含 text:label-followed-by="listtab"。
     /// </summary>
     [Fact]
-    public void AddListWithStyle_WithIndent_WritesAlignmentNode()
+    public void AddListWithStyleWithIndentWritesAlignmentNode()
     {
         using var doc = TextDocument.Create();
         var levels = new List<OdfListLevelStyle>
@@ -234,7 +234,7 @@ public class MultiLevelListTests
     /// 驗證清單可從 0 開始編號。
     /// </summary>
     [Fact]
-    public void StartFromZero_WritesTextStartValue()
+    public void StartFromZeroWritesTextStartValue()
     {
         using var doc = TextDocument.Create();
         OdfList list = doc.Body.Lists.Add();

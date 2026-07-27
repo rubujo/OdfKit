@@ -1196,11 +1196,11 @@ internal sealed class CmapMapping
         return output;
     }
 
-    private static byte[] BuildDefaultUvs(IReadOnlyList<CmapVariation> values)
+    private static byte[] BuildDefaultUvs(CmapVariation[] values)
     {
-        var output = new byte[checked(4 + (values.Count * 4))];
-        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(0, 4), checked((uint)values.Count));
-        for (int index = 0; index < values.Count; index++)
+        var output = new byte[checked(4 + (values.Length * 4))];
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(0, 4), checked((uint)values.Length));
+        for (int index = 0; index < values.Length; index++)
         {
             WriteUInt24(output, 4 + (index * 4), values[index].BaseScalar);
         }
@@ -1208,11 +1208,11 @@ internal sealed class CmapMapping
         return output;
     }
 
-    private static byte[] BuildNonDefaultUvs(IReadOnlyList<CmapVariation> values)
+    private static byte[] BuildNonDefaultUvs(CmapVariation[] values)
     {
-        var output = new byte[checked(4 + (values.Count * 5))];
-        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(0, 4), checked((uint)values.Count));
-        for (int index = 0; index < values.Count; index++)
+        var output = new byte[checked(4 + (values.Length * 5))];
+        BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(0, 4), checked((uint)values.Length));
+        for (int index = 0; index < values.Length; index++)
         {
             int offset = 4 + (index * 5);
             WriteUInt24(output, offset, values[index].BaseScalar);

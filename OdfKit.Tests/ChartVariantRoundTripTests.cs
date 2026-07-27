@@ -18,7 +18,7 @@ public class ChartVariantRoundTripTests
     /// 圖表定義與序列設定完整保留。
     /// </summary>
     [Fact]
-    public void ChartDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    public void ChartDocumentCreateTemplateFromDocumentRoundTripsBackToDocument()
     {
         var definition = new OdfChartDefinition
         {
@@ -48,7 +48,7 @@ public class ChartVariantRoundTripTests
     /// 圖表定義與序列設定完整保留，且 Flat 形態確實為單一 XML（非 ZIP）。
     /// </summary>
     [Fact]
-    public void ChartDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void ChartDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         var definition = new OdfChartDefinition
         {
@@ -77,7 +77,7 @@ public class ChartVariantRoundTripTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void ChartVariantConversions_NullSource_ThrowsArgumentNullException()
+    public void ChartVariantConversionsNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => ChartTemplateDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => ChartDocument.CreateFromTemplate(null!));

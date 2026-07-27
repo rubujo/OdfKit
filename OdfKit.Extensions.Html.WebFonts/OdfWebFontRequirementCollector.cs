@@ -126,7 +126,7 @@ public static class OdfWebFontRequirementCollector
             || formats is null
             || formats.Count == 0
             || requiredBrowserTargets is null
-            || requiredBrowserTargets.Any(target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target)))
+            || requiredBrowserTargets.Any(target => !OdfKit.Internal.OdfEnumHelper.IsDefined(target)))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
@@ -177,7 +177,7 @@ public static class OdfWebFontRequirementCollector
             && !string.IsNullOrWhiteSpace(route.FontFamily)
             && route.Formats is { Count: > 0 }
             && route.RequiredBrowserTargets is not null
-            && route.RequiredBrowserTargets.All(target => Enum.IsDefined(typeof(WebFontBrowserTarget), target));
+            && route.RequiredBrowserTargets.All(target => OdfKit.Internal.OdfEnumHelper.IsDefined(target));
 
     private static List<WebFontTextSequence> CollectUniqueClusters(TextDocument document)
     {

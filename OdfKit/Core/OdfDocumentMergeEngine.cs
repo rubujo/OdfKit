@@ -18,8 +18,7 @@ internal static class OdfDocumentMergeEngine
         OdfDocument sourceDoc,
         OdfMergeOptions options)
     {
-        if (sourceDoc == null)
-            throw new ArgumentNullException(nameof(sourceDoc));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourceDoc, nameof(sourceDoc));
 
         var styleRenameMap = new Dictionary<string, string>(StringComparer.Ordinal);
 

@@ -94,9 +94,9 @@ internal static partial class OdfSignatureVerifier
                 foreach (Reference reference in signedXml.SignedInfo.References)
                 {
                     string? uri = reference.Uri;
-                    if (!string.IsNullOrEmpty(uri) && !uri!.StartsWith("#"))
+                    if (!string.IsNullOrEmpty(uri) && !global::OdfKit.Internal.OdfStringHelper.StartsWith(uri!, '#'))
                     {
-                        string entryName = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(uri);
+                        string entryName = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(uri!);
                         if (package.HasEntry(entryName))
                         {
                             var stream = package.GetEntryStream(entryName);
@@ -285,7 +285,7 @@ internal static partial class OdfSignatureVerifier
         foreach (Reference reference in signedXml.SignedInfo.References)
         {
             string? uri = reference.Uri;
-            if (uri != null && !uri.StartsWith("#"))
+            if (uri != null && !global::OdfKit.Internal.OdfStringHelper.StartsWith(uri, '#'))
             {
                 string entryName = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(uri);
                 singleResult.CheckedReferences.Add(entryName);

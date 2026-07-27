@@ -20,10 +20,7 @@ public static class OdfNodeTraversalExtensions
     public static IEnumerable<TNode> Children<TNode>(this OdfNode node)
         where TNode : OdfNode
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         foreach (OdfNode child in node.Children)
         {
@@ -45,10 +42,7 @@ public static class OdfNodeTraversalExtensions
     public static IEnumerable<TNode> Descendants<TNode>(this OdfNode node)
         where TNode : OdfNode
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         foreach (OdfNode descendant in node.Descendants())
         {
@@ -73,15 +67,9 @@ public static class OdfNodeTraversalExtensions
     public static TNode Append<TNode>(this TNode node, params OdfNode[] children)
         where TNode : OdfNode
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
-        if (children is null)
-        {
-            throw new ArgumentNullException(nameof(children));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(children, nameof(children));
 
         foreach (OdfNode child in children)
         {

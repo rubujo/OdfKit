@@ -30,10 +30,7 @@ public partial class OdfTableSheet
     /// <returns>The object binding report. / 物件繫結報告。</returns>
     public OdfObjectBindingReport WriteObjects<T>(OdfCellAddress startAddress, IEnumerable<T> items, OdfObjectBindingOptions? options)
     {
-        if (items is null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(items, nameof(items));
 
         options ??= new OdfObjectBindingOptions();
         OdfCellAddress effectiveStart = options.StartColumn > 0
@@ -65,10 +62,7 @@ public partial class OdfTableSheet
     /// <returns>The object binding report. / 物件繫結報告。</returns>
     public OdfObjectBindingReport AppendObjects<T>(IEnumerable<T> items, OdfObjectBindingOptions? options)
     {
-        if (items is null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(items, nameof(items));
 
         options ??= new OdfObjectBindingOptions();
         IReadOnlyList<OdfObjectColumn> columns = OdfObjectBindingEngine.GetReadableColumns<T>(options);
@@ -391,7 +385,7 @@ public partial class OdfTableSheet
         return options.ConversionErrorPolicy == OdfObjectConversionErrorPolicy.WarnAndSkipRow;
     }
 
-    private bool IsEmptyRow(int row, IReadOnlyList<(OdfObjectColumn Column, int Index)> mappedColumns, int startColumn)
+    private bool IsEmptyRow(int row, List<(OdfObjectColumn Column, int Index)> mappedColumns, int startColumn)
     {
         if (mappedColumns.Count == 0)
         {
@@ -429,15 +423,9 @@ public partial class OdfTableSheet
         OdfObjectUpdateOptions options,
         bool insertMissing)
     {
-        if (items is null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(items, nameof(items));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         if (string.IsNullOrWhiteSpace(options.KeyColumn))
         {
@@ -575,7 +563,7 @@ public partial class OdfTableSheet
     }
 
     private static int ResolveHeaderKeyIndex(
-        IReadOnlyDictionary<string, int> headers,
+        Dictionary<string, int> headers,
         IReadOnlyList<OdfObjectColumn> columns,
         string keyColumn)
     {

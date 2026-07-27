@@ -147,8 +147,7 @@ internal static class TextDocumentFieldsEngine
 
     internal static void AddSequenceRefField(OdfParagraph paragraph, string sequenceName, string referenceFormat)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrEmpty(sequenceName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_SerialCannotBeEmpty"), nameof(sequenceName));
         var fNode = OdfNodeFactory.CreateElement("sequence-ref", OdfNamespaces.Text, "text");
@@ -159,8 +158,7 @@ internal static class TextDocumentFieldsEngine
 
     internal static void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrEmpty(bookmarkName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_BookmarkCannotBeEmpty"), nameof(bookmarkName));
 
@@ -193,8 +191,7 @@ internal static class TextDocumentFieldsEngine
         string? tableType,
         string? databaseName)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrEmpty(tableName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_DataCannotBeEmpty_2"), nameof(tableName));
         if (string.IsNullOrEmpty(columnName))
@@ -217,8 +214,7 @@ internal static class TextDocumentFieldsEngine
         string? databaseName,
         string? condition)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrEmpty(tableName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_DataCannotBeEmpty_2"), nameof(tableName));
 

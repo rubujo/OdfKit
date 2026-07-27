@@ -14,6 +14,7 @@ public partial class OdfTableSheet
     internal List<OdfNode> GetRowsList()
         => OdfTableSheetDomAccessEngine.GetRowsList(TableNode);
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal List<OdfNode> GetCellsInRow(OdfNode rowNode)
         => OdfTableSheetDomAccessEngine.GetCellsInRow(rowNode);
 

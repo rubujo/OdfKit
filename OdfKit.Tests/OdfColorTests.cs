@@ -13,7 +13,7 @@ public class OdfColorTests
     /// 驗證可由 HTML 色碼字串隱式轉換為 <see cref="OdfColor"/>。
     /// </summary>
     [Fact]
-    public void ImplicitFromString_ParsesHtmlColor()
+    public void ImplicitFromStringParsesHtmlColor()
     {
         OdfColor color = "#4472C4";
         Assert.Equal("#4472C4", color.Value);
@@ -23,7 +23,7 @@ public class OdfColorTests
     /// 驗證可由 <see cref="Color"/> 隱式轉換為 <see cref="OdfColor"/>。
     /// </summary>
     [Fact]
-    public void ImplicitFromSystemDrawingColor_FormatsHexValue()
+    public void ImplicitFromSystemDrawingColorFormatsHexValue()
     {
         OdfColor color = Color.FromArgb(68, 114, 196);
         Assert.Equal("#4472c4", color.Value);
@@ -33,7 +33,7 @@ public class OdfColorTests
     /// 驗證可由 <see cref="OdfColor"/> 隱式轉換為字串。
     /// </summary>
     [Fact]
-    public void ImplicitToString_ReturnsHexLexicalValue()
+    public void ImplicitToStringReturnsHexLexicalValue()
     {
         OdfColor color = "#1A2B3C";
         string text = color;

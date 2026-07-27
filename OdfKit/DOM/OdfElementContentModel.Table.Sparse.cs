@@ -65,10 +65,7 @@ public partial class TableTableElement
         get => _maxHotPages;
         set
         {
-            if (value < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(value, 1, nameof(value));
 
             _maxHotPages = value;
         }
@@ -326,10 +323,7 @@ public partial class TableTableElement
         long key = GetSparseCellKey(rowIndex, columnIndex);
         lock (_hotFormulaLock)
         {
-            if (_isDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TableTableElement));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(TableTableElement));
 
             if (_hotFormulaPtrs is not null && _hotFormulaPtrs.TryGetValue(key, out SafeHandle? existing))
             {
@@ -361,10 +355,7 @@ public partial class TableTableElement
         long key = GetSparseCellKey(rowIndex, columnIndex);
         lock (_hotFormulaLock)
         {
-            if (_isDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TableTableElement));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(TableTableElement));
 
             return _hotFormulaPtrs is not null && _hotFormulaPtrs.TryGetValue(key, out SafeHandle? handle)
                 ? Utf8PtrToString(handle.DangerousGetHandle())
@@ -613,15 +604,9 @@ public partial class TableTableElement
 
     private void EnsurePageAllocated(int rowIndex, int columnIndex)
     {
-        if (rowIndex > OdfSpreadsheetLimits.MaxRowIndex)
-        {
-            throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThan(rowIndex, OdfSpreadsheetLimits.MaxRowIndex, nameof(rowIndex));
 
-        if (columnIndex > OdfSpreadsheetLimits.MaxColumnIndex)
-        {
-            throw new ArgumentOutOfRangeException(nameof(columnIndex));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThan(columnIndex, OdfSpreadsheetLimits.MaxColumnIndex, nameof(columnIndex));
 
         if (_nativePages is null)
         {

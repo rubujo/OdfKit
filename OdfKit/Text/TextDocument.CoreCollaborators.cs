@@ -37,18 +37,23 @@ public partial class TextDocument
         internal OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
             => _document.FindOrCreateChild(parent, localName, ns, prefix);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
             => OdfDocumentStyleRemapEngine.RemapStylesInNodes(node, renameMap);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal OdfNode FindOrCreateSettingsNode(OdfNode root, string name)
             => OdfDocumentSettingsEngine.FindOrCreateSettingsNode(root, name);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal OdfNode FindOrCreateMapNode(OdfNode setNode, string name)
             => OdfDocumentSettingsEngine.FindOrCreateMapNode(setNode, name);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal OdfNode FindOrCreateMapEntryNode(OdfNode mapNode)
             => OdfDocumentSettingsEngine.FindOrCreateMapEntryNode(mapNode);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
             => OdfDocumentSettingsEngine.FindOrCreateConfigItemNode(entryNode, name, type);
     }

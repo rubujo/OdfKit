@@ -357,7 +357,7 @@ internal sealed class OdfPdfFontResolver : IFontResolver
             return new FontResolverInfo(resolved, isBold, isItalic);
         }
 
-        if (familyName.IndexOf("Courier", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (OdfKit.Internal.OdfStringHelper.Contains(familyName, "Courier", StringComparison.OrdinalIgnoreCase))
         {
             return new FontResolverInfo("Courier New", isBold, isItalic);
         }

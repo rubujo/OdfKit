@@ -191,7 +191,7 @@ namespace OdfKit.Tests
             Assert.Equal(1, totalSharedOccurrences);
         }
 
-        private bool ContainsReply(OdfComment parent, string text)
+        private static bool ContainsReply(OdfComment parent, string text)
         {
             foreach (var r in parent.Replies)
             {
@@ -337,7 +337,7 @@ namespace OdfKit.Tests
             Assert.True(sw.ElapsedMilliseconds < 3500, $"MailMerge took too long: {sw.ElapsedMilliseconds} ms");
         }
 
-        private class MergeItem
+        private sealed class MergeItem
         {
             public string Name { get; set; } = string.Empty;
             public double Price { get; set; }

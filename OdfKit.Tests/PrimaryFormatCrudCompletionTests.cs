@@ -39,7 +39,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證最上層 ODT 集合支援查找、移除、清除與 round-trip。
     /// </summary>
     [Fact]
-    public void OdtCollections_FindRemoveClearAndRoundTrip()
+    public void OdtCollectionsFindRemoveClearAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph firstParagraph = document.Body.Paragraphs.Add("保留段落");
@@ -78,7 +78,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODS 工作表移除會拒絕懸空公式參照，並在清除參照後可 round-trip。
     /// </summary>
     [Fact]
-    public void OdsWorksheets_RemovePreservesFormulaIntegrityAndRoundTrips()
+    public void OdsWorksheetsRemovePreservesFormulaIntegrityAndRoundTrips()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet data = document.Worksheets.Add("Data");
@@ -110,7 +110,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證工作表範圍的命名範圍與具名運算式支援對稱的查找、移除、清除及 round-trip 操作。
     /// </summary>
     [Fact]
-    public void OdsWorksheetNames_FindRemoveClearAndRoundTrip()
+    public void OdsWorksheetNamesFindRemoveClearAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -148,7 +148,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證資料庫範圍支援可編輯查找、識別安全移除、選擇性清除及 round-trip 保留。
     /// </summary>
     [Fact]
-    public void OdsDatabaseRanges_FindRemoveClearAndRoundTrip()
+    public void OdsDatabaseRangesFindRemoveClearAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         document.Worksheets.Add("Data");
@@ -183,7 +183,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證資料庫篩選與排序支援取代、清除及 round-trip 保留。
     /// </summary>
     [Fact]
-    public void OdsFiltersAndSorts_CompleteLifecycleAndRoundTrip()
+    public void OdsFiltersAndSortsCompleteLifecycleAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -236,7 +236,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證凍結與分割窗格支援查找、取代、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdsFrozenAndSplitPanes_CompleteLifecycleAndRoundTrip()
+    public void OdsFrozenAndSplitPanesCompleteLifecycleAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet frozenSheet = document.Worksheets.Add("Frozen");
@@ -285,7 +285,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證移除資料驗證時會解除儲存格引用，並在 round-trip 後保留容器中的未知內容。
     /// </summary>
     [Fact]
-    public void OdsDataValidations_FindRemoveClearAndRoundTrip()
+    public void OdsDataValidationsFindRemoveClearAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -351,7 +351,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證條件格式與走勢圖群組支援語意查找、移除、選擇性清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdsConditionalFormatsAndSparklines_FindRemoveClearAndRoundTrip()
+    public void OdsConditionalFormatsAndSparklinesFindRemoveClearAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -413,7 +413,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證樞紐分析表定義支援查找、範圍更新、選擇性移除及不重算的 round-trip。
     /// </summary>
     [Fact]
-    public void OdsPivotDefinitions_FindUpdateRemoveClearAndRoundTrip()
+    public void OdsPivotDefinitionsFindUpdateRemoveClearAndRoundTrip()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -466,7 +466,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證嵌入圖表支援查找、移除、清除、封裝清理及 round-trip。
     /// </summary>
     [Fact]
-    public void OdsEmbeddedCharts_FindRemoveClearAndPackageCleanup()
+    public void OdsEmbeddedChartsFindRemoveClearAndPackageCleanup()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         document.Worksheets.Add("Data");
@@ -518,7 +518,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證移除投影片繪圖物件時會清理相依動畫，並在 round-trip 後保留非繪圖內容。
     /// </summary>
     [Fact]
-    public void OdpDrawingObjects_FindRemoveClearAndRoundTrip()
+    public void OdpDrawingObjectsFindRemoveClearAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Objects");
@@ -562,7 +562,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證投影片預留位置支援查找、識別安全移除、清除及相依動畫清理。
     /// </summary>
     [Fact]
-    public void OdpPlaceholders_FindRemoveClearAndRoundTrip()
+    public void OdpPlaceholdersFindRemoveClearAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Placeholders");
@@ -601,7 +601,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證動畫時間軸支援查找、目標範圍移除、選擇性清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdpAnimations_FindRemoveClearAndRoundTrip()
+    public void OdpAnimationsFindRemoveClearAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Animations");
@@ -646,7 +646,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證母片重新命名與移除會自動維護投影片引用，並可通過 round-trip。
     /// </summary>
     [Fact]
-    public void OdpMasterPages_RenameRemoveAndMaintainReferences()
+    public void OdpMasterPagesRenameRemoveAndMaintainReferences()
     {
         using PresentationDocument document = PresentationDocument.Create();
         document.AddMasterPage("PrimaryMaster", new OdfMasterPageDefinition());
@@ -680,7 +680,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證版面配置重新命名與移除會自動維護投影片引用，並可通過 round-trip。
     /// </summary>
     [Fact]
-    public void OdpLayouts_RenameRemoveAndMaintainReferences()
+    public void OdpLayoutsRenameRemoveAndMaintainReferences()
     {
         using PresentationDocument document = PresentationDocument.Create();
         document.CreatePresentationPageLayout("PrimaryLayout");
@@ -714,7 +714,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODP 與 ODG 圖形在 round-trip 後可解析繼承的圖形樣式。
     /// </summary>
     [Fact]
-    public void OdpAndOdgGraphicStyleInheritance_RoundTrips()
+    public void OdpAndOdgGraphicStyleInheritanceRoundTrips()
     {
         using PresentationDocument presentation = PresentationDocument.Create();
         OdfSlide slide = presentation.Slides.Add("Styles");
@@ -758,7 +758,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODG 繪圖物件支援依識別碼調整堆疊順序、選擇性清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdgShapes_ZOrderClearAndRoundTrip()
+    public void OdgShapesZOrderClearAndRoundTrip()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Objects");
@@ -790,7 +790,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODG 圖層重新命名與移除會維護圖形指派，並可通過 round-trip。
     /// </summary>
     [Fact]
-    public void OdgLayers_RenameRemoveAndMaintainAssignments()
+    public void OdgLayersRenameRemoveAndMaintainAssignments()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Layers");
@@ -827,7 +827,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證載入既有與新建的 ODG 群組共用對稱的子物件 CRUD 行為。
     /// </summary>
     [Fact]
-    public void OdgGroups_FindRemoveClearAndRoundTrip()
+    public void OdgGroupsFindRemoveClearAndRoundTrip()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Groups");
@@ -859,7 +859,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證既有 ODG 路徑、多邊形、自訂幾何與 transform 資料可更新並通過 round-trip。
     /// </summary>
     [Fact]
-    public void OdgGeometry_UpdateAndRoundTrip()
+    public void OdgGeometryUpdateAndRoundTrip()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Geometry");
@@ -894,7 +894,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證書籤與參考標記重新命名及移除會維護相依欄位，並可通過 round-trip。
     /// </summary>
     [Fact]
-    public void OdtBookmarksAndReferenceMarks_MaintainReferencesAndRoundTrip()
+    public void OdtBookmarksAndReferenceMarksMaintainReferencesAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.Body.Paragraphs.Add("References");
@@ -934,7 +934,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODT 註解支援查找、就地更新、理解回覆的移除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtComments_FindUpdateRemoveAndRoundTrip()
+    public void OdtCommentsFindUpdateRemoveAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.Body.Paragraphs.Add("Commented");
@@ -975,7 +975,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證腳注與尾注支援查找、就地更新、選擇性清除、移除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtNotes_FindUpdateRemoveClearAndRoundTrip()
+    public void OdtNotesFindUpdateRemoveClearAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.Body.Paragraphs.Add("Notes");
@@ -1012,7 +1012,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證區段與索引支援查找、重新命名、依身分安全移除、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtSectionsAndIndexes_CompleteLifecycleAndRoundTrip()
+    public void OdtSectionsAndIndexesCompleteLifecycleAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfSection firstSection = document.AddSection("First", 2, OdfKit.Styles.OdfLength.Parse("0.5cm"));
@@ -1056,7 +1056,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證備忘錄與講義查找不會修改文件，並支援非破壞性生命週期操作。
     /// </summary>
     [Fact]
-    public void OdpNotesAndHandout_FindClearRemoveAndRoundTrip()
+    public void OdpNotesAndHandoutFindClearRemoveAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Lifecycle");
@@ -1100,7 +1100,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證現有投影片媒體可列舉、查找、更新、移除、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdpMediaObjects_CompleteLifecycleAndRoundTrip()
+    public void OdpMediaObjectsCompleteLifecycleAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Media");
@@ -1140,7 +1140,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證嵌入表格支援直接建立、查找、讀取、更新、移除、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdpEmbeddedTables_CompleteLifecycleAndRoundTrip()
+    public void OdpEmbeddedTablesCompleteLifecycleAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Tables");
@@ -1185,7 +1185,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證連接線支援直接建立、查找、移除、清除、相依清理及 round-trip。
     /// </summary>
     [Fact]
-    public void OdpConnectors_CompleteLifecycleAndDependencyCleanup()
+    public void OdpConnectorsCompleteLifecycleAndDependencyCleanup()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Connectors");
@@ -1226,7 +1226,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證投影片群組及其現有子物件支援對稱生命週期操作。
     /// </summary>
     [Fact]
-    public void OdpGroups_ChildLifecycleAndRoundTrip()
+    public void OdpGroupsChildLifecycleAndRoundTrip()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Groups");
@@ -1273,7 +1273,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證具名稱漸層支援 CRUD、圖形指派、參照安全重新命名與移除，以及 round-trip。
     /// </summary>
     [Fact]
-    public void OdgGradients_CompleteLifecycleAndReferenceSafety()
+    public void OdgGradientsCompleteLifecycleAndReferenceSafety()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Gradients");
@@ -1319,7 +1319,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證具名稱標記支援 CRUD、線段指派、參照安全重新命名與移除，以及 round-trip。
     /// </summary>
     [Fact]
-    public void OdgMarkers_CompleteLifecycleAndReferenceSafety()
+    public void OdgMarkersCompleteLifecycleAndReferenceSafety()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Markers");
@@ -1367,7 +1367,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證矩形與輪廓路徑裁切支援更新、清除、未知內容保留及 round-trip。
     /// </summary>
     [Fact]
-    public void OdgClips_UpdateClearAndRoundTrip()
+    public void OdgClipsUpdateClearAndRoundTrip()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Clips");
@@ -1403,7 +1403,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證 ODT 表單控制項支援查找、更新、幾何讀取、參照安全移除、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtFormControls_CompleteLifecycleAndRoundTrip()
+    public void OdtFormControlsCompleteLifecycleAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfKit.Styles.OdfLength x = OdfKit.Styles.OdfLength.Parse("1cm");
@@ -1458,7 +1458,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證使用者欄位宣告支援查找、更新、移除、清除、未知內容保留及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtUserFields_CompleteLifecycleAndRoundTrip()
+    public void OdtUserFieldsCompleteLifecycleAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         document.AddUserFieldDeclaration("Customer", "string", "Alice");
@@ -1493,7 +1493,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證公式物件支援查找、更新、移除、清除、封裝包清理及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtFormulaObjects_CompleteLifecycleAndPackageCleanup()
+    public void OdtFormulaObjectsCompleteLifecycleAndPackageCleanup()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.Body.Paragraphs.Add("Formulas");
@@ -1538,7 +1538,7 @@ public class PrimaryFormatCrudCompletionTests
     /// 驗證支援的內嵌文字欄位提供 typed 查找、非破壞性更新、移除、清除及 round-trip。
     /// </summary>
     [Fact]
-    public void OdtInlineFields_CompleteTypedLifecycleAndRoundTrip()
+    public void OdtInlineFieldsCompleteTypedLifecycleAndRoundTrip()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.Body.Paragraphs.Add("Fields: ");
@@ -1596,7 +1596,7 @@ public class PrimaryFormatCrudCompletionTests
     /// <param name="kind">The primary document kind. / 主要文件種類。</param>
     [Theory]
     [MemberData(nameof(LegacyVersionCases))]
-    public void LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent(
+    public void LegacyVersionsHighLevelMutationPreservesVersionAndForeignContent(
         OdfVersion version,
         OdfDocumentKind kind)
     {
@@ -1727,7 +1727,7 @@ public class PrimaryFormatCrudCompletionTests
         document.StyleEngine.RebuildStyleIndex();
     }
 
-    private static IReadOnlyList<string> GetDrawingObjectIds(OdfDrawPage page)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<string> GetDrawingObjectIds(OdfDrawPage page)
     {
         List<string> ids = [];
         foreach (OdfNode child in page.Node.Children)

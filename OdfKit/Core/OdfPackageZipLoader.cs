@@ -142,7 +142,7 @@ internal static class OdfPackageZipLoader
                         // 忽略預讀異常，待主線程存取時處理
                     }
                 }
-            });
+            }, CancellationToken.None);
         }
     }
 
@@ -264,7 +264,7 @@ internal static class OdfPackageZipLoader
                 {
                     using Stream stream = entry.OpenReader();
                 }
-            });
+            }, cancellationToken);
         }
     }
 
@@ -315,8 +315,8 @@ internal static class OdfPackageZipLoader
             ms,
             ctx.LoadOptions.MaxPackageSize,
             "Err_OdfPackage_InputStreamSizeLimitExceeded",
-            cancellationToken,
-            bytesRead).ConfigureAwait(false);
+            bytesRead,
+            cancellationToken).ConfigureAwait(false);
         ms.Position = 0;
         if (!ctx.LeaveOpen)
             underlying.Dispose();
@@ -421,8 +421,7 @@ internal static class OdfPackageZipLoader
             int offset = 0;
             while (offset < capacity)
             {
-                int bytesRead = await entryStream
-                    .ReadAsync(rented, offset, capacity - offset, cancellationToken)
+                int bytesRead = await global::OdfKit.Internal.OdfStreamHelper.ReadAsync(entryStream, rented, offset, capacity - offset, cancellationToken)
                     .ConfigureAwait(false);
                 if (bytesRead == 0)
                 {
@@ -495,8 +494,7 @@ internal static class OdfPackageZipLoader
                     rentedLength = larger.Length;
                 }
 
-                int bytesRead = await entryStream
-                    .ReadAsync(rented, count, rentedLength - count, cancellationToken)
+                int bytesRead = await global::OdfKit.Internal.OdfStreamHelper.ReadAsync(entryStream, rented, count, rentedLength - count, cancellationToken)
                     .ConfigureAwait(false);
                 if (bytesRead == 0)
                 {
@@ -563,7 +561,7 @@ internal static class OdfPackageZipLoader
             if (val is null)
                 return entry.CompressedLength == entry.Length;
 
-            int intVal = Convert.ToInt32(val);
+            int intVal = Convert.ToInt32(val, System.Globalization.CultureInfo.InvariantCulture);
             return intVal == 0;
         }
         catch (Exception ex)
@@ -654,7 +652,7 @@ internal static class OdfPackageZipLoader
                         }
                     });
                 });
-            });
+            }, CancellationToken.None);
         }
     }
 

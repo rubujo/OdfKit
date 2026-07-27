@@ -14,11 +14,13 @@ namespace OdfKit.Tests;
 /// </summary>
 public class DatabaseHighLevelApiTests
 {
+    private static readonly string[] CityChoices = ["台北", "台中"];
+    private static readonly string[] CustomerQueryColumns = ["Name", "Age"];
     /// <summary>
     /// 驗證 <see cref="DatabaseDocument.GetForms"/> 可讀回已新增的表單元件。
     /// </summary>
     [Fact]
-    public void GetForms_RoundTripsAfterAdd()
+    public void GetFormsRoundTripsAfterAdd()
     {
         using var database = DatabaseDocument.Create();
         database.AddForm(
@@ -46,7 +48,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證 <see cref="DatabaseDocument.GetReports"/> 可讀回已新增的報表元件。
     /// </summary>
     [Fact]
-    public void GetReports_RoundTripsAfterAdd()
+    public void GetReportsRoundTripsAfterAdd()
     {
         using var database = DatabaseDocument.Create();
         database.AddReport(
@@ -73,7 +75,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證資料庫摘要可彙總常見檢查資訊。
     /// </summary>
     [Fact]
-    public void GetSummary_ReturnsPracticalDatabaseCounts()
+    public void GetSummaryReturnsPracticalDatabaseCounts()
     {
         using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
@@ -97,7 +99,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證資料庫實務 helper 可描述連線、schema 與參數化查詢。
     /// </summary>
     [Fact]
-    public void PracticalDepthHelpers_DescribeConnectionSchemaAndParameterizedQuery()
+    public void PracticalDepthHelpersDescribeConnectionSchemaAndParameterizedQuery()
     {
         using var database = DatabaseDocument.Create();
         database
@@ -164,7 +166,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證 <see cref="OdfSchemaColumn"/> 的唯一值、預設值與檢查約束可於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void SchemaColumnConstraints_RoundTripAfterSaveAndLoad()
+    public void SchemaColumnConstraintsRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         var schema = new OdfDatabaseSchema(database);
@@ -197,7 +199,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證 <see cref="OdfSchemaIndex"/> 可於儲存／載入後保留索引定義。
     /// </summary>
     [Fact]
-    public void SchemaIndexes_RoundTripAfterSaveAndLoad()
+    public void SchemaIndexesRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         var schema = new OdfDatabaseSchema(database);
@@ -226,13 +228,13 @@ public class DatabaseHighLevelApiTests
     /// 驗證表單進階控制項（B-3）可新增並於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void AdvancedFormControls_RoundTripAfterSaveAndLoad()
+    public void AdvancedFormControlsRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
 
         designer.AddRadioButton("Gender", "男", isSelected: true);
-        designer.AddComboBox("City", "城市", new[] { "台北", "台中" });
+        designer.AddComboBox("City", "城市", CityChoices);
         designer.AddNumericField("Amount", "金額", 123.5);
         designer.AddDateField("BirthDate", "生日", new DateTime(2026, 1, 15));
         designer.AddTimeField("Appointment", "預約時間", new TimeSpan(13, 30, 0));
@@ -259,7 +261,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證連線登入與驅動程式設定（B-4）可往返。
     /// </summary>
     [Fact]
-    public void LoginAndDriverSettings_RoundTripAfterSaveAndLoad()
+    public void LoginAndDriverSettingsRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
@@ -289,13 +291,13 @@ public class DatabaseHighLevelApiTests
     /// 驗證查詢排序／篩選／欄位／更新表設定（B-6）可往返。
     /// </summary>
     [Fact]
-    public void QueryStatementsColumnsAndUpdateTable_RoundTripAfterSaveAndLoad()
+    public void QueryStatementsColumnsAndUpdateTableRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         database.AddQuery("CustomerQuery", "SELECT * FROM Customers");
         database.SetQueryOrderStatement("CustomerQuery", "Name ASC", applyCommand: true);
         database.SetQueryFilterStatement("CustomerQuery", "Age > 18", applyCommand: true);
-        database.SetQueryColumns("CustomerQuery", new[] { "Name", "Age" });
+        database.SetQueryColumns("CustomerQuery", CustomerQueryColumns);
         database.SetQueryUpdateTable("CustomerQuery", "Customers");
 
         using var stream = new MemoryStream();
@@ -312,7 +314,7 @@ public class DatabaseHighLevelApiTests
         Assert.NotNull(filter);
         Assert.Equal("Age > 18", filter!.Command);
 
-        Assert.Equal(new[] { "Name", "Age" }, loaded.GetQueryColumns("CustomerQuery"));
+        Assert.Equal(CustomerQueryColumns, loaded.GetQueryColumns("CustomerQuery"));
         Assert.Equal("Customers", loaded.FindQueryUpdateTable("CustomerQuery"));
     }
 
@@ -320,7 +322,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證表單控制項事件繫結與必填／最大長度設定（B-8）可往返。
     /// </summary>
     [Fact]
-    public void ControlEventAndValidationAttributes_RoundTripAfterSaveAndLoad()
+    public void ControlEventAndValidationAttributesRoundTripAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
@@ -349,7 +351,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證群組框控制項（B-9）可新增並於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void GroupBox_RoundTripsAfterSaveAndLoad()
+    public void GroupBoxRoundTripsAfterSaveAndLoad()
     {
         using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
@@ -372,7 +374,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證資料表與查詢支援更新、個別移除及集合清除，並可正確往返。
     /// </summary>
     [Fact]
-    public void TableAndQueryCrud_UpdateRemoveAndClearRoundTrips()
+    public void TableAndQueryCrudUpdateRemoveAndClearRoundTrips()
     {
         using var database = DatabaseDocument.Create();
         database.AddTable("Customers", "customers_v1");
@@ -405,7 +407,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證表單、報表與資料來源設定可用描述物件完整更新、往返及清除。
     /// </summary>
     [Fact]
-    public void ComponentsAndSettings_UpdateRoundTripAndClear()
+    public void ComponentsAndSettingsUpdateRoundTripAndClear()
     {
         using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:firebird");
@@ -463,7 +465,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證無效的設定值會在修改文件前被拒絕，避免留下部分更新。
     /// </summary>
     [Fact]
-    public void UpdateDataSourceSetting_NullValue_DoesNotPartiallyUpdate()
+    public void UpdateDataSourceSettingNullValueDoesNotPartiallyUpdate()
     {
         using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:firebird");
@@ -490,7 +492,7 @@ public class DatabaseHighLevelApiTests
     /// 驗證資料表與查詢可由不可變快照完整更新，並保留查詢子內容。
     /// </summary>
     [Fact]
-    public void TableAndQuerySnapshots_ApplyDesiredStateAndRoundTrip()
+    public void TableAndQuerySnapshotsApplyDesiredStateAndRoundTrip()
     {
         using var database = DatabaseDocument.Create();
         database.AddTable("Customers", "customers_v1");

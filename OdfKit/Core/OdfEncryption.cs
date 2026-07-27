@@ -144,7 +144,7 @@ public static partial class OdfEncryption
     {
         if (salt is null)
         {
-            throw new NullReferenceException(OdfLocalizer.GetMessage("Err_OdfEncryption_SaltCannotBeEmpty"));
+            throw new ArgumentNullException(nameof(salt), OdfLocalizer.GetMessage("Err_OdfEncryption_SaltCannotBeEmpty"));
         }
         if (iterations < 1 || iterations > MaxPbkdf2IterationCount)
         {

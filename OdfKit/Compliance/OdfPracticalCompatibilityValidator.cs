@@ -42,10 +42,7 @@ public static class OdfPracticalCompatibilityValidator
         OdfPracticalCompatibilityProfile profile,
         OdfPracticalCompatibilityOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         List<OdfPracticalCompatibilityIssue> issues = [];
         ScanPackage(document, profile, issues);
@@ -117,7 +114,7 @@ public static class OdfPracticalCompatibilityValidator
         {
             string path = entry.Key;
             string mediaType = entry.Value;
-            if (IsScriptPath(path) || mediaType.IndexOf("script", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (IsScriptPath(path) || global::OdfKit.Internal.OdfStringHelper.Contains(mediaType, "script", StringComparison.OrdinalIgnoreCase))
             {
                 AddIssue(document, issues, "PRAC0001", "Msg_Practical_MacroOrScript", path);
             }
@@ -210,8 +207,8 @@ public static class OdfPracticalCompatibilityValidator
                 }
 
                 if (node.NamespaceUri == OdfNamespaces.Style &&
-                    (node.LocalName.IndexOf("header", StringComparison.Ordinal) >= 0 ||
-                     node.LocalName.IndexOf("footer", StringComparison.Ordinal) >= 0))
+                    (global::OdfKit.Internal.OdfStringHelper.Contains(node.LocalName, "header", StringComparison.Ordinal) ||
+                     global::OdfKit.Internal.OdfStringHelper.Contains(node.LocalName, "footer", StringComparison.Ordinal)))
                 {
                     hasHeaderFooter = true;
                 }
@@ -383,7 +380,7 @@ public static class OdfPracticalCompatibilityValidator
 
     private static bool IsSpreadsheetPrintSettingsNode(OdfNode node) =>
         (node.NamespaceUri == OdfNamespaces.Table && node.GetAttribute("print-ranges", OdfNamespaces.Table) is not null) ||
-        (node.NamespaceUri == OdfNamespaces.Style && node.LocalName.IndexOf("print", StringComparison.OrdinalIgnoreCase) >= 0);
+        (node.NamespaceUri == OdfNamespaces.Style && global::OdfKit.Internal.OdfStringHelper.Contains(node.LocalName, "print", StringComparison.OrdinalIgnoreCase));
 
     private static bool IsImageTransformNode(OdfNode node) =>
         (node.NamespaceUri == OdfNamespaces.Draw &&

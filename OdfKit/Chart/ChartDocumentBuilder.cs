@@ -113,10 +113,7 @@ public sealed class ChartDocumentBuilder
     /// <returns>The current builder. / 目前 builder。</returns>
     public ChartDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var styles = new OdfStyleSet();
         configure(styles);
@@ -188,10 +185,7 @@ public sealed class ChartDocumentBuilder
     /// <returns>The current builder. / 目前 builder。</returns>
     public ChartDocumentBuilder WithAxis(string dimension, Action<ChartAxisBuilder> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         configure(new ChartAxisBuilder(_document, dimension));
         return this;
@@ -206,10 +200,7 @@ public sealed class ChartDocumentBuilder
     /// <returns>The current builder. / 目前 builder。</returns>
     public ChartDocumentBuilder ConfigureSeries(int index, Action<ChartSeriesBuilder> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         OdfChartSeries series = _document.GetSeriesEditor(index);
         ApplyStyleSetToSeries(series, index);
@@ -251,10 +242,7 @@ public sealed class ChartDocumentBuilder
     /// <returns>The current builder. / 目前 builder。</returns>
     public ChartDocumentBuilder With3D(Action<OdfChart3DOptions> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var options = new OdfChart3DOptions();
         configure(options);
@@ -404,10 +392,7 @@ public sealed class ChartSeriesBuilder
     /// <returns>The current builder. / 目前 builder。</returns>
     public ChartSeriesBuilder WithStyle(Action<OdfChartStyle> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         configure(_series.Style);
         return this;

@@ -5,7 +5,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class Cff2CharStringVerifierTests
 {
     [Fact]
-    public void Verify_AcceptsBlendAndVariationIndex()
+    public void VerifyAcceptsBlendAndVariationIndex()
     {
         byte[] charString = [140, 15, 139, 140, 141, 140, 16, 22];
 
@@ -19,7 +19,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_AcceptsEmptyProgram()
+    public void VerifyAcceptsEmptyProgram()
     {
         Cff2CharStringVerifier.Verify(
             Array.Empty<byte>(),
@@ -31,7 +31,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsHintMaskWithoutStemHints()
+    public void VerifyRejectsHintMaskWithoutStemHints()
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Cff2CharStringVerifier.Verify(
@@ -46,7 +46,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_AcceptsNonVariableContextWithoutVariationStore()
+    public void VerifyAcceptsNonVariableContextWithoutVariationStore()
     {
         Cff2CharStringVerifier.Verify(
             Array.Empty<byte>(),
@@ -58,7 +58,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsBlendWithoutVariationStore()
+    public void VerifyRejectsBlendWithoutVariationStore()
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Cff2CharStringVerifier.Verify(
@@ -75,7 +75,7 @@ public sealed class Cff2CharStringVerifierTests
     [Theory]
     [InlineData((byte)11)]
     [InlineData((byte)14)]
-    public void Verify_RejectsRemovedType2Operators(byte operation)
+    public void VerifyRejectsRemovedType2Operators(byte operation)
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Cff2CharStringVerifier.Verify(
@@ -90,7 +90,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsBlendWithInsufficientOperands()
+    public void VerifyRejectsBlendWithInsufficientOperands()
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Cff2CharStringVerifier.Verify(
@@ -105,7 +105,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsRecursiveSubroutineBeyondLimit()
+    public void VerifyRejectsRecursiveSubroutineBeyondLimit()
     {
         byte[] charString = [32, 10];
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 32, 10 }];
@@ -123,7 +123,7 @@ public sealed class Cff2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsOperandStackOverflow()
+    public void VerifyRejectsOperandStackOverflow()
     {
         byte[] charString = Enumerable.Repeat((byte)139, 514).ToArray();
 

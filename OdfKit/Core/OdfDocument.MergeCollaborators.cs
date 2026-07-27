@@ -36,6 +36,7 @@ public abstract partial class OdfDocument
         internal void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
             => _document.MergeContentNodes(sourceDoc, options, renameMap);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
             => OdfDocumentStyleRemapEngine.RemapStylesInNodes(node, renameMap);
     }

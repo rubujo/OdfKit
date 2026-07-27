@@ -25,8 +25,7 @@ public static class OdfRtfImporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="rtf"/> 為 null 時引發</exception>
     public static TextDocument Import(string rtf)
     {
-        if (rtf is null)
-            throw new ArgumentNullException(nameof(rtf));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(rtf, nameof(rtf));
 
         var parser = new Parser(rtf);
         return parser.Parse();
@@ -38,8 +37,7 @@ public static class OdfRtfImporter
     /// </summary>
     public static TextDocument Import(TextReader reader)
     {
-        if (reader is null)
-            throw new ArgumentNullException(nameof(reader));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         return Import(reader.ReadToEnd());
     }
@@ -255,7 +253,7 @@ public static class OdfRtfImporter
 
             int? number = null;
             if (pos > numberStart &&
-                int.TryParse(_rtf.Substring(numberStart, pos - numberStart), NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed))
+                OdfKit.Internal.OdfParsingHelper.TryParseInvariantInt32(_rtf, numberStart, pos - numberStart, out int parsed))
             {
                 number = negative ? -parsed : parsed;
             }
@@ -391,7 +389,7 @@ public static class OdfRtfImporter
                     AppendCurrentFootnoteCitation();
                     break;
                 case "bullet":
-                    _textBuffer.Append("•");
+                    _textBuffer.Append('•');
                     break;
                 case "enspace":
                     _textBuffer.Append('\u2002');
@@ -590,7 +588,7 @@ public static class OdfRtfImporter
             string altText = body;
             string href = string.Empty;
             int hrefStart = body.LastIndexOf(" (", StringComparison.Ordinal);
-            if (hrefStart >= 0 && body.EndsWith(")", StringComparison.Ordinal))
+            if (hrefStart >= 0 && global::OdfKit.Internal.OdfStringHelper.EndsWith(body, ')'))
             {
                 altText = body.Substring(0, hrefStart);
                 href = body.Substring(hrefStart + 2, body.Length - hrefStart - 3);
@@ -902,7 +900,7 @@ public static class OdfRtfImporter
             _lastRun = null;
         }
 
-        private void ApplyStyle(OdfTextRun run, InlineStyle style)
+        private static void ApplyStyle(OdfTextRun run, InlineStyle style)
         {
             if (style.Bold)
             {
@@ -1158,11 +1156,11 @@ public static class OdfRtfImporter
             return true;
         }
 
-        private static string? ReadFirstFieldArgument(IReadOnlyList<string> tokens)
+        private static string? ReadFirstFieldArgument(List<string> tokens)
         {
             for (int i = 1; i < tokens.Count; i++)
             {
-                if (!tokens[i].StartsWith("\\", StringComparison.Ordinal))
+                if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(tokens[i], '\\'))
                 {
                     return tokens[i];
                 }
@@ -1489,9 +1487,9 @@ public static class OdfRtfImporter
             preferredName = null;
             width = ReadPictureLength(group, "picwgoal", OdfLength.FromCentimeters(4));
             height = ReadPictureLength(group, "pichgoal", OdfLength.FromCentimeters(3));
-            string extension = group.IndexOf(@"\jpegblip", StringComparison.OrdinalIgnoreCase) >= 0
+            string extension = OdfKit.Internal.OdfStringHelper.Contains(group, @"\jpegblip", StringComparison.OrdinalIgnoreCase)
                 ? ".jpg"
-                : group.IndexOf(@"\pngblip", StringComparison.OrdinalIgnoreCase) >= 0
+                : OdfKit.Internal.OdfStringHelper.Contains(group, @"\pngblip", StringComparison.OrdinalIgnoreCase)
                     ? ".png"
                     : string.Empty;
             if (extension.Length == 0)
@@ -1569,7 +1567,7 @@ public static class OdfRtfImporter
                 }
 
                 return pos > start &&
-                    int.TryParse(group.Substring(start, pos - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out value) &&
+                    OdfKit.Internal.OdfParsingHelper.TryParseInvariantInt32(group, start, pos - start, out value) &&
                     !negative;
             }
 
@@ -1582,7 +1580,7 @@ public static class OdfRtfImporter
         private static int HexValue(char c) =>
             c <= '9' ? c - '0' : (c <= 'F' ? c - 'A' : c - 'a') + 10;
 
-        private string? ReadHyperlinkUrl(string? instruction)
+        private static string? ReadHyperlinkUrl(string? instruction)
         {
             if (string.IsNullOrWhiteSpace(instruction))
             {
@@ -1602,7 +1600,7 @@ public static class OdfRtfImporter
             return end < 0 ? null : fieldInstruction.Substring(start, end - start);
         }
 
-        private string? ReadFieldDestination(string group, string controlWord)
+        private static string? ReadFieldDestination(string group, string controlWord)
         {
             for (int i = 0; i < group.Length; i++)
             {
@@ -1767,7 +1765,7 @@ public static class OdfRtfImporter
 
             next = pos;
             return pos > start &&
-                int.TryParse(_rtf.Substring(start, pos - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
+                OdfKit.Internal.OdfParsingHelper.TryParseInvariantInt32(_rtf, start, pos - start, out value);
         }
 
         private string DecodeGroupText(int groupStart, bool skipFirstControl)
@@ -1803,7 +1801,7 @@ public static class OdfRtfImporter
             return DecodeRtfText(_rtf.Substring(start, Math.Max(0, groupEnd - start)));
         }
 
-        private string DecodeRtfText(string value, bool preserveUnknownControls = false)
+        private static string DecodeRtfText(string value, bool preserveUnknownControls = false)
         {
             var sb = new StringBuilder(value.Length);
             int unicodeFallbackLength = 1;
@@ -1947,7 +1945,7 @@ public static class OdfRtfImporter
             }
 
             if (pos > start &&
-                int.TryParse(value.Substring(start, pos - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed))
+                OdfKit.Internal.OdfParsingHelper.TryParseInvariantInt32(value, start, pos - start, out int parsed))
             {
                 sb.Append(DecodeSignedUnicodeEscape(negative ? -parsed : parsed));
             }
@@ -1978,7 +1976,7 @@ public static class OdfRtfImporter
             fallbackLength = 1;
             if (!negative &&
                 pos > start &&
-                int.TryParse(value.Substring(start, pos - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed))
+                OdfKit.Internal.OdfParsingHelper.TryParseInvariantInt32(value, start, pos - start, out int parsed))
             {
                 fallbackLength = parsed;
             }
@@ -2245,6 +2243,6 @@ public static class OdfRtfImporter
         string? TextTransform = null,
         string? FontVariant = null)
     {
-        public static InlineStyle Empty { get; } = new();
+        public static InlineStyle Empty => default;
     }
 }

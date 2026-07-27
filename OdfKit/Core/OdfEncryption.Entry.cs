@@ -116,13 +116,11 @@ public static partial class OdfEncryption
         byte[] rawPasswordBytes = Encoding.UTF8.GetBytes(password);
         if (startKeyIsSha256)
         {
-            using (var sha = SHA256.Create())
-                pwdBytes = sha.ComputeHash(rawPasswordBytes);
+            pwdBytes = global::OdfKit.Internal.OdfHashHelper.Sha256(rawPasswordBytes);
         }
         else if (startKeyIsSha1)
         {
-            using (var sha = SHA1.Create())
-                pwdBytes = sha.ComputeHash(rawPasswordBytes);
+            pwdBytes = global::OdfKit.Internal.OdfHashHelper.Sha1(rawPasswordBytes);
         }
         else
         {
@@ -274,8 +272,7 @@ public static partial class OdfEncryption
             // （key-derivation-name 與 loext:argon2-iterations／-memory／-lanes）對標 LibreOffice
             // 的 OpenDocument-v1.4+libreoffice-manifest-schema.rng。互通邊界見 docs/odf-format-support.md。
             byte[] preHashedPwd;
-            using (var sha = SHA256.Create())
-                preHashedPwd = sha.ComputeHash(pwdBytes);
+            preHashedPwd = global::OdfKit.Internal.OdfHashHelper.Sha256(pwdBytes);
 
             var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
                 .WithVersion(Argon2Parameters.Version13)
@@ -294,15 +291,13 @@ public static partial class OdfEncryption
             // start key 依 start-key-generation-name 取 SHA-256；PBKDF2 的 PRF 則是規範固定的
             // HMAC-SHA-1（Part 2 §4.16.7），兩者不可混為一談。
             byte[] preHashedPwd;
-            using (var sha = SHA256.Create())
-                preHashedPwd = sha.ComputeHash(pwdBytes);
+            preHashedPwd = global::OdfKit.Internal.OdfHashHelper.Sha256(pwdBytes);
             derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha1");
         }
         else
         {
             byte[] preHashedPwd;
-            using (var sha = SHA1.Create())
-                preHashedPwd = sha.ComputeHash(pwdBytes);
+            preHashedPwd = global::OdfKit.Internal.OdfHashHelper.Sha1(pwdBytes);
             derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha1");
         }
 

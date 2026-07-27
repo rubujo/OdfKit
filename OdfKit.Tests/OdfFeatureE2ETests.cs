@@ -30,7 +30,7 @@ namespace OdfKit.Tests
         private static readonly XNamespace smilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
 
         // Helper to perform round-trip saving and reloading of a document
-        private T RoundTrip<T>(T document, Func<OdfPackage, T> factory) where T : OdfDocument
+        private static T RoundTrip<T>(T document, Func<OdfPackage, T> factory) where T : OdfDocument
         {
             var ms = new MemoryStream();
             document.Package.Save(ms);
@@ -45,7 +45,7 @@ namespace OdfKit.Tests
 
         #region Feature 2: ODT Tracked Revisions
         [Fact]
-        public void F2_TrackedChanges_AcceptAll()
+        public void F2TrackedChangesAcceptAll()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -83,7 +83,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_TrackedChanges_RejectAll()
+        public void F2TrackedChangesRejectAll()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -118,7 +118,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_TrackedChanges_AcceptSingle()
+        public void F2TrackedChangesAcceptSingle()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -143,7 +143,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_TrackedChanges_RejectSingle()
+        public void F2TrackedChangesRejectSingle()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -168,7 +168,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_TrackedChanges_PropertyGetterSetter()
+        public void F2TrackedChangesPropertyGetterSetter()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -181,7 +181,7 @@ namespace OdfKit.Tests
 
         #region Feature 3: ODT CJK Layout
         [Fact]
-        public void F3_Ruby_HappyPath()
+        public void F3RubyHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -197,7 +197,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_Ruby_BaseAndTextElements()
+        public void F3RubyBaseAndTextElements()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -217,7 +217,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_VerticalWritingMode_Styles()
+        public void F3VerticalWritingModeStyles()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -232,7 +232,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_EastAsianLayoutGrid()
+        public void F3EastAsianLayoutGrid()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -257,7 +257,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_CjkFontFallbackInfo()
+        public void F3CjkFontFallbackInfo()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -284,7 +284,7 @@ namespace OdfKit.Tests
 
         #region Feature 4: ODT MathML Object Preservation
         [Fact]
-        public void F4_MathML_HappyPath()
+        public void F4MathMLHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -302,7 +302,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F4_MathML_NestedStructure()
+        public void F4MathMLNestedStructure()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -312,7 +312,7 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
-            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_") && e.Path.EndsWith("content.xml"));
+            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal) && e.Path.EndsWith("content.xml", System.StringComparison.Ordinal));
             Assert.NotNull(formulaEntry);
             string mathContent = Encoding.UTF8.GetString(reloaded.Package.ReadEntry(formulaEntry.Path));
             Assert.Contains("msqrt", mathContent);
@@ -320,7 +320,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F4_MathML_InHeaderFooter()
+        public void F4MathMLInHeaderFooter()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -340,12 +340,12 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
-            var hasFormula = reloaded.Package.GetEntries().Any(e => e.Path.StartsWith("Formula_") && e.Path.EndsWith("content.xml"));
+            var hasFormula = reloaded.Package.GetEntries().Any(e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal) && e.Path.EndsWith("content.xml", System.StringComparison.Ordinal));
             Assert.True(hasFormula);
         }
 
         [Fact]
-        public void F4_MathML_SpecialCharacters()
+        public void F4MathMLSpecialCharacters()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -355,7 +355,7 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
-            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_") && e.Path.EndsWith("content.xml"));
+            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal) && e.Path.EndsWith("content.xml", System.StringComparison.Ordinal));
             Assert.NotNull(formulaEntry);
             string mathContent = Encoding.UTF8.GetString(reloaded.Package.ReadEntry(formulaEntry.Path));
             Assert.Contains("&amp;", mathContent);
@@ -364,7 +364,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F4_MathML_PackageFidelity()
+        public void F4MathMLPackageFidelity()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -373,7 +373,7 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
-            var mimeEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_") && e.Path.EndsWith("mimetype"));
+            var mimeEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal) && e.Path.EndsWith("mimetype", System.StringComparison.Ordinal));
             Assert.NotNull(mimeEntry);
             string mimeType = Encoding.UTF8.GetString(reloaded.Package.ReadEntry(mimeEntry.Path));
             Assert.Equal("application/vnd.oasis.opendocument.formula", mimeType);
@@ -382,7 +382,7 @@ namespace OdfKit.Tests
 
         #region Feature 5: ODS Named & Database Ranges
         [Fact]
-        public void F5_NamedRange_HappyPath()
+        public void F5NamedRangeHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -406,7 +406,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_DatabaseRange_HappyPath()
+        public void F5DatabaseRangeHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -428,7 +428,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_NamedRange_MultipleRanges()
+        public void F5NamedRangeMultipleRanges()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -453,7 +453,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_DatabaseRange_Retrieval()
+        public void F5DatabaseRangeRetrieval()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -471,7 +471,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_NamedRange_FormulaBinding()
+        public void F5NamedRangeFormulaBinding()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -494,7 +494,7 @@ namespace OdfKit.Tests
 
         #region Feature 6: ODS Sort & Filter
         [Fact]
-        public void F6_SortCriteria_HappyPath()
+        public void F6SortCriteriaHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -523,7 +523,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_FilterCriteria_HappyPath()
+        public void F6FilterCriteriaHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -552,7 +552,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_DatabaseRangeSort()
+        public void F6DatabaseRangeSort()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -571,7 +571,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_DatabaseRangeFilter()
+        public void F6DatabaseRangeFilter()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -590,7 +590,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_MultiColumnSort()
+        public void F6MultiColumnSort()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -618,7 +618,7 @@ namespace OdfKit.Tests
 
         #region Feature 7: ODS Pivot Tables (Data Pilots)
         [Fact]
-        public void F7_PivotTable_HappyPath()
+        public void F7PivotTableHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -646,7 +646,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F7_PivotTable_SourceDestination()
+        public void F7PivotTableSourceDestination()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -671,7 +671,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F7_PivotTable_Fields()
+        public void F7PivotTableFields()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -694,7 +694,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F7_PivotTable_RowColFields()
+        public void F7PivotTableRowColFields()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -716,7 +716,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F7_PivotTable_DataFields()
+        public void F7PivotTableDataFields()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -745,7 +745,7 @@ namespace OdfKit.Tests
 
         #region Feature 8: ODS Conditional Formatting
         [Fact]
-        public void F8_ConditionalFormatting_HappyPath()
+        public void F8ConditionalFormattingHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -765,7 +765,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F8_ConditionalFormatting_MultipleRules()
+        public void F8ConditionalFormattingMultipleRules()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -782,7 +782,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F8_ConditionalFormatting_CellStyles()
+        public void F8ConditionalFormattingCellStyles()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -800,7 +800,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F8_ConditionalFormatting_DateRules()
+        public void F8ConditionalFormattingDateRules()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -816,7 +816,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F8_ConditionalFormatting_NumberStyles()
+        public void F8ConditionalFormattingNumberStyles()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -834,7 +834,7 @@ namespace OdfKit.Tests
 
         #region Feature 9: OpenFormula Evaluator (F3-F5)
         [Fact]
-        public void F9_Evaluator_MathFunctions()
+        public void F9EvaluatorMathFunctions()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -847,7 +847,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Evaluator_LogicalFunctions()
+        public void F9EvaluatorLogicalFunctions()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -861,7 +861,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Evaluator_DateFunctions()
+        public void F9EvaluatorDateFunctions()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -876,7 +876,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Evaluator_RangeUnion()
+        public void F9EvaluatorRangeUnion()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -891,7 +891,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Evaluator_RangeIntersection()
+        public void F9EvaluatorRangeIntersection()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -910,7 +910,7 @@ namespace OdfKit.Tests
 
         #region Feature 10: ODP Slide Layouts & Notes
         [Fact]
-        public void F10_SlideLayout_HappyPath()
+        public void F10SlideLayoutHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -923,7 +923,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_SpeakerNotes_HappyPath()
+        public void F10SpeakerNotesHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -936,7 +936,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_Placeholders_Presentation()
+        public void F10PlaceholdersPresentation()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -955,7 +955,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_MasterPageBinding()
+        public void F10MasterPageBinding()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -969,7 +969,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_NotesLayoutStructure()
+        public void F10NotesLayoutStructure()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -986,7 +986,7 @@ namespace OdfKit.Tests
 
         #region Feature 11: ODP SMIL Animations & Transitions
         [Fact]
-        public void F11_Transitions_HappyPath()
+        public void F11TransitionsHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1004,7 +1004,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F11_SmilTiming_Sequence()
+        public void F11SmilTimingSequence()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1023,7 +1023,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F11_SmilTiming_Parallel()
+        public void F11SmilTimingParallel()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1041,7 +1041,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F11_SmilTiming_EffectPresets()
+        public void F11SmilTimingEffectPresets()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1062,7 +1062,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F11_SlideTransition_Durations()
+        public void F11SlideTransitionDurations()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1081,7 +1081,7 @@ namespace OdfKit.Tests
 
         #region Feature 12: ODG Graphic Styles & Connectors
         [Fact]
-        public void F12_ShapeStyles_HappyPath()
+        public void F12ShapeStylesHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1100,7 +1100,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F12_Connector_HappyPath()
+        public void F12ConnectorHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1122,7 +1122,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F12_CustomShapeGeometry()
+        public void F12CustomShapeGeometry()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1138,7 +1138,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F12_ShapeFillGradients()
+        public void F12ShapeFillGradients()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1156,7 +1156,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F12_ConnectorAttributes()
+        public void F12ConnectorAttributes()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1176,7 +1176,7 @@ namespace OdfKit.Tests
 
         #region Feature 13: Embedded Objects
         [Fact]
-        public void F13_EmbeddedChart_HappyPath()
+        public void F13EmbeddedChartHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1202,7 +1202,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F13_EmbeddedFormula_HappyPath()
+        public void F13EmbeddedFormulaHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1227,7 +1227,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F13_ChartSeriesAndAxis()
+        public void F13ChartSeriesAndAxis()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1256,7 +1256,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F13_ChartLegendStyles()
+        public void F13ChartLegendStyles()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1279,7 +1279,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F13_EmbeddedObjectManifest()
+        public void F13EmbeddedObjectManifest()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1305,7 +1305,7 @@ namespace OdfKit.Tests
 
         #region Boundary Tests (Empty structures, boundary values, exception triggers)
         [Fact]
-        public void F1_Boundary_TocEmptyDocument()
+        public void F1BoundaryTocEmptyDocument()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1318,7 +1318,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_Boundary_TrackedRevisionsEmptyChanges()
+        public void F2BoundaryTrackedRevisionsEmptyChanges()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1329,7 +1329,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F2_Boundary_TrackedRevisionsInvalidId()
+        public void F2BoundaryTrackedRevisionsInvalidId()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1340,7 +1340,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_Boundary_RubyEmptyStringValues()
+        public void F3BoundaryRubyEmptyStringValues()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1354,7 +1354,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_Boundary_VerticalWritingModeDefaultsToLrTbWhenUnset()
+        public void F3BoundaryVerticalWritingModeDefaultsToLrTbWhenUnset()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1366,7 +1366,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F4_Boundary_MathMLLargeFormula()
+        public void F4BoundaryMathMLLargeFormula()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1389,12 +1389,12 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
-            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_") && e.Path.EndsWith("content.xml"));
+            var formulaEntry = reloaded.Package.GetEntries().FirstOrDefault(e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal) && e.Path.EndsWith("content.xml", System.StringComparison.Ordinal));
             Assert.NotNull(formulaEntry);
         }
 
         [Fact]
-        public void F4_Boundary_MathMLMalformedXml_Throws()
+        public void F4BoundaryMathMLMalformedXmlThrows()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1404,7 +1404,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_Boundary_NamedRangeInvalidName_Throws()
+        public void F5BoundaryNamedRangeInvalidNameThrows()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1429,7 +1429,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F5_Boundary_DatabaseRangeEmpty()
+        public void F5BoundaryDatabaseRangeEmpty()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1446,7 +1446,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_Boundary_SortEmptyRange()
+        public void F6BoundarySortEmptyRange()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1463,7 +1463,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F6_Boundary_FilterEmptyCriteria()
+        public void F6BoundaryFilterEmptyCriteria()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1480,7 +1480,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F7_Boundary_PivotTableEmptyFields()
+        public void F7BoundaryPivotTableEmptyFields()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1496,7 +1496,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F8_Boundary_ConditionalFormatEmptyStyle()
+        public void F8BoundaryConditionalFormatEmptyStyle()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1512,7 +1512,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Boundary_FormulaDivByZero()
+        public void F9BoundaryFormulaDivByZero()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -1524,7 +1524,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F9_Boundary_FormulaCircularReference()
+        public void F9BoundaryFormulaCircularReference()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -1542,7 +1542,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_Boundary_SlideLayoutNoPlaceholder()
+        public void F10BoundarySlideLayoutNoPlaceholder()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1554,7 +1554,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F10_Boundary_SpeakerNotesLargeText()
+        public void F10BoundarySpeakerNotesLargeText()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1569,7 +1569,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F11_Boundary_SmilAnimationsEmptySequence()
+        public void F11BoundarySmilAnimationsEmptySequence()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1585,7 +1585,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F12_Boundary_ShapeStylesInvalidColors()
+        public void F12BoundaryShapeStylesInvalidColors()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1602,7 +1602,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F13_Boundary_ChartLegendEmptyPosition()
+        public void F13BoundaryChartLegendEmptyPosition()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1626,7 +1626,7 @@ namespace OdfKit.Tests
 
         #region Cross-Feature Integration Tests
         [Fact]
-        public void Tier3_TOC_Heading_Inside_Tracked_Changes()
+        public void Tier3TOCHeadingInsideTrackedChanges()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1648,7 +1648,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier3_TrackedChanges_Inside_CJK_Ruby()
+        public void Tier3TrackedChangesInsideCJKRuby()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1669,7 +1669,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier3_Formula_Evaluating_NamedRanges()
+        public void Tier3FormulaEvaluatingNamedRanges()
         {
             var evaluator = new DefaultFormulaEvaluator();
             var context = new FormulaAndStylesTest.MockEvaluationContext();
@@ -1685,7 +1685,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier3_ConditionalFormatting_Referencing_NamedRange()
+        public void Tier3ConditionalFormattingReferencingNamedRange()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1702,7 +1702,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier3_Presentation_SpeakerNotes_With_TOC()
+        public void Tier3PresentationSpeakerNotesWithTOC()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1722,7 +1722,7 @@ namespace OdfKit.Tests
 
         #region Real-World Application Workloads
         [Fact]
-        public void Tier4_Complex_Text_Document_Workflow()
+        public void Tier4ComplexTextDocumentWorkflow()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -1741,11 +1741,11 @@ namespace OdfKit.Tests
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
             Assert.Equal(OdfWritingMode.TbRl, reloaded.GetDefaultPageSetup().WritingMode);
             Assert.NotNull(reloaded.BodyTextRoot.Descendants().FirstOrDefault(d => d.LocalName == "ruby"));
-            Assert.Contains(reloaded.Package.GetEntries(), e => e.Path.StartsWith("Formula_"));
+            Assert.Contains(reloaded.Package.GetEntries(), e => e.Path.StartsWith("Formula_", System.StringComparison.Ordinal));
         }
 
         [Fact]
-        public void Tier4_Financial_Spreadsheet_Workflow()
+        public void Tier4FinancialSpreadsheetWorkflow()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
@@ -1776,7 +1776,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier4_Business_Presentation_SlideDeck()
+        public void Tier4BusinessPresentationSlideDeck()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
@@ -1804,7 +1804,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier4_Technical_Engineering_Drawing()
+        public void Tier4TechnicalEngineeringDrawing()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
@@ -1834,7 +1834,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Tier4_Cross_Document_Analytics_Report()
+        public void Tier4CrossDocumentAnalyticsReport()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);

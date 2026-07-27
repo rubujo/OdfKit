@@ -6,7 +6,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class LegacyEncodingTests
 {
     [Fact]
-    public void Big5Provider_StrictlyDecodesCp950()
+    public void Big5ProviderStrictlyDecodesCp950()
     {
         System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         byte[] bytes = System.Text.Encoding.GetEncoding(950).GetBytes("中文");
@@ -17,7 +17,7 @@ public sealed class LegacyEncodingTests
     }
 
     [Fact]
-    public void Big5EProvider_UsesExplicitSupplementaryMappingBeforeCp950()
+    public void Big5EProviderUsesExplicitSupplementaryMappingBeforeCp950()
     {
         using var reader = new StringReader("# Big5E direct mapping\n8140\t20000\n");
         Big5EMapping mapping = Big5EMapping.Load(reader, "cns-2024");
@@ -28,7 +28,7 @@ public sealed class LegacyEncodingTests
     }
 
     [Fact]
-    public void Big5EProvider_RejectsUnknownUserDefinedBytes()
+    public void Big5EProviderRejectsUnknownUserDefinedBytes()
     {
         using var reader = new StringReader("8140\t20000\n");
         Big5EMapping mapping = Big5EMapping.Load(reader, "cns-2024");
@@ -38,7 +38,7 @@ public sealed class LegacyEncodingTests
     }
 
     [Fact]
-    public void PrivateUseProvider_IsScopedByProfile()
+    public void PrivateUseProviderIsScopedByProfile()
     {
         var provider = new PrivateUseCharacterMappingProvider(
             "agency-a-educ-v1",

@@ -20,8 +20,7 @@ public sealed class OdfCellRangeSelection
     /// <returns>The current range selection. / 目前的範圍選取。</returns>
     public OdfCellRangeSelection Style(Action<OdfCellStyleProxy> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         foreach (OdfCell cell in EnumerateCells())
             configure(cell.Style);
         return this;
@@ -143,7 +142,7 @@ public sealed class OdfCellRangeSelection
         if (rangeNode is null)
         {
             rangeNode = OdfNodeFactory.CreateElement("protected-range", OdfNamespaces.Table, "table");
-            string name = "range_protect_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            string name = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("range_protect_");
             rangeNode.SetAttribute("name", OdfNamespaces.Table, name, "table");
             rangeNode.SetAttribute("cell-range-address", OdfNamespaces.Table, Range.ToOdfString(false), "table");
             rangesNode.AppendChild(rangeNode);

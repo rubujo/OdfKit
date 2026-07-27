@@ -1929,10 +1929,10 @@ public partial class TypedDomParityTests
             Environment.NewLine,
             generatedFiles.Select(path => File.ReadAllText(path)));
 
-        int classCount = Regex.Matches(generated, @"public partial class \w+Element").Count;
-        int factoryCaseCount = Regex.Matches(generated, @"\{ "".*"",\s*prefix => new \w+Element\(prefix\) \}").Count;
-        int childCollectionPropertyCount = Regex.Matches(generated, @"public IEnumerable<\w+Element> \w+ChildElements").Count;
-        int stringPropertyCount = Regex.Matches(generated, @"public string\? \w+").Count;
+        int classCount = Regex.Count(generated, @"public partial class \w+Element");
+        int factoryCaseCount = Regex.Count(generated, @"\{ "".*"",\s*prefix => new \w+Element\(prefix\) \}");
+        int childCollectionPropertyCount = Regex.Count(generated, @"public IEnumerable<\w+Element> \w+ChildElements");
+        int stringPropertyCount = Regex.Count(generated, @"public string\? \w+");
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -2064,7 +2064,7 @@ public partial class TypedDomParityTests
         int propertyCount = childCollectionPropertyCount + stringPropertyCount;
         foreach (var pair in expectedFloors)
         {
-            int actual = Regex.Matches(generated, @"public " + Regex.Escape(pair.TypeName) + @"\? \w+").Count;
+            int actual = Regex.Count(generated, @"public " + Regex.Escape(pair.TypeName) + @"\? \w+");
             propertyCount += actual;
             Assert.True(actual >= pair.MinCount, $"generated '{pair.TypeName}' property count regressed: expected >= {pair.MinCount}, actual {actual}");
         }

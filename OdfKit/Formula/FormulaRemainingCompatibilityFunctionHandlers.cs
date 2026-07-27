@@ -271,7 +271,7 @@ internal static class FormulaRemainingCompatibilityFunctionHandlers
             return OdfFormulaError.Value;
         int startIndex = GetCharacterIndexAtByte(text, start - 1);
         int endIndex = GetCharacterIndexAtByte(text, start - 1 + count);
-        return text.Substring(0, startIndex) + replacement + text.Substring(endIndex);
+        return global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, startIndex, endIndex, replacement);
     }
 
     private static object ConvertWidth(

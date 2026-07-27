@@ -26,8 +26,7 @@ public static class OdfMarkdownImporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="markdown"/> 為 null 時引發</exception>
     public static TextDocument Import(string markdown, OdfMarkdownImportOptions? options = null)
     {
-        if (markdown is null)
-            throw new ArgumentNullException(nameof(markdown));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(markdown, nameof(markdown));
 
         options ??= new OdfMarkdownImportOptions();
         if (OdfMarkdownMarkdigImporter.TryImport(markdown, options, out TextDocument? markdigDocument))
@@ -179,8 +178,7 @@ public static class OdfMarkdownImporter
     /// </summary>
     public static TextDocument Import(TextReader reader, OdfMarkdownImportOptions? options = null)
     {
-        if (reader is null)
-            throw new ArgumentNullException(nameof(reader));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         return Import(reader.ReadToEnd(), options);
     }
@@ -466,8 +464,8 @@ public static class OdfMarkdownImporter
             }
             else if (string.Equals(name, "text-decoration", StringComparison.OrdinalIgnoreCase))
             {
-                underline = value.IndexOf("underline", StringComparison.OrdinalIgnoreCase) >= 0;
-                strikethrough = value.IndexOf("line-through", StringComparison.OrdinalIgnoreCase) >= 0;
+                underline = OdfKit.Internal.OdfStringHelper.Contains(value, "underline", StringComparison.OrdinalIgnoreCase);
+                strikethrough = OdfKit.Internal.OdfStringHelper.Contains(value, "line-through", StringComparison.OrdinalIgnoreCase);
             }
             else if (string.Equals(name, "font-size", StringComparison.OrdinalIgnoreCase))
             {
@@ -658,7 +656,7 @@ public static class OdfMarkdownImporter
             return false;
         }
 
-        int endComment = text.IndexOf("-->", marker);
+        int endComment = text.IndexOf("-->", marker, System.StringComparison.Ordinal);
         if (endComment < 0)
         {
             return false;
@@ -1054,7 +1052,7 @@ public static class OdfMarkdownImporter
             this.FontVariant = FontVariant;
         }
 
-        public static InlineImportStyle Empty { get; } = new();
+        public static InlineImportStyle Empty => default;
 
         public bool Bold { get; }
 

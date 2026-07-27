@@ -29,8 +29,7 @@ public partial class OdfDrawPage
     /// <returns>The newly created group instance. / 新建立的群組執行個體。</returns>
     public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds, string? name)
     {
-        if (shapeIds is null)
-            throw new ArgumentNullException(nameof(shapeIds));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(shapeIds, nameof(shapeIds));
 
         List<string> ids = shapeIds.Where(id => !string.IsNullOrEmpty(id)).Distinct().ToList();
         if (ids.Count == 0)

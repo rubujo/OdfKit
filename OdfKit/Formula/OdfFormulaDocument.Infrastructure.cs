@@ -113,7 +113,7 @@ public partial class OdfFormulaDocument
         return Package.IsFlatXml ? ContentDom : MathNode.CloneNode(true);
     }
 
-    private IReadOnlyList<OdfMathToken> ReadMathTokens()
+    private System.Collections.ObjectModel.ReadOnlyCollection<OdfMathToken> ReadMathTokens()
     {
         OdfNode math = MathNode;
         OdfNode presentationRoot = FindChildElement(math, "semantics", MathMlNamespace) ?? math;

@@ -76,7 +76,7 @@ public class OdfValidatorApiTests
     [InlineData(OdfDocumentKind.FlatChart, "chart.fodc")]
     [InlineData(OdfDocumentKind.FlatFormula, "formula.fdf")]
     [InlineData(OdfDocumentKind.FlatImage, "image.fodi")]
-    public void FlatOdf_SupplementalExtensions_ValidateWithExpectedKind(OdfDocumentKind expectedKind, string fileName)
+    public void FlatOdfSupplementalExtensionsValidateWithExpectedKind(OdfDocumentKind expectedKind, string fileName)
     {
         using var stream = new MemoryStream();
         OdfDocumentFactory.WriteFlatXml(stream, expectedKind, new OdfFlatXmlWriteOptions { LeaveOpen = true });
@@ -147,7 +147,7 @@ public class OdfValidatorApiTests
     /// 且能反映呼叫前所做但尚未儲存的編輯。
     /// </summary>
     [Fact]
-    public void DocumentInstance_Validate_ReflectsUnsavedEdits()
+    public void DocumentInstanceValidateReflectsUnsavedEdits()
     {
         using TextDocument doc = TextDocument.Create();
         doc.Title = "Validate() 骨架測試";
@@ -163,7 +163,7 @@ public class OdfValidatorApiTests
     /// 驗證文件實例可直接呼叫 <see cref="OdfDocument.ValidateAsync(OdfComplianceProfile?, System.Threading.CancellationToken)"/>。
     /// </summary>
     [Fact]
-    public async Task DocumentInstance_ValidateAsync_ReturnsStructuredReport()
+    public async Task DocumentInstanceValidateAsyncReturnsStructuredReport()
     {
         using TextDocument doc = TextDocument.Create();
         doc.AddParagraph("非同步驗證測試");
@@ -182,7 +182,7 @@ public class OdfValidatorApiTests
     /// 完成 Workstream E「統一驗證 API」對全格式的覆蓋。
     /// </summary>
     [Fact]
-    public void DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed()
+    public void DocumentInstanceValidateAcrossSecondaryFormatKindsAllSucceed()
     {
         using ChartDocument chart = ChartDocument.Create(new OdfChartDefinition
         {
@@ -213,7 +213,7 @@ public class OdfValidatorApiTests
     /// 插入未註冊命名空間／元素名稱的節點後，以嚴格相容性設定檔驗證應回報失敗，而非靜默通過。
     /// </summary>
     [Fact]
-    public void DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile()
+    public void DocumentInstanceValidateDetectsUnregisteredElementUnderStrictProfile()
     {
         using TextDocument doc = TextDocument.Create();
         doc.AddParagraph("正常段落");
@@ -233,7 +233,7 @@ public class OdfValidatorApiTests
     /// 驗證文件級 <see cref="OdfDocument.Validate(OdfComplianceProfile?)"/> 會合併記憶體 DOM 拓撲檢查結果。
     /// </summary>
     [Fact]
-    public void DocumentInstance_Validate_DetectsInMemoryDomTopologyErrors()
+    public void DocumentInstanceValidateDetectsInMemoryDomTopologyErrors()
     {
         using TextDocument doc = TextDocument.Create();
         doc.AddParagraph("正常段落");

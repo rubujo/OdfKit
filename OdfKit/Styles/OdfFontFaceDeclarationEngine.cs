@@ -26,10 +26,7 @@ internal static class OdfFontFaceDeclarationEngine
         string? genericFamily = null,
         string? pitch = null)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         AddToDom(document.ContentDom, name, fontFamily, genericFamily, pitch);
         AddToDom(document.StylesDom, name, fontFamily, genericFamily, pitch);

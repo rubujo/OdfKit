@@ -36,10 +36,8 @@ public static class OdfCsvExporter
     /// <exception cref="ArgumentOutOfRangeException">當 ExportSheetIndex 超出範圍時引發</exception>
     public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream, OdfCsvOptions? options)
     {
-        if (workbook is null)
-            throw new ArgumentNullException(nameof(workbook));
-        if (csvStream is null)
-            throw new ArgumentNullException(nameof(csvStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(workbook, nameof(workbook));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvStream, nameof(csvStream));
         options ??= new OdfCsvOptions();
 
         if (options.ExportSheetIndex < 0 || options.ExportSheetIndex >= workbook.Worksheets.Count)
@@ -86,8 +84,7 @@ public static class OdfCsvExporter
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options)
     {
-        if (csvPath is null)
-            throw new ArgumentNullException(nameof(csvPath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvPath, nameof(csvPath));
         using var stream = File.Create(csvPath);
         ExportToStream(workbook, stream, options);
     }
@@ -239,7 +236,7 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
 
     public override string GetName(int ordinal)
     {
-        return ordinal.ToString();
+        return ordinal.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 
     public override bool Read()
@@ -284,24 +281,24 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
         return dt;
     }
 
-    public override bool GetBoolean(int ordinal) => Convert.ToBoolean(GetValue(ordinal));
-    public override byte GetByte(int ordinal) => Convert.ToByte(GetValue(ordinal));
+    public override bool GetBoolean(int ordinal) => Convert.ToBoolean(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
+    public override byte GetByte(int ordinal) => Convert.ToByte(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
     public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_DbDataReader_GetBytesNotSupported"));
-    public override char GetChar(int ordinal) => Convert.ToChar(GetValue(ordinal));
+    public override char GetChar(int ordinal) => Convert.ToChar(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
     public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_DbDataReader_GetCharsNotSupported"));
     public override string GetDataTypeName(int ordinal) => typeof(object).Name;
-    public override DateTime GetDateTime(int ordinal) => Convert.ToDateTime(GetValue(ordinal));
-    public override decimal GetDecimal(int ordinal) => Convert.ToDecimal(GetValue(ordinal));
-    public override double GetDouble(int ordinal) => Convert.ToDouble(GetValue(ordinal));
+    public override DateTime GetDateTime(int ordinal) => Convert.ToDateTime(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
+    public override decimal GetDecimal(int ordinal) => Convert.ToDecimal(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
+    public override double GetDouble(int ordinal) => Convert.ToDouble(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
 #if !NETSTANDARD2_0
     [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
 #endif
     public override Type GetFieldType(int ordinal) => typeof(object);
-    public override float GetFloat(int ordinal) => Convert.ToSingle(GetValue(ordinal));
+    public override float GetFloat(int ordinal) => Convert.ToSingle(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
     public override Guid GetGuid(int ordinal) => Guid.Parse(GetString(ordinal));
-    public override short GetInt16(int ordinal) => Convert.ToInt16(GetValue(ordinal));
-    public override int GetInt32(int ordinal) => Convert.ToInt32(GetValue(ordinal));
-    public override long GetInt64(int ordinal) => Convert.ToInt64(GetValue(ordinal));
+    public override short GetInt16(int ordinal) => Convert.ToInt16(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
+    public override int GetInt32(int ordinal) => Convert.ToInt32(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
+    public override long GetInt64(int ordinal) => Convert.ToInt64(GetValue(ordinal), System.Globalization.CultureInfo.InvariantCulture);
     public override int GetOrdinal(string name) => int.TryParse(name, out int o) ? o : -1;
     public override int GetValues(object[] values)
     {

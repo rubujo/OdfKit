@@ -21,7 +21,7 @@ public class Cns11643InteropTests
     /// 驗證高階 API 建立的補充平面文字可 round-trip，並保留全字庫 font-face 與 run 樣式。
     /// </summary>
     [Fact]
-    public void Paragraph_AddTextWithFallbackOptions_RoundTripsFontFacesAndStyledRuns()
+    public void ParagraphAddTextWithFallbackOptionsRoundTripsFontFacesAndStyledRuns()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -60,7 +60,7 @@ public class Cns11643InteropTests
     /// 驗證 PUA 自造字可透過註冊的字型子集化擴充點產生子集字型 entry。
     /// </summary>
     [Fact]
-    public void Paragraph_AddTextWithFallbackOptions_UsesRegisteredSubsetterForPrivateUseRun()
+    public void ParagraphAddTextWithFallbackOptionsUsesRegisteredSubsetterForPrivateUseRun()
     {
         var subsetter = new FakeFontSubsetter();
         using IDisposable registration = OdfFontContext.Default.RegisterFontSubsetter(subsetter);
@@ -82,7 +82,7 @@ public class Cns11643InteropTests
     /// 驗證 ODS 儲存格可重用 CNS 11643 全字庫分段與 font-face 宣告。
     /// </summary>
     [Fact]
-    public void SpreadsheetCell_SetTextWithFallbackOptions_WritesStyledRunsAndFontFaces()
+    public void SpreadsheetCellSetTextWithFallbackOptionsWritesStyledRunsAndFontFaces()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Sheet1");
@@ -110,7 +110,7 @@ public class Cns11643InteropTests
     /// 驗證 ODP 文字方塊可重用 CNS 11643 全字庫分段與 font-face 宣告。
     /// </summary>
     [Fact]
-    public void PresentationSlide_AddTextBoxWithFallbackOptions_WritesStyledSpansAndFontFaces()
+    public void PresentationSlideAddTextBoxWithFallbackOptionsWritesStyledSpansAndFontFaces()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("CNS");
@@ -142,7 +142,7 @@ public class Cns11643InteropTests
     /// 驗證 ODG 文字方塊可重用 CNS 11643 全字庫分段與 font-face 宣告。
     /// </summary>
     [Fact]
-    public void DrawingPage_AddTextBoxWithFallbackOptions_WritesStyledSpansAndFontFaces()
+    public void DrawingPageAddTextBoxWithFallbackOptionsWritesStyledSpansAndFontFaces()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("CNS");
@@ -174,7 +174,7 @@ public class Cns11643InteropTests
     /// 驗證 ODS 儲存格會依花園明朝 profile 宣告 HanaMin font-face。
     /// </summary>
     [Fact]
-    public void SpreadsheetCell_SetTextWithHanaMinOptions_DeclaresProfileFontFaces()
+    public void SpreadsheetCellSetTextWithHanaMinOptionsDeclaresProfileFontFaces()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("HanaMin");
@@ -199,7 +199,7 @@ public class Cns11643InteropTests
     /// 驗證 ODP 文字方塊會依字雲 profile 宣告 Jigmo font-face。
     /// </summary>
     [Fact]
-    public void PresentationSlide_AddTextBoxWithJigmoOptions_DeclaresProfileFontFaces()
+    public void PresentationSlideAddTextBoxWithJigmoOptionsDeclaresProfileFontFaces()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.Slides.Add("Jigmo");

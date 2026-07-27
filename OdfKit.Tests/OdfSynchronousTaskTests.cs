@@ -7,7 +7,7 @@ namespace OdfKit.Tests;
 public class OdfSynchronousTaskTests
 {
     [Fact]
-    public void Run_DoesNotUseCallerSynchronizationContext()
+    public void RunDoesNotUseCallerSynchronizationContext()
     {
         SynchronizationContext? original = SynchronizationContext.Current;
         SynchronizationContext.SetSynchronizationContext(new RejectingSynchronizationContext());
@@ -30,7 +30,7 @@ public class OdfSynchronousTaskTests
     }
 
     [Fact]
-    public void Run_PreservesOriginalExceptionType()
+    public void RunPreservesOriginalExceptionType()
     {
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => OdfSynchronousTask.Run(

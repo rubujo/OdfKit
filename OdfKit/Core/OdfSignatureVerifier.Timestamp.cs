@@ -68,8 +68,7 @@ internal static partial class OdfSignatureVerifier
 
         byte[] sigBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(signatureValueElem);
 
-        using var sha256 = SHA256.Create();
-        byte[] calculatedHash = sha256.ComputeHash(sigBytes);
+        byte[] calculatedHash = global::OdfKit.Internal.OdfHashHelper.Sha256(sigBytes);
 
         byte[]? embeddedHash = null;
         try

@@ -67,7 +67,7 @@ public sealed class OdfScriptScanRequest
         Source = source ?? throw new ArgumentNullException(
             nameof(source),
             OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
-        if (!Enum.IsDefined(typeof(OdfScriptSyntaxLanguage), language))
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(language))
         {
             throw new ArgumentOutOfRangeException(
                 nameof(language),
@@ -114,7 +114,7 @@ public sealed class OdfScriptScanResult
         ProviderName = providerName ?? throw new ArgumentNullException(
             nameof(providerName),
             OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(providerName)));
-        if (!Enum.IsDefined(typeof(OdfScriptScanVerdict), verdict))
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(verdict))
         {
             throw new ArgumentOutOfRangeException(
                 nameof(verdict),

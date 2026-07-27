@@ -65,10 +65,8 @@ public static class OdfToXlsxConverter
     /// <exception cref="ArgumentNullException">Thrown when a required argument is null. / 當必要參數為 null 時擲出。</exception>
     public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream, long maxXmlCharactersInDocument)
     {
-        if (odsWorkbook is null)
-            throw new ArgumentNullException(nameof(odsWorkbook));
-        if (xlsxStream is null)
-            throw new ArgumentNullException(nameof(xlsxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(odsWorkbook, nameof(odsWorkbook));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(xlsxStream, nameof(xlsxStream));
 
         using var xlWorkbook = new XLWorkbook();
         var chartSpecs = new List<ChartSpec>();
@@ -355,25 +353,25 @@ public static class OdfToXlsxConverter
         string text = value!.Trim();
         if (text.EndsWith("cm", StringComparison.OrdinalIgnoreCase))
         {
-            return double.TryParse(text.Substring(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out centimeters);
+            return OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(text, 2, out centimeters);
         }
 
         if (text.EndsWith("mm", StringComparison.OrdinalIgnoreCase) &&
-            double.TryParse(text.Substring(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out double millimeters))
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(text, 2, out double millimeters))
         {
             centimeters = millimeters / 10d;
             return true;
         }
 
         if (text.EndsWith("in", StringComparison.OrdinalIgnoreCase) &&
-            double.TryParse(text.Substring(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out double inches))
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(text, 2, out double inches))
         {
             centimeters = inches * 2.54d;
             return true;
         }
 
         if (text.EndsWith("pt", StringComparison.OrdinalIgnoreCase) &&
-            double.TryParse(text.Substring(0, text.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out double points))
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(text, 2, out double points))
         {
             centimeters = points * 2.54d / 72d;
             return true;
@@ -533,7 +531,7 @@ public static class OdfToXlsxConverter
 
     private static void RewriteChartRelationships(
         ZipArchive archive,
-        IReadOnlyDictionary<string, string> mappings,
+        Dictionary<string, string> mappings,
         long maxXmlCharactersInDocument)
     {
         XNamespace relNs = "http://schemas.openxmlformats.org/package/2006/relationships";
@@ -558,7 +556,7 @@ public static class OdfToXlsxConverter
                 }
 
                 string target = (string?)relationship.Attribute("Target") ?? string.Empty;
-                string absoluteTarget = target.StartsWith("/", StringComparison.Ordinal)
+                string absoluteTarget = global::OdfKit.Internal.OdfStringHelper.StartsWith(target, '/')
                     ? target
                     : "/xl/drawings/" + target.TrimStart('/');
                 if (!mappings.TryGetValue(absoluteTarget, out string? normalizedTarget))
@@ -609,7 +607,7 @@ public static class OdfToXlsxConverter
 
     private static string EnsurePackagePartName(string partName)
     {
-        return partName.StartsWith("/", StringComparison.Ordinal)
+        return global::OdfKit.Internal.OdfStringHelper.StartsWith(partName, '/')
             ? partName
             : "/" + partName;
     }
@@ -1098,7 +1096,7 @@ public static class OdfToXlsxConverter
         XElement root = rels.Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_7"));
         int nextId = root.Elements(relNs + "Relationship")
             .Select(element => (string?)element.Attribute("Id"))
-            .Select(id => id is not null && id.StartsWith("rId", StringComparison.OrdinalIgnoreCase) && int.TryParse(id.Substring(3), out int value) ? value : 0)
+            .Select(id => id is not null && id.StartsWith("rId", StringComparison.OrdinalIgnoreCase) && OdfKit.Internal.OdfParsingHelper.TryParseInt32Suffix(id, 3, out int value) ? value : 0)
             .DefaultIfEmpty(0)
             .Max() + 1;
         string relationshipId = "rId" + nextId.ToString(CultureInfo.InvariantCulture);
@@ -1179,7 +1177,7 @@ public static class OdfToXlsxConverter
         public string SheetName { get; init; } = string.Empty;
         public string SourceRef { get; init; } = string.Empty;
         public string TargetRef { get; init; } = string.Empty;
-        public IReadOnlyList<PivotFieldSpec> Fields { get; init; } = [];
+        public List<PivotFieldSpec> Fields { get; init; } = [];
     }
 
     private sealed class PivotFieldSpec
@@ -1378,7 +1376,7 @@ public static class OdfToXlsxConverter
         }
 
         string normalized = value!.Trim();
-        if (!normalized.StartsWith("#", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(normalized, '#'))
         {
             normalized = "#" + normalized;
         }
@@ -1393,7 +1391,7 @@ public static class OdfToXlsxConverter
             return;
         }
 
-        var style = value!.IndexOf("dashed", StringComparison.OrdinalIgnoreCase) >= 0
+        var style = global::OdfKit.Internal.OdfStringHelper.Contains(value!, "dashed", StringComparison.OrdinalIgnoreCase)
             ? XLBorderStyleValues.Dashed
             : XLBorderStyleValues.Thin;
 
@@ -1560,7 +1558,7 @@ public static class OdfToXlsxConverter
     private static XLColor ToXlColor(string? value, string fallback)
     {
         string color = string.IsNullOrWhiteSpace(value) ? fallback : value!.Trim();
-        if (!color.StartsWith("#", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
         {
             color = "#" + color;
         }
@@ -1629,8 +1627,8 @@ public static class OdfToXlsxConverter
         }
 
         ValidationKind kind =
-            condition.IndexOf("text-length-is-between", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.TextLengthBetween :
-            condition.IndexOf("is-decimal-number", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.DecimalBetween :
+            global::OdfKit.Internal.OdfStringHelper.Contains(condition, "text-length-is-between", StringComparison.OrdinalIgnoreCase) ? ValidationKind.TextLengthBetween :
+            global::OdfKit.Internal.OdfStringHelper.Contains(condition, "is-decimal-number", StringComparison.OrdinalIgnoreCase) ? ValidationKind.DecimalBetween :
             ValidationKind.IntegerBetween;
 
         return new ValidationRule
@@ -1755,13 +1753,13 @@ public static class OdfToXlsxConverter
         if (f.StartsWith("of:=", StringComparison.Ordinal))
             f = f.Substring(3); // 保留 "="
         else if (f.StartsWith("of:", StringComparison.Ordinal))
-            f = "=" + f.Substring(3);
+            f = OdfKit.Internal.OdfStringHelper.ConcatSuffix("=", f, 3);
         else if (f.StartsWith("oooc:=", StringComparison.Ordinal))
             f = f.Substring(5);
         else if (f.StartsWith("oooc:", StringComparison.Ordinal))
-            f = "=" + f.Substring(5);
+            f = OdfKit.Internal.OdfStringHelper.ConcatSuffix("=", f, 5);
 
-        if (!f.StartsWith("=", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(f, '='))
             f = "=" + f;
 
         // 轉換工作表參照：Sheet.A1 → Sheet!A1；

@@ -92,10 +92,7 @@ public partial class OdfNumberFormatter
     /// <returns>解析後的 <see cref="FormatInfo"/> 執行個體</returns>
     public static FormatInfo ParsePattern(string pattern)
     {
-        if (pattern is null)
-        {
-            throw new ArgumentNullException(nameof(pattern));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pattern, nameof(pattern));
 
         if (FormatInfoPool.Count >= MaxFormatInfoPoolSize)
         {
@@ -110,7 +107,7 @@ public partial class OdfNumberFormatter
         FormatType type;
         string currencySymbol = "$";
         IReadOnlyList<DateTimeToken>? dateTimeTokens = null;
-        if (pattern.Contains("%"))
+        if (pattern.Contains('%'))
         {
             type = FormatType.Percentage;
         }
@@ -131,7 +128,7 @@ public partial class OdfNumberFormatter
         }
 
         string clean = StripLiteralsAndSymbols(pattern);
-        bool grouping = clean.Contains(",");
+        bool grouping = clean.Contains(',');
 
         int minIntegerDigits;
         int decimalPlaces;
@@ -171,15 +168,15 @@ public partial class OdfNumberFormatter
         symbol = "$";
         if (pattern.Contains("NT$"))
         { symbol = "NT$"; return true; }
-        if (pattern.Contains("$"))
+        if (pattern.Contains('$'))
         { symbol = "$"; return true; }
-        if (pattern.Contains("€"))
+        if (pattern.Contains('€'))
         { symbol = "€"; return true; }
-        if (pattern.Contains("£"))
+        if (pattern.Contains('£'))
         { symbol = "£"; return true; }
-        if (pattern.Contains("¥"))
+        if (pattern.Contains('¥'))
         { symbol = "¥"; return true; }
-        if (pattern.Contains("¤"))
+        if (pattern.Contains('¤'))
         { symbol = "$"; return true; }
         return false;
     }
@@ -188,7 +185,7 @@ public partial class OdfNumberFormatter
     {
         foreach (char c in pattern)
         {
-            if ("yMdhHmst/:".IndexOf(c) >= 0)
+            if ("yMdhHmst/:".Contains(c))
                 return true;
         }
         return false;
@@ -200,9 +197,9 @@ public partial class OdfNumberFormatter
         bool hasTime = false;
         foreach (char c in pattern)
         {
-            if ("yMd".IndexOf(c) >= 0)
+            if ("yMd".Contains(c))
                 hasDate = true;
-            if ("hHms".IndexOf(c) >= 0)
+            if ("hHms".Contains(c))
                 hasTime = true;
         }
         return hasTime && !hasDate;
@@ -245,7 +242,7 @@ public partial class OdfNumberFormatter
                 continue;
             }
 
-            if ("yMdhHmst".IndexOf(c) >= 0)
+            if ("yMdhHmst".Contains(c))
             {
                 int len = 1;
                 while (i + len < pattern.Length && pattern[i + len] == c)
@@ -275,7 +272,7 @@ public partial class OdfNumberFormatter
                 continue;
             if (c == '\\')
             { i++; continue; }
-            if ("0#.,".IndexOf(c) >= 0)
+            if ("0#.,".Contains(c))
                 sb.Append(c);
         }
         return sb.ToString();

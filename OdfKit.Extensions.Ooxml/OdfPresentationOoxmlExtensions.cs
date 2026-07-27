@@ -16,8 +16,7 @@ public static class OdfPresentationOoxmlExtensions
     /// </summary>
     public static byte[] ToPptx(this PresentationDocument presentation)
     {
-        if (presentation is null)
-            throw new ArgumentNullException(nameof(presentation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(presentation, nameof(presentation));
 
         using var stream = new MemoryStream();
         OdpToPptxConverter.Convert(presentation, stream);
@@ -30,8 +29,7 @@ public static class OdfPresentationOoxmlExtensions
     /// </summary>
     public static void SaveAsPptx(this PresentationDocument presentation, string path)
     {
-        if (presentation is null)
-            throw new ArgumentNullException(nameof(presentation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(presentation, nameof(presentation));
 
         if (string.IsNullOrEmpty(path))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationOoxmlExtensions_PathCannotBeEmpty_2"), nameof(path));
@@ -52,8 +50,7 @@ public static class OdfPresentationOoxmlExtensions
     /// </summary>
     public static PresentationDocument ToOdpPresentation(this Stream pptxStream)
     {
-        if (pptxStream is null)
-            throw new ArgumentNullException(nameof(pptxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pptxStream, nameof(pptxStream));
 
         return PptxToOdpConverter.Convert(pptxStream);
     }

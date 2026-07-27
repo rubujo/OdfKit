@@ -20,7 +20,7 @@ public class TextWebDocumentTests
     /// 內容與 MIME 類型正確且可往返還原。
     /// </summary>
     [Fact]
-    public void TextWebDocument_CreateFromDocument_RoundTripsBackToOdt()
+    public void TextWebDocumentCreateFromDocumentRoundTripsBackToOdt()
     {
         using var original = TextDocument.Create();
         original.Title = "網頁範本往返測試標題";
@@ -43,7 +43,7 @@ public class TextWebDocumentTests
     /// 編輯內容（不需下沉 DOM），且儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void TextWebDocument_SupportsHighLevelEditingApiWithoutDom()
+    public void TextWebDocumentSupportsHighLevelEditingApiWithoutDom()
     {
         using var web = TextWebDocument.Create();
         web.AddHeading("網頁範本標題", 1);
@@ -64,7 +64,7 @@ public class TextWebDocumentTests
     /// 不需任何額外轉接層，證明 OTH 與 HTML 匯出工作流的一致性。
     /// </summary>
     [Fact]
-    public void OdfHtmlExporter_AcceptsTextWebDocumentDirectly()
+    public void OdfHtmlExporterAcceptsTextWebDocumentDirectly()
     {
         using var web = TextWebDocument.Create();
         web.AddHeading("網頁範本標題", 1);
@@ -83,7 +83,7 @@ public class TextWebDocumentTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void CreateWebDocument_NullSource_ThrowsArgumentNullException()
+    public void CreateWebDocumentNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => TextWebDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => TextDocument.CreateFromWebDocument(null!));

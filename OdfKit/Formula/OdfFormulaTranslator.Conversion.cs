@@ -24,7 +24,7 @@ public static partial class OdfFormulaTranslator
             return excelFormula;
 
         string inner = excelFormula;
-        if (excelFormula.StartsWith("="))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(excelFormula, '='))
             inner = excelFormula.Substring(1);
 
         var tokens = Tokenize(inner);
@@ -92,7 +92,7 @@ public static partial class OdfFormulaTranslator
             inner = odfFormula.Substring(6);
         else if (odfFormula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
             inner = odfFormula.Substring(4);
-        else if (odfFormula.StartsWith("="))
+        else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(odfFormula, '='))
             inner = odfFormula.Substring(1);
 
         var tokens = Tokenize(inner);
@@ -114,7 +114,7 @@ public static partial class OdfFormulaTranslator
                     try
                     {
                         string raw = token.Value;
-                        if (raw.StartsWith("[") && raw.EndsWith("]"))
+                        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(raw, '[') && global::OdfKit.Internal.OdfStringHelper.EndsWith(raw, ']'))
                         {
                             string content = raw.Substring(1, raw.Length - 2);
                             if (content.Contains(':'))

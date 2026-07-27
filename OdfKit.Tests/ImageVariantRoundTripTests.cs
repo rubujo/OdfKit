@@ -18,7 +18,7 @@ public class ImageVariantRoundTripTests
     /// 影像框架內容完整保留。
     /// </summary>
     [Fact]
-    public void ImageDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    public void ImageDocumentCreateTemplateFromDocumentRoundTripsBackToDocument()
     {
         using var original = ImageDocument.Create();
         original.SetImageLayout(
@@ -51,7 +51,7 @@ public class ImageVariantRoundTripTests
     /// 影像框架內容完整保留。
     /// </summary>
     [Fact]
-    public void ImageDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void ImageDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = ImageDocument.Create();
         original.SetImageLayout(
@@ -82,7 +82,7 @@ public class ImageVariantRoundTripTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void ImageVariantConversions_NullSource_ThrowsArgumentNullException()
+    public void ImageVariantConversionsNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => ImageTemplateDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => ImageDocument.CreateFromTemplate(null!));

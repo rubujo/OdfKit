@@ -22,7 +22,7 @@ public class SemanticCoverageContractTests
     /// 驗證每種 ODF 文件格式都具備證據支撐的語意族群與操作。
     /// </summary>
     [Fact]
-    public void Manifest_CoversEveryPrimaryFormatAndOperation()
+    public void ManifestCoversEveryPrimaryFormatAndOperation()
     {
         string root = FindRepositoryRoot();
         string path = Path.Combine(root, "docs", "semantic-coverage.json");
@@ -217,7 +217,7 @@ public class SemanticCoverageContractTests
     [InlineData("Interop", "complete")]
     [InlineData("Interop", "tested")]
     [InlineData("Interop", "verified")]
-    public void OperationStatusContract_RejectsLegacyAndCrossDimensionValues(string operation, string status)
+    public void OperationStatusContractRejectsLegacyAndCrossDimensionValues(string operation, string status)
     {
         Assert.False(IsOperationStatusAllowed(operation, status));
     }
@@ -231,7 +231,7 @@ public class SemanticCoverageContractTests
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public void SchemaVersionContract_RejectsLegacyVersions(int schemaVersion)
+    public void SchemaVersionContractRejectsLegacyVersions(int schemaVersion)
     {
         Assert.False(IsSchemaVersionSupported(schemaVersion));
     }

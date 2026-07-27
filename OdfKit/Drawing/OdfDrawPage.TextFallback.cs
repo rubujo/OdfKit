@@ -25,15 +25,9 @@ public partial class OdfDrawPage
     /// <returns>The newly added text box instance. / 新增的文字方塊執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text, OdfTextFontFallbackOptions options)
     {
-        if (text is null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         var frame = CreateDrawingFrame(x, y, w, h);
         var textBoxNode = OdfNodeFactory.CreateElement("text-box", OdfNamespaces.Draw, "draw");

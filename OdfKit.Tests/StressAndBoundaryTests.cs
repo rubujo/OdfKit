@@ -363,9 +363,9 @@ namespace OdfKit.Tests
             var sbExcel = new StringBuilder("=IF(A1>0");
             for (int l = 1; l < levels; l++)
             {
-                sbExcel.Append($", IF(A1>{l}");
+                sbExcel.Append(System.FormattableString.Invariant($", IF(A1>{l}"));
             }
-            sbExcel.Append($", {levels}");
+            sbExcel.Append(System.FormattableString.Invariant($", {levels}"));
             for (int l = 0; l < levels; l++)
             {
                 sbExcel.Append(", 0)");
@@ -391,7 +391,7 @@ namespace OdfKit.Tests
             var sb = new StringBuilder("=A1");
             for (int t = 2; t <= termCount; t++)
             {
-                sb.Append($"+A{t}");
+                sb.Append(System.FormattableString.Invariant($"+A{t}"));
             }
             string originalExcel = sb.ToString();
 

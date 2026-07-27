@@ -35,7 +35,9 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
         /// <summary>
         /// 雙線框線。
         /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
         Double,
+#pragma warning restore CA1720
 
         /// <summary>
         /// 點線框線。
@@ -83,14 +85,14 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
         if (string.IsNullOrWhiteSpace(borderString) || borderString == "none")
             return None;
 
-        string[] parts = borderString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] parts = global::OdfKit.Internal.OdfStringHelper.SplitSpaces(borderString);
         OdfLength width = new(0, OdfUnit.Unspecified);
         BorderStyle style = BorderStyle.Solid;
         Color color = Color.Black;
 
         foreach (var part in parts)
         {
-            if (part.StartsWith("#"))
+            if (global::OdfKit.Internal.OdfStringHelper.StartsWith(part, '#'))
             {
                 if (OdfColor.TryParse(part, out _))
                 {

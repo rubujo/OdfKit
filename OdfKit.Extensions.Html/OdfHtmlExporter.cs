@@ -65,8 +65,7 @@ public static class OdfHtmlExporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 document 為 null 時引發</exception>
     public static string Export(TextDocument document, OdfHtmlExportOptions? options = null)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
         options ??= new OdfHtmlExportOptions();
 
         var sb = new StringBuilder(4096);

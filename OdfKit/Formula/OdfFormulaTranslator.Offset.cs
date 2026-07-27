@@ -30,11 +30,11 @@ public static partial class OdfFormulaTranslator
         string prefix = "";
         string inner = formula;
 
-        if (formula.StartsWith("oooc:="))
+        if (formula.StartsWith("oooc:=", System.StringComparison.Ordinal))
         { isOdf = true; prefix = "oooc:="; inner = formula.Substring(6); }
-        else if (formula.StartsWith("of:="))
+        else if (formula.StartsWith("of:=", System.StringComparison.Ordinal))
         { isOdf = true; prefix = "of:="; inner = formula.Substring(4); }
-        else if (formula.StartsWith("="))
+        else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(formula, '='))
         { prefix = "="; inner = formula.Substring(1); }
 
         var tokens = Tokenize(inner);
@@ -49,7 +49,7 @@ public static partial class OdfFormulaTranslator
                     if (isOdf)
                     {
                         string raw = token.Value;
-                        if (raw.StartsWith("[") && raw.EndsWith("]"))
+                        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(raw, '[') && global::OdfKit.Internal.OdfStringHelper.EndsWith(raw, ']'))
                         {
                             string content = raw.Substring(1, raw.Length - 2);
                             if (content.Contains(':'))

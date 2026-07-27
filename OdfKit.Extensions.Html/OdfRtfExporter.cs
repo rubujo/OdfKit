@@ -23,8 +23,7 @@ public static class OdfRtfExporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 document 為 null 時引發</exception>
     public static string Export(TextDocument document, OdfRtfExportOptions? options = null)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         options ??= new OdfRtfExportOptions();
 
@@ -347,11 +346,11 @@ public static class OdfRtfExporter
         string author = ReadFirstChildText(annotationNode, "creator", OdfNamespaces.Dc);
         string body = ReadAnnotationBody(annotationNode);
 
-        sb.Append(@"{\*\atnid ").Append(idStr).Append(@"}");
-        sb.Append(@"{\*\atnauthor ").Append(author).Append(@"}");
+        sb.Append(@"{\*\atnid ").Append(idStr).Append('}');
+        sb.Append(@"{\*\atnauthor ").Append(author).Append('}');
         sb.Append(@"{\*\annotation ");
         AppendRtfText(sb, body);
-        sb.Append(@"}");
+        sb.Append('}');
 
         sb.Append("[Comment");
         if (!string.IsNullOrEmpty(author))
@@ -608,7 +607,7 @@ public static class OdfRtfExporter
         }
 
         string color = value!.Trim();
-        if (color.StartsWith("#", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
         {
             color = color.Substring(1);
         }
@@ -769,9 +768,9 @@ public static class OdfRtfExporter
             sb.Append(@"{\colortbl;");
             foreach (string color in _colors)
             {
-                int red = int.Parse(color.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                int green = int.Parse(color.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                int blue = int.Parse(color.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                int red = OdfKit.Internal.OdfParsingHelper.ParseInvariantHexInt32(color, 0, 2);
+                int green = OdfKit.Internal.OdfParsingHelper.ParseInvariantHexInt32(color, 2, 2);
+                int blue = OdfKit.Internal.OdfParsingHelper.ParseInvariantHexInt32(color, 4, 2);
                 sb.Append(@"\red").Append(red)
                     .Append(@"\green").Append(green)
                     .Append(@"\blue").Append(blue)

@@ -41,7 +41,7 @@ internal static class SpreadsheetDocumentDatabaseRangeReadEngine
         return ranges.AsReadOnly();
     }
 
-    private static IReadOnlyList<OdfDatabaseFilterConditionInfo> ParseFilterConditions(OdfNode databaseRangeNode)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfDatabaseFilterConditionInfo> ParseFilterConditions(OdfNode databaseRangeNode)
     {
         List<OdfDatabaseFilterConditionInfo> conditions = [];
 
@@ -73,7 +73,7 @@ internal static class SpreadsheetDocumentDatabaseRangeReadEngine
         return conditions.AsReadOnly();
     }
 
-    private static IReadOnlyList<OdfDatabaseSortRuleInfo> ParseSortRules(OdfNode databaseRangeNode)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfDatabaseSortRuleInfo> ParseSortRules(OdfNode databaseRangeNode)
     {
         List<OdfDatabaseSortRuleInfo> rules = [];
 

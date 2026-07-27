@@ -172,7 +172,7 @@ public readonly struct OdfSpreadsheetFormula : IEquatable<OdfSpreadsheetFormula>
         }
 
         string trimmed = address.Trim();
-        if (trimmed.StartsWith("[", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(trimmed, '['))
         {
             return new(trimmed, 3);
         }
@@ -293,7 +293,7 @@ public readonly struct OdfSpreadsheetFormula : IEquatable<OdfSpreadsheetFormula>
     private static string NormalizeAddress(string address)
     {
         string trimmed = address.Trim();
-        return trimmed.StartsWith(".", StringComparison.Ordinal) || trimmed.Contains(".", StringComparison.Ordinal)
+        return global::OdfKit.Internal.OdfStringHelper.StartsWith(trimmed, '.') || trimmed.Contains('.')
             ? trimmed
             : "." + trimmed;
     }

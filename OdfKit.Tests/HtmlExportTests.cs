@@ -15,7 +15,7 @@ public class HtmlExportTests
     /// 驗證段落與標題可正確匯出為 HTML。
     /// </summary>
     [Fact]
-    public void Export_TextDocument_ContainsHeadingsAndParagraphs()
+    public void ExportTextDocumentContainsHeadingsAndParagraphs()
     {
         using var doc = TextDocument.Create();
         doc.AddHeading("主標題", 1);
@@ -37,7 +37,7 @@ public class HtmlExportTests
     /// 驗證 FullPage 為 false 時僅輸出 body 片段。
     /// </summary>
     [Fact]
-    public void Export_FragmentMode_DoesNotContainDoctype()
+    public void ExportFragmentModeDoesNotContainDoctype()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("片段內容");
@@ -54,7 +54,7 @@ public class HtmlExportTests
     /// 驗證腳注引用以 sup 呈現。
     /// </summary>
     [Fact]
-    public void Export_FootnoteInParagraph_RendersSupElement()
+    public void ExportFootnoteInParagraphRendersSupElement()
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文內容");
@@ -70,7 +70,7 @@ public class HtmlExportTests
     /// 驗證巢狀的 span 元素可正確遞迴處理，且非 text 命名空間的 span 節點會被忽略。
     /// </summary>
     [Fact]
-    public void Export_NestedSpansAndNamespaceChecks_PreservesFormattingAndChecksNamespace()
+    public void ExportNestedSpansAndNamespaceChecksPreservesFormattingAndChecksNamespace()
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph();

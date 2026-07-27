@@ -75,15 +75,9 @@ public static class OdtOperationsImporter
         string operationsJson,
         OdtOperationCompatibilityOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (operationsJson is null)
-        {
-            throw new ArgumentNullException(nameof(operationsJson));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(operationsJson, nameof(operationsJson));
 
         options ??= new OdtOperationCompatibilityOptions();
         OdtOperationLog operationLog = OdtOperationLog.Parse(operationsJson, options);
@@ -104,15 +98,9 @@ public static class OdtOperationsImporter
         OdtOperationLog operationLog,
         OdtOperationCompatibilityOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (operationLog is null)
-        {
-            throw new ArgumentNullException(nameof(operationLog));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(operationLog, nameof(operationLog));
 
         options ??= new OdtOperationCompatibilityOptions();
         var report = new OdtOperationImportReport();
@@ -502,7 +490,7 @@ public static class OdtOperationsImporter
         paragraph.TextContent = current.Insert(safeIndex, text);
     }
 
-    private static bool TryDeleteSingleParagraphRange(IReadOnlyList<OdfParagraph> paragraphs, JsonElement operation)
+    private static bool TryDeleteSingleParagraphRange(List<OdfParagraph> paragraphs, JsonElement operation)
     {
         if (!TryGetPosition(operation, "start", out int startParagraphIndex, out int startCharacterIndex) ||
             !TryGetPosition(operation, "end", out int endParagraphIndex, out int endCharacterIndex) ||
@@ -645,7 +633,7 @@ public static class OdtOperationsImporter
         return true;
     }
 
-    private static bool TryMoveSingleParagraphRange(IReadOnlyList<OdfParagraph> paragraphs, JsonElement operation)
+    private static bool TryMoveSingleParagraphRange(List<OdfParagraph> paragraphs, JsonElement operation)
     {
         if (!TryGetPosition(operation, "start", out int startParagraphIndex, out int startCharacterIndex) ||
             !TryGetPosition(operation, "end", out int endParagraphIndex, out int endCharacterIndex) ||
@@ -1316,7 +1304,7 @@ public static class OdtOperationsImporter
         return ApplyFormatAttributes(targetRun, attrs);
     }
 
-    private static bool TryApplyFormatToRange(IReadOnlyList<OdfParagraph> paragraphs, JsonElement operation, JsonElement attrs)
+    private static bool TryApplyFormatToRange(List<OdfParagraph> paragraphs, JsonElement operation, JsonElement attrs)
     {
         if (!TryGetPosition(operation, "start", out int startParagraphIndex, out int startCharacterIndex) ||
             !TryGetPosition(operation, "end", out int endParagraphIndex, out int endCharacterIndex) ||

@@ -57,7 +57,7 @@ public partial class OdfParagraph
     public OdfFloatingTextBox AddFloatingTextBox(OdfLength x, OdfLength y, OdfLength width, OdfLength height, OdfAnchorType anchorType, OdfTextWrap wrap)
     {
         var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("name", OdfNamespaces.Draw, "TextBox_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("name", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("TextBox_"), "draw");
         frame.SetAttribute("anchor-type", OdfNamespaces.Text, ToAnchorTypeValue(anchorType), "text");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");

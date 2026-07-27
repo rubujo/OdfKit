@@ -16,7 +16,7 @@ public class OdfCodePointMigrationTests
     /// 驗證內容樹與樣式樹都會被遞迴走訪，並產生正確報告。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_ContentAndStylesTrees_ReportsReplacements()
+    public void MigrateTextCodePointsContentAndStylesTreesReportsReplacements()
     {
         using TextDocument document = TextDocument.Create();
         OdfNode contentText = CreateTextNode("內文\uE000\uE000");
@@ -41,7 +41,7 @@ public class OdfCodePointMigrationTests
     /// 驗證 BMP 與增補平面碼位可雙向替換。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_BmpAndSupplementaryCodePoints_ReplacesBothDirections()
+    public void MigrateTextCodePointsBmpAndSupplementaryCodePointsReplacesBothDirections()
     {
         using TextDocument document = TextDocument.Create();
         OdfNode text = CreateTextNode("\uE000\U0002000B");
@@ -62,7 +62,7 @@ public class OdfCodePointMigrationTests
     /// 驗證沒有命中時不會改寫文字，並回傳全零報告。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_NoMatch_ReturnsZeroReportWithoutChangingText()
+    public void MigrateTextCodePointsNoMatchReturnsZeroReportWithoutChangingText()
     {
         using TextDocument document = TextDocument.Create();
         string original = "沒有命中的文字";
@@ -82,7 +82,7 @@ public class OdfCodePointMigrationTests
     /// 驗證相同來源與目標的對應項目會被略過。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_IdentityMapping_IsIgnored()
+    public void MigrateTextCodePointsIdentityMappingIsIgnored()
     {
         using TextDocument document = TextDocument.Create();
         string original = "一一";
@@ -102,7 +102,7 @@ public class OdfCodePointMigrationTests
     /// 驗證空值、代理字元碼位與超界碼位會被拒絕。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_InvalidMapping_ThrowsExpectedException()
+    public void MigrateTextCodePointsInvalidMappingThrowsExpectedException()
     {
         using TextDocument document = TextDocument.Create();
 
@@ -117,7 +117,7 @@ public class OdfCodePointMigrationTests
     /// 驗證同一碼位多次出現時會逐次統計。
     /// </summary>
     [Fact]
-    public void MigrateTextCodePoints_RepeatedCodePoint_CountsEveryOccurrence()
+    public void MigrateTextCodePointsRepeatedCodePointCountsEveryOccurrence()
     {
         using TextDocument document = TextDocument.Create();
         OdfNode text = CreateTextNode("\uE000甲\uE000\uE000");

@@ -70,10 +70,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// </summary>
     public OdfNode? Find(Predicate<OdfNode> match)
     {
-        if (match is null)
-        {
-            throw new ArgumentNullException(nameof(match));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(match, nameof(match));
         _owner.EnsureMaterialized();
         for (OdfNode? node = _owner.FirstChild; node is not null; node = node.NextSibling)
         {
@@ -127,14 +124,9 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// <inheritdoc />
     public void CopyTo(OdfNode[] array, int arrayIndex)
     {
-        if (array is null)
-        {
-            throw new ArgumentNullException(nameof(array));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(array, nameof(array));
         if (arrayIndex < 0 || arrayIndex > array.Length)
-        {
             throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-        }
 
         _owner.EnsureMaterialized();
         if (array.Length - arrayIndex < _count)
@@ -249,10 +241,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
     internal void Append(OdfNode child)
     {
-        if (child is null)
-        {
-            throw new ArgumentNullException(nameof(child));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(child, nameof(child));
 
         child.DetachFromParent();
         LinkLast(child);
@@ -260,15 +249,9 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
     internal void InsertBefore(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null)
-        {
-            throw new ArgumentNullException(nameof(newChild));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(newChild, nameof(newChild));
 
-        if (refChild is null)
-        {
-            throw new ArgumentNullException(nameof(refChild));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(refChild, nameof(refChild));
         if (refChild.Parent != _owner)
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
@@ -280,15 +263,9 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
     internal void InsertAfter(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null)
-        {
-            throw new ArgumentNullException(nameof(newChild));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(newChild, nameof(newChild));
 
-        if (refChild is null)
-        {
-            throw new ArgumentNullException(nameof(refChild));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(refChild, nameof(refChild));
         if (refChild.Parent != _owner)
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
@@ -401,7 +378,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         ReindexFromSibling(refChild, insertIndex + 1);
     }
 
-    private void ReindexFromSibling(OdfNode? start, int startIndex)
+    private static void ReindexFromSibling(OdfNode? start, int startIndex)
     {
         for (OdfNode? node = start; node is not null; node = node.NextSibling, startIndex++)
         {

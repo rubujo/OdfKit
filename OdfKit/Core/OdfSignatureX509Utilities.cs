@@ -77,14 +77,12 @@ internal static class OdfSignatureX509Utilities
         byte[] actualDigest;
         if (alg == SignedXml.XmlDsigSHA256Url || alg == "http://www.w3.org/2001/04/xmlenc#sha256")
         {
-            using var sha = SHA256.Create();
-            actualDigest = sha.ComputeHash(certificate.RawData);
+            actualDigest = global::OdfKit.Internal.OdfHashHelper.Sha256(certificate.RawData);
         }
         else if (alg == SignedXml.XmlDsigSHA1Url || alg == "http://www.w3.org/2000/09/xmldsig#sha1")
         {
 #pragma warning disable SYSLIB0021
-            using var sha = SHA1.Create();
-            actualDigest = sha.ComputeHash(certificate.RawData);
+            actualDigest = global::OdfKit.Internal.OdfHashHelper.Sha1(certificate.RawData);
 #pragma warning restore SYSLIB0021
         }
         else
@@ -106,7 +104,7 @@ internal static class OdfSignatureX509Utilities
         {
             string expectedSerialBase10 = serialNumberNode.InnerText.Trim();
             var bigSerial = BigInteger.Parse("0" + certificate.SerialNumber, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            string actualSerialBase10 = bigSerial.ToString();
+            string actualSerialBase10 = bigSerial.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (actualSerialBase10 != expectedSerialBase10)
             {
@@ -126,10 +124,8 @@ internal static class OdfSignatureX509Utilities
     /// </summary>
     internal static void InjectReferenceStream(Reference reference, Stream stream)
     {
-        if (reference == null)
-            throw new ArgumentNullException(nameof(reference));
-        if (stream == null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reference, nameof(reference));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         var type = typeof(Reference);
         var refTargetField = type.GetField("_refTarget", BindingFlags.Instance | BindingFlags.NonPublic)

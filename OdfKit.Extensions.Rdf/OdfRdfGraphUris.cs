@@ -57,7 +57,7 @@ public static class OdfRdfGraphUris
             if (uriPath.StartsWith(basePath, StringComparison.Ordinal))
             {
                 string relative = uriPath.Substring(basePath.Length);
-                if (relative.StartsWith("/", StringComparison.Ordinal))
+                if (global::OdfKit.Internal.OdfStringHelper.StartsWith(relative, '/'))
                 {
                     relative = relative.Substring(1);
                 }

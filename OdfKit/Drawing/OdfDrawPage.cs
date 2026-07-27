@@ -73,10 +73,10 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
         node => new OdfShape(node, Document));
     #region Drawing Helpers
 
-    private OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+    private static OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
-        var id = "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_");
         frame.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         frame.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -89,7 +89,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
     private static OdfNode CreateLineLikeNode(string localName, OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var node = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         node.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         node.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         node.SetAttribute("x1", OdfNamespaces.Svg, x1.ToString(), "svg");
@@ -99,7 +99,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
         return node;
     }
 
-    private IReadOnlyList<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
+    private System.Collections.ObjectModel.ReadOnlyCollection<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
     {
         List<T> objects = [];
         foreach (OdfNode child in Node.Children)

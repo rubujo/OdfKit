@@ -22,10 +22,7 @@ internal static class OdfSynchronousTask
 
     internal static TResult Run<TResult>(Func<Task<TResult>> operation)
     {
-        if (operation is null)
-        {
-            throw new ArgumentNullException(nameof(operation));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(operation, nameof(operation));
         return Task.Factory.StartNew(
                 operation,
                 CancellationToken.None,

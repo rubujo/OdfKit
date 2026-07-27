@@ -177,7 +177,7 @@ internal sealed class HostConfiguration
     }
 
     private static string GetSingle(
-        IReadOnlyDictionary<string, List<string>> values,
+        Dictionary<string, List<string>> values,
         string name,
         bool required)
     {
@@ -191,13 +191,13 @@ internal sealed class HostConfiguration
             : throw ConfigurationInvalid();
     }
 
-    private static IReadOnlyList<string> GetMany(
-        IReadOnlyDictionary<string, List<string>> values,
+    private static List<string> GetMany(
+        Dictionary<string, List<string>> values,
         string name)
         => values.TryGetValue(name, out List<string>? entries) ? entries : [];
 
     private static int GetInt(
-        IReadOnlyDictionary<string, List<string>> values,
+        Dictionary<string, List<string>> values,
         string name,
         int defaultValue,
         int minimum,
@@ -221,7 +221,7 @@ internal sealed class HostConfiguration
     }
 
     private static long GetLong(
-        IReadOnlyDictionary<string, List<string>> values,
+        Dictionary<string, List<string>> values,
         string name,
         long defaultValue,
         long minimum,

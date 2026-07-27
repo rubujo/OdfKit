@@ -245,10 +245,7 @@ public partial class OdfFormulaDocument : OdfDocument
     /// <exception cref="ArgumentNullException">When any token is <see langword="null"/>. / 當任一 token 為 <see langword="null"/> 時擲出。</exception>
     public OdfNode SetMathRow(params OdfMathToken[] tokens)
     {
-        if (tokens is null)
-        {
-            throw new ArgumentNullException(nameof(tokens));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(tokens, nameof(tokens));
 
         if (tokens.Length == 0)
         {

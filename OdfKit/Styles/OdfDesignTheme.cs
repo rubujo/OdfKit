@@ -77,8 +77,7 @@ public sealed class OdfDesignTheme
     /// <returns>目前主題執行個體</returns>
     public OdfDesignTheme WithAccentFillColors(params string[] colors)
     {
-        if (colors is null)
-            throw new ArgumentNullException(nameof(colors));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(colors, nameof(colors));
         if (colors.Length == 0)
             return this;
 

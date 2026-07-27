@@ -21,7 +21,7 @@ public class Cns11643OpenDataBaselineTests
     /// .NET CP950 與官方 CNS↔Big5 對照表的已知差異白名單（Big5↔Unicode 重複對應歧義字，
     /// CP950 對這兩字選擇不提供編碼）。上游改版若增減差異，測試會失敗以提醒重新釘選。
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, int> KnownCp950Differences = new Dictionary<string, int>(StringComparer.Ordinal)
+    private static readonly Dictionary<string, int> KnownCp950Differences = new(StringComparer.Ordinal)
     {
         ["1-7641"] = 0x5F5E,
         ["2-4C61"] = 0x7B9A
@@ -31,10 +31,10 @@ public class Cns11643OpenDataBaselineTests
     /// 驗證全字庫全部 CNS↔Unicode 碼位經分段器路由到現行內建規則指定的字型名稱，且分段結果無損。
     /// </summary>
     [Fact]
-    public void SegmentText_AllOfficialUnicodeMappings_RouteToExpectedFontsLosslessly()
+    public void SegmentTextAllOfficialUnicodeMappingsRouteToExpectedFontsLosslessly()
     {
         string root = GetDataRootOrSkip();
-        IReadOnlyDictionary<string, int> cnsToUnicode = LoadAllUnicodeMappings(root);
+        Dictionary<string, int> cnsToUnicode = LoadAllUnicodeMappings(root);
         Assert.True(cnsToUnicode.Count > 100_000, $"對照表數量異常：{cnsToUnicode.Count}");
 
         Dictionary<int, StringBuilder> textByPlane = [];
@@ -96,13 +96,13 @@ public class Cns11643OpenDataBaselineTests
     /// 且白名單字必須確實差異（防止白名單過期）。
     /// </summary>
     [Fact]
-    public void Cp950_MatchesOfficialBig5Table_ExceptKnownDifferences()
+    public void Cp950MatchesOfficialBig5TableExceptKnownDifferences()
     {
         string root = GetDataRootOrSkip();
         Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         Encoding cp950 = Encoding.GetEncoding(950);
 
-        IReadOnlyDictionary<string, int> cnsToUnicode = LoadAllUnicodeMappings(root);
+        Dictionary<string, int> cnsToUnicode = LoadAllUnicodeMappings(root);
         IReadOnlyDictionary<string, int> cnsToBig5;
         using (var reader = new StreamReader(Path.Combine(root, "Big5", "CNS2BIG5.txt")))
         {
@@ -141,7 +141,7 @@ public class Cns11643OpenDataBaselineTests
     /// 驗證以官方 CNS↔Unicode 與 CNS↔Big5E 對照表建立的 OdfBig5EEncoding 對全部碼位編解碼一致。
     /// </summary>
     [Fact]
-    public void Big5EEncoding_OfficialTable_RoundTripsAllCodePoints()
+    public void Big5EEncodingOfficialTableRoundTripsAllCodePoints()
     {
         string root = GetDataRootOrSkip();
         IReadOnlyDictionary<string, int> cnsToUnicode = LoadAllUnicodeMappings(root);
@@ -180,7 +180,7 @@ public class Cns11643OpenDataBaselineTests
         return root!;
     }
 
-    private static IReadOnlyDictionary<string, int> LoadAllUnicodeMappings(string root)
+    private static Dictionary<string, int> LoadAllUnicodeMappings(string root)
     {
         var merged = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (string file in Directory.GetFiles(Path.Combine(root, "Unicode"), "CNS2UNICODE_Unicode *.txt"))

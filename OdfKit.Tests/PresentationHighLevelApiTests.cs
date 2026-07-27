@@ -97,7 +97,7 @@ public class PresentationHighLevelApiTests
     /// 驗證 <see cref="OdfSlide.GetAnimations"/> 可讀回已建立的動畫效果。
     /// </summary>
     [Fact]
-    public void GetAnimations_RoundTripsAfterAdd()
+    public void GetAnimationsRoundTripsAfterAdd()
     {
         using var document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide();
@@ -138,7 +138,7 @@ public class PresentationHighLevelApiTests
     /// 驗證動畫持續時間與延遲可透過建立參數與 <see cref="OdfAnimation.SetDuration"/>／<see cref="OdfAnimation.SetDelay"/> 寫入。
     /// </summary>
     [Fact]
-    public void AnimationTiming_RoundTripsAfterWrite()
+    public void AnimationTimingRoundTripsAfterWrite()
     {
         using var document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide();
@@ -170,7 +170,7 @@ public class PresentationHighLevelApiTests
     /// 驗證 <see cref="PresentationDocument.GetPlaceholderInfos"/> 與 <see cref="PresentationDocument.GetSpeakerNotes"/> 可讀回投影片內容。
     /// </summary>
     [Fact]
-    public void GetPlaceholderInfosAndSpeakerNotes_RoundTripsAfterAdd()
+    public void GetPlaceholderInfosAndSpeakerNotesRoundTripsAfterAdd()
     {
         using var document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide();
@@ -298,7 +298,7 @@ public class PresentationHighLevelApiTests
     /// 驗證 <see cref="PresentationDocument.GetSlideTransitions"/> 可讀回各投影片切換效果。
     /// </summary>
     [Fact]
-    public void GetSlideTransitions_RoundTripsAfterSet()
+    public void GetSlideTransitionsRoundTripsAfterSet()
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();
@@ -322,7 +322,7 @@ public class PresentationHighLevelApiTests
     /// 驗證 <see cref="OdfSlide.SetLayout"/> 可於投影片層設定版面配置。
     /// </summary>
     [Fact]
-    public void SlideSetLayout_RoundTripsThroughGetLayout()
+    public void SlideSetLayoutRoundTripsThroughGetLayout()
     {
         using var document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide();
@@ -335,7 +335,7 @@ public class PresentationHighLevelApiTests
     /// 驗證母片進階編輯與依名稱套用版面配置 API。
     /// </summary>
     [Fact]
-    public void MasterAndLayoutAdvancedEditing_WorksCorrectly()
+    public void MasterAndLayoutAdvancedEditingWorksCorrectly()
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();
@@ -381,7 +381,7 @@ public class PresentationHighLevelApiTests
     /// 驗證 <see cref="PresentationDocument.GetLayouts"/> 可讀回各投影片版面配置。
     /// </summary>
     [Fact]
-    public void GetLayouts_RoundTripsAfterSetLayout()
+    public void GetLayoutsRoundTripsAfterSetLayout()
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();

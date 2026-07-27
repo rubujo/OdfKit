@@ -18,7 +18,7 @@ namespace OdfKit.Tests;
 public sealed class SpreadsheetObjectBindingTests
 {
     [Fact]
-    public void WriteObjects_WritesHeadersValuesAndCreatesTable()
+    public void WriteObjectsWritesHeadersValuesAndCreatesTable()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -46,7 +46,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_UsesDisplayNameAndConvertsCommonTypes()
+    public void ReadObjectsUsesDisplayNameAndConvertsCommonTypes()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -77,7 +77,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_AppliesDefaultValuesForBlankCells()
+    public void ReadObjectsAppliesDefaultValuesForBlankCells()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -103,7 +103,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void AppendObjects_AndDocumentWrappers_RoundTripObjects()
+    public void AppendObjectsAndDocumentWrappersRoundTripObjects()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         document.AddSheet("Data");
@@ -127,7 +127,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_ReportsMissingColumnsWhenRequested()
+    public void ReadObjectsReportsMissingColumnsWhenRequested()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -155,7 +155,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void SpreadsheetTable_AppliesFilterAndSortByColumnName()
+    public void SpreadsheetTableAppliesFilterAndSortByColumnName()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -177,7 +177,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void SpreadsheetTable_MissingColumn_ThrowsColumnNotFoundMessage()
+    public void SpreadsheetTableMissingColumnThrowsColumnNotFoundMessage()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -193,7 +193,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_ConversionPolicyThrow_ThrowsLocalizedFormatException()
+    public void ReadObjectsConversionPolicyThrowThrowsLocalizedFormatException()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -213,7 +213,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_ConversionPolicyWarnAndUseDefault_RecordsDiagnostic()
+    public void ReadObjectsConversionPolicyWarnAndUseDefaultRecordsDiagnostic()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -244,7 +244,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_ConversionPolicyWarnAndSkipRow_SkipsBadRows()
+    public void ReadObjectsConversionPolicyWarnAndSkipRowSkipsBadRows()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -272,7 +272,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ObjectColumnMap_ControlsOrderHeaderIgnoreAliasAndFormatting()
+    public void ObjectColumnMapControlsOrderHeaderIgnoreAliasAndFormatting()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -319,7 +319,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ValidateObjectBinding_ReportsRequiredDuplicateUnknownAndConversionIssues()
+    public void ValidateObjectBindingReportsRequiredDuplicateUnknownAndConversionIssues()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -354,7 +354,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpdateObjects_UpdatesExistingRowsAndPreservesUnmappedFormulaCells()
+    public void UpdateObjectsUpdatesExistingRowsAndPreservesUnmappedFormulaCells()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -387,7 +387,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_InsertsMissingRowsAndResizesMatchingTable()
+    public void UpsertObjectsInsertsMissingRowsAndResizesMatchingTable()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -431,7 +431,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_CopyAsIsFormulaModeKeepsTemplateFormula()
+    public void UpsertObjectsCopyAsIsFormulaModeKeepsTemplateFormula()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -457,7 +457,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_ShiftsRelativeFormulaReferencesAndPreservesAbsoluteRows()
+    public void UpsertObjectsShiftsRelativeFormulaReferencesAndPreservesAbsoluteRows()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -481,7 +481,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_ShiftsSheetQualifiedTemplateFormulaReferences()
+    public void UpsertObjectsShiftsSheetQualifiedTemplateFormulaReferences()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -503,7 +503,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_ClearFormulaModeDoesNotCopyTemplateFormula()
+    public void UpsertObjectsClearFormulaModeDoesNotCopyTemplateFormula()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -529,7 +529,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_DuplicateExistingKeys_ThrowsLocalizedException()
+    public void UpsertObjectsDuplicateExistingKeysThrowsLocalizedException()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -552,7 +552,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ReadObjects_DuplicateHeaderPolicyThrow_ThrowsLocalizedException()
+    public void ReadObjectsDuplicateHeaderPolicyThrowThrowsLocalizedException()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -573,7 +573,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ValidateObjectBinding_DuplicateHeaderPolicyThrow_ReportsError()
+    public void ValidateObjectBindingDuplicateHeaderPolicyThrowReportsError()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -594,7 +594,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void ValidateObjectBinding_UsesValidationOptionsEntryPoint()
+    public void ValidateObjectBindingUsesValidationOptionsEntryPoint()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -616,7 +616,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void UpsertObjects_MissingKeyWarnAndSkip_ReportsStableDiagnostic()
+    public void UpsertObjectsMissingKeyWarnAndSkipReportsStableDiagnostic()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -642,7 +642,7 @@ public sealed class SpreadsheetObjectBindingTests
     }
 
     [Fact]
-    public void DocumentValidateObjectBinding_DelegatesToSheet()
+    public void DocumentValidateObjectBindingDelegatesToSheet()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");

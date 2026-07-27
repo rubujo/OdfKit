@@ -30,10 +30,7 @@ public static class DocxToOdtConverter
     /// <exception cref="InvalidDataException">Thrown when the documented condition occurs. / 當 DOCX 缺少主要文件本文時擲出</exception>
     public static TextDocument Convert(Stream docxStream)
     {
-        if (docxStream is null)
-        {
-            throw new ArgumentNullException(nameof(docxStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(docxStream, nameof(docxStream));
 
         using var wordDocument = WordprocessingDocument.Open(docxStream, false);
         MainDocumentPart mainPart = wordDocument.MainDocumentPart

@@ -28,7 +28,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時擲出。</exception>
     public OdfChartSeries GetSeriesEditor(int index)
     {
-        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        List<OdfNode> nodes = GetSeriesNodes();
         if (index < 0 || index >= nodes.Count)
             throw new ArgumentOutOfRangeException(nameof(index), OdfLocalizer.GetMessage("Err_OdfChartDocument_SequenceIndexOutRange_2", index, nodes.Count));
 
@@ -43,7 +43,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時擲出。</exception>
     public void RemoveSeriesAt(int index)
     {
-        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        List<OdfNode> nodes = GetSeriesNodes();
         if (index < 0 || index >= nodes.Count)
         {
             throw new ArgumentOutOfRangeException(
@@ -63,7 +63,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentOutOfRangeException">Thrown when either index is out of range. / 任一索引超出範圍時擲出。</exception>
     public void MoveSeries(int sourceIndex, int destinationIndex)
     {
-        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        List<OdfNode> nodes = GetSeriesNodes();
         if (sourceIndex < 0 || sourceIndex >= nodes.Count)
         {
             throw new ArgumentOutOfRangeException(
@@ -110,12 +110,9 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">When <paramref name="snapshot"/> is <see langword="null"/>. / 當 <paramref name="snapshot"/> 為 <see langword="null"/> 時擲出。</exception>
     public bool ApplySeriesSnapshot(int index, OdfChartSeriesInfo snapshot)
     {
-        if (snapshot is null)
-        {
-            throw new ArgumentNullException(nameof(snapshot));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(snapshot, nameof(snapshot));
 
-        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        List<OdfNode> nodes = GetSeriesNodes();
         if (index < 0 || index >= nodes.Count)
         {
             return false;
@@ -138,10 +135,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">When <paramref name="updates"/> or an update snapshot is <see langword="null"/>. / 當 <paramref name="updates"/> 或任一更新快照為 <see langword="null"/> 時擲出。</exception>
     public OdfBatchUpdateResult ApplySeriesSnapshots(IEnumerable<OdfChartSeriesUpdate> updates)
     {
-        if (updates is null)
-        {
-            throw new ArgumentNullException(nameof(updates));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(updates, nameof(updates));
 
         var requests = new List<OdfChartSeriesUpdate>();
         foreach (OdfChartSeriesUpdate update in updates)
@@ -155,7 +149,7 @@ public partial class OdfChartDocument
         }
 
         var result = new OdfBatchUpdateResult();
-        IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
+        List<OdfNode> nodes = GetSeriesNodes();
         foreach (OdfChartSeriesUpdate update in requests)
         {
             string identifier = update.Index.ToString(CultureInfo.InvariantCulture);
@@ -194,7 +188,7 @@ public partial class OdfChartDocument
         }
     }
 
-    private IReadOnlyList<OdfNode> GetSeriesNodes()
+    private List<OdfNode> GetSeriesNodes()
     {
         OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
         if (plotArea is null)

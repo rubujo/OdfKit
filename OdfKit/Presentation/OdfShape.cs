@@ -81,10 +81,8 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// <returns>The newly created embedded table. / 新建立的嵌入表格。</returns>
     public OdfEmbeddedTable AddEmbeddedTable(int rows, int columns)
     {
-        if (rows < 1)
-            throw new ArgumentOutOfRangeException(nameof(rows));
-        if (columns < 1)
-            throw new ArgumentOutOfRangeException(nameof(columns));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(rows, 1, nameof(rows));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(columns, 1, nameof(columns));
 
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
         for (int row = 0; row < rows; row++)
@@ -330,7 +328,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
 
         if (string.IsNullOrEmpty(targetId))
         {
-            targetId = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            targetId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
             Id = targetId;
         }
 

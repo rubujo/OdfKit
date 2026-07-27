@@ -132,6 +132,7 @@ public partial class TextDocument
     /// 在指定的段落中新增日期欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddDateField(OdfParagraph paragraph) =>
         TextDocumentFieldsEngine.AddDateField(paragraph);
 
@@ -139,6 +140,7 @@ public partial class TextDocument
     /// 在指定的段落中新增時間欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddTimeField(OdfParagraph paragraph) =>
         TextDocumentFieldsEngine.AddTimeField(paragraph);
 
@@ -146,6 +148,7 @@ public partial class TextDocument
     /// 在指定的段落中新增作者名稱欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddAuthorField(OdfParagraph paragraph) =>
         TextDocumentFieldsEngine.AddAuthorField(paragraph);
 
@@ -153,6 +156,7 @@ public partial class TextDocument
     /// 在指定的段落中新增章節欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddChapterField(OdfParagraph paragraph) =>
         TextDocumentFieldsEngine.AddChapterField(paragraph);
 
@@ -162,6 +166,7 @@ public partial class TextDocument
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">序號欄位的名稱</param>
     /// <param name="numFormat">序號的編號格式</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddSequenceField(OdfParagraph paragraph, string name, string numFormat = "1") =>
         TextDocumentFieldsEngine.AddSequenceField(paragraph, name, numFormat);
 
@@ -170,6 +175,7 @@ public partial class TextDocument
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="refName">要參考的專案名稱</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddReferenceField(OdfParagraph paragraph, string refName) =>
         TextDocumentFieldsEngine.AddReferenceField(paragraph, refName);
 
@@ -179,6 +185,7 @@ public partial class TextDocument
     /// <param name="paragraph">目標段落</param>
     /// <param name="sequenceName">序號欄位名稱（需與 AddSequenceField 使用的 name 相同）</param>
     /// <param name="referenceFormat">參照格式，預設為 "value"（顯示數值）</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddSequenceRefField(OdfParagraph paragraph, string sequenceName, string referenceFormat = "value") =>
         TextDocumentFieldsEngine.AddSequenceRefField(paragraph, sequenceName, referenceFormat);
 
@@ -188,6 +195,7 @@ public partial class TextDocument
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="bookmarkName">要參照的書籤名稱</param>
     /// <param name="referenceFormat">參照格式，預設為 "text"</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text") =>
         TextDocumentFieldsEngine.AddBookmarkReferenceField(paragraph, bookmarkName, referenceFormat);
 
@@ -197,6 +205,7 @@ public partial class TextDocument
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">變數的名稱</param>
     /// <param name="value">變數的值</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddVariableSetField(OdfParagraph paragraph, string name, string value) =>
         TextDocumentFieldsEngine.AddVariableSetField(paragraph, name, value);
 
@@ -205,6 +214,7 @@ public partial class TextDocument
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">變數的名稱</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddVariableGetField(OdfParagraph paragraph, string name) =>
         TextDocumentFieldsEngine.AddVariableGetField(paragraph, name);
 
@@ -216,6 +226,7 @@ public partial class TextDocument
     /// <param name="columnName">要顯示的欄位名稱</param>
     /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
     /// <param name="databaseName">資料庫連線名稱</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddDatabaseDisplayField(OdfParagraph paragraph, string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
         TextDocumentFieldsEngine.AddDatabaseDisplayField(paragraph, tableName, columnName, tableType, databaseName);
 
@@ -227,6 +238,7 @@ public partial class TextDocument
     /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
     /// <param name="databaseName">資料庫連線名稱</param>
     /// <param name="condition">換行前的判斷條件式</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddDatabaseNextField(OdfParagraph paragraph, string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
         TextDocumentFieldsEngine.AddDatabaseNextField(paragraph, tableName, tableType, databaseName, condition);
 

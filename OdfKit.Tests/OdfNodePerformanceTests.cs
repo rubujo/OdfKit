@@ -18,7 +18,7 @@ public class OdfNodePerformanceTests
     /// 驗證連續 <see cref="OdfNode.InsertAfter"/> 後子節點索引快取仍正確。
     /// </summary>
     [Fact]
-    public void InsertAfter_MaintainsSiblingIndexForSequentialInserts()
+    public void InsertAfterMaintainsSiblingIndexForSequentialInserts()
     {
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
         var firstRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
@@ -45,7 +45,7 @@ public class OdfNodePerformanceTests
     /// 驗證單一文字子節點時 <see cref="OdfNode.TextContent"/> 讀取結果正確。
     /// </summary>
     [Fact]
-    public void TextContent_SingleTextChild_ReturnsExpectedValue()
+    public void TextContentSingleTextChildReturnsExpectedValue()
     {
         var paragraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         var text = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "快速路徑" };
@@ -58,7 +58,7 @@ public class OdfNodePerformanceTests
     /// 驗證 <see cref="OdfNode.TryWriteTextContent"/> 與 <see cref="OdfNode.TextContent"/> 結果一致。
     /// </summary>
     [Fact]
-    public void TryWriteTextContent_MatchesTextContent_ForMixedChildren()
+    public void TryWriteTextContentMatchesTextContentForMixedChildren()
     {
         var paragraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         paragraph.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "Hello" });
@@ -75,7 +75,7 @@ public class OdfNodePerformanceTests
     /// 驗證 <see cref="OdfAttributeName"/> 雜湊在常見屬性名稱下可穩定查詢字典。
     /// </summary>
     [Fact]
-    public void OdfAttributeName_HashCode_AllowsStableDictionaryLookup()
+    public void OdfAttributeNameHashCodeAllowsStableDictionaryLookup()
     {
         var attributes = new Dictionary<OdfAttributeName, string>
         {
@@ -92,7 +92,7 @@ public class OdfNodePerformanceTests
     /// 驗證 <see cref="OdfNode.PruneAndCollect"/> 會清除子節點隨機存取索引陣列，避免已剪裁子樹被快取保留。
     /// </summary>
     [Fact]
-    public void PruneAndCollect_ClearsChildListIndexCache()
+    public void PruneAndCollectClearsChildListIndexCache()
     {
         var root = new OdfNode(OdfNodeType.Element, "root", OdfNamespaces.Office, "office");
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
@@ -116,7 +116,7 @@ public class OdfNodePerformanceTests
     /// 驗證 <see cref="OdfNode.ReleaseUnusedNodes"/> 會非破壞式釋放子節點索引快取。
     /// </summary>
     [Fact]
-    public void ReleaseUnusedNodes_ClearsChildListIndexCacheWithoutPruningDom()
+    public void ReleaseUnusedNodesClearsChildListIndexCacheWithoutPruningDom()
     {
         var root = new OdfNode(OdfNodeType.Element, "root", OdfNamespaces.Office, "office");
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");

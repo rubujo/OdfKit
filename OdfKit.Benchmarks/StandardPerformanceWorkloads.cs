@@ -14,6 +14,7 @@ namespace OdfKit.Benchmarks;
 /// </summary>
 internal static class StandardPerformanceWorkloads
 {
+    private static readonly string[] CellTextValues = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"];
     /// <summary>
     /// Gets the standard ODS row count.
     /// 取得標準 ODS 列數。
@@ -388,7 +389,7 @@ internal static class StandardPerformanceWorkloads
         writer.WriteCell(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMinutes(row));
         writer.WriteCell(row % 3 == 0);
         writer.WriteCell(Math.Round((row * 0.61803398875) % 100, 4));
-        writer.WriteCell(new[] { "Alpha", "Beta", "Gamma", "Delta", "Epsilon" }[row % 5]);
+        writer.WriteCell(CellTextValues[row % CellTextValues.Length]);
         writer.WriteCell(row * 7d);
         writer.WriteCell($"備註 {row}");
     }

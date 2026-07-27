@@ -67,8 +67,7 @@ public sealed class ComputedStyle
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="element"/> is <see langword="null"/>. / 當 <paramref name="element"/> 為 <see langword="null"/> 時擲出。</exception>
     public static ComputedStyle Resolve(OdfElement element)
     {
-        if (element is null)
-            throw new ArgumentNullException(nameof(element));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(element, nameof(element));
 
         var styleEngine = element.Document?.StyleEngine;
         if (styleEngine is null)

@@ -56,10 +56,7 @@ public static class OdtOperationsExporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="document"/> 為 null 時擲出</exception>
     public static string ExportToJson(TextDocument document, OdtOperationCompatibilityOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         options ??= new OdtOperationCompatibilityOptions();
         List<OdtOperation> operations = [];

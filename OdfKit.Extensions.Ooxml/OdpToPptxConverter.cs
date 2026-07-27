@@ -35,10 +35,8 @@ public static class OdpToPptxConverter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 任一必要參數為 null 時引發</exception>
     public static void Convert(OdfPresentationDocument odpDocument, Stream pptxStream)
     {
-        if (odpDocument is null)
-            throw new ArgumentNullException(nameof(odpDocument));
-        if (pptxStream is null)
-            throw new ArgumentNullException(nameof(pptxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(odpDocument, nameof(odpDocument));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pptxStream, nameof(pptxStream));
 
         using var pptx = PresentationDocument.Create(pptxStream, PresentationDocumentType.Presentation, autoSave: false);
         PresentationPart presentationPart = pptx.AddPresentationPart();
@@ -166,7 +164,7 @@ public static class OdpToPptxConverter
     /// <summary>
     /// 取得演講者備忘錄的文字片段清單。
     /// </summary>
-    private static IReadOnlyList<TextRun> GetSpeakerNoteRuns(OdfNode slideNode, OdfPresentationDocument document)
+    private static List<TextRun> GetSpeakerNoteRuns(OdfNode slideNode, OdfPresentationDocument document)
     {
         OdfNode? notesNode = FindChild(slideNode, "notes", OdfNamespaces.Presentation);
         if (notesNode is null)
@@ -222,7 +220,7 @@ public static class OdpToPptxConverter
     /// <summary>
     /// 取得 OdfNode 內所有段落的文字段落清單。
     /// </summary>
-    private static IReadOnlyList<TextRun> GetTextRuns(OdfNode textBox, OdfPresentationDocument document)
+    private static List<TextRun> GetTextRuns(OdfNode textBox, OdfPresentationDocument document)
     {
         IReadOnlyList<TextParagraph> paragraphs = GetTextParagraphs(textBox, document);
         var runs = new List<TextRun>();
@@ -242,7 +240,7 @@ public static class OdpToPptxConverter
     /// <summary>
     /// 從 OdfNode 內解析文字段落清單。
     /// </summary>
-    private static IReadOnlyList<TextParagraph> GetTextParagraphs(OdfNode textBox, OdfPresentationDocument document)
+    private static List<TextParagraph> GetTextParagraphs(OdfNode textBox, OdfPresentationDocument document)
     {
         List<OdfNode> paragraphNodes = FindDescendants(textBox, "p", OdfNamespaces.Text);
         if (paragraphNodes.Count == 0)
@@ -837,15 +835,15 @@ public static class OdpToPptxConverter
     private static P.Timing? CreateAnimationTiming(
         OdfNode slideNode,
         OdfPresentationDocument odpDocument,
-        IReadOnlyDictionary<string, uint> animationTargets,
-        IReadOnlyDictionary<string, OdfNode> animationNodes)
+        Dictionary<string, uint> animationTargets,
+        Dictionary<string, OdfNode> animationNodes)
     {
-        IReadOnlyList<OdfKit.Presentation.OdfAnimationInfo> animations =
+        OdfKit.Presentation.OdfAnimationInfo[] animations =
             new OdfKit.Presentation.OdfSlide(slideNode, odpDocument)
                 .GetAnimations()
                 .Where(animation => animationTargets.ContainsKey(animation.TargetElementId))
                 .ToArray();
-        if (animations.Count == 0)
+        if (animations.Length == 0)
         {
             return null;
         }
@@ -1041,8 +1039,8 @@ public static class OdpToPptxConverter
     /// </summary>
     private static P.BuildList CreateAnimationBuildList(
         IEnumerable<OdfKit.Presentation.OdfAnimationInfo> animations,
-        IReadOnlyDictionary<string, uint> animationTargets,
-        IReadOnlyDictionary<string, OdfNode> animationNodes)
+        Dictionary<string, uint> animationTargets,
+        Dictionary<string, OdfNode> animationNodes)
     {
         var buildList = new P.BuildList();
         var shapeIds = new HashSet<uint>();
@@ -1376,7 +1374,9 @@ public static class OdpToPptxConverter
         string duration = value!.Trim();
 
         // 支援 W3C XML Schema Duration 格式，例如 "PT2.50S" 或 "PT1S"
-        if (duration.StartsWith("PT", StringComparison.OrdinalIgnoreCase) && duration.EndsWith("S", StringComparison.OrdinalIgnoreCase))
+        if (duration.StartsWith("PT", StringComparison.OrdinalIgnoreCase) &&
+            (global::OdfKit.Internal.OdfStringHelper.EndsWith(duration, 'S') ||
+             global::OdfKit.Internal.OdfStringHelper.EndsWith(duration, 's')))
         {
             string numberPart = duration.Substring(2, duration.Length - 3);
             if (double.TryParse(numberPart, NumberStyles.Float, CultureInfo.InvariantCulture, out double secs))
@@ -1386,8 +1386,9 @@ public static class OdpToPptxConverter
             }
         }
 
-        if (duration.EndsWith("s", StringComparison.OrdinalIgnoreCase) &&
-            double.TryParse(duration.Substring(0, duration.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out double seconds))
+        if ((global::OdfKit.Internal.OdfStringHelper.EndsWith(duration, 's') ||
+             global::OdfKit.Internal.OdfStringHelper.EndsWith(duration, 'S')) &&
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(duration, 1, out double seconds))
         {
             return Math.Max(0, (int)Math.Round(seconds * 1000d, MidpointRounding.AwayFromZero))
                 .ToString(CultureInfo.InvariantCulture);
@@ -1936,7 +1937,7 @@ public static class OdpToPptxConverter
     private static P.TextBody CreateTextBody(IReadOnlyList<TextRun> runs)
         => CreateTextBody(ToTextParagraphs(runs));
 
-    private static IReadOnlyList<TextParagraph> ToTextParagraphs(IReadOnlyList<TextRun> runs)
+    private static List<TextParagraph> ToTextParagraphs(IReadOnlyList<TextRun> runs)
     {
         var paragraphs = new List<TextParagraph>();
         var currentRuns = new List<TextRun>();
@@ -2130,7 +2131,8 @@ public static class OdpToPptxConverter
         }
 
         string trimmed = clip!.Trim();
-        if (!trimmed.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) || !trimmed.EndsWith(")", StringComparison.Ordinal))
+        if (!trimmed.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) ||
+            !global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, ')'))
         {
             return null;
         }
@@ -2380,7 +2382,7 @@ public static class OdpToPptxConverter
         }
 
         string trimmed = value!.Trim();
-        if (trimmed.EndsWith("%", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, '%'))
         {
             trimmed = trimmed.Substring(0, trimmed.Length - 1);
         }
@@ -2439,7 +2441,7 @@ public static class OdpToPptxConverter
         }
 
         string clean = value!.Trim();
-        if (clean.StartsWith("#", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(clean, '#'))
         {
             clean = clean.Substring(1);
         }
@@ -2502,8 +2504,8 @@ public static class OdpToPptxConverter
             return -33;
         }
 
-        if (head.EndsWith("%", StringComparison.Ordinal) &&
-            double.TryParse(head.Substring(0, head.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(head, '%') &&
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(head, 1, out double percent))
         {
             return (int)Math.Round(percent, MidpointRounding.AwayFromZero);
         }
@@ -2573,10 +2575,10 @@ public static class OdpToPptxConverter
         public string MinorComplexScriptFont { get; }
 
         public static ThemePalette From(
-            IReadOnlyList<string> colors,
-            IReadOnlyList<string> latinFonts,
-            IReadOnlyList<string> eastAsianFonts,
-            IReadOnlyList<string> complexScriptFonts)
+            List<string> colors,
+            List<string> latinFonts,
+            List<string> eastAsianFonts,
+            List<string> complexScriptFonts)
         {
             string dark1 = "000000";
             string light1 = "FFFFFF";

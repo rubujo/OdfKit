@@ -39,8 +39,7 @@ public partial class OdfMailMergeEngine(TextDocument doc)
     /// <returns>The mail merge execution report. / 郵件合併執行報告。</returns>
     public OdfMailMergeReport Execute(OdfNode root, object dataSource, OdfMailMergeOptions? options)
     {
-        if (root is null)
-            throw new ArgumentNullException(nameof(root));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(root, nameof(root));
 
         options ??= new OdfMailMergeOptions();
         var report = new OdfMailMergeReport();
@@ -67,10 +66,10 @@ public partial class OdfMailMergeEngine(TextDocument doc)
         {
             var child = parent.Children[i];
             string content = child.TextContent;
-            int startTokenIdx = content.IndexOf(options.RegionStartToken);
+            int startTokenIdx = content.IndexOf(options.RegionStartToken, System.StringComparison.Ordinal);
             if (startTokenIdx != -1)
             {
-                int endTokenIdx = content.IndexOf("}}", startTokenIdx);
+                int endTokenIdx = content.IndexOf("}}", startTokenIdx, System.StringComparison.Ordinal);
                 if (endTokenIdx != -1)
                 {
                     string regionName = content.Substring(startTokenIdx + options.RegionStartToken.Length, endTokenIdx - (startTokenIdx + options.RegionStartToken.Length)).Trim();

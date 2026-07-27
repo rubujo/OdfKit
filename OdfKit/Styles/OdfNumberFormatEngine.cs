@@ -21,8 +21,7 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串</returns>
     public static string Format(double value, OdfNode numberStyleNode)
     {
-        if (numberStyleNode is null)
-            throw new ArgumentNullException(nameof(numberStyleNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(numberStyleNode, nameof(numberStyleNode));
         string styleName = numberStyleNode.LocalName;
 
         if (styleName == "percentage-style")
@@ -46,8 +45,7 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串</returns>
     public static string Format(DateTime value, OdfNode dateStyleNode)
     {
-        if (dateStyleNode is null)
-            throw new ArgumentNullException(nameof(dateStyleNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dateStyleNode, nameof(dateStyleNode));
         return dateStyleNode.LocalName == "time-style"
             ? FormatTime(value, dateStyleNode)
             : FormatDate(value, dateStyleNode);
@@ -199,15 +197,15 @@ public static class OdfNumberFormatEngine
             {
                 case "year":
                     bool longYear = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longYear ? dt.Year.ToString("D4") : (dt.Year % 100).ToString("D2"));
+                    sb.Append(longYear ? dt.Year.ToString("D4", System.Globalization.CultureInfo.InvariantCulture) : (dt.Year % 100).ToString("D2", System.Globalization.CultureInfo.InvariantCulture));
                     break;
                 case "month":
                     bool longMonth = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longMonth ? dt.Month.ToString("D2") : dt.Month.ToString());
+                    sb.Append(longMonth ? dt.Month.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Month.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     break;
                 case "day":
                     bool longDay = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longDay ? dt.Day.ToString("D2") : dt.Day.ToString());
+                    sb.Append(longDay ? dt.Day.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Day.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     break;
                 case "day-of-week":
                     bool longDow = child.GetAttribute("style", OdfNamespaces.Number) == "long";
@@ -234,20 +232,21 @@ public static class OdfNumberFormatEngine
             {
                 case "hours":
                     bool longH = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longH ? dt.Hour.ToString("D2") : dt.Hour.ToString());
+                    sb.Append(longH ? dt.Hour.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Hour.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     break;
                 case "minutes":
                     bool longM = child.GetAttribute("style", OdfNamespaces.Number) == "long";
-                    sb.Append(longM ? dt.Minute.ToString("D2") : dt.Minute.ToString());
+                    sb.Append(longM ? dt.Minute.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Minute.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     break;
                 case "seconds":
                     bool longS = child.GetAttribute("style", OdfNamespaces.Number) == "long";
                     string? decPlaces = child.GetAttribute("decimal-places", OdfNamespaces.Number);
                     int dec = int.TryParse(decPlaces, out int sdec) ? sdec : 0;
-                    string secStr = longS ? dt.Second.ToString("D2") : dt.Second.ToString();
+                    string secStr = longS ? dt.Second.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) : dt.Second.ToString(System.Globalization.CultureInfo.InvariantCulture);
                     if (dec > 0)
                     {
-                        secStr += "." + (dt.Millisecond / 1000.0).ToString("F" + dec, CultureInfo.InvariantCulture).Substring(2);
+                        string fraction = (dt.Millisecond / 1000.0).ToString("F" + dec, CultureInfo.InvariantCulture);
+                        secStr += global::OdfKit.Internal.OdfStringHelper.ConcatSuffix(".", fraction, 2);
                     }
                     sb.Append(secStr);
                     break;

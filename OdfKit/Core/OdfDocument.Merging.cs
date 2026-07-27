@@ -25,10 +25,7 @@ public abstract partial class OdfDocument
     /// </remarks>
     public virtual OdfNode AdoptNode(OdfNode node)
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         var sourceDoc = node.Document;
         var sourcePackage = sourceDoc?.Package;
@@ -67,15 +64,9 @@ public abstract partial class OdfDocument
     /// </remarks>
     public virtual OdfNode AdoptNode(OdfDocument sourceDocument, OdfNode node)
     {
-        if (sourceDocument is null)
-        {
-            throw new ArgumentNullException(nameof(sourceDocument));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourceDocument, nameof(sourceDocument));
 
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         // 1. 與原 Parent 脫鉤
         node.Parent?.RemoveChild(node);
@@ -238,7 +229,7 @@ public abstract partial class OdfDocument
         return importedName;
     }
 
-    private bool TryFindSourceStyle(
+    private static bool TryFindSourceStyle(
         OdfDocument sourceDocument,
         string styleName,
         out OdfNode style,
@@ -432,6 +423,7 @@ public abstract partial class OdfDocument
     /// <param name="ns">子元素命名空間 URI</param>
     /// <param name="prefix">子元素前綴</param>
     /// <returns>符合條件的既有或新建子元素</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
     {
         foreach (OdfNode child in parent.Children)
@@ -460,6 +452,7 @@ public abstract partial class OdfDocument
     /// </summary>
     /// <param name="node">要處理的根節點</param>
     /// <param name="renameMap">樣式重新命名對照表</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
         => OdfDocumentStyleRemapEngine.RemapStylesInNodes(node, renameMap);
 

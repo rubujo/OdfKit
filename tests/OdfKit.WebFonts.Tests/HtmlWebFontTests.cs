@@ -5,7 +5,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class HtmlWebFontTests
 {
     [Fact]
-    public async Task CollectSupportedAsync_PartitionsMixedTextByCoverageAndRoutePriority()
+    public async Task CollectSupportedAsyncPartitionsMixedTextByCoverageAndRoutePriority()
     {
         using OdfKit.Text.TextDocument document = OdfKit.Text.TextDocument.Create();
         document.AddParagraph("𠆩󠄀一二三丨ㄩ幹𰀀");
@@ -24,12 +24,12 @@ public sealed class HtmlWebFontTests
         Assert.Equal("𰀀", Assert.Single(requests[1].Sequences).Text);
         Assert.DoesNotContain(
             requests.SelectMany(request => request.Sequences),
-            sequence => sequence.Text.Contains("一", StringComparison.Ordinal)
-                || sequence.Text.Contains("幹", StringComparison.Ordinal));
+            sequence => sequence.Text.Contains('一')
+                || sequence.Text.Contains('幹'));
     }
 
     [Fact]
-    public void AddStylesheetLink_InsertsEncodedLinkInHead()
+    public void AddStylesheetLinkInsertsEncodedLinkInHead()
     {
         string result = OdfWebFontRequirementCollector.AddStylesheetLink(
             "<html><head><title>x</title></head><body></body></html>",

@@ -18,7 +18,9 @@ public enum FormulaTokenType
     /// A string token.
     /// 字串。
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     String,
+#pragma warning restore CA1720
 
     /// <summary>
     /// A Boolean token.

@@ -16,7 +16,7 @@ public class ImageExportTests
     /// 驗證 ExportToPng 輸出非空的 PNG 位元組流。
     /// </summary>
     [Fact]
-    public void ExportToPng_WithCellData_ProducesNonEmptyPngStream()
+    public void ExportToPngWithCellDataProducesNonEmptyPngStream()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("圖表");
@@ -42,7 +42,7 @@ public class ImageExportTests
     /// 驗證 ExportToJpeg 輸出非空且符合 JFIF 格式的位元組流。
     /// </summary>
     [Fact]
-    public void ExportToJpeg_WithCellData_ProducesNonEmptyJpegStream()
+    public void ExportToJpegWithCellDataProducesNonEmptyJpegStream()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("圖表");
@@ -61,7 +61,7 @@ public class ImageExportTests
     /// 驗證 quality 超出範圍時拋出 ArgumentOutOfRangeException。
     /// </summary>
     [Fact]
-    public void ExportToJpeg_InvalidQuality_ThrowsArgumentOutOfRangeException()
+    public void ExportToJpegInvalidQualityThrowsArgumentOutOfRangeException()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Sheet1");
@@ -74,7 +74,7 @@ public class ImageExportTests
     /// 驗證匯出影像時不會改變工作表的 DOM 結構（匯出前後 TableNode 的 XML 內容完全相同）。
     /// </summary>
     [Fact]
-    public void Export_DoesNotMutateDocumentStructure()
+    public void ExportDoesNotMutateDocumentStructure()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("測試工作表");

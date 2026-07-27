@@ -17,7 +17,7 @@ public class ImageDrawingDepthTests
     /// 驗證 ODI 可透過 AddImages 批次新增圖片框架。
     /// </summary>
     [Fact]
-    public void ImageDocument_AddImages_AddsBatchFrames()
+    public void ImageDocumentAddImagesAddsBatchFrames()
     {
         using OdfImageDocument document = OdfImageDocument.Create();
 
@@ -36,7 +36,7 @@ public class ImageDrawingDepthTests
     /// 驗證 ODI 批次裁切與旋轉 helper 會回報更新數與未命中名稱。
     /// </summary>
     [Fact]
-    public void ImageDocument_BatchCropAndRotation_ReportMissingFrames()
+    public void ImageDocumentBatchCropAndRotationReportMissingFrames()
     {
         using OdfImageDocument document = OdfImageDocument.Create();
         document.AddImages(
@@ -58,7 +58,7 @@ public class ImageDrawingDepthTests
     /// 驗證 Image inspection 會回報缺少替代文字與裁切旋轉風險。
     /// </summary>
     [Fact]
-    public void ImageDocument_InspectImages_ReportsPortableEditingRisks()
+    public void ImageDocumentInspectImagesReportsPortableEditingRisks()
     {
         using OdfImageDocument document = OdfImageDocument.Create();
         document.AddImageFrame(CreatePngBytes(), 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm(), "risk.png", "RiskFrame");
@@ -75,7 +75,7 @@ public class ImageDrawingDepthTests
     /// 驗證 Drawing builder 可用 AddFlow 一次建立流程節點與連接線。
     /// </summary>
     [Fact]
-    public void DrawingDocumentBuilder_AddFlow_CreatesConnectedSteps()
+    public void DrawingDocumentBuilderAddFlowCreatesConnectedSteps()
     {
         using DrawingDocument document = DrawingDocument.Builder()
             .AddFlow(
@@ -98,7 +98,7 @@ public class ImageDrawingDepthTests
     /// 驗證 AddFlow 可用明確版面選項控制方向與節點大小。
     /// </summary>
     [Fact]
-    public void DrawingDocumentBuilder_AddFlow_UsesExplicitLayoutOptions()
+    public void DrawingDocumentBuilderAddFlowUsesExplicitLayoutOptions()
     {
         using DrawingDocument document = DrawingDocument.Builder()
             .AddFlow(
@@ -129,7 +129,7 @@ public class ImageDrawingDepthTests
     /// 驗證 Drawing 文件層批次更新可修改文字與圖形位置。
     /// </summary>
     [Fact]
-    public void DrawingDocument_DepthUpdates_TextAndShapes()
+    public void DrawingDocumentDepthUpdatesTextAndShapes()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Canvas");
@@ -157,7 +157,7 @@ public class ImageDrawingDepthTests
     /// 驗證 DrawingDocument 可用 request 批次更新圖形並調整繪圖順序。
     /// </summary>
     [Fact]
-    public void DrawingDocument_UpdateShapesRequestAndMoveRelative()
+    public void DrawingDocumentUpdateShapesRequestAndMoveRelative()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Canvas");
@@ -191,7 +191,7 @@ public class ImageDrawingDepthTests
     /// 驗證影像相容性 helper 只回報標準化建議，不執行核心轉檔。
     /// </summary>
     [Fact]
-    public void ImageCompatibility_NormalizeRequest_ReportsPortableFormatRisk()
+    public void ImageCompatibilityNormalizeRequestReportsPortableFormatRisk()
     {
         OdfImageNormalizationRequest request = OdfImageCompatibility.NormalizeRequest(
             "scan.bmp",

@@ -42,8 +42,7 @@ public static class OdfValidator
     /// <returns>The validation report. / 驗證結果報告。</returns>
     public static OdfValidationReport Validate(string path, OdfValidationOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         options ??= OdfValidationOptions.Default;
         string fileName = options.FileName ?? path;
@@ -85,8 +84,7 @@ public static class OdfValidator
     /// <returns>The validation report. / 驗證結果報告。</returns>
     public static OdfValidationReport Validate(Stream stream, OdfValidationOptions? options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         options ??= OdfValidationOptions.Default;
         if (IsFlatXmlFileName(options.FileName))
@@ -142,8 +140,7 @@ public static class OdfValidator
     /// <returns>The validation report. / 驗證結果報告。</returns>
     public static OdfValidationReport Validate(OdfPackage package, OdfValidationOptions? options)
     {
-        if (package is null)
-            throw new ArgumentNullException(nameof(package));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
 
         options ??= OdfValidationOptions.Default;
         return OdfPackageValidator.Validate(

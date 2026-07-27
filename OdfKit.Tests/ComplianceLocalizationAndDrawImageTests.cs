@@ -337,7 +337,7 @@ public partial class ComplianceTests
     /// （office-binary-data）變成強制要求，導致任何使用外部參照的合法圖片都被誤判為不合規。
     /// </summary>
     [Fact]
-    public void SchemaPatternValidator_DrawImageWithExternalHref_IsValid()
+    public void SchemaPatternValidatorDrawImageWithExternalHrefIsValid()
     {
         XNamespace draw = OdfNamespaces.Draw;
         XNamespace xlink = OdfNamespaces.XLink;
@@ -360,7 +360,7 @@ public partial class ComplianceTests
     /// 且沒有內嵌 <c>office:binary-data</c> 的 <c>draw:image</c> 仍必須判定為不合規。
     /// </summary>
     [Fact]
-    public void SchemaPatternValidator_DrawImageMissingHrefAndBinaryData_IsInvalid()
+    public void SchemaPatternValidatorDrawImageMissingHrefAndBinaryDataIsInvalid()
     {
         XNamespace draw = OdfNamespaces.Draw;
         XNamespace xlink = OdfNamespaces.XLink;

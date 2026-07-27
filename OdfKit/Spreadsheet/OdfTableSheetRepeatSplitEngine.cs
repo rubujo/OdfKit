@@ -47,7 +47,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var beforeRow = rowNode.CloneNode(true);
             if (beforeCount > 1)
-                beforeRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                beforeRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, beforeCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 beforeRow.RemoveAttribute("number-rows-repeated", OdfNamespaces.Table);
             parent.InsertBefore(beforeRow, rowNode);
@@ -57,7 +57,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var afterRow = rowNode.CloneNode(true);
             if (afterCount > 1)
-                afterRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                afterRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, afterCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 afterRow.RemoveAttribute("number-rows-repeated", OdfNamespaces.Table);
             parent.InsertAfter(afterRow, rowNode);
@@ -86,7 +86,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var beforeCell = cellNode.CloneNode(true);
             if (beforeCount > 1)
-                beforeCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                beforeCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 beforeCell.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
             rowNode.InsertBefore(beforeCell, cellNode);
@@ -96,7 +96,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var afterCell = cellNode.CloneNode(true);
             if (afterCount > 1)
-                afterCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                afterCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 afterCell.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
             rowNode.InsertAfter(afterCell, cellNode);
@@ -125,7 +125,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var beforeCol = colNode.CloneNode(true);
             if (beforeCount > 1)
-                beforeCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                beforeCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 beforeCol.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
             tableNode.InsertBefore(beforeCol, colNode);
@@ -135,7 +135,7 @@ internal static class OdfTableSheetRepeatSplitEngine
         {
             var afterCol = colNode.CloneNode(true);
             if (afterCount > 1)
-                afterCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                afterCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
             else
                 afterCol.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
             tableNode.InsertAfter(afterCol, colNode);

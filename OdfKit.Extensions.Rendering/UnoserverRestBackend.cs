@@ -60,8 +60,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
     /// <inheritdoc />
     public async Task<Stream> ConvertAsync(Stream input, string inputExtension, string convertTo, CancellationToken ct)
     {
-        if (input is null)
-            throw new ArgumentNullException(nameof(input));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(input, nameof(input));
         if (string.IsNullOrEmpty(inputExtension))
             throw new ArgumentNullException(nameof(inputExtension));
         if (string.IsNullOrEmpty(convertTo))
@@ -139,7 +138,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         var ms = new MemoryStream(responseLength.HasValue && responseLength.Value <= int.MaxValue
             ? (int)responseLength.Value
             : 0);
-        using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+        using (var responseStream = await OdfKit.Internal.OdfAsyncHelper.ReadAsStreamAsync(response.Content, ct).ConfigureAwait(false))
         {
             await CopyToBoundedAsync(responseStream, ms, MaxResponseBytes, "Err_UnoserverRestBackend_ResponseSizeLimitExceeded", ct)
                 .ConfigureAwait(false);
@@ -158,7 +157,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         byte[] buffer = new byte[81920];
         long totalBytes = 0;
         int bytesRead;
-        while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+        while ((bytesRead = await OdfKit.Internal.OdfStreamHelper.ReadAsync(source, buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
         {
             totalBytes = OdfBoundedStreamReader.AddBytes(
                 totalBytes,
@@ -166,7 +165,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
                 maxBytes,
                 (exceeded, max) => new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, exceeded, max)));
 
-            await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+            await OdfKit.Internal.OdfStreamHelper.WriteAsync(destination, buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
         }
     }
 }

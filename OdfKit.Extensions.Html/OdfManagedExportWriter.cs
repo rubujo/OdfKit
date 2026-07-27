@@ -10,8 +10,7 @@ internal static class OdfManagedExportWriter
 {
     internal static OdfExportReport Write(Stream destination, string content, OdfExportFormat format, string backend)
     {
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
 
         // Writes the already-built string directly through a StreamWriter instead of first
         // allocating a full UTF-8 byte[] copy of it — avoids holding two full-size buffers
@@ -33,8 +32,7 @@ internal static class OdfManagedExportWriter
         string backend,
         CancellationToken cancellationToken)
     {
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
         cancellationToken.ThrowIfCancellationRequested();
 
         var encoding = new UTF8Encoding(false);
@@ -42,7 +40,7 @@ internal static class OdfManagedExportWriter
         try
         {
             await writer.WriteAsync(content).ConfigureAwait(false);
-            await writer.FlushAsync().ConfigureAwait(false);
+            await OdfKit.Internal.OdfAsyncHelper.FlushAsync(writer, cancellationToken).ConfigureAwait(false);
         }
         finally
         {

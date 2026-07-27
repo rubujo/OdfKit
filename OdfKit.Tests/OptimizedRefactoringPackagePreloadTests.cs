@@ -14,7 +14,7 @@ public partial class OptimizedRefactoringTests
     /// 驗證 MMF lazy preload 會遵守全域 CPU 核心預留平行度。
     /// </summary>
     [Fact]
-    public void Test_OdfPackage_MmfPreload_UsesReservedCpuConcurrency()
+    public void TestOdfPackageMmfPreloadUsesReservedCpuConcurrency()
     {
         double originalRatio = OdfParallelScheduler.ReservationRatio;
         OdfParallelScheduler.ReservationRatio = 0.99d;
@@ -34,7 +34,7 @@ public partial class OptimizedRefactoringTests
     /// 驗證檔案路徑載入會以 MMF 定位核心 XML entries，並將多個獨立 entry 排入平行預讀。
     /// </summary>
     [Fact]
-    public async Task Test_OdfPackage_MmfPreload_QueuesCoreXmlEntriesForParallelRandomAccess()
+    public async Task TestOdfPackageMmfPreloadQueuesCoreXmlEntriesForParallelRandomAccess()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_preload_{Guid.NewGuid():N}.ods");
         byte[] xml = Encoding.UTF8.GetBytes("<root><item>payload</item></root>");
@@ -90,7 +90,7 @@ public partial class OptimizedRefactoringTests
     /// 驗證平行調度器會在工作委派期間暫時套用執行緒優先權，並於完成後還原。
     /// </summary>
     [Fact]
-    public void Test_OdfParallelScheduler_AppliesAndRestoresWorkerThreadPriority()
+    public void TestOdfParallelSchedulerAppliesAndRestoresWorkerThreadPriority()
     {
         ThreadPriority? originalConfiguredPriority = OdfParallelScheduler.WorkerThreadPriority;
         ThreadPriority originalThreadPriority = Thread.CurrentThread.Priority;

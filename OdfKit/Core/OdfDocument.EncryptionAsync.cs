@@ -43,8 +43,7 @@ public abstract partial class OdfDocument
         OdfEncryptionAlgorithm algorithm,
         CancellationToken cancellationToken)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         OdfSaveOptions options = OdfPackage.CreateEncryptedSaveOptions(password, algorithm);
         return SaveAsync(path, options, cancellationToken);
@@ -65,8 +64,7 @@ public abstract partial class OdfDocument
         OdfEncryptionAlgorithm algorithm,
         CancellationToken cancellationToken)
     {
-        if (destinationStream is null)
-            throw new ArgumentNullException(nameof(destinationStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
         OdfSaveOptions options = OdfPackage.CreateEncryptedSaveOptions(password, algorithm);
         return SaveToStreamAsync(destinationStream, options, cancellationToken);
@@ -85,8 +83,7 @@ public abstract partial class OdfDocument
         string password,
         CancellationToken cancellationToken)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         return LoadAsync(path, OdfPackage.CreateEncryptedLoadOptions(password), cancellationToken);
     }
@@ -106,8 +103,7 @@ public abstract partial class OdfDocument
         string? fileName,
         CancellationToken cancellationToken)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         return LoadAsync(stream, OdfPackage.CreateEncryptedLoadOptions(password), fileName, cancellationToken);
     }

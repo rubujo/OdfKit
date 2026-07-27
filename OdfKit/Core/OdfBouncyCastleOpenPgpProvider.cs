@@ -76,10 +76,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     /// <exception cref="NotSupportedException">公鑰演算法不受支援（僅支援 RSA 及 ElGamal）</exception>
     public byte[] EncryptSessionKey(byte[] sessionKey, OdfOpenPgpRecipient recipient)
     {
-        if (sessionKey is null)
-            throw new ArgumentNullException(nameof(sessionKey));
-        if (recipient is null)
-            throw new ArgumentNullException(nameof(recipient));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sessionKey, nameof(sessionKey));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(recipient, nameof(recipient));
         if (recipient.PublicKey is not { Length: > 0 })
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_RecipientCannotBeEmpty"), nameof(recipient));
 
@@ -120,8 +118,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     {
         if (_secretKeyRingData is null || _passphraseProvider is null)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_ProviderInstanceProvidePrivate"));
-        if (encryptedKeyPacket is null)
-            throw new ArgumentNullException(nameof(encryptedKeyPacket));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(encryptedKeyPacket, nameof(encryptedKeyPacket));
 
         try
         {
@@ -131,7 +128,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         }
         catch (Exception ex) when (ex is IOException or PgpException)
         {
-            // 早期 OdfKit 版本只保存 PKESK packet；若輸入不是完整 OpenPGP message，
+            // 早期 OdfKit 版本只儲存 PKESK packet；若輸入不是完整 OpenPGP message，
             // 退回既有的 RFC 4880 packet 解碼路徑。
         }
 
@@ -141,8 +138,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
         char[] passphrase = _passphraseProvider(pkeskKeyId)
             ?? throw new ArgumentException(
-                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
-                nameof(_passphraseProvider));
+                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"));
         PgpPrivateKey privateKey;
         try
         {
@@ -190,8 +186,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
 
             char[] passphrase = _passphraseProvider!(encryptedData.KeyId)
                 ?? throw new ArgumentException(
-                    OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
-                    nameof(_passphraseProvider));
+                    OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"));
             PgpPrivateKey privateKey;
             try
             {
@@ -249,8 +244,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
         char[] passphrase = _passphraseProvider!(pkeskKeyId)
             ?? throw new ArgumentException(
-                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
-                nameof(_passphraseProvider));
+                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"));
         try
         {
             PgpPrivateKey privateKey = secretKey.ExtractPrivateKey(passphrase);

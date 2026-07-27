@@ -73,10 +73,7 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// <returns>The matching paragraph, or <see langword="null"/> when no match exists. / 符合的段落；若找不到則為 <see langword="null"/>。</returns>
     public OdfParagraph? Find(Predicate<OdfParagraph> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         foreach (OdfParagraph paragraph in Items)
         {
@@ -97,10 +94,7 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// <returns><see langword="true"/> if the paragraph was removed; otherwise, <see langword="false"/>. / 若已移除段落則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool Remove(OdfParagraph paragraph)
     {
-        if (paragraph is null)
-        {
-            throw new ArgumentNullException(nameof(paragraph));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
 
         return ReferenceEquals(paragraph.Node.Parent, _document.BodyTextRoot) &&
             _document.BodyTextRoot.RemoveChild(paragraph.Node);

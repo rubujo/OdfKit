@@ -187,6 +187,7 @@ public sealed class OdfScriptCompilationResult
 public static class OdfExternalScriptCompiler
 {
     private const int MaximumDetailLength = 4096;
+    private static readonly string[] PythonExecutableNames = ["python.exe", "python", "python.bin"];
 
     /// <summary>
     /// Diagnoses source with a real external compiler worker.
@@ -215,7 +216,7 @@ public static class OdfExternalScriptCompiler
                 nameof(options),
                 OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(options)));
         }
-        if (!Enum.IsDefined(typeof(OdfScriptCompilerBackend), backend) ||
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(backend) ||
             options.Timeout <= TimeSpan.Zero ||
             options.Timeout > TimeSpan.FromMinutes(5))
         {
@@ -366,8 +367,8 @@ public static class OdfExternalScriptCompiler
         if (process is null)
             return new ProcessResult(exitCode: null, string.Empty, string.Empty, timedOut: false);
 
-        Task<string> stdout = process.StandardOutput.ReadToEndAsync();
-        Task<string> stderr = process.StandardError.ReadToEndAsync();
+        Task<string> stdout = OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardOutput, cancellationToken);
+        Task<string> stderr = OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardError, cancellationToken);
         Stopwatch elapsed = Stopwatch.StartNew();
         while (!process.WaitForExit(100))
         {
@@ -454,7 +455,7 @@ public static class OdfExternalScriptCompiler
         if (explicitPath is not null)
             return explicitPath;
         string directory = Path.GetDirectoryName(soffice)!;
-        return new[] { "python.exe", "python", "python.bin" }
+        return PythonExecutableNames
             .Select(name => Path.Combine(directory, name))
             .FirstOrDefault(File.Exists);
     }

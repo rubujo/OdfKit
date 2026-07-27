@@ -157,10 +157,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <exception cref="ArgumentNullException">當 <paramref name="options"/> 為 <see langword="null"/> 時擲出</exception>
     public void SetChartTitle(string? title, OdfTextFontFallbackOptions options)
     {
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         if (string.IsNullOrWhiteSpace(title))
         {

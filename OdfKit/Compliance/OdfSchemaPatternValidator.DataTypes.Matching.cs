@@ -167,7 +167,7 @@ public static partial class OdfSchemaPatternValidator
                 case "dateTime":
                 case "xsd:dateTime":
                     XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.RoundtripKind);
-                    return value.IndexOf('T') >= 0;
+                    return value.Contains('T');
                 case "time":
                 case "xsd:time":
                     return IsXmlTime(value);

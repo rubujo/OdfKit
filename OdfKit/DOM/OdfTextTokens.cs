@@ -92,7 +92,9 @@ public enum OdfTextAnchorType
     /// <summary>
     /// 錨定至字元。
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Char,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 錨定至框架。
@@ -318,7 +320,9 @@ public enum OdfTextPlaceholderType
     /// <summary>
     /// 物件。
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Object,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 表格。

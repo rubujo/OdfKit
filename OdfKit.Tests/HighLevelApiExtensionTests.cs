@@ -14,7 +14,7 @@ namespace OdfKit.Tests;
 public sealed class HighLevelApiExtensionTests
 {
     [Fact]
-    public void TestBookmarkManager_InlineBookmark_ReadWrite()
+    public void TestBookmarkManagerInlineBookmarkReadWrite()
     {
         using var doc = TextDocument.Create();
         var paragraph = doc.AddParagraph("段落文字");
@@ -39,7 +39,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestBookmarkManager_InlineBookmark_DuplicateWrite_ReplacesValue()
+    public void TestBookmarkManagerInlineBookmarkDuplicateWriteReplacesValue()
     {
         using var doc = TextDocument.Create();
         var paragraph = doc.AddParagraph("段落文字");
@@ -60,7 +60,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestBookmarkManager_InlineBookmark_SaveAndReload_DuplicateWrite_ReplacesValue()
+    public void TestBookmarkManagerInlineBookmarkSaveAndReloadDuplicateWriteReplacesValue()
     {
         using var ms = new System.IO.MemoryStream();
 
@@ -95,7 +95,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestBookmarkManager_RangeBookmark_ReadWrite()
+    public void TestBookmarkManagerRangeBookmarkReadWrite()
     {
         using var doc = TextDocument.Create();
         var paragraph = doc.AddParagraph();
@@ -128,7 +128,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestBookmarkManager_RangeBookmark_CrossParagraph_ReadWrite()
+    public void TestBookmarkManagerRangeBookmarkCrossParagraphReadWrite()
     {
         using var doc = TextDocument.Create();
         var p1 = doc.AddParagraph();
@@ -162,7 +162,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestBookmarkManager_NonExistent_ThrowsException()
+    public void TestBookmarkManagerNonExistentThrowsException()
     {
         using var doc = TextDocument.Create();
 
@@ -176,7 +176,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestListBuilder_NestedLists_Generation()
+    public void TestListBuilderNestedListsGeneration()
     {
         using var doc = TextDocument.Create();
 
@@ -217,7 +217,7 @@ public sealed class HighLevelApiExtensionTests
     }
 
     [Fact]
-    public void TestInlineTextBuilder_RichText_Flyweight()
+    public void TestInlineTextBuilderRichTextFlyweight()
     {
         using var doc = TextDocument.Create();
         var p1 = doc.AddParagraph();

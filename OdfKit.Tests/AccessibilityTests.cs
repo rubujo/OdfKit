@@ -46,7 +46,7 @@ public class AccessibilityTests
     /// 驗證 OdfImage.AltText 寫入 svg:desc 節點至 draw:frame 中。
     /// </summary>
     [Fact]
-    public void OdfImage_AltText_WritesSvgDescNode()
+    public void OdfImageAltTextWritesSvgDescNode()
     {
         using var doc = TextDocument.Create();
         var img = doc.Body.Images.Add(
@@ -66,7 +66,7 @@ public class AccessibilityTests
     /// 驗證 OdfImage.AccessibilityTitle 寫入 svg:title 節點。
     /// </summary>
     [Fact]
-    public void OdfImage_AccessibilityTitle_WritesSvgTitleNode()
+    public void OdfImageAccessibilityTitleWritesSvgTitleNode()
     {
         using var doc = TextDocument.Create();
         var img = doc.Body.Images.Add(
@@ -86,7 +86,7 @@ public class AccessibilityTests
     /// 驗證 AltText 和 AccessibilityTitle 可同時存在。
     /// </summary>
     [Fact]
-    public void OdfImage_AltTextAndTitle_BothWritten()
+    public void OdfImageAltTextAndTitleBothWritten()
     {
         using var doc = TextDocument.Create();
         var img = doc.Body.Images.Add(
@@ -109,7 +109,7 @@ public class AccessibilityTests
     /// 驗證 AltText getter 能讀回設定的值。
     /// </summary>
     [Fact]
-    public void OdfImage_AltText_GetterReturnsSetValue()
+    public void OdfImageAltTextGetterReturnsSetValue()
     {
         using var doc = TextDocument.Create();
         var img = doc.Body.Images.Add(
@@ -125,7 +125,7 @@ public class AccessibilityTests
     /// 驗證設定 AltText 為 null 時移除 svg:desc 節點。
     /// </summary>
     [Fact]
-    public void OdfImage_AltText_SetNull_RemovesSvgDesc()
+    public void OdfImageAltTextSetNullRemovesSvgDesc()
     {
         using var doc = TextDocument.Create();
         var img = doc.Body.Images.Add(
@@ -144,7 +144,7 @@ public class AccessibilityTests
     /// 驗證 OdfDocumentMetadata.Language 寫入 dc:language 至 meta.xml。
     /// </summary>
     [Fact]
-    public void DocumentMetadata_Language_WritesDcLanguage()
+    public void DocumentMetadataLanguageWritesDcLanguage()
     {
         using var doc = TextDocument.Create();
         doc.Metadata.Language = "zh-TW";
@@ -159,7 +159,7 @@ public class AccessibilityTests
     /// 驗證 OdfDocumentMetadata.Language getter 讀回設定的語言代碼。
     /// </summary>
     [Fact]
-    public void DocumentMetadata_Language_GetterReturnsSetValue()
+    public void DocumentMetadataLanguageGetterReturnsSetValue()
     {
         using var doc = TextDocument.Create();
         doc.Metadata.Language = "en-US";

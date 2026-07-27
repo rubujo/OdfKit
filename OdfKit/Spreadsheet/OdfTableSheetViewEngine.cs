@@ -14,10 +14,8 @@ internal static class OdfTableSheetViewEngine
 {
     internal static void FreezePanes(OdfTableSheetMutationContext context, int frozenRows, int frozenColumns)
     {
-        if (frozenRows < 0)
-            throw new ArgumentOutOfRangeException(nameof(frozenRows));
-        if (frozenColumns < 0)
-            throw new ArgumentOutOfRangeException(nameof(frozenColumns));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(frozenRows, nameof(frozenRows));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(frozenColumns, nameof(frozenColumns));
 
         context.TableNode.SetAttribute("frozen-rows", OdfNamespaces.Table, frozenRows.ToString(CultureInfo.InvariantCulture), "table");
         context.TableNode.SetAttribute("frozen-columns", OdfNamespaces.Table, frozenColumns.ToString(CultureInfo.InvariantCulture), "table");
@@ -27,10 +25,8 @@ internal static class OdfTableSheetViewEngine
 
     internal static void SplitPanes(OdfTableSheetMutationContext context, int splitRow, int splitColumn)
     {
-        if (splitRow < 0)
-            throw new ArgumentOutOfRangeException(nameof(splitRow));
-        if (splitColumn < 0)
-            throw new ArgumentOutOfRangeException(nameof(splitColumn));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(splitRow, nameof(splitRow));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(splitColumn, nameof(splitColumn));
 
         ApplySplitConfig(context, splitRow, splitColumn, freezeMode: false);
     }

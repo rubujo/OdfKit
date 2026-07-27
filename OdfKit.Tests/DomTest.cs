@@ -32,6 +32,7 @@ namespace OdfKit.Tests
         public void Dispose()
         {
             OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+            GC.SuppressFinalize(this);
         }
 
         [Fact]
@@ -100,12 +101,12 @@ namespace OdfKit.Tests
             var sb = new StringBuilder();
             for (int i = 0; i < 300; i++)
             {
-                sb.Append($"<node_{i}>");
+                sb.Append(System.FormattableString.Invariant($"<node_{i}>"));
             }
             sb.Append("Deep value");
             for (int i = 299; i >= 0; i--)
             {
-                sb.Append($"</node_{i}>");
+                sb.Append(System.FormattableString.Invariant($"</node_{i}>"));
             }
 
             string xml = sb.ToString();
@@ -303,7 +304,7 @@ namespace OdfKit.Tests
                             sigXml = sr.ReadToEnd();
                         }
                         catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
-                        throw new Exception("Signature verification failed. Logs:\n" + string.Join("\n", logs) + "\nSignature XML:\n" + sigXml);
+                        throw new InvalidOperationException("Signature verification failed. Logs:\n" + string.Join("\n", logs) + "\nSignature XML:\n" + sigXml);
                     }
                     Assert.Single(certs);
                     Assert.Contains("CN=OdfKitTest", certs[0].Subject);
@@ -319,7 +320,7 @@ namespace OdfKit.Tests
                     bool isValid = OdfSigner.VerifySignatures(package, out var certs);
                     if (!isValid)
                     {
-                        throw new Exception("Signature verification failed on reopened package. Logs:\n" + string.Join("\n", logs));
+                        throw new InvalidOperationException("Signature verification failed on reopened package. Logs:\n" + string.Join("\n", logs));
                     }
                 }
             }

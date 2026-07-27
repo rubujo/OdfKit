@@ -8,6 +8,13 @@ namespace OdfKit.Tools.OdfSchemaGenerator;
 
 public sealed class DomWrappersCSharpWriter
 {
+    private static readonly string[] FrozenCollectionUsings =
+    [
+        "#if NET8_0_OR_GREATER",
+        "using System.Collections.Frozen;",
+        "#endif"
+    ];
+    private static readonly char[] NameSeparators = ['-', '_', ':', '.'];
     private static readonly HashSet<string> HandWrittenClasses = new HashSet<string>(StringComparer.Ordinal)
     {
         "TextPElement", "TextHElement", "TextSpanElement", "TextListElement", "TextListItemElement",
@@ -22,7 +29,7 @@ public sealed class DomWrappersCSharpWriter
         "ManifestManifestElement", "ManifestFileEntryElement", "ManifestEncryptionDataElement"
     };
 
-    public void Write(SchemaMetadata metadata, TextWriter writer)
+    public static void Write(SchemaMetadata metadata, TextWriter writer)
     {
         var elementAttributes = ResolveAllElementAttributes(metadata);
         var elementChildRelations = ResolveAllElementChildRelations(metadata);
@@ -31,12 +38,7 @@ public sealed class DomWrappersCSharpWriter
             .ThenBy(e => e.LocalName, StringComparer.Ordinal)
             .ToList();
 
-        WriteFileHeader(writer, new[]
-        {
-            "#if NET8_0_OR_GREATER",
-            "using System.Collections.Frozen;",
-            "#endif"
-        });
+        WriteFileHeader(writer, FrozenCollectionUsings);
         writer.WriteLine("namespace OdfKit.DOM");
         writer.WriteLine("{");
         WriteElementWrappers(writer, sortedElements, elementAttributes, elementChildRelations);
@@ -45,12 +47,9 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("}");
     }
 
-    public void WriteToDirectory(SchemaMetadata metadata, string outputDirectory, TextWriter? errorLog = null)
+    public static void WriteToDirectory(SchemaMetadata metadata, string outputDirectory, TextWriter? errorLog = null)
     {
-        if (metadata is null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
+        ArgumentNullException.ThrowIfNull(metadata, nameof(metadata));
 
         if (string.IsNullOrWhiteSpace(outputDirectory))
         {
@@ -121,12 +120,7 @@ public sealed class DomWrappersCSharpWriter
 
         string factoryPath = Path.Combine(outputDirectory, "GeneratedDomFactory.g.cs");
         using var factoryWriter = new StreamWriter(factoryPath, append: false, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        WriteFileHeader(factoryWriter, new[]
-        {
-            "#if NET8_0_OR_GREATER",
-            "using System.Collections.Frozen;",
-            "#endif"
-        });
+        WriteFileHeader(factoryWriter, FrozenCollectionUsings);
         factoryWriter.WriteLine("namespace OdfKit.DOM");
         factoryWriter.WriteLine("{");
         WriteFactory(factoryWriter, sortedElements);
@@ -531,7 +525,7 @@ public sealed class DomWrappersCSharpWriter
         {
             string childClassName = GetElementClassName(child.NamespaceUri, child.LocalName);
             string propertyName = childClassName.EndsWith("Element", StringComparison.Ordinal)
-                ? childClassName.Substring(0, childClassName.Length - "Element".Length) + "ChildElements"
+                ? string.Concat(childClassName.AsSpan(0, childClassName.Length - "Element".Length), "ChildElements")
                 : childClassName + "ChildElements";
             if (!usedNames.Add(propertyName))
             {
@@ -2593,7 +2587,7 @@ public sealed class DomWrappersCSharpWriter
     {
         if (string.IsNullOrEmpty(s))
             return string.Empty;
-        var parts = s.Split(new[] { '-', '_', ':', '.' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = s.Split(NameSeparators, StringSplitOptions.RemoveEmptyEntries);
         var pascalParts = parts.Select(p =>
         {
             if (p.Length == 0)

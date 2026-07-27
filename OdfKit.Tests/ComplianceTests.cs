@@ -21,6 +21,15 @@ namespace OdfKit.Tests
     [Trait(TestCategories.Kind, TestCategories.Compliance)]
     public partial class ComplianceTests
     {
+        private static readonly string[] SchemaPatternExtensions = [".odt", ".fodt"];
+        private static readonly string[] SchemaPatternMediaTypes = ["application/vnd.oasis.opendocument.text"];
+        private static readonly OdfPolicyRule[] SchemaPatternRules =
+        [
+            new(
+                "RequireSchemaPatternValidation",
+                "Validate the XML root element against generated RELAX NG pattern metadata.",
+                OdfIssueSeverity.Error)
+        ];
         [Fact]
         public void BuiltInProfilesIncludeRequiredFirstWaveProfiles()
         {
@@ -2511,15 +2520,9 @@ namespace OdfKit.Tests
                 OdfPolicyAuthorityLevel.Compatibility,
                 OdfProfileVerificationStatus.CompatibilityOnly,
                 OdfVersionRange.Exact(OdfVersion.Odf14),
-                new[] { ".odt", ".fodt" },
-                new[] { "application/vnd.oasis.opendocument.text" },
-                new[]
-                {
-                    new OdfPolicyRule(
-                        "RequireSchemaPatternValidation",
-                        "Validate the XML root element against generated RELAX NG pattern metadata.",
-                        OdfIssueSeverity.Error)
-                });
+                SchemaPatternExtensions,
+                SchemaPatternMediaTypes,
+                SchemaPatternRules);
         }
 
         private static OdfSchemaSet CreateRootPatternSchema(string rootLocalName, string requiredAttributeLocalName)

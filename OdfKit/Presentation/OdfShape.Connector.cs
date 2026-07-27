@@ -42,8 +42,7 @@ public partial class OdfShape
     /// <exception cref="InvalidOperationException">When the shape is not a connector line. / 當圖形不是連接線時擲出。</exception>
     public OdfShape SetConnectorRoutePoints(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
-        if (points is null)
-            throw new ArgumentNullException(nameof(points));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(points, nameof(points));
 
         string pointsStr = string.Join(
             " ",

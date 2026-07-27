@@ -45,10 +45,7 @@ public class ChartDocument : OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="chartDefinition"/> is <see langword="null"/>. / 當 <paramref name="chartDefinition"/> 為 <see langword="null"/> 時擲出。</exception>
     public static ChartDocument Create(OdfChartDefinition chartDefinition)
     {
-        if (chartDefinition is null)
-        {
-            throw new ArgumentNullException(nameof(chartDefinition));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chartDefinition, nameof(chartDefinition));
 
         var doc = (ChartDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Chart);
 
@@ -278,10 +275,7 @@ public class ChartDocument : OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is <see langword="null"/>. / 當 <paramref name="data"/> 為 <see langword="null"/> 時擲出。</exception>
     public void UpdateData(IEnumerable<IEnumerable<object?>> data)
     {
-        if (data is null)
-        {
-            throw new ArgumentNullException(nameof(data));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(data, nameof(data));
 
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         OdfNode chartRoot = FindOrCreateChild(body, "chart", OdfNamespaces.Office, "office");
@@ -358,8 +352,8 @@ public class ChartDocument : OdfChartDocument
                         case DateTime date:
                             cellNode.SetAttribute("value-type", OdfNamespaces.Office, "date", "office");
                             string isoDate = (date == DateTime.MinValue || date == DateTime.MaxValue)
-                                ? date.ToString("yyyy-MM-ddTHH:mm:ss") + "Z"
-                                : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                                ? date.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + "Z"
+                                : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
                             cellNode.SetAttribute("date-value", OdfNamespaces.Office, isoDate, "office");
                             OdfNode pNodeDate = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
                             pNodeDate.TextContent = isoDate;

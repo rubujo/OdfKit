@@ -30,8 +30,7 @@ public sealed class DrawingDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         configure(new TextDocumentMetadataBuilder(new OdfDocumentMetadata(_document)));
         return this;
     }
@@ -68,8 +67,7 @@ public sealed class DrawingDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var styles = new OdfStyleSet();
         configure(styles);
@@ -97,8 +95,7 @@ public sealed class DrawingDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder AddPage(string name, Action<OdfDrawPageBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         OdfDrawPage page = _document.AddPage(name);
         configure(new OdfDrawPageBuilder(page, _theme, _layoutPreset));
         _pageCount++;
@@ -139,10 +136,7 @@ public sealed class DrawingDocumentBuilder
         OdfConnectorType connectorType,
         OdfFlowLayoutOptions? layoutOptions)
     {
-        if (steps is null)
-        {
-            throw new ArgumentNullException(nameof(steps));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(steps, nameof(steps));
 
         OdfFlowStepRequest[] snapshot = steps.ToArray();
         return AddPage(pageName, page =>
@@ -570,8 +564,7 @@ public sealed class OdfDrawPageBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddGroup(string name, Action<OdfDrawGroupBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         OdfDrawGroup group = _page.AddGroup(name);
         configure(new OdfDrawGroupBuilder(group, _theme));

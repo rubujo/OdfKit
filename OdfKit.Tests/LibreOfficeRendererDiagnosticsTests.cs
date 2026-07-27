@@ -28,6 +28,7 @@ namespace OdfKit.Tests
         public void Dispose()
         {
             OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+            GC.SuppressFinalize(this);
         }
 
         [Fact]
@@ -265,10 +266,10 @@ namespace OdfKit.Tests
             }
         }
 
-        private async Task<string?> CaptureSandboxDirAsync(Action runAction)
+        private static async Task<string?> CaptureSandboxDirAsync(Action runAction)
         {
             var tempPath = Path.GetTempPath();
-            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var currentPid = Environment.ProcessId;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -318,7 +319,7 @@ namespace OdfKit.Tests
             return detectedDir;
         }
 
-        private string GetMockSofficePath()
+        private static string GetMockSofficePath()
         {
             return MockSofficeFinder.GetMockSofficePath();
         }

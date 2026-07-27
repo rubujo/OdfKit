@@ -16,7 +16,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 預先取消的語彙應使 SaveAsync(path) 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SaveAsync_Path_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SaveAsyncPathPreCancelledTokenThrowsOperationCanceledException()
     {
         string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".odt");
         try
@@ -43,7 +43,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 預先取消的語彙應使 SaveAsync(stream) 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SaveAsync_Stream_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SaveAsyncStreamPreCancelledTokenThrowsOperationCanceledException()
     {
         using var doc = TextDocument.Create();
         doc.Body.Paragraphs.Add("取消測試");
@@ -62,7 +62,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 預先取消的語彙應使 LoadAsync(stream) 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task LoadAsync_Stream_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task LoadAsyncStreamPreCancelledTokenThrowsOperationCanceledException()
     {
         await using var source = await CreateMinimalOdtStreamAsync(TestContext.Current.CancellationToken);
         source.Position = 0;
@@ -80,7 +80,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 預先取消的語彙應使 LoadAsync(path) 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task LoadAsync_Path_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task LoadAsyncPathPreCancelledTokenThrowsOperationCanceledException()
     {
         string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".odt");
         try
@@ -108,7 +108,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 預先取消的語彙應使 VerifySignaturesAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task VerifySignaturesAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task VerifySignaturesAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var doc = TextDocument.Create();
         doc.Body.Paragraphs.Add("簽章驗證取消測試");
@@ -126,7 +126,7 @@ public class OdfDocumentAsyncCancellationTests
     /// 未取消時 SaveAsync(stream) 應成功寫入可載入的 ODF 文件。
     /// </summary>
     [Fact]
-    public async Task SaveAsync_Stream_DefaultToken_CompletesSuccessfully()
+    public async Task SaveAsyncStreamDefaultTokenCompletesSuccessfully()
     {
         using var doc = TextDocument.Create();
         doc.Body.Paragraphs.Add("非同步儲存");

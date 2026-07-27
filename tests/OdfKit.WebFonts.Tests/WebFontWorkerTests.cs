@@ -8,7 +8,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class WebFontWorkerTests
 {
     [Fact]
-    public async Task Worker_ReusesCompletedManifestWithoutRegeneration()
+    public async Task WorkerReusesCompletedManifestWithoutRegeneration()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -30,7 +30,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_SeparatesBrowserCompatibilityRequirementsInCacheKey()
+    public async Task WorkerSeparatesBrowserCompatibilityRequirementsInCacheKey()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -69,7 +69,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_RejectsInvalidNullableStateBeforeCreatingKey()
+    public async Task WorkerRejectsInvalidNullableStateBeforeCreatingKey()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(engine, new WebFontWorkerOptions());
@@ -91,7 +91,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_RejectsInvalidSourceDigestBeforeQueueing()
+    public async Task WorkerRejectsInvalidSourceDigestBeforeQueueing()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(engine, new WebFontWorkerOptions());
@@ -117,7 +117,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_CoalescesConcurrentIdenticalRequests()
+    public async Task WorkerCoalescesConcurrentIdenticalRequests()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -135,7 +135,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_BoundsConcurrencyAcrossTenThousandRequests()
+    public async Task WorkerBoundsConcurrencyAcrossTenThousandRequests()
     {
         var engine = new ConcurrencyTrackingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -160,7 +160,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_CoalescesSemanticallyEquivalentReorderedRequests()
+    public async Task WorkerCoalescesSemanticallyEquivalentReorderedRequests()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -203,7 +203,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DoesNotCoalesceLengthPrefixedFieldsWithDelimiterCollision()
+    public async Task WorkerDoesNotCoalesceLengthPrefixedFieldsWithDelimiterCollision()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -244,7 +244,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DoesNotCoalesceRequestsWithDifferentSequenceOrder()
+    public async Task WorkerDoesNotCoalesceRequestsWithDifferentSequenceOrder()
     {
         var engine = new CountingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -274,7 +274,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_RejectsWorkBeyondBoundedQueueCapacity()
+    public async Task WorkerRejectsWorkBeyondBoundedQueueCapacity()
     {
         var engine = new BlockingEngine();
         await using var worker = new WebFontGenerationWorker(
@@ -309,7 +309,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DisposeCompletesRunningAndQueuedWaiters()
+    public async Task WorkerDisposeCompletesRunningAndQueuedWaiters()
     {
         var engine = new BlockingEngine();
         var worker = new WebFontGenerationWorker(
@@ -343,7 +343,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheCoalescesAcrossWorkerInstances()
+    public async Task WorkerDurableCacheCoalescesAcrossWorkerInstances()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -383,7 +383,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsTamperedAsset()
+    public async Task WorkerDurableCacheRejectsTamperedAsset()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -419,7 +419,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRevalidatesAssetWithinSameWorker()
+    public async Task WorkerDurableCacheRevalidatesAssetWithinSameWorker()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -455,7 +455,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsAssetBeyondConfiguredLimit()
+    public async Task WorkerDurableCacheRejectsAssetBeyondConfiguredLimit()
     {
         string root = CreateTemporaryRoot();
         try
@@ -482,7 +482,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsNullDigestWithoutLeakingNullReference()
+    public async Task WorkerDurableCacheRejectsNullDigestWithoutLeakingNullReference()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -509,7 +509,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsMissingRequestedFormat()
+    public async Task WorkerDurableCacheRejectsMissingRequestedFormat()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -545,7 +545,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsUnicodeRangeMismatch()
+    public async Task WorkerDurableCacheRejectsUnicodeRangeMismatch()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -572,7 +572,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheAcceptsCanonicalContiguousUnicodeRange()
+    public async Task WorkerDurableCacheAcceptsCanonicalContiguousUnicodeRange()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -608,7 +608,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheUsesSharedPolicyForIvsJoinersAndSpaces()
+    public async Task WorkerDurableCacheUsesSharedPolicyForIvsJoinersAndSpaces()
     {
         string root = CreateTemporaryRoot();
         try
@@ -641,7 +641,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCachePrunesLeastRecentlyUsedManifests()
+    public async Task WorkerDurableCachePrunesLeastRecentlyUsedManifests()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");
@@ -679,7 +679,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCachePrunesOldUnreferencedAssetsWithinBudget()
+    public async Task WorkerDurableCachePrunesOldUnreferencedAssetsWithinBudget()
     {
         string root = CreateTemporaryRoot();
         try
@@ -722,7 +722,7 @@ public sealed class WebFontWorkerTests
     }
 
     [Fact]
-    public async Task Worker_DurableCacheRejectsLinkedAssetDirectory()
+    public async Task WorkerDurableCacheRejectsLinkedAssetDirectory()
     {
         string root = CreateTemporaryRoot();
         string assets = Path.Combine(root, "assets");

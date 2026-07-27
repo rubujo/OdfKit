@@ -10,7 +10,7 @@
       "converter": "OdfToDocxConverter",
       "baselineRenderer": "libreoffice-pdf",
       "candidateRenderer": "microsoft-word-pdf",
-      "test": "OfficeInteropConversionTests.WordAndLibreOffice_RenderConvertedDocxToPdf",
+      "test": "OfficeInteropConversionTests.WordAndLibreOfficeRenderConvertedDocxToPdf",
       "sampleFeatures": ["heading", "styled-run", "table", "header-footer", "tracked-changes-forward"]
     },
     {
@@ -20,7 +20,7 @@
       "converter": "OdfToXlsxConverter",
       "baselineRenderer": "libreoffice-pdf",
       "candidateRenderer": "microsoft-excel-pdf",
-      "test": "OfficeInteropConversionTests.ExcelAndLibreOffice_RenderConvertedXlsxToPdf",
+      "test": "OfficeInteropConversionTests.ExcelAndLibreOfficeRenderConvertedXlsxToPdf",
       "sampleFeatures": ["formula", "embedded-chart", "data-validation", "pivot-table-roundtrip"]
     }
   ]

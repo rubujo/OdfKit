@@ -33,6 +33,7 @@ namespace OdfKit.Tests
         public void Dispose()
         {
             OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+            GC.SuppressFinalize(this);
         }
 
         [Fact]
@@ -231,7 +232,7 @@ namespace OdfKit.Tests
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Boundary_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
 
             var tempPath = Path.GetTempPath();
-            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var currentPid = Environment.ProcessId;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -408,11 +409,11 @@ namespace OdfKit.Tests
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
         }
 
-        private async Task<string?> CaptureSandboxDirAsync(Action runAction)
+        private static async Task<string?> CaptureSandboxDirAsync(Action runAction)
         {
             LogDebug("CaptureSandboxDirAsync started");
             var tempPath = Path.GetTempPath();
-            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var currentPid = Environment.ProcessId;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -481,11 +482,11 @@ namespace OdfKit.Tests
             return detectedDir;
         }
 
-        private async Task<List<string>> CaptureArgumentsAsync(Action runAction, Func<List<string>, bool>? validator = null)
+        private static async Task<List<string>> CaptureArgumentsAsync(Action runAction, Func<List<string>, bool>? validator = null)
         {
             LogDebug("CaptureArgumentsAsync started");
             var tempPath = Path.GetTempPath();
-            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var currentPid = Environment.ProcessId;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             string capturePath = Path.Combine(tempPath, "OdfKit_MockSoffice_Args_" + Guid.NewGuid().ToString("N") + ".txt");
@@ -620,11 +621,11 @@ namespace OdfKit.Tests
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
 
-            LogDebug($"CaptureArgumentsAsync finished, returning {(capturedArgs != null ? capturedArgs.Count.ToString() : "null")} arguments");
+            LogDebug($"CaptureArgumentsAsync finished, returning {(capturedArgs != null ? capturedArgs.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null")} arguments");
             return capturedArgs ?? new List<string>();
         }
 
-        private string GetMockSofficePath()
+        private static string GetMockSofficePath()
         {
             return MockSofficeFinder.GetMockSofficePath();
         }
@@ -763,7 +764,7 @@ namespace OdfKit.Tests
             var tasks = new List<Task>();
 
             var tempPath = Path.GetTempPath();
-            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var currentPid = Environment.ProcessId;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var baselineDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
 
@@ -907,7 +908,7 @@ namespace OdfKit.Tests
                 sb.AppendLine("Captured arguments:");
                 foreach (var a in arguments)
                 {
-                    sb.AppendLine($"- '{a}'");
+                    sb.AppendLine(System.FormattableString.Invariant($"- '{a}'"));
                 }
                 Assert.Fail($"Expected format containing shell metacharacters to be passed as a single intact argument. {sb}");
             }

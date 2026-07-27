@@ -28,10 +28,8 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaSet schema,
         string patternName)
     {
-        if (element is null)
-            throw new ArgumentNullException(nameof(element));
-        if (schema is null)
-            throw new ArgumentNullException(nameof(schema));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(element, nameof(element));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(schema, nameof(schema));
         if (string.IsNullOrWhiteSpace(patternName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSchemaPatternValidator_PatternCannotBeEmpty"), nameof(patternName));
 

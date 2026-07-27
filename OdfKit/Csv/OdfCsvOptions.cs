@@ -36,7 +36,7 @@ public sealed class OdfCsvOptions
     /// Gets the ExportSheetIndex value.
     /// 取得或設定匯出時的工作表索引（從 0 開始），預設為 0。
     /// </summary>
-    public int ExportSheetIndex { get; init; } = 0;
+    public int ExportSheetIndex { get; init; }
 
     /// <summary>
     /// Gets a value indicating the SanitizeFormulas state.

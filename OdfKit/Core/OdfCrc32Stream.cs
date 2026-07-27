@@ -160,7 +160,7 @@ public sealed class OdfCrc32Stream : Stream
         uint finalCrc = Crc32;
         if (finalCrc != _expectedCrc!.Value)
         {
-            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", _expectedCrc.Value.ToString("X8"), finalCrc.ToString("X8")));
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", _expectedCrc.Value.ToString("X8", System.Globalization.CultureInfo.InvariantCulture), finalCrc.ToString("X8", System.Globalization.CultureInfo.InvariantCulture)));
         }
     }
 

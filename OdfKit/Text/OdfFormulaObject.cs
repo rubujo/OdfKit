@@ -82,7 +82,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
             if (value is not null)
             {
                 // 目錄穿越防禦 (Zip Slip Defense)：在指定資料夾路徑時執行嚴格的路徑驗證
-                if (value.Contains("..") || value.Contains("\\") || value.StartsWith("/"))
+                if (value.Contains("..") || value.Contains('\\') || global::OdfKit.Internal.OdfStringHelper.StartsWith(value, '/'))
                 {
                     throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaObject_InvalidFormulaFolderPath_2"));
                 }
@@ -128,12 +128,12 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
             string? folder = FormulaFolder;
             if (folder is null || folder.Length == 0)
             {
-                folder = $"Formula_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+                folder = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("Formula_");
                 FormulaFolder = folder;
             }
 
             // 針對目錄穿越 (Zip Slip) 的防禦性檢查
-            if (folder.Contains("..") || folder.Contains("\\") || folder.StartsWith("/"))
+            if (folder.Contains("..") || folder.Contains('\\') || global::OdfKit.Internal.OdfStringHelper.StartsWith(folder, '/'))
             {
                 throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaObject_InvalidFormulaFolderPath_2"));
             }
@@ -155,14 +155,14 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
         }
     }
 
-    private string ExtractFormulaContent(string documentXml)
+    private static string ExtractFormulaContent(string documentXml)
     {
         if (string.IsNullOrWhiteSpace(documentXml))
             return string.Empty;
 
-        int start = documentXml.IndexOf("<office:formula>");
+        int start = documentXml.IndexOf("<office:formula>", System.StringComparison.Ordinal);
         if (start == -1)
-            start = documentXml.IndexOf("<office:formula ");
+            start = documentXml.IndexOf("<office:formula ", System.StringComparison.Ordinal);
         if (start == -1)
             return string.Empty;
 
@@ -170,7 +170,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
         if (closeTagStart == -1)
             return string.Empty;
 
-        int end = documentXml.IndexOf("</office:formula>", closeTagStart);
+        int end = documentXml.IndexOf("</office:formula>", closeTagStart, System.StringComparison.Ordinal);
         if (end == -1)
             return string.Empty;
 

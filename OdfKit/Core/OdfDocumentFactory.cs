@@ -64,8 +64,7 @@ public static class OdfDocumentFactory
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(string path, OdfLoadOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         OdfPackage package = OdfPackage.Open(path, options);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, path));
@@ -100,8 +99,7 @@ public static class OdfDocumentFactory
         OdfLoadOptions? options,
         CancellationToken cancellationToken)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         OdfPackage package = await OdfPackage.OpenAsync(path, options, cancellationToken).ConfigureAwait(false);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, path));
@@ -136,8 +134,7 @@ public static class OdfDocumentFactory
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         OdfPackage package = OdfPackage.Open(stream, leaveOpen: false, options: options);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, fileName));
@@ -189,8 +186,7 @@ public static class OdfDocumentFactory
         string? fileName,
         CancellationToken cancellationToken)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         OdfPackage package = await OdfPackage.OpenAsync(stream, leaveOpen: false, options: options, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -238,8 +234,7 @@ public static class OdfDocumentFactory
         bool leaveOpen,
         OdfSaveOptions? options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCreated_2"), nameof(kind));
 
@@ -271,8 +266,7 @@ public static class OdfDocumentFactory
         OdfVersion version,
         OdfSaveOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCreated_2"), nameof(kind));
 
@@ -299,10 +293,8 @@ public static class OdfDocumentFactory
     /// <param name="options">The flat XML write options. / Flat XML 寫入選項。</param>
     public static void WriteFlatXml(Stream stream, OdfDocumentKind kind, OdfFlatXmlWriteOptions options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         OdfDocumentKind flatKind = OdfDocumentKindDetector.ToFlatKind(kind);
         if (!OdfDocumentKindDetector.IsFlatKind(flatKind))
@@ -350,8 +342,7 @@ public static class OdfDocumentFactory
     /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
     public static void InitializeMinimalPackage(OdfPackage package, OdfDocumentKind kind, OdfVersion version)
     {
-        if (package is null)
-            throw new ArgumentNullException(nameof(package));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCannot"), nameof(kind));
 

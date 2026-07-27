@@ -70,7 +70,7 @@ public class OdfSaveOptions
     /// Gets or sets a value indicating whether XML entries should be indented for diagnostics.
     /// 取得或設定是否為了診斷目的縮排 XML 專案。
     /// </summary>
-    public bool IndentXml { get; set; } = false;
+    public bool IndentXml { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether repeat saves should produce deterministic ZIP metadata.
@@ -80,7 +80,7 @@ public class OdfSaveOptions
     /// When enabled, ZIP entry timestamps are pinned so unchanged content produces repeatable binary hashes.
     /// 啟用時，所有 ZIP 封裝項目的 LastWriteTime 會固定，讓內容不變時產生可重複的二進位雜湊值。
     /// </remarks>
-    public bool Deterministic { get; set; } = false;
+    public bool Deterministic { get; set; }
 
     /// <summary>
     /// Gets or sets the ODF version to force into saved package metadata.
@@ -124,19 +124,19 @@ public class OdfSaveOptions
     /// Gets or sets a value indicating whether fonts referenced by the document are embedded on save.
     /// 取得或設定儲存時是否內嵌文件參照的字型。
     /// </summary>
-    public bool EmbedUsedFonts { get; set; } = false;
+    public bool EmbedUsedFonts { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether spreadsheet formulas are evaluated before saving.
     /// 取得或設定儲存前是否計算試算表公式。
     /// </summary>
-    public bool EvaluateFormulasOnSave { get; set; } = false;
+    public bool EvaluateFormulasOnSave { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether Direct I/O is used for uncached package writes.
     /// 取得或設定是否啟用 Direct I/O 進行非快取封裝寫入。
     /// </summary>
-    public bool EnableDirectIo { get; set; } = false;
+    public bool EnableDirectIo { get; set; }
 
     /// <summary>
     /// Gets or sets the password used to encrypt the saved ODF document.

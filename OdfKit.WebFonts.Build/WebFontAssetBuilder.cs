@@ -220,7 +220,7 @@ public sealed class WebFontAssetBuilder
             return [sequences];
         }
 
-        IReadOnlyList<IReadOnlyList<WebFontTextSequence>> slices = sequences
+        IReadOnlyList<WebFontTextSequence>[] slices = sequences
             .GroupBy(sequence => GetBaseScalar(sequence) / options.UnicodeRangeSliceSize)
             .OrderBy(group => group.Key)
             .Select(group => (IReadOnlyList<WebFontTextSequence>)group
@@ -228,7 +228,7 @@ public sealed class WebFontAssetBuilder
                 .ThenBy(sequence => string.Join(",", sequence.UnicodeScalars), StringComparer.Ordinal)
                 .ToArray())
             .ToArray();
-        if (slices.Count > options.MaxSliceCount)
+        if (slices.Length > options.MaxSliceCount)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }

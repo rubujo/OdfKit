@@ -42,7 +42,7 @@ namespace OdfKit.Tests
         // ==========================================
 
         [Fact]
-        public void OdfTemplate_Text_Creation_And_Detection()
+        public void OdfTemplateTextCreationAndDetection()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.TextTemplate, leaveOpen: true))
@@ -66,7 +66,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdfTemplate_Spreadsheet_Creation_And_Detection()
+        public void OdfTemplateSpreadsheetCreationAndDetection()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.SpreadsheetTemplate, leaveOpen: true))
@@ -91,7 +91,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdfTemplate_Presentation_Creation_And_Detection()
+        public void OdfTemplatePresentationCreationAndDetection()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.PresentationTemplate, leaveOpen: true))
@@ -114,7 +114,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdfTemplate_Graphics_Creation_And_Detection()
+        public void OdfTemplateGraphicsCreationAndDetection()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.GraphicsTemplate, leaveOpen: true))
@@ -128,7 +128,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdfFlatXml_Fodt_RoundTrip()
+        public void OdfFlatXmlFodtRoundTrip()
         {
             using var ms = new MemoryStream();
             OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
@@ -147,7 +147,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdfFlatXml_Fods_RoundTrip()
+        public void OdfFlatXmlFodsRoundTrip()
         {
             using var ms = new MemoryStream();
             OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatSpreadsheet, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
@@ -164,7 +164,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_OccurrenceCardinality()
+        public void ValidationOccurrenceCardinality()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -213,7 +213,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_W3CDatatypes_Basic()
+        public void ValidationW3CDatatypesBasic()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -256,7 +256,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_CustomFacets_LengthAndPattern()
+        public void ValidationCustomFacetsLengthAndPattern()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -319,7 +319,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_NameClassExcept()
+        public void ValidationNameClassExcept()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -357,7 +357,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_Interleave_Basic()
+        public void ValidationInterleaveBasic()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -399,7 +399,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Validation_DatatypeValueExcept()
+        public void ValidationDatatypeValueExcept()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -444,7 +444,7 @@ namespace OdfKit.Tests
         // ==========================================
 
         [Fact]
-        public void Mismatched_Extension_And_Mimetype()
+        public void MismatchedExtensionAndMimetype()
         {
             var flatXml = new XDocument(
                 new XElement(OfficeNs + "document",
@@ -465,7 +465,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Invalid_Or_Missing_FlatXml_Root()
+        public void InvalidOrMissingFlatXmlRoot()
         {
             var badXml = new XDocument(
                 new XElement("not-document",
@@ -482,7 +482,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void FlatXml_Detection_From_Invalid_Extension_But_Correct_Mimetype()
+        public void FlatXmlDetectionFromInvalidExtensionButCorrectMimetype()
         {
             var flatXml = new XDocument(
                 new XElement(OfficeNs + "document",
@@ -505,7 +505,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void FlatXml_With_Huge_Base64_Embedded_Asset()
+        public void FlatXmlWithHugeBase64EmbeddedAsset()
         {
             var base64Builder = new StringBuilder();
             for (int i = 0; i < 100000; i++)
@@ -536,7 +536,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Template_With_Duplicate_Mimetype_File()
+        public void TemplateWithDuplicateMimetypeFile()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.TextTemplate, leaveOpen: true))
@@ -555,7 +555,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Interleave_Backtracking_Performance_Caching()
+        public void InterleaveBacktrackingPerformanceCaching()
         {
             // RNG pattern: Interleave(Optional(A), Optional(B), Optional(C), Optional(D))
             var pattern = new OdfSchemaPatternDefinition("root", new[]
@@ -604,7 +604,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void ScaleAware_Numerical_Facet_Comparisons()
+        public void ScaleAwareNumericalFacetComparisons()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -643,7 +643,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Datetime_Timezone_And_EdgeValues()
+        public void DatetimeTimezoneAndEdgeValues()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -680,7 +680,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Strict_ODF14_Namespace_Enforcement()
+        public void StrictODF14NamespaceEnforcement()
         {
             // Verify flat ODF validator with strict profile rejects elements outside allowed namespaces
             var xmlWithForeignNamespace = new XDocument(
@@ -700,11 +700,11 @@ namespace OdfKit.Tests
             ms.Position = 0;
 
             var report = OdfFlatDocumentValidator.Validate(ms, new OdfValidationOptions { FileName = "document.fodt", Profile = OdfComplianceProfiles.OasisOdf14Strict });
-            Assert.Contains(report.Issues, i => i.Severity == OdfIssueSeverity.Error && (i.RuleId.StartsWith("ODF") || i.RuleId == "DisallowInvalidOdfNamespaceExtensions"));
+            Assert.Contains(report.Issues, i => i.Severity == OdfIssueSeverity.Error && (i.RuleId.StartsWith("ODF", System.StringComparison.Ordinal) || i.RuleId == "DisallowInvalidOdfNamespaceExtensions"));
         }
 
         [Fact]
-        public void Datatype_Validation_Invalid_Base64_And_HexBinary()
+        public void DatatypeValidationInvalidBase64AndHexBinary()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -753,7 +753,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void NameClassExcept_Nested_Inside_Choice_With_No_Match()
+        public void NameClassExceptNestedInsideChoiceWithNoMatch()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -805,7 +805,7 @@ namespace OdfKit.Tests
         // ==========================================
 
         [Fact]
-        public void Template_Saved_As_FlatXml_Validation()
+        public void TemplateSavedAsFlatXmlValidation()
         {
             using var ms = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(ms, OdfDocumentKind.TextTemplate, leaveOpen: true))
@@ -825,7 +825,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Custom_Facets_Inside_Interleaved_Elements()
+        public void CustomFacetsInsideInterleavedElements()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -898,7 +898,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void NameClassExcept_With_DatatypeValueExcept()
+        public void NameClassExceptWithDatatypeValueExcept()
         {
             var pattern = new OdfSchemaPatternDefinition("root", new[]
             {
@@ -954,7 +954,7 @@ namespace OdfKit.Tests
             );
 
             var result = OdfSchemaPatternValidator.ValidateElement(valid, schema, "root");
-            Assert.True(result.IsMatch, result.Issues.FirstOrDefault()?.Message ?? "No error message");
+            Assert.True(result.IsMatch, result.Issues.Count > 0 ? result.Issues[0].Message : "No error message");
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidName, schema, "root").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidValue, schema, "root").IsMatch);
         }
@@ -964,7 +964,7 @@ namespace OdfKit.Tests
         // ==========================================
 
         [Fact]
-        public void RealWorld_TextTemplate_Instantiation()
+        public void RealWorldTextTemplateInstantiation()
         {
             using var templateStream = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(templateStream, OdfDocumentKind.TextTemplate, leaveOpen: true))
@@ -1000,7 +1000,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void RealWorld_SpreadsheetTemplate_With_Data()
+        public void RealWorldSpreadsheetTemplateWithData()
         {
             using var templateStream = new MemoryStream();
             using (var package = OdfDocumentFactory.CreatePackage(templateStream, OdfDocumentKind.SpreadsheetTemplate, leaveOpen: true))
@@ -1041,7 +1041,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void RealWorld_FlatXml_Document_Generator()
+        public void RealWorldFlatXmlDocumentGenerator()
         {
             using var flatMs = new MemoryStream();
             OdfDocumentFactory.WriteFlatXml(flatMs, OdfDocumentKind.FlatText, new OdfFlatXmlWriteOptions { Version = OdfVersion.Odf14, LeaveOpen = true });
@@ -1081,7 +1081,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Complex_MathML_Formula_Validation()
+        public void ComplexMathMLFormulaValidation()
         {
             // Test validation of MathML math elements within ODF content
             XNamespace mathmlNs = "http://www.w3.org/1998/Math/MathML";
@@ -1232,7 +1232,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Document_Metadata_And_CustomProperties_Validation()
+        public void DocumentMetadataAndCustomPropertiesValidation()
         {
             XNamespace dc = OdfNamespaces.Dc;
             var metadataXml = new XElement(OfficeNs + "document-meta",

@@ -12,7 +12,7 @@ namespace OdfKit.Tests;
 public class OdfPackageAutoMediaTypeTests
 {
     [Fact]
-    public void WriteEntry_WithoutMediaType_AutoResolvesFromEntryPath()
+    public void WriteEntryWithoutMediaTypeAutoResolvesFromEntryPath()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -25,7 +25,7 @@ public class OdfPackageAutoMediaTypeTests
     }
 
     [Fact]
-    public void WriteEntry_StreamWithoutMediaType_AutoUpdatesEmbeddedDocumentMime()
+    public void WriteEntryStreamWithoutMediaTypeAutoUpdatesEmbeddedDocumentMime()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -40,7 +40,7 @@ public class OdfPackageAutoMediaTypeTests
     }
 
     [Fact]
-    public void AddEntry_WithoutMediaType_AutoResolvesManifestMediaTypes()
+    public void AddEntryWithoutMediaTypeAutoResolvesManifestMediaTypes()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");

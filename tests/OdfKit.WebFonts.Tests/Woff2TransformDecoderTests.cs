@@ -398,7 +398,7 @@ public sealed class Woff2TransformDecoderTests
         return result;
     }
 
-    private static IReadOnlyDictionary<string, byte[]> CreateGlyfDependencies(
+    private static Dictionary<string, byte[]> CreateGlyfDependencies(
         ushort glyphCount,
         short indexFormat)
     {

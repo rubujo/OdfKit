@@ -14,6 +14,7 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Compliance)]
 public sealed class OpenFormulaConformanceCorpusTests
 {
+    private static readonly string[] SupportedVersions = ["1.2", "1.3", "1.4"];
     /// <summary>
     /// Verifies scalar syntax, conversion, error, and function cases grouped by specification version.
     /// 驗證依規範版本分組的純量語法、轉換、錯誤及函式案例。
@@ -56,7 +57,7 @@ public sealed class OpenFormulaConformanceCorpusTests
         string expectedKind,
         string expectedText)
     {
-        Assert.Contains(version, new[] { "1.2", "1.3", "1.4" });
+        Assert.Contains(version, SupportedVersions);
         object result = new DefaultFormulaEvaluator().Evaluate(
             formula,
             new EmptyEvaluationContext());

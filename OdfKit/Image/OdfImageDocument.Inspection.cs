@@ -65,8 +65,7 @@ public partial class OdfImageDocument
 
             if (!string.IsNullOrWhiteSpace(frame.ImageHref) && Package.HasEntry(frame.ImageHref!))
             {
-                using SHA256 sha256 = SHA256.Create();
-                string hash = Convert.ToBase64String(sha256.ComputeHash(Package.ReadEntry(frame.ImageHref!)));
+                string hash = Convert.ToBase64String(global::OdfKit.Internal.OdfHashHelper.Sha256(Package.ReadEntry(frame.ImageHref!)));
                 if (seenHashes.TryGetValue(hash, out _))
                 {
                     report.Issues.Add(CreateIssue("IMG0005", "Msg_ImageInspection_DuplicateBytes", frame, OdfIssueSeverity.Info, profile));

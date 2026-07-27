@@ -20,10 +20,7 @@ public static class OdfRdfGraphBridge
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出</exception>
     public static IGraph ToGraph(OdfRdfMetadata metadata, Uri? baseUri = null)
     {
-        if (metadata is null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(metadata, nameof(metadata));
 
         Uri graphBase = baseUri ?? OdfRdfGraphUris.DefaultPackageBaseUri;
         var graph = new Graph(graphBase);
@@ -55,10 +52,7 @@ public static class OdfRdfGraphBridge
     /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當查詢類型不受支援時擲出</exception>
     public static object ExecuteQuery(OdfRdfMetadata metadata, string sparql, Uri? baseUri = null)
     {
-        if (metadata is null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(metadata, nameof(metadata));
 
         if (string.IsNullOrWhiteSpace(sparql))
         {
@@ -90,15 +84,9 @@ public static class OdfRdfGraphBridge
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當必要參數為 <see langword="null"/> 時擲出</exception>
     public static int ImportGraph(OdfRdfMetadata metadata, IGraph graph, Uri? baseUri = null)
     {
-        if (metadata is null)
-        {
-            throw new ArgumentNullException(nameof(metadata));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(metadata, nameof(metadata));
 
-        if (graph is null)
-        {
-            throw new ArgumentNullException(nameof(graph));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(graph, nameof(graph));
 
         Uri graphBase = baseUri ?? OdfRdfGraphUris.DefaultPackageBaseUri;
         int imported = 0;
@@ -129,7 +117,7 @@ public static class OdfRdfGraphBridge
         return imported;
     }
 
-    private static INode CreateUriNode(IGraph graph, string value, Uri graphBase)
+    private static INode CreateUriNode(Graph graph, string value, Uri graphBase)
     {
         return graph.CreateUriNode(OdfRdfGraphUris.ResolveSubjectUri(value, graphBase));
     }

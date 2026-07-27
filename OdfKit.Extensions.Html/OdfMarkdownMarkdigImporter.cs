@@ -19,12 +19,12 @@ internal static class OdfMarkdownMarkdigImporter
     internal static bool TryImport(string markdown, OdfMarkdownImportOptions options, out TextDocument? document)
     {
         document = null;
-        if (markdown.IndexOf("<!--", StringComparison.Ordinal) >= 0 || markdown.StartsWith("---", StringComparison.Ordinal))
+        if (OdfKit.Internal.OdfStringHelper.Contains(markdown, "<!--", StringComparison.Ordinal) || markdown.StartsWith("---", StringComparison.Ordinal))
         {
             return false;
         }
 
-        if (options.AcceptInlineHtml && markdown.IndexOf("<span", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (options.AcceptInlineHtml && OdfKit.Internal.OdfStringHelper.Contains(markdown, "<span", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
@@ -420,6 +420,6 @@ internal static class OdfMarkdownMarkdigImporter
         bool Underline = false,
         bool Strikethrough = false)
     {
-        public static InlineImportStyle Empty { get; } = new();
+        public static InlineImportStyle Empty => default;
     }
 }

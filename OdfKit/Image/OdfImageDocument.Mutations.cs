@@ -76,10 +76,7 @@ public partial class OdfImageDocument
     /// <exception cref="ArgumentNullException">When <paramref name="names"/> is <see langword="null"/>. / 當 <paramref name="names"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfImageBatchUpdateResult SetImageRotations(IEnumerable<string> names, double? degrees)
     {
-        if (names is null)
-        {
-            throw new ArgumentNullException(nameof(names));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(names, nameof(names));
 
         var result = new OdfImageBatchUpdateResult();
         foreach (string name in names)
@@ -107,10 +104,7 @@ public partial class OdfImageDocument
     /// <exception cref="ArgumentNullException">When <paramref name="names"/> is <see langword="null"/>. / 當 <paramref name="names"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfImageBatchUpdateResult SetImageCrops(IEnumerable<string> names, OdfImageCropInfo? crop)
     {
-        if (names is null)
-        {
-            throw new ArgumentNullException(nameof(names));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(names, nameof(names));
 
         var result = new OdfImageBatchUpdateResult();
         foreach (string name in names)
@@ -177,10 +171,7 @@ public partial class OdfImageDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"), nameof(name));
         }
 
-        if (imageBytes is null)
-        {
-            throw new ArgumentNullException(nameof(imageBytes));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(imageBytes, nameof(imageBytes));
 
         OdfNode? frame = FindFrameByName(name);
         OdfNode? image = frame is null ? null : FindChild(frame, "image", OdfNamespaces.Draw);
@@ -209,10 +200,7 @@ public partial class OdfImageDocument
     public OdfImageBatchUpdateResult ReplaceImageFrameContents(
         IEnumerable<OdfImageContentUpdate> updates)
     {
-        if (updates is null)
-        {
-            throw new ArgumentNullException(nameof(updates));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(updates, nameof(updates));
 
         var requests = new List<OdfImageContentUpdate>();
         foreach (OdfImageContentUpdate update in updates)
@@ -328,10 +316,7 @@ public partial class OdfImageDocument
     /// <exception cref="ArgumentNullException">When <paramref name="names"/> is <see langword="null"/>. / 當 <paramref name="names"/> 為 <see langword="null"/> 時擲出。</exception>
     public int RemoveImageFrames(IEnumerable<string> names)
     {
-        if (names is null)
-        {
-            throw new ArgumentNullException(nameof(names));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(names, nameof(names));
 
         int removedCount = 0;
         foreach (string name in names)

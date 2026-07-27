@@ -44,8 +44,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         p += 20;
         Array.Copy(fingerprint, 0, input, p, fingerprint.Length);
 
-        using var sha = SHA256.Create();
-        byte[] hash = sha.ComputeHash(input);
+        byte[] hash = global::OdfKit.Internal.OdfHashHelper.Sha256(input);
         byte[] kek = new byte[16];
         Array.Copy(hash, 0, kek, 0, 16);
         return kek;

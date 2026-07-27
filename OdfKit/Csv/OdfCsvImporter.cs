@@ -27,8 +27,7 @@ public static class OdfCsvImporter
     /// <exception cref="ArgumentNullException">當 csvStream 為 null 時引發</exception>
     public static SpreadsheetDocument ImportFromStream(Stream csvStream, OdfCsvOptions? options)
     {
-        if (csvStream is null)
-            throw new ArgumentNullException(nameof(csvStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvStream, nameof(csvStream));
         options ??= new OdfCsvOptions();
 
         var workbook = SpreadsheetDocument.Create();
@@ -81,8 +80,7 @@ public static class OdfCsvImporter
     /// <returns>包含 CSV 資料的新 SpreadsheetDocument 執行個體</returns>
     public static SpreadsheetDocument ImportFromFile(string csvPath, OdfCsvOptions? options)
     {
-        if (csvPath is null)
-            throw new ArgumentNullException(nameof(csvPath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvPath, nameof(csvPath));
         using var stream = File.OpenRead(csvPath);
         return ImportFromStream(stream, options);
     }

@@ -158,9 +158,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoReadableStream));
         long target = origin switch
         {
             SeekOrigin.Begin => offset,
@@ -203,14 +201,11 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count)
     {
-        if (buffer is null)
-            throw new ArgumentNullException(nameof(buffer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
         // 以減法形式檢查範圍，避免 offset + count 整數溢位繞過驗證
         if (offset < 0 || count < 0 || buffer.Length - offset < count)
             throw new ArgumentOutOfRangeException(nameof(count));
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoReadableStream));
         if (_currentPosition >= _totalLength || count == 0)
             return 0;
 
@@ -267,9 +262,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     private bool TryReadFromPrefetchedBuffer(Span<byte> destination, out int bytesRead)
     {
         bytesRead = 0;
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoReadableStream));
         if (_currentPosition >= _totalLength || destination.IsEmpty)
             return true;
 
@@ -484,8 +477,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// </remarks>
     public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        if (buffer is null)
-            throw new ArgumentNullException(nameof(buffer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
         // 以減法形式檢查範圍，避免 offset + count 整數溢位繞過驗證
         if (offset < 0 || count < 0 || buffer.Length - offset < count)
             throw new ArgumentOutOfRangeException(nameof(count));
@@ -517,9 +509,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// <inheritdoc />
     public override int Read(Span<byte> buffer)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoReadableStream));
         if (_currentPosition >= _totalLength || buffer.IsEmpty)
             return 0;
 

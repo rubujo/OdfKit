@@ -41,10 +41,8 @@ public sealed class OdfRichText
     /// <returns>The current rich text object for chaining. / 目前富文字物件，方便鏈式呼叫。</returns>
     public OdfRichText AddRun(string text, OdfRichTextRunOptions options)
     {
-        if (text is null)
-            throw new ArgumentNullException(nameof(text));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         _runs.Add(new OdfRichTextRun
         {

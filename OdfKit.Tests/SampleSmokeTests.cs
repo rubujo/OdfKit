@@ -74,8 +74,8 @@ public class SampleSmokeTests
             Assert.True(big5EBytes.Length >= 6, "Big5E CSV 內容長度不足。");
             Assert.Equal([0x8E, 0x40, 0x2C, 0x8E, 0x41], big5EBytes[..5]);
             Assert.True(
-                big5EBytes[5..].SequenceEqual(new byte[] { 0x0A }) ||
-                big5EBytes[5..].SequenceEqual(new byte[] { 0x0D, 0x0A }),
+                big5EBytes.AsSpan(5).SequenceEqual(stackalloc byte[] { 0x0A }) ||
+                big5EBytes.AsSpan(5).SequenceEqual(stackalloc byte[] { 0x0D, 0x0A }),
                 "Big5E CSV 應以 LF 或 CRLF 結尾。");
 
             Assert.False(File.Exists(Path.Combine(outputDir, "output_pdf.pdf")));
@@ -215,7 +215,7 @@ public class SampleSmokeTests
     /// 不清除 <c>PATH</c>／<c>DOTNET_ROOT</c>／NuGet 快取等執行 SDK 所需變數。
     /// </summary>
     /// <returns>實際移除的鍵名（供失敗診斷）。</returns>
-    private static IReadOnlyList<string> SanitizeDotnetChildEnvironment(IDictionary<string, string?> environment)
+    private static List<string> SanitizeDotnetChildEnvironment(IDictionary<string, string?> environment)
     {
         var removed = new List<string>();
 

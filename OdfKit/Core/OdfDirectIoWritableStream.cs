@@ -155,13 +155,10 @@ public sealed class OdfDirectIoWritableStream : Stream
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
-        if (buffer is null)
-            throw new ArgumentNullException(nameof(buffer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
         if (offset < 0 || count < 0 || offset + count > buffer.Length)
             throw new ArgumentOutOfRangeException(nameof(count));
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoWritableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoWritableStream));
         if (_isFallback)
         {
             _fileStream!.Write(buffer, offset, count);
@@ -179,9 +176,7 @@ public sealed class OdfDirectIoWritableStream : Stream
     /// <inheritdoc />
     public override void Write(ReadOnlySpan<byte> buffer)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDirectIoWritableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoWritableStream));
         if (_isFallback)
         {
             _fileStream!.Write(buffer);

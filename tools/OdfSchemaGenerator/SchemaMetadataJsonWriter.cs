@@ -14,12 +14,10 @@ public sealed class SchemaMetadataJsonWriter
     /// <summary>
     /// 將結構描述中繼資料寫入文字寫入器。
     /// </summary>
-    public void Write(SchemaMetadata metadata, TextWriter writer)
+    public static void Write(SchemaMetadata metadata, TextWriter writer)
     {
-        if (metadata == null)
-            throw new ArgumentNullException(nameof(metadata));
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(metadata, nameof(metadata));
+        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
 
         writer.WriteLine("{");
         writer.Write("  \"source\": ");
@@ -49,7 +47,7 @@ public sealed class SchemaMetadataJsonWriter
         writer.WriteLine("}");
     }
 
-    private static void WriteNames(TextWriter writer, IReadOnlyList<SchemaNameMetadata> names)
+    private static void WriteNames(TextWriter writer, List<SchemaNameMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -68,7 +66,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WritePatterns(TextWriter writer, IReadOnlyList<SchemaPatternMetadata> patterns)
+    private static void WritePatterns(TextWriter writer, List<SchemaPatternMetadata> patterns)
     {
         for (int i = 0; i < patterns.Count; i++)
         {
@@ -97,7 +95,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteStringsInline(TextWriter writer, IReadOnlyList<string> values)
+    private static void WriteStringsInline(TextWriter writer, List<string> values)
     {
         for (int i = 0; i < values.Count; i++)
         {
@@ -110,7 +108,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteNameUsesInline(TextWriter writer, IReadOnlyList<SchemaPatternNameUseMetadata> names)
+    private static void WriteNameUsesInline(TextWriter writer, List<SchemaPatternNameUseMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -130,7 +128,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteNameClassesInline(TextWriter writer, IReadOnlyList<SchemaNameClassMetadata> names)
+    private static void WriteNameClassesInline(TextWriter writer, List<SchemaNameClassMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -152,7 +150,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WritePatternNodesInline(TextWriter writer, IReadOnlyList<SchemaPatternNodeMetadata> nodes)
+    private static void WritePatternNodesInline(TextWriter writer, List<SchemaPatternNodeMetadata> nodes)
     {
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -193,7 +191,7 @@ public sealed class SchemaMetadataJsonWriter
         writer.Write("] }");
     }
 
-    private static void WriteDataParametersInline(TextWriter writer, IReadOnlyList<SchemaDatatypeParameterMetadata> parameters)
+    private static void WriteDataParametersInline(TextWriter writer, List<SchemaDatatypeParameterMetadata> parameters)
     {
         for (int i = 0; i < parameters.Count; i++)
         {
@@ -211,7 +209,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteStrings(TextWriter writer, IReadOnlyList<string> values)
+    private static void WriteStrings(TextWriter writer, List<string> values)
     {
         for (int i = 0; i < values.Count; i++)
         {

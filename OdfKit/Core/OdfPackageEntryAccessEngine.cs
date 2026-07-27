@@ -75,7 +75,7 @@ internal static class OdfPackageEntryAccessEngine
         if (!existed && !ctx.EntryOrder.Contains(name))
             ctx.EntryOrder.Add(name);
 
-        if (name.EndsWith("/mimetype") && name.Length > 9)
+        if (name.EndsWith("/mimetype", System.StringComparison.Ordinal) && name.Length > 9)
         {
             string folder = name.Substring(0, name.Length - 8);
             string mimeText = Encoding.UTF8.GetString(content).Trim();
@@ -119,7 +119,7 @@ internal static class OdfPackageEntryAccessEngine
         if (!existed && !ctx.EntryOrder.Contains(name))
             ctx.EntryOrder.Add(name);
 
-        if (name.EndsWith("/mimetype") && name.Length > 9)
+        if (name.EndsWith("/mimetype", System.StringComparison.Ordinal) && name.Length > 9)
         {
             string folder = name.Substring(0, name.Length - 8);
             string mimeText = Encoding.UTF8.GetString(bytes).Trim();

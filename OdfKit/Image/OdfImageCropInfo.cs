@@ -53,7 +53,8 @@ public sealed class OdfImageCropInfo(string top, string right, string bottom, st
         }
 
         string text = clip!.Trim();
-        if (!text.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) || !text.EndsWith(")", StringComparison.Ordinal))
+        if (!text.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) ||
+            !global::OdfKit.Internal.OdfStringHelper.EndsWith(text, ')'))
         {
             return false;
         }

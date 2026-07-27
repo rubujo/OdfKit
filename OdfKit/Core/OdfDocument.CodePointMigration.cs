@@ -26,10 +26,7 @@ public abstract partial class OdfDocument
     /// </remarks>
     public OdfCodePointMigrationReport MigrateTextCodePoints(IReadOnlyDictionary<int, int> codePointMapping)
     {
-        if (codePointMapping is null)
-        {
-            throw new ArgumentNullException(nameof(codePointMapping));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(codePointMapping, nameof(codePointMapping));
 
         var mapping = new Dictionary<int, int>();
         foreach (KeyValuePair<int, int> pair in codePointMapping)

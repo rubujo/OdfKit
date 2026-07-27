@@ -262,12 +262,12 @@ namespace OdfKit.Tests
             var sbExcel = new StringBuilder("=IF(A1=1, 1");
             for (int i = 2; i <= nestingDepth; i++)
             {
-                sbExcel.Append($", IF(A1={i}, {i}");
+                sbExcel.Append(System.FormattableString.Invariant($", IF(A1={i}, {i}"));
             }
             sbExcel.Append(", 0");
             for (int i = 1; i <= nestingDepth; i++)
             {
-                sbExcel.Append(")");
+                sbExcel.Append(')');
             }
 
             string originalExcel = sbExcel.ToString();
@@ -289,7 +289,7 @@ namespace OdfKit.Tests
             var sb = new StringBuilder("=A1");
             for (int i = 2; i <= additionTerms; i++)
             {
-                sb.Append($"+A{i}");
+                sb.Append(System.FormattableString.Invariant($"+A{i}"));
             }
             string originalExcel = sb.ToString();
 

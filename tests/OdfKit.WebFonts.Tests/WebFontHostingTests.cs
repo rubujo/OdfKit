@@ -21,8 +21,15 @@ namespace OdfKit.WebFonts.Tests;
 
 public sealed class WebFontHostingTests
 {
+    private static readonly JsonSerializerOptions ManifestJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     [Fact]
-    public async Task Endpoints_ServeOnlyManifestAddressedImmutableAsset()
+    public async Task EndpointsServeOnlyManifestAddressedImmutableAsset()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-secure-smoke"u8.ToArray();
@@ -103,7 +110,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task Endpoints_EmitOnlyAllowlistedCorsOrigin()
+    public async Task EndpointsEmitOnlyAllowlistedCorsOrigin()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-cors-smoke"u8.ToArray();
@@ -149,7 +156,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task ResourceProvider_UsesCdnWithoutInlineContent()
+    public async Task ResourceProviderUsesCdnWithoutInlineContent()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-resource-smoke"u8.ToArray();
@@ -190,7 +197,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task Endpoints_RevalidateLegacyStylesheetWithoutChangingBytes()
+    public async Task EndpointsRevalidateLegacyStylesheetWithoutChangingBytes()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-legacy-css-smoke"u8.ToArray();
@@ -240,7 +247,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task ResourceProvider_UsesImmutableFingerprintedStylesheet()
+    public async Task ResourceProviderUsesImmutableFingerprintedStylesheet()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-stylesheet-smoke"u8.ToArray();
@@ -288,7 +295,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task Endpoints_ServeConcurrentImmutableRequests()
+    public async Task EndpointsServeConcurrentImmutableRequests()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-concurrent-smoke"u8.ToArray();
@@ -331,7 +338,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_RequiresAuthorizationAllowlistAndPublishesImmutableAsset()
+    public async Task GenerationEndpointRequiresAuthorizationAllowlistAndPublishesImmutableAsset()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -402,7 +409,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_ColdStartsWithoutPrebuiltManifest()
+    public async Task GenerationEndpointColdStartsWithoutPrebuiltManifest()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -449,7 +456,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task StaticHosting_RejectsMissingManifest()
+    public async Task StaticHostingRejectsMissingManifest()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -463,7 +470,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_EnforcesNamedRateLimiter()
+    public async Task GenerationEndpointEnforcesNamedRateLimiter()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -498,7 +505,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_ReportsFullWorkerQueueAsTooManyRequests()
+    public async Task GenerationEndpointReportsFullWorkerQueueAsTooManyRequests()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -551,7 +558,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_FiltersMixedTextAndRecoversAfterNoSupportedGlyphs()
+    public async Task GenerationEndpointFiltersMixedTextAndRecoversAfterNoSupportedGlyphs()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -622,7 +629,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task AssetEndpoint_DiscoversSharedGeneratedAssetAcrossApplicationInstances()
+    public async Task AssetEndpointDiscoversSharedGeneratedAssetAcrossApplicationInstances()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -670,7 +677,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_ClassifiesClientIntegrityAndTransientFailures()
+    public async Task GenerationEndpointClassifiesClientIntegrityAndTransientFailures()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -700,7 +707,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task GenerationEndpoint_RejectsOversizedChunkedJsonBodyBeforeEngine()
+    public async Task GenerationEndpointRejectsOversizedChunkedJsonBodyBeforeEngine()
     {
         string rootPath = CreateTemporaryRoot();
         try
@@ -735,7 +742,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task Startup_RejectsAssetWhoseContentDoesNotMatchManifestHash()
+    public async Task StartupRejectsAssetWhoseContentDoesNotMatchManifestHash()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-original"u8.ToArray();
@@ -762,7 +769,7 @@ public sealed class WebFontHostingTests
     }
 
     [Fact]
-    public async Task Startup_RejectsInvalidUtf8Stylesheet()
+    public async Task StartupRejectsInvalidUtf8Stylesheet()
     {
         string rootPath = CreateTemporaryRoot();
         byte[] fontBytes = "wOF2-invalid-css"u8.ToArray();
@@ -955,15 +962,9 @@ public sealed class WebFontHostingTests
                 }
             ]
         };
-        var serializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        };
         await File.WriteAllTextAsync(
             Path.Combine(rootPath, "webfonts.json"),
-            JsonSerializer.Serialize(manifest, serializerOptions),
+            JsonSerializer.Serialize(manifest, ManifestJsonOptions),
             TestContext.Current.CancellationToken);
     }
 
@@ -1035,7 +1036,7 @@ public sealed class WebFontHostingTests
 
         public int CallCount => Volatile.Read(ref _callCount);
 
-        public IReadOnlyList<string> GeneratedSequences { get; private set; } = [];
+        public string[] GeneratedSequences { get; private set; } = [];
 
         public Task<IReadOnlyList<WebFontTextSequence>> FilterSupportedSequencesAsync(
             WebFontFaceIdentity face,
@@ -1135,13 +1136,13 @@ public sealed class WebFontHostingTests
             CancellationToken cancellationToken = default)
             => Task.FromException<WebFontManifest>(request.Sequences[0].Text switch
             {
-                "argument" => new ArgumentException(),
+                "argument" => new ArgumentException("Invalid test argument.", nameof(request)),
                 "unsupported" => new NotSupportedException(),
                 "invalid-data" => new InvalidDataException(),
                 "io" => new IOException(),
                 "invalid-operation" => new InvalidOperationException(),
                 "timeout" => new OperationCanceledException(),
-                "unexpected" => new NullReferenceException(),
+                "unexpected" => new InvalidOperationException("Unexpected test failure."),
                 _ => new InvalidOperationException()
             });
     }

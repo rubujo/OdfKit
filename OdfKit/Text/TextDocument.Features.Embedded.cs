@@ -31,10 +31,8 @@ public partial class TextDocument
     /// <returns>The OdfImage object representing the newly created image. / 代表新建影像的 OdfImage 物件。</returns>
     public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height, string? name)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (imageBytes is null)
-            throw new ArgumentNullException(nameof(imageBytes));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(imageBytes, nameof(imageBytes));
 
         var media = new OdfMediaManager(Package);
         string packagePath = media.AddImage(imageBytes, name);
@@ -54,10 +52,8 @@ public partial class TextDocument
     /// <returns>The OdfNode representing the chart object. / 代表圖表物件的 OdfNode 節點。</returns>
     public OdfNode AddChart(OdfParagraph paragraph, OdfChartDefinition chart, OdfLength width, OdfLength height)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (chart is null)
-            throw new ArgumentNullException(nameof(chart));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chart, nameof(chart));
 
         // 1. 計算唯一的 Object 名稱
         int objectIndex = 1;
@@ -108,8 +104,8 @@ public partial class TextDocument
         sb.Append("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.3\">");
         sb.Append("<office:body><office:chart>");
 
-        sb.Append($"<chart:chart chart:class=\"{chartClass}\"");
-        sb.Append(">");
+        sb.Append(System.FormattableString.Invariant($"<chart:chart chart:class=\"{chartClass}\""));
+        sb.Append('>');
 
         if (!string.IsNullOrEmpty(chart.Title))
         {
@@ -137,7 +133,7 @@ public partial class TextDocument
             sb.Append("<table:table table:name=\"LocalTable\">");
             int rows = Math.Abs(chart.DataRange.EndAddress.Row - chart.DataRange.StartAddress.Row) + 1;
             int cols = Math.Abs(chart.DataRange.EndAddress.Column - chart.DataRange.StartAddress.Column) + 1;
-            sb.Append($"<table:table-column table:number-columns-repeated=\"{cols}\"/>");
+            sb.Append(System.FormattableString.Invariant($"<table:table-column table:number-columns-repeated=\"{cols}\"/>"));
             for (int r = 0; r < rows; r++)
             {
                 sb.Append("<table:table-row>");

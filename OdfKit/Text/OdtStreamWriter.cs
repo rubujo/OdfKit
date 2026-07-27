@@ -45,10 +45,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
     private OdtStreamWriter(Stream outputStream, OdfVersion version, bool ownsStream)
     {
-        if (outputStream is null)
-        {
-            throw new ArgumentNullException(nameof(outputStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
 
         _ownedStream = ownsStream ? outputStream : null;
         _version = version;
@@ -305,10 +302,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// <exception cref="ArgumentException">Thrown when the subtree contains text or attribute values with characters that are not valid in XML 1.0. / 當子樹的文字或屬性值含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         EnsureNotDisposed();
         ValidateNodeXmlCharacters(node);
@@ -426,10 +420,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
     private static FileStream CreateFileStream(string path)
     {
-        if (path is null)
-        {
-            throw new ArgumentNullException(nameof(path));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         return new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
     }
@@ -541,8 +532,8 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     {
         // 於寫入任何元素前先驗證，避免例外發生時留下未關閉的標籤。
         // 參數名稱固定為公開 API 的 text／styleName，方便呼叫端對應。
-        OdfXmlCharacterGuard.ValidateText(text, "text");
-        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), "styleName");
+        OdfXmlCharacterGuard.ValidateText(text, nameof(text));
+        OdfXmlCharacterGuard.ValidateText(styleName.AsSpan(), nameof(styleName));
 
         string elementName = localName == "h" ? "text:h" : "text:p";
         _rawWriter.WriteStartElement(elementName);
@@ -589,10 +580,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 
     private void EnsureNotDisposed()
     {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(OdtStreamWriter));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdtStreamWriter));
     }
 
     private static string FormatVersion(OdfVersion version) => version switch

@@ -60,8 +60,7 @@ public sealed class OdfAnimation
     /// <returns>The current animation instance. / 目前動畫執行個體。</returns>
     public OdfAnimation SetDuration(TimeSpan duration)
     {
-        if (duration < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(duration));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(duration, TimeSpan.Zero, nameof(duration));
 
         string durStr = OdfSmilTime.FormatDuration(duration);
         Node.SetAttribute("dur", SmilNs, durStr, "smil");
@@ -77,8 +76,7 @@ public sealed class OdfAnimation
     /// <returns>The current animation instance. / 目前動畫執行個體。</returns>
     public OdfAnimation SetDelay(TimeSpan delay)
     {
-        if (delay < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(delay));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(delay, TimeSpan.Zero, nameof(delay));
 
         string delayStr = OdfSmilTime.FormatDelay(delay);
         string beginVal = Trigger switch

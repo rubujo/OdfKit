@@ -25,7 +25,7 @@ namespace OdfKit.Tests
         [InlineData("foo\\..\\bar")]
         [InlineData("foo\\..")]
         [InlineData("..")]
-        public void TestZipSlipDefense_RejectsInvalidPaths(string invalidPath)
+        public void TestZipSlipDefenseRejectsInvalidPaths(string invalidPath)
         {
             Assert.Throws<SecurityException>(() => OdfPackage.SanitizeEntryName(invalidPath));
         }
@@ -34,14 +34,14 @@ namespace OdfKit.Tests
         [InlineData("content.xml")]
         [InlineData("Pictures/image.png")]
         [InlineData("Object_1/content.xml")]
-        public void TestZipSlipDefense_AcceptsValidPaths(string validPath)
+        public void TestZipSlipDefenseAcceptsValidPaths(string validPath)
         {
             var result = OdfPackage.SanitizeEntryName(validPath);
             Assert.Equal(validPath.Replace('\\', '/'), result);
         }
 
         [Fact]
-        public void TestZipSlipDefense_RejectsInvalidZipEntryDuringLoad()
+        public void TestZipSlipDefenseRejectsInvalidZipEntryDuringLoad()
         {
             using var packageStream = new MemoryStream();
             using (var archive = new ZipArchive(packageStream, ZipArchiveMode.Create, leaveOpen: true))
@@ -117,7 +117,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestMacroSanitization_CleansPackageMacrosAndSignatures()
+        public void TestMacroSanitizationCleansPackageMacrosAndSignatures()
         {
             using var ms = new MemoryStream();
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -184,7 +184,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestMacroSanitization_DocumentLevel()
+        public void TestMacroSanitizationDocumentLevel()
         {
             using var ms = new MemoryStream();
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -265,7 +265,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestScriptsSanitization_CleansScriptsFolder()
+        public void TestScriptsSanitizationCleansScriptsFolder()
         {
             using var ms = new MemoryStream();
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -331,7 +331,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestDateParsingAndFormatting_IsCultureIndependent()
+        public void TestDateParsingAndFormattingIsCultureIndependent()
         {
             var originalCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
             var originalUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
@@ -429,7 +429,7 @@ namespace OdfKit.Tests
             }
         }
 
-        private OdfNode? FindNode(OdfNode parent, string localName)
+        private static OdfNode? FindNode(OdfNode parent, string localName)
         {
             if (parent.LocalName == localName)
                 return parent;

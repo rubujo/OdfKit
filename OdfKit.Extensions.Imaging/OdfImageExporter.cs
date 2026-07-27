@@ -23,10 +23,8 @@ public static class OdfImageExporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時拋出</exception>
     public static void ExportToPng(OdfTableSheet sheet, Stream pngStream, OdfImageExportOptions? options = null)
     {
-        if (sheet is null)
-            throw new ArgumentNullException(nameof(sheet));
-        if (pngStream is null)
-            throw new ArgumentNullException(nameof(pngStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pngStream, nameof(pngStream));
         Export(sheet, pngStream, SKEncodedImageFormat.Png, 100, options);
     }
 
@@ -40,10 +38,8 @@ public static class OdfImageExporter
     /// <param name="options">The value to use. / 影像匯出選項；若為 null 則使用預設值</param>
     public static void ExportToJpeg(OdfTableSheet sheet, Stream jpegStream, int quality = 90, OdfImageExportOptions? options = null)
     {
-        if (sheet is null)
-            throw new ArgumentNullException(nameof(sheet));
-        if (jpegStream is null)
-            throw new ArgumentNullException(nameof(jpegStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(jpegStream, nameof(jpegStream));
         if (quality < 1 || quality > 100)
             throw new ArgumentOutOfRangeException(nameof(quality), OdfLocalizer.GetMessage("Err_OdfImageExporter_QualityValueBetween1"));
         Export(sheet, jpegStream, SKEncodedImageFormat.Jpeg, quality, options);

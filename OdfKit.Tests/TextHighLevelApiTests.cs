@@ -25,7 +25,7 @@ public class TextHighLevelApiTests
     /// 驗證流式套印會以預編譯 XML 位元組區段輸出並正確逸出欄位值。
     /// </summary>
     [Fact]
-    public async Task StreamingMailMerge_CompilesBinaryXmlSegmentsAndEscapesValues()
+    public async Task StreamingMailMergeCompilesBinaryXmlSegmentsAndEscapesValues()
     {
         using MemoryStream template = CreateStreamingTemplateZip(
             """
@@ -57,7 +57,7 @@ public class TextHighLevelApiTests
     /// 驗證流式套印 XML 讀取器會禁止 DTD，避免 XXE 與實體展開風險。
     /// </summary>
     [Fact]
-    public async Task StreamingMailMerge_RejectsDtdTemplates()
+    public async Task StreamingMailMergeRejectsDtdTemplates()
     {
         using MemoryStream template = CreateStreamingTemplateZip(
             """
@@ -83,7 +83,7 @@ public class TextHighLevelApiTests
     /// 驗證流式套印會拒絕可能逃出 ODF 封裝的 ZIP 項目路徑。
     /// </summary>
     [Fact]
-    public async Task StreamingMailMerge_RejectsUnsafeZipEntryNames()
+    public async Task StreamingMailMergeRejectsUnsafeZipEntryNames()
     {
         using var template = new MemoryStream();
         using (var archive = new ZipArchive(template, ZipArchiveMode.Create, leaveOpen: true))
@@ -129,7 +129,7 @@ public class TextHighLevelApiTests
     /// 驗證批次套印會輸出每一筆資料，且記錄之間插入分頁符樣式。
     /// </summary>
     [Fact]
-    public async Task StreamingMailMerge_BatchMergesEveryRecordWithPageBreaks()
+    public async Task StreamingMailMergeBatchMergesEveryRecordWithPageBreaks()
     {
         using MemoryStream template = CreateStreamingTemplateZip(BatchTemplateContentXml);
         using MemoryStream output = new();
@@ -162,7 +162,7 @@ public class TextHighLevelApiTests
     /// 首筆資料不會被 styles.xml 的套印預取消耗而自批次結果中遺失。
     /// </summary>
     [Fact]
-    public async Task StreamingMailMerge_BatchWithSinglePassAsyncSource_KeepsFirstRecord()
+    public async Task StreamingMailMergeBatchWithSinglePassAsyncSourceKeepsFirstRecord()
     {
         // styles.xml 排在 content.xml 之前，重現單向資料源被雙重列舉時遺失首筆的情境
         using MemoryStream template = CreateStreamingTemplateZipWithStylesFirst(BatchTemplateContentXml);
@@ -205,7 +205,7 @@ public class TextHighLevelApiTests
     /// 驗證 HTML / CSS 樣式表可映射為 ODT 共用樣式並保存至 styles.xml。
     /// </summary>
     [Fact]
-    public void ImportHtmlStyles_MapsCssRulesToOdtStyles()
+    public void ImportHtmlStylesMapsCssRulesToOdtStyles()
     {
         using var document = TextDocument.Create();
         IReadOnlyDictionary<string, string> styles = document.ImportHtmlStyles(
@@ -677,7 +677,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetHyperlinks"/> 與 <see cref="TextDocument.GetReferenceMarks"/> 可讀回內嵌標記。
     /// </summary>
     [Fact]
-    public void GetHyperlinksAndReferenceMarks_RoundTripsAfterAdd()
+    public void GetHyperlinksAndReferenceMarksRoundTripsAfterAdd()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("連結測試");
@@ -696,7 +696,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetCommentInfos"/> 可讀回註解摘要。
     /// </summary>
     [Fact]
-    public void GetCommentInfos_RoundTripsAfterAdd()
+    public void GetCommentInfosRoundTripsAfterAdd()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("註解段落");
@@ -715,7 +715,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="OdfTable.InsertRows"/> 與 <see cref="OdfTable.DeleteColumns"/> 在啟用追蹤修訂時會記錄結構變更。
     /// </summary>
     [Fact]
-    public void TableStructureChanges_RecordedWhenTrackedChangesEnabled()
+    public void TableStructureChangesRecordedWhenTrackedChangesEnabled()
     {
         using var document = TextDocument.Create();
         document.TrackedChanges = true;
@@ -765,7 +765,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetTableStructuralChanges"/> 可讀回表格結構修訂。
     /// </summary>
     [Fact]
-    public void GetTableStructuralChanges_ReadsInsertionAndDeletion()
+    public void GetTableStructuralChangesReadsInsertionAndDeletion()
     {
         using var document = TextDocument.Create();
         OdfTable table = document.AddTable(2, 2);
@@ -805,7 +805,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.UpdateIndexes"/> 可重新產生字母索引內容。
     /// </summary>
     [Fact]
-    public void UpdateIndexes_RegeneratesAlphabeticalIndexBody()
+    public void UpdateIndexesRegeneratesAlphabeticalIndexBody()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("索引條目");
@@ -823,7 +823,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetIndexInfos"/> 與 <see cref="TextDocument.GetIndexMarks"/> 可讀回索引與標記。
     /// </summary>
     [Fact]
-    public void GetIndexInfosAndMarks_RoundTripsAfterAdd()
+    public void GetIndexInfosAndMarksRoundTripsAfterAdd()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("索引條目");
@@ -846,7 +846,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.InsertTableOfContents"/> 會立即掃描標題並產生可點擊的目錄項目。
     /// </summary>
     [Fact]
-    public void InsertTableOfContents_GeneratesHeadingLinksImmediately()
+    public void InsertTableOfContentsGeneratesHeadingLinksImmediately()
     {
         using var document = TextDocument.Create();
         document.AddHeading("第一章", 1);
@@ -877,7 +877,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetPageSetups"/> 可讀回頁首頁尾設定。
     /// </summary>
     [Fact]
-    public void GetPageSetups_RoundTripsAfterConfigure()
+    public void GetPageSetupsRoundTripsAfterConfigure()
     {
         using var document = TextDocument.Create();
         OdfPageSetup setup = document.GetDefaultPageSetup();
@@ -894,7 +894,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetPageSetup"/> 可依名稱取得主頁面樣式設定。
     /// </summary>
     [Fact]
-    public void GetPageSetup_ReturnsNamedMasterPage()
+    public void GetPageSetupReturnsNamedMasterPage()
     {
         using var document = TextDocument.Create();
         document.AddPageStyle("Landscape");
@@ -911,7 +911,7 @@ public class TextHighLevelApiTests
     /// 驗證頁首頁尾欄位混排與首頁專用區域寫入。
     /// </summary>
     [Fact]
-    public void HeaderFooterAdvancedEditing_WritesFieldsAndFirstPageRegions()
+    public void HeaderFooterAdvancedEditingWritesFieldsAndFirstPageRegions()
     {
         using var document = TextDocument.Create();
         OdfPageSetup setup = document.GetDefaultPageSetup();
@@ -1129,7 +1129,7 @@ public class TextHighLevelApiTests
     /// 驗證 ODT 流式寫入器可透過 <see cref="IAsyncDisposable"/> 釋放並完成封裝輸出。
     /// </summary>
     [Fact]
-    public async Task OdtStreamWriterDisposeAsync_WritesValidContent()
+    public async Task OdtStreamWriterDisposeAsyncWritesValidContent()
     {
         await using var stream = new MemoryStream();
         await using (var writer = new OdtStreamWriter(stream))
@@ -1151,7 +1151,7 @@ public class TextHighLevelApiTests
     /// 驗證 ODT 流式寫入器的 Span/Memory 文字多載可正常輸出。
     /// </summary>
     [Fact]
-    public void OdtStreamWriter_SpanAndMemoryOverloads_WriteExpectedContent()
+    public void OdtStreamWriterSpanAndMemoryOverloadsWriteExpectedContent()
     {
         using var stream = new MemoryStream();
         using (var writer = new OdtStreamWriter(stream))
@@ -1179,7 +1179,7 @@ public class TextHighLevelApiTests
     /// 驗證 ODT 流式寫入器可直接混合輸出既有 DOM 子樹。
     /// </summary>
     [Fact]
-    public void OdtStreamWriter_WriteNode_WritesDomSubtree()
+    public void OdtStreamWriterWriteNodeWritesDomSubtree()
     {
         using var stream = new MemoryStream();
         var paragraph = new TextPElement("text") { TextContent = "DOM 段落" };
@@ -1345,7 +1345,7 @@ public class TextHighLevelApiTests
     /// 驗證文件層級替換可跨相鄰文字片段命中關鍵字，並保留未命中片段的樣式設定。
     /// </summary>
     [Fact]
-    public void ReplaceTextAcrossRuns_PreservesSurroundingStyles()
+    public void ReplaceTextAcrossRunsPreservesSurroundingStyles()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph(string.Empty);
@@ -1371,7 +1371,7 @@ public class TextHighLevelApiTests
     /// 驗證段落層級替換僅影響目前段落，不會修改其他段落內容。
     /// </summary>
     [Fact]
-    public void ParagraphReplaceText_OnlyAffectsCurrentParagraph()
+    public void ParagraphReplaceTextOnlyAffectsCurrentParagraph()
     {
         using var document = TextDocument.Create();
         OdfParagraph first = document.AddParagraph(string.Empty);
@@ -1435,7 +1435,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.AddFontFace"/> 會同時於 content.xml 與 styles.xml 寫入字型宣告。
     /// </summary>
     [Fact]
-    public void AddFontFace_WritesFontFaceDeclInContentAndStylesXml()
+    public void AddFontFaceWritesFontFaceDeclInContentAndStylesXml()
     {
         using var document = TextDocument.Create();
         document.AddFontFace("自訂字型", "Noto Sans TC", "swiss", "variable");
@@ -1454,7 +1454,7 @@ public class TextHighLevelApiTests
     /// 驗證重複呼叫 <see cref="TextDocument.AddFontFace"/> 相同名稱時會更新既有宣告而非重複新增。
     /// </summary>
     [Fact]
-    public void AddFontFace_SameNameUpdatesExistingDeclaration()
+    public void AddFontFaceSameNameUpdatesExistingDeclaration()
     {
         using var document = TextDocument.Create();
         document.AddFontFace("自訂字型", "Noto Sans TC");
@@ -1469,7 +1469,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetComments"/> 可讀回文件中所有完整註解物件（含回覆）。
     /// </summary>
     [Fact]
-    public void GetComments_ReturnsFullCommentObjectsIncludingReplies()
+    public void GetCommentsReturnsFullCommentObjectsIncludingReplies()
     {
         using var document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("註解段落");
@@ -1491,7 +1491,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.GetIndexes"/> 可讀回文件中所有索引物件（字母索引與目錄）。
     /// </summary>
     [Fact]
-    public void GetIndexes_ReturnsAllIndexObjectsInDocument()
+    public void GetIndexesReturnsAllIndexObjectsInDocument()
     {
         using var document = TextDocument.Create();
         document.AddAlphabeticalIndex("術語索引");
@@ -1508,7 +1508,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.RecordTrackedChange"/> 可記錄附帶額外內容與原始樣式名稱的修訂。
     /// </summary>
     [Fact]
-    public void RecordTrackedChange_RecordsChangeWithExtraContentAndOriginalStyle()
+    public void RecordTrackedChangeRecordsChangeWithExtraContentAndOriginalStyle()
     {
         using var document = TextDocument.Create();
         OdfParagraph deletedPara = document.AddParagraph("待刪除內容");
@@ -1524,7 +1524,7 @@ public class TextHighLevelApiTests
     /// 驗證 <see cref="TextDocument.RejectAllChanges"/> 為 <see cref="TextDocument.RejectAllTrackedChanges"/> 之別名，可正確拒絕所有修訂。
     /// </summary>
     [Fact]
-    public void RejectAllChanges_RejectsAllTrackedChangesInDocument()
+    public void RejectAllChangesRejectsAllTrackedChangesInDocument()
     {
         using var document = TextDocument.Create();
         document.TrackedChanges = true;

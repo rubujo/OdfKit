@@ -202,7 +202,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         int index,
         OdfSchemaPatternMatchContext context)
     {
-        IReadOnlyList<OdfSchemaPatternNode> interleavedNodes =
+        List<OdfSchemaPatternNode> interleavedNodes =
             ExpandInterleaveReferences(node.Children, context);
         var matches = new HashSet<int>();
         var used = new bool[interleavedNodes.Count];
@@ -221,7 +221,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         return matches;
     }
 
-    private static IReadOnlyList<OdfSchemaPatternNode> ExpandInterleaveReferences(
+    private static List<OdfSchemaPatternNode> ExpandInterleaveReferences(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         OdfSchemaPatternMatchContext context)
     {

@@ -61,10 +61,7 @@ public class FormulaDocument : OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="mathml"/> is <see langword="null"/>. / 當 <paramref name="mathml"/> 為 <see langword="null"/> 時擲出。</exception>
     public static FormulaDocument Create(string mathml)
     {
-        if (mathml is null)
-        {
-            throw new ArgumentNullException(nameof(mathml));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(mathml, nameof(mathml));
 
         FormulaDocument doc = Create();
         doc.SetMathML(mathml);
@@ -95,10 +92,7 @@ public class FormulaDocument : OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="build"/> is <see langword="null"/>. / 當 <paramref name="build"/> 為 <see langword="null"/> 時擲出。</exception>
     public new static FormulaDocument FromBuilder(Action<OdfMathBuilder> build)
     {
-        if (build is null)
-        {
-            throw new ArgumentNullException(nameof(build));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(build, nameof(build));
 
         var mathBuilder = new OdfMathBuilder();
         build(mathBuilder);

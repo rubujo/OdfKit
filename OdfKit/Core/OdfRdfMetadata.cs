@@ -50,8 +50,7 @@ public sealed class OdfRdfMetadata
     /// <exception cref="ArgumentNullException">當 <paramref name="triple"/> 為 <see langword="null"/> 時拋出</exception>
     public void AddTriple(OdfRdfTriple triple)
     {
-        if (triple is null)
-            throw new ArgumentNullException(nameof(triple));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(triple, nameof(triple));
         _triples.Add(triple);
         IsDirty = true;
     }
@@ -155,10 +154,8 @@ public sealed class OdfRdfMetadata
     /// <exception cref="ArgumentNullException">當 <paramref name="entryPaths"/> 或 <paramref name="mediaTypes"/> 為 <see langword="null"/> 時拋出</exception>
     public int SyncWithPackageEntries(IEnumerable<string> entryPaths, IReadOnlyDictionary<string, string> mediaTypes, string? documentSubject)
     {
-        if (entryPaths is null)
-            throw new ArgumentNullException(nameof(entryPaths));
-        if (mediaTypes is null)
-            throw new ArgumentNullException(nameof(mediaTypes));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(entryPaths, nameof(entryPaths));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(mediaTypes, nameof(mediaTypes));
 
         string docSubject = ResolveDocumentSubject(documentSubject);
         HashSet<string> desiredParts = [];
@@ -273,7 +270,7 @@ public sealed class OdfRdfMetadata
         !string.Equals(path, "mimetype", StringComparison.Ordinal) &&
         !string.Equals(path, "META-INF/manifest.xml", StringComparison.Ordinal) &&
         !string.Equals(path, "META-INF/manifest.rdf", StringComparison.Ordinal) &&
-        !path.EndsWith("/", StringComparison.Ordinal);
+        !global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/');
 
     private static string NormalizePartPath(string path)
     {
@@ -359,8 +356,7 @@ public sealed class OdfRdfTriple
     /// <exception cref="ArgumentException">當任一必要值為空白時拋出</exception>
     public OdfRdfTriple(string subject, string predicate, string objectValue, bool isLiteral)
     {
-        if (subject is null)
-            throw new ArgumentNullException(nameof(subject));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(subject, nameof(subject));
         if (string.IsNullOrWhiteSpace(predicate))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfRdfMetadata_RdfCannotBeEmpty"), nameof(predicate));
         if (string.IsNullOrWhiteSpace(objectValue))

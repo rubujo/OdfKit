@@ -15,17 +15,17 @@ internal class CriteriaMatcher
         if (criteria is string strCriteria)
         {
             strCriteria = strCriteria.Trim();
-            if (strCriteria.StartsWith("<="))
+            if (strCriteria.StartsWith("<=", System.StringComparison.Ordinal))
             { _op = "<="; _operand = ParseOperand(strCriteria.Substring(2)); }
-            else if (strCriteria.StartsWith(">="))
+            else if (strCriteria.StartsWith(">=", System.StringComparison.Ordinal))
             { _op = ">="; _operand = ParseOperand(strCriteria.Substring(2)); }
-            else if (strCriteria.StartsWith("<>"))
+            else if (strCriteria.StartsWith("<>", System.StringComparison.Ordinal))
             { _op = "<>"; _operand = ParseOperand(strCriteria.Substring(2)); }
-            else if (strCriteria.StartsWith("<"))
+            else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(strCriteria, '<'))
             { _op = "<"; _operand = ParseOperand(strCriteria.Substring(1)); }
-            else if (strCriteria.StartsWith(">"))
+            else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(strCriteria, '>'))
             { _op = ">"; _operand = ParseOperand(strCriteria.Substring(1)); }
-            else if (strCriteria.StartsWith("="))
+            else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(strCriteria, '='))
             { _op = "="; _operand = ParseOperand(strCriteria.Substring(1)); }
             else
             {

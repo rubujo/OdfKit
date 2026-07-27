@@ -25,7 +25,7 @@ public class SpreadsheetDocumentEmbeddedChartReadEngineTests
     /// 而非位元組層級的大小限制。
     /// </summary>
     [Fact]
-    public void MaxXmlCharactersInDocument_LowerThanChartContentLength_ChartIsNotReturned()
+    public void MaxXmlCharactersInDocumentLowerThanChartContentLengthChartIsNotReturned()
     {
         using var stream = new MemoryStream();
         using (SpreadsheetDocument workbook = BuildSpreadsheetWithChart())
@@ -51,7 +51,7 @@ public class SpreadsheetDocumentEmbeddedChartReadEngineTests
     /// 確認上面的測試確實是受 MaxXmlCharactersInDocument 生效所影響，而非其他因素。
     /// </summary>
     [Fact]
-    public void MaxXmlCharactersInDocument_DefaultValue_ChartIsReturned()
+    public void MaxXmlCharactersInDocumentDefaultValueChartIsReturned()
     {
         using var stream = new MemoryStream();
         using (SpreadsheetDocument workbook = BuildSpreadsheetWithChart())
@@ -67,7 +67,7 @@ public class SpreadsheetDocumentEmbeddedChartReadEngineTests
     }
 
     [Fact]
-    public void EnsureLengthFitsInInt32_LengthWithinRange_DoesNotThrow()
+    public void EnsureLengthFitsInInt32LengthWithinRangeDoesNotThrow()
     {
         SpreadsheetDocumentEmbeddedChartReadEngine.EnsureLengthFitsInInt32(
             int.MaxValue, "Err_SpreadsheetDocumentEmbeddedChartReadEngine_ChartXmlSizeLimitExceeded");
@@ -79,7 +79,7 @@ public class SpreadsheetDocumentEmbeddedChartReadEngineTests
     /// 修正後：超過 Int32.MaxValue 必須明確擲出例外。
     /// </summary>
     [Fact]
-    public void EnsureLengthFitsInInt32_LengthExceedsInt32MaxValue_ThrowsSecurityExceptionWithLocalizedMessage()
+    public void EnsureLengthFitsInInt32LengthExceedsInt32MaxValueThrowsSecurityExceptionWithLocalizedMessage()
     {
         long overflowingLength = (long)int.MaxValue + 1000L;
 

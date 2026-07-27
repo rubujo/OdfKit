@@ -50,8 +50,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public void Save(string path, OdfSaveOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -126,8 +125,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public async Task SaveAsync(string path, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -170,8 +168,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public void SaveToStream(Stream destinationStream, OdfSaveOptions? options)
     {
-        if (destinationStream == null)
-            throw new ArgumentNullException(nameof(destinationStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -246,8 +243,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken)
     {
-        if (destinationStream is null)
-            throw new ArgumentNullException(nameof(destinationStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
@@ -277,8 +273,7 @@ public abstract partial class OdfDocument
         string targetMimeType,
         bool clearUserContent = false)
     {
-        if (template == null)
-            throw new ArgumentNullException(nameof(template));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(template, nameof(template));
 
         byte[] packageBytes = template.SaveToBytes();
         var ms = new MemoryStream(packageBytes);
@@ -324,8 +319,7 @@ public abstract partial class OdfDocument
         OdfDocumentKind targetTemplateKind,
         string targetTemplateMimeType)
     {
-        if (document == null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         byte[] packageBytes = document.SaveToBytes();
         var ms = new MemoryStream(packageBytes);
@@ -401,8 +395,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public void SaveAsFlatXml(string path, OdfSaveOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         options ??= OdfSaveOptions.Default;
         bool originalFlat = Package.IsFlatXml;
@@ -429,8 +422,7 @@ public abstract partial class OdfDocument
     /// </summary>
     public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         options ??= OdfSaveOptions.Default;
         bool originalFlat = Package.IsFlatXml;
@@ -462,8 +454,7 @@ public abstract partial class OdfDocument
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadFromFlatXml(string path, OdfLoadOptions? options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         var doc = OdfDocumentFactory.LoadDocument(path, options);
         doc.Package.IsFlatXml = true;
@@ -487,8 +478,7 @@ public abstract partial class OdfDocument
     /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadFromFlatXml(Stream stream, OdfLoadOptions? options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         var doc = OdfDocumentFactory.LoadDocument(stream, options);
         doc.Package.IsFlatXml = true;
@@ -509,8 +499,7 @@ public abstract partial class OdfDocument
         OdfDocumentKind targetKind,
         bool targetIsFlatXml)
     {
-        if (document == null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         byte[] packageBytes = document.SaveToBytes();
         var ms = new MemoryStream(packageBytes);
@@ -542,10 +531,8 @@ public abstract partial class OdfDocument
     /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public static void ConvertZipToFlatXml(string sourcePath, string destinationPath, OdfLoadOptions? loadOptions, OdfSaveOptions? saveOptions)
     {
-        if (sourcePath is null)
-            throw new ArgumentNullException(nameof(sourcePath));
-        if (destinationPath is null)
-            throw new ArgumentNullException(nameof(destinationPath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourcePath, nameof(sourcePath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationPath, nameof(destinationPath));
 
         using OdfDocument doc = OdfDocumentFactory.LoadDocument(sourcePath, loadOptions);
         doc.SaveAsFlatXml(destinationPath, saveOptions);
@@ -574,10 +561,8 @@ public abstract partial class OdfDocument
     /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public static void ConvertFlatXmlToZip(string sourcePath, string destinationPath, OdfLoadOptions? loadOptions, OdfSaveOptions? saveOptions)
     {
-        if (sourcePath is null)
-            throw new ArgumentNullException(nameof(sourcePath));
-        if (destinationPath is null)
-            throw new ArgumentNullException(nameof(destinationPath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourcePath, nameof(sourcePath));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationPath, nameof(destinationPath));
 
         using OdfDocument doc = LoadFromFlatXml(sourcePath, loadOptions);
         doc.Package.IsFlatXml = false;

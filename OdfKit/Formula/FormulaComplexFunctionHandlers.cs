@@ -258,8 +258,10 @@ internal static class FormulaComplexFunctionHandlers
     {
         string normalized = text.Trim();
         suffix = 'i';
-        bool hasSuffix = normalized.EndsWith("i", StringComparison.OrdinalIgnoreCase) ||
-            normalized.EndsWith("j", StringComparison.OrdinalIgnoreCase);
+        bool hasSuffix = global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, 'i') ||
+            global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, 'j') ||
+            global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, 'I') ||
+            global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, 'J');
         if (!hasSuffix)
         {
             if (double.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out double real))

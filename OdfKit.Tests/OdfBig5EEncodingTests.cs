@@ -18,7 +18,7 @@ public class OdfBig5EEncodingTests
     /// 驗證 BMP 與增補平面字元可完成編碼與解碼往返。
     /// </summary>
     [Fact]
-    public void Encoding_BmpAndSupplementaryCharacters_RoundTrips()
+    public void EncodingBmpAndSupplementaryCharactersRoundTrips()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
         const string original = "一\U0002000B";
@@ -34,7 +34,7 @@ public class OdfBig5EEncodingTests
     /// 驗證 ASCII 字元以單一位元組直接通過。
     /// </summary>
     [Fact]
-    public void Encoding_Ascii_PassesThrough()
+    public void EncodingAsciiPassesThrough()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
 
@@ -48,7 +48,7 @@ public class OdfBig5EEncodingTests
     /// 驗證未對應字元、未對應雙位元組與結尾孤立前導位元組均解譯為問號。
     /// </summary>
     [Fact]
-    public void Encoding_UnmappedValues_UseQuestionMark()
+    public void EncodingUnmappedValuesUseQuestionMark()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
 
@@ -63,7 +63,7 @@ public class OdfBig5EEncodingTests
     /// 驗證無法對應的輸入會遵守設定的例外 fallback。
     /// </summary>
     [Fact]
-    public void Encoding_ExceptionFallbacks_Throw()
+    public void EncodingExceptionFallbacksThrow()
     {
         var encoderEncoding = (Encoding)CreateEncoding().Clone();
         encoderEncoding.EncoderFallback = EncoderFallback.ExceptionFallback;
@@ -79,7 +79,7 @@ public class OdfBig5EEncodingTests
     /// 驗證多字元 replacement fallback 會完整輸出而不遭截斷。
     /// </summary>
     [Fact]
-    public void Encoding_MultiCharacterReplacementFallbacks_ArePreserved()
+    public void EncodingMultiCharacterReplacementFallbacksArePreserved()
     {
         var encoderEncoding = (Encoding)CreateEncoding().Clone();
         encoderEncoding.EncoderFallback = new EncoderReplacementFallback("XY");
@@ -97,7 +97,7 @@ public class OdfBig5EEncodingTests
     /// 驗證無法對應的替代字串不會無界遞迴。
     /// </summary>
     [Fact]
-    public void Encoding_UnmappableReplacementFallback_Throws()
+    public void EncodingUnmappableReplacementFallbackThrows()
     {
         var encoding = (Encoding)CreateEncoding().Clone();
         encoding.EncoderFallback = new EncoderReplacementFallback("乙");
@@ -110,7 +110,7 @@ public class OdfBig5EEncodingTests
     /// 驗證反向別名會選擇確定的標準 Unicode 純量值。
     /// </summary>
     [Fact]
-    public void Encoding_ReverseAliases_ChooseLowestUnicodeScalar()
+    public void EncodingReverseAliasesChooseLowestUnicodeScalar()
     {
         OdfBig5EEncoding encoding = OdfBig5EEncoding.Create(
             new Dictionary<int, int>
@@ -128,7 +128,7 @@ public class OdfBig5EEncodingTests
     /// 驗證具狀態編碼器會保留跨輸入區塊的代理對。
     /// </summary>
     [Fact]
-    public void Encoder_SplitSurrogatePair_PreservesState()
+    public void EncoderSplitSurrogatePairPreservesState()
     {
         Encoder encoder = CreateEncoding().GetEncoder();
         char[] high = ['\uD840'];
@@ -148,7 +148,7 @@ public class OdfBig5EEncodingTests
     /// 驗證具狀態解碼器會保留跨輸入區塊的 Big5E 位元組對。
     /// </summary>
     [Fact]
-    public void Decoder_SplitBig5EPair_PreservesState()
+    public void DecoderSplitBig5EPairPreservesState()
     {
         Decoder decoder = CreateEncoding().GetDecoder();
         var chars = new char[4];
@@ -166,7 +166,7 @@ public class OdfBig5EEncodingTests
     /// 驗證排清未完成狀態時會呼叫設定的 fallback。
     /// </summary>
     [Fact]
-    public void StatefulConverters_FlushIncompleteInput_UseFallback()
+    public void StatefulConvertersFlushIncompleteInputUseFallback()
     {
         Encoder encoder = CreateEncoding().GetEncoder();
         Decoder decoder = CreateEncoding().GetDecoder();
@@ -187,7 +187,7 @@ public class OdfBig5EEncodingTests
     /// 驗證區塊轉換會遵守受限的輸出緩衝區。
     /// </summary>
     [Fact]
-    public void StatefulConverters_Convert_ReportsPartialProgress()
+    public void StatefulConvertersConvertReportsPartialProgress()
     {
         Encoder encoder = CreateEncoding().GetEncoder();
         char[] input = "一甲".ToCharArray();
@@ -216,7 +216,7 @@ public class OdfBig5EEncodingTests
     /// 驗證無效尾隨位元組會重新作為下一個字元的開頭處理。
     /// </summary>
     [Fact]
-    public void Decoder_InvalidTrailByte_DoesNotConsumeFollowingCharacter()
+    public void DecoderInvalidTrailByteDoesNotConsumeFollowingCharacter()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
 
@@ -227,7 +227,7 @@ public class OdfBig5EEncodingTests
     /// 驗證混合字串的位元組計數與實際編碼長度一致。
     /// </summary>
     [Fact]
-    public void GetByteCount_MixedText_MatchesGetBytesLength()
+    public void GetByteCountMixedTextMatchesGetBytesLength()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
         const string text = "A一\U0002000B乙\uD800";
@@ -239,7 +239,7 @@ public class OdfBig5EEncodingTests
     /// 驗證建立編碼時會拒絕空值、空表與無效碼值。
     /// </summary>
     [Fact]
-    public void Create_InvalidMapping_ThrowsExpectedException()
+    public void CreateInvalidMappingThrowsExpectedException()
     {
         Assert.Throws<ArgumentNullException>(() => OdfBig5EEncoding.Create(null!));
         Assert.Throws<ArgumentException>(() => OdfBig5EEncoding.Create(new Dictionary<int, int>()));
@@ -259,7 +259,7 @@ public class OdfBig5EEncodingTests
     /// 驗證 CNS 對照表可解析、略過空行並以共同字碼聯結。
     /// </summary>
     [Fact]
-    public void MappingTable_ValidInput_ParsesAndJoins()
+    public void MappingTableValidInputParsesAndJoins()
     {
         using var sourceReader = new StringReader("1-2121\t3000\n\n3-2144\t2000B\n");
         using var targetReader = new StringReader("1-2121\t8140\n3-2144\t8141\n1-2728\t8E40");
@@ -279,7 +279,7 @@ public class OdfBig5EEncodingTests
     /// 驗證 CNS 對照表的格式錯誤行會擲出例外。
     /// </summary>
     [Fact]
-    public void MappingTable_InvalidLine_ThrowsFormatException()
+    public void MappingTableInvalidLineThrowsFormatException()
     {
         using var missingColumn = new StringReader("1-2121");
         using var invalidHex = new StringReader("1-2121\tXYZ");
@@ -294,7 +294,7 @@ public class OdfBig5EEncodingTests
     /// 驗證 CSV 匯出與匯入可使用同一 Big5E 編碼無損往返。
     /// </summary>
     [Fact]
-    public void CsvImportExport_WithBig5EEncoding_RoundTripsMappedText()
+    public void CsvImportExportWithBig5EEncodingRoundTripsMappedText()
     {
         OdfBig5EEncoding encoding = CreateEncoding();
         var options = new OdfCsvOptions { Encoding = encoding, HasHeaders = false };

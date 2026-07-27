@@ -74,10 +74,7 @@ public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
     /// <returns>The matching heading, or <see langword="null"/> when no match exists. / 符合的標題；若找不到則為 <see langword="null"/>。</returns>
     public OdfHeading? Find(Predicate<OdfHeading> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         foreach (OdfHeading heading in Items)
         {
@@ -98,10 +95,7 @@ public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
     /// <returns><see langword="true"/> if the heading was removed; otherwise, <see langword="false"/>. / 若已移除標題則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool Remove(OdfHeading heading)
     {
-        if (heading is null)
-        {
-            throw new ArgumentNullException(nameof(heading));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(heading, nameof(heading));
 
         return ReferenceEquals(heading.Node.Parent, _document.BodyTextRoot) &&
             _document.BodyTextRoot.RemoveChild(heading.Node);

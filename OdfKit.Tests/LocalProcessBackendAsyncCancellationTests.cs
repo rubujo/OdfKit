@@ -16,7 +16,7 @@ public class LocalProcessBackendAsyncCancellationTests
     /// 預先取消的語彙應使 ConvertAsync 在串流複製階段拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task ConvertAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task ConvertAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         var backend = new LocalProcessBackend();
         using var cts = new CancellationTokenSource();
@@ -34,7 +34,7 @@ public class LocalProcessBackendAsyncCancellationTests
     /// 轉檔進行中收到取消訊號時，應將取消傳遞至底層渲染器並拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task ConvertAsync_CancellationDuringConversion_PropagatesToRenderer()
+    public async Task ConvertAsyncCancellationDuringConversionPropagatesToRenderer()
     {
         var renderer = new BlockingRenderer();
         var backend = new LocalProcessBackend(renderer);

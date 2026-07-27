@@ -30,7 +30,7 @@ internal static class OdfElementComplexAttributeAccess
 
         string text = value!;
 
-        if (text.EndsWith("Z", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(text, 'Z'))
         {
             foreach (string baseFormat in DateTimeBaseFormats)
             {

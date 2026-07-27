@@ -19,7 +19,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證可將段落與文字匯出為 addParagraph／addText operations。
     /// </summary>
     [Fact]
-    public void ExportToJson_EmitsParagraphAndTextOperations()
+    public void ExportToJsonEmitsParagraphAndTextOperations()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("第一段");
@@ -53,7 +53,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證可匯出段落樣式名稱至 addParagraph attrs。
     /// </summary>
     [Fact]
-    public void ExportToJson_EmitsParagraphStyleName()
+    public void ExportToJsonEmitsParagraphStyleName()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph("自訂樣式");
@@ -71,7 +71,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證匯出端可選擇 TDF ODF Toolkit 相容的 changes 封包。
     /// </summary>
     [Fact]
-    public void ExportToJson_TdfEnvelope_WrapsOperationsInChanges()
+    public void ExportToJsonTdfEnvelopeWrapsOperationsInChanges()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("封包段落");
@@ -91,7 +91,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證換行符號可匯出為 TDF 相容的 addLineBreak operation。
     /// </summary>
     [Fact]
-    public void ExportToJson_EmitsAddLineBreakOperation()
+    public void ExportToJsonEmitsAddLineBreakOperation()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -110,7 +110,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 JSON operations 可單向 merge 重建段落與文字內容（COLLAB-2）。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysAddParagraphAndAddTextOperations()
+    public void MergeReplaysAddParagraphAndAddTextOperations()
     {
         using TextDocument source = TextDocument.Create();
         source.AddParagraph("第一段");
@@ -132,7 +132,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 addTab operation 可正確重播為定位字元。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysAddTabOperation()
+    public void MergeReplaysAddTabOperation()
     {
         const string json = """
             [
@@ -154,7 +154,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證匯入端可接受 TDF ODF Toolkit 的 changes 封包。
     /// </summary>
     [Fact]
-    public void Merge_AcceptsTdfChangesEnvelope()
+    public void MergeAcceptsTdfChangesEnvelope()
     {
         const string json = """
             {
@@ -183,7 +183,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 addLineBreak operation 可重播為段落換行節點。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysAddLineBreakOperation()
+    public void MergeReplaysAddLineBreakOperation()
     {
         const string json = """
             [
@@ -205,7 +205,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 format operation 的基本字元屬性可套用至最近的文字片段。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysBasicFormatOperationOnLastTextRun()
+    public void MergeReplaysBasicFormatOperationOnLastTextRun()
     {
         const string json = """
             [
@@ -240,7 +240,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 format operation 可依 start/end 範圍分裂文字片段並只套用指定區段。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysFormatOperationOnTextRange()
+    public void MergeReplaysFormatOperationOnTextRange()
     {
         const string json = """
             [
@@ -286,7 +286,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 addStyle operation 會以 metadata-only 子集合容忍，不阻斷後續段落重播。
     /// </summary>
     [Fact]
-    public void Merge_ToleratesAddStyleMetadataOperation()
+    public void MergeToleratesAddStyleMetadataOperation()
     {
         const string json = """
             [
@@ -312,7 +312,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證第二波相容子集合可重播單段落刪除、分割與合併。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysDeleteSplitAndMergeParagraphSubset()
+    public void MergeReplaysDeleteSplitAndMergeParagraphSubset()
     {
         const string json = """
             [
@@ -339,7 +339,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證第二波相容子集合可容忍清單樣式 metadata，並建立基本清單段落。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysBasicListParagraphSubset()
+    public void MergeReplaysBasicListParagraphSubset()
     {
         const string json = """
             [
@@ -366,7 +366,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證第二波相容子集合可建立簡單文字表格並依序填入儲存格。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysSimpleTableSubset()
+    public void MergeReplaysSimpleTableSubset()
     {
         const string json = """
             [
@@ -395,7 +395,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 repo 內 clean-room TDF subset fixture 可由匯入端重播。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysRepositoryTdfSubsetFixture()
+    public void MergeReplaysRepositoryTdfSubsetFixture()
     {
         string path = Path.Combine(FindRepositoryRoot(), "tests", "fixtures", "collaboration", "tdf-subset-envelope.json");
         string json = File.ReadAllText(path);
@@ -434,7 +434,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證未知 operation 預設會被略過並留下可稽核診斷。
     /// </summary>
     [Fact]
-    public void Merge_UnsupportedOperations_AreReportedWithoutThrowing()
+    public void MergeUnsupportedOperationsAreReportedWithoutThrowing()
     {
         using TextDocument document = TextDocument.Create();
         const string json = """
@@ -456,7 +456,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證未支援 operation 的嚴格策略會中止匯入。
     /// </summary>
     [Fact]
-    public void Merge_ThrowPolicy_ThrowsForUnsupportedOperation()
+    public void MergeThrowPolicyThrowsForUnsupportedOperation()
     {
         using TextDocument document = TextDocument.Create();
         var options = new OdtOperationCompatibilityOptions
@@ -473,7 +473,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證合併至既有文件時，新段落附加於文件結尾。
     /// </summary>
     [Fact]
-    public void Merge_AppendsOntoExistingDocument()
+    public void MergeAppendsOntoExistingDocument()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("既有段落");
@@ -491,7 +491,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 typed operation log 可保留未知欄位並以 TDF changes 封包輸出。
     /// </summary>
     [Fact]
-    public void OperationLog_ParseSerialize_PreservesUnknownWireFields()
+    public void OperationLogParseSerializePreservesUnknownWireFields()
     {
         const string json = """
             {
@@ -513,7 +513,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 parser 保留看似外部連結或 script 的 attrs，安全副作用由 replay 階段處理。
     /// </summary>
     [Fact]
-    public void OperationLog_ParseSerialize_PreservesUnsafeLookingAttributesForAudit()
+    public void OperationLogParseSerializePreservesUnsafeLookingAttributesForAudit()
     {
         const string json = """
             {
@@ -548,7 +548,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 replay 階段會略過含外部連結或 script attr 的 operation，且不產生副作用。
     /// </summary>
     [Fact]
-    public void Merge_UnsafeReplayAttributes_AreDiagnosticOnlyAndDoNotMutateDocument()
+    public void MergeUnsafeReplayAttributesAreDiagnosticOnlyAndDoNotMutateDocument()
     {
         const string json = """
             {
@@ -582,7 +582,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 strict mode 會在 replay 階段中止 unsafe attrs。
     /// </summary>
     [Fact]
-    public void Merge_UnsafeReplayAttributes_ThrowInStrictMode()
+    public void MergeUnsafeReplayAttributesThrowInStrictMode()
     {
         var options = OdtOperationCompatibilityOptions.CreateTdfCompatibility();
         options.UnsupportedOperationPolicy = OdtUnsupportedOperationPolicy.Throw;
@@ -611,7 +611,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證安全限制會拒絕過多 operation。
     /// </summary>
     [Fact]
-    public void OperationLog_Parse_RejectsOperationCountOverSafetyLimit()
+    public void OperationLogParseRejectsOperationCountOverSafetyLimit()
     {
         var options = new OdtOperationCompatibilityOptions
         {
@@ -636,7 +636,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證新增的 TDF operation 子集合可安全重播至 ODT DOM。
     /// </summary>
     [Fact]
-    public void Merge_ReplaysExtendedTdfTextOperationSubset()
+    public void MergeReplaysExtendedTdfTextOperationSubset()
     {
         const string json = """
             {
@@ -681,7 +681,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 importer 明確宣告 TDF 公開文件列出的 operation 名稱。
     /// </summary>
     [Fact]
-    public void CollaborationImporter_DeclaresDocumentedTdfOperationCases()
+    public void CollaborationImporterDeclaresDocumentedTdfOperationCases()
     {
         string repositoryRoot = FindRepositoryRoot();
         string source = File.ReadAllText(
@@ -753,7 +753,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證 10k collaboration operations 可完成剖析、序列化與重播。
     /// </summary>
     [Fact]
-    public void OperationLog_PerformanceSmoke_ParsesSerializesAndReplays10kOperations()
+    public void OperationLogPerformanceSmokeParsesSerializesAndReplays10kOperations()
     {
         string json = CreateTextOperationLog(paragraphCount: 5_000);
         OdtOperationCompatibilityOptions options = OdtOperationCompatibilityOptions.CreateTdfCompatibility();
@@ -775,7 +775,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證長段落 range formatting 可完成重播並只分裂必要文字片段。
     /// </summary>
     [Fact]
-    public void Merge_PerformanceSmoke_ReplaysLongParagraphRangeFormatting()
+    public void MergePerformanceSmokeReplaysLongParagraphRangeFormatting()
     {
         string text = new('A', 64_000);
         string json = "{\"changes\":[{\"name\":\"addParagraph\",\"start\":[0]},{\"name\":\"addText\",\"start\":[0,0],\"text\":\"" +
@@ -797,7 +797,7 @@ public sealed class CollaborationOperationsTests
     /// 驗證安全限制內的大型固定表格可完成建立。
     /// </summary>
     [Fact]
-    public void Merge_PerformanceSmoke_ReplaysLargeTableWithinSafetyLimit()
+    public void MergePerformanceSmokeReplaysLargeTableWithinSafetyLimit()
     {
         const string json = """
             {

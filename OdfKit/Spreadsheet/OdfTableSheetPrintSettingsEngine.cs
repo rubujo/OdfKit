@@ -172,7 +172,7 @@ internal static class OdfTableSheetPrintSettingsEngine
         var props = GetOrCreatePageLayoutPropertiesForSheet(context);
         props.RemoveAttribute("scale-to", OdfNamespaces.Style);
         if (maxPagesWide > 0 || maxPagesTall > 0)
-            props.SetAttribute("scale-to-pages", OdfNamespaces.Style, (maxPagesWide > 0 ? maxPagesWide : maxPagesTall).ToString(), "style");
+            props.SetAttribute("scale-to-pages", OdfNamespaces.Style, (maxPagesWide > 0 ? maxPagesWide : maxPagesTall).ToString(System.Globalization.CultureInfo.InvariantCulture), "style");
         else
             props.RemoveAttribute("scale-to-pages", OdfNamespaces.Style);
     }

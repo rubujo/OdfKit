@@ -86,6 +86,7 @@ public sealed class OdfScriptSyntaxDiagnostic
     /// Gets a localized summary; the stable <see cref="Code"/> identifies the exact condition.
     /// 取得在地化摘要；確切狀況由穩定的 <see cref="Code"/> 識別。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public string Message => OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidDocumentStructure");
 }
 
@@ -143,7 +144,7 @@ public static class OdfScriptSyntaxValidator
     {
         if (source is null)
             throw new ArgumentNullException(nameof(source), OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(source)));
-        if (!Enum.IsDefined(typeof(OdfScriptSyntaxLanguage), language))
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(language))
             throw new ArgumentOutOfRangeException(nameof(language), OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(language)));
 
         return language == OdfScriptSyntaxLanguage.LibreOfficeBasic
@@ -151,7 +152,7 @@ public static class OdfScriptSyntaxValidator
             : DiagnosePython(source);
     }
 
-    private static IReadOnlyList<OdfScriptSyntaxDiagnostic> DiagnoseBasic(string source)
+    private static List<OdfScriptSyntaxDiagnostic> DiagnoseBasic(string source)
     {
         var diagnostics = new List<OdfScriptSyntaxDiagnostic>();
         var blocks = new Stack<(string Kind, int Line)>();
@@ -177,7 +178,7 @@ public static class OdfScriptSyntaxValidator
         return diagnostics;
     }
 
-    private static IReadOnlyList<OdfScriptSyntaxDiagnostic> DiagnosePython(string source)
+    private static List<OdfScriptSyntaxDiagnostic> DiagnosePython(string source)
     {
         var diagnostics = new List<OdfScriptSyntaxDiagnostic>();
         var delimiters = new Stack<(char Value, int Line, int Column)>();
@@ -204,7 +205,7 @@ public static class OdfScriptSyntaxValidator
             if (!startedInsideTripleQuote
                 && tripleQuote is null
                 && RequiresPythonColon(trimmed)
-                && !trimmed.EndsWith(":", StringComparison.Ordinal))
+                && !global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, ':'))
                 diagnostics.Add(Create("ODFSCRIPT_PYTHON_MISSING_COLON", lineIndex + 1, Math.Max(1, line.Length)));
         }
 
@@ -218,7 +219,7 @@ public static class OdfScriptSyntaxValidator
     private static string StripBasicComment(
         string line,
         int lineNumber,
-        ICollection<OdfScriptSyntaxDiagnostic> diagnostics)
+        List<OdfScriptSyntaxDiagnostic> diagnostics)
     {
         bool inString = false;
         for (int index = 0; index < line.Length; index++)
@@ -246,7 +247,7 @@ public static class OdfScriptSyntaxValidator
         Stack<(string Kind, int Line)> blocks,
         string expected,
         int line,
-        ICollection<OdfScriptSyntaxDiagnostic> diagnostics)
+        List<OdfScriptSyntaxDiagnostic> diagnostics)
     {
         if (blocks.Count == 0 || blocks.Peek().Kind != expected)
         {
@@ -260,7 +261,7 @@ public static class OdfScriptSyntaxValidator
         string line,
         int lineNumber,
         Stack<(char Value, int Line, int Column)> delimiters,
-        ICollection<OdfScriptSyntaxDiagnostic> diagnostics,
+        List<OdfScriptSyntaxDiagnostic> diagnostics,
         ref string? tripleQuote)
     {
         char quote = '\0';

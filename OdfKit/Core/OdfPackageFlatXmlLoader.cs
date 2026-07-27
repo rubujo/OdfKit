@@ -409,8 +409,8 @@ internal static class OdfPackageFlatXmlLoader
                 ms,
                 ctx.LoadOptions.MaxPackageSize,
                 "Err_OdfPackage_InputStreamSizeLimitExceeded",
-                cancellationToken,
-                signatureLength).ConfigureAwait(false);
+                signatureLength,
+                cancellationToken).ConfigureAwait(false);
             ms.Position = 0;
             if (!ctx.LeaveOpen)
                 ctx.UnderlyingStream.Dispose();

@@ -83,7 +83,7 @@ internal static class OoxmlUnitConverter
         }
 
         string text = value!.Trim();
-        if (text.EndsWith("%", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(text, '%'))
         {
             string percentText = text.Substring(0, text.Length - 1);
             if (double.TryParse(percentText, NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))

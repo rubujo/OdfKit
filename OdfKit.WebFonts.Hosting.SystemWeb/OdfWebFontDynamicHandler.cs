@@ -24,6 +24,7 @@ namespace OdfKit.WebFonts.Hosting.SystemWeb;
 /// </remarks>
 public sealed class OdfWebFontDynamicHandler : IHttpHandler
 {
+    private static readonly char[] PathSeparators = ['/'];
     private const string ApiKeyHeader = "X-OdfKit-WebFont-Key";
     private const string BackendHeader = "X-OdfKit-WebFont-Backend";
     private const string ManagedBackend = "managed";
@@ -327,7 +328,7 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
 
     private static bool TryServeGeneratedAsset(HttpContext context, DynamicRuntime runtime)
     {
-        string[] segments = context.Request.Path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] segments = context.Request.Path.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
         if (segments.Length < 2)
         {
             return false;

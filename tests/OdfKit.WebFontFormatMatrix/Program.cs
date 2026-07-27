@@ -15,6 +15,7 @@ internal static class Program
     private const string ExtBText = "A𠆩";
     private const string IvsText = "邉󠄐";
     private const string PuaText = "󰀀󰖇󿸹";
+    private static readonly JsonSerializerOptions IndentedJsonOptions = new() { WriteIndented = true };
 
     public static async Task<int> Main(string[] args)
     {
@@ -389,7 +390,7 @@ internal static class Program
                 verifiedSourceCache = true,
                 deterministicMutationRobustness = robustnessResults,
                 largeCnsDelivery
-            }, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+            }, IndentedJsonOptions)).ConfigureAwait(false);
         Console.WriteLine($"PASS: {results.Count} real managed format cases. Evidence: {evidencePath}");
         return 0;
     }
@@ -563,7 +564,7 @@ internal static class Program
         };
         await File.WriteAllTextAsync(
             evidencePath,
-            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+            JsonSerializer.Serialize(evidence, IndentedJsonOptions)).ConfigureAwait(false);
     }
 
     private static async Task VerifyProductionWoff2Async(
@@ -634,7 +635,7 @@ internal static class Program
         };
         await File.WriteAllTextAsync(
             evidencePath,
-            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+            JsonSerializer.Serialize(evidence, IndentedJsonOptions)).ConfigureAwait(false);
     }
 
     private static async Task VerifyWoff2CollectionCorpusAsync(
@@ -732,7 +733,7 @@ internal static class Program
         };
         await File.WriteAllTextAsync(
             evidencePath,
-            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true })).ConfigureAwait(false);
+            JsonSerializer.Serialize(evidence, IndentedJsonOptions)).ConfigureAwait(false);
     }
 
     private static (int Count, int Accepted) RunWoff2MutationRobustnessChecks(byte[] source)
@@ -908,7 +909,7 @@ internal static class Program
         return true;
     }
 
-    private static IReadOnlyList<MutationRobustnessResult> RunDeterministicMutationRobustnessChecks(
+    private static List<MutationRobustnessResult> RunDeterministicMutationRobustnessChecks(
         string assetRoot,
         WebFontManifest manifest)
     {

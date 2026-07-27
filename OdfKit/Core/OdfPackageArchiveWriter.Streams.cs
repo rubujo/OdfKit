@@ -114,8 +114,7 @@ internal static partial class OdfPackageArchiveWriter
         public override void Write(byte[] buffer, int offset, int count)
         {
             ThrowIfDisposed();
-            if (buffer is null)
-                throw new ArgumentNullException(nameof(buffer));
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
             if (offset < 0 || count < 0 || offset > buffer.Length - count)
                 throw new ArgumentOutOfRangeException(nameof(offset));
 
@@ -166,10 +165,7 @@ internal static partial class OdfPackageArchiveWriter
 
         private void ThrowIfDisposed()
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(PooledZipPayloadStream));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(PooledZipPayloadStream));
         }
     }
 

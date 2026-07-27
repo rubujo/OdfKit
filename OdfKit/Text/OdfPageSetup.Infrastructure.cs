@@ -242,7 +242,7 @@ public partial class OdfPageSetup
         properties.SetAttribute(attributeName, ns, value, prefix);
     }
 
-    private OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
+    private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
     {
         foreach (var child in parent.Children)
         {

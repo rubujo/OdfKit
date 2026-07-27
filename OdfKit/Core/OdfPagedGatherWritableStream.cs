@@ -71,15 +71,9 @@ public sealed class OdfPagedGatherWritableStream : Stream
     public OdfPagedGatherWritableStream(Stream underlyingStream, int pageSize, int pagesPerFlush, bool leaveOpen)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(pageSize, nameof(pageSize));
 
-        if (pagesPerFlush <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pagesPerFlush));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(pagesPerFlush, nameof(pagesPerFlush));
 
         _pageSize = pageSize;
         _pagesPerFlush = pagesPerFlush;
@@ -312,20 +306,11 @@ public sealed class OdfPagedGatherWritableStream : Stream
     private void ValidateWrite(byte[] buffer, int offset, int count)
     {
         ThrowIfDisposed();
-        if (buffer is null)
-        {
-            throw new ArgumentNullException(nameof(buffer));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
 
-        if (offset < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(offset, nameof(offset));
 
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
 
         if (buffer.Length - offset < count)
         {
@@ -413,7 +398,7 @@ public sealed class OdfPagedGatherWritableStream : Stream
 
         foreach (PageLease page in _fullPages)
         {
-            await _underlyingStream.WriteAsync(page.Buffer, 0, page.Count, cancellationToken).ConfigureAwait(false);
+            await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(_underlyingStream, page.Buffer, 0, page.Count, cancellationToken).ConfigureAwait(false);
         }
 
         Interlocked.Increment(ref SequentialFallbackFlushCountForTests);
@@ -464,10 +449,7 @@ public sealed class OdfPagedGatherWritableStream : Stream
 
     private void ThrowIfDisposed()
     {
-        if (_isDisposed)
-        {
-            throw new ObjectDisposedException(nameof(OdfPagedGatherWritableStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfPagedGatherWritableStream));
     }
 
     private readonly struct PageLease(byte[] buffer, int count)

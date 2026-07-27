@@ -5,7 +5,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class Type2CharStringVerifierTests
 {
     [Fact]
-    public void Verify_AcceptsCalculatedLocalSubroutineIndex()
+    public void VerifyAcceptsCalculatedLocalSubroutineIndex()
     {
         byte[] charString = [251, 0, 140, 12, 10, 10, 14];
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 139, 139, 21, 11 }];
@@ -18,7 +18,7 @@ public sealed class Type2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_ReturnsSeacComponentsReachedThroughLocalSubroutine()
+    public void VerifyReturnsSeacComponentsReachedThroughLocalSubroutine()
     {
         byte[] charString = [32, 10, 14];
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 139, 139, 204, 247, 86, 14 }];
@@ -37,7 +37,7 @@ public sealed class Type2CharStringVerifierTests
     [Theory]
     [InlineData(new byte[] { 139, 139, 255, 0, 65, 128, 0, 247, 86, 14 }, "seac-bchar")]
     [InlineData(new byte[] { 139, 139, 204, 247, 148, 14 }, "seac-achar")]
-    public void Verify_RejectsInvalidSeacComponentCodes(byte[] charString, string detail)
+    public void VerifyRejectsInvalidSeacComponentCodes(byte[] charString, string detail)
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Type2CharStringVerifier.Verify(
@@ -50,7 +50,7 @@ public sealed class Type2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsRecursiveSubroutineBeyondLimit()
+    public void VerifyRejectsRecursiveSubroutineBeyondLimit()
     {
         byte[] charString = [32, 10, 14];
         ReadOnlyMemory<byte>[] localSubroutines = [new byte[] { 32, 10, 11 }];
@@ -66,7 +66,7 @@ public sealed class Type2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsOperandStackOverflow()
+    public void VerifyRejectsOperandStackOverflow()
     {
         byte[] charString = Enumerable.Repeat((byte)139, 49).Append((byte)14).ToArray();
 
@@ -81,7 +81,7 @@ public sealed class Type2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_RejectsTruncatedHintMask()
+    public void VerifyRejectsTruncatedHintMask()
     {
         byte[] charString = [139, 139, 1, 19];
 
@@ -96,7 +96,7 @@ public sealed class Type2CharStringVerifierTests
     }
 
     [Fact]
-    public void Verify_AcceptsZeroLengthHintMaskAndClampedIndex()
+    public void VerifyAcceptsZeroLengthHintMaskAndClampedIndex()
     {
         byte[] charString =
         [139, 140, 251, 0, 12, 29, 12, 18, 12, 18, 12, 18, 19, 14];
@@ -111,7 +111,7 @@ public sealed class Type2CharStringVerifierTests
     [Theory]
     [InlineData(new byte[] { 140, 139, 12, 12, 14 }, "div-zero")]
     [InlineData(new byte[] { 138, 12, 26, 14 }, "sqrt-negative")]
-    public void Verify_RejectsKnownInvalidArithmetic(byte[] charString, string detail)
+    public void VerifyRejectsKnownInvalidArithmetic(byte[] charString, string detail)
     {
         InvalidDataException exception = Assert.Throws<InvalidDataException>(() =>
             Type2CharStringVerifier.Verify(

@@ -50,28 +50,28 @@ public static class OdfMemoryTracker
     /// </summary>
     public static long BoxingWarningThreshold { get; set; } = 10_000;
     /// <summary>
-    /// Short overload of Track that accepts ptr and size; remaining optional parameters use defaults and forward to the full overload.
-    /// 便利多載：提供 ptr 與 size；其餘可選參數使用預設值並轉呼叫最長 Track 多載。
+    /// Short overload of Track that accepts address and size; remaining optional parameters use defaults and forward to the full overload.
+    /// 便利多載：提供 address 與 size；其餘可選參數使用預設值並轉呼叫最長 Track 多載。
     /// </summary>
-    public static void Track(IntPtr ptr, long size) => Track(ptr, size, null);
+    public static void Track(IntPtr address, long size) => Track(address, size, null);
 
 
     /// <summary>
     /// Performs track.
     /// 追蹤非受控記憶體或 POH 鎖定分配。
     /// </summary>
-    /// <param name="ptr">記憶體區塊指標</param>
+    /// <param name="address">記憶體區塊指標</param>
     /// <param name="size">分配的大小 (位元組)</param>
     /// <param name="label">選用的標籤，用於說明分配目的</param>
-    public static void Track(IntPtr ptr, long size, string? label)
+    public static void Track(IntPtr address, long size, string? label)
     {
-        if (ptr == IntPtr.Zero)
+        if (address == IntPtr.Zero)
             return;
 
         var stackTrace = new StackTrace(1, true).ToString();
         var info = new AllocationInfo(size, label ?? "Unspecified", stackTrace);
 
-        if (Allocations.TryAdd(ptr, info))
+        if (Allocations.TryAdd(address, info))
         {
             long totalBytes = System.Threading.Interlocked.Add(ref _trackedBytes, size);
             OdfPerformanceTelemetry.RecordMemoryAllocation(size);
@@ -84,13 +84,13 @@ public static class OdfMemoryTracker
     /// Performs untrack.
     /// 取消追蹤並釋放非受控記憶體。
     /// </summary>
-    /// <param name="ptr">記憶體區塊指標</param>
-    public static void Untrack(IntPtr ptr)
+    /// <param name="address">記憶體區塊指標</param>
+    public static void Untrack(IntPtr address)
     {
-        if (ptr == IntPtr.Zero)
+        if (address == IntPtr.Zero)
             return;
 
-        if (Allocations.TryRemove(ptr, out var info))
+        if (Allocations.TryRemove(address, out var info))
         {
             System.Threading.Interlocked.Add(ref _trackedBytes, -info.Size);
             OdfPerformanceTelemetry.RecordMemoryFree(info.Size);
@@ -173,7 +173,7 @@ public static class OdfMemoryTracker
             sb.AppendLine("偵測到 OdfKit 未受控記憶體洩漏：");
             foreach (var kvp in Allocations)
             {
-                sb.AppendLine($"指標: 0x{kvp.Key.ToInt64():X}, 大小: {kvp.Value.Size} 位元組, 標籤: {kvp.Value.Label}");
+                sb.AppendLine(System.FormattableString.Invariant($"指標: 0x{kvp.Key.ToInt64():X}, 大小: {kvp.Value.Size} 位元組, 標籤: {kvp.Value.Label}"));
                 sb.AppendLine("分配時的堆疊追蹤：");
                 sb.AppendLine(kvp.Value.StackTrace);
                 sb.AppendLine(new string('-', 40));

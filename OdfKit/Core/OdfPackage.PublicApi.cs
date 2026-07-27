@@ -205,10 +205,8 @@ public sealed partial class OdfPackage
     /// <returns>是否確實發生變更</returns>
     public bool RawEntryPatch(string entryName, OdfRawEntryPatcher patcher)
     {
-        if (entryName == null)
-            throw new ArgumentNullException(nameof(entryName));
-        if (patcher == null)
-            throw new ArgumentNullException(nameof(patcher));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(entryName, nameof(entryName));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(patcher, nameof(patcher));
 
         entryName = SanitizeEntryName(entryName);
         if (!_entries.TryGetValue(entryName, out var entry))
@@ -309,12 +307,12 @@ public sealed partial class OdfPackage
     public string DumpVfsLayout()
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"[VFS Root] MimeType: {MimeType ?? "N/A"}, Version: {Version}");
+        sb.AppendLine(System.FormattableString.Invariant($"[VFS Root] MimeType: {MimeType ?? "N/A"}, Version: {Version}"));
 
         foreach (OdfPackageDebugEntry entry in OdfPackageDebugEntry.CreateEntries(this))
         {
             string details = $"[Size: {entry.Size} bytes, Compressed: {entry.Compressed}, Dirty: {entry.Dirty}, LocalHeaderOffset: {entry.LocalHeaderOffset}, DataOffset: {entry.CompressedDataOffset}, MediaType: {entry.MediaType}{(entry.Encrypted ? ", Encrypted" : string.Empty)}]";
-            sb.AppendLine($"  ├── {entry.Path} {details}");
+            sb.AppendLine(System.FormattableString.Invariant($"  ├── {entry.Path} {details}"));
         }
 
         return sb.ToString();
@@ -355,8 +353,7 @@ public sealed partial class OdfPackage
         /// </summary>
         public void Advance(int count)
         {
-            if (count < 0)
-                throw new ArgumentException(nameof(count));
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
             if (_written + count > _buffer.Length)
                 throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotAdvancePastBufferedLength"));
             _written += count;

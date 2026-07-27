@@ -17,7 +17,7 @@ public sealed class RelaxNgSchemaMetadataReader
     /// <summary>
     /// 從 RELAX NG 檔案及其相對 include 圖譜讀取結構描述中繼資料。
     /// </summary>
-    public SchemaMetadata ReadFile(string path)
+    public static SchemaMetadata ReadFile(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Schema path cannot be empty.", nameof(path));
@@ -32,10 +32,9 @@ public sealed class RelaxNgSchemaMetadataReader
     /// <summary>
     /// 從 RELAX NG 串流讀取結構描述中繼資料。
     /// </summary>
-    public SchemaMetadata Read(Stream stream, string source)
+    public static SchemaMetadata Read(Stream stream, string source)
     {
-        if (stream == null)
-            throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         string baseDirectory = string.IsNullOrWhiteSpace(source)
             ? Directory.GetCurrentDirectory()

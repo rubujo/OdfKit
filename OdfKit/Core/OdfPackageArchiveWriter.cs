@@ -202,7 +202,7 @@ internal static partial class OdfPackageArchiveWriter
     {
         LastFallbackCrcWriteCount++;
         using var crcStream = new OdfCrc32Stream(entryStream);
-        await crcStream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+        await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(crcStream, data, 0, data.Length, cancellationToken).ConfigureAwait(false);
         await crcStream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 

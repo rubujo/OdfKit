@@ -29,8 +29,7 @@ public sealed class PresentationDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public PresentationDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         configure(new TextDocumentMetadataBuilder(new OdfDocumentMetadata(_document)));
         return this;
     }
@@ -67,8 +66,7 @@ public sealed class PresentationDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public PresentationDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var styles = new OdfStyleSet();
         configure(styles);
@@ -120,8 +118,7 @@ public sealed class PresentationDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public PresentationDocumentBuilder AddSlide(string name, Action<OdfSlideBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         OdfSlide slide = _document.AddSlide(name);
         configure(new OdfSlideBuilder(slide, _theme));
         if (!string.IsNullOrWhiteSpace(_defaultMasterPageName))

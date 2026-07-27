@@ -29,7 +29,7 @@ public abstract partial class OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
-        if (!subPath.EndsWith("/"))
+        if (!global::OdfKit.Internal.OdfStringHelper.EndsWith(subPath, '/'))
             subPath += "/";
 
         if (OdfEmbeddedDocumentFactory.TryCreate(Package, subPath, out T document))
@@ -60,7 +60,7 @@ public abstract partial class OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
-        if (!subPath.EndsWith("/"))
+        if (!global::OdfKit.Internal.OdfStringHelper.EndsWith(subPath, '/'))
             subPath += "/";
 
         string mimeType = OdfEmbeddedDocumentFactory.GetMimeType<T>();

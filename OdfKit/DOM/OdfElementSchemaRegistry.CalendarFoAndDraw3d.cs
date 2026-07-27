@@ -68,7 +68,7 @@ internal static partial class OdfElementSchemaRegistry
     {
         if (!string.IsNullOrWhiteSpace(value))
         {
-            foreach (TEnum item in Enum.GetValues(typeof(TEnum)))
+            foreach (TEnum item in GetEnumValues<TEnum>())
             {
                 if (string.Equals(value, ToOdfToken(item.ToString()), StringComparison.Ordinal))
                 {
@@ -85,12 +85,32 @@ internal static partial class OdfElementSchemaRegistry
     internal static string FormatEnumToken<TEnum>(TEnum value, string exceptionMessage)
         where TEnum : struct, Enum
     {
-        if (Enum.IsDefined(typeof(TEnum), value))
+        if (IsDefinedEnum(value))
         {
             return ToOdfToken(value.ToString());
         }
 
         throw new ArgumentOutOfRangeException(nameof(value), value, exceptionMessage);
+    }
+
+    private static TEnum[] GetEnumValues<TEnum>()
+        where TEnum : struct, Enum
+    {
+#if NET6_0_OR_GREATER
+        return Enum.GetValues<TEnum>();
+#else
+        return (TEnum[])Enum.GetValues(typeof(TEnum));
+#endif
+    }
+
+    private static bool IsDefinedEnum<TEnum>(TEnum value)
+        where TEnum : struct, Enum
+    {
+#if NET6_0_OR_GREATER
+        return Enum.IsDefined(value);
+#else
+        return Enum.IsDefined(typeof(TEnum), value);
+#endif
     }
 
     internal static string ToOdfToken(string name)

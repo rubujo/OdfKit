@@ -19,7 +19,7 @@ internal static class OdfSignerConstants
     /// <returns>若需要涵蓋，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     internal static bool IsCoverableEntry(string normalizedEntryName)
     {
-        if (string.IsNullOrEmpty(normalizedEntryName) || normalizedEntryName.EndsWith("/", StringComparison.Ordinal))
+        if (string.IsNullOrEmpty(normalizedEntryName) || global::OdfKit.Internal.OdfStringHelper.EndsWith(normalizedEntryName, '/'))
             return false;
 
         return !string.Equals(normalizedEntryName, SignaturePath, StringComparison.OrdinalIgnoreCase) &&

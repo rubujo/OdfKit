@@ -67,7 +67,7 @@ public partial class OdfImageDocument
         return true;
     }
 
-    private static IReadOnlyDictionary<string, string> ParseFilterSettings(string? raw)
+    private static Dictionary<string, string> ParseFilterSettings(string? raw)
     {
         var result = new Dictionary<string, string>();
         if (string.IsNullOrEmpty(raw))

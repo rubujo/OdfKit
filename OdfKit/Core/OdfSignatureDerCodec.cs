@@ -19,7 +19,7 @@ internal static class OdfSignatureDerCodec
         {
             if (bigInt.IsZero)
                 return "0";
-            return bigInt.ToString("X").TrimStart('0');
+            return bigInt.ToString("X", System.Globalization.CultureInfo.InvariantCulture).TrimStart('0');
         }
         string normalized = serialHex.TrimStart('0').ToUpperInvariant();
         return normalized == "" ? "0" : normalized;

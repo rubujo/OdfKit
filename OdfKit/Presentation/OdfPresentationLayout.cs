@@ -206,8 +206,7 @@ public partial class PresentationDocument
     {
         if (string.IsNullOrEmpty(name))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationLayout_NameCannotBeEmpty_2"), nameof(name));
-        if (def is null)
-            throw new ArgumentNullException(nameof(def));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(def, nameof(def));
 
         // 取得或建立 master-styles 節點
         OdfNode? masterStyles = null;

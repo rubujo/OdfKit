@@ -7,7 +7,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class CffSubsetterTests
 {
     [Fact]
-    public void Build_AcceptsNameKeyedFontWithPredefinedCharset()
+    public void BuildAcceptsNameKeyedFontWithPredefinedCharset()
     {
         byte[] source = BuildNameKeyedCff([14], [139, 22, 14]);
 
@@ -32,7 +32,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Validate_DoesNotReuseCachedParseAcrossGlyphCounts()
+    public void ValidateDoesNotReuseCachedParseAcrossGlyphCounts()
     {
         byte[] source = BuildNameKeyedCff([14], [139, 22, 14]);
         CffSubsetter.Validate(
@@ -52,7 +52,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Validate_RejectsPredefinedCharsetBeyondItsBound()
+    public void ValidateRejectsPredefinedCharsetBeyondItsBound()
     {
         byte[][] charStrings = Enumerable.Repeat(new byte[] { 14 }, 230).ToArray();
         byte[] source = BuildNameKeyedCff(charStrings);
@@ -68,7 +68,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Build_RetainsIsoAdobeSeacComponents()
+    public void BuildRetainsIsoAdobeSeacComponents()
     {
         byte[][] charStrings = Enumerable.Range(0, 127)
             .Select(_ => new byte[] { 14 })
@@ -93,7 +93,7 @@ public sealed class CffSubsetterTests
     [Theory]
     [InlineData(1, 12)]
     [InlineData(2, 8)]
-    public void Build_RetainsPredefinedExpertSeacComponents(int charset, int commaGlyph)
+    public void BuildRetainsPredefinedExpertSeacComponents(int charset, int commaGlyph)
     {
         int glyphCount = commaGlyph + 1;
         byte[][] charStrings = Enumerable.Range(0, glyphCount)
@@ -122,7 +122,7 @@ public sealed class CffSubsetterTests
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(2)]
-    public void Build_RetainsCustomCharsetSeacComponents(int charsetFormat)
+    public void BuildRetainsCustomCharsetSeacComponents(int charsetFormat)
     {
         byte[][] charStrings =
         [
@@ -149,7 +149,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Build_RejectsMissingSeacComponent()
+    public void BuildRejectsMissingSeacComponent()
     {
         byte[][] charStrings = Enumerable.Range(0, 125)
             .Select(_ => new byte[] { 14 })
@@ -169,7 +169,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Build_RejectsNestedSeacComponent()
+    public void BuildRejectsNestedSeacComponent()
     {
         byte[][] charStrings = Enumerable.Range(0, 127)
             .Select(_ => new byte[] { 14 })
@@ -190,7 +190,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Validate_RejectsDuplicateCustomCharsetSid()
+    public void ValidateRejectsDuplicateCustomCharsetSid()
     {
         byte[] source = BuildNameKeyedCffWithCustomCharset(
             [34, 34],
@@ -210,7 +210,7 @@ public sealed class CffSubsetterTests
     }
 
     [Fact]
-    public void Build_RewritesPrivateSubrsOffsetsAndIsIdempotent()
+    public void BuildRewritesPrivateSubrsOffsetsAndIsIdempotent()
     {
         byte[] source = BuildNameKeyedCffWithPrivateSubrs(
             [14],
@@ -364,12 +364,12 @@ public sealed class CffSubsetterTests
         bytes.AddRange(encoded.ToArray());
     }
 
-    private static void AppendIndex(List<byte> bytes, IReadOnlyList<byte[]> objects)
+    private static void AppendIndex(List<byte> bytes, byte[][] objects)
     {
         Span<byte> count = stackalloc byte[2];
-        BinaryPrimitives.WriteUInt16BigEndian(count, checked((ushort)objects.Count));
+        BinaryPrimitives.WriteUInt16BigEndian(count, checked((ushort)objects.Length));
         bytes.AddRange(count.ToArray());
-        if (objects.Count == 0)
+        if (objects.Length == 0)
         {
             return;
         }

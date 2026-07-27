@@ -19,7 +19,7 @@ public class OdfPackageAsyncCancellationTests
     /// 預先取消的語彙應使 SaveAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SaveAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SaveAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -38,7 +38,7 @@ public class OdfPackageAsyncCancellationTests
     /// 預先取消的語彙應使 SaveToStreamAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SaveToStreamAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SaveToStreamAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -58,7 +58,7 @@ public class OdfPackageAsyncCancellationTests
     /// 未取消時 SaveToStreamAsync 應成功寫入可讀取的 ODF 封裝。
     /// </summary>
     [Fact]
-    public async Task SaveToStreamAsync_DefaultToken_CompletesSuccessfully()
+    public async Task SaveToStreamAsyncDefaultTokenCompletesSuccessfully()
     {
         using var package = OdfPackage.Create(new MemoryStream());
         package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -77,7 +77,7 @@ public class OdfPackageAsyncCancellationTests
     /// 預先取消的語彙應使 OpenAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task OpenAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task OpenAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         await using var source = await CreateMinimalPackageStreamAsync(TestContext.Current.CancellationToken);
 
@@ -94,7 +94,7 @@ public class OdfPackageAsyncCancellationTests
     /// 未取消時 OpenAsync 應成功載入可讀取的 ODF 封裝。
     /// </summary>
     [Fact]
-    public async Task OpenAsync_DefaultToken_CompletesSuccessfully()
+    public async Task OpenAsyncDefaultTokenCompletesSuccessfully()
     {
         await using var source = await CreateMinimalPackageStreamAsync(TestContext.Current.CancellationToken);
         source.Position = 0;

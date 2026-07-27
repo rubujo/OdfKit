@@ -13,7 +13,7 @@ public class OdfFontResolverTests
     /// 驗證字型替換對照規則的註冊與解析對照是否正確。
     /// </summary>
     [Fact]
-    public void RegisterFallback_And_MapFont_ResolvesCorrectly()
+    public void RegisterFallbackAndMapFontResolvesCorrectly()
     {
         // 1. 註冊替代對照規則
         string target = "Microsoft YaHei";
@@ -38,7 +38,7 @@ public class OdfFontResolverTests
     /// 驗證當註冊替代對照時傳入 Null 或空字串，應正確拋出 ArgumentNullException 例外。
     /// </summary>
     [Fact]
-    public void RegisterFallback_NullOrEmptyArguments_ThrowsArgumentNullException()
+    public void RegisterFallbackNullOrEmptyArgumentsThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback(null!, "Font"));
         Assert.Throws<ArgumentNullException>(() => OdfFontContext.Default.RegisterFallback("Font", null!));

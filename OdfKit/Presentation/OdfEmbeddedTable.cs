@@ -121,10 +121,8 @@ public sealed class OdfEmbeddedTable
     /// <exception cref="InvalidOperationException">當目標為被合併覆蓋的儲存格時擲出</exception>
     public OdfEmbeddedTable SetCellText(int row, int column, string text, OdfTextFontFallbackOptions options)
     {
-        if (text is null)
-            throw new ArgumentNullException(nameof(text));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
@@ -258,10 +256,8 @@ public sealed class OdfEmbeddedTable
     /// <returns>The current embedded table. / 目前嵌入表格。</returns>
     public OdfEmbeddedTable SetCellSpan(int row, int column, int rowSpan, int columnSpan)
     {
-        if (rowSpan < 1)
-            throw new ArgumentOutOfRangeException(nameof(rowSpan));
-        if (columnSpan < 1)
-            throw new ArgumentOutOfRangeException(nameof(columnSpan));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(rowSpan, 1, nameof(rowSpan));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(columnSpan, 1, nameof(columnSpan));
 
         OdfNode origin = GetCell(row, column);
         if (origin.LocalName == "covered-table-cell")
@@ -470,18 +466,14 @@ public sealed class OdfEmbeddedTable
 
     private OdfNode GetCell(int row, int column)
     {
-        if (row < 0)
-            throw new ArgumentOutOfRangeException(nameof(row));
-        if (column < 0)
-            throw new ArgumentOutOfRangeException(nameof(column));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(row, nameof(row));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(column, nameof(column));
         List<OdfNode> rows = GetRows();
-        if (row >= rows.Count)
-            throw new ArgumentOutOfRangeException(nameof(row));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThanOrEqual(row, rows.Count, nameof(row));
 
         OdfNode rowNode = rows[row];
         List<OdfNode> cells = GetCells(rowNode);
-        if (column >= cells.Count)
-            throw new ArgumentOutOfRangeException(nameof(column));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThanOrEqual(column, cells.Count, nameof(column));
         return cells[column];
     }
 

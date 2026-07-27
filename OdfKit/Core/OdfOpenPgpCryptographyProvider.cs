@@ -195,7 +195,7 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
         }
     }
 
-    private byte[] EncryptEntry(
+    private static byte[] EncryptEntry(
         byte[] plaintext,
         byte[] sessionKey,
         byte[] iv,

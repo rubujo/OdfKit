@@ -147,7 +147,7 @@ public sealed class OdfImageLayout
         string? styleName = _image.FrameNode.GetAttribute("style-name", OdfNamespaces.Draw);
         if (string.IsNullOrEmpty(styleName))
         {
-            styleName = "img-style-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            styleName = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("img-style-");
             _image.FrameNode.SetAttribute("style-name", OdfNamespaces.Draw, styleName, "draw");
         }
 

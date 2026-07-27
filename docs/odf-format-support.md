@@ -229,12 +229,12 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 
 | 副檔名 | (1) 高階 API 完成常見工作流程 | (2) 專屬測試 | (3) 來回讀寫／邊界／互通證據 | (4) Validate() 正負向 | (5) 文件同步 |
 |---|---|---|---|---|---|
-| `.odt` | ✅ | ✅ `TextHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
-| `.ott` | ✅ `CreateFromTemplate`／`CreateFromDocument` | ✅ `TemplateRoundTripTests` | ✅ 真機（`LibreOfficeHeadless_LoadsTemplateVariantDocuments`） | ✅ 通用骨架 | ✅ |
-| `.odm` | ✅ 子文件 CRUD／合併／大綱位移 | ✅ `MasterDocumentTests` | ✅ 真機（`LibreOfficeHeadless_LoadsMasterDocument`，`writerglobal8`） | ✅ 通用骨架 | ✅ |
-| `.oth` | ✅ `CreateFromDocument`／`CreateFromWebDocument`＋HTML 匯出整合 | ✅ `TextWebDocumentTests` | ✅ 真機（`LibreOfficeHeadless_LoadsWebTemplateDocument`，`writerweb8_writer`） | ✅ 通用骨架 | ✅ |
-| `.fodt` | ✅ `CreateFromFlatDocument`／`CreateFromDocument` | ✅ `FlatVariantRoundTripTests` | ✅ 真機（`LibreOfficeHeadless_LoadsNativeFlatXmlDocuments`） | ✅ 通用骨架 | ✅ |
-| `.ods` | ✅ | ✅ `SpreadsheetHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
+| `.odt` | ✅ | ✅ `TextHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadlessLoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
+| `.ott` | ✅ `CreateFromTemplate`／`CreateFromDocument` | ✅ `TemplateRoundTripTests` | ✅ 真機（`LibreOfficeHeadlessLoadsTemplateVariantDocuments`） | ✅ 通用骨架 | ✅ |
+| `.odm` | ✅ 子文件 CRUD／合併／大綱位移 | ✅ `MasterDocumentTests` | ✅ 真機（`LibreOfficeHeadlessLoadsMasterDocument`，`writerglobal8`） | ✅ 通用骨架 | ✅ |
+| `.oth` | ✅ `CreateFromDocument`／`CreateFromWebDocument`＋HTML 匯出整合 | ✅ `TextWebDocumentTests` | ✅ 真機（`LibreOfficeHeadlessLoadsWebTemplateDocument`，`writerweb8_writer`） | ✅ 通用骨架 | ✅ |
+| `.fodt` | ✅ `CreateFromFlatDocument`／`CreateFromDocument` | ✅ `FlatVariantRoundTripTests` | ✅ 真機（`LibreOfficeHeadlessLoadsNativeFlatXmlDocuments`） | ✅ 通用骨架 | ✅ |
+| `.ods` | ✅ | ✅ `SpreadsheetHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadlessLoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
 | `.ots` | ✅ | ✅ `TemplateRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
 | `.fods` | ✅ | ✅ `FlatVariantRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
 | `.odp` | ✅ | ✅ `PresentationHighLevelApiTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
@@ -246,7 +246,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 | `.odc` | ✅ 軸線／序列／樣式／error-indicator／regression-curve／mean-value | ✅ `ChartHighLevelApiTests` | ✅\* 嵌入 ODS 真機成功；獨立檔案經實機確認上游不支援（已記錄） | ✅ 通用骨架 | ✅ |
 | `.otc` | ✅ `CreateFromDocument`／`CreateFromTemplate` | ✅ `ChartVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
 | `.fodc` | ✅ `CreateFromDocument`／`CreateFromFlatDocument` | ✅ `ChartVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄（誤判為 Writer document） | ✅ 通用骨架 | ✅ |
-| `.odf` | ✅ MathML token／builder／LaTeX／annotation | ✅ `FormulaHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsFormulaDocument`，`math8`） | ✅ 通用骨架 | ✅ |
+| `.odf` | ✅ MathML token／builder／LaTeX／annotation | ✅ `FormulaHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadlessLoadsFormulaDocument`，`math8`） | ✅ 通用骨架 | ✅ |
 | `.otf` | ✅ `CreateFromDocument`／`CreateFromTemplate` | ✅ `FormulaVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
 | `.fdf` | ✅ `CreateFromDocument`／`CreateFromFlatDocument` | ✅ `FormulaVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄（誤判為 Calc document） | ✅ 通用骨架 | ✅ |
 | `.odi` | ✅ 多框架／版面／旋轉／裁切／濾鏡／批次操作 | ✅ `ImageHighLevelApiTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
@@ -256,8 +256,8 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 
 第 (4) 項「Validate() 正負向」對所有列皆標示「✅ 通用骨架」：因 `OdfDocument.Validate()`／
 `ValidateAsync()` 定義於基底類別，對全部文件種類自動生效，無需逐格式重複實作或測試；正向
-與負向覆蓋見 `OdfValidatorApiTests.DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed`
-與 `DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile`。
+與負向覆蓋見 `OdfValidatorApiTests.DocumentInstanceValidateAcrossSecondaryFormatKindsAllSucceed`
+與 `DocumentInstanceValidateDetectsUnregisteredElementUnderStrictProfile`。
 
 ## 深度狀態與限制
 
@@ -277,7 +277,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
   既有）與新增的 `TextTemplateDocument.CreateFromDocument`／`SpreadsheetTemplateDocument.CreateFromDocument`／
   `PresentationTemplateDocument.CreateFromDocument`／`GraphicsTemplateDocument.CreateFromDocument`
   （文件→範本，本次新增），並各補上 `TemplateRoundTripTests` 雙向往返測試與
-  `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsTemplateVariantDocuments` 實機互通驗收。
+  `LibreOfficeInteropTests.LibreOfficeHeadlessLoadsTemplateVariantDocuments` 實機互通驗收。
   2026-06-23 完成時依「範本內容編輯仍沿用基底格式語意 API，尚未有範本專屬深度內容模型」為
   理由維持 `usable-variant`；2026-06-24 依 5 項完成標準（高階 API、
   專屬測試、round-trip／boundary／interop 證據、`Validate()` 正負向、文件同步）重新檢視，
@@ -287,11 +287,11 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
   狀態，內部委派既有 `OdfValidator` 靜態進入點與 `OdfValidationReport` 結構化結果。因定義於
   `OdfDocument` 基底類別，對全部文件種類（包含 Chart／Formula／Image／Database 等次要格式與其
   Template／Flat 變體）皆通用，無需逐格式重複實作。測試見
-  `OdfValidatorApiTests.DocumentInstance_Validate_ReflectsUnsavedEdits`、
-  `DocumentInstance_ValidateAsync_ReturnsStructuredReport`（正向，Text）、
-  `DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed`（正向，跨 Chart／Formula／
+  `OdfValidatorApiTests.DocumentInstanceValidateReflectsUnsavedEdits`、
+  `DocumentInstanceValidateAsyncReturnsStructuredReport`（正向，Text）、
+  `DocumentInstanceValidateAcrossSecondaryFormatKindsAllSucceed`（正向，跨 Chart／Formula／
   Image／Database 驗證 API 通用性）、
-  `DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile`（負向，插入未註冊
+  `DocumentInstanceValidateDetectsUnregisteredElementUnderStrictProfile`（負向，插入未註冊
   schema 元素於嚴格設定檔下應回報失敗）。
 - `.fodt`／`.fods`／`.fodp`／`.fodg`（Batch 1 第二波，2026-06-23）：新增型別化 Flat XML↔ZIP
   雙向轉換工作流——`FlatTextDocument.CreateFromDocument(TextDocument)`／
@@ -302,7 +302,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
   `PresentationDocument.CreateFromFlatDocument`／`DrawingDocument.CreateFromFlatDocument`
   （Flat→ZIP），共用 `OdfDocument.ConvertFlatVariantInternal` 基礎實作，呼應範本批次的
   `CreateFromTemplate`／`CreateFromDocument` 模式。新增 `FlatVariantRoundTripTests` 雙向往返與
-  邊界測試，並新增 `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsNativeFlatXmlDocuments`——
+  邊界測試，並新增 `LibreOfficeInteropTests.LibreOfficeHeadlessLoadsNativeFlatXmlDocuments`——
   以 OdfKit **直接產生**（非由 ZIP 轉換而來）的原生 FODT／FODS／FODP／FODG 檔案實機驗證
   LibreOffice 26.x 可直接開啟，證明 Flat XML 與 ZIP 封裝的高階工作流對 LibreOffice 而言互通等價。
   2026-06-24 依 5 項完成標準重新檢視，**升級為 `workflow-verified`**（理由與範本變體相同：
@@ -313,17 +313,17 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
   `GetSubDocumentReferences`／`RemoveSubDocumentReference`／`ReorderSubDocumentReferences`／
   `SetSubDocumentLoadOnRequest`／`MergeSubDocuments`），本次補上：(1) 實機 LibreOffice 26.x
   互通驗收——已確認 LibreOffice 將 .odm 識別為「Writer master document」並使用
-  `writerglobal8` 篩選器，非僅理論相容（`LibreOfficeInteropTests.LibreOfficeHeadless_LoadsMasterDocument`）；
+  `writerglobal8` 篩選器，非僅理論相容（`LibreOfficeInteropTests.LibreOfficeHeadlessLoadsMasterDocument`）；
   (2) 邊界測試——子文件參照目標檔案不存在時擲出 `FileNotFoundException`，
   `baseDirectory` 為空白時擲出 `ArgumentException`（`MasterDocumentTests`）。
 - `.oth`（Batch 2 第二項，2026-06-23）：新增型別化雙向轉換工作流
   `TextWebDocument.CreateFromDocument(TextDocument)` ↔ `TextDocument.CreateFromWebDocument(TextWebDocument)`，
   重用範本批次的種類／MIME 置換基礎實作。新增 `TextWebDocumentTests`（雙向往返、高階 API
-  編輯、null 引數邊界）；新增 `OdfHtmlExporter_AcceptsTextWebDocumentDirectly` 證明
+  編輯、null 引數邊界）；新增 `OdfHtmlExporterAcceptsTextWebDocumentDirectly` 證明
   `OdfKit.Extensions.Html` 的 `OdfHtmlExporter.Export(TextDocument)` 因繼承關係可直接接受
   OTH 文件，不需任何轉接層，滿足「與 HTML／export 行為一致性」要求。新增實機 LibreOffice
   互通驗收——已確認 LibreOffice 將 .oth 識別為「Writer/Web document」並使用
-  `writerweb8_writer` 篩選器轉換為 ODT（`LibreOfficeHeadless_LoadsWebTemplateDocument`）。
+  `writerweb8_writer` 篩選器轉換為 ODT（`LibreOfficeHeadlessLoadsWebTemplateDocument`）。
   2026-06-24 依 5 項完成標準重新檢視，**升級為 `workflow-verified`**（內容模型本身與 ODT 相同、
   未有專屬深度內容模型，但這不在最低完成標準之內）。
 - `.odc`／`.otc`／`.fodc`（Batch 3，2026-06-23）：現況調查發現既有圖表實作已遠比文件先前
@@ -340,16 +340,16 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
     `FlatChartDocument.CreateFromDocument(ChartDocument)` ↔
     `ChartDocument.CreateFromFlatDocument(FlatChartDocument)`，重用既有種類／MIME 置換
     基礎實作。新增 `ChartVariantRoundTripTests`（雙向往返、null 引數邊界）。
-  - 新增 `ChartHighLevelApiTests.SeriesErrorIndicatorRegressionCurveAndMeanValue_RoundTripAfterSaveAndLoad`
+  - 新增 `ChartHighLevelApiTests.SeriesErrorIndicatorRegressionCurveAndMeanValueRoundTripAfterSaveAndLoad`
     驗證上述三項 API 與其 schema 順序。
   - **互通驗收的誠實負向結果**：實測確認 LibreOffice 26.2.1 不支援將獨立（非嵌入
     ODS/ODT/ODP）的 ODC／OTC 開啟為主文件（回報 `source file could not be loaded`），
     FODC 則被誤判為「Writer document」僅原樣回顯來源 XML，並非真正剖析。
-    這與既有 `ImageDocument_PackageStructureMatchesOdf14Schema` 註解中
+    這與既有 `ImageDocumentPackageStructureMatchesOdf14Schema` 註解中
     「LibreOffice 已在 draw.xcd 註冊 ODC」的舊有假設不符——已在
-    `LibreOfficeInteropTests.OdfChartDocument_PackageStructureMatchesOdf14Schema` 的文件
+    `LibreOfficeInteropTests.OdfChartDocumentPackageStructureMatchesOdf14Schema` 的文件
     註解中修正此假設。改以封裝結構驗證取代真機驗證，並以既有
-    `LibreOfficeHeadless_LoadsGeneratedDocuments` 中「圖表嵌入 ODS 後由 LibreOffice 開啟」
+    `LibreOfficeHeadlessLoadsGeneratedDocuments` 中「圖表嵌入 ODS 後由 LibreOffice 開啟」
     的驗收佐證嵌入式圖表（ODF Chart 設計上唯一的真實使用情境）的互通性。
   - 2026-06-23 完成時依「仍缺 Legend 統一可編輯模型與 fluent builder API」為理由維持
     `usable`／`usable-variant`；2026-06-24 依 5 項完成標準重新檢視，
@@ -381,11 +381,11 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
     `Package.IsFlatXml` 為 `false`（ZIP 封裝）時才轉換為裸根節點，Flat XML 情境維持包裹結構）。
   - 新增 `FormulaVariantRoundTripTests`（雙向往返、邊界測試）。
   - **互通驗收**：實測確認獨立 `.odf` 文件**確實有真機支援**——LibreOffice 26.2.1 將其識別為
-    「Math document」並使用 `math8` 篩選器（`LibreOfficeHeadless_LoadsFormulaDocument`），是
+    「Math document」並使用 `math8` 篩選器（`LibreOfficeHeadlessLoadsFormulaDocument`），是
     目前唯一一個獨立 ZIP 主格式有真機支援的次要格式（不同於 Chart／Image）。但 `.otf`／`.fdf`
     變體仍與 Chart／Image 的變體一樣不受 LibreOffice 支援為獨立主文件（`.otf` 回報
     「source file could not be loaded」；`.fdf` 被誤判為「Calc document」），改以封裝結構驗證
-    取代（`OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema`）。
+    取代（`OdfFormulaVariantDocumentPackageStructureMatchesOdf14Schema`）。
   - 2026-06-23 完成時依「仍缺公式語意編輯 helper（例如『尋找分數→取得分子→
     更新分子』這類查詢－修改－更新 API）」為理由維持 `usable`／`usable-variant`；
     2026-06-24 依 5 項完成標準重新檢視，確認已全部滿足，**升級為
@@ -410,7 +410,7 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
     `FlatImageDocument.CreateFromDocument(...)` ↔
     `ImageDocument.CreateFromFlatDocument(...)`。新增
     `ImageVariantRoundTripTests`（雙向往返、邊界測試）。
-  - **修正一個既有文件註解的不準確描述**：`ImageDocument_PackageStructureMatchesOdf14Schema`
+  - **修正一個既有文件註解的不準確描述**：`ImageDocumentPackageStructureMatchesOdf14Schema`
     原先聲稱 LibreOffice 對 ODI／OTI／FODI 一律回報「source file could not be loaded」；
     實測確認此描述對 ODI／OTI 成立，但 **FODI 實際上被誤判為「Writer document」**，以
     `writer_png_Export` 篩選器產生與影像內容完全無關的輸出，與 `.fodc`（誤判為 Writer
@@ -536,7 +536,7 @@ LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKi
 
 - OpenPGP 寫入已改為 ODF 1.4 Part 2 的封裝形狀：整個 package 共用 256-bit session key，
   entry 先 deflate、以壓縮後未加密資料前 1024 bytes 計算 `#sha256-1k`，再以 AES-256-CBC
-  加密並以 ZIP `STORED` 保存。收件人的完整 OpenPGP encrypted message 位於根層
+  加密並以 ZIP `STORED` 儲存。收件人的完整 OpenPGP encrypted message 位於根層
   `manifest:encrypted-key`／`CipherData`／`CipherValue`，entry 的 key derivation 只宣告 `PGP`。
   `OpenPgpExternalInteropTests` 以臨時真實 RSA 金鑰確認 GnuPG 能解出 OdfKit session key，
   `odf-external-baseline.yml` 再以 Jing 驗證執行期產生的 manifest。
@@ -544,7 +544,7 @@ LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKi
   OdfKit 單一 PKESK payload 均保留。tag 20 由 OdfKit 驗證分塊與 final authentication tag，
   因為 BouncyCastle.Cryptography 2.6.2 的高階 OpenPGP parser 尚未支援此封包；實機測試
   強制 GnuPG 2.5.21 產生 tag 20，並確認末端竄改會遭拒絕。
-- `LibreOfficeUno_OpenPgpRealKeyBidirectionalRoundTrip` 以臨時 RSA 金鑰驗證 OdfKit 寫入後
+- `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` 以臨時 RSA 金鑰驗證 OdfKit 寫入後
   LibreOffice 26.2.4.2 可解密並重新儲存；LibreOffice 轉出的 wholesome AES-256-GCM +
   OpenPGP key transport 封裝再由 OdfKit 解密，且核對 LibreOffice 新增內容與根層
   `manifest:encrypted-key`。此測試由每週雙 TFM workflow 強制執行。

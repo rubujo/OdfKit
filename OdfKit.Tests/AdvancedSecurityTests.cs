@@ -44,7 +44,7 @@ namespace OdfKit.Tests
         [InlineData(OdfVersion.Odf12, "1.2")]
         [InlineData(OdfVersion.Odf13, "1.3")]
         [InlineData(OdfVersion.Odf14, "1.3")]
-        public async Task OdfSigner_Version_WritesSignatureDocumentVersionForPackageVersion(OdfVersion packageVersion, string expectedVersion)
+        public async Task OdfSignerVersionWritesSignatureDocumentVersionForPackageVersion(OdfVersion packageVersion, string expectedVersion)
         {
             using var cert = GenerateSelfSignedCertificate("VersionSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var stream = new MemoryStream();
@@ -98,7 +98,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task VerifySignaturesAsync_UnsignedAppendedEntry_ReturnsInvalidCoverage()
+        public async Task VerifySignaturesAsyncUnsignedAppendedEntryReturnsInvalidCoverage()
         {
             using var cert = GenerateSelfSignedCertificate("XmlDsigCoverageSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var signed = new MemoryStream();
@@ -1703,8 +1703,7 @@ namespace OdfKit.Tests
                 using var tsMs = new MemoryStream();
                 tsStream.CopyTo(tsMs);
                 byte[] sigBytes = tsMs.ToArray();
-                using var sha256 = SHA256.Create();
-                byte[] calculatedHash = sha256.ComputeHash(sigBytes);
+                byte[] calculatedHash = SHA256.HashData(sigBytes);
 
                 byte[] tsBytes = Convert.FromBase64String(encap!);
                 var signedCms = new SignedCms();
@@ -1810,8 +1809,7 @@ namespace OdfKit.Tests
                 tsStream.CopyTo(tsMs);
                 byte[] sigValueBytes = tsMs.ToArray();
 
-                using var sha256 = SHA256.Create();
-                byte[] sigHash = sha256.ComputeHash(sigValueBytes);
+                byte[] sigHash = SHA256.HashData(sigValueBytes);
 
                 string canonString = Encoding.UTF8.GetString(sigValueBytes);
                 string hashB64 = Convert.ToBase64String(sigHash);
@@ -2011,7 +2009,7 @@ namespace OdfKit.Tests
         }
     }
 
-    internal class DerNode
+    internal sealed class DerNode
     {
         public byte Tag { get; set; }
         public byte[] Value { get; set; }

@@ -199,7 +199,7 @@ internal sealed class OdfWebFontGenerationService
             || request.RequiredBrowserTargets is null
             || request.RequiredBrowserTargets.Distinct().Count() != request.RequiredBrowserTargets.Count
             || request.RequiredBrowserTargets.Any(
-                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target))
+            target => !OdfKit.Internal.OdfEnumHelper.IsDefined(target))
             || !_options.AllowedProfileIds.Contains(request.ProfileId, StringComparer.Ordinal))
         {
             return false;

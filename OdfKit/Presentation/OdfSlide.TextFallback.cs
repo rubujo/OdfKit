@@ -24,15 +24,9 @@ public partial class OdfSlide
     /// <returns>The added text box shape instance. / 新增的文字方塊圖形執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text, OdfTextFontFallbackOptions options)
     {
-        if (text is null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         var frame = CreateDrawingFrame(x, y, w, h);
         var textBoxNode = new OdfNode(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");

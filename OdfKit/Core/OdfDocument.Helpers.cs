@@ -36,6 +36,7 @@ public abstract partial class OdfDocument
     /// <param name="root">設定 DOM 根節點</param>
     /// <param name="name">設定集合名稱</param>
     /// <returns>設定集合節點</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode FindOrCreateSettingsNode(OdfNode root, string name)
         => OdfDocumentSettingsEngine.FindOrCreateSettingsNode(root, name);
 
@@ -46,6 +47,7 @@ public abstract partial class OdfDocument
     /// <param name="root">設定 DOM 根節點</param>
     /// <param name="name">設定集合名稱</param>
     /// <returns>設定集合節點；若不存在則為 <see langword="null"/></returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode? FindSettingsNode(OdfNode root, string name)
         => OdfDocumentSettingsEngine.FindSettingsNode(root, name);
 
@@ -56,6 +58,7 @@ public abstract partial class OdfDocument
     /// <param name="setNode">設定集合節點</param>
     /// <param name="name">map 名稱</param>
     /// <returns>設定 map 節點</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode FindOrCreateMapNode(OdfNode setNode, string name)
         => OdfDocumentSettingsEngine.FindOrCreateMapNode(setNode, name);
 
@@ -65,6 +68,7 @@ public abstract partial class OdfDocument
     /// </summary>
     /// <param name="mapNode">設定 map 節點</param>
     /// <returns>設定 map entry 節點</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode FindOrCreateMapEntryNode(OdfNode mapNode)
         => OdfDocumentSettingsEngine.FindOrCreateMapEntryNode(mapNode);
 
@@ -76,6 +80,7 @@ public abstract partial class OdfDocument
     /// <param name="name">設定專案名稱</param>
     /// <param name="type">設定專案類型</param>
     /// <returns>設定專案節點</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
         => OdfDocumentSettingsEngine.FindOrCreateConfigItemNode(entryNode, name, type);
 

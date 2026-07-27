@@ -44,8 +44,7 @@ internal static partial class OdfSignatureVerifier
         options ??= new OdfSigningOptions();
         var result = new OdfSignatureValidationResult { IsValid = true };
 
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
 
         if (!package.HasEntry(profile.SignaturePath))
         {

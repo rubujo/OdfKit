@@ -77,9 +77,7 @@ public partial class PresentationDocument
     public OdfSlide CloneSlide(int sourceSlideIndex)
     {
         if (sourceSlideIndex < 0 || sourceSlideIndex >= _slides.Count)
-        {
             throw new ArgumentOutOfRangeException(nameof(sourceSlideIndex));
-        }
 
         var sourceSlide = _slides[sourceSlideIndex];
         var clonedNode = sourceSlide.Node.CloneNode(deep: true);
@@ -109,9 +107,7 @@ public partial class PresentationDocument
     public void RemoveSlide(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= _slides.Count)
-        {
             throw new ArgumentOutOfRangeException(nameof(slideIndex));
-        }
 
         var slide = _slides[slideIndex];
         var presentationNode = GetPresentationNode();
@@ -127,10 +123,7 @@ public partial class PresentationDocument
     /// <returns><see langword="true"/> if the slide was removed; otherwise, <see langword="false"/>. / 若已移除投影片則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool RemoveSlide(OdfSlide slide)
     {
-        if (slide is null)
-        {
-            throw new ArgumentNullException(nameof(slide));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(slide, nameof(slide));
         int index = _slides.IndexOf(slide);
         if (index < 0)
         {
@@ -150,10 +143,10 @@ public partial class PresentationDocument
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an index is out of range. / 索引超出範圍時拋出。</exception>
     public void MoveSlide(int fromIndex, int toIndex)
     {
-        if (fromIndex < 0 || fromIndex >= _slides.Count || toIndex < 0 || toIndex >= _slides.Count)
-        {
-            throw new ArgumentOutOfRangeException();
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(fromIndex, nameof(fromIndex));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThanOrEqual(fromIndex, _slides.Count, nameof(fromIndex));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(toIndex, nameof(toIndex));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThanOrEqual(toIndex, _slides.Count, nameof(toIndex));
 
         if (fromIndex == toIndex)
         {

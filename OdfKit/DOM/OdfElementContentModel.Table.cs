@@ -75,15 +75,9 @@ public partial class TableTableElement
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="position"/> or <paramref name="count"/> is negative. / 當 <paramref name="position"/> 或 <paramref name="count"/> 小於 0 時擲出。</exception>
     public void InsertRows(int position, int count)
     {
-        if (position < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(position));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
 
         if (count == 0)
         {
@@ -110,15 +104,9 @@ public partial class TableTableElement
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="position"/> or <paramref name="count"/> is negative. / 當 <paramref name="position"/> 或 <paramref name="count"/> 小於 0 時擲出。</exception>
     public void DeleteRows(int position, int count)
     {
-        if (position < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(position));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
 
         if (count == 0)
         {
@@ -139,20 +127,11 @@ public partial class TableTableElement
     /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="sourcePosition"/>、<paramref name="count"/> 或 <paramref name="targetPosition"/> 小於 0 時擲出</exception>
     public void CopyRows(int sourcePosition, int count, int targetPosition)
     {
-        if (sourcePosition < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourcePosition, nameof(sourcePosition));
 
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
 
-        if (targetPosition < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(targetPosition));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetPosition, nameof(targetPosition));
 
         if (count == 0)
         {
@@ -175,20 +154,11 @@ public partial class TableTableElement
     /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="sourcePosition"/>、<paramref name="count"/> 或 <paramref name="targetPosition"/> 小於 0 時擲出</exception>
     public void MoveRows(int sourcePosition, int count, int targetPosition)
     {
-        if (sourcePosition < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourcePosition, nameof(sourcePosition));
 
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
 
-        if (targetPosition < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(targetPosition));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetPosition, nameof(targetPosition));
 
         if (count == 0)
         {

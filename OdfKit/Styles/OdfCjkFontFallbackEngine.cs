@@ -34,10 +34,7 @@ internal static class OdfCjkFontFallbackEngine
     /// <param name="document">The target ODF document. / 目標 ODF 文件。</param>
     internal static void ApplyFontFallback(OdfDocument document)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         ApplyFontFaces(document, DefaultFallbackFonts);
     }
@@ -50,15 +47,9 @@ internal static class OdfCjkFontFallbackEngine
     /// <param name="options">The font fallback options. / 字型遞補選項。</param>
     internal static void ApplyFontFallback(OdfDocument document, OdfTextFontFallbackOptions options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         ApplyFontFaces(document, options.FontFaces);
     }

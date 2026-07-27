@@ -125,10 +125,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     /// <returns>目前的影像元素，供鏈式呼叫使用</returns>
     public DrawImageElement SetEffects(Action<OdfImageEffectsBuilder> configure)
     {
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         configure(new OdfImageEffectsBuilder(this));
         return this;
@@ -145,15 +142,9 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     /// <exception cref="InvalidOperationException">當此影像尚未附加到文件 DOM，因此無法取得封裝容器時擲出</exception>
     public string SetImageSource(byte[] bytes, string fileName)
     {
-        if (bytes is null)
-        {
-            throw new ArgumentNullException(nameof(bytes));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bytes, nameof(bytes));
 
-        if (fileName is null)
-        {
-            throw new ArgumentNullException(nameof(fileName));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(fileName, nameof(fileName));
 
         OdfDocument document = Document
             ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_DrawImageElement_DocumentRequiredForImageSource"));
@@ -401,7 +392,7 @@ internal static class OdfTransformHelper
         var match = MatrixRegex.Match(transformStr);
         if (match.Success && match.Value.Trim() == transformStr!.Trim())
         {
-            var parts = match.Groups[1].Value.Split(new[] { ' ', ',', ';', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = global::OdfKit.Internal.OdfStringHelper.SplitDrawingValues(match.Groups[1].Value);
             if (parts.Length >= 6 &&
                 float.TryParse(parts[0], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out float m11) &&
                 float.TryParse(parts[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out float m12) &&
@@ -428,7 +419,7 @@ internal static class OdfTransformHelper
 
             string type = trimmed.Substring(0, openParen).Trim().ToLowerInvariant();
             string argsStr = trimmed.Substring(openParen + 1).Trim();
-            var args = argsStr.Split(new[] { ' ', ',', ';', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            var args = global::OdfKit.Internal.OdfStringHelper.SplitDrawingArguments(argsStr);
 
             if (type == "matrix" && args.Length >= 6)
             {

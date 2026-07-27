@@ -43,7 +43,7 @@ internal static class TextDocumentTrackChangesRecordingEngine
                 bodyTextRoot.AppendChild(tcNode);
         }
 
-        string changeId = "ct_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("ct_");
 
         var changedRegion = new OdfNode(OdfNodeType.Element, "changed-region", OdfNamespaces.Text, "text");
         changedRegion.SetAttribute("id", OdfNamespaces.Text, changeId, "text");

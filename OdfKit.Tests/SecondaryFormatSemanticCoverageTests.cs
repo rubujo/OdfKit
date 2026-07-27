@@ -25,7 +25,7 @@ public class SecondaryFormatSemanticCoverageTests
     /// <param name="kind">The document kind. / 文件種類。</param>
     [Theory]
     [MemberData(nameof(LegacyVersionCases))]
-    public void SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent(
+    public void SecondaryFormatsHighLevelMutationPreservesVersionAndForeignContent(
         OdfVersion version,
         OdfDocumentKind kind)
     {
@@ -59,7 +59,7 @@ public class SecondaryFormatSemanticCoverageTests
     [InlineData(OdfDocumentKind.Database)]
     [InlineData(OdfDocumentKind.Formula)]
     [InlineData(OdfDocumentKind.Image)]
-    public void VersionCompatibilityReport_CoversEverySecondaryFormat(OdfDocumentKind kind)
+    public void VersionCompatibilityReportCoversEverySecondaryFormat(OdfDocumentKind kind)
     {
         using OdfDocument document = OdfDocument.Create(kind);
         GetSemanticRoot(document, kind).AppendChild(
@@ -78,7 +78,7 @@ public class SecondaryFormatSemanticCoverageTests
     /// 驗證次要格式載入器會拒絕不同文件種類的封裝。
     /// </summary>
     [Fact]
-    public void SecondaryLoaders_RejectMismatchedDocumentKinds()
+    public void SecondaryLoadersRejectMismatchedDocumentKinds()
     {
         byte[] textPackage;
         using (var stream = new MemoryStream())

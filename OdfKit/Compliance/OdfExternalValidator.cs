@@ -214,8 +214,8 @@ public static class OdfExternalValidator
         };
 
         StartProcess(process);
-        Task<string> standardOutputTask = process.StandardOutput.ReadToEndAsync();
-        Task<string> standardErrorTask = process.StandardError.ReadToEndAsync();
+        Task<string> standardOutputTask = global::OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardOutput, cancellationToken);
+        Task<string> standardErrorTask = global::OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardError, cancellationToken);
 
         bool exited = await WaitForProcessExitAsync(process, timeoutMilliseconds, cancellationToken).ConfigureAwait(false);
         if (!exited)
@@ -319,7 +319,7 @@ internal static class OdfNativeProcessErrorMode
         }
 
         uint previousMode = GetErrorMode();
-        SetErrorMode(previousMode | SemNoGpFaultErrorBox);
+        _ = SetErrorMode(previousMode | SemNoGpFaultErrorBox);
         return new Scope(previousMode);
     }
 
@@ -338,7 +338,7 @@ internal static class OdfNativeProcessErrorMode
         {
             if (restore)
             {
-                SetErrorMode(previousMode);
+                _ = SetErrorMode(previousMode);
             }
         }
     }

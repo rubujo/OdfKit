@@ -42,10 +42,7 @@ public sealed class OdfDatabaseSchema
     /// <exception cref="InvalidOperationException">When a table with the same name already exists in the schema. / 當資料表名稱已存在於 Schema 中時擲出。</exception>
     public void AddTable(OdfSchemaTable table)
     {
-        if (table is null)
-        {
-            throw new ArgumentNullException(nameof(table));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(table, nameof(table));
 
         if (_tables.Any(t => string.Equals(t.Name, table.Name, StringComparison.OrdinalIgnoreCase)))
         {
@@ -429,7 +426,7 @@ public sealed class OdfDatabaseSchema
         database.AppendChild(schemaDef);
     }
 
-    private OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
+    private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
     {
         var child = FindChildElement(parent, localName, namespaceUri);
         if (child is not null)
@@ -442,7 +439,7 @@ public sealed class OdfDatabaseSchema
         return child;
     }
 
-    private OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
     {
         foreach (var child in parent.Children)
         {
@@ -535,10 +532,7 @@ public sealed class OdfSchemaTable
     /// <exception cref="InvalidOperationException">When a column with the same name already exists. / 當同名欄位已存在時擲出。</exception>
     public void AddColumn(OdfSchemaColumn column)
     {
-        if (column is null)
-        {
-            throw new ArgumentNullException(nameof(column));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(column, nameof(column));
 
         if (_columns.Any(existing =>
             string.Equals(existing.Name, column.Name, StringComparison.OrdinalIgnoreCase)))
@@ -581,10 +575,7 @@ public sealed class OdfSchemaTable
     /// <exception cref="InvalidOperationException">When a named foreign key with the same name already exists. / 當同名具名外鍵已存在時擲出。</exception>
     public void AddForeignKey(OdfSchemaForeignKey foreignKey)
     {
-        if (foreignKey is null)
-        {
-            throw new ArgumentNullException(nameof(foreignKey));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(foreignKey, nameof(foreignKey));
 
         if (!string.IsNullOrWhiteSpace(foreignKey.Name) &&
             _foreignKeys.Any(existing =>
@@ -644,10 +635,7 @@ public sealed class OdfSchemaTable
     /// <exception cref="InvalidOperationException">When an index with the same name already exists. / 當同名索引已存在時擲出。</exception>
     public void AddIndex(OdfSchemaIndex index)
     {
-        if (index is null)
-        {
-            throw new ArgumentNullException(nameof(index));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(index, nameof(index));
 
         if (_indexes.Any(existing =>
             string.Equals(existing.Name, index.Name, StringComparison.OrdinalIgnoreCase)))

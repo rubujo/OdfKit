@@ -24,10 +24,7 @@ public abstract partial class OdfDocument
     /// <returns>The extracted plain text. / 擷取出的純文字。</returns>
     public string ExtractText(OdfTextExtractionOptions options)
     {
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         return OdfDocumentTextExtractionEngine.Extract(ContentDom, options);
     }

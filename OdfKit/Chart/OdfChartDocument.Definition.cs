@@ -31,7 +31,7 @@ public partial class OdfChartDocument
             if (!string.IsNullOrEmpty(rangeAddress))
             {
                 string cleanAddress = rangeAddress!;
-                if (cleanAddress.StartsWith("[", StringComparison.Ordinal) && cleanAddress.EndsWith("]", StringComparison.Ordinal))
+                if (global::OdfKit.Internal.OdfStringHelper.StartsWith(cleanAddress, '[') && global::OdfKit.Internal.OdfStringHelper.EndsWith(cleanAddress, ']'))
                 {
                     cleanAddress = cleanAddress.Substring(1, cleanAddress.Length - 2);
                 }

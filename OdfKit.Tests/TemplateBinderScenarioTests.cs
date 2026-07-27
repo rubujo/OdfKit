@@ -20,7 +20,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODT 段落占位符可替換。
     /// </summary>
     [Fact]
-    public void Bind_ReplacesTextDocumentParagraphPlaceholders()
+    public void BindReplacesTextDocumentParagraphPlaceholders()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("Hello {{Name}}");
@@ -35,7 +35,7 @@ public class TemplateBinderScenarioTests
     /// 驗證跨越多個文字樣式節點的占位符可替換，且原有樣式與超連結結構不會被清除。
     /// </summary>
     [Fact]
-    public void Bind_ReplacesPlaceholderAcrossTextSpansWithoutFlatteningMarkup()
+    public void BindReplacesPlaceholderAcrossTextSpansWithoutFlatteningMarkup()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -71,7 +71,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODT 集合占位符會複製模板段落。
     /// </summary>
     [Fact]
-    public void Bind_ExpandsTextDocumentCollectionParagraphs()
+    public void BindExpandsTextDocumentCollectionParagraphs()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("項目：{{Items[].Name}}={{Items[].Amount}}");
@@ -100,7 +100,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODS 已使用儲存格占位符可替換。
     /// </summary>
     [Fact]
-    public void Bind_ReplacesSpreadsheetCellPlaceholders()
+    public void BindReplacesSpreadsheetCellPlaceholders()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -122,7 +122,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODS 集合占位符會複製模板列並保留相鄰欄位。
     /// </summary>
     [Fact]
-    public void Bind_ExpandsSpreadsheetCollectionRows()
+    public void BindExpandsSpreadsheetCollectionRows()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -152,7 +152,7 @@ public class TemplateBinderScenarioTests
     /// 驗證空集合會移除 ODS 模板列，且後續資料列會正確前移。
     /// </summary>
     [Fact]
-    public void Bind_EmptySpreadsheetCollection_RemovesTemplateRow()
+    public void BindEmptySpreadsheetCollectionRemovesTemplateRow()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -173,7 +173,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODP 文字方塊占位符可替換。
     /// </summary>
     [Fact]
-    public void Bind_ReplacesPresentationTextBoxPlaceholders()
+    public void BindReplacesPresentationTextBoxPlaceholders()
     {
         using PresentationDocument document = PresentationDocument.Create();
         document.AddSlide("Intro").AddTextBox(1.Cm(), 1.Cm(), 8.Cm(), 2.Cm(), "歡迎 {{Name}}");
@@ -188,7 +188,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODP 文字方塊集合段落可展開。
     /// </summary>
     [Fact]
-    public void Bind_ExpandsPresentationTextBoxCollectionParagraphs()
+    public void BindExpandsPresentationTextBoxCollectionParagraphs()
     {
         using PresentationDocument document = PresentationDocument.Create();
         document.AddSlide("Intro").AddTextBox(1.Cm(), 1.Cm(), 8.Cm(), 2.Cm(), "{{Items[].Name}}");
@@ -207,7 +207,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODG 文字方塊占位符可替換。
     /// </summary>
     [Fact]
-    public void Bind_ReplacesDrawingTextBoxPlaceholders()
+    public void BindReplacesDrawingTextBoxPlaceholders()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfDrawPage page = document.Pages.Add("Canvas");
@@ -223,7 +223,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODG 文字方塊集合段落可展開。
     /// </summary>
     [Fact]
-    public void Bind_ExpandsDrawingTextBoxCollectionParagraphs()
+    public void BindExpandsDrawingTextBoxCollectionParagraphs()
     {
         using DrawingDocument document = DrawingDocument.Create();
         document.Pages.Add("Canvas").AddTextBox(1.Cm(), 1.Cm(), 8.Cm(), 2.Cm(), "{{Items[].Name}}");
@@ -242,7 +242,7 @@ public class TemplateBinderScenarioTests
     /// 驗證混用多個集合來源時會記入 report 而不展開。
     /// </summary>
     [Fact]
-    public void Bind_MultipleCollectionsInOneTemplateNode_AreReported()
+    public void BindMultipleCollectionsInOneTemplateNodeAreReported()
     {
         using DrawingDocument document = DrawingDocument.Create();
         document.Pages.Add("Canvas").AddTextBox(1.Cm(), 1.Cm(), 8.Cm(), 2.Cm(), "{{A[].Name}} {{B[].Name}}");
@@ -266,7 +266,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 dry run 不修改文件，但會回報實際 placeholder 命中數。
     /// </summary>
     [Fact]
-    public void Bind_DryRunReportsHitsWithoutMutatingDocument()
+    public void BindDryRunReportsHitsWithoutMutatingDocument()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("{{Name}} / {{Name}} / {{Missing}}");
@@ -293,7 +293,7 @@ public class TemplateBinderScenarioTests
     /// 驗證未知 placeholder 可依選項清成空字串。
     /// </summary>
     [Fact]
-    public void Bind_UnknownPlaceholderPolicyCanClearUnresolvedTokens()
+    public void BindUnknownPlaceholderPolicyCanClearUnresolvedTokens()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -315,7 +315,7 @@ public class TemplateBinderScenarioTests
     /// 驗證保留未知 placeholder 時會保留原 token 並寫入 report。
     /// </summary>
     [Fact]
-    public void Bind_UnknownPlaceholderPolicyPreserve_ReportsUnresolvedToken()
+    public void BindUnknownPlaceholderPolicyPreserveReportsUnresolvedToken()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("Hello {{Missing}}");
@@ -338,7 +338,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODT 圖片占位符會替換成圖片 frame 並寫入封裝媒體。
     /// </summary>
     [Fact]
-    public void Bind_ImagePlaceholderInTextDocument_InsertsImageFrame()
+    public void BindImagePlaceholderInTextDocumentInsertsImageFrame()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("{{Image:Logo}}");
@@ -360,7 +360,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODP 文字方塊圖片占位符會以圖片取代同一 frame 內容。
     /// </summary>
     [Fact]
-    public void Bind_ImagePlaceholderInPresentationTextBox_ReplacesFrameContent()
+    public void BindImagePlaceholderInPresentationTextBoxReplacesFrameContent()
     {
         using PresentationDocument document = PresentationDocument.Create();
         document.AddSlide("Intro").AddTextBox(1.Cm(), 1.Cm(), 4.Cm(), 3.Cm(), "{{Image:Hero}}");
@@ -382,7 +382,7 @@ public class TemplateBinderScenarioTests
     /// 驗證 ODG 圖片占位符會以圖片取代文字方塊內容。
     /// </summary>
     [Fact]
-    public void Bind_ImagePlaceholderInDrawingTextBox_ReplacesFrameContent()
+    public void BindImagePlaceholderInDrawingTextBoxReplacesFrameContent()
     {
         using DrawingDocument document = DrawingDocument.Create();
         document.Pages.Add("Canvas").AddTextBox(1.Cm(), 1.Cm(), 4.Cm(), 3.Cm(), "{{Image:Diagram}}");
@@ -404,7 +404,7 @@ public class TemplateBinderScenarioTests
     /// 驗證圖片占位符缺值或型別錯誤時會回報精準診斷。
     /// </summary>
     [Fact]
-    public void Bind_ImagePlaceholderDiagnostics_ReportMissingAndWrongType()
+    public void BindImagePlaceholderDiagnosticsReportMissingAndWrongType()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("{{Image:Missing}}");
@@ -427,7 +427,7 @@ public class TemplateBinderScenarioTests
     /// 驗證行內圖片占位符與 ODS 圖片占位符會被回報而不替換。
     /// </summary>
     [Fact]
-    public void Bind_ImagePlaceholderUnsupportedShapes_AreReported()
+    public void BindImagePlaceholderUnsupportedShapesAreReported()
     {
         using TextDocument text = TextDocument.Create();
         text.AddParagraph("Logo: {{Image:Logo}}");

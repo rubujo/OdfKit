@@ -43,8 +43,7 @@ public sealed class ObjectDataReader<
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>. / 當 <paramref name="source"/> 為 <see langword="null"/> 時擲出。</exception>
     public ObjectDataReader(IEnumerable<T> source)
     {
-        if (source is null)
-            throw new ArgumentNullException(nameof(source));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(source, nameof(source));
         ThrowIfNoReadableProperties();
 
         _syncEnumerator = source.GetEnumerator();
@@ -58,8 +57,7 @@ public sealed class ObjectDataReader<
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>. / 當 <paramref name="source"/> 為 <see langword="null"/> 時擲出。</exception>
     public ObjectDataReader(IAsyncEnumerable<T> source)
     {
-        if (source is null)
-            throw new ArgumentNullException(nameof(source));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(source, nameof(source));
         ThrowIfNoReadableProperties();
 
         _asyncEnumerator = source.GetAsyncEnumerator();
@@ -244,8 +242,7 @@ public sealed class ObjectDataReader<
     /// <returns>The number of array items populated with values. / 陣列中被填入值的項目個數。</returns>
     public override int GetValues(object[] values)
     {
-        if (values is null)
-            throw new ArgumentNullException(nameof(values));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         int count = Math.Min(FieldCount, values.Length);
         for (int i = 0; i < count; i++)

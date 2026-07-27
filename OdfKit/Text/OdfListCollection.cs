@@ -73,10 +73,7 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// <returns>The matching list, or <see langword="null"/> when no match exists. / 符合的清單；若找不到則為 <see langword="null"/>。</returns>
     public OdfList? Find(Predicate<OdfList> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         foreach (OdfList list in Items)
         {
@@ -97,10 +94,7 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// <returns><see langword="true"/> if the list was removed; otherwise, <see langword="false"/>. / 若已移除清單則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool Remove(OdfList list)
     {
-        if (list is null)
-        {
-            throw new ArgumentNullException(nameof(list));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(list, nameof(list));
 
         return ReferenceEquals(list.Node.Parent, _document.BodyTextRoot) &&
             _document.BodyTextRoot.RemoveChild(list.Node);

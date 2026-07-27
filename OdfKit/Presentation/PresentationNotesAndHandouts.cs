@@ -70,8 +70,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// <returns>The current notes page. / 目前備忘錄頁面。</returns>
     public OdfNotesPage SetSpeakerNotes(IEnumerable<string> paragraphs)
     {
-        if (paragraphs is null)
-            throw new ArgumentNullException(nameof(paragraphs));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraphs, nameof(paragraphs));
 
         OdfNode textBox = GetOrCreateSpeakerNotesTextBox();
         foreach (OdfNode child in new List<OdfNode>(textBox.Children))
@@ -228,7 +227,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_"), "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -257,7 +256,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     public void AddSlideThumbnail(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode thumbnail = new(OdfNodeType.Element, "page-thumbnail", OdfNamespaces.Draw, "draw");
-        thumbnail.SetAttribute("id", OdfNamespaces.Draw, "thm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        thumbnail.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("thm_"), "draw");
         thumbnail.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         thumbnail.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         thumbnail.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -286,7 +285,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
         };
 
         OdfNode shapeNode = new(OdfNodeType.Element, localName, OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_"), "draw");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -316,7 +315,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_"), "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -467,7 +466,7 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_"), "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -496,7 +495,7 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     public void AddSlideThumbnailPlaceholder(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode thumbnail = new(OdfNodeType.Element, "page-thumbnail", OdfNamespaces.Draw, "draw");
-        thumbnail.SetAttribute("id", OdfNamespaces.Draw, "thm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        thumbnail.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("thm_"), "draw");
         thumbnail.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         thumbnail.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         thumbnail.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");

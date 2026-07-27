@@ -48,7 +48,7 @@ internal static class OdfSpreadsheetFormulaReferenceShifter
 
     private static string ShiftReferenceBody(string body, int rowOffset)
     {
-        if (body.StartsWith("$", System.StringComparison.Ordinal) ||
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(body, '$') ||
             body.Contains("://", System.StringComparison.Ordinal))
         {
             return body;

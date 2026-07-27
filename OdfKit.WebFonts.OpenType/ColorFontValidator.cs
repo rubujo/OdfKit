@@ -1111,7 +1111,7 @@ internal static class ColorFontValidator
             {
                 string value = reader.Value;
                 bool isHref = reader.LocalName == "href";
-                if (isHref && !value.StartsWith("#", StringComparison.Ordinal)
+                if (isHref && !global::OdfKit.Internal.OdfStringHelper.StartsWith(value, '#')
                     || value.Contains("javascript:", StringComparison.OrdinalIgnoreCase)
                     || value.Contains("@import", StringComparison.OrdinalIgnoreCase)
                     || value.Contains("url(", StringComparison.OrdinalIgnoreCase)

@@ -171,7 +171,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetPaths"/> 可讀回已建立的路徑圖形。
     /// </summary>
     [Fact]
-    public void GetPaths_RoundTripsAfterAdd()
+    public void GetPathsRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("路徑頁");
@@ -201,7 +201,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetConnectors"/> 可讀回圖形連結連接線。
     /// </summary>
     [Fact]
-    public void GetConnectors_RoundTripsAfterAdd()
+    public void GetConnectorsRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -236,7 +236,7 @@ public class DrawingHighLevelApiTests
     /// 讀回後可透過 <see cref="OdfConnectorInfo.TryGetStartPoint"/> 與 <see cref="OdfConnectorInfo.TryGetEndPoint"/> 正確解析起訖座標。
     /// </summary>
     [Fact]
-    public void GetConnectors_CoordinateMode_TryGetStartAndEndPointSucceed()
+    public void GetConnectorsCoordinateModeTryGetStartAndEndPointSucceed()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -262,7 +262,7 @@ public class DrawingHighLevelApiTests
     /// 驗證圖形連結模式連接線仍可讀回由圖形中心解析出的座標。
     /// </summary>
     [Fact]
-    public void GetConnectors_ShapeLinkedMode_TryGetStartAndEndPointSucceed()
+    public void GetConnectorsShapeLinkedModeTryGetStartAndEndPointSucceed()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -296,7 +296,7 @@ public class DrawingHighLevelApiTests
     /// 且重複呼叫會傳回同一個既存節點而非每次重建。
     /// </summary>
     [Fact]
-    public void GetDrawingNode_ReturnsSameUnderlyingNodeOnRepeatedCalls()
+    public void GetDrawingNodeReturnsSameUnderlyingNodeOnRepeatedCalls()
     {
         using var document = DrawingDocument.Create();
         document.AddPage("頁面一");
@@ -314,7 +314,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GroupShapes"/> 可將圖形合併為群組。
     /// </summary>
     [Fact]
-    public void GroupShapes_MovesShapesIntoNewGroup()
+    public void GroupShapesMovesShapesIntoNewGroup()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("Page1");
@@ -344,7 +344,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfShape.SetConnectorRoutePoints(string)"/> 可寫入連接線路由頂點。
     /// </summary>
     [Fact]
-    public void SetConnectorRoutePoints_RoundTripsAfterAdd()
+    public void SetConnectorRoutePointsRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("Page1");
@@ -372,7 +372,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetPolygons"/> 可讀回已建立的多邊形圖形。
     /// </summary>
     [Fact]
-    public void GetPolygons_RoundTripsAfterAdd()
+    public void GetPolygonsRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -397,7 +397,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetCustomShapes"/> 可讀回自定義幾何圖形。
     /// </summary>
     [Fact]
-    public void GetCustomShapes_RoundTripsAfterAdd()
+    public void GetCustomShapesRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -424,7 +424,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetGroups"/> 可讀回已建立的群組圖形。
     /// </summary>
     [Fact]
-    public void GetGroups_RoundTripsAfterAdd()
+    public void GetGroupsRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("群組頁");
@@ -450,7 +450,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetLayers"/> 可讀回繪圖頁面圖層定義。
     /// </summary>
     [Fact]
-    public void GetLayers_RoundTripsAfterAdd()
+    public void GetLayersRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("圖層頁");
@@ -478,7 +478,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetShapeLayerAssignments"/> 可讀回圖形圖層指派。
     /// </summary>
     [Fact]
-    public void GetShapeLayerAssignments_RoundTripsAfterAssign()
+    public void GetShapeLayerAssignmentsRoundTripsAfterAssign()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("圖層頁");
@@ -504,7 +504,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetTextBoxes"/> 可讀回已建立的文字方塊。
     /// </summary>
     [Fact]
-    public void GetTextBoxes_RoundTripsAfterAdd()
+    public void GetTextBoxesRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("標籤頁");
@@ -534,7 +534,7 @@ public class DrawingHighLevelApiTests
     /// 驗證 <see cref="OdfDrawPage.GetPictures"/> 可讀回已新增的圖片。
     /// </summary>
     [Fact]
-    public void GetPictures_RoundTripsAfterAdd()
+    public void GetPicturesRoundTripsAfterAdd()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("圖片頁");
@@ -591,7 +591,7 @@ public class DrawingHighLevelApiTests
     /// 驗證繪圖頁面集合可查找、移除並在儲存後保持結果。
     /// </summary>
     [Fact]
-    public void PageCollection_FindRemoveAndRoundTrip()
+    public void PageCollectionFindRemoveAndRoundTrip()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage first = document.Pages.Add("第一頁");
@@ -615,7 +615,7 @@ public class DrawingHighLevelApiTests
     /// 驗證移除圖形時會一併移除參照該圖形的連接線。
     /// </summary>
     [Fact]
-    public void RemoveShape_RemovesReferencingConnectorsAndRoundTrips()
+    public void RemoveShapeRemovesReferencingConnectorsAndRoundTrips()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("關聯頁");

@@ -102,10 +102,10 @@ public sealed class OdfTextBody
     /// </summary>
     /// <param name="section">The section to remove. / 要移除的區段。</param>
     /// <returns><see langword="true"/> if the section was removed; otherwise <see langword="false"/>. / 若已移除區段則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public bool RemoveSection(OdfSection section)
     {
-        if (section is null)
-            throw new ArgumentNullException(nameof(section));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(section, nameof(section));
         OdfNode? parent = section.Node.Parent;
         return parent is not null && parent.RemoveChild(section.Node);
     }

@@ -284,10 +284,7 @@ public sealed class OdfMathBuilder
 
     private static OdfMathToken BuildSingle(Action<OdfMathBuilder> build)
     {
-        if (build is null)
-        {
-            throw new ArgumentNullException(nameof(build));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(build, nameof(build));
 
         var builder = new OdfMathBuilder();
         build(builder);
@@ -296,10 +293,7 @@ public sealed class OdfMathBuilder
 
     private static OdfMathToken BuildRow(Action<OdfMathBuilder> build)
     {
-        if (build is null)
-        {
-            throw new ArgumentNullException(nameof(build));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(build, nameof(build));
 
         var builder = new OdfMathBuilder();
         build(builder);

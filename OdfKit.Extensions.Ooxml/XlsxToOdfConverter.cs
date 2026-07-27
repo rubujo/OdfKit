@@ -50,8 +50,7 @@ public static class XlsxToOdfConverter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 xlsxStream 為 null 時引發</exception>
     public static OdfKit.Spreadsheet.SpreadsheetDocument Convert(Stream xlsxStream)
     {
-        if (xlsxStream is null)
-            throw new ArgumentNullException(nameof(xlsxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(xlsxStream, nameof(xlsxStream));
 
         var odsWorkbook = OdfKit.Spreadsheet.SpreadsheetDocument.Create();
         using var workbookStream = new MemoryStream();
@@ -415,7 +414,7 @@ public static class XlsxToOdfConverter
         string value = rgb!.Trim();
         if (value.Length == 8)
         {
-            return "#" + value.Substring(2, 6);
+            return OdfKit.Internal.OdfStringHelper.ConcatSegment("#", value, 2, 6);
         }
 
         if (value.Length == 6)
@@ -732,7 +731,7 @@ public static class XlsxToOdfConverter
         var allRanges = xml.Descendants(chartNs + "f")
             .Select(e => e.Value)
             .Where(v => !string.IsNullOrWhiteSpace(v))
-            .Select(v => { OdfCellRange.TryParse(v!, out var r); return (OdfCellRange?)r; })
+            .Select(v => OdfCellRange.TryParse(v!, out var range) ? (OdfCellRange?)range : null)
             .Where(r => r.HasValue)
             .Select(r => r!.Value)
             .ToList();
@@ -870,7 +869,7 @@ public static class XlsxToOdfConverter
         }
 
         string? sheetName = worksheetSource?.Attribute("sheet")?.Value;
-        string sourceRef = string.IsNullOrWhiteSpace(sheetName) || rangeRef!.IndexOf('!') >= 0
+        string sourceRef = string.IsNullOrWhiteSpace(sheetName) || rangeRef!.Contains('!')
             ? rangeRef!
             : sheetName + "!" + rangeRef;
 
@@ -1267,8 +1266,8 @@ public static class XlsxToOdfConverter
 
     private static string GetConditionalColor(IXLConditionalFormat conditionalFormat, int key, string fallback)
     {
-        return conditionalFormat.Colors.ContainsKey(key)
-            ? ToHexColor(conditionalFormat.Colors[key], fallback)
+        return conditionalFormat.Colors.TryGetValue(key, out XLColor? color) && color is not null
+            ? ToHexColor(color, fallback)
             : fallback;
     }
 
@@ -1308,7 +1307,7 @@ public static class XlsxToOdfConverter
         }
 
         string formula = excelFormula.Trim();
-        if (!formula.StartsWith("=", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(formula, '='))
         {
             formula = "=" + formula;
         }

@@ -15,7 +15,7 @@ namespace OdfKit.Tests;
 public class RdfMetadataTests
 {
     [Fact]
-    public void RdfMetadata_Save_WritesManifestRdfAndRoundTripsTriples()
+    public void RdfMetadataSaveWritesManifestRdfAndRoundTripsTriples()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -54,7 +54,7 @@ public class RdfMetadataTests
     }
 
     [Fact]
-    public void RdfMetadata_Load_ParsesExistingManifestRdf()
+    public void RdfMetadataLoadParsesExistingManifestRdf()
     {
         const string rdfXml =
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -86,7 +86,7 @@ public class RdfMetadataTests
     /// 驗證 pkg ontology 便利 API 可建立、查詢與移除 triples。
     /// </summary>
     [Fact]
-    public void RdfMetadata_PkgOntologyHelpersRoundTrip()
+    public void RdfMetadataPkgOntologyHelpersRoundTrip()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -113,7 +113,7 @@ public class RdfMetadataTests
     /// 驗證 SyncWithPackageEntries 會為封裝專案建立 pkg:hasPart 與 pkg:mimeType。
     /// </summary>
     [Fact]
-    public void SyncWithPackageEntries_AddsHasPartAndMimeTypeForEntries()
+    public void SyncWithPackageEntriesAddsHasPartAndMimeTypeForEntries()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -142,7 +142,7 @@ public class RdfMetadataTests
     /// 驗證新增與移除封裝專案後，同步會更新 pkg triples。
     /// </summary>
     [Fact]
-    public void SyncWithPackageEntries_ReflectsAddedAndRemovedEntries()
+    public void SyncWithPackageEntriesReflectsAddedAndRemovedEntries()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -168,7 +168,7 @@ public class RdfMetadataTests
     /// 驗證儲存時會自動同步 manifest.rdf 與封裝專案。
     /// </summary>
     [Fact]
-    public void Save_AutoSyncsManifestRdfWithPackageEntries()
+    public void SaveAutoSyncsManifestRdfWithPackageEntries()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -200,7 +200,7 @@ public class RdfMetadataTests
     /// 驗證 <see cref="TextDocument"/> 儲存／載入會保留自訂 RDF triple 並同步標準 <c>pkg:</c> ontology。
     /// </summary>
     [Fact]
-    public void TextDocument_SaveLoad_PreservesCustomRdfTriplesAndPkgOntology()
+    public void TextDocumentSaveLoadPreservesCustomRdfTriplesAndPkgOntology()
     {
         const string title = "文件層 RDF 標題";
         const string dublinCoreTitle = OdfNamespaces.Dc + "title";
@@ -229,7 +229,7 @@ public class RdfMetadataTests
     /// 驗證 corpus 內含 <c>manifest.rdf</c> 的 ODT fixture 可載入並通過驗證。
     /// </summary>
     [Fact]
-    public void CorpusFixture_ManifestRdfText_LoadsAndValidates()
+    public void CorpusFixtureManifestRdfTextLoadsAndValidates()
     {
         string fixturePath = Path.Combine(FindRepositoryRoot(), "tests", "fixtures", "corpus", "generated", "manifest-rdf-text.odt");
         Assert.True(File.Exists(fixturePath), $"缺少 corpus fixture：{fixturePath}");
@@ -250,7 +250,7 @@ public class RdfMetadataTests
     }
 
     [Fact]
-    public void RdfMetadata_Load_RejectsDtd()
+    public void RdfMetadataLoadRejectsDtd()
     {
         const string rdfXml =
             "<!DOCTYPE rdf:RDF [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>" +

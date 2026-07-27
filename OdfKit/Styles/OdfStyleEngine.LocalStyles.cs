@@ -60,8 +60,7 @@ public partial class OdfStyleEngine
     /// <exception cref="ArgumentNullException">當 <paramref name="elementNode"/> 為 null 時拋出</exception>
     public OdfNode GetOrCreateLocalStyle(OdfNode elementNode, string family)
     {
-        if (elementNode is null)
-            throw new ArgumentNullException(nameof(elementNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(elementNode, nameof(elementNode));
 
         if (_localStyles.TryGetValue(elementNode, out var styleNode))
         {
@@ -403,26 +402,26 @@ public partial class OdfStyleEngine
         }
     }
 
-    private string SerializeStyleProperties(OdfNode styleNode)
+    private static string SerializeStyleProperties(OdfNode styleNode)
     {
         // 用於進行雜湊之樣式屬性的簡單確定性序列化
         StringBuilder sb = new();
-        sb.Append($"family:{styleNode.GetAttribute("family", OdfNamespaces.Style)}|");
-        sb.Append($"parent:{styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style)}|");
-        sb.Append($"class:{styleNode.GetAttribute("class", OdfNamespaces.Style)}|");
+        sb.Append(System.FormattableString.Invariant($"family:{styleNode.GetAttribute("family", OdfNamespaces.Style)}|"));
+        sb.Append(System.FormattableString.Invariant($"parent:{styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style)}|"));
+        sb.Append(System.FormattableString.Invariant($"class:{styleNode.GetAttribute("class", OdfNamespaces.Style)}|"));
 
         List<OdfNode> propNodes = [.. styleNode.Children];
         propNodes.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));
 
         foreach (var pNode in propNodes)
         {
-            sb.Append($"[{pNode.LocalName}:");
+            sb.Append(System.FormattableString.Invariant($"[{pNode.LocalName}:"));
             List<OdfAttributeName> attrs = [.. pNode.Attributes.Keys];
             attrs.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));
 
             foreach (var attr in attrs)
             {
-                sb.Append($"{attr.NamespaceUri}:{attr.LocalName}={pNode.Attributes[attr]};");
+                sb.Append(System.FormattableString.Invariant($"{attr.NamespaceUri}:{attr.LocalName}={pNode.Attributes[attr]};"));
             }
             sb.Append(']');
         }
@@ -430,7 +429,7 @@ public partial class OdfStyleEngine
         return sb.ToString();
     }
 
-    private string GetFamilyPrefix(string family)
+    private static string GetFamilyPrefix(string family)
     {
         return family.ToLowerInvariant() switch
         {

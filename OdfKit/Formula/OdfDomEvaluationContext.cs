@@ -166,7 +166,7 @@ internal class OdfDomEvaluationContext :
         }
     }
 
-    private object ParseCellValue(OdfNode cellNode)
+    private static object ParseCellValue(OdfNode cellNode)
     {
         string? valType = cellNode.GetAttribute("value-type", OdfNamespaces.Office);
         if (string.IsNullOrEmpty(valType))
@@ -367,7 +367,7 @@ internal class OdfDomEvaluationContext :
                 expression = expression.Substring(6);
             else if (expression.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
                 expression = expression.Substring(4);
-            else if (expression.StartsWith("="))
+            else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(expression, '='))
                 expression = expression.Substring(1);
 
             string scopeKey = string.Concat(currentSheet, "\n", simpleName);
@@ -455,7 +455,7 @@ internal class OdfDomEvaluationContext :
     private static string UnquoteName(string value)
     {
         value = value.Trim();
-        if (value.StartsWith("$", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(value, '$'))
             value = value.Substring(1);
         if (value.Length >= 2 &&
             value[0] == '\'' &&
@@ -1297,7 +1297,7 @@ internal class OdfDomEvaluationContext :
     }
 
     private static object AggregatePivotValues(
-        IReadOnlyList<object> values,
+        List<object> values,
         string aggregation)
     {
         var numbers = new List<double>();
@@ -1324,7 +1324,7 @@ internal class OdfDomEvaluationContext :
             return Product(numbers);
         if (normalized is "stdev" or "stdevp" or "var" or "varp")
         {
-            bool population = normalized.EndsWith("p", StringComparison.Ordinal);
+            bool population = global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, 'p');
             if (!population && numbers.Count < 2)
                 return OdfFormulaError.Div0;
             double mean = Sum(numbers) / numbers.Count;
@@ -1357,7 +1357,7 @@ internal class OdfDomEvaluationContext :
         return result;
     }
 
-    private static double Min(IReadOnlyList<double> values)
+    private static double Min(List<double> values)
     {
         double result = values[0];
         for (int index = 1; index < values.Count; index++)
@@ -1365,7 +1365,7 @@ internal class OdfDomEvaluationContext :
         return result;
     }
 
-    private static double Max(IReadOnlyList<double> values)
+    private static double Max(List<double> values)
     {
         double result = values[0];
         for (int index = 1; index < values.Count; index++)
@@ -1391,7 +1391,7 @@ internal class OdfDomEvaluationContext :
         internal string? Formula { get; } = formula;
     }
 
-    private OdfNode? FindSheetNode(OdfNode node, string? sheetName)
+    private static OdfNode? FindSheetNode(OdfNode node, string? sheetName)
     {
         if (string.IsNullOrEmpty(sheetName))
             return null;
@@ -1409,7 +1409,7 @@ internal class OdfDomEvaluationContext :
         return null;
     }
 
-    private OdfNode? FindNamedNodeUnderParent(OdfNode parent, string name)
+    private static OdfNode? FindNamedNodeUnderParent(OdfNode parent, string name)
     {
         foreach (var child in parent.Children)
         {
@@ -1433,7 +1433,7 @@ internal class OdfDomEvaluationContext :
         return null;
     }
 
-    private OdfNode? FindGlobalNamedNode(OdfNode root, string name)
+    private static OdfNode? FindGlobalNamedNode(OdfNode root, string name)
     {
         if (root.NodeType == OdfNodeType.Element && root.LocalName == "table" && root.NamespaceUri == OdfNamespaces.Table)
         {

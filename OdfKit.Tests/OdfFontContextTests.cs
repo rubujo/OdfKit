@@ -17,7 +17,7 @@ public class OdfFontContextTests
     /// 驗證不同 OdfFontContext 執行個體的平面對應彼此隔離，且不影響 Default 情境。
     /// </summary>
     [Fact]
-    public void PlaneFontMappings_AreIsolatedBetweenContexts()
+    public void PlaneFontMappingsAreIsolatedBetweenContexts()
     {
         var contextA = new OdfFontContext();
         var contextB = new OdfFontContext();
@@ -42,7 +42,7 @@ public class OdfFontContextTests
     /// 驗證字型替代規則（RegisterFallback／MapFont）在情境之間彼此隔離。
     /// </summary>
     [Fact]
-    public void FallbackRegistrations_AreIsolatedBetweenContexts()
+    public void FallbackRegistrationsAreIsolatedBetweenContexts()
     {
         var contextA = new OdfFontContext();
         var contextB = new OdfFontContext();
@@ -59,7 +59,7 @@ public class OdfFontContextTests
     /// 驗證 Default 為穩定單例，且文件與選項未指定情境時皆解析至 Default。
     /// </summary>
     [Fact]
-    public void DefaultContext_IsStableSingleton()
+    public void DefaultContextIsStableSingleton()
     {
         Assert.Same(OdfFontContext.Default, OdfFontContext.Default);
 
@@ -71,7 +71,7 @@ public class OdfFontContextTests
     /// 驗證 OdfDocument.FontContext 拒絕 null 並可指派自訂情境。
     /// </summary>
     [Fact]
-    public void DocumentFontContext_ValidatesAndAcceptsCustomContext()
+    public void DocumentFontContextValidatesAndAcceptsCustomContext()
     {
         using TextDocument document = TextDocument.Create();
         var context = new OdfFontContext();
@@ -86,7 +86,7 @@ public class OdfFontContextTests
     /// 驗證存檔時的字型子集化內嵌使用文件層級的字型情境，且 Default 情境不受影響。
     /// </summary>
     [Fact]
-    public void SaveWithDocumentFontContext_EmbedsSubsetsViaDocumentContext()
+    public void SaveWithDocumentFontContextEmbedsSubsetsViaDocumentContext()
     {
         var context = new OdfFontContext();
         var subsetter = new RecordingFontSubsetter();
@@ -109,7 +109,7 @@ public class OdfFontContextTests
     /// 驗證 OdfTextFontFallbackOptions.FontContext 可將段落分段路由至指定情境，且不影響 Default。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithFontContextOption_RoutesSegmentationToContext()
+    public void ParagraphAddTextWithFontContextOptionRoutesSegmentationToContext()
     {
         var context = new OdfFontContext();
         const string baseFont = "RoutedGothic-UnitTest";
@@ -140,7 +140,7 @@ public class OdfFontContextTests
     /// 驗證 FontContext 解析優先序：選項優先、其次文件、最後 Default。
     /// </summary>
     [Fact]
-    public void ResolveFontContext_HonorsOptionThenDocumentThenDefault()
+    public void ResolveFontContextHonorsOptionThenDocumentThenDefault()
     {
         var documentContext = new OdfFontContext();
         var optionContext = new OdfFontContext();
@@ -162,7 +162,7 @@ public class OdfFontContextTests
     /// 驗證圖表主標題與座標軸標題的字型遞補多載會分段、套用字型並宣告 font-face。
     /// </summary>
     [Fact]
-    public void ChartTitles_WithFallbackOptions_SegmentAndDeclareFontFaces()
+    public void ChartTitlesWithFallbackOptionsSegmentAndDeclareFontFaces()
     {
         string plane2Char = char.ConvertFromUtf32(0x20BB7);
         using Chart.ChartDocument chartDoc = Chart.ChartDocument.Builder()
@@ -188,7 +188,7 @@ public class OdfFontContextTests
     /// 驗證圖表標題多載的空白清除語意與參數驗證。
     /// </summary>
     [Fact]
-    public void SetChartTitle_WithFallbackOptions_ValidatesAndClearsBlankTitle()
+    public void SetChartTitleWithFallbackOptionsValidatesAndClearsBlankTitle()
     {
         using Chart.ChartDocument chartDoc = Chart.ChartDocument.Builder().Build();
         OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Cns11643("TW-Kai");
@@ -207,7 +207,7 @@ public class OdfFontContextTests
     /// 驗證簡報嵌入表格儲存格的字型遞補多載會分段、套用字型並宣告 font-face。
     /// </summary>
     [Fact]
-    public void EmbeddedTableSetCellText_WithFallbackOptions_SegmentsAndDeclaresFontFaces()
+    public void EmbeddedTableSetCellTextWithFallbackOptionsSegmentsAndDeclaresFontFaces()
     {
         string plane2Char = char.ConvertFromUtf32(0x20BB7);
         using Presentation.PresentationDocument document = Presentation.PresentationDocument.Create();
@@ -238,7 +238,7 @@ public class OdfFontContextTests
     /// 驗證 Custom 三參數多載可同時攜帶自訂 font-face 與字型情境，短多載維持 null 情境。
     /// </summary>
     [Fact]
-    public void CustomOptions_WithFontContext_CarriesContextThroughFactory()
+    public void CustomOptionsWithFontContextCarriesContextThroughFactory()
     {
         var context = new OdfFontContext();
         using IDisposable registration = context.RegisterSupplementaryPlaneFontMapping(

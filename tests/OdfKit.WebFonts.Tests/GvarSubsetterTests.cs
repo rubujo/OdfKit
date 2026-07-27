@@ -8,7 +8,7 @@ public sealed class GvarSubsetterTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void Build_ClearsUnselectedGlyphVariationData(bool longOffsets)
+    public void BuildClearsUnselectedGlyphVariationData(bool longOffsets)
     {
         byte[][] glyphData = longOffsets
             ? [[0x10], [0x20, 0x21, 0x22], [0x30, 0x31]]
@@ -34,7 +34,7 @@ public sealed class GvarSubsetterTests
     }
 
     [Fact]
-    public void Build_RejectsAxisCountMismatch()
+    public void BuildRejectsAxisCountMismatch()
     {
         byte[] source = CreateGvar(false, [[0x10, 0x11]]);
 
@@ -61,23 +61,23 @@ public sealed class GvarSubsetterTests
         return output;
     }
 
-    private static byte[] CreateGvar(bool longOffsets, IReadOnlyList<byte[]> glyphData)
+    private static byte[] CreateGvar(bool longOffsets, byte[][] glyphData)
     {
         int offsetSize = longOffsets ? 4 : 2;
-        int dataOffset = 20 + ((glyphData.Count + 1) * offsetSize);
+        int dataOffset = 20 + ((glyphData.Length + 1) * offsetSize);
         int dataLength = glyphData.Sum(item => item.Length);
         var output = new byte[dataOffset + dataLength];
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(0, 2), 1);
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(4, 2), 1);
-        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)glyphData.Count));
+        BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(12, 2), checked((ushort)glyphData.Length));
         BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(14, 2), longOffsets ? (ushort)1 : (ushort)0);
         BinaryPrimitives.WriteUInt32BigEndian(output.AsSpan(16, 4), checked((uint)dataOffset));
         int position = dataOffset;
         uint offset = 0;
-        for (int index = 0; index <= glyphData.Count; index++)
+        for (int index = 0; index <= glyphData.Length; index++)
         {
             WriteOffset(output, 20 + (index * offsetSize), offset, longOffsets);
-            if (index < glyphData.Count)
+            if (index < glyphData.Length)
             {
                 glyphData[index].CopyTo(output, position);
                 position += glyphData[index].Length;

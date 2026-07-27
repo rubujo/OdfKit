@@ -336,8 +336,7 @@ public partial class OdfSlide
     /// <returns>The matching animation summary, or <see langword="null"/>. / 相符的動畫摘要；若不存在則為 <see langword="null"/>。</returns>
     public OdfAnimationInfo? FindAnimation(Predicate<OdfAnimationInfo> predicate)
     {
-        if (predicate is null)
-            throw new ArgumentNullException(nameof(predicate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
         foreach (OdfAnimationInfo animation in GetAnimations())
         {
             if (predicate(animation))

@@ -20,7 +20,7 @@ namespace OdfKit.Tests;
 public class OdsStreamWriterFastPathTests
 {
     [Fact]
-    public void WriteCell_TextEscaping_MatchesXmlWriterBehavior()
+    public void WriteCellTextEscapingMatchesXmlWriterBehavior()
     {
         string xml = WriteContent(writer =>
         {
@@ -41,7 +41,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteCell_AttributeEscaping_MatchesXmlWriterBehavior()
+    public void WriteCellAttributeEscapingMatchesXmlWriterBehavior()
     {
         string xml = WriteContent(writer =>
         {
@@ -60,7 +60,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteCell_EmojiAndCjk_RoundTripsThroughParser()
+    public void WriteCellEmojiAndCjkRoundTripsThroughParser()
     {
         string emojiText = "分數 " + char.ConvertFromUtf32(0x1F600) + " 滿分：中文字串";
         string xml = WriteContent(writer =>
@@ -78,7 +78,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteCell_LongTextAcrossBufferBoundary_PreservesSurrogatePairs()
+    public void WriteCellLongTextAcrossBufferBoundaryPreservesSurrogatePairs()
     {
         // 超過快速路徑 16K 字元緩衝的長字串，且以代理對（emoji）密集分佈，
         // 驗證沖洗邊界不切開代理對、內容完整往返。
@@ -105,7 +105,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteCell_DoubleEdgeValues_MatchInvariantCultureFormatting()
+    public void WriteCellDoubleEdgeValuesMatchInvariantCultureFormatting()
     {
         double[] values = [0.0, -0.0, double.NaN, double.PositiveInfinity, double.NegativeInfinity, double.MaxValue, double.MinValue, double.Epsilon, 123456789.123456789, 1e-15];
         string xml = WriteContent(writer =>
@@ -129,7 +129,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteCell_DateTimeBoundaries_MatchExistingFormats()
+    public void WriteCellDateTimeBoundariesMatchExistingFormats()
     {
         string xml = WriteContent(writer =>
         {
@@ -152,7 +152,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void EmptyRowAndEmptySheet_UseSelfClosingForms()
+    public void EmptyRowAndEmptySheetUseSelfClosingForms()
     {
         string xml = WriteContent(writer =>
         {
@@ -174,7 +174,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteNode_MixedWithFastPath_PreservesOrderAndWellFormedness()
+    public void WriteNodeMixedWithFastPathPreservesOrderAndWellFormedness()
     {
         string xml = WriteContent(writer =>
         {
@@ -207,7 +207,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public void SwitchToSheet_BufferedMode_ProducesSameRowMarkupAsDirectMode()
+    public void SwitchToSheetBufferedModeProducesSameRowMarkupAsDirectMode()
     {
         string xml = WriteContent(writer =>
         {
@@ -235,7 +235,7 @@ public class OdsStreamWriterFastPathTests
     }
 
     [Fact]
-    public async Task WriteSheetsAsync_FastPathFragments_MatchMainPathShapes()
+    public async Task WriteSheetsAsyncFastPathFragmentsMatchMainPathShapes()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdsStreamWriter(ms))

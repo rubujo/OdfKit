@@ -67,7 +67,7 @@ public class ChartHighLevelApiTests
     /// 仍能正確解析為 <see cref="OdfChartType.Pie"/>。
     /// </summary>
     [Fact]
-    public void PieChartType_WritesOasisCircleClass_AndParsesCircleOrLegacyPieClass()
+    public void PieChartTypeWritesOasisCircleClassAndParsesCircleOrLegacyPieClass()
     {
         var definition = new OdfChartDefinition
         {
@@ -98,7 +98,7 @@ public class ChartHighLevelApiTests
     [InlineData(OdfChartType.Ring, "chart:ring")]
     [InlineData(OdfChartType.Radar, "chart:radar")]
     [InlineData(OdfChartType.Stock, "chart:stock")]
-    public void RingRadarAndStockChartTypes_RoundTripCorrectChartClass(OdfChartType chartType, string expectedClass)
+    public void RingRadarAndStockChartTypesRoundTripCorrectChartClass(OdfChartType chartType, string expectedClass)
     {
         var definition = new OdfChartDefinition
         {
@@ -119,7 +119,7 @@ public class ChartHighLevelApiTests
     /// <see cref="OdfChartDocument"/> 基底實作，不應因容器型別不同而有行為差異。
     /// </summary>
     [Fact]
-    public void LegendPosition_PersistsIdenticallyAcrossEmbeddedStandaloneTemplateAndFlatContainers()
+    public void LegendPositionPersistsIdenticallyAcrossEmbeddedStandaloneTemplateAndFlatContainers()
     {
         var definition = new OdfChartDefinition
         {
@@ -281,7 +281,7 @@ public class ChartHighLevelApiTests
     /// 驗證 SetDataRange 使用 ODF 1.4 合法的 series 與 categories 範圍屬性。
     /// </summary>
     [Fact]
-    public void SetDataRange_SetsSchemaValidSeriesAndCategoryRanges()
+    public void SetDataRangeSetsSchemaValidSeriesAndCategoryRanges()
     {
         using var chartDoc = OdfChartDocument.Create();
         var range = new OdfCellRange(0, 0, 4, 1);
@@ -304,7 +304,7 @@ public class ChartHighLevelApiTests
     /// 驗證 GetDataRange 能正確還原 SetDataRange 所設定的範圍。
     /// </summary>
     [Fact]
-    public void GetDataRange_ReturnsCorrectRange()
+    public void GetDataRangeReturnsCorrectRange()
     {
         using var chartDoc = OdfChartDocument.Create();
         var originalRange = new OdfCellRange(0, 0, 4, 2);
@@ -326,7 +326,7 @@ public class ChartHighLevelApiTests
     /// 驗證 SetDataRange 建立正確的 chart:data-source 與 chart:series 節點。
     /// </summary>
     [Fact]
-    public void SetDataRange_CreatesDataSourceAndSeriesNodes()
+    public void SetDataRangeCreatesDataSourceAndSeriesNodes()
     {
         using var chartDoc = OdfChartDocument.Create();
         // A1:C5：A 欄為標籤，B/C 欄為資料序列，第 1 列為標頭
@@ -356,7 +356,7 @@ public class ChartHighLevelApiTests
     /// 驗證使用內嵌圖表資料（無 chart:values-cell-range-address 屬性）的序列仍會由 Series 回傳，而非被靜默捨棄。
     /// </summary>
     [Fact]
-    public void Series_IncludesSeriesWithoutLinkedCellRange()
+    public void SeriesIncludesSeriesWithoutLinkedCellRange()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.AddSeries("Sheet1.$B$2:.$B$5");
@@ -380,7 +380,7 @@ public class ChartHighLevelApiTests
     /// 並可透過 GetDataRange() 驗證資料繫結已正確持久化。
     /// </summary>
     [Fact]
-    public void InsertChart_EmbeddedChartDocumentPersistedInOds()
+    public void InsertChartEmbeddedChartDocumentPersistedInOds()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Data");
@@ -434,7 +434,7 @@ public class ChartHighLevelApiTests
     /// 驗證 <see cref="OdfChartDocument.GetChartDefinition"/> 可讀回已設定的圖表屬性。
     /// </summary>
     [Fact]
-    public void GetChartDefinition_RoundTripsAfterSetDataRange()
+    public void GetChartDefinitionRoundTripsAfterSetDataRange()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.ChartClass = "chart:bar";
@@ -455,7 +455,7 @@ public class ChartHighLevelApiTests
     /// 驗證嵌入 ODS 圖表可透過 <see cref="OdfChartDocument.GetChartDefinition"/> 讀回摘要。
     /// </summary>
     [Fact]
-    public void GetChartDefinition_RoundTripsForEmbeddedChart()
+    public void GetChartDefinitionRoundTripsForEmbeddedChart()
     {
         using var doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Data");
@@ -477,7 +477,7 @@ public class ChartHighLevelApiTests
     /// 驗證座標軸進階屬性與序列個別屬性寫入。
     /// </summary>
     [Fact]
-    public void AxisAndSeriesAdvancedEditing_WritesAttributes()
+    public void AxisAndSeriesAdvancedEditingWritesAttributes()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -537,7 +537,7 @@ public class ChartHighLevelApiTests
     /// 驗證圖表自動樣式可建立、指派至序列並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void ChartStyle_CreateAssignAndRoundTrip()
+    public void ChartStyleCreateAssignAndRoundTrip()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -567,7 +567,7 @@ public class ChartHighLevelApiTests
     /// 驗證 <see cref="OdfChartDocument.RemoveChartStyle"/> 可移除圖表自動樣式。
     /// </summary>
     [Fact]
-    public void RemoveChartStyle_RemovesAutomaticStyle()
+    public void RemoveChartStyleRemovesAutomaticStyle()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -586,7 +586,7 @@ public class ChartHighLevelApiTests
     /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
     /// </summary>
     [Fact]
-    public void SetDataRange_SheetNameWithSpaces_RoundTrip()
+    public void SetDataRangeSheetNameWithSpacesRoundTrip()
     {
         using var chartDoc = OdfChartDocument.Create();
         var range = new OdfCellRange(0, 0, 9, 3);
@@ -606,7 +606,7 @@ public class ChartHighLevelApiTests
     /// 驗證 <see cref="OdfChartDocument.SetSeriesDataLabels"/> 與 <see cref="OdfChartDocument.FindSeriesDataLabels"/> 的往返一致性。
     /// </summary>
     [Fact]
-    public void SeriesDataLabels_RoundTripsAfterSetAndSave()
+    public void SeriesDataLabelsRoundTripsAfterSetAndSave()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -637,7 +637,7 @@ public class ChartHighLevelApiTests
     /// 驗證資料標籤 preset 與 Fluent builder 可產生正確的 <c>chart:data-label</c>。
     /// </summary>
     [Fact]
-    public void ChartBuilder_DataLabelPreset_RoundTripsAndCanBeRemoved()
+    public void ChartBuilderDataLabelPresetRoundTripsAndCanBeRemoved()
     {
         using ChartDocument chart = ChartDocument.Builder()
             .WithType(OdfChartType.Bar)
@@ -674,7 +674,7 @@ public class ChartHighLevelApiTests
     /// 驗證 <see cref="OdfChartDocument.SetWallStyleName"/> 與 <see cref="OdfChartDocument.SetFloorStyleName"/> 的往返一致性。
     /// </summary>
     [Fact]
-    public void WallAndFloorStyleName_RoundTripsAfterSetAndSave()
+    public void WallAndFloorStyleNameRoundTripsAfterSetAndSave()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
@@ -701,7 +701,7 @@ public class ChartHighLevelApiTests
     /// 驗證軸標籤格式相關樣式屬性（C-3）可往返。
     /// </summary>
     [Fact]
-    public void AxisLabelPositionStyle_RoundTripsAfterSaveAndLoad()
+    public void AxisLabelPositionStyleRoundTripsAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
@@ -729,7 +729,7 @@ public class ChartHighLevelApiTests
     /// 驗證圖例對齊與圖例樣式（C-4）可往返。
     /// </summary>
     [Fact]
-    public void LegendAlignmentAndStyle_RoundTripsAfterSaveAndLoad()
+    public void LegendAlignmentAndStyleRoundTripsAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
@@ -753,7 +753,7 @@ public class ChartHighLevelApiTests
     /// data-point、data-label）。
     /// </summary>
     [Fact]
-    public void SeriesErrorIndicatorRegressionCurveAndMeanValue_RoundTripAfterSaveAndLoad()
+    public void SeriesErrorIndicatorRegressionCurveAndMeanValueRoundTripAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -821,7 +821,7 @@ public class ChartHighLevelApiTests
     /// 驗證資料點樣式覆蓋（C-5）可新增、列舉並往返。
     /// </summary>
     [Fact]
-    public void SeriesDataPoints_RoundTripsAfterSaveAndLoad()
+    public void SeriesDataPointsRoundTripsAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
@@ -850,7 +850,7 @@ public class ChartHighLevelApiTests
     /// 驗證 3D 光源與投影／照明樣式設定（C-6）可往返。
     /// </summary>
     [Fact]
-    public void Lights_And_3DProjectionStyle_RoundTripsAfterSaveAndLoad()
+    public void LightsAnd3DProjectionStyleRoundTripsAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
@@ -880,7 +880,7 @@ public class ChartHighLevelApiTests
     /// 驗證股票圖漲跌標記與範圍線樣式名稱（C-7）可往返。
     /// </summary>
     [Fact]
-    public void StockMarkerStyleNames_RoundTripAfterSaveAndLoad()
+    public void StockMarkerStyleNamesRoundTripAfterSaveAndLoad()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.SetDataRange("Stock", new OdfCellRange(0, 0, 4, 3));
@@ -903,7 +903,7 @@ public class ChartHighLevelApiTests
     /// 寫入 OdfPackage 中，並正確更新 XML 以加入 draw:image 節點且不損壞既有的 draw:object 節點。
     /// </summary>
     [Fact]
-    public void RenderChartsToFallbackImages_GeneratesPngAndUpdatesXml()
+    public void RenderChartsToFallbackImagesGeneratesPngAndUpdatesXml()
     {
         // 1. 建立試算表並填入資料
         using var doc = SpreadsheetDocument.Create();
@@ -968,7 +968,7 @@ public class ChartHighLevelApiTests
     /// 驗證統一圖例模型與既有圖例屬性可雙向同步。
     /// </summary>
     [Fact]
-    public void LegendModel_SynchronizesWithLegacyLegendProperties()
+    public void LegendModelSynchronizesWithLegacyLegendProperties()
     {
         using var chartDoc = OdfChartDocument.Create();
         chartDoc.Legend.IsVisible = true;
@@ -988,7 +988,7 @@ public class ChartHighLevelApiTests
     /// 驗證圖表 Fluent builder 可鏈式設定圖表、圖例、座標軸與序列設定。
     /// </summary>
     [Fact]
-    public void ChartBuilder_ConfiguresChartLegendAxisAndSeries()
+    public void ChartBuilderConfiguresChartLegendAxisAndSeries()
     {
         using ChartDocument chart = ChartDocument.Builder()
             .WithType(OdfChartType.Bar)
@@ -1034,7 +1034,7 @@ public class ChartHighLevelApiTests
     /// 驗證資料序列可依索引移除，且剩餘順序於儲存／載入後保持穩定。
     /// </summary>
     [Fact]
-    public void RemoveSeriesAt_RemovesOnlySelectedSeriesAndRoundTrips()
+    public void RemoveSeriesAtRemovesOnlySelectedSeriesAndRoundTrips()
     {
         using var chart = ChartDocument.Create();
         chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");
@@ -1061,7 +1061,7 @@ public class ChartHighLevelApiTests
     /// 驗證資料序列可向前或向後重排，且完整序列內容於往返後保持一致。
     /// </summary>
     [Fact]
-    public void MoveSeries_ReordersCompleteSeriesAndRoundTrips()
+    public void MoveSeriesReordersCompleteSeriesAndRoundTrips()
     {
         using var chart = ChartDocument.Create();
         chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");
@@ -1094,7 +1094,7 @@ public class ChartHighLevelApiTests
     /// 驗證不可變序列快照可單筆及批次套用，並保留既有序列子內容。
     /// </summary>
     [Fact]
-    public void ApplySeriesSnapshots_UpdatesKnownAttributesAndPreservesChildren()
+    public void ApplySeriesSnapshotsUpdatesKnownAttributesAndPreservesChildren()
     {
         using var chart = ChartDocument.Create();
         chart.AddSeries("LocalTable.A2:A4", "LocalTable.A1");

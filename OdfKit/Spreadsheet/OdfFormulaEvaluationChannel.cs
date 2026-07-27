@@ -31,10 +31,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     internal OdfFormulaEvaluationChannel(SpreadsheetDocument document, int capacity, CancellationToken cancellationToken)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacity));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(capacity, nameof(capacity));
 
 #if NET10_0_OR_GREATER
         _channel = Channel.CreateBounded<bool>(new BoundedChannelOptions(capacity)
@@ -45,7 +42,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         });
 #endif
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _worker = Task.Run(ProcessAsync);
+        _worker = Task.Run(ProcessAsync, CancellationToken.None);
     }
 
     /// <summary>
@@ -225,9 +222,6 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 
     private void ThrowIfDisposed()
     {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(OdfFormulaEvaluationChannel));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdfFormulaEvaluationChannel));
     }
 }

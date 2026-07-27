@@ -15,7 +15,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證可直接解析 Unicode.org 官方對照檔格式（TAB 分隔、0x 前綴、# 註解）。
     /// </summary>
     [Fact]
-    public void ParseDelimitedHex_ParsesUnicodeOrgVendorMappingFormat()
+    public void ParseDelimitedHexParsesUnicodeOrgVendorMappingFormat()
     {
         // 取自 unicode.org Public/MAPPINGS 之 BIG5.TXT 實際格式樣本
         const string sample =
@@ -39,7 +39,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證分號分隔的 UCD 式清單（欄位周圍空白、U+ 前綴、行尾註解）與重複鍵後者覆蓋。
     /// </summary>
     [Fact]
-    public void ParseDelimitedHex_ParsesSemicolonListWithPrefixesAndDuplicates()
+    public void ParseDelimitedHexParsesSemicolonListWithPrefixesAndDuplicates()
     {
         const string sample =
             "U+F0000 ; 20BB7 # PUA to Ext-B\n" +
@@ -58,7 +58,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證格式不符的資料行擲出 FormatException，null 讀取器擲出 ArgumentNullException。
     /// </summary>
     [Fact]
-    public void ParseDelimitedHex_ValidatesArguments()
+    public void ParseDelimitedHexValidatesArguments()
     {
         Assert.Throws<ArgumentNullException>(
             () => OdfCodePointMappingTable.ParseDelimitedHex(null!, '\t'));
@@ -74,7 +74,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證委派式解析：空行略過、回傳 null 略過、自訂格式可解析。
     /// </summary>
     [Fact]
-    public void Parse_WithLineParserDelegate_SupportsCustomFormats()
+    public void ParseWithLineParserDelegateSupportsCustomFormats()
     {
         const string sample =
             "MJ000001,F0001,20BB7\n" +
@@ -111,7 +111,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證資源預算防線：超長資料行、8 位十六進位溢為負值一律拒絕，例外訊息截斷原始行。
     /// </summary>
     [Fact]
-    public void ParseDelimitedHex_EnforcesResourceBudgetAndRejectsNegativeHex()
+    public void ParseDelimitedHexEnforcesResourceBudgetAndRejectsNegativeHex()
     {
         // 超過 4,096 字元的資料行：資源預算拒絕
         string longLine = new string('A', 5_000) + "\t4E00";
@@ -149,7 +149,7 @@ public class OdfCodePointMappingTableTests
     /// 驗證通用 Join 與 CNS 特化 JoinOnCns 的聯結結果一致。
     /// </summary>
     [Fact]
-    public void Join_MatchesJoinOnCnsSemantics()
+    public void JoinMatchesJoinOnCnsSemantics()
     {
         var keyToSource = new Dictionary<string, int> { ["1-2121"] = 0x4E00, ["1-2122"] = 0x4E8C };
         var keyToTarget = new Dictionary<string, int> { ["1-2121"] = 0x8E40, ["9-9999"] = 0x8E41 };

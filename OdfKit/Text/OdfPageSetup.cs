@@ -75,11 +75,7 @@ public partial class OdfPageSetup
         result = 0;
         return value is not null &&
             value.EndsWith("cm", StringComparison.Ordinal) &&
-            double.TryParse(
-                value.Substring(0, value.Length - 2),
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out result);
+            global::OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(value, 2, out result);
     }
 
     private static string FormatCentimeterLength(double value) => value.ToString(CultureInfo.InvariantCulture) + "cm";

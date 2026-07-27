@@ -49,8 +49,7 @@ public static partial class OdfPackageValidator
     /// <returns>The validation report. / 驗證結果報告。</returns>
     public static OdfValidationReport Validate(OdfPackage package, OdfValidationOptions options)
     {
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         return ValidateCore(package, options.Profile, options.FileName, options.Culture);
     }
@@ -71,8 +70,7 @@ public static partial class OdfPackageValidator
         string? fileName,
         CultureInfo? culture)
     {
-        if (package is null)
-            throw new ArgumentNullException(nameof(package));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
 
         List<OdfValidationIssue> issues = [];
 

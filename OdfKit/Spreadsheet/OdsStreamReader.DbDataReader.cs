@@ -87,7 +87,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             return -1;
 
         if (name.StartsWith("Column_", StringComparison.OrdinalIgnoreCase) &&
-            int.TryParse(name.Substring(7), out int col))
+            global::OdfKit.Internal.OdfParsingHelper.TryParseInt32Suffix(name, 7, out int col))
         {
             return col;
         }
@@ -131,8 +131,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// <returns>The number of array items populated with values. / 陣列中被填入值的項目個數。</returns>
     public override int GetValues(object[] values)
     {
-        if (values is null)
-            throw new ArgumentNullException(nameof(values));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         int count = Math.Min(FieldCount, values.Length);
         for (int i = 0; i < count; i++)

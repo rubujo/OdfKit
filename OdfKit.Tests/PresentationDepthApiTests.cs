@@ -15,7 +15,7 @@ public class PresentationDepthApiTests
     /// 驗證簡報文件可聚合查詢文字方塊、圖片、圖形並批次更新圖片。
     /// </summary>
     [Fact]
-    public void PresentationDocument_DepthQueriesAndPictureUpdates()
+    public void PresentationDocumentDepthQueriesAndPictureUpdates()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide("Intro");
@@ -48,7 +48,7 @@ public class PresentationDepthApiTests
     /// 驗證簡報圖片批次更新會回報 missing 與 unchanged。
     /// </summary>
     [Fact]
-    public void PresentationDocument_PictureUpdateReportsMissingAndUnchanged()
+    public void PresentationDocumentPictureUpdateReportsMissingAndUnchanged()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfPicture picture = document.AddSlide("Intro").AddPicture(CreatePngBytes(), 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm());
@@ -69,7 +69,7 @@ public class PresentationDepthApiTests
     /// 驗證簡報圖形可用 request 批次更新與調整繪圖順序。
     /// </summary>
     [Fact]
-    public void PresentationDocument_ShapeUpdateAndZOrder()
+    public void PresentationDocumentShapeUpdateAndZOrder()
     {
         using PresentationDocument document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide("Intro");

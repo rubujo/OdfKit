@@ -26,8 +26,7 @@ internal static class TextDocumentFieldExtractionEngine
         string startDelimiter,
         string endDelimiter)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
         if (string.IsNullOrEmpty(startDelimiter))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldExtraction_DelimiterCannotBeEmpty"), nameof(startDelimiter));
         if (string.IsNullOrEmpty(endDelimiter))

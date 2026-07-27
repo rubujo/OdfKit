@@ -118,8 +118,8 @@ public sealed class OdfAnimationInfo(
             return false;
 
         string trimmed = value!.Trim();
-        if (trimmed.EndsWith("s", StringComparison.Ordinal) &&
-            double.TryParse(trimmed.Substring(0, trimmed.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out seconds))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, 's') &&
+            global::OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(trimmed, 1, out seconds))
             return true;
 
         return double.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out seconds);

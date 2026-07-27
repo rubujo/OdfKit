@@ -24,7 +24,7 @@ public class DatabaseSchemaAndFormTests
     /// 驗證 <see cref="OdfDatabaseSchema"/> 對資料表、欄位型別、主鍵與外鍵的 Round-trip 儲存與重新載入。
     /// </summary>
     [Fact]
-    public void Schema_AddTableAndKeys_RoundTripsSuccessfully()
+    public void SchemaAddTableAndKeysRoundTripsSuccessfully()
     {
         using var database = DatabaseDocument.Create();
         var schema = database.Schema;
@@ -97,7 +97,7 @@ public class DatabaseSchemaAndFormTests
     /// 驗證 Schema table 只透過受控方法修改欄位、主鍵、外鍵與索引。
     /// </summary>
     [Fact]
-    public void SchemaTable_ControlledEditors_RejectDirectCollectionMutation()
+    public void SchemaTableControlledEditorsRejectDirectCollectionMutation()
     {
         var table = new OdfSchemaTable("Orders");
         var id = new OdfSchemaColumn("Id", "INTEGER");
@@ -138,7 +138,7 @@ public class DatabaseSchemaAndFormTests
     /// 驗證 <see cref="OdfDatabaseFormDesigner"/> 能在子文件中正確新增文字框、核取方塊、下拉式選單、按鈕與標籤。
     /// </summary>
     [Fact]
-    public void FormDesigner_AddControls_XmlContainsExpectedElements()
+    public void FormDesignerAddControlsXmlContainsExpectedElements()
     {
         using var formDoc = TextDocument.Create();
         var designer = new OdfDatabaseFormDesigner(formDoc);
@@ -199,7 +199,7 @@ public class DatabaseSchemaAndFormTests
     /// 產生合法的 <c>text:database-display</c>／<c>text:database-next</c> 結構（官方 ODF schema 元素）。
     /// </summary>
     [Fact]
-    public void Paragraph_DatabaseFields_ProduceValidSchemaElements()
+    public void ParagraphDatabaseFieldsProduceValidSchemaElements()
     {
         using var reportDoc = TextDocument.Create();
 
@@ -229,7 +229,7 @@ public class DatabaseSchemaAndFormTests
     /// 取代先前基於虛構 <c>report:1.0</c> 命名空間的 <c>DefineReportStructure</c>。
     /// </summary>
     [Fact]
-    public void Database_ReportLinkedViaHref_ToTextDocumentBasedReport()
+    public void DatabaseReportLinkedViaHrefToTextDocumentBasedReport()
     {
         using var reportDoc = TextDocument.Create();
         var p = reportDoc.AddParagraph("銷售人員：");

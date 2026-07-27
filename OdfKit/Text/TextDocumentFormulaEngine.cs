@@ -18,8 +18,7 @@ internal static class TextDocumentFormulaEngine
     /// </summary>
     internal static void AddFormula(TextDocument.TextDocumentCoreCollaborators ctx, OdfParagraph paragraph, string mathMlXmlString)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrWhiteSpace(mathMlXmlString))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFormulaEngine_MathmlCannotBeEmpty"), nameof(mathMlXmlString));
 
@@ -45,7 +44,7 @@ internal static class TextDocumentFormulaEngine
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFormulaEngine_InvalidMathmlXml") + ex.Message, nameof(mathMlXmlString), ex);
         }
 
-        string folder = $"Formula_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+        string folder = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("Formula_");
         string mathDocXml = $"<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:body><office:formula>{mathMlXmlString}</office:formula></office:body></office:document-content>";
         string stylesXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:styles/><office:automatic-styles/><office:master-styles/></office:document-styles>";
         string metaXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:meta/></office:document-meta>";

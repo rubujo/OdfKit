@@ -19,7 +19,7 @@ public sealed class PrimaryFormatMutationPropertyTests
     /// 驗證隨機 ODT 段落修改在重複儲存與載入後保持穩定。
     /// </summary>
     [Fact]
-    public void Odt_RandomizedParagraphMutationsRemainStable()
+    public void OdtRandomizedParagraphMutationsRemainStable()
     {
         var expected = new HashSet<string>(StringComparer.Ordinal);
         var random = new Random(0x0D7);
@@ -58,7 +58,7 @@ public sealed class PrimaryFormatMutationPropertyTests
     /// 驗證隨機 ODS 工作表修改在重複儲存與載入後保持穩定。
     /// </summary>
     [Fact]
-    public void Ods_RandomizedWorksheetMutationsRemainStable()
+    public void OdsRandomizedWorksheetMutationsRemainStable()
     {
         var expected = new HashSet<string>(StringComparer.Ordinal) { "Seed" };
         var random = new Random(0x0D5);
@@ -97,7 +97,7 @@ public sealed class PrimaryFormatMutationPropertyTests
     /// 驗證隨機 ODP 投影片修改在重複儲存與載入後保持穩定。
     /// </summary>
     [Fact]
-    public void Odp_RandomizedSlideMutationsRemainStable()
+    public void OdpRandomizedSlideMutationsRemainStable()
     {
         var expected = new HashSet<string>(StringComparer.Ordinal);
         var random = new Random(0x0D9);
@@ -136,7 +136,7 @@ public sealed class PrimaryFormatMutationPropertyTests
     /// 驗證隨機 ODG 頁面修改在重複儲存與載入後保持穩定。
     /// </summary>
     [Fact]
-    public void Odg_RandomizedPageMutationsRemainStable()
+    public void OdgRandomizedPageMutationsRemainStable()
     {
         var expected = new HashSet<string>(StringComparer.Ordinal);
         var random = new Random(0x0D6);

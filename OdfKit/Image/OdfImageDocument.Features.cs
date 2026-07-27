@@ -59,10 +59,7 @@ public partial class OdfImageDocument
     /// <returns>The path of the image within the ODF package. / 影像在 ODF 封裝中的路徑。</returns>
     public string AddImageFrame(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength width, OdfLength height, string? preferredName, string? name, string? title, string? description)
     {
-        if (imageBytes is null)
-        {
-            throw new System.ArgumentNullException(nameof(imageBytes));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(imageBytes, nameof(imageBytes));
 
         OdfMediaManager mediaManager = new(Package);
         string href = mediaManager.AddImage(imageBytes, preferredName ?? "image.png");
@@ -120,10 +117,7 @@ public partial class OdfImageDocument
     /// <exception cref="ArgumentNullException">When <paramref name="requests"/> or any request within it is <see langword="null"/>. / 當 <paramref name="requests"/> 或其中任一筆請求為 <see langword="null"/> 時擲出。</exception>
     public IReadOnlyList<string> AddImageFrames(IEnumerable<OdfImageFrameRequest> requests)
     {
-        if (requests is null)
-        {
-            throw new ArgumentNullException(nameof(requests));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(requests, nameof(requests));
 
         List<string> hrefs = [];
         foreach (OdfImageFrameRequest request in requests)

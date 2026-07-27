@@ -82,8 +82,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// <param name="options">The reader options. / 讀取器選項。</param>
     public OdsStreamReader(Stream stream, OdsStreamReaderOptions options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
         _options = ValidateOptions(options);
         _zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: _options.LeaveOpen);
         ScanSheetNames();
@@ -106,8 +105,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// <param name="options">The reader options. / 讀取器選項。</param>
     public OdsStreamReader(string path, OdsStreamReaderOptions options)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
         _options = ValidateOptions(options);
         _zip = ZipFile.OpenRead(path);
         ScanSheetNames();
@@ -565,8 +563,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 
     private static OdsStreamReaderOptions ValidateOptions(OdsStreamReaderOptions options)
     {
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
         return options;
     }
 

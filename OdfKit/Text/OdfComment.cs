@@ -93,8 +93,7 @@ public class OdfComment
     /// <param name="reply">The reply comment instance to add. / 要新增的回覆註解執行個體。</param>
     public void AddReply(OdfComment reply)
     {
-        if (reply is null)
-            throw new ArgumentNullException(nameof(reply));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reply, nameof(reply));
         _replies.Add(reply);
     }
 
@@ -183,7 +182,7 @@ public class OdfComment
         annotationNode.Children.Append(dateNode);
 
         var normalizedText = comment.Text ?? string.Empty;
-        var paragraphs = normalizedText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        var paragraphs = global::OdfKit.Internal.OdfStringHelper.SplitLines(normalizedText);
         foreach (var pText in paragraphs)
         {
             var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
@@ -286,8 +285,7 @@ public class OdfComment
     /// <returns>The parsed root <see cref="OdfComment"/> object. / 解析後的 <see cref="OdfComment"/> 根註解物件。</returns>
     public static OdfComment FromXmlNode(OdfNode node)
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         // 識別所有候選 XML 節點
         IEnumerable<OdfNode> xmlNodes;

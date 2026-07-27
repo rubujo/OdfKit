@@ -282,14 +282,14 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         if (date == DateTime.MinValue || date == DateTime.MaxValue)
         {
             isoDate = useTimezoneNaive
-                ? date.ToString("yyyy-MM-ddTHH:mm:ss")
-                : date.ToString("yyyy-MM-ddTHH:mm:ss") + "Z";
+                ? date.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+                : date.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + "Z";
         }
         else
         {
             isoDate = useTimezoneNaive
-                ? date.ToString("yyyy-MM-ddTHH:mm:ss")
-                : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                ? date.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+                : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
         }
         Node.SetAttribute("date-value", OdfNamespaces.Office, isoDate, "office");
         DisplayText = isoDate;

@@ -81,7 +81,7 @@ OdfKit.Extensions.Scripting.OdfMacroTrustPolicy.VerificationTime.set -> void
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus.InvalidSignature = 1 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus.Trusted = 3 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
-OdfKit.Extensions.Scripting.OdfMacroTrustStatus.Unsigned = 0 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
+OdfKit.Extensions.Scripting.OdfMacroTrustStatus.NotSigned = 0 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfMacroTrustStatus.Untrusted = 2 -> OdfKit.Extensions.Scripting.OdfMacroTrustStatus
 OdfKit.Extensions.Scripting.OdfPackageScriptDiagnostics
 OdfKit.Extensions.Scripting.OdfPackageScriptDiagnostics.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Extensions.Scripting.OdfScriptSyntaxDiagnostic!>!

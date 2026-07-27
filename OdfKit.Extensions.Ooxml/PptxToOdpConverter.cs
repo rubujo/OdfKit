@@ -39,8 +39,7 @@ public static class PptxToOdpConverter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="pptxStream"/> 為 null 時引發</exception>
     public static OdfPresentationDocument Convert(Stream pptxStream)
     {
-        if (pptxStream is null)
-            throw new ArgumentNullException(nameof(pptxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pptxStream, nameof(pptxStream));
 
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
         var odp = OdfPresentationDocument.Create();
@@ -195,8 +194,8 @@ public static class PptxToOdpConverter
 
         ApplySlideAnimations(slidePart, slide, animationTargets, animationTargetParagraphCounts);
 
-        IReadOnlyList<string> speakerNotes = GetSpeakerNotes(slidePart);
-        if (speakerNotes.Count > 0 && speakerNotes.Any(note => !string.IsNullOrWhiteSpace(note)))
+        string[] speakerNotes = GetSpeakerNotes(slidePart);
+        if (speakerNotes.Length > 0 && speakerNotes.Any(note => !string.IsNullOrWhiteSpace(note)))
         {
             slide.SetSpeakerNotes(speakerNotes);
         }
@@ -224,7 +223,7 @@ public static class PptxToOdpConverter
 
     private static OdfKit.Presentation.OdfTransitionType? ReadTransitionType(P.Transition transition)
     {
-        OpenXmlElement? child = transition.ChildElements.FirstOrDefault();
+        OpenXmlElement? child = transition.ChildElements.Count > 0 ? transition.ChildElements[0] : null;
         return child switch
         {
             P.PushTransition _ => OdfKit.Presentation.OdfTransitionType.Push,
@@ -858,8 +857,8 @@ public static class PptxToOdpConverter
     private static void ApplySlideAnimations(
         SlidePart slidePart,
         OdfKit.Presentation.OdfSlide slide,
-        IReadOnlyDictionary<uint, string> animationTargets,
-        IReadOnlyDictionary<uint, int> animationTargetParagraphCounts)
+        Dictionary<uint, string> animationTargets,
+        Dictionary<uint, int> animationTargetParagraphCounts)
     {
         P.Timing? timing = slidePart.Slide?.Timing;
         if (timing is null || animationTargets.Count == 0)
@@ -867,7 +866,7 @@ public static class PptxToOdpConverter
             return;
         }
 
-        IReadOnlyDictionary<uint, bool> paragraphBuildTargets = ReadParagraphBuildTargets(timing);
+        Dictionary<uint, bool> paragraphBuildTargets = ReadParagraphBuildTargets(timing);
         var animationNodes = timing.Descendants<OpenXmlCompositeElement>()
             .Where(e => e is P.AnimateEffect || e is P.Animate || e is P.AnimateColor || e is P.AnimateMotion || e is P.AnimateRotation || e is P.AnimateScale ||
                 (e is P.SetBehavior setBehavior && !IsSupplementalSetBehavior(setBehavior)));
@@ -930,7 +929,7 @@ public static class PptxToOdpConverter
         };
     }
 
-    private static IReadOnlyDictionary<uint, bool> ReadParagraphBuildTargets(P.Timing timing)
+    private static Dictionary<uint, bool> ReadParagraphBuildTargets(P.Timing timing)
     {
         var targets = new Dictionary<uint, bool>();
         foreach (P.BuildParagraph buildParagraph in timing.BuildList?.Elements<P.BuildParagraph>() ?? [])
@@ -1299,7 +1298,7 @@ public static class PptxToOdpConverter
                 .Where(text => text.Length > 0));
     }
 
-    private static IReadOnlyList<TextParagraph> GetTextParagraphs(
+    private static List<TextParagraph> GetTextParagraphs(
         P.Shape shape,
         ThemeColorMap themeColors,
         P.Shape? matchingPlaceholder = null)
@@ -1339,17 +1338,17 @@ public static class PptxToOdpConverter
         return paragraphs;
     }
 
-    private static A.Paragraph? GetInheritedParagraph(IReadOnlyList<A.Paragraph> paragraphs, int index)
+    private static A.Paragraph? GetInheritedParagraph(A.Paragraph[] paragraphs, int index)
     {
-        if (paragraphs.Count == 0)
+        if (paragraphs.Length == 0)
         {
             return null;
         }
 
-        return index < paragraphs.Count ? paragraphs[index] : paragraphs[0];
+        return index < paragraphs.Length ? paragraphs[index] : paragraphs[0];
     }
 
-    private static IReadOnlyList<TextRun> FlattenTextRuns(IReadOnlyList<TextParagraph> paragraphs)
+    private static List<TextRun> FlattenTextRuns(IReadOnlyList<TextParagraph> paragraphs)
     {
         var runs = new List<TextRun>();
         foreach (TextParagraph paragraph in paragraphs)
@@ -1424,13 +1423,13 @@ public static class PptxToOdpConverter
             GetTextPosition(runProperties?.Baseline?.Value ?? inheritedProperties?.Baseline?.Value));
     }
 
-    private static OdfKit.Presentation.OdfShape AddStyledTextBox(
+    private static OdfKit.Presentation.OdfTextBox AddStyledTextBox(
         OdfKit.Presentation.OdfSlide slide,
         Bounds bounds,
         IReadOnlyList<TextParagraph> paragraphs)
     {
         var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_"), "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, bounds.X.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, bounds.Y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, bounds.Width.ToString(), "svg");
@@ -1528,7 +1527,7 @@ public static class PptxToOdpConverter
         }
     }
 
-    private static IReadOnlyList<string> GetSpeakerNotes(SlidePart slidePart)
+    private static string[] GetSpeakerNotes(SlidePart slidePart)
     {
         NotesSlidePart? notesPart = slidePart.NotesSlidePart;
         if (notesPart?.NotesSlide is null)
@@ -1600,7 +1599,7 @@ public static class PptxToOdpConverter
         }
 
         string color = value!.Trim();
-        if (color.StartsWith("#", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
         {
             color = color.Substring(1);
         }
@@ -1987,7 +1986,7 @@ public static class PptxToOdpConverter
             Dictionary<uint, string> effectStyleColors,
             Dictionary<uint, ThemeEffectShadow> effectStyleShadows,
             A.EffectStyleList? effectStyleList,
-            IReadOnlyDictionary<A.SchemeColorValues, string> colors)
+            Dictionary<A.SchemeColorValues, string> colors)
         {
             if (effectStyleList is null)
             {

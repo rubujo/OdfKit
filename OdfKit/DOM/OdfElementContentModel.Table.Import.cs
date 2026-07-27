@@ -32,10 +32,7 @@ public partial class TableTableElement
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="reader"/> is <see langword="null"/>. / 當 <paramref name="reader"/> 為 <see langword="null"/> 時擲出。</exception>
     public void ImportData(DbDataReader reader)
     {
-        if (reader is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         int rowIndex = 0;
         while (reader.Read())
@@ -59,10 +56,7 @@ public partial class TableTableElement
     /// <exception cref="ArgumentNullException">當 <paramref name="table"/> 為 <see langword="null"/> 時擲出</exception>
     public void ImportData(DataTable table)
     {
-        if (table is null)
-        {
-            throw new ArgumentNullException(nameof(table));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(table, nameof(table));
 
         for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
         {
@@ -85,10 +79,7 @@ public partial class TableTableElement
     /// <exception cref="ArgumentNullException">當 <paramref name="collection"/> 為 <see langword="null"/> 時擲出</exception>
     public void ImportData<T>(IEnumerable<T> collection)
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(collection, nameof(collection));
 
         Func<T, object?>[] accessors = ValueAccessorCache<T>.Accessors;
         int rowIndex = 0;
@@ -107,14 +98,10 @@ public partial class TableTableElement
     private TableTableCellElement GetOrCreateCell(int rowIndex, int columnIndex)
     {
         if (rowIndex < 0 || rowIndex > OdfSpreadsheetLimits.MaxRowIndex)
-        {
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
 
         if (columnIndex < 0 || columnIndex > OdfSpreadsheetLimits.MaxColumnIndex)
-        {
             throw new ArgumentOutOfRangeException(nameof(columnIndex));
-        }
 
         TableTableRowElement row = GetOrCreateRow(rowIndex);
         List<TableTableCellElement> cells = row.TableTableCellChildElements.ToList();

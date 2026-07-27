@@ -41,12 +41,9 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     /// <param name="ct">The value to use. / 用於取消作業的取消語彙</param>
     public async Task ConvertAsync(OdfDocument document, Stream outputStream, string targetFormat, CancellationToken ct = default)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(LibreOfficeHttpRenderer));
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
-        if (outputStream is null)
-            throw new ArgumentNullException(nameof(outputStream));
+        OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(LibreOfficeHttpRenderer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
         if (string.IsNullOrEmpty(targetFormat))
             throw new ArgumentNullException(nameof(targetFormat));
 

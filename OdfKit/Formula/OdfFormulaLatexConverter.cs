@@ -24,10 +24,7 @@ public static class OdfFormulaLatexConverter
     /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
     public static string Convert(string latex)
     {
-        if (latex == null)
-        {
-            throw new ArgumentNullException(nameof(latex));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(latex, nameof(latex));
 
         var (mathList, error) = LaTeXParser.MathListFromLaTeX(latex);
         if (error != null)
@@ -247,9 +244,9 @@ public static class OdfFormulaLatexConverter
                 tag = "mn";
             }
 
-            sb.Append($"<{tag}>");
+            sb.Append(System.FormattableString.Invariant($"<{tag}>"));
             sb.Append(EscapeXml(nucleus));
-            sb.Append($"</{tag}>");
+            sb.Append(System.FormattableString.Invariant($"</{tag}>"));
         }
     }
 
@@ -285,10 +282,7 @@ public static class OdfFormulaLatexConverter
     /// <exception cref="ArgumentNullException">When <paramref name="tokens"/> is <see langword="null"/>. / 當 <paramref name="tokens"/> 為 <see langword="null"/> 時擲出。</exception>
     public static string ToLatex(IReadOnlyList<OdfMathToken> tokens)
     {
-        if (tokens is null)
-        {
-            throw new ArgumentNullException(nameof(tokens));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(tokens, nameof(tokens));
 
         var sb = new StringBuilder();
         foreach (OdfMathToken token in tokens)

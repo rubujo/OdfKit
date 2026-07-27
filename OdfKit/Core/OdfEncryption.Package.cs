@@ -278,7 +278,7 @@ public static partial class OdfEncryption
         foreach (var entry in package.Entries.Values)
         {
             string name = entry.Name;
-            if (name == "mimetype" || name.StartsWith("META-INF/"))
+            if (name == "mimetype" || name.StartsWith("META-INF/", System.StringComparison.Ordinal))
             {
                 continue;
             }
@@ -308,7 +308,7 @@ public static partial class OdfEncryption
         foreach (var entry in package.Entries.Values)
         {
             string name = entry.Name;
-            if (name == "mimetype" || name.StartsWith("META-INF/"))
+            if (name == "mimetype" || name.StartsWith("META-INF/", System.StringComparison.Ordinal))
             {
                 continue;
             }

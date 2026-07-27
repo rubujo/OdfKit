@@ -39,12 +39,9 @@ public static partial class OdfStreamingMailMerge
         IDictionary<string, object?> data,
         CancellationToken cancellationToken)
     {
-        if (templateStream is null)
-            throw new ArgumentNullException(nameof(templateStream));
-        if (outputStream is null)
-            throw new ArgumentNullException(nameof(outputStream));
-        if (data is null)
-            throw new ArgumentNullException(nameof(data));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(templateStream, nameof(templateStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(data, nameof(data));
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -79,7 +76,7 @@ public static partial class OdfStreamingMailMerge
                     destStream,
                     loadOptions.MaxEntrySize,
                     "Err_OdfPackage_InputStreamSizeLimitExceeded",
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
     }
@@ -100,12 +97,9 @@ public static partial class OdfStreamingMailMerge
         IEnumerable<IDictionary<string, object?>> dataSequence,
         CancellationToken cancellationToken)
     {
-        if (templateStream is null)
-            throw new ArgumentNullException(nameof(templateStream));
-        if (outputStream is null)
-            throw new ArgumentNullException(nameof(outputStream));
-        if (dataSequence is null)
-            throw new ArgumentNullException(nameof(dataSequence));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(templateStream, nameof(templateStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dataSequence, nameof(dataSequence));
 
         return ApplyBatchTemplateCoreAsync(
             templateStream,
@@ -130,12 +124,9 @@ public static partial class OdfStreamingMailMerge
         IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
         CancellationToken cancellationToken)
     {
-        if (templateStream is null)
-            throw new ArgumentNullException(nameof(templateStream));
-        if (outputStream is null)
-            throw new ArgumentNullException(nameof(outputStream));
-        if (dataSequence is null)
-            throw new ArgumentNullException(nameof(dataSequence));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(templateStream, nameof(templateStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dataSequence, nameof(dataSequence));
 
         return ApplyBatchTemplateCoreAsync(templateStream, outputStream, dataSequence, cancellationToken);
     }
@@ -217,7 +208,7 @@ public static partial class OdfStreamingMailMerge
                         destStream,
                         loadOptions.MaxEntrySize,
                         "Err_OdfPackage_InputStreamSizeLimitExceeded",
-                        cancellationToken).ConfigureAwait(false);
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -302,8 +293,7 @@ public static partial class OdfStreamingMailMerge
         DbDataReader reader,
         CancellationToken cancellationToken)
     {
-        if (reader is null)
-            throw new ArgumentNullException(nameof(reader));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         var sequence = AsAsyncEnumerable(reader, default);
         return ApplyBatchTemplateAsync(templateStream, outputStream, sequence, cancellationToken);
@@ -552,13 +542,13 @@ public static partial class OdfStreamingMailMerge
                     ? text.Substring(start + 2, end - start - 4).Trim()
                     : text.Substring(start + 1, end - start - 2).Trim();
 
-                if (field.StartsWith("#foreach "))
+                if (field.StartsWith("#foreach ", System.StringComparison.Ordinal))
                 {
                     FlushStaticSegment(ms, segments);
 
                     // 解析 foreach 宣告
                     string decl = field.Substring("#foreach ".Length).Trim();
-                    var parts = decl.Split(new[] { " in " }, StringSplitOptions.None);
+                    var parts = global::OdfKit.Internal.OdfStringHelper.SplitInExpression(decl);
                     string itemName = "";
                     string collectionName = "";
                     if (parts.Length == 2)
@@ -581,7 +571,7 @@ public static partial class OdfStreamingMailMerge
                     }
                     pos = text.Length;
                 }
-                else if (field.StartsWith("/foreach"))
+                else if (field.StartsWith("/foreach", System.StringComparison.Ordinal))
                 {
                     pos = end;
                 }
@@ -813,7 +803,7 @@ public static partial class OdfStreamingMailMerge
                     if (declEnd >= 0)
                     {
                         string decl = node.Value.Substring(declStart, declEnd - declStart);
-                        var parts = decl.Split(new[] { " in " }, StringSplitOptions.None);
+                        var parts = global::OdfKit.Internal.OdfStringHelper.SplitInExpression(decl);
                         if (parts.Length == 2)
                         {
                             string nestedItemName = parts[0].Trim();
@@ -1000,7 +990,7 @@ public static partial class OdfStreamingMailMerge
 
                 if (!isFirst)
                 {
-                    await destXml.WriteAsync(pageBreakBytes, 0, pageBreakBytes.Length, cancellationToken).ConfigureAwait(false);
+                    await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(destXml, pageBreakBytes, 0, pageBreakBytes.Length, cancellationToken).ConfigureAwait(false);
                 }
                 isFirst = false;
 

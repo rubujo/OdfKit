@@ -125,18 +125,18 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     private static bool TryParseCore(string? value, bool allowNegative, out decimal percent)
     {
         percent = 0;
-        if (string.IsNullOrEmpty(value) || !value!.EndsWith("%", StringComparison.Ordinal))
+        if (string.IsNullOrEmpty(value) || !global::OdfKit.Internal.OdfStringHelper.EndsWith(value!, '%'))
         {
             return false;
         }
 
-        string number = value.Substring(0, value.Length - 1);
-        if (number.Length == 0 || number.StartsWith("+", StringComparison.Ordinal))
+        string number = value!.Substring(0, value.Length - 1);
+        if (number.Length == 0 || global::OdfKit.Internal.OdfStringHelper.StartsWith(number, '+'))
         {
             return false;
         }
 
-        if (number.StartsWith("-", StringComparison.Ordinal) && !allowNegative)
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(number, '-') && !allowNegative)
         {
             return false;
         }

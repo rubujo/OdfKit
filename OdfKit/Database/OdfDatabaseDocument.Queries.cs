@@ -157,10 +157,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When <paramref name="columnNames"/> is empty. / 當 <paramref name="columnNames"/> 為空時擲出。</exception>
     public OdfNode SetQueryColumns(string queryName, IEnumerable<string> columnNames)
     {
-        if (columnNames is null)
-        {
-            throw new ArgumentNullException(nameof(columnNames));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(columnNames, nameof(columnNames));
 
         List<string> names = new(columnNames);
         if (names.Count == 0)

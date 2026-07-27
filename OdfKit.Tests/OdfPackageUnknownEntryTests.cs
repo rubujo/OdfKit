@@ -15,7 +15,7 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class OdfPackageUnknownEntryTests
 {
-    private static readonly IReadOnlyDictionary<string, byte[]> UnknownEntries = new Dictionary<string, byte[]>
+    private static readonly Dictionary<string, byte[]> UnknownEntries = new Dictionary<string, byte[]>
     {
         ["Extra/custom.bin"] = [0x00, 0x01, 0x02, 0xFE, 0xFF],
         ["Configurations2/accelerator/current.xml"] = Encoding.UTF8.GetBytes("<config:acceleratorlist xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" />"),

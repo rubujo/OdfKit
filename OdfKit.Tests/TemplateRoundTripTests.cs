@@ -70,7 +70,7 @@ public class TemplateRoundTripTests
     /// 驗證使用者欄位（範本變數）宣告可新增、更新並於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void UserFieldDeclarations_RoundTripAfterSaveAndLoad()
+    public void UserFieldDeclarationsRoundTripAfterSaveAndLoad()
     {
         using var template = TextTemplateDocument.Create();
         template.AddUserFieldDeclaration("CustomerName", "string", "預設客戶");
@@ -100,7 +100,7 @@ public class TemplateRoundTripTests
     /// 驗證 <see cref="OdfDocument.ConvertZipToFlatXml"/> 與 <see cref="OdfDocument.ConvertFlatXmlToZip"/> 的往返一致性。
     /// </summary>
     [Fact]
-    public void ConvertZipToFlatXmlAndBack_RoundTrips()
+    public void ConvertZipToFlatXmlAndBackRoundTrips()
     {
         using var doc = TextDocument.Create();
         doc.Title = "Flat XML 轉換測試";
@@ -135,7 +135,7 @@ public class TemplateRoundTripTests
     /// <c>clearUserContent</c> 選項可清除範本段落內容但保留母片頁面樣式。
     /// </summary>
     [Fact]
-    public void TextTemplate_ClearUserContent_RemovesParagraphsKeepsMasterPage()
+    public void TextTemplateClearUserContentRemovesParagraphsKeepsMasterPage()
     {
         using var template = TextTemplateDocument.Create();
         var masterPage = template.AddMasterPage("MyTemplateMaster");
@@ -155,7 +155,7 @@ public class TemplateRoundTripTests
     /// <c>clearUserContent</c> 選項可清除工作表資料列但保留欄寬設定。
     /// </summary>
     [Fact]
-    public void SpreadsheetTemplate_ClearUserContent_RemovesRowsKeepsColumnWidth()
+    public void SpreadsheetTemplateClearUserContentRemovesRowsKeepsColumnWidth()
     {
         using var template = SpreadsheetTemplateDocument.Create();
         var sheet = template.Worksheets.Add("Sheet1");
@@ -297,7 +297,7 @@ public class TemplateRoundTripTests
     /// 還原為一般文件，形成雙向往返工作流。
     /// </summary>
     [Fact]
-    public void TextDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    public void TextDocumentCreateTemplateFromDocumentRoundTripsBackToDocument()
     {
         using var original = TextDocument.Create();
         original.Title = "既有文件標題";
@@ -318,7 +318,7 @@ public class TemplateRoundTripTests
     /// 試算表文件另存為範本，且完整保留工作表資料。
     /// </summary>
     [Fact]
-    public void SpreadsheetDocument_CreateTemplateFromDocument_PreservesSheetData()
+    public void SpreadsheetDocumentCreateTemplateFromDocumentPreservesSheetData()
     {
         using var original = SpreadsheetDocument.Create();
         var sheet = original.Worksheets.Add("Sheet1");
@@ -335,7 +335,7 @@ public class TemplateRoundTripTests
     /// 簡報文件另存為範本，且完整保留母片頁面。
     /// </summary>
     [Fact]
-    public void PresentationDocument_CreateTemplateFromDocument_PreservesMasterPages()
+    public void PresentationDocumentCreateTemplateFromDocumentPreservesMasterPages()
     {
         using var original = PresentationDocument.Create();
         original.AddMasterPage("OriginalMaster");
@@ -351,7 +351,7 @@ public class TemplateRoundTripTests
     /// 繪圖文件另存為範本，且完整保留母片頁面。
     /// </summary>
     [Fact]
-    public void DrawingDocument_CreateTemplateFromDocument_PreservesMasterPages()
+    public void DrawingDocumentCreateTemplateFromDocumentPreservesMasterPages()
     {
         using var original = DrawingDocument.Create();
         original.AddMasterPage("OriginalDrawingMaster");
@@ -367,7 +367,7 @@ public class TemplateRoundTripTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void CreateTemplateFromDocument_NullSource_ThrowsArgumentNullException()
+    public void CreateTemplateFromDocumentNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => TextTemplateDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => SpreadsheetTemplateDocument.CreateFromDocument(null!));
@@ -380,7 +380,7 @@ public class TemplateRoundTripTests
     /// 用於將範本中特定區段標記為唯讀。
     /// </summary>
     [Fact]
-    public void Section_IsProtected_RoundTripsAfterSaveAndLoad()
+    public void SectionIsProtectedRoundTripsAfterSaveAndLoad()
     {
         using var doc = TextDocument.Create();
         OdfSection section = doc.AddSection("ReadOnlySection", 1, OdfLength.FromCentimeters(0));

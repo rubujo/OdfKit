@@ -50,16 +50,12 @@ internal static class OdfSignatureSigner
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (package is null)
-            throw new ArgumentNullException(nameof(package));
-        if (certificate is null)
-            throw new ArgumentNullException(nameof(certificate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(certificate, nameof(certificate));
         if (!certificate.HasPrivateKey)
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_CertificateContainPrivateKey"), nameof(certificate));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
-        if (profile is null)
-            throw new ArgumentNullException(nameof(profile));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(profile, nameof(profile));
 
         using AsymmetricAlgorithm? privateKey = certificate.GetRSAPrivateKey() ?? (AsymmetricAlgorithm?)certificate.GetECDsaPrivateKey();
         if (privateKey is null)
@@ -139,8 +135,7 @@ internal static class OdfSignatureSigner
             certDigest.AppendChild(digestMethod);
 
             var digestValue = doc.CreateElement("ds", "DigestValue", OdfNamespaces.Ds);
-            using (var sha256 = SHA256.Create())
-                digestValue.InnerText = Convert.ToBase64String(sha256.ComputeHash(certificate.RawData));
+            digestValue.InnerText = Convert.ToBase64String(global::OdfKit.Internal.OdfHashHelper.Sha256(certificate.RawData));
             certDigest.AppendChild(digestValue);
             cert.AppendChild(certDigest);
 
@@ -221,8 +216,7 @@ internal static class OdfSignatureSigner
 
             byte[] sigValueBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(sigValElem);
 
-            using var sha256 = SHA256.Create();
-            byte[] sigHash = sha256.ComputeHash(sigValueBytes);
+            byte[] sigHash = global::OdfKit.Internal.OdfHashHelper.Sha256(sigValueBytes);
 
             byte[] tsaResponse = await OdfSignatureTsaClient.QueryTsaAsync(
                 options.TsaUrl!,

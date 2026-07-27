@@ -104,8 +104,7 @@ public partial class OdfNode
     /// <returns>匯入後的新節點</returns>
     public static OdfNode ImportNode(OdfNode sourceNode, OdfPackage? sourcePackage, OdfPackage? destPackage)
     {
-        if (sourceNode is null)
-            throw new ArgumentNullException(nameof(sourceNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourceNode, nameof(sourceNode));
 
         // 先深層複製節點結構
         OdfNode importedNode = sourceNode.CloneNode(true);

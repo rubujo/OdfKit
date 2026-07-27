@@ -121,7 +121,7 @@ internal sealed class OdfRawXmlWriter : IDisposable
             start = i + 1;
         }
 
-        AppendRun(value.Slice(start, value.Length - start));
+        AppendRun(value.Slice(start));
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ internal sealed class OdfRawXmlWriter : IDisposable
             start = i + 1;
         }
 
-        AppendRun(value.Slice(start, value.Length - start));
+        AppendRun(value.Slice(start));
     }
 
     private void AppendLiteral(string text)

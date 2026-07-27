@@ -134,7 +134,7 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         };
 
         var shapeNode = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_"), "draw");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -166,7 +166,7 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawGroup_EndCannotBeEmpty"), nameof(endShapeId));
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
-        connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        connectorNode.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_"), "draw");
         connectorNode.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
         connectorNode.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
         connectorNode.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
@@ -188,7 +188,7 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
     private static OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("id", OdfNamespaces.Draw, global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("frm_"), "draw");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");

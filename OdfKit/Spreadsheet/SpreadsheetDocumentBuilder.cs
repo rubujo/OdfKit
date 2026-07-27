@@ -29,8 +29,7 @@ public sealed class SpreadsheetDocumentBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public SpreadsheetDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         configure(new TextDocumentMetadataBuilder(new OdfDocumentMetadata(_document)));
         return this;
@@ -56,8 +55,7 @@ public sealed class SpreadsheetDocumentBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public SpreadsheetDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var styles = new OdfStyleSet();
         configure(styles);
@@ -85,8 +83,7 @@ public sealed class SpreadsheetDocumentBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public SpreadsheetDocumentBuilder AddSheet(string name, Action<OdfSheetBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         OdfTableSheet sheet = _document.Worksheets.Add(name);
         configure(new OdfSheetBuilder(_document, sheet, _styles));
         return this;
@@ -175,8 +172,7 @@ public sealed class OdfSheetBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public OdfSheetBuilder SetFormulaRange(OdfCellRange range, Func<int, int, string> formulaFactory)
     {
-        if (formulaFactory is null)
-            throw new ArgumentNullException(nameof(formulaFactory));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(formulaFactory, nameof(formulaFactory));
 
         OdfCellRange normalizedRange = EnsureSheetName(range);
         int startRow = Math.Min(normalizedRange.StartAddress.Row, normalizedRange.EndAddress.Row);
@@ -233,8 +229,7 @@ public sealed class OdfSheetBuilder
     {
         if (string.IsNullOrWhiteSpace(columnName))
             throw new ArgumentNullException(nameof(columnName));
-        if (formulaFactory is null)
-            throw new ArgumentNullException(nameof(formulaFactory));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(formulaFactory, nameof(formulaFactory));
         EnsureOneBasedIndex(headerRow, nameof(headerRow));
         EnsureOneBasedIndex(firstDataRow, nameof(firstDataRow));
         EnsureOneBasedIndex(lastDataRow, nameof(lastDataRow));
@@ -275,10 +270,8 @@ public sealed class OdfSheetBuilder
     {
         if (string.IsNullOrWhiteSpace(columnName))
             throw new ArgumentNullException(nameof(columnName));
-        if (formulaFactory is null)
-            throw new ArgumentNullException(nameof(formulaFactory));
-        if (cachedValueFactory is null)
-            throw new ArgumentNullException(nameof(cachedValueFactory));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(formulaFactory, nameof(formulaFactory));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(cachedValueFactory, nameof(cachedValueFactory));
         EnsureOneBasedIndex(headerRow, nameof(headerRow));
         EnsureOneBasedIndex(firstDataRow, nameof(firstDataRow));
         EnsureOneBasedIndex(lastDataRow, nameof(lastDataRow));
@@ -322,10 +315,8 @@ public sealed class OdfSheetBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public OdfSheetBuilder ImportRows<T>(IEnumerable<T> items, Func<T, object?[]> selector, int startRow, int startColumn)
     {
-        if (items is null)
-            throw new ArgumentNullException(nameof(items));
-        if (selector is null)
-            throw new ArgumentNullException(nameof(selector));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(items, nameof(items));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(selector, nameof(selector));
         EnsureOneBasedIndex(startRow, nameof(startRow));
         EnsureOneBasedIndex(startColumn, nameof(startColumn));
 
@@ -373,8 +364,7 @@ public sealed class OdfSheetBuilder
     /// <returns>The result. / 目前 builder 執行個體</returns>
     public OdfSheetBuilder ImportTable<T>(IEnumerable<T> items, Func<T, object?[]> rowSelector, IEnumerable<string> headers, int startRow, int startColumn)
     {
-        if (headers is null)
-            throw new ArgumentNullException(nameof(headers));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(headers, nameof(headers));
         EnsureOneBasedIndex(startRow, nameof(startRow));
         EnsureOneBasedIndex(startColumn, nameof(startColumn));
 
@@ -435,8 +425,7 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder SetColumnWidth(int columnIndex, double widthCm)
     {
         EnsureOneBasedIndex(columnIndex, nameof(columnIndex));
-        if (widthCm <= 0)
-            throw new ArgumentOutOfRangeException(nameof(widthCm));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(widthCm, nameof(widthCm));
 
         _sheet.SetColumnWidth(columnIndex - 1, OdfLength.FromCentimeters(widthCm));
         return this;

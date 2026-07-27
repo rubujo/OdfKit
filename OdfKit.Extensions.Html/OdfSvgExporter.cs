@@ -57,8 +57,7 @@ public static class OdfSvgExporter
     /// <returns>The result. / SVG 內容字串</returns>
     public static string Export(DrawingDocument document, OdfSvgExportOptions? options = null)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         options ??= new OdfSvgExportOptions();
         if (options.PageIndex < 0 || options.PageIndex >= document.Pages.Count)
@@ -376,7 +375,7 @@ public static class OdfSvgExporter
         sb.Append("</text></g>");
     }
 
-    private static IReadOnlyList<TextParagraph> ReadTextParagraphs(OdfNode textBox, DrawingDocument document)
+    private static List<TextParagraph> ReadTextParagraphs(OdfNode textBox, DrawingDocument document)
     {
         var paragraphs = new List<TextParagraph>();
         foreach (OdfNode child in textBox.Children)
@@ -821,7 +820,7 @@ public static class OdfSvgExporter
         }
 
         string trimmed = value!.Trim();
-        if (trimmed.EndsWith("%", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, '%'))
         {
             string number = trimmed.Substring(0, trimmed.Length - 1);
             if (double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
@@ -876,7 +875,7 @@ public static class OdfSvgExporter
         }
 
         string color = value!.Trim();
-        if (color.StartsWith("#", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
         {
             color = color.Substring(1);
         }
@@ -893,7 +892,7 @@ public static class OdfSvgExporter
 
         string clip = value!.Trim();
         if (!clip.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) ||
-            !clip.EndsWith(")", StringComparison.Ordinal))
+            !global::OdfKit.Internal.OdfStringHelper.EndsWith(clip, ')'))
         {
             return null;
         }
@@ -1421,7 +1420,7 @@ public static class OdfSvgExporter
 
     private static bool AppendBoundingBoxArc(
         StringBuilder sb,
-        IReadOnlyList<double> values,
+        double[] values,
         bool moveToStart,
         bool clockwise,
         ref double currentX,
@@ -1469,7 +1468,7 @@ public static class OdfSvgExporter
 
     private static bool AppendCurrentPointAngleArc(
         StringBuilder sb,
-        IReadOnlyList<double> values,
+        double[] values,
         double startX,
         double startY,
         ref double currentX,
@@ -1496,7 +1495,7 @@ public static class OdfSvgExporter
 
     private static bool AppendAngleEllipseArc(
         StringBuilder sb,
-        IReadOnlyList<double> values,
+        double[] values,
         bool moveToStart,
         ref double currentX,
         ref double currentY)
@@ -1859,7 +1858,7 @@ public static class OdfSvgExporter
             return TryEvaluateFunction(name, args, out value);
         }
 
-        private static bool TryEvaluateFunction(string name, IReadOnlyList<double> args, out double value)
+        private static bool TryEvaluateFunction(string name, List<double> args, out double value)
         {
             value = 0;
             switch (name.ToLowerInvariant())
@@ -1958,7 +1957,7 @@ public static class OdfSvgExporter
             }
 
             return _position > start &&
-                double.TryParse(_formula.Substring(start, _position - start), NumberStyles.Float, CultureInfo.InvariantCulture, out value) &&
+            OdfKit.Internal.OdfParsingHelper.TryParseInvariantDouble(_formula, start, _position - start, out value) &&
                 IsFinite(value);
         }
 
@@ -2304,7 +2303,7 @@ public static class OdfSvgExporter
             }
 
             string percent = value!.Trim();
-            if (percent.EndsWith("%", StringComparison.Ordinal))
+            if (global::OdfKit.Internal.OdfStringHelper.EndsWith(percent, '%'))
             {
                 return percent;
             }

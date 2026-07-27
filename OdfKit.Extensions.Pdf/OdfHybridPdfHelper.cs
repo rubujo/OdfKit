@@ -44,8 +44,7 @@ public static class OdfHybridPdfHelper
     /// <returns>The result. / 傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
     public static byte[]? ExtractOdfFromPdf(Stream pdfStream, string? password = null)
     {
-        if (pdfStream is null)
-            throw new ArgumentNullException(nameof(pdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pdfStream, nameof(pdfStream));
 
         // 載入 PDF 文件（用於提取附件的匯入模式）
         using var document = string.IsNullOrEmpty(password)
@@ -146,12 +145,9 @@ public static class OdfHybridPdfHelper
     /// <param name="password">The value to use. / PDF 密碼，若無則為 <see langword="null"/></param>
     public static void InjectOdfToPdf(Stream pdfStream, Stream odfStream, Stream outputPdfStream, string odfFileName, string? password = null)
     {
-        if (pdfStream is null)
-            throw new ArgumentNullException(nameof(pdfStream));
-        if (odfStream is null)
-            throw new ArgumentNullException(nameof(odfStream));
-        if (outputPdfStream is null)
-            throw new ArgumentNullException(nameof(outputPdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pdfStream, nameof(pdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(odfStream, nameof(odfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputPdfStream, nameof(outputPdfStream));
         if (string.IsNullOrWhiteSpace(odfFileName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_OdfFileNameSpecified"), nameof(odfFileName));
 

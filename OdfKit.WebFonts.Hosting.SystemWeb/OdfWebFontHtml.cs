@@ -55,7 +55,7 @@ public static class OdfWebFontHtml
 
     private static bool IsSafeBaseUrl(string value)
     {
-        if (value.StartsWith("/", StringComparison.Ordinal)
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(value, '/')
             && !value.StartsWith("//", StringComparison.Ordinal)
             && !value.Contains('\\')
             && !value.Contains('?')

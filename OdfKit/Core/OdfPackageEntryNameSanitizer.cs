@@ -59,23 +59,23 @@ internal static class OdfPackageEntryNameSanitizer
 
     private static string NormalizePackagePath(string name, bool allowParentSegments)
     {
-        if (name.Contains(":") ||
+        if (name.Contains(':') ||
             name.Contains("//") ||
             name.Contains(@"\\") ||
             (!allowParentSegments &&
              (name.Contains("../") ||
               name.Contains(@"..\") ||
-              name.Equals("..") ||
-              name.EndsWith("/..") ||
-              name.EndsWith(@"\.."))))
+              name.Equals("..", System.StringComparison.Ordinal) ||
+              name.EndsWith("/..", System.StringComparison.Ordinal) ||
+              name.EndsWith(@"\..", System.StringComparison.Ordinal))))
         {
             throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageEntryNameSanitizer_ForbiddenAbsolutePathDrive", name));
         }
 
         string normalized = name.Replace('\\', '/');
-        bool hasTrailingDirectorySeparator = normalized.EndsWith("/", StringComparison.Ordinal);
+        bool hasTrailingDirectorySeparator = global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, '/');
 
-        while (normalized.StartsWith("/"))
+        while (global::OdfKit.Internal.OdfStringHelper.StartsWith(normalized, '/'))
         {
             normalized = normalized.Substring(1);
         }

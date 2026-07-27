@@ -15,7 +15,7 @@ public class OdfCoverageContractTests
     /// 驗證 ODF 1.4 覆蓋契約明確區分規格覆蓋與高階 API 深度。
     /// </summary>
     [Fact]
-    public void Odf14CoverageContract_DeclaresLayeredCoverageModel()
+    public void Odf14CoverageContractDeclaresLayeredCoverageModel()
     {
         string repoRoot = FindRepoRoot();
         string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf14-coverage-contract.md"));
@@ -33,7 +33,7 @@ public class OdfCoverageContractTests
     /// 驗證 API reference 已提供四個高使用率工作流的永久文件。
     /// </summary>
     [Fact]
-    public void ApiReference_DocumentsHighValueWorkflows()
+    public void ApiReferenceDocumentsHighValueWorkflows()
     {
         string repoRoot = FindRepoRoot();
         string referenceRoot = Path.Combine(repoRoot, "docs", "reference");
@@ -61,7 +61,7 @@ public class OdfCoverageContractTests
     /// 驗證 ODF 1.4 coverage status 文件連回 audit 與 typed DOM 追蹤入口。
     /// </summary>
     [Fact]
-    public void Odf14CoverageStatus_DocumentsAuditEntrypoints()
+    public void Odf14CoverageStatusDocumentsAuditEntrypoints()
     {
         string repoRoot = FindRepoRoot();
         string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf14-coverage-status.md"));
@@ -76,7 +76,7 @@ public class OdfCoverageContractTests
     /// 驗證 v0.0.1 完滿條件綁定 main 持續證據，而非發行里程碑。
     /// </summary>
     [Fact]
-    public void ContinuousV001Contract_DoesNotDependOnReleaseMilestone()
+    public void ContinuousV001ContractDoesNotDependOnReleaseMilestone()
     {
         string repoRoot = FindRepoRoot();
         string quality = File.ReadAllText(Path.Combine(repoRoot, "docs", "product-quality-gates.md"));
@@ -96,7 +96,7 @@ public class OdfCoverageContractTests
     /// 驗證外部 RELAX NG 工作流程使用不可變且經雜湊驗證的工具快取與阻擋式對標閘門。
     /// </summary>
     [Fact]
-    public void ExternalValidatorCi_UsesImmutableVerifiedCache()
+    public void ExternalValidatorCiUsesImmutableVerifiedCache()
     {
         string repoRoot = FindRepoRoot();
         string manifestPath = Path.Combine(repoRoot, "eng", "external-tools.json");
@@ -141,7 +141,7 @@ public class OdfCoverageContractTests
         Assert.Contains("-InternalBaselineExcludedKinds 'Database', 'Formula', 'FormulaTemplate'", workflow);
         Assert.Contains("Test-OdfRelaxNgBaseline.ps1", workflow);
         Assert.Contains("OdfCorpusGenerator", workflow);
-        Assert.Contains("ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments", workflow);
+        Assert.Contains("ValidateWithOdfValidatorRealJarDetectsValidAndInvalidDocuments", workflow);
         Assert.DoesNotContain("continue-on-error", workflow);
         Assert.Contains("-SkipBuild", workflow);
         Assert.Contains("-SkipInternalValidation", workflow);
@@ -151,7 +151,7 @@ public class OdfCoverageContractTests
     /// 驗證 cookbook 保留高使用率工作流的 API 名稱，避免文件漂移。
     /// </summary>
     [Fact]
-    public void Cookbook_ReferencesCurrentHighValueWorkflowApis()
+    public void CookbookReferencesCurrentHighValueWorkflowApis()
     {
         string repoRoot = FindRepoRoot();
         string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "cookbook.md"));
@@ -167,7 +167,7 @@ public class OdfCoverageContractTests
     /// 驗證 typed DOM coverage audit 可穩定輸出 schema 與 wrapper 摘要。
     /// </summary>
     [Fact]
-    public void TypedDomCoverageAudit_ReportsSchemaAndWrapperCounts()
+    public void TypedDomCoverageAuditReportsSchemaAndWrapperCounts()
     {
         OdfTypedDomCoverageReport report = OdfTypedDomCoverage.Build();
 
@@ -183,7 +183,7 @@ public class OdfCoverageContractTests
     /// 驗證 ODF 1.4 schema provider 與 typed DOM audit 維持可比較的最低覆蓋摘要。
     /// </summary>
     [Fact]
-    public void TypedDomCoverageAudit_HasStableOdf14ElementAndAttributeCounts()
+    public void TypedDomCoverageAuditHasStableOdf14ElementAndAttributeCounts()
     {
         OdfTypedDomCoverageReport report = OdfTypedDomCoverage.Build();
 

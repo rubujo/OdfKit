@@ -542,7 +542,7 @@ namespace OdfKit.Tests
 
         #region Helper Methods
 
-        private void FindNodesByLocalName(OdfNode node, string localName, List<OdfNode> results)
+        private static void FindNodesByLocalName(OdfNode node, string localName, List<OdfNode> results)
         {
             if (node.LocalName == localName)
             {
@@ -554,7 +554,7 @@ namespace OdfKit.Tests
             }
         }
 
-        private int GetNodeDepth(OdfNode node)
+        private static int GetNodeDepth(OdfNode node)
         {
             int maxChildDepth = 0;
             foreach (var child in node.Children)

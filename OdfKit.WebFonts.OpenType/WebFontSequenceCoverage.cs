@@ -141,7 +141,7 @@ internal static class WebFontSequenceCoverage
         return trailingRegionalCount % 2 == 1;
     }
 
-    private static void Flush(StringBuilder run, ICollection<WebFontTextSequence> supported)
+    private static void Flush(StringBuilder run, List<WebFontTextSequence> supported)
     {
         if (run.Length == 0)
         {

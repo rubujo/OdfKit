@@ -92,10 +92,10 @@ public partial class TextDocument
     /// </summary>
     /// <param name="index">The index to remove. / 要移除的索引。</param>
     /// <returns><see langword="true"/> if the index was removed; otherwise <see langword="false"/>. / 若已移除索引則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public bool RemoveIndex(OdfIndex index)
     {
-        if (index is null)
-            throw new System.ArgumentNullException(nameof(index));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(index, nameof(index));
         OdfKit.DOM.OdfNode? parent = index.Node.Parent;
         return parent is not null && parent.RemoveChild(index.Node);
     }
@@ -150,6 +150,7 @@ public partial class TextDocument
     /// <param name="key1">主要鍵值</param>
     /// <param name="key2">次要鍵值</param>
     /// <returns>建立的字母索引標記物件</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(OdfParagraph paragraph, string stringValue, string? key1 = null, string? key2 = null) =>
         TextDocumentNotesEngine.AddAlphabeticalIndexMark(paragraph, stringValue, key1, key2);
 
@@ -163,6 +164,7 @@ public partial class TextDocument
     /// <param name="title">文獻標題</param>
     /// <param name="year">出版年份</param>
     /// <returns>建立的文獻標記物件</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal OdfBibliographyMark AddBibliographyMark(
         OdfParagraph paragraph,
         string identifier,
@@ -435,10 +437,8 @@ public partial class TextDocument
 
     private bool UpdateNote(string id, string noteClass, string citation, string bodyText)
     {
-        if (citation is null)
-            throw new System.ArgumentNullException(nameof(citation));
-        if (bodyText is null)
-            throw new System.ArgumentNullException(nameof(bodyText));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(citation, nameof(citation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bodyText, nameof(bodyText));
         OdfKit.DOM.OdfNode? note = FindNoteNode(BodyTextRoot, id, noteClass);
         if (note is null)
             return false;
@@ -512,6 +512,7 @@ public partial class TextDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     /// <param name="name">書籤名稱</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddBookmark(OdfParagraph paragraph, string name) =>
         TextDocumentNotesEngine.AddBookmark(paragraph, name);
 
@@ -520,6 +521,7 @@ public partial class TextDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     /// <param name="name">參考標記名稱</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddReferenceMark(OdfParagraph paragraph, string name) =>
         TextDocumentNotesEngine.AddReferenceMark(paragraph, name);
 
@@ -529,6 +531,7 @@ public partial class TextDocument
     /// <param name="paragraph">目標段落</param>
     /// <param name="url">超連結網址</param>
     /// <param name="text">連結顯示文字</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddHyperlink(OdfParagraph paragraph, string url, string text) =>
         TextDocumentNotesEngine.AddHyperlink(paragraph, url, text);
 
@@ -541,6 +544,7 @@ public partial class TextDocument
     /// <param name="height">圖片高度</param>
     /// <param name="name">圖片名稱</param>
     /// <returns>新建立的圖片物件</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal OdfImage AddImage(OdfParagraph paragraph, string packagePath, OdfLength width, OdfLength height, string? name = null) =>
         TextDocumentNotesEngine.AddImage(paragraph, packagePath, width, height, name);
 

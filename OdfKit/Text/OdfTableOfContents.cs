@@ -149,7 +149,7 @@ public class OdfTableOfContents : OdfIndex
 
             if (string.IsNullOrEmpty(anchor))
             {
-                anchor = "_Toc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                anchor = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("_Toc_");
                 refMark = OdfNodeFactory.CreateElement("reference-mark", OdfNamespaces.Text, "text");
                 refMark.SetAttribute("name", OdfNamespaces.Text, anchor, "text");
                 node.AppendChild(refMark);
@@ -166,7 +166,7 @@ public class OdfTableOfContents : OdfIndex
         }
     }
 
-    private OdfNode BuildTocEntryParagraph(OdfHeadingInfo heading, OdfNode? template)
+    private static OdfNode BuildTocEntryParagraph(OdfHeadingInfo heading, OdfNode? template)
     {
         var p = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         string styleName = template?.GetAttribute("style-name", OdfNamespaces.Text) ?? $"Contents_{heading.Level}";

@@ -334,8 +334,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool RemovePlaceholder(OdfPlaceholder placeholder)
     {
-        if (placeholder is null)
-            throw new ArgumentNullException(nameof(placeholder));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(placeholder, nameof(placeholder));
         if (!ReferenceEquals(placeholder.Slide, this) || placeholder.Node.Parent != Node)
             return false;
 
@@ -551,7 +550,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     public OdfKit.Drawing.OdfDrawGroup AddGroup(string? name)
     {
         var groupNode = new OdfNode(OdfNodeType.Element, "g", OdfNamespaces.Draw, "draw");
-        string id = "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("grp_");
         groupNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         groupNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         if (!string.IsNullOrEmpty(name))

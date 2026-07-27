@@ -223,8 +223,8 @@ public sealed partial class OdfScriptManager
         for (int index = 0; index < lines.Length; index++)
         {
             string normalized = lines[index].Trim().ToLowerInvariant();
-            if (normalized.Length == 0 || normalized.StartsWith("'", StringComparison.Ordinal) ||
-                normalized.StartsWith("#", StringComparison.Ordinal))
+            if (normalized.Length == 0 || global::OdfKit.Internal.OdfStringHelper.StartsWith(normalized, '\'') ||
+                global::OdfKit.Internal.OdfStringHelper.StartsWith(normalized, '#'))
             {
                 continue;
             }

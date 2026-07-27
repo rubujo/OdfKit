@@ -32,7 +32,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS 轉換至 XLSX 再轉回 ODS 的完整 round-trip 可保留字串值。
     /// </summary>
     [Fact]
-    public void OdsToXlsxToOds_PreservesStringCellValues()
+    public void OdsToXlsxToOdsPreservesStringCellValues()
     {
         using var original = OdfSpreadsheetDocument.Create();
         var sheet = original.Worksheets.Add("轉換測試");
@@ -57,7 +57,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX 轉換至 ODS 可保留多個工作表名稱。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_MultipleSheets_PreservesSheetNames()
+    public void XlsxToOdfMultipleSheetsPreservesSheetNames()
     {
         using var original = OdfSpreadsheetDocument.Create();
         original.Worksheets.Add("Sheet1").Cells["A1"].CellValue = "工作表一";
@@ -75,7 +75,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可產生有效的 DOCX 資料流，並保留段落文字與標題。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesTextContentAndHeadings()
+    public void OdtToDocxPreservesTextContentAndHeadings()
     {
         using var odtDoc = TextDocument.Create();
         odtDoc.AddHeading("測試標題", 1);
@@ -122,7 +122,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS 公式翻譯（OpenFormula → Excel A1 格式）。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_FormulaTranslation_StripsPrefix()
+    public void OdfToXlsxFormulaTranslationStripsPrefix()
     {
         Assert.Equal("=SUM(A1:B2)", OdfToXlsxConverter.TranslateFormula("of:=SUM(A1:B2)"));
         Assert.Equal("=SUM(A1:B2)", OdfToXlsxConverter.TranslateFormula("oooc:=SUM(A1:B2)"));
@@ -137,7 +137,7 @@ public class OoxmlConversionTests
     /// 驗證雙向公式翻譯不會改寫字串常數內的點與驚嘆號。
     /// </summary>
     [Fact]
-    public void FormulaTranslation_PreservesStringLiterals()
+    public void FormulaTranslationPreservesStringLiterals()
     {
         // ODF → XLSX：字串常數內形似工作表參照的「Sheet.A1」不得被改寫為驚嘆號
         Assert.Equal("=\"File.Name\"&Sheet2!B1", OdfToXlsxConverter.TranslateFormula("of:=\"File.Name\"&Sheet2.B1"));
@@ -160,7 +160,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可正確轉換表格結構（行列數一致）。
     /// </summary>
     [Fact]
-    public void OdtToDocx_TableConversion_PreservesRowAndColumnCount()
+    public void OdtToDocxTableConversionPreservesRowAndColumnCount()
     {
         using var odtDoc = TextDocument.Create();
         odtDoc.AddParagraph("表格前");
@@ -191,7 +191,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留頁首與頁尾文字。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesHeaderAndFooter()
+    public void OdtToDocxPreservesHeaderAndFooter()
     {
         using var odtDoc = TextDocument.Create();
         var setup = odtDoc.GetDefaultPageSetup();
@@ -220,7 +220,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留段落水平對齊。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesParagraphAlignment()
+    public void OdtToDocxPreservesParagraphAlignment()
     {
         using var odtDoc = TextDocument.Create();
         var centered = odtDoc.AddParagraph("置中段落");
@@ -255,7 +255,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留自訂段落樣式名稱。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesCustomParagraphStyleName()
+    public void OdtToDocxPreservesCustomParagraphStyleName()
     {
         using var odtDoc = TextDocument.Create();
         OdfParagraph paragraph = odtDoc.AddParagraph("自訂樣式段落");
@@ -278,7 +278,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留段落縮排、段前距與行距。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesParagraphIndentationAndSpacing()
+    public void OdtToDocxPreservesParagraphIndentationAndSpacing()
     {
         using var odtDoc = TextDocument.Create();
         OdfParagraph paragraph = odtDoc.AddParagraph("縮排段落");
@@ -320,7 +320,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 轉換可保留段落樣式名稱與縮排。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesParagraphStyleNameAndIndentation()
+    public void DocxToOdtPreservesParagraphStyleNameAndIndentation()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -356,7 +356,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT → DOCX 往返可保留段落樣式名稱與縮排行距。
     /// </summary>
     [Fact]
-    public void DocxToOdtToDocx_RoundTripPreservesParagraphStyleAndIndentation()
+    public void DocxToOdtToDocxRoundTripPreservesParagraphStyleAndIndentation()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -405,7 +405,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留段落內嵌圖片。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesInlineImage()
+    public void OdtToDocxPreservesInlineImage()
     {
         using var odtDoc = TextDocument.Create();
         var paragraph = odtDoc.AddParagraph();
@@ -432,7 +432,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留追蹤修訂插入與刪除標記。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesTrackedInsertionAndDeletion()
+    public void OdtToDocxPreservesTrackedInsertionAndDeletion()
     {
         using var odtDoc = TextDocument.Create();
         var paragraph = odtDoc.AddParagraph();
@@ -460,7 +460,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留格式變更追蹤修訂（段落與字元）。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesFormatChangeRevision()
+    public void OdtToDocxPreservesFormatChangeRevision()
     {
         using var odtDoc = TextDocument.Create();
         odtDoc.TrackedChanges = false;
@@ -505,7 +505,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留自訂字元樣式名稱。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesCustomCharacterStyleName()
+    public void OdtToDocxPreservesCustomCharacterStyleName()
     {
         using var odtDoc = TextDocument.Create();
         OdfParagraph paragraph = odtDoc.AddParagraph();
@@ -530,7 +530,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 轉換可保留字元樣式名稱與粗體格式。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesCharacterStyleNameAndFormatting()
+    public void DocxToOdtPreservesCharacterStyleNameAndFormatting()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -560,7 +560,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT → DOCX 往返可保留字元樣式名稱與粗體格式。
     /// </summary>
     [Fact]
-    public void DocxToOdtToDocx_RoundTripPreservesCharacterStyleAndFormatting()
+    public void DocxToOdtToDocxRoundTripPreservesCharacterStyleAndFormatting()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -598,7 +598,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX 轉換可保留 content.xml 自動樣式中的字元格式。
     /// </summary>
     [Fact]
-    public void OdtToDocx_PreservesAutomaticCharacterStyles()
+    public void OdtToDocxPreservesAutomaticCharacterStyles()
     {
         using var odtDoc = TextDocument.Create();
         var paragraph = odtDoc.AddParagraph();
@@ -632,7 +632,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留段落、標題與表格文字。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesHeadingsParagraphsAndTableText()
+    public void DocxToOdtPreservesHeadingsParagraphsAndTableText()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -668,7 +668,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留頁首與頁尾文字。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesHeaderAndFooter()
+    public void DocxToOdtPreservesHeaderAndFooter()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -704,7 +704,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留內嵌圖片與尺寸。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesInlineImage()
+    public void DocxToOdtPreservesInlineImage()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -748,7 +748,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留基本字元格式。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesRunFormatting()
+    public void DocxToOdtPreservesRunFormatting()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -785,7 +785,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留段落水平對齊。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesParagraphAlignment()
+    public void DocxToOdtPreservesParagraphAlignment()
     {
         using var docxStream = new MemoryStream();
         using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
@@ -813,7 +813,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留基本追蹤修訂標記。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesTrackedInsertionAndDeletion()
+    public void DocxToOdtPreservesTrackedInsertionAndDeletion()
     {
         var changedAt = new DocumentFormat.OpenXml.DateTimeValue(new DateTime(2026, 6, 16, 8, 0, 0, DateTimeKind.Utc));
         using var docxStream = new MemoryStream();
@@ -846,7 +846,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX → ODT 反向轉換可保留格式變更追蹤修訂（段落與字元）。
     /// </summary>
     [Fact]
-    public void DocxToOdt_PreservesFormatChangeRevision()
+    public void DocxToOdtPreservesFormatChangeRevision()
     {
         var changedAt = new DocumentFormat.OpenXml.DateTimeValue(new DateTime(2026, 6, 16, 8, 0, 0, DateTimeKind.Utc));
         using var docxStream = new MemoryStream();
@@ -904,7 +904,7 @@ public class OoxmlConversionTests
     /// 驗證 DOCX 轉換後的追蹤修訂可列舉並接受。
     /// </summary>
     [Fact]
-    public void DocxToOdt_TrackedChangesCanBeAcceptedAfterConversion()
+    public void DocxToOdtTrackedChangesCanBeAcceptedAfterConversion()
     {
         var changedAt = new DocumentFormat.OpenXml.DateTimeValue(new DateTime(2026, 6, 16, 8, 0, 0, DateTimeKind.Utc));
         using var docxStream = new MemoryStream();
@@ -938,7 +938,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換會保留公式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesFormulasAsOpenFormula()
+    public void XlsxToOdfPreservesFormulasAsOpenFormula()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -960,7 +960,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留整數範圍資料驗證。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesIntegerBetweenDataValidation()
+    public void XlsxToOdfPreservesIntegerBetweenDataValidation()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -988,7 +988,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留整數範圍資料驗證。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesIntegerBetweenDataValidation()
+    public void OdfToXlsxPreservesIntegerBetweenDataValidation()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         odsDocument.AddSheet("Sheet1");
@@ -1025,7 +1025,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留基本儲存格格式。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesBasicCellFormatting()
+    public void OdfToXlsxPreservesBasicCellFormatting()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sheet1");
@@ -1057,7 +1057,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留色階條件格式。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesColorScaleConditionalFormat()
+    public void OdfToXlsxPreservesColorScaleConditionalFormat()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sheet1");
@@ -1084,7 +1084,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留資料橫條條件格式。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesDataBarConditionalFormat()
+    public void OdfToXlsxPreservesDataBarConditionalFormat()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sheet1");
@@ -1111,7 +1111,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留圖示集條件格式。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesIconSetConditionalFormat()
+    public void OdfToXlsxPreservesIconSetConditionalFormat()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sheet1");
@@ -1136,7 +1136,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留基本嵌入圖表結構。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesEmbeddedChartStructure()
+    public void OdfToXlsxPreservesEmbeddedChartStructure()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Data");
@@ -1196,7 +1196,7 @@ public class OoxmlConversionTests
     [Theory]
     [InlineData(OdfChartType.Line, "<c:lineChart>", "<c:ser>", "<c:barSer>")]
     [InlineData(OdfChartType.Pie, "<c:pieChart>", "<c:ser>", "<c:barSer>")]
-    public void OdfToXlsx_PreservesChartTypeSpecificSeries(
+    public void OdfToXlsxPreservesChartTypeSpecificSeries(
         OdfChartType chartType,
         string expectedChartElement,
         string expectedSeriesElement,
@@ -1239,7 +1239,7 @@ public class OoxmlConversionTests
     /// 驗證 ODS → XLSX 轉換可保留基本樞紐分析表 OOXML 結構。
     /// </summary>
     [Fact]
-    public void OdfToXlsx_PreservesPivotTableStructure()
+    public void OdfToXlsxPreservesPivotTableStructure()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sales");
@@ -1304,7 +1304,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可還原基本樞紐分析表結構。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesPivotTableStructure()
+    public void XlsxToOdfPreservesPivotTableStructure()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sales");
@@ -1345,7 +1345,7 @@ public class OoxmlConversionTests
     /// 驗證含樞紐表的 XLSX → ODS fallback 路徑可還原資料驗證與條件格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PivotFallbackPreservesDataValidationAndConditionalFormat()
+    public void XlsxToOdfPivotFallbackPreservesDataValidationAndConditionalFormat()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sales");
@@ -1408,7 +1408,7 @@ public class OoxmlConversionTests
     /// 驗證含樞紐表的 XLSX → ODS fallback 路徑可還原基本儲存格格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PivotFallbackPreservesBasicCellFormatting()
+    public void XlsxToOdfPivotFallbackPreservesBasicCellFormatting()
     {
         using var odsDocument = OdfSpreadsheetDocument.Create();
         var sheet = odsDocument.Worksheets.Add("Sales");
@@ -1462,7 +1462,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX → ODT 往返可保留段落內嵌圖片。
     /// </summary>
     [Fact]
-    public void OdtToDocxToOdt_PreservesInlineImage()
+    public void OdtToDocxToOdtPreservesInlineImage()
     {
         using var original = TextDocument.Create();
         var paragraph = original.AddParagraph();
@@ -1487,7 +1487,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX → ODT 往返可保留格式變更追蹤修訂。
     /// </summary>
     [Fact]
-    public void OdtToDocxToOdt_PreservesFormatChangeRevision()
+    public void OdtToDocxToOdtPreservesFormatChangeRevision()
     {
         using var original = TextDocument.Create();
         original.TrackedChanges = false;
@@ -1527,7 +1527,7 @@ public class OoxmlConversionTests
     /// 驗證 ODT → DOCX → ODT 往返可保留追蹤修訂插入與刪除。
     /// </summary>
     [Fact]
-    public void OdtToDocxToOdt_PreservesTrackedInsertionAndDeletion()
+    public void OdtToDocxToOdtPreservesTrackedInsertionAndDeletion()
     {
         using var original = TextDocument.Create();
         var paragraph = original.AddParagraph();
@@ -1556,7 +1556,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留基本儲存格格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesBasicCellFormatting()
+    public void XlsxToOdfPreservesBasicCellFormatting()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -1591,7 +1591,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留色階條件格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesColorScaleConditionalFormat()
+    public void XlsxToOdfPreservesColorScaleConditionalFormat()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -1621,7 +1621,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留資料橫條條件格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesDataBarConditionalFormat()
+    public void XlsxToOdfPreservesDataBarConditionalFormat()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -1650,7 +1650,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留圖示集條件格式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesIconSetConditionalFormat()
+    public void XlsxToOdfPreservesIconSetConditionalFormat()
     {
         using var xlsxStream = new MemoryStream();
         using (var workbook = new XLWorkbook())
@@ -1677,7 +1677,7 @@ public class OoxmlConversionTests
     /// 驗證 XLSX → ODS 反向轉換可保留基本圖表結構。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_PreservesEmbeddedChartStructure()
+    public void XlsxToOdfPreservesEmbeddedChartStructure()
     {
         using var sourceOds = OdfSpreadsheetDocument.Create();
         var sheet = sourceOds.Worksheets.Add("Data");
@@ -1721,7 +1721,7 @@ public class OoxmlConversionTests
     /// 驗證 Excel 公式可翻譯為 OpenFormula 公式。
     /// </summary>
     [Fact]
-    public void XlsxToOdf_FormulaTranslation_AddsOpenFormulaPrefix()
+    public void XlsxToOdfFormulaTranslationAddsOpenFormulaPrefix()
     {
         Assert.Equal("of:=SUM(A1:B2)", XlsxToOdfConverter.TranslateFormulaToOdf("=SUM(A1:B2)"));
         Assert.Equal("of:=Sheet1.A1", XlsxToOdfConverter.TranslateFormulaToOdf("=Sheet1!A1"));
@@ -1784,7 +1784,7 @@ public class OoxmlConversionTests
     [InlineData("of:=Sheet1.A1", "=Sheet1!A1")]
     [InlineData("of:=Sheet1.A1:B2", "=Sheet1!A1:B2")]
     [InlineData("of:=Sheet1.A1+Sheet2.B1", "=Sheet1!A1+Sheet2!B1")]
-    public void FormulaTranslation_CoversCommonFormulaBenchmark(string openFormula, string excelFormula)
+    public void FormulaTranslationCoversCommonFormulaBenchmark(string openFormula, string excelFormula)
     {
         Assert.Equal(excelFormula, OdfToXlsxConverter.TranslateFormula(openFormula));
         Assert.Equal(openFormula, XlsxToOdfConverter.TranslateFormulaToOdf(excelFormula));
@@ -1876,7 +1876,7 @@ public class OoxmlConversionTests
     /// 驗證 manifest 包含預期的兩個 OOXML 視覺場景與門檻設定。
     /// </summary>
     [Fact]
-    public void Manifest_DefinesExpectedScenarios()
+    public void ManifestDefinesExpectedScenarios()
     {
         string manifestPath = Path.Combine(
             FindRepositoryRoot(),
@@ -1902,7 +1902,7 @@ public class OoxmlConversionTests
         JsonElement docxScenario = root.GetProperty("scenarios").EnumerateArray()
             .First(item => item.GetProperty("id").GetString() == "odt-docx-word-pdf");
         Assert.Equal(
-            "OfficeInteropConversionTests.WordAndLibreOffice_RenderConvertedDocxToPdf",
+            "OfficeInteropConversionTests.WordAndLibreOfficeRenderConvertedDocxToPdf",
             docxScenario.GetProperty("test").GetString());
 
         string diffScriptPath = Path.Combine(FindRepositoryRoot(), "eng", "scripts", "PdfVisualDiff.py");

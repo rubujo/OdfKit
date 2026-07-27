@@ -102,7 +102,7 @@ static string ComputeSha256(string path)
 {
     using var stream = File.OpenRead(path);
     using SHA256 algorithm = SHA256.Create();
-    return string.Concat(algorithm.ComputeHash(stream).Select(value => value.ToString("x2")));
+    return string.Concat(algorithm.ComputeHash(stream).Select(value => value.ToString("x2", System.Globalization.CultureInfo.InvariantCulture)));
 }
 
 static void Require(bool condition, string message)

@@ -90,10 +90,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentException">當 <paramref name="dimension"/> 為空白時擲出</exception>
     public void SetAxisTitle(string dimension, string? title, OdfTextFontFallbackOptions options)
     {
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         ValidateAxisDimension(dimension);
 
@@ -250,7 +247,7 @@ public partial class OdfChartDocument
         return fallbackCategories;
     }
 
-    private IReadOnlyList<OdfChartSeriesInfo> GetSeries()
+    private List<OdfChartSeriesInfo> GetSeries()
     {
         OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
         if (plotArea is null)

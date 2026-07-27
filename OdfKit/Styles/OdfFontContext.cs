@@ -237,10 +237,7 @@ public sealed class OdfFontContext
     /// <exception cref="ArgumentNullException">當 <paramref name="isAvailable"/> 為 <see langword="null"/> 時擲出</exception>
     public string? ResolveFontFallback(string fontName, Func<string, bool> isAvailable)
     {
-        if (isAvailable is null)
-        {
-            throw new ArgumentNullException(nameof(isAvailable));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(isAvailable, nameof(isAvailable));
 
         foreach (string candidate in GetFontFallbackCandidates(fontName))
         {
@@ -322,10 +319,7 @@ public sealed class OdfFontContext
     /// <exception cref="ArgumentNullException">當 <paramref name="subsetter"/> 為 <see langword="null"/> 時擲出</exception>
     public IDisposable RegisterFontSubsetter(IFontSubsetter subsetter)
     {
-        if (subsetter is null)
-        {
-            throw new ArgumentNullException(nameof(subsetter));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(subsetter, nameof(subsetter));
 
         lock (_lock)
         {
@@ -356,8 +350,7 @@ public sealed class OdfFontContext
     {
         if (string.IsNullOrEmpty(baseFontPattern))
             throw new ArgumentNullException(nameof(baseFontPattern));
-        if (planeFontNames is null)
-            throw new ArgumentNullException(nameof(planeFontNames));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(planeFontNames, nameof(planeFontNames));
 
         // 防禦性複製：呼叫端後續修改原字典不得影響已註冊規則；複製後的字典不再變動，可供多執行緒無鎖讀取。
         var planeFonts = new Dictionary<int, string>(planeFontNames.Count);
@@ -667,20 +660,11 @@ public sealed class OdfFontContext
     /// <param name="stylesRoot">The styles XML root. / 樣式 XML 的根節點。</param>
     public void EmbedFontSubsets(OdfPackage package, OdfNode contentRoot, OdfNode stylesRoot)
     {
-        if (package is null)
-        {
-            throw new ArgumentNullException(nameof(package));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(package, nameof(package));
 
-        if (contentRoot is null)
-        {
-            throw new ArgumentNullException(nameof(contentRoot));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(contentRoot, nameof(contentRoot));
 
-        if (stylesRoot is null)
-        {
-            throw new ArgumentNullException(nameof(stylesRoot));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stylesRoot, nameof(stylesRoot));
 
         IFontSubsetter? subsetter;
         lock (_lock)

@@ -135,7 +135,7 @@ public class DocsAndCorpusContractTests
     /// 驗證證據宣稱使用 schema v2 與各維度專屬層級。
     /// </summary>
     [Fact]
-    public void EvidenceClaims_UseDimensionSpecificVerifiedLevels()
+    public void EvidenceClaimsUseDimensionSpecificVerifiedLevels()
     {
         string repoRoot = FindRepositoryRoot();
         using JsonDocument document = JsonDocument.Parse(
@@ -166,7 +166,7 @@ public class DocsAndCorpusContractTests
     [InlineData("SemanticApiDepth", "round-trip-verified")]
     [InlineData("InteropEvidence", "tested")]
     [InlineData("InteropEvidence", "semantic-contract-verified")]
-    public void EvidenceClaimLevelContract_RejectsLegacyAndCrossDimensionValues(string dimension, string level)
+    public void EvidenceClaimLevelContractRejectsLegacyAndCrossDimensionValues(string dimension, string level)
     {
         Assert.False(IsEvidenceClaimLevelAllowed(dimension, level));
     }
@@ -176,7 +176,7 @@ public class DocsAndCorpusContractTests
     /// 拒絕舊版證據宣稱 schema 版本。
     /// </summary>
     [Fact]
-    public void EvidenceClaimsSchemaVersionContract_RejectsLegacyVersion()
+    public void EvidenceClaimsSchemaVersionContractRejectsLegacyVersion()
     {
         Assert.False(IsEvidenceClaimsSchemaVersionSupported(1));
     }
@@ -652,7 +652,7 @@ public class DocsAndCorpusContractTests
 
         foreach (string key in keys)
         {
-            Assert.Equal(17, Regex.Matches(localizer, "\\[\"" + Regex.Escape(key) + "\"\\]").Count);
+            Assert.Equal(17, Regex.Count(localizer, "\\[\"" + Regex.Escape(key) + "\"\\]"));
         }
 
         Assert.Contains("Die baseline exception baseline", localizer, StringComparison.Ordinal);
@@ -1263,7 +1263,7 @@ public class DocsAndCorpusContractTests
     /// （Workstream A 文件契約檢查；僅檢查證據欄位存在，不驗證測試實際內容）。
     /// </summary>
     [Fact]
-    public void FormatSupportMatrix_VerifiedWorkflowRowsDeclareNonEmptyTestEvidence()
+    public void FormatSupportMatrixVerifiedWorkflowRowsDeclareNonEmptyTestEvidence()
     {
         string repoRoot = FindRepositoryRoot();
         string[] lines = File.ReadAllLines(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
@@ -1311,7 +1311,7 @@ public class DocsAndCorpusContractTests
     /// 驗證格式支援文件不再把 Formula 最小語意編輯 helper 誤列為後續追蹤項目。
     /// </summary>
     [Fact]
-    public void FormatSupportDocs_FormulaSemanticEditingHelpersAreMarkedComplete()
+    public void FormatSupportDocsFormulaSemanticEditingHelpersAreMarkedComplete()
     {
         string repoRoot = FindRepositoryRoot();
         string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
@@ -1320,16 +1320,16 @@ public class DocsAndCorpusContractTests
         Assert.Contains("Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst`", support, StringComparison.Ordinal);
         Assert.Contains("最小「尋找→取得→更新」語意編輯 helper", support, StringComparison.Ordinal);
         Assert.DoesNotContain("續列為獨立追蹤的後續深度工作", support, StringComparison.Ordinal);
-        Assert.Contains("OdfMathToken_FindAndWithChild_WorksForNestedStructure", tests, StringComparison.Ordinal);
-        Assert.Contains("FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists", tests, StringComparison.Ordinal);
-        Assert.Contains("ReplaceFirst_ReplacesNestedFraction", tests, StringComparison.Ordinal);
+        Assert.Contains("OdfMathTokenFindAndWithChildWorksForNestedStructure", tests, StringComparison.Ordinal);
+        Assert.Contains("FormulaTokenSemanticEditingFindReplaceAndSetMathRowPersists", tests, StringComparison.Ordinal);
+        Assert.Contains("ReplaceFirstReplacesNestedFraction", tests, StringComparison.Ordinal);
     }
 
     /// <summary>
     /// 驗證格式支援文件明確區分 CNS 11643 全字庫骨架支援與官方語意相容聲明。
     /// </summary>
     [Fact]
-    public void FormatSupportDocs_Cns11643FontSupportBoundaryIsConservative()
+    public void FormatSupportDocsCns11643FontSupportBoundaryIsConservative()
     {
         string repoRoot = FindRepositoryRoot();
         string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-format-support.md"));

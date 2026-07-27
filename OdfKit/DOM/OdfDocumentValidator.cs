@@ -21,8 +21,7 @@ public static class OdfDocumentValidator
     /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時拋出</exception>
     public static OdfValidationReport Validate(OdfDocument document)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         var issues = new List<OdfValidationIssue>();
 

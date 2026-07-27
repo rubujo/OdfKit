@@ -188,7 +188,7 @@ public class PresentationApiUsabilityTests
     /// 驗證可用 LoadAsync 非同步載入 ODP 並 round-trip。
     /// </summary>
     [Fact]
-    public async Task LoadAsync_RoundTripsPresentationContent()
+    public async Task LoadAsyncRoundTripsPresentationContent()
     {
         using var deck = PresentationDocument.Create();
         deck.Slides.Add("AsyncIntro").AddTextBox(
@@ -213,7 +213,7 @@ public class PresentationApiUsabilityTests
     /// 預先取消的語彙應使 PresentationDocument.LoadAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task LoadAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task LoadAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         await using var stream = new MemoryStream();
         using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Presentation, leaveOpen: true))

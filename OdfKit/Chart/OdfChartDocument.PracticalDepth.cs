@@ -20,10 +20,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="series"/> is <see langword="null"/>. / 當 <paramref name="series"/> 為 <see langword="null"/> 時擲出。</exception>
     public void SetBubbleSeries(IEnumerable<OdfBubbleChartSeriesRequest> series)
     {
-        if (series is null)
-        {
-            throw new ArgumentNullException(nameof(series));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(series, nameof(series));
 
         ChartClass = "chart:bubble";
         OdfNode plotArea = FindOrCreatePlotArea();
@@ -56,7 +53,7 @@ public partial class OdfChartDocument
         List<OdfBubbleChartSeriesInfo> result = [];
         foreach (OdfNode seriesNode in EnumerateSeriesNodes())
         {
-            IReadOnlyList<OdfNode> domains = GetDomainNodes(seriesNode);
+            List<OdfNode> domains = GetDomainNodes(seriesNode);
             result.Add(new OdfBubbleChartSeriesInfo(
                 domains.Count > 0 ? domains[0].GetAttribute("cell-range-address", OdfNamespaces.Table) : null,
                 seriesNode.GetAttribute("values-cell-range-address", OdfNamespaces.Chart),
@@ -76,10 +73,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="series"/> is <see langword="null"/>. / 當 <paramref name="series"/> 為 <see langword="null"/> 時擲出。</exception>
     public void SetStockSeries(IEnumerable<OdfStockChartSeriesRequest> series)
     {
-        if (series is null)
-        {
-            throw new ArgumentNullException(nameof(series));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(series, nameof(series));
 
         ChartClass = "chart:stock";
         OdfNode plotArea = FindOrCreatePlotArea();
@@ -119,7 +113,7 @@ public partial class OdfChartDocument
         List<OdfStockChartSeriesInfo> result = [];
         foreach (OdfNode seriesNode in EnumerateSeriesNodes())
         {
-            IReadOnlyList<OdfNode> domains = GetDomainNodes(seriesNode);
+            List<OdfNode> domains = GetDomainNodes(seriesNode);
             result.Add(new OdfStockChartSeriesInfo(
                 domains.Count > 0 ? domains[0].GetAttribute("cell-range-address", OdfNamespaces.Table) : null,
                 domains.Count > 1 ? domains[1].GetAttribute("cell-range-address", OdfNamespaces.Table) : null,
@@ -141,10 +135,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="options"/> is <see langword="null"/>. / 當 <paramref name="options"/> 為 <see langword="null"/> 時擲出。</exception>
     public void Apply3DOptions(OdfChart3DOptions options)
     {
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         OdfChartStyle plotStyle = PlotAreaStyle;
         plotStyle.ThreeDimensional = options.Enabled;
@@ -170,10 +161,7 @@ public partial class OdfChartDocument
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="style"/> is <see langword="null"/>. / 當 <paramref name="style"/> 為 <see langword="null"/> 時擲出。</exception>
     public void ApplyStockMarkerStyle(OdfStockMarkerStyle style)
     {
-        if (style is null)
-        {
-            throw new ArgumentNullException(nameof(style));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(style, nameof(style));
 
         ApplySurfaceStyle(style.GainStyle, SetStockGainMarkerStyleName);
         ApplySurfaceStyle(style.LossStyle, SetStockLossMarkerStyleName);
@@ -256,7 +244,7 @@ public partial class OdfChartDocument
         }
     }
 
-    private static IReadOnlyList<OdfNode> GetDomainNodes(OdfNode seriesNode)
+    private static List<OdfNode> GetDomainNodes(OdfNode seriesNode)
     {
         List<OdfNode> domains = [];
         foreach (OdfNode child in seriesNode.Children)

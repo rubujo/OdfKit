@@ -100,8 +100,7 @@ public partial class OdfDrawPage
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdatePathData(string id, string svgPathData)
     {
-        if (svgPathData is null)
-            throw new ArgumentNullException(nameof(svgPathData));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(svgPathData, nameof(svgPathData));
         OdfKit.DOM.OdfNode? path = FindShapeNode(Node, id);
         if (path is null || path.LocalName != "path" || path.NamespaceUri != OdfKit.Core.OdfNamespaces.Draw)
             return false;
@@ -119,8 +118,7 @@ public partial class OdfDrawPage
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdatePolygonPoints(string id, string points)
     {
-        if (points is null)
-            throw new ArgumentNullException(nameof(points));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(points, nameof(points));
         OdfKit.DOM.OdfNode? polygon = FindShapeNode(Node, id);
         if (polygon is null || polygon.LocalName != "polygon" || polygon.NamespaceUri != OdfKit.Core.OdfNamespaces.Draw)
             return false;

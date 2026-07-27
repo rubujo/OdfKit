@@ -16,7 +16,9 @@ public sealed class OdfMediaObject
     {
         FrameNode = frameNode ?? throw new ArgumentNullException(nameof(frameNode));
         Slide = slide ?? throw new ArgumentNullException(nameof(slide));
-        _pluginNode = FindPlugin(frameNode) ?? throw new ArgumentException(nameof(frameNode));
+        _pluginNode = FindPlugin(frameNode) ?? throw new ArgumentException(
+            OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty"),
+            nameof(frameNode));
     }
 
     internal OdfNode FrameNode { get; }

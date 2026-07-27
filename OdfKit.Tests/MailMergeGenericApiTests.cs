@@ -15,7 +15,7 @@ public class MailMergeGenericApiTests
     /// 驗證強型別泛型 MailMerge&lt;T&gt; 能正確置換文件中的預留位置。
     /// </summary>
     [Fact]
-    public void MailMerge_GenericRecord_ReplacesPlaceholders()
+    public void MailMergeGenericRecordReplacesPlaceholders()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("親愛的 {{Name}}，您來自 {{City}}，年齡 {{Age}} 歲。");
@@ -36,7 +36,7 @@ public class MailMergeGenericApiTests
     /// 驗證字典型 MailMerge 能正確置換文件中的預留位置。
     /// </summary>
     [Fact]
-    public void MailMerge_Dictionary_ReplacesPlaceholders()
+    public void MailMergeDictionaryReplacesPlaceholders()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("產品：{{Product}}，價格：{{Price}}");
@@ -59,7 +59,7 @@ public class MailMergeGenericApiTests
     /// 驗證批次泛型 MailMerge&lt;T&gt; 回傳筆數與輸入記錄數相同。
     /// </summary>
     [Fact]
-    public void MailMergeBatch_Generic_ReturnsOneDocumentPerRecord()
+    public void MailMergeBatchGenericReturnsOneDocumentPerRecord()
     {
         using var template = TextDocument.Create();
         template.AddParagraph("姓名：{{Name}}");
@@ -96,7 +96,7 @@ public class MailMergeGenericApiTests
     /// 驗證批次字典 MailMerge 回傳正確數量的文件副本。
     /// </summary>
     [Fact]
-    public void MailMergeBatch_Dictionary_ReturnsOneDocumentPerRecord()
+    public void MailMergeBatchDictionaryReturnsOneDocumentPerRecord()
     {
         using var template = TextDocument.Create();
         template.AddParagraph("城市：{{City}}");
@@ -126,7 +126,7 @@ public class MailMergeGenericApiTests
     /// 驗證批次合併不影響原始範本文件的內容。
     /// </summary>
     [Fact]
-    public void MailMergeBatch_TemplateRemainsUnmodified()
+    public void MailMergeBatchTemplateRemainsUnmodified()
     {
         using var template = TextDocument.Create();
         template.AddParagraph("{{Name}} 您好");
@@ -153,7 +153,7 @@ public class MailMergeGenericApiTests
     /// 驗證 IReadOnlyDictionary 巢狀路徑在合併引擎中能正確解析。
     /// </summary>
     [Fact]
-    public void MailMerge_ReadOnlyDictionaryPlaceholder_Resolves()
+    public void MailMergeReadOnlyDictionaryPlaceholderResolves()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("編號：{{Id}}，標題：{{Title}}");
@@ -175,7 +175,7 @@ public class MailMergeGenericApiTests
     /// 驗證多層巢狀 TableStart / TableEnd 區段展開與資料解析。
     /// </summary>
     [Fact]
-    public void MailMerge_TableStartEndNested_ExpandsAndResolves()
+    public void MailMergeTableStartEndNestedExpandsAndResolves()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("{{TableStart:Departments}}");
@@ -258,7 +258,7 @@ public class MailMergeGenericApiTests
     /// 驗證當範本中含有無法由資料來源解析的預留位置時，會被正確收集於報告中且原字串留空或被清除。
     /// </summary>
     [Fact]
-    public void MailMerge_UnresolvedPlaceholders_ReportsUnresolved()
+    public void MailMergeUnresolvedPlaceholdersReportsUnresolved()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("親愛的 {{Name}}，您來自 {{City}}，您喜歡 {{MissingField}}！");

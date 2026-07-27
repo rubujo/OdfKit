@@ -1515,7 +1515,7 @@ namespace OdfKit.Tests
         /// 驗證當公式遍歷表格遇到極大的 rows-repeated 時，不會發生 OOM 且在合理時間內傳回。
         /// </summary>
         [Fact]
-        public void TraverseTable_LargeRowRepeatCount_DoesNotOOM()
+        public void TraverseTableLargeRowRepeatCountDoesNotOOM()
         {
             using var pkg = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(pkg);

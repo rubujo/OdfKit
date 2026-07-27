@@ -56,10 +56,7 @@ public sealed partial class OdfPackage
     /// <returns>The embedded document descriptor. / 內嵌文件描述資訊。</returns>
     public OdfEmbeddedObjectInfo AddEmbeddedDocument(string path, OdfDocument document)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         string objectPath = SanitizeEntryName(path).TrimEnd('/');
         if (string.IsNullOrEmpty(objectPath))
@@ -102,10 +99,7 @@ public sealed partial class OdfPackage
     /// <returns>The replacement embedded document descriptor. / 取代後的內嵌文件描述資訊。</returns>
     public OdfEmbeddedObjectInfo ReplaceEmbeddedDocument(string path, OdfDocument document)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         RemoveEmbeddedObject(path);
         return AddEmbeddedDocument(path, document);

@@ -666,8 +666,7 @@ public static class OdfFormulaSupport
 
     private static OdfFormulaAnalysis AnalyzeCore(string formula, OdfFormulaFunctionRegistry? functions)
     {
-        if (formula is null)
-            throw new ArgumentNullException(nameof(formula));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(formula, nameof(formula));
 
         string normalized = NormalizeForParsing(formula);
         var diagnostics = new List<OdfFormulaDiagnostic>();
@@ -748,7 +747,7 @@ public static class OdfFormulaSupport
             return "oooc:=" + analysis.SerializedFormula;
         }
 
-        if (formula.StartsWith("=", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(formula, '='))
         {
             return "=" + analysis.SerializedFormula;
         }
@@ -832,7 +831,7 @@ public static class OdfFormulaSupport
             _ => throw new ArgumentOutOfRangeException(nameof(group))
         };
 
-    private static IReadOnlyList<string> GetMissingSmallGroupFunctionsCore(
+    private static List<string> GetMissingSmallGroupFunctionsCore(
         OdfFormulaFunctionRegistry? functions)
     {
         var missingFunctions = new List<string>();
@@ -896,7 +895,7 @@ public static class OdfFormulaSupport
         return functions;
     }
 
-    private static int FindNextNonWhitespace(IReadOnlyList<FormulaToken> tokens, int startIndex)
+    private static int FindNextNonWhitespace(List<FormulaToken> tokens, int startIndex)
     {
         for (int i = startIndex; i < tokens.Count; i++)
         {

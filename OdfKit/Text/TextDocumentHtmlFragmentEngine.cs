@@ -30,18 +30,15 @@ internal static class TextDocumentHtmlFragmentEngine
 
     internal static void AddHtmlFragment(TextDocument document, OdfParagraph paragraph, string html)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
 
         AddHtmlFragment(document, paragraph.Node, html);
     }
 
     internal static void AddHtmlFragment(TextDocument document, OdfNode paragraphNode, string html)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
-        if (paragraphNode is null)
-            throw new ArgumentNullException(nameof(paragraphNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraphNode, nameof(paragraphNode));
         if (string.IsNullOrWhiteSpace(html))
             return;
 
@@ -65,7 +62,7 @@ internal static class TextDocumentHtmlFragmentEngine
             bool isClosing = false;
             string tagName = string.Empty;
 
-            if (token.StartsWith("<", StringComparison.Ordinal) && !token.StartsWith("<!--", StringComparison.Ordinal))
+            if (global::OdfKit.Internal.OdfStringHelper.StartsWith(token, '<') && !token.StartsWith("<!--", StringComparison.Ordinal))
             {
                 var tagMatch = TagNameRegex.Match(token);
                 if (tagMatch.Success)
@@ -354,7 +351,7 @@ internal static class TextDocumentHtmlFragmentEngine
     {
         string trimmed = value.Trim().ToLowerInvariant();
         if (trimmed.EndsWith("px", StringComparison.Ordinal) &&
-            double.TryParse(trimmed.Substring(0, trimmed.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double pixels))
+            global::OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(trimmed, 2, out double pixels))
         {
             return (pixels * 0.75d).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture) + "pt";
         }

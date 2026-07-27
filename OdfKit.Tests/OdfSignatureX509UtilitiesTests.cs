@@ -19,7 +19,7 @@ namespace OdfKit.Tests;
 public class OdfSignatureX509UtilitiesTests
 {
     [Fact]
-    public void MissingCertDigestElements_ReturnsLocalizedErrorMessage()
+    public void MissingCertDigestElementsReturnsLocalizedErrorMessage()
     {
         RunWithEnUsCulture(() =>
         {
@@ -39,7 +39,7 @@ public class OdfSignatureX509UtilitiesTests
     }
 
     [Fact]
-    public void UnsupportedDigestAlgorithm_ReturnsLocalizedErrorMessageWithAlgorithm()
+    public void UnsupportedDigestAlgorithmReturnsLocalizedErrorMessageWithAlgorithm()
     {
         RunWithEnUsCulture(() =>
         {
@@ -64,7 +64,7 @@ public class OdfSignatureX509UtilitiesTests
     }
 
     [Fact]
-    public void CertDigestMismatch_ReturnsLocalizedErrorMessage()
+    public void CertDigestMismatchReturnsLocalizedErrorMessage()
     {
         RunWithEnUsCulture(() =>
         {
@@ -90,7 +90,7 @@ public class OdfSignatureX509UtilitiesTests
     }
 
     [Fact]
-    public void SerialNumberMismatch_ReturnsLocalizedErrorMessageWithBothSerials()
+    public void SerialNumberMismatchReturnsLocalizedErrorMessageWithBothSerials()
     {
         RunWithEnUsCulture(() =>
         {
@@ -98,12 +98,11 @@ public class OdfSignatureX509UtilitiesTests
 
             // CertDigest 使用實際憑證的正確 SHA-256 摘要，確保先前的檢查全部通過，
             // 單獨鎖定 IssuerSerial 序號比對失敗的訊息在地化行為。
-            using SHA256 sha = SHA256.Create();
-            string correctDigest = Convert.ToBase64String(sha.ComputeHash(cert.RawData));
+            string correctDigest = Convert.ToBase64String(SHA256.HashData(cert.RawData));
             var bigSerial = System.Numerics.BigInteger.Parse(
                 "0" + cert.SerialNumber, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            string actualSerialBase10 = bigSerial.ToString();
-            string wrongSerialBase10 = (bigSerial + 1).ToString();
+            string actualSerialBase10 = bigSerial.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string wrongSerialBase10 = (bigSerial + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             XmlElement signatureElement = BuildSignatureElement(
                 $"""

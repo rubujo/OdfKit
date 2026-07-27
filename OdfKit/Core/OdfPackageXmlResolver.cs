@@ -20,8 +20,7 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     /// </summary>
     public override object? GetEntity(Uri absoluteUri, string? role, Type? ofObjectToReturn)
     {
-        if (absoluteUri == null)
-            throw new ArgumentNullException(nameof(absoluteUri));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(absoluteUri, nameof(absoluteUri));
 
         if (string.Equals(absoluteUri.Scheme, "odf", StringComparison.OrdinalIgnoreCase))
         {
@@ -73,7 +72,7 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     {
         if (baseUri == null)
         {
-            if (relativeUri?.StartsWith("#", StringComparison.Ordinal) == true)
+            if (relativeUri is not null && global::OdfKit.Internal.OdfStringHelper.StartsWith(relativeUri, '#'))
             {
                 return new Uri($"odf://package/{relativeUri}");
             }
@@ -88,8 +87,8 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     {
         try
         {
-            if (!baseDir.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
-                !baseDir.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+            if (!global::OdfKit.Internal.OdfStringHelper.EndsWith(baseDir, Path.DirectorySeparatorChar) &&
+                !global::OdfKit.Internal.OdfStringHelper.EndsWith(baseDir, Path.AltDirectorySeparatorChar))
             {
                 baseDir += Path.DirectorySeparatorChar;
             }

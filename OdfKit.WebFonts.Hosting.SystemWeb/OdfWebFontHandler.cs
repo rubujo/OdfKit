@@ -16,6 +16,7 @@ namespace OdfKit.WebFonts.Hosting.SystemWeb;
 /// </summary>
 public sealed class OdfWebFontHandler : IHttpHandler
 {
+    private static readonly char[] PathSeparators = ['/'];
     // 刻意不使用 Lazy：isThreadSafe: true 等同 ExecutionAndPublication，會永久快取例外，
     // 使一次暫時性的載入失敗（權限、掛載延遲、manifest 尚未產生）在 AppDomain 回收前
     // 都固定失敗。這裡只快取成功建立的結果，失敗允許後續請求重試。
@@ -24,6 +25,12 @@ public sealed class OdfWebFontHandler : IHttpHandler
     private static readonly Lazy<bool> AllowPublicCrossOriginAssets = new(
         LoadAllowPublicCrossOriginAssets,
         isThreadSafe: true);
+    private static readonly JsonSerializerOptions ManifestJsonOptions = new()
+    {
+        MaxDepth = 32,
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
     private readonly AssetCatalog? _catalog;
     private readonly bool? _allowPublicCrossOriginAssets;
 
@@ -82,7 +89,7 @@ public sealed class OdfWebFontHandler : IHttpHandler
             return;
         }
 
-        string[] segments = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] segments = path.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
         if (segments.Length < 2)
         {
             context.Response.StatusCode = 404;
@@ -343,13 +350,7 @@ public sealed class OdfWebFontHandler : IHttpHandler
             }
 
             byte[] manifestBytes = File.ReadAllBytes(manifestPath);
-            var jsonOptions = new JsonSerializerOptions
-            {
-                MaxDepth = 32,
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() }
-            };
-            WebFontManifest? manifest = JsonSerializer.Deserialize<WebFontManifest>(manifestBytes, jsonOptions);
+            WebFontManifest? manifest = JsonSerializer.Deserialize<WebFontManifest>(manifestBytes, ManifestJsonOptions);
             if (manifest is null || manifest.SchemaVersion != 1 || manifest.Assets.Count is 0 || manifest.Assets.Count > maxAssets)
             {
                 throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));

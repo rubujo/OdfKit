@@ -87,7 +87,7 @@ public class OdfSaveOptionsVersionTests
     /// 驗證安全降版會在儲存期間產生不含問題的結構化報告。
     /// </summary>
     [Fact]
-    public void VersionCompatibilityReport_SafeDowngradeIsReportedDuringSave()
+    public void VersionCompatibilityReportSafeDowngradeIsReportedDuringSave()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("ODF 1.3 safe content");
@@ -113,7 +113,7 @@ public class OdfSaveOptionsVersionTests
     /// 驗證僅限 ODF 1.4 的元素與屬性會產生結構化降版診斷，且不會刪除內容。
     /// </summary>
     [Fact]
-    public void VersionCompatibilityReport_ReportsUnsupportedSemanticsAndPreservesThem()
+    public void VersionCompatibilityReportReportsUnsupportedSemanticsAndPreservesThem()
     {
         using TextDocument document = TextDocument.Create();
         OdfUnknownElement odf14Element = new("num-list-format", OdfNamespaces.Number, "number");
@@ -154,7 +154,7 @@ public class OdfSaveOptionsVersionTests
     [InlineData(OdfDocumentKind.Spreadsheet)]
     [InlineData(OdfDocumentKind.Presentation)]
     [InlineData(OdfDocumentKind.Graphics)]
-    public void VersionCompatibilityReport_CoversEveryPrimaryFormat(OdfDocumentKind kind)
+    public void VersionCompatibilityReportCoversEveryPrimaryFormat(OdfDocumentKind kind)
     {
         using OdfDocument document = OdfDocument.Create(kind);
         document.ContentDom.AppendChild(

@@ -300,6 +300,7 @@ public partial class TextDocument : OdfDocument
     /// 在指定的段落中新增頁碼欄位。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddPageNumberField(OdfParagraph paragraph)
         => TextDocumentPageFieldsEngine.AddPageNumberField(paragraph);
 
@@ -307,6 +308,7 @@ public partial class TextDocument : OdfDocument
     /// 在指定的段落中新增總頁數欄位。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddPageCountField(OdfParagraph paragraph)
         => TextDocumentPageFieldsEngine.AddPageCountField(paragraph);
 
@@ -630,6 +632,7 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要新增註解的段落</param>
     /// <param name="comment">註解物件執行個體</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
     internal void AddComment(OdfParagraph paragraph, OdfComment comment)
         => TextDocumentCommentsEngine.AddComment(paragraph, comment);
 
@@ -674,10 +677,8 @@ public partial class TextDocument : OdfDocument
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdateComment(string name, string author, string text)
     {
-        if (author is null)
-            throw new ArgumentNullException(nameof(author));
-        if (text is null)
-            throw new ArgumentNullException(nameof(text));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(author, nameof(author));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
         return TextDocumentCommentsEngine.UpdateComment(BodyTextRoot, name, author, text);
     }
 
@@ -788,15 +789,9 @@ public partial class TextDocument : OdfDocument
     /// </remarks>
     public async Task StreamingMailMergeAsync(Stream outputStream, IDictionary<string, object?> dataSource, CancellationToken cancellationToken)
     {
-        if (outputStream is null)
-        {
-            throw new ArgumentNullException(nameof(outputStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
 
-        if (dataSource is null)
-        {
-            throw new ArgumentNullException(nameof(dataSource));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dataSource, nameof(dataSource));
 
         // 確保目前文件的內容已序列化寫入封裝
         Save();
@@ -844,15 +839,9 @@ public partial class TextDocument : OdfDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_TemplatePathCannotBeNullOrEmpty"), nameof(templatePath));
         }
 
-        if (outputStream is null)
-        {
-            throw new ArgumentNullException(nameof(outputStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
 
-        if (dataSource is null)
-        {
-            throw new ArgumentNullException(nameof(dataSource));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dataSource, nameof(dataSource));
 
         using var templateStream = File.OpenRead(templatePath);
         OdfSynchronousTask.Run(

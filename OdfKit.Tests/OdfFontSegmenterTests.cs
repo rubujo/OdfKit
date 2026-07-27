@@ -19,7 +19,7 @@ public class OdfFontSegmenterTests
     /// 驗證當輸入為空字串或 null 時，分段結果回傳空集合。
     /// </summary>
     [Fact]
-    public void SegmentText_WithEmptyOrNull_ReturnsEmptyList()
+    public void SegmentTextWithEmptyOrNullReturnsEmptyList()
     {
         var result1 = OdfFontContext.Default.SegmentText(null!, "TW-Kai");
         var result2 = OdfFontContext.Default.SegmentText(string.Empty, "TW-Kai");
@@ -32,7 +32,7 @@ public class OdfFontSegmenterTests
     /// 驗證純 Plane 0 字元（BMP）混合排版時，不進行額外的字型分段。
     /// </summary>
     [Fact]
-    public void SegmentText_WithOnlyPlane0_ReturnsSingleSegment()
+    public void SegmentTextWithOnlyPlane0ReturnsSingleSegment()
     {
         string text = "哈囉 World! 這是一般 Unicode 測試字串。";
         string defaultFont = "DFKai-SB";
@@ -48,7 +48,7 @@ public class OdfFontSegmenterTests
     /// 驗證混有 Unicode Plane 2（Ext-B）與 Plane 15（PUA 自造字）字元時，正確分割為多個文字片段並指派對應字型。
     /// </summary>
     [Fact]
-    public void SegmentText_WithSupplementaryCharacters_SegmentsCorrectly()
+    public void SegmentTextWithSupplementaryCharactersSegmentsCorrectly()
     {
         // 𠮷 為 Plane 2 字元 (U+20BB7)
         string plane2Char = char.ConvertFromUtf32(0x20BB7);
@@ -88,13 +88,13 @@ public class OdfFontSegmenterTests
     /// 驗證大量 Plane 2 難字與一般字混排時，僅難字使用 Ext-B 字型，BMP 文字維持預設字型。
     /// </summary>
     [Fact]
-    public void SegmentText_WithMixedRareAndCommonCharacters_UsesFallbackOnlyForRareCharacters()
+    public void SegmentTextWithMixedRareAndCommonCharactersUsesFallbackOnlyForRareCharacters()
     {
         const string commonText = "一二三丨ㄩ幹";
         const string rareText = "𪚥𩙡𦚡𨏿𠆩𡘙𡌂𠀀";
         const string defaultFont = "TW-Song-98_1";
 
-        IReadOnlyList<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
+        List<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
             rareText + commonText,
             defaultFont);
 
@@ -109,11 +109,11 @@ public class OdfFontSegmenterTests
     /// 驗證增補平面基底字與 IVS selector 不會被拆到不同字型片段。
     /// </summary>
     [Fact]
-    public void SegmentText_WithSupplementaryIvs_PreservesClusterAndUsesBaseFontRoute()
+    public void SegmentTextWithSupplementaryIvsPreservesClusterAndUsesBaseFontRoute()
     {
         const string ivs = "𠆩󠄀";
 
-        IReadOnlyList<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
+        List<(string Text, string FontName)> segments = OdfFontContext.Default.SegmentText(
             $"前{ivs}後",
             "TW-Song-98_1");
 
@@ -126,7 +126,7 @@ public class OdfFontSegmenterTests
     /// 驗證增補平面基底字與組合記號維持在同一字型片段。
     /// </summary>
     [Fact]
-    public void SegmentText_WithSupplementaryCombiningSequence_PreservesCluster()
+    public void SegmentTextWithSupplementaryCombiningSequencePreservesCluster()
     {
         const string cluster = "𠆩\u0301";
 
@@ -156,7 +156,7 @@ public class OdfFontSegmenterTests
     [InlineData(13, "BiauKai-UnitTest")]
     [InlineData(14, "BiauKai-UnitTest")]
     [InlineData(16, "TW-Kai-Plus-98_1")]
-    public void SegmentText_WithoutCustomMapping_PreservesSupplementaryPlaneRouting(
+    public void SegmentTextWithoutCustomMappingPreservesSupplementaryPlaneRouting(
         int plane,
         string expectedFont)
     {
@@ -188,7 +188,7 @@ public class OdfFontSegmenterTests
     /// 驗證註冊字型子集化擴充點後，存檔會掃描 PUA 字元、嵌入子集字型並更新 font-face-uri。
     /// </summary>
     [Fact]
-    public void FontSubsetterRegistration_EmbedsPrivateUseFontSubsetOnSave()
+    public void FontSubsetterRegistrationEmbedsPrivateUseFontSubsetOnSave()
     {
         var subsetter = new FakeFontSubsetter();
         using IDisposable registration = OdfFontContext.Default.RegisterFontSubsetter(subsetter);
@@ -216,7 +216,7 @@ public class OdfFontSegmenterTests
     /// 驗證預設 CJK 字型遞補宣告包含全字庫楷體與宋體家族。
     /// </summary>
     [Fact]
-    public void ApplyCjkFontFallback_DeclaresTaiwanFullFontSetFamilies()
+    public void ApplyCjkFontFallbackDeclaresTaiwanFullFontSetFamilies()
     {
         using TextDocument document = TextDocument.Create();
 
@@ -241,7 +241,7 @@ public class OdfFontSegmenterTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void Cns11643Options_WithMissingBaseFont_UsesDefaultKaiFont(string? baseFont)
+    public void Cns11643OptionsWithMissingBaseFontUsesDefaultKaiFont(string? baseFont)
     {
         OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Cns11643(baseFont);
 
@@ -253,7 +253,7 @@ public class OdfFontSegmenterTests
     /// 驗證直接建立字型遞補設定時仍會保證基礎字型名稱有效。
     /// </summary>
     [Fact]
-    public void TextFontFallbackOptions_WithMissingBaseFont_UsesDefaultKaiFont()
+    public void TextFontFallbackOptionsWithMissingBaseFontUsesDefaultKaiFont()
     {
         var options = new OdfTextFontFallbackOptions(null, declareDefaultCjkFallbackFonts: false);
 
@@ -265,7 +265,7 @@ public class OdfFontSegmenterTests
     /// 驗證段落高階 API 可自動依 CNS 11643 全字庫情境分段並套用字型。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithFallbackOptions_SegmentsTextRunsAndDeclaresFallbackFonts()
+    public void ParagraphAddTextWithFallbackOptionsSegmentsTextRunsAndDeclaresFallbackFonts()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -294,7 +294,7 @@ public class OdfFontSegmenterTests
     /// 驗證花園明朝 profile 會分段並宣告 HanaMin font-face。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithHanaMinOptions_SegmentsAndDeclaresFontFaces()
+    public void ParagraphAddTextWithHanaMinOptionsSegmentsAndDeclaresFontFaces()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -318,7 +318,7 @@ public class OdfFontSegmenterTests
     /// 驗證字雲 profile 會分段並宣告 Jigmo font-face。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithJigmoOptions_SegmentsAndDeclaresFontFaces()
+    public void ParagraphAddTextWithJigmoOptionsSegmentsAndDeclaresFontFaces()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
@@ -345,7 +345,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否依據基礎字型名稱與平面正確指派全字庫宋體字型。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_SongBaseline_MapsToSongFonts()
+    public void GetSupplementaryPlaneFontNameSongBaselineMapsToSongFonts()
     {
         string baseFont = "TW-Song"; // 應判定為宋體/明體家族
 
@@ -359,7 +359,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否依據基礎字型名稱與平面正確指派全字庫楷體字型。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_KaiBaseline_MapsToKaiFonts()
+    public void GetSupplementaryPlaneFontNameKaiBaselineMapsToKaiFonts()
     {
         string baseFont = "DFKai-SB"; // 標楷體，應判定為楷體家族
 
@@ -373,7 +373,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否依據基礎字型名稱與平面正確指派花園明朝字型。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_HanaMinBaseline_MapsToHanaMinFonts()
+    public void GetSupplementaryPlaneFontNameHanaMinBaselineMapsToHanaMinFonts()
     {
         string baseFont = "HanaMinA"; // 花園明朝，應判定為 HanaMin 家族
 
@@ -387,7 +387,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否依據基礎字型名稱與平面正確指派字雲（Jigmo）字型。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_JigmoBaseline_MapsToJigmoFonts()
+    public void GetSupplementaryPlaneFontNameJigmoBaselineMapsToJigmoFonts()
     {
         string baseFont = "Jigmo"; // 字雲字型
 
@@ -400,7 +400,7 @@ public class OdfFontSegmenterTests
     /// 驗證混有 Unicode Plane 3（Ext.G/H）字元時，正確分割為多個文字片段並指派對應的 Jigmo 字型。
     /// </summary>
     [Fact]
-    public void SegmentText_WithPlane3Characters_SegmentsCorrectly()
+    public void SegmentTextWithPlane3CharactersSegmentsCorrectly()
     {
         // 𰀀 為 Plane 3 字元 (U+30000, Ext.G 第一字)
         string plane3Char = char.ConvertFromUtf32(0x30000);
@@ -424,7 +424,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否依據 Windows 細明體、新細明體與中易宋體系統字型正確指派擴充字型（ExtB/ExtG）。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_WindowsSystemFonts_MapsToExtFonts()
+    public void GetSupplementaryPlaneFontNameWindowsSystemFontsMapsToExtFonts()
     {
         Assert.Equal("MingLiU-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("MingLiU", 2));
         Assert.Equal("PMingLiU-ExtB", OdfFontContext.Default.GetSupplementaryPlaneFontName("PMingLiU", 2));
@@ -440,7 +440,7 @@ public class OdfFontSegmenterTests
     /// 驗證 GetSupplementaryPlaneFontName 是否將不需要進行超大型拆分對照的常規字型（如思源黑體、Noto Sans、微軟正黑體等）直接回傳原字型名稱。
     /// </summary>
     [Fact]
-    public void GetSupplementaryPlaneFontName_RegularFonts_ReturnsOriginalName()
+    public void GetSupplementaryPlaneFontNameRegularFontsReturnsOriginalName()
     {
         string baseFont1 = "Source Han Sans TC";
         string baseFont2 = "Noto Sans CJK TC";
@@ -465,7 +465,7 @@ public class OdfFontSegmenterTests
     /// 驗證自訂平面對應註冊後可導向自訂字型，且 Dispose 後還原為原字型名稱。
     /// </summary>
     [Fact]
-    public void RegisterSupplementaryPlaneFontMapping_RoutesToCustomFontsAndRestoresOnDispose()
+    public void RegisterSupplementaryPlaneFontMappingRoutesToCustomFontsAndRestoresOnDispose()
     {
         string plane2Char = char.ConvertFromUtf32(0x20BB7);
         string plane3Char = char.ConvertFromUtf32(0x30000);
@@ -494,7 +494,7 @@ public class OdfFontSegmenterTests
     /// 驗證自訂平面對應優先於內建規則，且命中規則後未列出的平面維持基礎字型（不再回退內建規則）。
     /// </summary>
     [Fact]
-    public void RegisterSupplementaryPlaneFontMapping_TakesPrecedenceOverBuiltInRules()
+    public void RegisterSupplementaryPlaneFontMappingTakesPrecedenceOverBuiltInRules()
     {
         // BiauKai-UnitTest 含 "BiauKai"，未註冊時會命中內建楷體規則
         const string baseFont = "BiauKai-UnitTest";
@@ -518,7 +518,7 @@ public class OdfFontSegmenterTests
     /// 驗證自訂平面對應可涵蓋內建規則不處理的 Plane 1（SMP），且後註冊規則優先。
     /// </summary>
     [Fact]
-    public void RegisterSupplementaryPlaneFontMapping_SupportsPlane1AndLaterRegistrationWins()
+    public void RegisterSupplementaryPlaneFontMappingSupportsPlane1AndLaterRegistrationWins()
     {
         string plane1Char = char.ConvertFromUtf32(0x1F600);
         const string baseFont = "FakeSymbol-UnitTest";
@@ -539,7 +539,7 @@ public class OdfFontSegmenterTests
     /// 驗證自訂平面對應的參數驗證：空白模式、null 字典、平面編號超界與空白字型名稱。
     /// </summary>
     [Fact]
-    public void RegisterSupplementaryPlaneFontMapping_ValidatesArguments()
+    public void RegisterSupplementaryPlaneFontMappingValidatesArguments()
     {
         var valid = new Dictionary<int, string> { [2] = "Font" };
 
@@ -562,7 +562,7 @@ public class OdfFontSegmenterTests
     /// 驗證註冊後修改原字典不影響既有規則（防禦性複製）。
     /// </summary>
     [Fact]
-    public void RegisterSupplementaryPlaneFontMapping_CopiesMappingDefensively()
+    public void RegisterSupplementaryPlaneFontMappingCopiesMappingDefensively()
     {
         const string baseFont = "FakeCopy-UnitTest";
         var planeFonts = new Dictionary<int, string> { [2] = "Copied-Font" };
@@ -579,7 +579,7 @@ public class OdfFontSegmenterTests
     /// 驗證 Custom 遞補選項會宣告自訂 font-face，並可搭配自訂平面對應讓段落分段導向自訂字型。
     /// </summary>
     [Fact]
-    public void ParagraphAddText_WithCustomOptions_SegmentsAndDeclaresCustomFontFaces()
+    public void ParagraphAddTextWithCustomOptionsSegmentsAndDeclaresCustomFontFaces()
     {
         using IDisposable registration = OdfFontContext.Default.RegisterSupplementaryPlaneFontMapping(
             "FakeCustom-UnitTest",
@@ -612,7 +612,7 @@ public class OdfFontSegmenterTests
     /// 驗證 Custom 遞補選項的參數驗證與防禦性複製行為。
     /// </summary>
     [Fact]
-    public void CustomOptions_ValidatesAndCopiesFontFaces()
+    public void CustomOptionsValidatesAndCopiesFontFaces()
     {
         Assert.Throws<ArgumentNullException>(
             () => OdfTextFontFallbackOptions.Custom("Base", null!));

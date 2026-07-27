@@ -22,7 +22,7 @@ public class FormControlTests
     /// 驗證新增核取方塊後，XML 中包含正確的 form:checkbox 與 draw:frame 結構。
     /// </summary>
     [Fact]
-    public void AddFormControl_CheckBox_XmlContainsExpectedElements()
+    public void AddFormControlCheckBoxXmlContainsExpectedElements()
     {
         using var doc = TextDocument.Create();
 
@@ -54,7 +54,7 @@ public class FormControlTests
     /// 驗證新增文字欄位後，XML 包含 form:text 元素。
     /// </summary>
     [Fact]
-    public void AddFormControl_TextBox_XmlContainsFormText()
+    public void AddFormControlTextBoxXmlContainsFormText()
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.TextBox, "txt1", Cm1, Cm2, Cm4, Cm08, label: "預設文字");
@@ -76,7 +76,7 @@ public class FormControlTests
     /// 驗證 GetFormControls 能讀回 AddFormControl 寫入的控制項清單。
     /// </summary>
     [Fact]
-    public void GetFormControls_ReturnsAllAddedControls()
+    public void GetFormControlsReturnsAllAddedControls()
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.CheckBox, "chk1", Cm1, Cm1, Cm4, Cm08, "同意");
@@ -104,7 +104,7 @@ public class FormControlTests
     /// 驗證 ListBox 控制項包含 form:option 子元素。
     /// </summary>
     [Fact]
-    public void AddFormControl_ListBox_XmlContainsOptions()
+    public void AddFormControlListBoxXmlContainsOptions()
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.ListBox, "lst1", Cm1, Cm1, Cm4, Cm2,
@@ -129,7 +129,7 @@ public class FormControlTests
     /// 驗證 GetFormControls 對 ListBox 正確讀回選項清單。
     /// </summary>
     [Fact]
-    public void GetFormControls_ListBox_ReturnsCorrectItems()
+    public void GetFormControlsListBoxReturnsCorrectItems()
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.ListBox, "lst1", Cm1, Cm1, Cm4, Cm2,
@@ -150,7 +150,7 @@ public class FormControlTests
     /// 驗證 GetFormControls 在無表單時回傳空清單。
     /// </summary>
     [Fact]
-    public void GetFormControls_NoControls_ReturnsEmpty()
+    public void GetFormControlsNoControlsReturnsEmpty()
     {
         using var doc = TextDocument.Create();
         var controls = doc.GetFormControls();

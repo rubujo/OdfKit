@@ -28,7 +28,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     [InlineData((char)0x1F)]
     [InlineData((char)0xFFFE)]
     [InlineData((char)0xFFFF)]
-    public void WriteCell_String_WithInvalidXmlCharacter_ThrowsLocalizedArgumentException(char invalid)
+    public void WriteCellStringWithInvalidXmlCharacterThrowsLocalizedArgumentException(char invalid)
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -44,7 +44,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_WithLoneHighSurrogate_Throws()
+    public void WriteCellStringWithLoneHighSurrogateThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -61,7 +61,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_WithLoneLowSurrogate_Throws()
+    public void WriteCellStringWithLoneLowSurrogateThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -73,7 +73,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_Span_WithInvalidXmlCharacter_Throws()
+    public void WriteCellSpanWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -86,7 +86,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_WithTabLfCr_IsAllowedAndDocumentStaysWellFormed()
+    public void WriteCellStringWithTabLfCrIsAllowedAndDocumentStaysWellFormed()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdsStreamWriter(ms))
@@ -108,7 +108,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_WithSurrogatePairEmoji_RoundTrips()
+    public void WriteCellStringWithSurrogatePairEmojiRoundTrips()
     {
         // U+1F600（GRINNING FACE）以合法代理對組成，必須放行且完整往返。
         string emojiText = "分數 " + char.ConvertFromUtf32(0x1F600) + " 滿分";
@@ -131,7 +131,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_WithReplacementCharacterUpperBound_IsAllowed()
+    public void WriteCellStringWithReplacementCharacterUpperBoundIsAllowed()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -145,7 +145,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_String_EmptyAndNull_BehaviorUnchanged()
+    public void WriteCellStringEmptyAndNullBehaviorUnchanged()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdsStreamWriter(ms))
@@ -169,7 +169,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_StyleName_WithInvalidXmlCharacter_Throws()
+    public void WriteCellStyleNameWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -185,7 +185,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteStartSheet_SheetName_WithInvalidXmlCharacter_Throws()
+    public void WriteStartSheetSheetNameWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -195,7 +195,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void SwitchToSheet_BufferedCellWrite_WithInvalidXmlCharacter_Throws()
+    public void SwitchToSheetBufferedCellWriteWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -208,7 +208,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public async Task WriteSheetsAsync_SheetWriterStringCell_WithInvalidXmlCharacter_Throws()
+    public async Task WriteSheetsAsyncSheetWriterStringCellWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdsStreamWriter(ms);
@@ -227,7 +227,7 @@ public class OdsStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void WriteCell_AfterGuardException_WriterRemainsUsable()
+    public void WriteCellAfterGuardExceptionWriterRemainsUsable()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdsStreamWriter(ms))

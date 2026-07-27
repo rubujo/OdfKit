@@ -21,8 +21,8 @@ public class NumberFormatEngineTests
         root.SetAttribute("name", OdfNamespaces.Style, "N1", "style");
 
         var num = new OdfNode(OdfNodeType.Element, "number", OdfNamespaces.Number, "number");
-        num.SetAttribute("decimal-places", OdfNamespaces.Number, decimalPlaces.ToString(), "number");
-        num.SetAttribute("min-integer-digits", OdfNamespaces.Number, minInt.ToString(), "number");
+        num.SetAttribute("decimal-places", OdfNamespaces.Number, decimalPlaces.ToString(System.Globalization.CultureInfo.InvariantCulture), "number");
+        num.SetAttribute("min-integer-digits", OdfNamespaces.Number, minInt.ToString(System.Globalization.CultureInfo.InvariantCulture), "number");
         num.SetAttribute("grouping", OdfNamespaces.Number, grouping ? "true" : "false", "number");
         root.AppendChild(num);
         return root;
@@ -34,7 +34,7 @@ public class NumberFormatEngineTests
         root.SetAttribute("name", OdfNamespaces.Style, "N2", "style");
 
         var num = new OdfNode(OdfNodeType.Element, "number", OdfNamespaces.Number, "number");
-        num.SetAttribute("decimal-places", OdfNamespaces.Number, decimalPlaces.ToString(), "number");
+        num.SetAttribute("decimal-places", OdfNamespaces.Number, decimalPlaces.ToString(System.Globalization.CultureInfo.InvariantCulture), "number");
         num.SetAttribute("min-integer-digits", OdfNamespaces.Number, "1", "number");
         root.AppendChild(num);
 
@@ -130,7 +130,7 @@ public class NumberFormatEngineTests
     /// 驗證基本整數格式化（無小數點）。
     /// </summary>
     [Fact]
-    public void Format_NumberStyle_NoDecimals_ReturnsInteger()
+    public void FormatNumberStyleNoDecimalsReturnsInteger()
     {
         var node = NumberStyleNode(decimalPlaces: 0, minInt: 1);
         string result = OdfNumberFormatEngine.Format(1234.0, node);
@@ -141,7 +141,7 @@ public class NumberFormatEngineTests
     /// 驗證兩位小數格式化。
     /// </summary>
     [Fact]
-    public void Format_NumberStyle_TwoDecimals_ReturnsFormatted()
+    public void FormatNumberStyleTwoDecimalsReturnsFormatted()
     {
         var node = NumberStyleNode(decimalPlaces: 2, minInt: 1);
         string result = OdfNumberFormatEngine.Format(1234.5, node);
@@ -152,7 +152,7 @@ public class NumberFormatEngineTests
     /// 驗證千分位分隔符號。
     /// </summary>
     [Fact]
-    public void Format_NumberStyle_Grouping_ReturnsThousandsSeparated()
+    public void FormatNumberStyleGroupingReturnsThousandsSeparated()
     {
         var node = NumberStyleNode(decimalPlaces: 2, minInt: 1, grouping: true);
         string result = OdfNumberFormatEngine.Format(1234567.89, node);
@@ -163,7 +163,7 @@ public class NumberFormatEngineTests
     /// 驗證最小整數位數補零（minInt=4）。
     /// </summary>
     [Fact]
-    public void Format_NumberStyle_MinIntDigits_PadsWithZeros()
+    public void FormatNumberStyleMinIntDigitsPadsWithZeros()
     {
         var node = NumberStyleNode(decimalPlaces: 0, minInt: 4);
         string result = OdfNumberFormatEngine.Format(42.0, node);
@@ -176,7 +176,7 @@ public class NumberFormatEngineTests
     /// 驗證百分比格式化（值乘以 100 後加 %）。
     /// </summary>
     [Fact]
-    public void Format_PercentageStyle_MultipliesBy100AndAppendsPercent()
+    public void FormatPercentageStyleMultipliesBy100AndAppendsPercent()
     {
         var node = PercentStyleNode(2);
         string result = OdfNumberFormatEngine.Format(0.1234, node);
@@ -187,7 +187,7 @@ public class NumberFormatEngineTests
     /// 驗證百分比零小數格式。
     /// </summary>
     [Fact]
-    public void Format_PercentageStyle_ZeroDecimals_ReturnsWholePercent()
+    public void FormatPercentageStyleZeroDecimalsReturnsWholePercent()
     {
         var node = PercentStyleNode(0);
         string result = OdfNumberFormatEngine.Format(0.5, node);
@@ -200,7 +200,7 @@ public class NumberFormatEngineTests
     /// 驗證布林格式化 — 非零回傳 TRUE。
     /// </summary>
     [Fact]
-    public void Format_BooleanStyle_NonZero_ReturnsTrue()
+    public void FormatBooleanStyleNonZeroReturnsTrue()
     {
         var node = BoolStyleNode();
         Assert.Equal("TRUE", OdfNumberFormatEngine.Format(1.0, node));
@@ -210,7 +210,7 @@ public class NumberFormatEngineTests
     /// 驗證布林格式化 — 零回傳 FALSE。
     /// </summary>
     [Fact]
-    public void Format_BooleanStyle_Zero_ReturnsFalse()
+    public void FormatBooleanStyleZeroReturnsFalse()
     {
         var node = BoolStyleNode();
         Assert.Equal("FALSE", OdfNumberFormatEngine.Format(0.0, node));
@@ -222,7 +222,7 @@ public class NumberFormatEngineTests
     /// 驗證貨幣格式含貨幣符號與千分位。
     /// </summary>
     [Fact]
-    public void Format_CurrencyStyle_IncludesCurrencySymbol()
+    public void FormatCurrencyStyleIncludesCurrencySymbol()
     {
         var node = CurrencyStyleNode();
         string result = OdfNumberFormatEngine.Format(1234.5, node);
@@ -236,7 +236,7 @@ public class NumberFormatEngineTests
     /// 驗證日期格式化 yyyy-MM-dd。
     /// </summary>
     [Fact]
-    public void Format_DateStyle_ReturnsFormattedDate()
+    public void FormatDateStyleReturnsFormattedDate()
     {
         var node = DateStyleNode();
         var dt = new DateTime(2026, 6, 16);
@@ -248,7 +248,7 @@ public class NumberFormatEngineTests
     /// 驗證日期格式化 — 月份補零。
     /// </summary>
     [Fact]
-    public void Format_DateStyle_PadsMonthWithZero()
+    public void FormatDateStylePadsMonthWithZero()
     {
         var node = DateStyleNode();
         var dt = new DateTime(2026, 3, 5);
@@ -262,7 +262,7 @@ public class NumberFormatEngineTests
     /// 驗證時間格式化 HH:mm:ss。
     /// </summary>
     [Fact]
-    public void Format_TimeStyle_ReturnsFormattedTime()
+    public void FormatTimeStyleReturnsFormattedTime()
     {
         var node = TimeStyleNode();
         var dt = new DateTime(2026, 1, 1, 9, 5, 3);
@@ -276,7 +276,7 @@ public class NumberFormatEngineTests
     /// 驗證 FindFormatNode 能從巢狀 DOM 找到指定名稱的格式節點。
     /// </summary>
     [Fact]
-    public void FindFormatNode_FoundByName()
+    public void FindFormatNodeFoundByName()
     {
         var dom = new OdfNode(OdfNodeType.Element, "document-content", OdfNamespaces.Office, "office");
         var autoStyles = new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
@@ -298,7 +298,7 @@ public class NumberFormatEngineTests
     /// 驗證 FindFormatNode 對不存在的名稱回傳 null。
     /// </summary>
     [Fact]
-    public void FindFormatNode_NotFound_ReturnsNull()
+    public void FindFormatNodeNotFoundReturnsNull()
     {
         var dom = new OdfNode(OdfNodeType.Element, "root", string.Empty, string.Empty);
         var found = OdfNumberFormatEngine.FindFormatNode(dom, "N99");
@@ -311,7 +311,7 @@ public class NumberFormatEngineTests
     /// 驗證三參數多載能依樣式名稱格式化。
     /// </summary>
     [Fact]
-    public void Format_ByStyleName_FormatsCorrectly()
+    public void FormatByStyleNameFormatsCorrectly()
     {
         var dom = new OdfNode(OdfNodeType.Element, "document-content", OdfNamespaces.Office, "office");
         var autoStyles = new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
@@ -335,7 +335,7 @@ public class NumberFormatEngineTests
     /// 驗證三參數多載對 null 值回傳空字串。
     /// </summary>
     [Fact]
-    public void Format_ByStyleName_NullValue_ReturnsEmpty()
+    public void FormatByStyleNameNullValueReturnsEmpty()
     {
         var dom = new OdfNode(OdfNodeType.Element, "root", string.Empty, string.Empty);
         string result = OdfNumberFormatEngine.Format(null, "N1", dom);
@@ -348,7 +348,7 @@ public class NumberFormatEngineTests
     /// 驗證無樣式的儲存格 FormattedValue 回傳 DisplayText。
     /// </summary>
     [Fact]
-    public void OdfCell_FormattedValue_NoStyle_ReturnsDisplayText()
+    public void OdfCellFormattedValueNoStyleReturnsDisplayText()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -361,7 +361,7 @@ public class NumberFormatEngineTests
     /// 驗證整合場景：儲存格帶數字格式樣式，FormattedValue 依格式輸出。
     /// </summary>
     [Fact]
-    public void OdfCell_FormattedValue_WithNumberStyle_ReturnsFormatted()
+    public void OdfCellFormattedValueWithNumberStyleReturnsFormatted()
     {
         using var doc = SpreadsheetDocument.Create();
 

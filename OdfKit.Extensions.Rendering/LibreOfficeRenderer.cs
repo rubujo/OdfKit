@@ -221,12 +221,10 @@ public class LibreOfficeRenderer
         string format,
         CancellationToken cancellationToken = default)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
         if (string.IsNullOrEmpty(outputPath))
             throw new ArgumentNullException(nameof(outputPath));
-        if (format is null)
-            throw new ArgumentNullException(nameof(format));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(format, nameof(format));
 
         string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_RenderDoc_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempSandbox);
@@ -289,7 +287,12 @@ public class LibreOfficeRenderer
         try
         {
             // 在系統臨時路徑中建立一個依處理程序 ID 隔離的唯一沙盒目錄
-            string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + Process.GetCurrentProcess().Id + "_" + Guid.NewGuid().ToString("N"));
+#if NET6_0_OR_GREATER
+            int processId = Environment.ProcessId;
+#else
+        int processId = Process.GetCurrentProcess().Id;
+#endif
+            string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + processId + "_" + Guid.NewGuid().ToString("N"));
             if (!Directory.Exists(tempSandbox))
             {
                 Directory.CreateDirectory(tempSandbox);
@@ -341,8 +344,8 @@ public class LibreOfficeRenderer
             {
                 process.Start();
 
-                Task<string> stdOutTask = process.StandardOutput.ReadToEndAsync();
-                Task<string> stdErrTask = process.StandardError.ReadToEndAsync();
+                Task<string> stdOutTask = OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardOutput, cancellationToken);
+                Task<string> stdErrTask = OdfKit.Internal.OdfAsyncHelper.ReadToEndAsync(process.StandardError, cancellationToken);
 
                 bool exited = await WaitForProcessExitAsync(process, (int)Timeout.TotalMilliseconds, cancellationToken)
                     .ConfigureAwait(false);
@@ -539,8 +542,7 @@ public class LibreOfficeRenderer
     /// <returns>The result. / 不含前導句點的副檔名</returns>
     public static string GetInputExtension(OdfDocument document)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         return OdfDocumentKindDetector.TryGetFormatByKind(document.DocumentKind, out OdfFormatInfo? format)
             ? format!.Extension.TrimStart('.')
@@ -762,7 +764,7 @@ public class LibreOfficeRenderer
         return sb.ToString();
     }
 
-    private void SafeCleanDirectory(string? dirPath)
+    private static void SafeCleanDirectory(string? dirPath)
     {
         if (string.IsNullOrEmpty(dirPath) || !Directory.Exists(dirPath))
         {

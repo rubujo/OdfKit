@@ -172,13 +172,13 @@ public class OdfAlphabeticalIndex : OdfIndex
                 }
             }
 
-            templates.TryGetValue(level.ToString(), out var temp);
+            templates.TryGetValue(level.ToString(System.Globalization.CultureInfo.InvariantCulture), out var temp);
             var entryPara = BuildAlphabeticalEntryParagraph(text, level, temp);
             body.AppendChild(entryPara);
         }
     }
 
-    private void ScanIndexMarks(OdfNode node, List<OdfIndexMarkInfo> marks)
+    private static void ScanIndexMarks(OdfNode node, List<OdfIndexMarkInfo> marks)
     {
         if (node.NodeType == OdfNodeType.Element && node.NamespaceUri == OdfNamespaces.Text)
         {
@@ -210,7 +210,7 @@ public class OdfAlphabeticalIndex : OdfIndex
         }
     }
 
-    private OdfNode BuildSeparatorParagraph(string letter, OdfNode? template)
+    private static OdfNode BuildSeparatorParagraph(string letter, OdfNode? template)
     {
         var p = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         string styleName = template?.GetAttribute("style-name", OdfNamespaces.Text) ?? "Index_20_Separator";
@@ -219,7 +219,7 @@ public class OdfAlphabeticalIndex : OdfIndex
         return p;
     }
 
-    private OdfNode BuildAlphabeticalEntryParagraph(string text, int level, OdfNode? template)
+    private static OdfNode BuildAlphabeticalEntryParagraph(string text, int level, OdfNode? template)
     {
         var p = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         string styleName = template?.GetAttribute("style-name", OdfNamespaces.Text) ?? $"Index_{level}";

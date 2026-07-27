@@ -74,10 +74,7 @@ public partial class SpreadsheetDocument
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdateDataValidation(string name, string sheetName, OdfDataValidation validation)
     {
-        if (validation is null)
-        {
-            throw new ArgumentNullException(nameof(validation));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(validation, nameof(validation));
 
         OdfNode? node = FindDataValidationNode(name);
         if (node is null)
@@ -562,10 +559,7 @@ public partial class SpreadsheetDocument
     /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool RemoveDatabaseRange(OdfDatabaseRange range)
     {
-        if (range is null)
-        {
-            throw new ArgumentNullException(nameof(range));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(range, nameof(range));
         OdfNode? node = FindDatabaseRangeNode(range.Name);
         if (node is null || !ReferenceEquals(node, range.Node) || node.Parent is null)
         {
@@ -761,8 +755,7 @@ public partial class SpreadsheetDocument
     {
         if (string.IsNullOrEmpty(sheetName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_WorksheetCannotBeEmpty_2"), nameof(sheetName));
-        if (chart is null)
-            throw new ArgumentNullException(nameof(chart));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chart, nameof(chart));
 
         var sheet = FindSheet(sheetName);
         if (sheet is null)
@@ -825,7 +818,7 @@ public partial class SpreadsheetDocument
         sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         sb.Append("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.3\">");
         sb.Append("<office:body><office:chart>");
-        sb.Append($"<chart:chart chart:class=\"{chartClass}\">");
+        sb.Append(System.FormattableString.Invariant($"<chart:chart chart:class=\"{chartClass}\">"));
 
         if (!string.IsNullOrEmpty(chart.Title))
         {
@@ -1020,12 +1013,10 @@ public partial class SpreadsheetDocument
     /// <param name="firstRowAsHeader">Whether the first row is treated as series labels. / 首列是否視為序列標籤。</param>
     /// <param name="firstColumnAsLabel">Whether the first column is treated as category labels. / 首欄是否視為分類標籤。</param>
     /// <returns>The updated embedded chart document. / 已更新的嵌入圖表文件。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public OdfChartDocument RefreshChartDataRange(OdfChartDocument chart, string sheetName, OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel)
     {
-        if (chart is null)
-        {
-            throw new ArgumentNullException(nameof(chart));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chart, nameof(chart));
 
         chart.SetDataRange(sheetName, range, firstRowAsHeader, firstColumnAsLabel);
         chart.Save();
@@ -1040,19 +1031,14 @@ public partial class SpreadsheetDocument
     /// <param name="chart">The embedded chart document. / 嵌入圖表文件。</param>
     /// <param name="updates">The series updates. / 序列更新。</param>
     /// <returns>The batch update result. / 批次更新結果。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public OdfBatchUpdateResult UpdateEmbeddedChartSeries(
         OdfChartDocument chart,
         IEnumerable<OdfEmbeddedChartSeriesUpdate> updates)
     {
-        if (chart is null)
-        {
-            throw new ArgumentNullException(nameof(chart));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chart, nameof(chart));
 
-        if (updates is null)
-        {
-            throw new ArgumentNullException(nameof(updates));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(updates, nameof(updates));
 
         var result = new OdfBatchUpdateResult();
         foreach (OdfEmbeddedChartSeriesUpdate update in updates)
@@ -1182,8 +1168,7 @@ public partial class SpreadsheetDocument
     {
         if (string.IsNullOrEmpty(sheetName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_WorksheetCannotBeEmpty_2"), nameof(sheetName));
-        if (validation is null)
-            throw new ArgumentNullException(nameof(validation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(validation, nameof(validation));
 
         var sheet = FindSheet(sheetName);
         if (sheet is null)

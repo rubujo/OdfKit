@@ -32,6 +32,7 @@ namespace OdfKit.Tests
         public void Dispose()
         {
             OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+            GC.SuppressFinalize(this);
         }
 
         #region 1. OdfComment Tests
@@ -908,7 +909,7 @@ namespace OdfKit.Tests
         /// 驗證 AddEmbeddedObject 會將 subPath 中的反斜線分隔符號正規化為正斜線，符合 ODF 套件 href 慣例的要求。
         /// </summary>
         [Fact]
-        public void AddEmbeddedObject_NormalizesBackslashesInHref()
+        public void AddEmbeddedObjectNormalizesBackslashesInHref()
         {
             using var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true);
             var doc = new PresentationDocument(package);
@@ -925,7 +926,7 @@ namespace OdfKit.Tests
 
         #region Helpers
 
-        private string GetMockSofficePath()
+        private static string GetMockSofficePath()
         {
             var baseDir = AppContext.BaseDirectory;
             var paths = new List<string>
@@ -951,7 +952,7 @@ namespace OdfKit.Tests
             return string.Empty;
         }
 
-        private OdfNode? FindNodeByLocalName(OdfNode parent, string name)
+        private static OdfNode? FindNodeByLocalName(OdfNode parent, string name)
         {
             if (parent.LocalName == name)
                 return parent;
@@ -964,7 +965,7 @@ namespace OdfKit.Tests
             return null;
         }
 
-        private void FindNodesByLocalName(OdfNode parent, string name, List<OdfNode> result)
+        private static void FindNodesByLocalName(OdfNode parent, string name, List<OdfNode> result)
         {
             if (parent.LocalName == name)
                 result.Add(parent);
@@ -974,7 +975,7 @@ namespace OdfKit.Tests
             }
         }
 
-        private OdfNode? FindMapNode(OdfNode parent, string name)
+        private static OdfNode? FindMapNode(OdfNode parent, string name)
         {
             foreach (var child in parent.Children)
             {
@@ -987,7 +988,7 @@ namespace OdfKit.Tests
             return null;
         }
 
-        private OdfNode? FindConfigItemNode(OdfNode parent, string name)
+        private static OdfNode? FindConfigItemNode(OdfNode parent, string name)
         {
             foreach (var child in parent.Children)
             {

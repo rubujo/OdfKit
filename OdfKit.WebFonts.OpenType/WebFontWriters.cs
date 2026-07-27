@@ -256,7 +256,7 @@ internal static class WebFontWriters
     }
 
     private static KeyValuePair<string, byte[]>[] OrderWoff2Tables(
-        IReadOnlyDictionary<string, byte[]> tables)
+        SortedDictionary<string, byte[]> tables)
     {
         var ordered = new List<KeyValuePair<string, byte[]>>(tables.Count);
         foreach (KeyValuePair<string, byte[]> table in tables)

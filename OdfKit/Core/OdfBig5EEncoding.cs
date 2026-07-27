@@ -48,10 +48,7 @@ public sealed class OdfBig5EEncoding : Encoding
     /// <exception cref="ArgumentException">The mapping is empty or contains an invalid Unicode scalar or Big5E code. / 對應表為空，或包含無效的 Unicode 純量值或 Big5E 碼。</exception>
     public static OdfBig5EEncoding Create(IReadOnlyDictionary<int, int> unicodeToBig5E)
     {
-        if (unicodeToBig5E is null)
-        {
-            throw new ArgumentNullException(nameof(unicodeToBig5E));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(unicodeToBig5E, nameof(unicodeToBig5E));
 
         if (unicodeToBig5E.Count == 0)
         {
@@ -108,15 +105,10 @@ public sealed class OdfBig5EEncoding : Encoding
     public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex)
     {
         ValidateArraySegment(chars, charIndex, charCount, nameof(chars), nameof(charIndex), nameof(charCount));
-        if (bytes is null)
-        {
-            throw new ArgumentNullException(nameof(bytes));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bytes, nameof(bytes));
 
         if (byteIndex < 0 || byteIndex > bytes.Length)
-        {
             throw new ArgumentOutOfRangeException(nameof(byteIndex));
-        }
 
         return Encode(chars, charIndex, charCount, bytes, byteIndex, EncoderFallback);
     }
@@ -148,15 +140,10 @@ public sealed class OdfBig5EEncoding : Encoding
     public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
     {
         ValidateArraySegment(bytes, byteIndex, byteCount, nameof(bytes), nameof(byteIndex), nameof(byteCount));
-        if (chars is null)
-        {
-            throw new ArgumentNullException(nameof(chars));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chars, nameof(chars));
 
         if (charIndex < 0 || charIndex > chars.Length)
-        {
             throw new ArgumentOutOfRangeException(nameof(charIndex));
-        }
 
         return Decode(bytes, byteIndex, byteCount, chars, charIndex, DecoderFallback);
     }
@@ -183,10 +170,7 @@ public sealed class OdfBig5EEncoding : Encoding
     /// <returns>A safe maximum byte count. / 安全的最大位元組數量。</returns>
     public override int GetMaxByteCount(int charCount)
     {
-        if (charCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(charCount));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(charCount, nameof(charCount));
 
         long multiplier = Math.Max(2L, EncoderFallback.MaxCharCount * 2L);
         long maximum = (charCount + 1L) * multiplier;
@@ -206,10 +190,7 @@ public sealed class OdfBig5EEncoding : Encoding
     /// <returns>A safe maximum character count. / 安全的最大字元數量。</returns>
     public override int GetMaxCharCount(int byteCount)
     {
-        if (byteCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(byteCount));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(byteCount, nameof(byteCount));
 
         long multiplier = Math.Max(1, DecoderFallback.MaxCharCount);
         long maximum = (byteCount + 1L) * multiplier;
@@ -543,15 +524,10 @@ public sealed class OdfBig5EEncoding : Encoding
             bool flush)
         {
             ValidateArraySegment(chars, charIndex, charCount, nameof(chars), nameof(charIndex), nameof(charCount));
-            if (bytes is null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bytes, nameof(bytes));
 
             if (byteIndex < 0 || byteIndex > bytes.Length)
-            {
                 throw new ArgumentOutOfRangeException(nameof(byteIndex));
-            }
 
             char[] input = PrepareEncoderInput(
                 chars,
@@ -640,15 +616,10 @@ public sealed class OdfBig5EEncoding : Encoding
             bool flush)
         {
             ValidateArraySegment(bytes, byteIndex, byteCount, nameof(bytes), nameof(byteIndex), nameof(byteCount));
-            if (chars is null)
-            {
-                throw new ArgumentNullException(nameof(chars));
-            }
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chars, nameof(chars));
 
             if (charIndex < 0 || charIndex > chars.Length)
-            {
                 throw new ArgumentOutOfRangeException(nameof(charIndex));
-            }
 
             byte[] input = PrepareDecoderInput(
                 bytes,

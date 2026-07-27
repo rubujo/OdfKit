@@ -16,7 +16,7 @@ public class OdfLoadOptions
     /// When set to <see langword="true"/>, malformed XML or non-conforming structure throws immediately.
     /// 設為 <see langword="true"/> 時，XML 解析錯誤或結構不合規會立即擲出例外；設為 <see langword="false"/>（預設）時，會對損毀或非標準 ODF 輸入採取容錯處理。
     /// </remarks>
-    public bool StrictXmlParsing { get; set; } = false;
+    public bool StrictXmlParsing { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the package mimetype entry is validated during load.
@@ -138,7 +138,7 @@ public class OdfLoadOptions
     /// Gets or sets a value indicating whether Direct I/O is used for high-throughput file reads.
     /// 取得或設定是否啟用 Direct I/O 進行高吞吐量檔案讀取。
     /// </summary>
-    public bool EnableDirectIo { get; set; } = false;
+    public bool EnableDirectIo { get; set; }
 
     /// <summary>
     /// Gets a new instance with the default load settings.

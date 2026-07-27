@@ -23,10 +23,8 @@ public static class OdfParagraphExtensions
     /// <param name="writingMode">The value to use. / 書寫模式（橫書或直書）</param>
     public static void AutoShrinkToFit(this OdfParagraph paragraph, double maxWidthInCentimeters, string fontName, double initialFontSizePoints, OdfWritingMode writingMode = OdfWritingMode.LrTb)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (maxWidthInCentimeters <= 0)
-            throw new ArgumentOutOfRangeException(nameof(maxWidthInCentimeters));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(maxWidthInCentimeters, nameof(maxWidthInCentimeters));
         if (string.IsNullOrEmpty(fontName))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfParagraphExtensions_FontCannotBeEmpty"), nameof(fontName));
 

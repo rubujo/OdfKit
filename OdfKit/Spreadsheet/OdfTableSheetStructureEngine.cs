@@ -194,7 +194,7 @@ internal static class OdfTableSheetStructureEngine
         }
     }
 
-    private static IReadOnlyList<OdfNode> DeleteColumnDefinitions(OdfNode tableNode, int position, int count)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfNode> DeleteColumnDefinitions(OdfNode tableNode, int position, int count)
     {
         List<OdfNode> deletedSnapshots = [];
 
@@ -283,18 +283,18 @@ internal static class OdfTableSheetStructureEngine
         return snapshots.AsReadOnly();
     }
 
-    private static OdfNode CreateEmptyRow(int repeatedCount = 1)
+    private static TableTableRowElement CreateEmptyRow(int repeatedCount = 1)
     {
         var row = new TableTableRowElement("table");
         if (repeatedCount > 1)
-            row.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatedCount.ToString(), "table");
+            row.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatedCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
         return row;
     }
 
-    private static OdfNode CreateEmptyColumn() =>
+    private static TableTableColumnElement CreateEmptyColumn() =>
         new TableTableColumnElement("table");
 
-    private static OdfNode CreateEmptyCell() =>
+    private static TableTableCellElement CreateEmptyCell() =>
         new TableTableCellElement("table");
 
     private static void CopyCellContent(OdfNode source, OdfNode target)

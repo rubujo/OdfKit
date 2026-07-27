@@ -345,7 +345,7 @@ public ref struct FormulaParser
         return error is not null;
     }
 
-    private AstNode ParseInlineArray()
+    private InlineArrayNode ParseInlineArray()
     {
         Consume();
         List<IReadOnlyList<AstNode>> rows = [];

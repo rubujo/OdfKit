@@ -130,10 +130,7 @@ public sealed class OdfTextFontFallbackOptions
     /// <exception cref="ArgumentException">當任一 font-face 宣告的名稱或字型家族為空白時擲出</exception>
     public static OdfTextFontFallbackOptions Custom(string? baseFont, IReadOnlyList<OdfFontFaceInfo> fontFaces, OdfFontContext? fontContext)
     {
-        if (fontFaces is null)
-        {
-            throw new ArgumentNullException(nameof(fontFaces));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(fontFaces, nameof(fontFaces));
 
         // 防禦性複製：呼叫端後續修改原集合不得影響本選項；同時驗證每筆宣告的必要欄位。
         var copy = new OdfFontFaceInfo[fontFaces.Count];

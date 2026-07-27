@@ -11,7 +11,9 @@ public enum OdfStyleHorizontalRel
     /// <summary>
     /// 字元
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Char,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 框架
@@ -329,7 +331,9 @@ public enum OdfNumberTransliterationStyle
     /// <summary>
     /// 長格式
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Long,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 中格式
@@ -339,7 +343,9 @@ public enum OdfNumberTransliterationStyle
     /// <summary>
     /// 短格式
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Short
+#pragma warning restore CA1720
 }
 
 /// <summary>

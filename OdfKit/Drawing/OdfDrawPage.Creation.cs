@@ -64,7 +64,7 @@ public partial class OdfDrawPage
         };
 
         var shapeNode = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -123,7 +123,7 @@ public partial class OdfDrawPage
     public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var shapeNode = OdfNodeFactory.CreateElement("polyline", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -178,11 +178,10 @@ public partial class OdfDrawPage
     /// <returns>The newly added path shape instance. / 新增的路徑圖形執行個體。</returns>
     public OdfShape AddPath(string svgPathData, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
-        if (svgPathData is null)
-            throw new ArgumentNullException(nameof(svgPathData));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(svgPathData, nameof(svgPathData));
 
         var shapeNode = OdfNodeFactory.CreateElement("path", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -239,8 +238,7 @@ public partial class OdfDrawPage
     /// <returns>The newly added polygon shape instance. / 新增的多邊形圖形執行個體。</returns>
     public OdfShape AddPolygon(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
-        if (points is null)
-            throw new ArgumentNullException(nameof(points));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(points, nameof(points));
         var ptList = points.ToList();
         if (ptList.Count == 0)
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_VertexCannotBeEmpty"), nameof(points));
@@ -273,7 +271,7 @@ public partial class OdfDrawPage
         var h = OdfLength.FromPoints(heightPoints);
 
         var shapeNode = OdfNodeFactory.CreateElement("polygon", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -394,7 +392,7 @@ public partial class OdfDrawPage
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_GeometryTypeNullable"), nameof(shapeType));
 
         var shapeNode = OdfNodeFactory.CreateElement("custom-shape", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("shp_");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
@@ -471,7 +469,7 @@ public partial class OdfDrawPage
     public OdfDrawGroup AddGroup(string? name)
     {
         var groupNode = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
-        var id = "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        var id = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("grp_");
         groupNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
         groupNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         if (!string.IsNullOrWhiteSpace(name))

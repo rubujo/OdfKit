@@ -271,7 +271,7 @@ public sealed partial class OdfScriptManager
         return null;
     }
 
-    private string ValidateScriptingEntryPath(string path)
+    private static string ValidateScriptingEntryPath(string path)
     {
         if (path is null)
         {

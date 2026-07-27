@@ -165,8 +165,7 @@ internal static class OdfPackageSaver
     /// </summary>
     internal static void SaveToStream(OdfPackage package, Stream destination, bool includeRdfMetadata)
     {
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
 
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         RunEncryptedPipeline(
@@ -192,8 +191,7 @@ internal static class OdfPackageSaver
         bool includeRdfMetadata,
         CancellationToken cancellationToken = default)
     {
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
 
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         await RunEncryptedPipelineAsync(
@@ -235,47 +233,45 @@ internal static class OdfPackageSaver
 
         try
         {
-            if (ctx.HasActiveEncryption)
+            try
             {
-                snapshots = CaptureEntrySnapshots(ctx);
-                OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
-                encrypted = true;
+                if (ctx.HasActiveEncryption)
+                {
+                    snapshots = CaptureEntrySnapshots(ctx);
+                    OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+                    encrypted = true;
+                }
+
+                body();
+            }
+            catch
+            {
+                if (snapshots is not null)
+                {
+                    RestoreEntrySnapshots(snapshots);
+                    encrypted = false;
+                }
+
+                throw;
             }
 
-            body();
-        }
-        catch
-        {
-            if (snapshots is not null)
+            if (ctx.HasActiveEncryption && encrypted)
             {
-                RestoreEntrySnapshots(snapshots);
-                encrypted = false;
+                try
+                {
+                    OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+                }
+                catch
+                {
+                    if (snapshots is not null)
+                        RestoreEntrySnapshots(snapshots);
+                    throw;
+                }
             }
-
-            throw;
         }
         finally
         {
-            try
-            {
-                if (ctx.HasActiveEncryption && encrypted)
-                {
-                    try
-                    {
-                        OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
-                    }
-                    catch
-                    {
-                        if (snapshots is not null)
-                            RestoreEntrySnapshots(snapshots);
-                        throw;
-                    }
-                }
-            }
-            finally
-            {
-                DisposeEntrySnapshots(snapshots);
-            }
+            DisposeEntrySnapshots(snapshots);
         }
     }
 
@@ -297,47 +293,45 @@ internal static class OdfPackageSaver
 
         try
         {
-            if (ctx.HasActiveEncryption)
+            try
             {
-                snapshots = CaptureEntrySnapshots(ctx);
-                OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
-                encrypted = true;
+                if (ctx.HasActiveEncryption)
+                {
+                    snapshots = CaptureEntrySnapshots(ctx);
+                    OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+                    encrypted = true;
+                }
+
+                await body().ConfigureAwait(false);
+            }
+            catch
+            {
+                if (snapshots is not null)
+                {
+                    RestoreEntrySnapshots(snapshots);
+                    encrypted = false;
+                }
+
+                throw;
             }
 
-            await body().ConfigureAwait(false);
-        }
-        catch
-        {
-            if (snapshots is not null)
+            if (ctx.HasActiveEncryption && encrypted)
             {
-                RestoreEntrySnapshots(snapshots);
-                encrypted = false;
+                try
+                {
+                    OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+                }
+                catch
+                {
+                    if (snapshots is not null)
+                        RestoreEntrySnapshots(snapshots);
+                    throw;
+                }
             }
-
-            throw;
         }
         finally
         {
-            try
-            {
-                if (ctx.HasActiveEncryption && encrypted)
-                {
-                    try
-                    {
-                        OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
-                    }
-                    catch
-                    {
-                        if (snapshots is not null)
-                            RestoreEntrySnapshots(snapshots);
-                        throw;
-                    }
-                }
-            }
-            finally
-            {
-                DisposeEntrySnapshots(snapshots);
-            }
+            DisposeEntrySnapshots(snapshots);
         }
     }
 

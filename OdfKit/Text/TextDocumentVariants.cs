@@ -387,10 +387,7 @@ public sealed class TextMasterDocument : TextDocument
     /// <exception cref="InvalidOperationException">Thrown when the specified sub-document references are scattered across different parent nodes and cannot be reordered. / 當指定的子文件參照分散於不同父節點下，無法重新排序時擲出。</exception>
     public void ReorderSubDocumentReferences(IReadOnlyList<string> orderedSectionNames)
     {
-        if (orderedSectionNames is null)
-        {
-            throw new ArgumentNullException(nameof(orderedSectionNames));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(orderedSectionNames, nameof(orderedSectionNames));
 
         List<OdfNode> sections = [];
         OdfNode? parent = null;

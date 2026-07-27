@@ -46,10 +46,7 @@ public sealed class OdtOperationLog
     /// <exception cref="JsonException">Thrown when the documented condition occurs. / 當 JSON 格式或安全限制不符時擲出。</exception>
     public static OdtOperationLog Parse(string json, OdtOperationCompatibilityOptions? options = null)
     {
-        if (json is null)
-        {
-            throw new ArgumentNullException(nameof(json));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(json, nameof(json));
 
         options ??= new OdtOperationCompatibilityOptions();
         OdtOperationSafetyOptions safety = options.Safety;

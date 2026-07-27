@@ -24,7 +24,7 @@ namespace OdfKit.Tests
         public void TestPlaceholderTypesEnumParsing()
         {
             // Verify that all possible values of OdfPlaceholderType roundtrip correctly
-            foreach (OdfPlaceholderType type in Enum.GetValues(typeof(OdfPlaceholderType)))
+            foreach (OdfPlaceholderType type in Enum.GetValues<OdfPlaceholderType>())
             {
                 string kebab = OdfPlaceholderTemplate.TypeToKebab(type);
                 Assert.NotNull(kebab);

@@ -48,7 +48,7 @@ internal class OdfPackageEntry : IDisposable
                     var val = fieldInfo.GetValue(_zipEntry);
                     if (val != null)
                     {
-                        int intVal = Convert.ToInt32(val);
+                        int intVal = Convert.ToInt32(val, System.Globalization.CultureInfo.InvariantCulture);
                         return intVal == 0; // 0 is Stored
                     }
                 }
@@ -81,8 +81,7 @@ internal class OdfPackageEntry : IDisposable
 
     internal void SetContent(Stream stream)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         if (_stream != null && !ReferenceEquals(_stream, stream))
             _stream.Dispose();
@@ -161,7 +160,7 @@ internal class OdfPackageEntry : IDisposable
     /// </summary>
     public void Prefetch()
     {
-        if (!string.IsNullOrEmpty(Name) && (Name.EndsWith("/") || Name.EndsWith("\\")))
+        if (!string.IsNullOrEmpty(Name) && (global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '/') || global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '\\')))
         {
             _bytes = Array.Empty<byte>();
             return;
@@ -225,7 +224,7 @@ internal class OdfPackageEntry : IDisposable
         if (_bytes != null)
             return;
 
-        if (!string.IsNullOrEmpty(Name) && (Name.EndsWith("/") || Name.EndsWith("\\")))
+        if (!string.IsNullOrEmpty(Name) && (global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '/') || global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '\\')))
         {
             _bytes = Array.Empty<byte>();
             return;
@@ -271,7 +270,7 @@ internal class OdfPackageEntry : IDisposable
                                ?? typeof(ZipArchiveEntry).GetField("crc32", BindingFlags.NonPublic | BindingFlags.Instance);
                 if (crcField != null)
                 {
-                    expectedCrc = Convert.ToUInt32(crcField.GetValue(_zipEntry));
+                    expectedCrc = Convert.ToUInt32(crcField.GetValue(_zipEntry), System.Globalization.CultureInfo.InvariantCulture);
                 }
 #endif
                 try
@@ -305,7 +304,7 @@ internal class OdfPackageEntry : IDisposable
             return new MemoryStream(_bytes, false);
         }
 
-        if (!string.IsNullOrEmpty(Name) && (Name.EndsWith("/") || Name.EndsWith("\\")))
+        if (!string.IsNullOrEmpty(Name) && (global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '/') || global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '\\')))
         {
             _bytes = Array.Empty<byte>();
             return new MemoryStream(_bytes, false);

@@ -8,6 +8,15 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Ooxml")]
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Scripting")]
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Html")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Html.WebFonts")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Collaboration")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Rdf")]
+[assembly: InternalsVisibleTo("OdfKit.WebFonts.Hosting.AspNetCore")]
+[assembly: InternalsVisibleTo("OdfKit.WebFonts.Hosting.SystemWeb")]
+[assembly: InternalsVisibleTo("OdfKit.WebFonts.Sidecar")]
+[assembly: InternalsVisibleTo("OdfKit.WebFonts.OpenType")]
+[assembly: InternalsVisibleTo("OdfKit.Cli")]
+[assembly: InternalsVisibleTo("OdfSchemaGenerator")]
 [assembly: InternalsVisibleTo("OdfKit.TrimSmoke")]
 
 namespace OdfKit.Core;

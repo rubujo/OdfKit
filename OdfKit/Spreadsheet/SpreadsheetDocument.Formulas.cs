@@ -33,8 +33,7 @@ public partial class SpreadsheetDocument
     /// <returns>The result. / 符合條件的公式儲存格資訊列舉</returns>
     public IEnumerable<OdfFormulaCellInfo> GetFormulaCells(Func<OdfFormulaCellInfo, bool> predicate)
     {
-        if (predicate is null)
-            throw new ArgumentNullException(nameof(predicate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         foreach (OdfFormulaCellInfo formulaCell in GetFormulaCells())
         {
@@ -105,8 +104,7 @@ public partial class SpreadsheetDocument
     /// <returns>The result. / 實際變更的公式數量</returns>
     public int UpdateFormulas(Func<OdfFormulaCellInfo, string?> updater)
     {
-        if (updater is null)
-            throw new ArgumentNullException(nameof(updater));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(updater, nameof(updater));
 
         int updatedCount = 0;
         foreach (OdfTableSheet sheet in Worksheets)

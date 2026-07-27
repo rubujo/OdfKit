@@ -480,7 +480,7 @@ internal static class OdfTableSheetConditionalFormatEngine
         {
             int pct = i == 0 ? 0 : (int)Math.Round(100.0 * i / entryCount);
             var entry = new OdfNode(OdfNodeType.Element, "formatting-entry", calcextNs, "calcext");
-            entry.SetAttribute("value", calcextNs, pct.ToString(), "calcext");
+            entry.SetAttribute("value", calcextNs, pct.ToString(System.Globalization.CultureInfo.InvariantCulture), "calcext");
             entry.SetAttribute("type", calcextNs, "percent", "calcext");
             iconSetNode.AppendChild(entry);
         }

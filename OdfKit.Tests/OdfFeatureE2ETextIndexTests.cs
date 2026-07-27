@@ -11,7 +11,7 @@ namespace OdfKit.Tests
     {
         #region Feature 1: ODT TOC / Index
         [Fact]
-        public void F1_Toc_HappyPath()
+        public void F1TocHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -26,7 +26,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F1_AlphabeticalIndex_HappyPath()
+        public void F1AlphabeticalIndexHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -40,7 +40,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F1_Bibliography_HappyPath()
+        public void F1BibliographyHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -54,7 +54,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F1_TableIndex_HappyPath()
+        public void F1TableIndexHappyPath()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -68,7 +68,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F1_TOC_IndexBodyStructure()
+        public void F1TOCIndexBodyStructure()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);

@@ -18,7 +18,7 @@ namespace OdfKit.Tests
         // ─── ROW HEIGHTS BOUNDARY & STRESS TESTS ───
 
         [Fact]
-        public void WriteStartRow_NegativeHeight_FailsOrConvertsToNegativeCm()
+        public void WriteStartRowNegativeHeightFailsOrConvertsToNegativeCm()
         {
             // Verify negative height behavior
             using var ms = new MemoryStream();
@@ -48,7 +48,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void WriteStartRow_NaNOrInfinityHeight_ThrowsOrWritesInvalidValues()
+        public void WriteStartRowNaNOrInfinityHeightThrowsOrWritesInvalidValues()
         {
             // NaN
             using (var ms = new MemoryStream())
@@ -98,7 +98,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void WriteStartRow_UseOptimalAndHeightTogether_PrioritizesOptimalHeight()
+        public void WriteStartRowUseOptimalAndHeightTogetherPrioritizesOptimalHeight()
         {
             using var ms = new MemoryStream();
             using (var writer = new OdsStreamWriter(ms))
@@ -131,7 +131,7 @@ namespace OdfKit.Tests
         // ─── HASH MATCHING EDGE CASES ───
 
         [Fact]
-        public void ComputeHash_NullOrEmptyChecksumType_ThrowsExceptions()
+        public void ComputeHashNullOrEmptyChecksumTypeThrowsExceptions()
         {
             // ComputeHash is null-safe for static string.Equals, returning false, so it falls to NotSupportedException instead of ArgumentNullException
             Assert.Throws<NotSupportedException>(() =>
@@ -142,7 +142,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void ComputeHash_VaryingCasingAndWhitespace_HandlesStandardTypesCorrectly()
+        public void ComputeHashVaryingCasingAndWhitespaceHandlesStandardTypesCorrectly()
         {
             byte[] data = [1, 2, 3];
             byte[] expectedHash = OdfEncryption.ComputeHash(data, "SHA256");
@@ -162,7 +162,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void ComputeHash_EmptyDataArray_ComputesValidHash()
+        public void ComputeHashEmptyDataArrayComputesValidHash()
         {
             byte[] data = [];
             byte[] sha256Hash = OdfEncryption.ComputeHash(data, "SHA256");
@@ -176,7 +176,7 @@ namespace OdfKit.Tests
         // ─── ENCRYPTION & DECRYPTION BOUNDARY & STRESS TESTS ───
 
         [Fact]
-        public void Pbkdf2_ZeroOrNegativeIterations_ThrowsOrReturnsEmpty()
+        public void Pbkdf2ZeroOrNegativeIterationsThrowsOrReturnsEmpty()
         {
             byte[] password = Encoding.UTF8.GetBytes("password");
             byte[] salt = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -207,7 +207,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void Pbkdf2_NegativeKeyLength_ThrowsOverflowException()
+        public void Pbkdf2NegativeKeyLengthThrowsOverflowException()
         {
             byte[] password = Encoding.UTF8.GetBytes("password");
             byte[] salt = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -218,7 +218,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void DecryptEntry_WithWhitespaceInStartKeyGenName_ThrowsOrFails()
+        public void DecryptEntryWithWhitespaceInStartKeyGenNameThrowsOrFails()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("plain text");
             byte[] ciphertext = OdfEncryption.EncryptEntry(plaintext, "pwd", OdfEncryptionAlgorithm.Aes256, out byte[] iv, out byte[] salt, out byte[] checksum);

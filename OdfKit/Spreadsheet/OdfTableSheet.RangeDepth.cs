@@ -28,10 +28,7 @@ public partial class OdfTableSheet
     /// <returns>The range write report. / 範圍寫入報告。</returns>
     public OdfRangeWriteReport SetValues(OdfCellAddress startAddress, object?[,] values, OdfRangeWriteOptions? options)
     {
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         return SetValues(startAddress, ToRows(values), options);
     }
@@ -56,10 +53,7 @@ public partial class OdfTableSheet
     /// <returns>The range write report. / 範圍寫入報告。</returns>
     public OdfRangeWriteReport SetValues(OdfCellAddress startAddress, IEnumerable<IEnumerable<object?>> rows, OdfRangeWriteOptions? options)
     {
-        if (rows is null)
-        {
-            throw new ArgumentNullException(nameof(rows));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(rows, nameof(rows));
 
         ValidateStartAddress(startAddress);
         options ??= OdfRangeWriteOptions.Default;

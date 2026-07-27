@@ -131,7 +131,7 @@ public class OdfSigningOptions
     /// Gets or sets a value indicating whether certificate revocation is checked.
     /// 取得或設定是否檢查憑證撤銷狀態。
     /// </summary>
-    public bool CheckRevocation { get; set; } = false;
+    public bool CheckRevocation { get; set; }
 
     /// <summary>
     /// Gets or sets the HTTP client used to fetch CRLs and contact timestamp authorities.
@@ -143,13 +143,13 @@ public class OdfSigningOptions
     /// Gets or sets a value indicating whether untrusted root certificates are accepted during validation.
     /// 取得或設定驗證期間是否接受不受信任的根憑證。
     /// </summary>
-    public bool AllowUntrustedRoot { get; set; } = false;
+    public bool AllowUntrustedRoot { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether untrusted timestamp certificates are accepted.
     /// 取得或設定是否接受不受信任的時間戳記憑證。
     /// </summary>
-    public bool AllowUntrustedTimestamp { get; set; } = false;
+    public bool AllowUntrustedTimestamp { get; set; }
 
     /// <summary>
     /// Gets additional certificates used when building signing or validation chains.

@@ -32,6 +32,7 @@ public class CliTests : IDisposable
     public void Dispose()
     {
         OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

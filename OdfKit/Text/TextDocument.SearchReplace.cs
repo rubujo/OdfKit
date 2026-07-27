@@ -18,8 +18,7 @@ public partial class TextDocument
     /// </summary>
     public new OdfTextReplaceResult ReplaceText(string search, string replacement)
     {
-        if (string.IsNullOrEmpty(search))
-            throw new ArgumentException(null, nameof(search));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNullOrEmpty(search, nameof(search));
 
         // 尋找與取代共用單次文件走訪（見 TextDocumentSearchReplaceEngine.ScanParagraphs），
         // 不再先組完整文件字串找一次、又各自逐段落取代一次。
@@ -44,8 +43,7 @@ public partial class TextDocument
     /// <returns>The matching text locations. / 符合的文字位置。</returns>
     public IReadOnlyList<OdfTextMatch> FindText(string search, OdfTextQueryOptions? options)
     {
-        if (string.IsNullOrEmpty(search))
-            throw new ArgumentException(null, nameof(search));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNullOrEmpty(search, nameof(search));
         options ??= OdfTextQueryOptions.Default;
         if (options.MaxResults < 0)
             throw new ArgumentOutOfRangeException(nameof(options));

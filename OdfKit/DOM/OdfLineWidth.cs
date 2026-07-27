@@ -201,13 +201,13 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     private static bool TryParsePercent(string value, out decimal percent)
     {
         percent = 0;
-        if (!value.EndsWith("%", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.EndsWith(value, '%'))
         {
             return false;
         }
 
         string number = value.Substring(0, value.Length - 1);
-        if (number.Length == 0 || number.StartsWith("+", StringComparison.Ordinal))
+        if (number.Length == 0 || global::OdfKit.Internal.OdfStringHelper.StartsWith(number, '+'))
         {
             return false;
         }

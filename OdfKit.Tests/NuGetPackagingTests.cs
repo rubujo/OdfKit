@@ -28,7 +28,7 @@ public class NuGetPackagingTests
     /// </summary>
     [Theory]
     [MemberData(nameof(PackableProjectPaths))]
-    public void PackableProject_DeclaresDualTargetFrameworks(string packageId, string projectRelativePath)
+    public void PackableProjectDeclaresDualTargetFrameworks(string packageId, string projectRelativePath)
     {
         Assert.False(string.IsNullOrWhiteSpace(packageId));
         string tfms = ReadProperty(projectRelativePath, "TargetFrameworks")
@@ -42,7 +42,7 @@ public class NuGetPackagingTests
     /// 驗證核心套件具備 README 與授權中繼資料。
     /// </summary>
     [Fact]
-    public void OdfKit_CorePackage_HasReadmeAndLicenseMetadata()
+    public void OdfKitCorePackageHasReadmeAndLicenseMetadata()
     {
         Assert.Equal("OdfKit", ReadProperty("OdfKit/OdfKit.csproj", "PackageId"));
         Assert.Equal("CC0-1.0", ReadProperty("OdfKit/OdfKit.csproj", "PackageLicenseExpression"));
@@ -54,7 +54,7 @@ public class NuGetPackagingTests
     /// 驗證 Imaging 套件明確攜帶 Linux、Windows 與 macOS 原生資產相依。
     /// </summary>
     [Fact]
-    public void ImagingPackage_DeclaresAllDesktopNativeAssets()
+    public void ImagingPackageDeclaresAllDesktopNativeAssets()
     {
         string projectPath = Path.Combine(
             RepoRoot,
@@ -79,7 +79,7 @@ public class NuGetPackagingTests
     /// 驗證 NuGet CI 僅封裝一次，並在四種桌面 runner 測試同一份不可變快照。
     /// </summary>
     [Fact]
-    public void NuGetWorkflow_UsesSinglePackAndFourPlatformConsumerMatrix()
+    public void NuGetWorkflowUsesSinglePackAndFourPlatformConsumerMatrix()
     {
         string workflow = File.ReadAllText(Path.Combine(RepoRoot, ".github", "workflows", "nuget-pack.yml"));
         string setupAction = File.ReadAllText(
@@ -113,7 +113,7 @@ public class NuGetPackagingTests
     /// 驗證 Windows x64 套件閘門會以 net48 consumer 執行全部可發佈套件。
     /// </summary>
     [Fact]
-    public void NetFramework48Consumer_IsIntegratedWithPackageGateAndWorkflow()
+    public void NetFramework48ConsumerIsIntegratedWithPackageGateAndWorkflow()
     {
         string projectPath = Path.Combine(
             RepoRoot,

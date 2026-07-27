@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace MockSoffice
 {
-    class Program
+internal static class Program
     {
         static int Main(string[] args)
         {
@@ -119,7 +119,7 @@ namespace MockSoffice
                 File.WriteAllLines(argsPath, args);
 
                 string filePath = Path.Combine(outDir, "document." + format);
-                if (format.StartsWith("pdf"))
+            if (format.StartsWith("pdf", StringComparison.Ordinal))
                 {
                     File.WriteAllText(filePath, "%PDF-1.4\n%mock pdf");
                 }

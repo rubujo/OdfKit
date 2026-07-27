@@ -19,7 +19,7 @@ public class DatabaseBoundaryTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void AddTable_BlankName_ThrowsArgumentException(string blankName)
+    public void AddTableBlankNameThrowsArgumentException(string blankName)
     {
         using var database = DatabaseDocument.Create();
         Assert.Throws<ArgumentException>(() => database.AddTable(blankName));
@@ -29,7 +29,7 @@ public class DatabaseBoundaryTests
     /// 驗證 <see cref="DatabaseDocument.AddQuery"/> 在名稱或命令為空白時擲出 <see cref="ArgumentException"/>。
     /// </summary>
     [Fact]
-    public void AddQuery_BlankNameOrCommand_ThrowsArgumentException()
+    public void AddQueryBlankNameOrCommandThrowsArgumentException()
     {
         using var database = DatabaseDocument.Create();
         Assert.Throws<ArgumentException>(() => database.AddQuery("", "SELECT 1"));
@@ -41,7 +41,7 @@ public class DatabaseBoundaryTests
     /// 避免產生重複鍵導致 ODB 載入失敗。
     /// </summary>
     [Fact]
-    public void AddTableOrQuery_DuplicateName_ThrowsInvalidOperationException()
+    public void AddTableOrQueryDuplicateNameThrowsInvalidOperationException()
     {
         using var database = DatabaseDocument.Create();
 
@@ -62,7 +62,7 @@ public class DatabaseBoundaryTests
     /// <see langword="false"/>，而非擲出例外或靜默忽略。
     /// </summary>
     [Fact]
-    public void RemoveOperations_NonExistentName_ReturnsFalse()
+    public void RemoveOperationsNonExistentNameReturnsFalse()
     {
         using var database = DatabaseDocument.Create();
 
@@ -80,7 +80,7 @@ public class DatabaseBoundaryTests
     /// 以 <see cref="System.IO.InvalidDataException"/> 中止，而非引發 StackOverflowException 使進程崩潰。
     /// </summary>
     [Fact]
-    public void GetForms_DeeplyNestedComponentCollection_ThrowsInsteadOfStackOverflow()
+    public void GetFormsDeeplyNestedComponentCollectionThrowsInsteadOfStackOverflow()
     {
         const string dbNs = "urn:oasis:names:tc:opendocument:xmlns:database:1.0";
 
@@ -123,7 +123,7 @@ public class DatabaseBoundaryTests
     /// <see cref="DatabaseDocument.RemoveDataSourceSetting"/> 在名稱為空白時擲出 <see cref="ArgumentException"/>。
     /// </summary>
     [Fact]
-    public void RemoveOperations_BlankName_ThrowsArgumentException()
+    public void RemoveOperationsBlankNameThrowsArgumentException()
     {
         using var database = DatabaseDocument.Create();
 
@@ -138,7 +138,7 @@ public class DatabaseBoundaryTests
     /// <see langword="null"/>，且不影響既有資料表／查詢／設定的查詢結果。
     /// </summary>
     [Fact]
-    public void FindOperations_NonExistentName_ReturnsNull()
+    public void FindOperationsNonExistentNameReturnsNull()
     {
         using var database = DatabaseDocument.Create();
         database.AddTable("Customers", "SELECT * FROM \"Customers\"");

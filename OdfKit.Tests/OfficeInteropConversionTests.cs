@@ -29,7 +29,7 @@ public sealed class OfficeInteropConversionTests
     /// 驗證 ODT → DOCX 結果可由 Microsoft Word 開啟並匯出 PDF。
     /// </summary>
     [Fact]
-    public void WordAndLibreOffice_RenderConvertedDocxToPdf()
+    public void WordAndLibreOfficeRenderConvertedDocxToPdf()
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -84,7 +84,7 @@ public sealed class OfficeInteropConversionTests
     /// 驗證 ODS → XLSX 結果可由 Microsoft Excel 開啟並匯出 PDF。
     /// </summary>
     [Fact]
-    public void ExcelAndLibreOffice_RenderConvertedXlsxToPdf()
+    public void ExcelAndLibreOfficeRenderConvertedXlsxToPdf()
     {
         if (!OperatingSystem.IsWindows())
         {
@@ -132,7 +132,7 @@ public sealed class OfficeInteropConversionTests
             // 對「未顯式設定樣式」的圖表區各自套用不同預設主題（LO 預設灰底繪圖區；
             // Excel 預設白底圓角邊框），即使圖例與資料數列色彩完全一致（已以真機
             // Excel 驗證圖例存在且長條顏色一致，見 OoxmlConversionTests
-            // .OdfToXlsx_PreservesEmbeddedChartStructure 的結構層斷言），像素級
+            // .OdfToXlsxPreservesEmbeddedChartStructure 的結構層斷言），像素級
             // 差異仍會落在 9% ~ 10% 區間，無法收斂至 5%。門檻放寬至 15% 以反映此
             // 跨應用程式預設主題落差，而非真正的資料保真度缺陷。
             AssertPdfVisualDifferenceBelow(libreOfficePdfPath, excelPdfPath, 15d);
@@ -155,7 +155,7 @@ public sealed class OfficeInteropConversionTests
     /// 結構，是真實 PowerPoint MainSequence 低估第二步驟的根因，修正後以此測試鎖定。
     /// </remarks>
     [Fact]
-    public void PowerPoint_ChainedAnimationSecondStepReportsCorrectMainSequenceCount()
+    public void PowerPointChainedAnimationSecondStepReportsCorrectMainSequenceCount()
     {
         if (!OperatingSystem.IsWindows())
         {

@@ -75,6 +75,18 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     /// </summary>
     /// <returns>32 位元有號整數雜湊碼</returns>
     public override int GetHashCode() => OdfHashing.Combine(LocalName, NamespaceUri);
+
+    /// <summary>
+    /// Determines whether two attribute names are equal.
+    /// 判斷兩個屬性名稱是否相等。
+    /// </summary>
+    public static bool operator ==(OdfAttributeName left, OdfAttributeName right) => left.Equals(right);
+
+    /// <summary>
+    /// Determines whether two attribute names are different.
+    /// 判斷兩個屬性名稱是否不同。
+    /// </summary>
+    public static bool operator !=(OdfAttributeName left, OdfAttributeName right) => !left.Equals(right);
 }
 
 /// <summary>

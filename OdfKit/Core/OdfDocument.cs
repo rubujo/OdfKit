@@ -341,7 +341,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     {
         Package = package ?? throw new ArgumentNullException(nameof(package));
         SubPath = subPath ?? string.Empty;
-        if (!string.IsNullOrEmpty(SubPath) && !SubPath.EndsWith("/"))
+        if (!string.IsNullOrEmpty(SubPath) && !global::OdfKit.Internal.OdfStringHelper.EndsWith(SubPath, '/'))
         {
             SubPath += "/";
         }
@@ -634,8 +634,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="certificate">The certificate used to sign the PDF; if null, the PDF is not signed. / 用於簽章 PDF 的憑證；若為 null 則不簽章。</param>
     public void ExportToPdf(Stream pdfStream, X509Certificate2? certificate)
     {
-        if (pdfStream is null)
-            throw new ArgumentNullException(nameof(pdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pdfStream, nameof(pdfStream));
 
         var renderer = OdfRendererRegistry.Instance;
         if (renderer is null)

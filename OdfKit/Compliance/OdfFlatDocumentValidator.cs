@@ -43,10 +43,8 @@ public static class OdfFlatDocumentValidator
     /// <returns>The validation report. / 驗證結果報告。</returns>
     public static OdfValidationReport Validate(Stream stream, OdfValidationOptions options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         string? fileName = options.FileName;
         OdfComplianceProfile? profile = options.Profile;

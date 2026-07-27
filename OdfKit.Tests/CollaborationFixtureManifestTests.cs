@@ -45,7 +45,7 @@ public sealed class CollaborationFixtureManifestTests
     /// 驗證 manifest schema、來源邊界、路徑與 SHA-256。
     /// </summary>
     [Fact]
-    public void Manifest_DeclaresCleanRoomCoverageAndValidHashes()
+    public void ManifestDeclaresCleanRoomCoverageAndValidHashes()
     {
         string fixtureRoot = GetCollaborationFixtureRoot();
         using JsonDocument manifest = LoadManifest();
@@ -108,7 +108,7 @@ public sealed class CollaborationFixtureManifestTests
     /// 驗證所有 fixture 的 parse、replay、safety 與 strict 期望。
     /// </summary>
     [Fact]
-    public void Fixtures_HonorManifestReplayAndSafetyExpectations()
+    public void FixturesHonorManifestReplayAndSafetyExpectations()
     {
         string fixtureRoot = GetCollaborationFixtureRoot();
         using JsonDocument manifest = LoadManifest();
@@ -197,8 +197,7 @@ public sealed class CollaborationFixtureManifestTests
 
     private static string ComputeSha256(string path)
     {
-        using SHA256 sha256 = SHA256.Create();
-        byte[] hash = sha256.ComputeHash(NormalizeLineEndings(File.ReadAllBytes(path)));
+        byte[] hash = SHA256.HashData(NormalizeLineEndings(File.ReadAllBytes(path)));
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 

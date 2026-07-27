@@ -21,8 +21,7 @@ public partial class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點時擲出</exception>
     public void AppendChild(OdfNode child)
     {
-        if (child is null)
-            throw new ArgumentNullException(nameof(child));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(child, nameof(child));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
@@ -45,10 +44,8 @@ public partial class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點，或參考節點不是此節點的子節點時擲出</exception>
     public void InsertBefore(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null)
-            throw new ArgumentNullException(nameof(newChild));
-        if (refChild is null)
-            throw new ArgumentNullException(nameof(refChild));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(newChild, nameof(newChild));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(refChild, nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
@@ -76,10 +73,8 @@ public partial class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點，或參考節點不是此節點的子節點時擲出</exception>
     public void InsertAfter(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null)
-            throw new ArgumentNullException(nameof(newChild));
-        if (refChild is null)
-            throw new ArgumentNullException(nameof(refChild));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(newChild, nameof(newChild));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(refChild, nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
@@ -106,8 +101,7 @@ public partial class OdfNode
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="child"/> is <see langword="null"/>. / 當 <paramref name="child"/> 為 <see langword="null"/> 時擲出。</exception>
     public bool RemoveChild(OdfNode child)
     {
-        if (child is null)
-            throw new ArgumentNullException(nameof(child));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(child, nameof(child));
 
         if (child.Parent != this)
         {

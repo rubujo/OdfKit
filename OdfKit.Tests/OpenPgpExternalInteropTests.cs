@@ -19,7 +19,7 @@ public sealed class OpenPgpExternalInteropTests
     /// 以真實金鑰驗證雙向工作階段金鑰傳送與規範形狀的 ODF 封裝。
     /// </summary>
     [Fact]
-    public void GnuPg_DecryptsOdfKitSessionKey_AndPackageRoundTrips()
+    public void GnuPgDecryptsOdfKitSessionKeyAndPackageRoundTrips()
     {
         if (!string.Equals(
                 Environment.GetEnvironmentVariable("ODFKIT_RUN_GNUPG_INTEROP"),
@@ -34,7 +34,7 @@ public sealed class OpenPgpExternalInteropTests
             ?? Path.GetTempPath();
         string tempRoot = Path.Combine(
             baseTemp,
-            "opgp-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("opgp-"));
         string gpgHome = Path.Combine(tempRoot, "g");
         Directory.CreateDirectory(gpgHome);
 
@@ -133,9 +133,7 @@ public sealed class OpenPgpExternalInteropTests
                 fingerprint,
                 "--cipher-algo",
                 "AES256",
-                "--aead-algo",
-                "OCB",
-                "--force-aead",
+                "--force-ocb",
                 "--compress-algo",
                 "none",
                 "--output",

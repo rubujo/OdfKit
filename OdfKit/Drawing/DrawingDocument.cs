@@ -258,9 +258,7 @@ public partial class DrawingDocument : OdfDocument
     public void RemovePage(int pageIndex)
     {
         if (pageIndex < 0 || pageIndex >= _pages.Count)
-        {
             throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
 
         OdfDrawPage page = _pages[pageIndex];
         GetDrawingNode().RemoveChild(page.Node);
@@ -275,10 +273,7 @@ public partial class DrawingDocument : OdfDocument
     /// <returns><see langword="true"/> if the page was removed; otherwise, <see langword="false"/>. / 若已移除頁面則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool RemovePage(OdfDrawPage page)
     {
-        if (page is null)
-        {
-            throw new ArgumentNullException(nameof(page));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(page, nameof(page));
         int index = _pages.IndexOf(page);
         if (index < 0)
         {
@@ -435,6 +430,7 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="localName">The local name of the element. / 元素的區域名稱。</param>
     /// <param name="nsUri">The namespace URI. / 命名空間 URI。</param>
     /// <returns>The found child element node, or <c>null</c> if none is found. / 找到的子元素節點，若無則為 <c>null</c>。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
     {
         foreach (var child in parent.Children)

@@ -162,9 +162,9 @@ internal static partial class OdfProfileRuleValidator
             return;
         }
 
-        bool isScriptElement = reader.LocalName.IndexOf("script", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            reader.LocalName.IndexOf("event-listener", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            reader.NamespaceURI.IndexOf(":script:", StringComparison.OrdinalIgnoreCase) >= 0;
+        bool isScriptElement = global::OdfKit.Internal.OdfStringHelper.Contains(reader.LocalName, "script", StringComparison.OrdinalIgnoreCase) ||
+            global::OdfKit.Internal.OdfStringHelper.Contains(reader.LocalName, "event-listener", StringComparison.OrdinalIgnoreCase) ||
+            global::OdfKit.Internal.OdfStringHelper.Contains(reader.NamespaceURI, ":script:", StringComparison.OrdinalIgnoreCase);
         if (!isScriptElement)
         {
             return;

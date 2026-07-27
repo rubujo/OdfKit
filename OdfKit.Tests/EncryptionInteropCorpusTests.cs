@@ -41,7 +41,7 @@ public class EncryptionInteropCorpusTests
     /// </summary>
     [Theory]
     [MemberData(nameof(FixtureIds))]
-    public void ForeignEncryptedPackage_DecryptsToExpectedText(string fixtureId)
+    public void ForeignEncryptedPackageDecryptsToExpectedText(string fixtureId)
     {
         InteropManifest manifest = LoadManifest();
         InteropFixture fixture = manifest.Fixtures.Single(f => f.Id == fixtureId);
@@ -59,7 +59,7 @@ public class EncryptionInteropCorpusTests
     /// </summary>
     [Theory]
     [MemberData(nameof(FixtureIds))]
-    public void ForeignEncryptedPackage_DeclaresExpectedEncryptionParameters(string fixtureId)
+    public void ForeignEncryptedPackageDeclaresExpectedEncryptionParameters(string fixtureId)
     {
         InteropManifest manifest = LoadManifest();
         InteropFixture fixture = manifest.Fixtures.Single(f => f.Id == fixtureId);
@@ -100,7 +100,7 @@ public class EncryptionInteropCorpusTests
     /// </summary>
     [Theory]
     [MemberData(nameof(FixtureIds))]
-    public void ForeignEncryptedPackage_SurvivesLoadAndResave(string fixtureId)
+    public void ForeignEncryptedPackageSurvivesLoadAndResave(string fixtureId)
     {
         InteropManifest manifest = LoadManifest();
         InteropFixture fixture = manifest.Fixtures.Single(f => f.Id == fixtureId);

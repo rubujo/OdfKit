@@ -71,15 +71,15 @@ internal static class OdfManifestLoader
         if (string.IsNullOrWhiteSpace(path))
             return false;
 
-        if (path.StartsWith("/", StringComparison.Ordinal) ||
-            path.Contains("\\") ||
-            path.Contains(":") ||
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(path, '/') ||
+            path.Contains('\\') ||
+            path.Contains(':') ||
             path.Contains("//"))
         {
             return false;
         }
 
-        string normalized = path.EndsWith("/", StringComparison.Ordinal)
+        string normalized = global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/')
             ? path.Substring(0, path.Length - 1)
             : path;
 

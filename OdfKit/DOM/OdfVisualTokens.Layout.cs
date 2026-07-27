@@ -336,7 +336,9 @@ public enum OdfStyleVerticalRel
     /// <summary>
     /// 字元
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Char,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 框架

@@ -180,7 +180,7 @@ internal static class Cff2Subsetter
 
     private static (IReadOnlyList<ReadOnlyMemory<byte>> Subroutines, int DefaultVariationIndex) ReadPrivateDict(
         byte[] source,
-        IReadOnlyDictionary<int, double?[]> fontDict,
+        Dictionary<int, double?[]> fontDict,
         int[] variationRegionCounts)
     {
         if (!fontDict.TryGetValue(PrivateOperator, out double?[]? operands))
@@ -511,7 +511,7 @@ internal static class Cff2Subsetter
     private static Dictionary<int, double?[]> ReadDict(
         ReadOnlySpan<byte> data,
         string detail,
-        ISet<int> allowedOperators,
+        HashSet<int> allowedOperators,
         int[]? variationRegionCounts)
     {
         var result = new Dictionary<int, double?[]>();
@@ -691,7 +691,7 @@ internal static class Cff2Subsetter
     }
 
     private static int GetOffset(
-        IReadOnlyDictionary<int, double?[]> dict,
+        Dictionary<int, double?[]> dict,
         int operation,
         int operandCount,
         string detail)
@@ -759,7 +759,7 @@ internal static class Cff2Subsetter
 
         internal int NextOffset { get; } = nextOffset;
 
-        internal IReadOnlyList<ReadOnlyMemory<byte>> GetPrograms(byte[] source)
+        internal ReadOnlyMemory<byte>[] GetPrograms(byte[] source)
         {
             var result = new ReadOnlyMemory<byte>[Objects.Count];
             for (int index = 0; index < Objects.Count; index++)

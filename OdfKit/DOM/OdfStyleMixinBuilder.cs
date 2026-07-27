@@ -210,15 +210,9 @@ public static class OdfStyleMixinExtensions
     /// <exception cref="ArgumentNullException">當 <paramref name="element"/> 或 <paramref name="configure"/> 為 <see langword="null"/> 時擲出</exception>
     public static TElement ApplyStyle<TElement>(this TElement element, Action<OdfStyleMixinBuilder> configure, string? family) where TElement : OdfElement
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(element, nameof(element));
 
-        if (configure is null)
-        {
-            throw new ArgumentNullException(nameof(configure));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var builder = new OdfStyleMixinBuilder(element, family);
         configure(builder);
@@ -277,15 +271,9 @@ public static class OdfStyleMixinExtensions
     /// </remarks>
     public static TElement CopyFormatFrom<TElement>(this TElement element, OdfElement source, string? family) where TElement : OdfElement
     {
-        if (element is null)
-        {
-            throw new ArgumentNullException(nameof(element));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(element, nameof(element));
 
-        if (source is null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(source, nameof(source));
 
         string resolvedFamily = string.IsNullOrWhiteSpace(family)
             ? OdfStyleMixinBuilder.InferStyleFamily(element)

@@ -260,15 +260,9 @@ public partial class OdfParagraph
     /// <returns>The collection of added text runs. / 新增的文字片段集合。</returns>
     public IReadOnlyList<OdfTextRun> AddText(string text, OdfTextFontFallbackOptions options)
     {
-        if (text is null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         if (options.DeclareDefaultCjkFallbackFonts)
         {

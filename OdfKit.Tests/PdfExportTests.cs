@@ -20,7 +20,7 @@ public class PdfExportTests
     /// 驗證含標題與段落的 ODT 可匯出為非空 PDF 位元組流。
     /// </summary>
     [Fact]
-    public void Export_TextDocumentWithContent_ProducesNonEmptyPdfStream()
+    public void ExportTextDocumentWithContentProducesNonEmptyPdfStream()
     {
         using var doc = TextDocument.Create();
         doc.AddHeading("PDF 測試標題", 1);
@@ -42,7 +42,7 @@ public class PdfExportTests
     /// 驗證空文件可匯出為 PDF 且不拋出例外。
     /// </summary>
     [Fact]
-    public void Export_EmptyDocument_DoesNotThrow()
+    public void ExportEmptyDocumentDoesNotThrow()
     {
         using var doc = TextDocument.Create();
         using var ms = new MemoryStream();
@@ -54,7 +54,7 @@ public class PdfExportTests
     /// 驗證 PDF 轉譯器收到簽章憑證時會產生可驗證的 CMS detached PDF 簽章。
     /// </summary>
     [Fact]
-    public void Renderer_ExportToPdfWithCertificate_WritesVerifiableDetachedSignature()
+    public void RendererExportToPdfWithCertificateWritesVerifiableDetachedSignature()
     {
         using var doc = TextDocument.Create();
         doc.AddParagraph("PDF 簽章測試內容。");
@@ -84,7 +84,7 @@ public class PdfExportTests
     /// 驗證 OdfHybridPdfHelper 可將 ODF 檔案注入 PDF 中，並完整無損地提取回原始位元組。
     /// </summary>
     [Fact]
-    public void HybridPdf_InjectThenExtract_RoundTripsOriginalOdfBytes()
+    public void HybridPdfInjectThenExtractRoundTripsOriginalOdfBytes()
     {
         using var doc = TextDocument.Create();
         doc.AddHeading("混合 PDF 測試文件", 1);
@@ -133,7 +133,7 @@ public class PdfExportTests
         int hexEnd = text.IndexOf('>', hexStart);
         Assert.True(hexEnd > hexStart);
 
-        byte[] contents = Convert.FromHexString(text.Substring(hexStart, hexEnd - hexStart));
+        byte[] contents = Convert.FromHexString(text.AsSpan(hexStart, hexEnd - hexStart));
         return (signedContent.ToArray(), TrimDer(contents));
     }
 

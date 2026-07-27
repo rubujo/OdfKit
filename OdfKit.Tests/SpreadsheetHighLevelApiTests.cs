@@ -82,7 +82,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 InsertChartFromRange 會回傳可繼續編輯的嵌入圖表文件。
     /// </summary>
     [Fact]
-    public void InsertChartFromRange_ReturnsEditableEmbeddedChartDocument()
+    public void InsertChartFromRangeReturnsEditableEmbeddedChartDocument()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -173,7 +173,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetDataValidations"/> 可讀回資料驗證規則。
     /// </summary>
     [Fact]
-    public void GetDataValidations_RoundTripsAfterAdd()
+    public void GetDataValidationsRoundTripsAfterAdd()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -202,7 +202,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedChartDocument"/> 可取得並編輯嵌入圖表。
     /// </summary>
     [Fact]
-    public void GetEmbeddedChartDocument_AllowsEditingTitleAndType()
+    public void GetEmbeddedChartDocumentAllowsEditingTitleAndType()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -227,7 +227,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證嵌入圖表可設定座標軸與序列進階屬性。
     /// </summary>
     [Fact]
-    public void GetEmbeddedChartDocument_AllowsAxisAndSeriesAdvancedEditing()
+    public void GetEmbeddedChartDocumentAllowsAxisAndSeriesAdvancedEditing()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -258,7 +258,7 @@ public class SpreadsheetHighLevelApiTests
     /// 對嵌入圖表所做的修改，只呼叫父文件儲存也可正確持久化並於重新載入後讀回。
     /// </summary>
     [Fact]
-    public void EmbeddedChartDocument_ClearSeriesAndApplyDefinition_PersistsWhenParentSaves()
+    public void EmbeddedChartDocumentClearSeriesAndApplyDefinitionPersistsWhenParentSaves()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -306,7 +306,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedCharts"/> 可讀回嵌入圖表摘要。
     /// </summary>
     [Fact]
-    public void GetEmbeddedCharts_RoundTripsAfterAdd()
+    public void GetEmbeddedChartsRoundTripsAfterAdd()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -334,7 +334,7 @@ public class SpreadsheetHighLevelApiTests
     /// 而不受載入階段既有的 ZIP 項目大小檢查影響。
     /// </summary>
     [Fact]
-    public void GetEmbeddedCharts_SkipsChartExceedingMaxEntrySize()
+    public void GetEmbeddedChartsSkipsChartExceedingMaxEntrySize()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -368,7 +368,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetConditionalFormats"/> 可聚合所有工作表的條件格式規則。
     /// </summary>
     [Fact]
-    public void GetConditionalFormats_AggregatesAllSheets()
+    public void GetConditionalFormatsAggregatesAllSheets()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet1 = document.AddSheet("Sheet1");
@@ -388,7 +388,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetSparklineGroups"/> 可聚合所有工作表的走勢圖群組。
     /// </summary>
     [Fact]
-    public void GetSparklineGroups_AggregatesAllSheets()
+    public void GetSparklineGroupsAggregatesAllSheets()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -407,7 +407,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetNamedRanges"/> 可聚合文件層與工作表層命名範圍。
     /// </summary>
     [Fact]
-    public void GetNamedRanges_AggregatesDocumentAndSheetScopes()
+    public void GetNamedRangesAggregatesDocumentAndSheetScopes()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -427,7 +427,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetNamedExpressions"/> 可聚合文件層與工作表層具名運算式。
     /// </summary>
     [Fact]
-    public void GetNamedExpressions_AggregatesDocumentAndSheetScopes()
+    public void GetNamedExpressionsAggregatesDocumentAndSheetScopes()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -443,7 +443,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetDatabaseRanges"/> 可讀回資料庫範圍、排序與篩選設定。
     /// </summary>
     [Fact]
-    public void GetDatabaseRanges_RoundTripsAfterAdd()
+    public void GetDatabaseRangesRoundTripsAfterAdd()
     {
         using var document = SpreadsheetDocument.Create();
         document.AddSheet("Sheet1");
@@ -519,7 +519,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetPivotTables"/> 可讀回樞紐分析表欄位、排序與篩選設定。
     /// </summary>
     [Fact]
-    public void GetPivotTables_RoundTripsAfterBuild()
+    public void GetPivotTablesRoundTripsAfterBuild()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -556,7 +556,7 @@ public class SpreadsheetHighLevelApiTests
     /// 在文件實際儲存並重新載入後仍能正確讀回。
     /// </summary>
     [Fact]
-    public void GetPivotTables_WithRowHeadersFalse_PersistsAfterSaveAndReload()
+    public void GetPivotTablesWithRowHeadersFalsePersistsAfterSaveAndReload()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -597,7 +597,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetSplitPanes"/> 可讀回各工作表分割窗格設定。
     /// </summary>
     [Fact]
-    public void GetSplitPanes_RoundTripsAfterSplit()
+    public void GetSplitPanesRoundTripsAfterSplit()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Report");
@@ -613,7 +613,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetFrozenPanes"/> 可讀回各工作表凍結窗格設定。
     /// </summary>
     [Fact]
-    public void GetFrozenPanes_RoundTripsAfterFreeze()
+    public void GetFrozenPanesRoundTripsAfterFreeze()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Report");
@@ -1007,7 +1007,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證外部連結快取支援對稱 CRUD，並保留未知設定內容。
     /// </summary>
     [Fact]
-    public void ExternalLinkCachedValues_CrudAndUnknownContentRoundTrip()
+    public void ExternalLinkCachedValuesCrudAndUnknownContentRoundTrip()
     {
         using var document = SpreadsheetDocument.Create();
         OdfExternalLinkManager links = document.ExternalLinks;
@@ -1059,7 +1059,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="SpreadsheetDocument.GetPrintAreas"/> 可讀回各工作表列印範圍。
     /// </summary>
     [Fact]
-    public void GetPrintAreas_RoundTripsAfterSet()
+    public void GetPrintAreasRoundTripsAfterSet()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Report");
@@ -1451,7 +1451,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 <see cref="OdfCell.SetBorders"/> 寫入的框線樣式可儲存並於重新載入後正確讀回。
     /// </summary>
     [Fact]
-    public void SetBorders_WritesAndRoundTripsBorderStyles()
+    public void SetBordersWritesAndRoundTripsBorderStyles()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -1531,7 +1531,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 SetValues、AppendRows 與 GetUsedRange 提供實務批次資料入口。
     /// </summary>
     [Fact]
-    public void RangeDepthHelpers_SetValuesAppendRowsAndUsedRange()
+    public void RangeDepthHelpersSetValuesAppendRowsAndUsedRange()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1566,7 +1566,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證範圍寫入 report 可回報清除、略過與依 key 欄附加。
     /// </summary>
     [Fact]
-    public void RangeDepthHelpers_ReportClearTrailingAndAppendByKeyColumn()
+    public void RangeDepthHelpersReportClearTrailingAndAppendByKeyColumn()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1601,7 +1601,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證嵌入圖表可刷新資料範圍並批次更新序列。
     /// </summary>
     [Fact]
-    public void EmbeddedChart_CanRefreshRangeAndUpdateSeries()
+    public void EmbeddedChartCanRefreshRangeAndUpdateSeries()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1643,7 +1643,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證嵌入圖表可套用 marker 與座標軸格式。
     /// </summary>
     [Fact]
-    public void EmbeddedChart_AppliesMarkerAndAxisFormat()
+    public void EmbeddedChartAppliesMarkerAndAxisFormat()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1678,7 +1678,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 spreadsheet table facade 會寫入 database range、named range、filter、sort 並可調整範圍。
     /// </summary>
     [Fact]
-    public void SpreadsheetTableFacade_WritesDatabaseRangeMetadata()
+    public void SpreadsheetTableFacadeWritesDatabaseRangeMetadata()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1712,7 +1712,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 table facade 會拒絕重複名稱並同步更新同名 named range。
     /// </summary>
     [Fact]
-    public void SpreadsheetTableFacade_RejectsDuplicateAndSyncsNamedRange()
+    public void SpreadsheetTableFacadeRejectsDuplicateAndSyncsNamedRange()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -1745,7 +1745,7 @@ public class SpreadsheetHighLevelApiTests
     /// 驗證 FindTable 取得的 facade 可編輯 filter、sort 並清除 metadata。
     /// </summary>
     [Fact]
-    public void SpreadsheetTableFacade_FindTableEditsAndClearsMetadata()
+    public void SpreadsheetTableFacadeFindTableEditsAndClearsMetadata()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         document.Worksheets.Add("Data").SetValues(

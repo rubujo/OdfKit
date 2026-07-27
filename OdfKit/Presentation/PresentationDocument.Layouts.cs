@@ -139,6 +139,7 @@ public partial class PresentationDocument
     /// <param name="localName">The local name. / 區域名稱。</param>
     /// <param name="nsUri">The namespace URI. / 命名空間 URI。</param>
     /// <returns>The found child node, or <see langword="null"/> if none is found. / 尋找到的子節點，若未找到則為 <see langword="null"/>。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
     {
         foreach (var child in parent.Children)

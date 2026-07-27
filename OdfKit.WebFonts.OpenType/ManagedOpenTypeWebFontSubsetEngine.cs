@@ -62,13 +62,13 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
 
         source.ValidateOutputFormats(request.Formats);
         source.ValidateBrowserTargets(request.RequiredBrowserTargets);
-        IReadOnlyList<int> advertisedScalars = request.Sequences
+        int[] advertisedScalars = request.Sequences
             .SelectMany(sequence => sequence.UnicodeScalars)
             .Where(RequiresGlyph)
             .Distinct()
             .OrderBy(value => value)
             .ToArray();
-        if (advertisedScalars.Count == 0)
+        if (advertisedScalars.Length == 0)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
@@ -171,7 +171,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
             cancellationToken);
     }
 
-    private static IReadOnlyList<UnicodeVariationSequence> CreateVariationSequences(
+    private static UnicodeVariationSequence[] CreateVariationSequences(
         IEnumerable<WebFontTextSequence> sequences)
     {
         var result = new HashSet<UnicodeVariationSequence>();
@@ -218,9 +218,9 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
             || request.Formats.Count == 0
             || request.RequiredBrowserTargets is null
             || request.Sequences.Sum(item => (long)item.UnicodeScalars.Count) > _options.MaxUnicodeScalars
-            || request.Formats.Any(format => !Enum.IsDefined(typeof(WebFontFormat), format))
+            || request.Formats.Any(format => !IsDefinedEnum(format))
             || request.RequiredBrowserTargets.Any(
-                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target)))
+                target => !IsDefinedEnum(target)))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
         }
@@ -229,6 +229,16 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
         {
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
+    }
+
+    private static bool IsDefinedEnum<TEnum>(TEnum value)
+        where TEnum : struct, Enum
+    {
+#if NET6_0_OR_GREATER
+        return Enum.IsDefined(value);
+#else
+        return Enum.IsDefined(typeof(TEnum), value);
+#endif
     }
 
     private string ResolveSource(WebFontFaceIdentity face)
@@ -273,7 +283,7 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
         while (read < bytes.Length)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            int count = await stream.ReadAsync(bytes, read, bytes.Length - read, cancellationToken).ConfigureAwait(false);
+            int count = await ReadAsync(stream, bytes, read, bytes.Length - read, cancellationToken).ConfigureAwait(false);
             if (count == 0)
             {
                 throw DataInvalid("source-truncated");
@@ -283,12 +293,26 @@ public sealed class ManagedOpenTypeWebFontSubsetEngine : IWebFontSubsetEngine, I
         }
 
         var trailing = new byte[1];
-        if (await stream.ReadAsync(trailing, 0, 1, cancellationToken).ConfigureAwait(false) != 0)
+        if (await ReadAsync(stream, trailing, 0, 1, cancellationToken).ConfigureAwait(false) != 0)
         {
             throw DataInvalid("source-size");
         }
 
         return bytes;
+    }
+
+    private static Task<int> ReadAsync(
+        Stream stream,
+        byte[] buffer,
+        int offset,
+        int count,
+        CancellationToken cancellationToken)
+    {
+#if NET6_0_OR_GREATER
+        return stream.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
+#else
+        return stream.ReadAsync(buffer, offset, count, cancellationToken);
+#endif
     }
 
     private async Task<CachedSource> GetVerifiedSourceAsync(

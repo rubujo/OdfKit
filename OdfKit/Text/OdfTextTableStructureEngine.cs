@@ -149,7 +149,7 @@ internal static class OdfTextTableStructureEngine
             parent.InsertBefore(CreateColumn(), referenceColumn);
     }
 
-    private static IReadOnlyList<OdfNode> DeleteColumnDefinitions(OdfNode tableNode, int position, int count)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfNode> DeleteColumnDefinitions(OdfNode tableNode, int position, int count)
     {
         List<OdfNode> columns = GetColumnsList(tableNode);
         List<OdfNode> deletedSnapshots = [];

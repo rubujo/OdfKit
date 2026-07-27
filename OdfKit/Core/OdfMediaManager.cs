@@ -212,12 +212,11 @@ public class OdfMediaManager
 
     private static string ComputeSha256(byte[] bytes)
     {
-        using var sha = SHA256.Create();
-        byte[] hashBytes = sha.ComputeHash(bytes);
+        byte[] hashBytes = global::OdfKit.Internal.OdfHashHelper.Sha256(bytes);
         var sb = new StringBuilder(hashBytes.Length * 2);
         foreach (byte b in hashBytes)
         {
-            sb.Append(b.ToString("x2"));
+            sb.Append(b.ToString("x2", System.Globalization.CultureInfo.InvariantCulture));
         }
         return sb.ToString();
     }

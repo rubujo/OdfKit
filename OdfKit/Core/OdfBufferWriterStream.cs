@@ -34,8 +34,7 @@ internal sealed class OdfBufferWriterStream(IBufferWriter<byte> writer) : Stream
 
     public override void Write(byte[] buffer, int offset, int count)
     {
-        if (buffer is null)
-            throw new ArgumentNullException(nameof(buffer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
         if (offset < 0 || count < 0 || buffer.Length - offset < count)
             throw new ArgumentOutOfRangeException(nameof(offset));
 

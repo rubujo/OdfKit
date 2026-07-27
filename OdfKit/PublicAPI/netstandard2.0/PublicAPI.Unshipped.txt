@@ -18934,11 +18934,11 @@ static OdfKit.Core.OdfMemoryTracker.ReportLoadProfile(long nodeCount, long? allo
 static OdfKit.Core.OdfMemoryTracker.ReportLoadProfile(long nodeCount, long? allocatedBytes, long boxedValueCount, string? label) -> void
 static OdfKit.Core.OdfMemoryTracker.TotalTrackedMemoryWarningThresholdBytes.get -> long
 static OdfKit.Core.OdfMemoryTracker.TotalTrackedMemoryWarningThresholdBytes.set -> void
-static OdfKit.Core.OdfMemoryTracker.Track(System.IntPtr ptr, long size) -> void
-static OdfKit.Core.OdfMemoryTracker.Track(System.IntPtr ptr, long size, string? label) -> void
+static OdfKit.Core.OdfMemoryTracker.Track(System.IntPtr address, long size) -> void
+static OdfKit.Core.OdfMemoryTracker.Track(System.IntPtr address, long size, string? label) -> void
 static OdfKit.Core.OdfMemoryTracker.TrackedAllocationCountWarningThreshold.get -> int
 static OdfKit.Core.OdfMemoryTracker.TrackedAllocationCountWarningThreshold.set -> void
-static OdfKit.Core.OdfMemoryTracker.Untrack(System.IntPtr ptr) -> void
+static OdfKit.Core.OdfMemoryTracker.Untrack(System.IntPtr address) -> void
 static OdfKit.Core.OdfMergeOptions.Default.get -> OdfKit.Core.OdfMergeOptions!
 static OdfKit.Core.OdfNamespaces.GetPrefix(string! namespaceUri) -> string!
 static OdfKit.Core.OdfNamespaces.LookupNamespaceUri(string! prefix) -> string!
@@ -19036,6 +19036,8 @@ static OdfKit.DOM.OdfAngle.FromDegrees(decimal degrees) -> OdfKit.DOM.OdfAngle
 static OdfKit.DOM.OdfAngle.operator !=(OdfKit.DOM.OdfAngle left, OdfKit.DOM.OdfAngle right) -> bool
 static OdfKit.DOM.OdfAngle.operator ==(OdfKit.DOM.OdfAngle left, OdfKit.DOM.OdfAngle right) -> bool
 static OdfKit.DOM.OdfAngle.TryParse(string? value, out OdfKit.DOM.OdfAngle angle) -> bool
+static OdfKit.DOM.OdfAttributeName.operator !=(OdfKit.DOM.OdfAttributeName left, OdfKit.DOM.OdfAttributeName right) -> bool
+static OdfKit.DOM.OdfAttributeName.operator ==(OdfKit.DOM.OdfAttributeName left, OdfKit.DOM.OdfAttributeName right) -> bool
 static OdfKit.DOM.OdfBorderWidths.operator !=(OdfKit.DOM.OdfBorderWidths left, OdfKit.DOM.OdfBorderWidths right) -> bool
 static OdfKit.DOM.OdfBorderWidths.operator ==(OdfKit.DOM.OdfBorderWidths left, OdfKit.DOM.OdfBorderWidths right) -> bool
 static OdfKit.DOM.OdfBorderWidths.TryParse(string? value, out OdfKit.DOM.OdfBorderWidths borderWidths) -> bool

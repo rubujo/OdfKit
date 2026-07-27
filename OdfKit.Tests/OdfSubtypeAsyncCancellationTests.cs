@@ -16,7 +16,7 @@ public class OdfSubtypeAsyncCancellationTests
     /// 預先取消的語彙應使 TextDocument.LoadAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task TextDocument_LoadAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task TextDocumentLoadAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         await using var source = await CreateMinimalOdtStreamAsync(TestContext.Current.CancellationToken);
         source.Position = 0;
@@ -34,7 +34,7 @@ public class OdfSubtypeAsyncCancellationTests
     /// 預先取消的語彙應使 SpreadsheetDocument.LoadAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SpreadsheetDocument_LoadAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SpreadsheetDocumentLoadAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         await using var source = await CreateMinimalOdsStreamAsync(TestContext.Current.CancellationToken);
         source.Position = 0;

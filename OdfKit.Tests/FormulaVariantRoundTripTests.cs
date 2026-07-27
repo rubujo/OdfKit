@@ -18,7 +18,7 @@ public class FormulaVariantRoundTripTests
     /// MathML 公式內容完整保留。
     /// </summary>
     [Fact]
-    public void FormulaDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    public void FormulaDocumentCreateTemplateFromDocumentRoundTripsBackToDocument()
     {
         using var original = FormulaDocument.Create(
             "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>F</mi><mo>=</mo><mi>m</mi><mi>a</mi></math>");
@@ -40,7 +40,7 @@ public class FormulaVariantRoundTripTests
     /// MathML 公式內容完整保留，且 Flat 形態確實可由 OdfKit 自身正確儲存與重新載入。
     /// </summary>
     [Fact]
-    public void FormulaDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void FormulaDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = FormulaDocument.Create(
             "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></math>");
@@ -68,7 +68,7 @@ public class FormulaVariantRoundTripTests
     /// 證明 Flat 公式文件本身（而非僅透過轉換 API）的 round-trip 正確性。
     /// </summary>
     [Fact]
-    public void FlatFormulaDocument_SavesAndReloadsDirectlyAsFlatXmlFile()
+    public void FlatFormulaDocumentSavesAndReloadsDirectlyAsFlatXmlFile()
     {
         string path = Path.Combine(Path.GetTempPath(), $"odfkit-formula-flat-{Guid.NewGuid():N}.fdf");
         try
@@ -97,7 +97,7 @@ public class FormulaVariantRoundTripTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void FormulaVariantConversions_NullSource_ThrowsArgumentNullException()
+    public void FormulaVariantConversionsNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => FormulaTemplateDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => FormulaDocument.CreateFromTemplate(null!));

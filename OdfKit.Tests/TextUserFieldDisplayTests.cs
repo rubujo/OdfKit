@@ -18,7 +18,7 @@ public class TextUserFieldDisplayTests
     /// 驗證 SetFieldValue 可更新 user-field-get 與 user-field-input 顯示內容並完成往返。
     /// </summary>
     [Fact]
-    public void SetFieldValue_UserFields_UpdatesDisplaysAcrossRoundTrip()
+    public void SetFieldValueUserFieldsUpdatesDisplaysAcrossRoundTrip()
     {
         using var template = TextTemplateDocument.Create();
         template.AddUserFieldDeclaration("發文日期", "string", "待填入");

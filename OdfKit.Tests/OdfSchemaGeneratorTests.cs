@@ -11,6 +11,67 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Regression)]
 public class OdfSchemaGeneratorTests
 {
+    private static readonly string[] QualifiedElements =
+    [
+        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content",
+        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|spreadsheet",
+        "urn:oasis:names:tc:opendocument:xmlns:table:1.0|table",
+        "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p"
+    ];
+    private static readonly string[] QualifiedAttributes =
+    [
+        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|version",
+        "urn:oasis:names:tc:opendocument:xmlns:text:1.0|style-name"
+    ];
+    private static readonly string[] PatternKinds =
+    [
+        "bounded-data:data",
+        "duplicate:anyName,except,interleave,name,nsName",
+        "paragraph:",
+        "root:choice,group,optional,zeroOrMore",
+        "sheet:",
+        "start:",
+        "table:",
+        "wildcard-element:anyName,empty,except,nsName"
+    ];
+    private static readonly string[] PatternReferences =
+    [
+        "bounded-data:",
+        "duplicate:",
+        "paragraph:style-attributes",
+        "root:paragraph,sheet",
+        "sheet:table",
+        "start:root",
+        "table:",
+        "wildcard-element:"
+    ];
+    private static readonly string[] RootChildElements =
+    [
+        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content|exactlyOne",
+        "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p|zeroOrMore"
+    ];
+    private static readonly string[] RootAttributes =
+        ["urn:oasis:names:tc:opendocument:xmlns:office:1.0|version|optional"];
+    private static readonly string[] DuplicateNameClasses =
+    [
+        "anyName|||False",
+        "name|urn:oasis:names:tc:opendocument:xmlns:text:1.0|span|True",
+        "nsName|urn:oasis:names:tc:opendocument:xmlns:draw:1.0||True"
+    ];
+    private static readonly string[] RootChoiceReferences = ["sheet", "paragraph", "paragraph"];
+    private static readonly string[] DataParameters = ["maxInclusive|10", "minInclusive|1"];
+    private static readonly string[] ParagraphAndTable = ["p", "table"];
+    private static readonly string[] InvalidClassNameArguments =
+        ["--format", "csharp-provider", "--class-name", "not-a-class", "schema.rng"];
+    private static readonly string[] InvalidSourceDateArguments =
+        ["--source-date", "2025/10/06", "schema.rng"];
+    private static readonly string[] IncludedElements =
+    [
+        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content",
+        "urn:oasis:names:tc:opendocument:xmlns:table:1.0|table",
+        "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p"
+    ];
+
     [Fact]
     public void ReaderExtractsDirectChildNameDeclarations()
     {
@@ -19,7 +80,7 @@ public class OdfSchemaGeneratorTests
             "<name>text:word-count</name></choice>" +
             "<attribute><name>text:style-name</name><text /></attribute><empty /></element></define>")));
 
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "fixture.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "fixture.rng");
 
         Assert.Contains(metadata.Elements, item =>
             item.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
@@ -40,77 +101,35 @@ public class OdfSchemaGeneratorTests
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
 
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "fixture.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "fixture.rng");
 
         Assert.Equal("fixture.rng", metadata.Source);
         Assert.Equal(
-            new[]
-            {
-                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content",
-                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0|spreadsheet",
-                    "urn:oasis:names:tc:opendocument:xmlns:table:1.0|table",
-                    "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p"
-            },
+            QualifiedElements,
             metadata.Elements.Select(item => item.NamespaceUri + "|" + item.LocalName).ToArray());
 
         Assert.Equal(
-            new[]
-            {
-                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0|version",
-                    "urn:oasis:names:tc:opendocument:xmlns:text:1.0|style-name"
-            },
+            QualifiedAttributes,
             metadata.Attributes.Select(item => item.NamespaceUri + "|" + item.LocalName).ToArray());
 
         Assert.Equal(
-            new[]
-            {
-                    "bounded-data:data",
-                    "duplicate:anyName,except,interleave,name,nsName",
-                    "paragraph:",
-                    "root:choice,group,optional,zeroOrMore",
-                    "sheet:",
-                    "start:",
-                    "table:",
-                    "wildcard-element:anyName,empty,except,nsName"
-            },
+            PatternKinds,
             metadata.Patterns.Select(item => item.Name + ":" + string.Join(",", item.PatternKinds)).ToArray());
         Assert.Equal(
-            new[]
-            {
-                    "bounded-data:",
-                    "duplicate:",
-                    "paragraph:style-attributes",
-                    "root:paragraph,sheet",
-                    "sheet:table",
-                    "start:root",
-                    "table:",
-                    "wildcard-element:"
-            },
+            PatternReferences,
             metadata.Patterns.Select(item => item.Name + ":" + string.Join(",", item.References)).ToArray());
 
         SchemaPatternMetadata root = metadata.Patterns.Single(pattern => pattern.Name == "root");
         Assert.Equal(
-            new[]
-            {
-                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content|exactlyOne",
-                    "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p|zeroOrMore"
-            },
+            RootChildElements,
             root.ChildElements.Select(item => item.NamespaceUri + "|" + item.LocalName + "|" + item.Occurrence).ToArray());
         Assert.Equal(
-            new[]
-            {
-                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0|version|optional"
-            },
+            RootAttributes,
             root.Attributes.Select(item => item.NamespaceUri + "|" + item.LocalName + "|" + item.Occurrence).ToArray());
 
         SchemaPatternMetadata duplicate = metadata.Patterns.Single(pattern => pattern.Name == "duplicate");
         Assert.Equal(
-            new[]
-            {
-                    "anyName|||False",
-                    "name|urn:oasis:names:tc:opendocument:xmlns:text:1.0|span|True",
-                    "nsName|urn:oasis:names:tc:opendocument:xmlns:draw:1.0||True"
-            },
+            DuplicateNameClasses,
             duplicate.NameClasses.Select(item => item.Kind + "|" + item.NamespaceUri + "|" + item.LocalName + "|" + item.IsExcept).ToArray());
 
         SchemaPatternNodeMetadata rootElement = root.PatternTree[0];
@@ -142,7 +161,7 @@ public class OdfSchemaGeneratorTests
         SchemaPatternNodeMetadata rootChoice = Assert.Single(rootGroup.Children);
         Assert.Equal("choice", rootChoice.Kind);
         Assert.Equal(
-            new[] { "sheet", "paragraph", "paragraph" },
+            RootChoiceReferences,
             rootChoice.Children.Select(item => item.ReferenceName).ToArray());
 
         SchemaPatternNodeMetadata duplicateAnyName = duplicate.PatternTree[0].Children[1];
@@ -167,7 +186,7 @@ public class OdfSchemaGeneratorTests
         Assert.Equal("data", data.Kind);
         Assert.Equal("integer", data.DataType);
         Assert.Equal(
-            new[] { "maxInclusive|10", "minInclusive|1" },
+            DataParameters,
             data.DataParameters.Select(item => item.Name + "|" + item.Value).ToArray());
 
         SchemaPatternMetadata start = metadata.Patterns.Single(pattern => pattern.Name == "start");
@@ -180,10 +199,10 @@ public class OdfSchemaGeneratorTests
     public void JsonWriterUsesStableOrderingAndEscaping()
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "fixture.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "fixture.rng");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataJsonWriter().Write(metadata, writer);
+        SchemaMetadataJsonWriter.Write(metadata, writer);
 
         string json = writer.ToString();
         Assert.Contains("\"source\": \"fixture.rng\"", json);
@@ -209,10 +228,10 @@ public class OdfSchemaGeneratorTests
     public void CSharpWriterEmitsDeterministicRuntimeSeed()
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
+        SchemaMetadataCSharpWriter.Write(metadata, writer, "FixtureSchemaMetadata");
 
         string code = writer.ToString();
         Assert.Contains("internal static class FixtureSchemaMetadata", code);
@@ -243,10 +262,10 @@ public class OdfSchemaGeneratorTests
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
             "<define name=\"wrapped\"><div><element name=\"text:p\"><empty /></element></div></define>")));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
+        SchemaMetadataCSharpWriter.Write(metadata, writer, "FixtureSchemaMetadata");
 
         string code = writer.ToString();
         Assert.Contains("new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Group", code);
@@ -421,10 +440,10 @@ public class OdfSchemaGeneratorTests
             "<attribute name=\"table:name\"><data type=\"string\" /></attribute>" +
             "<element name=\"text:p\" />" +
             "</element></define>")));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new DomWrappersCSharpWriter().Write(metadata, writer);
+        DomWrappersCSharpWriter.Write(metadata, writer);
 
         string code = writer.ToString();
         Assert.Contains("public partial class TableCalculationSettingsElement : OdfElement", code);
@@ -710,11 +729,11 @@ public class OdfSchemaGeneratorTests
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
             "<define name=\"paragraph\"><element name=\"text:p\"><empty /></element></define>" +
             "<define name=\"wrapper\"><element name=\"office:document-content\"><parentRef name=\"paragraph\" /></element></define>")));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata wrapper = metadata.Patterns.Single(pattern => pattern.Name == "wrapper");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
+        SchemaMetadataCSharpWriter.Write(metadata, writer, "FixtureSchemaMetadata");
 
         Assert.Contains("paragraph", wrapper.References);
         SchemaPatternNodeMetadata parentRef = wrapper.PatternTree[0].Children.Single();
@@ -735,21 +754,21 @@ public class OdfSchemaGeneratorTests
             "<define name=\"combined\" combine=\"interleave\"><element name=\"table:table\"><empty /></element></define>" +
             "<define name=\"choice-combined\" combine=\"choice\"><element name=\"text:p\"><empty /></element></define>" +
             "<define name=\"choice-combined\" combine=\"choice\"><element name=\"table:table\"><empty /></element></define>")));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata combined = metadata.Patterns.Single(pattern => pattern.Name == "combined");
         SchemaPatternMetadata choiceCombined = metadata.Patterns.Single(pattern => pattern.Name == "choice-combined");
         SchemaPatternMetadata sequence = metadata.Patterns.Single(pattern => pattern.Name == "sequence");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
+        SchemaMetadataCSharpWriter.Write(metadata, writer, "FixtureSchemaMetadata");
 
         SchemaPatternNodeMetadata root = Assert.Single(combined.PatternTree);
         Assert.Equal("interleave", root.Kind);
-        Assert.Equal(new[] { "p", "table" }, root.Children.Select(child => child.LocalName).ToArray());
+        Assert.Equal(ParagraphAndTable, root.Children.Select(child => child.LocalName).ToArray());
         Assert.Equal(2, choiceCombined.PatternTree.Count);
         SchemaPatternNodeMetadata sequenceRoot = Assert.Single(sequence.PatternTree);
         Assert.Equal("group", sequenceRoot.Kind);
-        Assert.Equal(new[] { "p", "table" }, sequenceRoot.Children.Select(child => child.LocalName).ToArray());
+        Assert.Equal(ParagraphAndTable, sequenceRoot.Children.Select(child => child.LocalName).ToArray());
         string code = writer.ToString();
         Assert.Contains("new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Interleave", code);
         Assert.Contains("new OdfSchemaPatternDefinition(\"choice-combined\", new[]", code);
@@ -772,7 +791,7 @@ public class OdfSchemaGeneratorTests
             "</grammar>";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(schema));
 
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
 
         Assert.Contains(metadata.Elements, item =>
             item.NamespaceUri == officeNamespace &&
@@ -811,7 +830,7 @@ public class OdfSchemaGeneratorTests
             "</define>" +
             "</grammar>";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(schema));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata typed = metadata.Patterns.Single(pattern => pattern.Name == "typed");
         SchemaPatternNodeMetadata choice = Assert.Single(typed.PatternTree);
         SchemaPatternNodeMetadata data = choice.Children[0];
@@ -819,8 +838,8 @@ public class OdfSchemaGeneratorTests
         using var jsonWriter = new StringWriter(CultureInfo.InvariantCulture);
         using var csharpWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataJsonWriter().Write(metadata, jsonWriter);
-        new SchemaMetadataCSharpWriter().Write(metadata, csharpWriter, "FixtureSchemaMetadata");
+        SchemaMetadataJsonWriter.Write(metadata, jsonWriter);
+        SchemaMetadataCSharpWriter.Write(metadata, csharpWriter, "FixtureSchemaMetadata");
 
         Assert.Equal(xmlSchemaDatatypeLibrary, data.DataTypeLibrary);
         Assert.Equal(xmlSchemaDatatypeLibrary, value.DataTypeLibrary);
@@ -832,10 +851,10 @@ public class OdfSchemaGeneratorTests
     public void CSharpProviderWriterEmitsRuntimeProviderHook()
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
-        SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+        SchemaMetadata metadata = RelaxNgSchemaMetadataReader.Read(stream, "https://example.invalid/schema.rng");
         using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-        new SchemaMetadataCSharpWriter().WriteProvider(metadata, writer, "FixtureSchemaMetadata");
+        SchemaMetadataCSharpWriter.WriteProvider(metadata, writer, "FixtureSchemaMetadata");
 
         string code = writer.ToString();
         Assert.Contains("internal static partial class OdfGeneratedSchemaProvider", code);
@@ -898,7 +917,7 @@ public class OdfSchemaGeneratorTests
         using var stderr = new StringWriter(CultureInfo.InvariantCulture);
 
         int exitCode = OdfSchemaGeneratorCli.Run(
-            new[] { "--format", "csharp-provider", "--class-name", "not-a-class", "schema.rng" },
+            InvalidClassNameArguments,
             stdout,
             stderr);
 
@@ -913,7 +932,7 @@ public class OdfSchemaGeneratorTests
         using var stderr = new StringWriter(CultureInfo.InvariantCulture);
 
         int exitCode = OdfSchemaGeneratorCli.Run(
-            new[] { "--source-date", "2025/10/06", "schema.rng" },
+            InvalidSourceDateArguments,
             stdout,
             stderr);
 
@@ -1101,16 +1120,11 @@ public class OdfSchemaGeneratorTests
                 CreateGrammar("<include href=\"root.rng\" /><define name=\"sheet\"><element name=\"table:table\" /></define>"),
                 Encoding.UTF8);
 
-            SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().ReadFile(rootPath);
+            SchemaMetadata metadata = RelaxNgSchemaMetadataReader.ReadFile(rootPath);
 
             Assert.Equal(Path.GetFullPath(rootPath), metadata.Source);
             Assert.Equal(
-                new[]
-                {
-                        "urn:oasis:names:tc:opendocument:xmlns:office:1.0|document-content",
-                        "urn:oasis:names:tc:opendocument:xmlns:table:1.0|table",
-                        "urn:oasis:names:tc:opendocument:xmlns:text:1.0|p"
-                },
+                IncludedElements,
                 metadata.Elements.Select(item => item.NamespaceUri + "|" + item.LocalName).ToArray());
             Assert.Single(metadata.Attributes);
             Assert.Contains(metadata.Patterns, pattern => pattern.Name == "root" && pattern.References.Contains("paragraph"));
@@ -1147,10 +1161,10 @@ public class OdfSchemaGeneratorTests
                 CreateGrammar("<define name=\"escaped\"><element name=\"text:p\" /></define>"),
                 Encoding.UTF8);
 
-            SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().ReadFile(rootPath);
+            SchemaMetadata metadata = RelaxNgSchemaMetadataReader.ReadFile(rootPath);
             using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
-            new SchemaMetadataJsonWriter().Write(metadata, writer);
+            SchemaMetadataJsonWriter.Write(metadata, writer);
 
             Assert.DoesNotContain(metadata.Elements, item => item.LocalName == "p");
             Assert.DoesNotContain(metadata.Patterns, pattern => pattern.Name == "escaped");

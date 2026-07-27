@@ -24,11 +24,9 @@ public partial class OdfTableSheet
     /// <param name="count">The numeric value. / 要插入的列數</param>
     public void InsertRows(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         if (TableNode is TableTableElement tableElement)
             tableElement.InsertRows(position, count);
@@ -62,11 +60,9 @@ public partial class OdfTableSheet
     /// <param name="count">The numeric value. / 要刪除的列數</param>
     public void DeleteRows(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         IReadOnlyList<OdfNode> deletedSnapshots;
         if (TableNode is TableTableElement tableElement)
@@ -101,14 +97,11 @@ public partial class OdfTableSheet
     /// <param name="targetPosition">The numeric value. / 以 0 為基準的目標插入列索引</param>
     public void CopyRows(int sourcePosition, int count, int targetPosition)
     {
-        if (sourcePosition < 0)
-            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourcePosition, nameof(sourcePosition));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
-        if (targetPosition < 0)
-            throw new ArgumentOutOfRangeException(nameof(targetPosition));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetPosition, nameof(targetPosition));
 
         if (TableNode is TableTableElement tableElement)
             tableElement.CopyRows(sourcePosition, count, targetPosition);
@@ -127,14 +120,11 @@ public partial class OdfTableSheet
     /// <param name="targetPosition">The numeric value. / 移除來源列後，以 0 為基準的目標插入列索引</param>
     public void MoveRows(int sourcePosition, int count, int targetPosition)
     {
-        if (sourcePosition < 0)
-            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourcePosition, nameof(sourcePosition));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
-        if (targetPosition < 0)
-            throw new ArgumentOutOfRangeException(nameof(targetPosition));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetPosition, nameof(targetPosition));
 
         if (TableNode is TableTableElement tableElement)
             tableElement.MoveRows(sourcePosition, count, targetPosition);
@@ -158,11 +148,9 @@ public partial class OdfTableSheet
     /// <param name="count">The numeric value. / 要插入的欄數</param>
     public void InsertColumns(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         OdfTableSheetStructureEngine.InsertColumns(TableNode, position, count);
         InvalidateAccessCache();
@@ -192,11 +180,9 @@ public partial class OdfTableSheet
     /// <param name="count">The numeric value. / 要刪除的欄數</param>
     public void DeleteColumns(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         ColumnDeletionSnapshots deletedSnapshots = OdfTableSheetStructureEngine.DeleteColumns(TableNode, position, count);
         InvalidateAccessCache();
@@ -223,17 +209,13 @@ public partial class OdfTableSheet
     /// <param name="targetColumn">The numeric value. / 目標欄索引（以 0 為基準）</param>
     public void MoveCell(int sourceRow, int sourceColumn, int targetRow, int targetColumn)
     {
-        if (sourceRow < 0)
-            throw new ArgumentOutOfRangeException(nameof(sourceRow));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourceRow, nameof(sourceRow));
 
-        if (sourceColumn < 0)
-            throw new ArgumentOutOfRangeException(nameof(sourceColumn));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(sourceColumn, nameof(sourceColumn));
 
-        if (targetRow < 0)
-            throw new ArgumentOutOfRangeException(nameof(targetRow));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetRow, nameof(targetRow));
 
-        if (targetColumn < 0)
-            throw new ArgumentOutOfRangeException(nameof(targetColumn));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(targetColumn, nameof(targetColumn));
 
         OdfTableSheetStructureEngine.MoveCell(TableNode, sourceRow, sourceColumn, targetRow, targetColumn);
         InvalidateAccessCache();

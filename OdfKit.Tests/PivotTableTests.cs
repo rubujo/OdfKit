@@ -39,7 +39,7 @@ public class PivotTableTests
     /// 驗證基本欄位（Row/Column/Data/Page）與 XML 節點結構正確。
     /// </summary>
     [Fact]
-    public void Build_BasicFields_XmlContainsCorrectOrientation()
+    public void BuildBasicFieldsXmlContainsCorrectOrientation()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -66,7 +66,7 @@ public class PivotTableTests
     /// 驗證計畫名 CreatePivotTable API 會建立可讀回的強型別樞紐分析表。
     /// </summary>
     [Fact]
-    public void CreatePivotTable_ConfiguresBuilderAndReadsBack()
+    public void CreatePivotTableConfiguresBuilderAndReadsBack()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -102,7 +102,7 @@ public class PivotTableTests
     [InlineData(OdfPivotFunction.Average, "average")]
     [InlineData(OdfPivotFunction.Max, "max")]
     [InlineData(OdfPivotFunction.Min, "min")]
-    public void AddDataField_AllFunctions_WritesCorrectFunctionAttribute(OdfPivotFunction fn, string expected)
+    public void AddDataFieldAllFunctionsWritesCorrectFunctionAttribute(OdfPivotFunction fn, string expected)
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -121,7 +121,7 @@ public class PivotTableTests
     /// 驗證計算欄位寫入 function="formula" 及 formula 屬性。
     /// </summary>
     [Fact]
-    public void AddCalculatedField_WritesFormulaAttribute()
+    public void AddCalculatedFieldWritesFormulaAttribute()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -141,7 +141,7 @@ public class PivotTableTests
     /// 驗證排序設定寫入正確的 table:sort-info/table:sort-field 結構。
     /// </summary>
     [Fact]
-    public void AddSortInfo_WritesCorrectSortNodes()
+    public void AddSortInfoWritesCorrectSortNodes()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -165,7 +165,7 @@ public class PivotTableTests
     /// 驗證升冪排序寫入 order="ascending"。
     /// </summary>
     [Fact]
-    public void AddSortInfo_Ascending_WritesAscendingOrder()
+    public void AddSortInfoAscendingWritesAscendingOrder()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -184,7 +184,7 @@ public class PivotTableTests
     /// 驗證篩選條件寫入正確的 table:filter/table:filter-condition 結構。
     /// </summary>
     [Fact]
-    public void AddFilter_WritesFilterConditionNode()
+    public void AddFilterWritesFilterConditionNode()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -213,7 +213,7 @@ public class PivotTableTests
     [InlineData(OdfPivotFilterOperator.GreaterThanOrEqual, "&gt;=")]
     [InlineData(OdfPivotFilterOperator.LessThan, "&lt;")]
     [InlineData(OdfPivotFilterOperator.LessThanOrEqual, "&lt;=")]
-    public void AddFilter_AllOperators_WritesCorrectOperatorString(OdfPivotFilterOperator op, string expected)
+    public void AddFilterAllOperatorsWritesCorrectOperatorString(OdfPivotFilterOperator op, string expected)
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -232,7 +232,7 @@ public class PivotTableTests
     /// 驗證 WithColumnHeaders(false) 不輸出非標準 has-column-headers 屬性。
     /// </summary>
     [Fact]
-    public void WithColumnHeaders_False_DoesNotWriteNonstandardAttribute()
+    public void WithColumnHeadersFalseDoesNotWriteNonstandardAttribute()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -251,7 +251,7 @@ public class PivotTableTests
     /// 驗證預設情況下不輸出非標準 header 屬性。
     /// </summary>
     [Fact]
-    public void Build_DefaultHeaders_DoesNotWriteNonstandardAttributes()
+    public void BuildDefaultHeadersDoesNotWriteNonstandardAttributes()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -266,7 +266,7 @@ public class PivotTableTests
     /// 驗證 WithRowHeaders(false) 不輸出非標準 has-row-headers 屬性。
     /// </summary>
     [Fact]
-    public void WithRowHeaders_False_DoesNotWriteNonstandardAttribute()
+    public void WithRowHeadersFalseDoesNotWriteNonstandardAttribute()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -286,7 +286,7 @@ public class PivotTableTests
     /// 驗證 WithRowHeaders 與 WithColumnHeaders 可同時呼叫且不輸出非標準屬性。
     /// </summary>
     [Fact]
-    public void WithRowHeadersAndWithColumnHeaders_BothFalse_DoesNotWriteNonstandardAttributes()
+    public void WithRowHeadersAndWithColumnHeadersBothFalseDoesNotWriteNonstandardAttributes()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -307,7 +307,7 @@ public class PivotTableTests
     /// 驗證多個篩選條件可同時存在於同一個 table:filter 節點中。
     /// </summary>
     [Fact]
-    public void AddFilter_MultipleConditions_AllWrittenInSameFilterNode()
+    public void AddFilterMultipleConditionsAllWrittenInSameFilterNode()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");

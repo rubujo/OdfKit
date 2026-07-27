@@ -15,7 +15,7 @@ public class StandardPerformanceWorkloadTests
     /// 驗證 ODS 固定資料集在兩次建立後具有相同語意檢查碼。
     /// </summary>
     [Fact]
-    public void OdsWorkload_IsDeterministicAndReadable()
+    public void OdsWorkloadIsDeterministicAndReadable()
     {
         byte[] first = StandardPerformanceWorkloads.CreateStreamingOds(250);
         byte[] second = StandardPerformanceWorkloads.CreateStreamingOds(250);
@@ -30,7 +30,7 @@ public class StandardPerformanceWorkloadTests
     /// 驗證 ODT 巢狀清單與一般文字節點不會在串流檢查碼中產生不穩定結果。
     /// </summary>
     [Fact]
-    public void OdtWorkload_IsDeterministicAndReadable()
+    public void OdtWorkloadIsDeterministicAndReadable()
     {
         byte[] first = StandardPerformanceWorkloads.CreateStreamingOdt(500);
         byte[] second = StandardPerformanceWorkloads.CreateStreamingOdt(500);
@@ -44,7 +44,7 @@ public class StandardPerformanceWorkloadTests
     /// 驗證 ODP 語意檢查碼涵蓋投影片、文字、圖形、媒體與講者備忘。
     /// </summary>
     [Fact]
-    public void OdpWorkload_RoundTripsAllMeasuredObjectKinds()
+    public void OdpWorkloadRoundTripsAllMeasuredObjectKinds()
     {
         byte[] bytes = StandardPerformanceWorkloads.CreateOdp(5, includeMedia: true);
         ulong checksum = StandardPerformanceWorkloads.ChecksumOdp(bytes);
@@ -68,7 +68,7 @@ public class StandardPerformanceWorkloadTests
     /// 驗證三種複雜 DOM 工作負載皆可保存並重新載入。
     /// </summary>
     [Fact]
-    public void ComplexDomWorkloads_SaveAndReload()
+    public void ComplexDomWorkloadsSaveAndReload()
     {
         byte[] ods = StandardPerformanceWorkloads.CreateComplexOds(20);
         byte[] odt = StandardPerformanceWorkloads.CreateComplexOdt(100);

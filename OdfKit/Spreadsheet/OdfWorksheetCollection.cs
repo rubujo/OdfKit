@@ -43,9 +43,7 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
         {
             IReadOnlyList<OdfTableSheet> sheets = _document.GetSheets();
             if (index < 0 || index >= sheets.Count)
-            {
                 throw new ArgumentOutOfRangeException(nameof(index));
-            }
 
             return sheets[index];
         }

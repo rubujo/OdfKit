@@ -248,6 +248,10 @@ internal static class FormulaExtendedStatisticalFunctionHandlers
         return total;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "CA1859:Use concrete types when possible for improved performance",
+        Justification = "The formula result intentionally returns either a numeric value or an OdfFormulaError sentinel.")]
     private static object CalculateSlope(List<double> knownY, List<double> knownX)
     {
         double xMean = Mean(knownX);

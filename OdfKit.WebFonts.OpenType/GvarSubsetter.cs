@@ -138,9 +138,9 @@ internal static class GvarSubsetter
         return offsets;
     }
 
-    private static void WriteOffsets(byte[] output, IReadOnlyList<uint> offsets, bool usesLongOffsets)
+    private static void WriteOffsets(byte[] output, uint[] offsets, bool usesLongOffsets)
     {
-        for (int index = 0; index < offsets.Count; index++)
+        for (int index = 0; index < offsets.Length; index++)
         {
             uint offset = offsets[index];
             if (usesLongOffsets)

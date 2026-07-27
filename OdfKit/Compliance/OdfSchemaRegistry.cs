@@ -90,10 +90,8 @@ public static class OdfSchemaRegistry
     /// <returns>A disposable scope that restores the previous registration. / 釋放時還原先前註冊的範圍物件。</returns>
     public static IDisposable RegisterSchema(OdfSchemaSet schema, OdfSchemaRegistrationOptions options)
     {
-        if (schema is null)
-            throw new ArgumentNullException(nameof(schema));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(schema, nameof(schema));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         lock (SyncRoot)
         {

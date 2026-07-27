@@ -47,9 +47,7 @@ public sealed class OdfTransaction : IDisposable
     /// <exception cref="IOException">Thrown when the main file cannot be durably flushed or the journal cannot be marked as committed. / 當主檔無法耐久刷寫或交易日誌無法標記為已提交時擲出。</exception>
     public void Commit()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(nameof(OdfTransaction));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdfTransaction));
         _package.CommitTransaction();
         _committed = true;
     }

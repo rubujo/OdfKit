@@ -10,10 +10,10 @@ namespace OdfKit.Compliance;
 /// </summary>
 public sealed class OdfSchemaSet
 {
-    private readonly IReadOnlyDictionary<OdfQualifiedName, OdfElementDefinition> _elements;
-    private readonly IReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition> _attributes;
+    private readonly System.Collections.ObjectModel.ReadOnlyDictionary<OdfQualifiedName, OdfElementDefinition> _elements;
+    private readonly System.Collections.ObjectModel.ReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition> _attributes;
     private readonly IReadOnlyList<OdfSchemaNameClass> _nameClasses;
-    private readonly IReadOnlyDictionary<string, OdfSchemaPatternDefinition> _patterns;
+    private readonly System.Collections.ObjectModel.ReadOnlyDictionary<string, OdfSchemaPatternDefinition> _patterns;
     /// <summary>
     /// Short overload of OdfSchemaSet that accepts version, sourceUrl, sourceDate, and elements; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 version、sourceUrl、sourceDate 與 elements；其餘可選參數使用預設值並轉呼叫最長 OdfSchemaSet 多載。
@@ -56,7 +56,7 @@ public sealed class OdfSchemaSet
             byName[element.Name] = element;
         }
 
-        _elements = new ReadOnlyDictionary<OdfQualifiedName, OdfElementDefinition>(byName);
+        _elements = new System.Collections.ObjectModel.ReadOnlyDictionary<OdfQualifiedName, OdfElementDefinition>(byName);
 
         var attributesByName = new Dictionary<OdfQualifiedName, OdfAttributeDefinition>();
         foreach (OdfAttributeDefinition attribute in attributes ?? [])
@@ -64,7 +64,7 @@ public sealed class OdfSchemaSet
             attributesByName[attribute.Name] = attribute;
         }
 
-        _attributes = new ReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition>(attributesByName);
+        _attributes = new System.Collections.ObjectModel.ReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition>(attributesByName);
         _nameClasses = new List<OdfSchemaNameClass>(nameClasses ?? []).AsReadOnly();
 
         var patternsByName = new Dictionary<string, OdfSchemaPatternDefinition>(StringComparer.Ordinal);
@@ -73,7 +73,7 @@ public sealed class OdfSchemaSet
             patternsByName[pattern.Name] = pattern;
         }
 
-        _patterns = new ReadOnlyDictionary<string, OdfSchemaPatternDefinition>(patternsByName);
+        _patterns = new System.Collections.ObjectModel.ReadOnlyDictionary<string, OdfSchemaPatternDefinition>(patternsByName);
     }
 
 
@@ -134,8 +134,7 @@ public sealed class OdfSchemaSet
     /// <returns>合併後的全新 <see cref="OdfSchemaSet"/> 執行個體</returns>
     public OdfSchemaSet MergeWith(OdfSchemaSet additional, bool overwriteExisting)
     {
-        if (additional is null)
-            throw new ArgumentNullException(nameof(additional));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(additional, nameof(additional));
 
         var elements = new Dictionary<OdfQualifiedName, OdfElementDefinition>();
         foreach (var pair in _elements)

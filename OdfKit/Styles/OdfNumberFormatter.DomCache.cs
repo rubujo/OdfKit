@@ -16,7 +16,7 @@ public partial class OdfNumberFormatter
     #region DOM 操作與快取去重
 
 
-    private OdfNode CreateStyleNode(string styleName, FormatInfo info)
+    private static OdfNode CreateStyleNode(string styleName, FormatInfo info)
     {
         string localName = info.Type switch
         {
@@ -102,7 +102,7 @@ public partial class OdfNumberFormatter
         return styleNode;
     }
 
-    private OdfNode? CreateDateTimePartNode(string token, bool is12Hour)
+    private static OdfNode? CreateDateTimePartNode(string token, bool is12Hour)
     {
         OdfNode node;
         switch (token)
@@ -176,7 +176,7 @@ public partial class OdfNumberFormatter
         }
     }
 
-    private string SerializeOdfStyleStructure(OdfNode node)
+    private static string SerializeOdfStyleStructure(OdfNode node)
     {
         StringBuilder sb = new();
         sb.Append(node.LocalName).Append('|');
@@ -191,7 +191,7 @@ public partial class OdfNumberFormatter
             {
                 if (attr.LocalName == "name" && attr.NamespaceUri == OdfNamespaces.Style)
                     continue;
-                sb.Append($"{attr.NamespaceUri}:{attr.LocalName}={child.Attributes[attr]};");
+                sb.Append(System.FormattableString.Invariant($"{attr.NamespaceUri}:{attr.LocalName}={child.Attributes[attr]};"));
             }
 
             if (child.Children.Count > 0 && child.Children[0].NodeType == OdfNodeType.Text)
@@ -252,7 +252,7 @@ public partial class OdfNumberFormatter
         return FindStyleInParent(FindChildElement(_stylesRoot, "styles", OdfNamespaces.Office), name);
     }
 
-    private OdfNode? FindStyleInParent(OdfNode? parentNode, string name)
+    private static OdfNode? FindStyleInParent(OdfNode? parentNode, string name)
     {
         if (parentNode is null)
             return null;
@@ -266,7 +266,7 @@ public partial class OdfNumberFormatter
         return null;
     }
 
-    private OdfNode GetOrCreateStandardFallbackNode(string styleName)
+    private static OdfNode GetOrCreateStandardFallbackNode(string styleName)
     {
         OdfNode fallback = new(OdfNodeType.Element, "number-style", OdfNamespaces.Number, "number");
         fallback.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
@@ -295,7 +295,7 @@ public partial class OdfNumberFormatter
         return contentAuto;
     }
 
-    private OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
     {
         foreach (var child in parent.Children)
         {

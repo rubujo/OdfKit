@@ -57,10 +57,7 @@ public static class OdfCodePointMappingTable
     /// <exception cref="FormatException">當資料行不符合分隔十六進位格式，或超出行長／筆數資源預算時擲出</exception>
     public static IReadOnlyDictionary<int, int> ParseDelimitedHex(TextReader reader, char separator)
     {
-        if (reader is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         char[] separators = [separator];
         var result = new Dictionary<int, int>();
@@ -110,15 +107,9 @@ public static class OdfCodePointMappingTable
     /// <exception cref="FormatException">當資料行超出行長／筆數資源預算時擲出</exception>
     public static IReadOnlyDictionary<int, int> Parse(TextReader reader, Func<string, KeyValuePair<int, int>?> lineParser)
     {
-        if (reader is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
-        if (lineParser is null)
-        {
-            throw new ArgumentNullException(nameof(lineParser));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(lineParser, nameof(lineParser));
 
         var result = new Dictionary<int, int>();
         int parsedEntryCount = 0;
@@ -154,15 +145,9 @@ public static class OdfCodePointMappingTable
         IReadOnlyDictionary<string, int> keyToSource,
         IReadOnlyDictionary<string, int> keyToTarget)
     {
-        if (keyToSource is null)
-        {
-            throw new ArgumentNullException(nameof(keyToSource));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(keyToSource, nameof(keyToSource));
 
-        if (keyToTarget is null)
-        {
-            throw new ArgumentNullException(nameof(keyToTarget));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(keyToTarget, nameof(keyToTarget));
 
         var result = new Dictionary<int, int>();
         foreach (KeyValuePair<string, int> source in keyToSource)

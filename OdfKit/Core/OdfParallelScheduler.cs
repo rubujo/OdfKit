@@ -98,10 +98,7 @@ public static class OdfParallelScheduler
 
     internal static void RunWithConfiguredThreadPriority(Action action)
     {
-        if (action is null)
-        {
-            throw new ArgumentNullException(nameof(action));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(action, nameof(action));
 
         ThreadPriority? configuredPriority = WorkerThreadPriority;
         if (configuredPriority is null)
@@ -134,10 +131,7 @@ public static class OdfParallelScheduler
 
     internal static T RunWithConfiguredThreadPriority<T>(Func<T> action)
     {
-        if (action is null)
-        {
-            throw new ArgumentNullException(nameof(action));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(action, nameof(action));
 
         T result = default!;
         RunWithConfiguredThreadPriority((Action)(() => result = action()));

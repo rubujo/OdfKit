@@ -313,7 +313,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task ToAsyncEnumerable_WritesSyncAndAsyncProducerOutput()
+        public async Task ToAsyncEnumerableWritesSyncAndAsyncProducerOutput()
         {
             var chunks = new List<byte[]>();
             await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(
@@ -370,7 +370,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task ToAsyncEnumerable_LargeOutputProducesValidChunks()
+        public async Task ToAsyncEnumerableLargeOutputProducesValidChunks()
         {
             var chunks = new List<byte[]>();
             await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(
@@ -410,7 +410,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task ToAsyncEnumerable_PropagatesProducerFailure()
+        public async Task ToAsyncEnumerablePropagatesProducerFailure()
         {
             InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
@@ -428,7 +428,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void OdsStreamReader_LoadsRowsThroughDbDataReader()
+        public void OdsStreamReaderLoadsRowsThroughDbDataReader()
         {
             using var tempStream = new MemoryStream();
             using (var writer = new OdsStreamWriter(tempStream))
@@ -462,9 +462,9 @@ namespace OdfKit.Tests
             Assert.Equal(3, table.Rows.Count);
             Assert.Equal("Name", table.Rows[0][0]);
             Assert.Equal("Alice", table.Rows[1][0]);
-            Assert.Equal(25.0, Convert.ToDouble(table.Rows[1][1]));
+            Assert.Equal(25.0, Convert.ToDouble(table.Rows[1][1], System.Globalization.CultureInfo.InvariantCulture));
             Assert.Equal("Bob", table.Rows[2][0]);
-            Assert.Equal(30.0, Convert.ToDouble(table.Rows[2][1]));
+            Assert.Equal(30.0, Convert.ToDouble(table.Rows[2][1], System.Globalization.CultureInfo.InvariantCulture));
         }
 
         #endregion
@@ -636,7 +636,7 @@ namespace OdfKit.Tests
 
         #region Helper Methods
 
-        private void FindNodesByLocalName(OdfNode node, string localName, List<OdfNode> results)
+        private static void FindNodesByLocalName(OdfNode node, string localName, List<OdfNode> results)
         {
             if (node.LocalName == localName)
             {

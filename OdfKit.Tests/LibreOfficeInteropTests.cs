@@ -32,7 +32,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證含追蹤修訂的 ODT 可由 LibreOffice 26.x headless 模式載入、轉換並由 OdfKit 重新讀取。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsTrackedChangesOdt()
+    public void LibreOfficeHeadlessLoadsTrackedChangesOdt()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -109,7 +109,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證含 <c>table:tracked-changes</c> 的 ODS 可由 LibreOffice 26.x headless 模式載入並往返。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsTrackedChangesOds()
+    public void LibreOfficeHeadlessLoadsTrackedChangesOds()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -157,7 +157,7 @@ public partial class LibreOfficeInteropTests
     /// 仍可由 LibreOffice 26.x headless 模式載入並往返，且儲存格已還原為原始內容。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_RejectAllChangesRoundTripsOds()
+    public void LibreOfficeHeadlessRejectAllChangesRoundTripsOds()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -222,7 +222,7 @@ public partial class LibreOfficeInteropTests
     /// 套用後的嵌入圖表，仍可由 LibreOffice 26.x headless 模式載入並正確往返。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_ChartApplyDefinitionAndClearSeriesRoundTripsOds()
+    public void LibreOfficeHeadlessChartApplyDefinitionAndClearSeriesRoundTripsOds()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -320,7 +320,7 @@ public partial class LibreOfficeInteropTests
     /// 重新匯出為 CSV 檔案，驗證資料往返不失真。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_CsvImportFromFileThenExportToFileRoundTrips()
+    public void LibreOfficeHeadlessCsvImportFromFileThenExportToFileRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -376,7 +376,7 @@ public partial class LibreOfficeInteropTests
     /// headless 模式正確載入、往返並轉出 PDF，且框線屬性於往返後仍存在於 content.xml 中。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_CellSetBordersRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadlessCellSetBordersRoundTripsOdsAndPdf()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -444,7 +444,7 @@ public partial class LibreOfficeInteropTests
     /// 解析結果）於往返後仍正確。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_PivotTableRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadlessPivotTableRoundTripsOdsAndPdf()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -538,7 +538,7 @@ public partial class LibreOfficeInteropTests
     /// 屬性，於 LibreOffice 26.x headless 模式往返後語意仍正確。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_SheetLayoutApiRoundTripsOds()
+    public void LibreOfficeHeadlessSheetLayoutApiRoundTripsOds()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -652,7 +652,7 @@ public partial class LibreOfficeInteropTests
     /// 且清除後對應的 XML 結構與屬性應完全移除。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_SheetPrintSettingsClearApiRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadlessSheetPrintSettingsClearApiRoundTripsOdsAndPdf()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -784,7 +784,7 @@ public partial class LibreOfficeInteropTests
     /// 於版面配置與列印設定變更後仍可正確列舉已使用儲存格。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_PrintScaleAndPageBreaksWithUsedCellsRoundTripsOds()
+    public void LibreOfficeHeadlessPrintScaleAndPageBreaksWithUsedCellsRoundTripsOds()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -875,7 +875,7 @@ public partial class LibreOfficeInteropTests
     /// 且欄群組節點應完全移除、欄資料與順序應正確還原。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_UngroupColumnsRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadlessUngroupColumnsRoundTripsOdsAndPdf()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -956,7 +956,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證 ODT、ODS、ODP 與 ODG 可由 LibreOffice 26.x headless 模式載入並轉換。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsGeneratedDocuments()
+    public void LibreOfficeHeadlessLoadsGeneratedDocuments()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1018,7 +1018,7 @@ public partial class LibreOfficeInteropTests
     /// 涵蓋 Batch 1 四主格式範本變體的最低互通驗收案例。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsTemplateVariantDocuments()
+    public void LibreOfficeHeadlessLoadsTemplateVariantDocuments()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1079,7 +1079,7 @@ public partial class LibreOfficeInteropTests
     /// 高階工作流對 LibreOffice 而言互通等價。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsNativeFlatXmlDocuments()
+    public void LibreOfficeHeadlessLoadsNativeFlatXmlDocuments()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1145,7 +1145,7 @@ public partial class LibreOfficeInteropTests
     /// <c>writerglobal8</c> 篩選器，非僅理論相容）。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsMasterDocument()
+    public void LibreOfficeHeadlessLoadsMasterDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1198,7 +1198,7 @@ public partial class LibreOfficeInteropTests
     /// <c>writerweb8_writer</c> 篩選器，非僅理論相容）。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsWebTemplateDocument()
+    public void LibreOfficeHeadlessLoadsWebTemplateDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1251,7 +1251,7 @@ public partial class LibreOfficeInteropTests
     /// 將公式作為獨立文件編輯，而非僅作為嵌入物件）。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsFormulaDocument()
+    public void LibreOfficeHeadlessLoadsFormulaDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1296,12 +1296,12 @@ public partial class LibreOfficeInteropTests
     /// 注意：實測確認 LibreOffice 26.2.1 不接受獨立 .otf 為可直接開啟的主文件（回報
     /// 「source file could not be loaded」）；獨立 .fdf 則更隱晦地被誤判為「Calc document」並以
     /// <c>calc_png_Export</c> 篩選器產生與公式內容完全無關的輸出，同樣不構成有效互通。與獨立
-    /// <c>.odf</c>（見 <see cref="LibreOfficeHeadless_LoadsFormulaDocument"/>，已確認真機支援）
+    /// <c>.odf</c>（見 <see cref="LibreOfficeHeadlessLoadsFormulaDocument"/>，已確認真機支援）
     /// 不同，這是上游應用程式對範本／Flat 公式變體的已知限制，並非 OdfKit 的缺陷。因此 OTF／FDF
     /// 改以封裝結構與 schema 層級的精確驗證取代真機驗證。
     /// </summary>
     [Fact]
-    public void OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema()
+    public void OdfFormulaVariantDocumentPackageStructureMatchesOdf14Schema()
     {
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitFormulaVariantPackageStructure_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempRoot);
@@ -1356,13 +1356,13 @@ public partial class LibreOfficeInteropTests
     /// 缺陷。獨立 FODI（Flat XML）則更隱晦地被誤判為「Writer document」，以
     /// <c>writer_png_Export</c> 篩選器產生與影像內容完全無關的輸出（並非真正剖析為影像），
     /// 同樣不構成有效互通——與 ODC／OTC／FODC（見
-    /// <see cref="OdfChartDocument_PackageStructureMatchesOdf14Schema"/>）及 OTF／FDF（見
-    /// <see cref="OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema"/>）的誤判模式
+    /// <see cref="OdfChartDocumentPackageStructureMatchesOdf14Schema"/>）及 OTF／FDF（見
+    /// <see cref="OdfFormulaVariantDocumentPackageStructureMatchesOdf14Schema"/>）的誤判模式
     /// 一致。Microsoft Office 則完全不支援開啟任何 ODF 影像文件。因此 ODI／OTI／FODI 改以封裝
     /// 結構與 schema 層級的精確驗證取代真機驗證。
     /// </summary>
     [Fact]
-    public void ImageDocument_PackageStructureMatchesOdf14Schema()
+    public void ImageDocumentPackageStructureMatchesOdf14Schema()
     {
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitImagePackageStructure_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempRoot);
@@ -1442,17 +1442,17 @@ public partial class LibreOfficeInteropTests
     /// OdfKit 產生的獨立 .odc／.otc 一律回報「source file could not be loaded」，即使內容完全
     /// 符合 ODF 規格亦然；獨立 .fodc（Flat XML）則更隱晦地被誤判為「Writer document」並原樣
     /// 回顯來源 XML（並非真正剖析為圖表），同樣不構成有效互通。這與既有
-    /// <c>ImageDocument_PackageStructureMatchesOdf14Schema</c> 註解中「LibreOffice 已在
+    /// <c>ImageDocumentPackageStructureMatchesOdf14Schema</c> 註解中「LibreOffice 已在
     /// draw.xcd 註冊 ODC」的舊有假設不符——ODF Chart 在 ODF 生態中設計上即為僅可嵌入
     /// ODS/ODT/ODP 內的子文件類型，並非獨立可開啟的主文件格式，這是上游應用程式的已知限制，
     /// 並非 OdfKit 的缺陷。因此 ODC／OTC／FODC 改以封裝結構與 schema 層級的精確驗證，以及
     /// <see cref="ChartHighLevelApiTests"/>／<see cref="EmbeddedChartIntegrationTests"/> 中
     /// 「圖表嵌入 ODS/ODT 後由 LibreOffice 開啟」的既有嵌入式互通驗收（見
-    /// <c>LibreOfficeHeadless_LoadsGeneratedDocuments</c> 對含圖表 ODS 的 <c>xlsx</c> 轉換）
+    /// <c>LibreOfficeHeadlessLoadsGeneratedDocuments</c> 對含圖表 ODS 的 <c>xlsx</c> 轉換）
     /// 取代獨立檔案的真機驗證。
     /// </summary>
     [Fact]
-    public void OdfChartDocument_PackageStructureMatchesOdf14Schema()
+    public void OdfChartDocumentPackageStructureMatchesOdf14Schema()
     {
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitChartPackageStructure_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempRoot);
@@ -1559,7 +1559,7 @@ public partial class LibreOfficeInteropTests
     /// 自訂字型宣告皆能往返保真（巢狀表格改由 OdfKit 自身 round-trip 驗證，原因詳見內文註解）。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsIndexTemplatesNestedStructuresAndFontFace()
+    public void LibreOfficeHeadlessLoadsIndexTemplatesNestedStructuresAndFontFace()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -1646,7 +1646,7 @@ public partial class LibreOfficeInteropTests
     /// content.xml 結構驗證。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsBuilderImageFrameSectionAndFloatingTextBoxDocument()
+    public void LibreOfficeHeadlessLoadsBuilderImageFrameSectionAndFloatingTextBoxDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2236,7 +2236,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證官方範例 Sample.cs 可成功編譯執行，且其產生的 ODT、ODS、ODP 檔案可由 LibreOffice 完美載入與相容。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsSampleGeneratedDocuments()
+    public void LibreOfficeHeadlessLoadsSampleGeneratedDocuments()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2354,7 +2354,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證由 OdtStreamWriter 與 OdsStreamWriter 流式寫入產生的文件可由 LibreOffice 完美載入與相容。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsStreamWriterGeneratedDocuments()
+    public void LibreOfficeHeadlessLoadsStreamWriterGeneratedDocuments()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2413,7 +2413,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證 CJK 增補平面與自造字罕見字寫入文件後，其 LibreOffice 實機開檔與轉檔內容的字元保真度。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_LoadsSupplementaryPlaneFontDocument()
+    public void LibreOfficeHeadlessLoadsSupplementaryPlaneFontDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2483,7 +2483,7 @@ public partial class LibreOfficeInteropTests
     /// <c>presentation:placeholder</c> 語意（並非退化為一般文字方塊）。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_SlideBuilderAddTitlePlaceholderRoundTrips()
+    public void LibreOfficeHeadlessSlideBuilderAddTitlePlaceholderRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2536,7 +2536,7 @@ public partial class LibreOfficeInteropTests
     /// 建立的 ODF 公式文件可由 LibreOffice 26.x headless 模式正確開啟並轉出 PDF。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_FormulaBuilderWithMathMLAndIdentifierEquationRoundTrips()
+    public void LibreOfficeHeadlessFormulaBuilderWithMathMLAndIdentifierEquationRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2675,7 +2675,7 @@ public partial class LibreOfficeInteropTests
     /// 檔案可由真實 LibreOffice 26.x headless 模式正確開啟與往返，不會因列結構順序錯誤而被拒絕載入。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_AppendHeaderRowsAfterDataRowInsertsBeforeRowsAndRoundTrips()
+    public void LibreOfficeHeadlessAppendHeaderRowsAfterDataRowInsertsBeforeRowsAndRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2751,7 +2751,7 @@ public partial class LibreOfficeInteropTests
     /// 自封裝層級擷取內嵌物件內容，確認其與 <c>OdfDocument.GetEmbeddedDocument</c> 高階 API 結果一致。
     /// </summary>
     [Fact]
-    public void LibreOfficeHeadless_EmbeddedObjectExtractionRoundTrips()
+    public void LibreOfficeHeadlessEmbeddedObjectExtractionRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2907,7 +2907,7 @@ public partial class LibreOfficeInteropTests
     /// 以獨一字型名稱直接登錄複製後的真實字型路徑，而不依賴目錄掃描的「尚未登錄才寫入」語意。
     /// </remarks>
     [Fact]
-    public void LibreOfficeHeadless_EmbedUsedFontsFromRegisteredDirectoryRoundTrips()
+    public void LibreOfficeHeadlessEmbedUsedFontsFromRegisteredDirectoryRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -2994,7 +2994,7 @@ public partial class LibreOfficeInteropTests
     /// </para>
     /// </remarks>
     [Fact]
-    public void LibreOfficeHeadless_PruneUnusedMediaRemovesOnlyUnreferencedPicturesAndRoundTrips()
+    public void LibreOfficeHeadlessPruneUnusedMediaRemovesOnlyUnreferencedPicturesAndRoundTrips()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))

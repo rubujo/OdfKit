@@ -50,7 +50,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
             return;
 
         OdfNode trackedChangesNode = GetOrCreateTrackedChangesNode(document.SheetsRoot);
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
 
         var changeNode = new OdfNode(OdfNodeType.Element, "cell-content-change", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
@@ -526,7 +526,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
 
     private static OdfNode CreateInsertionChangeNode(int sheetIndex, string structuralType, int position, int count)
     {
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
         var changeNode = new OdfNode(OdfNodeType.Element, "insertion", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
         changeNode.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");
@@ -545,7 +545,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         int targetRow,
         int targetColumn)
     {
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
         var changeNode = new OdfNode(OdfNodeType.Element, "movement", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
         changeNode.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");
@@ -567,7 +567,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
 
     private static OdfNode CreateDeletionChangeNode(int sheetIndex, string structuralType, int position, int count)
     {
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
         var changeNode = new OdfNode(OdfNodeType.Element, "deletion", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
         changeNode.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");

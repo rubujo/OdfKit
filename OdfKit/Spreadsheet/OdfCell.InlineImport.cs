@@ -37,8 +37,7 @@ public partial class OdfCell
 
     private void AppendInlineHtml(string html)
     {
-        if (html is null)
-            throw new ArgumentNullException(nameof(html));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(html, nameof(html));
 
         IReadOnlyList<OdfInlineTextSegment> segments = TextDocumentHtmlFragmentEngine.ParseHtmlSegments(html);
         if (segments.Count == 0)

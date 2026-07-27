@@ -51,17 +51,11 @@ public static partial class OdfEncryption
 
         if (isSha256)
         {
-            using (var sha = SHA256.Create())
-            {
-                return sha.ComputeHash(digestInput);
-            }
+            return global::OdfKit.Internal.OdfHashHelper.Sha256(digestInput);
         }
         else if (isSha1)
         {
-            using (var sha = SHA1.Create())
-            {
-                return sha.ComputeHash(digestInput);
-            }
+            return global::OdfKit.Internal.OdfHashHelper.Sha1(digestInput);
         }
         else
         {

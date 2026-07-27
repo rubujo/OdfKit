@@ -6,7 +6,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class ColorFontValidatorTests
 {
     [Fact]
-    public void Validate_AcceptsBoundedColrVersionZero()
+    public void ValidateAcceptsBoundedColrVersionZero()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -23,7 +23,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_ColrVersionZeroAddsOnlySelectedBaseGlyphLayers()
+    public void ValidateColrVersionZeroAddsOnlySelectedBaseGlyphLayers()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -42,7 +42,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_AcceptsColrVersionOnePaintOffsetRelativeToBaseGlyphList()
+    public void ValidateAcceptsColrVersionOnePaintOffsetRelativeToBaseGlyphList()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -59,7 +59,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_RejectsColrVersionOnePaintOffsetAtTableEnd()
+    public void ValidateRejectsColrVersionOnePaintOffsetAtTableEnd()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -74,7 +74,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_ColrVersionOneTraversesPaintGlyphClosure()
+    public void ValidateColrVersionOneTraversesPaintGlyphClosure()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -95,7 +95,7 @@ public sealed class ColorFontValidatorTests
     [Theory]
     [InlineData(11)]
     [InlineData(33)]
-    public void Validate_RejectsCyclicOrUnknownColrVersionOnePaint(byte paintFormat)
+    public void ValidateRejectsCyclicOrUnknownColrVersionOnePaint(byte paintFormat)
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -110,7 +110,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_RejectsColrWithoutCpal()
+    public void ValidateRejectsColrWithoutCpal()
     {
         var tables = new Dictionary<string, byte[]> { ["COLR"] = CreateColrVersionZero() };
 
@@ -121,7 +121,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_AcceptsSvgWithOptionalCpal()
+    public void ValidateAcceptsSvgWithOptionalCpal()
     {
         var tables = new Dictionary<string, byte[]>
         {
@@ -141,7 +141,7 @@ public sealed class ColorFontValidatorTests
     [InlineData("<svg xmlns=\"http://www.w3.org/2000/svg\"><script/></svg>")]
     [InlineData("<svg xmlns=\"http://www.w3.org/2000/svg\"><use href=\"https://example.test/x\"/></svg>")]
     [InlineData("<!DOCTYPE svg><svg xmlns=\"http://www.w3.org/2000/svg\"/>")]
-    public void Validate_RejectsActiveSvgContent(string document)
+    public void ValidateRejectsActiveSvgContent(string document)
     {
         var tables = new Dictionary<string, byte[]> { ["SVG "] = CreateSvg(document) };
 
@@ -152,7 +152,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_RejectsUnpairedBitmapTables()
+    public void ValidateRejectsUnpairedBitmapTables()
     {
         var tables = new Dictionary<string, byte[]> { ["CBDT"] = [0, 3, 0, 0] };
 
@@ -165,7 +165,7 @@ public sealed class ColorFontValidatorTests
     [Theory]
     [InlineData("CBDT", "CBLC", 0x00030000u, 19)]
     [InlineData("EBDT", "EBLC", 0x00020000u, 1)]
-    public void Validate_AcceptsVersionedBitmapIndexFormatOne(
+    public void ValidateAcceptsVersionedBitmapIndexFormatOne(
         string dataTag,
         string locationTag,
         uint version,
@@ -190,7 +190,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_RejectsBitmapIndexPastDataTable()
+    public void ValidateRejectsBitmapIndexPastDataTable()
     {
         (byte[] data, byte[] location) = CreateBitmapPair(0x00030000u, imageFormat: 19, finalImageOffset: 1);
         var tables = new Dictionary<string, byte[]>
@@ -206,7 +206,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_SbixDupeAddsReferencedGlyph()
+    public void ValidateSbixDupeAddsReferencedGlyph()
     {
         var tables = new Dictionary<string, byte[]> { ["sbix"] = CreateSbixDupe() };
         ColorGlyphClosure closure = ColorFontValidator.Validate(
@@ -222,7 +222,7 @@ public sealed class ColorFontValidatorTests
     }
 
     [Fact]
-    public void Validate_RejectsSbixReservedFlags()
+    public void ValidateRejectsSbixReservedFlags()
     {
         byte[] sbix = CreateSbixDupe();
         WriteUInt16(sbix, 2, 5);

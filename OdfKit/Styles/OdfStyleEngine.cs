@@ -251,7 +251,7 @@ public partial class OdfStyleEngine
 
         return null;
     }
-    private OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
     {
         foreach (var child in parent.Children)
         {

@@ -20,7 +20,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證 LibreOffice 能以臨時真實金鑰開啟並重新儲存 OdfKit OpenPGP 文件。
     /// </summary>
     [Fact]
-    public void LibreOfficeUno_OpenPgpRealKeyBidirectionalRoundTrip()
+    public void LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -36,7 +36,7 @@ public partial class LibreOfficeInteropTests
         const string expectedText = "OdfKit OpenPGP LibreOffice real-key interop";
         string tempRoot = Path.Combine(
             Environment.GetEnvironmentVariable("RUNNER_TEMP") ?? Path.GetTempPath(),
-            "olo-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("olo-"));
         string gpgHome = Path.Combine(tempRoot, "gnupg");
         string profileDirectory = Path.Combine(tempRoot, "profile");
         string sourcePath = Path.Combine(tempRoot, "odfkit-openpgp.odt");
@@ -171,7 +171,7 @@ public partial class LibreOfficeInteropTests
     /// 驗證 LibreOffice 可解密並讀取 OdfKit 產生的 wholesome 加密文件。
     /// </summary>
     [Fact]
-    public void LibreOfficeUno_OpensOdfKitWholesomeEncryptedDocument()
+    public void LibreOfficeUnoOpensOdfKitWholesomeEncryptedDocument()
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
@@ -287,7 +287,7 @@ public partial class LibreOfficeInteropTests
     [InlineData(OdfVersion.Odf12)]
     [InlineData(OdfVersion.Odf13)]
     [InlineData(OdfVersion.Odf14)]
-    public async Task LibreOfficeHeadless_ExecutesManagedDocumentMacros(OdfVersion version)
+    public async Task LibreOfficeHeadlessExecutesManagedDocumentMacros(OdfVersion version)
     {
         string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))

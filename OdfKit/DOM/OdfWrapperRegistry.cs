@@ -21,12 +21,9 @@ public static class OdfWrapperRegistry
     /// <param name="factory">依命名空間前綴建立 wrapper 的 factory</param>
     public static void Register(string localName, string namespaceUri, Func<string?, OdfElement> factory)
     {
-        if (localName is null)
-            throw new ArgumentNullException(nameof(localName));
-        if (namespaceUri is null)
-            throw new ArgumentNullException(nameof(namespaceUri));
-        if (factory is null)
-            throw new ArgumentNullException(nameof(factory));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(localName, nameof(localName));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(namespaceUri, nameof(namespaceUri));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(factory, nameof(factory));
 
         lock (SyncRoot)
         {
@@ -43,10 +40,8 @@ public static class OdfWrapperRegistry
     /// <returns>若已移除既有註冊，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public static bool Unregister(string localName, string namespaceUri)
     {
-        if (localName is null)
-            throw new ArgumentNullException(nameof(localName));
-        if (namespaceUri is null)
-            throw new ArgumentNullException(nameof(namespaceUri));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(localName, nameof(localName));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(namespaceUri, nameof(namespaceUri));
 
         lock (SyncRoot)
         {

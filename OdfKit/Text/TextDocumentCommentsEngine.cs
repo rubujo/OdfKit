@@ -15,10 +15,8 @@ internal static class TextDocumentCommentsEngine
     /// </summary>
     internal static void AddComment(OdfParagraph paragraph, OdfComment comment)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (comment is null)
-            throw new ArgumentNullException(nameof(comment));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(comment, nameof(comment));
 
         OdfNode node = comment.ToXmlNode();
         if (node.LocalName == "annotation-list")
@@ -70,7 +68,7 @@ internal static class TextDocumentCommentsEngine
         creator.TextContent = author;
         foreach (OdfNode paragraph in paragraphs)
             annotation.RemoveChild(paragraph);
-        foreach (string line in text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+        foreach (string line in global::OdfKit.Internal.OdfStringHelper.SplitLines(text))
         {
             annotation.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
             {

@@ -28,10 +28,8 @@ public static class OdfXmlWriter
     /// <exception cref="ArgumentNullException">當 <paramref name="rootNode"/> 或 <paramref name="stream"/> 為 <see langword="null"/> 時擲出</exception>
     public static void Write(OdfNode rootNode, Stream stream, OdfSaveOptions? options)
     {
-        if (rootNode is null)
-            throw new ArgumentNullException(nameof(rootNode));
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(rootNode, nameof(rootNode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
         options ??= OdfSaveOptions.Default;
 
         XmlWriterSettings settings = new()

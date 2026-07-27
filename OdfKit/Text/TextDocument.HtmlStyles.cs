@@ -21,8 +21,7 @@ public partial class TextDocument
     /// <returns>A map from CSS selectors to the generated ODF style names. / CSS selector 與產生的 ODF 樣式名稱對照表。</returns>
     public IReadOnlyDictionary<string, string> ImportHtmlStyles(string cssString)
     {
-        if (cssString is null)
-            throw new ArgumentNullException(nameof(cssString));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(cssString, nameof(cssString));
 
         Dictionary<string, string> imported = new(StringComparer.Ordinal);
         string css = Regex.Replace(cssString, @"/\*[\s\S]*?\*/", string.Empty);
@@ -223,7 +222,7 @@ public partial class TextDocument
         return normalized.StartsWith("span", StringComparison.Ordinal) ||
             normalized.StartsWith("strong", StringComparison.Ordinal) ||
             normalized.StartsWith("em", StringComparison.Ordinal) ||
-            normalized.StartsWith("a", StringComparison.Ordinal)
+            global::OdfKit.Internal.OdfStringHelper.StartsWith(normalized, 'a')
             ? "text"
             : "paragraph";
     }
@@ -250,7 +249,7 @@ public partial class TextDocument
     {
         string trimmed = NormalizeCssValue(value).ToLowerInvariant();
         if (trimmed.EndsWith("px", StringComparison.Ordinal) &&
-            double.TryParse(trimmed.Substring(0, trimmed.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double pixels))
+            global::OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(trimmed, 2, out double pixels))
         {
             return (pixels * 0.75d).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture) + "pt";
         }
@@ -278,5 +277,5 @@ public partial class TextDocument
             value is "700" or "800" or "900";
 
     private static bool ContainsOrdinalIgnoreCase(string text, string value)
-        => text.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
+        => global::OdfKit.Internal.OdfStringHelper.Contains(text, value, StringComparison.OrdinalIgnoreCase);
 }

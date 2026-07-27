@@ -87,7 +87,7 @@ internal static class TextDocumentTableStructuralChangeRecordingEngine
         string author,
         DateTime date)
     {
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
         var changeNode = new OdfNode(OdfNodeType.Element, "insertion", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
         changeNode.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");
@@ -107,7 +107,7 @@ internal static class TextDocumentTableStructuralChangeRecordingEngine
         string author,
         DateTime date)
     {
-        string changeId = "tc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        string changeId = global::OdfKit.Internal.OdfStringHelper.CreatePrefixedGuid("tc_");
         var changeNode = new OdfNode(OdfNodeType.Element, "deletion", OdfNamespaces.Table, "table");
         changeNode.SetAttribute("id", OdfNamespaces.Table, changeId, "table");
         changeNode.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");

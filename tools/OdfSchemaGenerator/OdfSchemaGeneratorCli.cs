@@ -16,12 +16,9 @@ public static class OdfSchemaGeneratorCli
     /// </summary>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
-        if (args == null)
-            throw new ArgumentNullException(nameof(args));
-        if (output == null)
-            throw new ArgumentNullException(nameof(output));
-        if (error == null)
-            throw new ArgumentNullException(nameof(error));
+        ArgumentNullException.ThrowIfNull(args, nameof(args));
+        ArgumentNullException.ThrowIfNull(output, nameof(output));
+        ArgumentNullException.ThrowIfNull(error, nameof(error));
 
         if (!TryParse(args, error, out GeneratorOptions? options))
         {
@@ -32,7 +29,7 @@ public static class OdfSchemaGeneratorCli
         SchemaMetadata metadata;
         try
         {
-            metadata = new RelaxNgSchemaMetadataReader().ReadFile(parsedOptions.SchemaPath);
+            metadata = RelaxNgSchemaMetadataReader.ReadFile(parsedOptions.SchemaPath);
         }
         catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is System.Xml.XmlException)
         {
@@ -65,7 +62,7 @@ public static class OdfSchemaGeneratorCli
 
             string fullOutputDirectory = Path.GetFullPath(parsedOptions.OutputDirectory);
             Directory.CreateDirectory(fullOutputDirectory);
-            new DomWrappersCSharpWriter().WriteToDirectory(metadata, fullOutputDirectory, error);
+            DomWrappersCSharpWriter.WriteToDirectory(metadata, fullOutputDirectory, error);
             return 0;
         }
 
@@ -324,23 +321,23 @@ public static class OdfSchemaGeneratorCli
     {
         if (string.Equals(options.Format, "json", StringComparison.OrdinalIgnoreCase))
         {
-            new SchemaMetadataJsonWriter().Write(metadata, writer);
+            SchemaMetadataJsonWriter.Write(metadata, writer);
             return;
         }
 
         if (string.Equals(options.Format, "csharp", StringComparison.OrdinalIgnoreCase))
         {
-            new SchemaMetadataCSharpWriter().Write(metadata, writer, options.ClassName);
+            SchemaMetadataCSharpWriter.Write(metadata, writer, options.ClassName);
             return;
         }
 
         if (string.Equals(options.Format, "dom-wrappers", StringComparison.OrdinalIgnoreCase))
         {
-            new DomWrappersCSharpWriter().Write(metadata, writer);
+            DomWrappersCSharpWriter.Write(metadata, writer);
             return;
         }
 
-        new SchemaMetadataCSharpWriter().WriteProvider(metadata, writer, options.ClassName);
+        SchemaMetadataCSharpWriter.WriteProvider(metadata, writer, options.ClassName);
     }
 
     private sealed class GeneratorOptions

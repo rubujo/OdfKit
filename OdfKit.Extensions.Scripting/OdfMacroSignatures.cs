@@ -40,7 +40,7 @@ public enum OdfMacroTrustStatus
     /// No macro signature was present.
     /// 不存在巨集簽章。
     /// </summary>
-    Unsigned,
+    NotSigned,
 
     /// <summary>
     /// At least one cryptographic signature was invalid.
@@ -290,6 +290,7 @@ public sealed class OdfMacroSignatureValidationResult
     /// Gets whether macro code safety was evaluated; certificate trust does not establish code safety.
     /// 取得是否已評估巨集程式碼安全性；憑證信任不代表程式碼安全。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public bool IsCodeSafetyEvaluated => false;
 }
 
@@ -406,9 +407,9 @@ public sealed partial class OdfScriptManager
     {
         if (policy is null)
             throw new ArgumentNullException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_ArgumentNull", nameof(policy)));
-        if (!Enum.IsDefined(typeof(OdfMacroTrustMode), policy.Mode))
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(policy.Mode))
             throw new ArgumentOutOfRangeException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(policy)));
-        if (!Enum.IsDefined(typeof(OdfMacroRevocationMode), policy.RevocationMode))
+        if (!OdfKit.Internal.OdfEnumHelper.IsDefined(policy.RevocationMode))
             throw new ArgumentOutOfRangeException(nameof(policy), OdfLocalizer.GetMessage("Err_OdfScriptManager_InvalidArgument", nameof(policy)));
         EnsurePackageScriptsSupported();
 
@@ -436,7 +437,7 @@ public sealed partial class OdfScriptManager
         OdfMacroTrustPolicy policy)
     {
         if (validation.Signatures.Count == 0)
-            return (OdfMacroTrustStatus.Unsigned, OdfMacroTrustFailure.None);
+            return (OdfMacroTrustStatus.NotSigned, OdfMacroTrustFailure.None);
         if (!validation.IsValid)
             return (OdfMacroTrustStatus.InvalidSignature, OdfMacroTrustFailure.None);
 
@@ -460,8 +461,7 @@ public sealed partial class OdfScriptManager
         OdfMacroTrustFailure failures = EvaluateSignerIdentity(certificate, policy);
         if (policy.Mode == OdfMacroTrustMode.PinnedCertificate)
         {
-            using SHA256 sha256 = SHA256.Create();
-            string fingerprint = BitConverter.ToString(sha256.ComputeHash(certificate.RawData)).Replace("-", string.Empty);
+            string fingerprint = OdfKit.Internal.OdfHashHelper.Sha256Hex(certificate.RawData);
             DateTimeOffset verificationTime = policy.VerificationTime ?? DateTimeOffset.UtcNow;
             bool isPinned = policy.PinnedCertificateSha256.Any(pin => NormalizeFingerprint(pin) == fingerprint) ||
                 policy.RotatingCertificatePins.Any(pin =>
@@ -584,7 +584,7 @@ public sealed partial class OdfScriptManager
 
     private static bool IsMacroSignatureEntry(string path)
     {
-        if (string.IsNullOrEmpty(path) || path.EndsWith("/", StringComparison.Ordinal))
+        if (string.IsNullOrEmpty(path) || global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/'))
             return false;
         return path.StartsWith(BasicRoot, StringComparison.Ordinal)
             || path.StartsWith(PythonRoot, StringComparison.Ordinal);

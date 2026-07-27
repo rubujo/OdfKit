@@ -13,7 +13,7 @@ public sealed class SchemaMetadataCSharpWriter
     /// <summary>
     /// 寫出一個可建立 OdfSchemaSet 的 C# 類別。
     /// </summary>
-    public void Write(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
+    public static void Write(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
     {
         Write(metadata, writer, className, includeProviderHook: false);
     }
@@ -21,17 +21,15 @@ public sealed class SchemaMetadataCSharpWriter
     /// <summary>
     /// 寫出一個 C# 類別，並附加 OdfKit 執行階段提供者掛鉤。
     /// </summary>
-    public void WriteProvider(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
+    public static void WriteProvider(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
     {
         Write(metadata, writer, className, includeProviderHook: true);
     }
 
-    private void Write(SchemaMetadata metadata, TextWriter writer, string className, bool includeProviderHook)
+    private static void Write(SchemaMetadata metadata, TextWriter writer, string className, bool includeProviderHook)
     {
-        if (metadata == null)
-            throw new ArgumentNullException(nameof(metadata));
-        if (writer == null)
-            throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(metadata, nameof(metadata));
+        ArgumentNullException.ThrowIfNull(writer, nameof(writer));
         if (string.IsNullOrWhiteSpace(className))
             throw new ArgumentException("Class name cannot be empty.", nameof(className));
 

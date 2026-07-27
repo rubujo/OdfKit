@@ -716,7 +716,7 @@ public static class ManagedOpenTypeWebFontVerifier
 
     private static byte[] ReconstructTransformedHmtx(
         ReadOnlySpan<byte> transformed,
-        IReadOnlyDictionary<string, byte[]> tables)
+        SortedDictionary<string, byte[]> tables)
     {
         if (!tables.TryGetValue("maxp", out byte[]? maxp)
             || !tables.TryGetValue("hhea", out byte[]? hhea)
@@ -866,7 +866,7 @@ public static class ManagedOpenTypeWebFontVerifier
         return result;
     }
 
-    private static IReadOnlyList<Woff2CollectionFace> ReadWoff2Collection(
+    private static List<Woff2CollectionFace> ReadWoff2Collection(
         ReadOnlySpan<byte> data,
         ref int position,
         IReadOnlyList<Woff2TableEntry> entries)
@@ -943,8 +943,8 @@ public static class ManagedOpenTypeWebFontVerifier
         IReadOnlyList<Woff2TableEntry> entries,
         int glyfIndex,
         int locaIndex,
-        IDictionary<int, int> glyfToLoca,
-        IDictionary<int, int> locaToGlyf)
+        Dictionary<int, int> glyfToLoca,
+        Dictionary<int, int> locaToGlyf)
     {
         if ((glyfIndex >= 0) != (locaIndex >= 0))
         {

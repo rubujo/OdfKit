@@ -6,7 +6,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class ProfileTests
 {
     [Fact]
-    public void JsonProfile_DecodesMultibyteAndPrivateMappings()
+    public void JsonProfileDecodesMultibyteAndPrivateMappings()
     {
         const string json = """
               {
@@ -34,7 +34,7 @@ public sealed class ProfileTests
     }
 
     [Fact]
-    public void CnsProfile_DecodesPlaneOneAndSupplementaryPlane()
+    public void CnsProfileDecodesPlaneOneAndSupplementaryPlane()
     {
         using var planeOne = new StringReader("1-2121\t4E00\n");
         using var planeTwo = new StringReader("2-2121\t20000\n");
@@ -50,7 +50,7 @@ public sealed class ProfileTests
     }
 
     [Fact]
-    public void CnsProfile_RejectsConflictingAndUnmappedData()
+    public void CnsProfileRejectsConflictingAndUnmappedData()
     {
         using var first = new StringReader("1-2121\t4E00\n");
         using var conflicting = new StringReader("1-2121\t4E01\n");

@@ -16,10 +16,10 @@ internal static class FormulaPrefixNormalizer
             formula = formula.Substring(6);
         else if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
             formula = formula.Substring(4);
-        else if (formula.StartsWith("=", StringComparison.Ordinal))
+        else if (global::OdfKit.Internal.OdfStringHelper.StartsWith(formula, '='))
             formula = formula.Substring(1);
 
-        if (formula.StartsWith("=", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(formula, '='))
             return formula.Substring(1);
         return formula;
     }

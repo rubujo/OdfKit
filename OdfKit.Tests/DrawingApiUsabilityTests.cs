@@ -273,7 +273,7 @@ public class DrawingApiUsabilityTests
     /// 驗證圖形可標記為 ODF 1.4 裝飾性物件。
     /// </summary>
     [Fact]
-    public void ShapeMarkAsDecorative_WritesDrawDecorativeAttribute()
+    public void ShapeMarkAsDecorativeWritesDrawDecorativeAttribute()
     {
         using var drawing = DrawingDocument.Create();
         OdfDrawPage page = drawing.Pages.Add("Canvas");
@@ -296,7 +296,7 @@ public class DrawingApiUsabilityTests
     /// 驗證圖形框架可嵌入表格。
     /// </summary>
     [Fact]
-    public void ShapeEmbeddedTable_WritesTableInsideShape()
+    public void ShapeEmbeddedTableWritesTableInsideShape()
     {
         using var drawing = DrawingDocument.Create();
         OdfDrawPage page = drawing.Pages.Add("Canvas");

@@ -50,10 +50,7 @@ public partial class SpreadsheetDocument
     /// </remarks>
     public OdfTableSheet AdoptSheet(OdfTableSheet sheet, string? newName)
     {
-        if (sheet is null)
-        {
-            throw new ArgumentNullException(nameof(sheet));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
 
         OdfNode adopted = AdoptNode(sheet.Document, sheet.TableNode);
         if (newName is { Length: > 0 })
@@ -169,10 +166,7 @@ public partial class SpreadsheetDocument
     /// <returns><see langword="true"/> if the worksheet was removed; otherwise, <see langword="false"/>. / 若已移除工作表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool RemoveSheet(OdfTableSheet sheet)
     {
-        if (sheet is null)
-        {
-            throw new ArgumentNullException(nameof(sheet));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
 
         return ReferenceEquals(sheet.Document, this) &&
             TryRemoveSheet(sheet.Name, out _);
@@ -315,10 +309,7 @@ public partial class SpreadsheetDocument
                  (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
         {
             // 向下相容：舊格式使用 SHA-256 單次雜湊
-            using (var sha = SHA256.Create())
-            {
-                actualHash = sha.ComputeHash(input);
-            }
+            actualHash = global::OdfKit.Internal.OdfHashHelper.Sha256(input);
         }
         else
         {
@@ -328,7 +319,7 @@ public partial class SpreadsheetDocument
         return CompareBytes(expectedHash, actualHash);
     }
 
-    private string? FindConfigItemValue(OdfNode entry, string name)
+    private static string? FindConfigItemValue(OdfNode entry, string name)
     {
         foreach (var child in entry.Children)
         {

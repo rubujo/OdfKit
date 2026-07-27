@@ -104,7 +104,7 @@ public class OdfBibliography : OdfIndex
         }
     }
 
-    private void ScanBibliographyMarks(OdfNode node, List<OdfBibliographyMarkInfo> rawMarks)
+    private static void ScanBibliographyMarks(OdfNode node, List<OdfBibliographyMarkInfo> rawMarks)
     {
         if (node.NodeType == OdfNodeType.Element &&
             node.LocalName == "bibliography-mark" &&
@@ -133,7 +133,7 @@ public class OdfBibliography : OdfIndex
         }
     }
 
-    private OdfNode BuildBibliographyEntryParagraph(OdfBibliographyMarkInfo bib, OdfNode? template)
+    private static OdfNode BuildBibliographyEntryParagraph(OdfBibliographyMarkInfo bib, OdfNode? template)
     {
         var p = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         string styleName = template?.GetAttribute("style-name", OdfNamespaces.Text) ?? "Bibliography_20_1";

@@ -26,10 +26,7 @@ public static class OdfCns11643MappingTable
     /// <exception cref="FormatException">A nonblank line does not use the expected format. / 非空白行不符合預期格式。</exception>
     public static IReadOnlyDictionary<string, int> Parse(TextReader reader)
     {
-        if (reader is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
         var result = new Dictionary<string, int>(StringComparer.Ordinal);
         int parsedEntryCount = 0;
@@ -51,7 +48,7 @@ public static class OdfCns11643MappingTable
 
             string cnsCode = fields[0].Trim();
             string valueText = fields[1].Trim();
-            if (!cnsCode.Contains("-", StringComparison.Ordinal) ||
+            if (!cnsCode.Contains('-') ||
                 !int.TryParse(valueText, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out int value) ||
                 value < 0)
             {

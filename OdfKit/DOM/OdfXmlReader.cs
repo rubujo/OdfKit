@@ -458,8 +458,7 @@ public static class OdfXmlReader
     public static OdfNode Parse(Stream stream, OdfLoadOptions? options)
     {
         var stopwatch = Stopwatch.StartNew();
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
         options ??= OdfLoadOptions.Default;
 
         XmlReaderSettings settings = new()
@@ -705,8 +704,8 @@ public static class OdfXmlReader
 
     private static bool IsXmlSizeLimitExceeded(XmlException exception)
     {
-        return exception.Message.IndexOf(nameof(XmlReaderSettings.MaxCharactersInDocument), StringComparison.OrdinalIgnoreCase) >= 0 ||
-            exception.Message.IndexOf("maximum number of characters", StringComparison.OrdinalIgnoreCase) >= 0;
+        return global::OdfKit.Internal.OdfStringHelper.Contains(exception.Message, nameof(XmlReaderSettings.MaxCharactersInDocument), StringComparison.OrdinalIgnoreCase) ||
+            global::OdfKit.Internal.OdfStringHelper.Contains(exception.Message, "maximum number of characters", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsDtdException(XmlException exception)

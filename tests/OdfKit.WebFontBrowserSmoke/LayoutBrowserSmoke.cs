@@ -32,10 +32,24 @@ internal static class LayoutBrowserSmoke
         "繁體中文測試"
     ];
 
+    private static readonly string[] s_nameCffTexts = ["OdfKit café", "fi ffi 0123456789", "OdfKit café 0123"];
+    private static readonly string[] s_seacCffTexts = ["AÁ", "ÁA", "AÁA"];
+    private static readonly string[] s_staticCff2Texts = ["ABCabc", "CBAcba", "AaBbCc"];
+    private static readonly string[] s_arabicVariableTexts = ["السَّلَامُ عَلَيْكُمْ"];
+    private static readonly string[] s_devanagariVariableTexts = ["क्षेत्रज्ञ भारत"];
+    private static readonly string[] s_bengaliVariableTexts = ["বাংলা ভাষা বাংলাদেশ", "ক্ষুদ্র জ্ঞান", "স্বাধীনতা"];
+    private static readonly string[] s_khmerVariableTexts = ["ខ្មែរជាភាសាសម្បូរបែប", "សួស្តីពិភពលោក", "កម្ពុជា"];
+    private static readonly string[] s_thaiVariableTexts = ["ภาษาไทยกำลังทดสอบ", "สวัสดีชาวโลก", "น้ำใจ"];
+    private static readonly string[] s_cff2VariableTexts = ["繁體字 香港邨裏"];
+    private static readonly string[] s_cffCollectionTexts = ["香港邨裏𠮷"];
+    private static readonly string[] s_cff2CollectionTexts = ["繁體字 香港邨裏"];
+    private static readonly string[] s_colrV1Texts = ["😀"];
+    private static readonly string[] s_colorBitmapTexts = ["simple_linear"];
+
     /// <summary>
     /// 依名稱取出必要路徑；缺漏時以明確訊息失敗，而非沿用錯誤的位置引數。
     /// </summary>
-    private static string RequirePath(IReadOnlyDictionary<string, string> named, string name)
+    private static string RequirePath(Dictionary<string, string> named, string name)
         => named.TryGetValue(name, out string? value) && !string.IsNullOrWhiteSpace(value)
             ? Path.GetFullPath(value)
             : throw new ArgumentException($"Missing layout argument: {name}");
@@ -472,12 +486,7 @@ internal static class LayoutBrowserSmoke
                 language = "en",
                 sourceFamily = "OdfKit Name CFF Source",
                 subsetFamily = "OdfKit Name CFF Subset",
-                texts = new[]
-                {
-                    "OdfKit café",
-                    "fi ffi 0123456789",
-                    "OdfKit café 0123"
-                },
+                texts = s_nameCffTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -488,7 +497,7 @@ internal static class LayoutBrowserSmoke
                 language = "en",
                 sourceFamily = "OdfKit seac CFF Source",
                 subsetFamily = "OdfKit seac CFF Subset",
-                texts = new[] { "AÁ", "ÁA", "AÁA" },
+                texts = s_seacCffTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -499,7 +508,7 @@ internal static class LayoutBrowserSmoke
                 language = "en",
                 sourceFamily = "OdfKit Static CFF2 Source",
                 subsetFamily = "OdfKit Static CFF2 Subset",
-                texts = new[] { "ABCabc", "CBAcba", "AaBbCc" },
+                texts = s_staticCff2Texts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -510,7 +519,7 @@ internal static class LayoutBrowserSmoke
                 language = "ar",
                 sourceFamily = "OdfKit Arabic Variable Source",
                 subsetFamily = "OdfKit Arabic Variable Subset",
-                texts = new[] { "السَّلَامُ عَلَيْكُمْ" },
+                texts = s_arabicVariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -526,7 +535,7 @@ internal static class LayoutBrowserSmoke
                 language = "hi",
                 sourceFamily = "OdfKit Devanagari Variable Source",
                 subsetFamily = "OdfKit Devanagari Variable Subset",
-                texts = new[] { "क्षेत्रज्ञ भारत" },
+                texts = s_devanagariVariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -542,7 +551,7 @@ internal static class LayoutBrowserSmoke
                 language = "bn",
                 sourceFamily = "OdfKit Bengali Source",
                 subsetFamily = "OdfKit Bengali Subset",
-                texts = new[] { "বাংলা ভাষা বাংলাদেশ", "ক্ষুদ্র জ্ঞান", "স্বাধীনতা" },
+                texts = s_bengaliVariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -558,7 +567,7 @@ internal static class LayoutBrowserSmoke
                 language = "km",
                 sourceFamily = "OdfKit Khmer Source",
                 subsetFamily = "OdfKit Khmer Subset",
-                texts = new[] { "ខ្មែរជាភាសាសម្បូរបែប", "សួស្តីពិភពលោក", "កម្ពុជា" },
+                texts = s_khmerVariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -574,7 +583,7 @@ internal static class LayoutBrowserSmoke
                 language = "th",
                 sourceFamily = "OdfKit Thai Source",
                 subsetFamily = "OdfKit Thai Subset",
-                texts = new[] { "ภาษาไทยกำลังทดสอบ", "สวัสดีชาวโลก", "น้ำใจ" },
+                texts = s_thaiVariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -590,7 +599,7 @@ internal static class LayoutBrowserSmoke
                 language = "zh-Hant",
                 sourceFamily = "OdfKit CFF2 Variable Source",
                 subsetFamily = "OdfKit CFF2 Variable Subset",
-                texts = new[] { "繁體字 香港邨裏" },
+                texts = s_cff2VariableTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -606,7 +615,7 @@ internal static class LayoutBrowserSmoke
                 language = "zh-Hant",
                 sourceFamily = "OdfKit CFF Collection Source",
                 subsetFamily = "OdfKit CFF Collection Subset",
-                texts = new[] { "香港邨裏𠮷" },
+                texts = s_cffCollectionTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -617,7 +626,7 @@ internal static class LayoutBrowserSmoke
                 language = "zh-Hant",
                 sourceFamily = "OdfKit CFF2 Collection Source",
                 subsetFamily = "OdfKit CFF2 Collection Subset",
-                texts = new[] { "繁體字 香港邨裏" },
+                texts = s_cff2CollectionTexts,
                 axes = new[]
                 {
                     new { weight = 300, stretch = "normal" },
@@ -633,7 +642,7 @@ internal static class LayoutBrowserSmoke
                 language = "und",
                 sourceFamily = "OdfKit Color COLRv1 Source",
                 subsetFamily = "OdfKit Color COLRv1 Subset",
-                texts = new[] { "😀" },
+                texts = s_colrV1Texts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -644,7 +653,7 @@ internal static class LayoutBrowserSmoke
                 language = "und",
                 sourceFamily = "OdfKit Color sbix Source",
                 subsetFamily = "OdfKit Color sbix Subset",
-                texts = new[] { "simple_linear" },
+                texts = s_colorBitmapTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -655,7 +664,7 @@ internal static class LayoutBrowserSmoke
                 language = "und",
                 sourceFamily = "OdfKit Color SVG Source",
                 subsetFamily = "OdfKit Color SVG Subset",
-                texts = new[] { "simple_linear" },
+                texts = s_colorBitmapTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             }

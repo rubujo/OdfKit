@@ -63,15 +63,15 @@ public static partial class OdfPackageValidator
             return false;
         }
 
-        if (path.StartsWith("/", StringComparison.Ordinal) ||
-            path.Contains("\\") ||
-            path.Contains(":") ||
+        if (global::OdfKit.Internal.OdfStringHelper.StartsWith(path, '/') ||
+            path.Contains('\\') ||
+            path.Contains(':') ||
             path.Contains("//"))
         {
             return false;
         }
 
-        string normalized = path.EndsWith("/", StringComparison.Ordinal)
+        string normalized = global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/')
             ? path.Substring(0, path.Length - 1)
             : path;
 
@@ -174,7 +174,7 @@ public static partial class OdfPackageValidator
         {
             if (entryName == "mimetype" ||
                 entryName == "META-INF/manifest.xml" ||
-                entryName.EndsWith("/", StringComparison.Ordinal))
+                global::OdfKit.Internal.OdfStringHelper.EndsWith(entryName, '/'))
             {
                 continue;
             }
@@ -197,7 +197,7 @@ public static partial class OdfPackageValidator
         foreach (string manifestPath in package.Manifest.Keys)
         {
             if (manifestPath != "/" &&
-                !manifestPath.EndsWith("/", StringComparison.Ordinal) &&
+                !global::OdfKit.Internal.OdfStringHelper.EndsWith(manifestPath, '/') &&
                 string.IsNullOrEmpty(package.Manifest[manifestPath]) &&
                 !package.HasEntry(manifestPath))
             {
@@ -210,7 +210,7 @@ public static partial class OdfPackageValidator
             }
 
             if (manifestPath == "/" ||
-                manifestPath.EndsWith("/", StringComparison.Ordinal) ||
+                global::OdfKit.Internal.OdfStringHelper.EndsWith(manifestPath, '/') ||
                 manifestPath == "META-INF/manifest.xml")
             {
                 continue;
@@ -274,7 +274,7 @@ public static partial class OdfPackageValidator
         }
     }
 
-    private static IReadOnlyDictionary<string, string?> ManifestDetails(
+    private static Dictionary<string, string?> ManifestDetails(
         string entryPath,
         string? expectedMediaType = null,
         string? actualMediaType = null,

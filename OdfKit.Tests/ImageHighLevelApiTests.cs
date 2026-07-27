@@ -16,7 +16,7 @@ public class ImageHighLevelApiTests
     /// 驗證 <see cref="ImageDocument.GetImageFrames"/> 可讀回主要影像框架。
     /// </summary>
     [Fact]
-    public void GetImageFrames_RoundTripsAfterSetImage()
+    public void GetImageFramesRoundTripsAfterSetImage()
     {
         using var image = ImageDocument.Create();
         byte[] bytes = CreatePngBytes();
@@ -49,7 +49,7 @@ public class ImageHighLevelApiTests
     /// 驗證 <see cref="ImageDocument.AddImageFrame"/> 與 <see cref="ImageDocument.GetImageFrames"/> 可列舉多個框架。
     /// </summary>
     [Fact]
-    public void GetImageFrames_ReturnsMultipleFrames()
+    public void GetImageFramesReturnsMultipleFrames()
     {
         using var image = ImageDocument.Create();
         byte[] primary = CreatePngBytes();
@@ -86,7 +86,7 @@ public class ImageHighLevelApiTests
     /// 驗證 <see cref="ImageDocument.UpdateImageFrame"/> 與 <see cref="ImageDocument.RemoveImageFrame"/> 可編輯多框架文件。
     /// </summary>
     [Fact]
-    public void UpdateAndRemoveImageFrame_EditsMultiFrameDocument()
+    public void UpdateAndRemoveImageFrameEditsMultiFrameDocument()
     {
         using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
@@ -131,7 +131,7 @@ public class ImageHighLevelApiTests
     /// 驗證框架更新與移除可於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void UpdateAndRemoveImageFrame_PersistAfterSaveAndLoad()
+    public void UpdateAndRemoveImageFramePersistAfterSaveAndLoad()
     {
         using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
@@ -177,7 +177,7 @@ public class ImageHighLevelApiTests
     /// 驗證 <see cref="ImageDocument.SetImageFilter"/> 與 <see cref="ImageDocument.FindImageFilter"/> 的往返一致性。
     /// </summary>
     [Fact]
-    public void ImageFilter_RoundTripsAfterSetAndSave()
+    public void ImageFilterRoundTripsAfterSetAndSave()
     {
         using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
@@ -207,7 +207,7 @@ public class ImageHighLevelApiTests
     /// 驗證 <see cref="ImageDocument.SetImageRotation"/> 與 <see cref="ImageDocument.SetImageCrop"/> 的往返一致性。
     /// </summary>
     [Fact]
-    public void ImageRotationAndCrop_RoundTripAfterSaveAndLoad()
+    public void ImageRotationAndCropRoundTripAfterSaveAndLoad()
     {
         using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
@@ -244,7 +244,7 @@ public class ImageHighLevelApiTests
     /// 且結果與依序個別呼叫 <see cref="ImageDocument.AddImageFrame"/> 等價。
     /// </summary>
     [Fact]
-    public void AddImageFrames_AddsMultipleFramesInOneCall()
+    public void AddImageFramesAddsMultipleFramesInOneCall()
     {
         using var image = ImageDocument.Create();
         byte[] primary = CreatePngBytes();
@@ -286,7 +286,7 @@ public class ImageHighLevelApiTests
     /// 並正確回報實際移除數量（忽略找不到的名稱，不擲出例外）。
     /// </summary>
     [Fact]
-    public void RemoveImageFrames_RemovesMultipleFramesAndIgnoresMissingNames()
+    public void RemoveImageFramesRemovesMultipleFramesAndIgnoresMissingNames()
     {
         using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
@@ -316,7 +316,7 @@ public class ImageHighLevelApiTests
     /// 傳入 <see langword="null"/> 集合時擲出 <see cref="System.ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void BatchFrameOperations_NullCollection_ThrowsArgumentNullException()
+    public void BatchFrameOperationsNullCollectionThrowsArgumentNullException()
     {
         using var image = ImageDocument.Create();
 
@@ -335,7 +335,7 @@ public class ImageHighLevelApiTests
     /// 驗證替換具名框架的影像內容時會保留版面、標題與描述，並於儲存後讀回新內容。
     /// </summary>
     [Fact]
-    public void ReplaceImageFrameContent_PreservesFrameMetadataAndRoundTrips()
+    public void ReplaceImageFrameContentPreservesFrameMetadataAndRoundTrips()
     {
         using var image = ImageDocument.Create();
         image.SetImageLayout(
@@ -375,7 +375,7 @@ public class ImageHighLevelApiTests
     /// 驗證具名框架可批次替換影像內容，並回報不存在的框架。
     /// </summary>
     [Fact]
-    public void ReplaceImageFrameContents_UpdatesFoundFramesAndReportsMissingNames()
+    public void ReplaceImageFrameContentsUpdatesFoundFramesAndReportsMissingNames()
     {
         using var image = ImageDocument.Create();
         image.SetImageLayout(

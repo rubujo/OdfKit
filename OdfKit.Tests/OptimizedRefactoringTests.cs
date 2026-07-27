@@ -34,10 +34,10 @@ public partial class OptimizedRefactoringTests
     /// 驗證文件非同步載入會解析 content、styles、meta 與 settings 四個核心 XML entry；
     /// 文件內容刻意灌入大量文字，讓四份核心 XML 總量超過 <see cref="OdfDocument.SequentialCoreXmlLoadThresholdBytes"/>，
     /// 以維持對 Channel 平行載入路徑的覆蓋（門檻以下的小型文件改走循序路徑，見
-    /// <see cref="Test_OdfDocument_LoadAsync_SmallCoreXml_UsesSequentialPath"/>）。
+    /// <see cref="TestOdfDocumentLoadAsyncSmallCoreXmlUsesSequentialPath"/>）。
     /// </summary>
     [Fact]
-    public async Task Test_OdfDocument_LoadAsync_ParsesCoreXmlEntries()
+    public async Task TestOdfDocumentLoadAsyncParsesCoreXmlEntries()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_async_load_{Guid.NewGuid():N}.odt");
         const string markerNamespace = "urn:example:odfkit:async-load";
@@ -87,7 +87,7 @@ public partial class OptimizedRefactoringTests
     /// 載入時會略過 Channel 平行載入路徑，直接在呼叫執行緒上循序剖析（見 <c>OdfDocument.LoadXmlTrees</c>）。
     /// </summary>
     [Fact]
-    public async Task Test_OdfDocument_LoadAsync_SmallCoreXml_UsesSequentialPath()
+    public async Task TestOdfDocumentLoadAsyncSmallCoreXmlUsesSequentialPath()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_async_load_small_{Guid.NewGuid():N}.odt");
 
@@ -116,7 +116,7 @@ public partial class OptimizedRefactoringTests
         }
     }
 
-    private class DummyRenderer : IOdfRenderer
+    private sealed class DummyRenderer : IOdfRenderer
     {
         public bool ExportCalled { get; private set; }
 
@@ -129,7 +129,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfXmlNameTable_Preloads_Standard_Odf_Names()
+    public void TestOdfXmlNameTablePreloadsStandardOdfNames()
     {
         NameTable nameTable = OdfXmlNameTable.Create();
 
@@ -147,7 +147,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfXmlNameTable_Is_Used_By_XmlReader()
+    public void TestOdfXmlNameTableIsUsedByXmlReader()
     {
         NameTable nameTable = OdfXmlNameTable.Create();
         string tableNamespace = nameTable.Get(OdfNamespaces.Table)!;
@@ -174,7 +174,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_BeginUpdate_Defers_Style_Deduplication_Until_Outer_EndUpdate()
+    public void TestBeginUpdateDefersStyleDeduplicationUntilOuterEndUpdate()
     {
         using var doc = TextDocument.Create();
         OdfParagraph paragraph = doc.AddParagraph("批次更新");
@@ -204,7 +204,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_EndUpdate_Without_BeginUpdate_Throws_Localized_Exception()
+    public void TestEndUpdateWithoutBeginUpdateThrowsLocalizedException()
     {
         using var doc = TextDocument.Create();
 
@@ -214,7 +214,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_PruneAndCollect_Detaches_And_Clears_Dom_Subtree()
+    public void TestPruneAndCollectDetachesAndClearsDomSubtree()
     {
         var root = new OdfNode(OdfNodeType.Element, "root", OdfNamespaces.Office, "office");
         var section = new OdfNode(OdfNodeType.Element, "section", OdfNamespaces.Text, "text");
@@ -236,7 +236,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_PruneAndCollect_Releases_Deferred_Local_Styles()
+    public void TestPruneAndCollectReleasesDeferredLocalStyles()
     {
         using var doc = TextDocument.Create();
         var p = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
@@ -265,7 +265,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_RendererRegistry_And_ExportToPdf()
+    public void TestRendererRegistryAndExportToPdf()
     {
         // 備份並用反射將 _renderer 重設為 null 且將 _attemptedAutoRegister 設為 true，確保測試中不會觸發自動尋檢
         var rendererField = typeof(OdfRendererRegistry).GetField("_renderer", BindingFlags.NonPublic | BindingFlags.Static);
@@ -303,7 +303,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_ComputedStyle_Caching_And_Invalidation()
+    public void TestComputedStyleCachingAndInvalidation()
     {
         var doc = TextDocument.Create();
         var p = new TextPElement("text");
@@ -320,7 +320,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPerformanceTelemetry()
+    public void TestOdfPerformanceTelemetry()
     {
         // 測試 ActivitySource 與 Meter
         using var listener = new ActivityListener
@@ -338,7 +338,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfTransaction_Rollback()
+    public void TestOdfTransactionRollback()
     {
         // 測試沙盒交易能正常使用
         using var tempStream = new MemoryStream();
@@ -363,7 +363,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_TransactionException_IsLocalized()
+    public void TestOdfPackageTransactionExceptionIsLocalized()
     {
         using var tempStream = new MemoryStream();
         using (var writer = new OdsStreamWriter(tempStream))
@@ -383,7 +383,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfMemoryTracker_Diagnose()
+    public void TestOdfMemoryTrackerDiagnose()
     {
         var ptr = new IntPtr(12345);
         OdfMemoryTracker.Track(ptr, 1024, "TestAllocation");
@@ -399,7 +399,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfMemoryTracker_Emits_Large_Allocation_Diagnostics()
+    public void TestOdfMemoryTrackerEmitsLargeAllocationDiagnostics()
     {
         List<OdfDiagnosticsEventArgs> diagnostics = [];
         EventHandler<OdfDiagnosticsEventArgs> handler = (_, args) => diagnostics.Add(args);
@@ -426,7 +426,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfMemoryTracker_ReportLoadProfile_Emits_AntiPattern_Diagnostics()
+    public void TestOdfMemoryTrackerReportLoadProfileEmitsAntiPatternDiagnostics()
     {
         List<OdfDiagnosticsEventArgs> diagnostics = [];
         EventHandler<OdfDiagnosticsEventArgs> handler = (_, args) => diagnostics.Add(args);
@@ -456,7 +456,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfDocumentValidator_Topology()
+    public void TestOdfDocumentValidatorTopology()
     {
         var doc = TextDocument.Create();
 
@@ -470,7 +470,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8XmlReader_Parity()
+    public void TestOdfUtf8XmlReaderParity()
     {
         var xmlStr = "<office:document-content xmlns:office=\"urn\" office:version=\"1.4\"><p>Hello World</p></office:document-content>"u8;
         var reader = new OdfUtf8XmlReader(xmlStr);
@@ -488,7 +488,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8XmlReader_CommentContainingLessThan_DoesNotSwallowFollowingMarkup()
+    public void TestOdfUtf8XmlReaderCommentContainingLessThanDoesNotSwallowFollowingMarkup()
     {
         // 註解內含裸 < ；舊的 < > 深度計數會被誤導而吞掉註解後的 <p> 標記。
         var xml = "<root><!-- 1 < 2 --><p>Kept</p></root>"u8;
@@ -506,7 +506,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8XmlReader_ReadValueChunk_ReadsTextInUtf8Chunks()
+    public void TestOdfUtf8XmlReaderReadValueChunkReadsTextInUtf8Chunks()
     {
         var xml = "<root><p>Chunked UTF-8 value 1234567890</p></root>"u8;
         var reader = new OdfUtf8XmlReader(xml);
@@ -538,7 +538,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8XmlReader_CopyValueTo_WritesRemainingValueToBufferWriter()
+    public void TestOdfUtf8XmlReaderCopyValueToWritesRemainingValueToBufferWriter()
     {
         string value = new string('A', 257) + "臺灣 UTF-8 chunk";
         byte[] xml = Encoding.UTF8.GetBytes($"<root><p>{value}</p></root>");
@@ -581,7 +581,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8SpanWriter_FormatsValuesAndEscapesXmlWithoutStrings()
+    public void TestOdfUtf8SpanWriterFormatsValuesAndEscapesXmlWithoutStrings()
     {
         var buffer = new ArrayBufferWriter<byte>();
         var writer = new OdfUtf8SpanWriter(buffer);
@@ -602,7 +602,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8SpanWriter_RepeatedNumericWritesAvoidPerValueStringAllocation()
+    public void TestOdfUtf8SpanWriterRepeatedNumericWritesAvoidPerValueStringAllocation()
     {
         var buffer = new ArrayBufferWriter<byte>(1024 * 64);
         var writer = new OdfUtf8SpanWriter(buffer);
@@ -630,7 +630,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfUtf8XmlReader_GetStringMaybeDecoded_UsesFastEntityDecoder()
+    public void TestOdfUtf8XmlReaderGetStringMaybeDecodedUsesFastEntityDecoder()
     {
         int decodeHitsBefore = OdfUtf8XmlReader.LastEntityFastDecodeCountForTests;
         var value = "A&amp;B&lt;C&gt;&quot;D&quot;&apos;E&apos;&#65;&#x1F600;&unknown;"u8;
@@ -642,7 +642,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfAttributeStringPool_InternsCommonNamesNamespacesAndValues()
+    public void TestOdfAttributeStringPoolInternsCommonNamesNamespacesAndValues()
     {
         int nameHitsBefore = OdfAttributeStringPool.NameHitCountForTests;
         int valueHitsBefore = OdfAttributeStringPool.ValueHitCountForTests;
@@ -672,7 +672,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfFastNumberParser_UsesUtf8LookupAndSpanParserForShortNumbers()
+    public void TestOdfFastNumberParserUsesUtf8LookupAndSpanParserForShortNumbers()
     {
         int utf8HitsBefore = OdfFastNumberParser.LastUtf8LookupHitCountForTests;
         int spanHitsBefore = OdfFastNumberParser.LastSpanParserHitCountForTests;
@@ -690,7 +690,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_FormulaCoercion_UsesFastNumberParserForCommonNumericStrings()
+    public void TestFormulaCoercionUsesFastNumberParserForCommonNumericStrings()
     {
         int charHitsBefore = OdfFastNumberParser.LastCharLookupHitCountForTests;
 
@@ -701,7 +701,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfChartBuilder_BindData_And_Transform()
+    public void TestOdfChartBuilderBindDataAndTransform()
     {
         var spreadsheet = SpreadsheetDocument.Create();
         var package = spreadsheet.Package;
@@ -749,7 +749,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_RawEntryPatch_And_DumpVfsLayout()
+    public void TestOdfPackageRawEntryPatchAndDumpVfsLayout()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdsStreamWriter(ms))
@@ -788,7 +788,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_DebuggerProxy_Exposes_Structured_Vfs_Entries()
+    public void TestOdfPackageDebuggerProxyExposesStructuredVfsEntries()
     {
         using var ms = new MemoryStream();
         using var package = OdfPackage.Create(ms, leaveOpen: true);
@@ -821,7 +821,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_FileOpen_UsesCentralDirectoryIndexForVfsOffsets()
+    public void TestOdfPackageFileOpenUsesCentralDirectoryIndexForVfsOffsets()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"central_directory_index_{Guid.NewGuid():N}.odt");
         try
@@ -861,7 +861,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_Save_WritesToBufferWriter()
+    public void TestOdfPackageSaveWritesToBufferWriter()
     {
         var buffer = new ArrayBufferWriter<byte>();
         using (var package = OdfPackage.Create(new MemoryStream()))
@@ -882,7 +882,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_Save_UsesParallelPreparedZipEntries()
+    public void TestOdfPackageSaveUsesParallelPreparedZipEntries()
     {
         using var stream = new MemoryStream();
         using (var package = OdfPackage.Create(stream, leaveOpen: true))
@@ -910,7 +910,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdfPackage_SaveAsync_UsesParallelPreparedZipEntries()
+    public async Task TestOdfPackageSaveAsyncUsesParallelPreparedZipEntries()
     {
         using var source = new MemoryStream();
         using var destination = new MemoryStream();
@@ -943,7 +943,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdfPackage_SaveAsync_UsesRawCopyForUnmodifiedMmfEntries()
+    public async Task TestOdfPackageSaveAsyncUsesRawCopyForUnmodifiedMmfEntries()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"async_raw_copy_{Guid.NewGuid():N}.odt");
         using var cts = new CancellationTokenSource();
@@ -984,7 +984,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdfPackage_SaveAsync_CanceledBeforeFastPathThrows()
+    public async Task TestOdfPackageSaveAsyncCanceledBeforeFastPathThrows()
     {
         using var source = new MemoryStream();
         using var destination = new MemoryStream();
@@ -999,7 +999,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_RawEntryPatch_RepeatedCacheConsistency()
+    public void TestOdfPackageRawEntryPatchRepeatedCacheConsistency()
     {
         using var ms = new MemoryStream();
         using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -1034,7 +1034,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_WriteEntry_NewEntryRoundTripsAfterSave()
+    public void TestOdfPackageWriteEntryNewEntryRoundTripsAfterSave()
     {
         using var ms = new MemoryStream();
         using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -1051,7 +1051,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_WriteEntry_StreamContentIsPackageOwned()
+    public void TestOdfPackageWriteEntryStreamContentIsPackageOwned()
     {
         using var ms = new MemoryStream();
         using (var package = OdfPackage.Create(ms, leaveOpen: true))
@@ -1076,7 +1076,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_RawEntryPatch_StoredEntry_RoundTripsWithUpdatedCrc()
+    public void TestOdfPackageRawEntryPatchStoredEntryRoundTripsWithUpdatedCrc()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"raw_patch_{Guid.NewGuid():N}.ods");
         try
@@ -1130,7 +1130,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_RawEntryPatch_VariableLengthEntry_AppendsNewCentralDirectory()
+    public void TestOdfPackageRawEntryPatchVariableLengthEntryAppendsNewCentralDirectory()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"raw_patch_append_{Guid.NewGuid():N}.ods");
         string marker = "<!-- 增量追加 Patch 測試內容 -->";
@@ -1206,7 +1206,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdfDoubleBufferedWritableStream_PreservesBytesAcrossBufferBoundaries()
+    public async Task TestOdfDoubleBufferedWritableStreamPreservesBytesAcrossBufferBoundaries()
     {
         byte[] expected = Enumerable.Range(0, 4097)
             .Select(static value => (byte)(value % 251))
@@ -1221,7 +1221,7 @@ public partial class OptimizedRefactoringTests
             while (offset < expected.Length)
             {
                 int count = Math.Min(53, expected.Length - offset);
-                await stream.WriteAsync(expected, offset, count, TestContext.Current.CancellationToken);
+                await stream.WriteAsync(expected.AsMemory(offset, count), TestContext.Current.CancellationToken);
                 offset += count;
             }
 
@@ -1240,7 +1240,7 @@ public partial class OptimizedRefactoringTests
     /// 且與非同步寫入交錯使用時輸出順序正確。
     /// </summary>
     [Fact]
-    public async Task Test_OdfDoubleBufferedWritableStream_SyncWritePreservesBytesAndInterleavesWithAsync()
+    public async Task TestOdfDoubleBufferedWritableStreamSyncWritePreservesBytesAndInterleavesWithAsync()
     {
         byte[] expected = Enumerable.Range(0, 4097)
             .Select(static value => (byte)(value % 251))
@@ -1260,7 +1260,7 @@ public partial class OptimizedRefactoringTests
                 }
                 else
                 {
-                    await stream.WriteAsync(expected, offset, count, TestContext.Current.CancellationToken);
+                    await stream.WriteAsync(expected.AsMemory(offset, count), TestContext.Current.CancellationToken);
                 }
 
                 useSync = !useSync;
@@ -1274,14 +1274,14 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfDoubleBufferedWritableStream_RejectsInvalidBufferSize()
+    public void TestOdfDoubleBufferedWritableStreamRejectsInvalidBufferSize()
     {
         using var target = new MemoryStream();
         Assert.Throws<ArgumentOutOfRangeException>(() => new OdfDoubleBufferedWritableStream(target, bufferSize: 0));
     }
 
     [Fact]
-    public async Task Test_OdfPagedGatherWritableStream_BatchesPagesAndFallsBackForNonFileStream()
+    public async Task TestOdfPagedGatherWritableStreamBatchesPagesAndFallsBackForNonFileStream()
     {
         byte[] expected = Enumerable.Range(0, 192)
             .Select(static value => (byte)(value % 251))
@@ -1293,7 +1293,7 @@ public partial class OptimizedRefactoringTests
         using var target = new MemoryStream();
         using (var stream = new OdfPagedGatherWritableStream(target, pageSize: 64, pagesPerFlush: 3, leaveOpen: true))
         {
-            await stream.WriteAsync(expected, 0, expected.Length, TestContext.Current.CancellationToken);
+            await stream.WriteAsync(expected.AsMemory(), TestContext.Current.CancellationToken);
             await stream.FlushAsync(TestContext.Current.CancellationToken);
         }
 
@@ -1305,7 +1305,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdfPagedGatherWritableStream_UsesVectoredFileWriteOnNet10()
+    public async Task TestOdfPagedGatherWritableStreamUsesVectoredFileWriteOnNet10()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitPagedGather_{Guid.NewGuid():N}.bin");
         byte[] expected = Enumerable.Range(0, 384)
@@ -1318,7 +1318,7 @@ public partial class OptimizedRefactoringTests
             await using (var file = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous))
             await using (var stream = new OdfPagedGatherWritableStream(file, pageSize: 128, pagesPerFlush: 3, leaveOpen: true))
             {
-                await stream.WriteAsync(expected, 0, expected.Length, TestContext.Current.CancellationToken);
+                await stream.WriteAsync(expected.AsMemory(), TestContext.Current.CancellationToken);
                 await stream.FlushAsync(TestContext.Current.CancellationToken);
                 Assert.Equal(expected.Length, file.Position);
             }
@@ -1342,7 +1342,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_DOMTree_ComputedStyleInvalidation()
+    public void TestDOMTreeComputedStyleInvalidation()
     {
         var doc = TextDocument.Create();
         var parent1 = new TextPElement("text");
@@ -1367,7 +1367,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_AdoptNode_MediaManagerCache()
+    public void TestAdoptNodeMediaManagerCache()
     {
         var docSrc = TextDocument.Create();
         var docDest = TextDocument.Create();
@@ -1395,7 +1395,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfDocument_ReplaceText_PreservingFormat()
+    public void TestOdfDocumentReplaceTextPreservingFormat()
     {
         var doc = TextDocument.Create();
         var p = new TextPElement("text");
@@ -1408,7 +1408,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfLazyLoading_ZeroAllocation_MmfPtr()
+    public void TestOdfLazyLoadingZeroAllocationMmfPtr()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitMmfLazyTest_{Guid.NewGuid():N}.dat");
         try
@@ -1478,7 +1478,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfSparseStorage_LruCache_Tiering()
+    public void TestOdfSparseStorageLruCacheTiering()
     {
         using (var doc = SpreadsheetDocument.Create())
         {
@@ -1552,7 +1552,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfSparseStorage_MaxHotPages_IsConfigurablePerTable()
+    public void TestOdfSparseStorageMaxHotPagesIsConfigurablePerTable()
     {
         using (var doc = SpreadsheetDocument.Create())
         {
@@ -1594,7 +1594,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfSparseStorage_MaxHotPages_RejectsNonPositiveValue()
+    public void TestOdfSparseStorageMaxHotPagesRejectsNonPositiveValue()
     {
         using (var doc = SpreadsheetDocument.Create())
         {
@@ -1607,7 +1607,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public unsafe void Test_DirectIoAlignedNativeBuffer_Uses4096ByteAlignedNativeMemory()
+    public unsafe void TestDirectIoAlignedNativeBufferUses4096ByteAlignedNativeMemory()
     {
 #if NET10_0_OR_GREATER
         using var buffer = new AlignedNativeBuffer(64 * 1024, 4096);
@@ -1620,7 +1620,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_DirectIoStreams_ReadWriteRoundTripAsync()
+    public async Task TestDirectIoStreamsReadWriteRoundTripAsync()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIo_{Guid.NewGuid():N}.bin");
         try
@@ -1630,13 +1630,13 @@ public partial class OptimizedRefactoringTests
                 .ToArray();
             using (var writer = new OdfDirectIoWritableStream(tempFile))
             {
-                await writer.WriteAsync(payload, 0, payload.Length, TestContext.Current.CancellationToken);
+                await writer.WriteAsync(payload.AsMemory(), TestContext.Current.CancellationToken);
             }
 
             using (var reader = new OdfDirectIoReadableStream(tempFile))
             {
                 byte[] buffer = new byte[payload.Length + 16];
-                int read = await reader.ReadAsync(buffer, 0, buffer.Length, TestContext.Current.CancellationToken);
+                int read = await reader.ReadAsync(buffer.AsMemory(), TestContext.Current.CancellationToken);
                 Assert.Equal(payload.Length, read);
                 Assert.Equal(payload, buffer.Take(read).ToArray());
             }
@@ -1651,7 +1651,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_DirectIoStreams_ReadAcrossPrefetchAndTailBoundariesAsync()
+    public async Task TestDirectIoStreamsReadAcrossPrefetchAndTailBoundariesAsync()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoBoundary_{Guid.NewGuid():N}.bin");
         try
@@ -1666,7 +1666,7 @@ public partial class OptimizedRefactoringTests
                 while (offset < payload.Length)
                 {
                     int count = Math.Min(7001, payload.Length - offset);
-                    await writer.WriteAsync(payload, offset, count, TestContext.Current.CancellationToken);
+                    await writer.WriteAsync(payload.AsMemory(offset, count), TestContext.Current.CancellationToken);
                     offset += count;
                 }
             }
@@ -1678,9 +1678,7 @@ public partial class OptimizedRefactoringTests
                 while (total < actual.Length)
                 {
                     int read = await reader.ReadAsync(
-                        actual,
-                        total,
-                        Math.Min(5003, actual.Length - total),
+                        actual.AsMemory(total, Math.Min(5003, actual.Length - total)),
                         TestContext.Current.CancellationToken);
                     if (read == 0)
                         break;
@@ -1719,7 +1717,7 @@ public partial class OptimizedRefactoringTests
     /// 否則背景執行緒會與已釋放的資源競爭。
     /// </summary>
     [Fact]
-    public void Test_DirectIoReadableStream_DisposeWhilePrefetchInFlight_DoesNotThrow()
+    public void TestDirectIoReadableStreamDisposeWhilePrefetchInFlightDoesNotThrow()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoDispose_{Guid.NewGuid():N}.bin");
         try
@@ -1759,7 +1757,7 @@ public partial class OptimizedRefactoringTests
     /// 否則會與新排程的預讀共寫同一緩衝區而讀到交錯的錯誤位元組。
     /// </summary>
     [Fact]
-    public void Test_DirectIoReadableStream_InterleavedReadAndSeek_ReturnsCorrectBytes()
+    public void TestDirectIoReadableStreamInterleavedReadAndSeekReturnsCorrectBytes()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoSeek_{Guid.NewGuid():N}.bin");
         try
@@ -1823,13 +1821,13 @@ public partial class OptimizedRefactoringTests
     [Theory]
     [InlineData("number-rows-repeated", 2_000_000_000, 1_048_576)]
     [InlineData("number-columns-repeated", 2_000_000_000, 16_384)]
-    public void Test_GetRepeatCount_ClampsExcessiveRepeatedCountToStreamingReaderLimit(
+    public void TestGetRepeatCountClampsExcessiveRepeatedCountToStreamingReaderLimit(
         string attributeName,
         int declaredCount,
         int expectedMax)
     {
         var node = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
-        node.SetAttribute(attributeName, OdfNamespaces.Table, declaredCount.ToString(), "table");
+        node.SetAttribute(attributeName, OdfNamespaces.Table, declaredCount.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
 
         int count = OdfTableSheetRepeatSplitEngine.GetRepeatCount(node, attributeName);
 
@@ -1837,7 +1835,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfTransaction_JournalCreateFailure_FailsFast()
+    public void TestOdfTransactionJournalCreateFailureFailsFast()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"journal_fail_{Guid.NewGuid():N}.ods");
         string journalPath = tempFile + ".journal";
@@ -1869,7 +1867,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_ZipEntryCountLimit_UsesLocalizedException()
+    public void TestOdfPackageZipEntryCountLimitUsesLocalizedException()
     {
         using MemoryStream packageStream = CreateZipPackage(
             ("content.xml", Encoding.UTF8.GetBytes("<root/>")),
@@ -1883,7 +1881,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_FilePathZipEntryCountLimit_UsesLocalizedException()
+    public void TestOdfPackageFilePathZipEntryCountLimitUsesLocalizedException()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"entry_count_{Guid.NewGuid():N}.odt");
         try
@@ -1912,7 +1910,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_ZipEntrySizeLimit_UsesLocalizedException()
+    public void TestOdfPackageZipEntrySizeLimitUsesLocalizedException()
     {
         byte[] payload = Encoding.UTF8.GetBytes("12345");
         using MemoryStream packageStream = CreateZipPackage(("content.xml", payload));
@@ -1925,7 +1923,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_ZipTotalUncompressedSizeLimit_UsesLocalizedException()
+    public void TestOdfPackageZipTotalUncompressedSizeLimitUsesLocalizedException()
     {
         byte[] payload = Encoding.UTF8.GetBytes("12345");
         using MemoryStream packageStream = CreateZipPackage(
@@ -1944,7 +1942,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfSparseStorage_ColdPageCompression_RoundTrip()
+    public void TestOdfSparseStorageColdPageCompressionRoundTrip()
     {
         var table = new TableTableElement("table");
         table.SetSparseCellStyle(0, 0, "StyleA");
@@ -1975,7 +1973,7 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfTransaction_Journal_Recovery()
+    public void TestOdfTransactionJournalRecovery()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"journal_test_{Guid.NewGuid():N}.ods");
         try

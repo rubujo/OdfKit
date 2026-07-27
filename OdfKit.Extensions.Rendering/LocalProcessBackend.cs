@@ -31,8 +31,7 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
     /// <inheritdoc />
     public async Task<Stream> ConvertAsync(Stream input, string inputExtension, string convertTo, CancellationToken ct)
     {
-        if (input is null)
-            throw new ArgumentNullException(nameof(input));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(input, nameof(input));
         if (string.IsNullOrEmpty(inputExtension))
             throw new ArgumentNullException(nameof(inputExtension));
         if (string.IsNullOrEmpty(convertTo))

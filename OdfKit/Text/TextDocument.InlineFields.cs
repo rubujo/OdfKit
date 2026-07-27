@@ -59,8 +59,7 @@ public partial class TextDocument
     /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool RemoveTextField(OdfTextField field)
     {
-        if (field is null)
-            throw new ArgumentNullException(nameof(field));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(field, nameof(field));
         return IsDescendantOfBody(field.Node) && field.Node.Parent is not null && field.Node.Parent.RemoveChild(field.Node);
     }
 

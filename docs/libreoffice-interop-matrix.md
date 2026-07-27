@@ -37,25 +37,25 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 | 測試 | 來源格式 | OdfKit 建立內容 | LibreOffice 轉換 | 驗收方式 | 狀態 |
 |------|----------|-----------------|------------------|----------|------|
-| `LibreOfficeHeadless_LoadsGeneratedDocuments` | ODT | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
+| `LibreOfficeHeadlessLoadsGeneratedDocuments` | ODT | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
 | 同上 | ODS | 嵌入圖表（條形圖、標題、圖例） | `xlsx` | 轉出 XLSX 非空 | ✅ |
 | 同上 | ODP | 進場動畫（fade-in） | `fodp` | 轉出 XML 含 `ooo-entrance-fade-in` | ✅ |
 | 同上 | ODG | 文字方塊互通標記 | `fodg` | 轉出 XML 含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
-| `LibreOfficeHeadless_LoadsTrackedChangesOdt` | ODT | `text:tracked-changes` 段落與表格 | `txt` / `odt` | 標記保留；可 accept 修訂 | ✅ |
-| `LibreOfficeHeadless_LoadsTrackedChangesOds` | ODS | `table:tracked-changes` 公式變更 | `ods` | 標記與修訂節點保留 | ✅ |
-| `LibreOfficeHeadless_LoadsTemplateVariantDocuments` | OTT | 母片頁面、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-Template-Interop-Marker` | ✅ |
+| `LibreOfficeHeadlessLoadsTrackedChangesOdt` | ODT | `text:tracked-changes` 段落與表格 | `txt` / `odt` | 標記保留；可 accept 修訂 | ✅ |
+| `LibreOfficeHeadlessLoadsTrackedChangesOds` | ODS | `table:tracked-changes` 公式變更 | `ods` | 標記與修訂節點保留 | ✅ |
+| `LibreOfficeHeadlessLoadsTemplateVariantDocuments` | OTT | 母片頁面、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-Template-Interop-Marker` | ✅ |
 | 同上 | OTS | 工作表互通標記 | `fods` | 轉出 Flat XML 含互通標記 | ✅ |
 | 同上 | OTP | 標題 placeholder、文字方塊互通標記 | `fodp` | 轉出 Flat XML 含互通標記 | ✅ |
 | 同上 | OTG | 文字方塊互通標記 | `fodg` | 轉出 Flat XML 含互通標記 | ✅ |
-| `LibreOfficeHeadless_LoadsNativeFlatXmlDocuments` | FODT（原生產生，非由 ZIP 轉換） | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-NativeFlat-Interop-Marker` | ✅ |
+| `LibreOfficeHeadlessLoadsNativeFlatXmlDocuments` | FODT（原生產生，非由 ZIP 轉換） | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-NativeFlat-Interop-Marker` | ✅ |
 | 同上 | FODS（原生產生） | 工作表互通標記 | `xlsx` | 轉出 XLSX 非空 | ✅ |
 | 同上 | FODP（原生產生） | 文字方塊互通標記 | `odp` | 轉出 ODP 含互通標記 | ✅ |
 | 同上 | FODG（原生產生） | 文字方塊互通標記 | `png` | 轉出 PNG 非空 | ✅ |
-| `LibreOfficeHeadless_LoadsMasterDocument` | ODM | 段落、子文件參照、互通標記 | `txt` / `odm` | LibreOffice 識別為 Writer master document（`writerglobal8`）；轉出文字含互通標記；往返後子文件參照保留 | ✅ |
-| `LibreOfficeHeadless_LoadsWebTemplateDocument` | OTH | 標題、段落、互通標記 | `txt` / `odt` | LibreOffice 識別為 Writer/Web document（`writerweb8_writer`）；轉出文字含互通標記；轉出 ODT 內容保留 | ✅ |
+| `LibreOfficeHeadlessLoadsMasterDocument` | ODM | 段落、子文件參照、互通標記 | `txt` / `odm` | LibreOffice 識別為 Writer master document（`writerglobal8`）；轉出文字含互通標記；往返後子文件參照保留 | ✅ |
+| `LibreOfficeHeadlessLoadsWebTemplateDocument` | OTH | 標題、段落、互通標記 | `txt` / `odt` | LibreOffice 識別為 Writer/Web document（`writerweb8_writer`）；轉出文字含互通標記；轉出 ODT 內容保留 | ✅ |
 | `DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType` | ODB | 資料表、查詢、表單封裝 | （封裝層級，無 CLI 轉換） | mimetype／manifest media-type 與真實 LibreOffice 自建 ODB 完全一致；另以 UNO API `desktop.loadComponentFromURL` 人工驗證可成功載入 | ✅ |
-| `LibreOfficeHeadless_ExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
-| `LibreOfficeUno_OpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
+| `LibreOfficeHeadlessExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
+| `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
 
 ## 已知上游限制（非 OdfKit 缺陷）
 
@@ -70,8 +70,8 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 ODF Chart 設計上即為僅可嵌入 ODS/ODT/ODP 內的子文件類型，並非獨立可開啟的主文件格式。
 改以封裝結構與 schema 層級的精確驗證取代真機驗證（見
-`LibreOfficeInteropTests.OdfChartDocument_PackageStructureMatchesOdf14Schema`），並以既有
-「圖表嵌入 ODS 後由 LibreOffice 開啟」驗收（`LibreOfficeHeadless_LoadsGeneratedDocuments` 對
+`LibreOfficeInteropTests.OdfChartDocumentPackageStructureMatchesOdf14Schema`），並以既有
+「圖表嵌入 ODS 後由 LibreOffice 開啟」驗收（`LibreOfficeHeadlessLoadsGeneratedDocuments` 對
 含圖表 ODS 的 `xlsx` 轉換）佐證嵌入式圖表的真實互通性。
 
 獨立 OTF／FDF 公式範本與 Flat 變體同樣不被 LibreOffice 26.2.1 接受為可直接開啟的主文件：
@@ -84,8 +84,8 @@ ODF Chart 設計上即為僅可嵌入 ODS/ODT/ODP 內的子文件類型，並非
 
 ODF Formula 是唯一一個獨立 ZIP 主格式（`.odf`）確實有真機支援的次要格式（不同於 Chart／Image），
 但其 Template／Flat 變體仍與 Chart／Image 的變體一樣不受支援。見
-`LibreOfficeInteropTests.LibreOfficeHeadless_LoadsFormulaDocument`（.odf 真機驗收）與
-`OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema`（.otf／.fdf 封裝結構驗證）。
+`LibreOfficeInteropTests.LibreOfficeHeadlessLoadsFormulaDocument`（.odf 真機驗收）與
+`OdfFormulaVariantDocumentPackageStructureMatchesOdf14Schema`（.otf／.fdf 封裝結構驗證）。
 
 獨立 ODI／OTI／FODI 影像文件同樣不被 LibreOffice 26.2.1 與 Microsoft Office 365 接受為可直接
 開啟的主文件：
@@ -97,7 +97,7 @@ ODF Formula 是唯一一個獨立 ZIP 主格式（`.odf`）確實有真機支援
 | `.fodi` | ❌ 未回報錯誤，但被誤判為「Writer document」，以 `writer_png_Export` 篩選器產生與影像內容完全無關的輸出 |
 
 `.fodi` 的誤判模式與 `.fodc`（誤判為 Writer document）、`.fdf`（誤判為 Calc document）一致——
-這修正了既有 `ImageDocument_PackageStructureMatchesOdf14Schema` 註解中原先聲稱「ODI／OTI／
+這修正了既有 `ImageDocumentPackageStructureMatchesOdf14Schema` 註解中原先聲稱「ODI／OTI／
 FODI 一律回報 source file could not be loaded」的不準確描述（該描述對 ODI／OTI 成立，但對
 FODI 並不成立）。改以封裝結構與 schema 層級的精確驗證取代真機驗證（該測試已擴充涵蓋
 ODI／OTI／FODI 三者）。

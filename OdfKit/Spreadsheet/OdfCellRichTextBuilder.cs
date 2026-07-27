@@ -47,10 +47,8 @@ public sealed class OdfCellRichTextBuilder
     /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder Append(string text, OdfRichTextRunOptions options)
     {
-        if (text is null)
-            throw new ArgumentNullException(nameof(text));
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         _richText.AddRun(text, options);
         Commit();
@@ -77,8 +75,7 @@ public sealed class OdfCellRichTextBuilder
     /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder Set(OdfRichText richText)
     {
-        if (richText is null)
-            throw new ArgumentNullException(nameof(richText));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(richText, nameof(richText));
 
         _richText.Clear();
         foreach (OdfRichTextRun run in richText.Runs)

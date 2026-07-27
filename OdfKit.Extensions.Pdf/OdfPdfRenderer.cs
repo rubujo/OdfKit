@@ -42,10 +42,8 @@ public sealed class OdfPdfRenderer : IOdfRenderer
     /// <param name="certificate">The value to use. / 用於簽章 PDF 的憑證；此 PDFsharp 實作目前不支援 PDF 簽章</param>
     public void ExportToPdf(OdfDocument document, Stream pdfStream, X509Certificate2? certificate = null)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
-        if (pdfStream is null)
-            throw new ArgumentNullException(nameof(pdfStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pdfStream, nameof(pdfStream));
         if (document is TextDocument textDoc)
         {
             if (certificate is null)

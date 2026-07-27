@@ -28,7 +28,7 @@ public sealed class OfficeGuiSmokeTests
     [InlineData(OdfVersion.Odf12)]
     [InlineData(OdfVersion.Odf13)]
     [InlineData(OdfVersion.Odf14)]
-    public void Word_OpensScriptedOdfWithoutExecutingLibreOfficeMacros(OdfVersion version)
+    public void WordOpensScriptedOdfWithoutExecutingLibreOfficeMacros(OdfVersion version)
     {
         Type wordType = FindOfficeComType("Word.Application", "找不到 Microsoft Word COM，略過指令碼 ODF 驗收。");
         string root = CreateTempDirectory("OdfKitOfficeScriptSmoke");
@@ -104,7 +104,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 Excel 可開啟代表性 ODS fixture 並讀取儲存格值。
     /// </summary>
     [Fact]
-    public void Excel_OpensRepresentativeOds()
+    public void ExcelOpensRepresentativeOds()
     {
         Type excelType = FindOfficeComType("Excel.Application", "找不到 Microsoft Excel COM，略過 Excel GUI 煙霧驗收。");
         string path = ResolveFixturePath("complex-financial-model.ods");
@@ -162,7 +162,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 Word 可復原並讀取代表性 ODT fixture 的文字。
     /// </summary>
     [Fact]
-    public void Word_OpensRepresentativeOdtAndExposesText()
+    public void WordOpensRepresentativeOdtAndExposesText()
     {
         Type wordType = FindOfficeComType("Word.Application", "找不到 Microsoft Word COM，略過 Word GUI 煙霧驗收。");
         string path = ResolveFixturePath("complex-annual-report.odt");
@@ -222,7 +222,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 PowerPoint 可開啟代表性 ODP fixture 並讀取投影片。
     /// </summary>
     [Fact]
-    public void PowerPoint_OpensRepresentativeOdp()
+    public void PowerPointOpensRepresentativeOdp()
     {
         Type powerPointType = FindOfficeComType("PowerPoint.Application", "找不到 Microsoft PowerPoint COM，略過 PowerPoint GUI 煙霧驗收。");
         string path = ResolveFixturePath("complex-business-deck.odp");
@@ -272,7 +272,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 Excel 可修改、另存為 ODS、重新開啟，並產生 OdfKit 可讀取的文件。
     /// </summary>
     [Fact]
-    public void Excel_ModifiesSavesAndReloadsRepresentativeOds()
+    public void ExcelModifiesSavesAndReloadsRepresentativeOds()
     {
         Type excelType = FindOfficeComType("Excel.Application", "找不到 Microsoft Excel COM，略過 Excel GUI 修改驗收。");
         string sourcePath = ResolveFixturePath("complex-financial-model.ods");
@@ -342,7 +342,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 Word 可修改、另存為 ODT、重新開啟，並產生 OdfKit 可讀取的文件。
     /// </summary>
     [Fact]
-    public void Word_ModifiesSavesAndReloadsRepresentativeOdt()
+    public void WordModifiesSavesAndReloadsRepresentativeOdt()
     {
         Type wordType = FindOfficeComType("Word.Application", "找不到 Microsoft Word COM，略過 Word GUI 修改驗收。");
         string sourcePath = ResolveFixturePath("complex-annual-report.odt");
@@ -423,7 +423,7 @@ public sealed class OfficeGuiSmokeTests
     /// 驗證 PowerPoint 可修改、另存為 ODP、重新開啟，並產生 OdfKit 可讀取的文件。
     /// </summary>
     [Fact]
-    public void PowerPoint_ModifiesSavesAndReloadsRepresentativeOdp()
+    public void PowerPointModifiesSavesAndReloadsRepresentativeOdp()
     {
         Type powerPointType = FindOfficeComType("PowerPoint.Application", "找不到 Microsoft PowerPoint COM，略過 PowerPoint GUI 修改驗收。");
         string sourcePath = ResolveFixturePath("complex-business-deck.odp");

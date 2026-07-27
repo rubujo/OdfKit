@@ -17,7 +17,7 @@ public class ChartAdvancedDepthTests
     /// 驗證 bubble、stock 與 3D preset 可建立預期圖表類別。
     /// </summary>
     [Fact]
-    public void ChartPreset_BubbleStockAnd3D_CreateExpectedChartClass()
+    public void ChartPresetBubbleStockAnd3DCreateExpectedChartClass()
     {
         using ChartDocument bubble = ChartDocument.Builder()
             .WithPreset(OdfChartPreset.Bubble)
@@ -40,7 +40,7 @@ public class ChartAdvancedDepthTests
     /// 驗證泡泡圖可用 X、Y 與大小範圍建立並 round-trip。
     /// </summary>
     [Fact]
-    public void BubbleChart_FromRanges_RoundTripsSeriesDomains()
+    public void BubbleChartFromRangesRoundTripsSeriesDomains()
     {
         using ChartDocument chart = ChartDocument.CreateBubble(
             "泡泡圖",
@@ -68,7 +68,7 @@ public class ChartAdvancedDepthTests
     /// 驗證股票圖 OHLC、成交量與漲跌標記樣式可 round-trip。
     /// </summary>
     [Fact]
-    public void StockChart_OhlcRanges_RoundTripsMarkers()
+    public void StockChartOhlcRangesRoundTripsMarkers()
     {
         using ChartDocument chart = ChartDocument.CreateStock(
             "股票圖",
@@ -103,7 +103,7 @@ public class ChartAdvancedDepthTests
     /// 驗證 3D 投影、光源與 wall/floor 樣式可 round-trip。
     /// </summary>
     [Fact]
-    public void ThreeDChart_AppliesProjectionLightsWallAndFloor()
+    public void ThreeDChartAppliesProjectionLightsWallAndFloor()
     {
         using ChartDocument chart = ChartDocument.FromTable(
             "Data",
@@ -140,7 +140,7 @@ public class ChartAdvancedDepthTests
     /// 驗證折線圖標記樣式與座標軸數字格式可 round-trip。
     /// </summary>
     [Fact]
-    public void MarkerStyleAndAxisNumberFormat_RoundTrip()
+    public void MarkerStyleAndAxisNumberFormatRoundTrip()
     {
         using ChartDocument chart = ChartDocument.FromTable(
             "Data",
@@ -163,7 +163,7 @@ public class ChartAdvancedDepthTests
     /// 驗證圖表樣式摘要可讀回 marker 與 data style。
     /// </summary>
     [Fact]
-    public void ChartStyleInfo_ReadsMarkerAndDataStyle()
+    public void ChartStyleInfoReadsMarkerAndDataStyle()
     {
         using ChartDocument chart = ChartDocument.FromTable(
             "Data",
@@ -184,7 +184,7 @@ public class ChartAdvancedDepthTests
     /// 驗證進階圖表設定在 ODS 嵌入圖表中可 round-trip。
     /// </summary>
     [Fact]
-    public void EmbeddedChart_AdvancedOptionsRoundTripWithStandaloneParity()
+    public void EmbeddedChartAdvancedOptionsRoundTripWithStandaloneParity()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");

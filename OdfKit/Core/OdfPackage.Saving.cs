@@ -133,8 +133,7 @@ public sealed partial class OdfPackage
     /// </summary>
     public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options)
     {
-        if (destination is null)
-            throw new ArgumentNullException(nameof(destination));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destination, nameof(destination));
 
         using var stream = new OdfBufferWriterStream(destination);
         SaveToStream(stream, options);

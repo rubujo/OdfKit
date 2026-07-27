@@ -182,7 +182,7 @@ public partial class OdfDatabaseDocument
         return false;
     }
 
-    private OdfNode FindOrCreateOrderedChild(
+    private static OdfNode FindOrCreateOrderedChild(
         OdfNode parent, string localName, string namespaceUri, string prefix,
         params (string LocalName, string NamespaceUri)[] followingElementNames)
     {

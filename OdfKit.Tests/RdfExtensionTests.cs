@@ -17,7 +17,7 @@ public class RdfExtensionTests
     /// 驗證 <see cref="OdfRdfGraphBridge.ToGraph"/> 可反映 OdfKit triple 數量。
     /// </summary>
     [Fact]
-    public void ToGraph_ReflectsMetadataTripleCount()
+    public void ToGraphReflectsMetadataTripleCount()
     {
         var metadata = new OdfRdfMetadata();
         metadata.LinkDocumentPart(string.Empty, "content.xml");
@@ -32,7 +32,7 @@ public class RdfExtensionTests
     /// 驗證含相對路徑 predicate 的 triple 會相對於 base URI 解析，而非擲出 UriFormatException。
     /// </summary>
     [Fact]
-    public void ToGraph_RelativePredicate_ResolvesAgainstBaseInsteadOfThrowing()
+    public void ToGraphRelativePredicateResolvesAgainstBaseInsteadOfThrowing()
     {
         var metadata = new OdfRdfMetadata();
         metadata.AddTriple(string.Empty, "creator", "Ada");
@@ -50,7 +50,7 @@ public class RdfExtensionTests
     /// 驗證 SPARQL SELECT 可讀回 Dublin Core 標題。
     /// </summary>
     [Fact]
-    public void SelectSparql_ReturnsDublinCoreTitle()
+    public void SelectSparqlReturnsDublinCoreTitle()
     {
         var metadata = new OdfRdfMetadata();
         metadata.AddTriple(string.Empty, "http://purl.org/dc/elements/1.1/title", "季度報表");
@@ -68,7 +68,7 @@ public class RdfExtensionTests
     /// 驗證 SPARQL SELECT 可列舉 pkg:hasPart 連結的封裝組件。
     /// </summary>
     [Fact]
-    public void SelectSparql_ReturnsLinkedPackageParts()
+    public void SelectSparqlReturnsLinkedPackageParts()
     {
         var metadata = new OdfRdfMetadata();
         metadata.LinkDocumentPart(string.Empty, "content.xml");
@@ -88,7 +88,7 @@ public class RdfExtensionTests
     /// 驗證 SPARQL ASK 可判斷 pkg:mimeType 是否存在。
     /// </summary>
     [Fact]
-    public void ExecuteQuery_AskDetectsMimeTypeTriple()
+    public void ExecuteQueryAskDetectsMimeTypeTriple()
     {
         var metadata = new OdfRdfMetadata();
         metadata.SetPartMimeType("content.xml", "text/xml");
@@ -106,7 +106,7 @@ public class RdfExtensionTests
     /// 驗證圖形匯入可將 dotNetRDF triples 還原至 OdfKit metadata。
     /// </summary>
     [Fact]
-    public void ImportGraph_RoundTripsThroughMetadata()
+    public void ImportGraphRoundTripsThroughMetadata()
     {
         var source = new OdfRdfMetadata();
         source.LinkDocumentPart(string.Empty, "content.xml");
@@ -130,7 +130,7 @@ public class RdfExtensionTests
     /// 驗證封裝層 RDF metadata 可透過 SPARQL 查詢讀回標題。
     /// </summary>
     [Fact]
-    public void PackageMetadata_SelectSparqlAfterSaveAndLoad()
+    public void PackageMetadataSelectSparqlAfterSaveAndLoad()
     {
         const string dublinCoreTitle = "http://purl.org/dc/elements/1.1/title";
         using var stream = new MemoryStream();

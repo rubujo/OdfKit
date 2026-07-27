@@ -33,7 +33,7 @@ internal static class OdfDocumentMetadataEngine
     {
         var metaRoot = FindOrCreateMetaRoot(metaDom);
         string localName = qualifiedName.Split(':')[1];
-        string ns = qualifiedName.StartsWith("dc:") ? OdfNamespaces.Dc : OdfNamespaces.Meta;
+        string ns = qualifiedName.StartsWith("dc:", System.StringComparison.Ordinal) ? OdfNamespaces.Dc : OdfNamespaces.Meta;
 
         foreach (var child in metaRoot.Children)
         {
@@ -119,7 +119,7 @@ internal static class OdfDocumentMetadataEngine
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentMetadataEngine_PropertyCannotBeEmpty"), nameof(name));
 
-        if (name.Contains(":"))
+        if (name.Contains(':'))
         {
             string oldName = name;
             name = name.Replace(":", "_");
@@ -301,7 +301,7 @@ internal static class OdfDocumentMetadataEngine
         return type.ToLowerInvariant() switch
         {
             "boolean" => ((bool)val) ? "true" : "false",
-            "float" => Convert.ToDouble(val).ToString(CultureInfo.InvariantCulture),
+            "float" => Convert.ToDouble(val, System.Globalization.CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture),
             "date" => FormatDateValue((DateTime)val),
             _ => val.ToString() ?? string.Empty
         };

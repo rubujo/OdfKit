@@ -23,8 +23,7 @@ public static class OdfChartRenderer
     /// <param name="document">The source or target object. / 目標試算表文件</param>
     public static void RenderChartsToFallbackImages(this SpreadsheetDocument document)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         foreach (var sheet in document.Worksheets)
         {
@@ -343,14 +342,14 @@ public static class OdfChartRenderer
     {
         cm = 0;
         s = s.Trim().ToLowerInvariant();
-        if (s.EndsWith("cm"))
+        if (s.EndsWith("cm", System.StringComparison.Ordinal))
         {
-            return double.TryParse(s.Substring(0, s.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out cm);
+            return OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(s, 2, out cm);
         }
 
-        if (s.EndsWith("in"))
+        if (s.EndsWith("in", System.StringComparison.Ordinal))
         {
-            if (double.TryParse(s.Substring(0, s.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out double inches))
+            if (OdfKit.Internal.OdfParsingHelper.TryParseInvariantDoubleWithoutSuffix(s, 2, out double inches))
             {
                 cm = inches * 2.54;
                 return true;

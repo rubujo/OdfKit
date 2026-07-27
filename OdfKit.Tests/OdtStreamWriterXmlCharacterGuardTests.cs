@@ -20,7 +20,7 @@ public class OdtStreamWriterXmlCharacterGuardTests
     [InlineData((char)0x01)]
     [InlineData((char)0x0B)]
     [InlineData((char)0xFFFE)]
-    public void AddParagraph_WithInvalidXmlCharacter_ThrowsLocalizedArgumentException(char invalid)
+    public void AddParagraphWithInvalidXmlCharacterThrowsLocalizedArgumentException(char invalid)
     {
         using var ms = new MemoryStream();
         using var writer = new OdtStreamWriter(ms);
@@ -34,7 +34,7 @@ public class OdtStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void AddParagraph_StyleName_WithInvalidXmlCharacter_Throws()
+    public void AddParagraphStyleNameWithInvalidXmlCharacterThrows()
     {
         using var ms = new MemoryStream();
         using var writer = new OdtStreamWriter(ms);
@@ -44,7 +44,7 @@ public class OdtStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void AddParagraph_WithSurrogatePairEmoji_RoundTrips()
+    public void AddParagraphWithSurrogatePairEmojiRoundTrips()
     {
         string emojiText = "測試 " + char.ConvertFromUtf32(0x1F600);
         using var ms = new MemoryStream();
@@ -61,7 +61,7 @@ public class OdtStreamWriterXmlCharacterGuardTests
     }
 
     [Fact]
-    public void AddParagraph_AfterGuardException_WriterRemainsUsable()
+    public void AddParagraphAfterGuardExceptionWriterRemainsUsable()
     {
         using var ms = new MemoryStream();
         using (var writer = new OdtStreamWriter(ms))

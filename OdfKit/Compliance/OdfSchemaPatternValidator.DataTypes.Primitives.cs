@@ -89,8 +89,8 @@ public static partial class OdfSchemaPatternValidator
             return true;
         }
 
-        int timezoneHour = int.Parse(timezone.Substring(1, 2), CultureInfo.InvariantCulture);
-        int timezoneMinute = int.Parse(timezone.Substring(4, 2), CultureInfo.InvariantCulture);
+        int timezoneHour = global::OdfKit.Internal.OdfParsingHelper.ParseInvariantInt32(timezone, 1, 2);
+        int timezoneMinute = global::OdfKit.Internal.OdfParsingHelper.ParseInvariantInt32(timezone, 4, 2);
         if (timezoneMinute > 59)
         {
             return false;

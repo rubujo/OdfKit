@@ -24,11 +24,9 @@ public partial class OdfTable
     /// <param name="count">The number of rows to insert. / 要插入的列數。</param>
     public void InsertRows(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         OdfTextTableStructureEngine.InsertRows(Node, position, count);
         InvalidateStructureCache();
@@ -59,11 +57,9 @@ public partial class OdfTable
     /// <param name="count">The number of rows to delete. / 要刪除的列數。</param>
     public void DeleteRows(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         IReadOnlyList<OdfNode> deletedSnapshots = OdfTextTableStructureEngine.DeleteRows(Node, position, count);
         InvalidateStructureCache();
@@ -94,11 +90,9 @@ public partial class OdfTable
     /// <param name="count">The number of columns to insert. / 要插入的欄數。</param>
     public void InsertColumns(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         OdfTextTableStructureEngine.InsertColumns(Node, position, count);
         InvalidateStructureCache();
@@ -129,11 +123,9 @@ public partial class OdfTable
     /// <param name="count">The number of columns to delete. / 要刪除的欄數。</param>
     public void DeleteColumns(int position, int count)
     {
-        if (position < 0)
-            throw new ArgumentOutOfRangeException(nameof(position));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(position, nameof(position));
 
-        if (count < 1)
-            throw new ArgumentOutOfRangeException(nameof(count));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(count, 1, nameof(count));
 
         ColumnDeletionSnapshots deletedSnapshots = OdfTextTableStructureEngine.DeleteColumns(Node, position, count);
         InvalidateStructureCache();

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -692,12 +693,13 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="language">The macro language, defaulting to <c>ooo:script</c>. / 巨集語言，預設為 <c>ooo:script</c>。</param>
     /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
     /// <exception cref="ArgumentException">When <paramref name="eventName"/> or <paramref name="macroName"/> is blank. / 當 <paramref name="eventName"/> 或 <paramref name="macroName"/> 為空白時擲出。</exception>
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "This public instance overload is retained for source compatibility with the form designer API.")]
     public void SetControlEvent(OdfNode controlNode, string eventName, string macroName, string language)
     {
-        if (controlNode is null)
-        {
-            throw new ArgumentNullException(nameof(controlNode));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(controlNode, nameof(controlNode));
 
         if (string.IsNullOrWhiteSpace(eventName))
         {
@@ -745,12 +747,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="controlNode">The control node. / 控制項節點。</param>
     /// <param name="required">Whether the control is required. / 是否必填。</param>
     /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public void SetControlRequired(OdfNode controlNode, bool required)
     {
-        if (controlNode is null)
-        {
-            throw new ArgumentNullException(nameof(controlNode));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(controlNode, nameof(controlNode));
 
         controlNode.SetAttribute("input-required", OdfNamespaces.Form, required ? "true" : "false", "form");
     }
@@ -763,12 +763,10 @@ public sealed class OdfDatabaseFormDesigner
     /// <param name="maxLength">The maximum character length; <c>0</c> means unlimited. / 最大字元長度；<c>0</c> 表示不限制。</param>
     /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxLength"/> is negative. / 當 <paramref name="maxLength"/> 為負數時擲出。</exception>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     public void SetControlMaxLength(OdfNode controlNode, int maxLength)
     {
-        if (controlNode is null)
-        {
-            throw new ArgumentNullException(nameof(controlNode));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(controlNode, nameof(controlNode));
 
         if (maxLength < 0)
         {
@@ -830,7 +828,7 @@ public sealed class OdfDatabaseFormDesigner
     }
 
 
-    private void AddLabelProperty(OdfNode controlNode, string? label)
+    private static void AddLabelProperty(OdfNode controlNode, string? label)
     {
         if (string.IsNullOrEmpty(label))
         {
@@ -878,7 +876,7 @@ public sealed class OdfDatabaseFormDesigner
         p.AppendChild(drawControl);
     }
 
-    private OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
+    private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
     {
         var child = FindChildElement(parent, localName, namespaceUri);
         if (child is not null)
@@ -891,7 +889,7 @@ public sealed class OdfDatabaseFormDesigner
         return child;
     }
 
-    private OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
     {
         foreach (var child in parent.Children)
         {

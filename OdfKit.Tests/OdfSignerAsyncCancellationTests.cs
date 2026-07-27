@@ -20,7 +20,7 @@ public class OdfSignerAsyncCancellationTests
     /// 預先取消的語彙應使 OdfSigner.SignAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task SignAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task SignAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var package = CreateMinimalPackage();
         using var cert = CreateSelfSignedCertificate();
@@ -37,7 +37,7 @@ public class OdfSignerAsyncCancellationTests
     /// 預先取消的語彙應使 OdfSigner.VerifySignaturesAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task VerifySignaturesAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task VerifySignaturesAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var package = CreateMinimalPackage();
         using var cts = new CancellationTokenSource();
@@ -53,7 +53,7 @@ public class OdfSignerAsyncCancellationTests
     /// 預先取消的語彙應使 OdfDocument.SignAsync 拋出 OperationCanceledException。
     /// </summary>
     [Fact]
-    public async Task DocumentSignAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    public async Task DocumentSignAsyncPreCancelledTokenThrowsOperationCanceledException()
     {
         using var doc = TextDocument.Create();
         doc.Body.Paragraphs.Add("簽章取消測試");
@@ -71,7 +71,7 @@ public class OdfSignerAsyncCancellationTests
     /// 文件層一鍵式 SignDocumentAsync 應寫入簽章專案並可由文件層驗證通過。
     /// </summary>
     [Fact]
-    public async Task DocumentSignDocumentAsync_DefaultToken_WritesAndVerifiesSignature()
+    public async Task DocumentSignDocumentAsyncDefaultTokenWritesAndVerifiesSignature()
     {
         using var doc = TextDocument.Create();
         doc.Body.Paragraphs.Add("一鍵式文件簽章測試");
@@ -95,7 +95,7 @@ public class OdfSignerAsyncCancellationTests
     /// 未取消時 SignAsync 與 VerifySignaturesAsync 應成功完成基本簽章往返。
     /// </summary>
     [Fact]
-    public async Task SignAndVerifyAsync_DefaultToken_CompletesSuccessfully()
+    public async Task SignAndVerifyAsyncDefaultTokenCompletesSuccessfully()
     {
         using var package = CreateMinimalPackage();
         using var cert = CreateSelfSignedCertificate();

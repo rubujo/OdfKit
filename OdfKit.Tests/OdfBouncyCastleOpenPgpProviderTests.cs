@@ -64,7 +64,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     // ── 測試案例 ─────────────────────────────────────────────────────────────
 
     [Fact]
-    public void RsaRoundTrip_SessionKey_EncryptThenDecrypt_Succeeds()
+    public void RsaRoundTripSessionKeyEncryptThenDecryptSucceeds()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateRsaKeyRing();
 
@@ -88,7 +88,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void RsaRoundTrip_MultipleSessionKeys_AllDecryptCorrectly()
+    public void RsaRoundTripMultipleSessionKeysAllDecryptCorrectly()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateRsaKeyRing();
 
@@ -108,7 +108,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EncryptionOnly_DecryptSessionKey_Throws_InvalidOperationException()
+    public void EncryptionOnlyDecryptSessionKeyThrowsInvalidOperationException()
     {
         var provider = new OdfBouncyCastleOpenPgpProvider();
         byte[] dummyPacket = new byte[64];
@@ -118,7 +118,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void WrongPassphrase_DecryptSessionKey_Throws_CryptographicException()
+    public void WrongPassphraseDecryptSessionKeyThrowsCryptographicException()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateRsaKeyRing(
             passphrase: "correct-passphrase".ToCharArray());
@@ -140,7 +140,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EncryptSessionKey_NullSessionKey_Throws_ArgumentNullException()
+    public void EncryptSessionKeyNullSessionKeyThrowsArgumentNullException()
     {
         var (pubKeyBytes, _) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider();
@@ -151,7 +151,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EncryptSessionKey_NullRecipient_Throws_ArgumentNullException()
+    public void EncryptSessionKeyNullRecipientThrowsArgumentNullException()
     {
         var provider = new OdfBouncyCastleOpenPgpProvider();
         byte[] sessionKey = RandomSessionKey();
@@ -161,7 +161,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EncryptSessionKey_EmptyPublicKey_Throws_ArgumentException()
+    public void EncryptSessionKeyEmptyPublicKeyThrowsArgumentException()
     {
         var provider = new OdfBouncyCastleOpenPgpProvider();
         byte[] sessionKey = RandomSessionKey();
@@ -172,7 +172,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void DecryptSessionKey_InvalidPacket_Throws_CryptographicException()
+    public void DecryptSessionKeyInvalidPacketThrowsCryptographicException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -188,7 +188,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void DecryptSessionKey_TruncatedFiveByteLengthHeader_Throws_CryptographicException()
+    public void DecryptSessionKeyTruncatedFiveByteLengthHeaderThrowsCryptographicException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -211,7 +211,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void DecryptSessionKey_HighBitBodyLength_Throws_CryptographicException()
+    public void DecryptSessionKeyHighBitBodyLengthThrowsCryptographicException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -240,7 +240,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     /// 屬輕量級的內建隨機化邊界測試，取代需要外部原生 libFuzzer 工具鏈的完整模糊測試方案。
     /// </summary>
     [Fact]
-    public void DecryptSessionKey_RandomizedMalformedPackets_NeverThrowsUndocumentedExceptionType()
+    public void DecryptSessionKeyRandomizedMalformedPacketsNeverThrowsUndocumentedExceptionType()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -282,7 +282,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void DecryptSessionKey_NullPacket_Throws_ArgumentNullException()
+    public void DecryptSessionKeyNullPacketThrowsArgumentNullException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -294,7 +294,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void DecryptSessionKey_NullPassphraseFromProvider_Throws_ArgumentException()
+    public void DecryptSessionKeyNullPassphraseFromProviderThrowsArgumentException()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateRsaKeyRing();
 
@@ -314,7 +314,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void OpenPgpDecrypt_WrongKey_ThrowsCryptographicException_NotSwallowed()
+    public void OpenPgpDecryptWrongKeyThrowsCryptographicExceptionNotSwallowed()
     {
         // 產生用金鑰 A 加密的封包
         var (pubA, secA) = GenerateRsaKeyRing();
@@ -389,7 +389,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EcdhX25519RoundTrip_SessionKey_EncryptThenDecrypt_Succeeds()
+    public void EcdhX25519RoundTripSessionKeyEncryptThenDecryptSucceeds()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateX25519KeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(
@@ -408,7 +408,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
-    public void EcdhX25519RoundTrip_MultipleSessionKeys_AllDecryptCorrectly()
+    public void EcdhX25519RoundTripMultipleSessionKeysAllDecryptCorrectly()
     {
         var (pubKeyBytes, secKeyRingBytes) = GenerateX25519KeyRing();
         var provider = new OdfBouncyCastleOpenPgpProvider(

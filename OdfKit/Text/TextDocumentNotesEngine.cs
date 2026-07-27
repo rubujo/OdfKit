@@ -13,23 +13,17 @@ internal static class TextDocumentNotesEngine
 {
     internal static void AddFootnote(TextDocumentMutationContext context, OdfParagraph paragraph, string citation, string bodyText)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (citation is null)
-            throw new ArgumentNullException(nameof(citation));
-        if (bodyText is null)
-            throw new ArgumentNullException(nameof(bodyText));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(citation, nameof(citation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bodyText, nameof(bodyText));
         AppendNote(paragraph, "footnote", context.NextFootnoteId(), citation, bodyText);
     }
 
     internal static void AddEndnote(TextDocumentMutationContext context, OdfParagraph paragraph, string citation, string bodyText)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (citation is null)
-            throw new ArgumentNullException(nameof(citation));
-        if (bodyText is null)
-            throw new ArgumentNullException(nameof(bodyText));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(citation, nameof(citation));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(bodyText, nameof(bodyText));
         AppendNote(paragraph, "endnote", context.NextEndnoteId(), citation, bodyText);
     }
 

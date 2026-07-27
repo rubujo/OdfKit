@@ -52,13 +52,13 @@ internal static class OdfPackageXmlMacroSanitizer
             bool isHref = attr.Key.LocalName == "href" && attr.Key.NamespaceUri == OdfNamespaces.XLink;
             if (val != null)
             {
-                if (val.IndexOf("ooo:StarBasic", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    val.IndexOf("vnd.sun.star.script", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    val.IndexOf("vnd.sun.star.VBA", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    (isHref && (val.IndexOf("basic/", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                val.IndexOf("basic\\", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                val.IndexOf("Scripts/", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                val.IndexOf("Scripts\\", StringComparison.OrdinalIgnoreCase) >= 0)))
+                if (global::OdfKit.Internal.OdfStringHelper.Contains(val, "ooo:StarBasic", StringComparison.OrdinalIgnoreCase) ||
+                    global::OdfKit.Internal.OdfStringHelper.Contains(val, "vnd.sun.star.script", StringComparison.OrdinalIgnoreCase) ||
+                    global::OdfKit.Internal.OdfStringHelper.Contains(val, "vnd.sun.star.VBA", StringComparison.OrdinalIgnoreCase) ||
+                    (isHref && (global::OdfKit.Internal.OdfStringHelper.Contains(val, "basic/", StringComparison.OrdinalIgnoreCase) ||
+                                global::OdfKit.Internal.OdfStringHelper.Contains(val, "basic\\", StringComparison.OrdinalIgnoreCase) ||
+                                global::OdfKit.Internal.OdfStringHelper.Contains(val, "Scripts/", StringComparison.OrdinalIgnoreCase) ||
+                                global::OdfKit.Internal.OdfStringHelper.Contains(val, "Scripts\\", StringComparison.OrdinalIgnoreCase))))
                 {
                     attributesToRemove.Add(attr.Key);
                 }

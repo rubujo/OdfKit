@@ -37,7 +37,7 @@
 encrypted message 透過 BouncyCastle 公開 OpenPGP API 建立／讀取，舊式 PKESK 與 ECDH 則使用
 其底層基礎密碼學元件（RSA/ElGamal 加解密、AES 引擎、`Rfc3394WrapEngine`）。`DecodePkeskPacket`
 對任意輸入的例外契約由 `OdfBouncyCastleOpenPgpProviderTests` 中的隨機化邊界測試
-（`DecryptSessionKey_RandomizedMalformedPackets_NeverThrowsUndocumentedExceptionType`）鎖定。
+（`DecryptSessionKeyRandomizedMalformedPacketsNeverThrowsUndocumentedExceptionType`）鎖定。
 
 ## Schema pattern 來源
 
@@ -58,8 +58,8 @@ RELAX NG validator。若需要對外部 schema 做完整 RELAX NG 驗證，應�
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
 | TDF ODF Toolkit operations wire shape | TDF ODF Toolkit 公開文件與 reference JSON | `OdfKit.Extensions.Collaboration/OdtOperationLog.cs`、`OdtOperationsImporter.cs`、`OdtOperationsExporter.cs` | `CollaborationOperationsTests`、`CollaborationFixtureManifestTests`、`tests/fixtures/collaboration/manifest.json` |
-| TDF `{ "changes": [...] }` envelope 與裸陣列相容 | TDF ODF Toolkit reference operations corpus wire shape | `OdtOperationCompatibilityOptions`、`OdtOperationLog`、`OdtOperationImportReport` | `CollaborationOperationsTests.Merge_AcceptsTdfChangesEnvelope`、`ExportToJson_TdfEnvelope_WrapsOperationsInChanges`、`OperationLog_ParseSerialize_PreservesUnknownWireFields` |
-| ODF Text operation replay：段落、文字、Tab、換行、基本格式、單段落刪除／移動、最上層 split/merge、基本清單、固定尺寸表格、欄位、comment、header/footer、font declaration 與安全 drawing placeholder | TDF operation 名稱與公開 JSON fixture 行為觀察 | `OdtOperationsImporter.Merge` | `CollaborationOperationsTests.Merge_Replays*`、`Merge_ReplaysExtendedTdfTextOperationSubset`、`CollaborationFixtureManifestTests` |
+| TDF `{ "changes": [...] }` envelope 與裸陣列相容 | TDF ODF Toolkit reference operations corpus wire shape | `OdtOperationCompatibilityOptions`、`OdtOperationLog`、`OdtOperationImportReport` | `CollaborationOperationsTests.MergeAcceptsTdfChangesEnvelope`、`ExportToJsonTdfEnvelopeWrapsOperationsInChanges`、`OperationLogParseSerializePreservesUnknownWireFields` |
+| ODF Text operation replay：段落、文字、Tab、換行、基本格式、單段落刪除／移動、最上層 split/merge、基本清單、固定尺寸表格、欄位、comment、header/footer、font declaration 與安全 drawing placeholder | TDF operation 名稱與公開 JSON fixture 行為觀察 | `OdtOperationsImporter.Merge` | `CollaborationOperationsTests.Merge_Replays*`、`MergeReplaysExtendedTdfTextOperationSubset`、`CollaborationFixtureManifestTests` |
 
 JSON Collaboration 是選用 extension-scoped compatibility subset，不是核心套件功能。clean-room 策略
 只允許使用 TDF 公開文件、operation 名稱、wire shape 與 reference JSON 做行為對標；不得複製

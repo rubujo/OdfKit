@@ -12,7 +12,7 @@ namespace OdfKit.DOM;
 /// 表示 ODF 中的 table:table 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
-public partial class TableTableElement(string? prefix = null) : OdfElement("table", OdfNamespaces.Table, prefix)
+public partial class TableTableElement(string? prefix = null) : OdfElement("table", OdfNamespaces.Table, prefix), IDisposable
 {
     /// <summary>
     /// Provides the member member.

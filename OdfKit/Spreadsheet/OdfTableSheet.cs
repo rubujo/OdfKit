@@ -325,8 +325,8 @@ public partial class OdfTableSheet
         int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
 
         var mainCell = GetCell(startRow, startCol);
-        mainCell.Node.SetAttribute("number-columns-spanned", OdfNamespaces.Table, (endCol - startCol + 1).ToString(), "table");
-        mainCell.Node.SetAttribute("number-rows-spanned", OdfNamespaces.Table, (endRow - startRow + 1).ToString(), "table");
+        mainCell.Node.SetAttribute("number-columns-spanned", OdfNamespaces.Table, (endCol - startCol + 1).ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
+        mainCell.Node.SetAttribute("number-rows-spanned", OdfNamespaces.Table, (endRow - startRow + 1).ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
 
         for (int r = startRow; r <= endRow; r++)
         {

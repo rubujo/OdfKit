@@ -169,7 +169,7 @@ internal static class OdfDocumentPersistenceEngine
             return null;
         }
 
-        int fragmentIndex = value.IndexOf("#", System.StringComparison.Ordinal);
+        int fragmentIndex = value.IndexOf('#');
         if (fragmentIndex >= 0)
         {
             value = value.Substring(0, fragmentIndex);

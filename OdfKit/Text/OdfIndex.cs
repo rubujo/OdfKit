@@ -74,6 +74,7 @@ public abstract class OdfIndex
     /// <param name="localName">The XML local name. / XML 區域名稱。</param>
     /// <param name="ns">The namespace URI. / 命名空間 URI。</param>
     /// <returns>The matching child, or <c>null</c> if none exists. / 符合條件的子項目，若無則傳回 <c>null</c>。</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Established instance API; changing it to static would break source compatibility.")]
     protected OdfNode? FindChild(OdfNode parent, string localName, string ns)
     {
         foreach (var child in parent.Children)

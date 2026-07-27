@@ -28,8 +28,7 @@ public sealed class OdfStyleSet
     /// <returns>由設計主題推導出的樣式集合</returns>
     public static OdfStyleSet FromTheme(OdfDesignTheme theme)
     {
-        if (theme is null)
-            throw new ArgumentNullException(nameof(theme));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(theme, nameof(theme));
 
         return new OdfStyleSet()
             .WithHeadingColor(theme.StrokeColor)
@@ -188,8 +187,7 @@ public sealed class OdfStyleSet
     /// <returns>目前樣式集合執行個體</returns>
     public OdfStyleSet WithChartPaletteColors(params string[] colors)
     {
-        if (colors is null)
-            throw new ArgumentNullException(nameof(colors));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(colors, nameof(colors));
         if (colors.Length == 0)
             return this;
 

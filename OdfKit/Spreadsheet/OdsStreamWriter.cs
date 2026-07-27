@@ -42,8 +42,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private bool _disposed;
     private readonly List<(string styleName, OdfLength width)> _columnStyles = [];
     private readonly List<(string styleName, OdfLength? height, bool useOptimalHeight)> _rowStyles = [];
-    private int _autoColumnStyleIndex = 0;
-    private int _autoRowStyleIndex = 0;
+    private int _autoColumnStyleIndex;
+    private int _autoRowStyleIndex;
     private OdfVersion _version = OdfVersionInfo.DefaultVersion;
 
     internal int BufferedSheetCountForTests => _sheetBuffers.Count;
@@ -248,8 +248,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <param name="options">The row write options. / 資料列寫入選項。</param>
     public void WriteStartRow(OdsRowWriteOptions options)
     {
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         if (_disposed)
             return;
@@ -500,8 +499,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <exception cref="ArgumentException">Thrown when the subtree contains text or attribute values with characters that are not valid in XML 1.0. / 當子樹的文字或屬性值含有 XML 1.0 不允許的字元時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
         if (_disposed)
             return;
 
@@ -565,15 +563,9 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         bool firstRowAsHeader,
         CancellationToken cancellationToken)
     {
-        if (csvStream is null)
-        {
-            throw new ArgumentNullException(nameof(csvStream));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvStream, nameof(csvStream));
 
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(OdsStreamWriter));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdsStreamWriter));
 
         if (!_isSheetStarted)
         {
@@ -639,15 +631,9 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         bool includeColumnNames,
         CancellationToken cancellationToken)
     {
-        if (reader is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(reader, nameof(reader));
 
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(OdsStreamWriter));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdsStreamWriter));
 
         if (!_isSheetStarted)
         {
@@ -757,6 +743,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             return;
         await FlushAsync(CancellationToken.None).ConfigureAwait(false);
         Dispose();
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -771,8 +758,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// </remarks>
     public async Task FlushAsync(CancellationToken cancellationToken)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(nameof(OdsStreamWriter));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdsStreamWriter));
         cancellationToken.ThrowIfCancellationRequested();
         CurrentRawWriter.FlushToTarget();
         await CurrentWriter.FlushAsync().ConfigureAwait(false);
@@ -871,15 +857,9 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// <exception cref="ObjectDisposedException">Thrown when the writer has been disposed. / 當寫入器已釋放時擲出。</exception>
     public async Task WriteSheetsAsync(IEnumerable<OdsSheetWriteJob> jobs, int maxConcurrency, CancellationToken cancellationToken)
     {
-        if (jobs is null)
-        {
-            throw new ArgumentNullException(nameof(jobs));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(jobs, nameof(jobs));
 
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(OdsStreamWriter));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_disposed, nameof(OdsStreamWriter));
 
         if (_isRowStarted)
         {
@@ -1125,8 +1105,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         OdfVersion version,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (writeAction is null)
-            throw new ArgumentNullException(nameof(writeAction));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writeAction, nameof(writeAction));
 
         var stream = new AsyncProducerConsumerStream();
 
@@ -1190,8 +1169,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         OdfVersion version,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (writeAction is null)
-            throw new ArgumentNullException(nameof(writeAction));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writeAction, nameof(writeAction));
 
         var stream = new AsyncProducerConsumerStream();
 

@@ -102,10 +102,7 @@ public sealed class OdfMathToken
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_PropertyCannotBeEmpty"), nameof(name));
         }
 
-        if (value is null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(value, nameof(value));
 
         var merged = new Dictionary<string, string>();
         if (Attributes is not null)
@@ -211,10 +208,7 @@ public sealed class OdfMathToken
     /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> is <see langword="null"/>. / 當 <paramref name="predicate"/> 為 <see langword="null"/> 時擲出。</exception>
     public IEnumerable<OdfMathToken> GetAll(Func<OdfMathToken, bool> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         if (predicate(this))
         {
@@ -242,16 +236,11 @@ public sealed class OdfMathToken
     /// <exception cref="ArgumentOutOfRangeException">When <paramref name="index"/> is outside the available child range. / 當 <paramref name="index"/> 超出可用子節點範圍時擲出。</exception>
     public OdfMathToken WithChild(int index, OdfMathToken replacement)
     {
-        if (replacement is null)
-        {
-            throw new ArgumentNullException(nameof(replacement));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacement, nameof(replacement));
 
         int childCount = GetChildCount();
         if (index < 0 || index >= childCount)
-        {
             throw new ArgumentOutOfRangeException(nameof(index));
-        }
 
         return Kind switch
         {
@@ -271,15 +260,9 @@ public sealed class OdfMathToken
     /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> or <paramref name="replacementFactory"/> is <see langword="null"/>. / 當 <paramref name="predicate"/> 或 <paramref name="replacementFactory"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfMathToken ReplaceFirst(Func<OdfMathToken, bool> predicate, Func<OdfMathToken, OdfMathToken> replacementFactory)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
-        if (replacementFactory is null)
-        {
-            throw new ArgumentNullException(nameof(replacementFactory));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacementFactory, nameof(replacementFactory));
 
         if (predicate(this))
         {
@@ -311,10 +294,7 @@ public sealed class OdfMathToken
     /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfMathToken ReplaceFirst(OdfMathTokenKind kind, OdfMathToken replacement)
     {
-        if (replacement is null)
-        {
-            throw new ArgumentNullException(nameof(replacement));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacement, nameof(replacement));
 
         return ReplaceFirst(token => token.Kind == kind, _ => replacement);
     }
@@ -331,15 +311,9 @@ public sealed class OdfMathToken
         Func<OdfMathToken, bool> predicate,
         Func<OdfMathToken, OdfMathToken> replacementFactory)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
-        if (replacementFactory is null)
-        {
-            throw new ArgumentNullException(nameof(replacementFactory));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacementFactory, nameof(replacementFactory));
 
         if (predicate(this))
         {
@@ -372,10 +346,7 @@ public sealed class OdfMathToken
     /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfMathToken ReplaceAll(OdfMathTokenKind kind, OdfMathToken replacement)
     {
-        if (replacement is null)
-        {
-            throw new ArgumentNullException(nameof(replacement));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacement, nameof(replacement));
 
         return ReplaceAll(token => token.Kind == kind, _ => replacement);
     }
@@ -880,9 +851,7 @@ public sealed class OdfMathToken
         RequireKind(OdfMathTokenKind.Matrix);
         int childCount = Children?.Count ?? 0;
         if (rowIndex < 0 || rowIndex >= childCount)
-        {
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
 
         if (childCount <= 1)
         {
@@ -910,7 +879,7 @@ public sealed class OdfMathToken
         }
     }
 
-    private static IReadOnlyList<OdfMathToken> RequireChildren(OdfMathToken[]? children, string paramName)
+    private static List<OdfMathToken> RequireChildren(OdfMathToken[]? children, string paramName)
     {
         if (children is null || children.Length == 0)
         {
@@ -925,7 +894,7 @@ public sealed class OdfMathToken
         return children.ToList();
     }
 
-    private static IReadOnlyDictionary<string, string>? CopyAttributes(
+    private static System.Collections.ObjectModel.ReadOnlyDictionary<string, string>? CopyAttributes(
         IReadOnlyDictionary<string, string>? attributes)
     {
         if (attributes is null || attributes.Count == 0)
@@ -939,7 +908,7 @@ public sealed class OdfMathToken
             copy[attribute.Key] = attribute.Value;
         }
 
-        return new ReadOnlyDictionary<string, string>(copy);
+        return new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(copy);
     }
 
     private int GetChildCount() =>

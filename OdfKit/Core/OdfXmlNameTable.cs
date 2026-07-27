@@ -123,8 +123,7 @@ internal static class OdfXmlNameTable
 
     internal static void Preload(XmlNameTable nameTable)
     {
-        if (nameTable is null)
-            throw new ArgumentNullException(nameof(nameTable));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(nameTable, nameof(nameTable));
 
         foreach (string name in Names)
         {

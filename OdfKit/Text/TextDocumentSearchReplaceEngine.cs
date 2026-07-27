@@ -17,8 +17,7 @@ internal static class TextDocumentSearchReplaceEngine
         string search,
         string replacement)
     {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(paragraph, nameof(paragraph));
         if (string.IsNullOrEmpty(search))
             return;
 
@@ -71,7 +70,7 @@ internal static class TextDocumentSearchReplaceEngine
             {
                 if (styleAction is not null && node.Parent is not null)
                 {
-                    int index = text.IndexOf(search);
+                    int index = text.IndexOf(search, System.StringComparison.Ordinal);
                     var left = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text.Substring(0, index) };
                     var mid = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
                     var midRun = new OdfTextRun(mid, document) { Text = replacement };

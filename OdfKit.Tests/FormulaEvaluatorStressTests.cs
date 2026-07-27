@@ -17,7 +17,7 @@ namespace OdfKit.Tests
     {
         #region Stress Mock IEvaluationContext
 
-        private class StressMockEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
+        private sealed class StressMockEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
         {
             public bool IsBlank(OdfCellAddress address) =>
                 !CellValues.ContainsKey(address) && !CellFormulas.ContainsKey(address);
@@ -91,7 +91,7 @@ namespace OdfKit.Tests
         #region 1. Circular Reference Detection
 
         [Fact]
-        public void TestCircularDependency_SelfReference()
+        public void TestCircularDependencySelfReference()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -106,7 +106,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCircularDependency_IndirectCycle_Length3()
+        public void TestCircularDependencyIndirectCycleLength3()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -131,7 +131,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCircularDependency_IndirectCycle_Length10()
+        public void TestCircularDependencyIndirectCycleLength10()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -151,7 +151,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCircularDependency_MultiplePaths()
+        public void TestCircularDependencyMultiplePaths()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -171,7 +171,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCircularDependency_Propagation()
+        public void TestCircularDependencyPropagation()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -192,7 +192,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCircularDependency_RecoveryAfterClearCache()
+        public void TestCircularDependencyRecoveryAfterClearCache()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -224,7 +224,7 @@ namespace OdfKit.Tests
         #region 2. Division by Zero
 
         [Fact]
-        public void TestDivisionByZero_DirectAndIndirect()
+        public void TestDivisionByZeroDirectAndIndirect()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -258,7 +258,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestDivisionByZero_Nested()
+        public void TestDivisionByZeroNested()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -270,7 +270,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestDivisionByZero_PropagationInMath()
+        public void TestDivisionByZeroPropagationInMath()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -288,7 +288,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestDivisionByZero_InStatisticalFunctions()
+        public void TestDivisionByZeroInStatisticalFunctions()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -323,7 +323,7 @@ namespace OdfKit.Tests
         #region 3. Type Mismatches
 
         [Fact]
-        public void TestTypeMismatch_MathOperations()
+        public void TestTypeMismatchMathOperations()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -347,7 +347,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestTypeMismatch_Comparisons()
+        public void TestTypeMismatchComparisons()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -370,7 +370,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestTypeMismatch_LogicalFunctions()
+        public void TestTypeMismatchLogicalFunctions()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -393,7 +393,7 @@ namespace OdfKit.Tests
         #region 4. Empty Values (Nulls)
 
         [Fact]
-        public void TestEmptyValues_Arithmetic()
+        public void TestEmptyValuesArithmetic()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -413,7 +413,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestEmptyValues_Concatenation_ThrowsException()
+        public void TestEmptyValuesConcatenationThrowsException()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -435,7 +435,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestEmptyValues_Comparisons_ThrowsException()
+        public void TestEmptyValuesComparisonsThrowsException()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -457,7 +457,7 @@ namespace OdfKit.Tests
         #region 5. Exact and Approximate VLOOKUP
 
         [Fact]
-        public void TestVLookup_ExactMatch()
+        public void TestVLookupExactMatch()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -499,7 +499,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestVLookup_ApproximateMatch()
+        public void TestVLookupApproximateMatch()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -543,7 +543,7 @@ namespace OdfKit.Tests
         #region 6. Cache Correctness
 
         [Fact]
-        public void TestCacheCorrectness_TransitiveCaching()
+        public void TestCacheCorrectnessTransitiveCaching()
         {
             var context = new StressMockEvaluationContext();
             var evaluator = new DefaultFormulaEvaluator();
@@ -585,7 +585,7 @@ namespace OdfKit.Tests
         #region 7. Number Formatter
 
         [Fact]
-        public void TestNumberFormatter_DeduplicationHighLoad()
+        public void TestNumberFormatterDeduplicationHighLoad()
         {
             var contentRoot = new OdfNode(OdfNodeType.Element, "document-content", OdfNamespaces.Office, "office");
             var stylesRoot = new OdfNode(OdfNodeType.Element, "document-styles", OdfNamespaces.Office, "office");
@@ -612,7 +612,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestNumberFormatter_StandardFormatResolution()
+        public void TestNumberFormatterStandardFormatResolution()
         {
             var contentRoot = new OdfNode(OdfNodeType.Element, "document-content", OdfNamespaces.Office, "office");
             var stylesRoot = new OdfNode(OdfNodeType.Element, "document-styles", OdfNamespaces.Office, "office");

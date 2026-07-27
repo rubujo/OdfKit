@@ -43,8 +43,7 @@ public sealed partial class OdfPackage
         OdfEncryptionAlgorithm algorithm,
         CancellationToken cancellationToken)
     {
-        if (destinationStream is null)
-            throw new ArgumentNullException(nameof(destinationStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
         OdfSaveOptions options = CreateEncryptedSaveOptions(password, algorithm);
         return SaveToStreamAsync(destinationStream, options, cancellationToken);
@@ -63,8 +62,7 @@ public sealed partial class OdfPackage
         string password,
         CancellationToken cancellationToken)
     {
-        if (path is null)
-            throw new ArgumentNullException(nameof(path));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
         return OpenAsync(path, CreateEncryptedLoadOptions(password), cancellationToken);
     }
@@ -84,8 +82,7 @@ public sealed partial class OdfPackage
         bool leaveOpen,
         CancellationToken cancellationToken)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
         return OpenAsync(stream, leaveOpen, CreateEncryptedLoadOptions(password), cancellationToken);
     }
@@ -94,8 +91,7 @@ public sealed partial class OdfPackage
         string password,
         OdfEncryptionAlgorithm algorithm)
     {
-        if (password is null)
-            throw new ArgumentNullException(nameof(password));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(password, nameof(password));
 
         return new OdfSaveOptions
         {
@@ -106,8 +102,7 @@ public sealed partial class OdfPackage
 
     internal static OdfLoadOptions CreateEncryptedLoadOptions(string password)
     {
-        if (password is null)
-            throw new ArgumentNullException(nameof(password));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(password, nameof(password));
 
         return new OdfLoadOptions
         {

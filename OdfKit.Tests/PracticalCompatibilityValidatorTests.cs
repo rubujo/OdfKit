@@ -23,7 +23,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證巨集與腳本封裝項目會回報 portable editing 風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsMacroOrScriptPackageEntries()
+    public void ValidateReportsMacroOrScriptPackageEntries()
     {
         using TextDocument document = TextDocument.Create();
         document.Package.WriteEntry("Scripts/python/hello.py", Encoding.UTF8.GetBytes("print('hi')"), "text/x-python");
@@ -39,7 +39,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證非標準圖片格式會回報跨工具編輯風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsNonPortableImageMediaTypes()
+    public void ValidateReportsNonPortableImageMediaTypes()
     {
         using OdfImageDocument document = OdfImageDocument.Create();
         document.Package.WriteEntry("Pictures/source.bmp", [1, 2, 3, 4], "image/bmp");
@@ -55,7 +55,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 ImageDocument inspection issue 會整合到實務相容性報告。
     /// </summary>
     [Fact]
-    public void Validate_IncludesImageInspectionIssuesForImageDocuments()
+    public void ValidateIncludesImageInspectionIssuesForImageDocuments()
     {
         using OdfImageDocument document = OdfImageDocument.Create();
         document.AddImageFrame([1, 2, 3, 4], 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm(), "risk.bmp", "RiskFrame");
@@ -73,7 +73,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證進階圖表對 Microsoft Office ODF profile 會回報呈現差異風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsAdvancedChartForMicrosoftOfficeProfile()
+    public void ValidateReportsAdvancedChartForMicrosoftOfficeProfile()
     {
         using ChartDocument chart = ChartDocument.CreateBubble(
             "泡泡圖",
@@ -93,7 +93,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證複雜 ODT 結構會對 Microsoft Office profile 回報 Word 復原提示風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsWordOdtRepairRiskForComplexTextStructures()
+    public void ValidateReportsWordOdtRepairRiskForComplexTextStructures()
     {
         using TextDocument document = TextDocument.Create();
         document.AddTableOfContents("目錄", 1);
@@ -116,7 +116,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 ODS 嵌入進階圖表也會依 profile 回報呈現差異風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsEmbeddedAdvancedChartForMicrosoftOfficeProfile()
+    public void ValidateReportsEmbeddedAdvancedChartForMicrosoftOfficeProfile()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -146,7 +146,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 ODS 明確列高欄寬會依 profile 回報跨套件風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsSpreadsheetSizingForPortableProfiles()
+    public void ValidateReportsSpreadsheetSizingForPortableProfiles()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -167,7 +167,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 ODG 裁切或旋轉圖片會對 portable editing 回報風險。
     /// </summary>
     [Fact]
-    public void Validate_ReportsImageTransformForDrawingDocuments()
+    public void ValidateReportsImageTransformForDrawingDocuments()
     {
         using DrawingDocument document = DrawingDocument.Create();
         OdfPicture picture = document.Pages.Add("Canvas")
@@ -185,7 +185,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證實務互通報告保留文件類型與本地化訊息。
     /// </summary>
     [Fact]
-    public void Validate_ReportCarriesDocumentKindAndMessage()
+    public void ValidateReportCarriesDocumentKindAndMessage()
     {
         using ChartDocument chart = ChartDocument.CreateStock(
             "股票圖",
@@ -205,7 +205,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 validator options 可停用規則、覆寫嚴重性與限制回傳數量。
     /// </summary>
     [Fact]
-    public void Validate_OptionsFilterOverrideAndLimitIssues()
+    public void ValidateOptionsFilterOverrideAndLimitIssues()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");
@@ -230,7 +230,7 @@ public class PracticalCompatibilityValidatorTests
     /// 驗證 maximum issue count 為 0 時會回傳空清單。
     /// </summary>
     [Fact]
-    public void Validate_OptionsCanSuppressAllIssuesWithZeroLimit()
+    public void ValidateOptionsCanSuppressAllIssuesWithZeroLimit()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.Worksheets.Add("Data");

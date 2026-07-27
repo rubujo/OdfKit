@@ -385,17 +385,17 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         var sb = new StringBuilder();
         if (!string.IsNullOrEmpty(SheetName))
         {
-            bool needsQuotes = SheetName!.Contains(" ") || SheetName.Contains("'") || SheetName.Contains("-") || SheetName.Contains("!");
+            bool needsQuotes = SheetName!.Contains(' ') || SheetName!.Contains('\'') || SheetName!.Contains('-') || SheetName!.Contains('!');
             if (needsQuotes)
-                sb.Append("'").Append(SheetName.Replace("'", "''")).Append("'!");
+                sb.Append('\'').Append(SheetName!.Replace("'", "''")).Append("'!");
             else
-                sb.Append(SheetName).Append("!");
+                sb.Append(SheetName).Append('!');
         }
         if (IsColumnAbsolute)
-            sb.Append("$");
+            sb.Append('$');
         sb.Append(IndexToColumnName(Column));
         if (IsRowAbsolute)
-            sb.Append("$");
+            sb.Append('$');
         sb.Append(Row + 1);
         return sb.ToString();
     }
@@ -416,33 +416,33 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     {
         var sb = new StringBuilder();
         if (includeBrackets)
-            sb.Append("[");
+            sb.Append('[');
 
         if (!string.IsNullOrEmpty(SheetName))
         {
             if (IsSheetAbsolute)
-                sb.Append("$");
-            bool needsQuotes = SheetName!.Contains(" ") || SheetName.Contains("'") || SheetName.Contains("-") || SheetName.Contains(".");
+                sb.Append('$');
+            bool needsQuotes = SheetName!.Contains(' ') || SheetName!.Contains('\'') || SheetName!.Contains('-') || SheetName!.Contains('.');
             if (needsQuotes)
-                sb.Append("'").Append(SheetName.Replace("'", "''")).Append("'");
+                sb.Append('\'').Append(SheetName!.Replace("'", "''")).Append('\'');
             else
                 sb.Append(SheetName);
-            sb.Append(".");
+            sb.Append('.');
         }
         else
         {
-            sb.Append("."); // Local reference prefix
+            sb.Append('.'); // Local reference prefix
         }
 
         if (IsColumnAbsolute)
-            sb.Append("$");
+            sb.Append('$');
         sb.Append(IndexToColumnName(Column));
         if (IsRowAbsolute)
-            sb.Append("$");
+            sb.Append('$');
         sb.Append(Row + 1);
 
         if (includeBrackets)
-            sb.Append("]");
+            sb.Append(']');
         return sb.ToString();
     }
 

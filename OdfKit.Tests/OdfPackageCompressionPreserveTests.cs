@@ -15,8 +15,13 @@ namespace OdfKit.Tests;
 /// </summary>
 public class OdfPackageCompressionPreserveTests
 {
+    private static readonly string[] DuplicateEntryOrder =
+        ["mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml"];
+    private static readonly string[] MemoryMappedEntryOrder =
+        ["mimetype", "content.xml", "styles.xml", "meta.xml", "META-INF/manifest.xml"];
+
     [Fact]
-    public void OpenAndSave_PreservesStoredCompressionForEmptyEntry()
+    public void OpenAndSavePreservesStoredCompressionForEmptyEntry()
     {
         using var source = CreatePackageWithStoredEntry("Extra/empty.bin", Array.Empty<byte>());
         using var package = OdfPackage.Open(source, leaveOpen: true);
@@ -28,7 +33,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public void OpenAndSave_RoundTripsStoredCompressionMethod()
+    public void OpenAndSaveRoundTripsStoredCompressionMethod()
     {
         const string entryName = "Extra/stored.bin";
         byte[] content = new byte[1024];
@@ -49,7 +54,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public void SaveToStream_CopiesUnmodifiedMmfEntryCompressedPayload()
+    public void SaveToStreamCopiesUnmodifiedMmfEntryCompressedPayload()
     {
         const string entryName = "Extra/raw-copy.txt";
         string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_raw_copy_{Guid.NewGuid():N}.odt");
@@ -84,7 +89,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public void FallbackSave_LargeEntryAvoidsExtraByteCloneAndRoundTrips()
+    public void FallbackSaveLargeEntryAvoidsExtraByteCloneAndRoundTrips()
     {
         byte[] payload = Enumerable.Range(0, 512 * 1024).Select(static value => (byte)(value % 251)).ToArray();
         using var source = new MemoryStream();
@@ -123,7 +128,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public void FallbackWriter_ComputesCrcDuringSingleWritePass()
+    public void FallbackWriterComputesCrcDuringSingleWritePass()
     {
         byte[] payload = Encoding.UTF8.GetBytes(new string('x', 4096));
         using var output = new MemoryStream();
@@ -137,7 +142,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public void Crc32Stream_ReadDetectsCrcMismatch()
+    public void Crc32StreamReadDetectsCrcMismatch()
     {
         byte[] payload = Encoding.UTF8.GetBytes("crc mismatch payload");
         uint wrongCrc = OdfCrc32.Compute(payload) ^ 0xFFFFFFFFu;
@@ -153,7 +158,7 @@ public class OdfPackageCompressionPreserveTests
     }
 
     [Fact]
-    public async Task LoadEntries_TracksEntryOrderWithDuplicates()
+    public async Task LoadEntriesTracksEntryOrderWithDuplicates()
     {
         byte[] first = Encoding.UTF8.GetBytes("first");
         byte[] second = Encoding.UTF8.GetBytes("second");
@@ -169,7 +174,7 @@ public class OdfPackageCompressionPreserveTests
         using (OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true))
         {
             Assert.Contains("content.xml", package.DuplicateEntryNames);
-            Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
+            Assert.Equal(DuplicateEntryOrder, package.EntryOrder);
             Assert.Equal(second, package.ReadEntry("content.xml"));
         }
 
@@ -180,12 +185,12 @@ public class OdfPackageCompressionPreserveTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Contains("content.xml", asyncPackage.DuplicateEntryNames);
-        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, asyncPackage.EntryOrder);
+        Assert.Equal(DuplicateEntryOrder, asyncPackage.EntryOrder);
         Assert.Equal(second, asyncPackage.ReadEntry("content.xml"));
     }
 
     [Fact]
-    public void LoadEntriesFromMmf_TracksEntryOrderWithoutLinearContains()
+    public void LoadEntriesFromMmfTracksEntryOrderWithoutLinearContains()
     {
         string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_entry_order_{Guid.NewGuid():N}.odt");
         try
@@ -206,7 +211,7 @@ public class OdfPackageCompressionPreserveTests
 
             Assert.NotNull(package.MmfEntries);
             Assert.Equal(
-                new[] { "mimetype", "content.xml", "styles.xml", "meta.xml", "META-INF/manifest.xml" },
+                MemoryMappedEntryOrder,
                 package.EntryOrder);
         }
         finally
@@ -298,7 +303,7 @@ public class OdfPackageCompressionPreserveTests
         }
 
         object? value = compressionMethodField.GetValue(entry);
-        return value is not null && Convert.ToInt32(value) == 0;
+        return value is not null && Convert.ToInt32(value, System.Globalization.CultureInfo.InvariantCulture) == 0;
     }
 
     private static byte[] ReadCompressedPayload(byte[] zipBytes, string entryName, out ushort compressionMethod)

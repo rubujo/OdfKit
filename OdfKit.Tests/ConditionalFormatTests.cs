@@ -25,7 +25,7 @@ public class ConditionalFormatTests
     /// 驗證兩色色階寫入正確的 calcext:color-scale 結構（min/max 兩個 entry）。
     /// </summary>
     [Fact]
-    public void AddColorScaleFormat_TwoColor_XmlContainsMinMaxEntries()
+    public void AddColorScaleFormatTwoColorXmlContainsMinMaxEntries()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -49,7 +49,7 @@ public class ConditionalFormatTests
     /// 驗證三色色階寫入正確的 calcext:color-scale 結構（min/percentile/max 三個 entry）。
     /// </summary>
     [Fact]
-    public void AddColorScaleFormat_ThreeColor_XmlContainsMidEntry()
+    public void AddColorScaleFormatThreeColorXmlContainsMidEntry()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -71,7 +71,7 @@ public class ConditionalFormatTests
     /// 驗證資料橫條條件格式寫入正確的 calcext:data-bar 元素及正值色彩。
     /// </summary>
     [Fact]
-    public void AddDataBarFormat_XmlContainsDataBarWithPositiveColor()
+    public void AddDataBarFormatXmlContainsDataBarWithPositiveColor()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -93,7 +93,7 @@ public class ConditionalFormatTests
     /// （真實 LibreOffice 一律會寫出此屬性，省略會導致長條比例計算例外）。
     /// </summary>
     [Fact]
-    public void AddDataBarFormat_NoNegativeColor_WritesDefaultNegativeColor()
+    public void AddDataBarFormatNoNegativeColorWritesDefaultNegativeColor()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -109,7 +109,7 @@ public class ConditionalFormatTests
     /// 驗證計畫名 AddDataBar API 會建立可讀回的資料橫條條件格式。
     /// </summary>
     [Fact]
-    public void AddDataBar_CreatesReadableDataBarFormat()
+    public void AddDataBarCreatesReadableDataBarFormat()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -125,7 +125,7 @@ public class ConditionalFormatTests
     /// 驗證三箭頭圖示集寫入正確的 calcext:icon-set 元素與 icon-set-type。
     /// </summary>
     [Fact]
-    public void AddIconSetFormat_ThreeArrows_XmlContainsCorrectType()
+    public void AddIconSetFormatThreeArrowsXmlContainsCorrectType()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -144,7 +144,7 @@ public class ConditionalFormatTests
     /// 驗證 FiveRating 圖示集寫入 5 個 entry 且 icon-set-type 正確。
     /// </summary>
     [Fact]
-    public void AddIconSetFormat_FiveRating_HasFiveEntries()
+    public void AddIconSetFormatFiveRatingHasFiveEntries()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -167,7 +167,7 @@ public class ConditionalFormatTests
     /// 驗證計畫名 AddIconSet API 會建立可讀回的圖示集條件格式。
     /// </summary>
     [Fact]
-    public void AddIconSet_CreatesReadableIconSetFormat()
+    public void AddIconSetCreatesReadableIconSetFormat()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -184,7 +184,7 @@ public class ConditionalFormatTests
     /// 驗證三種條件格式可在同一個工作表中共存（使用同一個 calcext:conditional-formats 節點）。
     /// </summary>
     [Fact]
-    public void AllThreeFormats_CanCoexistInSameSheet()
+    public void AllThreeFormatsCanCoexistInSameSheet()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -205,7 +205,7 @@ public class ConditionalFormatTests
     /// 驗證兩色色階寫入後可透過 <see cref="OdfTableSheet.ConditionalFormats"/> 讀回。
     /// </summary>
     [Fact]
-    public void GetConditionalFormats_ColorScaleTwoColor_RoundTrips()
+    public void GetConditionalFormatsColorScaleTwoColorRoundTrips()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -230,7 +230,7 @@ public class ConditionalFormatTests
     /// 驗證三色色階、資料橫條與圖示集可透過讀取 API 列舉。
     /// </summary>
     [Fact]
-    public void GetConditionalFormats_AllThreeKinds_EnumeratesCorrectly()
+    public void GetConditionalFormatsAllThreeKindsEnumeratesCorrectly()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -267,7 +267,7 @@ public class ConditionalFormatTests
     /// 驗證單一條件格式寫入後可透過讀取 API 讀回。
     /// </summary>
     [Fact]
-    public void GetConditionalFormats_SimpleCondition_RoundTrips()
+    public void GetConditionalFormatsSimpleConditionRoundTrips()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -284,7 +284,7 @@ public class ConditionalFormatTests
     /// 驗證走勢圖群組寫入後可透過 <see cref="OdfTableSheet.SparklineGroups"/> 讀回。
     /// </summary>
     [Fact]
-    public void GetSparklineGroups_AfterAdd_RoundTrips()
+    public void GetSparklineGroupsAfterAddRoundTrips()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Data");
@@ -314,7 +314,7 @@ public class ConditionalFormatTests
     /// 驗證載入既有 ODS 後可讀取 calcext 條件格式（save/load round-trip）。
     /// </summary>
     [Fact]
-    public void GetConditionalFormats_AfterSaveLoad_PreservesRules()
+    public void GetConditionalFormatsAfterSaveLoadPreservesRules()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");

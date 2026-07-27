@@ -202,8 +202,8 @@ public static class OdfDocumentKindDetector
     private static string GetExtension(string fileName)
     {
         string trimmed = fileName.Trim();
-        return trimmed.StartsWith(".", StringComparison.Ordinal) &&
-            trimmed.IndexOfAny(new[] { '/', '\\' }) < 0
+        return global::OdfKit.Internal.OdfStringHelper.StartsWith(trimmed, '.') &&
+            global::OdfKit.Internal.OdfStringHelper.IndexOfDirectorySeparator(trimmed) < 0
             ? trimmed
             : Path.GetExtension(trimmed);
     }

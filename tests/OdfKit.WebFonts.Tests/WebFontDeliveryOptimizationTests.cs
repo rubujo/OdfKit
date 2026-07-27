@@ -8,7 +8,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class WebFontDeliveryOptimizationTests
 {
     [Fact]
-    public void UnicodeRanges_MergeOnlyAdjacentScalars()
+    public void UnicodeRangesMergeOnlyAdjacentScalars()
     {
         IReadOnlyList<string> ranges = UnicodeRangeFormatter.Create(
             [0x41, 0x42, 0x43, 0x45, 0x201A9]);
@@ -17,7 +17,7 @@ public sealed class WebFontDeliveryOptimizationTests
     }
 
     [Fact]
-    public void UnicodeRanges_CompactLargeContiguousCorpusToOneDescriptor()
+    public void UnicodeRangesCompactLargeContiguousCorpusToOneDescriptor()
     {
         IReadOnlyList<string> ranges = UnicodeRangeFormatter.Create(
             Enumerable.Range(0x4E00, 20_000));
@@ -26,7 +26,7 @@ public sealed class WebFontDeliveryOptimizationTests
     }
 
     [Fact]
-    public void StableSlices_KeepVariationSequenceWithItsBaseScalar()
+    public void StableSlicesKeepVariationSequenceWithItsBaseScalar()
     {
         IReadOnlyList<WebFontTextSequence> sequences = WebFontAssetBuilder.SelectUniqueSequences(
             "A邉󠄐𠀀",
@@ -44,7 +44,7 @@ public sealed class WebFontDeliveryOptimizationTests
     }
 
     [Fact]
-    public void Css_EmitsConfiguredDisplayAndFallbackMetrics()
+    public void CssEmitsConfiguredDisplayAndFallbackMetrics()
     {
         var manifest = new WebFontManifest
         {
@@ -85,7 +85,7 @@ public sealed class WebFontDeliveryOptimizationTests
     }
 
     [Fact]
-    public void WoffZlibCompression_RoundTripsAndReducesRepetitiveData()
+    public void WoffZlibCompressionRoundTripsAndReducesRepetitiveData()
     {
         byte[] source = System.Text.Encoding.ASCII.GetBytes(new string('A', 16 * 1024));
 

@@ -66,7 +66,7 @@ public class FlatXmlMediaEncodingTests
     /// 超過門檻時改用隨關閉自動刪除的暫存檔資料流，避免大型 Flat XML 文件一次性佔用大量記憶體。
     /// </summary>
     [Fact]
-    public void TempStreamFactory_SwitchesBetweenMemoryAndTempFileByThreshold()
+    public void TempStreamFactorySwitchesBetweenMemoryAndTempFileByThreshold()
     {
         using Stream smallStream = OdfTempStreamFactory.Create(estimatedSize: 1024, temporaryDirectory: null, thresholdBytes: 1024 * 1024);
         Assert.IsType<MemoryStream>(smallStream);

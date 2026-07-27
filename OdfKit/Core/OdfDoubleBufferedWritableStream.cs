@@ -48,8 +48,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     public OdfDoubleBufferedWritableStream(Stream underlyingStream, int bufferSize, bool leaveOpen)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
-        if (bufferSize <= 0)
-            throw new ArgumentOutOfRangeException(nameof(bufferSize));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(bufferSize, nameof(bufferSize));
 
         _bufferSize = bufferSize;
         _bufferA = ArrayPool<byte>.Shared.Rent(bufferSize);
@@ -126,7 +125,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
         await _writeTask.ConfigureAwait(false);
         if (_activeCount > 0)
         {
-            await _underlyingStream.WriteAsync(_activeBuffer, 0, _activeCount, cancellationToken).ConfigureAwait(false);
+            await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(_underlyingStream, _activeBuffer, 0, _activeCount, cancellationToken).ConfigureAwait(false);
             _activeCount = 0;
         }
         await _underlyingStream.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -164,9 +163,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     /// </remarks>
     public override void Write(byte[] buffer, int offset, int count)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDoubleBufferedWritableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDoubleBufferedWritableStream));
         int bytesWritten = 0;
         while (bytesWritten < count)
         {
@@ -197,9 +194,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
 
     private async Task WriteAsyncCore(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(OdfDoubleBufferedWritableStream));
-
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDoubleBufferedWritableStream));
         int bytesWritten = 0;
         while (bytesWritten < buffer.Length)
         {
@@ -228,13 +223,13 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
                 {
                     try
                     {
-                        await _underlyingStream.WriteAsync(_backBuffer, 0, lengthToWrite, cancellationToken).ConfigureAwait(false);
+                        await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(_underlyingStream, _backBuffer, 0, lengthToWrite, cancellationToken).ConfigureAwait(false);
                     }
                     finally
                     {
                         _semaphore.Release();
                     }
-                });
+                }, CancellationToken.None);
             }
         }
     }

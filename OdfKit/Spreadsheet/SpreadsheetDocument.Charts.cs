@@ -28,8 +28,7 @@ public partial class SpreadsheetDocument
     /// </remarks>
     public OdfChartDocument GetEmbeddedChartDocument(OdfEmbeddedChartInfo chartInfo)
     {
-        if (chartInfo is null)
-            throw new ArgumentNullException(nameof(chartInfo));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chartInfo, nameof(chartInfo));
 
         return GetEmbeddedChartDocument(chartInfo.ObjectPath);
     }
@@ -50,7 +49,7 @@ public partial class SpreadsheetDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_EmbeddedCannotBeEmpty"), nameof(objectPath));
 
         string normalized = objectPath.Trim();
-        if (normalized.EndsWith("/", StringComparison.Ordinal))
+        if (global::OdfKit.Internal.OdfStringHelper.EndsWith(normalized, '/'))
             normalized = normalized.Substring(0, normalized.Length - 1);
 
         return GetEmbeddedDocument<OdfChartDocument>(normalized);
@@ -84,8 +83,7 @@ public partial class SpreadsheetDocument
     /// <returns><see langword="true"/> if the chart was removed; otherwise, <see langword="false"/>. / 若已移除圖表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool RemoveEmbeddedChart(OdfEmbeddedChartInfo chartInfo)
     {
-        if (chartInfo is null)
-            throw new ArgumentNullException(nameof(chartInfo));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(chartInfo, nameof(chartInfo));
 
         return RemoveEmbeddedChart(chartInfo.ObjectPath);
     }

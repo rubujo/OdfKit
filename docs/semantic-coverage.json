@@ -7,32 +7,32 @@
     "versions": ["1.0", "1.1", "1.2", "1.3"],
     "formats": ["ODT", "ODS", "ODP", "ODG"],
     "test": "OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs",
-    "symbol": "LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent"
+    "symbol": "LegacyVersionsHighLevelMutationPreservesVersionAndForeignContent"
   },
   "qualityEvidence": [
     {
       "dimension": "ExistingDocument",
       "formats": ["ODT", "ODS", "ODP", "ODG"],
       "test": "OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs",
-      "symbol": "LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "LegacyVersionsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "UnknownContentPreservation",
       "formats": ["ODT", "ODS", "ODP", "ODG"],
       "test": "OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs",
-      "symbol": "LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "LegacyVersionsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "LegacyVersions",
       "formats": ["ODT", "ODS", "ODP", "ODG"],
       "test": "OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs",
-      "symbol": "LegacyVersions_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "LegacyVersionsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "DowngradeDiagnostics",
       "formats": ["ODT", "ODS", "ODP", "ODG"],
       "test": "OdfKit.Tests/OdfSaveOptionsVersionTests.cs",
-      "symbol": "VersionCompatibilityReport_CoversEveryPrimaryFormat"
+      "symbol": "VersionCompatibilityReportCoversEveryPrimaryFormat"
     },
     {
       "dimension": "InvalidInput",
@@ -62,40 +62,40 @@
       "dimension": "ExistingDocument",
       "formats": ["ODC", "ODB", "ODF", "ODI"],
       "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
-      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "SecondaryFormatsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "UnknownContentPreservation",
       "formats": ["ODC", "ODB", "ODF", "ODI"],
       "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
-      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "SecondaryFormatsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "LegacyVersions",
       "formats": ["ODC", "ODB", "ODF", "ODI"],
       "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
-      "symbol": "SecondaryFormats_HighLevelMutationPreservesVersionAndForeignContent"
+      "symbol": "SecondaryFormatsHighLevelMutationPreservesVersionAndForeignContent"
     },
     {
       "dimension": "DowngradeDiagnostics",
       "formats": ["ODC", "ODB", "ODF", "ODI"],
       "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
-      "symbol": "VersionCompatibilityReport_CoversEverySecondaryFormat"
+      "symbol": "VersionCompatibilityReportCoversEverySecondaryFormat"
     },
     {
       "dimension": "InvalidInput",
       "formats": ["ODC", "ODB", "ODF", "ODI"],
       "test": "OdfKit.Tests/SecondaryFormatSemanticCoverageTests.cs",
-      "symbol": "SecondaryLoaders_RejectMismatchedDocumentKinds"
+      "symbol": "SecondaryLoadersRejectMismatchedDocumentKinds"
     }
   ],
   "mutationEvidence": {
     "test": "OdfKit.Tests/PrimaryFormatMutationPropertyTests.cs",
     "randomOperationSequences": [
-      "Odt_RandomizedParagraphMutationsRemainStable",
-      "Ods_RandomizedWorksheetMutationsRemainStable",
-      "Odp_RandomizedSlideMutationsRemainStable",
-      "Odg_RandomizedPageMutationsRemainStable"
+      "OdtRandomizedParagraphMutationsRemainStable",
+      "OdsRandomizedWorksheetMutationsRemainStable",
+      "OdpRandomizedSlideMutationsRemainStable",
+      "OdgRandomizedPageMutationsRemainStable"
     ],
     "repeatedSaveLoad": true,
     "corpusDifferentialScript": "eng/Test-OdfCorpus.ps1",
@@ -113,10 +113,10 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs", "OdfKit.Tests/OfficeGuiSmokeTests.cs"],
       "limitations": "Physical pagination and pixel rendering are delegated to a rendering backend.",
       "operationEvidence": [
-        {"topics":["text","paragraph","heading","list","table","section","style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtCollections_FindRemoveClearAndRoundTrip"},
-        {"topics":["text","paragraph","heading","list","table","section","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["text","paragraph","heading","list","table"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtCollections_FindRemoveClearAndRoundTrip"},
-        {"topics":["section"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtSectionsAndIndexes_CompleteLifecycleAndRoundTrip"},
+        {"topics":["text","paragraph","heading","list","table","section","style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtCollectionsFindRemoveClearAndRoundTrip"},
+        {"topics":["text","paragraph","heading","list","table","section","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["text","paragraph","heading","list","table"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtCollectionsFindRemoveClearAndRoundTrip"},
+        {"topics":["section"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtSectionsAndIndexesCompleteLifecycleAndRoundTrip"},
         {"topics":["style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/TextHighLevelApiTests.cs","symbol":"StylesGcRemovesUnusedStylesAndKeepsParentChain"}
       ]
     },
@@ -131,11 +131,11 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Generated index page numbers require an external pagination engine.",
       "operationEvidence": [
-        {"topics":["bookmark","cross-reference","footnote","endnote","table-of-contents","alphabetical-index","bibliography"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/TextHighLevelApiTests.cs","symbol":"GetIndexInfosAndMarks_RoundTripsAfterAdd"},
-        {"topics":["bookmark","cross-reference","footnote","endnote","table-of-contents","alphabetical-index","bibliography"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsIndexTemplatesNestedStructuresAndFontFace"},
-        {"topics":["bookmark","cross-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtBookmarksAndReferenceMarks_MaintainReferencesAndRoundTrip"},
-        {"topics":["footnote","endnote"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtNotes_FindUpdateRemoveClearAndRoundTrip"},
-        {"topics":["table-of-contents","alphabetical-index","bibliography"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtSectionsAndIndexes_CompleteLifecycleAndRoundTrip"}
+        {"topics":["bookmark","cross-reference","footnote","endnote","table-of-contents","alphabetical-index","bibliography"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/TextHighLevelApiTests.cs","symbol":"GetIndexInfosAndMarksRoundTripsAfterAdd"},
+        {"topics":["bookmark","cross-reference","footnote","endnote","table-of-contents","alphabetical-index","bibliography"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsIndexTemplatesNestedStructuresAndFontFace"},
+        {"topics":["bookmark","cross-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtBookmarksAndReferenceMarksMaintainReferencesAndRoundTrip"},
+        {"topics":["footnote","endnote"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtNotesFindUpdateRemoveClearAndRoundTrip"},
+        {"topics":["table-of-contents","alphabetical-index","bibliography"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtSectionsAndIndexesCompleteLifecycleAndRoundTrip"}
       ]
     },
     {
@@ -150,14 +150,14 @@
       "limitations": "Arbitrary collaborative conflict resolution is outside the core API.",
       "operationEvidence": [
         {"topics":["field","form","comment","tracked-change","template","mail-merge","embedded-object"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/TextAdvancedFidelityTests.cs","symbol":"AdvancedTextFeaturesRoundTripTogether"},
-        {"topics":["field","form","comment","tracked-change","template","mail-merge","embedded-object"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsTrackedChangesOdt"},
-        {"topics":["comment"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtComments_FindUpdateRemoveAndRoundTrip"},
+        {"topics":["field","form","comment","tracked-change","template","mail-merge","embedded-object"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsTrackedChangesOdt"},
+        {"topics":["comment"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtCommentsFindUpdateRemoveAndRoundTrip"},
         {"topics":["tracked-change"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/TextHighLevelApiTests.cs","symbol":"TrackedChangesWriteDualMetadataForLibreOfficeInterop"},
-        {"topics":["mail-merge"],"operations":["Create","Get","Set","Update","RoundTrip"],"test":"OdfKit.Tests/MailMergeGenericApiTests.cs","symbol":"MailMergeBatch_TemplateRemainsUnmodified"},
-        {"topics":["form"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtFormControls_CompleteLifecycleAndRoundTrip"},
-        {"topics":["field","template"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtUserFields_CompleteLifecycleAndRoundTrip"},
-        {"topics":["embedded-object"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtFormulaObjects_CompleteLifecycleAndPackageCleanup"},
-        {"topics":["field"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtInlineFields_CompleteTypedLifecycleAndRoundTrip"}
+        {"topics":["mail-merge"],"operations":["Create","Get","Set","Update","RoundTrip"],"test":"OdfKit.Tests/MailMergeGenericApiTests.cs","symbol":"MailMergeBatchTemplateRemainsUnmodified"},
+        {"topics":["form"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtFormControlsCompleteLifecycleAndRoundTrip"},
+        {"topics":["field","template"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtUserFieldsCompleteLifecycleAndRoundTrip"},
+        {"topics":["embedded-object"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtFormulaObjectsCompleteLifecycleAndPackageCleanup"},
+        {"topics":["field"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdtInlineFieldsCompleteTypedLifecycleAndRoundTrip"}
       ]
     },
     {
@@ -171,12 +171,12 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs", "OdfKit.Tests/OfficeGuiSmokeTests.cs"],
       "limitations": "Formula syntax and cached values are preserved; a full recalculation engine is not provided.",
       "operationEvidence": [
-        {"topics":["workbook","sheet","row","column","cell","range","named-expression","formula-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheets_RemovePreservesFormulaIntegrityAndRoundTrips"},
-        {"topics":["workbook","sheet","row","column","cell","range","named-expression","formula-reference"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["workbook","sheet","formula-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheets_RemovePreservesFormulaIntegrityAndRoundTrips"},
-        {"topics":["sheet","named-expression"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheetNames_FindRemoveClearAndRoundTrip"},
+        {"topics":["workbook","sheet","row","column","cell","range","named-expression","formula-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheetsRemovePreservesFormulaIntegrityAndRoundTrips"},
+        {"topics":["workbook","sheet","row","column","cell","range","named-expression","formula-reference"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["workbook","sheet","formula-reference"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheetsRemovePreservesFormulaIntegrityAndRoundTrips"},
+        {"topics":["sheet","named-expression"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsWorksheetNamesFindRemoveClearAndRoundTrip"},
         {"topics":["row","column"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"CopyRowsAndMoveRowsPreserveRowContentOrder"},
-        {"topics":["cell","range"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"RangeDepthHelpers_ReportClearTrailingAndAppendByKeyColumn"}
+        {"topics":["cell","range"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"RangeDepthHelpersReportClearTrailingAndAppendByKeyColumn"}
       ]
     },
     {
@@ -190,16 +190,16 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Pivot definitions round-trip, but pivot aggregation is performed by office software.",
       "operationEvidence": [
-        {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"GetPivotTables_RoundTripsAfterBuild"},
-        {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_ChartApplyDefinitionAndClearSeriesRoundTripsOds"},
-        {"topics":["validation"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsDataValidations_FindRemoveClearAndRoundTrip"},
-        {"topics":["conditional-format"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsConditionalFormatsAndSparklines_FindRemoveClearAndRoundTrip"},
-        {"topics":["database-range"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsDatabaseRanges_FindRemoveClearAndRoundTrip"},
-        {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Clear"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"SpreadsheetTableFacade_FindTableEditsAndClearsMetadata"},
-        {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFiltersAndSorts_CompleteLifecycleAndRoundTrip"},
-        {"topics":["pivot-definition"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsPivotDefinitions_FindUpdateRemoveClearAndRoundTrip"},
-        {"topics":["external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"ExternalLinkCachedValues_CrudAndUnknownContentRoundTrip"},
-        {"topics":["chart"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsEmbeddedCharts_FindRemoveClearAndPackageCleanup"}
+        {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"GetPivotTablesRoundTripsAfterBuild"},
+        {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessChartApplyDefinitionAndClearSeriesRoundTripsOds"},
+        {"topics":["validation"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsDataValidationsFindRemoveClearAndRoundTrip"},
+        {"topics":["conditional-format"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsConditionalFormatsAndSparklinesFindRemoveClearAndRoundTrip"},
+        {"topics":["database-range"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsDatabaseRangesFindRemoveClearAndRoundTrip"},
+        {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Clear"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"SpreadsheetTableFacadeFindTableEditsAndClearsMetadata"},
+        {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFiltersAndSortsCompleteLifecycleAndRoundTrip"},
+        {"topics":["pivot-definition"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsPivotDefinitionsFindUpdateRemoveClearAndRoundTrip"},
+        {"topics":["external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"ExternalLinkCachedValuesCrudAndUnknownContentRoundTrip"},
+        {"topics":["chart"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsEmbeddedChartsFindRemoveClearAndPackageCleanup"}
       ]
     },
     {
@@ -214,13 +214,13 @@
       "limitations": "Application-specific view state may be preserved as foreign content rather than normalized.",
       "operationEvidence": [
         {"topics":["style","print","view","freeze","split","grouping","tracked-change"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"PrintSettingsApiWritesExpectedXml"},
-        {"topics":["style","print","view","freeze","split","grouping","tracked-change"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_SheetLayoutApiRoundTripsOds"},
-        {"topics":["freeze","split"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFrozenAndSplitPanes_CompleteLifecycleAndRoundTrip"},
-        {"topics":["view"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFrozenAndSplitPanes_CompleteLifecycleAndRoundTrip"},
-        {"topics":["print"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"GetPrintAreas_RoundTripsAfterSet"},
-        {"topics":["grouping"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_UngroupColumnsRoundTripsOdsAndPdf"},
+        {"topics":["style","print","view","freeze","split","grouping","tracked-change"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessSheetLayoutApiRoundTripsOds"},
+        {"topics":["freeze","split"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFrozenAndSplitPanesCompleteLifecycleAndRoundTrip"},
+        {"topics":["view"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFrozenAndSplitPanesCompleteLifecycleAndRoundTrip"},
+        {"topics":["print"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"GetPrintAreasRoundTripsAfterSet"},
+        {"topics":["grouping"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessUngroupColumnsRoundTripsOdsAndPdf"},
         {"topics":["tracked-change"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetTrackedChangesTests.cs","symbol":"CellContentChangeCanBeRecordedAcceptedOrRejected"},
-        {"topics":["style"],"operations":["Create","Get","Find","Set","Update","RoundTrip","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_CellSetBordersRoundTripsOdsAndPdf"}
+        {"topics":["style"],"operations":["Create","Get","Find","Set","Update","RoundTrip","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessCellSetBordersRoundTripsOdsAndPdf"}
       ]
     },
     {
@@ -235,13 +235,13 @@
       "limitations": "Streaming slide generation is not claimed.",
       "operationEvidence": [
         {"topics":["master-page","layout","placeholder","slide","notes","handout","style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationBoundaryTests.cs","symbol":"TestSlideManipulationBoundaryCases"},
-        {"topics":["master-page","layout","placeholder","slide","notes","handout","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_SlideBuilderAddTitlePlaceholderRoundTrips"},
-        {"topics":["master-page"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpMasterPages_RenameRemoveAndMaintainReferences"},
-        {"topics":["layout"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpLayouts_RenameRemoveAndMaintainReferences"},
-        {"topics":["placeholder"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpPlaceholders_FindRemoveClearAndRoundTrip"},
+        {"topics":["master-page","layout","placeholder","slide","notes","handout","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessSlideBuilderAddTitlePlaceholderRoundTrips"},
+        {"topics":["master-page"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpMasterPagesRenameRemoveAndMaintainReferences"},
+        {"topics":["layout"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpLayoutsRenameRemoveAndMaintainReferences"},
+        {"topics":["placeholder"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpPlaceholdersFindRemoveClearAndRoundTrip"},
         {"topics":["slide"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationBoundaryTests.cs","symbol":"TestSlideManipulationBoundaryCases"},
-        {"topics":["style-inheritance"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAndOdgGraphicStyleInheritance_RoundTrips"},
-        {"topics":["notes","handout"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpNotesAndHandout_FindClearRemoveAndRoundTrip"}
+        {"topics":["style-inheritance"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAndOdgGraphicStyleInheritanceRoundTrips"},
+        {"topics":["notes","handout"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpNotesAndHandoutFindClearRemoveAndRoundTrip"}
       ]
     },
     {
@@ -255,13 +255,13 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "SmartArt and Office-specific layout effects are not synthesized.",
       "operationEvidence": [
-        {"topics":["text","table","picture","media","shape","connector","group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationDepthApiTests.cs","symbol":"PresentationDocument_ShapeUpdateAndZOrder"},
-        {"topics":["text","table","picture","media","shape","connector","group"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["text","picture","shape"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationDepthApiTests.cs","symbol":"PresentationDocument_DepthQueriesAndPictureUpdates"},
-        {"topics":["media"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpMediaObjects_CompleteLifecycleAndRoundTrip"},
-        {"topics":["table"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpEmbeddedTables_CompleteLifecycleAndRoundTrip"},
-        {"topics":["connector"],"operations":["Create","Get","Find","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpConnectors_CompleteLifecycleAndDependencyCleanup"},
-        {"topics":["group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpGroups_ChildLifecycleAndRoundTrip"}
+        {"topics":["text","table","picture","media","shape","connector","group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationDepthApiTests.cs","symbol":"PresentationDocumentShapeUpdateAndZOrder"},
+        {"topics":["text","table","picture","media","shape","connector","group"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["text","picture","shape"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationDepthApiTests.cs","symbol":"PresentationDocumentDepthQueriesAndPictureUpdates"},
+        {"topics":["media"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpMediaObjectsCompleteLifecycleAndRoundTrip"},
+        {"topics":["table"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpEmbeddedTablesCompleteLifecycleAndRoundTrip"},
+        {"topics":["connector"],"operations":["Create","Get","Find","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpConnectorsCompleteLifecycleAndDependencyCleanup"},
+        {"topics":["group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpGroupsChildLifecycleAndRoundTrip"}
       ]
     },
     {
@@ -275,11 +275,11 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Office-specific effects without an ODF equivalent are not emulated.",
       "operationEvidence": [
-        {"topics":["transition","animation-timeline","speaker-notes"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationHighLevelApiTests.cs","symbol":"AnimationTiming_RoundTripsAfterWrite"},
-        {"topics":["transition","animation-timeline","speaker-notes"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["transition"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationHighLevelApiTests.cs","symbol":"GetSlideTransitions_RoundTripsAfterSet"},
-        {"topics":["animation-timeline"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAnimations_FindRemoveClearAndRoundTrip"},
-        {"topics":["speaker-notes"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpNotesAndHandout_FindClearRemoveAndRoundTrip"}
+        {"topics":["transition","animation-timeline","speaker-notes"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationHighLevelApiTests.cs","symbol":"AnimationTimingRoundTripsAfterWrite"},
+        {"topics":["transition","animation-timeline","speaker-notes"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["transition"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PresentationHighLevelApiTests.cs","symbol":"GetSlideTransitionsRoundTripsAfterSet"},
+        {"topics":["animation-timeline"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAnimationsFindRemoveClearAndRoundTrip"},
+        {"topics":["speaker-notes"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpNotesAndHandoutFindClearRemoveAndRoundTrip"}
       ]
     },
     {
@@ -293,12 +293,12 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Microsoft Office interoperability is limited to conversion paths supported by Office.",
       "operationEvidence": [
-        {"topics":["page","layer","z-order","style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"PageCollection_FindRemoveAndRoundTrip"},
-        {"topics":["page","layer","z-order","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["page"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"PageCollection_FindRemoveAndRoundTrip"},
-        {"topics":["layer"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgLayers_RenameRemoveAndMaintainAssignments"},
-        {"topics":["z-order"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgShapes_ZOrderClearAndRoundTrip"}
-        ,{"topics":["style-inheritance"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAndOdgGraphicStyleInheritance_RoundTrips"}
+        {"topics":["page","layer","z-order","style-inheritance"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"PageCollectionFindRemoveAndRoundTrip"},
+        {"topics":["page","layer","z-order","style-inheritance"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["page"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"PageCollectionFindRemoveAndRoundTrip"},
+        {"topics":["layer"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgLayersRenameRemoveAndMaintainAssignments"},
+        {"topics":["z-order"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgShapesZOrderClearAndRoundTrip"}
+        ,{"topics":["style-inheritance"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdpAndOdgGraphicStyleInheritanceRoundTrips"}
       ]
     },
     {
@@ -312,12 +312,12 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "A SmartArt or automatic complex-shape layout engine is not provided.",
       "operationEvidence": [
-        {"topics":["shape","path","bezier","polygon","connector","group","custom-geometry","transform"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"RemoveShape_RemovesReferencingConnectorsAndRoundTrips"},
-        {"topics":["shape","path","bezier","polygon","connector","group","custom-geometry","transform"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
-        {"topics":["shape"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgShapes_ZOrderClearAndRoundTrip"},
-        {"topics":["path","bezier","polygon","custom-geometry","transform"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGeometry_UpdateAndRoundTrip"},
-        {"topics":["connector"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"RemoveShape_RemovesReferencingConnectorsAndRoundTrips"},
-        {"topics":["group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGroups_FindRemoveClearAndRoundTrip"}
+        {"topics":["shape","path","bezier","polygon","connector","group","custom-geometry","transform"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"RemoveShapeRemovesReferencingConnectorsAndRoundTrips"},
+        {"topics":["shape","path","bezier","polygon","connector","group","custom-geometry","transform"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
+        {"topics":["shape"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgShapesZOrderClearAndRoundTrip"},
+        {"topics":["path","bezier","polygon","custom-geometry","transform"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGeometryUpdateAndRoundTrip"},
+        {"topics":["connector"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"RemoveShapeRemovesReferencingConnectorsAndRoundTrips"},
+        {"topics":["group"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGroupsFindRemoveClearAndRoundTrip"}
       ]
     },
     {
@@ -331,12 +331,12 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Pixel-identical rendering remains the responsibility of a rendering backend.",
       "operationEvidence": [
-        {"topics":["text","picture","gradient","marker","clip","media-resource"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"GetPictures_RoundTripsAfterAdd"},
-        {"topics":["text","picture","gradient","marker","clip","media-resource"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsGeneratedDocuments"},
+        {"topics":["text","picture","gradient","marker","clip","media-resource"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingHighLevelApiTests.cs","symbol":"GetPicturesRoundTripsAfterAdd"},
+        {"topics":["text","picture","gradient","marker","clip","media-resource"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsGeneratedDocuments"},
         {"topics":["text","picture","media-resource"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DrawingApiUsabilityTests.cs","symbol":"CreateLoadPagesShapesPicturesGroupsAndConnectors"},
-        {"topics":["gradient"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGradients_CompleteLifecycleAndReferenceSafety"},
-        {"topics":["marker"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgMarkers_CompleteLifecycleAndReferenceSafety"},
-        {"topics":["clip"],"operations":["Get","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgClips_UpdateClearAndRoundTrip"}
+        {"topics":["gradient"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgGradientsCompleteLifecycleAndReferenceSafety"},
+        {"topics":["marker"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgMarkersCompleteLifecycleAndReferenceSafety"},
+        {"topics":["clip"],"operations":["Get","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdgClipsUpdateClearAndRoundTrip"}
       ]
     },
     {
@@ -350,9 +350,9 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "LibreOffice does not open standalone ODC as a main document; interoperability is verified through embedded ODF charts and package structure.",
       "operationEvidence": [
-        {"topics":["chart-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ChartScenario_AxisAdvancedEditingSurvivesRoundTrip"},
-        {"topics":["chart-model"],"operations":["Remove"],"test":"OdfKit.Tests/ChartHighLevelApiTests.cs","symbol":"RemoveSeriesAt_RemovesOnlySelectedSeriesAndRoundTrips"},
-        {"topics":["chart-model"],"operations":["Clear","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_ChartApplyDefinitionAndClearSeriesRoundTripsOds"}
+        {"topics":["chart-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ChartScenarioAxisAdvancedEditingSurvivesRoundTrip"},
+        {"topics":["chart-model"],"operations":["Remove"],"test":"OdfKit.Tests/ChartHighLevelApiTests.cs","symbol":"RemoveSeriesAtRemovesOnlySelectedSeriesAndRoundTrips"},
+        {"topics":["chart-model"],"operations":["Clear","Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessChartApplyDefinitionAndClearSeriesRoundTripsOds"}
       ]
     },
     {
@@ -366,7 +366,7 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "Headless conversion is not a reliable ODB interoperability path; package conformance and manual UNO loading remain the available evidence.",
       "operationEvidence": [
-        {"topics":["database-model"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DatabaseHighLevelApiTests.cs","symbol":"TableAndQueryCrud_UpdateRemoveAndClearRoundTrips"},
+        {"topics":["database-model"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/DatabaseHighLevelApiTests.cs","symbol":"TableAndQueryCrudUpdateRemoveAndClearRoundTrips"},
         {"topics":["database-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType"}
       ]
     },
@@ -381,9 +381,9 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "LaTeX reconstruction without a source annotation remains best-effort because MathML and LaTeX are not one-to-one.",
       "operationEvidence": [
-        {"topics":["formula-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists"},
-        {"topics":["formula-model"],"operations":["Remove","Clear"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"RemoveFirstAndClearMathTokens_PreserveEditableMathContainer"},
-        {"topics":["formula-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadless_LoadsFormulaDocument"}
+        {"topics":["formula-model"],"operations":["Create","Get","Find","Set","Update","RoundTrip"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"FormulaTokenSemanticEditingFindReplaceAndSetMathRowPersists"},
+        {"topics":["formula-model"],"operations":["Remove","Clear"],"test":"OdfKit.Tests/FormulaHighLevelApiTests.cs","symbol":"RemoveFirstAndClearMathTokensPreserveEditableMathContainer"},
+        {"topics":["formula-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessLoadsFormulaDocument"}
       ]
     },
     {
@@ -397,10 +397,10 @@
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
       "limitations": "ODF 1.4 defines a standalone image document as one frame containing one image; multi-frame APIs are extended-document workflows and are not claimed as strict ODI conformance.",
       "operationEvidence": [
-        {"topics":["image-model"],"operations":["Create","Get","Find","Set","Update","Remove","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ImageScenario_MultiFrameLayoutSurvivesRoundTrip"},
-        {"topics":["image-model"],"operations":["Update"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ReplaceImageFrameContent_PreservesFrameMetadataAndRoundTrips"},
-        {"topics":["image-model"],"operations":["Clear"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ImageRotationAndCrop_RoundTripAfterSaveAndLoad"},
-        {"topics":["image-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"ImageDocument_PackageStructureMatchesOdf14Schema"}
+        {"topics":["image-model"],"operations":["Create","Get","Find","Set","Update","Remove","RoundTrip"],"test":"OdfKit.Tests/SecondaryFormatApiScenarioTests.cs","symbol":"ImageScenarioMultiFrameLayoutSurvivesRoundTrip"},
+        {"topics":["image-model"],"operations":["Update"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ReplaceImageFrameContentPreservesFrameMetadataAndRoundTrips"},
+        {"topics":["image-model"],"operations":["Clear"],"test":"OdfKit.Tests/ImageHighLevelApiTests.cs","symbol":"ImageRotationAndCropRoundTripAfterSaveAndLoad"},
+        {"topics":["image-model"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"ImageDocumentPackageStructureMatchesOdf14Schema"}
       ]
     }
   ]

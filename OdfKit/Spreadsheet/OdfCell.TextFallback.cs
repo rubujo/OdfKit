@@ -17,15 +17,9 @@ public partial class OdfCell
     /// <param name="options">The font fallback options. / 字型遞補選項。</param>
     public void SetText(string text, OdfTextFontFallbackOptions options)
     {
-        if (text is null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(text, nameof(text));
 
-        if (options is null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
 
         if (options.DeclareDefaultCjkFallbackFonts)
         {

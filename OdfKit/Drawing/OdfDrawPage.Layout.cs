@@ -94,8 +94,7 @@ public partial class OdfDrawPage
 
     private List<ShapeBounds> ResolveBounds(IEnumerable<string> shapeIds, out OdfShapeLayoutResult result)
     {
-        if (shapeIds is null)
-            throw new ArgumentNullException(nameof(shapeIds));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(shapeIds, nameof(shapeIds));
 
         result = new OdfShapeLayoutResult();
         var shapes = new List<ShapeBounds>();

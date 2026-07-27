@@ -76,7 +76,7 @@ internal static class SpreadsheetDocumentEmbeddedChartReadEngine
         string path = href.Trim();
         if (path.StartsWith("./", StringComparison.Ordinal))
             path = path.Substring(2);
-        if (!path.EndsWith("/", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/'))
             path += "/";
         return path;
     }

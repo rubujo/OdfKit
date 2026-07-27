@@ -145,7 +145,7 @@ ODF 1.0～1.4 使用相同的 `office`、`script` 與 `xlink` 命名空間 URI�
 
 ## LibreOffice 實機證據
 
-`LibreOfficeHeadless_ExecutesManagedDocumentMacros` 會以 OdfKit 分別建立 ODF 1.0～1.4、含
+`LibreOfficeHeadlessExecutesManagedDocumentMacros` 會以 OdfKit 分別建立 ODF 1.0～1.4、含
 已簽署 Basic 與 Python 文件巨集的 ODT，再透過隔離的 LibreOffice UNO headless profile 分別呼叫
 兩個文件 script URI，並核對巨集實際寫出的標記檔內容。2026-07-22 已以 LibreOffice
 Portable 26.2.4.2 在 Windows 通過全部五個版本；此證據代表目前產生的 LibreOffice package

@@ -30,8 +30,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         configure(new TextDocumentMetadataBuilder(_document.Metadata));
         return this;
     }
@@ -56,8 +55,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var styles = new OdfStyleSet();
         configure(styles);
@@ -133,8 +131,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         OdfParagraph paragraph = _document.Body.Paragraphs.Add();
         ApplyBodyStyle(_document, paragraph, _styles);
         configure(new TextParagraphBuilder(_document, paragraph));
@@ -170,8 +167,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddCoverPage(string title, string? subtitle, string? author, string? dateText)
     {
-        if (title is null)
-            throw new ArgumentNullException(nameof(title));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(title, nameof(title));
 
         OdfParagraph lastParagraph = _document.Body.Headings.Add(title, 1);
         ApplyCoverLineStyle(lastParagraph, "28pt", bold: true, marginTop: "6cm", marginBottom: "0.6cm");
@@ -214,8 +210,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddList(Action<TextListBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         OdfList list = _document.Body.Lists.Add();
         configure(new TextListBuilder(list));
         return this;
@@ -301,8 +296,7 @@ public sealed class TextDocumentBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithPageSetup(Action<TextPageSetupBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         configure(new TextPageSetupBuilder(_document.GetDefaultPageSetup()));
         return this;
@@ -637,8 +631,7 @@ public sealed class TextParagraphBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder Append(string text, Action<TextRunFormattingBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
         var format = new TextRunFormattingBuilder();
         configure(format);
         OdfTextRun run = _paragraph.AddTextRun(text);
@@ -802,8 +795,7 @@ public sealed class TextSectionBuilder
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextSectionBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         _section.Node.AppendChild(paragraphNode);

@@ -37,8 +37,7 @@ public sealed class OdfChartBuilder
     /// <exception cref="ArgumentException">當 <paramref name="range"/> 為空值時擲出</exception>
     public OdfChartBuilder BindData(TableTableElement table, string range)
     {
-        if (table is null)
-            throw new ArgumentNullException(nameof(table));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(table, nameof(table));
         if (string.IsNullOrEmpty(range))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_ChartBuilder_RangeCannotBeEmpty"), nameof(range));
 

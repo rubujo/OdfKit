@@ -112,10 +112,7 @@ public sealed class OdfSpreadsheetTable
     /// <param name="conditions">The filter conditions. / 篩選條件。</param>
     public void ApplyFilter(params OdfDatabaseFilterConditionInfo[] conditions)
     {
-        if (conditions is null)
-        {
-            throw new ArgumentNullException(nameof(conditions));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(conditions, nameof(conditions));
 
         _databaseRange.SetFilter(conditions.Select(condition =>
             (condition.FieldNumber, condition.Operator, condition.Value)).ToArray());
@@ -153,10 +150,7 @@ public sealed class OdfSpreadsheetTable
     /// <param name="rules">The sort rules. / 排序規則。</param>
     public void ApplySort(params OdfDatabaseSortRuleInfo[] rules)
     {
-        if (rules is null)
-        {
-            throw new ArgumentNullException(nameof(rules));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(rules, nameof(rules));
 
         _databaseRange.SetSort(rules.Select(rule => (rule.FieldNumber, rule.Ascending)).ToArray());
     }

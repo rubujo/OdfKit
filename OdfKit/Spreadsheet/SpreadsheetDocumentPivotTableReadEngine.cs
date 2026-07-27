@@ -82,7 +82,7 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
         return string.Empty;
     }
 
-    private static IReadOnlyList<OdfPivotTableFieldInfo> ParseFields(OdfNode pivotTableNode)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfPivotTableFieldInfo> ParseFields(OdfNode pivotTableNode)
     {
         List<OdfPivotTableFieldInfo> fields = [];
 
@@ -107,7 +107,7 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
         return fields.AsReadOnly();
     }
 
-    private static IReadOnlyList<OdfPivotTableSortFieldInfo> ParseSortFields(OdfNode pivotTableNode)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfPivotTableSortFieldInfo> ParseSortFields(OdfNode pivotTableNode)
     {
         List<OdfPivotTableSortFieldInfo> sortFields = [];
 
@@ -137,7 +137,7 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
         return sortFields.AsReadOnly();
     }
 
-    private static IReadOnlyList<OdfPivotTableFilterConditionInfo> ParseFilterConditions(OdfNode pivotTableNode)
+    private static System.Collections.ObjectModel.ReadOnlyCollection<OdfPivotTableFilterConditionInfo> ParseFilterConditions(OdfNode pivotTableNode)
     {
         List<OdfPivotTableFilterConditionInfo> conditions = [];
 

@@ -22,7 +22,7 @@ public class SecurityBoundaryTests
     /// 測試 Pbkdf2 當輸入無效或極端的反覆運算次數時，是否能正確處理或擲出例外。
     /// </summary>
     [Fact]
-    public void TestPbkdf2_BoundaryAndInvalidInputs()
+    public void TestPbkdf2BoundaryAndInvalidInputs()
     {
         byte[] pwd = Encoding.UTF8.GetBytes("Password");
         byte[] salt = new byte[8];
@@ -53,7 +53,7 @@ public class SecurityBoundaryTests
         Assert.Throws<ArgumentNullException>(() =>
             OdfEncryption.Pbkdf2(null!, salt, 1000, 16, "sha256"));
 
-        Assert.Throws<NullReferenceException>(() =>
+        Assert.Throws<ArgumentNullException>(() =>
             OdfEncryption.Pbkdf2(pwd, null!, 1000, 16, "sha256"));
 
         Assert.Throws<NullReferenceException>(() =>
@@ -64,7 +64,7 @@ public class SecurityBoundaryTests
     /// 測試 DecryptEntry 當輸入無效的密碼學參數時，是否正確擲出對應的例外。
     /// </summary>
     [Fact]
-    public void TestDecryptEntry_BoundaryAndInvalidInputs()
+    public void TestDecryptEntryBoundaryAndInvalidInputs()
     {
         byte[] ciphertext = new byte[32];
         byte[] salt = new byte[16];
@@ -95,7 +95,7 @@ public class SecurityBoundaryTests
         Assert.Throws<NotSupportedException>(() =>
             OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, null!, 32, 1000, salt, iv));
 
-        Assert.Throws<NullReferenceException>(() =>
+        Assert.Throws<ArgumentNullException>(() =>
             OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1000, null!, iv));
 
         Assert.Throws<ArgumentNullException>(() =>
@@ -106,7 +106,7 @@ public class SecurityBoundaryTests
     /// 測試 ComputeHash 在處理未知雜湊別名與局部匹配時，是否能正確拒腳並擲出例外。
     /// </summary>
     [Fact]
-    public void TestComputeHash_BoundaryAndInvalidInputs()
+    public void TestComputeHashBoundaryAndInvalidInputs()
     {
         byte[] data = [1, 2, 3, 4];
 
@@ -132,7 +132,7 @@ public class SecurityBoundaryTests
     /// 測試列高的極端值與邊界條件，檢查寫入 NaN、無限大與負數時的行為。
     /// </summary>
     [Fact]
-    public void TestWriteStartRow_RowHeightBoundaryConditions()
+    public void TestWriteStartRowRowHeightBoundaryConditions()
     {
         // 1. 測試負數高度 (例如 -15.0 pt)
         // 預期行為：OdfLength 會正常解析，並在 styles.xml 中寫入對應的負公分值 "-0.5292cm"

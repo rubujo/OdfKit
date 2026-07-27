@@ -98,8 +98,7 @@ public partial class SpreadsheetDocument
         OdfObjectBindingOptions? options,
         CancellationToken cancellationToken)
     {
-        if (records is null)
-            throw new ArgumentNullException(nameof(records));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(records, nameof(records));
         cancellationToken.ThrowIfCancellationRequested();
 
         var buffered = new List<T>();

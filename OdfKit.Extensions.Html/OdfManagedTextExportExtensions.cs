@@ -53,8 +53,7 @@ public static class OdfManagedTextExportExtensions
     /// </summary>
     public static TextDocument ToOdtTextDocument(this FileInfo file, OdfMarkdownImportOptions? options = null)
     {
-        if (file is null)
-            throw new ArgumentNullException(nameof(file));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(file, nameof(file));
 
         return OdfMarkdownImporter.Load(file.FullName, options);
     }
@@ -86,8 +85,7 @@ public static class OdfManagedTextExportExtensions
     /// </summary>
     public static TextDocument ToOdtTextDocumentFromRtf(this FileInfo file)
     {
-        if (file is null)
-            throw new ArgumentNullException(nameof(file));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(file, nameof(file));
 
         return OdfRtfImporter.Load(file.FullName);
     }

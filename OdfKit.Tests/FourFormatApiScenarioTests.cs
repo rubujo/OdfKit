@@ -24,7 +24,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODT 追蹤修訂讀取 API 可於完整建立／儲存／載入流程後列舉修訂。
     /// </summary>
     [Fact]
-    public void TextScenario_TrackedChangesReadableAfterRoundTrip()
+    public void TextScenarioTrackedChangesReadableAfterRoundTrip()
     {
         using var stream = new MemoryStream();
         string changeId;
@@ -51,7 +51,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODS 資料驗證、嵌入圖表與追蹤修訂讀取 API 可於單一工作流程後讀回。
     /// </summary>
     [Fact]
-    public void SpreadsheetScenario_ReadApisSurviveRoundTrip()
+    public void SpreadsheetScenarioReadApisSurviveRoundTrip()
     {
         using var workbook = SpreadsheetDocument.Create();
         workbook.Worksheets.Add("銷售");
@@ -97,7 +97,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODP 動畫讀取 API 可於簡報建立／儲存／載入流程後列舉效果。
     /// </summary>
     [Fact]
-    public void PresentationScenario_AnimationsReadableAfterRoundTrip()
+    public void PresentationScenarioAnimationsReadableAfterRoundTrip()
     {
         using var document = PresentationDocument.Create();
         OdfSlide slide = document.AddSlide();
@@ -130,7 +130,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODG 路徑、連接線、多邊形與自定義圖形讀取 API 可於單一繪圖流程後讀回。
     /// </summary>
     [Fact]
-    public void DrawingScenario_ShapeReadApisSurviveRoundTrip()
+    public void DrawingScenarioShapeReadApisSurviveRoundTrip()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage("場景頁");
@@ -189,7 +189,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODP 儲存／載入後可列舉投影片母片。
     /// </summary>
     [Fact]
-    public void PresentationScenario_GetMasterPagesSurvivesRoundTrip()
+    public void PresentationScenarioGetMasterPagesSurvivesRoundTrip()
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();
@@ -208,7 +208,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODS 資料庫範圍讀取 API 可於儲存／載入後讀回篩選條件。
     /// </summary>
     [Fact]
-    public void SpreadsheetScenario_GetDatabaseRangesSurvivesRoundTrip()
+    public void SpreadsheetScenarioGetDatabaseRangesSurvivesRoundTrip()
     {
         using var workbook = SpreadsheetDocument.Create();
         workbook.AddSheet("資料");
@@ -232,7 +232,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODT 頁首頁尾進階寫入 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void TextScenario_HeaderFooterAdvancedEditingSurvivesRoundTrip()
+    public void TextScenarioHeaderFooterAdvancedEditingSurvivesRoundTrip()
     {
         using var stream = new MemoryStream();
         using (TextDocument document = TextDocument.Create())
@@ -267,7 +267,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODS 圖表軸與序列進階寫入 API 可於嵌入圖表往返後讀回。
     /// </summary>
     [Fact]
-    public void SpreadsheetScenario_ChartAdvancedEditingSurvivesRoundTrip()
+    public void SpreadsheetScenarioChartAdvancedEditingSurvivesRoundTrip()
     {
         using var workbook = SpreadsheetDocument.Create();
         OdfTableSheet sheet = workbook.AddSheet("銷售");
@@ -305,7 +305,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODP 母片與版面配置進階寫入 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void PresentationScenario_MasterAndLayoutAdvancedEditingSurvivesRoundTrip()
+    public void PresentationScenarioMasterAndLayoutAdvancedEditingSurvivesRoundTrip()
     {
         using var stream = new MemoryStream();
         using (var document = PresentationDocument.Create())
@@ -339,7 +339,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODG 群組與連接線路由進階寫入 API 可於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void DrawingScenario_GroupAndConnectorAdvancedEditingSurvivesRoundTrip()
+    public void DrawingScenarioGroupAndConnectorAdvancedEditingSurvivesRoundTrip()
     {
         const string routePoints = "0cm 0cm 2cm 1cm 4cm 0cm";
         using var stream = new MemoryStream();
@@ -395,7 +395,7 @@ public class FourFormatApiScenarioTests
     /// 驗證 ODT 儲存／載入會保留自訂 RDF triple 並同步標準 <c>pkg:</c> ontology。
     /// </summary>
     [Fact]
-    public void TextScenario_RdfMetadataAndPkgOntologySurviveRoundTrip()
+    public void TextScenarioRdfMetadataAndPkgOntologySurviveRoundTrip()
     {
         const string title = "RDF 場景標題";
         using var stream = new MemoryStream();

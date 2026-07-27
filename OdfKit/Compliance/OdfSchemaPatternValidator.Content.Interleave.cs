@@ -160,8 +160,8 @@ internal static partial class OdfSchemaPatternContentMatcher
 
     private static bool InterleaveRequirementsSatisfied(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
-        IReadOnlyList<bool> used,
-        IReadOnlyList<bool> oneOrMoreSatisfied,
+        bool[] used,
+        bool[] oneOrMoreSatisfied,
         OdfSchemaPatternMatchContext context)
     {
         for (int i = 0; i < nodes.Count; i++)

@@ -48,8 +48,8 @@ internal static class OdfBoundedStreamReader
         Stream destination,
         long maxBytes,
         string errorMessageKey,
-        CancellationToken cancellationToken = default,
-        long initialBytes = 0)
+        long initialBytes = 0,
+        CancellationToken cancellationToken = default)
     {
         byte[] buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
         try
@@ -57,11 +57,11 @@ internal static class OdfBoundedStreamReader
             long totalBytes = initialBytes;
             EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
             int bytesRead;
-            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+            while ((bytesRead = await global::OdfKit.Internal.OdfStreamHelper.ReadAsync(source, buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
             {
                 totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
 
-                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+                await global::OdfKit.Internal.OdfStreamHelper.WriteAsync(destination, buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
             }
         }
         finally
@@ -82,11 +82,11 @@ internal static class OdfBoundedStreamReader
             throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, contentLength.Value, maxBytes));
         }
 
-        using Stream stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+        using Stream stream = await global::OdfKit.Internal.OdfAsyncHelper.ReadAsStreamAsync(content, cancellationToken).ConfigureAwait(false);
         using var ms = new MemoryStream(contentLength.HasValue && contentLength.Value <= int.MaxValue
             ? (int)contentLength.Value
             : 0);
-        await CopyToAsync(stream, ms, maxBytes, errorMessageKey, cancellationToken).ConfigureAwait(false);
+        await CopyToAsync(stream, ms, maxBytes, errorMessageKey, cancellationToken: cancellationToken).ConfigureAwait(false);
         return ms.ToArray();
     }
 

@@ -121,7 +121,7 @@ public sealed class OdfValidationIssue(
             string location = PackagePath ?? defaultLoc;
             try
             {
-                return string.Format(fix, location);
+                return string.Format(System.Globalization.CultureInfo.InvariantCulture, fix, location);
             }
             catch (FormatException)
             {

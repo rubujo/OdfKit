@@ -54,8 +54,7 @@ public static class OdfMarkdownExporter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 document 為 null 時引發</exception>
     public static string Export(TextDocument document, OdfMarkdownExportOptions? options = null)
     {
-        if (document is null)
-            throw new ArgumentNullException(nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         options ??= new OdfMarkdownExportOptions();
         var sb = new StringBuilder(2048);
@@ -69,15 +68,15 @@ public static class OdfMarkdownExporter
         {
             sb.AppendLine("---");
             if (!string.IsNullOrEmpty(meta.Title))
-                sb.AppendLine($"title: \"{meta.Title!.Replace("\"", "\\\"")}\"");
+                sb.AppendLine(System.FormattableString.Invariant($"title: \"{meta.Title!.Replace("\"", "\\\"")}\""));
             if (!string.IsNullOrEmpty(meta.Creator))
-                sb.AppendLine($"author: \"{meta.Creator!.Replace("\"", "\\\"")}\"");
+                sb.AppendLine(System.FormattableString.Invariant($"author: \"{meta.Creator!.Replace("\"", "\\\"")}\""));
             if (!string.IsNullOrEmpty(meta.Subject))
-                sb.AppendLine($"subject: \"{meta.Subject!.Replace("\"", "\\\"")}\"");
+                sb.AppendLine(System.FormattableString.Invariant($"subject: \"{meta.Subject!.Replace("\"", "\\\"")}\""));
             if (!string.IsNullOrEmpty(meta.Description))
-                sb.AppendLine($"description: \"{meta.Description!.Replace("\"", "\\\"")}\"");
+                sb.AppendLine(System.FormattableString.Invariant($"description: \"{meta.Description!.Replace("\"", "\\\"")}\""));
             if (!string.IsNullOrEmpty(meta.Language))
-                sb.AppendLine($"language: \"{meta.Language!.Replace("\"", "\\\"")}\"");
+                sb.AppendLine(System.FormattableString.Invariant($"language: \"{meta.Language!.Replace("\"", "\\\"")}\""));
             sb.AppendLine("---");
             sb.AppendLine();
         }
@@ -705,7 +704,7 @@ public static class OdfMarkdownExporter
         }
 
         string color = value!.Trim();
-        return color.StartsWith("#", StringComparison.Ordinal) ? color : null;
+        return global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#') ? color : null;
     }
 
     private static void AppendEscaped(StringBuilder sb, string? text)

@@ -7,7 +7,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class Cff2SubsetterTests
 {
     [Fact]
-    public void Build_AcceptsNonVariableFontWithoutVariationStoreOrFvar()
+    public void BuildAcceptsNonVariableFontWithoutVariationStoreOrFvar()
     {
         byte[] source = BuildCff2([]);
         var selectedGlyphs = new HashSet<ushort> { 0 };
@@ -29,7 +29,7 @@ public sealed class Cff2SubsetterTests
     }
 
     [Fact]
-    public void Validate_RejectsVariationIndexWithoutVariationStore()
+    public void ValidateRejectsVariationIndexWithoutVariationStore()
     {
         byte[] source = BuildCff2([139, 15]);
 
@@ -45,7 +45,7 @@ public sealed class Cff2SubsetterTests
     }
 
     [Fact]
-    public void Validate_RejectsBlendWithoutVariationStore()
+    public void ValidateRejectsBlendWithoutVariationStore()
     {
         byte[] source = BuildCff2([139, 16]);
 
@@ -61,7 +61,7 @@ public sealed class Cff2SubsetterTests
     }
 
     [Fact]
-    public void Validate_DoesNotReuseCachedParseAcrossGlyphCounts()
+    public void ValidateDoesNotReuseCachedParseAcrossGlyphCounts()
     {
         byte[] source = BuildCff2([]);
         var selectedGlyphs = new HashSet<ushort> { 0 };
@@ -84,7 +84,7 @@ public sealed class Cff2SubsetterTests
     }
 
     [Fact]
-    public void Validate_DoesNotReuseCachedParseAcrossVariationContexts()
+    public void ValidateDoesNotReuseCachedParseAcrossVariationContexts()
     {
         byte[] source = BuildCff2([]);
         var selectedGlyphs = new HashSet<ushort> { 0 };
@@ -113,7 +113,7 @@ public sealed class Cff2SubsetterTests
     }
 
     [Fact]
-    public void Build_CompactsCharStringsAndRewritesPrivateSubrsOffsets()
+    public void BuildCompactsCharStringsAndRewritesPrivateSubrsOffsets()
     {
         byte[] source = BuildCff2WithCharStrings(
             includeLocalSubrs: true,
@@ -192,12 +192,12 @@ public sealed class Cff2SubsetterTests
         return bytes.ToArray();
     }
 
-    private static void AppendIndex(List<byte> bytes, IReadOnlyList<byte[]> objects)
+    private static void AppendIndex(List<byte> bytes, byte[][] objects)
     {
         Span<byte> count = stackalloc byte[4];
-        BinaryPrimitives.WriteUInt32BigEndian(count, checked((uint)objects.Count));
+        BinaryPrimitives.WriteUInt32BigEndian(count, checked((uint)objects.Length));
         bytes.AddRange(count.ToArray());
-        if (objects.Count == 0)
+        if (objects.Length == 0)
         {
             return;
         }

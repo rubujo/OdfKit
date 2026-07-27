@@ -89,9 +89,9 @@ public static class OdfTypedDomCoverage
             orderedWrapperPropertyTypeCounts);
     }
 
-    private static IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> BuildAttributeDatatypeCoverage(
+    private static OdfTypedDomAttributeDatatypeCoverage[] BuildAttributeDatatypeCoverage(
         IReadOnlyDictionary<string, int> attributeValueTypeCounts,
-        IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts)
+        Dictionary<string, int> wrapperPropertyTypeCounts)
     {
         return attributeValueTypeCounts
             .Select(pair =>
@@ -143,7 +143,7 @@ public static class OdfTypedDomCoverage
         };
     }
 
-    private static IReadOnlyList<OdfTypedDomChildElementRelationCoverage> BuildChildElementRelations(OdfSchemaSet schema)
+    private static OdfTypedDomChildElementRelationCoverage[] BuildChildElementRelations(OdfSchemaSet schema)
     {
         var relations = new Dictionary<string, OdfTypedDomChildElementRelationCoverage>(StringComparer.Ordinal);
         foreach (OdfSchemaPatternDefinition pattern in schema.Patterns.Values)

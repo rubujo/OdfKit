@@ -328,7 +328,7 @@ public class TextApiUsabilityTests
     /// 驗證文字圖片可標記為 ODF 1.4 裝飾性物件。
     /// </summary>
     [Fact]
-    public void ImageMarkAsDecorative_WritesDrawDecorativeAttribute()
+    public void ImageMarkAsDecorativeWritesDrawDecorativeAttribute()
     {
         using var doc = TextDocument.Create();
         doc.Body.Images.Add(CreatePngBytes(), "1cm", "1cm", "Decorative")
@@ -538,7 +538,7 @@ public class TextApiUsabilityTests
     /// 驗證可在段落中插入腳注並 round-trip。
     /// </summary>
     [Fact]
-    public void AddFootnote_PersistsNoteElementInOdt()
+    public void AddFootnotePersistsNoteElementInOdt()
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文");
@@ -559,7 +559,7 @@ public class TextApiUsabilityTests
     /// 驗證可在段落中插入尾注並 round-trip。
     /// </summary>
     [Fact]
-    public void AddEndnote_PersistsNoteElementInOdt()
+    public void AddEndnotePersistsNoteElementInOdt()
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文");
@@ -580,7 +580,7 @@ public class TextApiUsabilityTests
     /// 驗證可在段落中插入文獻標記並 round-trip。
     /// </summary>
     [Fact]
-    public void AddBibliographyMark_PersistsAttributesInOdt()
+    public void AddBibliographyMarkPersistsAttributesInOdt()
     {
         using var doc = TextDocument.Create();
         OdfParagraph para = doc.AddParagraph("依據文獻一所述");
@@ -607,7 +607,7 @@ public class TextApiUsabilityTests
     /// 驗證可在段落中插入定位點（Tab）字元並 round-trip。
     /// </summary>
     [Fact]
-    public void AddTab_PersistsTabElementInOdt()
+    public void AddTabPersistsTabElementInOdt()
     {
         using var doc = TextDocument.Create();
         OdfParagraph para = doc.AddParagraph("前段");
@@ -632,7 +632,7 @@ public class TextApiUsabilityTests
 
         ms.Position = 0;
         using TextDocument loaded = TextDocument.Load(ms);
-        OdfParagraph loadedPara = loaded.Body.Paragraphs.Single(p => p.TextContent.Contains("左", StringComparison.Ordinal));
+        OdfParagraph loadedPara = loaded.Body.Paragraphs.Single(p => p.TextContent.Contains('左'));
         Assert.Contains(loadedPara.Node.Children, child => child.LocalName == "tab");
     }
 
@@ -640,7 +640,7 @@ public class TextApiUsabilityTests
     /// 驗證 <see cref="OdfTextRun.WithFontName"/> 可同時設定西文、東亞與複雜文字字型並 round-trip。
     /// </summary>
     [Fact]
-    public void WithFontName_SetsWesternAsianAndComplexFontsAndPersists()
+    public void WithFontNameSetsWesternAsianAndComplexFontsAndPersists()
     {
         using var doc = TextDocument.Create();
         OdfParagraph para = doc.AddParagraph();
@@ -661,7 +661,7 @@ public class TextApiUsabilityTests
     /// 驗證 <see cref="TextRunFormattingBuilder.Underline"/> 經由段落 Fluent builder 套用後可正確 round-trip。
     /// </summary>
     [Fact]
-    public void TextParagraphBuilderAppend_UnderlineFormattingPersists()
+    public void TextParagraphBuilderAppendUnderlineFormattingPersists()
     {
         using TextDocument document = TextDocument.Builder()
             .AddParagraph(paragraph => paragraph
@@ -720,7 +720,7 @@ public class TextApiUsabilityTests
     /// 驗證 <see cref="OdfSubDocumentReference"/> record 衍生方法（相等性、解構、複製）的正確性。
     /// </summary>
     [Fact]
-    public void OdfSubDocumentReference_RecordSemanticsAreCorrect()
+    public void OdfSubDocumentReferenceRecordSemanticsAreCorrect()
     {
         var reference = new OdfSubDocumentReference("Chapter1", "chapter1.odt");
         var sameValue = new OdfSubDocumentReference("Chapter1", "chapter1.odt");

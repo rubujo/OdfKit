@@ -23,7 +23,7 @@ public class FlatVariantRoundTripTests
     /// 內容與 Flat XML 形態正確且可往返還原。
     /// </summary>
     [Fact]
-    public void TextDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void TextDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = TextDocument.Create();
         original.Title = "Flat 往返測試標題";
@@ -53,7 +53,7 @@ public class FlatVariantRoundTripTests
     /// 編輯內容（不需下沉 DOM），證明 Flat XML 與 ZIP 封裝的高階編輯工作流等價。
     /// </summary>
     [Fact]
-    public void FlatTextDocument_SupportsHighLevelEditingApiWithoutDom()
+    public void FlatTextDocumentSupportsHighLevelEditingApiWithoutDom()
     {
         using var flat = FlatTextDocument.Create();
         flat.AddHeading("Flat 文件標題", 1);
@@ -74,7 +74,7 @@ public class FlatVariantRoundTripTests
     /// 完整保留工作表資料。
     /// </summary>
     [Fact]
-    public void SpreadsheetDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void SpreadsheetDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = SpreadsheetDocument.Create();
         var sheet = original.Worksheets.Add("Sheet1");
@@ -95,7 +95,7 @@ public class FlatVariantRoundTripTests
     /// 完整保留母片頁面。
     /// </summary>
     [Fact]
-    public void PresentationDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void PresentationDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = PresentationDocument.Create();
         original.AddMasterPage("OriginalFlatMaster");
@@ -115,7 +115,7 @@ public class FlatVariantRoundTripTests
     /// 完整保留母片頁面。
     /// </summary>
     [Fact]
-    public void DrawingDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void DrawingDocumentCreateFlatDocumentRoundTripsBackToZip()
     {
         using var original = DrawingDocument.Create();
         original.AddMasterPage("OriginalFlatDrawingMaster");
@@ -134,7 +134,7 @@ public class FlatVariantRoundTripTests
     /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
     /// </summary>
     [Fact]
-    public void CreateFlatVariant_NullSource_ThrowsArgumentNullException()
+    public void CreateFlatVariantNullSourceThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => FlatTextDocument.CreateFromDocument(null!));
         Assert.Throws<ArgumentNullException>(() => TextDocument.CreateFromFlatDocument(null!));

@@ -91,10 +91,7 @@ public sealed class OdfTextTableCollection : IEnumerable<OdfTextTableInfo>
     /// <returns><see langword="true"/> if the table was removed; otherwise, <see langword="false"/>. / 若已移除表格則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool Remove(OdfTextTableInfo table)
     {
-        if (table is null)
-        {
-            throw new ArgumentNullException(nameof(table));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(table, nameof(table));
 
         return ReferenceEquals(table.Node.Parent, _document.BodyTextRoot) &&
             _document.BodyTextRoot.RemoveChild(table.Node);

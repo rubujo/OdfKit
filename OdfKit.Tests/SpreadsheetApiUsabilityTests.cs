@@ -336,7 +336,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證串流寫入器會將列高與最佳列高設定輸出為自動列樣式。
     /// </summary>
     [Fact]
-    public void WriteStartRow_Height_WritesAutomaticRowStyle()
+    public void WriteStartRowHeightWritesAutomaticRowStyle()
     {
         using var stream = new MemoryStream();
         using (var writer = new OdsStreamWriter(stream))
@@ -364,7 +364,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可透過 <see cref="IAsyncDisposable"/> 釋放並完成封裝輸出。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_DisposeAsync_FinalizesPackage()
+    public async Task OdsStreamWriterDisposeAsyncFinalizesPackage()
     {
         await using var stream = new MemoryStream();
         await using (var writer = new OdsStreamWriter(stream))
@@ -389,7 +389,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可直接將 CSV 資料流逐列匯入目前工作表。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_WriteCsvStreamAsync_WritesRowsFromCsv()
+    public async Task OdsStreamWriterWriteCsvStreamAsyncWritesRowsFromCsv()
     {
         const string csv = "Name,Qty\nKeyboard,5\nMouse,12\n";
         await using var stream = new MemoryStream();
@@ -416,7 +416,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可直接逐列寫入 <see cref="System.Data.Common.DbDataReader"/>。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_WriteDataAsync_WritesRowsFromDbDataReader()
+    public async Task OdsStreamWriterWriteDataAsyncWritesRowsFromDbDataReader()
     {
         System.Data.DataTable table = new();
         table.Columns.Add("Name", typeof(string));
@@ -452,7 +452,7 @@ public class SpreadsheetApiUsabilityTests
     /// 是結構合法的 XML，可被 <see cref="OdsStreamReader"/> 嚴格剖析回讀，而不是只用子字串比對。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_SwitchToSheet_ProducesWellFormedContentXmlReadableByOdsStreamReader()
+    public async Task OdsStreamWriterSwitchToSheetProducesWellFormedContentXmlReadableByOdsStreamReader()
     {
         await using var stream = new MemoryStream();
         await using (var writer = new OdsStreamWriter(stream))
@@ -476,7 +476,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器的 Span/Memory 字串多載可正常寫入字串儲存格。
     /// </summary>
     [Fact]
-    public void OdsStreamWriter_WriteCell_SpanAndMemoryOverloadsWork()
+    public void OdsStreamWriterWriteCellSpanAndMemoryOverloadsWork()
     {
         using var stream = new MemoryStream();
         using (var writer = new OdsStreamWriter(stream))
@@ -500,7 +500,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可交錯切換工作表並於完成時依首次出現順序輸出。
     /// </summary>
     [Fact]
-    public void OdsStreamWriter_SwitchToSheet_WritesInterleavedSheets()
+    public void OdsStreamWriterSwitchToSheetWritesInterleavedSheets()
     {
         using var stream = new MemoryStream();
         bool usedBufferedMode;
@@ -542,7 +542,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可並行產生多工作表片段並依工作清單順序輸出。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_WriteSheetsAsync_WritesParallelSheetsInStableOrder()
+    public async Task OdsStreamWriterWriteSheetsAsyncWritesParallelSheetsInStableOrder()
     {
         using var stream = new MemoryStream();
         using (var writer = new OdsStreamWriter(stream))
@@ -595,7 +595,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證自動平行化會套用 CPU 核心預留比例，明確平行度則維持呼叫端設定。
     /// </summary>
     [Fact]
-    public async Task OdsStreamWriter_WriteSheetsAsync_UsesReservedCpuConcurrency()
+    public async Task OdsStreamWriterWriteSheetsAsyncUsesReservedCpuConcurrency()
     {
         double originalRatio = OdfParallelScheduler.ReservationRatio;
         OdfParallelScheduler.ReservationRatio = 0.99d;
@@ -651,7 +651,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 ODS 流式寫入器可直接混合輸出既有 DOM 子樹。
     /// </summary>
     [Fact]
-    public void OdsStreamWriter_WriteNode_WritesDomSubtree()
+    public void OdsStreamWriterWriteNodeWritesDomSubtree()
     {
         using var stream = new MemoryStream();
         var row = new TableTableRowElement("table");
@@ -685,7 +685,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 SplitWindow 寫入 config-item 並可 round-trip。
     /// </summary>
     [Fact]
-    public void SplitWindow_WritesConfigItemsToSettingsXml()
+    public void SplitWindowWritesConfigItemsToSettingsXml()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Sheet1");
@@ -714,7 +714,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 AddSparklineGroup 寫入 calcext:sparkline-groups 並可 round-trip。
     /// </summary>
     [Fact]
-    public void AddSparklineGroup_WritesCalcExtSparklineGroupXml()
+    public void AddSparklineGroupWritesCalcExtSparklineGroupXml()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Data");
@@ -745,7 +745,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 Workbook 密碼保護功能使用了 PBKDF2 加密且能正確 round-trip 驗證。
     /// </summary>
     [Fact]
-    public void ProtectWorkbook_UsesPbkdf2NotSingleHash()
+    public void ProtectWorkbookUsesPbkdf2NotSingleHash()
     {
         using var doc = SpreadsheetDocument.Create();
         doc.ProtectWorkbook("TestPassword123");
@@ -757,7 +757,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 Sheet 密碼保護功能使用了 PBKDF2 加密且能正確 round-trip 驗證。
     /// </summary>
     [Fact]
-    public void ProtectSheet_UsesPbkdf2NotSingleHash()
+    public void ProtectSheetUsesPbkdf2NotSingleHash()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -770,7 +770,7 @@ public class SpreadsheetApiUsabilityTests
     /// 驗證 VerifyWorkbookPassword 的 CompareBytes 正常執行。
     /// </summary>
     [Fact]
-    public void VerifyWorkbookPassword_UsesCryptographicCompare()
+    public void VerifyWorkbookPasswordUsesCryptographicCompare()
     {
         using var doc = SpreadsheetDocument.Create();
         doc.ProtectWorkbook("my_password");

@@ -12,7 +12,7 @@ namespace OdfKit.Tests;
 public class RepeatedColumnStructureTests
 {
     [Fact]
-    public void DeleteColumns_WithRepeatedColumnDefinition_RemovesCorrectLogicalColumn()
+    public void DeleteColumnsWithRepeatedColumnDefinitionRemovesCorrectLogicalColumn()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");
@@ -34,7 +34,7 @@ public class RepeatedColumnStructureTests
     }
 
     [Fact]
-    public void DeleteColumns_WithAutoCreatedColumnsBeyondRepeatedRange_RemovesCorrectLogicalColumn()
+    public void DeleteColumnsWithAutoCreatedColumnsBeyondRepeatedRangeRemovesCorrectLogicalColumn()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");
@@ -54,7 +54,7 @@ public class RepeatedColumnStructureTests
     }
 
     [Fact]
-    public void InsertColumns_WithRepeatedColumnDefinition_InsertsAtCorrectLogicalPosition()
+    public void InsertColumnsWithRepeatedColumnDefinitionInsertsAtCorrectLogicalPosition()
     {
         using SpreadsheetDocument doc = SpreadsheetDocument.Create();
         OdfTableSheet sheet = doc.AddSheet("Sheet1");

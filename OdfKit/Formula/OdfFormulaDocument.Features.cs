@@ -56,10 +56,7 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
     public void LoadFromLatex(string latex)
     {
-        if (latex == null)
-        {
-            throw new ArgumentNullException(nameof(latex));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(latex, nameof(latex));
         var xml = OdfFormulaLatexConverter.Convert(latex);
         SetMathMl(xml);
         SetAnnotation(LatexAnnotationEncoding, latex);
@@ -85,10 +82,7 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="build"/> is <see langword="null"/>. / 當 <paramref name="build"/> 為 <see langword="null"/> 時擲出。</exception>
     public static OdfFormulaDocument FromBuilder(Action<OdfMathBuilder> build)
     {
-        if (build is null)
-        {
-            throw new ArgumentNullException(nameof(build));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(build, nameof(build));
 
         var mathBuilder = new OdfMathBuilder();
         build(mathBuilder);
@@ -109,12 +103,9 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
     public bool ReplaceFirst(OdfMathTokenKind kind, OdfMathToken replacement)
     {
-        if (replacement is null)
-        {
-            throw new ArgumentNullException(nameof(replacement));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacement, nameof(replacement));
 
-        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        System.Collections.ObjectModel.ReadOnlyCollection<OdfMathToken> tokens = ReadMathTokens();
         if (tokens.Count == 0)
         {
             return false;
@@ -154,7 +145,7 @@ public partial class OdfFormulaDocument
     /// </remarks>
     public bool RemoveFirst(OdfMathTokenKind kind)
     {
-        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        System.Collections.ObjectModel.ReadOnlyCollection<OdfMathToken> tokens = ReadMathTokens();
         for (int index = 0; index < tokens.Count; index++)
         {
             OdfMathToken root = tokens[index];
@@ -210,10 +201,7 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
     public int ReplaceAll(OdfMathTokenKind kind, OdfMathToken replacement)
     {
-        if (replacement is null)
-        {
-            throw new ArgumentNullException(nameof(replacement));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacement, nameof(replacement));
 
         return ReplaceAll(token => token.Kind == kind, _ => replacement);
     }
@@ -234,17 +222,11 @@ public partial class OdfFormulaDocument
         Func<OdfMathToken, bool> predicate,
         Func<OdfMathToken, OdfMathToken> replacementFactory)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
-        if (replacementFactory is null)
-        {
-            throw new ArgumentNullException(nameof(replacementFactory));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(replacementFactory, nameof(replacementFactory));
 
-        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        System.Collections.ObjectModel.ReadOnlyCollection<OdfMathToken> tokens = ReadMathTokens();
         int replacedCount = 0;
         var rewritten = new OdfMathToken[tokens.Count];
         for (int index = 0; index < tokens.Count; index++)
@@ -295,10 +277,7 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentNullException">When <paramref name="predicate"/> is <see langword="null"/>. / 當 <paramref name="predicate"/> 為 <see langword="null"/> 時擲出。</exception>
     public int RemoveAll(Func<OdfMathToken, bool> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
 
         IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
         int removedCount = 0;

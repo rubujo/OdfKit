@@ -267,7 +267,7 @@ internal static class CffTableCompactor
 
     private static byte[] RewriteTopDict(
         Layout layout,
-        IReadOnlyDictionary<int, int> privateLengths,
+        Dictionary<int, int> privateLengths,
         RelocationMap? offsetMap)
     {
         var values = new Dictionary<int, int[]>();
@@ -290,7 +290,7 @@ internal static class CffTableCompactor
 
     private static byte[] RewriteFontDict(
         FontDictLayout fontDict,
-        IReadOnlyDictionary<int, int> privateLengths,
+        Dictionary<int, int> privateLengths,
         RelocationMap? offsetMap)
     {
         var values = new Dictionary<int, int[]>();
@@ -321,7 +321,7 @@ internal static class CffTableCompactor
     }
 
     private static void AddMappedOffset(
-        IDictionary<int, int[]> values,
+        Dictionary<int, int[]> values,
         IReadOnlyList<DictEntry> entries,
         int operation,
         RelocationMap? offsetMap,
@@ -345,7 +345,7 @@ internal static class CffTableCompactor
 
     private static byte[] RewriteDict(
         IReadOnlyList<DictEntry> entries,
-        IReadOnlyDictionary<int, int[]> replacementValues)
+        Dictionary<int, int[]> replacementValues)
     {
         var output = new List<byte>();
         var encoded = new byte[4];
@@ -397,14 +397,14 @@ internal static class CffTableCompactor
         return BuildIndex(objects);
     }
 
-    private static byte[] BuildIndex(IReadOnlyList<byte[]> objects)
+    private static byte[] BuildIndex(byte[][] objects)
     {
-        if (objects.Count == 0)
+        if (objects.Length == 0)
         {
             return [0, 0];
         }
 
-        if (objects.Count > ushort.MaxValue)
+        if (objects.Length > ushort.MaxValue)
         {
             throw SfntFont.DataInvalid("CFF-compact-INDEX-count");
         }
@@ -423,13 +423,13 @@ internal static class CffTableCompactor
                 : maximumOffset <= 0x00FF_FFFF
                     ? 3
                     : 4;
-        int headerLength = checked(3 + ((objects.Count + 1) * offSize));
+        int headerLength = checked(3 + ((objects.Length + 1) * offSize));
         var output = new byte[checked(headerLength + dataLength)];
-        BinaryPrimitives.WriteUInt16BigEndian(output, checked((ushort)objects.Count));
+        BinaryPrimitives.WriteUInt16BigEndian(output, checked((ushort)objects.Length));
         output[2] = checked((byte)offSize);
         int offset = 1;
         int dataPosition = headerLength;
-        for (int index = 0; index < objects.Count; index++)
+        for (int index = 0; index < objects.Length; index++)
         {
             WriteOffset(output, 3 + (index * offSize), offSize, checked((uint)offset));
             byte[] value = objects[index];
@@ -438,7 +438,7 @@ internal static class CffTableCompactor
             dataPosition = checked(dataPosition + value.Length);
         }
 
-        WriteOffset(output, 3 + (objects.Count * offSize), offSize, checked((uint)offset));
+        WriteOffset(output, 3 + (objects.Length * offSize), offSize, checked((uint)offset));
         return output;
     }
 
@@ -489,7 +489,7 @@ internal static class CffTableCompactor
         return new IndexLayout(offset, length, objects);
     }
 
-    private static IReadOnlyList<DictEntry> ReadDict(ReadOnlySpan<byte> data, string detail)
+    private static List<DictEntry> ReadDict(ReadOnlySpan<byte> data, string detail)
     {
         var entries = new List<DictEntry>();
         var operands = new List<long?>(48);
@@ -744,6 +744,7 @@ internal static class CffTableCompactor
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance collaborator contract; callers intentionally dispatch through the owning document.")]
         internal byte[] Apply(byte[] source, IReadOnlyList<Replacement> replacements)
         {
             Replacement[] ordered = replacements.OrderBy(item => item.Start).ToArray();

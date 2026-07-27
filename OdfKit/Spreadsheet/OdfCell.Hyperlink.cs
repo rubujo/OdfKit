@@ -162,10 +162,7 @@ public partial class OdfCell
     /// <param name="richText">The rich text content to write to the cell. / 要寫入儲存格的富文字內容。</param>
     public void SetRichText(OdfRichText richText)
     {
-        if (richText is null)
-        {
-            throw new ArgumentNullException(nameof(richText));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(richText, nameof(richText));
 
         var toRemove = new List<OdfNode>();
         foreach (var child in Node.Children)

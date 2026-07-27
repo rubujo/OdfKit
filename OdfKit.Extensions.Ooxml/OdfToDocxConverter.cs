@@ -37,10 +37,8 @@ public static class OdfToDocxConverter
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 任一必要參數為 null 時引發</exception>
     public static void Convert(TextDocument odtDocument, Stream docxStream)
     {
-        if (odtDocument is null)
-            throw new ArgumentNullException(nameof(odtDocument));
-        if (docxStream is null)
-            throw new ArgumentNullException(nameof(docxStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(odtDocument, nameof(odtDocument));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(docxStream, nameof(docxStream));
 
         var ctx = new ConversionContext(odtDocument);
         var imagePartCache = new Dictionary<string, ImagePart>();
@@ -322,7 +320,7 @@ public static class OdfToDocxConverter
             info.Underline = !string.IsNullOrEmpty(underline) && !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase);
 
             string? color = textProps.GetAttribute("color", OdfNamespaces.Fo);
-            if (!string.IsNullOrEmpty(color) && color.StartsWith("#", StringComparison.Ordinal))
+            if (!string.IsNullOrEmpty(color) && global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
                 info.Color = color!.Substring(1);
 
             string? fontSize = textProps.GetAttribute("font-size", OdfNamespaces.Fo);
@@ -368,7 +366,7 @@ public static class OdfToDocxConverter
             info.Underline = !string.IsNullOrEmpty(underline) && !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase);
 
             string? color = textProps.GetAttribute("color", OdfNamespaces.Fo);
-            if (color is { Length: > 0 } && color.StartsWith("#", StringComparison.Ordinal))
+            if (color is { Length: > 0 } && global::OdfKit.Internal.OdfStringHelper.StartsWith(color, '#'))
                 info.Color = color.Substring(1);
 
             string? fontSize = textProps.GetAttribute("font-size", OdfNamespaces.Fo);
@@ -1089,7 +1087,7 @@ public static class OdfToDocxConverter
         if (style.FontSizePt.HasValue)
         {
             int halfPoints = (int)(style.FontSizePt.Value * 2);
-            previousRunProperties.AppendChild(new WP.FontSize { Val = halfPoints.ToString() });
+            previousRunProperties.AppendChild(new WP.FontSize { Val = halfPoints.ToString(System.Globalization.CultureInfo.InvariantCulture) });
         }
 
         return previousRunProperties;
@@ -1116,7 +1114,7 @@ public static class OdfToDocxConverter
         if (style.FontSizePt.HasValue)
         {
             int halfPoints = (int)(style.FontSizePt.Value * 2);
-            rp.AppendChild(new WP.FontSize { Val = halfPoints.ToString() });
+            rp.AppendChild(new WP.FontSize { Val = halfPoints.ToString(System.Globalization.CultureInfo.InvariantCulture) });
         }
         return rp;
     }
@@ -1344,7 +1342,7 @@ public static class OdfToDocxConverter
         {
             var rp = new WP.StyleRunProperties();
             if (halfPoints.HasValue)
-                rp.AppendChild(new WP.FontSize { Val = halfPoints.Value.ToString() });
+                rp.AppendChild(new WP.FontSize { Val = halfPoints.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) });
             if (bold)
                 rp.AppendChild(new WP.Bold());
             style.AppendChild(rp);

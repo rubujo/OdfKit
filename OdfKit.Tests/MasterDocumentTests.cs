@@ -15,11 +15,12 @@ namespace OdfKit.Tests;
 /// </summary>
 public class MasterDocumentTests
 {
+    private static readonly string[] ReorderedChapterNames = ["Chapter3", "Chapter1", "Chapter2"];
     /// <summary>
     /// 驗證 <see cref="TextMasterDocument.RemoveSubDocumentReference"/> 可移除指定名稱的子文件參照。
     /// </summary>
     [Fact]
-    public void RemoveSubDocumentReference_RemovesMatchingSection()
+    public void RemoveSubDocumentReferenceRemovesMatchingSection()
     {
         using var master = TextMasterDocument.Create();
         master.AddSubDocumentReference("Chapter1", "chapter1.odt");
@@ -37,7 +38,7 @@ public class MasterDocumentTests
     /// 驗證 <see cref="TextMasterDocument.ReorderSubDocumentReferences"/> 可依指定順序重新排列子文件參照，並於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void ReorderSubDocumentReferences_ReordersAndPersists()
+    public void ReorderSubDocumentReferencesReordersAndPersists()
     {
         using var master = TextMasterDocument.Create();
         master.AddSubDocumentReference("Chapter1", "chapter1.odt");
@@ -47,7 +48,7 @@ public class MasterDocumentTests
         master.ReorderSubDocumentReferences(new List<string> { "Chapter3", "Chapter1", "Chapter2" });
 
         var reordered = master.GetSubDocumentReferences();
-        Assert.Equal(new[] { "Chapter3", "Chapter1", "Chapter2" }, reordered.Select(r => r.SectionName));
+        Assert.Equal(ReorderedChapterNames, reordered.Select(r => r.SectionName));
 
         using var stream = new MemoryStream();
         master.SaveToStream(stream);
@@ -55,7 +56,7 @@ public class MasterDocumentTests
 
         using var loaded = TextMasterDocument.Load(stream);
         var persisted = loaded.GetSubDocumentReferences();
-        Assert.Equal(new[] { "Chapter3", "Chapter1", "Chapter2" }, persisted.Select(r => r.SectionName));
+        Assert.Equal(ReorderedChapterNames, persisted.Select(r => r.SectionName));
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public class MasterDocumentTests
     /// 並透過 <see cref="TextMasterDocument.SetSubDocumentLoadOnRequest"/> 變更，於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void SubDocumentActuate_SetAndPersistAfterSaveAndLoad()
+    public void SubDocumentActuateSetAndPersistAfterSaveAndLoad()
     {
         using var master = TextMasterDocument.Create();
         master.AddSubDocumentReference("Chapter1", "chapter1.odt");
@@ -91,7 +92,7 @@ public class MasterDocumentTests
     /// 將主控文件本身內容與外部子文件內容合併為單一文字文件。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_CombinesOwnContentAndSubDocumentsInOrder()
+    public void MergeSubDocumentsCombinesOwnContentAndSubDocumentsInOrder()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -137,7 +138,7 @@ public class MasterDocumentTests
     /// 並將結果限制在最小值 1。
     /// </summary>
     [Fact]
-    public void ShiftHeadingOutlineLevels_AdjustsHeadingsAndClampsToMinimumOne()
+    public void ShiftHeadingOutlineLevelsAdjustsHeadingsAndClampsToMinimumOne()
     {
         using var doc = TextDocument.Create();
         var heading = doc.AddHeading("頂層標題", 1);
@@ -154,7 +155,7 @@ public class MasterDocumentTests
     /// 參數可位移子文件標題大綱階層，使其正確巢狀於主控文件本身的標題之下。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_WithOutlineOffset_ShiftsSubDocumentHeadingLevels()
+    public void MergeSubDocumentsWithOutlineOffsetShiftsSubDocumentHeadingLevels()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -192,7 +193,7 @@ public class MasterDocumentTests
     /// 不受該僅供即時檢視應用程式使用的載入時機語意影響。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_IncludesOnRequestSubDocuments()
+    public void MergeSubDocumentsIncludesOnRequestSubDocuments()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -230,7 +231,7 @@ public class MasterDocumentTests
     /// 保留兩者各自的格式設定，而非互相覆蓋。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_RenamesConflictingStyleNames()
+    public void MergeSubDocumentsRenamesConflictingStyleNames()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -271,7 +272,7 @@ public class MasterDocumentTests
     /// 避免產生不必要的重新命名樣式與 XML 增長。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_ReusesSemanticallyEquivalentStyleNames()
+    public void MergeSubDocumentsReusesSemanticallyEquivalentStyleNames()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -313,7 +314,7 @@ public class MasterDocumentTests
     /// 會擲出檔案系統層級的例外，而非靜默忽略或產生不完整的合併結果。
     /// </summary>
     [Fact]
-    public void MergeSubDocuments_MissingSubDocumentFile_ThrowsFileNotFoundException()
+    public void MergeSubDocumentsMissingSubDocumentFileThrowsFileNotFoundException()
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-missing-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -337,7 +338,7 @@ public class MasterDocumentTests
     [Theory]
     [InlineData("../outside.odt")]
     [InlineData("chapters/../../outside.odt")]
-    public void MergeSubDocuments_PathTraversalHref_ThrowsSecurityException(string href)
+    public void MergeSubDocumentsPathTraversalHrefThrowsSecurityException(string href)
     {
         string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-traversal-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDir);
@@ -362,7 +363,7 @@ public class MasterDocumentTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void MergeSubDocuments_BlankBaseDirectory_ThrowsArgumentException(string baseDirectory)
+    public void MergeSubDocumentsBlankBaseDirectoryThrowsArgumentException(string baseDirectory)
     {
         using var master = TextMasterDocument.Create();
         master.AddSubDocumentReference("Chapter1", "chapter1.odt");

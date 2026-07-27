@@ -7,7 +7,7 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class SqlServerTextReaderTests
 {
     [Fact]
-    public void Reader_PreservesNvarcharSupplementaryAndIvsText()
+    public void ReaderPreservesNvarcharSupplementaryAndIvsText()
     {
         using DataTableReader reader = CreateReader("邉\U000E0110\U00020000", [0xA4, 0xA4]);
 
@@ -17,7 +17,7 @@ public sealed class SqlServerTextReaderTests
     }
 
     [Fact]
-    public void Reader_DecodesBoundedBig5Varbinary()
+    public void ReaderDecodesBoundedBig5Varbinary()
     {
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         byte[] big5 = System.Text.Encoding.GetEncoding(950).GetBytes("中文");

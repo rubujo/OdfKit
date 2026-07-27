@@ -43,15 +43,9 @@ public static partial class TemplateBinder
         IReadOnlyDictionary<string, object?> values,
         OdfTemplateBindOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         options ??= OdfTemplateBindOptions.Default;
         var report = new OdfTemplateBindReport();
@@ -92,15 +86,9 @@ public static partial class TemplateBinder
         IReadOnlyDictionary<string, object?> values,
         OdfTemplateBindOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         options ??= OdfTemplateBindOptions.Default;
         var report = new OdfTemplateBindReport();
@@ -154,15 +142,9 @@ public static partial class TemplateBinder
         IReadOnlyDictionary<string, object?> values,
         OdfTemplateBindOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         options ??= OdfTemplateBindOptions.Default;
         var report = new OdfTemplateBindReport();
@@ -216,15 +198,9 @@ public static partial class TemplateBinder
         IReadOnlyDictionary<string, object?> values,
         OdfTemplateBindOptions? options)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         options ??= OdfTemplateBindOptions.Default;
         var report = new OdfTemplateBindReport();
@@ -270,7 +246,7 @@ public static partial class TemplateBinder
         foreach (OdfNode target in targets)
         {
             string text = target.TextContent;
-            IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+            List<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
                 ResolveScalarTextReplacements(text, values, options, report);
             if (replacements.Count > 0)
             {
@@ -300,7 +276,7 @@ public static partial class TemplateBinder
                 child.NamespaceUri == OdfNamespaces.Text)
             {
                 string text = child.TextContent;
-                IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+                List<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
                     ResolveScalarTextReplacements(text, values, options, report);
                 if (replacements.Count > 0)
                 {
@@ -513,7 +489,7 @@ public static partial class TemplateBinder
             .ToArray())
         {
             string text = target.TextContent;
-            IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
+            List<TextDocumentSearchReplaceEngine.TextReplacement> replacements =
                 ResolveCollectionTextReplacements(
                     text,
                     collectionName,
@@ -578,7 +554,7 @@ public static partial class TemplateBinder
         });
     }
 
-    private static IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> ResolveScalarTextReplacements(
+    private static List<TextDocumentSearchReplaceEngine.TextReplacement> ResolveScalarTextReplacements(
         string text,
         IReadOnlyDictionary<string, object?> values,
         OdfTemplateBindOptions options,
@@ -633,7 +609,7 @@ public static partial class TemplateBinder
         return replacements;
     }
 
-    private static IReadOnlyList<TextDocumentSearchReplaceEngine.TextReplacement> ResolveCollectionTextReplacements(
+    private static List<TextDocumentSearchReplaceEngine.TextReplacement> ResolveCollectionTextReplacements(
         string text,
         string collectionName,
         object? item,

@@ -455,10 +455,7 @@ public sealed class OdfChartSeries
     /// <param name="style">The marker style. / 標記樣式。</param>
     public void ApplyMarkerStyle(OdfChartMarkerStyle style)
     {
-        if (style is null)
-        {
-            throw new ArgumentNullException(nameof(style));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(style, nameof(style));
 
         OdfChartStyle chartStyle = Style;
         chartStyle.SymbolType = string.IsNullOrWhiteSpace(style.Symbol) ? null : "named-symbol";

@@ -22,8 +22,7 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
     /// <param name="alignment">對齊邊界，必須為 2 的次方。</param>
     public AlignedNativeBuffer(int length, int alignment)
     {
-        if (length < 0)
-            throw new ArgumentOutOfRangeException(nameof(length));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(length, nameof(length));
 
         _length = length;
         _pointer = NativeMemory.AlignedAlloc((nuint)length, (nuint)alignment);

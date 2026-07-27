@@ -186,10 +186,10 @@ internal static class SidecarProtocol
         header[6] = (byte)operation;
         header[7] = (byte)status;
         WriteInt32(header, 8, payload.Length);
-        await stream.WriteAsync(header, 0, header.Length, cancellationToken).ConfigureAwait(false);
+        await OdfKit.Internal.OdfStreamHelper.WriteAsync(stream, header, 0, header.Length, cancellationToken).ConfigureAwait(false);
         if (payload.Length > 0)
         {
-            await stream.WriteAsync(payload, 0, payload.Length, cancellationToken).ConfigureAwait(false);
+            await OdfKit.Internal.OdfStreamHelper.WriteAsync(stream, payload, 0, payload.Length, cancellationToken).ConfigureAwait(false);
         }
 
         await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -208,8 +208,8 @@ internal static class SidecarProtocol
         int payloadLength = ReadInt32(header, 8);
         if (magic != expectedMagic
             || version != Version
-            || !Enum.IsDefined(typeof(SidecarOperation), header[6])
-            || !Enum.IsDefined(typeof(SidecarStatus), header[7])
+            || !OdfKit.Internal.OdfEnumHelper.IsDefined((SidecarOperation)header[6])
+            || !OdfKit.Internal.OdfEnumHelper.IsDefined((SidecarStatus)header[7])
             || payloadLength < 0
             || payloadLength > maximumPayloadBytes)
         {
@@ -236,7 +236,8 @@ internal static class SidecarProtocol
         int offset = 0;
         while (offset < buffer.Length)
         {
-            int read = await stream.ReadAsync(
+            int read = await OdfKit.Internal.OdfStreamHelper.ReadAsync(
+                stream,
                 buffer,
                 offset,
                 buffer.Length - offset,

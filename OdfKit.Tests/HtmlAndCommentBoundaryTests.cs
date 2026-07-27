@@ -131,7 +131,7 @@ namespace OdfKit.Tests
             Assert.Equal(0, countOfC); // Completely omitted!
         }
 
-        private int CountOccurrences(OdfNode node, string text)
+        private static int CountOccurrences(OdfNode node, string text)
         {
             int count = 0;
             if (node.NodeType == OdfNodeType.Text && node.TextContent.Contains(text))
@@ -424,7 +424,7 @@ namespace OdfKit.Tests
             Assert.Contains("style-name", xml);
         }
 
-        private void LogDiagnostics(string msg)
+        private static void LogDiagnostics(string msg)
         {
             Console.WriteLine(msg);
         }

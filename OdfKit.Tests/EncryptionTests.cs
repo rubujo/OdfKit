@@ -27,6 +27,7 @@ namespace OdfKit.Tests
         public void Dispose()
         {
             OdfLocalizer.DefaultCulture = _originalDefaultCulture;
+            GC.SuppressFinalize(this);
         }
 
         [Fact]
@@ -51,7 +52,7 @@ namespace OdfKit.Tests
         /// LibreOffice 26.x 的傳統加密文件寫入 100,000 次 PBKDF2；上限必須高於實務值才能讀取。
         /// </summary>
         [Fact]
-        public void Pbkdf2IterationLimit_AllowsRealWorldIterationCounts()
+        public void Pbkdf2IterationLimitAllowsRealWorldIterationCounts()
         {
             Assert.True(OdfEncryption.MaxPbkdf2IterationCount >= 1_300_000,
                 "上限應涵蓋 OWASP 對 PBKDF2-HMAC-SHA1 的現行建議值。");
@@ -77,7 +78,7 @@ namespace OdfKit.Tests
         [InlineData("sha256", "http://www.w3.org/2001/04/xmlenc#sha256")]
         [InlineData("sha1", "sha-1")]
         [InlineData("sha1", "http://www.w3.org/2000/09/xmldsig#sha1")]
-        public void Pbkdf2_HashAlgorithm_AcceptsKnownAliases(string canonicalName, string aliasName)
+        public void Pbkdf2HashAlgorithmAcceptsKnownAliases(string canonicalName, string aliasName)
         {
             byte[] password = Encoding.UTF8.GetBytes("密碼");
             byte[] salt = Encoding.UTF8.GetBytes("salt");
@@ -92,7 +93,7 @@ namespace OdfKit.Tests
         [InlineData("sha2561")]
         [InlineData("http://www.w3.org/2000/09/xmldsig#sha2561")]
         [InlineData("sha512")]
-        public void Pbkdf2_HashAlgorithm_RejectsUnsupportedNames(string hashName)
+        public void Pbkdf2HashAlgorithmRejectsUnsupportedNames(string hashName)
         {
             var exception = Assert.Throws<NotSupportedException>(() =>
                 OdfEncryption.Pbkdf2(new byte[16], new byte[8], 1024, 16, hashName));
@@ -138,7 +139,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestAes256EncryptionDecryption_Roundtrip()
+        public void TestAes256EncryptionDecryptionRoundtrip()
         {
             var ms = new MemoryStream();
             string originalContent = "<content>AES-256 Protected Data</content>";
@@ -180,7 +181,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task SaveEncryptedAsyncAndLoadEncryptedAsync_DocumentRoundTrip()
+        public async Task SaveEncryptedAsyncAndLoadEncryptedAsyncDocumentRoundTrip()
         {
             const string password = "AsyncDocumentSecret";
             using var ms = new MemoryStream();
@@ -207,7 +208,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task SaveEncryptedAsyncAndLoadEncryptedAsync_PackageRoundTrip()
+        public async Task SaveEncryptedAsyncAndLoadEncryptedAsyncPackageRoundTrip()
         {
             const string password = "AsyncPackageSecret";
             using var ms = new MemoryStream();
@@ -237,7 +238,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestBlowfishLegacyDecryption_Roundtrip()
+        public void TestBlowfishLegacyDecryptionRoundtrip()
         {
             var ms = new MemoryStream();
             string originalContent = "<content>Blowfish Legacy Protected Data</content>";
@@ -285,7 +286,7 @@ namespace OdfKit.Tests
         /// <see cref="OdfDocument.Save(string)"/> 會把密文當成 DOM 寫出並擲出 XML 名稱錯誤。
         /// </summary>
         [Fact]
-        public void EncryptedPackage_LoadThenSave_DoesNotReuseCiphertextFromMemoryMapping()
+        public void EncryptedPackageLoadThenSaveDoesNotReuseCiphertextFromMemoryMapping()
         {
             const string password = "mmf_roundtrip_password";
             string path = Path.Combine(Path.GetTempPath(), $"odfkit-mmf-{Guid.NewGuid():N}.odt");
@@ -334,7 +335,7 @@ namespace OdfKit.Tests
         /// algorithm →〔start-key-generation〕→ key-derivation 排列。
         /// </summary>
         [Fact]
-        public void EncryptedManifest_UsesSpecifiedChecksumAndElementOrder()
+        public void EncryptedManifestUsesSpecifiedChecksumAndElementOrder()
         {
             var ms = new MemoryStream();
             byte[] content = Encoding.UTF8.GetBytes("<content>checksum contract</content>");
@@ -383,7 +384,7 @@ namespace OdfKit.Tests
         /// 這是 LibreOffice／OpenOffice 產生密碼保護文件時採用的形狀。
         /// </summary>
         [Fact]
-        public void DecryptEntry_Aes256_AcceptsXmlEncryptionPadding()
+        public void DecryptEntryAes256AcceptsXmlEncryptionPadding()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("W3C padded ciphertext produced by another ODF implementation.");
             byte[] salt = new byte[16];
@@ -395,10 +396,7 @@ namespace OdfKit.Tests
             }
 
             byte[] startKey;
-            using (var sha = SHA256.Create())
-            {
-                startKey = sha.ComputeHash(Encoding.UTF8.GetBytes("w3c_padding_password"));
-            }
+            startKey = SHA256.HashData(Encoding.UTF8.GetBytes("w3c_padding_password"));
 
             // PBKDF2 的 PRF 是規範固定的 HMAC-SHA-1，與 SHA-256 的 start key 無關。
             byte[] key = OdfEncryption.Pbkdf2(startKey, salt, 50000, 32, "sha1");
@@ -445,7 +443,7 @@ namespace OdfKit.Tests
         /// （CFB 不填補），且規範的簡短名稱等價可用。
         /// </summary>
         [Fact]
-        public void EncryptEntry_Blowfish_UsesCipherFeedbackMode()
+        public void EncryptEntryBlowfishUsesCipherFeedbackMode()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("Blowfish CFB has no padding, so sizes match.");
             byte[] ciphertext = OdfEncryption.EncryptEntry(
@@ -472,7 +470,7 @@ namespace OdfKit.Tests
         /// 參數取自 LibreOffice 26.2.4.2 以 ODF 1.0／1.1 設定實際產生的檔案。
         /// </summary>
         [Fact]
-        public void DecryptEntry_Blowfish_AcceptsLibreOfficeManifestDefaults()
+        public void DecryptEntryBlowfishAcceptsLibreOfficeManifestDefaults()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("LibreOffice omits key-size and start-key-generation.");
             const string password = "pw123";
@@ -487,10 +485,7 @@ namespace OdfKit.Tests
             }
 
             byte[] startKey;
-            using (var sha1 = SHA1.Create())
-            {
-                startKey = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
+            startKey = OdfKit.Internal.OdfHashHelper.Sha1(Encoding.UTF8.GetBytes(password));
 
             byte[] key = OdfEncryption.Pbkdf2(startKey, salt, iterations, OdfEncryption.BlowfishKeySizeBytes, "sha1");
 
@@ -521,7 +516,7 @@ namespace OdfKit.Tests
         /// 與 `start-key-generation-name` 的 SHA-256 無關。這是與 LibreOffice 互通的前提。
         /// </summary>
         [Fact]
-        public void EncryptEntry_Aes256_DerivesKeyWithHmacSha1PseudoRandomFunction()
+        public void EncryptEntryAes256DerivesKeyWithHmacSha1PseudoRandomFunction()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("PBKDF2 PRF is HMAC-SHA-1 regardless of the start key digest.");
             const string password = "prf_contract";
@@ -530,10 +525,7 @@ namespace OdfKit.Tests
                 plaintext, password, OdfEncryptionAlgorithm.Aes256, out byte[] iv, out byte[] salt, out _);
 
             byte[] startKey;
-            using (var sha256 = SHA256.Create())
-            {
-                startKey = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
+            startKey = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 
             // 規範形狀：start key 用 SHA-256，PBKDF2 的 PRF 用 SHA-1。
             byte[] specKey = OdfEncryption.Pbkdf2(
@@ -557,7 +549,7 @@ namespace OdfKit.Tests
         /// 封裝層在規範 PRF 的 checksum 不符時，會以舊 PRF 再嘗試一次。
         /// </summary>
         [Fact]
-        public void Decrypt_Package_AcceptsLegacySha256PseudoRandomFunction()
+        public void DecryptPackageAcceptsLegacySha256PseudoRandomFunction()
         {
             const string password = "legacy_prf_password";
             byte[] content = Encoding.UTF8.GetBytes("<content>legacy HMAC-SHA-256 PBKDF2 shape</content>");
@@ -578,10 +570,7 @@ namespace OdfKit.Tests
                 }
 
                 byte[] startKey;
-                using (var sha256 = SHA256.Create())
-                {
-                    startKey = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                }
+                startKey = SHA256.HashData(Encoding.UTF8.GetBytes(password));
 
                 // 早期形狀：PBKDF2 的 PRF 誤用 HMAC-SHA-256。
                 byte[] legacyKey = OdfEncryption.Pbkdf2(startKey, salt, 50_000, OdfEncryption.Aes256KeySizeBytes, "sha256");
@@ -630,7 +619,7 @@ namespace OdfKit.Tests
         /// 驗證早期 OdfKit 版本的 Argon2id 縮寫參數名（`argon2-t`／`-m`／`-p`）與非標準 URI 仍可解密。
         /// </summary>
         [Fact]
-        public void DecryptEntry_Argon2id_AcceptsLegacyParameterNames()
+        public void DecryptEntryArgon2idAcceptsLegacyParameterNames()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("legacy argon2 parameter names");
             byte[] ciphertext = OdfEncryption.EncryptEntry(
@@ -659,7 +648,7 @@ namespace OdfKit.Tests
         /// 但既有檔案宣告的 `xmldsig-more#blowfish-cbc` 必須保留讀取路徑。
         /// </summary>
         [Fact]
-        public void DecryptEntry_Blowfish_AcceptsLegacyCipherBlockChainingCiphertext()
+        public void DecryptEntryBlowfishAcceptsLegacyCipherBlockChainingCiphertext()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("legacy blowfish cbc ciphertext written by OdfKit 0.0.1");
             byte[] salt = new byte[16];
@@ -671,10 +660,7 @@ namespace OdfKit.Tests
             }
 
             byte[] startKey;
-            using (var sha = SHA1.Create())
-            {
-                startKey = sha.ComputeHash(Encoding.UTF8.GetBytes("legacy_blowfish"));
-            }
+            startKey = OdfKit.Internal.OdfHashHelper.Sha1(Encoding.UTF8.GetBytes("legacy_blowfish"));
 
             byte[] key = OdfEncryption.Pbkdf2(startKey, salt, 50000, 16, "sha1");
 
@@ -704,7 +690,7 @@ namespace OdfKit.Tests
         /// `SHA256` 檢查碼型別，且檢查碼以未壓縮明文計算。
         /// </summary>
         [Fact]
-        public void Decrypt_Package_AcceptsLegacyOdfKitEncryptionShape()
+        public void DecryptPackageAcceptsLegacyOdfKitEncryptionShape()
         {
             const string password = "legacy_package_password";
             byte[] content = Encoding.UTF8.GetBytes("<content>legacy package shape written by OdfKit 0.0.1</content>");
@@ -726,10 +712,7 @@ namespace OdfKit.Tests
                 }
 
                 byte[] startKey;
-                using (var sha1 = SHA1.Create())
-                {
-                    startKey = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
-                }
+                startKey = OdfKit.Internal.OdfHashHelper.Sha1(Encoding.UTF8.GetBytes(password));
 
                 byte[] key = OdfEncryption.Pbkdf2(startKey, salt, 50000, 16, "sha1");
 
@@ -741,10 +724,7 @@ namespace OdfKit.Tests
                 byte[] ciphertext = cipher.DoFinal(deflated);
 
                 byte[] legacyChecksum;
-                using (var sha256 = SHA256.Create())
-                {
-                    legacyChecksum = sha256.ComputeHash(content);
-                }
+                legacyChecksum = SHA256.HashData(content);
 
                 OdfPackageEntry entry = package.Entries["content.xml"];
                 entry.SetContent(ciphertext);
@@ -778,7 +758,7 @@ namespace OdfKit.Tests
         /// 驗證 1K 檢查碼只涵蓋前 1024 個位元組，而既有的完整摘要型別維持原行為。
         /// </summary>
         [Fact]
-        public void ComputeHash_OneKilobyteChecksumTypes_CoverFirstKilobyteOnly()
+        public void ComputeHashOneKilobyteChecksumTypesCoverFirstKilobyteOnly()
         {
             byte[] data = new byte[4096];
             for (int i = 0; i < data.Length; i++)
@@ -789,34 +769,25 @@ namespace OdfKit.Tests
             byte[] firstKilobyte = new byte[OdfEncryption.OneKilobyteChecksumLength];
             Buffer.BlockCopy(data, 0, firstKilobyte, 0, firstKilobyte.Length);
 
-            using (var sha256 = SHA256.Create())
-            {
-                Assert.Equal(
-                    sha256.ComputeHash(firstKilobyte),
-                    OdfEncryption.ComputeHash(data, OdfEncryption.Sha256OneKilobyteChecksumUri));
-                Assert.Equal(
-                    sha256.ComputeHash(data),
-                    OdfEncryption.ComputeHash(data, "SHA256"));
-            }
+            Assert.Equal(
+                SHA256.HashData(firstKilobyte),
+                OdfEncryption.ComputeHash(data, OdfEncryption.Sha256OneKilobyteChecksumUri));
+            Assert.Equal(
+                SHA256.HashData(data),
+                OdfEncryption.ComputeHash(data, "SHA256"));
 
-            using (var sha1 = SHA1.Create())
-            {
-                Assert.Equal(
-                    sha1.ComputeHash(firstKilobyte),
-                    OdfEncryption.ComputeHash(data, OdfEncryption.Sha1OneKilobyteChecksumName));
-                Assert.Equal(
-                    sha1.ComputeHash(firstKilobyte),
-                    OdfEncryption.ComputeHash(data, OdfEncryption.Sha1OneKilobyteChecksumUri));
-            }
+            Assert.Equal(
+                OdfKit.Internal.OdfHashHelper.Sha1(firstKilobyte),
+                OdfEncryption.ComputeHash(data, OdfEncryption.Sha1OneKilobyteChecksumName));
+            Assert.Equal(
+                OdfKit.Internal.OdfHashHelper.Sha1(firstKilobyte),
+                OdfEncryption.ComputeHash(data, OdfEncryption.Sha1OneKilobyteChecksumUri));
 
             // 短於 1024 位元組時涵蓋全部內容。
             byte[] shortData = Encoding.UTF8.GetBytes("short");
-            using (var sha256 = SHA256.Create())
-            {
-                Assert.Equal(
-                    sha256.ComputeHash(shortData),
-                    OdfEncryption.ComputeHash(shortData, OdfEncryption.Sha256OneKilobyteChecksumUri));
-            }
+            Assert.Equal(
+                SHA256.HashData(shortData),
+                OdfEncryption.ComputeHash(shortData, OdfEncryption.Sha256OneKilobyteChecksumUri));
         }
 
         private static byte[] Deflate(byte[] data)
@@ -831,7 +802,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestCustomCryptographyProvider_Integration()
+        public void TestCustomCryptographyProviderIntegration()
         {
             var ms = new MemoryStream();
             string originalContent = "<content>Custom Cryptography Provider Data</content>";
@@ -872,7 +843,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void TestOpenPgpProvider_ManifestEncryptedKeyRoundtrip()
+        public void TestOpenPgpProviderManifestEncryptedKeyRoundtrip()
         {
             var ms = new MemoryStream();
             string originalContent = "<content>OpenPGP Provider Data</content>";
@@ -957,7 +928,7 @@ namespace OdfKit.Tests
             Assert.Equal("OpenPGP 加密必須透過 IOdfCryptographyProvider 實作。", exception.Message);
         }
 
-        private class MockCryptographyProvider : IOdfCryptographyProvider
+        private sealed class MockCryptographyProvider : IOdfCryptographyProvider
         {
             public bool CanHandle(OdfEncryptionInfo info)
             {
@@ -1007,7 +978,7 @@ namespace OdfKit.Tests
         [InlineData("sha-256")]
         [InlineData("http://www.w3.org/2000/09/xmldsig#sha256")]
         [InlineData("http://www.w3.org/2001/04/xmlenc#sha256")]
-        public void ComputeHash_KnownSha256Types_ReturnsThirtyTwoBytes(string checksumType)
+        public void ComputeHashKnownSha256TypesReturnsThirtyTwoBytes(string checksumType)
         {
             byte[] result = OdfEncryption.ComputeHash([1, 2, 3], checksumType);
             Assert.Equal(32, result.Length);
@@ -1017,7 +988,7 @@ namespace OdfKit.Tests
         /// 測試當輸入未知的雜湊類型時， <see cref="OdfEncryption.ComputeHash"/> 是否會擲出 <see cref="NotSupportedException"/> 。
         /// </summary>
         [Fact]
-        public void ComputeHash_UnknownType_ThrowsNotSupportedException()
+        public void ComputeHashUnknownTypeThrowsNotSupportedException()
         {
             Assert.Throws<NotSupportedException>(() =>
                 OdfEncryption.ComputeHash([1], "sha2561"));
@@ -1027,7 +998,7 @@ namespace OdfKit.Tests
         /// 測試當輸入僅為局部匹配的雜湊類型（例如 "sha256extra"）時， <see cref="OdfEncryption.ComputeHash"/> 是否會正確擲出 <see cref="NotSupportedException"/> 。
         /// </summary>
         [Fact]
-        public void ComputeHash_UnknownType_ThrowsNotSupportedException_ForPartialMatch()
+        public void ComputeHashUnknownTypeThrowsNotSupportedExceptionForPartialMatch()
         {
             Assert.Throws<NotSupportedException>(() =>
                 OdfEncryption.ComputeHash([1], "sha256extra"));
@@ -1037,7 +1008,7 @@ namespace OdfKit.Tests
         /// 測試使用精確的起始金鑰產生演算法名稱（例如結尾為 #sha256、等於 sha256 或 sha-256）進行解密時是否成功，而局部匹配的名稱則應失敗。
         /// </summary>
         [Fact]
-        public void DecryptEntry_WithPreciseStartKeyGenName_Succeeds()
+        public void DecryptEntryWithPreciseStartKeyGenNameSucceeds()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("Test plaintext data for encryption");
             byte[] ciphertext = OdfEncryption.EncryptEntry(plaintext, "MySecretPassword", OdfEncryptionAlgorithm.Aes256, out byte[] iv, out byte[] salt, out byte[] checksum);
@@ -1083,7 +1054,7 @@ namespace OdfKit.Tests
         /// 測試 Blowfish 演算法在使用精確的起始金鑰產生演算法名稱（例如結尾為 #sha1、等於 sha1 或 sha-1）進行解密時是否成功，而局部匹配的名稱則應失敗。
         /// </summary>
         [Fact]
-        public void DecryptEntry_Blowfish_WithPreciseStartKeyGenName_Succeeds()
+        public void DecryptEntryBlowfishWithPreciseStartKeyGenNameSucceeds()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("Test plaintext data for Blowfish");
             byte[] ciphertext = OdfEncryption.EncryptEntry(plaintext, "BlowfishPassword", OdfEncryptionAlgorithm.Blowfish, out byte[] iv, out byte[] salt, out byte[] checksum);
@@ -1124,7 +1095,7 @@ namespace OdfKit.Tests
         /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在傳入 OpenPGP 加密演算法名稱時，是否正確傳回 <see langword="true"/> 。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueForOpenPgpEntry()
+        public void OdfOpenPgpCryptographyProviderCanHandleReturnsTrueForOpenPgpEntry()
         {
             var provider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
             var info = new OdfEncryptionInfo
@@ -1138,7 +1109,7 @@ namespace OdfKit.Tests
         /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在加密金鑰清單不為空時，是否正確傳回 <see langword="true"/> 。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueWhenEncryptedKeysExist()
+        public void OdfOpenPgpCryptographyProviderCanHandleReturnsTrueWhenEncryptedKeysExist()
         {
             var provider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
             var info = new OdfEncryptionInfo();
@@ -1154,7 +1125,7 @@ namespace OdfKit.Tests
         /// 測試以 <see cref="OdfOpenPgpCryptographyProvider"/> 進行 OpenPGP 加密與解密的完整流程是否能正確還原資料。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_EncryptDecrypt_RoundTrip()
+        public void OdfOpenPgpCryptographyProviderEncryptDecryptRoundTrip()
         {
             var fakeProvider = new FakeOpenPgpKeyProvider();
             var pgpProvider = new OdfOpenPgpCryptographyProvider(fakeProvider);
@@ -1187,7 +1158,7 @@ namespace OdfKit.Tests
         /// 測試當有多個 OpenPGP 收件者時，所有加密後的金鑰封包是否皆能正確寫入加密資訊中。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_MultipleRecipients_AllKeysWrittenToEncryptionInfo()
+        public void OdfOpenPgpCryptographyProviderMultipleRecipientsAllKeysWrittenToEncryptionInfo()
         {
             var pgpProvider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
             var saveOptions = new OdfSaveOptions
@@ -1209,7 +1180,7 @@ namespace OdfKit.Tests
         /// 測試在未提供任何 OpenPGP 收件者時，<see cref="OdfOpenPgpCryptographyProvider.Encrypt"/> 會拒絕輸出不可解密密文。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_Encrypt_WithoutRecipients_ThrowsInvalidOperationException()
+        public void OdfOpenPgpCryptographyProviderEncryptWithoutRecipientsThrowsInvalidOperationException()
         {
             var pgpProvider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
             var saveOptions = new OdfSaveOptions
@@ -1225,7 +1196,7 @@ namespace OdfKit.Tests
         /// 測試當儲存後還原階段解密失敗時，封裝內容仍會回復到儲存前的明文狀態。
         /// </summary>
         [Fact]
-        public void SaveToStream_OpenPgpEncryptOnlyProvider_DecryptFailureRestoresPlaintextState()
+        public void SaveToStreamOpenPgpEncryptOnlyProviderDecryptFailureRestoresPlaintextState()
         {
             using var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true);
             package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -1255,7 +1226,7 @@ namespace OdfKit.Tests
         /// 測試在解密時若無任何可用的私鑰能成功解密金鑰封包，是否正確擲出 <see cref="CryptographicException"/> 。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_Decrypt_NoValidKey_ThrowsCryptographicException()
+        public void OdfOpenPgpCryptographyProviderDecryptNoValidKeyThrowsCryptographicException()
         {
             var provider = new OdfOpenPgpCryptographyProvider(new ThrowingKeyProvider());
             var info = new OdfEncryptionInfo
@@ -1277,7 +1248,7 @@ namespace OdfKit.Tests
         /// 測試多收件者 OpenPGP 解密在第一把金鑰失敗時，仍會嘗試後續收件者並成功解密。
         /// </summary>
         [Fact]
-        public void OdfOpenPgpCryptographyProvider_Decrypt_FirstRecipientFails_ContinuesToNextRecipient()
+        public void OdfOpenPgpCryptographyProviderDecryptFirstRecipientFailsContinuesToNextRecipient()
         {
             var provider = new OdfOpenPgpCryptographyProvider(new FirstRecipientCorruptingKeyProvider());
             var saveOptions = new OdfSaveOptions
@@ -1368,7 +1339,7 @@ namespace OdfKit.Tests
         /// 測試在 <see cref="OdfLoadOptions"/> 設定 OpenPgpKeyProvider 後，是否會自動建立對應的密碼學提供者執行個體。
         /// </summary>
         [Fact]
-        public void OdfLoadOptions_OpenPgpKeyProvider_AutoWiresCryptographyProvider()
+        public void OdfLoadOptionsOpenPgpKeyProviderAutoWiresCryptographyProvider()
         {
             var opts = new OdfLoadOptions
             {
@@ -1382,7 +1353,7 @@ namespace OdfKit.Tests
         /// 測試在 <see cref="OdfSaveOptions"/> 設定 OpenPgpKeyProvider 後，是否會自動建立對應的密碼學提供者執行個體。
         /// </summary>
         [Fact]
-        public void OdfSaveOptions_OpenPgpKeyProvider_AutoWiresCryptographyProvider()
+        public void OdfSaveOptionsOpenPgpKeyProviderAutoWiresCryptographyProvider()
         {
             var opts = new OdfSaveOptions
             {
@@ -1396,7 +1367,7 @@ namespace OdfKit.Tests
         /// 測試在儲存加密文件時，PBKDF2 反覆運算次數為 <see cref="OdfEncryption.DefaultPbkdf2IterationCount"/>。
         /// </summary>
         [Fact]
-        public void Encrypt_PbkdfIterationCount_UsesDefault()
+        public void EncryptPbkdfIterationCountUsesDefault()
         {
             using var doc = OdfDocument.Create(OdfDocumentKind.Text);
             using var ms = new MemoryStream();
@@ -1416,7 +1387,7 @@ namespace OdfKit.Tests
         /// 且 manifest.xml 中包含符合 loext 擴充格式的 xml 節點。
         /// </summary>
         [Fact]
-        public void Aes256Gcm_Argon2id_RoundTrip_Succeeds()
+        public void Aes256GcmArgon2idRoundTripSucceeds()
         {
             using var doc = OdfDocument.Create(OdfDocumentKind.Text);
             using var ms = new MemoryStream();
@@ -1468,7 +1439,7 @@ namespace OdfKit.Tests
         /// 測試 wholesome encryption 外層密文遭竄改或密碼錯誤時，AEAD 驗證會拒絕載入。
         /// </summary>
         [Fact]
-        public void WholesomeEncryption_WrongPasswordOrTamperedCiphertext_Throws()
+        public void WholesomeEncryptionWrongPasswordOrTamperedCiphertextThrows()
         {
             const string password = "wholesome-secret";
             using var document = TextDocument.Create();
@@ -1520,7 +1491,7 @@ namespace OdfKit.Tests
         /// 測試 AES-256-GCM 密文遭竄改時，應以在地化密碼學例外拒絕解密。
         /// </summary>
         [Fact]
-        public void Aes256Gcm_TamperedCiphertext_ThrowsLocalizedCryptographicException()
+        public void Aes256GcmTamperedCiphertextThrowsLocalizedCryptographicException()
         {
             byte[] plaintext = Encoding.UTF8.GetBytes("AES-GCM authentication must reject tampered content.");
             byte[] ciphertext = OdfEncryption.EncryptEntry(

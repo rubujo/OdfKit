@@ -41,10 +41,7 @@ public partial class OdfDatabaseDocument
     /// <returns>The added query node. / 新增的查詢節點。</returns>
     public OdfNode AddParameterizedQuery(string name, string command, IEnumerable<OdfDatabaseQueryParameter> parameters, string? title)
     {
-        if (parameters is null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(parameters, nameof(parameters));
 
         string description = "Parameters: " + string.Join(
             ", ",
@@ -65,10 +62,7 @@ public partial class OdfDatabaseDocument
     /// <returns>The added table node. / 新增的資料表節點。</returns>
     public OdfNode AddTableSchema(string name, IEnumerable<string> columns)
     {
-        if (columns is null)
-        {
-            throw new ArgumentNullException(nameof(columns));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(columns, nameof(columns));
 
         string command = string.Join(", ", columns.Where(column => !string.IsNullOrWhiteSpace(column)));
         if (string.IsNullOrWhiteSpace(command))

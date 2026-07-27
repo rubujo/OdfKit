@@ -35,8 +35,8 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 
 | 場景 ID | 來源 | 轉換 | 基準 PDF | 候選 PDF | 測試 | 狀態 |
 |---------|------|------|--------------|---------------|------|------|
-| `odt-docx-word-pdf` | ODT | DOCX | LibreOffice | Word | `WordAndLibreOffice_RenderConvertedDocxToPdf` | ✅ 自動化（可選環境） |
-| `ods-xlsx-excel-pdf` | ODS | XLSX | LibreOffice | Excel | `ExcelAndLibreOffice_RenderConvertedXlsxToPdf` | ✅ 自動化（可選環境） |
+| `odt-docx-word-pdf` | ODT | DOCX | LibreOffice | Word | `WordAndLibreOfficeRenderConvertedDocxToPdf` | ✅ 自動化（可選環境） |
+| `ods-xlsx-excel-pdf` | ODS | XLSX | LibreOffice | Excel | `ExcelAndLibreOfficeRenderConvertedXlsxToPdf` | ✅ 自動化（可選環境） |
 
 ## Office GUI / COM 煙霧驗收
 
@@ -71,4 +71,4 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 |------|------|
 | `OfficeInteropConversionTests` | 本矩陣的實機 PDF 視覺比對 |
 | `OfficeGuiSmokeTests` | Office COM 開啟代表性 ODT / ODS / ODP 的煙霧驗收 |
-| `OoxmlConversionTests` | OOXML 結構與語意來回讀寫（非視覺）；含 ODT↔DOCX 圖片／追蹤修訂與 ODS↔XLSX 樞紐表往返；`Manifest_DefinesExpectedScenarios` 驗證本矩陣 manifest 結構與場景清單完整性 |
+| `OoxmlConversionTests` | OOXML 結構與語意來回讀寫（非視覺）；含 ODT↔DOCX 圖片／追蹤修訂與 ODS↔XLSX 樞紐表往返；`ManifestDefinesExpectedScenarios` 驗證本矩陣 manifest 結構與場景清單完整性 |

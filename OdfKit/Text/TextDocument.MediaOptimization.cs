@@ -98,7 +98,7 @@ public partial class TextDocument
         string normalizedExtension = string.IsNullOrWhiteSpace(extension)
             ? Path.GetExtension(originalPath)
             : extension;
-        if (!normalizedExtension.StartsWith(".", StringComparison.Ordinal))
+        if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(normalizedExtension, '.'))
         {
             normalizedExtension = "." + normalizedExtension;
         }

@@ -38,8 +38,7 @@ public partial class OdfTableSheet
     /// <returns>The matching format, or <see langword="null"/>. / 相符的格式；若不存在則為 <see langword="null"/>。</returns>
     public OdfConditionalFormatInfo? FindConditionalFormat(Predicate<OdfConditionalFormatInfo> predicate)
     {
-        if (predicate is null)
-            throw new ArgumentNullException(nameof(predicate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
         return OdfTableSheetConditionalFormatEngine.FindConditionalFormat(MutationContext, predicate);
     }
 
@@ -51,8 +50,7 @@ public partial class OdfTableSheet
     /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool RemoveConditionalFormat(OdfConditionalFormatInfo format)
     {
-        if (format is null)
-            throw new ArgumentNullException(nameof(format));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(format, nameof(format));
         return OdfTableSheetConditionalFormatEngine.RemoveConditionalFormat(MutationContext, format);
     }
 
@@ -65,8 +63,7 @@ public partial class OdfTableSheet
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdateConditionalFormatRange(OdfConditionalFormatInfo format, OdfCellRange range)
     {
-        if (format is null)
-            throw new ArgumentNullException(nameof(format));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(format, nameof(format));
         return OdfTableSheetConditionalFormatEngine.UpdateConditionalFormatRange(MutationContext, format, range);
     }
 
@@ -86,8 +83,7 @@ public partial class OdfTableSheet
     /// <returns>The matching group, or <see langword="null"/>. / 相符的群組；若不存在則為 <see langword="null"/>。</returns>
     public OdfSparklineGroupInfo? FindSparklineGroup(Predicate<OdfSparklineGroupInfo> predicate)
     {
-        if (predicate is null)
-            throw new ArgumentNullException(nameof(predicate));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(predicate, nameof(predicate));
         return OdfTableSheetConditionalFormatEngine.FindSparklineGroup(MutationContext, predicate);
     }
 
@@ -99,8 +95,7 @@ public partial class OdfTableSheet
     /// <returns><see langword="true"/> if removed; otherwise <see langword="false"/>. / 若已移除則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool RemoveSparklineGroup(OdfSparklineGroupInfo group)
     {
-        if (group is null)
-            throw new ArgumentNullException(nameof(group));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(group, nameof(group));
         return OdfTableSheetConditionalFormatEngine.RemoveSparklineGroup(MutationContext, group);
     }
 
@@ -113,8 +108,7 @@ public partial class OdfTableSheet
     /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool UpdateSparklineGroupType(OdfSparklineGroupInfo group, SparklineType type)
     {
-        if (group is null)
-            throw new ArgumentNullException(nameof(group));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(group, nameof(group));
         return OdfTableSheetConditionalFormatEngine.UpdateSparklineGroupType(MutationContext, group, type);
     }
 
@@ -225,11 +219,10 @@ public partial class OdfTableSheet
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 dataRange 為 null 時拋出</exception>
     public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell, SparklineType type)
     {
-        if (dataRange is null)
-            throw new ArgumentNullException(nameof(dataRange));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(dataRange, nameof(dataRange));
 
         OdfTableSheetConditionalFormatEngine.AddSparklineGroup(
-            MutationContext, dataRange.Value, hostCell, type);
+            MutationContext, dataRange!.Value, hostCell, type);
     }
 
 

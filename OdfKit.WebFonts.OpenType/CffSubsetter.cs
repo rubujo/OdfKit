@@ -209,7 +209,7 @@ internal static class CffSubsetter
     private static void AddSeacComponent(
         byte[] source,
         ParsedCff parsed,
-        ISet<ushort> retainedGlyphs,
+        HashSet<ushort> retainedGlyphs,
         byte standardEncodingCode,
         CffSubroutineUsage? usage)
     {
@@ -238,9 +238,9 @@ internal static class CffSubsetter
         retainedGlyphs.Add(glyph);
     }
 
-    private static IReadOnlyList<ReadOnlyMemory<byte>> ValidatePrivateDict(
+    private static ReadOnlyMemory<byte>[] ValidatePrivateDict(
         byte[] source,
-        IReadOnlyDictionary<int, long?[]> dict)
+        Dictionary<int, long?[]> dict)
     {
         if (!dict.TryGetValue(PrivateOperator, out long?[]? operands))
         {
@@ -491,7 +491,7 @@ internal static class CffSubsetter
     }
 
     private static void AddCharsetEntry(
-        IDictionary<ushort, ushort> glyphBySid,
+        Dictionary<ushort, ushort> glyphBySid,
         ushort sid,
         ushort glyph)
     {
@@ -763,7 +763,7 @@ internal static class CffSubsetter
     }
 
     private static int GetOffset(
-        IReadOnlyDictionary<int, long?[]> dict,
+        Dictionary<int, long?[]> dict,
         int operation,
         int operandCount,
         string detail)
@@ -774,7 +774,7 @@ internal static class CffSubsetter
     }
 
     private static void RequireOperands(
-        IReadOnlyDictionary<int, long?[]> dict,
+        Dictionary<int, long?[]> dict,
         int operation,
         int count,
         string detail)
@@ -807,7 +807,7 @@ internal static class CffSubsetter
 
         internal int NextOffset { get; }
 
-        internal IReadOnlyList<ReadOnlyMemory<byte>> GetPrograms(byte[] source)
+        internal ReadOnlyMemory<byte>[] GetPrograms(byte[] source)
         {
             var programs = new ReadOnlyMemory<byte>[Objects.Count];
             for (int index = 0; index < Objects.Count; index++)

@@ -16,7 +16,7 @@ public class CustomPropertiesTests
     /// 驗證 SetCustomProperty(string, string) 能寫入並以 FindCustomProperty 讀回。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_String_CanBeReadBack()
+    public void SetCustomPropertyStringCanBeReadBack()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Author", "Alice");
@@ -27,26 +27,26 @@ public class CustomPropertiesTests
     /// 驗證 SetCustomProperty(string, int) 能以整數讀回。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_Int_CanBeReadBack()
+    public void SetCustomPropertyIntCanBeReadBack()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Version", 42);
         var val = doc.FindCustomProperty("Version");
         Assert.NotNull(val);
-        Assert.Equal(42.0, Convert.ToDouble(val));
+        Assert.Equal(42.0, Convert.ToDouble(val, System.Globalization.CultureInfo.InvariantCulture));
     }
 
     /// <summary>
     /// 驗證 SetCustomProperty(string, double) 能以 double 讀回。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_Double_CanBeReadBack()
+    public void SetCustomPropertyDoubleCanBeReadBack()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Score", 3.14);
         var val = doc.FindCustomProperty("Score");
         Assert.NotNull(val);
-        double d = Convert.ToDouble(val);
+        double d = Convert.ToDouble(val, System.Globalization.CultureInfo.InvariantCulture);
         Assert.InRange(d, 3.13, 3.15);
     }
 
@@ -54,7 +54,7 @@ public class CustomPropertiesTests
     /// 驗證 SetCustomProperty(string, bool) 能以 bool 讀回。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_Bool_CanBeReadBack()
+    public void SetCustomPropertyBoolCanBeReadBack()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("IsActive", true);
@@ -66,14 +66,14 @@ public class CustomPropertiesTests
     /// 驗證 SetCustomProperty(string, DateTime) 能以 DateTime 讀回（精度至秒）。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_DateTime_CanBeReadBack()
+    public void SetCustomPropertyDateTimeCanBeReadBack()
     {
         using var doc = TextDocument.Create();
         var dt = new DateTime(2026, 6, 16, 12, 0, 0, DateTimeKind.Utc);
         doc.SetCustomProperty("CreatedAt", dt);
         var val = doc.FindCustomProperty("CreatedAt");
         Assert.NotNull(val);
-        var result = Convert.ToDateTime(val);
+        var result = Convert.ToDateTime(val, System.Globalization.CultureInfo.InvariantCulture);
         Assert.Equal(2026, result.Year);
         Assert.Equal(6, result.Month);
         Assert.Equal(16, result.Day);
@@ -83,7 +83,7 @@ public class CustomPropertiesTests
     /// 驗證 FindCustomProperty&lt;T&gt; 泛型版本能正確轉型字串屬性。
     /// </summary>
     [Fact]
-    public void GetCustomProperty_Generic_ReturnsTypedValue()
+    public void GetCustomPropertyGenericReturnsTypedValue()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Department", "工程部");
@@ -95,7 +95,7 @@ public class CustomPropertiesTests
     /// 驗證 FindCustomProperty&lt;T&gt; 對不存在的屬性回傳預設值。
     /// </summary>
     [Fact]
-    public void GetCustomProperty_Generic_NonExistent_ReturnsDefault()
+    public void GetCustomPropertyGenericNonExistentReturnsDefault()
     {
         using var doc = TextDocument.Create();
         string? val = doc.FindCustomProperty<string>("NonExistent");
@@ -106,7 +106,7 @@ public class CustomPropertiesTests
     /// 驗證 GetAllCustomProperties 回傳所有已設定的屬性。
     /// </summary>
     [Fact]
-    public void GetAllCustomProperties_ReturnsAllSetProperties()
+    public void GetAllCustomPropertiesReturnsAllSetProperties()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Name", "測試");
@@ -125,7 +125,7 @@ public class CustomPropertiesTests
     /// 驗證覆寫同名屬性時只保留最新值。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_OverwriteSameName_KeepsLatestValue()
+    public void SetCustomPropertyOverwriteSameNameKeepsLatestValue()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Title", "舊標題");
@@ -144,7 +144,7 @@ public class CustomPropertiesTests
     /// 驗證屬性存檔後仍可讀回（Round-trip 測試）。
     /// </summary>
     [Fact]
-    public void SetCustomProperty_RoundTrip_ValuesPersistedAfterSaveLoad()
+    public void SetCustomPropertyRoundTripValuesPersistedAfterSaveLoad()
     {
         byte[] bytes;
         using (var doc = TextDocument.Create())
@@ -157,6 +157,6 @@ public class CustomPropertiesTests
         using var ms2 = new MemoryStream(bytes);
         using var loaded = (TextDocument)OdfDocumentFactory.LoadDocument(ms2);
         Assert.Equal("Bob", loaded.FindCustomProperty("Author") as string);
-        Assert.Equal(100.0, Convert.ToDouble(loaded.FindCustomProperty("Pages")));
+        Assert.Equal(100.0, Convert.ToDouble(loaded.FindCustomProperty("Pages"), System.Globalization.CultureInfo.InvariantCulture));
     }
 }

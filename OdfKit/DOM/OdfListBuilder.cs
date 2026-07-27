@@ -62,8 +62,7 @@ public sealed class OdfListBuilder
     /// <exception cref="ArgumentNullException">當 <paramref name="configure"/> 為 <see langword="null"/> 時擲出</exception>
     public OdfListBuilder Item(Action<OdfParagraph> configure)
     {
-        if (configure == null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         _lastItemNode = new OdfNode(OdfNodeType.Element, "list-item", OdfNamespaces.Text, "text");
         _listNode.AppendChild(_lastItemNode);

@@ -24,8 +24,7 @@ public partial class OdfTableSheet
         OdfCellAddress targetCell,
         Action<OdfPivotTableBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
 
         var builder = new OdfPivotTableBuilder(
             CreatePivotTableName(),
@@ -52,10 +51,8 @@ public partial class OdfTableSheet
         OdfCellAddress targetCell,
         Action<OdfPivotTableBuilder> configure)
     {
-        if (configure is null)
-            throw new ArgumentNullException(nameof(configure));
-        if (name is null)
-            throw new ArgumentNullException(nameof(name));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(configure, nameof(configure));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(name, nameof(name));
 
         var builder = new OdfPivotTableBuilder(
             name,

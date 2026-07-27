@@ -87,7 +87,7 @@ public class FormulaHighLevelApiTests
     /// 驗證 <see cref="OdfFormulaDocument.GetMathTokens"/> 可讀回 SetMathRow 寫入的 token。
     /// </summary>
     [Fact]
-    public void GetMathTokens_RoundTripsAfterSetMathRow()
+    public void GetMathTokensRoundTripsAfterSetMathRow()
     {
         using var formulaDoc = FormulaDocument.Create("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow/></math>");
         formulaDoc.SetMathRow(
@@ -109,7 +109,7 @@ public class FormulaHighLevelApiTests
     /// 驗證上標 MathML token 可寫入並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void SuperscriptToken_RoundTripsAfterSaveAndLoad()
+    public void SuperscriptTokenRoundTripsAfterSaveAndLoad()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -140,7 +140,7 @@ public class FormulaHighLevelApiTests
     /// 驗證下標 MathML token 可寫入並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void SubscriptToken_RoundTripsAfterSaveAndLoad()
+    public void SubscriptTokenRoundTripsAfterSaveAndLoad()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -169,7 +169,7 @@ public class FormulaHighLevelApiTests
     /// 驗證分數、根號 token 可寫入並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void FractionAndRadicalToken_RoundTripsAfterSaveAndLoad()
+    public void FractionAndRadicalTokenRoundTripsAfterSaveAndLoad()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -202,7 +202,7 @@ public class FormulaHighLevelApiTests
     /// 驗證 <see cref="OdfMathBuilder"/> 可組合矩陣 token 並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void OdfMathBuilder_BuildsMatrixAndRoundTrips()
+    public void OdfMathBuilderBuildsMatrixAndRoundTrips()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(builder => builder
             .Matrix(
@@ -230,7 +230,7 @@ public class FormulaHighLevelApiTests
     /// 驗證短名公式 facade 的 builder delegate 入口會建立 <see cref="FormulaDocument"/>。
     /// </summary>
     [Fact]
-    public void FormulaDocument_FromBuilder_ReturnsShortFacade()
+    public void FormulaDocumentFromBuilderReturnsShortFacade()
     {
         using FormulaDocument formula = FormulaDocument.FromBuilder(builder => builder
             .Matrix(
@@ -247,7 +247,7 @@ public class FormulaHighLevelApiTests
     /// 驗證 <see cref="OdfMathToken.WithAttribute"/> 設定的 MathML 通用屬性可寫入並於儲存／載入後讀回。
     /// </summary>
     [Fact]
-    public void MathTokenAttributes_RoundTripAfterSaveAndLoad()
+    public void MathTokenAttributesRoundTripAfterSaveAndLoad()
     {
         OdfMathToken identifier = OdfMathToken.Identifier("x")
             .WithAttribute("mathvariant", "bold")
@@ -274,7 +274,7 @@ public class FormulaHighLevelApiTests
     /// 驗證 <see cref="OdfFormulaDocument.ToLatex"/> 可將分數、根號與上標結構反向轉換為 LaTeX。
     /// </summary>
     [Fact]
-    public void ToLatex_ConvertsFractionRadicalAndSuperscript()
+    public void ToLatexConvertsFractionRadicalAndSuperscript()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -296,7 +296,7 @@ public class FormulaHighLevelApiTests
     /// 對基本算式具備語意往返一致性（轉為 MathML 再轉回 LaTeX 後，結構保持等價）。
     /// </summary>
     [Fact]
-    public void ToLatex_RoundTripsThroughFromLatex()
+    public void ToLatexRoundTripsThroughFromLatex()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.FromLatex("\\frac{a}{b}");
         string latex = formula.ToLatex();
@@ -309,7 +309,7 @@ public class FormulaHighLevelApiTests
     /// 驗證短名公式 facade 的 LaTeX 入口會建立 <see cref="FormulaDocument"/> 並保留來源標註。
     /// </summary>
     [Fact]
-    public void FormulaDocument_FromLatex_ReturnsShortFacadeAndPreservesSource()
+    public void FormulaDocumentFromLatexReturnsShortFacadeAndPreservesSource()
     {
         using FormulaDocument formula = FormulaDocument.FromLatex(@"\frac{a}{b}");
 
@@ -329,7 +329,7 @@ public class FormulaHighLevelApiTests
     /// token，並於儲存／載入後保留該屬性（W3C MathML 重音語意，與一般 <c>Over</c> 的極限記號語意有別）。
     /// </summary>
     [Fact]
-    public void Accent_SetsAccentAttributeAndRoundTrips()
+    public void AccentSetsAccentAttributeAndRoundTrips()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(
             b => b.Accent(inner => inner.Identifier("v"), mark => mark.Operator("→")));
@@ -352,7 +352,7 @@ public class FormulaHighLevelApiTests
     /// 轉換為對應的 LaTeX 中綴運算式。
     /// </summary>
     [Fact]
-    public void Apply_RoundTripsAndConvertsToLatex()
+    public void ApplyRoundTripsAndConvertsToLatex()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(
             b => b.Apply("plus", x => x.Identifier("x"), y => y.Identifier("y")));
@@ -394,7 +394,7 @@ public class FormulaHighLevelApiTests
     /// 內容（presentation MathML）的 token 讀取，並於儲存／載入後保留。
     /// </summary>
     [Fact]
-    public void SetAndGetAnnotation_RoundTripsAfterSaveAndLoad_WithoutAffectingTokens()
+    public void SetAndGetAnnotationRoundTripsAfterSaveAndLoadWithoutAffectingTokens()
     {
         using var formula = OdfFormulaDocument.Builder()
             .WithTokens(OdfMathToken.Identifier("x"), OdfMathToken.Operator("+"), OdfMathToken.Identifier("y"))
@@ -429,7 +429,7 @@ public class FormulaHighLevelApiTests
     /// 原始來源字串，而非僅 best-effort 由 MathML 重建。
     /// </summary>
     [Fact]
-    public void ToLatex_AfterLoadFromLatex_ReturnsExactOriginalSource()
+    public void ToLatexAfterLoadFromLatexReturnsExactOriginalSource()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.FromLatex(@"\frac{a}{b} + \sqrt{c}");
 
@@ -447,7 +447,7 @@ public class FormulaHighLevelApiTests
     /// 驗證公式 token 的查詢與不可變子節點替換能力。
     /// </summary>
     [Fact]
-    public void OdfMathToken_FindAndWithChild_WorksForNestedStructure()
+    public void OdfMathTokenFindAndWithChildWorksForNestedStructure()
     {
         OdfMathToken original = OdfMathToken.Row(
             OdfMathToken.Identifier("x"),
@@ -475,7 +475,7 @@ public class FormulaHighLevelApiTests
     /// 驗證可用「搜尋、取得、更新、寫回」流程編輯公式 token tree，並於儲存後保留。
     /// </summary>
     [Fact]
-    public void FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists()
+    public void FormulaTokenSemanticEditingFindReplaceAndSetMathRowPersists()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -508,7 +508,7 @@ public class FormulaHighLevelApiTests
     /// 驗證語意替換 API 可替換巢狀公式中的第一個目標 token。
     /// </summary>
     [Fact]
-    public void ReplaceFirst_ReplacesNestedFraction()
+    public void ReplaceFirstReplacesNestedFraction()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -539,7 +539,7 @@ public class FormulaHighLevelApiTests
     /// 以及種類不符時擲出 <see cref="InvalidOperationException"/>。
     /// </summary>
     [Fact]
-    public void OdfMathToken_SymbolLevelAccessors_WorkForFractionRadicalScriptsAndMatrix()
+    public void OdfMathTokenSymbolLevelAccessorsWorkForFractionRadicalScriptsAndMatrix()
     {
         OdfMathToken fraction = OdfMathToken.Fraction(OdfMathToken.Number("1"), OdfMathToken.Number("2"));
         Assert.Equal("1", fraction.Numerator.Text);
@@ -597,7 +597,7 @@ public class FormulaHighLevelApiTests
     /// 驗證公式 token 可移除及清除，且清除後仍保留有效的 MathML 容器。
     /// </summary>
     [Fact]
-    public void RemoveFirstAndClearMathTokens_PreserveEditableMathContainer()
+    public void RemoveFirstAndClearMathTokensPreserveEditableMathContainer()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -630,7 +630,7 @@ public class FormulaHighLevelApiTests
     /// 驗證公式可一次替換或移除所有目標 token，且替換內容不會被重複巡覽。
     /// </summary>
     [Fact]
-    public void ReplaceAllAndRemoveAll_RewriteOriginalTreeAndRoundTrip()
+    public void ReplaceAllAndRemoveAllRewriteOriginalTreeAndRoundTrip()
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
@@ -678,7 +678,7 @@ public class FormulaHighLevelApiTests
     /// 驗證 predicate rewrite、屬性移除及 token 集合維持真正不可變。
     /// </summary>
     [Fact]
-    public void PredicateRewriteAndAttributes_PreserveImmutableTokenTree()
+    public void PredicateRewriteAndAttributesPreserveImmutableTokenTree()
     {
         OdfMathToken original = OdfMathToken.Row(
             OdfMathToken.Identifier("alpha")

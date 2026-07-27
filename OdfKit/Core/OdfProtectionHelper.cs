@@ -19,10 +19,8 @@ internal static class OdfProtectionHelper
     /// <param name="nsUri">命名空間 URI</param>
     public static void ProtectNode(OdfNode node, string password, string prefix, string nsUri)
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
-        if (password is null)
-            throw new ArgumentNullException(nameof(password));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(password, nameof(password));
 
         byte[] salt = new byte[16];
         using (var rng = RandomNumberGenerator.Create())
@@ -49,8 +47,7 @@ internal static class OdfProtectionHelper
     /// <returns>若驗證成功或節點未受保護則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool VerifyPassword(OdfNode node, string password, string nsUri)
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         string? isProtected = node.GetAttribute("protected", nsUri);
         if (isProtected != "true")
@@ -81,10 +78,7 @@ internal static class OdfProtectionHelper
         else if (string.IsNullOrEmpty(derivation) &&
                  (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
         {
-            using (var sha = SHA256.Create())
-            {
-                actualHash = sha.ComputeHash(input);
-            }
+            actualHash = global::OdfKit.Internal.OdfHashHelper.Sha256(input);
         }
         else
         {
@@ -101,8 +95,7 @@ internal static class OdfProtectionHelper
     /// <param name="nsUri">命名空間 URI</param>
     public static void UnprotectNode(OdfNode node, string nsUri)
     {
-        if (node is null)
-            throw new ArgumentNullException(nameof(node));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(node, nameof(node));
 
         node.RemoveAttribute("protected", nsUri);
         node.RemoveAttribute("protection-key", nsUri);

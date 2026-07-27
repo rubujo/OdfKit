@@ -324,7 +324,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     {
         var sb = new StringBuilder();
         if (includeBrackets)
-            sb.Append("[");
+            sb.Append('[');
 
         var startStr = StartAddress.ToOdfString(false);
 
@@ -339,10 +339,10 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
             endStr = EndAddress.ToOdfString(false);
         }
 
-        sb.Append(startStr).Append(":").Append(endStr);
+        sb.Append(startStr).Append(':').Append(endStr);
 
         if (includeBrackets)
-            sb.Append("]");
+            sb.Append(']');
         return sb.ToString();
     }
 

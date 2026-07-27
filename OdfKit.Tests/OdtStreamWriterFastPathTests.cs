@@ -17,7 +17,7 @@ namespace OdfKit.Tests;
 public class OdtStreamWriterFastPathTests
 {
     [Fact]
-    public void AddParagraph_TextEscaping_MatchesXmlWriterBehavior()
+    public void AddParagraphTextEscapingMatchesXmlWriterBehavior()
     {
         string xml = WriteContent(writer =>
         {
@@ -32,7 +32,7 @@ public class OdtStreamWriterFastPathTests
     }
 
     [Fact]
-    public void AddParagraph_StyleNameEscaping_MatchesXmlWriterBehavior()
+    public void AddParagraphStyleNameEscapingMatchesXmlWriterBehavior()
     {
         string xml = WriteContent(writer =>
         {
@@ -45,7 +45,7 @@ public class OdtStreamWriterFastPathTests
     }
 
     [Fact]
-    public void AddHeadingAndList_WriteExpectedStructure()
+    public void AddHeadingAndListWriteExpectedStructure()
     {
         string xml = WriteContent(writer =>
         {
@@ -64,7 +64,7 @@ public class OdtStreamWriterFastPathTests
     }
 
     [Fact]
-    public void AddParagraph_EmojiAndLongText_RoundTripsThroughParser()
+    public void AddParagraphEmojiAndLongTextRoundTripsThroughParser()
     {
         string emojiText = "分數 " + char.ConvertFromUtf32(0x1F600) + " 滿分";
         var builder = new StringBuilder(24 * 1024);
@@ -87,7 +87,7 @@ public class OdtStreamWriterFastPathTests
     }
 
     [Fact]
-    public void WriteNode_MixedWithFastPath_PreservesOrder()
+    public void WriteNodeMixedWithFastPathPreservesOrder()
     {
         string xml = WriteContent(writer =>
         {
@@ -107,7 +107,7 @@ public class OdtStreamWriterFastPathTests
     }
 
     [Fact]
-    public void EmptyParagraph_UsesSelfClosingForm()
+    public void EmptyParagraphUsesSelfClosingForm()
     {
         string xml = WriteContent(writer => writer.AddParagraph(string.Empty));
         Assert.Contains("<text:p />", xml, StringComparison.Ordinal);

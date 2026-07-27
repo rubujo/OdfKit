@@ -29,12 +29,9 @@ public static class OdfKitCli
     /// <returns>The process exit code; zero indicates success. / 程序結束碼；零表示成功。</returns>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
-        if (args is null)
-            throw new ArgumentNullException(nameof(args));
-        if (output is null)
-            throw new ArgumentNullException(nameof(output));
-        if (error is null)
-            throw new ArgumentNullException(nameof(error));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(args, nameof(args));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(output, nameof(output));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(error, nameof(error));
 
         try
         {
@@ -79,8 +76,8 @@ public static class OdfKitCli
         }
 
         ValidateOptions parsedOptions = options!;
-        IReadOnlyList<string> files = ResolveValidateFiles(parsedOptions.Path, parsedOptions.Recursive);
-        if (files.Count == 0)
+        string[] files = ResolveValidateFiles(parsedOptions.Path, parsedOptions.Recursive);
+        if (files.Length == 0)
         {
             error.WriteLine(OdfLocalizer.GetMessage("Cli_NoOdfFilesFound", parsedOptions.Path));
             return 2;
@@ -544,7 +541,7 @@ public static class OdfKitCli
     }
 
     private static bool PreservedEntryHashesMatch(
-        IReadOnlyDictionary<string, string> expected,
+        Dictionary<string, string> expected,
         OdfPackage package)
     {
         Dictionary<string, string> actual = GetPreservedEntryHashes(package);
@@ -680,7 +677,7 @@ public static class OdfKitCli
                     }
                     break;
                 default:
-                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    if (global::OdfKit.Internal.OdfStringHelper.StartsWith(arg, '-'))
                     {
                         error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
@@ -804,7 +801,7 @@ public static class OdfKitCli
                     }
                     break;
                 default:
-                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    if (global::OdfKit.Internal.OdfStringHelper.StartsWith(arg, '-'))
                     {
                         error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
@@ -880,7 +877,7 @@ public static class OdfKitCli
                     }
                     break;
                 default:
-                    error.WriteLine(arg.StartsWith("-", StringComparison.Ordinal)
+                    error.WriteLine(global::OdfKit.Internal.OdfStringHelper.StartsWith(arg, '-')
                         ? "unknown option: " + arg
                         : "usage: odfkit typed-dom-coverage [--format text|json]");
                     return false;
@@ -942,7 +939,7 @@ public static class OdfKitCli
                     }
                     break;
                 default:
-                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    if (global::OdfKit.Internal.OdfStringHelper.StartsWith(arg, '-'))
                     {
                         error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
@@ -1055,7 +1052,7 @@ public static class OdfKitCli
                     }
                     break;
                 default:
-                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    if (global::OdfKit.Internal.OdfStringHelper.StartsWith(arg, '-'))
                     {
                         error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
@@ -1251,7 +1248,7 @@ public static class OdfKitCli
             result.StandardError);
     }
 
-    private static IReadOnlyList<string> ResolveValidateFiles(string path, bool recursive)
+    private static string[] ResolveValidateFiles(string path, bool recursive)
     {
         if (File.Exists(path))
         {
@@ -1775,7 +1772,7 @@ public static class OdfKitCli
                 return false;
             }
 
-            string normalized = expectedKind.StartsWith(".", StringComparison.Ordinal)
+            string normalized = global::OdfKit.Internal.OdfStringHelper.StartsWith(expectedKind, '.')
                 ? expectedKind
                 : "." + expectedKind;
             return string.Equals(normalized, format.Extension, StringComparison.OrdinalIgnoreCase);

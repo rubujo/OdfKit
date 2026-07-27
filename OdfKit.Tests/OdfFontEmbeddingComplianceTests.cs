@@ -21,7 +21,7 @@ public sealed class OdfFontEmbeddingComplianceTests
     /// 驗證完整字型內嵌會寫出合規的字型來源與指令清單項目。
     /// </summary>
     [Fact]
-    public void EmbedFonts_WritesConformingFontSourceAndManifestEntry()
+    public void EmbedFontsWritesConformingFontSourceAndManifestEntry()
     {
         const string fontName = "OdfKit-Embedded-Font-UnitTest";
         string fontPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.ttf");
@@ -53,7 +53,7 @@ public sealed class OdfFontEmbeddingComplianceTests
     /// 驗證外部 PUA 字型子集化會寫出合規的字型來源與指令清單項目。
     /// </summary>
     [Fact]
-    public void EmbedFontSubsets_WritesConformingFontSourceAndManifestEntry()
+    public void EmbedFontSubsetsWritesConformingFontSourceAndManifestEntry()
     {
         const string fontName = "OdfKit-Subset-Font-UnitTest";
         var context = new OdfFontContext();

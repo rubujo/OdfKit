@@ -220,27 +220,37 @@ public enum OdfDatabaseDataSourceSettingType
     /// <summary>
     /// 雙精確度浮點型別
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Double,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 整數型別
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Int,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 長整數型別
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Long,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 短整數型別
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     Short,
+#pragma warning restore CA1720
 
     /// <summary>
     /// 字串型別
     /// </summary>
+#pragma warning disable CA1720 // ODF lexical token or compatibility API name.
     String
+#pragma warning restore CA1720
 }
 
 /// <summary>

@@ -258,7 +258,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
                 default:
                     if (ch < ' ')
                     {
-                        builder.Append("\\u").Append(((int)ch).ToString("x4"));
+                        builder.Append("\\u").Append(((int)ch).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
                     }
                     else
                     {

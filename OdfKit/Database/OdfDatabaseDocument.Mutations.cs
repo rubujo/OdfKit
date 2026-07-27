@@ -172,10 +172,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When the table name is blank. / 當資料表名稱為空白時擲出。</exception>
     public bool UpdateTable(OdfDatabaseTableInfo table)
     {
-        if (table is null)
-        {
-            throw new ArgumentNullException(nameof(table));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(table, nameof(table));
 
         return UpdateTable(table.Name, table.Command);
     }
@@ -220,10 +217,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When the query name or command is blank. / 當查詢名稱或命令為空白時擲出。</exception>
     public bool UpdateQuery(OdfDatabaseQueryInfo query)
     {
-        if (query is null)
-        {
-            throw new ArgumentNullException(nameof(query));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(query, nameof(query));
 
         if (string.IsNullOrWhiteSpace(query.Name))
         {
@@ -289,10 +283,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When the form name is blank. / 當表單名稱為空白時擲出。</exception>
     public bool UpdateForm(OdfDatabaseFormInfo form)
     {
-        if (form is null)
-        {
-            throw new ArgumentNullException(nameof(form));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(form, nameof(form));
 
         if (string.IsNullOrWhiteSpace(form.Name))
         {
@@ -312,10 +303,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When the report name is blank. / 當報表名稱為空白時擲出。</exception>
     public bool UpdateReport(OdfDatabaseReportInfo report)
     {
-        if (report is null)
-        {
-            throw new ArgumentNullException(nameof(report));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(report, nameof(report));
 
         if (string.IsNullOrWhiteSpace(report.Name))
         {
@@ -335,10 +323,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">When the setting name or values are empty. / 當設定名稱或值清單為空時擲出。</exception>
     public bool UpdateDataSourceSetting(OdfDatabaseDataSourceSettingInfo setting)
     {
-        if (setting is null)
-        {
-            throw new ArgumentNullException(nameof(setting));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(setting, nameof(setting));
 
         if (string.IsNullOrWhiteSpace(setting.Name))
         {
@@ -498,10 +483,7 @@ public partial class OdfDatabaseDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_8"), nameof(name));
         }
 
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(values, nameof(values));
 
         if (values.Length == 0)
         {

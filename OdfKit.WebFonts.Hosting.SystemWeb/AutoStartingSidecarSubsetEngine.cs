@@ -6,7 +6,7 @@ using OdfKit.WebFonts.Sidecar;
 
 namespace OdfKit.WebFonts.Hosting.SystemWeb;
 
-internal sealed class AutoStartingSidecarSubsetEngine : IWebFontSubsetEngine, IWebFontTextCoverageFilter
+internal sealed class AutoStartingSidecarSubsetEngine : IWebFontSubsetEngine, IWebFontTextCoverageFilter, IDisposable
 {
     private const string ChildTokenEnvironmentVariable = "ODFKIT_WEBFONT_AUTOSTART_TOKEN";
     private static readonly TimeSpan HealthFreshness = TimeSpan.FromSeconds(2);
@@ -215,6 +215,11 @@ internal sealed class AutoStartingSidecarSubsetEngine : IWebFontSubsetEngine, IW
 
     private static IOException ProcessFailed()
         => new(OdfLocalizer.GetMessage("Err_WebFont_ProcessFailed"));
+
+    public void Dispose()
+    {
+        _startGate.Dispose();
+    }
 }
 
 internal sealed class AutoStartSidecarOptions
