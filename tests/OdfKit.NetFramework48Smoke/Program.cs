@@ -1,4 +1,5 @@
 ﻿using OdfKit.Collaboration;
+using System.Globalization;
 using OdfKit.Conversion;
 using OdfKit.Core;
 using OdfKit.Drawing;
@@ -80,7 +81,9 @@ internal static class Program
 
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(path);
         Require(
-            Convert.ToString(loaded.Worksheets["Data"].Cells[0, 0].CellValue) == "OdfKit-net48-ODS",
+            Convert.ToString(
+                loaded.Worksheets["Data"].Cells[0, 0].CellValue,
+                CultureInfo.InvariantCulture) == "OdfKit-net48-ODS",
             "ODS round-trip failed.");
     }
 

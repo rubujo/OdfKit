@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -195,6 +196,10 @@ public sealed class Cns11643EucTwMappingProvider : ITraceableCharacterMappingPro
         return result.ToString();
     }
 
+    [SuppressMessage(
+        "Performance",
+        "CA1863:Use 'CompositeFormat'",
+        Justification = "The localized format string follows the current UI culture and cannot be cached as one process-wide CompositeFormat.")]
     private static DecoderFallbackException Unmapped(int offset)
         => new(string.Format(
             CultureInfo.CurrentCulture,

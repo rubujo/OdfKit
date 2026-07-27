@@ -236,6 +236,10 @@ public static class OdfComplianceProfiles
     /// Gets the ISO/IEC 26300:2006 compliance profile (corresponding to ODF 1.0).
     /// 取得 ISO/IEC 26300:2006 一致性規範（對應於 ODF 1.0）。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1707:Identifiers should not contain underscores",
+        Justification = "The underscore preserves the official ISO/IEC standard number and edition boundary.")]
     public static OdfComplianceProfile IsoIec26300_2006 { get; } = new(
         "ISO_IEC_26300_2006",
         "International",
@@ -254,6 +258,10 @@ public static class OdfComplianceProfiles
     /// Gets the ISO/IEC 26300:2015 compliance profile (corresponding to the ODF 1.2 baseline).
     /// 取得 ISO/IEC 26300:2015 一致性規範（對應於 ODF 1.2 基準）。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1707:Identifiers should not contain underscores",
+        Justification = "The underscore preserves the official ISO/IEC standard number and edition boundary.")]
     public static OdfComplianceProfile IsoIec26300_2015 { get; } = new(
         "ISO_IEC_26300_2015",
         "International",
@@ -272,6 +280,10 @@ public static class OdfComplianceProfiles
     /// Gets the ISO/IEC 26300:2025 compliance profile (corresponding to the ODF 1.3 baseline).
     /// 取得 ISO/IEC 26300:2025 一致性規範（對應於 ODF 1.3 基準）。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1707:Identifiers should not contain underscores",
+        Justification = "The underscore preserves the official ISO/IEC standard number and edition boundary.")]
     public static OdfComplianceProfile IsoIec26300_2025 { get; } = new(
         "ISO_IEC_26300_2025",
         "International",

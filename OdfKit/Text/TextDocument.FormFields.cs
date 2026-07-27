@@ -24,6 +24,10 @@ public partial class TextDocument
 /// Indexes text document form fields by name and safely fills their values.
 /// 提供文字文件表單欄位的名稱索引與安全填值 API。
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Naming",
+    "CA1711:Identifiers should not have incorrect suffix",
+    Justification = "This established public type is a named indexer collection facade; renaming it would break the document API.")]
 public sealed class OdfFormFieldCollection
 {
     private readonly TextDocument _document;

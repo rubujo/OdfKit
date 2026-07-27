@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using OdfKit.Compliance;
 
@@ -31,6 +32,10 @@ public sealed class Big5EMapping
     /// <param name="reader">The trusted mapping reader. / 受信任的對照表 reader。</param>
     /// <param name="version">The mapping dataset version. / 對照資料集版本。</param>
     /// <returns>The immutable mapping. / 不可變對照表。</returns>
+    [SuppressMessage(
+        "Performance",
+        "CA1863:Use 'CompositeFormat'",
+        Justification = "The localized format string follows the current UI culture and cannot be cached as one process-wide CompositeFormat.")]
     public static Big5EMapping Load(TextReader reader, string version)
     {
         if (reader is null)
@@ -54,7 +59,7 @@ public sealed class Big5EMapping
         {
             lineNumber++;
             string trimmed = line.Trim();
-            if (trimmed.Length == 0 || trimmed.StartsWith("#", StringComparison.Ordinal))
+            if (trimmed.Length == 0 || trimmed[0] == '#')
             {
                 continue;
             }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using OdfKit.Compliance;
@@ -11,6 +12,12 @@ namespace OdfKit.WebFonts.Profiles;
 /// </summary>
 public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingProvider
 {
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
+    {
+        MaxDepth = 16,
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly IReadOnlyDictionary<string, string> _mappings;
     private readonly int _maximumByteLength;
 
@@ -98,11 +105,7 @@ public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingPro
         MappingProfile? profile;
         try
         {
-            profile = JsonSerializer.Deserialize<MappingProfile>(bounded.ToArray(), new JsonSerializerOptions
-            {
-                MaxDepth = 16,
-                PropertyNameCaseInsensitive = true
-            });
+            profile = JsonSerializer.Deserialize<MappingProfile>(bounded.ToArray(), s_jsonOptions);
         }
         catch (JsonException exception)
         {
@@ -156,6 +159,10 @@ public sealed class JsonCharacterMappingProvider : ITraceableCharacterMappingPro
     /// </summary>
     /// <param name="source">The source bytes to decode. / 要解碼的來源位元組。</param>
     /// <returns>The decoded Unicode text. / 解碼後的 Unicode 文字。</returns>
+    [SuppressMessage(
+        "Performance",
+        "CA1863:Use 'CompositeFormat'",
+        Justification = "The localized format string follows the current UI culture and cannot be cached as one process-wide CompositeFormat.")]
     public string Decode(byte[] source)
     {
         if (source is null)

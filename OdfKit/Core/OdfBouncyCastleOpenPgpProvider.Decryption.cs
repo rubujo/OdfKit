@@ -155,6 +155,20 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             case PublicKeyAlgorithmTag.RsaEncrypt:
             case PublicKeyAlgorithmTag.RsaGeneral:
                 {
+                    // BouncyCastle 的 GetEncoded() 會回傳不含 MPI bit-count 的 RSA 區塊，
+                    // GnuPG 的線上格式則保留兩位元組 MPI bit-count；兩種形狀都必須接受。
+                    if (enc.Length > 2)
+                    {
+                        int mpiBitLength = (enc[0] << 8) | enc[1];
+                        int mpiByteLength = (mpiBitLength + 7) / 8;
+                        if (mpiByteLength == enc.Length - 2)
+                        {
+                            byte[] mpi = new byte[mpiByteLength];
+                            Buffer.BlockCopy(enc, 2, mpi, 0, mpi.Length);
+                            enc = mpi;
+                        }
+                    }
+
                     var cipher = new Pkcs1Encoding(new RsaBlindedEngine());
                     cipher.Init(false, privateKey.Key);
                     return cipher.ProcessBlock(enc, 0, enc.Length);

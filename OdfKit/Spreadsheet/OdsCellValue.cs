@@ -13,6 +13,10 @@ public enum OdsCellValueKind
     /// <summary>
     /// A text value. / 文字值。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1720:Identifier contains type name",
+        Justification = "String is the normative ODF office:value-type token.")]
     String,
     /// <summary>
     /// A numeric value. / 數值。

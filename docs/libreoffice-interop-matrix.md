@@ -55,6 +55,7 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeHeadless_LoadsWebTemplateDocument` | OTH | 標題、段落、互通標記 | `txt` / `odt` | LibreOffice 識別為 Writer/Web document（`writerweb8_writer`）；轉出文字含互通標記；轉出 ODT 內容保留 | ✅ |
 | `DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType` | ODB | 資料表、查詢、表單封裝 | （封裝層級，無 CLI 轉換） | mimetype／manifest media-type 與真實 LibreOffice 自建 ODB 完全一致；另以 UNO API `desktop.loadComponentFromURL` 人工驗證可成功載入 | ✅ |
 | `LibreOfficeHeadless_ExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
+| `LibreOfficeUno_OpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
 
 ## 已知上游限制（非 OdfKit 缺陷）
 

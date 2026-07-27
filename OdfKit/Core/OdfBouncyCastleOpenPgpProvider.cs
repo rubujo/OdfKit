@@ -84,11 +84,26 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_RecipientCannotBeEmpty"), nameof(recipient));
 
         PgpPublicKey encKey = FindEncryptionSubkey(recipient.PublicKey);
-        byte[] payload = BuildSessionKeyPayload(sessionKey);
-        byte[][] encMpis = EncryptPayload(encKey, payload);
+        using var output = new MemoryStream();
+        var encryptedGenerator = new PgpEncryptedDataGenerator(
+            SymmetricKeyAlgorithmTag.Aes256,
+            withIntegrityPacket: true,
+            s_rng);
+        encryptedGenerator.AddMethod(encKey);
 
-        var pkt = new PublicKeyEncSessionPacket(encKey.KeyId, encKey.Algorithm, encMpis);
-        return pkt.GetEncoded();
+        using (Stream encryptedStream = encryptedGenerator.Open(output, new byte[1 << 16]))
+        {
+            var literalGenerator = new PgpLiteralDataGenerator();
+            using Stream literalStream = literalGenerator.Open(
+                encryptedStream,
+                PgpLiteralData.Binary,
+                PgpLiteralDataGenerator.Console,
+                sessionKey.Length,
+                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            literalStream.Write(sessionKey, 0, sessionKey.Length);
+        }
+
+        return output.ToArray();
     }
 
     /// <summary>
@@ -108,7 +123,20 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         if (encryptedKeyPacket is null)
             throw new ArgumentNullException(nameof(encryptedKeyPacket));
 
-        (long pkeskKeyId, PublicKeyAlgorithmTag algorithm, byte[][] encMpis) = DecodePkeskPacket(encryptedKeyPacket);
+        try
+        {
+            byte[]? messageKey = TryDecryptOpenPgpMessage(encryptedKeyPacket);
+            if (messageKey is not null)
+                return messageKey;
+        }
+        catch (Exception ex) when (ex is IOException or PgpException)
+        {
+            // 早期 OdfKit 版本只保存 PKESK packet；若輸入不是完整 OpenPGP message，
+            // 退回既有的 RFC 4880 packet 解碼路徑。
+        }
+
+        (long pkeskKeyId, PublicKeyAlgorithmTag algorithm, byte[][] encMpis) =
+            DecodePkeskPacket(encryptedKeyPacket);
 
         PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
         char[] passphrase = _passphraseProvider(pkeskKeyId)
@@ -131,6 +159,108 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
 
         byte[] payload = DecryptPayload(privateKey, secretKey.PublicKey, algorithm, encMpis);
         return ExtractAndVerifySessionKey(payload);
+    }
+
+    private byte[]? TryDecryptOpenPgpMessage(byte[] encryptedMessage)
+    {
+        byte[]? aeadMessageKey = TryDecryptAeadMessage(encryptedMessage);
+        if (aeadMessageKey is not null)
+            return aeadMessageKey;
+
+        using var input = new MemoryStream(encryptedMessage, writable: false);
+        using Stream decoder = PgpUtilities.GetDecoderStream(input);
+        var factory = new PgpObjectFactory(decoder);
+        object? first = factory.NextPgpObject();
+        PgpEncryptedDataList? encryptedDataList = first as PgpEncryptedDataList
+            ?? factory.NextPgpObject() as PgpEncryptedDataList;
+        if (encryptedDataList is null)
+            return null;
+
+        foreach (PgpPublicKeyEncryptedData encryptedData in encryptedDataList.GetEncryptedDataObjects())
+        {
+            PgpSecretKey secretKey;
+            try
+            {
+                secretKey = FindSecretKey(encryptedData.KeyId);
+            }
+            catch (CryptographicException)
+            {
+                continue;
+            }
+
+            char[] passphrase = _passphraseProvider!(encryptedData.KeyId)
+                ?? throw new ArgumentException(
+                    OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
+                    nameof(_passphraseProvider));
+            PgpPrivateKey privateKey;
+            try
+            {
+                privateKey = secretKey.ExtractPrivateKey(passphrase);
+            }
+            catch (Exception ex) when (ex is not CryptographicException)
+            {
+                throw new CryptographicException(
+                    OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_OpenpgpPrivateKeyUnlocking"),
+                    ex);
+            }
+            finally
+            {
+                Array.Clear(passphrase, 0, passphrase.Length);
+            }
+
+            using Stream clear = encryptedData.GetDataStream(privateKey);
+            var clearFactory = new PgpObjectFactory(clear);
+            object? message = clearFactory.NextPgpObject();
+            if (message is PgpCompressedData compressedData)
+            {
+                using Stream compressedStream = compressedData.GetDataStream();
+                message = new PgpObjectFactory(compressedStream).NextPgpObject();
+            }
+
+            if (message is not PgpLiteralData literalData)
+                continue;
+
+            using Stream literalStream = literalData.GetInputStream();
+            using var output = new MemoryStream();
+            literalStream.CopyTo(output);
+            byte[] sessionKey = output.ToArray();
+            if (sessionKey.Length != 32)
+            {
+                Array.Clear(sessionKey, 0, sessionKey.Length);
+                continue;
+            }
+
+            if (encryptedData.IsIntegrityProtected() && !encryptedData.Verify())
+            {
+                Array.Clear(sessionKey, 0, sessionKey.Length);
+                continue;
+            }
+
+            return sessionKey;
+        }
+
+        return null;
+    }
+
+    private byte[] DecryptPkeskSessionKey(byte[] encodedPkesk)
+    {
+        (long pkeskKeyId, PublicKeyAlgorithmTag algorithm, byte[][] encMpis) =
+            DecodePkeskPacket(encodedPkesk);
+        PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
+        char[] passphrase = _passphraseProvider!(pkeskKeyId)
+            ?? throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PassphraseProviderReturnedNull"),
+                nameof(_passphraseProvider));
+        try
+        {
+            PgpPrivateKey privateKey = secretKey.ExtractPrivateKey(passphrase);
+            byte[] payload = DecryptPayload(privateKey, secretKey.PublicKey, algorithm, encMpis);
+            return ExtractAndVerifySessionKey(payload);
+        }
+        finally
+        {
+            Array.Clear(passphrase, 0, passphrase.Length);
+        }
     }
 
     #region Session Key Payload

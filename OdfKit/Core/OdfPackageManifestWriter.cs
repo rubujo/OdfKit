@@ -41,6 +41,11 @@ internal static class OdfPackageManifestWriter
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
 
+            // ODF 1.3+ 將 package-wide OpenPGP key transport 放在 manifest 根層，
+            // 且必須排在所有 file-entry 之前。各 entry 共用同一把 session key。
+            foreach (OdfOpenPgpEncryptedKeyInfo encryptedKey in GetPackageEncryptedKeys(ctx))
+                WriteEncryptedKey(writer, encryptedKey);
+
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
             writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, ctx.MimeType ?? "application/vnd.oasis.opendocument.text");
@@ -139,22 +144,6 @@ internal static class OdfPackageManifestWriter
         writer.WriteAttributeString("manifest", "initialisation-vector", OdfNamespaces.Manifest, Convert.ToBase64String(info.InitialisationVector));
         writer.WriteEndElement();
 
-        foreach (OdfOpenPgpEncryptedKeyInfo encryptedKey in info.OpenPgpEncryptedKeys)
-        {
-            writer.WriteStartElement("encrypted-key", OdfNamespaces.Manifest);
-            if (!string.IsNullOrEmpty(encryptedKey.KeyId))
-                writer.WriteAttributeString("manifest", "key-id", OdfNamespaces.Manifest, encryptedKey.KeyId);
-            if (!string.IsNullOrEmpty(encryptedKey.Recipient))
-                writer.WriteAttributeString("manifest", "recipient", OdfNamespaces.Manifest, encryptedKey.Recipient);
-            if (!string.IsNullOrEmpty(encryptedKey.AlgorithmName))
-                writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, encryptedKey.AlgorithmName);
-            foreach (KeyValuePair<string, string> prop in encryptedKey.ExtensionProperties)
-                writer.WriteAttributeString("manifest", prop.Key, OdfNamespaces.Manifest, prop.Value);
-            if (encryptedKey.KeyPacket.Length > 0)
-                writer.WriteString(Convert.ToBase64String(encryptedKey.KeyPacket));
-            writer.WriteEndElement();
-        }
-
         // manifest schema 的 encryption-data 內容順序為 algorithm →〔start-key-generation〕→ key-derivation。
         if (!string.IsNullOrEmpty(info.StartKeyGenerationName) && info.StartKeySize.HasValue)
         {
@@ -169,6 +158,16 @@ internal static class OdfPackageManifestWriter
 
         writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
         writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);
+
+        // ODF manifest schema 的 PGP 分支只允許 key-derivation-name，不允許 PBKDF2 的
+        // key-size、iteration-count 或 salt。
+        if (string.Equals(info.KeyDerivationName, "PGP", StringComparison.Ordinal))
+        {
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+            return;
+        }
+
         writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString(CultureInfo.InvariantCulture));
 
         // Argon2id 分支不使用 manifest:iteration-count：迭代次數由 loext:argon2-iterations 表示，
@@ -193,6 +192,60 @@ internal static class OdfPackageManifestWriter
 
         writer.WriteEndElement();
 
+        writer.WriteEndElement();
+    }
+
+    private static List<OdfOpenPgpEncryptedKeyInfo> GetPackageEncryptedKeys(
+        OdfPackage.OdfPackageSaveCollaborators ctx)
+    {
+        foreach (OdfPackageEntry entry in ctx.Entries.Values)
+        {
+            if (entry.EncryptionInfo is { OpenPgpEncryptedKeys.Count: > 0 } info)
+                return info.OpenPgpEncryptedKeys;
+        }
+
+        return [];
+    }
+
+    private static void WriteEncryptedKey(XmlWriter writer, OdfOpenPgpEncryptedKeyInfo encryptedKey)
+    {
+        byte[] cipherValue = encryptedKey.CipherValue.Length > 0
+            ? encryptedKey.CipherValue
+            : encryptedKey.KeyPacket;
+
+        writer.WriteStartElement("encrypted-key", OdfNamespaces.Manifest);
+
+        if (!string.IsNullOrEmpty(encryptedKey.AlgorithmName))
+        {
+            writer.WriteStartElement("encryption-method", OdfNamespaces.Manifest);
+            writer.WriteAttributeString(
+                "manifest",
+                "PGPAlgorithm",
+                OdfNamespaces.Manifest,
+                encryptedKey.AlgorithmName);
+            writer.WriteEndElement();
+        }
+
+        writer.WriteStartElement("keyinfo", OdfNamespaces.Manifest);
+        writer.WriteStartElement("PGPData", OdfNamespaces.Manifest);
+        writer.WriteStartElement("PGPKeyID", OdfNamespaces.Manifest);
+        byte[] keyId = Encoding.UTF8.GetBytes(encryptedKey.KeyId + "\0");
+        writer.WriteString(Convert.ToBase64String(keyId));
+        writer.WriteEndElement();
+        if (encryptedKey.CipherValue.Length > 0 && encryptedKey.KeyPacket.Length > 0)
+        {
+            writer.WriteStartElement("PGPKeyPacket", OdfNamespaces.Manifest);
+            writer.WriteString(Convert.ToBase64String(encryptedKey.KeyPacket));
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
+        writer.WriteEndElement();
+
+        writer.WriteStartElement("CipherData", OdfNamespaces.Manifest);
+        writer.WriteStartElement("CipherValue", OdfNamespaces.Manifest);
+        writer.WriteString(Convert.ToBase64String(cipherValue));
+        writer.WriteEndElement();
+        writer.WriteEndElement();
         writer.WriteEndElement();
     }
 

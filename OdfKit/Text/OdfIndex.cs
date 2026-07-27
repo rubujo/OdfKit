@@ -23,7 +23,7 @@ public abstract class OdfIndex
     /// The owning text document.
     /// 所屬的文字文件。
     /// </summary>
-    protected readonly TextDocument Doc;
+    protected TextDocument Doc { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfIndex"/> class.

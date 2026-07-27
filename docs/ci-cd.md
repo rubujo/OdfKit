@@ -13,7 +13,7 @@
   - `Test-BilingualXmlDocs.ps1 -FailOnNewIssues`
   - `Test-LocalizerKeyParity.ps1 -FailOnIssues`
   - `Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly`（JSON ↔ C# 一致）
-  - `dotnet build OdfKit`（全域 `AnalysisLevel=latest`、`AnalysisMode=Recommended`、
+  - `dotnet build OdfKit`（全域 `AnalysisLevel=latest`、`AnalysisMode=Recommended`；
     `RunAnalyzersDuringBuild=true`，含 PublicApiAnalyzers；只有明確升為 error 的規則阻擋建置）
 - `full-regression` job 依賴 `maintainability`，在 Ubuntu 對 `net8.0` 與 `net10.0`
   執行完整測試套件；它是每次 PR 與 main push 的必要回歸證據。TRX 與 blame diagnostics
@@ -85,8 +85,12 @@ cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路
 同一個外部 baseline 另釘選與排程 LibreOffice 相同版本的 extended manifest schema。工作流程
 由目前 CLI 即時產生 AES-256-GCM／Argon2id wholesome ODT、抽出外層 manifest，再交由 Jing
 驗證；schema 下載與 cache 命中皆重算 SHA-256，產生的文件與驗證結果不進入 cache。
-LibreOffice 每週雙 TFM 工作流程則以 Python UNO 開啟該形狀並核對本文；已明確啟用實機
-互通時若缺少 UNO runtime，測試必須失敗而非略過。
+同一工作流程也以臨時 GnuPG RSA 金鑰執行 OpenPGP session-key 解密與 OdfKit package
+round-trip，再將執行期產出的根層 `manifest:encrypted-key` manifest 交由 Jing 驗證；測試金鑰
+與文件只存在於 runner 暫存目錄。
+LibreOffice 每週雙 TFM 工作流程則以 Python UNO 開啟 wholesome 密碼文件，並以臨時
+GnuPG RSA 金鑰完成 OpenPGP OdfKit → LibreOffice → OdfKit 修改後雙向 round-trip；已明確
+啟用實機互通時若缺少 UNO runtime，測試必須失敗而非略過。
 
 NuGet 驗證由 Ubuntu 僅封裝一次，產生 `SHA256SUMS` 後以上傳 artifact 將同一份短期快照
 分送至 Linux x64、Windows x64、Windows ARM64 與 macOS ARM64 runner。每個 consumer job

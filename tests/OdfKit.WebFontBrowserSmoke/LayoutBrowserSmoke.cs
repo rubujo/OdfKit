@@ -6,6 +6,32 @@ namespace OdfKit.WebFontBrowserSmoke;
 
 internal static class LayoutBrowserSmoke
 {
+    private static readonly JsonSerializerOptions s_indentedJsonOptions = new()
+    {
+        WriteIndented = true
+    };
+
+    private static readonly string[] s_arabicTexts =
+    [
+        "السَّلَامُ عَلَيْكُمْ",
+        "لا إله إلا الله",
+        "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ"
+    ];
+
+    private static readonly string[] s_devanagariTexts =
+    [
+        "क्षेत्रज्ञ भारत",
+        "शृंखला हिन्दी",
+        "कर्मण्येवाधिकारस्ते"
+    ];
+
+    private static readonly string[] s_cffTexts =
+    [
+        "香港邨裏𠮷",
+        "全字庫難字顯示",
+        "繁體中文測試"
+    ];
+
     /// <summary>
     /// 依名稱取出必要路徑；缺漏時以明確訊息失敗，而非沿用錯誤的位置引數。
     /// </summary>
@@ -384,7 +410,7 @@ internal static class LayoutBrowserSmoke
             };
             await File.WriteAllTextAsync(
                 evidencePath,
-                JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true }))
+                JsonSerializer.Serialize(evidence, s_indentedJsonOptions))
                 .ConfigureAwait(false);
             Console.WriteLine(
                 $"PASS: {browserName} preserved real CFF/CFF2 and TrueType variable pixels.");
@@ -413,12 +439,7 @@ internal static class LayoutBrowserSmoke
                 language = "ar",
                 sourceFamily = "OdfKit Arabic Source",
                 subsetFamily = "OdfKit Arabic Subset",
-                texts = new[]
-                {
-                    "السَّلَامُ عَلَيْكُمْ",
-                    "لا إله إلا الله",
-                    "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ"
-                },
+                texts = s_arabicTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -429,12 +450,7 @@ internal static class LayoutBrowserSmoke
                 language = "hi",
                 sourceFamily = "OdfKit Devanagari Source",
                 subsetFamily = "OdfKit Devanagari Subset",
-                texts = new[]
-                {
-                    "क्षेत्रज्ञ भारत",
-                    "शृंखला हिन्दी",
-                    "कर्मण्येवाधिकारस्ते"
-                },
+                texts = s_devanagariTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },
@@ -445,12 +461,7 @@ internal static class LayoutBrowserSmoke
                 language = "zh-Hant",
                 sourceFamily = "OdfKit CFF Source",
                 subsetFamily = "OdfKit CFF Subset",
-                texts = new[]
-                {
-                    "香港邨裏𠮷",
-                    "全字庫難字顯示",
-                    "繁體中文測試"
-                },
+                texts = s_cffTexts,
                 axes = new[] { new { weight = 400, stretch = "normal" } },
                 requireAxisDifference = false
             },

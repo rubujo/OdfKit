@@ -192,17 +192,20 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     /// 寫入 Async。
     /// </summary>
     /// <inheritdoc />
-    public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        => WriteAsyncCore(buffer.AsMemory(offset, count), cancellationToken);
+
+    private async Task WriteAsyncCore(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
     {
         if (_isDisposed)
             throw new ObjectDisposedException(nameof(OdfDoubleBufferedWritableStream));
 
         int bytesWritten = 0;
-        while (bytesWritten < count)
+        while (bytesWritten < buffer.Length)
         {
             int space = _bufferSize - _activeCount;
-            int toCopy = Math.Min(space, count - bytesWritten);
-            Buffer.BlockCopy(buffer, offset + bytesWritten, _activeBuffer, _activeCount, toCopy);
+            int toCopy = Math.Min(space, buffer.Length - bytesWritten);
+            buffer.Slice(bytesWritten, toCopy).CopyTo(_activeBuffer.AsMemory(_activeCount, toCopy));
             _activeCount += toCopy;
             bytesWritten += toCopy;
 
@@ -235,6 +238,27 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
             }
         }
     }
+
+#if NETCOREAPP2_1_OR_GREATER
+    /// <summary>
+    /// Writes the buffer asynchronously without cancellation.
+    /// 在不可取消的情況下非同步寫入緩衝區。
+    /// </summary>
+    /// <param name="buffer">The buffer to write. / 要寫入的緩衝區。</param>
+    /// <returns>A value task representing the write operation. / 代表寫入作業的值工作。</returns>
+    public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer)
+        => WriteAsync(buffer, CancellationToken.None);
+
+    /// <summary>
+    /// Writes a memory buffer asynchronously.
+    /// 非同步寫入記憶體緩衝區。
+    /// </summary>
+    /// <inheritdoc />
+    public override ValueTask WriteAsync(
+        ReadOnlyMemory<byte> buffer,
+        CancellationToken cancellationToken)
+        => new(WriteAsyncCore(buffer, cancellationToken));
+#endif
 
     /// <summary>
     /// Releases unmanaged resources.

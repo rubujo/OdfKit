@@ -48,6 +48,19 @@ public static partial class OdfEncryption
     public const string OpenPgpAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#openpgp";
 
     /// <summary>
+    /// Gets the LibreOffice-compatible OpenPGP key-transport profile identifier.
+    /// 取得與 LibreOffice 相容的 OpenPGP 金鑰傳送設定檔識別 URI。
+    /// </summary>
+    /// <remarks>
+    /// ODF defines <c>manifest:PGPAlgorithm</c> as implementation-defined. This
+    /// identifier names the interoperable package-key transport profile; entry
+    /// content encryption is declared separately as AES-256-CBC.
+    /// ODF 將 <c>manifest:PGPAlgorithm</c> 定義為實作自訂。此識別碼代表可互通的
+    /// 封裝金鑰傳送設定檔；項目內容加密會另行宣告為 AES-256-CBC。
+    /// </remarks>
+    public const string OpenPgpKeyTransportAlgorithmUri = "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
+
+    /// <summary>
     /// AES-256-GCM 加密演算法的識別 URI。
     /// </summary>
     public const string Aes256GcmAlgorithmUri = "http://www.w3.org/2009/xmlenc11#aes256-gcm";

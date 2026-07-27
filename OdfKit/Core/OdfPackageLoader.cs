@@ -152,7 +152,7 @@ internal static class OdfPackageLoader
         if (!OdfWholesomeEncryption.IsWholesomePackage(package))
             return false;
 
-        byte[]? inner = OdfWholesomeEncryption.TryDecryptInnerPackage(package, ctx.LoadOptions.Password ?? string.Empty);
+        byte[]? inner = OdfWholesomeEncryption.TryDecryptInnerPackage(package, ctx.LoadOptions);
         if (inner is null)
             return false;
 

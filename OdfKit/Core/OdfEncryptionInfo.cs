@@ -156,6 +156,19 @@ public sealed class OdfOpenPgpEncryptedKeyInfo
     public byte[] KeyPacket { get; set; } = [];
 
     /// <summary>
+    /// Gets or sets the OpenPGP message that transports the package session key.
+    /// 取得或設定用來傳送封裝工作階段金鑰的 OpenPGP 訊息。
+    /// </summary>
+    /// <remarks>
+    /// This value is serialized as <c>manifest:CipherValue</c>. The optional
+    /// <see cref="KeyPacket"/> property represents <c>manifest:PGPKeyPacket</c>
+    /// and is not the encrypted session-key payload.
+    /// 此值會序列化為 <c>manifest:CipherValue</c>。選用的 <see cref="KeyPacket"/>
+    /// 代表 <c>manifest:PGPKeyPacket</c>，不是加密後的工作階段金鑰內容。
+    /// </remarks>
+    public byte[] CipherValue { get; set; } = [];
+
+    /// <summary>
     /// Gets vendor-specific encrypted-key metadata properties.
     /// 取得供特定供應商使用的 encrypted-key 中繼資料屬性。
     /// </summary>

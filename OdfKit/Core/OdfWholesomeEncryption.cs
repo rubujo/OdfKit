@@ -68,7 +68,7 @@ internal static class OdfWholesomeEncryption
     /// <summary>
     /// 解密整包加密項目並回傳內層 ODF 封裝的位元組；非此形狀時回傳 <see langword="null"/>。
     /// </summary>
-    internal static byte[]? TryDecryptInnerPackage(OdfPackage package, string password)
+    internal static byte[]? TryDecryptInnerPackage(OdfPackage package, OdfLoadOptions loadOptions)
     {
         if (!package.Entries.TryGetValue(EncryptedPackageEntryName, out OdfPackageEntry? entry))
             return null;
@@ -94,7 +94,19 @@ internal static class OdfWholesomeEncryption
         if (container.Length <= GcmNonceLength + GcmTagLength)
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_GcmDecryptionFailed"));
 
-        byte[] derivedKey = DeriveKey(info, password);
+        if (info.OpenPgpEncryptedKeys.Count > 0)
+        {
+            IOdfCryptographyProvider? provider = loadOptions.CryptographyProvider;
+            if (provider is null || !provider.CanHandle(info))
+            {
+                throw new CryptographicException(
+                    OdfLocalizer.GetMessage("Err_OdfOpenPgpCryptographyProvider_OpenpgpDecryptionFailedUnable"));
+            }
+
+            return provider.Decrypt(container, info, loadOptions);
+        }
+
+        byte[] derivedKey = DeriveKey(info, loadOptions.Password ?? string.Empty);
         byte[] deflated;
         try
         {
@@ -284,7 +296,7 @@ internal static class OdfWholesomeEncryption
     /// <summary>
     /// 解開 <c>IV ‖ 密文 ‖ tag</c> 佈局的 AES-256-GCM 容器。
     /// </summary>
-    private static byte[] DecryptGcm(byte[] container, byte[] key)
+    internal static byte[] DecryptGcm(byte[] container, byte[] key)
     {
         byte[] nonce = new byte[GcmNonceLength];
         Buffer.BlockCopy(container, 0, nonce, 0, GcmNonceLength);
@@ -462,7 +474,7 @@ internal static class OdfWholesomeEncryption
     /// <summary>
     /// 將解密後的 deflate 位元組還原為內層 ODF 封裝，並套用載入選項的資源預算。
     /// </summary>
-    private static byte[] Inflate(byte[] deflated, OdfLoadOptions loadOptions)
+    internal static byte[] Inflate(byte[] deflated, OdfLoadOptions loadOptions)
     {
         using var source = new MemoryStream(deflated);
         using var inflater = new DeflateStream(source, CompressionMode.Decompress);

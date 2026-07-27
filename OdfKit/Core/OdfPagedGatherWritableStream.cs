@@ -235,6 +235,46 @@ public sealed class OdfPagedGatherWritableStream : Stream
         }
     }
 
+#if NETCOREAPP2_1_OR_GREATER
+    /// <summary>
+    /// Writes the buffer asynchronously without cancellation.
+    /// 在不可取消的情況下非同步寫入緩衝區。
+    /// </summary>
+    /// <param name="buffer">The buffer to write. / 要寫入的緩衝區。</param>
+    /// <returns>A value task representing the write operation. / 代表寫入作業的值工作。</returns>
+    public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer)
+        => WriteAsync(buffer, CancellationToken.None);
+
+    /// <summary>
+    /// Writes a memory buffer asynchronously.
+    /// 非同步寫入記憶體緩衝區。
+    /// </summary>
+    /// <inheritdoc />
+    public override async ValueTask WriteAsync(
+        ReadOnlyMemory<byte> buffer,
+        CancellationToken cancellationToken)
+    {
+        ThrowIfDisposed();
+        int written = 0;
+        while (written < buffer.Length)
+        {
+            int toCopy = Math.Min(_pageSize - _activeCount, buffer.Length - written);
+            buffer.Slice(written, toCopy).Span.CopyTo(_activePage.AsSpan(_activeCount));
+            _activeCount += toCopy;
+            written += toCopy;
+
+            if (_activeCount == _pageSize)
+            {
+                CommitActivePage();
+                if (_fullPages.Count == _pagesPerFlush)
+                {
+                    await FlushPagesAsync(includeActivePage: false, cancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+    }
+#endif
+
     /// <summary>
     /// Releases unmanaged resources.
     /// 釋放非受控資源。

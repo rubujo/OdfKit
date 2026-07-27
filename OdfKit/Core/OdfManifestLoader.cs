@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Security;
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using OdfKit.Compliance;
 
@@ -34,19 +35,32 @@ internal static class OdfManifestLoader
 
         OdfPackageEntry? currentEntry = null;
         OdfEncryptionInfo? currentEncryptionInfo = null;
+        OdfOpenPgpEncryptedKeyInfo? currentEncryptedKey = null;
 
         using XmlReader reader = XmlReader.Create(stream, settings);
         while (reader.Read())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                ParseElement(reader, context, ref currentEntry, ref currentEncryptionInfo);
+                ParseElement(
+                    reader,
+                    context,
+                    ref currentEntry,
+                    ref currentEncryptionInfo,
+                    ref currentEncryptedKey);
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                ParseEndElement(reader, ref currentEntry, ref currentEncryptionInfo);
+                ParseEndElement(
+                    reader,
+                    context,
+                    ref currentEntry,
+                    ref currentEncryptionInfo,
+                    ref currentEncryptedKey);
             }
         }
+
+        AttachPackageEncryptedKeys(context);
     }
 
     /// <summary>
@@ -86,7 +100,8 @@ internal static class OdfManifestLoader
         XmlReader reader,
         OdfManifestLoadContext context,
         ref OdfPackageEntry? currentEntry,
-        ref OdfEncryptionInfo? currentEncryptionInfo)
+        ref OdfEncryptionInfo? currentEncryptionInfo,
+        ref OdfOpenPgpEncryptedKeyInfo? currentEncryptedKey)
     {
         if (reader.LocalName == "manifest" && reader.NamespaceURI == OdfNamespaces.Manifest)
         {
@@ -146,6 +161,49 @@ internal static class OdfManifestLoader
 
             reader.MoveToElement();
             return;
+        }
+
+        if (reader.LocalName == "encrypted-key" && reader.NamespaceURI == OdfNamespaces.Manifest)
+        {
+            if (currentEncryptionInfo is not null)
+            {
+                ParseLegacyEncryptedKey(reader, currentEncryptionInfo);
+                return;
+            }
+
+            currentEncryptedKey = new OdfOpenPgpEncryptedKeyInfo();
+            return;
+        }
+
+        if (currentEncryptedKey is not null)
+        {
+            if (reader.LocalName == "encryption-method" && reader.NamespaceURI == OdfNamespaces.Manifest)
+            {
+                currentEncryptedKey.AlgorithmName =
+                    reader.GetAttribute("PGPAlgorithm", OdfNamespaces.Manifest)
+                    ?? reader.GetAttribute("PGPAlgorithm")
+                    ?? string.Empty;
+                return;
+            }
+
+            if (reader.LocalName == "PGPKeyID" && reader.NamespaceURI == OdfNamespaces.Manifest)
+            {
+                byte[] keyId = ReadBase64Element(reader);
+                currentEncryptedKey.KeyId = Encoding.UTF8.GetString(keyId).TrimEnd('\0');
+                return;
+            }
+
+            if (reader.LocalName == "PGPKeyPacket" && reader.NamespaceURI == OdfNamespaces.Manifest)
+            {
+                currentEncryptedKey.KeyPacket = ReadBase64Element(reader);
+                return;
+            }
+
+            if (reader.LocalName == "CipherValue" && reader.NamespaceURI == OdfNamespaces.Manifest)
+            {
+                currentEncryptedKey.CipherValue = ReadBase64Element(reader);
+                return;
+            }
         }
 
         if (currentEncryptionInfo is null)
@@ -209,40 +267,6 @@ internal static class OdfManifestLoader
             }
 
             reader.MoveToElement();
-            return;
-        }
-
-        if (reader.LocalName == "encrypted-key" && reader.NamespaceURI == OdfNamespaces.Manifest)
-        {
-            var encryptedKey = new OdfOpenPgpEncryptedKeyInfo
-            {
-                KeyId = reader.GetAttribute("key-id", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-id") ?? string.Empty,
-                Recipient = reader.GetAttribute("recipient", OdfNamespaces.Manifest) ?? reader.GetAttribute("recipient"),
-                AlgorithmName = reader.GetAttribute("algorithm-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("algorithm-name") ?? string.Empty
-            };
-
-            for (int i = 0; i < reader.AttributeCount; i++)
-            {
-                reader.MoveToAttribute(i);
-                if (reader.NamespaceURI == OdfNamespaces.Manifest &&
-                    reader.LocalName is not "key-id" and not "recipient" and not "algorithm-name")
-                {
-                    encryptedKey.ExtensionProperties[reader.LocalName] = reader.Value;
-                }
-            }
-
-            reader.MoveToElement();
-
-            if (reader.IsEmptyElement)
-            {
-                currentEncryptionInfo.OpenPgpEncryptedKeys.Add(encryptedKey);
-                return;
-            }
-
-            string keyPacket = reader.ReadElementContentAsString();
-            if (!string.IsNullOrWhiteSpace(keyPacket))
-                encryptedKey.KeyPacket = Convert.FromBase64String(keyPacket.Trim());
-            currentEncryptionInfo.OpenPgpEncryptedKeys.Add(encryptedKey);
             return;
         }
 
@@ -344,10 +368,19 @@ internal static class OdfManifestLoader
 
     private static void ParseEndElement(
         XmlReader reader,
+        OdfManifestLoadContext context,
         ref OdfPackageEntry? currentEntry,
-        ref OdfEncryptionInfo? currentEncryptionInfo)
+        ref OdfEncryptionInfo? currentEncryptionInfo,
+        ref OdfOpenPgpEncryptedKeyInfo? currentEncryptedKey)
     {
-        if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
+        if (reader.LocalName == "encrypted-key"
+            && reader.NamespaceURI == OdfNamespaces.Manifest
+            && currentEncryptedKey is not null)
+        {
+            context.PackageOpenPgpEncryptedKeys.Add(currentEncryptedKey);
+            currentEncryptedKey = null;
+        }
+        else if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
         {
             currentEntry = null;
             currentEncryptionInfo = null;
@@ -355,6 +388,65 @@ internal static class OdfManifestLoader
         else if (reader.LocalName == "encryption-data" && reader.NamespaceURI == OdfNamespaces.Manifest)
         {
             currentEncryptionInfo = null;
+        }
+    }
+
+    private static void ParseLegacyEncryptedKey(XmlReader reader, OdfEncryptionInfo encryptionInfo)
+    {
+        var encryptedKey = new OdfOpenPgpEncryptedKeyInfo
+        {
+            KeyId = reader.GetAttribute("key-id", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-id") ?? string.Empty,
+            Recipient = reader.GetAttribute("recipient", OdfNamespaces.Manifest) ?? reader.GetAttribute("recipient"),
+            AlgorithmName = reader.GetAttribute("algorithm-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("algorithm-name") ?? string.Empty
+        };
+
+        for (int i = 0; i < reader.AttributeCount; i++)
+        {
+            reader.MoveToAttribute(i);
+            if (reader.NamespaceURI == OdfNamespaces.Manifest
+                && reader.LocalName is not "key-id" and not "recipient" and not "algorithm-name")
+            {
+                encryptedKey.ExtensionProperties[reader.LocalName] = reader.Value;
+            }
+        }
+
+        reader.MoveToElement();
+        if (!reader.IsEmptyElement)
+            encryptedKey.KeyPacket = ReadBase64Element(reader);
+        encryptionInfo.OpenPgpEncryptedKeys.Add(encryptedKey);
+    }
+
+    private static byte[] ReadBase64Element(XmlReader reader)
+    {
+        // ReadString 會停在目前元素的 end tag；外層 reader.Read() 才前進到下一個 sibling。
+        // ReadElementContentAsString 會直接越過 end tag，造成外層迴圈再 Read 時跳過相鄰元素。
+        string value = reader.ReadString();
+        return string.IsNullOrWhiteSpace(value)
+            ? []
+            : Convert.FromBase64String(value.Trim());
+    }
+
+    private static void AttachPackageEncryptedKeys(OdfManifestLoadContext context)
+    {
+        if (context.PackageOpenPgpEncryptedKeys.Count == 0)
+            return;
+
+        foreach (OdfPackageEntry entry in context.Entries.Values)
+        {
+            if (entry.EncryptionInfo is not { } info || info.OpenPgpEncryptedKeys.Count > 0)
+                continue;
+
+            foreach (OdfOpenPgpEncryptedKeyInfo encryptedKey in context.PackageOpenPgpEncryptedKeys)
+            {
+                info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+                {
+                    KeyId = encryptedKey.KeyId,
+                    Recipient = encryptedKey.Recipient,
+                    AlgorithmName = encryptedKey.AlgorithmName,
+                    KeyPacket = (byte[])encryptedKey.KeyPacket.Clone(),
+                    CipherValue = (byte[])encryptedKey.CipherValue.Clone()
+                });
+            }
         }
     }
 }
@@ -393,6 +485,11 @@ internal sealed class OdfManifestLoadContext
     /// 輸出：file-entry 結構問題清單。
     /// </summary>
     public List<OdfManifestFileEntryIssue> FileEntryIssues { get; set; } = null!;
+
+    /// <summary>
+    /// 從 manifest 根層解析出的 package-wide OpenPGP 金鑰傳送資訊。
+    /// </summary>
+    public List<OdfOpenPgpEncryptedKeyInfo> PackageOpenPgpEncryptedKeys { get; } = [];
 
     /// <summary>
     /// 輸出：manifest 根節點資訊。

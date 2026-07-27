@@ -21,6 +21,7 @@ const OdfKit.Core.OdfEncryption.DefaultPbkdf2IterationCount = 100000 -> int
 const OdfKit.Core.OdfEncryption.MaxPbkdf2IterationCount = 10000000 -> int
 const OdfKit.Core.OdfEncryption.OneKilobyteChecksumLength = 1024 -> int
 const OdfKit.Core.OdfEncryption.OpenPgpAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#openpgp" -> string!
+const OdfKit.Core.OdfEncryption.OpenPgpKeyTransportAlgorithmUri = "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" -> string!
 const OdfKit.Core.OdfEncryption.Sha1OneKilobyteChecksumName = "SHA1/1K" -> string!
 const OdfKit.Core.OdfEncryption.Sha1OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha1-1k" -> string!
 const OdfKit.Core.OdfEncryption.Sha256OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha256-1k" -> string!
@@ -1142,6 +1143,8 @@ OdfKit.Core.OdfOpenPgpCryptographyProvider.OdfOpenPgpCryptographyProvider(OdfKit
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.AlgorithmName.get -> string!
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.AlgorithmName.set -> void
+OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.CipherValue.get -> byte[]!
+OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.CipherValue.set -> void
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.ExtensionProperties.get -> System.Collections.Generic.Dictionary<string!, string!>!
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.KeyId.get -> string!
 OdfKit.Core.OdfOpenPgpEncryptedKeyInfo.KeyId.set -> void
@@ -17122,7 +17125,8 @@ OdfKit.Styles.OdfStyleEngine.GC() -> int
 OdfKit.Styles.OdfStyleEngine.GetOrCreateLocalStyle(OdfKit.DOM.OdfNode! elementNode, string! family) -> OdfKit.DOM.OdfNode!
 OdfKit.Styles.OdfStyleEngine.GetStyleProperty(string! styleName, string! propertyLocalName, string! propertyNsUri, string! styleFamily) -> string?
 OdfKit.Styles.OdfStyleEngine.OdfStyleEngine(OdfKit.DOM.OdfNode! contentRoot, OdfKit.DOM.OdfNode! stylesRoot) -> void
-OdfKit.Styles.OdfStyleEngine.OnStyleChanging -> System.Action<OdfKit.DOM.OdfNode!, string!>?
+OdfKit.Styles.OdfStyleEngine.OnStyleChanging.get -> System.Action<OdfKit.DOM.OdfNode!, string!>?
+OdfKit.Styles.OdfStyleEngine.OnStyleChanging.set -> void
 OdfKit.Styles.OdfStyleEngine.RebuildStyleIndex() -> void
 OdfKit.Styles.OdfStyleEngine.SetLocalStyleProperty(OdfKit.DOM.OdfNode! elementNode, string! family, string! propElementLocalName, string! propAttrLocalName, string! propAttrNsUri, string? value) -> void
 OdfKit.Styles.OdfStyleEngine.SetLocalStyleProperty(OdfKit.DOM.OdfNode! elementNode, string! family, string! propElementLocalName, string! propAttrLocalName, string! propAttrNsUri, string? value, string? propAttrPrefix) -> void
@@ -17392,6 +17396,7 @@ OdfKit.Text.OdfImageLayout.Wrap.get -> string?
 OdfKit.Text.OdfImageLayout.Wrap.set -> void
 OdfKit.Text.OdfIndex
 OdfKit.Text.OdfIndex.BodyNode.get -> OdfKit.DOM.OdfNode?
+OdfKit.Text.OdfIndex.Doc.get -> OdfKit.Text.TextDocument!
 OdfKit.Text.OdfIndex.FindChild(OdfKit.DOM.OdfNode! parent, string! localName, string! ns) -> OdfKit.DOM.OdfNode?
 OdfKit.Text.OdfIndex.FindOrCreateChild(OdfKit.DOM.OdfNode! parent, string! localName, string! ns, string! prefix) -> OdfKit.DOM.OdfNode!
 OdfKit.Text.OdfIndex.Name.get -> string!
@@ -18646,7 +18651,6 @@ override OdfKit.Text.TextDocument.ClearTemplateUserContent() -> void
 override OdfKit.Text.TextDocument.GetDefaultContentXml() -> string!
 override OdfKit.Text.TextDocument.GetDefaultStylesXml() -> string!
 override OdfKit.Text.TextDocument.MergeContentNodes(OdfKit.Core.OdfDocument! sourceDoc, OdfKit.Core.OdfMergeOptions! options, System.Collections.Generic.Dictionary<string!, string!>! renameMap) -> void
-readonly OdfKit.Text.OdfIndex.Doc -> OdfKit.Text.TextDocument!
 static OdfKit.Chart.ChartDocument.Builder() -> OdfKit.Chart.ChartDocumentBuilder!
 static OdfKit.Chart.ChartDocument.Create(OdfKit.Spreadsheet.OdfChartDefinition! chartDefinition) -> OdfKit.Chart.ChartDocument!
 static OdfKit.Chart.ChartDocument.CreateBubble(string? title, params OdfKit.Chart.OdfBubbleChartSeriesRequest![]! series) -> OdfKit.Chart.ChartDocument!

@@ -209,7 +209,7 @@ static IReadOnlyList<string> DiscoverContentPaths(IReadOnlyDictionary<string, st
             "content-extensions",
             ".txt,.html,.htm,.cshtml,.razor,.aspx,.ascx,.master,.resx,.json,.xml,.csv,.md")
         .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Select(extension => extension.StartsWith(".", StringComparison.Ordinal) ? extension : $".{extension}")
+        .Select(extension => extension.StartsWith('.') ? extension : $".{extension}")
         .ToHashSet(StringComparer.OrdinalIgnoreCase);
     if (extensions.Count == 0 || extensions.Count > 64)
     {

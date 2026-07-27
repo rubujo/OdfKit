@@ -48,6 +48,10 @@
   實機開啟由每週 `libreoffice-interop.yml` 的雙 TFM UNO 測試守備；目前來源產生的 manifest
   則由 `odf-external-baseline.yml` 以固定 SHA-256 的 LibreOffice extended schema 與 Jing 驗證。
   兩者仍不進入無外部應用程式依賴的主 CI 煙霧分片。
+- OpenPGP 外部 baseline 以臨時 GnuPG RSA 金鑰驗證 OdfKit 產生的完整 encrypted message，
+  並以 Jing 驗證根層 `manifest:encrypted-key`；反向路徑強制 GnuPG 產生 LibrePGP tag 20
+  AES-OCB message，驗證 OdfKit 解密與竄改拒絕。每週 LibreOffice workflow 另以同樣的臨時
+  真實金鑰執行 OdfKit 寫入、LibreOffice 解密及重新儲存、OdfKit 再開啟的雙向測試。
 
 ## 安全邊界 corpus
 

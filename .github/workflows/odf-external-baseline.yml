@@ -7,6 +7,7 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'OdfKit.Tests/OdfExternalValidatorAsyncTests.cs'
       - 'OdfKit.Tests/OdfCoverageContractTests.cs'
+      - 'OdfKit.Tests/OpenPgpExternalInteropTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
       - 'eng/Install-Jing.ps1'
@@ -27,6 +28,7 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'OdfKit.Tests/OdfExternalValidatorAsyncTests.cs'
       - 'OdfKit.Tests/OdfCoverageContractTests.cs'
+      - 'OdfKit.Tests/OpenPgpExternalInteropTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
       - 'eng/Install-Jing.ps1'
@@ -177,6 +179,24 @@ jobs:
             -JingJar '${{ steps.install-jing.outputs.jar_path }}' `
             -LibreOfficeManifestSchema '${{ steps.install-libreoffice-schema.outputs.schema_path }}' `
             -NoBuild
+
+      - name: Validate OpenPGP transport and manifest with GnuPG and Jing
+        shell: pwsh
+        env:
+          ODFKIT_RUN_GNUPG_INTEROP: '1'
+          ODFKIT_OPENPGP_OUTPUT_DIR: ${{ runner.temp }}/odfkit-openpgp
+        run: |
+          $gpg = (Get-Command gpg -ErrorAction Stop).Source
+          $env:ODFKIT_GPG_PATH = $gpg
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            --configuration Release `
+            --framework net10.0 `
+            --no-build `
+            --no-restore `
+            --filter 'FullyQualifiedName=OdfKit.Tests.OpenPgpExternalInteropTests.GnuPg_DecryptsOdfKitSessionKey_AndPackageRoundTrips'
+          java -jar '${{ steps.install-jing.outputs.jar_path }}' `
+            -i '${{ steps.install-libreoffice-schema.outputs.schema_path }}' `
+            "$env:ODFKIT_OPENPGP_OUTPUT_DIR/openpgp-manifest.xml"
 
       - name: Validate applicable ODF package parity
         shell: pwsh

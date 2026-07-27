@@ -168,14 +168,40 @@ public sealed class OdfDirectIoWritableStream : Stream
             return;
         }
 
-        int remaining = count;
-        int currentOffset = offset;
+        WriteDirect(buffer.AsSpan(offset, count));
+    }
+
+#if NETCOREAPP2_1_OR_GREATER
+    /// <summary>
+    /// Writes a span directly to the underlying stream.
+    /// 將唯讀範圍直接寫入底層資料流。
+    /// </summary>
+    /// <inheritdoc />
+    public override void Write(ReadOnlySpan<byte> buffer)
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(OdfDirectIoWritableStream));
+
+        if (_isFallback)
+        {
+            _fileStream!.Write(buffer);
+            return;
+        }
+
+        WriteDirect(buffer);
+    }
+#endif
+
+    private void WriteDirect(ReadOnlySpan<byte> buffer)
+    {
+        int remaining = buffer.Length;
+        int currentOffset = 0;
 
         while (remaining > 0)
         {
             int space = SectorSize - _bufferOffset;
             int toCopy = Math.Min(space, remaining);
-            buffer.AsSpan(currentOffset, toCopy).CopyTo(DirectSpan.Slice(_bufferOffset, toCopy));
+            buffer.Slice(currentOffset, toCopy).CopyTo(DirectSpan.Slice(_bufferOffset, toCopy));
 
             _bufferOffset += toCopy;
             currentOffset += toCopy;
@@ -233,6 +259,40 @@ public sealed class OdfDirectIoWritableStream : Stream
             return Task.FromException(ex);
         }
     }
+
+#if NETCOREAPP2_1_OR_GREATER
+    /// <summary>
+    /// Writes the buffer asynchronously without cancellation.
+    /// 在不可取消的情況下非同步寫入緩衝區。
+    /// </summary>
+    /// <param name="buffer">The buffer to write. / 要寫入的緩衝區。</param>
+    /// <returns>A value task representing the write operation. / 代表寫入作業的值工作。</returns>
+    public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer)
+        => WriteAsync(buffer, CancellationToken.None);
+
+    /// <summary>
+    /// Writes a memory buffer asynchronously.
+    /// 非同步寫入記憶體緩衝區。
+    /// </summary>
+    /// <inheritdoc />
+    public override ValueTask WriteAsync(
+        ReadOnlyMemory<byte> buffer,
+        CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return ValueTask.FromCanceled(cancellationToken);
+
+        try
+        {
+            Write(buffer.Span);
+            return ValueTask.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            return ValueTask.FromException(ex);
+        }
+    }
+#endif
 
     /// <summary>
     /// Releases unmanaged resources.

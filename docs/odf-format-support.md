@@ -534,7 +534,20 @@ LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKi
 
 已知缺口：
 
-- OpenPGP 路徑由 `IOdfCryptographyProvider` 提供，其 checksum 維持 OdfKit 自洽形狀。
+- OpenPGP 寫入已改為 ODF 1.4 Part 2 的封裝形狀：整個 package 共用 256-bit session key，
+  entry 先 deflate、以壓縮後未加密資料前 1024 bytes 計算 `#sha256-1k`，再以 AES-256-CBC
+  加密並以 ZIP `STORED` 保存。收件人的完整 OpenPGP encrypted message 位於根層
+  `manifest:encrypted-key`／`CipherData`／`CipherValue`，entry 的 key derivation 只宣告 `PGP`。
+  `OpenPgpExternalInteropTests` 以臨時真實 RSA 金鑰確認 GnuPG 能解出 OdfKit session key，
+  `odf-external-baseline.yml` 再以 Jing 驗證執行期產生的 manifest。
+- 反向讀取完整 RFC 4880 OpenPGP message、LibrePGP tag 20 v1 AES-OCB message 與早期
+  OdfKit 單一 PKESK payload 均保留。tag 20 由 OdfKit 驗證分塊與 final authentication tag，
+  因為 BouncyCastle.Cryptography 2.6.2 的高階 OpenPGP parser 尚未支援此封包；實機測試
+  強制 GnuPG 2.5.21 產生 tag 20，並確認末端竄改會遭拒絕。
+- `LibreOfficeUno_OpenPgpRealKeyBidirectionalRoundTrip` 以臨時 RSA 金鑰驗證 OdfKit 寫入後
+  LibreOffice 26.2.4.2 可解密並重新儲存；LibreOffice 轉出的 wholesome AES-256-GCM +
+  OpenPGP key transport 封裝再由 OdfKit 解密，且核對 LibreOffice 新增內容與根層
+  `manifest:encrypted-key`。此測試由每週雙 TFM workflow 強制執行。
 - `.odc`、`.odb`、`.odf`、`.odi` 已納入 schema v4 深度語意證據契約：
   ODC 補齊單一序列移除，ODB 補齊 table／query 更新與集合清除，ODF 補齊 token 移除與清除，
   ODI 補齊保留框架版面／替代文字時的影像內容替換；既有圖表樣式、資料庫 schema、

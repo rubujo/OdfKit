@@ -29,7 +29,7 @@ public partial class OdfParagraph
     /// The owning text document.
     /// 取得所屬的文字文件。
     /// </summary>
-    protected readonly TextDocument Doc;
+    protected TextDocument Doc { get; }
 
     /// <summary>
     /// Gets or sets the paragraph's text content.

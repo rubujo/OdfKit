@@ -26,7 +26,7 @@ public partial class OdfStyleEngine
     /// Provides the member member.
     /// 樣式變更時發生的事件。
     /// </summary>
-    public Action<OdfNode, string>? OnStyleChanging;
+    public Action<OdfNode, string>? OnStyleChanging { get; set; }
 
     // 已載入樣式的登錄表
     private readonly Dictionary<string, OdfNode> _automaticStyles = new(StringComparer.Ordinal);

@@ -26,6 +26,17 @@ namespace OdfKit.WebFontWorkerProcessSmoke;
 
 internal static class Program
 {
+    private static readonly JsonSerializerOptions s_indentedJsonOptions = new()
+    {
+        WriteIndented = true
+    };
+
+    private static readonly JsonSerializerOptions s_manifestJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     public static async Task<int> Main(string[] args)
     {
         if (args.Length is not (7 or 8))
@@ -230,7 +241,7 @@ internal static class Program
         };
         await File.WriteAllTextAsync(
             string.Concat(counterPath, ".metrics.json"),
-            JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true }),
+            JsonSerializer.Serialize(evidence, s_indentedJsonOptions),
             cancellationToken).ConfigureAwait(false);
 
         if (cacheHitRatio < 0.85
@@ -277,11 +288,7 @@ internal static class Program
         };
         await File.WriteAllTextAsync(
             Path.Combine(rootPath, "webfonts.json"),
-            JsonSerializer.Serialize(initialManifest, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters = { new JsonStringEnumConverter() }
-            }),
+            JsonSerializer.Serialize(initialManifest, s_manifestJsonOptions),
             cancellationToken).ConfigureAwait(false);
 
         string apiKey = Guid.NewGuid().ToString("N");
@@ -532,7 +539,7 @@ internal static class Program
     }
 
     private static async Task VerifyMissingUnicodeRejectedAsync(
-        IWebFontSubsetEngine engine,
+        ManagedOpenTypeWebFontSubsetEngine engine,
         string destinationDirectory,
         string sourceSha256,
         CancellationToken cancellationToken)

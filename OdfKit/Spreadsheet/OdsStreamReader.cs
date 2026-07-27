@@ -16,6 +16,10 @@ namespace OdfKit.Spreadsheet;
 /// Provides the OdsStreamReader API.
 /// 以低記憶體流式方式逐列讀取 ODS 試算表，適用於大型資料集。
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Design",
+    "CA1010:Generic interface should also be implemented",
+    Justification = "DbDataReader defines the non-generic enumeration contract; adding a stateful generic sequence would conflict with its cursor semantics.")]
 public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 {
     private readonly ZipArchive _zip;

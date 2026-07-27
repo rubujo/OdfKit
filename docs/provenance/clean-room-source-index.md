@@ -28,12 +28,14 @@
 
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
-| ODF 1.3 OpenPGP session key 加解密封包（PKESK）二進位結構 | OpenPGP Message Format（RFC 4880） | `OdfBouncyCastleOpenPgpProvider.cs`、`OdfBouncyCastleOpenPgpProvider.Decryption.cs`（`DecodePkeskPacket`） | `OdfBouncyCastleOpenPgpProviderTests` |
+| ODF 1.4 OpenPGP 根層 encrypted-key、entry deflate/checksum 與 PGP KDF | ODF 1.4 Part 2 package specification 與官方 manifest RELAX NG | `OdfOpenPgpCryptographyProvider.cs`、`OdfPackageManifestWriter.cs`、`OdfManifestLoader.cs` | `EncryptionTests`、`OpenPgpExternalInteropTests`、`odf-external-baseline.yml` 的 Jing gate |
+| OpenPGP session key 完整 encrypted message 與早期單一 PKESK 相容讀取 | OpenPGP Message Format（RFC 4880）與 BouncyCastle 公開 OpenPGP API | `OdfBouncyCastleOpenPgpProvider.cs`、`OdfBouncyCastleOpenPgpProvider.Decryption.cs`（`DecodePkeskPacket`） | `OdfBouncyCastleOpenPgpProviderTests`、以臨時真實金鑰執行的 `OpenPgpExternalInteropTests` |
 | ECDH（X25519 與傳統曲線）Key Derivation Function | Elliptic Curve Cryptography (ECC) in OpenPGP（RFC 6637 §8） | `OdfBouncyCastleOpenPgpProvider.Ecdh.cs`（`ComputeEcdhKdf`、`ApplyEcdhPkcs5Padding`、`AesKeyWrap128`/`AesKeyUnwrap128`） | `OdfBouncyCastleOpenPgpProviderTests` |
 
-上述實作直接對照 RFC 4880 與 RFC 6637 規格文本手動解析二進位封包與計算 KDF，未複製
-BouncyCastle 或其他 OpenPGP 實作（例如 GnuPG、RNP）的原始碼；僅使用 BouncyCastle 提供的
-底層基礎密碼學元件（RSA/ElGamal 加解密、AES 引擎、`Rfc3394WrapEngine`）。`DecodePkeskPacket`
+上述實作直接對照 ODF 1.4 Part 2、RFC 4880 與 RFC 6637 規格文本處理 manifest、封包與 KDF，
+未複製 LibreOffice、BouncyCastle 或其他 OpenPGP 實作（例如 GnuPG、RNP）的原始碼；完整
+encrypted message 透過 BouncyCastle 公開 OpenPGP API 建立／讀取，舊式 PKESK 與 ECDH 則使用
+其底層基礎密碼學元件（RSA/ElGamal 加解密、AES 引擎、`Rfc3394WrapEngine`）。`DecodePkeskPacket`
 對任意輸入的例外契約由 `OdfBouncyCastleOpenPgpProviderTests` 中的隨機化邊界測試
 （`DecryptSessionKey_RandomizedMalformedPackets_NeverThrowsUndocumentedExceptionType`）鎖定。
 

@@ -37,6 +37,18 @@ internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
         return _baseStream.ReadAsync(buffer, offset, count, cancellationToken);
     }
 
+#if NETCOREAPP2_1_OR_GREATER
+    public override System.Threading.Tasks.ValueTask WriteAsync(
+        ReadOnlyMemory<byte> buffer,
+        System.Threading.CancellationToken cancellationToken = default)
+        => _baseStream.WriteAsync(buffer, cancellationToken);
+
+    public override System.Threading.Tasks.ValueTask<int> ReadAsync(
+        Memory<byte> buffer,
+        System.Threading.CancellationToken cancellationToken = default)
+        => _baseStream.ReadAsync(buffer, cancellationToken);
+#endif
+
     public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
     {
         return _baseStream.FlushAsync(cancellationToken);

@@ -18,6 +18,10 @@ namespace OdfKit.Spreadsheet;
 /// 將任意 <see cref="IEnumerable{T}"/> 或 <see cref="IAsyncEnumerable{T}"/> 物件序列轉接為 <see cref="System.Data.Common.DbDataReader"/>，把 <typeparamref name="T"/> 的每個可讀公開執行個體屬性對應到一個資料行。這讓任意物件序列（例如 Entity Framework Core 查詢投影）可以直接餵給 <see cref="OdsStreamWriter.WriteDataAsync(System.Data.Common.DbDataReader, bool, CancellationToken)"/> 或其他 <see cref="System.Data.Common.DbDataReader"/> 消費者（如 <c>SqlBulkCopy</c>），且 OdfKit 本身不需相依任何特定 ORM 或資料庫 provider。
 /// </summary>
 /// <typeparam name="T">The element type whose readable public instance properties become data reader columns. / 元素型別，其可讀公開執行個體屬性將成為資料讀取器的資料行。</typeparam>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Design",
+    "CA1010:Generic interface should also be implemented",
+    Justification = "DbDataReader defines the non-generic enumeration contract; adding a stateful generic sequence would conflict with its cursor semantics.")]
 public sealed class ObjectDataReader<
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>
     : System.Data.Common.DbDataReader

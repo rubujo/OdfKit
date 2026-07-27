@@ -7,6 +7,10 @@ namespace OdfKit.Spreadsheet;
 /// Indexes worksheet cells by row, column, or address.
 /// 提供工作表儲存格的索引入口。
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Naming",
+    "CA1711:Identifiers should not have incorrect suffix",
+    Justification = "This established public type is an indexer collection facade; renaming it would break the worksheet API.")]
 public sealed class OdfCellCollection
 {
     private readonly OdfTableSheet _sheet;

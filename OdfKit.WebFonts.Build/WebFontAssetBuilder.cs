@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -29,6 +30,10 @@ public sealed class WebFontAssetBuilder
     /// <param name="options">The trusted build options. / 受信任的建置設定。</param>
     /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
     /// <returns>The generated manifest. / 產生的 manifest。</returns>
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "The public builder instance is an extensibility seam and changing this established method to static would break callers.")]
     public async Task<WebFontManifest> BuildAsync(
         WebFontBuildOptions options,
         CancellationToken cancellationToken = default)
@@ -410,7 +415,7 @@ public sealed class WebFontAssetBuilder
             || options.Formats.Count == 0
             || options.RequiredBrowserTargets is null
             || options.RequiredBrowserTargets.Any(
-                target => !Enum.IsDefined(typeof(WebFontBrowserTarget), target)))
+                target => !Enum.IsDefined(target)))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_ConfigurationInvalid"));
         }

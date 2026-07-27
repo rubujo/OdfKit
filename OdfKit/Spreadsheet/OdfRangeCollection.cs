@@ -7,6 +7,10 @@ namespace OdfKit.Spreadsheet;
 /// Indexes worksheet cell ranges by address.
 /// 提供工作表儲存格範圍的索引入口。
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Naming",
+    "CA1711:Identifiers should not have incorrect suffix",
+    Justification = "This established public type is an indexer collection facade; renaming it would break the worksheet API.")]
 public sealed class OdfRangeCollection
 {
     private readonly OdfTableSheet _sheet;

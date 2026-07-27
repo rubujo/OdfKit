@@ -43,6 +43,10 @@ public enum OdfPlaceholderType
     /// An object placeholder.
     /// 物件。
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1720:Identifier contains type name",
+        Justification = "Object is the normative ODF presentation placeholder token.")]
     Object,
 
     /// <summary>

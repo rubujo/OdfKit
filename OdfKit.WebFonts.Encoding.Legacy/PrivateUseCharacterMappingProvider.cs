@@ -9,7 +9,7 @@ namespace OdfKit.WebFonts.Encoding.Legacy;
 /// </summary>
 public sealed class PrivateUseCharacterMappingProvider : ICharacterMappingProvider
 {
-    private readonly IReadOnlyDictionary<string, int> _mappings;
+    private readonly Dictionary<string, int> _mappings;
 
     /// <summary>
     /// Initializes a private mapping with a tenant-scoped profile identifier.
@@ -59,7 +59,11 @@ public sealed class PrivateUseCharacterMappingProvider : ICharacterMappingProvid
                 OdfLocalizer.GetMessage("Err_WebFontLegacyEncoding_SourceRequired"));
         }
 
+#if NET5_0_OR_GREATER
+        string key = Convert.ToHexString(source);
+#else
         string key = BitConverter.ToString(source).Replace("-", string.Empty);
+#endif
         if (!_mappings.TryGetValue(key, out int scalar)
             || scalar is not (>= 0xE000 and <= 0xF8FF)
                 and not (>= 0xF0000 and <= 0xFFFFD)

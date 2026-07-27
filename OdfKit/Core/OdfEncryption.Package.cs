@@ -61,7 +61,8 @@ public static partial class OdfEncryption
             if (cryptoProvider is not null)
             {
                 decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
-                ValidateChecksumForProviderDecryption(entry.EncryptionInfo, decryptedPlaintext);
+                if (cryptoProvider is not OdfOpenPgpCryptographyProvider)
+                    ValidateChecksumForProviderDecryption(entry.EncryptionInfo, decryptedPlaintext);
             }
             else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
                 string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))
@@ -264,6 +265,13 @@ public static partial class OdfEncryption
         if (package.SaveOptions.CryptographyProvider is null)
         {
             EncryptBuiltInEntries(package, password, algorithm);
+            return;
+        }
+
+        if (algorithm == OdfEncryptionAlgorithm.OpenPgp
+            && package.SaveOptions.CryptographyProvider is OdfOpenPgpCryptographyProvider openPgpProvider)
+        {
+            openPgpProvider.EncryptPackage(package, package.SaveOptions);
             return;
         }
 
