@@ -27,9 +27,20 @@ public static partial class OdfEncryption
     public const string Aes256AlgorithmUri = "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
 
     /// <summary>
-    /// Blowfish 加密演算法的識別 URI。
+    /// ODF 傳統 Blowfish CFB 加密演算法的識別 URI（ODF 1.0～1.4 Part 2 §4.16.1）；
+    /// 回饋寬度依 OpenOffice.org 以來的實作採 64 位元區塊，見 OdfEncryption.Algorithms.cs。
     /// </summary>
-    public const string BlowfishAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc";
+    public const string BlowfishAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#blowfish";
+
+    /// <summary>
+    /// ODF 傳統 Blowfish CFB 的規範簡短名稱；`manifest:algorithm-name` 允許與 URI 等價使用。
+    /// </summary>
+    public const string BlowfishAlgorithmName = "Blowfish CFB";
+
+    /// <summary>
+    /// 早期 OdfKit 版本寫出的非規範 Blowfish CBC 識別 URI；僅供讀取既有檔案時相容比對。
+    /// </summary>
+    public const string BlowfishCbcLegacyAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc";
 
     /// <summary>
     /// OpenPGP 加密演算法的識別 URI。
@@ -42,9 +53,62 @@ public static partial class OdfEncryption
     public const string Aes256GcmAlgorithmUri = "http://www.w3.org/2009/xmlenc11#aes256-gcm";
 
     /// <summary>
-    /// Argon2id 金鑰衍生函數的識別 URI。
+    /// Argon2id 金鑰衍生函數的識別 URI；與 LibreOffice 25.8+ 的
+    /// `OpenDocument-v1.4+libreoffice-manifest-schema.rng` 一致。
     /// </summary>
-    public const string Argon2idDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id";
+    public const string Argon2idDerivationUri = "urn:org:documentfoundation:names:experimental:office:manifest:argon2id";
+
+    /// <summary>
+    /// ODF 1.5 草案預計採用的 Argon2id 識別 URI；目前只用於讀取相容。
+    /// </summary>
+    public const string Argon2idOdf15DerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.5#argon2id";
+
+    /// <summary>
+    /// 早期 OdfKit 版本寫出的非標準 Argon2id 識別 URI；僅供讀取既有檔案時相容比對。
+    /// </summary>
+    public const string Argon2idLegacyDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id";
+
+    /// <summary>
+    /// SHA-256／1K 檢查碼的識別 URI；ODF 1.2 起建議新實作採用。
+    /// </summary>
+    public const string Sha256OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha256-1k";
+
+    /// <summary>
+    /// SHA-1／1K 檢查碼的識別 URI；ODF 1.0～1.1 產出的檔案採用。
+    /// </summary>
+    public const string Sha1OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha1-1k";
+
+    /// <summary>
+    /// SHA-1／1K 檢查碼的 ODF 規範簡短名稱。
+    /// </summary>
+    public const string Sha1OneKilobyteChecksumName = "SHA1/1K";
+
+    /// <summary>
+    /// 1K 檢查碼所涵蓋的位元組數；ODF 規範定義為壓縮後未加密資料的前 1024 個位元組。
+    /// </summary>
+    public const int OneKilobyteChecksumLength = 1024;
+
+    /// <summary>
+    /// 讀取既有文件時允許的 PBKDF2 反覆運算次數上限，作為 DoS 防線。
+    /// 實務值需高於現行實作：LibreOffice 26.x 寫入 100,000 次，OWASP 對 PBKDF2-HMAC-SHA1
+    /// 的現行建議為 1,300,000 次，因此上限訂在 10,000,000。
+    /// </summary>
+    public const int MaxPbkdf2IterationCount = 10_000_000;
+
+    /// <summary>
+    /// 寫入新文件時採用的 PBKDF2 反覆運算次數。
+    /// </summary>
+    public const int DefaultPbkdf2IterationCount = 100_000;
+
+    /// <summary>
+    /// Blowfish 傳統加密的金鑰長度（位元組）；`manifest:key-size` 缺席時的規範預設。
+    /// </summary>
+    public const int BlowfishKeySizeBytes = 16;
+
+    /// <summary>
+    /// AES-256 的金鑰長度（位元組）；`manifest:key-size` 缺席時的預設。
+    /// </summary>
+    public const int Aes256KeySizeBytes = 32;
 
     /// <summary>
     /// 同時進行 Argon2id 衍生運算的上限，避免高併發解密耗盡 ThreadPool（PERF-4k）。
@@ -69,9 +133,9 @@ public static partial class OdfEncryption
         {
             throw new NullReferenceException(OdfLocalizer.GetMessage("Err_OdfEncryption_SaltCannotBeEmpty"));
         }
-        if (iterations < 1 || iterations > 50000)
+        if (iterations < 1 || iterations > MaxPbkdf2IterationCount)
         {
-            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds", iterations));
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds", iterations, MaxPbkdf2IterationCount));
         }
         if (keyLength < 0)
         {

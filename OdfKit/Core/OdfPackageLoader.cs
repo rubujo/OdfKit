@@ -48,7 +48,12 @@ internal static class OdfPackageLoader
         ctx.LoadManifest();
 
         if (ctx.LoadOptions.Password != null || ctx.LoadOptions.CryptographyProvider != null)
-            OdfEncryption.Decrypt(package, ctx.LoadOptions.Password ?? string.Empty);
+        {
+            // 整包加密（LibreOffice wholesome）先展開內層封裝；展開後內層本身未加密，
+            // 因此不再進入逐項目解密流程。
+            if (!TryExpandWholesomePackage(package, ctx))
+                OdfEncryption.Decrypt(package, ctx.LoadOptions.Password ?? string.Empty);
+        }
 
         ctx.LoadRdfMetadata();
     }
@@ -91,7 +96,12 @@ internal static class OdfPackageLoader
         ctx.LoadManifest();
 
         if (ctx.LoadOptions.Password != null || ctx.LoadOptions.CryptographyProvider != null)
-            OdfEncryption.Decrypt(package, ctx.LoadOptions.Password ?? string.Empty);
+        {
+            // 整包加密（LibreOffice wholesome）先展開內層封裝；展開後內層本身未加密，
+            // 因此不再進入逐項目解密流程。
+            if (!TryExpandWholesomePackage(package, ctx))
+                OdfEncryption.Decrypt(package, ctx.LoadOptions.Password ?? string.Empty);
+        }
 
         ctx.LoadRdfMetadata();
     }
@@ -131,6 +141,59 @@ internal static class OdfPackageLoader
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_InvalidNotFound"));
         }
+    }
+
+    /// <summary>
+    /// 展開整包加密（LibreOffice wholesome）封裝：解密後以內層 ODF 封裝取代目前的 ZIP 內容。
+    /// 非此形狀時回傳 <see langword="false"/>，由呼叫端改走逐項目解密。
+    /// </summary>
+    private static bool TryExpandWholesomePackage(OdfPackage package, OdfPackage.OdfPackageLoadCollaborators ctx)
+    {
+        if (!OdfWholesomeEncryption.IsWholesomePackage(package))
+            return false;
+
+        byte[]? inner = OdfWholesomeEncryption.TryDecryptInnerPackage(package, ctx.LoadOptions.Password ?? string.Empty);
+        if (inner is null)
+            return false;
+
+        // 以內層封裝取代外層：釋放外層 ZIP 與已註冊項目，改由內層位元組重新載入。
+        ctx.Archive?.Dispose();
+        ctx.Archive = null;
+
+        foreach (OdfPackageEntry existing in ctx.Entries.Values)
+        {
+            existing.Dispose();
+        }
+
+        ctx.Entries.Clear();
+        ctx.EntryOrder.Clear();
+        ctx.DuplicateEntryNames.Clear();
+        ctx.Manifest.Clear();
+
+        // 外層資料流與記憶體映射不再對應目前內容，必須解除關聯。
+        package.Mmf = null;
+        package.MmfEntries = null;
+
+        var innerStream = new MemoryStream(inner, writable: false);
+        ctx.UnderlyingStream = innerStream;
+        ctx.Archive = new ZipArchive(innerStream, ZipArchiveMode.Read, leaveOpen: true, Encoding.UTF8);
+
+        // LoadEntries 會在 FilePath 非 null 時改以記憶體映射讀取「原始檔案」，那仍是外層封裝；
+        // 展開期間暫時解除路徑關聯，強制它從內層資料流讀取，載入完成後再還原供存檔使用。
+        string? originalPath = package.FilePath;
+        package.FilePath = null;
+        try
+        {
+            OdfPackageZipLoader.LoadEntries(ctx.Archive, ctx);
+            LoadMimeType(ctx);
+            ctx.LoadManifest();
+        }
+        finally
+        {
+            package.FilePath = originalPath;
+        }
+
+        return true;
     }
 
 }

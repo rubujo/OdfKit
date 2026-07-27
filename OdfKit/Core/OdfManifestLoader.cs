@@ -116,7 +116,11 @@ internal static class OdfManifestLoader
 
         if (reader.LocalName == "encryption-data" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEntry is not null)
         {
-            currentEncryptionInfo = new OdfEncryptionInfo();
+            currentEncryptionInfo = new OdfEncryptionInfo
+            {
+                // manifest:size 位於 file-entry 上，是加密項目的原始未壓縮未加密大小（Part 2 §3.4.1）。
+                PlaintextSize = context.CurrentFileEntrySize
+            };
             string? checksumType = reader.GetAttribute("checksum-type", OdfNamespaces.Manifest) ?? reader.GetAttribute("checksum-type");
             string? checksumStr = reader.GetAttribute("checksum", OdfNamespaces.Manifest) ?? reader.GetAttribute("checksum");
 
@@ -182,9 +186,9 @@ internal static class OdfManifestLoader
             if (int.TryParse(iterationCountStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iterationCount))
             {
                 bool isPbkdf2 = string.Equals(currentEncryptionInfo.KeyDerivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase);
-                if (iterationCount > 50000 || (isPbkdf2 && iterationCount < 1))
+                if (iterationCount > OdfEncryption.MaxPbkdf2IterationCount || (isPbkdf2 && iterationCount < 1))
                 {
-                    throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount));
+                    throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount, OdfEncryption.MaxPbkdf2IterationCount));
                 }
 
                 currentEncryptionInfo.IterationCount = iterationCount;
@@ -262,6 +266,13 @@ internal static class OdfManifestLoader
     {
         string? path = reader.GetAttribute("full-path", OdfNamespaces.Manifest) ?? reader.GetAttribute("full-path");
         string? mediaType = reader.GetAttribute("media-type", OdfNamespaces.Manifest) ?? reader.GetAttribute("media-type");
+
+        // manifest:size 由後續的 encryption-data 取用；非加密項目維持 null。
+        string? sizeStr = reader.GetAttribute("size", OdfNamespaces.Manifest) ?? reader.GetAttribute("size");
+        context.CurrentFileEntrySize =
+            long.TryParse(sizeStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out long entrySize) && entrySize >= 0
+                ? entrySize
+                : null;
 
         var issue = new OdfManifestFileEntryIssue();
         bool hasIssue = false;
@@ -362,6 +373,11 @@ internal sealed class OdfManifestLoadContext
     /// 載入選項。
     /// </summary>
     public OdfLoadOptions LoadOptions { get; set; } = null!;
+
+    /// <summary>
+    /// 目前 file-entry 的 <c>manifest:size</c>；供隨後的 encryption-data 取得原始未加密大小。
+    /// </summary>
+    public long? CurrentFileEntrySize { get; set; }
 
     /// <summary>
     /// 輸出：full-path 至 media-type 的對應。

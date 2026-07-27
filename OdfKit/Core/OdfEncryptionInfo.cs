@@ -70,6 +70,16 @@ public sealed class OdfEncryptionInfo
     public int? StartKeySize { get; set; }
 
     /// <summary>
+    /// Gets or sets the original uncompressed, unencrypted size of the entry.
+    /// 取得或設定項目在壓縮與加密前的原始大小。
+    /// </summary>
+    /// <remarks>
+    /// ODF 1.0～1.4 Part 2 §3.4.1 規定加密項目必須以 <c>manifest:size</c> 宣告此值；
+    /// 消費端（含 LibreOffice）以它配置解壓緩衝，缺少時會拒絕開啟文件。
+    /// </remarks>
+    public long? PlaintextSize { get; set; }
+
+    /// <summary>
     /// Gets or sets vendor-specific encryption metadata properties.
     /// 取得或設定供特定供應商使用的加密中繼資料屬性。
     /// </summary>

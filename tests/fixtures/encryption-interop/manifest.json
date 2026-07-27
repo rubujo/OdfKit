@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Guard OdfKit's ability to decrypt password-protected ODF packages produced by other implementations. 守護 OdfKit 解密他家實作所產生之密碼保護 ODF 封裝的能力。",
+  "cleanRoomPolicy": "Fixture content is authored by OdfKit (a single paragraph written through TextDocument); LibreOffice is used only to apply ODF package encryption. No LibreOffice source, template, or bundled asset is copied.",
+  "password": "OdfKit-interop",
+  "producer": {
+    "application": "LibreOffice",
+    "version": "26.2.4.2",
+    "buildId": "0229ac93fcf0d7cbc6376066c6f35021cef002dc",
+    "method": "UNO storeToURL with FilterName=writer8 and a Password property, after setting /org.openoffice.Office.Common/Save/ODF DefaultVersion."
+  },
+  "fixtures": [
+    {
+      "id": "libreoffice-blowfish-cfb",
+      "path": "libreoffice-blowfish-cfb.odt",
+      "sha256": "2034c07e3c975fe20eba3a6d052b967a4babec774e79aad3eac2120be01f436c",
+      "odfDefaultVersion": 1,
+      "algorithmName": "Blowfish CFB",
+      "checksumType": "SHA1/1K",
+      "keyDerivationName": "PBKDF2",
+      "iterationCount": 100000,
+      "startKeyGeneration": null,
+      "keySize": null,
+      "notes": "ODF 1.0/1.1 legacy per-entry encryption. Omits manifest:key-size and manifest:start-key-generation, so consumers must apply the specified defaults (16 bytes, SHA-1). Cipher feedback width is the full 64-bit block despite the specification text saying 8-bit CFB."
+    },
+    {
+      "id": "libreoffice-aes256-cbc",
+      "path": "libreoffice-aes256-cbc.odt",
+      "sha256": "28cf931c81106363ab08be1292d7e1ccff5dcaa3250fd529bf98236b66dc2536",
+      "odfDefaultVersion": 4,
+      "algorithmName": "http://www.w3.org/2001/04/xmlenc#aes256-cbc",
+      "checksumType": "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha256-1k",
+      "keyDerivationName": "PBKDF2",
+      "iterationCount": 100000,
+      "startKeyGeneration": "http://www.w3.org/2000/09/xmldsig#sha256",
+      "keySize": 32,
+      "notes": "ODF 1.2/1.3 legacy per-entry encryption. The start key uses SHA-256 while the PBKDF2 pseudo-random function stays HMAC-SHA-1 per Part 2 4.16.7; conflating the two derives the wrong key."
+    },
+    {
+      "id": "libreoffice-wholesome-gcm",
+      "path": "libreoffice-wholesome-gcm.odt",
+      "sha256": "9792e330855705c3469274a035ff0b74da217c0f4592b6fcf1b85fd4a473867d",
+      "odfDefaultVersion": 3,
+      "shape": "wholesome",
+      "algorithmName": "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+      "checksumType": null,
+      "keyDerivationName": "urn:org:documentfoundation:names:experimental:office:manifest:argon2id",
+      "iterationCount": 0,
+      "startKeyGeneration": "http://www.w3.org/2001/04/xmlenc#sha256",
+      "keySize": 32,
+      "innerPackageSize": 6612,
+      "argon2": { "iterations": 3, "memoryKib": 65536, "lanes": 4 },
+      "notes": "LibreOffice 24.8+ default for ODF 1.4 (wholesome encryption). The ZIP holds only mimetype, encrypted-package and the manifest; encrypted-package is IV(12) || AES-256-GCM ciphertext || tag(16) over the deflated inner ODF package. The key is Argon2id(SHA-256(password), salt) and there is no per-entry checksum because the AEAD tag covers integrity."
+    }
+  ],
+  "expectedText": "OdfKit encryption interop fixture / 加密互通測試素材",
+  "regenerate": "See docs/odf-format-support.md. Regeneration requires a local LibreOffice; the fixtures are committed so that the decryption contract is verifiable without external tooling."
+}

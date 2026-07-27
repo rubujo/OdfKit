@@ -457,7 +457,82 @@ OdfKit 內建部分已知字型家族的平面路由名稱，但不內建任何�
 - ODG 已補強路徑、多邊形、連接線（含 `draw:points` 路由）、自定義幾何、群組、圖層、文字方塊、圖片與圖層指派讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`／`GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`）；測試見 `DrawingHighLevelApiTests`。
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
-- LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
+- `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
+- **密碼保護文件的 manifest 契約符合 ODF 1.0～1.4 Part 2 §4.16**：`manifest:checksum-type` 為
+  `urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha256-1k`，內容是壓縮後未加密資料
+  前 1024 位元組的摘要；解密端另接受 `SHA1/1K`、`#sha1-1k` 與早期 OdfKit 版本的完整摘要形狀。
+  `encryption-data` 只輸出 `checksum-type` 與 `checksum`，子元素依
+  algorithm →〔start-key-generation〕→ key-derivation 排列。AES-256-CBC 與 Blowfish 產出的
+  `META-INF/manifest.xml` 已以 Jing 對官方 `OpenDocument-v1.4-manifest-schema.rng` 實測通過。
+- **`Blowfish CFB` 依實作而非規範字面**：規範 §4.16.1 的文字是「8-bit CFB」，但被它標準化的
+  OpenOffice.org 實作用的是整個 64 位元區塊回饋 —— LibreOffice 的 `sal/rtl/cipher.cxx` 對
+  `rtl_Cipher_ModeStream` 呼叫 OpenSSL `EVP_bf_cfb()`（即 `EVP_bf_cfb64()`），其自有 fallback
+  `BF_updateCFB` 同樣是每 8 個位元組重新加密一次 IV、再逐位元組 XOR。既有檔案都是這個形狀，
+  OdfKit 因此採 CFB-64；此結論另由 LibreOffice 26.2 實機產生的加密文件逐項目解密確認。
+  這是規範文字與參考實作的落差，不是實作偏離規範。
+- **可選屬性的規範預設**：`manifest:start-key-generation` 缺席時採 SHA-1（LibreOffice 的傳統加密
+  文件不輸出該元素）；`manifest:key-size` 缺席時依演算法推導（Blowfish 16、AES-256 32）。
+  PBKDF2 反覆運算次數上限放寬至 `OdfEncryption.MaxPbkdf2IterationCount`（10,000,000）以容納
+  LibreOffice 寫入的 100,000 次與 OWASP 的現行建議；OdfKit 自身寫入採
+  `DefaultPbkdf2IterationCount`（100,000）。
+- Argon2id 金鑰衍生（AES-256-GCM 路徑）屬 extended package 功能，形狀對標 LibreOffice 的
+  `OpenDocument-v1.4+libreoffice-manifest-schema.rng`：`manifest:key-derivation-name` 為
+  `urn:org:documentfoundation:names:experimental:office:manifest:argon2id`，參數為
+  `loext:argon2-iterations`／`loext:argon2-memory`／`loext:argon2-lanes`，且不輸出
+  `manifest:iteration-count`。該 manifest 已以 Jing 對 LibreOffice schema 實測通過；官方 ODF 1.4
+  manifest schema 未定義 Argon2，因此不會（也不應）通過官方 schema。解密端另接受早期 OdfKit
+  版本的 `argon2-t`／`-m`／`-p` 與非標準 URI。
+
+### 與 LibreOffice 加密文件的互通現況
+
+以 LibreOffice 26.2.4.2 實機產生與開啟的檔案驗證：
+
+**OdfKit 讀取 LibreOffice 的加密文件**
+
+| LibreOffice 儲存設定 | 封裝形狀 | OdfKit 讀取 |
+|---|---|---|
+| ODF 1.4（預設，wholesome encryption） | 單一 `encrypted-package` entry、AES-256-GCM、Argon2id、無 checksum | ✅ 載入時自動展開內層封裝 |
+| ODF 1.2／1.3（傳統逐項目加密） | 每個 entry 各自加密、AES-256-CBC、`#sha256-1k`、PBKDF2 100,000 次 | ✅ 全部 entry 可正確解密並取得原始內容 |
+| ODF 1.0／1.1（傳統逐項目加密） | 每個 entry 各自加密、`Blowfish CFB`、`SHA1/1K`、PBKDF2 100,000 次、無 `key-size`／`start-key-generation` | ✅ 全部 entry 可正確解密並取得原始內容 |
+
+**整包加密（wholesome）的形狀**（以 LibreOffice 26.2 實機產出驗證，實作見
+`OdfWholesomeEncryption`）：ZIP 只含 `mimetype`、`encrypted-package` 與 `META-INF/manifest.xml`；
+`encrypted-package` 的位元組是 `IV(12) ‖ AES-256-GCM 密文 ‖ tag(16)`（IV 內嵌於開頭，
+`manifest:initialisation-vector` 為重複資訊），解密後為 deflate 過的內層完整 ODF 封裝，
+inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), salt)`，不使用逐項目 checksum——
+完整性由 AEAD tag 提供。OdfKit 在載入時偵測此形狀並展開內層封裝，之後的操作與一般封裝相同；
+**寫入仍採規範定義的逐項目加密**。
+
+**LibreOffice 讀取 OdfKit 的加密文件**
+
+| OdfKit 加密演算法 | LibreOffice 26.2 開啟 |
+|---|---|
+| `Blowfish CFB`（`--encryption blowfish`） | ✅ 可開啟並取得完整內容 |
+| AES-256-CBC（`--encryption aes256`，預設） | ✅ 可開啟並取得完整內容 |
+| AES-256-GCM ＋ Argon2id | ❌ 屬 extended package，LibreOffice 只在 wholesome 封裝下使用 GCM |
+
+達成雙向互通的關鍵有兩項，兩者都是規範明確、OdfKit 先前實作錯誤：
+
+- **加密項目必須以 ZIP `STORED` 寫出**。內容在加密前已 deflate，密文不可再壓縮；先前多包一層
+  ZIP DEFLATE，LibreOffice 的加密讀取路徑會拿到非預期的位元組。
+- **`PBKDF2` 的虛擬亂數函式固定為 HMAC-SHA-1**（Part 2 §4.16.7），與
+  `start-key-generation-name` 無關 —— 後者只決定密碼如何雜湊成 start key。先前把兩者綁在一起，
+  AES 路徑誤用 HMAC-SHA-256。Blowfish 因 start key 恰好也是 SHA-1 而未暴露此問題。
+  解密端保留 HMAC-SHA-256 後備路徑，既有的 OdfKit 加密檔仍可讀取。
+
+**讀取方向已納入 CI**：`tests/fixtures/encryption-interop/` 收錄 LibreOffice 26.2 實機產生的兩份
+加密素材（Blowfish CFB 與 AES-256-CBC）與其加密參數 manifest，由
+`EncryptionInteropCorpusTests` 驗證解密結果、參數契約與載入後重新儲存；素材已提交，因此
+**不需要本機 LibreOffice 即可在 CI 執行**，並掛在主 CI 的 `core-security` 煙霧分片。
+還原任一項修正都會讓對應素材失敗（已實測）。
+
+已知缺口：
+
+- **寫入** wholesome 形狀尚未支援：OdfKit 產生加密文件時一律採規範定義的逐項目加密。
+  讀入 wholesome 文件後重新儲存會得到逐項目加密（或未加密）的封裝，不會還原成整包加密。
+- **反向**（LibreOffice 開啟 OdfKit 產出）與 manifest 的 Jing schema 驗證仍需本機 LibreOffice
+  與 Jing，屬手動或排程工作流程，不在主 CI 的守備範圍。
+- OpenPGP 路徑由 `IOdfCryptographyProvider` 提供，其 checksum 維持 OdfKit 自洽形狀。
 - `.odc`、`.odb`、`.odf`、`.odi` 已納入 schema v4 深度語意證據契約：
   ODC 補齊單一序列移除，ODB 補齊 table／query 更新與集合清除，ODF 補齊 token 移除與清除，
   ODI 補齊保留框架版面／替代文字時的影像內容替換；既有圖表樣式、資料庫 schema、

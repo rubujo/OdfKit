@@ -226,7 +226,7 @@ namespace OdfKit.Tests
             // Casing mismatch in URI: startKeyGenName in DecryptEntry checks with EndsWith using StringComparison.OrdinalIgnoreCase
             // Let's verify if uppercase URI is handled
             byte[] decrypted = OdfEncryption.DecryptEntry(
-                ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
+                ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, OdfEncryption.DefaultPbkdf2IterationCount, salt, iv,
                 "HTTP://WWW.W3.ORG/2000/09/XMLDSIG#SHA256");
             Assert.Equal(plaintext, decrypted);
 
@@ -235,7 +235,7 @@ namespace OdfKit.Tests
             try
             {
                 byte[] decryptedWrong = OdfEncryption.DecryptEntry(
-                    ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
+                    ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, OdfEncryption.DefaultPbkdf2IterationCount, salt, iv,
                     "http://www.w3.org/2000/09/xmldsig#sha256 ");
                 // 若解密未拋出例外（機率極低之 PKCS7 填充巧合對齊），則解密出的資料必定不等於明文
                 Assert.NotEqual(plaintext, decryptedWrong);

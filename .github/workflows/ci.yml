@@ -604,7 +604,7 @@ jobs:
         shell: pwsh
         timeout-minutes: 8
         run: |
-          $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfCoreRegressionTests|FullyQualifiedName~OdfBoundaryRegressionTests|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityBoundaryTests)'
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfCoreRegressionTests|FullyQualifiedName~OdfBoundaryRegressionTests|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityBoundaryTests|FullyQualifiedName~EncryptionInteropCorpusTests)'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'core-security'
           New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
           Write-Host "CI 快速回歸測試 filter: $testFilter"

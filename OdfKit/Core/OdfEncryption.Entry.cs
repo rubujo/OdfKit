@@ -66,17 +66,31 @@ public static partial class OdfEncryption
     /// <param name="argon2M">Argon2id 的記憶體複雜度（單位為 KB，選填）</param>
     /// <param name="argon2P">Argon2id 的平行度/通道數（選填）</param>
     /// <returns>解密後的純文字資料位元組陣列</returns>
-    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M, int argon2P)
+    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M, int argon2P) =>
+        DecryptEntryCore(ciphertext, password, algorithmUri, derivationName, keySize, iterationCount, salt, iv, startKeyGenName, kdfName, argon2T, argon2M, argon2P, legacyPbkdf2WithSha256Prf: false);
+
+    /// <summary>
+    /// 解密單一封裝項目的核心實作。
+    /// </summary>
+    /// <remarks>
+    /// <c>legacyPbkdf2WithSha256Prf</c> 為 <see langword="true"/> 時，改以早期 OdfKit 版本的
+    /// HMAC-SHA-256 虛擬亂數函式衍生金鑰；僅供讀取既有檔案的後備路徑使用，新寫入一律採規範的 HMAC-SHA-1。
+    /// </remarks>
+    internal static byte[] DecryptEntryCore(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M, int argon2P, bool legacyPbkdf2WithSha256Prf)
     {
         bool isArgon2 = string.Equals(kdfName, "argon2id", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(derivationName, Argon2idDerivationUri, StringComparison.OrdinalIgnoreCase);
+                        string.Equals(derivationName, Argon2idDerivationUri, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(derivationName, Argon2idOdf15DerivationUri, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(derivationName, Argon2idLegacyDerivationUri, StringComparison.OrdinalIgnoreCase);
 
-        if (!isArgon2 && string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase) && iterationCount > 50000)
+        if (!isArgon2 && string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase) && iterationCount > MaxPbkdf2IterationCount)
         {
-            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount));
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount, MaxPbkdf2IterationCount));
         }
 
-        if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri && algorithmUri != Aes256GcmAlgorithmUri)
+        bool isBlowfishCfb = IsBlowfishCfbAlgorithm(algorithmUri);
+        bool isLegacyBlowfishCbc = IsLegacyBlowfishCbcAlgorithm(algorithmUri);
+        if (algorithmUri != Aes256AlgorithmUri && algorithmUri != Aes256GcmAlgorithmUri && !isBlowfishCfb && !isLegacyBlowfishCbc)
         {
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedEncryptionAlgorithmOdfkit", algorithmUri));
         }
@@ -86,47 +100,44 @@ public static partial class OdfEncryption
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedKeyDerivationFunction", derivationName));
         }
 
-        // 若 startKeyGenName 存在，則衍生密碼位元組
-        byte[] pwdBytes;
-        if (startKeyGenName is not null)
-        {
-            byte[] rawPassBytes = Encoding.UTF8.GetBytes(password);
-            if (startKeyGenName.EndsWith("#sha256", StringComparison.OrdinalIgnoreCase)
+        // ODF 1.0～1.4 Part 2 §4.16.7：`manifest:start-key-generation` 可省略，省略時的預設是 SHA1。
+        // LibreOffice 產生的傳統加密文件即不輸出該元素，因此不能退回「直接使用原始密碼位元組」。
+        bool startKeyIsSha256 = startKeyGenName is not null
+            && (startKeyGenName.EndsWith("#sha256", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(startKeyGenName, "sha256", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha-256", StringComparison.OrdinalIgnoreCase))
-            {
-                using (var sha = SHA256.Create())
-                    pwdBytes = sha.ComputeHash(rawPassBytes);
-            }
-            else if (startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha-1", StringComparison.OrdinalIgnoreCase))
-            {
-                using (var sha = SHA1.Create())
-                    pwdBytes = sha.ComputeHash(rawPassBytes);
-            }
-            else
-            {
-                pwdBytes = rawPassBytes;
-            }
+                || string.Equals(startKeyGenName, "sha-256", StringComparison.OrdinalIgnoreCase));
+
+        bool startKeyIsSha1 = startKeyGenName is null
+            || startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(startKeyGenName, "sha-1", StringComparison.OrdinalIgnoreCase);
+
+        byte[] pwdBytes;
+        byte[] rawPasswordBytes = Encoding.UTF8.GetBytes(password);
+        if (startKeyIsSha256)
+        {
+            using (var sha = SHA256.Create())
+                pwdBytes = sha.ComputeHash(rawPasswordBytes);
+        }
+        else if (startKeyIsSha1)
+        {
+            using (var sha = SHA1.Create())
+                pwdBytes = sha.ComputeHash(rawPasswordBytes);
         }
         else
         {
-            pwdBytes = Encoding.UTF8.GetBytes(password);
+            pwdBytes = rawPasswordBytes;
         }
 
-        // 決定 PBKDF2 的雜湊名稱
-        string hashName = "sha256";
-        if (startKeyGenName is not null
-            && (startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha-1", StringComparison.OrdinalIgnoreCase)))
+        // ODF 1.0～1.4 Part 2 §4.16.7：`PBKDF2` 的虛擬亂數函式固定為 HMAC-SHA-1，與
+        // `start-key-generation-name` 無關（後者只決定密碼如何雜湊成 start key）。
+        // 早期 OdfKit 版本誤把兩者綁在一起，對 AES 路徑用了 HMAC-SHA-256；解密端保留該形狀作為後備。
+        string hashName = legacyPbkdf2WithSha256Prf ? "sha256" : "sha1";
+
+        // `manifest:key-size` 為可選屬性；缺席時依演算法採用規範預設長度。
+        if (keySize <= 0)
         {
-            hashName = "sha1";
-        }
-        else if (algorithmUri == BlowfishAlgorithmUri)
-        {
-            hashName = "sha1";
+            keySize = isBlowfishCfb || isLegacyBlowfishCbc ? BlowfishKeySizeBytes : Aes256KeySizeBytes;
         }
 
         byte[] derivedKey;
@@ -193,7 +204,11 @@ public static partial class OdfEncryption
                 aes.Key = derivedKey;
                 aes.IV = iv;
                 aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
+
+                // W3C XML Encryption §5.2 只定義「最後一個位元組是填充長度」，其餘填充位元組值未定義；
+                // PKCS#7 是其特例。因此改以 PaddingMode.None 解出全部區塊，再手動移除填充，
+                // 才能同時讀取 LibreOffice／OpenOffice 與早期 OdfKit 產生的密文。
+                aes.Padding = PaddingMode.None;
 
                 using (var decryptor = aes.CreateDecryptor())
                 using (var msDecrypt = new MemoryStream())
@@ -203,9 +218,13 @@ public static partial class OdfEncryption
                         csDecrypt.Write(ciphertext, 0, ciphertext.Length);
                         csDecrypt.FlushFinalBlock();
                     }
-                    return msDecrypt.ToArray();
+                    return RemoveXmlEncryptionPadding(msDecrypt.ToArray(), aes.BlockSize / 8);
                 }
             }
+        }
+        else if (isBlowfishCfb)
+        {
+            return DecryptBlowfishCfb(ciphertext, derivedKey, iv);
         }
         else
         {
@@ -224,7 +243,7 @@ public static partial class OdfEncryption
     /// <param name="iv">輸出參數，接收隨機產生的初始向量（IV）位元組陣列</param>
     /// <param name="salt">輸出參數，接收隨機產生的鹽值（Salt）位元組陣列</param>
     /// <param name="checksum">輸出參數，接收加密後計算出的驗證碼（Checksum）位元組陣列</param>
-    /// <param name="iterationCount">金鑰衍生的反覆運算次數（預設為 50,000 次）</param>
+    /// <param name="iterationCount">金鑰衍生的反覆運算次數（預設為 <see cref="DefaultPbkdf2IterationCount"/>）</param>
     /// <returns>加密後的密文資料位元組陣列</returns>
     public static byte[] EncryptEntry(
         byte[] plaintext,
@@ -233,7 +252,7 @@ public static partial class OdfEncryption
         out byte[] iv,
         out byte[] salt,
         out byte[] checksum,
-        int iterationCount = 50000)
+        int iterationCount = DefaultPbkdf2IterationCount)
     {
         salt = new byte[algorithm == OdfEncryptionAlgorithm.Aes256Gcm ? 32 : 16];
         iv = new byte[algorithm == OdfEncryptionAlgorithm.Aes256Gcm ? 12 : (algorithm == OdfEncryptionAlgorithm.Aes256 ? 16 : 8)];
@@ -244,12 +263,16 @@ public static partial class OdfEncryption
         }
 
         byte[] pwdBytes = Encoding.UTF8.GetBytes(password);
-        int keySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16;
+        int keySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
+            ? Aes256KeySizeBytes
+            : BlowfishKeySizeBytes;
 
         byte[] derivedKey;
         if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
         {
-            // 使用 Argon2id 衍生金鑰，參數相容於 LibreOffice 25.8+ loext
+            // 使用 Argon2id 衍生金鑰。t=3／m=64 MiB／p=4 屬 RFC 9106 建議區間；manifest 形狀
+            // （key-derivation-name 與 loext:argon2-iterations／-memory／-lanes）對標 LibreOffice
+            // 的 OpenDocument-v1.4+libreoffice-manifest-schema.rng。互通邊界見 docs/odf-format-support.md。
             byte[] preHashedPwd;
             using (var sha = SHA256.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
@@ -268,10 +291,12 @@ public static partial class OdfEncryption
         }
         else if (algorithm == OdfEncryptionAlgorithm.Aes256)
         {
+            // start key 依 start-key-generation-name 取 SHA-256；PBKDF2 的 PRF 則是規範固定的
+            // HMAC-SHA-1（Part 2 §4.16.7），兩者不可混為一談。
             byte[] preHashedPwd;
             using (var sha = SHA256.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
-            derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha256");
+            derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha1");
         }
         else
         {
@@ -319,13 +344,14 @@ public static partial class OdfEncryption
         }
         else
         {
-            ciphertext = EncryptBlowfishCbc(plaintext, derivedKey, iv);
+            ciphertext = EncryptBlowfishCfb(plaintext, derivedKey, iv);
         }
 
-        using (var sha = SHA256.Create())
-        {
-            checksum = sha.ComputeHash(plaintext);
-        }
+        // ODF 1.0～1.4 Part 2 §4.16.4：checksum 是「壓縮後、未加密」資料前 1024 位元組的摘要。
+        // 呼叫端傳入的 plaintext 已經是 deflate 後的位元組。檢查碼型別跟著演算法世代。
+        checksum = ComputeHash(
+            plaintext,
+            algorithm == OdfEncryptionAlgorithm.Blowfish ? Sha1OneKilobyteChecksumName : Sha256OneKilobyteChecksumUri);
 
         return ciphertext;
     }

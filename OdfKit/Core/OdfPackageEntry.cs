@@ -358,14 +358,27 @@ internal class OdfPackageEntry : IDisposable
         return _bytes;
     }
 
-    public bool CanExposeMmfPointer => _mmfEntry != null && _mmfEntry.CompressionMethod == 0 && _package != null && _package.Mmf != null;
+    /// <summary>
+    /// Gets a value indicating whether the entry can expose a direct memory-mapped pointer.
+    /// 取得是否可直接暴露記憶體映射指標。
+    /// </summary>
+    /// <remarks>
+    /// 內容被覆寫過（<see cref="SetContent(byte[])"/>／<see cref="SetContent(Stream)"/>）之後一律不可，
+    /// 因為映射區仍指向封裝中的原始位元組。解密就是這個情形：明文寫在 <c>_bytes</c>，
+    /// 而映射區留著密文；若仍走零拷貝路徑，消費端會拿到密文。
+    /// </remarks>
+    public bool CanExposeMmfPointer => !_isModified && _mmfEntry != null && _mmfEntry.CompressionMethod == 0 && _package != null && _package.Mmf != null;
 
     /// <summary>
     /// 取得 entry 在記憶體映射檔案 (MMF) 中的直接唯讀記憶體指標。
+    /// 內容被覆寫後回傳 <see cref="IntPtr.Zero"/>，呼叫端必須改走一般讀取路徑。
     /// </summary>
     public unsafe IntPtr GetMmfPointer(out int length)
     {
         length = 0;
+        if (_isModified)
+            return IntPtr.Zero;
+
         var mmfEntry = _mmfEntry;
         var package = _package;
         if (mmfEntry == null || mmfEntry.CompressionMethod != 0 || package == null || package.Mmf == null)

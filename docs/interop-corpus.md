@@ -33,6 +33,20 @@
   覆蓋 foreign namespace、未知屬性、comments、processing instructions 與 prefix 保留（見上方
   「自動產生的 corpus」段落）。
 
+## 加密互通 corpus
+
+- `tests/fixtures/encryption-interop/` 收錄 LibreOffice 26.2 實機產生的密碼保護 ODT：
+  `libreoffice-blowfish-cfb.odt`（ODF 1.0／1.1 傳統加密）、`libreoffice-aes256-cbc.odt`
+  （ODF 1.2／1.3 傳統加密）與 `libreoffice-wholesome-gcm.odt`（ODF 1.4 整包加密，
+  LibreOffice 24.8 起的預設）。同目錄 `manifest.json` 記錄密碼、SHA-256、產生方式與逐項加密參數。
+- `EncryptionInteropCorpusTests` 驗證三件事：以宣告密碼解密後取得預期文字、manifest 宣告的加密
+  參數與檔案實際內容一致、載入後重新儲存仍保留內容。
+- 素材已提交，**不需要本機 LibreOffice 即可執行**；測試標記為 `Smoke` 與 `Interop`，並掛在主 CI
+  的 `core-security` 煙霧分片。互通邊界與已知缺口見
+  [odf-format-support.md](odf-format-support.md)。
+- 反向（LibreOffice 開啟 OdfKit 產出）與 manifest 的 Jing schema 驗證仍需外部工具，不在此 corpus
+  的守備範圍。
+
 ## 安全邊界 corpus
 
 - `OdfSecurityBoundaryTests` 覆蓋簽章儲存 / 失效、macro sanitize、加密文件 sanitize 後重新儲存。

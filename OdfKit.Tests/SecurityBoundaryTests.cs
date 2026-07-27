@@ -27,13 +27,13 @@ public class SecurityBoundaryTests
         byte[] pwd = Encoding.UTF8.GetBytes("Password");
         byte[] salt = new byte[8];
 
-        // 1. 測試 iterations 大於 50000 時擲出 CryptographicException
+        // 1. 測試 iterations 超過上限時擲出 CryptographicException
         Assert.Throws<CryptographicException>(() =>
-            OdfEncryption.Pbkdf2(pwd, salt, 50001, 16, "sha256"));
+            OdfEncryption.Pbkdf2(pwd, salt, OdfEncryption.MaxPbkdf2IterationCount + 1, 16, "sha256"));
 
-        // 2. 測試 iterations 等於 50000（剛好在邊界上）應成功執行
-        byte[] key50000 = OdfEncryption.Pbkdf2(pwd, salt, 50000, 16, "sha256");
-        Assert.Equal(16, key50000.Length);
+        // 2. 測試 iterations 等於寫入端預設值（實務常見值）應成功執行
+        byte[] keyAtDefault = OdfEncryption.Pbkdf2(pwd, salt, OdfEncryption.DefaultPbkdf2IterationCount, 16, "sha256");
+        Assert.Equal(16, keyAtDefault.Length);
 
         // 3. 測試 iterations 為 0 或負數時應擲出 CryptographicException（反覆運算次數必須至少為 1）
         Assert.Throws<CryptographicException>(() =>
@@ -78,9 +78,9 @@ public class SecurityBoundaryTests
         Assert.Throws<NotSupportedException>(() =>
             OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, "scrypt", 32, 1000, salt, iv));
 
-        // 3. 測試反覆運算次數超過 50000 應擲出 CryptographicException
+        // 3. 測試反覆運算次數超過上限應擲出 CryptographicException
         Assert.Throws<CryptographicException>(() =>
-            OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50001, salt, iv));
+            OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, OdfEncryption.MaxPbkdf2IterationCount + 1, salt, iv));
 
         // 4. 測試 null 參數的防禦性例外攔截
         Assert.Throws<NullReferenceException>(() =>

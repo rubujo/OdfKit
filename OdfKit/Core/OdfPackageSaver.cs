@@ -361,6 +361,7 @@ internal static class OdfPackageSaver
             Salt = [.. source.Salt],
             StartKeyGenerationName = source.StartKeyGenerationName,
             StartKeySize = source.StartKeySize,
+            PlaintextSize = source.PlaintextSize,
             HasChecksumType = source.HasChecksumType,
             HasChecksum = source.HasChecksum,
             HasAlgorithmName = source.HasAlgorithmName,

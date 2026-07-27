@@ -98,7 +98,20 @@ internal static class OdfPackageManifestWriter
                 writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, mediaType);
 
                 if (ctx.Entries.TryGetValue(key, out OdfPackageEntry? entry) && entry.EncryptionInfo is not null)
+                {
+                    // ODF 1.0～1.4 Part 2 §3.4.1：加密項目必須宣告原始未壓縮未加密大小，
+                    // 消費端據此配置解壓緩衝；屬性順序須排在 encryption-data 子元素之前。
+                    if (entry.EncryptionInfo.PlaintextSize is long plaintextSize)
+                    {
+                        writer.WriteAttributeString(
+                            "manifest",
+                            "size",
+                            OdfNamespaces.Manifest,
+                            plaintextSize.ToString(CultureInfo.InvariantCulture));
+                    }
+
                     WriteEncryptionData(writer, entry.EncryptionInfo);
+                }
 
                 writer.WriteEndElement();
             }
@@ -115,14 +128,11 @@ internal static class OdfPackageManifestWriter
     private static void WriteEncryptionData(XmlWriter writer, OdfEncryptionInfo info)
     {
         writer.WriteStartElement("encryption-data", OdfNamespaces.Manifest);
+
+        // ODF 1.0～1.4 Part 2 的 manifest schema 只允許 encryption-data 帶 checksum-type 與 checksum；
+        // 金鑰衍生的擴充屬性屬於 key-derivation，不在此處輸出。
         writer.WriteAttributeString("manifest", "checksum-type", OdfNamespaces.Manifest, info.ChecksumType);
         writer.WriteAttributeString("manifest", "checksum", OdfNamespaces.Manifest, Convert.ToBase64String(info.Checksum));
-
-        if (info.ExtensionProperties is not null)
-        {
-            foreach (KeyValuePair<string, string> prop in info.ExtensionProperties)
-                writer.WriteAttributeString("manifest", prop.Key, OdfNamespaces.Manifest, prop.Value);
-        }
 
         writer.WriteStartElement("algorithm", OdfNamespaces.Manifest);
         writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, info.AlgorithmName);
@@ -145,36 +155,7 @@ internal static class OdfPackageManifestWriter
             writer.WriteEndElement();
         }
 
-        writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
-        writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);
-        writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString(CultureInfo.InvariantCulture));
-        writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString(CultureInfo.InvariantCulture));
-        writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(info.Salt));
-
-        if (info.ExtensionProperties is not null)
-        {
-            foreach (KeyValuePair<string, string> prop in info.ExtensionProperties)
-            {
-                switch (prop.Key)
-                {
-                    case "kdf-name":
-                        writer.WriteAttributeString("loext", "kdf-name", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
-                        break;
-                    case "argon2-t":
-                        writer.WriteAttributeString("loext", "argon2-t", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
-                        break;
-                    case "argon2-m":
-                        writer.WriteAttributeString("loext", "argon2-m", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
-                        break;
-                    case "argon2-p":
-                        writer.WriteAttributeString("loext", "argon2-p", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
-                        break;
-                }
-            }
-        }
-
-        writer.WriteEndElement();
-
+        // manifest schema 的 encryption-data 內容順序為 algorithm →〔start-key-generation〕→ key-derivation。
         if (!string.IsNullOrEmpty(info.StartKeyGenerationName) && info.StartKeySize.HasValue)
         {
             writer.WriteStartElement("start-key-generation", OdfNamespaces.Manifest);
@@ -183,6 +164,51 @@ internal static class OdfPackageManifestWriter
             writer.WriteEndElement();
         }
 
+        bool isArgon2 = string.Equals(info.KeyDerivationName, OdfEncryption.Argon2idDerivationUri, StringComparison.Ordinal)
+            || string.Equals(info.KeyDerivationName, OdfEncryption.Argon2idOdf15DerivationUri, StringComparison.Ordinal);
+
+        writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
+        writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);
+        writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString(CultureInfo.InvariantCulture));
+
+        // Argon2id 分支不使用 manifest:iteration-count：迭代次數由 loext:argon2-iterations 表示，
+        // 且 LibreOffice 的 manifest schema 在該分支不允許此屬性。
+        if (!isArgon2)
+        {
+            writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString(CultureInfo.InvariantCulture));
+        }
+
+        writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(info.Salt));
+
+        if (info.ExtensionProperties is not null)
+        {
+            foreach (KeyValuePair<string, string> prop in info.ExtensionProperties)
+            {
+                if (LoextKeyDerivationAttributes.Contains(prop.Key))
+                {
+                    writer.WriteAttributeString("loext", prop.Key, OdfNamespaces.LoExt, prop.Value);
+                }
+            }
+        }
+
+        writer.WriteEndElement();
+
         writer.WriteEndElement();
     }
+
+    /// <summary>
+    /// key-derivation 允許輸出的 loext 擴充屬性；與 LibreOffice
+    /// `OpenDocument-v1.4+libreoffice-manifest-schema.rng` 的 Argon2id 分支一致，
+    /// 另保留早期 OdfKit 版本的縮寫屬性名以維持既有檔案的來回讀寫。
+    /// </summary>
+    private static readonly HashSet<string> LoextKeyDerivationAttributes = new(StringComparer.Ordinal)
+    {
+        "argon2-iterations",
+        "argon2-memory",
+        "argon2-lanes",
+        "kdf-name",
+        "argon2-t",
+        "argon2-m",
+        "argon2-p"
+    };
 }

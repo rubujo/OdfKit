@@ -9,9 +9,21 @@ abstract OdfKit.Text.OdfIndex.Update() -> void
 const OdfKit.Compliance.OdfExternalValidator.OdfValidatorJarEnvironmentVariable = "ODFKIT_ODFVALIDATOR_JAR" -> string!
 const OdfKit.Core.OdfEncryption.Aes256AlgorithmUri = "http://www.w3.org/2001/04/xmlenc#aes256-cbc" -> string!
 const OdfKit.Core.OdfEncryption.Aes256GcmAlgorithmUri = "http://www.w3.org/2009/xmlenc11#aes256-gcm" -> string!
-const OdfKit.Core.OdfEncryption.Argon2idDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id" -> string!
-const OdfKit.Core.OdfEncryption.BlowfishAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc" -> string!
+const OdfKit.Core.OdfEncryption.Aes256KeySizeBytes = 32 -> int
+const OdfKit.Core.OdfEncryption.Argon2idDerivationUri = "urn:org:documentfoundation:names:experimental:office:manifest:argon2id" -> string!
+const OdfKit.Core.OdfEncryption.Argon2idLegacyDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id" -> string!
+const OdfKit.Core.OdfEncryption.Argon2idOdf15DerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.5#argon2id" -> string!
+const OdfKit.Core.OdfEncryption.BlowfishAlgorithmName = "Blowfish CFB" -> string!
+const OdfKit.Core.OdfEncryption.BlowfishAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#blowfish" -> string!
+const OdfKit.Core.OdfEncryption.BlowfishCbcLegacyAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc" -> string!
+const OdfKit.Core.OdfEncryption.BlowfishKeySizeBytes = 16 -> int
+const OdfKit.Core.OdfEncryption.DefaultPbkdf2IterationCount = 100000 -> int
+const OdfKit.Core.OdfEncryption.MaxPbkdf2IterationCount = 10000000 -> int
+const OdfKit.Core.OdfEncryption.OneKilobyteChecksumLength = 1024 -> int
 const OdfKit.Core.OdfEncryption.OpenPgpAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#openpgp" -> string!
+const OdfKit.Core.OdfEncryption.Sha1OneKilobyteChecksumName = "SHA1/1K" -> string!
+const OdfKit.Core.OdfEncryption.Sha1OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha1-1k" -> string!
+const OdfKit.Core.OdfEncryption.Sha256OneKilobyteChecksumUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#sha256-1k" -> string!
 const OdfKit.Core.OdfMediaManager.PicturesEntryPrefix = "Pictures/" -> string!
 const OdfKit.Core.OdfNamespaces.Anim = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0" -> string!
 const OdfKit.Core.OdfNamespaces.CalcExt = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" -> string!
@@ -1051,6 +1063,8 @@ OdfKit.Core.OdfEncryptionInfo.KeySize.get -> int
 OdfKit.Core.OdfEncryptionInfo.KeySize.set -> void
 OdfKit.Core.OdfEncryptionInfo.OdfEncryptionInfo() -> void
 OdfKit.Core.OdfEncryptionInfo.OpenPgpEncryptedKeys.get -> System.Collections.Generic.List<OdfKit.Core.OdfOpenPgpEncryptedKeyInfo!>!
+OdfKit.Core.OdfEncryptionInfo.PlaintextSize.get -> long?
+OdfKit.Core.OdfEncryptionInfo.PlaintextSize.set -> void
 OdfKit.Core.OdfEncryptionInfo.Salt.get -> byte[]!
 OdfKit.Core.OdfEncryptionInfo.Salt.set -> void
 OdfKit.Core.OdfEncryptionInfo.StartKeyGenerationName.get -> string?
@@ -18893,7 +18907,7 @@ static OdfKit.Core.OdfEncryption.DecryptEntry(byte[]! ciphertext, string! passwo
 static OdfKit.Core.OdfEncryption.DecryptEntry(byte[]! ciphertext, string! password, string! algorithmUri, string! derivationName, int keySize, int iterationCount, byte[]! salt, byte[]! iv, string? startKeyGenName, string? kdfName, int argon2T, int argon2M, int argon2P) -> byte[]!
 static OdfKit.Core.OdfEncryption.Encrypt(OdfKit.Core.OdfPackage! package, string! password) -> void
 static OdfKit.Core.OdfEncryption.Encrypt(OdfKit.Core.OdfPackage! package, string! password, OdfKit.Core.OdfEncryptionAlgorithm algorithm) -> void
-static OdfKit.Core.OdfEncryption.EncryptEntry(byte[]! plaintext, string! password, OdfKit.Core.OdfEncryptionAlgorithm algorithm, out byte[]! iv, out byte[]! salt, out byte[]! checksum, int iterationCount = 50000) -> byte[]!
+static OdfKit.Core.OdfEncryption.EncryptEntry(byte[]! plaintext, string! password, OdfKit.Core.OdfEncryptionAlgorithm algorithm, out byte[]! iv, out byte[]! salt, out byte[]! checksum, int iterationCount = 100000) -> byte[]!
 static OdfKit.Core.OdfEncryption.Pbkdf2(byte[]! password, byte[]! salt, int iterations, int keyLength, string! hashName) -> byte[]!
 static OdfKit.Core.OdfFlatXmlWriteOptions.Default.get -> OdfKit.Core.OdfFlatXmlWriteOptions!
 static OdfKit.Core.OdfJsonSerializerOptions.Compact.get -> System.Text.Json.JsonSerializerOptions!

@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -74,110 +75,157 @@ public static partial class OdfEncryption
                 {
                     kdfName = kn;
                 }
-                int argon2T = 3;
-                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-t", out string? tStr) && int.TryParse(tStr, out int tVal))
-                {
-                    argon2T = tVal;
-                }
-                int argon2M = 65536;
-                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-m", out string? mStr) && int.TryParse(mStr, out int mVal))
-                {
-                    argon2M = mVal;
-                }
-                int argon2P = 4;
-                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-p", out string? pStr) && int.TryParse(pStr, out int pVal))
-                {
-                    argon2P = pVal;
-                }
 
-                byte[] decryptedBytes = DecryptEntry(
-                    ciphertext,
-                    password,
-                    entry.EncryptionInfo.AlgorithmName,
-                    entry.EncryptionInfo.KeyDerivationName,
-                    entry.EncryptionInfo.KeySize,
-                    entry.EncryptionInfo.IterationCount,
-                    entry.EncryptionInfo.Salt,
-                    entry.EncryptionInfo.InitialisationVector,
-                    entry.EncryptionInfo.StartKeyGenerationName,
-                    kdfName,
-                    argon2T,
-                    argon2M,
-                    argon2P
-                );
+                // 優先讀 LibreOffice／目前 OdfKit 的 loext:argon2-iterations／-memory／-lanes，
+                // 找不到才退回早期 OdfKit 版本寫出的 argon2-t／-m／-p。
+                int argon2T = ReadArgon2Parameter(entry.EncryptionInfo, "argon2-iterations", "argon2-t", 3);
+                int argon2M = ReadArgon2Parameter(entry.EncryptionInfo, "argon2-memory", "argon2-m", 65536);
+                int argon2P = ReadArgon2Parameter(entry.EncryptionInfo, "argon2-lanes", "argon2-p", 4);
 
-                bool decompressedSuccessfully = false;
-                byte[]? decompressedBytes = null;
-                try
-                {
-                    using (var ms = new MemoryStream(decryptedBytes))
-                    using (var deflate = new DeflateStream(ms, CompressionMode.Decompress))
-                    using (var outMs = new MemoryStream())
-                    {
-                        long maxEntrySize = package.LoadOptions.MaxEntrySize;
-                        byte[] buffer = new byte[8192];
-                        long cumulativeBytes = 0;
-                        int bytesRead;
-                        while ((bytesRead = deflate.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            cumulativeBytes += bytesRead;
-                            if (cumulativeBytes > maxEntrySize)
-                            {
-                                throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnzippedItemSizeExceeds", maxEntrySize));
-                            }
-                            outMs.Write(buffer, 0, bytesRead);
-                        }
-                        decompressedBytes = outMs.ToArray();
-                        decompressedSuccessfully = true;
-                    }
-                }
-                catch (SecurityException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    // 非 deflate 或解壓失敗時改以原始解密位元組驗證 checksum。
-                    OdfKitDiagnostics.Warn($"加密項目 deflate 容錯驗證失敗，改以原始位元組驗證：{ex.Message}", ex);
-                }
+                // 早期 OdfKit 版本誤將 PBKDF2 的 PRF 綁在 start-key 演算法上，對 SHA-256 start key
+                // 使用 HMAC-SHA-256；規範固定為 HMAC-SHA-1。只有兩者會不同時才需要後備嘗試。
+                bool prfMayDiffer = !isArgon2ForEntry(entry.EncryptionInfo, kdfName)
+                    && IsSha256StartKey(entry.EncryptionInfo.StartKeyGenerationName);
 
-                if (decompressedSuccessfully && decompressedBytes is not null)
-                {
-                    byte[] calculatedChecksum = ComputeHash(decompressedBytes, entry.EncryptionInfo.ChecksumType);
-                    if (ByteArrayEquals(calculatedChecksum, entry.EncryptionInfo.Checksum))
-                    {
-                        decryptedPlaintext = decompressedBytes;
-                    }
-                    else
-                    {
-                        byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
-                        if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
-                        {
-                            decryptedPlaintext = decryptedBytes;
-                        }
-                        else
-                        {
-                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
-                        }
-                    }
-                }
-                else
-                {
-                    byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
-                    if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
-                    {
-                        decryptedPlaintext = decryptedBytes;
-                    }
-                    else
-                    {
-                        throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
-                    }
-                }
+                decryptedPlaintext =
+                    TryDecryptEntryContent(package, entry.EncryptionInfo, ciphertext, password, kdfName, argon2T, argon2M, argon2P, legacyPrf: false)
+                    ?? (prfMayDiffer
+                        ? TryDecryptEntryContent(package, entry.EncryptionInfo, ciphertext, password, kdfName, argon2T, argon2M, argon2P, legacyPrf: true)
+                        : null)
+                    ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
             }
 
             entry.SetContent(decryptedPlaintext);
             entry.EncryptionInfo = null;
         }
+    }
+
+    /// <summary>
+    /// 判斷 `start-key-generation-name` 是否為 SHA-256。
+    /// </summary>
+    private static bool IsSha256StartKey(string? startKeyGenerationName) =>
+        startKeyGenerationName is not null
+        && (startKeyGenerationName.EndsWith("#sha256", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(startKeyGenerationName, "sha256", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(startKeyGenerationName, "sha-256", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// 判斷項目是否使用 Argon2id 金鑰衍生。
+    /// </summary>
+    private static bool isArgon2ForEntry(OdfEncryptionInfo info, string? kdfName) =>
+        string.Equals(kdfName, "argon2id", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(info.KeyDerivationName, Argon2idDerivationUri, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(info.KeyDerivationName, Argon2idOdf15DerivationUri, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(info.KeyDerivationName, Argon2idLegacyDerivationUri, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// 以指定的虛擬亂數函式解密單一項目，並驗證 checksum；不符時回傳 <see langword="null"/>。
+    /// </summary>
+    private static byte[]? TryDecryptEntryContent(
+        OdfPackage package,
+        OdfEncryptionInfo info,
+        byte[] ciphertext,
+        string password,
+        string? kdfName,
+        int argon2T,
+        int argon2M,
+        int argon2P,
+        bool legacyPrf)
+    {
+        byte[] decryptedBytes;
+        try
+        {
+            decryptedBytes = DecryptEntryCore(
+                ciphertext,
+                password,
+                info.AlgorithmName,
+                info.KeyDerivationName,
+                info.KeySize,
+                info.IterationCount,
+                info.Salt,
+                info.InitialisationVector,
+                info.StartKeyGenerationName,
+                kdfName,
+                argon2T,
+                argon2M,
+                argon2P,
+                legacyPrf);
+        }
+        catch (CryptographicException)
+        {
+            // 金鑰不符時區塊解密會在填補檢查或 GCM 驗證階段失敗；視為本次嘗試不成立，
+            // 讓呼叫端有機會改用後備的虛擬亂數函式再試一次。
+            return null;
+        }
+
+        byte[]? decompressedBytes = null;
+        try
+        {
+            using var ms = new MemoryStream(decryptedBytes);
+            using var deflate = new DeflateStream(ms, CompressionMode.Decompress);
+            using var outMs = new MemoryStream();
+
+            long maxEntrySize = package.LoadOptions.MaxEntrySize;
+            byte[] buffer = new byte[8192];
+            long cumulativeBytes = 0;
+            int bytesRead;
+            while ((bytesRead = deflate.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                cumulativeBytes += bytesRead;
+                if (cumulativeBytes > maxEntrySize)
+                {
+                    throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnzippedItemSizeExceeds", maxEntrySize));
+                }
+                outMs.Write(buffer, 0, bytesRead);
+            }
+            decompressedBytes = outMs.ToArray();
+        }
+        catch (SecurityException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // 非 deflate 或解壓失敗時改以原始解密位元組驗證 checksum。
+            OdfKitDiagnostics.Warn($"加密項目 deflate 容錯驗證失敗，改以原始位元組驗證：{ex.Message}", ex);
+        }
+
+        if (decompressedBytes is not null)
+        {
+            // ODF 1.0～1.4 Part 2 §4.16.4 的 checksum 涵蓋「壓縮後、未加密」資料，也就是 decryptedBytes；
+            // 先驗規範形狀，再退回早期 OdfKit 版本的解壓後形狀。
+            if (ByteArrayEquals(ComputeHash(decryptedBytes, info.ChecksumType), info.Checksum)
+                || ByteArrayEquals(ComputeHash(decompressedBytes, info.ChecksumType), info.Checksum))
+            {
+                return decompressedBytes;
+            }
+
+            return null;
+        }
+
+        return ByteArrayEquals(ComputeHash(decryptedBytes, info.ChecksumType), info.Checksum)
+            ? decryptedBytes
+            : null;
+    }
+
+    /// <summary>
+    /// 讀取 Argon2 參數：先取規範對標的屬性名，再退回早期 OdfKit 版本的縮寫屬性名。
+    /// </summary>
+    private static int ReadArgon2Parameter(OdfEncryptionInfo info, string preferredName, string legacyName, int defaultValue)
+    {
+        if (info.ExtensionProperties.TryGetValue(preferredName, out string? preferred)
+            && int.TryParse(preferred, NumberStyles.Integer, CultureInfo.InvariantCulture, out int preferredValue))
+        {
+            return preferredValue;
+        }
+
+        if (info.ExtensionProperties.TryGetValue(legacyName, out string? legacy)
+            && int.TryParse(legacy, NumberStyles.Integer, CultureInfo.InvariantCulture, out int legacyValue))
+        {
+            return legacyValue;
+        }
+
+        return defaultValue;
     }
 
     private static void ValidateChecksumForProviderDecryption(OdfEncryptionInfo info, byte[] plaintext)
@@ -317,19 +365,29 @@ public static partial class OdfEncryption
             byte[] salt;
             _ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out _);
 
-            byte[] checksum = ComputeHash(plaintext, "SHA256");
+            // 檢查碼型別跟著演算法世代：傳統 Blowfish 沿用 ODF 1.0／1.1 的 `SHA1/1K`（LibreOffice
+            // 只接受這個形狀），AES 路徑採規範建議給新實作的 `#sha256-1k`。
+            string checksumType = algorithm == OdfEncryptionAlgorithm.Blowfish
+                ? Sha1OneKilobyteChecksumName
+                : Sha256OneKilobyteChecksumUri;
+            byte[] checksum = ComputeHash(compressedPlaintext, checksumType);
 
             _info = new OdfEncryptionInfo
             {
-                ChecksumType = "SHA256",
+                ChecksumType = checksumType,
                 Checksum = checksum,
+
+                // ODF Part 2 §3.4.1：加密項目必須以 manifest:size 宣告原始未壓縮未加密大小。
+                PlaintextSize = plaintext.Length,
+                // Blowfish 使用規範的簡短名稱：等價的 URI 形式雖然合法，但 LibreOffice 的
+                // 傳統加密讀取路徑只比對 `Blowfish CFB`。
                 AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256Gcm
                     ? Aes256GcmAlgorithmUri
-                    : (algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri),
+                    : (algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmName),
                 InitialisationVector = iv,
                 KeyDerivationName = "PBKDF2",
-                KeySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16,
-                IterationCount = 50000,
+                KeySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? Aes256KeySizeBytes : BlowfishKeySizeBytes,
+                IterationCount = DefaultPbkdf2IterationCount,
                 Salt = salt
             };
 
@@ -337,21 +395,24 @@ public static partial class OdfEncryption
             {
                 _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
                 _info.StartKeySize = 32;
-                _info.ExtensionProperties["kdf-name"] = "argon2id";
-                _info.ExtensionProperties["argon2-t"] = "3";
-                _info.ExtensionProperties["argon2-m"] = "65536";
-                _info.ExtensionProperties["argon2-p"] = "4";
+
+                // Argon2id 的 manifest 形狀對標 LibreOffice 的
+                // OpenDocument-v1.4+libreoffice-manifest-schema.rng：key-derivation-name 使用 TDF
+                // 實驗性 URI，參數以 loext:argon2-iterations／-memory／-lanes 表示。
+                // manifest:iteration-count 仍會輸出：官方 ODF 1.4 manifest schema 對非 PGP 的
+                // key-derivation 要求該屬性必填，LibreOffice 解析 Argon2 時則直接讀 loext 參數而忽略它。
+                _info.KeyDerivationName = Argon2idDerivationUri;
+                _info.ExtensionProperties["argon2-iterations"] = "3";
+                _info.ExtensionProperties["argon2-memory"] = "65536";
+                _info.ExtensionProperties["argon2-lanes"] = "4";
             }
             else if (algorithm == OdfEncryptionAlgorithm.Aes256)
             {
                 _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
                 _info.StartKeySize = 32;
             }
-            else
-            {
-                _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha1";
-                _info.StartKeySize = 20;
-            }
+            // Blowfish 不輸出 start-key-generation：SHA-1 本來就是規範預設，省略後與
+            // LibreOffice 產生的傳統加密文件形狀一致。
         }
 
         public void Apply()
@@ -360,6 +421,11 @@ public static partial class OdfEncryption
                 OdfLocalizer.GetMessage("Err_OdfEncryptionPackage_MissingCiphertext")));
             entry.EncryptionInfo = _info ?? throw new InvalidOperationException(
                 OdfLocalizer.GetMessage("Err_OdfEncryptionPackage_MissingEncryptionInfo"));
+
+            // 加密項目一律以 ZIP STORED 寫出：內容在加密前就已 deflate，密文不可再壓縮，
+            // 且消費端（LibreOffice `package/source/zippackage`）預期加密項目的 ZIP 位元組
+            // 就是密文本身。多包一層 DEFLATE 會讓它拿到非預期的位元組。
+            entry.IsCompressed = false;
         }
     }
 
