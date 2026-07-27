@@ -2,7 +2,7 @@
 title: Avisos de terceiros
 _lang: pt-BR
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
+translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
 ---
 
 # Avisos de terceiros
@@ -13,12 +13,12 @@ O projeto OdfKit é disponibilizado sob a licença [CC0-1.0 Universal](https://c
 
 | Pacote | Finalidade | Licença |
 |---|---|---|
-| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Suporte a algoritmos de criptografia, hash e derivação de chaves | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.html) |
+| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Suporte a algoritmos de criptografia, hash e derivação de chaves | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.md) |
 | [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet) | Ferramentas de memória e buffers de alto desempenho | [MIT](https://github.com/CommunityToolkit/dotnet/blob/main/License.md) |
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | Processamento de assinaturas digitais XML | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | Processamento de assinaturas PKCS7 / CMS | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | Importação e exportação de CSV para arquivos ODS | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Mecanismo de conversão de fórmulas LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [Sylvan.Data.Csv](https://github.com/MarkPflug/Sylvan) | Importação e exportação de CSV para arquivos ODS | [MIT](https://github.com/MarkPflug/Sylvan/blob/main/license.txt) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Mecanismo de conversão de fórmulas LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/License) |
 | [System.Text.Json](https://github.com/dotnet/runtime) | Serialização JSON usada pelo pacote principal e pelo destino netstandard2.0 de OdfKit.Extensions.Collaboration | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | Operações numéricas vetorizadas para funções de agregação de fórmulas; somente no destino net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Cálculo da soma de verificação CRC-32; somente no destino net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |

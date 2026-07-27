@@ -36,7 +36,7 @@
 | `US_NARA_ODF` | `https://www.archives.gov/records-mgmt/policy/transfer-guidance-tables.html` | `null` | `Compatibility` | `OfficialButIndirect` | `all-known` | 美國 NARA 電子檔案移轉格式接受規則映射，不是完整 ODF 規格 profile。 |
 | `NATO_ODF` | `https://www.nato.int/` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 北約 (NATO) ODF 文件相容性規範。 |
 | `PT_Government_ODF_RNID` | `https://www.ama.gov.pt/` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 葡萄牙政府 ODF 文件相容性規範 (RNID)。 |
-| `BE_Government_ODF` | `https://bosa.belgium.be/` | `null` | `Normative` | `VerifiedOfficial` | `all-known` | 比利時政府 ODF 文件相容性規範。 |
+| `BE_Government_ODF` | `https://bosa.belgium.be/` | `null` | `Draft` | `NeedsActiveSource` | `all-known` | 比利時 BOSA 來源入口；ODF 義務源自 2006-06-23 部長會議決議與 2007 年聯邦備忘錄，但 BOSA 站內查無直接列出 ODF 的現行條目（`dt.bosa.be` 的開放標準頁目前不可達），仍需確認有效官方條目。 |
 | `IT_Government_ODF_CAD` | `https://www.agid.gov.it/` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 義大利政府 ODF 文件相容性規範 (CAD)。 |
 | `UK_Government_ODF_1_2` | `https://www.gov.uk/government/publications/open-standards-for-government/sharing-or-collaborating-with-government-documents` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 英國政府 ODF 1.2 相容性規範。 |
 | `NL_Government_ODF` | `https://www.forumstandaardisatie.nl/open-standaarden/odf` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 荷蘭政府 ODF 1.2 相容性規範。 |

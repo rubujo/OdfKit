@@ -56,6 +56,8 @@ testhost 收尾不穩。
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
 | `api-docs.yml` | 17 語系 GitHub Pages API reference 建置（DocFX）與部署；結構與閘門見 [api-docs-site.md](api-docs-site.md) | PR（僅建置）/ main / 手動 |
 | `github-release.yml` | tag 驅動的發佈流程 | tag |
+| `codeql.yml` | CodeQL 靜態安全分析與 SARIF 上傳 | PR / main / 每週 |
+| `cns11643-baseline.yml` | CNS 11643 開放資料對照基線驗證 | PR / main（僅對照表相關路徑）|
 | `scorecard.yml` | OpenSSF Scorecard 供應鏈檢查與 SARIF 上傳 | main、每週、branch protection 變更 |
 
 發行 workflow 只負責交付快照，不是 `v0.0.1` 完滿條件。完滿狀態由每個 `main` 提交的必要
@@ -116,7 +118,9 @@ OdfKit 因此採下列可機器驗證的契約：
 - artifact 最多保留 14 天；NuGet 分送快照維持 1 天，CI diagnostics 與 WebFont 實證通常
   7 天。GitHub 支援個別 artifact 設定留存期限：
   [Store and share data](https://docs.github.com/en/actions/tutorials/store-and-share-data)。
-- 所有 job 都必須有 timeout。自動排程最多兩個 workflow 並啟用
+- 所有 job 都必須有 timeout。自動排程 workflow 上限為 `eng/ci-resource-policy.json` 的
+  `maxScheduledWorkflowCount`（目前為四個：`codeql.yml`、`libreoffice-interop.yml`、
+  `performance-benchmark.yml`、`scorecard.yml`），並啟用
   `cancel-in-progress: true`，避免排程重疊；GitHub 也明確說明排程可能在高負載時延遲：
   [Scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。
 

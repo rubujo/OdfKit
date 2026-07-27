@@ -2,7 +2,7 @@
 title: Third-Party Notices
 _lang: en
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
+translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
 ---
 
 # Third-Party Notices

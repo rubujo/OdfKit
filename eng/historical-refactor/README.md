@@ -5,6 +5,7 @@
 - `Split-*`：依行數或 AST 機械拆 partial
 - `Merge-*`：弱 partial 合併批次
 - `Migrate-*`／`Rename-*`：命名與屬性存取遷移
+- `Fix-TextSplitUsings.ps1`：拆分後批次補回 `OdfKit/Text` 缺少的 `using OdfKit.DOM;`
 
 **預設不要重跑。** 現行 partial 準則見 [docs/maintainability.md](../../docs/maintainability.md)。
 診斷請用 `eng/Analyze-PartialSplits.ps1` 與 `eng/List-LargeCsFiles.ps1`。

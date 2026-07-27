@@ -554,14 +554,21 @@ public static class OdfComplianceProfiles
     /// Gets the Belgian government ODF document compatibility profile.
     /// 取得比利時政府 ODF 文件相容性規範。
     /// </summary>
+    /// <remarks>
+    /// The 2006-06-23 Council of Ministers decision and the 2007 federal memorandum made ODF the
+    /// office-document exchange format, but BOSA currently publishes no live entry that names ODF,
+    /// so the profile stays draft until an active official source is confirmed.
+    /// ODF 的義務源自 2006-06-23 部長會議決議與 2007 年聯邦備忘錄，但 BOSA 站上目前查無直接
+    /// 列出 ODF 的現行條目，因此在確認有效官方來源前維持 draft。
+    /// </remarks>
     public static OdfComplianceProfile BeGovernmentOdf { get; } = new(
         "BE_Government_ODF",
         "Belgium",
         "BOSA (Federal Public Service Policy and Support)",
         new Uri("https://bosa.belgium.be/"),
         null,
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.AllKnown,
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,

@@ -2,7 +2,7 @@
 title: Informacje o składnikach innych firm
 _lang: pl
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
+translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
 ---
 
 # Informacje o składnikach innych firm
@@ -13,12 +13,12 @@ Projekt OdfKit jest udostępniany na podstawie licencji [CC0-1.0 Universal](http
 
 | Pakiet | Zastosowanie | Licencja |
 |---|---|---|
-| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Obsługa algorytmów szyfrowania, skrótu i wyprowadzania kluczy | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.html) |
+| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Obsługa algorytmów szyfrowania, skrótu i wyprowadzania kluczy | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.md) |
 | [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet) | Wysokowydajne narzędzia do obsługi pamięci i buforów | [MIT](https://github.com/CommunityToolkit/dotnet/blob/main/License.md) |
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | Przetwarzanie podpisów cyfrowych XML | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | Przetwarzanie podpisów PKCS7 / CMS | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | Import i eksport CSV dla plików ODS | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Mechanizm konwersji formuł LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [Sylvan.Data.Csv](https://github.com/MarkPflug/Sylvan) | Import i eksport CSV dla plików ODS | [MIT](https://github.com/MarkPflug/Sylvan/blob/main/license.txt) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Mechanizm konwersji formuł LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/License) |
 | [System.Text.Json](https://github.com/dotnet/runtime) | Serializacja JSON używana przez pakiet główny i element docelowy netstandard2.0 rozszerzenia OdfKit.Extensions.Collaboration | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | Wektoryzowane operacje numeryczne funkcji agregujących formuły; tylko element docelowy net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Obliczanie sumy kontrolnej CRC-32; tylko element docelowy net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |

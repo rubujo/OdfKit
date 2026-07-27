@@ -12,6 +12,8 @@
     href: package-catalog.md
   - name: NuGet 相容矩陣
     href: nuget-compatibility-matrix.md
+  - name: NativeAOT 支援與部署邊界
+    href: nativeaot.md
   - name: 版本與交付
     href: version-delivery.md
   - name: 高階 API 遷移
@@ -40,6 +42,8 @@
     href: reference/diagnostics.md
   - name: ODF 格式支援
     href: odf-format-support.md
+  - name: ODF 規範支援邊界
+    href: odf-specification-support.md
   - name: ODF Toolkit 對標
     href: odf-toolkit-parity.md
   - name: API 表面分層

@@ -23,7 +23,7 @@ Windows NativeAOT sidecar。CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
 | 相容性 | Package 與 DOM 來回讀寫會保留未知封裝項目、foreign XML、processing instructions、comments 與 prefix |
 | 驗證 | 內建 package / flat XML 檢查、ODF 1.4 schema metadata、profile rules、positive / negative corpus 測試 |
 | 在地化 | 透過 `OdfLocalizer` 提供多語系訊息與語系遞補機制 |
-| 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`typed-dom-coverage`、`convert-flat`、`convert-csv` 與 `pack` |
+| 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`typed-dom-coverage`、`convert-flat`、`convert-csv`、`set-cell` 與 `pack` |
 
 完整支援範圍請見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
 [能力宣稱與證據索引](docs/evidence-index.md)、

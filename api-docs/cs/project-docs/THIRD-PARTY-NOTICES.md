@@ -2,7 +2,7 @@
 title: Oznámení třetích stran
 _lang: cs
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
+translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
 ---
 
 # Oznámení třetích stran
@@ -13,12 +13,12 @@ Projekt OdfKit je poskytován pod licencí [CC0-1.0 Universal](https://creativec
 
 | Balíček | Účel | Licence |
 |---|---|---|
-| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Podpora algoritmů šifrování, hashování a odvozování klíčů | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.html) |
+| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | Podpora algoritmů šifrování, hashování a odvozování klíčů | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.md) |
 | [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet) | Vysoce výkonné nástroje pro paměť a vyrovnávací paměti | [MIT](https://github.com/CommunityToolkit/dotnet/blob/main/License.md) |
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | Zpracování digitálních podpisů XML | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | Zpracování podpisů PKCS7 / CMS | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | Import a export CSV pro soubory ODS | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Modul převodu vzorců LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [Sylvan.Data.Csv](https://github.com/MarkPflug/Sylvan) | Import a export CSV pro soubory ODS | [MIT](https://github.com/MarkPflug/Sylvan/blob/main/license.txt) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | Modul převodu vzorců LaTeX ↔ MathML | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/License) |
 | [System.Text.Json](https://github.com/dotnet/runtime) | Serializace JSON používaná jádrem a cílem netstandard2.0 rozšíření OdfKit.Extensions.Collaboration | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | Vektorizované numerické operace agregačních funkcí vzorců; pouze cíl net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | Výpočet kontrolního součtu CRC-32; pouze cíl net10.0 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |

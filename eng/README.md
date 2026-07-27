@@ -61,9 +61,15 @@
 | `Add-LocalizerKey.ps1` | 於 17 語系 `i18n/exceptions.*.json` 新增鍵並重產 C#（支援 `-WhatIf`）。 |
 | `Generate-LocalizerExceptionsFromJson.ps1` | 自 JSON 產生 `OdfLocalizer.Exceptions.<culture>.cs`；`-VerifyOnly` 檢查一致性。 |
 | `Build-ApiDocs.ps1` | 建置 17 語系 GitHub Pages API reference 站台（DocFX modern），內建固定版本、語系 TOC、權威文件、footer、未渲染頁面 href、sitemap 與站內連結驗證；可用 `-OutputDirectory` 指定工作區內的替代輸出，見 [api-docs-site.md](../docs/api-docs-site.md)。 |
+| `Test-ApiDocsTranslations.ps1` | 驗證 DocFX 正式文件的多語系翻譯契約（來源雜湊、必要 token 與同語系導覽）；同目錄 `Test-ApiDocsTranslations.Tests.ps1` 是其 Pester 自我測試。 |
 | `Test-OoxmlVisualGolden.ps1` | 執行 OOXML 轉換視覺 golden file 驗收。 |
 | `Test-RenderingBackends.ps1` | 執行 `OdfKit.Extensions.Rendering` 相關單元測試。 |
 | `Test-TrimSmoke.ps1` | 建置並執行 OdfKit trimming（Native AOT）煙霧測試。 |
+| `Test-SemanticCoverage.ps1` | 依 `docs/semantic-coverage.json` 驗證語意覆蓋 manifest 與對應測試證據。 |
+| `Test-EvidenceClaims.ps1` | 依 `docs/claims.json` 驗證能力宣稱的維度與驗證層級，見 [evidence-index.md](../docs/evidence-index.md)。 |
+| `Test-NetFramework48Smoke.ps1` | 以本機 nupkg 在 .NET Framework 4.8 消費端執行四主格式 round-trip 與 extension 入口煙霧測試。 |
+| `Test-OdfRelaxNgBaseline.ps1` | 以固定版本 Jing 對 corpus 執行 RELAX NG 外部對標，需先以 `Install-Jing.ps1` 取得 JAR。 |
+| `Test-OfficeGuiSmoke.ps1` | 執行 Microsoft Office GUI／COM 的 ODT／ODS／ODP 讀取煙霧驗收（僅 Windows，手動）。 |
 
 產品品質分層與發版前建議清單見 [docs/product-quality-gates.md](../docs/product-quality-gates.md)。
 
@@ -77,6 +83,8 @@
 | `Benchmark-BaselineReport.ps1` | 執行 stable benchmark profile 並產生 Markdown 效能基準報告。 |
 | `Test-PerformanceBudgets.ps1` | 驗證效能預算、schema v2 樣本與候選；active 時執行 allocation 硬閘門及耗時／峰值提醒。 |
 | `New-PerformanceBudgetCandidate.ps1` | 從至少三份同 OS／架構／runtime／CPU 且執行身分唯一的 schema v2 樣本計算九情境中位數候選；不會自動啟用門檻。 |
+| `Benchmark-Competitive.ps1` | 執行 `OdsStreamWriter` 與 MiniExcel、ClosedXML 的跨套件串流寫入對比，是 [performance-comparison.md](../docs/performance-comparison.md) 公開數值的來源。 |
+| `Benchmark-StandardDocuments.ps1` | 以獨立子處理程序執行 ODS／ODT／ODP 標準工作負載，輸出耗時、配置量、峰值工作集與語意 checksum，見 [performance-standard-documents.md](../docs/performance-standard-documents.md)。 |
 
 ### 封裝與發行
 
@@ -85,6 +93,42 @@
 | `Pack-NuGet.ps1` | 建置並封裝所有可發佈的 OdfKit NuGet 套件。 |
 | `Publish-GitHubRelease.ps1` | 將已驗證的 NuGet 套件附加至 GitHub Release，詳見 [github-release-publishing.md](../docs/github-release-publishing.md)。 |
 | `Test-ReleaseSbom.ps1` | 由完整方案 restore closure 與發布 nupkg 產生 SPDX 3.0.1 JSON-LD 主 SBOM，並產生 GitHub attestation 專用 SPDX 2.3 相容檔。 |
+| `Publish-WebFontSidecar.ps1` | 建立 Windows NativeAOT WebFont sidecar 的可發布 ZIP 與 SHA-256 manifest，見 [webfont-sidecar-deployment.md](../docs/webfont-sidecar-deployment.md)。 |
+| `Manage-WebFontSidecarService.ps1` | 安裝、更新、查詢或解除安裝 WebFont Sidecar Windows Service。 |
+
+### WebFont 驗證
+
+WebFont 驗證多半需要外部字型、瀏覽器或 IIS，屬手動或專用工作流程；能力範圍與人工閘門見
+[webfont-evidence-matrix.md](../docs/webfont-evidence-matrix.md)。
+
+| 腳本 | 用途 |
+|------|------|
+| `Test-WebFontSmoke.ps1` | 以真實 CNS 11643 字型驗證純 .NET 子集、HTTP 動態產字與三瀏覽器載入。 |
+| `Test-WebFontPackageConsumer.ps1` | 從本次 nupkg 安裝 WebFont library 與 CLI，並以真實 CNS 字型離線產字。 |
+| `Test-WebFontSupplyChain.ps1` | 驗證 WebFont 相依授權漂移，並產生可重現的 SPDX 2.3 SBOM。 |
+| `Test-WebFontStandardsAndDependencies.ps1` | 驗證 WebFont 規範基準、相依政策與全專案 GitHub Actions 供應鏈政策；`-Online` 查詢官方 API 且連線失敗時 fail closed。 |
+| `Test-WebFontOtsOracle.ps1` | 以 OpenType Sanitiser 對產出的 WebFont 資產做差分驗證。 |
+| `Test-WebFontCmapScaleBrowserProof.ps1` | 以真實字型與三個瀏覽器引擎驗證 cmap format 4 的規模路徑。 |
+| `Test-WebFontWorkerProcessSmoke.ps1` | 以兩個獨立 OS process 驗證 WebFont 動態產生與故障復原。 |
+| `Test-WebFontIisExpressSmoke.ps1` | 以真實 IIS Express 驗證 ASP.NET Web Forms 動態 WebFont 部署。 |
+| `Test-WebFontAspNetCoreIisExpressSmoke.ps1` | 以 IIS Express 與 ASP.NET Core Module 驗證 ASP.NET Core 動態 WebFont 部署。 |
+| `Test-WebFontSidecarAot.ps1` | 發布 NativeAOT sidecar 並以 net48 用戶端產生真正的 WOFF2。 |
+| `Test-WebFontSidecarWindowsService.ps1` | 發布並透過真實 Windows SCM 驗證 NativeAOT sidecar。 |
+| `Test-PlaywrightFirefoxShortcutPolicy.ps1` | 驗證 Playwright Firefox 私密瀏覽捷徑清理範圍不會影響一般 Firefox。 |
+| `Remove-PlaywrightFirefoxPrivateBrowsingShortcut.ps1` | 移除 Playwright Firefox 私密瀏覽代理程式與目前使用者開始功能表捷徑。 |
+| `WebFontIisSmoke.Common.ps1` | 兩支 IIS Express 煙霧腳本共用的函式模組，不單獨執行。 |
+| `Generate-WebFontPublicApiBaselines.ps1` | 重產各 WebFont 套件的 `PublicAPI.Unshipped.txt` 基線。 |
+
+### 外部工具與資料安裝
+
+外部工具版本、來源 URL 與 SHA-256 一律由 `eng/external-tools.json` 釘選；腳本在
+cache 命中時仍會重新驗證雜湊。
+
+| 腳本 | 用途 |
+|------|------|
+| `Install-Jing.ps1` | 依 manifest 下載並驗證固定版本 Jing RELAX NG 驗證器。 |
+| `Install-OdfValidator.ps1` | 依 manifest 下載並驗證固定版本 ODF Validator。 |
+| `Install-Cns11643MappingTables.ps1` | 下載並驗證全字庫（CNS 11643 open data）中文碼對照表；資料不內建於儲存庫。 |
 
 ### Schema 與 Corpus 產生
 

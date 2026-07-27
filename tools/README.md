@@ -7,7 +7,7 @@
 
 | 工具 | 主要用途 | 執行方式 |
 |------|----------|----------|
-| `OdfKit.Cli` | 驗證、資訊查詢、淨化、Flat XML / CSV 轉換 | `dotnet run --project tools/OdfKit.Cli --framework net10.0 -- ...` |
+| `OdfKit.Cli` | 驗證、資訊查詢、淨化、儲存格寫入、Flat XML / CSV 轉換 | `dotnet run --project tools/OdfKit.Cli --framework net10.0 -- ...` |
 | `OdfSchemaGenerator` | 從 OASIS RNG 產生 schema metadata、provider 與 DOM wrapper 輔助輸出 | `dotnet run --project tools/OdfSchemaGenerator -- ...` |
 | `OdfCorpusGenerator` | 依支援格式批次產生 corpus fixture 並更新 manifest | `dotnet run --project tools/OdfCorpusGenerator -- [repo-root]` |
 | `OdfKit.TrimSmoke` | Native AOT / trimming API 根煙霧測試 | `dotnet run --project tools/OdfKit.TrimSmoke` |
@@ -26,6 +26,7 @@
 | `typed-dom-coverage` | 輸出 typed DOM 覆蓋報告 |
 | `convert-flat` | ZIP ODF 與 Flat XML 之間轉換 |
 | `convert-csv` | ODS / FODS 與 CSV 之間轉換 |
+| `set-cell` | 於既有 ODS 指定工作表與位址寫入儲存格值並另存 |
 | `pack` | 將 Flat XML 重新封裝為 ZIP ODF |
 
 ### 常用範例
@@ -39,6 +40,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- sanitize input.odt 
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- typed-dom-coverage --format json
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat input.odt output.fodt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-csv input.ods output.csv
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- set-cell input.ods Sheet1 A1 42 output.ods
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt output.odt
 ```
 

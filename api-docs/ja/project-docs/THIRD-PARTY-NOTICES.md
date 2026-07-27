@@ -2,7 +2,7 @@
 title: 第三者に関する通知
 _lang: ja
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: d621ca4da6ba3062788fe0588b10a5f164f297c88a0a601e3614493e4c4200a3
+translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
 ---
 
 # 第三者に関する通知
@@ -13,12 +13,12 @@ OdfKit プロジェクトは [CC0-1.0 Universal](https://creativecommons.org/pub
 
 | パッケージ | 用途 | ライセンス |
 |---|---|---|
-| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | 暗号化、ハッシュ、およびキー導出アルゴリズムのサポート | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.html) |
+| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | 暗号化、ハッシュ、およびキー導出アルゴリズムのサポート | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.md) |
 | [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet) | 高性能なメモリおよびバッファーツール | [MIT](https://github.com/CommunityToolkit/dotnet/blob/main/License.md) |
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | XML デジタル署名の処理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | PKCS7 / CMS 署名の処理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | ODS ファイルの CSV インポートおよびエクスポート | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [CSharpMath](https://github.com/verybadcat/CSharpMath) | LaTeX ↔ MathML 数式変換エンジン | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [Sylvan.Data.Csv](https://github.com/MarkPflug/Sylvan) | ODS ファイルの CSV インポートおよびエクスポート | [MIT](https://github.com/MarkPflug/Sylvan/blob/main/license.txt) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | LaTeX ↔ MathML 数式変換エンジン | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/License) |
 | [System.Text.Json](https://github.com/dotnet/runtime) | JSON シリアル化。コアパッケージと OdfKit.Extensions.Collaboration の netstandard2.0 ターゲットで使用 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | 数式集計関数のベクトル化された数値演算。net10.0 ターゲットのみ | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | CRC-32 チェックサムの計算。net10.0 ターゲットのみ | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |

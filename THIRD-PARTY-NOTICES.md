@@ -6,12 +6,12 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 
 | 套件 (Package) | 用途 (Purpose) | 授權 (License) |
 |---|---|---|
-| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | 提供加密、雜湊與金鑰衍生演算法支援 | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.html) |
+| [BouncyCastle.Cryptography](https://github.com/bcgit/bc-csharp) | 提供加密、雜湊與金鑰衍生演算法支援 | [MIT](https://github.com/bcgit/bc-csharp/blob/master/LICENSE.md) |
 | [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet) | 高效能記憶體與緩衝區工具 | [MIT](https://github.com/CommunityToolkit/dotnet/blob/main/License.md) |
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | XML 數位簽章處理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | PKCS7 / CMS 簽章處理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
-| [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | 用於 ODS 檔案的 CSV 匯入與匯出 | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [CSharpMath](https://github.com/verybadcat/CSharpMath) | LaTeX ↔ MathML 公式轉換引擎 | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [Sylvan.Data.Csv](https://github.com/MarkPflug/Sylvan) | 用於 ODS 檔案的 CSV 匯入與匯出 | [MIT](https://github.com/MarkPflug/Sylvan/blob/main/license.txt) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | LaTeX ↔ MathML 公式轉換引擎 | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/License) |
 | [System.Text.Json](https://github.com/dotnet/runtime) | JSON 序列化（核心套件與 OdfKit.Extensions.Collaboration 之 netstandard2.0 目標均使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Numerics.Tensors](https://github.com/dotnet/runtime) | 公式聚合函式的向量化數值運算（僅 net10.0 目標使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.IO.Hashing](https://github.com/dotnet/runtime) | CRC-32 校驗碼計算（僅 net10.0 目標使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
@@ -26,7 +26,7 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | RDF 圖形與 SPARQL 查詢橋接（於 OdfKit.Extensions.Rdf 中使用） | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [Microsoft.CSharp](https://github.com/dotnet/runtime) | 提供 `dynamic` 型別執行期繫結支援（於 OdfKit.Extensions.Ooxml 之 netstandard2.0 目標使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與程式碼產生（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |
-| [Noto Sans TC](https://github.com/notofonts/noto-cjk) | WebFont 最小測試使用的繁體中文字型（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/notofonts/noto-cjk/blob/main/LICENSE) |
+| [Noto Sans TC](https://github.com/notofonts/noto-cjk) | WebFont 最小測試使用的繁體中文字型（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE) |
 | [Noto Sans Arabic／Devanagari](https://github.com/google/fonts) 與 [Noto Sans CJK](https://github.com/notofonts/noto-cjk) | 多國文字、複雜塑形、TTC face 與 OpenType CFF smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://openfontlicense.org/) |
 | [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) | Color／bitmap font 明確拒絕 smoke（僅測試時下載，不隨套件散布） | [SIL Open Font License 1.1](https://github.com/googlefonts/noto-emoji/blob/main/LICENSE) |
 | [IPAmj Mincho](https://moji.or.jp/mojikiban/font/) | 日本文字資訊基盤 IVS smoke（僅測試時下載，不隨套件散布） | [IPA Font License Agreement v1.0](https://moji.or.jp/ipafont/license/) |

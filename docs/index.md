@@ -50,7 +50,7 @@
 | [WebFont 純 .NET 架構契約](webfont-managed-architecture.md) | 純 C#／.NET 產品邊界、格式與授權準入、Phase 0～5 驗收 |
 | [API 表面分層](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
 | [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
-| [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |
+| [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名判讀、破壞性重新命名批次與文件掃描基線 |
 | [API Reference](reference/index.md) | Spreadsheet、Chart、Template 與 Interop 的 options、report 與能力邊界 |
 | [高階 API 遷移指南](migration-high-level-api.md) | 從早期 0.0.1 草稿遷移至四主格式一致生命週期契約 |
 | [NPOI／Independentsoft 遷移指南](migration-npoi-independentsoft.md) | 從常見第三方文件 API 遷移至 OdfKit 的對照與注意事項 |
