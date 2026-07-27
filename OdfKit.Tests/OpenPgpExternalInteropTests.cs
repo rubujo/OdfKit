@@ -203,16 +203,23 @@ public sealed class OpenPgpExternalInteropTests
 
     private static string RunGpg(string executable, string home, params string[] arguments)
     {
+        string workingDirectory = Directory.GetParent(home)!.FullName;
         var startInfo = new ProcessStartInfo(executable)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
+            WorkingDirectory = workingDirectory
         };
-        startInfo.Environment["GNUPGHOME"] = home;
+        startInfo.Environment["GNUPGHOME"] = Path.GetRelativePath(workingDirectory, home);
         foreach (string argument in arguments)
-            startInfo.ArgumentList.Add(argument);
+        {
+            startInfo.ArgumentList.Add(
+                Path.IsPathRooted(argument)
+                    ? Path.GetRelativePath(workingDirectory, argument)
+                    : argument);
+        }
 
         using Process process = Process.Start(startInfo)
             ?? throw new InvalidOperationException("無法啟動 GnuPG。");
