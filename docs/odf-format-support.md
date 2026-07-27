@@ -520,16 +520,20 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
   AES 路徑誤用 HMAC-SHA-256。Blowfish 因 start key 恰好也是 SHA-1 而未暴露此問題。
   解密端保留 HMAC-SHA-256 後備路徑，既有的 OdfKit 加密檔仍可讀取。
 
-**讀取方向已納入 CI**：`tests/fixtures/encryption-interop/` 收錄 LibreOffice 26.2 實機產生的兩份
-加密素材（Blowfish CFB 與 AES-256-CBC）與其加密參數 manifest，由
+**讀取方向已納入 CI**：`tests/fixtures/encryption-interop/` 收錄 LibreOffice 26.2 實機產生的三份
+加密素材（Blowfish CFB、AES-256-CBC 與 wholesome AES-256-GCM）及其加密參數 manifest，由
 `EncryptionInteropCorpusTests` 驗證解密結果、參數契約與載入後重新儲存；素材已提交，因此
 **不需要本機 LibreOffice 即可在 CI 執行**，並掛在主 CI 的 `core-security` 煙霧分片。
 還原任一項修正都會讓對應素材失敗（已實測）。
 
+**寫入方向已納入專用排程驗證**：`libreoffice-interop.yml` 在同一個 Windows runner 安裝一次
+LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKit 產生的 wholesome ODT
+並核對本文；缺少 Python UNO runtime 時該排程會失敗，不會以略過偽裝成功。
+`odf-external-baseline.yml` 另由目前 CLI 產生 wholesome 封裝，抽出 manifest 後以固定版本、
+固定 SHA-256 的 LibreOffice extended schema 與 Jing 作阻擋驗證。
+
 已知缺口：
 
-- **反向**（LibreOffice 開啟 OdfKit 產出）與 manifest 的 Jing schema 驗證仍需本機 LibreOffice
-  與 Jing，屬手動或排程工作流程，不在主 CI 的守備範圍。
 - OpenPGP 路徑由 `IOdfCryptographyProvider` 提供，其 checksum 維持 OdfKit 自洽形狀。
 - `.odc`、`.odb`、`.odf`、`.odi` 已納入 schema v4 深度語意證據契約：
   ODC 補齊單一序列移除，ODB 補齊 table／query 更新與集合清除，ODF 補齊 token 移除與清除，

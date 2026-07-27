@@ -12,6 +12,7 @@
 | ODF Toolkit source | `https://github.com/tdf/odftoolkit` | ODF Toolkit、ODFDOM 與 Validator 原始碼來源。 | no |
 | ODF Validator Maven metadata | `https://mvnrepository.com/artifact/org.odftoolkit/odfvalidator` | 檢查可取得版本與 artifact 名稱。 | no |
 | Jing 20241231 release | `https://github.com/relaxng/jing-trang/releases/tag/V20241231` | 獨立執行 OASIS ODF RELAX NG schema 的固定版驗證器；archive 與必要 JAR 皆以 SHA-256 固定。 | no |
+| LibreOffice 26.2.4.2 extended manifest schema | `https://github.com/LibreOffice/core/blob/libreoffice-26.2.4.2/schema/libreoffice/OpenDocument-v1.4%2Blibreoffice-manifest-schema.rng` | 驗證 wholesome encryption 使用的 Argon2id 與 `loext:*` manifest 擴充；外部 baseline 依 `eng/external-tools.json` 固定來源與 SHA-256，僅測試時下載。 | no |
 | OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 獨立數位典藏用途 validator；名稱相近但不是 ODF Toolkit baseline。 | no |
 | OASIS ODF 1.0 RNG schema | `https://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng` | OASIS Standard（2005-05-01）頁面列出的官方獨立 RELAX NG schema。舊下載端點目前會重新導向，儲存庫副本取自 TDF ODF Toolkit，並與 Debian Sources 的歷史副本逐位元組比對；SHA-256 為 `1284AE860F4A72F591B99F21FC0356B87AC30AD95DC457F7D7A5421658A5423F`。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.0-os.rng`） |
 | OASIS ODF 1.1 RNG schema | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | OASIS Standard（2007-02-01）官方獨立 RELAX NG schema，`OdfSchemaRegistry`／`OdfComplianceProfiles.OasisOdf11` 用以產生真實 ODF 1.1 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.1.rng`） |

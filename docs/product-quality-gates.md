@@ -40,6 +40,7 @@ HTML anchor；外部 HTTP 連結不在此離線閘門的責任範圍。
 |------|------|
 | `pwsh eng/Test-OdfCorpus.ps1` | 內建 corpus（`tests/fixtures/corpus/manifest.json`）；可設 `ODFKIT_PARITY_CORPUS_ROOT` 併跑外部 corpus |
 | `pwsh eng/Test-OdfRelaxNgBaseline.ps1 -JingJar <jar>` | 以 Jing 與 OASIS ODF 1.0～1.4 schema 驗證通用 schema 適用的 flat 與 package XML streams，並在報告明列公式格式排除集合 |
+| `pwsh eng/Test-WholesomeManifestBaseline.ps1 -JingJar <jar> -LibreOfficeManifestSchema <rng>` | 由目前來源產生 AES-256-GCM／Argon2id wholesome 封裝，並以 Jing 對固定版本 LibreOffice extended manifest schema 驗證 |
 | `pwsh eng/Test-OdfCorpus.ps1 -InternalBaselineJar <jar> -InternalBaselinePackageOnly` | 以外部 ODF Validator 對適用的 ODF 1.0～1.4 package fixtures 執行分類對標；CI 使用固定 SHA-256 工具快取 |
 | `pwsh eng/Initialize-OdfExternalCorpus.ps1 -OutputRoot <path>` | 初始化外部 corpus 目錄與 manifest 範本 |
 | `pwsh eng/Test-LibreOfficeInterop.ps1` | LibreOffice headless 實機互通（需本機安裝 soffice） |

@@ -10,7 +10,9 @@ on:
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
       - 'eng/Install-Jing.ps1'
+      - 'eng/Install-LibreOfficeManifestSchema.ps1'
       - 'eng/Test-OdfRelaxNgBaseline.ps1'
+      - 'eng/Test-WholesomeManifestBaseline.ps1'
       - 'eng/Test-OdfCorpus.ps1'
       - 'tools/OdfCorpusGenerator/**'
       - 'tools/OdfSchemaGenerator/schemas/**'
@@ -28,7 +30,9 @@ on:
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
       - 'eng/Install-Jing.ps1'
+      - 'eng/Install-LibreOfficeManifestSchema.ps1'
       - 'eng/Test-OdfRelaxNgBaseline.ps1'
+      - 'eng/Test-WholesomeManifestBaseline.ps1'
       - 'eng/Test-OdfCorpus.ps1'
       - 'tools/OdfCorpusGenerator/**'
       - 'tools/OdfSchemaGenerator/schemas/**'
@@ -82,6 +86,19 @@ jobs:
           "sha256=$($tool.sha256)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
           "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Read pinned LibreOffice manifest schema metadata
+        id: libreoffice-schema
+        shell: pwsh
+        run: |
+          $schema = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).libreOfficeManifestSchema
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE `
+            "odfkit/libreoffice-manifest-schema/$($schema.source)/r$($schema.cacheRevision)/$($schema.version)/$($schema.sha256)"
+          "source=$($schema.source)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "cache_revision=$($schema.cacheRevision)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "version=$($schema.version)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$($schema.sha256)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "cache_root=$cacheRoot" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Setup Java
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
@@ -116,6 +133,20 @@ jobs:
             -DestinationRoot '${{ steps.jing.outputs.cache_root }}'
           "jar_path=$jarPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+      - name: Cache pinned LibreOffice manifest schema
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ steps.libreoffice-schema.outputs.cache_root }}
+          key: libreoffice-manifest-schema-${{ runner.os }}-${{ steps.libreoffice-schema.outputs.source }}-r${{ steps.libreoffice-schema.outputs.cache_revision }}-${{ steps.libreoffice-schema.outputs.version }}-${{ steps.libreoffice-schema.outputs.sha256 }}
+
+      - name: Install and verify LibreOffice manifest schema
+        id: install-libreoffice-schema
+        shell: pwsh
+        run: |
+          $schemaPath = ./eng/Install-LibreOfficeManifestSchema.ps1 `
+            -DestinationRoot '${{ steps.libreoffice-schema.outputs.cache_root }}'
+          "schema_path=$schemaPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Validate internal ODF corpus
         shell: pwsh
         run: ./eng/Test-OdfCorpus.ps1
@@ -138,6 +169,14 @@ jobs:
         run: |
           ./eng/Test-OdfRelaxNgBaseline.ps1 `
             -JingJar '${{ steps.install-jing.outputs.jar_path }}'
+
+      - name: Validate generated wholesome manifest with Jing
+        shell: pwsh
+        run: |
+          ./eng/Test-WholesomeManifestBaseline.ps1 `
+            -JingJar '${{ steps.install-jing.outputs.jar_path }}' `
+            -LibreOfficeManifestSchema '${{ steps.install-libreoffice-schema.outputs.schema_path }}' `
+            -NoBuild
 
       - name: Validate applicable ODF package parity
         shell: pwsh

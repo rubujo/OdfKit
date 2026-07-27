@@ -127,6 +127,7 @@ cache 命中時仍會重新驗證雜湊。
 | 腳本 | 用途 |
 |------|------|
 | `Install-Jing.ps1` | 依 manifest 下載並驗證固定版本 Jing RELAX NG 驗證器。 |
+| `Install-LibreOfficeManifestSchema.ps1` | 依 manifest 下載並驗證與排程實機版本一致的 LibreOffice extended manifest schema。 |
 | `Install-OdfValidator.ps1` | 依 manifest 下載並驗證固定版本 ODF Validator。 |
 | `Install-Cns11643MappingTables.ps1` | 下載並驗證全字庫（CNS 11643 open data）中文碼對照表；資料不內建於儲存庫。 |
 
@@ -136,6 +137,7 @@ cache 命中時仍會重新驗證雜湊。
 |------|------|
 | `Generate-OdfSchemaProvider.ps1` | 從 OASIS RNG schema manifest（`tools/OdfSchemaGenerator/`）產生 schema provider 程式碼。 |
 | `Initialize-OdfExternalCorpus.ps1` | 將外部 corpus manifest 與 baseline exception 範本複製到指定資料夾，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |
+| `Test-WholesomeManifestBaseline.ps1` | 由目前 CLI 產生 wholesome 加密 ODT，抽出 manifest 並以固定版本 LibreOffice schema 與 Jing 驗證。 |
 
 ### 程式碼結構診斷
 

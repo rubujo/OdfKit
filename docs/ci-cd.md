@@ -82,6 +82,12 @@ cache key 同時包含來源、cache revision、版本與完整雜湊，且不�
 cache miss 的下載先寫入唯一暫存檔，驗證成功後才移入正式路徑。CI 不快取 corpus 驗證輸出、
 暫存 manifest 或測試結果，因此舊結果不會被誤當成本次驗證證據。
 
+同一個外部 baseline 另釘選與排程 LibreOffice 相同版本的 extended manifest schema。工作流程
+由目前 CLI 即時產生 AES-256-GCM／Argon2id wholesome ODT、抽出外層 manifest，再交由 Jing
+驗證；schema 下載與 cache 命中皆重算 SHA-256，產生的文件與驗證結果不進入 cache。
+LibreOffice 每週雙 TFM 工作流程則以 Python UNO 開啟該形狀並核對本文；已明確啟用實機
+互通時若缺少 UNO runtime，測試必須失敗而非略過。
+
 NuGet 驗證由 Ubuntu 僅封裝一次，產生 `SHA256SUMS` 後以上傳 artifact 將同一份短期快照
 分送至 Linux x64、Windows x64、Windows ARM64 與 macOS ARM64 runner。每個 consumer job
 都會先驗證 SHA-256，再以安裝發布套件的獨立專案執行 managed 與 Imaging native runtime

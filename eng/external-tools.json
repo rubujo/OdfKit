@@ -308,5 +308,15 @@
       "xercesImpl.jar": "6ae540a7c85c814ac64bea48016b3a6f45c95d4765f547fcc0053dc36c94ed5c",
       "xml-apis.jar": "d404aa881eb9c5f7a4fb546e84ea11506cd417a72b5972e88eff17f43f9f8a64"
     }
+  },
+  "libreOfficeManifestSchema": {
+    "source": "libreoffice-core",
+    "cacheRevision": "1",
+    "version": "26.2.4.2",
+    "revision": "libreoffice-26.2.4.2",
+    "fileName": "OpenDocument-v1.4+libreoffice-manifest-schema.rng",
+    "uri": "https://raw.githubusercontent.com/LibreOffice/core/libreoffice-26.2.4.2/schema/libreoffice/OpenDocument-v1.4+libreoffice-manifest-schema.rng",
+    "sha256": "d3b34ec638a4e013fd740ebc74dcd34ba8baff15e6939a4486b26a7a92c8058d",
+    "role": "僅在外部 baseline 下載，用於驗證 LibreOffice 26.2.4.2 wholesome encryption manifest；不隨 OdfKit 套件散布。"
   }
 }

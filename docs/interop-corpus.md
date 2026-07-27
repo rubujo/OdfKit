@@ -44,8 +44,10 @@
 - 素材已提交，**不需要本機 LibreOffice 即可執行**；測試標記為 `Smoke` 與 `Interop`，並掛在主 CI
   的 `core-security` 煙霧分片。互通邊界與已知缺口見
   [odf-format-support.md](odf-format-support.md)。
-- OdfKit 寫入 `OdfEncryptionAlgorithm.Aes256Gcm` 時會產生 LibreOffice wholesome 封裝；反向
-  實機開啟與 manifest 的 Jing schema 驗證仍需外部工具，不在此 corpus 的守備範圍。
+- OdfKit 寫入 `OdfEncryptionAlgorithm.Aes256Gcm` 時會產生 LibreOffice wholesome 封裝。反向
+  實機開啟由每週 `libreoffice-interop.yml` 的雙 TFM UNO 測試守備；目前來源產生的 manifest
+  則由 `odf-external-baseline.yml` 以固定 SHA-256 的 LibreOffice extended schema 與 Jing 驗證。
+  兩者仍不進入無外部應用程式依賴的主 CI 煙霧分片。
 
 ## 安全邊界 corpus
 

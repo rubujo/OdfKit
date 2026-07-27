@@ -25,8 +25,9 @@ public partial class LibreOfficeInteropTests
             Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 wholesome 加密實機互通性測試。");
 
         string pythonPath = Path.Combine(Path.GetDirectoryName(sofficePath!)!, "python.exe");
-        if (!File.Exists(pythonPath))
-            Assert.Skip("LibreOffice 安裝未包含 Python UNO runtime，略過 wholesome 加密實機互通性測試。");
+        Assert.True(
+            File.Exists(pythonPath),
+            "已啟用 LibreOffice 實機互通，但安裝未包含 Python UNO runtime，無法驗證 wholesome 反向互通。");
 
         const string password = "OdfKit-Wholesome-Interop";
         const string expectedText = "OdfKit wholesome encryption LibreOffice interop";
