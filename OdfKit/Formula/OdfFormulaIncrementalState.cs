@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
@@ -11,11 +12,17 @@ internal sealed class OdfFormulaIncrementalState
     private OdfFormulaIncrementalState(
         OdfFormulaDependencyGraph graph,
         Dictionary<OdfCellAddress, string> formulas,
-        Dictionary<OdfCellAddress, object> values)
+        Dictionary<OdfCellAddress, object> values,
+        Dictionary<OdfCellAddress, OdfNode> nodes,
+        List<string> sheetNames,
+        long mutationVersion)
     {
         Graph = graph;
         Formulas = formulas;
         Values = values;
+        Nodes = nodes;
+        SheetNames = sheetNames;
+        MutationVersion = mutationVersion;
     }
 
     internal OdfFormulaDependencyGraph Graph { get; }
@@ -24,11 +31,21 @@ internal sealed class OdfFormulaIncrementalState
 
     internal Dictionary<OdfCellAddress, object> Values { get; }
 
+    internal Dictionary<OdfCellAddress, OdfNode> Nodes { get; }
+
+    internal List<string> SheetNames { get; }
+
+    internal long MutationVersion { get; }
+
     internal static OdfFormulaIncrementalState CaptureOwned(
         OdfFormulaDependencyGraph graph,
-        OdfDomEvaluationContext context) =>
+        OdfDomEvaluationContext context,
+        long mutationVersion) =>
         new(
             graph,
             context.CellFormulas,
-            context.CellValues);
+            context.CellValues,
+            context.CellNodes,
+            context.MutableSheetNames,
+            mutationVersion);
 }

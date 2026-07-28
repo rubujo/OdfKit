@@ -86,6 +86,46 @@ internal class OdfDomEvaluationContext :
         TraverseTable(contentRoot);
     }
 
+    internal OdfDomEvaluationContext(
+        OdfFormulaIncrementalState state,
+        IReadOnlyList<OdfFormulaCellMutation> mutations,
+        OdfNode contentRoot,
+        DefaultFormulaEvaluator evaluator,
+        OdfExternalLinkManager? externalLinks,
+        IOdfFormulaVolatileContext volatileContext,
+        OdfFormulaEvaluationBudget? budget,
+        OdfFormulaExternalReferencePolicy externalReferencePolicy)
+    {
+        _contentRoot = contentRoot;
+        _evaluator = evaluator;
+        _externalLinks = externalLinks;
+        _volatileContext = volatileContext;
+        _budget = budget;
+        _externalReferencePolicy = externalReferencePolicy;
+        _cellNodes = new Dictionary<OdfCellAddress, OdfNode>(state.Nodes);
+        _cellFormulas = new Dictionary<OdfCellAddress, string>(state.Formulas);
+        _cellValues = new Dictionary<OdfCellAddress, object>(state.Values);
+        _sheetNames = new List<string>(state.SheetNames);
+
+        foreach (OdfFormulaCellMutation mutation in mutations)
+        {
+            _cellNodes[mutation.Address] = mutation.Node;
+            string? formula = mutation.Node.GetAttribute(
+                "formula",
+                OdfNamespaces.Table);
+            if (string.IsNullOrEmpty(formula))
+            {
+                _cellFormulas.Remove(mutation.Address);
+            }
+            else
+            {
+                _cellFormulas[mutation.Address] = formula;
+            }
+
+            _cellValues[mutation.Address] = ParseCellValue(mutation.Node);
+        }
+    }
+
     private OdfDomEvaluationContext(
         OdfDomEvaluationContext source,
         DefaultFormulaEvaluator evaluator)
@@ -118,6 +158,8 @@ internal class OdfDomEvaluationContext :
         new(this, evaluator);
 
     public IReadOnlyList<string> SheetNames => _sheetNames;
+
+    internal List<string> MutableSheetNames => _sheetNames;
 
     public double NextRandomDouble() => _volatileContext.NextRandomDouble();
 

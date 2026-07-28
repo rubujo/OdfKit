@@ -16,6 +16,7 @@ public partial class SpreadsheetDocument
 {
     private OdfExternalLinkManager? _externalLinks;
     private OdfFormulaEvaluationChannel? _formulaEvaluationChannel;
+    private readonly OdfFormulaMutationJournal _formulaMutationJournal = new();
 
     /// <summary>
     /// Gets the external link manager for cross-document formula references.
@@ -117,7 +118,11 @@ public partial class SpreadsheetDocument
                 OdfLocalizer.GetMessage("Err_SpreadsheetDocument_FormulaOptionsNull"));
         }
 
-        return new OdfFormulaEvaluationSession(ContentDom, ExternalLinks, options);
+        return new OdfFormulaEvaluationSession(
+            ContentDom,
+            ExternalLinks,
+            options,
+            _formulaMutationJournal);
     }
 
     /// <summary>
@@ -151,6 +156,15 @@ public partial class SpreadsheetDocument
     internal void NotifyFormulaRecalculationRequested()
     {
         _formulaEvaluationChannel?.TryEnqueue();
+    }
+
+    internal void NotifyFormulaCellChanged(
+        OdfCellAddress address,
+        DOM.OdfNode node,
+        bool formulaChanged)
+    {
+        _formulaMutationJournal.Record(address, node, formulaChanged);
+        NotifyFormulaRecalculationRequested();
     }
 
     /// <summary>

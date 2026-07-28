@@ -21,16 +21,19 @@ public sealed class OdfFormulaEvaluationSession
     private readonly OdfExternalLinkManager? _externalLinks;
     private readonly OdfFormulaEvaluationOptions _options;
     private readonly DefaultFormulaEvaluator _evaluator;
+    private readonly OdfFormulaMutationJournal _mutationJournal;
     private OdfFormulaIncrementalState? _state;
 
     internal OdfFormulaEvaluationSession(
         OdfNode contentRoot,
         OdfExternalLinkManager? externalLinks,
-        OdfFormulaEvaluationOptions options)
+        OdfFormulaEvaluationOptions options,
+        OdfFormulaMutationJournal mutationJournal)
     {
         _contentRoot = contentRoot;
         _externalLinks = externalLinks;
         _options = options;
+        _mutationJournal = mutationJournal;
         _evaluator = options.Evaluator ?? new DefaultFormulaEvaluator();
     }
 
@@ -62,6 +65,7 @@ public sealed class OdfFormulaEvaluationSession
                 _externalLinks,
                 _options,
                 _state,
+                _mutationJournal,
                 cancellationToken);
         _state = state;
         return report;

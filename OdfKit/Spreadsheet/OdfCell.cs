@@ -113,7 +113,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
             }
 
             PublishTrackingSnapshot(previousSnapshot);
-            _doc.NotifyFormulaRecalculationRequested();
+            NotifyFormulaCellChanged(formulaChanged: false);
         }
     }
 
@@ -218,7 +218,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
             }
 
             PublishTrackingSnapshot(previousSnapshot);
-            _doc.NotifyFormulaRecalculationRequested();
+            NotifyFormulaCellChanged(formulaChanged: true);
         }
     }
 
@@ -247,7 +247,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         ValueType = "float";
         RawValue = val.ToString(CultureInfo.InvariantCulture);
         DisplayText = val.ToString(CultureInfo.InvariantCulture);
-        _doc.NotifyFormulaRecalculationRequested();
+        NotifyFormulaCellChanged(formulaChanged: false);
     }
 
     /// <summary>
@@ -260,7 +260,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         ValueType = "boolean";
         Node.SetAttribute("boolean-value", OdfNamespaces.Office, val ? "true" : "false", "office");
         DisplayText = val ? "TRUE" : "FALSE";
-        _doc.NotifyFormulaRecalculationRequested();
+        NotifyFormulaCellChanged(formulaChanged: false);
     }
     /// <summary>
     /// Short overload of SetValue that accepts date; remaining optional parameters use defaults and forward to the full overload.
@@ -293,7 +293,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         }
         Node.SetAttribute("date-value", OdfNamespaces.Office, isoDate, "office");
         DisplayText = isoDate;
-        _doc.NotifyFormulaRecalculationRequested();
+        NotifyFormulaCellChanged(formulaChanged: false);
     }
 
 
@@ -306,7 +306,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     {
         ValueType = "string";
         DisplayText = text;
-        _doc.NotifyFormulaRecalculationRequested();
+        NotifyFormulaCellChanged(formulaChanged: false);
     }
 
     private OdfNode? CaptureTrackingSnapshot() =>
@@ -334,7 +334,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
         Node.RemoveAttribute("date-value", OdfNamespaces.Office);
         DisplayText = string.Empty;
-        _doc.NotifyFormulaRecalculationRequested();
+        NotifyFormulaCellChanged(formulaChanged: false);
     }
 
     private void SetCellTextContent(string text)
@@ -362,6 +362,12 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
             SetStyleProperty("table-cell-properties", "wrap-option", OdfNamespaces.Fo, "wrap", "fo");
         }
     }
+
+    private void NotifyFormulaCellChanged(bool formulaChanged) =>
+        _doc.NotifyFormulaCellChanged(
+            new OdfCellAddress(Row, Column, _sheetName),
+            Node,
+            formulaChanged);
 
     private static void AppendTextContent(OdfNode parentNode, string text, ref bool needsWrap)
     {
