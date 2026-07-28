@@ -517,10 +517,10 @@ internal static class FormulaMathFunctionHandlers
 
     internal static object EvaluateRoundUp(List<AstNode> arguments, IEvaluationContext context)
     {
-        if (arguments.Count != 2)
+        if (arguments.Count is < 1 or > 2)
             return OdfFormulaError.Value;
         var numVal = arguments[0].Evaluate(context);
-        var digitsVal = arguments[1].Evaluate(context);
+        var digitsVal = arguments.Count == 2 ? arguments[1].Evaluate(context) : 0d;
 
         if (numVal is OdfFormulaError err1)
             return err1;
@@ -538,10 +538,10 @@ internal static class FormulaMathFunctionHandlers
 
     internal static object EvaluateRoundDown(List<AstNode> arguments, IEvaluationContext context)
     {
-        if (arguments.Count != 2)
+        if (arguments.Count is < 1 or > 2)
             return OdfFormulaError.Value;
         var numVal = arguments[0].Evaluate(context);
-        var digitsVal = arguments[1].Evaluate(context);
+        var digitsVal = arguments.Count == 2 ? arguments[1].Evaluate(context) : 0d;
 
         if (numVal is OdfFormulaError err1)
             return err1;

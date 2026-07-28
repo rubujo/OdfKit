@@ -5,9 +5,10 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 但「功能超集合」與「正式 Large Group 一致性」是兩件不同的事。
 
 文件層的計算設定檔稱為 **OdfKit Safe Large**：Large Group 的 388 個強制函式名稱
-皆可派送，但 `DDE` 永久列入安全排除，不啟動程序、不連網，也不求值引數。因此
-`IsSafeProfileComplete` 可以為 `true`，但 OdfKit 不把它描述成未附條件的 OASIS
-Large 正式一致性。
+皆可派送，其中 387 個可求值函式均通過 OASIS 條文可追溯的獨立 oracle 代表案例；
+`DDE` 永久列入安全排除，不啟動程序、不連網，也不求值引數。因此
+`IsSafeProfileComplete` 與機器可讀 manifest 的 `safeLargeConformanceClaim` 為 `true`，
+但 OdfKit 不把它描述成未附條件的 OASIS Large 正式一致性。
 
 ## 交易式計算與儲存策略
 
@@ -62,10 +63,11 @@ document.Save(
 | ODF 1.0／1.1 公式互通 | 支援 | 辨識及評估常見的 `oooc:=` 前綴；這兩版早於標準化的 OpenFormula 一致性群組。 |
 | ODF 1.2～1.4 OpenFormula | 廣泛實作 | 辨識 `of:=` 與強制重算標記，支援科學記號、常數錯誤、參照範圍／交集／聯集、引號標籤、自動交集、命名運算式、外部名稱、inline array、矩陣公式寫回及受控重算。 |
 | Small Group 強制函式名稱 | 110／110 | `OdfFormulaSupport.GetConformanceReport(Small)` 可機械化確認內建函式清單沒有名稱缺口。 |
-| Small Group 正式一致性 | 尚未宣稱 | 尚須以規範 corpus 逐項證明基本限制、完整語法、隱含轉換、錯誤傳播及函式邊界語意。 |
+| Small Group 規範 oracle | 110／110 | 每個強制函式至少一筆正常語意案例通過獨立 oracle，另由七維安全契約及專項 corpus 覆蓋轉型、錯誤與邊界。 |
 | Medium Group 強制函式名稱 | 272／272 | 強制函式皆可由預設評估器派送，包含參照、矩陣、機率分佈、統計及財務函式。 |
 | Large Group 強制函式名稱 | 388／388 | 強制函式名稱皆可派送，並包含 inline array、矩陣、複數、進位轉換與東亞位元組文字函式。 |
-| Medium／Large 正式一致性 | 尚未宣稱 | 名稱覆蓋已完成；能力報告會另外列出刻意安全拒絕的 `DDE`。內嵌陣列、矩陣公式寫回、自動交集、文件／工作表名稱、外部名稱、Bessel 高階數值、奇數票息及 pivot 替代語法皆已有執行測試；仍須持續擴充逐函式 corpus，以涵蓋所有限制、locale／主機屬性、數值誤差及極端邊界。 |
+| OdfKit Safe Large | 已驗證 | 388 個逐函式規範案例、2,716 個七維安全契約，以及 inline array、自動交集、外部／工作表名稱、複數、矩陣公式、pivot、多重運算、Bessel 與奇數票息專項案例皆可重現通過。 |
+| 未附條件的 OASIS Large | 不宣稱 | `DDE` 依安全政策刻意拒絕；Safe Large 是清楚揭露此差異的專案設定檔，不冒充未附條件的 OASIS Large。 |
 | OdfKit Extended | 已實作擴充邊界 | 可註冊規範外或尚未內建的函式，也可把整條不受支援公式交給外部服務。這不是新的 OASIS 一致性等級。 |
 
 OASIS 規定 OpenDocument Formula Evaluator 必須符合 Small、Medium 或 Large
@@ -201,16 +203,23 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 逐一列出 388 個 Large Group 函式、ODF 1.2／1.3／1.4、Safe Large 分類與測試證據。
 每個函式都對應參數數量、正常型別、隱含轉換、空值、錯誤傳播、邊界及版本差異
 七個可執行安全契約，共 2,716 個案例，並標示為 `safe-contract-covered`。
-這些案例保證剖析、派送、封閉結果型別與安全排除，不是獨立的 OASIS 數值 oracle；
-`normativeOracleStatus` 仍會如實標示 `pending-independent-oasis-oracle`，不得被工具
-或文件當成官方 Large 正式一致性通過。
-`pwsh eng/Generate-OpenFormulaConformanceManifest.ps1 -VerifyOnly` 會防止 manifest
-與實際強制函式清單漂移。
+這些安全契約保證剖析、派送、封閉結果型別與安全排除；另有機器可讀的
+[OpenFormula normative corpus](openformula-normative-corpus.json)，為 388 個函式各保留
+OASIS 1.4 條文、官方 Syntax、公式、預期型別、預期值及 oracle 身分。387 個可求值函式
+標示為 `representative-oasis-oracle-covered`；`DDE` 標示為
+`not-applicable-security-exclusion`。
 
-後續證據工作應持續擴充每個函式的限制、空值、locale、日期基準、浮點容許誤差及
-極端輸入案例；同時保留 OdfKit Extended 註冊表與後援，讓應用程式在 Large 清單之外
-加入領域函式，並個別揭露外部引擎與安全邊界。是否正式宣稱 Small、Medium 或 Large
-一致性，應以整份 corpus 的可重現通過證據決定，而不是只看 388／388 名稱覆蓋。
+normative corpus 的預期值主要由固定版本 LibreOffice Calc 26.2.4.2 產生，再由
+`OpenFormulaNormativeCorpusTests` 離線重跑。volatile 與宿主服務函式使用規範性質或
+明確 workbook contract；LibreOffice 與已發表參考值衝突的奇數首期票息案例，以可追溯
+的已發表參考值裁決，不把單一實作當成規範本身。
+`pwsh eng/Generate-OpenFormulaConformanceManifest.ps1 -VerifyOnly` 會防止 manifest
+與實際強制函式清單漂移；需要重建獨立 oracle 時，使用
+`eng/Generate-OpenFormulaNormativeCorpus.ps1` 並明確提供 OASIS HTML 與 `soffice` 路徑。
+
+後續仍可增加每個函式的限制、空值、locale、日期基準與極端輸入向量，但這些擴充不再
+是 Safe Large 基準線的未完成項目。若未來要宣稱未附條件的 OASIS Large，必須先重新
+評估 `DDE` 安全排除；不得只因 388／388 名稱或代表案例通過便移除此揭露。
 
 規範依據為 OASIS
 [ODF 1.4 Part 4: OpenFormula](https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html)；

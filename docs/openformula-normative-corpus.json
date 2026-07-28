@@ -1,0 +1,4284 @@
+{
+  "schemaVersion": 1,
+  "profile": "OdfKit Safe Large",
+  "normativeSource": {
+    "title": "OpenDocument v1.4 Part 4 OpenFormula",
+    "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html",
+    "sha256": "3e7c0f0ea815e63e96ee40fd4f6df034a521c90f4b79b7ccad8a0b8e36e4cd8b"
+  },
+  "independentOracle": {
+    "product": "LibreOffice Calc",
+    "version": "LibreOffice 26.2.4.2 0229ac93fcf0d7cbc6376066c6f35021cef002dc"
+  },
+  "requiredFunctionCount": 388,
+  "cases": [
+    {
+      "function": "ABS",
+      "section": "6.16.2",
+      "syntax": "ABS( Number N )",
+      "formula": "of:=ABS(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACOS",
+      "section": "6.16.3",
+      "syntax": "ACOS( Number N )",
+      "formula": "of:=ACOS(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "1.0471975511966",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AND",
+      "section": "6.15.2",
+      "syntax": "AND( { Logical|NumberSequenceList L } + )",
+      "formula": "of:=AND(TRUE();{1;2;3})",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ASIN",
+      "section": "6.16.7",
+      "syntax": "ASIN( Number N )",
+      "formula": "of:=ASIN(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.523598775598299",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ATAN",
+      "section": "6.16.9",
+      "syntax": "ATAN( Number N )",
+      "formula": "of:=ATAN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.10714871779409",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ATAN2",
+      "section": "6.16.10",
+      "syntax": "ATAN2( Number x ; Number y )",
+      "formula": "of:=ATAN2(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.785398163397448",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AVERAGE",
+      "section": "6.18.3",
+      "syntax": "AVERAGE( { NumberSequence N } + )",
+      "formula": "of:=AVERAGE({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AVERAGEIF",
+      "section": "6.18.5",
+      "syntax": "AVERAGEIF( Reference R ; Criterion C [ ; Reference A ] )",
+      "formula": "of:=AVERAGEIF([Data.B2:.B4];\">1\";[Data.B2:.B4])",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CHOOSE",
+      "section": "6.14.3",
+      "syntax": "CHOOSE( Integer Index ; { Any Value } + )",
+      "formula": "of:=CHOOSE(2;\"a\";\"b\";\"c\")",
+      "expected": {
+        "kind": "string",
+        "value": "b",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COLUMNS",
+      "section": "6.13.5",
+      "syntax": "COLUMNS( Reference|Array R )",
+      "formula": "of:=COLUMNS([Data.A2:.B4])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COS",
+      "section": "6.16.19",
+      "syntax": "COS( Number N )",
+      "formula": "of:=COS(2)",
+      "expected": {
+        "kind": "float",
+        "value": "-0.416146836547142",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUNT",
+      "section": "6.13.6",
+      "syntax": "COUNT( { NumberSequenceList N } + )",
+      "formula": "of:=COUNT({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUNTA",
+      "section": "6.13.7",
+      "syntax": "COUNTA( { Any AnyValue } + )",
+      "formula": "of:=COUNTA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUNTBLANK",
+      "section": "6.13.8",
+      "syntax": "COUNTBLANK( ReferenceList R )",
+      "formula": "of:=COUNTBLANK([Data.C1:.C3])",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUNTIF",
+      "section": "6.13.9",
+      "syntax": "COUNTIF( ReferenceList R ; Criterion C )",
+      "formula": "of:=COUNTIF([Data.B2:.B4];\">1\")",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DATE",
+      "section": "6.10.2",
+      "syntax": "DATE( Integer Year ; Integer Month ; Integer Day )",
+      "formula": "of:=DATE(2020;1;15)",
+      "expected": {
+        "kind": "date",
+        "value": "2020-01-15",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DAVERAGE",
+      "section": "6.9.2",
+      "syntax": "DAVERAGE( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DAVERAGE([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DAY",
+      "section": "6.10.5",
+      "syntax": "DAY( DateParam D )",
+      "formula": "of:=DAY(DATE(2020;1;15))",
+      "expected": {
+        "kind": "float",
+        "value": "15",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DCOUNT",
+      "section": "6.9.3",
+      "syntax": "DCOUNT( Database D ; [ Field F ] ; Criteria C )",
+      "formula": "of:=DCOUNT([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DCOUNTA",
+      "section": "6.9.4",
+      "syntax": "DCOUNTA( Database D ; [ Field F ] ; Criteria C )",
+      "formula": "of:=DCOUNTA([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DDB",
+      "section": "6.12.14",
+      "syntax": "DDB( Number Cost ; Number Salvage ; Number LifeTime ; Number Period [ ; Number DeclinationFactor = 2 ] )",
+      "formula": "of:=DDB(1000;100;5;1;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "400",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DEGREES",
+      "section": "6.16.25",
+      "syntax": "DEGREES( Number N )",
+      "formula": "of:=DEGREES(2)",
+      "expected": {
+        "kind": "float",
+        "value": "114.591559026165",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DGET",
+      "section": "6.9.5",
+      "syntax": "DGET( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DGET([Data.A1:.B4];2;[Data.E1:.E2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DMAX",
+      "section": "6.9.6",
+      "syntax": "DMAX( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DMAX([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DMIN",
+      "section": "6.9.7",
+      "syntax": "DMIN( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DMIN([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DPRODUCT",
+      "section": "6.9.8",
+      "syntax": "DPRODUCT( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DPRODUCT([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DSTDEV",
+      "section": "6.9.9",
+      "syntax": "DSTDEV( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DSTDEV([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "0.707106781186548",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DSTDEVP",
+      "section": "6.9.10",
+      "syntax": "DSTDEVP( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DSTDEVP([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DSUM",
+      "section": "6.9.11",
+      "syntax": "DSUM( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DSUM([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DVAR",
+      "section": "6.9.12",
+      "syntax": "DVAR( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DVAR([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DVARP",
+      "section": "6.9.13",
+      "syntax": "DVARP( Database D ; Field F ; Criteria C )",
+      "formula": "of:=DVARP([Data.A1:.B4];2;[Data.D1:.D2])",
+      "expected": {
+        "kind": "float",
+        "value": "0.25",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EVEN",
+      "section": "6.16.30",
+      "syntax": "EVEN( Number N )",
+      "formula": "of:=EVEN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EXACT",
+      "section": "6.20.8",
+      "syntax": "EXACT( Text T1 ; Text T2 )",
+      "formula": "of:=EXACT(\"x\";\"x\")",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EXP",
+      "section": "6.16.31",
+      "syntax": "EXP( Number X )",
+      "formula": "of:=EXP(2)",
+      "expected": {
+        "kind": "float",
+        "value": "7.38905609893065",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FACT",
+      "section": "6.16.32",
+      "syntax": "FACT( Integer F )",
+      "formula": "of:=FACT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FALSE",
+      "section": "6.15.3",
+      "syntax": "FALSE()",
+      "formula": "of:=FALSE()",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FIND",
+      "section": "6.20.9",
+      "syntax": "FIND( Text Search ; Text T [ ; Integer Start = 1 ] )",
+      "formula": "of:=FIND(\"x\";\"x\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FV",
+      "section": "6.12.20",
+      "syntax": "FV( Number Rate ; Number Nper ; Number Payment [ ; [ Number Pv = 0 ] [ ; Number PayType = 0 ] ] )",
+      "formula": "of:=FV(2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "-8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HLOOKUP",
+      "section": "6.14.5",
+      "syntax": "HLOOKUP( Any Lookup ; ForceArray Reference|Array DataSource ; Integer Row [ ; Logical RangeLookup = TRUE ] )",
+      "formula": "of:=HLOOKUP(2;[Data.A6:.C7];2;FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "20",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HOUR",
+      "section": "6.10.11",
+      "syntax": "HOUR( TimeParam T )",
+      "formula": "of:=HOUR(TIME(12;30;0))",
+      "expected": {
+        "kind": "float",
+        "value": "12",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IF",
+      "section": "6.15.4",
+      "syntax": "IF( Logical Condition [ ; [ Any IfTrue ] [ ; [ Any IfFalse ] ] ] )",
+      "formula": "of:=IF(TRUE();1;2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INDEX",
+      "section": "6.14.6",
+      "syntax": "INDEX( ReferenceList | Array DataSource ; [ Integer Row ] [ ; [ Integer Column ] ] [ ; Integer AreaNumber = 1 ] )",
+      "formula": "of:=INDEX([Data.A2:.B4];2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INT",
+      "section": "6.17.2",
+      "syntax": "INT( Number N )",
+      "formula": "of:=INT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IRR",
+      "section": "6.12.24",
+      "syntax": "IRR( NumberSequence Values [ ; Number Guess = 0.1 ] )",
+      "formula": "of:=IRR({-100;60;60};0.1)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0.130662386291807",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISBLANK",
+      "section": "6.13.14",
+      "syntax": "ISBLANK( Scalar X )",
+      "formula": "of:=ISBLANK(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISERR",
+      "section": "6.13.15",
+      "syntax": "ISERR( Scalar X )",
+      "formula": "of:=ISERR(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISERROR",
+      "section": "6.13.16",
+      "syntax": "ISERROR( Scalar X )",
+      "formula": "of:=ISERROR(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISLOGICAL",
+      "section": "6.13.19",
+      "syntax": "ISLOGICAL( Scalar X )",
+      "formula": "of:=ISLOGICAL(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISNA",
+      "section": "6.13.20",
+      "syntax": "ISERR( Scalar X )",
+      "formula": "of:=ISNA(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISNONTEXT",
+      "section": "6.13.21",
+      "syntax": "ISNONTEXT( Scalar X )",
+      "formula": "of:=ISNONTEXT(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISNUMBER",
+      "section": "6.13.22",
+      "syntax": "ISNUMBER( Scalar X )",
+      "formula": "of:=ISNUMBER(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISTEXT",
+      "section": "6.13.25",
+      "syntax": "ISTEXT( Scalar X )",
+      "formula": "of:=ISTEXT(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEFT",
+      "section": "6.20.12",
+      "syntax": "LEFT( Text T [ ; Integer Length ] )",
+      "formula": "of:=LEFT(\"abc\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "ab",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEN",
+      "section": "6.20.13",
+      "syntax": "LEN( Text T )",
+      "formula": "of:=LEN(\"x\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LN",
+      "section": "6.16.39",
+      "syntax": "LN( Number X )",
+      "formula": "of:=LN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.693147180559945",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOG",
+      "section": "6.16.40",
+      "syntax": "LOG( Number N [ ; Number Base = 10 ] )",
+      "formula": "of:=LOG(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.301029995663981",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOG10",
+      "section": "6.16.41",
+      "syntax": "LOG10( Number N )",
+      "formula": "of:=LOG10(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.301029995663981",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOWER",
+      "section": "6.20.14",
+      "syntax": "LOWER( Text T )",
+      "formula": "of:=LOWER(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "x",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MATCH",
+      "section": "6.14.9",
+      "syntax": "MATCH( Scalar Search ; ForceArray Reference|Array SearchRegion [ ; Integer MatchType = 1 ] )",
+      "formula": "of:=MATCH(2;[Data.B2:.B4];0)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MAX",
+      "section": "6.18.45",
+      "syntax": "MAX( { NumberSequenceList N } + )",
+      "formula": "of:=MAX({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MID",
+      "section": "6.20.15",
+      "syntax": "MID( Text T ; Integer Start ; Integer Length )",
+      "formula": "of:=MID(\"abcd\";2;2)",
+      "expected": {
+        "kind": "string",
+        "value": "bc",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MIN",
+      "section": "6.18.48",
+      "syntax": "MIN( { NumberSequenceList N } + )",
+      "formula": "of:=MIN({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MINUTE",
+      "section": "6.10.13",
+      "syntax": "MINUTE( TimeParam T )",
+      "formula": "of:=MINUTE(TIME(12;30;0))",
+      "expected": {
+        "kind": "float",
+        "value": "30",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MOD",
+      "section": "6.16.42",
+      "syntax": "MOD( Number A ; Number B )",
+      "formula": "of:=MOD(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MONTH",
+      "section": "6.10.14",
+      "syntax": "MONTH( DateParam Date )",
+      "formula": "of:=MONTH(DATE(2020;1;15))",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "N",
+      "section": "6.13.26",
+      "syntax": "N( Any X )",
+      "formula": "of:=N(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NA",
+      "section": "6.13.27",
+      "syntax": "NA()",
+      "formula": "of:=NA()",
+      "expected": {
+        "kind": "string",
+        "value": "#N/A",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NOT",
+      "section": "6.15.7",
+      "syntax": "NOT( Logical L )",
+      "formula": "of:=NOT(TRUE())",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NOW",
+      "section": "6.10.16",
+      "syntax": "NOW()",
+      "formula": "of:=NOW()",
+      "expected": {
+        "kind": "predicate",
+        "value": "current-date-time",
+        "oracle": "oasis-runtime-property"
+      }
+    },
+    {
+      "function": "NPER",
+      "section": "6.12.29",
+      "syntax": "NPER( Number Rate ; Number Payment ; Number Pv [ ; [ Number Fv = 0] [ ; Number PayType = 0] ] )",
+      "formula": "of:=NPER(0.01;-100;1000;0;0)",
+      "expected": {
+        "kind": "float",
+        "value": "10.5886444594232",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NPV",
+      "section": "6.12.30",
+      "syntax": "NPV( Number Rate ; { NumberSequenceList Values } + )",
+      "formula": "of:=NPV(0.1;100;100;100)",
+      "expected": {
+        "kind": "currency",
+        "value": "248.685199098422",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ODD",
+      "section": "6.16.44",
+      "syntax": "ODD( Number N )",
+      "formula": "of:=ODD(2)",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "OR",
+      "section": "6.15.8",
+      "syntax": "OR( { Logical|NumberSequenceList L } + )",
+      "formula": "of:=OR(TRUE();{1;2;3})",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PI",
+      "section": "6.16.45",
+      "syntax": "PI()",
+      "formula": "of:=PI()",
+      "expected": {
+        "kind": "float",
+        "value": "3.14159265358979",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PMT",
+      "section": "6.12.36",
+      "syntax": "PMT( Number Rate ; Integer Nper ; Number Pv [ ; [ Number Fv = 0 ] [ ; Number PayType = 0 ] ] )",
+      "formula": "of:=PMT(2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "-4.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "POWER",
+      "section": "6.16.46",
+      "syntax": "POWER( Number A ; Number B )",
+      "formula": "of:=POWER(2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PRODUCT",
+      "section": "6.16.47",
+      "syntax": "PRODUCT( { NumberSequenceList N } + )",
+      "formula": "of:=PRODUCT({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PROPER",
+      "section": "6.20.16",
+      "syntax": "PROPER( Text T )",
+      "formula": "of:=PROPER(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "X",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PV",
+      "section": "6.12.41",
+      "syntax": "PV( Number Rate ; Number Nper ; Number Payment [ ; [ Number Fv = 0 ] [ ; Number PayType = 0 ] ] )",
+      "formula": "of:=PV(2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "-0.888888888888889",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RADIANS",
+      "section": "6.16.49",
+      "syntax": "RADIANS( Number N )",
+      "formula": "of:=RADIANS(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0349065850398866",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RATE",
+      "section": "6.12.42",
+      "syntax": "RATE( Number Nper ; Number Payment ; Number Pv [ ; [ Number Fv = 0 ] [ ; [ Number PayType = 0 ] [ ; Number Guess = 0.1 ] ] ] )",
+      "formula": "of:=RATE(12;-100;1000;0;0;0.01)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0.0292285407691422",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "REPLACE",
+      "section": "6.20.17",
+      "syntax": "REPLACE( Text T ; Number Start ; Number Count ; Text New )",
+      "formula": "of:=REPLACE(\"abcd\";2;2;\"XY\")",
+      "expected": {
+        "kind": "string",
+        "value": "aXYd",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "REPT",
+      "section": "6.20.18",
+      "syntax": "T ( Text T ; Integer Count )",
+      "formula": "of:=REPT(\"x\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "xx",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RIGHT",
+      "section": "6.20.19",
+      "syntax": "RIGHT( Text T [ ; Integer Length ] )",
+      "formula": "of:=RIGHT(\"abc\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "bc",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROUND",
+      "section": "6.17.5",
+      "syntax": "ROUND( Number X [ ; Number Digits = 0 ] )",
+      "formula": "of:=ROUND(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROWS",
+      "section": "6.13.30",
+      "syntax": "ROWS( Reference|Array R )",
+      "formula": "of:=ROWS([Data.A2:.B4])",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SECOND",
+      "section": "6.10.17",
+      "syntax": "SECOND( TimeParam T )",
+      "formula": "of:=SECOND(TIME(12;30;0))",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SIN",
+      "section": "6.16.55",
+      "syntax": "SIN( Number N )",
+      "formula": "of:=SIN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.909297426825682",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SLN",
+      "section": "6.12.45",
+      "syntax": "DDB( Number Cost ; Number Salvage ; Number LifeTime )",
+      "formula": "of:=SLN(2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SQRT",
+      "section": "6.16.58",
+      "syntax": "SQRT( Number N )",
+      "formula": "of:=SQRT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.4142135623731",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STDEV",
+      "section": "6.18.72",
+      "syntax": "STDEV( { NumberSequenceList N } + )",
+      "formula": "of:=STDEV({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STDEVP",
+      "section": "6.18.74",
+      "syntax": "STDEVP( { NumberSequence N } + )",
+      "formula": "of:=STDEVP({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "0.816496580927726",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUBSTITUTE",
+      "section": "6.20.21",
+      "syntax": "SUBSTITUTE( Text T ; Text Old ; Text New [ ; Integer Which ] )",
+      "formula": "of:=SUBSTITUTE(\"abab\";\"a\";\"x\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "abxb",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUM",
+      "section": "6.16.61",
+      "syntax": "SUM( { NumberSequenceList N } + )",
+      "formula": "of:=SUM({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMIF",
+      "section": "6.16.62",
+      "syntax": "SUMIF( ReferenceList|Reference R ; Criterion C [ ; Reference S ] )",
+      "formula": "of:=SUMIF([Data.B2:.B4];\">1\";[Data.B2:.B4])",
+      "expected": {
+        "kind": "float",
+        "value": "5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SYD",
+      "section": "6.12.46",
+      "syntax": "SYD( Number Cost ; Number Salvage ; Number LifeTime ; Number Period )",
+      "formula": "of:=SYD(2;2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "T",
+      "section": "6.20.22",
+      "syntax": "T( Any X )",
+      "formula": "of:=T(2)",
+      "expected": {
+        "kind": "",
+        "value": "",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TAN",
+      "section": "6.16.69",
+      "syntax": "TAN( Number N )",
+      "formula": "of:=TAN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "-2.18503986326152",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TIME",
+      "section": "6.10.18",
+      "syntax": "TIME( Number Hours ; Number Minutes ; Number Seconds )",
+      "formula": "of:=TIME(12;30;0)",
+      "expected": {
+        "kind": "time",
+        "value": "PT12H30M00S",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TODAY",
+      "section": "6.10.20",
+      "syntax": "TODAY()",
+      "formula": "of:=TODAY()",
+      "expected": {
+        "kind": "predicate",
+        "value": "current-date",
+        "oracle": "oasis-runtime-property"
+      }
+    },
+    {
+      "function": "TRIM",
+      "section": "6.20.24",
+      "syntax": "TRIM( Text T )",
+      "formula": "of:=TRIM(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "x",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TRUE",
+      "section": "6.15.9",
+      "syntax": "TRUE()",
+      "formula": "of:=TRUE()",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TRUNC",
+      "section": "6.17.8",
+      "syntax": "TRUNC( Number A ; Integer B )",
+      "formula": "of:=TRUNC(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "UPPER",
+      "section": "6.20.27",
+      "syntax": "UPPER( Text T )",
+      "formula": "of:=UPPER(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "X",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VALUE",
+      "section": "6.13.34",
+      "syntax": "VALUE( Text X )",
+      "formula": "of:=VALUE(\"42.5\")",
+      "expected": {
+        "kind": "float",
+        "value": "42.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VAR",
+      "section": "6.18.82",
+      "syntax": "VAR( { NumberSequence N } + )",
+      "formula": "of:=VAR({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VARP",
+      "section": "6.18.84",
+      "syntax": "VARP( { NumberSequence N } + )",
+      "formula": "of:=VARP({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "0.666666666666667",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VLOOKUP",
+      "section": "6.14.12",
+      "syntax": "VLOOKUP( Any Lookup ; ForceArray Reference|Array DataSource ; Integer Column [ ; Logical RangeLookup = TRUE() ] )",
+      "formula": "of:=VLOOKUP(\"Two\";[Data.A2:.B4];2;FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "WEEKDAY",
+      "section": "6.10.21",
+      "syntax": "WEEKDAY( DateParam D [ ; Integer Type = 1 ] )",
+      "formula": "of:=WEEKDAY(DATE(2020;1;1);2)",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "YEAR",
+      "section": "6.10.24",
+      "syntax": "YEAR( DateParam D )",
+      "formula": "of:=YEAR(DATE(2020;1;15))",
+      "expected": {
+        "kind": "float",
+        "value": "2020",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACCRINT",
+      "section": "6.12.2",
+      "syntax": "ACCRINT( DateParam Issue ; DateParam First ; DateParam Settlement ; Number Coupon ; Number Par ; Integer Frequency [ ; Basis B = 0 [ ; Logical CalcMethod = TRUE ] ] )",
+      "formula": "of:=ACCRINT(DATE(2020;1;1);DATE(2020;3;1);DATE(2020;7;1);0.05;1000;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "25",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACCRINTM",
+      "section": "6.12.3",
+      "syntax": "ACCRINT( DateParam Issue ; DateParam Settlement ; Number Coupon ; Number Par [ ; Basis B = 0 ] )",
+      "formula": "of:=ACCRINTM(DATE(2020;1;1);DATE(2020;7;1);0.05;1000;0)",
+      "expected": {
+        "kind": "float",
+        "value": "25",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACOSH",
+      "section": "6.16.4",
+      "syntax": "ACOSH( Number N )",
+      "formula": "of:=ACOSH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.31695789692482",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACOT",
+      "section": "6.16.5",
+      "syntax": "ACOT( Number N )",
+      "formula": "of:=ACOT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.463647609000806",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ACOTH",
+      "section": "6.16.6",
+      "syntax": "ACOTH( Number N )",
+      "formula": "of:=ACOTH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.549306144334055",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ADDRESS",
+      "section": "6.14.2",
+      "syntax": "ADDRESS( Integer Row ; Integer Column [ ; Integer Abs = 1 [ ; Logical A1Style = TRUE [ ; Text Sheet ] ] ] )",
+      "formula": "of:=ADDRESS(2;2)",
+      "expected": {
+        "kind": "string",
+        "value": "$B$2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ASINH",
+      "section": "6.16.8",
+      "syntax": "ASINH( Number N )",
+      "formula": "of:=ASINH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.44363547517881",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ATANH",
+      "section": "6.16.11",
+      "syntax": "ATANH( Number N )",
+      "formula": "of:=ATANH(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.549306144334055",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AVEDEV",
+      "section": "6.18.2",
+      "syntax": "AVEDEV( { NumberSequenceList N } + )",
+      "formula": "of:=AVEDEV(1;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.666666666666667",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BESSELI",
+      "section": "6.16.12",
+      "syntax": "BESSELI( Number X ; Number N )",
+      "formula": "of:=BESSELI(0;0)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BESSELJ",
+      "section": "6.16.13",
+      "syntax": "BESSELJ( Number X ; Number N )",
+      "formula": "of:=BESSELJ(0;0)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BESSELK",
+      "section": "6.16.14",
+      "syntax": "BESSELK( Number X ; Number N )",
+      "formula": "of:=BESSELK(1;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.421024441682191",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BESSELY",
+      "section": "6.16.15",
+      "syntax": "BESSELY( Number X ; Number N )",
+      "formula": "of:=BESSELY(1;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.088256964215677",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BETADIST",
+      "section": "6.18.7",
+      "syntax": "BETADIST( Number x ; Number α ; Number β [ ; Number a = 0 [ ; Number b = 1 [ ; Logical Cumulative = TRUE ] ] ] )",
+      "formula": "of:=BETADIST(0.5;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.6875",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BETAINV",
+      "section": "6.18.8",
+      "syntax": "BETAINV( Number P ; Number α ; Number β [ ; Number A = 0 [ ; Number B = 1 ] ] )",
+      "formula": "of:=BETAINV(0.5;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.38572756813239",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BINOMDIST",
+      "section": "6.18.10",
+      "syntax": "BINOMDIST( Integer S ; Integer N ; Number P ; Logical Cumulative )",
+      "formula": "of:=BINOMDIST(3;10;0.5;FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.1171875",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CEILING",
+      "section": "6.17.1",
+      "syntax": "CEILING( Number N [ ; [ Number Significance ] [ ; Number Mode ] ] )",
+      "formula": "of:=CEILING(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CHAR",
+      "section": "6.20.3",
+      "syntax": "CHAR( Number N )",
+      "formula": "of:=CHAR(65)",
+      "expected": {
+        "kind": "string",
+        "value": "A",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CLEAN",
+      "section": "6.20.4",
+      "syntax": "CLEAN( Text T )",
+      "formula": "of:=CLEAN(\"a\"&CHAR(9)&\"b\")",
+      "expected": {
+        "kind": "string",
+        "value": "ab",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CODE",
+      "section": "6.20.5",
+      "syntax": "CODE( Text T )",
+      "formula": "of:=CODE(\"A\")",
+      "expected": {
+        "kind": "float",
+        "value": "65",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COLUMN",
+      "section": "6.13.4",
+      "syntax": "COLUMN( [ Reference R ] )",
+      "formula": "of:=COLUMN([Data.B2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COMBIN",
+      "section": "6.16.16",
+      "syntax": "COMBIN( Integer N ; Integer R )",
+      "formula": "of:=COMBIN(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CONCATENATE",
+      "section": "6.20.6",
+      "syntax": "CONCATENATE( { Text T } + )",
+      "formula": "of:=CONCATENATE(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "x",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CONFIDENCE",
+      "section": "6.18.16",
+      "syntax": "CONFIDENCE( Number Alpha ; Number Stddev ; Number Size )",
+      "formula": "of:=CONFIDENCE(0.05;2;100)",
+      "expected": {
+        "kind": "float",
+        "value": "0.391992796908011",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CONVERT",
+      "section": "6.16.18",
+      "syntax": "CONVERT( Number N ; Text From ; Text Into )",
+      "formula": "of:=CONVERT(1;\"m\";\"cm\")",
+      "expected": {
+        "kind": "float",
+        "value": "100",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CORREL",
+      "section": "6.18.17",
+      "syntax": "CORREL( ForceArray Array N1 ; ForceArray Array N2 )",
+      "formula": "of:=CORREL({1;2;3};{2;4;6})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COSH",
+      "section": "6.16.20",
+      "syntax": "COSH( Number N )",
+      "formula": "of:=COSH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "3.76219569108363",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COT",
+      "section": "6.16.21",
+      "syntax": "COT( Number N )",
+      "formula": "of:=COT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "-0.457657554360286",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COTH",
+      "section": "6.16.22",
+      "syntax": "COTH( Number N )",
+      "formula": "of:=COTH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.03731472072755",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPDAYBS",
+      "section": "6.12.5",
+      "syntax": "COUPDAYBS( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPDAYBS(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPDAYS",
+      "section": "6.12.6",
+      "syntax": "COUPDAYS( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPDAYS(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "180",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPDAYSNC",
+      "section": "6.12.7",
+      "syntax": "COUPDAYNC( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPDAYSNC(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "180",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPNCD",
+      "section": "6.12.8",
+      "syntax": "COUPNCD( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPNCD(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "44027",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPNUM",
+      "section": "6.12.9",
+      "syntax": "COUPNUM( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPNUM(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "4",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUPPCD",
+      "section": "6.12.10",
+      "syntax": "COUPPCD( DateParam Settlement ; DateParam Maturity ; Integer Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=COUPPCD(DATE(2020;1;15);DATE(2022;1;15);2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "43845",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COVAR",
+      "section": "6.18.18",
+      "syntax": "COVAR( ForceArray Array N1 ; ForceArray Array N2 )",
+      "formula": "of:=COVAR({1;2|3;4};{1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "1.25",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CRITBINOM",
+      "section": "6.18.19",
+      "syntax": "CRITBINOM( Number Trials ; Number SP ; Number Alpha )",
+      "formula": "of:=CRITBINOM(10;0.5;0.7)",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CUMIPMT",
+      "section": "6.12.11",
+      "syntax": "CUMIPMT( Number Rate ; Number Periods ; Number Value ; Integer Start ; Integer End ; Integer Type )",
+      "formula": "of:=CUMIPMT(0.01;12;1000;1;3;0)",
+      "expected": {
+        "kind": "currency",
+        "value": "-27.6266514607819",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CUMPRINC",
+      "section": "6.12.12",
+      "syntax": "CUMPRINC( Number Rate ; Number Periods ; Number Value ; Integer Start ; Integer End ; Integer Type )",
+      "formula": "of:=CUMPRINC(0.01;12;1000;1;3;0)",
+      "expected": {
+        "kind": "currency",
+        "value": "-238.919714574243",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DATEVALUE",
+      "section": "6.10.4",
+      "syntax": "DATEVALUE( Text D )",
+      "formula": "of:=DATEVALUE(\"2020-01-15\")",
+      "expected": {
+        "kind": "float",
+        "value": "43845",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DAYS360",
+      "section": "6.10.7",
+      "syntax": "DAYS360( DateParam StartDate ; DateParam EndDate [ ; Logical Method = FALSE ] )",
+      "formula": "of:=DAYS360(DATE(2020;1;1);DATE(2020;7;1);FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "180",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DB",
+      "section": "6.12.13",
+      "syntax": "DB( Number Cost ; Number Salvage ; Integer LifeTime ; Number Period [ ; Number Month = 12 ] )",
+      "formula": "of:=DB(1000;100;5;1;12)",
+      "expected": {
+        "kind": "currency",
+        "value": "369",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DEVSQ",
+      "section": "6.18.20",
+      "syntax": "DEVSQ( { NumberSequence N } + )",
+      "formula": "of:=DEVSQ({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DISC",
+      "section": "6.12.15",
+      "syntax": "DISC( DateParam Settlement ; DateParam Maturity ; Number Price ; Number Redemption [ ; Basis B = 0 ] )",
+      "formula": "of:=DISC(DATE(2020;1;1);DATE(2020;7;1);97;100;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0600000000000001",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DOLLARDE",
+      "section": "6.12.16",
+      "syntax": "DOLLARDE( Number Fractional ; Integer Denominator )",
+      "formula": "of:=DOLLARDE(1.02;16)",
+      "expected": {
+        "kind": "float",
+        "value": "1.125",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DOLLARFR",
+      "section": "6.12.17",
+      "syntax": "DOLLARFR( Number Decimal ; Integer Denominator )",
+      "formula": "of:=DOLLARFR(1.125;16)",
+      "expected": {
+        "kind": "float",
+        "value": "1.02",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DURATION",
+      "section": "6.12.18",
+      "syntax": "DURATION( Date Settlement ; Date Maturity ; Number Coupon ; Number Yield ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=DURATION(DATE(2020;1;1);DATE(2025;1;1);0.05;0.04;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "4.49890364452623",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EFFECT",
+      "section": "6.12.19",
+      "syntax": "EFFECT( Number Rate ; Integer Payments )",
+      "formula": "of:=EFFECT(0.1;12)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0.104713067441297",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EOMONTH",
+      "section": "6.10.10",
+      "syntax": "EOMONTH( DateParam StartDate ; Integer MonthAdd",
+      "formula": "of:=EOMONTH(DATE(2020;1;15);1)",
+      "expected": {
+        "kind": "float",
+        "value": "43890",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ERF",
+      "section": "6.16.27",
+      "syntax": "ERF( Number Z0 [ ; Number Z1 ] )",
+      "formula": "of:=ERF(1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.842700792949715",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ERFC",
+      "section": "6.16.28",
+      "syntax": "ERFC( Number Z )",
+      "formula": "of:=ERFC(1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.157299207050285",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EXPONDIST",
+      "section": "6.18.21",
+      "syntax": "EXPONDIST( Number X ; Number λ [ ; Logical Cumulative = TRUE ] )",
+      "formula": "of:=EXPONDIST(1;2;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.864664716763387",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FISHER",
+      "section": "6.18.26",
+      "syntax": "FISHER( Number R )",
+      "formula": "of:=FISHER(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.549306144334055",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FISHERINV",
+      "section": "6.18.27",
+      "syntax": "FISHERINV( Number R )",
+      "formula": "of:=FISHERINV(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.46211715726001",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FIXED",
+      "section": "6.20.10",
+      "syntax": "FIXED( Number N [ ; Integer D = 2 [ ; Logical OmitSeparators = FALSE ] ] )",
+      "formula": "of:=FIXED(1234.5;1;TRUE())",
+      "expected": {
+        "kind": "string",
+        "value": "1234.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FLOOR",
+      "section": "6.17.3",
+      "syntax": "FLOOR( Number N [ ; [ Number Significance ] [ ; Number Mode ] ] )",
+      "formula": "of:=FLOOR(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FORECAST",
+      "section": "6.18.28",
+      "syntax": "FORECAST( Number Value ; ForceArray Array Data_Y ; ForceArray Array Data_X )",
+      "formula": "of:=FORECAST(4;{2;4;6};{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FTEST",
+      "section": "6.18.30",
+      "syntax": "FTEST( ForceArray NumberSequence Data_1 ; ForceArray NumberSequence Data_2 )",
+      "formula": "of:=FTEST({1;2;3};{2;3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GAMMADIST",
+      "section": "6.18.31",
+      "syntax": "GAMMADIST( Number X ; Number α ; Number β [ ; Logical Cumulative = TRUE ] )",
+      "formula": "of:=GAMMADIST(2;3;2;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.0803013970713942",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GAMMAINV",
+      "section": "6.18.32",
+      "syntax": "GAMMAINV( Number P ; Number α ; Number β )",
+      "formula": "of:=GAMMAINV(0.5;3;2)",
+      "expected": {
+        "kind": "float",
+        "value": "5.34812062744712",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GAMMALN",
+      "section": "6.16.35",
+      "syntax": "GAMMALN( Number X )",
+      "formula": "of:=GAMMALN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GCD",
+      "section": "6.16.36",
+      "syntax": "GCD( { NumberSequenceList X } + )",
+      "formula": "of:=GCD({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GEOMEAN",
+      "section": "6.18.34",
+      "syntax": "GEOMEAN( { NumberSequenceList N } + )",
+      "formula": "of:=GEOMEAN(1;2;4)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HARMEAN",
+      "section": "6.18.36",
+      "syntax": "HARMEAN( { NumberSequenceList N } + )",
+      "formula": "of:=HARMEAN(1;2;4)",
+      "expected": {
+        "kind": "float",
+        "value": "1.71428571428571",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HYPGEOMDIST",
+      "section": "6.18.37",
+      "syntax": "HYPGEOMDIST( Integer X ; Integer T ; Integer M ; Integer N [ ; Logical Cumulative = FALSE ] )",
+      "formula": "of:=HYPGEOMDIST(1;4;3;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INTERCEPT",
+      "section": "6.18.38",
+      "syntax": "INTERCEPT( ForceArray Array Data_Y ; ForceArray Array Data_X )",
+      "formula": "of:=INTERCEPT({2;4;6};{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INTRATE",
+      "section": "6.12.22",
+      "syntax": "INTRATE( Date Settlement ; Date Maturity ; Number Investment ; Number Redemption [ ; Basis Basis = 0 ] )",
+      "formula": "of:=INTRATE(DATE(2020;1;1);DATE(2020;7;1);97;100;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0618556701030926",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISEVEN",
+      "section": "6.13.17",
+      "syntax": "ISEVEN( Number X )",
+      "formula": "of:=ISEVEN(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISODD",
+      "section": "6.13.23",
+      "syntax": "ISODD( Number X )",
+      "formula": "of:=ISODD(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISOWEEKNUM",
+      "section": "6.10.12",
+      "syntax": "ISOWEEKNUM( DateParam D )",
+      "formula": "of:=ISOWEEKNUM(DATE(2020;1;15))",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "KURT",
+      "section": "6.18.39",
+      "syntax": "KURT( { NumberSequenceList X } + )",
+      "formula": "of:=KURT(1;2;3;4;5)",
+      "expected": {
+        "kind": "float",
+        "value": "-1.2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LARGE",
+      "section": "6.18.40",
+      "syntax": "LARGE( NumberSequenceList List ; Number|Array N )",
+      "formula": "of:=LARGE({1;2;3};2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LCM",
+      "section": "6.16.38",
+      "syntax": "LCM( { NumberSequenceList X } + )",
+      "formula": "of:=LCM({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.CHIDIST",
+      "section": "6.18.11",
+      "syntax": "LEGACY.CHIDIST( Number X ; Number DegreesOfFreedom )",
+      "formula": "of:=LEGACY.CHIDIST(2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.57240670447088",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.CHIINV",
+      "section": "6.18.13",
+      "syntax": "LEGACY.CHIINV( Number P ; Number DegreesOfFreedom )",
+      "formula": "of:=LEGACY.CHIINV(0.5;3)",
+      "expected": {
+        "kind": "float",
+        "value": "2.36597388437534",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.CHITEST",
+      "section": "6.18.15",
+      "syntax": "LEGACY.CHITEST( ForceArray Array A ; ForceArray Array E )",
+      "formula": "of:=LEGACY.CHITEST({10;20|30;40};{12;18|28;42})",
+      "expected": {
+        "kind": "float",
+        "value": "0.372998483613487",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.FDIST",
+      "section": "6.18.23",
+      "syntax": "LEGACY.FDIST( Number X ; Number R 1 ; Number R 2 )",
+      "formula": "of:=LEGACY.FDIST(1;5;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.4651194265378",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.FINV",
+      "section": "6.18.25",
+      "syntax": "LEGACY.FINV( Number P ; Number R 1 ; Number R 2 )",
+      "formula": "of:=LEGACY.FINV(0.5;5;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.931933160851048",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.NORMSDIST",
+      "section": "6.18.54",
+      "syntax": "LEGACY.NORMSDIST( Number X )",
+      "formula": "of:=LEGACY.NORMSDIST(0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.NORMSINV",
+      "section": "6.18.55",
+      "syntax": "LEGACY.NORMSINV( Number P )",
+      "formula": "of:=LEGACY.NORMSINV(0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEGACY.TDIST",
+      "section": "6.18.77",
+      "syntax": "LEGACY.TDIST( Number X ; Integer Df ; Integer Tails )",
+      "formula": "of:=LEGACY.TDIST(1;10;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.340893132302061",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LINEST",
+      "section": "6.18.41",
+      "syntax": "LINEST( ForceArray Array KnownY [ ; [ ForceArray Array KnownX ] [ ; Logical Const = TRUE [ ; Logical Stats = FALSE ] ] ] )",
+      "formula": "of:=LINEST({2;4;6};{1;2;3};TRUE();FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOGEST",
+      "section": "6.18.42",
+      "syntax": "LOGEST( ForceArray Array KnownY [ ; [ ForceArray Array KnownX ] [ ; Logical Const = TRUE [ ; Logical Stats = FALSE ] ] ] )",
+      "formula": "of:=LOGEST({2;4;8};{1;2;3};TRUE();FALSE())",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOGINV",
+      "section": "6.18.43",
+      "syntax": "LOGINV( Number P [ ; Number Mean = 0 [ ; Number StandardDeviation = 1 ] ] )",
+      "formula": "of:=LOGINV(0.5;0;1)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOGNORMDIST",
+      "section": "6.18.44",
+      "syntax": "LOGNORMDIST( Number X [ ; Number μ = 0 [ ; Number σ = 1 [ ; Logical Cumulative = TRUE ] ] ] )",
+      "formula": "of:=LOGNORMDIST(1;0;1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LOOKUP",
+      "section": "6.14.8",
+      "syntax": "LOOKUP( Any Find ; ForceArray Reference|Array Searched [ ; ForceArray Reference|Array Results ] )",
+      "formula": "of:=LOOKUP(2;{1;2;3};{10;20;30})",
+      "expected": {
+        "kind": "float",
+        "value": "20",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MDURATION",
+      "section": "6.12.26",
+      "syntax": "MDURATION( Date Settlement ; Date Maturity ; Number Coupon ; Number Yield ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=MDURATION(DATE(2020;1;1);DATE(2025;1;1);0.05;0.04;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "4.41068984757474",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MEDIAN",
+      "section": "6.18.47",
+      "syntax": "MEDIAN( { NumberSequenceList X } + )",
+      "formula": "of:=MEDIAN(1;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MINVERSE",
+      "section": "6.5.3",
+      "syntax": "MINVERSE( ForceArray Array A )",
+      "formula": "of:=MINVERSE({1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "-2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MIRR",
+      "section": "6.12.27",
+      "syntax": "MIRR( Array Values ; Number Investment ; Number ReinvestRate )",
+      "formula": "of:=MIRR({-100;60;60};0.1;0.12)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0.127829774389735",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MMULT",
+      "section": "6.5.4",
+      "syntax": "MMULT( ForceArray Array A ; ForceArray Array B )",
+      "formula": "of:=MMULT({1;2|3;4};{5;6|7;8})",
+      "expected": {
+        "kind": "float",
+        "value": "19",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MODE",
+      "section": "6.18.50",
+      "syntax": "MODE( { ForceArray NumberSequence N } + )",
+      "formula": "of:=MODE(1;2;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MROUND",
+      "section": "6.17.4",
+      "syntax": "MROUND( Number A ; Number B )",
+      "formula": "of:=MROUND(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MULTINOMIAL",
+      "section": "6.16.43",
+      "syntax": "MULTINOMIAL( { NumberSequence A } + )",
+      "formula": "of:=MULTINOMIAL(2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NEGBINOMDIST",
+      "section": "6.18.51",
+      "syntax": "NEGBINOMDIST( Integer X ; Integer R ; Number Prob ) • X : The number of failures. • R : The threshold number of successes. • Prob : The probability of a success.",
+      "formula": "of:=NEGBINOMDIST(2;3;0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.1875",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NETWORKDAYS",
+      "section": "6.10.15",
+      "syntax": "NETWORKDAYS( DateParam Date1 ; DateParam Date2 [ ; [ DateSequence Holidays ] [ ; LogicalSequence Workdays ] ] )",
+      "formula": "of:=NETWORKDAYS(DATE(2020;1;1);DATE(2020;1;10))",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NOMINAL",
+      "section": "6.12.28",
+      "syntax": "NOMINAL( Number EffectiveRate ; Integer CompoundingPeriods )",
+      "formula": "of:=NOMINAL(0.1;12)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0.0956896851468452",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ODDFPRICE",
+      "section": "6.12.31",
+      "syntax": "ODDFPRICE( DateParam Settlement ; DateParam Maturity ; DateParam Issue ; DateParam First ; Number Rate ; Number Yield ; Number Redemption ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=ODDFPRICE(DATE(2008;11;11);DATE(2021;3;1);DATE(2008;10;15);DATE(2009;3;1);0.0785;0.0625;100;2;1)",
+      "expected": {
+        "kind": "float",
+        "value": "113.597717474078",
+        "oracle": "published-reference-example"
+      }
+    },
+    {
+      "function": "ODDFYIELD",
+      "section": "6.12.32",
+      "syntax": "ODDFYIELD( DateParam Settlement ; DateParam Maturity ; DateParam Issue ; DateParam First ; Number Rate ; Number Price ; Number Redemption ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=ODDFYIELD(DATE(2008;11;11);DATE(2021;3;1);DATE(2008;10;15);DATE(2009;3;1);0.0785;113.597717474078;100;2;1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0625",
+        "oracle": "published-reference-example"
+      }
+    },
+    {
+      "function": "ODDLPRICE",
+      "section": "6.12.33",
+      "syntax": "ODDLPRICE( DateParam Settlement ; DateParam Maturity ; DateParam Last ; Number Rate ; Number AnnualYield ; Number Redemption ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=ODDLPRICE(DATE(2021;10;1);DATE(2022;1;1);DATE(2021;7;1);0.05;0.04;100;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "100.235148514851",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ODDLYIELD",
+      "section": "6.12.34",
+      "syntax": "ODDLYIELD( DateParam Settlement ; DateParam Maturity ; DateParam Last ; Number Rate ; Number Price ; Number Redemption ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=ODDLYIELD(DATE(2021;10;1);DATE(2022;1;1);DATE(2021;7;1);0.05;95;100;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.259740259740259",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "OFFSET",
+      "section": "6.14.11",
+      "syntax": "OFFSET( Reference R ; Integer RowOffset ; Integer ColumnOffset [ ; [ Integer NewHeight ] [ ; [ Integer NewWidth ] ] ] )",
+      "formula": "of:=OFFSET([Data.A2];2;1)",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PEARSON",
+      "section": "6.18.56",
+      "syntax": "PEARSON( ForceArray Array IndependentValues ; ForceArray Array DependentValues )",
+      "formula": "of:=PEARSON({1;2|3;4};{1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PERCENTILE",
+      "section": "6.18.57",
+      "syntax": "PERCENTILE( NumberSequenceList Data ; Number X )",
+      "formula": "of:=PERCENTILE({1;2;3;4};0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PERCENTRANK",
+      "section": "6.18.58",
+      "syntax": "PERCENTRANK( NumberSequenceList Data ; Number X [ ; Integer Significance = 3 ] )",
+      "formula": "of:=PERCENTRANK({1;2;3;4};2.5;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PERMUT",
+      "section": "6.18.59",
+      "syntax": "PERMUT( Integer N ; Integer K )",
+      "formula": "of:=PERMUT(5;2)",
+      "expected": {
+        "kind": "float",
+        "value": "20",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "POISSON",
+      "section": "6.18.62",
+      "syntax": "POISSON( Integer X ; Number λ [ ; Logical Cumulative = TRUE ] )",
+      "formula": "of:=POISSON(2;3;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.423190081126844",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PRICE",
+      "section": "6.12.38",
+      "syntax": "PRICE( DateParam Settlement ; DateParam Maturity ; Number Rate ; Number AnnualYield ; Number Redemption ; Number Frequency [ ; Basis Bas = 0 ] )",
+      "formula": "of:=PRICE(DATE(2020;1;1);DATE(2025;1;1);0.05;0.04;100;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "104.491292503121",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PRICEMAT",
+      "section": "6.12.40",
+      "syntax": "PRICEMAT( DateParam Settlement ; DateParam Maturity ; DateParam Issue ; Number Rate ; Number AnnualYield [ ; Basis B = 0 ] )",
+      "formula": "of:=PRICEMAT(DATE(2020;1;1);DATE(2021;1;1);DATE(2019;7;1);0.05;0.04;0)",
+      "expected": {
+        "kind": "float",
+        "value": "100.865384615385",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PROB",
+      "section": "6.18.63",
+      "syntax": "PROB( ForceArray Array Data ; ForceArray Array Probability ; Number Start [ ; Number End ] )",
+      "formula": "of:=PROB({1;2;3};{0.2;0.3;0.5};2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "0.8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "QUARTILE",
+      "section": "6.18.64",
+      "syntax": "QUARTILE( NumberSequence Data ; Integer Quart )",
+      "formula": "of:=QUARTILE({1;2;3;4};2)",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "QUOTIENT",
+      "section": "6.16.48",
+      "syntax": "QUOTIENT( Number A ; Number B )",
+      "formula": "of:=QUOTIENT(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RAND",
+      "section": "6.16.50",
+      "syntax": "RAND()",
+      "formula": "of:=RAND()",
+      "expected": {
+        "kind": "predicate",
+        "value": "number-zero-inclusive-one-exclusive",
+        "oracle": "oasis-runtime-property"
+      }
+    },
+    {
+      "function": "RANDBETWEEN",
+      "section": "6.16.51",
+      "syntax": "RANDBETWEEN( Integer A ; Integer B )",
+      "formula": "of:=RANDBETWEEN(1;1)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RANK",
+      "section": "6.18.65",
+      "syntax": "RANK( Number Value ; NumberSequenceList Data [ ; Number Order = 0 ] )",
+      "formula": "of:=RANK(2;{1;2;3};0)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RECEIVED",
+      "section": "6.12.43",
+      "syntax": "RECEIVED( DateParam Settlement ; DateParam Maturity ; Number Investment ; Number Discount [ ; Basis B = 0 ] )",
+      "formula": "of:=RECEIVED(DATE(2020;1;1);DATE(2020;7;1);97;0.04;0)",
+      "expected": {
+        "kind": "float",
+        "value": "98.9795918367347",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROMAN",
+      "section": "6.19.17",
+      "syntax": "ROMAN( Integer N [ ; Integer Format = 0 ] )",
+      "formula": "of:=ROMAN(14;0)",
+      "expected": {
+        "kind": "string",
+        "value": "XIV",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROUNDDOWN",
+      "section": "6.17.6",
+      "syntax": "ROUNDDOWN( Number X [ ; Integer Digits = 0 ] )",
+      "formula": "of:=ROUNDDOWN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROUNDUP",
+      "section": "6.17.7",
+      "syntax": "ROUNDUP( Number X [ ; Integer Digits = 0 ] )",
+      "formula": "of:=ROUNDUP(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ROW",
+      "section": "6.13.29",
+      "syntax": "ROW( [ Reference R ] )",
+      "formula": "of:=ROW([Data.B2])",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RSQ",
+      "section": "6.18.66",
+      "syntax": "RSQ( ForceArray Array ArrayY ; ForceArray Array ArrayX )",
+      "formula": "of:=RSQ({1;2|3;4};{1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SERIESSUM",
+      "section": "6.16.53",
+      "syntax": "SERIESSUM( Number X ; Number N ; Number M ; Array Coefficients ) • X : the independent variable of the power series. • N : the initial power to which X is to be raised. • M : the increment by which to increase N for each term in the series. • Coefficients : a set of coefficients by which each successive power of the variable X is multiplied.",
+      "formula": "of:=SERIESSUM(2;1;1;{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "34",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SIGN",
+      "section": "6.16.54",
+      "syntax": "SIGN( Number N )",
+      "formula": "of:=SIGN(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SINH",
+      "section": "6.16.56",
+      "syntax": "SINH( Number N )",
+      "formula": "of:=SINH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "3.62686040784702",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SKEW",
+      "section": "6.18.67",
+      "syntax": "SKEW( { NumberSequenceList Sample } + )",
+      "formula": "of:=SKEW(1;2;3;4;5)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SKEWP",
+      "section": "6.18.68",
+      "syntax": "SKEWP( { NumberSequence Population } + )",
+      "formula": "of:=SKEWP(1;2;3;4;5)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SLOPE",
+      "section": "6.18.69",
+      "syntax": "SLOPE( ForceArray Array Y ; ForceArray Array X )",
+      "formula": "of:=SLOPE({2;4;6};{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SMALL",
+      "section": "6.18.70",
+      "syntax": "SMALL( NumberSequenceList List ; Integer|Array N )",
+      "formula": "of:=SMALL({1;2;3};2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SQRTPI",
+      "section": "6.16.59",
+      "syntax": "SQRTPI( Number N )",
+      "formula": "of:=SQRTPI(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2.506628274631",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STANDARDIZE",
+      "section": "6.18.71",
+      "syntax": "STANDARDIZE( Number Value ; Number Mean ; Number Sigma )",
+      "formula": "of:=STANDARDIZE(2;1;0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STDEVA",
+      "section": "6.18.73",
+      "syntax": "STDEVA( { Any Sample } + )",
+      "formula": "of:=STDEVA(1;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STDEVPA",
+      "section": "6.18.75",
+      "syntax": "STDEVPA( { Any Sample } + )",
+      "formula": "of:=STDEVPA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "STEYX",
+      "section": "6.18.76",
+      "syntax": "STEYX( ForceArray Array MeasuredY ; ForceArray Array X )",
+      "formula": "of:=STEYX({2;4;5};{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "0.408248290463863",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUBTOTAL",
+      "section": "6.16.60",
+      "syntax": "SUBTOTAL( Integer Function ; NumberSequence Sequence )",
+      "formula": "of:=SUBTOTAL(9;{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "6",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMPRODUCT",
+      "section": "6.16.64",
+      "syntax": "SUMPRODUCT( { ForceArray Array A } + )",
+      "formula": "of:=SUMPRODUCT({1;2;3};{4;5;6})",
+      "expected": {
+        "kind": "float",
+        "value": "32",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMSQ",
+      "section": "6.16.65",
+      "syntax": "SUMSQ( { NumberSequence N } + )",
+      "formula": "of:=SUMSQ({1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "14",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMX2MY2",
+      "section": "6.16.66",
+      "syntax": "SUMX2MY2( ForceArray Array A ; ForceArray Array B )",
+      "formula": "of:=SUMX2MY2({1;2};{3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "-20",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMX2PY2",
+      "section": "6.16.67",
+      "syntax": "SUMX2PY2( ForceArray Array A ; ForceArray Array B )",
+      "formula": "of:=SUMX2PY2({1;2};{3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "30",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMXMY2",
+      "section": "6.16.68",
+      "syntax": "SUMXMY2( ForceArray Array A ; ForceArray Array B )",
+      "formula": "of:=SUMXMY2({1;2};{3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TANH",
+      "section": "6.16.70",
+      "syntax": "TANH( Number N )",
+      "formula": "of:=TANH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.964027580075817",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TBILLEQ",
+      "section": "6.12.47",
+      "syntax": "TBILLEQ( DateParam Settlement ; DateParam Maturity ; Number Discount )",
+      "formula": "of:=TBILLEQ(DATE(2008;3;31);DATE(2008;6;1);0.0914)",
+      "expected": {
+        "kind": "float",
+        "value": "0.094151493565943",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TBILLPRICE",
+      "section": "6.12.48",
+      "syntax": "TBILLPRICE( DateParam Settlement ; DateParam Maturity ; Number Discount )",
+      "formula": "of:=TBILLPRICE(DATE(2008;3;31);DATE(2008;6;1);0.09)",
+      "expected": {
+        "kind": "float",
+        "value": "98.45",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TBILLYIELD",
+      "section": "6.12.49",
+      "syntax": "TBILLYIELD( DateParam Settlement ; DateParam Maturity ; Number Price )",
+      "formula": "of:=TBILLYIELD(DATE(2008;3;31);DATE(2008;6;1);98.45)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0914169629253423",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TIMEVALUE",
+      "section": "6.10.19",
+      "syntax": "TIMEVALUE( Text T )",
+      "formula": "of:=TIMEVALUE(\"12:30:00\")",
+      "expected": {
+        "kind": "float",
+        "value": "0.520833333333333",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TINV",
+      "section": "6.18.78",
+      "syntax": "TINV( Number Probability ; Integer DegreeOfFreedom )",
+      "formula": "of:=TINV(0.5;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.699812061312432",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TRANSPOSE",
+      "section": "6.5.6",
+      "syntax": "TRANSPOSE( Array A )",
+      "formula": "of:=TRANSPOSE({1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TREND",
+      "section": "6.18.79",
+      "syntax": "TREND( Array KnownY [ ; [ Array KnownX ] [ ; [ Array NewX ] [ ; Logical Const = TRUE ] ] ] )",
+      "formula": "of:=TREND({2;4;6};{1;2;3};{4};TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TRIMMEAN",
+      "section": "6.18.80",
+      "syntax": "TRIMMEAN( NumberSequenceList DataSet ; Number CutOffFraction )",
+      "formula": "of:=TRIMMEAN({1;2;3;100};0.5)",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TTEST",
+      "section": "6.18.81",
+      "syntax": "TTEST( ForceArray Array X ; ForceArray Array Y ; Integer Tails ; Integer Type )",
+      "formula": "of:=TTEST({1;2;3};{2;3;4};2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.287864134726691",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TYPE",
+      "section": "6.13.33",
+      "syntax": "TYPE( Any Value )",
+      "formula": "of:=TYPE(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VARA",
+      "section": "6.18.83",
+      "syntax": "VARA( { Any Sample } + )",
+      "formula": "of:=VARA(1;2;3)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VDB",
+      "section": "6.12.50",
+      "syntax": "VDB( Number Cost ; Number Salvage ; Number LifeTime ; Number StartPeriod ; Number EndPeriod [ ; Number DepreciationFactor = 2 [ ; Logical NoSwitch = FALSE ] ] )",
+      "formula": "of:=VDB(1000;100;5;0;1)",
+      "expected": {
+        "kind": "currency",
+        "value": "400",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "WEEKNUM",
+      "section": "6.10.22",
+      "syntax": "WEEKNUM( DateParam D [ ; Number Mode = 1 ] )",
+      "formula": "of:=WEEKNUM(DATE(2020;1;1);2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "WEIBULL",
+      "section": "6.18.86",
+      "syntax": "WEIBULL( Number Value ; Number Shape ; Number Scale ; Logical Cumulative )",
+      "formula": "of:=WEIBULL(1;2;3;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.10516068318563",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "WORKDAY",
+      "section": "6.10.23",
+      "syntax": "WORKDAY( DateParam Date ; Number Offset [ ; [ DateSequence Holidays ] [ ; LogicalSequence Workdays ] ] )",
+      "formula": "of:=WORKDAY(DATE(2020;1;1);5)",
+      "expected": {
+        "kind": "float",
+        "value": "43838",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "XIRR",
+      "section": "6.12.51",
+      "syntax": "XIRR( NumberSequence Values ; DateSequence Dates [ ; Number Guess = 0.1 ] )",
+      "formula": "of:=XIRR({-100;60;60};{43831;44013;44197};0.1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.278158944317214",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "XNPV",
+      "section": "6.12.52",
+      "syntax": "XNPV( Number Rate ; Reference | Array Values ; Reference | Array Dates )",
+      "formula": "of:=XNPV(0.1;{-100;60;60};{43831;44013;44197})",
+      "expected": {
+        "kind": "float",
+        "value": "11.7464382846325",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "YEARFRAC",
+      "section": "6.10.25",
+      "syntax": "YEARFRAC( DateParam StartDate ; DateParam EndDate [ ; Basis B = 0 ] )",
+      "formula": "of:=YEARFRAC(DATE(2020;1;1);DATE(2021;1;1);0)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "YIELD",
+      "section": "6.12.53",
+      "syntax": "YIELD( DateParam Settlement ; DateParam Maturity ; Number Rate ; Number Price ; Number Redemption ; Number Frequency [ ; Basis B = 0 ] )",
+      "formula": "of:=YIELD(DATE(2020;1;1);DATE(2025;1;1);0.05;95;100;2;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.06177624640903",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "YIELDDISC",
+      "section": "6.12.54",
+      "syntax": "YIELDDISC( DateParam Settlement ; DateParam Maturity ; Number Price ; Number Redemption [ ; Basis B = 0 ] )",
+      "formula": "of:=YIELDDISC(DATE(2020;1;1);DATE(2020;7;1);97;100;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0618556701030926",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "YIELDMAT",
+      "section": "6.12.55",
+      "syntax": "YIELDMAT( DateParam Settlement ; DateParam Maturity ; DateParam Issue ; Number Rate ; Number Price [ ; Basis B = 0 ] )",
+      "formula": "of:=YIELDMAT(DATE(2020;1;1);DATE(2021;1;1);DATE(2019;7;1);0.05;95;0)",
+      "expected": {
+        "kind": "float",
+        "value": "0.102564102564103",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ZTEST",
+      "section": "6.18.87",
+      "syntax": "ZTEST( NumberSequenceList Sample ; Number Mean [ ; Number Sigma ] )",
+      "formula": "of:=ZTEST({1;2;3};2;1)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AMORLINC",
+      "section": "6.12.4",
+      "syntax": "AMORLINC( Number Cost ; DateParam PurchaseDate ; DateParam FirstPeriodEndDate ; Number Salvage ; Integer Period ; Number Rate [ ; Basis B = 0 ] )",
+      "formula": "of:=AMORLINC(1000;DATE(2020;1;1);DATE(2020;12;31);100;0;0.1;0)",
+      "expected": {
+        "kind": "float",
+        "value": "100",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ARABIC",
+      "section": "6.19.2",
+      "syntax": "ARABIC( Text X )",
+      "formula": "of:=ARABIC(\"x\")",
+      "expected": {
+        "kind": "float",
+        "value": "10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AREAS",
+      "section": "6.13.2",
+      "syntax": "AREAS( ReferenceList R )",
+      "formula": "of:=AREAS([Data.A2])",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ASC",
+      "section": "6.20.2",
+      "syntax": "ASC( Text T )",
+      "formula": "of:=ASC(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "x",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AVERAGEA",
+      "section": "6.18.4",
+      "syntax": "AVERAGEA( { Any N } + )",
+      "formula": "of:=AVERAGEA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "AVERAGEIFS",
+      "section": "6.18.6",
+      "syntax": "AVERAGEIFS( Reference A ; Reference R1 ; Criterion C1 [ ; Reference R2 ; Criterion C2 ]... )",
+      "formula": "of:=AVERAGEIFS([Data.B2:.B4];[Data.B2:.B4];\">1\")",
+      "expected": {
+        "kind": "float",
+        "value": "2.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BASE",
+      "section": "6.19.3",
+      "syntax": "BASE( Integer X ; Integer Radix [ ; Integer MinimumLength ] )",
+      "formula": "of:=BASE(255;16;4)",
+      "expected": {
+        "kind": "string",
+        "value": "00FF",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BIN2DEC",
+      "section": "6.19.4",
+      "syntax": "BIN2DEC( TextOrNumber X )",
+      "formula": "of:=BIN2DEC(\"10\")",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BIN2HEX",
+      "section": "6.19.5",
+      "syntax": "BIN2HEX( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=BIN2HEX(\"10\")",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BIN2OCT",
+      "section": "6.19.6",
+      "syntax": "BIN2OCT( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=BIN2OCT(\"10\")",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BINOM.DIST.RANGE",
+      "section": "6.18.9",
+      "syntax": "BINOM.DIST.RANGE( Integer N ; Number P ; Integer S [ ; Integer S2 ] )",
+      "formula": "of:=BINOM.DIST.RANGE(10;0.5;3;5)",
+      "expected": {
+        "kind": "float",
+        "value": "0.568359375",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BITAND",
+      "section": "6.6.2",
+      "syntax": "BITAND( Integer X ; Integer Y )",
+      "formula": "of:=BITAND(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BITLSHIFT",
+      "section": "6.6.3",
+      "syntax": "BITLSHIFT( Integer X ; Integer N )",
+      "formula": "of:=BITLSHIFT(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "8",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BITOR",
+      "section": "6.6.4",
+      "syntax": "BITOR( Integer X ; Integer Y )",
+      "formula": "of:=BITOR(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BITRSHIFT",
+      "section": "6.6.5",
+      "syntax": "BITRSHIFT( Integer X ; Integer N )",
+      "formula": "of:=BITRSHIFT(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "BITXOR",
+      "section": "6.6.6",
+      "syntax": "BITXOR( Integer X ; Integer Y )",
+      "formula": "of:=BITXOR(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CHISQDIST",
+      "section": "6.18.12",
+      "syntax": "CHISQDIST( Number X ; Number DegreesOfFreedom [ ; Logical Cumulative = TRUE ] )",
+      "formula": "of:=CHISQDIST(2;3;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.42759329552912",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CHISQINV",
+      "section": "6.18.14",
+      "syntax": "CHISQINV( Number P ; Number DegreesOfFreedom )",
+      "formula": "of:=CHISQINV(0.5;3)",
+      "expected": {
+        "kind": "float",
+        "value": "2.36597388437534",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COMBINA",
+      "section": "6.16.17",
+      "syntax": "COMBINA( Integer N ; Integer M )",
+      "formula": "of:=COMBINA(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "3",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COMPLEX",
+      "section": "6.8.2",
+      "syntax": "COMPLEX( Number Real ; Number Imaginary [ ; Text Suffix ] )",
+      "formula": "of:=COMPLEX(1;2)",
+      "expected": {
+        "kind": "string",
+        "value": "1+2i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "COUNTIFS",
+      "section": "6.13.10",
+      "syntax": "COUNTIFS( Reference R1 ; Criterion C1 [ ; Reference R2 ; Criterion C2 ]... )",
+      "formula": "of:=COUNTIFS([Data.B2:.B4];\">1\";[Data.B2:.B4];\"<3\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CSC",
+      "section": "6.16.23",
+      "syntax": "CSC( Number N )",
+      "formula": "of:=CSC(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1.09975017029462",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "CSCH",
+      "section": "6.16.24",
+      "syntax": "CSCH( Number N )",
+      "formula": "of:=CSCH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.275720564771783",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DATEDIF",
+      "section": "6.10.3",
+      "syntax": "DATEDIF( DateParam StartDate ; DateParam EndDate ; Text Format )",
+      "formula": "of:=DATEDIF(DATE(2020;1;1);DATE(2021;2;3);\"d\")",
+      "expected": {
+        "kind": "float",
+        "value": "399",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DAYS",
+      "section": "6.10.6",
+      "syntax": "DAYS( DateParam EndDate ; DateParam StartDate )",
+      "formula": "of:=DAYS(DATE(2020;1;15);DATE(2020;1;1))",
+      "expected": {
+        "kind": "float",
+        "value": "14",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DDE",
+      "section": "6.11.2",
+      "syntax": "DDE( Text Server ; Text Topic ; Text Item [ ; Integer Mode = 0 ] )",
+      "formula": "of:=DDE(\"x\";\"x\";\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "#N/A",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DEC2BIN",
+      "section": "6.19.7",
+      "syntax": "DEC2BIN( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=DEC2BIN(2)",
+      "expected": {
+        "kind": "string",
+        "value": "10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DEC2HEX",
+      "section": "6.19.8",
+      "syntax": "DEC2HEX( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=DEC2HEX(2)",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DEC2OCT",
+      "section": "6.19.9",
+      "syntax": "DEC2OCT( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=DEC2OCT(2)",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DECIMAL",
+      "section": "6.19.10",
+      "syntax": "DECIMAL( Text X ; Integer Radix )",
+      "formula": "of:=DECIMAL(\"FF\";16)",
+      "expected": {
+        "kind": "float",
+        "value": "255",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "DELTA",
+      "section": "6.16.26",
+      "syntax": "DELTA( Number X [ ; Number Y = 0 ] )",
+      "formula": "of:=DELTA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EDATE",
+      "section": "6.10.9",
+      "syntax": "EDATE( DateParam StartDate ; Number MonthAdd )",
+      "formula": "of:=EDATE(DATE(2020;1;31);1)",
+      "expected": {
+        "kind": "float",
+        "value": "43890",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ERROR.TYPE",
+      "section": "6.13.11",
+      "syntax": "ERROR.TYPE( Error E )",
+      "formula": "of:=ERROR.TYPE(#REF!)",
+      "expected": {
+        "kind": "float",
+        "value": "4",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "EUROCONVERT",
+      "section": "6.16.29",
+      "syntax": "EUROCONVERT( Number N ; Text From ; Text To [ ; Logical FullPrecision = FALSE [ ; Integer TriangulationPrecision ] ] )",
+      "formula": "of:=EUROCONVERT(1;\"EUR\";\"DEM\";TRUE();3)",
+      "expected": {
+        "kind": "float",
+        "value": "1.95583",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FACTDOUBLE",
+      "section": "6.16.33",
+      "syntax": "FACTDOUBLE( Integer F )",
+      "formula": "of:=FACTDOUBLE(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FDIST",
+      "section": "6.18.22",
+      "syntax": "FDIST( Number X ; Number R 1 ; Number R 2 [ ; Logical Cumulative = TRUE ] )",
+      "formula": "of:=FDIST(1;5;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.5348805734622",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FINDB",
+      "section": "6.7.2",
+      "syntax": "FINDB( Text Search ; Text T [ ; BytePosition Start ] )",
+      "formula": "of:=FINDB(\"b\";\"abc\";1)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FINV",
+      "section": "6.18.24",
+      "syntax": "FINV( Number P ; Number R 1 ; Number R 2 )",
+      "formula": "of:=FINV(0.5;5;10)",
+      "expected": {
+        "kind": "float",
+        "value": "0.931933160851048",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FORMULA",
+      "section": "6.13.12",
+      "syntax": "FORMULA( Reference X )",
+      "formula": "of:=FORMULA([Data.A2])",
+      "expected": {
+        "kind": "string",
+        "value": "#N/A",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FREQUENCY",
+      "section": "6.18.29",
+      "syntax": "FREQUENCY( NumberSequenceList Data ; NumberSequenceList Bins )",
+      "formula": "of:=FREQUENCY({1;2;3;4};{2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "FVSCHEDULE",
+      "section": "6.12.21",
+      "syntax": "FVSCHEDULE( Number Principal ; NumberSequence Schedule )",
+      "formula": "of:=FVSCHEDULE(2;{1;2;3})",
+      "expected": {
+        "kind": "float",
+        "value": "48",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GAMMA",
+      "section": "6.16.34",
+      "syntax": "GAMMA( Number N )",
+      "formula": "of:=GAMMA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GAUSS",
+      "section": "6.18.33",
+      "syntax": "GAUSS( Number X )",
+      "formula": "of:=GAUSS(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.477249868051821",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GESTEP",
+      "section": "6.16.37",
+      "syntax": "GESTEP( Number X [ ; Number Step = 0 ] )",
+      "formula": "of:=GESTEP(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "GETPIVOTDATA",
+      "section": "6.14.4",
+      "syntax": "GETPIVOTDATA( Text DataField ; Reference Table { ; Text FieldName ; Scalar Member } * ) Note: This version of the syntax is distinguished by the parameter Table being the second parameter.",
+      "formula": "of:=GETPIVOTDATA(\"x\";[Data.A2];\"x\";2)",
+      "expected": {
+        "kind": "predicate",
+        "value": "workbook-pivot-contract",
+        "oracle": "oasis-host-contract"
+      }
+    },
+    {
+      "function": "GROWTH",
+      "section": "6.18.35",
+      "syntax": "GROWTH( Array KnownY [ ; [ Array KnownX ] [ ; [ Array NewX ] [ ; Logical Const = TRUE ] ] ] )",
+      "formula": "of:=GROWTH({2;4;8};{1;2;3};{4})",
+      "expected": {
+        "kind": "float",
+        "value": "16",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HEX2BIN",
+      "section": "6.19.11",
+      "syntax": "HEX2BIN( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=HEX2BIN(2)",
+      "expected": {
+        "kind": "string",
+        "value": "10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HEX2DEC",
+      "section": "6.19.12",
+      "syntax": "HEX2DEC( TextOrNumber X )",
+      "formula": "of:=HEX2DEC(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HEX2OCT",
+      "section": "6.19.13",
+      "syntax": "HEX2OCT( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=HEX2OCT(2)",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "HYPERLINK",
+      "section": "6.11.3",
+      "syntax": "HYPERLINK( Text IRI [ ; Text|Number FunctionResult ] )",
+      "formula": "of:=HYPERLINK(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "x",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IFERROR",
+      "section": "6.15.5",
+      "syntax": "IFERROR( Any X ; Any Alternative )",
+      "formula": "of:=IFERROR(1/0;42)",
+      "expected": {
+        "kind": "float",
+        "value": "42",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IFNA",
+      "section": "6.15.6",
+      "syntax": "IFNA( Any X ; Any Alternative )",
+      "formula": "of:=IFNA(#N/A;42)",
+      "expected": {
+        "kind": "float",
+        "value": "42",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMABS",
+      "section": "6.8.3",
+      "syntax": "IMABS( Complex X )",
+      "formula": "of:=IMABS(\"1+i\")",
+      "expected": {
+        "kind": "float",
+        "value": "1.4142135623731",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMAGINARY",
+      "section": "6.8.4",
+      "syntax": "IMAGINARY( Complex X )",
+      "formula": "of:=IMAGINARY(\"1+i\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMARGUMENT",
+      "section": "6.8.5",
+      "syntax": "IMARGUMENT( Complex X )",
+      "formula": "of:=IMARGUMENT(\"1+i\")",
+      "expected": {
+        "kind": "float",
+        "value": "0.785398163397448",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMCONJUGATE",
+      "section": "6.8.6",
+      "syntax": "IMCONJUGATE( Complex X )",
+      "formula": "of:=IMCONJUGATE(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "1-i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMCOS",
+      "section": "6.8.7",
+      "syntax": "IMCOS( Complex X )",
+      "formula": "of:=IMCOS(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.833730025131149-0.988897705762865i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMCOT",
+      "section": "6.8.9",
+      "syntax": "IMCOT( Complex N )",
+      "formula": "of:=IMCOT(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.217621561854403-0.868014142895925i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMCSC",
+      "section": "6.8.10",
+      "syntax": "IMCSC( Complex N )",
+      "formula": "of:=IMCSC(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.621518017170428-0.303931001628426i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMCSCH",
+      "section": "6.8.11",
+      "syntax": "IMCSCH( Complex N )",
+      "formula": "of:=IMCSCH(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.303931001628426-0.621518017170428i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMDIV",
+      "section": "6.8.12",
+      "syntax": "IMDIV( Complex X ; Complex Y )",
+      "formula": "of:=IMDIV(\"2+2i\";\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMEXP",
+      "section": "6.8.13",
+      "syntax": "IMEXP( Complex X )",
+      "formula": "of:=IMEXP(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "1.46869393991589+2.28735528717884i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMLN",
+      "section": "6.8.14",
+      "syntax": "IMLN( Complex X )",
+      "formula": "of:=IMLN(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.346573590279973+0.785398163397448i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMLOG10",
+      "section": "6.8.15",
+      "syntax": "IMLOG10( Complex X )",
+      "formula": "of:=IMLOG10(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.150514997831991+0.34109408846046i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMLOG2",
+      "section": "6.8.16",
+      "syntax": "IMLOG2( Complex X )",
+      "formula": "of:=IMLOG2(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.5+1.1330900354568i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMPOWER",
+      "section": "6.8.17",
+      "syntax": "IMPOWER( Complex X ; Complex Y ) or IMPOWER( Complex X ; Number Y )",
+      "formula": "of:=IMPOWER(\"1+i\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "1.22464679914735e-16+2i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMPRODUCT",
+      "section": "6.8.18",
+      "syntax": "IMPRODUCT( { ComplexSequence N } + )",
+      "formula": "of:=IMPRODUCT(\"1+i\";\"1-i\")",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMREAL",
+      "section": "6.8.19",
+      "syntax": "IMREAL( Complex N )",
+      "formula": "of:=IMREAL(\"1+i\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSEC",
+      "section": "6.8.22",
+      "syntax": "IMSEC( Complex N )",
+      "formula": "of:=IMSEC(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.498337030555187+0.591083841721045i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSECH",
+      "section": "6.8.23",
+      "syntax": "IMSECH( Complex N )",
+      "formula": "of:=IMSECH(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.498337030555187-0.591083841721045i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSIN",
+      "section": "6.8.20",
+      "syntax": "IMSIN( Complex N )",
+      "formula": "of:=IMSIN(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "1.29845758141598+0.634963914784736i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSQRT",
+      "section": "6.8.24",
+      "syntax": "IMSQRT( Complex N )",
+      "formula": "of:=IMSQRT(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "1.09868411346781+0.455089860562227i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSUB",
+      "section": "6.8.25",
+      "syntax": "IMSUB( Complex X ; Complex Y )",
+      "formula": "of:=IMSUB(\"2+2i\";\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "1+i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMSUM",
+      "section": "6.8.26",
+      "syntax": "IMSUM( { ComplexSequence N } + )",
+      "formula": "of:=IMSUM(\"1+i\";\"1-i\")",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "IMTAN",
+      "section": "6.8.27",
+      "syntax": "IMTAN( Complex N )",
+      "formula": "of:=IMTAN(\"1+i\")",
+      "expected": {
+        "kind": "string",
+        "value": "0.271752585319512+1.08392332733869i",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INDIRECT",
+      "section": "6.14.7",
+      "syntax": "INDIRECT( Text Ref [ ; Logical A1 = TRUE ] )",
+      "formula": "of:=INDIRECT(\"Data.A2\")",
+      "expected": {
+        "kind": "string",
+        "value": "One",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "INFO",
+      "section": "6.13.13",
+      "syntax": "INFO( Text Category )",
+      "formula": "of:=INFO(\"system\")",
+      "expected": {
+        "kind": "predicate",
+        "value": "non-empty-host-text",
+        "oracle": "oasis-host-contract"
+      }
+    },
+    {
+      "function": "IPMT",
+      "section": "6.12.23",
+      "syntax": "IPMT( Number Rate ; Number Period ; Number Nper ; Number PV [ ; Number FV = 0 [ ; Number Type = 0 ] ] )",
+      "formula": "of:=IPMT(0.01;1;12;1000;0;0)",
+      "expected": {
+        "kind": "currency",
+        "value": "-10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISFORMULA",
+      "section": "6.13.18",
+      "syntax": "ISFORMULA( Reference X )",
+      "formula": "of:=ISFORMULA([Data.A2])",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISPMT",
+      "section": "6.12.25",
+      "syntax": "ISPMT( Number Rate ; Number Period ; Number Nper ; Number Pv )",
+      "formula": "of:=ISPMT(2;2;2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "ISREF",
+      "section": "6.13.24",
+      "syntax": "ISREF( Any X )",
+      "formula": "of:=ISREF(2)",
+      "expected": {
+        "kind": "boolean",
+        "value": "false",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "JIS",
+      "section": "6.20.11",
+      "syntax": "JIS( Text T )",
+      "formula": "of:=JIS(\"x\")",
+      "expected": {
+        "kind": "string",
+        "value": "ｘ",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LEFTB",
+      "section": "6.7.3",
+      "syntax": "LEFTB( Text T [ ; ByteLength Length ] )",
+      "formula": "of:=LEFTB(\"abc\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "ab",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "LENB",
+      "section": "6.7.4",
+      "syntax": "LENB( Text T )",
+      "formula": "of:=LENB(\"x\")",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MAXA",
+      "section": "6.18.46",
+      "syntax": "MAXA( { Any N } + )",
+      "formula": "of:=MAXA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MDETERM",
+      "section": "6.5.2",
+      "syntax": "MDETERM( ForceArray Array A )",
+      "formula": "of:=MDETERM({1;2|3;4})",
+      "expected": {
+        "kind": "float",
+        "value": "-2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MULTIPLE.OPERATIONS",
+      "section": "6.14.10",
+      "syntax": "MULTIPLE.OPERATIONS( Reference FormulaCell ; Reference RowCell ; Reference RowReplacement [ ; Reference ColumnCell ; Reference ColumnReplacement ] )",
+      "formula": "of:=MULTIPLE.OPERATIONS([Data.A2];[Data.A2];[Data.A2])",
+      "expected": {
+        "kind": "predicate",
+        "value": "workbook-data-table-contract",
+        "oracle": "oasis-host-contract"
+      }
+    },
+    {
+      "function": "MUNIT",
+      "section": "6.5.5",
+      "syntax": "MUNIT( Integer N )",
+      "formula": "of:=MUNIT(2)",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MIDB",
+      "section": "6.7.5",
+      "syntax": "MIDB( Text T ; BytePosition Start ; ByteLength Length )",
+      "formula": "of:=MIDB(\"abcd\";2;2)",
+      "expected": {
+        "kind": "string",
+        "value": "bc",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "MINA",
+      "section": "6.18.49",
+      "syntax": "MINA( { Any N } + )",
+      "formula": "of:=MINA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NORMDIST",
+      "section": "6.18.52",
+      "syntax": "NORMDIST( Number X ; Number Mean ; Number StandardDeviation [ ; Logical Cumulative = TRUE() ] )",
+      "formula": "of:=NORMDIST(0;0;1;TRUE())",
+      "expected": {
+        "kind": "float",
+        "value": "0.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NORMINV",
+      "section": "6.18.53",
+      "syntax": "NORMINV( Number P ; Number Mean ; Number StandardDeviation )",
+      "formula": "of:=NORMINV(0.5;0;1)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "NUMBERVALUE",
+      "section": "6.13.28",
+      "syntax": "NUMBERVALUE( Text X [ ; Text DecimalSeparator [ ; Text GroupSeparator ] ] )",
+      "formula": "of:=NUMBERVALUE(\"1,234.5\";\".\";\",\")",
+      "expected": {
+        "kind": "float",
+        "value": "1234.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "OCT2BIN",
+      "section": "6.19.14",
+      "syntax": "OCT2BIN( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=OCT2BIN(2)",
+      "expected": {
+        "kind": "string",
+        "value": "10",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "OCT2DEC",
+      "section": "6.19.15",
+      "syntax": "OCT2DEC( TextOrNumber X ) Summary: Converts an octal number (30 th bit is sign) to decimal",
+      "formula": "of:=OCT2DEC(2)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "OCT2HEX",
+      "section": "6.19.16",
+      "syntax": "OCT2HEX( TextOrNumber X [ ; Number Digits ] )",
+      "formula": "of:=OCT2HEX(2)",
+      "expected": {
+        "kind": "string",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PDURATION",
+      "section": "6.12.35",
+      "syntax": "PDURATION( Number Rate ; Number CurrentValue ; Number SpecifiedValue )",
+      "formula": "of:=PDURATION(2;2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PERMUTATIONA",
+      "section": "6.18.60",
+      "syntax": "PERMUTATIONA( Integer Total ; Integer Chosen )",
+      "formula": "of:=PERMUTATIONA(2;2)",
+      "expected": {
+        "kind": "float",
+        "value": "4",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PHI",
+      "section": "6.18.61",
+      "syntax": "PHI( Number N )",
+      "formula": "of:=PHI(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.0539909665131881",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PPMT",
+      "section": "6.12.37",
+      "syntax": "PPMT( Number Rate ; Integer Period ; Integer Nper ; Number Present [ ; Number Future = 0 [ ; Number Type = 0 ] ] )",
+      "formula": "of:=PPMT(2;2;2;2)",
+      "expected": {
+        "kind": "currency",
+        "value": "-1.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "PRICEDISC",
+      "section": "6.12.39",
+      "syntax": "PRICEDISC( DateParam Settlement ; DateParam Maturity ; Number Discount ; Number Redemption [ ; Basis B = 0 ] )",
+      "formula": "of:=PRICEDISC(DATE(2020;1;1);DATE(2020;7;1);0.04;100;0)",
+      "expected": {
+        "kind": "float",
+        "value": "98",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "REPLACEB",
+      "section": "6.7.6",
+      "syntax": "REPLACEB( Text T ; BytePosition Start ; ByteLength Len ; Text New )",
+      "formula": "of:=REPLACEB(\"abcd\";2;2;\"XY\")",
+      "expected": {
+        "kind": "string",
+        "value": "aXYd",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RIGHTB",
+      "section": "6.7.7",
+      "syntax": "RIGHTB( Text T [ ; ByteLength Length ] )",
+      "formula": "of:=RIGHTB(\"abc\";2)",
+      "expected": {
+        "kind": "string",
+        "value": "bc",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "RRI",
+      "section": "6.12.44",
+      "syntax": "RRI( Number Nper ; Number Pv ; Number Fv )",
+      "formula": "of:=RRI(2;2;2)",
+      "expected": {
+        "kind": "percentage",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SEARCH",
+      "section": "6.20.20",
+      "syntax": "SEARCH( Text Search ; Text T [ ; Integer Start = 1 ] )",
+      "formula": "of:=SEARCH(\"b\";\"abc\";1)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SEARCHB",
+      "section": "6.7.8",
+      "syntax": "SEARCHB( Text Search ; Text T [ ; BytePosition Start ] )",
+      "formula": "of:=SEARCHB(\"b\";\"abc\";1)",
+      "expected": {
+        "kind": "float",
+        "value": "2",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SEC",
+      "section": "6.16.52",
+      "syntax": "SEC( Number N )",
+      "formula": "of:=SEC(2)",
+      "expected": {
+        "kind": "float",
+        "value": "-2.40299796172238",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SECH",
+      "section": "6.16.57",
+      "syntax": "SECH( Number N )",
+      "formula": "of:=SECH(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0.26580222883408",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SHEET",
+      "section": "6.13.31",
+      "syntax": "SHEET( [ Text|Reference R ] )",
+      "formula": "of:=SHEET([Data.A1])",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SHEETS",
+      "section": "6.13.32",
+      "syntax": "SHEETS( [ Reference R ] )",
+      "formula": "of:=SHEETS([Data.A1])",
+      "expected": {
+        "kind": "float",
+        "value": "1",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "SUMIFS",
+      "section": "6.16.63",
+      "syntax": "SUMIFS( Reference R ; Reference R1 ; Criterion C1 [ ; Reference R2 ; Criterion C2 ]... )",
+      "formula": "of:=SUMIFS([Data.B2:.B4];[Data.B2:.B4];\">1\")",
+      "expected": {
+        "kind": "float",
+        "value": "5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "TEXT",
+      "section": "6.20.23",
+      "syntax": "TEXT( Scalar X ; Text FormatCode )",
+      "formula": "of:=TEXT(1234.5;\"0.0\")",
+      "expected": {
+        "kind": "string",
+        "value": "1234.5",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "UNICHAR",
+      "section": "6.20.25",
+      "syntax": "UNICHAR( Integer N )",
+      "formula": "of:=UNICHAR(65)",
+      "expected": {
+        "kind": "string",
+        "value": "A",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "UNICODE",
+      "section": "6.20.26",
+      "syntax": "UNICODE( Text T )",
+      "formula": "of:=UNICODE(\"A\")",
+      "expected": {
+        "kind": "float",
+        "value": "65",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "VARPA",
+      "section": "6.18.85",
+      "syntax": "VARPA( { Any Sample } + )",
+      "formula": "of:=VARPA(2)",
+      "expected": {
+        "kind": "float",
+        "value": "0",
+        "oracle": "libreoffice-calc"
+      }
+    },
+    {
+      "function": "XOR",
+      "section": "6.15.10",
+      "syntax": "XOR( { Logical L } + )",
+      "formula": "of:=XOR(TRUE())",
+      "expected": {
+        "kind": "boolean",
+        "value": "true",
+        "oracle": "libreoffice-calc"
+      }
+    }
+  ]
+}

@@ -448,8 +448,10 @@ internal static class FormulaConformanceFunctionHandlers
         }
         if (arguments.Count < 2)
             return OdfFormulaError.Value;
-        if (!TryGetNumbers(arguments[0].Evaluate(context), out double[] first, out object firstError) ||
-            !TryGetNumbers(arguments[1].Evaluate(context), out double[] second, out firstError))
+        object firstValue = arguments[0].Evaluate(context);
+        object secondValue = arguments[1].Evaluate(context);
+        if (!TryGetNumbers(firstValue, out double[] first, out object firstError) ||
+            !TryGetNumbers(secondValue, out double[] second, out firstError))
             return firstError;
         if (first.Length < 2 || second.Length < 2)
             return OdfFormulaError.Div0;
@@ -469,6 +471,19 @@ internal static class FormulaConformanceFunctionHandlers
         {
             if (first.Length != second.Length)
                 return OdfFormulaError.NA;
+            int degreesOfFreedom = first.Length - 1;
+            if (firstValue is object[,] firstArray &&
+                secondValue is object[,] secondArray &&
+                firstArray.GetLength(0) == secondArray.GetLength(0) &&
+                firstArray.GetLength(1) == secondArray.GetLength(1) &&
+                firstArray.GetLength(0) > 1 &&
+                firstArray.GetLength(1) > 1)
+            {
+                degreesOfFreedom =
+                    (firstArray.GetLength(0) - 1) *
+                    (firstArray.GetLength(1) - 1);
+            }
+
             double statistic = 0;
             for (int i = 0; i < first.Length; i++)
             {
@@ -476,7 +491,7 @@ internal static class FormulaConformanceFunctionHandlers
                     return OdfFormulaError.Div0;
                 statistic += Math.Pow(first[i] - second[i], 2) / second[i];
             }
-            return 1 - RegularizedGammaP((first.Length - 1) / 2d, statistic / 2);
+            return 1 - RegularizedGammaP(degreesOfFreedom / 2d, statistic / 2);
         }
         if (arguments.Count != 4)
             return OdfFormulaError.Value;
@@ -912,8 +927,8 @@ internal static class FormulaConformanceFunctionHandlers
         return name switch
         {
             "ACCRINTM" => v[2] * (v.Length > 3 ? v[3] : 0) * fraction,
-            "ACCRINT" => v[3] * v[4] * YearFraction(second, DateTime.FromOADate(v[2]), basis),
-            "DISC" => (v[2] - v[3]) / v[2] / fraction,
+            "ACCRINT" => v[3] * v[4] * YearFraction(first, DateTime.FromOADate(v[2]), basis),
+            "DISC" => (v[3] - v[2]) / v[3] / fraction,
             "INTRATE" => (v[3] - v[2]) / v[2] / fraction,
             "RECEIVED" => v[2] / (1 - (v[3] * fraction)),
             "TBILLPRICE" => 100 * (1 - (v[2] * ((second - first).TotalDays / 360))),
@@ -924,9 +939,13 @@ internal static class FormulaConformanceFunctionHandlers
             "YIELDDISC" => (v[3] - v[2]) / v[2] / fraction,
             "PRICEMAT" => (100 + (v[3] * 100 * YearFraction(
                 DateTime.FromOADate(v[2]), second, basis))) /
-                (1 + (v[4] * fraction)),
+                (1 + (v[4] * fraction)) -
+                (v[3] * 100 * YearFraction(
+                    DateTime.FromOADate(v[2]), first, basis)),
             "YIELDMAT" => ((100 + (100 * v[3] * YearFraction(
-                DateTime.FromOADate(v[2]), second, basis))) / v[4] - 1) / fraction,
+                DateTime.FromOADate(v[2]), second, basis))) /
+                (v[4] + (100 * v[3] * YearFraction(
+                    DateTime.FromOADate(v[2]), first, basis))) - 1) / fraction,
             _ => OdfFormulaError.Value
         };
     }

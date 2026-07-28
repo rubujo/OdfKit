@@ -15,6 +15,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $assemblyPath = Join-Path $repoRoot 'OdfKit/bin/Release/net10.0/OdfKit.dll'
 $outputPath = Join-Path $repoRoot 'docs/openformula-conformance-manifest.json'
+$normativeCorpusPath = Join-Path $repoRoot 'docs/openformula-normative-corpus.json'
 
 if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
     throw "找不到 Release 組件：$assemblyPath"
@@ -23,6 +24,12 @@ if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
 Add-Type -Path $assemblyPath
 $group = [OdfKit.Formula.OdfFormulaConformanceGroup]::Large
 $requiredFunctions = [OdfKit.Formula.OdfFormulaSupport]::GetRequiredFunctions($group)
+$normativeCorpus = Get-Content -LiteralPath $normativeCorpusPath -Raw | ConvertFrom-Json
+$normativeFunctions = @($normativeCorpus.cases.function)
+if ($normativeFunctions.Count -ne $requiredFunctions.Count -or
+    (Compare-Object $requiredFunctions $normativeFunctions).Count -ne 0) {
+    throw 'OpenFormula normative corpus 未一對一涵蓋 Large Group 函式。'
+}
 $semanticDimensions = @(
     'arity',
     'normal-types',
@@ -49,25 +56,31 @@ $entries = foreach ($functionName in $requiredFunctions) {
         versions = @('1.2', '1.3', '1.4')
         profileStatus = if ($securityExcluded) { 'security-excluded' } else { 'evaluated-dispatch' }
         semanticCorpusStatus = if ($securityExcluded) { 'security-tested' } else { 'safe-contract-covered' }
-        normativeOracleStatus = if ($securityExcluded) { 'not-applicable-security-exclusion' } else { 'pending-independent-oasis-oracle' }
+        normativeOracleStatus = if ($securityExcluded) { 'not-applicable-security-exclusion' } else { 'representative-oasis-oracle-covered' }
         semanticCases = @($semanticCases)
         evidenceTests = if ($securityExcluded) {
             @(
                 'OpenFormulaConformanceCorpusTests.ScalarCorpusMatchesExpectedResult',
+                'OpenFormulaNormativeCorpusTests.EverySafeLargeFunctionMatchesNormativeOracle',
                 'OpenFormulaExtendedEvaluatorTests.DdeDoesNotEvaluateArguments'
             )
         } else {
-            @('OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable')
+            @(
+                'OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable',
+                'OpenFormulaNormativeCorpusTests.EverySafeLargeFunctionMatchesNormativeOracle'
+            )
         }
     }
 }
 
 $manifest = [ordered]@{
-    schemaVersion = 2
+    schemaVersion = 3
     profile = 'OdfKit Safe Large'
     odfVersions = @('1.2', '1.3', '1.4')
     requiredFunctionCount = $requiredFunctions.Count
     safeSemanticContractCaseCount = $requiredFunctions.Count * $semanticDimensions.Count
+    normativeFunctionCaseCount = $normativeCorpus.cases.Count
+    safeLargeConformanceClaim = $true
     officialLargeConformanceClaim = $false
     requiredSemanticDimensions = $semanticDimensions
     securityExcludedFunctions = @('DDE')

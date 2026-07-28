@@ -108,9 +108,18 @@ public sealed class OpenFormulaFunctionSemanticContractTests
         JsonElement root = document.RootElement;
         Assert.Equal(388, root.GetProperty("requiredFunctionCount").GetInt32());
         Assert.Equal(2716, root.GetProperty("safeSemanticContractCaseCount").GetInt32());
+        Assert.Equal(388, root.GetProperty("normativeFunctionCaseCount").GetInt32());
+        Assert.True(root.GetProperty("safeLargeConformanceClaim").GetBoolean());
+        Assert.False(root.GetProperty("officialLargeConformanceClaim").GetBoolean());
 
         foreach (JsonElement function in root.GetProperty("functions").EnumerateArray())
         {
+            string functionName = function.GetProperty("name").GetString()!;
+            Assert.Equal(
+                functionName == "DDE"
+                    ? "not-applicable-security-exclusion"
+                    : "representative-oasis-oracle-covered",
+                function.GetProperty("normativeOracleStatus").GetString());
             string[] dimensions = function
                 .GetProperty("semanticCases")
                 .EnumerateArray()

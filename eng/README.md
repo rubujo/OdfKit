@@ -136,6 +136,7 @@ cache 命中時仍會重新驗證雜湊。
 | 腳本 | 用途 |
 |------|------|
 | `Generate-OdfSchemaProvider.ps1` | 從 OASIS RNG schema manifest（`tools/OdfSchemaGenerator/`）產生 schema provider 程式碼。 |
+| `Generate-OpenFormulaNormativeCorpus.ps1` | 從 OASIS ODF 1.4 Part 4 HTML 擷取函式條文，並以固定 LibreOffice headless 產生 388 筆 Safe Large 離線 oracle。 |
 | `Initialize-OdfExternalCorpus.ps1` | 將外部 corpus manifest 與 baseline exception 範本複製到指定資料夾，詳見 [corpus-manifest.md](../docs/corpus-manifest.md)。 |
 | `Test-WholesomeManifestBaseline.ps1` | 由目前 CLI 產生 wholesome 加密 ODT，抽出 manifest 並以固定版本 LibreOffice schema 與 Jing 驗證。 |
 
