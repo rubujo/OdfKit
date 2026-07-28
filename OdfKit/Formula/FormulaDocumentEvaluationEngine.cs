@@ -560,6 +560,8 @@ internal static class FormulaDocumentEvaluationEngine
                     completed[addr] = result;
                     evaluator.SetCachedValue(addr, result);
                 }
+
+                dirtyFormulaCells.Remove(addr);
             }
         }
 

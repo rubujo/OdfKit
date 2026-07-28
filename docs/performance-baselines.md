@@ -12,7 +12,7 @@
 | `DomInsertBenchmarks.SequentialInsertAfter` | `123.9 us` | `+40%` | 偵測 DOM 循序插入效能的重大回歸 |
 | `OdsStreamWriterBenchmarks.WriteRows` | 以 `eng/baselines/performance-baselines.json` 為準 | 時間 `+40%`、配置量 `+15%` | 保護 200,000 列雙欄 ODS 串流寫入的時間與配置量 |
 | `FormulaEvaluationBenchmarks.FullRecalculation10000` | `223.9 ms`／`98.83 MB` | 時間 `+40%`、配置量 `+15%` | 保護 10K 獨立公式交易式全量重算 |
-| `FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation10000` | `84.40 ms`／`28.96 MB` | 時間 `+40%`、配置量 `+15%` | 保護 10K 公式中 1% 受影響子圖的交易式增量重算 |
+| `FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation10000` | `2.058 ms`／`1.82 MB` | 時間 `+40%`、配置量 `+15%` | 保護 10K 公式中 1% 受影響子圖的交易式增量重算 |
 
 執行：
 

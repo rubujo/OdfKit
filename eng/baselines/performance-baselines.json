@@ -48,12 +48,12 @@
       "note": "10000 independent formulas, median of three Medium in-process runs, Release, 2026-07-28"
     },
     "FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation10000": {
-      "meanNanoseconds": 84400000,
+      "meanNanoseconds": 2058000,
       "toleranceRatio": 0.4,
-      "allocatedBytes": 30366762,
+      "allocatedBytes": 1913104,
       "allocationToleranceRatio": 0.15,
       "unit": "ms",
-      "note": "10000 formulas with 1 percent affected, median of three Medium in-process runs, Release, 2026-07-28"
+      "note": "10000 formulas with 1 percent affected, median of three Medium in-process runs after incremental indexing optimization, Release, 2026-07-28"
     }
   }
 }
