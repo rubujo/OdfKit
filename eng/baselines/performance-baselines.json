@@ -38,6 +38,22 @@
       "toleranceRatio": 0.4,
       "unit": "ms",
       "note": "Updated by Benchmark-Regression.ps1 on 2026-07-12"
+    },
+    "FormulaEvaluationBenchmarks.FullRecalculation10000": {
+      "meanNanoseconds": 223900000,
+      "toleranceRatio": 0.4,
+      "allocatedBytes": 103630766,
+      "allocationToleranceRatio": 0.15,
+      "unit": "ms",
+      "note": "10000 independent formulas, median of three Medium in-process runs, Release, 2026-07-28"
+    },
+    "FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation10000": {
+      "meanNanoseconds": 25180,
+      "toleranceRatio": 0.4,
+      "allocatedBytes": 2580,
+      "allocationToleranceRatio": 0.15,
+      "unit": "us",
+      "note": "1 percent dirty propagation in 10000-formula graph, median of three Medium in-process runs, Release, 2026-07-28"
     }
   }
 }

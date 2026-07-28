@@ -4,6 +4,57 @@ OdfKit 提供受控的純 .NET 公式評估器，也允許應用程式以執行�
 或外部後援擴充能力。這些擴充可以處理 OASIS Large Group 清單以外的函式，
 但「功能超集合」與「正式 Large Group 一致性」是兩件不同的事。
 
+文件層的計算設定檔稱為 **OdfKit Safe Large**：Large Group 的 388 個強制函式名稱
+皆可派送，但 `DDE` 永久列入安全排除，不啟動程序、不連網，也不求值引數。因此
+`IsSafeProfileComplete` 可以為 `true`，但 OdfKit 不把它描述成未附條件的 OASIS
+Large 正式一致性。
+
+## 交易式計算與儲存策略
+
+`EvaluateFormulas` 先在不可變輸入快照與暫存 DOM 上完成剖析、相依排序及求值；只有
+整輪成功才依文件順序提交結果。不支援公式、剖析失敗、未授權外部參照或資源超限會
+擲出含 `OdfFormulaEvaluationReport` 的 `OdfFormulaEvaluationException`，而原文件
+與既有快取保持不變。標準結果 `#DIV/0!`、`#VALUE!` 等是合法公式值，不會觸發回復；
+取消則維持 `OperationCanceledException`。
+
+```csharp
+var limits = new OdfFormulaEvaluationOptions
+{
+    MaxFormulaCount = 100_000,
+    MaxCellReads = 10_000_000,
+    TimeLimit = TimeSpan.FromSeconds(30),
+    MaxDegreeOfParallelism = 0
+};
+
+OdfFormulaEvaluationReport report =
+    document.EvaluateFormulas(limits, cancellationToken);
+Console.WriteLine(
+    $"{report.EvaluatedFormulaCount} formulas, " +
+    $"{report.CellReadCount} reads, {report.Elapsed}");
+```
+
+預設預算另限制每式 32,768 字元、AST 深度 256、2,000,000 條公式相依邊、
+10,000,000 次操作及儲存格讀取，以及 1,000,000 個陣列結果元素。整欄或大型範圍
+相依只建立公式對公式的拓撲邊，不按範圍面積展開。平行求值只發生在同一拓撲層，
+工作數同時受選項及全域 `OdfParallelScheduler` 限制；`NOW`／`TODAY` 共用工作階段
+時間戳，提交順序固定，因此輸出可重現。
+
+儲存時以 `OdfSaveOptions.FormulaStrategy` 明確選擇行為：
+
+- `PreserveCachedValues`（預設）：公式、快取及顯示文字完全保持。
+- `MarkForRecalculation`：保留公式，清除結果屬性與顯示文字，並設定自動計算。
+- `Calculate`：使用相同的交易式引擎重算；失敗或取消不會留下部分結果。
+
+```csharp
+document.Save(
+    "calculated.ods",
+    new OdfSaveOptions
+    {
+        FormulaStrategy = OdfFormulaSaveStrategy.Calculate,
+        FormulaEvaluationOptions = limits
+    });
+```
+
 ## 目前等級
 
 | 項目 | 狀態 | 說明 |
@@ -41,10 +92,10 @@ document.EvaluateFormulas(evaluator);
 
 `OdfFormulaSupport.GetConformanceReport(group, functions)` 另以 ODF 1.4 正式標準的
 累計強制函式清單回報缺口。報告只證明函式名稱可派送，不會把名稱覆蓋誤當成完整
-語法、限制、型別轉換與函式語意的一致性證明。`BestEffortFunctions` 會列出需要額外
-內容模型或 corpus 證據的函式；只有 `HasOnlyFullyEvaluatedFunctions` 為 `true` 時，
-該群組才沒有已知的 Best Effort 函式。`HasCompleteFunctionSet` 仍只表示名稱沒有缺口，
-以維持既有 API 的單一職責。
+語法、限制、型別轉換與函式語意的一致性證明。`MissingFunctions`、
+`BestEffortFunctions` 與 `SecurityExcludedFunctions` 分開呈現；`DDE` 位於最後一類。
+`IsSafeProfileComplete` 表示除了明列的安全排除外沒有名稱或 Best Effort 缺口。
+`HasCompleteFunctionSet` 仍只表示名稱沒有缺口，以維持既有 API 的單一職責。
 
 `DDE` 不會由核心建立外部程序或網路連線，而是依安全政策傳回 `#N/A`。
 `IOdfFormulaWorkbookContext` 提供依文件順序排列的工作表目錄，以及 pivot 與
@@ -61,9 +112,9 @@ document.EvaluateFormulas(evaluator);
 QR 最小平方法求值，共線欄位會以秩不足模型處理，而不再直接反解容易失穩的一般方程式。
 `LINEST`／`LOGEST` 的 `Stats=TRUE` 會回傳五列係數、標準誤、決定係數、估計標準誤、
 F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由度的模型依規範回傳錯誤。
-目前 Large Group 能力報告中的 Best Effort 清單只剩 `DDE`。核心會驗證三個必要引數
-及一個選用模式引數的形狀，但不會求值引數，也不會建立外部程序、網路或資料連線；
-合法呼叫固定傳回 `#N/A`。這是刻意的安全政策，不是待補的演算法缺陷。
+目前 Large Group 能力報告的 `SecurityExcludedFunctions` 只包含 `DDE`。核心不求值
+其引數，也不會建立外部程序、網路或資料連線；任何呼叫固定傳回 `#N/A`。這是刻意的
+安全政策，不是待補的演算法缺陷。
 
 ```csharp
 public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
@@ -92,6 +143,12 @@ sheet.Ranges["A1:B2"].ClearArrayFormula();
 
 ## 外部後援
 
+文件評估預設採 `CachedOnly`：外部參照只能讀取文件內既有快取，不會呼叫應用程式
+resolver。只有呼叫端明確設定
+`ExternalReferencePolicy = OdfFormulaExternalReferencePolicy.AllowConfiguredResolver`
+才會使用已注入的 resolver。自訂函式、resolver 與整式 fallback 都是呼叫端信任的
+程式碼，不受核心資源預算完整隔離。
+
 `IOdfFormulaEvaluationFallback` 接收完整公式與目前的 `IEvaluationContext`。
 只有當純 .NET 評估結果為不受支援名稱錯誤時才會呼叫後援；後援拒絕處理時，
 原始錯誤會保持不變。介面可以連接 LibreOffice worker、企業試算服務或領域專用引擎，
@@ -112,6 +169,13 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 強制重算、常數錯誤、左側錯誤傳播、型別比較、陣列形狀、矩陣、Unicode、Bessel
 數值邊界、奇數票息公開範例、pivot 替代語法歧義與 `DDE` 安全拒絕。這是專案依正式
 文本自行撰寫的可稽核 corpus，不冒充 OASIS 官方測試套件。
+
+機器可讀的 [OpenFormula conformance manifest](openformula-conformance-manifest.json)
+逐一列出 388 個 Large Group 函式、ODF 1.2／1.3／1.4、Safe Large 分類與測試證據。
+其中尚未具備逐函式七維度案例者會明確標示
+`pending-function-specific-corpus`，不得被工具或文件當成正式語意一致性通過。
+`pwsh eng/Generate-OpenFormulaConformanceManifest.ps1 -VerifyOnly` 會防止 manifest
+與實際強制函式清單漂移。
 
 後續證據工作應持續擴充每個函式的限制、空值、locale、日期基準、浮點容許誤差及
 極端輸入案例；同時保留 OdfKit Extended 註冊表與後援，讓應用程式在 Large 清單之外

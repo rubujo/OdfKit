@@ -918,7 +918,11 @@ public class SpreadsheetHighLevelApiTests
         document.ExternalLinks.DocumentResolver = documentId =>
             documentId == "file:///external.ods" ? external : null;
 
-        document.EvaluateFormulas();
+        document.EvaluateFormulas(new OdfFormulaEvaluationOptions
+        {
+            ExternalReferencePolicy =
+                OdfFormulaExternalReferencePolicy.AllowConfiguredResolver
+        }, TestContext.Current.CancellationToken);
 
         Assert.Equal(42d, sheet.Cells["A1"].CellValue);
     }
@@ -964,7 +968,17 @@ public class SpreadsheetHighLevelApiTests
             documentId == "file:///external.ods" ? external : null;
 
         using var stream = new MemoryStream();
-        document.SaveToStream(stream, new OdfSaveOptions { EvaluateFormulasOnSave = true });
+        document.SaveToStream(
+            stream,
+            new OdfSaveOptions
+            {
+                FormulaStrategy = OdfFormulaSaveStrategy.Calculate,
+                FormulaEvaluationOptions = new OdfFormulaEvaluationOptions
+                {
+                    ExternalReferencePolicy =
+                        OdfFormulaExternalReferencePolicy.AllowConfiguredResolver
+                }
+            });
 
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
         using Stream contentStream = package.GetEntryStream("content.xml");

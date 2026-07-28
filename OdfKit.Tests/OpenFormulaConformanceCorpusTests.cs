@@ -50,7 +50,7 @@ public sealed class OpenFormulaConformanceCorpusTests
     [InlineData("1.4", "of:=BESSELY(0;0)", "error", "#NUM!")]
     [InlineData("1.4", "of:=DDE(\"service\";\"topic\";\"item\")", "error", "#N/A")]
     [InlineData("1.4", "of:=DDE(1/0;1/0;1/0)", "error", "#N/A")]
-    [InlineData("1.4", "of:=DDE(\"service\";\"topic\")", "error", "#VALUE!")]
+    [InlineData("1.4", "of:=DDE(\"service\";\"topic\")", "error", "#N/A")]
     public void ScalarCorpusMatchesExpectedResult(
         string version,
         string formula,

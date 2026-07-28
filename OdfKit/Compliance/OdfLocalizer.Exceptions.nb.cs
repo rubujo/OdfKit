@@ -647,6 +647,16 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Digesten til signeringssertifikatet samsvarer ikke med XAdES CertDigest-verdien.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Sertifikatets serienummer {0} samsvarer ikke med XAdES IssuerSerial {1}.",
             ["Err_OdfImageExporter_InvalidDimensions"] = "Bildeeksportalternativet '{0}' må være positivt og innenfor det støttede gjengivelsesområdet.",
+            ["Err_OdfFormulaEvaluationOptions_PositiveTimeLimit"] = "Tidsgrensen for formelevaluering må være positiv.",
+            ["Err_OdfFormulaEvaluationOptions_NonNegative"] = "Alternativet for formelevaluering «{0}» kan ikke være negativt.",
+            ["Err_OdfFormulaEvaluationOptions_Positive"] = "Alternativet for formelevaluering «{0}» må være positivt.",
+            ["Err_OdfFormulaEvaluation_ResourceLimitExceeded"] = "Formelevalueringen overskred ressursgrensen «{0}».",
+            ["Err_OdfFormulaEvaluation_Failed"] = "Formelevalueringen mislyktes: {0}",
+            ["Err_OdfFormulaEvaluation_InvalidFormula"] = "Formelen i celle {0} kunne ikke tolkes.",
+            ["Err_OdfFormulaEvaluation_UnsupportedFormula"] = "Formelen i celle {0} bruker en funksjon som ikke støttes.",
+            ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Alternativer for formelevaluering kan ikke være null ved beregning under lagring.",
+            ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Alternativer for formelevaluering kan ikke være null.",
+            ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Den eksterne referansen «{0}» har ingen hurtigbufret verdi, og konfigurerte løsere er deaktivert.",
         };
     }
 }

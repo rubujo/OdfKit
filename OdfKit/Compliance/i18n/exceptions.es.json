@@ -629,4 +629,14 @@
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "El resumen del certificado de firma no coincide con el valor CertDigest de XAdES.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "El numero de serie del certificado {0} no coincide con el IssuerSerial {1} de XAdES.",
   "Err_OdfImageExporter_InvalidDimensions": "La opción de exportación de imagen '{0}' debe ser positiva y estar dentro del intervalo de representación admitido."
+  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "El límite de tiempo de evaluación de fórmulas debe ser positivo."
+  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "La opción de evaluación de fórmulas «{0}» no puede ser negativa."
+  ,"Err_OdfFormulaEvaluationOptions_Positive": "La opción de evaluación de fórmulas «{0}» debe ser positiva."
+  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "La evaluación de fórmulas superó el límite de recursos «{0}»."
+  ,"Err_OdfFormulaEvaluation_Failed": "La evaluación de fórmulas falló: {0}"
+  ,"Err_OdfFormulaEvaluation_InvalidFormula": "No se pudo analizar la fórmula de la celda {0}."
+  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "La fórmula de la celda {0} usa una función no compatible."
+  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Las opciones de evaluación no pueden ser nulas al calcular durante el guardado."
+  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Las opciones de evaluación de fórmulas no pueden ser nulas."
+  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "La referencia externa «{0}» no tiene valor en caché y los resolutores configurados están deshabilitados."
 }

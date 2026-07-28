@@ -647,6 +647,16 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "서명 인증서 다이제스트가 XAdES CertDigest 값과 일치하지 않습니다.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "인증서 일련번호 {0}이(가) XAdES IssuerSerial {1}과(와) 일치하지 않습니다.",
             ["Err_OdfImageExporter_InvalidDimensions"] = "이미지 내보내기 옵션 '{0}'은(는) 양수이며 지원되는 렌더링 범위 내에 있어야 합니다.",
+            ["Err_OdfFormulaEvaluationOptions_PositiveTimeLimit"] = "수식 평가 시간 제한은 양수여야 합니다.",
+            ["Err_OdfFormulaEvaluationOptions_NonNegative"] = "수식 평가 옵션 '{0}'은(는) 음수일 수 없습니다.",
+            ["Err_OdfFormulaEvaluationOptions_Positive"] = "수식 평가 옵션 '{0}'은(는) 양수여야 합니다.",
+            ["Err_OdfFormulaEvaluation_ResourceLimitExceeded"] = "수식 평가가 리소스 제한 '{0}'을(를) 초과했습니다.",
+            ["Err_OdfFormulaEvaluation_Failed"] = "수식 평가에 실패했습니다: {0}",
+            ["Err_OdfFormulaEvaluation_InvalidFormula"] = "셀 {0}의 수식을 구문 분석할 수 없습니다.",
+            ["Err_OdfFormulaEvaluation_UnsupportedFormula"] = "셀 {0}의 수식에서 지원되지 않는 기능을 사용합니다.",
+            ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "저장할 때 계산하는 경우 수식 평가 옵션은 null일 수 없습니다.",
+            ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "수식 평가 옵션은 null일 수 없습니다.",
+            ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "외부 참조 '{0}'에 캐시된 값이 없으며 구성된 확인자가 비활성화되었습니다.",
         };
     }
 }

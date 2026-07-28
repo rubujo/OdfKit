@@ -1,0 +1,86 @@
+#Requires -Version 7.0
+<#
+.SYNOPSIS
+    由 OdfFormulaSupport 的 Large Group 清單產生可稽核的 OpenFormula manifest。
+.DESCRIPTION
+    manifest 明確區分名稱派送、安全排除與逐函式語意 corpus，不會把 388/388
+    名稱覆蓋誤標為未附條件的 OASIS Large 正式一致性。
+#>
+[CmdletBinding()]
+param(
+    [switch]$VerifyOnly
+)
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$assemblyPath = Join-Path $repoRoot 'OdfKit/bin/Release/net10.0/OdfKit.dll'
+$outputPath = Join-Path $repoRoot 'docs/openformula-conformance-manifest.json'
+
+if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
+    throw "找不到 Release 組件：$assemblyPath"
+}
+
+Add-Type -Path $assemblyPath
+$group = [OdfKit.Formula.OdfFormulaConformanceGroup]::Large
+$requiredFunctions = [OdfKit.Formula.OdfFormulaSupport]::GetRequiredFunctions($group)
+
+$entries = foreach ($functionName in $requiredFunctions) {
+    $securityExcluded = $functionName -eq 'DDE'
+    [ordered]@{
+        name = $functionName
+        versions = @('1.2', '1.3', '1.4')
+        profileStatus = if ($securityExcluded) { 'security-excluded' } else { 'evaluated-dispatch' }
+        semanticCorpusStatus = if ($securityExcluded) { 'security-tested' } else { 'pending-function-specific-corpus' }
+        evidenceTests = if ($securityExcluded) {
+            @(
+                'OpenFormulaConformanceCorpusTests.ScalarCorpusMatchesExpectedResult',
+                'OpenFormulaExtendedEvaluatorTests.DdeDoesNotEvaluateArguments'
+            )
+        } else {
+            @('OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable')
+        }
+    }
+}
+
+$manifest = [ordered]@{
+    schemaVersion = 1
+    profile = 'OdfKit Safe Large'
+    odfVersions = @('1.2', '1.3', '1.4')
+    requiredFunctionCount = $requiredFunctions.Count
+    officialLargeConformanceClaim = $false
+    requiredSemanticDimensions = @(
+        'arity',
+        'normal-types',
+        'implicit-conversion',
+        'blank-values',
+        'error-propagation',
+        'boundaries',
+        'version-differences'
+    )
+    securityExcludedFunctions = @('DDE')
+    functions = @($entries)
+}
+
+$json = $manifest | ConvertTo-Json -Depth 8
+$json = $json -replace "`r?`n", "`r`n"
+$json += "`r`n"
+
+if ($VerifyOnly) {
+    if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
+        throw "缺少 OpenFormula conformance manifest：$outputPath"
+    }
+
+    $current = [System.IO.File]::ReadAllText($outputPath)
+    if ($current -ne $json) {
+        throw 'OpenFormula conformance manifest 已漂移，請重新執行產生器。'
+    }
+
+    Write-Host "PASS：OpenFormula conformance manifest 與 388 個 Large Group 函式清單一致。"
+    exit 0
+}
+
+[System.IO.File]::WriteAllText(
+    $outputPath,
+    $json,
+    [System.Text.UTF8Encoding]::new($false))
+Write-Host "WROTE：$outputPath（$($requiredFunctions.Count) functions）"

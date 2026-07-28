@@ -52,7 +52,8 @@ public sealed partial class OdfPackage
 
         internal OdfExternalLinkManager? FormulaExternalLinksForSave => _package.FormulaExternalLinksForSave;
 
-        internal void ProcessSaveHooks() => OdfPackageSaveHooksEngine.Process(this);
+        internal void ProcessSaveHooks(CancellationToken cancellationToken) =>
+            OdfPackageSaveHooksEngine.Process(this, cancellationToken);
 
         internal void SaveRdfMetadata() => OdfPackageRdfMetadataEngine.Save(this);
 

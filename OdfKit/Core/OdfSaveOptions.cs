@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Compression;
 using OdfKit.Compliance;
+using OdfKit.Formula;
 
 namespace OdfKit.Core;
 
@@ -127,10 +128,17 @@ public class OdfSaveOptions
     public bool EmbedUsedFonts { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether spreadsheet formulas are evaluated before saving.
-    /// 取得或設定儲存前是否計算試算表公式。
+    /// Gets or sets how spreadsheet formula results are handled before saving.
+    /// 取得或設定儲存前如何處理試算表公式結果。
     /// </summary>
-    public bool EvaluateFormulasOnSave { get; set; }
+    public OdfFormulaSaveStrategy FormulaStrategy { get; set; } =
+        OdfFormulaSaveStrategy.PreserveCachedValues;
+
+    /// <summary>
+    /// Gets or sets formula evaluation limits used by the calculate save strategy.
+    /// 取得或設定計算儲存策略使用的公式評估限制。
+    /// </summary>
+    public OdfFormulaEvaluationOptions FormulaEvaluationOptions { get; set; } = new();
 
     /// <summary>
     /// Gets or sets a value indicating whether Direct I/O is used for uncached package writes.

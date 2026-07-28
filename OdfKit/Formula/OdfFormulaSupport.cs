@@ -441,6 +441,8 @@ public static class OdfFormulaSupport
     private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
     private static readonly HashSet<string> BestEffortFunctionNames =
         CreateFunctionSet(OdfFormulaSupportLevel.BestEffort);
+    private static readonly HashSet<string> SecurityExcludedFunctionNames =
+        new(StringComparer.OrdinalIgnoreCase) { "DDE" };
 
     private static readonly string[] SmallGroupFunctionTable =
     [
@@ -802,11 +804,16 @@ public static class OdfFormulaSupport
         IReadOnlyList<string> requiredFunctions = GetRequiredFunctionsCore(group);
         var missingFunctions = new List<string>();
         var bestEffortFunctions = new List<string>();
+        var securityExcludedFunctions = new List<string>();
         foreach (string functionName in requiredFunctions)
         {
             if (!IsFunctionSupportedCore(functionName, functions))
             {
                 missingFunctions.Add(functionName);
+            }
+            else if (SecurityExcludedFunctionNames.Contains(functionName))
+            {
+                securityExcludedFunctions.Add(functionName);
             }
             else if (BestEffortFunctionNames.Contains(functionName))
             {
@@ -818,7 +825,8 @@ public static class OdfFormulaSupport
             group,
             requiredFunctions,
             Array.AsReadOnly(missingFunctions.ToArray()),
-            Array.AsReadOnly(bestEffortFunctions.ToArray()));
+            Array.AsReadOnly(bestEffortFunctions.ToArray()),
+            Array.AsReadOnly(securityExcludedFunctions.ToArray()));
     }
 
     private static IReadOnlyList<string> GetRequiredFunctionsCore(

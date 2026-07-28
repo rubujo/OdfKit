@@ -76,14 +76,36 @@ public sealed class OdfFormulaDependencyGraph
                     int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
                     string? sheetName = range.StartAddress.SheetName ?? cell.SheetName;
 
-                    for (int r = startRow; r <= endRow; r++)
+                    if (context is OdfDomEvaluationContext domContext)
                     {
-                        for (int c = startCol; c <= endCol; c++)
+                        foreach (OdfCellAddress formulaAddress in domContext.CellFormulas.Keys)
                         {
-                            var depAddress = new OdfCellAddress(r, c, sheetName);
-                            if (depAddress != cell) // 避免自相依
+                            if (formulaAddress != cell &&
+                                string.Equals(
+                                    formulaAddress.SheetName,
+                                    sheetName,
+                                    StringComparison.Ordinal) &&
+                                formulaAddress.Row >= startRow &&
+                                formulaAddress.Row <= endRow &&
+                                formulaAddress.Column >= startCol &&
+                                formulaAddress.Column <= endCol &&
+                                depsSet.Add(formulaAddress))
                             {
-                                depsSet.Add(depAddress);
+                                domContext.Budget?.ChargeDependencyEdge();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int r = startRow; r <= endRow; r++)
+                        {
+                            for (int c = startCol; c <= endCol; c++)
+                            {
+                                var depAddress = new OdfCellAddress(r, c, sheetName);
+                                if (depAddress != cell && depsSet.Add(depAddress))
+                                {
+                                    // 公開自訂內容模型維持舊行為；文件評估器使用上方的緊湊公式索引。
+                                }
                             }
                         }
                     }
@@ -121,17 +143,21 @@ public sealed class OdfFormulaDependencyGraph
     /// <param name="cell">The modified or affected cell address. / 被修改或受影響的儲存格位址。</param>
     public void MarkDirty(OdfCellAddress cell)
     {
-        if (_dirtyCells.Add(cell))
+        var pending = new Stack<OdfCellAddress>();
+        pending.Push(cell);
+        while (pending.Count > 0)
         {
-            // 清除循環參照標籤，重新計算時會重新評估
-            _circularCells.Remove(cell);
+            OdfCellAddress current = pending.Pop();
+            if (!_dirtyCells.Add(current))
+                continue;
 
-            // 遞迴將所有依賴於此單元格的下游節點標記為 Dirty
-            if (_dependents.TryGetValue(cell, out var dependents))
+            _circularCells.Remove(current);
+
+            if (_dependents.TryGetValue(current, out var dependents))
             {
-                foreach (var dependent in dependents)
+                foreach (OdfCellAddress dependent in dependents)
                 {
-                    MarkDirty(dependent);
+                    pending.Push(dependent);
                 }
             }
         }
@@ -178,16 +204,15 @@ public sealed class OdfFormulaDependencyGraph
     /// <returns>The sorted cell calculation order. / 已排序的儲存格計算順序清單。</returns>
     public List<OdfCellAddress> GetTopologicallySortedDirtyCells()
     {
-        var visited = new HashSet<OdfCellAddress>();
-        var tempStack = new HashSet<OdfCellAddress>();
         var sortedList = new List<OdfCellAddress>();
-
-        foreach (var cell in _dirtyCells)
+        foreach (List<OdfCellAddress> level in GetTopologicalDirtyLevels())
         {
-            if (!visited.Contains(cell))
-            {
-                Visit(cell, visited, tempStack, sortedList);
-            }
+            sortedList.AddRange(level);
+        }
+
+        foreach (OdfCellAddress cell in _circularCells)
+        {
+            sortedList.Add(cell);
         }
 
         return sortedList;
@@ -269,40 +294,5 @@ public sealed class OdfFormulaDependencyGraph
         }
 
         return levels;
-    }
-
-    private void Visit(
-        OdfCellAddress node,
-        HashSet<OdfCellAddress> visited,
-        HashSet<OdfCellAddress> tempStack,
-        List<OdfCellAddress> sortedList)
-    {
-        if (tempStack.Contains(node))
-        {
-            // 偵測到循環相依 (Cycle Detected)
-            _circularCells.Add(node);
-            return;
-        }
-
-        if (!visited.Contains(node))
-        {
-            tempStack.Add(node);
-
-            if (_dependencies.TryGetValue(node, out var deps))
-            {
-                foreach (var dep in deps)
-                {
-                    // 僅需排序與計算目前也為 Dirty 的相依單元格
-                    if (_dirtyCells.Contains(dep))
-                    {
-                        Visit(dep, visited, tempStack, sortedList);
-                    }
-                }
-            }
-
-            tempStack.Remove(node);
-            visited.Add(node);
-            sortedList.Add(node);
-        }
     }
 }

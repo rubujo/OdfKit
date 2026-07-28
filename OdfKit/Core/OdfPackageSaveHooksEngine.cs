@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Formula;
 using OdfKit.Styles;
@@ -14,12 +16,16 @@ internal static class OdfPackageSaveHooksEngine
     /// <summary>
     /// 依儲存選項執行公式評估與字型嵌入等預儲存處理。
     /// </summary>
-    internal static void Process(OdfPackage.OdfPackageSaveCollaborators ctx)
+    internal static void Process(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        CancellationToken cancellationToken)
     {
-        bool evaluateFormulas = ctx.SaveOptions.EvaluateFormulasOnSave;
+        OdfFormulaSaveStrategy formulaStrategy = ctx.SaveOptions.FormulaStrategy;
+        bool processFormulas =
+            formulaStrategy != OdfFormulaSaveStrategy.PreserveCachedValues;
         bool embedFonts = ctx.SaveOptions.EmbedUsedFonts;
 
-        if (!evaluateFormulas && !embedFonts)
+        if (!processFormulas && !embedFonts)
             return;
 
         var nonLazyOptions = ctx.LoadOptions != null
@@ -41,6 +47,7 @@ internal static class OdfPackageSaveHooksEngine
 
         OdfNode? contentRoot = null;
         OdfNode? stylesRoot = null;
+        OdfNode? settingsRoot = null;
 
         if (ctx.Entries.TryGetValue("content.xml", out var contentEntry))
         {
@@ -68,21 +75,46 @@ internal static class OdfPackageSaveHooksEngine
             }
         }
 
+        if (formulaStrategy == OdfFormulaSaveStrategy.MarkForRecalculation &&
+            ctx.Entries.TryGetValue("settings.xml", out var settingsEntry))
+        {
+            using var stream = settingsEntry.OpenReader();
+            settingsRoot = OdfXmlReader.Parse(stream, nonLazyOptions);
+        }
+
         bool contentModified = false;
         bool stylesModified = false;
+        bool settingsModified = false;
 
-        if (evaluateFormulas && contentRoot != null)
+        if (processFormulas && contentRoot != null)
         {
-            try
+            cancellationToken.ThrowIfCancellationRequested();
+            if (formulaStrategy == OdfFormulaSaveStrategy.MarkForRecalculation)
             {
-                var evaluator = new DefaultFormulaEvaluator();
-                evaluator.EvaluateFormulasInDocument(contentRoot, ctx.FormulaExternalLinksForSave);
-                contentModified = true;
+                MarkFormulasForRecalculation(contentRoot);
+                if (settingsRoot is not null)
+                {
+                    OdfDocumentSettingsEngine.SetAutoCalculate(settingsRoot, true);
+                    settingsModified = true;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                OdfKitDiagnostics.Warn($"Failed to evaluate formulas in document on save: {ex.Message}");
+                OdfFormulaEvaluationOptions options =
+                    ctx.SaveOptions.FormulaEvaluationOptions ??
+                    throw new InvalidOperationException(
+                        OdfLocalizer.GetMessage(
+                            "Err_OdfPackageSaveHooks_FormulaOptionsNull"));
+                DefaultFormulaEvaluator evaluator =
+                    options.Evaluator ?? new DefaultFormulaEvaluator();
+                evaluator.EvaluateFormulasInDocument(
+                    contentRoot,
+                    ctx.FormulaExternalLinksForSave,
+                    options,
+                    cancellationToken);
             }
+
+            contentModified = true;
         }
 
         if (embedFonts && (contentRoot != null || stylesRoot != null))
@@ -107,6 +139,31 @@ internal static class OdfPackageSaveHooksEngine
 
         if (stylesModified && stylesRoot != null)
             WriteXmlEntry(ctx, "styles.xml", stylesRoot);
+
+        if (settingsModified && settingsRoot != null)
+            WriteXmlEntry(ctx, "settings.xml", settingsRoot);
+    }
+
+    private static void MarkFormulasForRecalculation(OdfNode contentRoot)
+    {
+        foreach (OdfNode node in contentRoot.Descendants())
+        {
+            if (node.NodeType != OdfNodeType.Element ||
+                node.LocalName != "table-cell" ||
+                node.NamespaceUri != OdfNamespaces.Table ||
+                node.GetAttribute("formula", OdfNamespaces.Table) is null)
+            {
+                continue;
+            }
+
+            node.RemoveAttribute("value-type", OdfNamespaces.Office);
+            node.RemoveAttribute("value", OdfNamespaces.Office);
+            node.RemoveAttribute("string-value", OdfNamespaces.Office);
+            node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
+            node.RemoveAttribute("date-value", OdfNamespaces.Office);
+            node.RemoveAttribute("time-value", OdfNamespaces.Office);
+            node.Children.Clear();
+        }
     }
 
     private static void WriteXmlEntry(OdfPackage.OdfPackageSaveCollaborators ctx, string entryName, OdfNode root)

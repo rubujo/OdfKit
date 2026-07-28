@@ -109,6 +109,9 @@ internal sealed class OdfFormulaDispatchContext(
 
     public bool TryEvaluateFunction(string name, List<AstNode> arguments, out object result)
     {
+        if (inner is OdfDomEvaluationContext domContext)
+            domContext.Budget?.ChargeOperation();
+
         if (FormulaBuiltinFunctionRegistry.TryEvaluate(name, arguments, this, out result))
         {
             return true;

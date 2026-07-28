@@ -16,12 +16,14 @@ public sealed class OdfFormulaConformanceReport
         OdfFormulaConformanceGroup group,
         IReadOnlyList<string> requiredFunctions,
         IReadOnlyList<string> missingFunctions,
-        IReadOnlyList<string> bestEffortFunctions)
+        IReadOnlyList<string> bestEffortFunctions,
+        IReadOnlyList<string> securityExcludedFunctions)
     {
         Group = group;
         RequiredFunctions = requiredFunctions;
         MissingFunctions = missingFunctions;
         BestEffortFunctions = bestEffortFunctions;
+        SecurityExcludedFunctions = securityExcludedFunctions;
     }
 
     /// <summary>
@@ -49,6 +51,12 @@ public sealed class OdfFormulaConformanceReport
     public IReadOnlyList<string> BestEffortFunctions { get; }
 
     /// <summary>
+    /// Gets mandatory functions intentionally excluded by the safe execution policy.
+    /// 取得因安全執行政策而刻意排除的強制函式。
+    /// </summary>
+    public IReadOnlyList<string> SecurityExcludedFunctions { get; }
+
+    /// <summary>
     /// Gets a value indicating whether every mandatory function name is available.
     /// 取得是否已提供全部強制函式名稱。
     /// </summary>
@@ -59,5 +67,18 @@ public sealed class OdfFormulaConformanceReport
     /// 取得所有可用強制函式是否皆分類為完整求值。
     /// </summary>
     public bool HasOnlyFullyEvaluatedFunctions =>
+        MissingFunctions.Count == 0 &&
+        BestEffortFunctions.Count == 0 &&
+        SecurityExcludedFunctions.Count == 0;
+
+    /// <summary>
+    /// Gets a value indicating whether the safe profile has no missing or best-effort functions.
+    /// 取得安全設定檔是否沒有缺少或 Best Effort 函式。
+    /// </summary>
+    /// <remarks>
+    /// Security-excluded functions remain visible and prevent an unconditional official-conformance claim.
+    /// 安全排除函式仍會明列，且不得據此宣稱無條件的官方一致性。
+    /// </remarks>
+    public bool IsSafeProfileComplete =>
         MissingFunctions.Count == 0 && BestEffortFunctions.Count == 0;
 }

@@ -73,9 +73,8 @@ internal static class FormulaConformanceFunctionHandlers
             "EUROCONVERT" => EvaluateEuroConvert(arguments, context),
             "GETPIVOTDATA" => EvaluateGetPivotData(arguments, context),
             "MULTIPLE.OPERATIONS" => EvaluateMultipleOperations(arguments, context),
-            "DDE" => arguments.Count is 3 or 4
-                ? OdfFormulaError.NA
-                : OdfFormulaError.Value,
+            // 安全設定檔永久拒絕 DDE，且刻意不評估任何引數。
+            "DDE" => OdfFormulaError.NA,
             _ => OdfFormulaError.Name
         };
     }

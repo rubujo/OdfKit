@@ -54,6 +54,18 @@ $definitions = @(
         Key = "FindReplaceBenchmarks.ReplaceText"
         Filter = "*FindReplaceBenchmarks*"
         Method = "ReplaceText"
+    },
+    [PSCustomObject]@{
+        Key = "FormulaEvaluationBenchmarks.FullRecalculation10000"
+        Filter = "*FormulaEvaluationBenchmarks.FullRecalculation(FormulaCount: 10000)"
+        Method = "FullRecalculation"
+        ParameterValue = 10000
+    },
+    [PSCustomObject]@{
+        Key = "FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation10000"
+        Filter = "*FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation(FormulaCount: 10000)"
+        Method = "IncrementalOnePercentDirtyPropagation"
+        ParameterValue = 10000
     }
 )
 
@@ -101,14 +113,19 @@ function Invoke-ProtectedBenchmark {
     Write-Host $output
 
     $escapedMethod = [regex]::Escape($Definition.Method)
-    if ($output -notmatch "\|\s*$escapedMethod\s*\|\s*([\d.,]+)\s*(ns|us|µs|ms|s)\s*\|") {
+    $rowPrefix = "\|\s*$escapedMethod\s*\|"
+    if ($null -ne $Definition.ParameterValue) {
+        $rowPrefix += "\s*$($Definition.ParameterValue)\s*\|"
+    }
+
+    if ($output -notmatch "$rowPrefix\s*([\d.,]+)\s*(ns|us|µs|ms|s)\s*\|") {
         throw "無法從 BenchmarkDotNet 輸出解析 $($Definition.Method) Mean。"
     }
 
     $mean = [double]::Parse($Matches[1].Replace(',', ''), [Globalization.CultureInfo]::InvariantCulture)
     $meanNanoseconds = Convert-TimeToNanoseconds -Value $mean -Unit $Matches[2]
     $allocatedBytes = $null
-    if ($output -match "\|\s*$escapedMethod\s*\|[^\r\n]*\|\s*([\d.,]+)\s*(B|KB|MB|GB)\s*\|") {
+    if ($output -match "$rowPrefix[^\r\n]*\|\s*([\d.,]+)\s*(B|KB|MB|GB)\s*\|") {
         $allocated = [double]::Parse($Matches[1].Replace(',', ''), [Globalization.CultureInfo]::InvariantCulture)
         $allocatedBytes = Convert-SizeToBytes -Value $allocated -Unit $Matches[2]
     }

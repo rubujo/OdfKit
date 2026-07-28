@@ -647,6 +647,16 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Skrot certyfikatu podpisujacego nie zgadza sie z wartoscia CertDigest XAdES.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Numer seryjny certyfikatu {0} nie zgadza sie z XAdES IssuerSerial {1}.",
             ["Err_OdfImageExporter_InvalidDimensions"] = "Opcja eksportu obrazu „{0}” musi być dodatnia i mieścić się w obsługiwanym zakresie renderowania.",
+            ["Err_OdfFormulaEvaluationOptions_PositiveTimeLimit"] = "Limit czasu obliczania formuł musi być dodatni.",
+            ["Err_OdfFormulaEvaluationOptions_NonNegative"] = "Opcja obliczania formuł „{0}” nie może być ujemna.",
+            ["Err_OdfFormulaEvaluationOptions_Positive"] = "Opcja obliczania formuł „{0}” musi być dodatnia.",
+            ["Err_OdfFormulaEvaluation_ResourceLimitExceeded"] = "Obliczanie formuł przekroczyło limit zasobów „{0}”.",
+            ["Err_OdfFormulaEvaluation_Failed"] = "Obliczanie formuł nie powiodło się: {0}",
+            ["Err_OdfFormulaEvaluation_InvalidFormula"] = "Nie można przeanalizować formuły w komórce {0}.",
+            ["Err_OdfFormulaEvaluation_UnsupportedFormula"] = "Formuła w komórce {0} używa nieobsługiwanej funkcji.",
+            ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Opcje obliczania nie mogą być null podczas obliczania przy zapisie.",
+            ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Opcje obliczania formuł nie mogą być null.",
+            ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Odwołanie zewnętrzne „{0}” nie ma wartości w pamięci podręcznej, a skonfigurowane resolvery są wyłączone.",
         };
     }
 }

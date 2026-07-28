@@ -223,7 +223,8 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.True(large.HasCompleteFunctionSet);
         Assert.Empty(large.MissingFunctions);
         Assert.False(large.HasOnlyFullyEvaluatedFunctions);
-        Assert.Contains("DDE", large.BestEffortFunctions);
+        Assert.Contains("DDE", large.SecurityExcludedFunctions);
+        Assert.True(large.IsSafeProfileComplete);
         Assert.DoesNotContain("GETPIVOTDATA", large.BestEffortFunctions);
         Assert.DoesNotContain("INFO", large.BestEffortFunctions);
         Assert.DoesNotContain("LINEST", large.BestEffortFunctions);
@@ -1019,7 +1020,11 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         document.ExternalLinks.DocumentResolver = id =>
             id == "memory:book" ? external : null;
 
-        document.EvaluateFormulas();
+        document.EvaluateFormulas(new OdfFormulaEvaluationOptions
+        {
+            ExternalReferencePolicy =
+                OdfFormulaExternalReferencePolicy.AllowConfiguredResolver
+        }, TestContext.Current.CancellationToken);
 
         Assert.Equal(42d, first.Cells["A1"].CellValue);
         Assert.Equal(42d, first.Cells["A2"].CellValue);

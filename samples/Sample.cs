@@ -307,13 +307,34 @@ static void DemoSpreadsheetDocument(string outputDir)
         Console.WriteLine($"   公式儲存格： {formulaCell.ExcelAddress} = {formulaCell.Formula} ");
     }
 
+    // 11. 以安全預算交易式重算；失敗或取消不會留下部分公式結果。
+    var formulaOptions = new OdfFormulaEvaluationOptions
+    {
+        MaxFormulaCount = 100_000,
+        MaxOperations = 10_000_000,
+        MaxCellReads = 10_000_000,
+        TimeLimit = TimeSpan.FromSeconds(30)
+    };
+    OdfFormulaEvaluationReport formulaReport =
+        workbook.EvaluateFormulas(formulaOptions);
+    Console.WriteLine(
+        $"   已評估 {formulaReport.EvaluatedFormulaCount} 式，" +
+        $"讀取 {formulaReport.CellReadCount} 格。");
+
     // 6. 設定第二個工作表示範
     OdfTableSheet metaSheet = workbook.Worksheets.Add("說明頁面");
     metaSheet.Cells["A1"].CellValue = "此試算表是由 OdfKit 自動產生。";
     metaSheet.Columns[0].AutoFit();
 
     string outputPath = Path.Combine(outputDir, "output_spreadsheet.ods");
-    workbook.Save(outputPath);
+    workbook.Save(
+        outputPath,
+        new OdfSaveOptions
+        {
+            // 另可選 PreserveCachedValues（預設）或 MarkForRecalculation。
+            FormulaStrategy = OdfFormulaSaveStrategy.Calculate,
+            FormulaEvaluationOptions = formulaOptions
+        });
     Console.WriteLine($"   已儲存試算表至： {outputPath} ");
 }
 

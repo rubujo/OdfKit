@@ -301,6 +301,44 @@ sheet.Cells["A3"].Formula = "of:=SUM([.A1:.A2])";
 workbook.Save("calc.ods");
 ```
 
+## 安全重算與儲存公式
+
+```csharp
+using OdfKit.Core;
+using OdfKit.Formula;
+using OdfKit.Spreadsheet;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Load("calc.ods");
+var limits = new OdfFormulaEvaluationOptions
+{
+    MaxFormulaCount = 100_000,
+    MaxOperations = 10_000_000,
+    MaxCellReads = 10_000_000,
+    TimeLimit = TimeSpan.FromSeconds(30)
+};
+
+OdfFormulaEvaluationReport report =
+    workbook.EvaluateFormulas(limits, cancellationToken);
+Console.WriteLine(
+    $"已評估 {report.EvaluatedFormulaCount} 式，" +
+    $"讀取 {report.CellReadCount} 格。");
+
+workbook.Save(
+    "calc-updated.ods",
+    new OdfSaveOptions
+    {
+        FormulaStrategy = OdfFormulaSaveStrategy.Calculate,
+        FormulaEvaluationOptions = limits
+    });
+```
+
+若只要讓下一個試算表應用程式重算，改用
+`OdfFormulaSaveStrategy.MarkForRecalculation`；它會清除舊快取但保留公式與格式。
+預設的 `PreserveCachedValues` 不改公式、快取或顯示文字。外部參照預設只讀既有快取；
+啟用 `AllowConfiguredResolver` 代表呼叫端明確信任已設定的 resolver。取消會擲出
+`OperationCanceledException`；其它安全或支援失敗會以
+`OdfFormulaEvaluationException.Report` 回報且不部分寫回。
+
 ## 搜尋與更新試算表公式
 
 ```csharp

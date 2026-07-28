@@ -11,6 +11,8 @@
 |-----------|---------------|-----------|------|
 | `DomInsertBenchmarks.SequentialInsertAfter` | `123.9 us` | `+40%` | 偵測 DOM 循序插入效能的重大回歸 |
 | `OdsStreamWriterBenchmarks.WriteRows` | 以 `eng/baselines/performance-baselines.json` 為準 | 時間 `+40%`、配置量 `+15%` | 保護 200,000 列雙欄 ODS 串流寫入的時間與配置量 |
+| `FormulaEvaluationBenchmarks.FullRecalculation10000` | `223.9 ms`／`98.83 MB` | 時間 `+40%`、配置量 `+15%` | 保護 10K 獨立公式交易式全量重算 |
+| `FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation10000` | `25.18 us`／`2.52 KB` | 時間 `+40%`、配置量 `+15%` | 保護 10K 相依圖中 1% dirty 傳播 |
 
 執行：
 
@@ -78,7 +80,7 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 | 文件來回讀寫 | `OdtRoundTripBenchmarks` | 建立、儲存、載入大型 ODT |
 | 三格式標準 | `StandardOdsBenchmarks`、`StandardOdtBenchmarks`、`StandardOdpBenchmarks` | ODS／ODT／ODP 標準讀寫、DOM 與語意檢查碼 |
 | 共通封裝 | `StandardPackageOpenBenchmarks` | 分離 ZIP 封裝開啟與文件模型成本 |
-| 公式 | `FormulaParseBenchmarks` | 公式剖析配置量與延遲 |
+| 公式 | `FormulaParseBenchmarks`、`FormulaEvaluationBenchmarks` | 公式剖析、1K／10K 全量重算、10K 線性鏈與寬 DAG、1% dirty 傳播、大範圍及 100 × 100 陣列的配置量與延遲 |
 | 協作 | `CollaborationOperationBenchmarks` | TDF JSON operation 剖析與重播 |
 
 ## 判讀規則
@@ -88,3 +90,14 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 - 對微型基準測試結果保持保守；若 BenchmarkDotNet 提示 minimum iteration time 過短，請提高 `-IterationTime` 或資料量。
 - CI 適合跑煙霧測試與回歸關卡，不適合以單一本機毫秒數作為跨平台硬門檻。
 - 三格式標準工作負載與獨立子處理程序報告方法見 [ODS、ODT、ODP 標準效能基準](performance-standard-documents.md)。
+
+公式完整矩陣以穩定設定檔執行：
+
+```powershell
+pwsh eng/Benchmark-Stable.ps1 -Filter "*FormulaEvaluationBenchmarks*"
+```
+
+BenchmarkDotNet 的 `MemoryDiagnoser` 同時記錄配置量與 Gen0／1／2；每公式配置量以
+`Allocated / FormulaCount` 判讀。正式更新公式回歸基準前，必須在同一台穩定機器以
+相同設定連跑三次並採中位數。時間容許 `+40%`、配置量容許 `+15%`；共享 CI runner
+只執行固定小型工作負載，不把單次數值寫成公開效能宣稱。

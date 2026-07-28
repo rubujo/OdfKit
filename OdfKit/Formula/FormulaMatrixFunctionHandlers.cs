@@ -176,6 +176,12 @@ internal static class FormulaMatrixFunctionHandlers
         }
 
         int size = (int)sizeValue;
+        if (context is OdfDomEvaluationContext domContext)
+        {
+            domContext.Budget?.EnsureArrayResultCapacity(
+                checked((long)size * size));
+        }
+
         var result = new object[size, size];
         for (int rowIndex = 0; rowIndex < size; rowIndex++)
         {

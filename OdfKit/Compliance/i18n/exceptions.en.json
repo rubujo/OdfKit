@@ -629,4 +629,14 @@
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Signing certificate digest does not match the XAdES CertDigest value.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Certificate serial number {0} does not match XAdES IssuerSerial {1}.",
   "Err_OdfImageExporter_InvalidDimensions": "The image export option '{0}' must be positive and within the supported rendering range."
+  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "The formula evaluation time limit must be positive."
+  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "The formula evaluation option '{0}' cannot be negative."
+  ,"Err_OdfFormulaEvaluationOptions_Positive": "The formula evaluation option '{0}' must be positive."
+  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Formula evaluation exceeded the resource limit '{0}'."
+  ,"Err_OdfFormulaEvaluation_Failed": "Formula evaluation failed: {0}"
+  ,"Err_OdfFormulaEvaluation_InvalidFormula": "The formula in cell {0} could not be parsed."
+  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "The formula in cell {0} uses an unsupported feature."
+  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Formula evaluation options cannot be null when calculation on save is requested."
+  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Formula evaluation options cannot be null."
+  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "External reference '{0}' has no cached value and configured resolvers are disabled."
 }

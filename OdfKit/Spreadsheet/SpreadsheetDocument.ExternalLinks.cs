@@ -28,10 +28,9 @@ public partial class SpreadsheetDocument
     /// Evaluates formulas in the current spreadsheet document and resolves cross-document references with <see cref="ExternalLinks"/>.
     /// 評估目前試算表文件中的公式，並使用 <see cref="ExternalLinks"/> 解析跨文件參照。
     /// </summary>
-    public void EvaluateFormulas()
+    public OdfFormulaEvaluationReport EvaluateFormulas()
     {
-        var evaluator = new DefaultFormulaEvaluator();
-        evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
+        return EvaluateFormulas(new OdfFormulaEvaluationOptions(), CancellationToken.None);
     }
 
     /// <summary>
@@ -39,7 +38,7 @@ public partial class SpreadsheetDocument
     /// 使用已設定的評估器計算公式，包含其自訂函式與後援。
     /// </summary>
     /// <param name="evaluator">The configured formula evaluator. / 已設定的公式評估器。</param>
-    public void EvaluateFormulas(DefaultFormulaEvaluator evaluator)
+    public OdfFormulaEvaluationReport EvaluateFormulas(DefaultFormulaEvaluator evaluator)
     {
         if (evaluator is null)
         {
@@ -48,7 +47,49 @@ public partial class SpreadsheetDocument
                 OdfLocalizer.GetMessage("Err_SpreadsheetDocument_FormulaEvaluatorNull"));
         }
 
-        evaluator.EvaluateFormulasInDocument(ContentDom, ExternalLinks);
+        return EvaluateFormulas(
+            new OdfFormulaEvaluationOptions { Evaluator = evaluator },
+            CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Evaluates formulas transactionally with explicit security and resource limits.
+    /// 使用明確的安全與資源限制，以交易方式評估公式。
+    /// </summary>
+    /// <param name="options">The formula evaluation options. / 公式評估選項。</param>
+    /// <returns>The evaluation report. / 評估報告。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when options is null. / 當 options 為 null 時擲出。</exception>
+    /// <exception cref="OdfFormulaEvaluationException">Thrown when strict evaluation fails. / 當嚴格評估失敗時擲出。</exception>
+    public OdfFormulaEvaluationReport EvaluateFormulas(OdfFormulaEvaluationOptions options) =>
+        EvaluateFormulas(options, CancellationToken.None);
+
+    /// <summary>
+    /// Evaluates formulas transactionally with explicit limits and cancellation.
+    /// 使用明確限制與取消權杖，以交易方式評估公式。
+    /// </summary>
+    /// <param name="options">The formula evaluation options. / 公式評估選項。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The evaluation report. / 評估報告。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when options is null. / 當 options 為 null 時擲出。</exception>
+    /// <exception cref="OdfFormulaEvaluationException">Thrown when strict evaluation fails. / 當嚴格評估失敗時擲出。</exception>
+    /// <exception cref="OperationCanceledException">Thrown when cancellation is requested. / 當要求取消時擲出。</exception>
+    public OdfFormulaEvaluationReport EvaluateFormulas(
+        OdfFormulaEvaluationOptions options,
+        CancellationToken cancellationToken)
+    {
+        if (options is null)
+        {
+            throw new ArgumentNullException(
+                nameof(options),
+                OdfLocalizer.GetMessage("Err_SpreadsheetDocument_FormulaOptionsNull"));
+        }
+
+        DefaultFormulaEvaluator evaluator = options.Evaluator ?? new DefaultFormulaEvaluator();
+        return evaluator.EvaluateFormulasInDocument(
+            ContentDom,
+            ExternalLinks,
+            options,
+            cancellationToken);
     }
     /// <summary>
     /// Short overload of BeginFormulaEvaluationChannel that uses default values for all optional parameters and forwards to the full overload.

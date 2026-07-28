@@ -157,7 +157,8 @@ internal static class OdfPackageSaver
                 {
                     await DisposeStreamAsync(temp).ConfigureAwait(false);
                 }
-            }).ConfigureAwait(false);
+            },
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -205,7 +206,8 @@ internal static class OdfPackageSaver
             {
                 PrepareMetadata(ctx, includeRdfMetadata);
                 await OdfWholesomeEncryption.WritePackageAsync(ctx, destination, cancellationToken).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            },
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static void PrepareMetadata(OdfPackage.OdfPackageSaveCollaborators ctx, bool includeRdfMetadata)
@@ -221,7 +223,7 @@ internal static class OdfPackageSaver
     private static void RunEncryptedPipeline(OdfPackage package, Action body, Action wholesomeBody)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
-        ctx.ProcessSaveHooks();
+        ctx.ProcessSaveHooks(CancellationToken.None);
         if (UsesWholesomeEncryption(ctx))
         {
             wholesomeBody();
@@ -278,10 +280,11 @@ internal static class OdfPackageSaver
     private static async Task RunEncryptedPipelineAsync(
         OdfPackage package,
         Func<Task> body,
-        Func<Task> wholesomeBody)
+        Func<Task> wholesomeBody,
+        CancellationToken cancellationToken)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
-        ctx.ProcessSaveHooks();
+        ctx.ProcessSaveHooks(cancellationToken);
         if (UsesWholesomeEncryption(ctx))
         {
             await wholesomeBody().ConfigureAwait(false);

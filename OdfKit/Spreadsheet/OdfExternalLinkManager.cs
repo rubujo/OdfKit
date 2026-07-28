@@ -113,7 +113,19 @@ public sealed class OdfExternalLinkManager
         }
     }
 
+    internal static bool IsExternalAddress(OdfCellAddress address) =>
+        TryParseExternalSheet(address.SheetName, out _, out _);
+
+    internal static bool IsExternalRange(OdfCellRange range) =>
+        TryParseExternalSheet(range.StartAddress.SheetName, out _, out _);
+
     internal bool TryGetCellValue(OdfCellAddress address, out object? value)
+        => TryGetCellValue(address, allowResolver: true, out value);
+
+    internal bool TryGetCellValue(
+        OdfCellAddress address,
+        bool allowResolver,
+        out object? value)
     {
         value = null;
         if (!TryParseExternalSheet(address.SheetName, out string documentId, out string sheetName))
@@ -125,6 +137,11 @@ public sealed class OdfExternalLinkManager
         if (_cellCache.TryGetValue(key, out value))
         {
             return true;
+        }
+
+        if (!allowResolver)
+        {
+            return false;
         }
 
         SpreadsheetDocument? document = DocumentResolver?.Invoke(documentId);
@@ -140,6 +157,12 @@ public sealed class OdfExternalLinkManager
     }
 
     internal bool TryGetRangeValues(OdfCellRange range, out object[,] values)
+        => TryGetRangeValues(range, allowResolver: true, out values);
+
+    internal bool TryGetRangeValues(
+        OdfCellRange range,
+        bool allowResolver,
+        out object[,] values)
     {
         values = new object[0, 0];
         if (!TryParseExternalSheet(range.StartAddress.SheetName, out string documentId, out string sheetName))
@@ -158,7 +181,10 @@ public sealed class OdfExternalLinkManager
             for (int column = minCol; column <= maxCol; column++)
             {
                 var cellAddress = new OdfCellAddress(row, column, range.StartAddress.SheetName);
-                values[row - minRow, column - minCol] = TryGetCellValue(cellAddress, out object? value)
+                values[row - minRow, column - minCol] = TryGetCellValue(
+                    cellAddress,
+                    allowResolver,
+                    out object? value)
                     ? value ?? 0.0
                     : 0.0;
             }
@@ -173,8 +199,26 @@ public sealed class OdfExternalLinkManager
         string name,
         DefaultFormulaEvaluator evaluator,
         out object result)
+        => TryGetNamedExpressionValue(
+            documentId,
+            sheetName,
+            name,
+            evaluator,
+            allowResolver: true,
+            out result);
+
+    internal bool TryGetNamedExpressionValue(
+        string documentId,
+        string? sheetName,
+        string name,
+        DefaultFormulaEvaluator evaluator,
+        bool allowResolver,
+        out object result)
     {
         result = OdfFormulaError.Name;
+        if (!allowResolver)
+            return false;
+
         SpreadsheetDocument? document = DocumentResolver?.Invoke(documentId);
         if (document is null)
             return false;

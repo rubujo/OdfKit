@@ -1,0 +1,4296 @@
+{
+  "schemaVersion": 1,
+  "profile": "OdfKit Safe Large",
+  "odfVersions": [
+    "1.2",
+    "1.3",
+    "1.4"
+  ],
+  "requiredFunctionCount": 388,
+  "officialLargeConformanceClaim": false,
+  "requiredSemanticDimensions": [
+    "arity",
+    "normal-types",
+    "implicit-conversion",
+    "blank-values",
+    "error-propagation",
+    "boundaries",
+    "version-differences"
+  ],
+  "securityExcludedFunctions": [
+    "DDE"
+  ],
+  "functions": [
+    {
+      "name": "ABS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACOS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ASIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ATAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ATAN2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AVERAGE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AVERAGEIF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CHOOSE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COLUMNS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUNT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUNTA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUNTBLANK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUNTIF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DAVERAGE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DAY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DCOUNT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DCOUNTA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DDB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DEGREES",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DGET",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DMAX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DMIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DPRODUCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DSTDEV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DSTDEVP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DSUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DVAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DVARP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EVEN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EXACT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EXP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FACT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FALSE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FIND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HLOOKUP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HOUR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INDEX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IRR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISBLANK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISERR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISERROR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISLOGICAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISNA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISNONTEXT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISNUMBER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISTEXT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEFT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOG",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOG10",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOWER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MATCH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MAX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MID",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MINUTE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MOD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MONTH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "N",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NOT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NOW",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NPER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NPV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ODD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "OR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PI",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PMT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "POWER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PRODUCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PROPER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RADIANS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "REPLACE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "REPT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RIGHT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROUND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROWS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SECOND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SLN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SQRT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STDEV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STDEVP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUBSTITUTE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMIF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SYD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "T",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TIME",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TODAY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TRIM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TRUE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TRUNC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "UPPER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VALUE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VARP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VLOOKUP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "WEEKDAY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "YEAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACCRINT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACCRINTM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACOSH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACOT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ACOTH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ADDRESS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ASINH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ATANH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AVEDEV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BESSELI",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BESSELJ",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BESSELK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BESSELY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BETADIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BETAINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BINOMDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CEILING",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CHAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CLEAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CODE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COLUMN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COMBIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CONCATENATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CONFIDENCE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CONVERT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CORREL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COSH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COTH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPDAYBS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPDAYS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPDAYSNC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPNCD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPNUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUPPCD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COVAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CRITBINOM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CUMIPMT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CUMPRINC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DATEVALUE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DAYS360",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DEVSQ",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DISC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DOLLARDE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DOLLARFR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DURATION",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EFFECT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EOMONTH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ERF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ERFC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EXPONDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FISHER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FISHERINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FIXED",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FLOOR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FORECAST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FTEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GAMMADIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GAMMAINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GAMMALN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GCD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GEOMEAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HARMEAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HYPGEOMDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INTERCEPT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INTRATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISEVEN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISODD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISOWEEKNUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "KURT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LARGE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LCM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.CHIDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.CHIINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.CHITEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.FDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.FINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.NORMSDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.NORMSINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEGACY.TDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LINEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOGEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOGINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOGNORMDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LOOKUP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MDURATION",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MEDIAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MINVERSE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MIRR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MMULT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MODE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MROUND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MULTINOMIAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NEGBINOMDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NETWORKDAYS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NOMINAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ODDFPRICE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ODDFYIELD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ODDLPRICE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ODDLYIELD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "OFFSET",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PEARSON",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PERCENTILE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PERCENTRANK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PERMUT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "POISSON",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PRICE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PRICEMAT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PROB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "QUARTILE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "QUOTIENT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RAND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RANDBETWEEN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RANK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RECEIVED",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROMAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROUNDDOWN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROUNDUP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ROW",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RSQ",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SERIESSUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SIGN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SINH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SKEW",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SKEWP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SLOPE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SMALL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SQRTPI",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STANDARDIZE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STDEVA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STDEVPA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "STEYX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUBTOTAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMPRODUCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMSQ",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMX2MY2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMX2PY2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMXMY2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TANH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TBILLEQ",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TBILLPRICE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TBILLYIELD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TIMEVALUE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TRANSPOSE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TREND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TRIMMEAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TTEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TYPE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VARA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VDB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "WEEKNUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "WEIBULL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "WORKDAY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "XIRR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "XNPV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "YEARFRAC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "YIELD",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "YIELDDISC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "YIELDMAT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ZTEST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AMORLINC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ARABIC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AREAS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ASC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AVERAGEA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "AVERAGEIFS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BASE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BIN2DEC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BIN2HEX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BIN2OCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BINOM.DIST.RANGE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BITAND",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BITLSHIFT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BITOR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BITRSHIFT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "BITXOR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CHISQDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CHISQINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COMBINA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COMPLEX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "COUNTIFS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CSC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "CSCH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DATEDIF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DAYS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DDE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "security-excluded",
+      "semanticCorpusStatus": "security-tested",
+      "evidenceTests": [
+        "OpenFormulaConformanceCorpusTests.ScalarCorpusMatchesExpectedResult",
+        "OpenFormulaExtendedEvaluatorTests.DdeDoesNotEvaluateArguments"
+      ]
+    },
+    {
+      "name": "DEC2BIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DEC2HEX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DEC2OCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DECIMAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "DELTA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EDATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ERROR.TYPE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "EUROCONVERT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FACTDOUBLE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FINDB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FORMULA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FREQUENCY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "FVSCHEDULE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GAMMA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GAUSS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GESTEP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GETPIVOTDATA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "GROWTH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HEX2BIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HEX2DEC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HEX2OCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "HYPERLINK",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IFERROR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IFNA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMABS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMAGINARY",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMARGUMENT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMCONJUGATE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMCOS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMCOT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMCSC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMCSCH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMDIV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMEXP",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMLN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMLOG10",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMLOG2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMPOWER",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMPRODUCT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMREAL",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSEC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSECH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSQRT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSUB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMSUM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IMTAN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INDIRECT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "INFO",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "IPMT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISFORMULA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISPMT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "ISREF",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "JIS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LEFTB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "LENB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MAXA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MDETERM",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MULTIPLE.OPERATIONS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MUNIT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MIDB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "MINA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NORMDIST",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NORMINV",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "NUMBERVALUE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "OCT2BIN",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "OCT2DEC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "OCT2HEX",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PDURATION",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PERMUTATIONA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PHI",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PPMT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "PRICEDISC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "REPLACEB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RIGHTB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "RRI",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SEARCH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SEARCHB",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SEC",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SECH",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SHEET",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SHEETS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "SUMIFS",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "TEXT",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "UNICHAR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "UNICODE",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "VARPA",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    },
+    {
+      "name": "XOR",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "profileStatus": "evaluated-dispatch",
+      "semanticCorpusStatus": "pending-function-specific-corpus",
+      "evidenceTests": "OpenFormulaSupportTests.LargeGroupMandatoryFunctionsAreDispatchable"
+    }
+  ]
+}

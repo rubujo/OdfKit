@@ -647,6 +647,16 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Der Digest des Signaturzertifikats stimmt nicht mit dem XAdES-CertDigest-Wert ueberein.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Die Zertifikatsseriennummer {0} stimmt nicht mit der XAdES-IssuerSerial {1} ueberein.",
             ["Err_OdfImageExporter_InvalidDimensions"] = "Die Bildexportoption '{0}' muss positiv sein und im unterstützten Darstellungsbereich liegen.",
+            ["Err_OdfFormulaEvaluationOptions_PositiveTimeLimit"] = "Das Zeitlimit für die Formelauswertung muss positiv sein.",
+            ["Err_OdfFormulaEvaluationOptions_NonNegative"] = "Die Formelauswertungsoption „{0}“ darf nicht negativ sein.",
+            ["Err_OdfFormulaEvaluationOptions_Positive"] = "Die Formelauswertungsoption „{0}“ muss positiv sein.",
+            ["Err_OdfFormulaEvaluation_ResourceLimitExceeded"] = "Die Formelauswertung hat das Ressourcenlimit „{0}“ überschritten.",
+            ["Err_OdfFormulaEvaluation_Failed"] = "Die Formelauswertung ist fehlgeschlagen: {0}",
+            ["Err_OdfFormulaEvaluation_InvalidFormula"] = "Die Formel in Zelle {0} konnte nicht analysiert werden.",
+            ["Err_OdfFormulaEvaluation_UnsupportedFormula"] = "Die Formel in Zelle {0} verwendet eine nicht unterstützte Funktion.",
+            ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Formelauswertungsoptionen dürfen bei der Berechnung beim Speichern nicht null sein.",
+            ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Formelauswertungsoptionen dürfen nicht null sein.",
+            ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Die externe Referenz „{0}“ hat keinen Cachewert und konfigurierte Resolver sind deaktiviert.",
         };
     }
 }

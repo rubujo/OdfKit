@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System;
 using System.Collections.Generic;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
@@ -32,6 +33,8 @@ internal class OdfDomEvaluationContext :
     private readonly OdfNode _contentRoot;
     private readonly OdfExternalLinkManager? _externalLinks;
     private readonly IOdfFormulaVolatileContext _volatileContext;
+    private readonly OdfFormulaEvaluationBudget? _budget;
+    private readonly OdfFormulaExternalReferencePolicy _externalReferencePolicy;
 
     public DateTime EvaluationTimestamp => _volatileContext.EvaluationTimestamp;
     /// <summary>
@@ -55,18 +58,59 @@ internal class OdfDomEvaluationContext :
         DefaultFormulaEvaluator evaluator,
         OdfExternalLinkManager? externalLinks,
         IOdfFormulaVolatileContext volatileContext)
+        : this(
+            contentRoot,
+            evaluator,
+            externalLinks,
+            volatileContext,
+            null,
+            OdfFormulaExternalReferencePolicy.AllowConfiguredResolver)
+    {
+    }
+
+    internal OdfDomEvaluationContext(
+        OdfNode contentRoot,
+        DefaultFormulaEvaluator evaluator,
+        OdfExternalLinkManager? externalLinks,
+        IOdfFormulaVolatileContext volatileContext,
+        OdfFormulaEvaluationBudget? budget,
+        OdfFormulaExternalReferencePolicy externalReferencePolicy)
     {
         _contentRoot = contentRoot;
         _evaluator = evaluator;
         _externalLinks = externalLinks;
         _volatileContext = volatileContext;
+        _budget = budget;
+        _externalReferencePolicy = externalReferencePolicy;
         TraverseTable(contentRoot);
+    }
+
+    private OdfDomEvaluationContext(
+        OdfDomEvaluationContext source,
+        DefaultFormulaEvaluator evaluator)
+    {
+        _contentRoot = source._contentRoot;
+        _evaluator = evaluator;
+        _externalLinks = source._externalLinks;
+        _volatileContext = source._volatileContext;
+        _budget = source._budget;
+        _externalReferencePolicy = source._externalReferencePolicy;
+        _cellNodes = source._cellNodes;
+        _cellFormulas = source._cellFormulas;
+        _cellValues = source._cellValues;
+        _sheetNames = source._sheetNames;
     }
 
 
     public Dictionary<OdfCellAddress, OdfNode> CellNodes => _cellNodes;
     public Dictionary<OdfCellAddress, string> CellFormulas => _cellFormulas;
     public Dictionary<OdfCellAddress, object> CellValues => _cellValues;
+
+    internal OdfFormulaEvaluationBudget? Budget => _budget;
+
+    internal OdfDomEvaluationContext CreateWorkerView(
+        DefaultFormulaEvaluator evaluator) =>
+        new(this, evaluator);
 
     public IReadOnlyList<string> SheetNames => _sheetNames;
 
@@ -204,9 +248,23 @@ internal class OdfDomEvaluationContext :
     /// </summary>
     public object GetCellValue(OdfCellAddress address)
     {
-        if (_externalLinks is not null && _externalLinks.TryGetCellValue(address, out object? externalValue))
+        _budget?.ChargeCellReads(1);
+        if (_externalLinks is not null &&
+            OdfExternalLinkManager.IsExternalAddress(address))
         {
-            return externalValue ?? 0.0;
+            if (_externalLinks.TryGetCellValue(
+                    address,
+                    _externalReferencePolicy ==
+                        OdfFormulaExternalReferencePolicy.AllowConfiguredResolver,
+                    out object? externalValue))
+            {
+                return externalValue ?? 0.0;
+            }
+
+            throw new OdfFormulaExternalReferenceDeniedException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfFormulaEvaluation_ExternalReferenceDenied",
+                    address.SheetName ?? string.Empty));
         }
 
         if (string.IsNullOrEmpty(address.SheetName) && !string.IsNullOrEmpty(CurrentCell.SheetName))
@@ -241,9 +299,31 @@ internal class OdfDomEvaluationContext :
     /// <returns>A two-dimensional array of cell values. / 儲存格值的二維陣列。</returns>
     public object[,] GetRangeValues(OdfCellRange range)
     {
-        if (_externalLinks is not null && _externalLinks.TryGetRangeValues(range, out object[,] externalValues))
+        int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+        int maxRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+        int minCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+        int maxCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+        long requestedCells = checked(
+            (long)(maxRow - minRow + 1) *
+            (maxCol - minCol + 1));
+        _budget?.ChargeCellReads(requestedCells);
+
+        if (_externalLinks is not null &&
+            OdfExternalLinkManager.IsExternalRange(range))
         {
-            return externalValues;
+            if (_externalLinks.TryGetRangeValues(
+                    range,
+                    _externalReferencePolicy ==
+                        OdfFormulaExternalReferencePolicy.AllowConfiguredResolver,
+                    out object[,] externalValues))
+            {
+                return externalValues;
+            }
+
+            throw new OdfFormulaExternalReferenceDeniedException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfFormulaEvaluation_ExternalReferenceDenied",
+                    range.StartAddress.SheetName ?? string.Empty));
         }
 
         string? sheetName = range.StartAddress.SheetName;
@@ -251,11 +331,6 @@ internal class OdfDomEvaluationContext :
         {
             sheetName = CurrentCell.SheetName;
         }
-
-        int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
-        int maxRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
-        int minCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
-        int maxCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
 
         int rows = maxRow - minRow + 1;
         int cols = maxCol - minCol + 1;
@@ -266,10 +341,40 @@ internal class OdfDomEvaluationContext :
             for (int c = 0; c < cols; c++)
             {
                 var addr = new OdfCellAddress(minRow + r, minCol + c, sheetName);
-                arr[r, c] = GetCellValue(addr);
+                arr[r, c] = GetCellValueWithoutBudget(addr);
             }
         }
         return arr;
+    }
+
+    private object GetCellValueWithoutBudget(OdfCellAddress address)
+    {
+        if (string.IsNullOrEmpty(address.SheetName) && !string.IsNullOrEmpty(CurrentCell.SheetName))
+        {
+            address = new OdfCellAddress(
+                address.Row,
+                address.Column,
+                CurrentCell.SheetName,
+                address.IsRowAbsolute,
+                address.IsColumnAbsolute,
+                address.IsSheetAbsolute);
+        }
+
+        if (_cellFormulas.ContainsKey(address))
+        {
+            OdfCellAddress oldCell = CurrentCell;
+            CurrentCell = address;
+            try
+            {
+                return _evaluator.EvaluateCell(address, this);
+            }
+            finally
+            {
+                CurrentCell = oldCell;
+            }
+        }
+
+        return _cellValues.TryGetValue(address, out object? value) ? value : 0.0;
     }
 
     /// <summary>
@@ -299,15 +404,23 @@ internal class OdfDomEvaluationContext :
             out string simpleName);
         if (!string.IsNullOrEmpty(source))
         {
-            return _externalLinks is not null &&
+            if (_externalLinks is not null &&
                 _externalLinks.TryGetNamedExpressionValue(
                     source!,
                     qualifiedSheet,
                     simpleName,
                     _evaluator,
-                    out object externalResult)
-                ? externalResult
-                : OdfFormulaError.Name;
+                    _externalReferencePolicy ==
+                        OdfFormulaExternalReferencePolicy.AllowConfiguredResolver,
+                    out object externalResult))
+            {
+                return externalResult;
+            }
+
+            throw new OdfFormulaExternalReferenceDeniedException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfFormulaEvaluation_ExternalReferenceDenied",
+                    source!));
         }
 
         string? currentSheet = qualifiedSheet ?? CurrentCell.SheetName;

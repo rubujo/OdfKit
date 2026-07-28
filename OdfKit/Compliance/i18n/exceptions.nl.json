@@ -629,4 +629,14 @@
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "De digest van het ondertekeningscertificaat komt niet overeen met de XAdES CertDigest-waarde.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Het certificaatserienummer {0} komt niet overeen met de XAdES IssuerSerial {1}.",
   "Err_OdfImageExporter_InvalidDimensions": "De afbeeldingsexportoptie '{0}' moet positief zijn en binnen het ondersteunde weergavebereik vallen."
+  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "De tijdslimiet voor formule-evaluatie moet positief zijn."
+  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "De formule-evaluatieoptie '{0}' mag niet negatief zijn."
+  ,"Err_OdfFormulaEvaluationOptions_Positive": "De formule-evaluatieoptie '{0}' moet positief zijn."
+  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "De formule-evaluatie overschreed de resourcelimiet '{0}'."
+  ,"Err_OdfFormulaEvaluation_Failed": "De formule-evaluatie is mislukt: {0}"
+  ,"Err_OdfFormulaEvaluation_InvalidFormula": "De formule in cel {0} kon niet worden ontleed."
+  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "De formule in cel {0} gebruikt een niet-ondersteunde functie."
+  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Formule-evaluatieopties mogen niet null zijn bij berekening tijdens opslaan."
+  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Formule-evaluatieopties mogen niet null zijn."
+  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "De externe verwijzing '{0}' heeft geen cachewaarde en geconfigureerde oplossers zijn uitgeschakeld."
 }

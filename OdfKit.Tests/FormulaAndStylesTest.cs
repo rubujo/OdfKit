@@ -1117,7 +1117,10 @@ namespace OdfKit.Tests
         {
             // Create an in-memory package representing a spreadsheet
             using var ms = new MemoryStream();
-            var saveOptions = new OdfSaveOptions { EvaluateFormulasOnSave = true };
+            var saveOptions = new OdfSaveOptions
+            {
+                FormulaStrategy = OdfFormulaSaveStrategy.Calculate
+            };
 
             using (var package = OdfPackage.Create(ms, leaveOpen: true, options: saveOptions))
             {

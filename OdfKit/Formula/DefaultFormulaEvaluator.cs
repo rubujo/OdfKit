@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -22,6 +23,8 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
 
     // 剖析樹快取的筆數上限；達到上限時整批清除，避免長時間執行時無上限累積。
     private const int AstCacheCapacity = 4096;
+
+    internal bool ThrowOnEvaluationFailure { get; set; }
 
     /// <summary>
     /// Initializes an evaluator with an empty application-defined function registry.
@@ -119,6 +122,9 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         }
         catch (Exception ex)
         {
+            if (ThrowOnEvaluationFailure)
+                throw;
+
             OdfKitDiagnostics.Error($"Evaluation failed for cell {cellAddress.ToExcelString()}: {ex.Message}", ex);
             return OdfFormulaError.Value;
         }
@@ -178,6 +184,9 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         }
         catch (Exception ex)
         {
+            if (ThrowOnEvaluationFailure)
+                throw;
+
             OdfKitDiagnostics.Warn($"Parser failed on formula '{formula}': {ex.Message}");
             return OdfFormulaError.Value;
         }
@@ -203,8 +212,12 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     /// 評估指定內容根節點下的所有文件公式，並更新其顯示文字與屬性。
     /// </summary>
     /// <param name="contentRoot">The document content root node. / 文件的內容根節點。</param>
-    public void EvaluateFormulasInDocument(OdfNode contentRoot)
-        => FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(contentRoot, this);
+    public OdfFormulaEvaluationReport EvaluateFormulasInDocument(OdfNode contentRoot) =>
+        EvaluateFormulasInDocument(
+            contentRoot,
+            null,
+            new OdfFormulaEvaluationOptions { Evaluator = this },
+            CancellationToken.None);
 
     /// <summary>
     /// Evaluates all document formulas under the specified content root and resolves cross-document references through an external link manager.
@@ -212,8 +225,37 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     /// </summary>
     /// <param name="contentRoot">The document content root node. / 文件的內容根節點。</param>
     /// <param name="externalLinks">The external link manager. / 外部連結管理器。</param>
-    public void EvaluateFormulasInDocument(OdfNode contentRoot, OdfExternalLinkManager? externalLinks)
-        => FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(contentRoot, this, externalLinks);
+    public OdfFormulaEvaluationReport EvaluateFormulasInDocument(
+        OdfNode contentRoot,
+        OdfExternalLinkManager? externalLinks) =>
+        EvaluateFormulasInDocument(
+            contentRoot,
+            externalLinks,
+            new OdfFormulaEvaluationOptions { Evaluator = this },
+            CancellationToken.None);
+
+    /// <summary>
+    /// Evaluates document formulas transactionally with explicit limits and cancellation.
+    /// 使用明確限制與取消權杖，以交易方式評估文件公式。
+    /// </summary>
+    /// <param name="contentRoot">The document content root. / 文件內容根節點。</param>
+    /// <param name="externalLinks">The external link manager, or null. / 外部連結管理器，或為 null。</param>
+    /// <param name="options">The evaluation options. / 評估選項。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The evaluation report. / 評估報告。</returns>
+    /// <exception cref="OdfFormulaEvaluationException">Thrown when strict evaluation fails. / 當嚴格評估失敗時擲出。</exception>
+    /// <exception cref="OperationCanceledException">Thrown when cancellation is requested. / 當要求取消時擲出。</exception>
+    public OdfFormulaEvaluationReport EvaluateFormulasInDocument(
+        OdfNode contentRoot,
+        OdfExternalLinkManager? externalLinks,
+        OdfFormulaEvaluationOptions options,
+        CancellationToken cancellationToken) =>
+        FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(
+            contentRoot,
+            this,
+            externalLinks,
+            options,
+            cancellationToken);
 
     /// <summary>
     /// 評估所有支援之公式函式的中央分派方法。

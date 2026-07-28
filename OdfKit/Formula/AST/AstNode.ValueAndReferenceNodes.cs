@@ -60,6 +60,12 @@ public sealed class InlineArrayNode(IReadOnlyList<IReadOnlyList<AstNode>> rows) 
         }
 
         int columnCount = rows[0].Count;
+        if (context is OdfDomEvaluationContext domContext)
+        {
+            domContext.Budget?.EnsureArrayResultCapacity(
+                checked((long)rows.Count * columnCount));
+        }
+
         var values = new object[rows.Count, columnCount];
         for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
         {

@@ -629,4 +629,14 @@
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Signeringscertifikatets digest stemmer ikke overens med XAdES CertDigest-vaerdien.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Certifikatets serienummer {0} stemmer ikke overens med XAdES IssuerSerial {1}.",
   "Err_OdfImageExporter_InvalidDimensions": "Billedeksportindstillingen '{0}' skal være positiv og inden for det understøttede gengivelsesområde."
+  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "Tidsgrænsen for formevaluering skal være positiv."
+  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "Indstillingen for formevaluering '{0}' må ikke være negativ."
+  ,"Err_OdfFormulaEvaluationOptions_Positive": "Indstillingen for formevaluering '{0}' skal være positiv."
+  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Formevalueringen overskred ressourcegrænsen '{0}'."
+  ,"Err_OdfFormulaEvaluation_Failed": "Formevalueringen mislykkedes: {0}"
+  ,"Err_OdfFormulaEvaluation_InvalidFormula": "Formlen i celle {0} kunne ikke fortolkes."
+  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "Formlen i celle {0} bruger en funktion, der ikke understøttes."
+  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Indstillinger for formevaluering må ikke være null ved beregning under lagring."
+  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Indstillinger for formevaluering må ikke være null."
+  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Den eksterne reference '{0}' har ingen cacheværdi, og konfigurerede opløsere er deaktiveret."
 }
