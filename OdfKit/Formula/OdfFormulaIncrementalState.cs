@@ -24,11 +24,11 @@ internal sealed class OdfFormulaIncrementalState
 
     internal Dictionary<OdfCellAddress, object> Values { get; }
 
-    internal static OdfFormulaIncrementalState Capture(
+    internal static OdfFormulaIncrementalState CaptureOwned(
         OdfFormulaDependencyGraph graph,
         OdfDomEvaluationContext context) =>
         new(
             graph,
-            new Dictionary<OdfCellAddress, string>(context.CellFormulas),
-            new Dictionary<OdfCellAddress, object>(context.CellValues));
+            context.CellFormulas,
+            context.CellValues);
 }

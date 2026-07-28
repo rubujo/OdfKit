@@ -245,20 +245,13 @@ internal static class FormulaDocumentEvaluationEngine
                         0,
                         budget,
                         diagnostics),
-                    OdfFormulaIncrementalState.Capture(
+                    OdfFormulaIncrementalState.CaptureOwned(
                         graph,
                         originalContext));
             }
 
-            var stagedContext = new OdfDomEvaluationContext(
-                contentRoot,
-                evaluator,
-                externalLinks,
-                volatileSession,
-                budget,
-                options.ExternalReferencePolicy);
             EvaluationStatistics statistics = EvaluateDirtyCore(
-                stagedContext,
+                originalContext,
                 evaluator,
                 options,
                 budget,
@@ -276,13 +269,6 @@ internal static class FormulaDocumentEvaluationEngine
                 graph.ClearDirty(address);
             }
 
-            var committedContext = new OdfDomEvaluationContext(
-                contentRoot,
-                evaluator,
-                externalLinks,
-                volatileSession,
-                null,
-                options.ExternalReferencePolicy);
             return (
                 CreateReport(
                     originalContext.CellFormulas.Count,
@@ -292,9 +278,9 @@ internal static class FormulaDocumentEvaluationEngine
                     statistics.MaximumParallelism,
                     budget,
                     diagnostics),
-                OdfFormulaIncrementalState.Capture(
+                OdfFormulaIncrementalState.CaptureOwned(
                     graph,
-                    committedContext));
+                    originalContext));
         }
         catch (OperationCanceledException)
         {
@@ -407,12 +393,7 @@ internal static class FormulaDocumentEvaluationEngine
         bool writeDom)
     {
         var dirtyFormulaCells = new HashSet<OdfCellAddress>(graph.DirtyCells);
-        foreach (OdfCellAddress cleanFormula in context.CellFormulas.Keys
-                     .Where(address => !dirtyFormulaCells.Contains(address))
-                     .ToArray())
-        {
-            context.CellFormulas.Remove(cleanFormula);
-        }
+        context.SetActiveFormulaFilter(dirtyFormulaCells);
 
         List<List<OdfCellAddress>> levels = graph.GetTopologicalDirtyLevels();
         evaluator.ClearCache();
@@ -526,7 +507,6 @@ internal static class FormulaDocumentEvaluationEngine
                         context.CellValues[addr] = result;
                     }
 
-                    context.CellFormulas.Remove(addr);
                 }
                 else
                 {

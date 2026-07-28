@@ -35,6 +35,7 @@ internal class OdfDomEvaluationContext :
     private readonly IOdfFormulaVolatileContext _volatileContext;
     private readonly OdfFormulaEvaluationBudget? _budget;
     private readonly OdfFormulaExternalReferencePolicy _externalReferencePolicy;
+    private IReadOnlySet<OdfCellAddress>? _activeFormulaFilter;
 
     public DateTime EvaluationTimestamp => _volatileContext.EvaluationTimestamp;
     /// <summary>
@@ -99,6 +100,7 @@ internal class OdfDomEvaluationContext :
         _cellFormulas = source._cellFormulas;
         _cellValues = source._cellValues;
         _sheetNames = source._sheetNames;
+        _activeFormulaFilter = source._activeFormulaFilter;
     }
 
 
@@ -107,6 +109,9 @@ internal class OdfDomEvaluationContext :
     public Dictionary<OdfCellAddress, object> CellValues => _cellValues;
 
     internal OdfFormulaEvaluationBudget? Budget => _budget;
+
+    internal void SetActiveFormulaFilter(IReadOnlySet<OdfCellAddress>? formulaFilter) =>
+        _activeFormulaFilter = formulaFilter;
 
     internal OdfDomEvaluationContext CreateWorkerView(
         DefaultFormulaEvaluator evaluator) =>
@@ -273,7 +278,8 @@ internal class OdfDomEvaluationContext :
                 address.IsRowAbsolute, address.IsColumnAbsolute, address.IsSheetAbsolute);
         }
 
-        if (_cellFormulas.TryGetValue(address, out var formula))
+        if (_cellFormulas.ContainsKey(address) &&
+            (_activeFormulaFilter is null || _activeFormulaFilter.Contains(address)))
         {
             var oldCell = CurrentCell;
             CurrentCell = address;
@@ -360,7 +366,8 @@ internal class OdfDomEvaluationContext :
                 address.IsSheetAbsolute);
         }
 
-        if (_cellFormulas.ContainsKey(address))
+        if (_cellFormulas.ContainsKey(address) &&
+            (_activeFormulaFilter is null || _activeFormulaFilter.Contains(address)))
         {
             OdfCellAddress oldCell = CurrentCell;
             CurrentCell = address;
