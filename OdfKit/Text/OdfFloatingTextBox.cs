@@ -18,6 +18,17 @@ public sealed class OdfFloatingTextBox
         _textBoxNode = textBoxNode ?? throw new ArgumentNullException(nameof(textBoxNode));
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
+
+    /// <summary>
+    /// 取得供同套件擴充元件使用的文字框節點。
+    /// </summary>
+    internal OdfNode TextBoxNode => _textBoxNode;
+
+    /// <summary>
+    /// 取得供同套件擴充元件使用的所屬文件。
+    /// </summary>
+    internal TextDocument Document => _document;
+
     /// <summary>
     /// Short overload of AddParagraph that uses default values for all optional parameters and forwards to the full overload.
     /// 便利多載：AddParagraph 的所有可選參數使用預設值並轉呼叫最長多載。

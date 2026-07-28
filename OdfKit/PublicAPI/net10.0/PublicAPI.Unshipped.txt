@@ -16615,6 +16615,14 @@ OdfKit.Spreadsheet.OdfTableSheet.ApplyStyle(OdfKit.Spreadsheet.OdfCellRange rang
 OdfKit.Spreadsheet.OdfTableSheet.AutoFilter(OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfDatabaseRange!
 OdfKit.Spreadsheet.OdfTableSheet.AutoFilter(string! range) -> OdfKit.Spreadsheet.OdfDatabaseRange!
 OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidth(int col) -> void
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidth(int column, OdfKit.Styles.OdfAutoFitOptions! options) -> OdfKit.Styles.OdfLength
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidth(int column, OdfKit.Styles.OdfAutoFitOptions! options, System.Threading.CancellationToken cancellationToken) -> OdfKit.Styles.OdfLength
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidths(System.Collections.Generic.IEnumerable<int>! columns, OdfKit.Styles.OdfAutoFitOptions! options) -> System.Collections.Generic.IReadOnlyDictionary<int, OdfKit.Styles.OdfLength>!
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitColumnWidths(System.Collections.Generic.IEnumerable<int>! columns, OdfKit.Styles.OdfAutoFitOptions! options, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IReadOnlyDictionary<int, OdfKit.Styles.OdfLength>!
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitRowHeight(int row, OdfKit.Styles.OdfAutoFitOptions! options) -> OdfKit.Styles.OdfLength
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitRowHeight(int row, OdfKit.Styles.OdfAutoFitOptions! options, System.Threading.CancellationToken cancellationToken) -> OdfKit.Styles.OdfLength
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitRowHeights(System.Collections.Generic.IEnumerable<int>! rows, OdfKit.Styles.OdfAutoFitOptions! options) -> System.Collections.Generic.IReadOnlyDictionary<int, OdfKit.Styles.OdfLength>!
+OdfKit.Spreadsheet.OdfTableSheet.AutoFitRowHeights(System.Collections.Generic.IEnumerable<int>! rows, OdfKit.Styles.OdfAutoFitOptions! options, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IReadOnlyDictionary<int, OdfKit.Styles.OdfLength>!
 OdfKit.Spreadsheet.OdfTableSheet.Cells.get -> OdfKit.Spreadsheet.OdfCellCollection!
 OdfKit.Spreadsheet.OdfTableSheet.ClearConditionalFormats() -> int
 OdfKit.Spreadsheet.OdfTableSheet.ClearFrozenPanes() -> bool
@@ -17042,6 +17050,48 @@ OdfKit.Styles.FormatType.Percentage = 2 -> OdfKit.Styles.FormatType
 OdfKit.Styles.FormatType.Time = 4 -> OdfKit.Styles.FormatType
 OdfKit.Styles.IFontSubsetter
 OdfKit.Styles.IFontSubsetter.CreateSubset(OdfKit.Styles.OdfFontSubsetRequest! request) -> OdfKit.Styles.OdfFontSubset?
+OdfKit.Styles.IOdfTextLayoutMeasurer
+OdfKit.Styles.IOdfTextLayoutMeasurer.Measure(OdfKit.Styles.OdfTextMeasureRequest! request, System.Threading.CancellationToken cancellationToken) -> OdfKit.Styles.OdfTextMeasureResult
+OdfKit.Styles.OdfAutoFitMode
+OdfKit.Styles.OdfAutoFitMode.Fast = 1 -> OdfKit.Styles.OdfAutoFitMode
+OdfKit.Styles.OdfAutoFitMode.Precise = 2 -> OdfKit.Styles.OdfAutoFitMode
+OdfKit.Styles.OdfAutoFitMode.Reader = 0 -> OdfKit.Styles.OdfAutoFitMode
+OdfKit.Styles.OdfAutoFitOptions
+OdfKit.Styles.OdfAutoFitOptions.DefaultColumnWidth.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.DefaultColumnWidth.set -> void
+OdfKit.Styles.OdfAutoFitOptions.DefaultFontFamily.get -> string!
+OdfKit.Styles.OdfAutoFitOptions.DefaultFontFamily.set -> void
+OdfKit.Styles.OdfAutoFitOptions.DefaultFontSizePoints.get -> double
+OdfKit.Styles.OdfAutoFitOptions.DefaultFontSizePoints.set -> void
+OdfKit.Styles.OdfAutoFitOptions.HorizontalPadding.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.HorizontalPadding.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumCells.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumCells.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumColumnWidth.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.MaximumColumnWidth.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumMeasurementCacheEntries.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumMeasurementCacheEntries.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumRowHeight.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.MaximumRowHeight.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumTextElements.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumTextElements.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumTextElementsPerBlock.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumTextElementsPerBlock.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MinimumColumnWidth.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.MinimumColumnWidth.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MinimumRowHeight.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.MinimumRowHeight.set -> void
+OdfKit.Styles.OdfAutoFitOptions.Mode.get -> OdfKit.Styles.OdfAutoFitMode
+OdfKit.Styles.OdfAutoFitOptions.Mode.set -> void
+OdfKit.Styles.OdfAutoFitOptions.OdfAutoFitOptions() -> void
+OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxHeight.get -> bool
+OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxHeight.set -> void
+OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxWidth.get -> bool
+OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxWidth.set -> void
+OdfKit.Styles.OdfAutoFitOptions.TextMeasurer.get -> OdfKit.Styles.IOdfTextLayoutMeasurer?
+OdfKit.Styles.OdfAutoFitOptions.TextMeasurer.set -> void
+OdfKit.Styles.OdfAutoFitOptions.VerticalPadding.get -> OdfKit.Styles.OdfLength
+OdfKit.Styles.OdfAutoFitOptions.VerticalPadding.set -> void
 OdfKit.Styles.OdfBorder
 OdfKit.Styles.OdfBorder.BorderStyle
 OdfKit.Styles.OdfBorder.BorderStyle.Dashed = 4 -> OdfKit.Styles.OdfBorder.BorderStyle
@@ -17244,6 +17294,35 @@ OdfKit.Styles.OdfTextFontFallbackOptions.FontContext.init -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions() -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions(string? baseFont) -> void
 OdfKit.Styles.OdfTextFontFallbackOptions.OdfTextFontFallbackOptions(string? baseFont, bool declareDefaultCjkFallbackFonts) -> void
+OdfKit.Styles.OdfTextMeasureRequest
+OdfKit.Styles.OdfTextMeasureRequest.AvailableWidthCentimeters.get -> double?
+OdfKit.Styles.OdfTextMeasureRequest.AvailableWidthCentimeters.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.FontFamily.get -> string!
+OdfKit.Styles.OdfTextMeasureRequest.FontFamily.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.FontSizePoints.get -> double
+OdfKit.Styles.OdfTextMeasureRequest.FontSizePoints.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.IsBold.get -> bool
+OdfKit.Styles.OdfTextMeasureRequest.IsBold.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.IsItalic.get -> bool
+OdfKit.Styles.OdfTextMeasureRequest.IsItalic.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.MaximumTextElements.get -> int
+OdfKit.Styles.OdfTextMeasureRequest.MaximumTextElements.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.OdfTextMeasureRequest() -> void
+OdfKit.Styles.OdfTextMeasureRequest.RotationDegrees.get -> double
+OdfKit.Styles.OdfTextMeasureRequest.RotationDegrees.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.Text.get -> string!
+OdfKit.Styles.OdfTextMeasureRequest.Text.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.Wrap.get -> bool
+OdfKit.Styles.OdfTextMeasureRequest.Wrap.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.WritingMode.get -> OdfKit.Styles.OdfWritingMode
+OdfKit.Styles.OdfTextMeasureRequest.WritingMode.set -> void
+OdfKit.Styles.OdfTextMeasureResult
+OdfKit.Styles.OdfTextMeasureResult.HeightCentimeters.get -> double
+OdfKit.Styles.OdfTextMeasureResult.IsExact.get -> bool
+OdfKit.Styles.OdfTextMeasureResult.LineCount.get -> int
+OdfKit.Styles.OdfTextMeasureResult.OdfTextMeasureResult() -> void
+OdfKit.Styles.OdfTextMeasureResult.OdfTextMeasureResult(double widthCentimeters, double heightCentimeters, int lineCount, bool isExact) -> void
+OdfKit.Styles.OdfTextMeasureResult.WidthCentimeters.get -> double
 OdfKit.Styles.OdfUnit
 OdfKit.Styles.OdfUnit.Centimeters = 1 -> OdfKit.Styles.OdfUnit
 OdfKit.Styles.OdfUnit.Em = 8 -> OdfKit.Styles.OdfUnit

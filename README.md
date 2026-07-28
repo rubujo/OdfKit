@@ -39,6 +39,10 @@ Windows NativeAOT sidecar。CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
 | 核心 SDK | `OdfKit` | ODF 文件建立、載入、儲存、驗證、來回讀寫 |
 | 匯出與轉換擴充 | `OdfKit.Extensions.Html`、`OdfKit.Extensions.Pdf`、`OdfKit.Extensions.Ooxml` | HTML / Markdown / RTF、PDF、DOCX / XLSX 互通 |
 | 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration`、`OdfKit.Extensions.Scripting` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作與選用巨集管理 |
+
+試算表欄寬、確定性列高，以及 ODT／ODP／ODG 文字框可共用具資源上限的
+Fast／Precise／Reader 文字版面配置；詳見
+[跨格式文字自動版面配置](docs/text-auto-layout.md)。
 | WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
 | 工具 | `OdfKit.Cli`、samples、測試與 corpus 工具 | 自動化驗證、批次轉檔、範例與工程驗證 |
 

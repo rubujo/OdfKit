@@ -1,201 +1,65 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using HarfBuzzSharp;
-using OdfKit.Compliance;
-using OdfKit.Core;
-using OdfKit.DOM;
+﻿using System.Threading;
 using OdfKit.Styles;
-using SkiaSharp;
 
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
 /// Measures text using the configured font and rendering options.
-/// 提供整合 HarfBuzzSharp 與 SkiaSharp 的跨平台文字物理寬度精確量測工具。
+/// 提供整合 HarfBuzzSharp 與 SkiaSharp 的跨平台文字物理尺寸精確量測工具。
 /// </summary>
 public static class OdfTextMeasurer
 {
     /// <summary>
     /// Measures the rendered width of text.
-    /// 精確量測指定字型、大小與書寫模式下文字的物理寬度（回傳 <see cref="OdfLength"/> 封裝）。
+    /// 精確量測指定字型、大小與書寫模式下文字的物理寬度。
     /// </summary>
-    /// <param name="text">The text or value. / 要量測的文字內容</param>
-    /// <param name="fontName">The name or identifier. / 字型名稱</param>
-    /// <param name="fontSizePoints">The numeric value. / 字型大小（以點 Pt 為單位）</param>
-    /// <param name="isBold">The value to use. / 是否為粗體</param>
-    /// <param name="isItalic">The value to use. / 是否為斜體</param>
-    /// <param name="writingMode">The value to use. / 書寫模式（橫書或直書）</param>
-    /// <param name="fontContext">The font context for segmentation and resolution; null uses <see cref="OdfFontContext.Default"/>. / 用於分段與解析的字型情境；為 null 時使用 <see cref="OdfFontContext.Default"/>。</param>
-    /// <returns>The result. / 量測後的物理長度 <see cref="OdfLength"/></returns>
-    public static OdfLength MeasureWidth(string text, string fontName, double fontSizePoints, bool isBold = false, bool isItalic = false, OdfWritingMode writingMode = OdfWritingMode.LrTb, OdfFontContext? fontContext = null)
+    /// <param name="text">The text or value. / 要量測的文字內容。</param>
+    /// <param name="fontName">The font family name. / 字型名稱。</param>
+    /// <param name="fontSizePoints">The font size in points. / 字型大小（點）。</param>
+    /// <param name="isBold">Whether the text is bold. / 是否為粗體。</param>
+    /// <param name="isItalic">Whether the text is italic. / 是否為斜體。</param>
+    /// <param name="writingMode">The writing mode. / 書寫模式。</param>
+    /// <param name="fontContext">The isolated font context, or null for the default. / 隔離的字型情境；null 表示使用預設值。</param>
+    /// <returns>The measured physical width. / 量測後的實體寬度。</returns>
+    public static OdfLength MeasureWidth(
+        string text,
+        string fontName,
+        double fontSizePoints,
+        bool isBold = false,
+        bool isItalic = false,
+        OdfWritingMode writingMode = OdfWritingMode.LrTb,
+        OdfFontContext? fontContext = null)
     {
-        if (string.IsNullOrEmpty(text))
-            return OdfLength.FromCentimeters(0);
-
-        OdfFontContext context = fontContext ?? OdfFontContext.Default;
-
-        // 檢查是否含有高字面字元（第 2 字面或第 15/16 字面）
-        bool hasSupplementary = false;
-        for (int i = 0; i < text.Length; i++)
-        {
-            if (char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+        using var session = new OdfTextLayoutSession(
+            fontContext ?? OdfFontContext.Default);
+        OdfTextMeasureResult result = session.Measure(
+            new OdfTextMeasureRequest
             {
-                int codePoint = char.ConvertToUtf32(text[i], text[i + 1]);
-                int plane = codePoint >> 16;
-                if (plane == 2 || plane == 3 || plane == 15 || plane == 16)
-                {
-                    hasSupplementary = true;
-                    break;
-                }
-            }
-        }
-
-        if (hasSupplementary)
-        {
-            double totalCm = 0;
-            var segments = context.SegmentText(text, fontName);
-            foreach (var (segText, font) in segments)
-            {
-                if (font != fontName)
-                    context.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
-                var width = MeasureWidthSingle(segText, font, fontSizePoints, isBold, isItalic, writingMode, context);
-                totalCm += width.ToCentimeters();
-            }
-            return OdfLength.FromCentimeters(totalCm);
-        }
-        else
-        {
-            return MeasureWidthSingle(text, fontName, fontSizePoints, isBold, isItalic, writingMode, context);
-        }
+                Text = text,
+                FontFamily = fontName,
+                FontSizePoints = fontSizePoints,
+                IsBold = isBold,
+                IsItalic = isItalic,
+                WritingMode = writingMode
+            },
+            CancellationToken.None);
+        return OdfLength.FromCentimeters(result.WidthCentimeters);
     }
 
-    private static OdfLength MeasureWidthSingle(string text, string fontName, double fontSizePoints, bool isBold, bool isItalic, OdfWritingMode writingMode, OdfFontContext fontContext)
+    /// <summary>
+    /// Measures rendered text width, height, and line count.
+    /// 量測呈現文字的寬度、高度與行數。
+    /// </summary>
+    /// <param name="request">The text-layout request. / 文字版面量測要求。</param>
+    /// <param name="fontContext">The isolated font context. / 隔離的字型情境。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The physical text-layout result. / 實體文字版面量測結果。</returns>
+    public static OdfTextMeasureResult Measure(
+        OdfTextMeasureRequest request,
+        OdfFontContext fontContext,
+        CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(text))
-            return OdfLength.FromCentimeters(0);
-
-        // 1. 字型替代對照
-        string mappedFont = fontContext.MapFont(fontName);
-        string? fontPath = fontContext.ResolveFontPath(mappedFont);
-
-        SKTypeface? typeface = null;
-        // 只釋放本方法建立的 typeface；SKTypeface.Default 為共用單例，不可 Dispose。
-        bool ownsTypeface = false;
-        if (fontPath is not null && File.Exists(fontPath))
-        {
-            typeface = SKTypeface.FromFile(fontPath);
-            ownsTypeface = typeface is not null;
-        }
-
-        if (typeface is null)
-        {
-            var weight = isBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
-            var slant = isItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;
-            SKTypeface? created = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)weight, (int)SKFontStyleWidth.Normal, slant));
-            if (created is not null)
-            {
-                typeface = created;
-                ownsTypeface = true;
-            }
-            else
-            {
-                typeface = SKTypeface.Default;
-                ownsTypeface = false;
-            }
-        }
-
-        // 2. 嘗試使用 HarfBuzzSharp 進行 Shaping 量測
-        try
-        {
-            using var stream = typeface.OpenStream(out int ttcIndex);
-            if (stream != null)
-            {
-                byte[] fontData;
-                using (var ms = new MemoryStream())
-                {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = stream.Read(buffer, buffer.Length)) > 0)
-                    {
-                        ms.Write(buffer, 0, bytesRead);
-                    }
-                    fontData = ms.ToArray();
-                }
-
-                if (fontData.Length > 0)
-                {
-                    var handle = GCHandle.Alloc(fontData, GCHandleType.Pinned);
-                    try
-                    {
-                        IntPtr dataPtr = handle.AddrOfPinnedObject();
-                        using var blob = new Blob(dataPtr, fontData.Length, MemoryMode.ReadOnly);
-                        using var hbFace = new Face(blob, ttcIndex);
-                        using var hbFont = new HarfBuzzSharp.Font(hbFace);
-                        hbFont.SetScale(2048, 2048); // 設定標準 EM 單位
-
-                        using var hbBuffer = new HarfBuzzSharp.Buffer();
-                        hbBuffer.AddUtf8(text);
-                        hbBuffer.GuessSegmentProperties();
-
-                        // 設定書寫方向
-                        if (writingMode == OdfWritingMode.RlTb)
-                        {
-                            hbBuffer.Direction = Direction.RightToLeft;
-                        }
-                        else if (writingMode == OdfWritingMode.TbRl || writingMode == OdfWritingMode.TbLr)
-                        {
-                            hbBuffer.Direction = Direction.TopToBottom;
-                        }
-                        else
-                        {
-                            hbBuffer.Direction = Direction.LeftToRight;
-                        }
-
-                        hbFont.Shape(hbBuffer);
-
-                        int totalAdvance = 0;
-                        var glyphPositions = hbBuffer.GlyphPositions;
-                        for (int i = 0; i < glyphPositions.Length; i++)
-                        {
-                            totalAdvance += (writingMode == OdfWritingMode.TbRl || writingMode == OdfWritingMode.TbLr) ? glyphPositions[i].YAdvance : glyphPositions[i].XAdvance;
-                        }
-
-                        double widthInPoints = (totalAdvance / 2048.0) * fontSizePoints;
-                        // 1 pt = 2.54 / 72 cm
-                        double widthInCm = widthInPoints * (2.54 / 72.0);
-                        return OdfLength.FromCentimeters(widthInCm);
-                    }
-                    finally
-                    {
-                        if (handle.IsAllocated)
-                            handle.Free();
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // 發生任何例外時改用 SkiaSharp 量測
-            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfTextMeasurer_GdiFontMeasurementFallback", ex.Message), ex);
-        }
-        finally
-        {
-            if (ownsTypeface)
-            {
-                typeface.Dispose();
-            }
-        }
-
-        // 3. Fallback 後援：使用 SkiaSharp 量測
-        using var paint = new SKPaint();
-        var styleWeight = isBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
-        var styleSlant = isItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;
-        using var fallbackTypeface = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)styleWeight, (int)SKFontStyleWidth.Normal, styleSlant));
-        using var fallbackFont = new SKFont(fallbackTypeface ?? SKTypeface.Default, (float)fontSizePoints * 1.3333f); // Points to Pixels (96 DPI)
-
-        float widthInPx = fallbackFont.MeasureText(text, paint);
-        double fallbackCm = widthInPx / 96.0 * 2.54; // Pixels to Centimeters
-        return OdfLength.FromCentimeters(fallbackCm);
+        using var session = new OdfTextLayoutSession(fontContext);
+        return session.Measure(request, cancellationToken);
     }
 }

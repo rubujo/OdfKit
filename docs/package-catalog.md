@@ -9,7 +9,7 @@
 |---------|------|----------|----------|----------|
 | `OdfKit` | 核心 SDK | `net10.0;netstandard2.0` | ODF 文件建立、載入、儲存、驗證與 round-trip | 所有擴充套件的共同基礎 |
 | `OdfKit.Extensions.Html` | 匯出擴充 | `net10.0;netstandard2.0` | HTML / Markdown / RTF 匯出 | 適合 Web 預覽或內容轉出 |
-| `OdfKit.Extensions.Imaging` | 渲染擴充 | `net10.0;netstandard2.0` | 影像渲染與圖表 fallback 視覺化 | 依賴 SkiaSharp / HarfBuzzSharp |
+| `OdfKit.Extensions.Imaging` | 渲染擴充 | `net10.0;netstandard2.0` | 影像渲染、圖表 fallback 與精確文字版面量測 | 依賴 SkiaSharp / HarfBuzzSharp |
 | `OdfKit.Extensions.Ooxml` | 互通擴充 | `net10.0;netstandard2.0` | DOCX / XLSX 轉換與互通 | 依賴 ClosedXML 與 Open XML SDK |
 | `OdfKit.Extensions.Pdf` | 匯出擴充 | `net10.0;netstandard2.0` | PDF 匯出 | 依賴 PDFsharp-MigraDoc |
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
