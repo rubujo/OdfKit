@@ -35,7 +35,7 @@ internal class OdfDomEvaluationContext :
     private readonly IOdfFormulaVolatileContext _volatileContext;
     private readonly OdfFormulaEvaluationBudget? _budget;
     private readonly OdfFormulaExternalReferencePolicy _externalReferencePolicy;
-    private IReadOnlySet<OdfCellAddress>? _activeFormulaFilter;
+    private HashSet<OdfCellAddress>? _activeFormulaFilter;
 
     public DateTime EvaluationTimestamp => _volatileContext.EvaluationTimestamp;
     /// <summary>
@@ -119,7 +119,7 @@ internal class OdfDomEvaluationContext :
             }
             else
             {
-                _cellFormulas[mutation.Address] = formula;
+                _cellFormulas[mutation.Address] = formula!;
             }
 
             _cellValues[mutation.Address] = ParseCellValue(mutation.Node);
@@ -150,7 +150,7 @@ internal class OdfDomEvaluationContext :
 
     internal OdfFormulaEvaluationBudget? Budget => _budget;
 
-    internal void SetActiveFormulaFilter(IReadOnlySet<OdfCellAddress>? formulaFilter) =>
+    internal void SetActiveFormulaFilter(HashSet<OdfCellAddress>? formulaFilter) =>
         _activeFormulaFilter = formulaFilter;
 
     internal OdfDomEvaluationContext CreateWorkerView(
