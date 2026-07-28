@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "지원되지 않는 인증서 다이제스트 알고리즘: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "서명 인증서 다이제스트가 XAdES CertDigest 값과 일치하지 않습니다.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "인증서 일련번호 {0}이(가) XAdES IssuerSerial {1}과(와) 일치하지 않습니다.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "이미지 내보내기 옵션 '{0}'은(는) 양수이며 지원되는 렌더링 범위 내에 있어야 합니다.",
         };
     }
 }

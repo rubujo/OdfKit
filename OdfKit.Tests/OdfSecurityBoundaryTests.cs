@@ -345,6 +345,35 @@ public class OdfSecurityBoundaryTests
         Assert.DoesNotContain(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault");
     }
 
+    /// <summary>
+    /// Verifies a foreign namespace bound to the script prefix is not treated as ODF script content.
+    /// 驗證綁定至 script 前綴的外部命名空間不會被誤判為 ODF 指令碼內容。
+    /// </summary>
+    [Fact]
+    public void ComplianceProfileDoesNotTreatPrefixAsNamespaceIdentity()
+    {
+        const string content =
+            "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+            "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
+            "xmlns:script=\"urn:odfkit:test:metadata\" office:version=\"1.3\">" +
+            "<office:body><office:text><text:p script:label=\"safe\">Text</text:p></office:text></office:body>" +
+            "</office:document-content>";
+        using var stream = new MemoryStream();
+        using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Text, leaveOpen: true))
+        {
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(content), "text/xml");
+            package.Save();
+        }
+
+        stream.Position = 0;
+        using OdfPackage reopened = OdfPackage.Open(stream);
+        OdfValidationReport report = OdfPackageValidator.Validate(
+            reopened,
+            OdfComplianceProfiles.RocTaiwanGovernmentOdfTools);
+
+        Assert.DoesNotContain(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault");
+    }
+
     private static MemoryStream CreateTextPackage(bool includeMacroContent = false, bool includeExternalResource = false)
     {
         var stream = new MemoryStream();

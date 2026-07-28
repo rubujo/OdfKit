@@ -133,7 +133,6 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(string text) => AddHeading(text, 1);
 
     /// <summary>
@@ -157,7 +156,6 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(ReadOnlySpan<char> text) => AddHeading(text, 1);
 
     /// <summary>
@@ -180,7 +178,6 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     /// 加入標題段落。
     /// </summary>
     /// <param name="text">The heading text. / 標題文字。</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when  is not between 1 and 6. / 當  不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(ReadOnlyMemory<char> text) => AddHeading(text.Span, 1);
 
     /// <summary>

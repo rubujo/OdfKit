@@ -627,5 +627,6 @@
   "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "Les elements CertDigest XAdES-BES sont manquants.",
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Algorithme de condense de certificat non pris en charge : {0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Le condense du certificat de signature ne correspond pas a la valeur CertDigest XAdES.",
-  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Le numero de serie du certificat {0} ne correspond pas a l'IssuerSerial XAdES {1}."
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Le numero de serie du certificat {0} ne correspond pas a l'IssuerSerial XAdES {1}.",
+  "Err_OdfImageExporter_InvalidDimensions": "L’option d’exportation d’image « {0} » doit être positive et comprise dans la plage de rendu prise en charge."
 }

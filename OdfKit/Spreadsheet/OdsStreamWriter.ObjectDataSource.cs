@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace OdfKit.Spreadsheet;
 /// <summary>
-/// Provides the OdsStreamWriter API.
-/// 提供 OdsStreamWriter API。
+/// Streams object data sources into the current ODS worksheet.
+/// 將物件資料來源串流寫入目前的 ODS 工作表。
 /// </summary>
 
 public partial class OdsStreamWriter

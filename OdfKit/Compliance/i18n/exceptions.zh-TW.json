@@ -627,5 +627,6 @@
   "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "缺少 XAdES-BES CertDigest 元素。",
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "不支援的憑證摘要演算法：{0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "簽章憑證的摘要值與 XAdES CertDigest 不符。",
-  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "憑證序號 {0} 與 XAdES IssuerSerial {1} 不符。"
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "憑證序號 {0} 與 XAdES IssuerSerial {1} 不符。",
+  "Err_OdfImageExporter_InvalidDimensions": "影像匯出選項「{0}」必須為正值，且在支援的轉譯範圍內。"
 }

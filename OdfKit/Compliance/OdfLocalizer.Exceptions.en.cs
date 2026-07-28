@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Unsupported certificate digest algorithm: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Signing certificate digest does not match the XAdES CertDigest value.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Certificate serial number {0} does not match XAdES IssuerSerial {1}.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "The image export option '{0}' must be positive and within the supported rendering range.",
         };
     }
 }

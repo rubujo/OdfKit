@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Algoritmo de resumen de certificado no compatible: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "El resumen del certificado de firma no coincide con el valor CertDigest de XAdES.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "El numero de serie del certificado {0} no coincide con el IssuerSerial {1} de XAdES.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "La opción de exportación de imagen '{0}' debe ser positiva y estar dentro del intervalo de representación admitido.",
         };
     }
 }

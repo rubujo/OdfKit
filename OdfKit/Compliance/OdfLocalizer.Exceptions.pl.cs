@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Nieobslugiwany algorytm skrotu certyfikatu: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Skrot certyfikatu podpisujacego nie zgadza sie z wartoscia CertDigest XAdES.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Numer seryjny certyfikatu {0} nie zgadza sie z XAdES IssuerSerial {1}.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "Opcja eksportu obrazu „{0}” musi być dodatnia i mieścić się w obsługiwanym zakresie renderowania.",
         };
     }
 }

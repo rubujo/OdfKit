@@ -7,8 +7,8 @@ using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
 /// <summary>
-/// Provides the OdsStreamWriter API.
-/// 提供 OdsStreamWriter API。
+/// Writes the standard package entries required by an ODS document.
+/// 寫入 ODS 文件所需的標準封裝項目。
 /// </summary>
 
 public partial class OdsStreamWriter

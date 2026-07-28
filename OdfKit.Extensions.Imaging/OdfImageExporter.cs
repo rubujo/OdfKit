@@ -21,6 +21,7 @@ public static class OdfImageExporter
     /// <param name="pngStream">The source or target object. / 目標 PNG 資料流</param>
     /// <param name="options">The value to use. / 影像匯出選項；若為 null 則使用預設值</param>
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時拋出</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when an image export option is outside the supported rendering range. / 當影像匯出選項超出支援的轉譯範圍時擲出。</exception>
     public static void ExportToPng(OdfTableSheet sheet, Stream pngStream, OdfImageExportOptions? options = null)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
@@ -36,6 +37,7 @@ public static class OdfImageExporter
     /// <param name="jpegStream">The source or target object. / 目標 JPEG 資料流</param>
     /// <param name="quality">The numeric value. / JPEG 壓縮品質，範圍為 1 至 100，預設為 90</param>
     /// <param name="options">The value to use. / 影像匯出選項；若為 null 則使用預設值</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="quality"/> or an image export option is outside its supported range. / 當 <paramref name="quality"/> 或影像匯出選項超出其支援範圍時擲出。</exception>
     public static void ExportToJpeg(OdfTableSheet sheet, Stream jpegStream, int quality = 90, OdfImageExportOptions? options = null)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sheet, nameof(sheet));
@@ -48,15 +50,42 @@ public static class OdfImageExporter
     private static void Export(OdfTableSheet sheet, Stream stream, SKEncodedImageFormat format, int quality, OdfImageExportOptions? options)
     {
         options ??= new OdfImageExportOptions();
+        ValidatePositive(options.ColumnCount, nameof(options), nameof(options.ColumnCount));
+        ValidatePositive(options.RowCount, nameof(options), nameof(options.RowCount));
+        ValidatePositive(options.CellWidthPx, nameof(options), nameof(options.CellWidthPx));
+        ValidatePositive(options.CellHeightPx, nameof(options), nameof(options.CellHeightPx));
+        if (!(options.FontSizePx > 0) || float.IsInfinity(options.FontSizePx))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                OdfLocalizer.GetMessage(
+                    "Err_OdfImageExporter_InvalidDimensions",
+                    nameof(options.FontSizePx)));
+        }
+
         int cols = options.ColumnCount;
         int rows = options.RowCount;
         int colWidth = options.CellWidthPx;
         int rowHeight = options.CellHeightPx;
-        int width = cols * colWidth + 1;
-        int height = rows * rowHeight + 1;
+        int width;
+        int height;
+        try
+        {
+            width = checked(cols * colWidth + 1);
+            height = checked(rows * rowHeight + 1);
+        }
+        catch (OverflowException)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                OdfLocalizer.GetMessage("Err_OdfImageExporter_InvalidDimensions", nameof(options)));
+        }
 
         var imageInfo = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
-        using var surface = SKSurface.Create(imageInfo);
+        using SKSurface surface = SKSurface.Create(imageInfo) ??
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                OdfLocalizer.GetMessage("Err_OdfImageExporter_InvalidDimensions", nameof(options)));
         var canvas = surface.Canvas;
 
         canvas.Clear(SKColors.White);
@@ -100,6 +129,16 @@ public static class OdfImageExporter
         using var image = surface.Snapshot();
         using var data = image.Encode(format, quality);
         data.SaveTo(stream);
+    }
+
+    private static void ValidatePositive(int value, string parameterName, string optionName)
+    {
+        if (value <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                OdfLocalizer.GetMessage("Err_OdfImageExporter_InvalidDimensions", optionName));
+        }
     }
 
     private static string? TryGetCellDisplayText(OdfNode cellNode)

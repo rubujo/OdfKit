@@ -627,5 +627,6 @@
   "Err_OdfSignatureX509Utilities_CertDigestElementsMissing": "XAdES-BES CertDigest-elementerne mangler.",
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Ikke-understoettet certifikat-digest-algoritme: {0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Signeringscertifikatets digest stemmer ikke overens med XAdES CertDigest-vaerdien.",
-  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Certifikatets serienummer {0} stemmer ikke overens med XAdES IssuerSerial {1}."
+  "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Certifikatets serienummer {0} stemmer ikke overens med XAdES IssuerSerial {1}.",
+  "Err_OdfImageExporter_InvalidDimensions": "Billedeksportindstillingen '{0}' skal være positiv og inden for det understøttede gengivelsesområde."
 }

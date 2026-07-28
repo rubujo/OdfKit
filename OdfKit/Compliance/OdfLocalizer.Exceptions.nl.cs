@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Niet-ondersteund certificaat-digestalgoritme: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "De digest van het ondertekeningscertificaat komt niet overeen met de XAdES CertDigest-waarde.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Het certificaatserienummer {0} komt niet overeen met de XAdES IssuerSerial {1}.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "De afbeeldingsexportoptie '{0}' moet positief zijn en binnen het ondersteunde weergavebereik vallen.",
         };
     }
 }

@@ -71,6 +71,58 @@ public class ImageExportTests
     }
 
     /// <summary>
+    /// 驗證非正值的影像匯出選項會在呼叫 native renderer 前被拒絕。
+    /// </summary>
+    [Theory]
+    [InlineData(nameof(OdfImageExportOptions.ColumnCount))]
+    [InlineData(nameof(OdfImageExportOptions.RowCount))]
+    [InlineData(nameof(OdfImageExportOptions.CellWidthPx))]
+    [InlineData(nameof(OdfImageExportOptions.CellHeightPx))]
+    [InlineData(nameof(OdfImageExportOptions.FontSizePx))]
+    public void ExportRejectsNonPositiveImageOptions(string propertyName)
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Sheet1");
+        using var stream = new MemoryStream();
+        OdfImageExportOptions options = propertyName switch
+        {
+            nameof(OdfImageExportOptions.ColumnCount) => new OdfImageExportOptions { ColumnCount = 0 },
+            nameof(OdfImageExportOptions.RowCount) => new OdfImageExportOptions { RowCount = 0 },
+            nameof(OdfImageExportOptions.CellWidthPx) => new OdfImageExportOptions { CellWidthPx = 0 },
+            nameof(OdfImageExportOptions.CellHeightPx) => new OdfImageExportOptions { CellHeightPx = 0 },
+            nameof(OdfImageExportOptions.FontSizePx) => new OdfImageExportOptions { FontSizePx = 0 },
+            _ => throw new InvalidOperationException(propertyName)
+        };
+
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
+            () => OdfImageExporter.ExportToPng(sheet, stream, options));
+
+        Assert.Equal("options", exception.ParamName);
+        Assert.Contains(propertyName, exception.Message);
+    }
+
+    /// <summary>
+    /// 驗證影像像素尺寸計算溢位時會轉換為可預期的引數例外。
+    /// </summary>
+    [Fact]
+    public void ExportRejectsOverflowingImageDimensions()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Sheet1");
+        using var stream = new MemoryStream();
+        var options = new OdfImageExportOptions
+        {
+            ColumnCount = int.MaxValue,
+            CellWidthPx = 2
+        };
+
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(
+            () => OdfImageExporter.ExportToPng(sheet, stream, options));
+
+        Assert.Equal("options", exception.ParamName);
+    }
+
+    /// <summary>
     /// 驗證匯出影像時不會改變工作表的 DOM 結構（匯出前後 TableNode 的 XML 內容完全相同）。
     /// </summary>
     [Fact]

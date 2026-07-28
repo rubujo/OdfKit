@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Algoritma digest sijil tidak disokong: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Digest sijil penandatangan tidak sepadan dengan nilai CertDigest XAdES.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Nombor siri sijil {0} tidak sepadan dengan XAdES IssuerSerial {1}.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "Pilihan eksport imej '{0}' mesti positif dan dalam julat pemaparan yang disokong.",
         };
     }
 }

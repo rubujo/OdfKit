@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "サポートされていない証明書ダイジェストアルゴリズム:{0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "署名証明書のダイジェストがXAdESのCertDigest値と一致しません。",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "証明書のシリアル番号{0}がXAdESのIssuerSerial{1}と一致しません。",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "画像エクスポートオプション「{0}」は正の値で、サポートされる描画範囲内である必要があります。",
         };
     }
 }

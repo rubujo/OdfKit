@@ -646,6 +646,7 @@ public static partial class OdfLocalizer
             ["Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm"] = "Nepodporovany algoritmus otisku certifikatu: {0}",
             ["Err_OdfSignatureX509Utilities_CertDigestMismatch"] = "Otisk podepisujiciho certifikatu neodpovida hodnote CertDigest XAdES.",
             ["Err_OdfSignatureX509Utilities_SerialNumberMismatch"] = "Seriove cislo certifikatu {0} neodpovida XAdES IssuerSerial {1}.",
+            ["Err_OdfImageExporter_InvalidDimensions"] = "Možnost exportu obrázku „{0}“ musí být kladná a v podporovaném rozsahu vykreslování.",
         };
     }
 }
