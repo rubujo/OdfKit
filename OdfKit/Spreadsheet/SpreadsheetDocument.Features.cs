@@ -276,6 +276,30 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentDatabaseRangeReadEngine.GetDatabaseRanges(this);
 
     /// <summary>
+    /// Gets whether the spreadsheet contains formula DDE link declarations.
+    /// 取得試算表是否包含公式 DDE 連結宣告。
+    /// </summary>
+    /// <remarks>
+    /// This property only inspects document markup and never connects to a DDE server.
+    /// 此屬性只檢查文件標記，絕不連線至 DDE 伺服器。
+    /// </remarks>
+    public bool ContainsDdeLinks =>
+        SpreadsheetDocumentDdeLinkReadEngine.ContainsDdeLinks(this);
+
+    /// <summary>
+    /// Gets read-only summaries for all formula DDE links in the spreadsheet.
+    /// 取得試算表中所有公式 DDE 連結的唯讀摘要清單。
+    /// </summary>
+    /// <returns>The DDE link summaries in document order. / 依文件順序排列的 DDE 連結摘要。</returns>
+    /// <remarks>
+    /// This method only inspects document markup and cached-table metadata. It never connects to a DDE server
+    /// or refreshes cached data.
+    /// 此方法只檢查文件標記與快取表格中繼資料，絕不連線至 DDE 伺服器或更新快取資料。
+    /// </remarks>
+    public IReadOnlyList<OdfDdeLinkInfo> GetDdeLinks() =>
+        SpreadsheetDocumentDdeLinkReadEngine.GetDdeLinks(this);
+
+    /// <summary>
     /// Gets summaries for all worksheets in the spreadsheet that define print areas.
     /// 取得試算表中所有已設定列印範圍的工作表摘要清單。
     /// </summary>

@@ -465,6 +465,103 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證沒有 DDE 宣告時，唯讀檢查不會回報連結。
+    /// </summary>
+    [Fact]
+    public void GetDdeLinksReturnsEmptyForDocumentWithoutDeclarations()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+
+        Assert.False(document.ContainsDdeLinks);
+        Assert.Empty(document.GetDdeLinks());
+    }
+
+    /// <summary>
+    /// 驗證 DDE 連結摘要不依賴 XML 前綴，並在往返儲存後保留來源與快取資料。
+    /// </summary>
+    [Fact]
+    public void GetDdeLinksReadsPrefixIndependentMetadataAndPreservesCachedTable()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        var ddeLinks = new OdfNode(OdfNodeType.Element, "dde-links", OdfNamespaces.Table, "t2");
+        var ddeLink = new OdfNode(OdfNodeType.Element, "dde-link", OdfNamespaces.Table, "t2");
+        var source = new OdfNode(OdfNodeType.Element, "dde-source", OdfNamespaces.Office, "o2");
+        source.SetAttribute("dde-application", OdfNamespaces.Office, "soffice", "o2");
+        source.SetAttribute("dde-topic", OdfNamespaces.Office, "file:///data/source.ods", "o2");
+        source.SetAttribute("dde-item", OdfNamespaces.Office, "Sheet1.A1:B2", "o2");
+        source.SetAttribute("name", OdfNamespaces.Office, "Sales feed", "o2");
+        source.SetAttribute("conversion-mode", OdfNamespaces.Office, "keep-text", "o2");
+        source.SetAttribute("automatic-update", OdfNamespaces.Office, "false", "o2");
+
+        var cachedTable = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "t2");
+        cachedTable.SetAttribute("name", OdfNamespaces.Table, "DDE cache", "t2");
+        var cachedRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "t2");
+        var cachedCell = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "t2");
+        cachedCell.SetAttribute("value-type", OdfNamespaces.Office, "string", "o2");
+        cachedCell.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+        {
+            TextContent = "last known value",
+        });
+        cachedRow.AppendChild(cachedCell);
+        cachedTable.AppendChild(cachedRow);
+        ddeLink.AppendChild(source);
+        ddeLink.AppendChild(cachedTable);
+        ddeLinks.AppendChild(ddeLink);
+        document.SheetsRoot.AppendChild(ddeLinks);
+        document.AddSheet("Sheet1");
+
+        Assert.True(document.ContainsDdeLinks);
+        OdfDdeLinkInfo link = Assert.Single(document.GetDdeLinks());
+        Assert.Equal("soffice", link.Application);
+        Assert.Equal("file:///data/source.ods", link.Topic);
+        Assert.Equal("Sheet1.A1:B2", link.Item);
+        Assert.Equal("Sales feed", link.Name);
+        Assert.Equal("keep-text", link.ConversionMode);
+        Assert.False(link.AutomaticUpdate);
+        Assert.True(link.HasCachedTable);
+        Assert.Equal("DDE cache", link.CachedTableName);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, fileName: "dde-links.ods");
+
+        OdfDdeLinkInfo reloadedLink = Assert.Single(reloaded.GetDdeLinks());
+        Assert.Equal("soffice", reloadedLink.Application);
+        Assert.Equal("file:///data/source.ods", reloadedLink.Topic);
+        Assert.Equal("Sheet1.A1:B2", reloadedLink.Item);
+        Assert.False(reloadedLink.AutomaticUpdate);
+        Assert.True(reloadedLink.HasCachedTable);
+        Assert.Equal("DDE cache", reloadedLink.CachedTableName);
+        Assert.Contains(
+            reloaded.ContentDom.Descendants(),
+            node => node.TextContent == "last known value");
+    }
+
+    /// <summary>
+    /// 驗證不完整的 DDE 宣告仍可被安全列舉，以供呼叫端診斷。
+    /// </summary>
+    [Fact]
+    public void GetDdeLinksRetainsIncompleteDeclarationForDiagnostics()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        var ddeLinks = new OdfNode(OdfNodeType.Element, "dde-links", OdfNamespaces.Table, "table");
+        ddeLinks.AppendChild(new OdfNode(OdfNodeType.Element, "dde-link", OdfNamespaces.Table, "table"));
+        document.SheetsRoot.AppendChild(ddeLinks);
+
+        OdfDdeLinkInfo link = Assert.Single(document.GetDdeLinks());
+
+        Assert.True(document.ContainsDdeLinks);
+        Assert.Null(link.Application);
+        Assert.Null(link.Topic);
+        Assert.Null(link.Item);
+        Assert.Null(link.AutomaticUpdate);
+        Assert.False(link.HasCachedTable);
+        Assert.Null(link.CachedTableName);
+    }
+
+    /// <summary>
     /// 驗證工作表可一鍵建立自動篩選與排序資料庫範圍。
     /// </summary>
     [Fact]

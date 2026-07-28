@@ -15979,6 +15979,16 @@ OdfKit.Spreadsheet.OdfDataValidationInfo.ErrorTitle.get -> string?
 OdfKit.Spreadsheet.OdfDataValidationInfo.Name.get -> string!
 OdfKit.Spreadsheet.OdfDataValidationInfo.OdfDataValidationInfo(string! name, string! conditionExpression, string? errorMessage, string? errorTitle, string? alertStyle, System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfCellRange>! appliedRanges) -> void
 OdfKit.Spreadsheet.OdfDataValidationInfo.TryGetCondition(out OdfKit.Spreadsheet.OdfValidationCondition condition) -> bool
+OdfKit.Spreadsheet.OdfDdeLinkInfo
+OdfKit.Spreadsheet.OdfDdeLinkInfo.Application.get -> string?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.AutomaticUpdate.get -> bool?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.CachedTableName.get -> string?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.ConversionMode.get -> string?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.HasCachedTable.get -> bool
+OdfKit.Spreadsheet.OdfDdeLinkInfo.Item.get -> string?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.Name.get -> string?
+OdfKit.Spreadsheet.OdfDdeLinkInfo.OdfDdeLinkInfo(string? application, string? topic, string? item, string? name, string? conversionMode, bool? automaticUpdate, bool hasCachedTable, string? cachedTableName) -> void
+OdfKit.Spreadsheet.OdfDdeLinkInfo.Topic.get -> string?
 OdfKit.Spreadsheet.OdfEmbeddedChartInfo
 OdfKit.Spreadsheet.OdfEmbeddedChartInfo.AnchorAddress.get -> string!
 OdfKit.Spreadsheet.OdfEmbeddedChartInfo.ChartType.get -> OdfKit.Spreadsheet.OdfChartType
@@ -16899,6 +16909,7 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ClearDatabaseRanges() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearDataValidations() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearEmbeddedCharts() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearPivotTables() -> int
+OdfKit.Spreadsheet.SpreadsheetDocument.ContainsDdeLinks.get -> bool
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateFormulaEvaluationSession() -> OdfKit.Formula.OdfFormulaEvaluationSession!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateFormulaEvaluationSession(OdfKit.Formula.OdfFormulaEvaluationOptions! options) -> OdfKit.Formula.OdfFormulaEvaluationSession!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
@@ -16919,6 +16930,7 @@ OdfKit.Spreadsheet.SpreadsheetDocument.FindTable(string! name) -> OdfKit.Spreads
 OdfKit.Spreadsheet.SpreadsheetDocument.GetConditionalFormats() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfConditionalFormatInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetDatabaseRanges() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfDatabaseRangeInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetDataValidations() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfDataValidationInfo!>!
+OdfKit.Spreadsheet.SpreadsheetDocument.GetDdeLinks() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfDdeLinkInfo!>!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetEmbeddedChartDocument(OdfKit.Spreadsheet.OdfEmbeddedChartInfo! chartInfo) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetEmbeddedChartDocument(string! objectPath) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.GetEmbeddedCharts() -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfEmbeddedChartInfo!>!

@@ -116,6 +116,11 @@ F 統計量、自由度、迴歸平方和及殘差平方和；沒有殘差自由
 其引數，也不會建立外部程序、網路或資料連線；任何呼叫固定傳回 `#N/A`。這是刻意的
 安全政策，不是待補的演算法缺陷。
 
+試算表文件仍可安全辨識並保留標準 ODF DDE 連結宣告。使用
+`SpreadsheetDocument.ContainsDdeLinks` 快速檢查是否存在連結，或使用
+`SpreadsheetDocument.GetDdeLinks()` 唯讀取得 application、topic、item、自動更新、
+轉換模式與快取表格中繼資料。這些 API 不會連線至 DDE 伺服器，也不會更新快取資料。
+
 ```csharp
 public sealed class WorkbookFormulaContext : IOdfFormulaWorkbookContext
 {
