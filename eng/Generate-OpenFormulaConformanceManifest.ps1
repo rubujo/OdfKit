@@ -23,14 +23,34 @@ if (-not (Test-Path -LiteralPath $assemblyPath -PathType Leaf)) {
 Add-Type -Path $assemblyPath
 $group = [OdfKit.Formula.OdfFormulaConformanceGroup]::Large
 $requiredFunctions = [OdfKit.Formula.OdfFormulaSupport]::GetRequiredFunctions($group)
+$semanticDimensions = @(
+    'arity',
+    'normal-types',
+    'implicit-conversion',
+    'blank-values',
+    'error-propagation',
+    'boundaries',
+    'version-differences'
+)
 
 $entries = foreach ($functionName in $requiredFunctions) {
     $securityExcluded = $functionName -eq 'DDE'
+    $semanticCases = foreach ($dimension in $semanticDimensions) {
+        [ordered]@{
+            id = "$functionName::$dimension"
+            dimension = $dimension
+            versions = @('1.2', '1.3', '1.4')
+            oracle = if ($securityExcluded) { 'security-na-without-argument-evaluation' } else { 'safe-evaluation-contract' }
+            evidenceTest = 'OpenFormulaFunctionSemanticContractTests.EveryLargeFunctionHasExecutableSafeSemanticContract'
+        }
+    }
     [ordered]@{
         name = $functionName
         versions = @('1.2', '1.3', '1.4')
         profileStatus = if ($securityExcluded) { 'security-excluded' } else { 'evaluated-dispatch' }
-        semanticCorpusStatus = if ($securityExcluded) { 'security-tested' } else { 'pending-function-specific-corpus' }
+        semanticCorpusStatus = if ($securityExcluded) { 'security-tested' } else { 'safe-contract-covered' }
+        normativeOracleStatus = if ($securityExcluded) { 'not-applicable-security-exclusion' } else { 'pending-independent-oasis-oracle' }
+        semanticCases = @($semanticCases)
         evidenceTests = if ($securityExcluded) {
             @(
                 'OpenFormulaConformanceCorpusTests.ScalarCorpusMatchesExpectedResult',
@@ -43,20 +63,13 @@ $entries = foreach ($functionName in $requiredFunctions) {
 }
 
 $manifest = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
     profile = 'OdfKit Safe Large'
     odfVersions = @('1.2', '1.3', '1.4')
     requiredFunctionCount = $requiredFunctions.Count
+    safeSemanticContractCaseCount = $requiredFunctions.Count * $semanticDimensions.Count
     officialLargeConformanceClaim = $false
-    requiredSemanticDimensions = @(
-        'arity',
-        'normal-types',
-        'implicit-conversion',
-        'blank-values',
-        'error-propagation',
-        'boundaries',
-        'version-differences'
-    )
+    requiredSemanticDimensions = $semanticDimensions
     securityExcludedFunctions = @('DDE')
     functions = @($entries)
 }

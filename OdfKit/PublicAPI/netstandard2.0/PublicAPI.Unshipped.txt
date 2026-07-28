@@ -14853,6 +14853,10 @@ OdfKit.Formula.OdfFormulaEvaluationReport.MaximumParallelism.get -> int
 OdfKit.Formula.OdfFormulaEvaluationReport.OperationCount.get -> long
 OdfKit.Formula.OdfFormulaEvaluationReport.ScannedFormulaCount.get -> int
 OdfKit.Formula.OdfFormulaEvaluationReport.WrittenFormulaCount.get -> int
+OdfKit.Formula.OdfFormulaEvaluationSession
+OdfKit.Formula.OdfFormulaEvaluationSession.Invalidate() -> void
+OdfKit.Formula.OdfFormulaEvaluationSession.Recalculate() -> OdfKit.Formula.OdfFormulaEvaluationReport!
+OdfKit.Formula.OdfFormulaEvaluationSession.Recalculate(System.Threading.CancellationToken cancellationToken) -> OdfKit.Formula.OdfFormulaEvaluationReport!
 OdfKit.Formula.OdfFormulaExternalReferencePolicy
 OdfKit.Formula.OdfFormulaExternalReferencePolicy.AllowConfiguredResolver = 1 -> OdfKit.Formula.OdfFormulaExternalReferencePolicy
 OdfKit.Formula.OdfFormulaExternalReferencePolicy.CachedOnly = 0 -> OdfKit.Formula.OdfFormulaExternalReferencePolicy
@@ -16892,6 +16896,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ClearDatabaseRanges() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearDataValidations() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearEmbeddedCharts() -> int
 OdfKit.Spreadsheet.SpreadsheetDocument.ClearPivotTables() -> int
+OdfKit.Spreadsheet.SpreadsheetDocument.CreateFormulaEvaluationSession() -> OdfKit.Formula.OdfFormulaEvaluationSession!
+OdfKit.Spreadsheet.SpreadsheetDocument.CreateFormulaEvaluationSession(OdfKit.Formula.OdfFormulaEvaluationOptions! options) -> OdfKit.Formula.OdfFormulaEvaluationSession!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.CreateTable(string! name, OdfKit.Spreadsheet.OdfCellRange range, OdfKit.Spreadsheet.OdfSpreadsheetTableOptions? options) -> OdfKit.Spreadsheet.OdfSpreadsheetTable!
 OdfKit.Spreadsheet.SpreadsheetDocument.EvaluateFormulas() -> OdfKit.Formula.OdfFormulaEvaluationReport!

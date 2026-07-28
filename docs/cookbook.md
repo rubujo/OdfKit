@@ -332,6 +332,23 @@ workbook.Save(
     });
 ```
 
+需要反覆修改輸入時，建立一次增量工作階段即可保留相依圖。第一次呼叫會完整重算，
+之後只計算受影響的公式子圖：
+
+```csharp
+OdfFormulaEvaluationSession session =
+    workbook.CreateFormulaEvaluationSession(limits);
+session.Recalculate(cancellationToken);
+
+workbook.Worksheets["Calc"].Cells["A1"].CellValue = 25;
+OdfFormulaEvaluationReport incremental =
+    session.Recalculate(cancellationToken);
+Console.WriteLine($"本輪只重算 {incremental.EvaluatedFormulaCount} 式。");
+```
+
+若透過儲存格 API 以外的方式大幅重組文件，呼叫 `session.Invalidate()`，讓下一輪重建
+完整相依狀態。工作階段不具執行緒安全性。
+
 若只要讓下一個試算表應用程式重算，改用
 `OdfFormulaSaveStrategy.MarkForRecalculation`；它會清除舊快取但保留公式與格式。
 預設的 `PreserveCachedValues` 不改公式、快取或顯示文字。外部參照預設只讀既有快取；

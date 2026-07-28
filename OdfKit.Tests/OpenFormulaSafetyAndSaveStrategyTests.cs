@@ -312,6 +312,86 @@ public sealed class OpenFormulaSafetyAndSaveStrategyTests
         Assert.Equal(99d, document.FindSheet("Data")!.Cells["A1"].CellValue);
     }
 
+    /// <summary>
+    /// Verifies a retained session recalculates only the formula descendants of a changed input.
+    /// 驗證保留狀態的工作階段只會重算已變更輸入的公式下游。
+    /// </summary>
+    [Fact]
+    public void IncrementalSessionRecalculatesOnlyDirtySubgraph()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = 1d;
+        sheet.Cells["B1"].SetFormula("of:=[.A1]+1", 0d);
+        sheet.Cells["C1"].SetFormula("of:=[.B1]+1", 0d);
+        sheet.Cells["D1"].SetFormula("of:=40+2", 0d);
+        OdfFormulaEvaluationSession session =
+            document.CreateFormulaEvaluationSession();
+
+        OdfFormulaEvaluationReport initial = session.Recalculate(
+            TestContext.Current.CancellationToken);
+        sheet.Cells["A1"].CellValue = 10d;
+        OdfFormulaEvaluationReport incremental = session.Recalculate(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(3, initial.EvaluatedFormulaCount);
+        Assert.Equal(2, incremental.EvaluatedFormulaCount);
+        Assert.Equal(2, incremental.WrittenFormulaCount);
+        Assert.Equal(11d, sheet.Cells["B1"].CellValue);
+        Assert.Equal(12d, sheet.Cells["C1"].CellValue);
+        Assert.Equal(42d, sheet.Cells["D1"].CellValue);
+    }
+
+    /// <summary>
+    /// Verifies an unchanged retained session performs no formula evaluation or writeback.
+    /// 驗證未變更的保留狀態工作階段不會執行公式評估或寫回。
+    /// </summary>
+    [Fact]
+    public void IncrementalSessionSkipsUnchangedWorkbook()
+    {
+        using SpreadsheetDocument document = CreateFormulaDocument(
+            "of:=1+1",
+            0d);
+        OdfFormulaEvaluationSession session =
+            document.CreateFormulaEvaluationSession();
+
+        session.Recalculate(TestContext.Current.CancellationToken);
+        OdfFormulaEvaluationReport unchanged = session.Recalculate(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, unchanged.ScannedFormulaCount);
+        Assert.Equal(0, unchanged.EvaluatedFormulaCount);
+        Assert.Equal(0, unchanged.WrittenFormulaCount);
+    }
+
+    /// <summary>
+    /// Verifies a failed incremental formula edit preserves both the DOM and retained session state.
+    /// 驗證失敗的增量公式編輯會保留 DOM 與工作階段狀態。
+    /// </summary>
+    [Fact]
+    public void IncrementalFailurePreservesCommittedState()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = 1d;
+        sheet.Cells["B1"].SetFormula("of:=[.A1]+1", 0d);
+        OdfFormulaEvaluationSession session =
+            document.CreateFormulaEvaluationSession();
+        session.Recalculate(TestContext.Current.CancellationToken);
+
+        sheet.Cells["B1"].Formula = "of:=UNSUPPORTED.TEST()";
+        Assert.Throws<OdfFormulaEvaluationException>(
+            () => session.Recalculate(TestContext.Current.CancellationToken));
+        Assert.Equal(2d, sheet.Cells["B1"].CellValue);
+
+        sheet.Cells["B1"].Formula = "of:=[.A1]+2";
+        OdfFormulaEvaluationReport recovered = session.Recalculate(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, recovered.EvaluatedFormulaCount);
+        Assert.Equal(3d, sheet.Cells["B1"].CellValue);
+    }
+
     private static SpreadsheetDocument CreateFormulaDocument(
         string formula,
         double cachedValue)

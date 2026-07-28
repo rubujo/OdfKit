@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
@@ -49,7 +50,7 @@ internal static class FormulaDocumentEvaluationEngine
 
         try
         {
-            Preflight(originalContext, evaluator, options, budget, diagnostics);
+            Preflight(originalContext, evaluator, options, budget, diagnostics, null);
             var stagedRoot = contentRoot.CloneNode(deep: true);
             EvaluationStatistics statistics = EvaluateCore(
                 stagedRoot,
@@ -69,7 +70,7 @@ internal static class FormulaDocumentEvaluationEngine
                 volatileSession,
                 budget,
                 options.ExternalReferencePolicy);
-            int written = CommitFormulaResults(originalContext, stagedContext);
+            int written = CommitFormulaResults(originalContext, stagedContext, null);
             return CreateReport(
                 originalContext.CellFormulas.Count,
                 statistics.EvaluatedFormulaCount,
@@ -78,6 +79,222 @@ internal static class FormulaDocumentEvaluationEngine
                 statistics.MaximumParallelism,
                 budget,
                 diagnostics);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (OdfFormulaEvaluationException)
+        {
+            throw;
+        }
+        catch (OdfFormulaExternalReferenceDeniedException ex)
+        {
+            diagnostics.Add(new OdfFormulaDiagnostic(
+                "OF1002",
+                ex.Message,
+                OdfFormulaDiagnosticSeverity.Error));
+            throw new OdfFormulaEvaluationException(
+                OdfFormulaEvaluationFailureReason.UnsupportedFormula,
+                CreateReport(
+                    originalContext.CellFormulas.Count,
+                    0,
+                    0,
+                    0,
+                    0,
+                    budget,
+                    diagnostics),
+                ex.Message);
+        }
+        catch (OdfFormulaResourceLimitException ex)
+        {
+            diagnostics.Add(new OdfFormulaDiagnostic(
+                "OF1003",
+                ex.Message,
+                OdfFormulaDiagnosticSeverity.Error));
+            throw new OdfFormulaEvaluationException(
+                OdfFormulaEvaluationFailureReason.ResourceLimitExceeded,
+                CreateReport(
+                    originalContext.CellFormulas.Count,
+                    0,
+                    0,
+                    0,
+                    0,
+                    budget,
+                    diagnostics),
+                ex.Message);
+        }
+        catch (Exception ex)
+        {
+            diagnostics.Add(new OdfFormulaDiagnostic(
+                "OF1004",
+                ex.Message,
+                OdfFormulaDiagnosticSeverity.Error));
+            throw new OdfFormulaEvaluationException(
+                OdfFormulaEvaluationFailureReason.EvaluationFailed,
+                CreateReport(
+                    originalContext.CellFormulas.Count,
+                    0,
+                    0,
+                    0,
+                    0,
+                    budget,
+                    diagnostics),
+                OdfLocalizer.GetMessage(
+                    "Err_OdfFormulaEvaluation_Failed",
+                    ex.Message));
+        }
+    }
+
+    internal static (
+        OdfFormulaEvaluationReport Report,
+        OdfFormulaIncrementalState State) EvaluateIncrementallyInDocument(
+            OdfNode contentRoot,
+            DefaultFormulaEvaluator evaluator,
+            OdfExternalLinkManager? externalLinks,
+            OdfFormulaEvaluationOptions options,
+            OdfFormulaIncrementalState? previousState,
+            CancellationToken cancellationToken)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(contentRoot, nameof(contentRoot));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(evaluator, nameof(evaluator));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options, nameof(options));
+
+        var diagnostics = new List<OdfFormulaDiagnostic>();
+        var budget = new OdfFormulaEvaluationBudget(options, cancellationToken);
+        var volatileSession = new OdfFormulaVolatileSession();
+        var originalContext = new OdfDomEvaluationContext(
+            contentRoot,
+            evaluator,
+            externalLinks,
+            volatileSession,
+            budget,
+            options.ExternalReferencePolicy);
+
+        try
+        {
+            OdfFormulaDependencyGraph graph =
+                previousState?.Graph.Clone() ?? new OdfFormulaDependencyGraph();
+            var changedFormulas = new HashSet<OdfCellAddress>();
+
+            if (previousState is null)
+            {
+                changedFormulas.UnionWith(originalContext.CellFormulas.Keys);
+            }
+            else
+            {
+                foreach (OdfCellAddress oldAddress in previousState.Formulas.Keys)
+                {
+                    if (!originalContext.CellFormulas.ContainsKey(oldAddress))
+                    {
+                        graph.RemoveFormula(oldAddress);
+                        graph.MarkDirty(oldAddress);
+                    }
+                }
+
+                foreach (KeyValuePair<OdfCellAddress, string> pair in originalContext.CellFormulas)
+                {
+                    if (!previousState.Formulas.TryGetValue(pair.Key, out string? oldFormula) ||
+                        !string.Equals(oldFormula, pair.Value, StringComparison.Ordinal))
+                    {
+                        changedFormulas.Add(pair.Key);
+                    }
+                }
+            }
+
+            Preflight(
+                originalContext,
+                evaluator,
+                options,
+                budget,
+                diagnostics,
+                changedFormulas);
+
+            foreach (OdfCellAddress address in changedFormulas)
+            {
+                graph.UpdateFormulaDependencies(
+                    address,
+                    originalContext.CellFormulas[address],
+                    originalContext,
+                    propagateDirty: previousState is not null);
+            }
+
+            if (previousState is not null)
+            {
+                var valueAddresses = new HashSet<OdfCellAddress>(previousState.Values.Keys);
+                valueAddresses.UnionWith(originalContext.CellValues.Keys);
+                foreach (OdfCellAddress address in valueAddresses)
+                {
+                    bool hadOld = previousState.Values.TryGetValue(address, out object? oldValue);
+                    bool hasCurrent = originalContext.CellValues.TryGetValue(address, out object? currentValue);
+                    if (hadOld != hasCurrent || !Equals(oldValue, currentValue))
+                    {
+                        graph.MarkDirty(address);
+                    }
+                }
+            }
+
+            if (graph.DirtyCells.Count == 0)
+            {
+                return (
+                    CreateReport(
+                        originalContext.CellFormulas.Count,
+                        0,
+                        0,
+                        0,
+                        0,
+                        budget,
+                        diagnostics),
+                    OdfFormulaIncrementalState.Capture(
+                        graph,
+                        originalContext));
+            }
+
+            var stagedContext = new OdfDomEvaluationContext(
+                contentRoot,
+                evaluator,
+                externalLinks,
+                volatileSession,
+                budget,
+                options.ExternalReferencePolicy);
+            EvaluationStatistics statistics = EvaluateDirtyCore(
+                stagedContext,
+                evaluator,
+                options,
+                budget,
+                graph,
+                writeDom: false);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            budget.Checkpoint();
+
+            int written = CommitComputedResults(
+                originalContext,
+                statistics.Results);
+            foreach (OdfCellAddress address in statistics.EvaluatedAddresses)
+            {
+                graph.ClearDirty(address);
+            }
+
+            var committedContext = new OdfDomEvaluationContext(
+                contentRoot,
+                evaluator,
+                externalLinks,
+                volatileSession,
+                null,
+                options.ExternalReferencePolicy);
+            return (
+                CreateReport(
+                    originalContext.CellFormulas.Count,
+                    statistics.EvaluatedFormulaCount,
+                    written,
+                    statistics.FormulaErrorCount,
+                    statistics.MaximumParallelism,
+                    budget,
+                    diagnostics),
+                OdfFormulaIncrementalState.Capture(
+                    graph,
+                    committedContext));
         }
         catch (OperationCanceledException)
         {
@@ -165,7 +382,36 @@ internal static class FormulaDocumentEvaluationEngine
         foreach (var kvp in context.CellFormulas)
         {
             budget.Checkpoint();
-            graph.UpdateFormulaDependencies(kvp.Key, kvp.Value, context);
+            graph.UpdateFormulaDependencies(
+                kvp.Key,
+                kvp.Value,
+                context,
+                propagateDirty: false);
+        }
+
+        return EvaluateDirtyCore(
+            context,
+            evaluator,
+            options,
+            budget,
+            graph,
+            writeDom: true);
+    }
+
+    private static EvaluationStatistics EvaluateDirtyCore(
+        OdfDomEvaluationContext context,
+        DefaultFormulaEvaluator evaluator,
+        OdfFormulaEvaluationOptions options,
+        OdfFormulaEvaluationBudget budget,
+        OdfFormulaDependencyGraph graph,
+        bool writeDom)
+    {
+        var dirtyFormulaCells = new HashSet<OdfCellAddress>(graph.DirtyCells);
+        foreach (OdfCellAddress cleanFormula in context.CellFormulas.Keys
+                     .Where(address => !dirtyFormulaCells.Contains(address))
+                     .ToArray())
+        {
+            context.CellFormulas.Remove(cleanFormula);
         }
 
         List<List<OdfCellAddress>> levels = graph.GetTopologicalDirtyLevels();
@@ -176,6 +422,7 @@ internal static class FormulaDocumentEvaluationEngine
         LastParallelFormulaWorkerDegreeForTests = 0;
 
         var completed = new ConcurrentDictionary<OdfCellAddress, object>();
+        var evaluatedAddresses = new HashSet<OdfCellAddress>();
         int formulaErrors = 0;
         int evaluated = 0;
         foreach (List<OdfCellAddress> level in levels)
@@ -248,6 +495,7 @@ internal static class FormulaDocumentEvaluationEngine
             foreach (OdfCellAddress addr in level)
             {
                 object result = levelResults[addr];
+                evaluatedAddresses.Add(addr);
                 evaluated++;
                 if (result is OdfFormulaError)
                 {
@@ -264,13 +512,17 @@ internal static class FormulaDocumentEvaluationEngine
                             completed,
                             cellNode,
                             addr,
-                            array);
+                            array,
+                            writeDom);
                     }
                     else
                     {
                         completed[addr] = result;
                         evaluator.SetCachedValue(addr, result);
-                        ApplyResultToCell(cellNode, addr, result);
+                        if (writeDom)
+                        {
+                            ApplyResultToCell(cellNode, addr, result);
+                        }
                         context.CellValues[addr] = result;
                     }
 
@@ -287,19 +539,28 @@ internal static class FormulaDocumentEvaluationEngine
         foreach (OdfCellAddress addr in graph.CircularCells)
         {
             object result = OdfFormulaError.Ref;
+            evaluatedAddresses.Add(addr);
+            evaluated++;
+            formulaErrors++;
             completed[addr] = result;
             evaluator.SetCachedValue(addr, result);
 
             if (context.CellNodes.TryGetValue(addr, out var cellNode))
             {
-                ApplyResultToCell(cellNode, addr, result);
+                context.CellValues[addr] = result;
+                if (writeDom)
+                {
+                    ApplyResultToCell(cellNode, addr, result);
+                }
             }
         }
 
         return new EvaluationStatistics(
             evaluated,
             formulaErrors,
-            LastParallelFormulaWorkerDegreeForTests);
+            LastParallelFormulaWorkerDegreeForTests,
+            evaluatedAddresses,
+            new Dictionary<OdfCellAddress, object>(completed));
     }
 
     private static void ApplyArrayResult(
@@ -308,7 +569,8 @@ internal static class FormulaDocumentEvaluationEngine
         ConcurrentDictionary<OdfCellAddress, object> completed,
         OdfNode anchorNode,
         OdfCellAddress anchor,
-        object[,] result)
+        object[,] result,
+        bool writeDom)
     {
         context.Budget?.ChargeArrayResult(checked((long)result.GetLength(0) * result.GetLength(1)));
         int declaredColumns = ParsePositiveSpan(
@@ -326,7 +588,8 @@ internal static class FormulaDocumentEvaluationEngine
                 completed,
                 anchorNode,
                 anchor,
-                OdfFormulaError.NA);
+                OdfFormulaError.NA,
+                writeDom);
             return;
         }
 
@@ -348,7 +611,8 @@ internal static class FormulaDocumentEvaluationEngine
                         completed,
                         anchorNode,
                         anchor,
-                        OdfFormulaError.Ref);
+                        OdfFormulaError.Ref,
+                        writeDom);
                     return;
                 }
             }
@@ -368,7 +632,8 @@ internal static class FormulaDocumentEvaluationEngine
                     completed,
                     context.CellNodes[address],
                     address,
-                    result[row, column]);
+                    result[row, column],
+                    writeDom);
             }
         }
     }
@@ -392,12 +657,16 @@ internal static class FormulaDocumentEvaluationEngine
         ConcurrentDictionary<OdfCellAddress, object> completed,
         OdfNode cellNode,
         OdfCellAddress address,
-        object value)
+        object value,
+        bool writeDom)
     {
         completed[address] = value;
         evaluator.SetCachedValue(address, value);
         context.CellValues[address] = value;
-        ApplyResultToCell(cellNode, address, value);
+        if (writeDom)
+        {
+            ApplyResultToCell(cellNode, address, value);
+        }
     }
 
     private static void EvaluateChunkWithCompletedResults(
@@ -429,7 +698,8 @@ internal static class FormulaDocumentEvaluationEngine
         DefaultFormulaEvaluator evaluator,
         OdfFormulaEvaluationOptions options,
         OdfFormulaEvaluationBudget budget,
-        List<OdfFormulaDiagnostic> diagnostics)
+        List<OdfFormulaDiagnostic> diagnostics,
+        HashSet<OdfCellAddress>? formulaFilter)
     {
         if (context.CellFormulas.Count > options.MaxFormulaCount)
         {
@@ -442,6 +712,11 @@ internal static class FormulaDocumentEvaluationEngine
 
         foreach (KeyValuePair<OdfCellAddress, string> pair in context.CellFormulas)
         {
+            if (formulaFilter is not null && !formulaFilter.Contains(pair.Key))
+            {
+                continue;
+            }
+
             budget.Checkpoint();
             string formula = pair.Value;
             if (formula.Length > options.MaxFormulaLength)
@@ -560,12 +835,15 @@ internal static class FormulaDocumentEvaluationEngine
 
     private static int CommitFormulaResults(
         OdfDomEvaluationContext originalContext,
-        OdfDomEvaluationContext stagedContext)
+        OdfDomEvaluationContext stagedContext,
+        HashSet<OdfCellAddress>? formulaAddresses)
     {
         int written = 0;
         foreach (KeyValuePair<OdfCellAddress, OdfNode> pair in stagedContext.CellNodes)
         {
-            bool isFormulaCell = originalContext.CellFormulas.ContainsKey(pair.Key);
+            bool isFormulaCell = formulaAddresses is null
+                ? originalContext.CellFormulas.ContainsKey(pair.Key)
+                : formulaAddresses.Contains(pair.Key);
             bool valueChanged =
                 stagedContext.CellValues.TryGetValue(pair.Key, out object? stagedValue) &&
                 (!originalContext.CellValues.TryGetValue(pair.Key, out object? originalValue) ||
@@ -590,6 +868,25 @@ internal static class FormulaDocumentEvaluationEngine
                 originalCell.AppendChild(child.CloneNode(deep: true));
             }
 
+            written++;
+        }
+
+        return written;
+    }
+
+    private static int CommitComputedResults(
+        OdfDomEvaluationContext originalContext,
+        Dictionary<OdfCellAddress, object> results)
+    {
+        int written = 0;
+        foreach (KeyValuePair<OdfCellAddress, OdfNode> pair in originalContext.CellNodes)
+        {
+            if (!results.TryGetValue(pair.Key, out object? result))
+            {
+                continue;
+            }
+
+            ApplyResultToCell(pair.Value, pair.Key, result);
             written++;
         }
 
@@ -634,7 +931,9 @@ internal static class FormulaDocumentEvaluationEngine
     private readonly record struct EvaluationStatistics(
         int EvaluatedFormulaCount,
         int FormulaErrorCount,
-        int MaximumParallelism);
+        int MaximumParallelism,
+        HashSet<OdfCellAddress> EvaluatedAddresses,
+        Dictionary<OdfCellAddress, object> Results);
 
     internal static void ApplyResultToCell(OdfNode cellNode, OdfCellAddress addr, object result)
     {

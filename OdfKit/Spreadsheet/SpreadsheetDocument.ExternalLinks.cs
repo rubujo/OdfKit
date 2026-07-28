@@ -91,6 +91,35 @@ public partial class SpreadsheetDocument
             options,
             cancellationToken);
     }
+
+    /// <summary>
+    /// Creates an incremental formula evaluation session with default safety limits.
+    /// 使用預設安全限制建立增量公式評估工作階段。
+    /// </summary>
+    /// <returns>The document-bound incremental evaluation session. / 繫結至文件的增量評估工作階段。</returns>
+    public OdfFormulaEvaluationSession CreateFormulaEvaluationSession() =>
+        CreateFormulaEvaluationSession(new OdfFormulaEvaluationOptions());
+
+    /// <summary>
+    /// Creates an incremental formula evaluation session with explicit safety limits.
+    /// 使用明確的安全限制建立增量公式評估工作階段。
+    /// </summary>
+    /// <param name="options">The formula evaluation options. / 公式評估選項。</param>
+    /// <returns>The document-bound incremental evaluation session. / 繫結至文件的增量評估工作階段。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when options is null. / 當 options 為 null 時擲出。</exception>
+    public OdfFormulaEvaluationSession CreateFormulaEvaluationSession(
+        OdfFormulaEvaluationOptions options)
+    {
+        if (options is null)
+        {
+            throw new ArgumentNullException(
+                nameof(options),
+                OdfLocalizer.GetMessage("Err_SpreadsheetDocument_FormulaOptionsNull"));
+        }
+
+        return new OdfFormulaEvaluationSession(ContentDom, ExternalLinks, options);
+    }
+
     /// <summary>
     /// Short overload of BeginFormulaEvaluationChannel that uses default values for all optional parameters and forwards to the full overload.
     /// 便利多載：BeginFormulaEvaluationChannel 的所有可選參數使用預設值並轉呼叫最長多載。

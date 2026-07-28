@@ -315,8 +315,10 @@ static void DemoSpreadsheetDocument(string outputDir)
         MaxCellReads = 10_000_000,
         TimeLimit = TimeSpan.FromSeconds(30)
     };
+    OdfFormulaEvaluationSession formulaSession =
+        workbook.CreateFormulaEvaluationSession(formulaOptions);
     OdfFormulaEvaluationReport formulaReport =
-        workbook.EvaluateFormulas(formulaOptions);
+        formulaSession.Recalculate();
     Console.WriteLine(
         $"   已評估 {formulaReport.EvaluatedFormulaCount} 式，" +
         $"讀取 {formulaReport.CellReadCount} 格。");

@@ -11,28 +11,27 @@ namespace OdfKit.Benchmarks;
 [MemoryDiagnoser]
 public class FormulaEvaluationBenchmarks
 {
-    private SpreadsheetDocument? _fullDocument;
+    private SpreadsheetDocument? _fullDocument1000;
+    private SpreadsheetDocument? _fullDocument10000;
     private SpreadsheetDocument? _linearDocument;
     private SpreadsheetDocument? _wideDocument;
     private SpreadsheetDocument? _rangeDocument;
     private SpreadsheetDocument? _arrayDocument;
-    private OdfFormulaDependencyGraph? _incrementalGraph;
-    private OdfCellAddress _incrementalRoot;
-
-    /// <summary>
-    /// Gets or sets the number of independent formulas used by the full recalculation benchmark.
-    /// 取得或設定全量重算基準使用的獨立公式數量。
-    /// </summary>
-    [Params(1_000, 10_000)]
-    public int FormulaCount { get; set; }
+    private SpreadsheetDocument? _incrementalDocument;
+    private OdfFormulaEvaluationSession? _incrementalSession;
+    private OdfCell? _incrementalInput;
+    private double _incrementalValue;
 
     /// <summary>
     /// Builds the independent-formula workbook.
     /// 建立獨立公式活頁簿。
     /// </summary>
     [GlobalSetup(Target = nameof(FullRecalculation))]
-    public void SetupFullRecalculation() =>
-        _fullDocument = CreateIndependentDocument(FormulaCount);
+    public void SetupFullRecalculation()
+    {
+        _fullDocument1000 = CreateIndependentDocument(1_000);
+        _fullDocument10000 = CreateIndependentDocument(10_000);
+    }
 
     /// <summary>
     /// Builds the linear dependency workbook.
@@ -52,12 +51,17 @@ public class FormulaEvaluationBenchmarks
         _wideDocument = CreateWideDocument(10_000);
 
     /// <summary>
-    /// Builds the incremental dependency graph.
-    /// 建立增量相依圖。
+    /// Builds and initially evaluates the incremental workbook.
+    /// 建立並初次評估增量活頁簿。
     /// </summary>
-    [GlobalSetup(Target = nameof(IncrementalOnePercentDirtyPropagation))]
-    public void SetupIncrementalGraph() =>
-        (_incrementalGraph, _incrementalRoot) = CreateIncrementalGraph();
+    [GlobalSetup(Target = nameof(IncrementalOnePercentRecalculation))]
+    public void SetupIncrementalRecalculation()
+    {
+        (_incrementalDocument, _incrementalInput) = CreateIncrementalDocument();
+        _incrementalSession =
+            _incrementalDocument.CreateFormulaEvaluationSession();
+        _incrementalSession.Recalculate();
+    }
 
     /// <summary>
     /// Builds the large-range workbook.
@@ -79,10 +83,14 @@ public class FormulaEvaluationBenchmarks
     /// Evaluates 1,000 or 10,000 independent formulas with automatic scheduling.
     /// 使用自動排程評估 1,000 或 10,000 個獨立公式。
     /// </summary>
+    /// <param name="formulaCount">The formula count. / 公式數量。</param>
     /// <returns>The evaluation report. / 評估報告。</returns>
     [Benchmark(Baseline = true)]
-    public OdfFormulaEvaluationReport FullRecalculation() =>
-        _fullDocument!.EvaluateFormulas();
+    [Arguments(1_000)]
+    [Arguments(10_000)]
+    public OdfFormulaEvaluationReport FullRecalculation(int formulaCount) =>
+        (formulaCount == 1_000 ? _fullDocument1000 : _fullDocument10000)!
+            .EvaluateFormulas();
 
     /// <summary>
     /// Evaluates a 10,000-formula linear dependency chain.
@@ -115,17 +123,16 @@ public class FormulaEvaluationBenchmarks
         _wideDocument!.EvaluateFormulas();
 
     /// <summary>
-    /// Propagates one changed input through exactly one percent of a 10,000-formula graph.
-    /// 將單一輸入變更傳播至 10,000 個公式圖中恰好百分之一的公式。
+    /// Changes one input and transactionally recalculates one percent of 10,000 formulas.
+    /// 變更單一輸入，並以交易方式重算 10,000 個公式中的百分之一。
     /// </summary>
-    /// <returns>The number of dirty cells. / Dirty 儲存格數量。</returns>
+    /// <returns>The incremental evaluation report. / 增量評估報告。</returns>
     [Benchmark]
-    public int IncrementalOnePercentDirtyPropagation()
+    public OdfFormulaEvaluationReport IncrementalOnePercentRecalculation()
     {
-        OdfFormulaDependencyGraph graph = _incrementalGraph!;
-        ClearDirtyFlags(graph);
-        graph.MarkDirty(_incrementalRoot);
-        return graph.DirtyCells.Count;
+        _incrementalValue = _incrementalValue == 1d ? 2d : 1d;
+        _incrementalInput!.CellValue = _incrementalValue;
+        return _incrementalSession!.Recalculate();
     }
 
     /// <summary>
@@ -153,11 +160,13 @@ public class FormulaEvaluationBenchmarks
     [GlobalCleanup]
     public void Cleanup()
     {
-        _fullDocument?.Dispose();
+        _fullDocument1000?.Dispose();
+        _fullDocument10000?.Dispose();
         _linearDocument?.Dispose();
         _wideDocument?.Dispose();
         _rangeDocument?.Dispose();
         _arrayDocument?.Dispose();
+        _incrementalDocument?.Dispose();
     }
 
     private static SpreadsheetDocument CreateIndependentDocument(int count)
@@ -220,50 +229,25 @@ public class FormulaEvaluationBenchmarks
         return document;
     }
 
-    private static (OdfFormulaDependencyGraph Graph, OdfCellAddress Root)
-        CreateIncrementalGraph()
+    private static (SpreadsheetDocument Document, OdfCell Input)
+        CreateIncrementalDocument()
     {
-        var graph = new OdfFormulaDependencyGraph();
-        var context = new EmptyEvaluationContext();
+        SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
         for (int chain = 0; chain < 100; chain++)
         {
             int firstRow = (chain * 100) + 1;
+            sheet.Cells[$"A{firstRow}"].CellValue = 1d;
             for (int offset = 0; offset < 100; offset++)
             {
                 int row = firstRow + offset;
                 string formula = offset == 0
-                    ? "of:=1"
-                    : $"of:=[.A{row - 1}]+1";
-                graph.UpdateFormulaDependencies(
-                    new OdfCellAddress(row - 1, 0, "Data"),
-                    formula,
-                    context);
+                    ? $"of:=[.A{firstRow}]+1"
+                    : $"of:=[.B{row - 1}]+1";
+                sheet.Cells[$"B{row}"].SetFormula(formula, 0d);
             }
         }
 
-        ClearDirtyFlags(graph);
-        return (graph, new OdfCellAddress(0, 0, "Data"));
-    }
-
-    private static void ClearDirtyFlags(OdfFormulaDependencyGraph graph)
-    {
-        foreach (OdfCellAddress address in graph.DirtyCells.ToArray())
-        {
-            graph.ClearDirty(address);
-        }
-    }
-
-    private sealed class EmptyEvaluationContext : IEvaluationContext
-    {
-        public OdfCellAddress CurrentCell => default;
-
-        public object GetCellValue(OdfCellAddress address) => 0d;
-
-        public object[,] GetRangeValues(OdfCellRange range) => new object[0, 0];
-
-        public string? GetCellFormula(OdfCellAddress address) => null;
-
-        public object GetNamedRangeOrExpressionValue(string name) =>
-            OdfFormulaError.Name;
+        return (document, sheet.Cells["A1"]);
     }
 }

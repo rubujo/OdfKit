@@ -12,6 +12,9 @@ public sealed class OdfFormulaDependencyGraph
 {
     private readonly Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> _dependencies = new();
     private readonly Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> _dependents = new();
+    private readonly Dictionary<string, List<RangeDependency>> _rangeDependents = new(StringComparer.Ordinal);
+    private readonly Dictionary<OdfCellAddress, List<RangeDependency>> _rangesByFormula = new();
+    private readonly HashSet<OdfCellAddress> _formulaCells = new();
     private readonly HashSet<OdfCellAddress> _dirtyCells = new();
     private readonly HashSet<OdfCellAddress> _circularCells = new();
 
@@ -27,6 +30,8 @@ public sealed class OdfFormulaDependencyGraph
     /// </summary>
     public IReadOnlyCollection<OdfCellAddress> CircularCells => _circularCells;
 
+    internal IReadOnlyCollection<OdfCellAddress> FormulaCells => _formulaCells;
+
     /// <summary>
     /// Adds or updates formula dependencies for a cell.
     /// 新增或更新儲存格的公式相依關係。
@@ -34,28 +39,26 @@ public sealed class OdfFormulaDependencyGraph
     /// <param name="cell">The cell address. / 儲存格位址。</param>
     /// <param name="formula">The formula string. / 公式字串。</param>
     /// <param name="context">The evaluation context. / 評估內容。</param>
-    public void UpdateFormulaDependencies(OdfCellAddress cell, string formula, IEvaluationContext context)
-    {
-        // 1. 清除舊相依關係
-        if (_dependencies.TryGetValue(cell, out var oldDeps))
-        {
-            foreach (var oldDep in oldDeps)
-            {
-                if (_dependents.TryGetValue(oldDep, out var dependents))
-                {
-                    dependents.Remove(cell);
-                }
-            }
-            _dependencies.Remove(cell);
-        }
+    public void UpdateFormulaDependencies(
+        OdfCellAddress cell,
+        string formula,
+        IEvaluationContext context) =>
+        UpdateFormulaDependencies(cell, formula, context, propagateDirty: true);
 
-        // 2. 解析公式並擷取所有相依儲存格與範圍
+    internal void UpdateFormulaDependencies(
+        OdfCellAddress cell,
+        string formula,
+        IEvaluationContext context,
+        bool propagateDirty)
+    {
+        RemoveFormulaDependencies(cell);
+        _formulaCells.Add(cell);
+
         var depsSet = new HashSet<OdfCellAddress>();
         if (!string.IsNullOrEmpty(formula))
         {
             try
             {
-                // 去除前綴
                 string cleanFormula = formula;
                 if (cleanFormula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase) ||
                     cleanFormula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
@@ -75,6 +78,14 @@ public sealed class OdfFormulaDependencyGraph
                     int startCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
                     int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
                     string? sheetName = range.StartAddress.SheetName ?? cell.SheetName;
+                    var indexedRange = new RangeDependency(
+                        cell,
+                        sheetName ?? string.Empty,
+                        startRow,
+                        endRow,
+                        startCol,
+                        endCol);
+                    AddRangeDependency(indexedRange);
 
                     if (context is OdfDomEvaluationContext domContext)
                     {
@@ -117,7 +128,6 @@ public sealed class OdfFormulaDependencyGraph
             }
         }
 
-        // 3. 儲存新相依關係與反向相依鏈
         if (depsSet.Count > 0)
         {
             _dependencies[cell] = depsSet;
@@ -132,8 +142,22 @@ public sealed class OdfFormulaDependencyGraph
             }
         }
 
-        // 4. 將本單元格標記為 Dirty
-        MarkDirty(cell);
+        if (propagateDirty)
+        {
+            MarkDirty(cell);
+        }
+        else
+        {
+            _dirtyCells.Add(cell);
+        }
+    }
+
+    internal void RemoveFormula(OdfCellAddress cell)
+    {
+        RemoveFormulaDependencies(cell);
+        _formulaCells.Remove(cell);
+        _dirtyCells.Remove(cell);
+        _circularCells.Remove(cell);
     }
 
     /// <summary>
@@ -144,20 +168,37 @@ public sealed class OdfFormulaDependencyGraph
     public void MarkDirty(OdfCellAddress cell)
     {
         var pending = new Stack<OdfCellAddress>();
+        var visited = new HashSet<OdfCellAddress>();
         pending.Push(cell);
         while (pending.Count > 0)
         {
             OdfCellAddress current = pending.Pop();
-            if (!_dirtyCells.Add(current))
+            if (!visited.Add(current))
                 continue;
 
-            _circularCells.Remove(current);
+            if (_formulaCells.Contains(current))
+            {
+                _dirtyCells.Add(current);
+                _circularCells.Remove(current);
+            }
 
             if (_dependents.TryGetValue(current, out var dependents))
             {
                 foreach (OdfCellAddress dependent in dependents)
                 {
                     pending.Push(dependent);
+                }
+            }
+
+            string sheetName = current.SheetName ?? string.Empty;
+            if (_rangeDependents.TryGetValue(sheetName, out List<RangeDependency>? ranges))
+            {
+                foreach (RangeDependency range in ranges)
+                {
+                    if (range.Contains(current))
+                    {
+                        pending.Push(range.Formula);
+                    }
                 }
             }
         }
@@ -189,8 +230,30 @@ public sealed class OdfFormulaDependencyGraph
     {
         _dependencies.Clear();
         _dependents.Clear();
+        _rangeDependents.Clear();
+        _rangesByFormula.Clear();
+        _formulaCells.Clear();
         _dirtyCells.Clear();
         _circularCells.Clear();
+    }
+
+    internal OdfFormulaDependencyGraph Clone()
+    {
+        var clone = new OdfFormulaDependencyGraph();
+        CopySets(_dependencies, clone._dependencies);
+        CopySets(_dependents, clone._dependents);
+        foreach (KeyValuePair<string, List<RangeDependency>> pair in _rangeDependents)
+        {
+            clone._rangeDependents[pair.Key] = [.. pair.Value];
+        }
+        foreach (KeyValuePair<OdfCellAddress, List<RangeDependency>> pair in _rangesByFormula)
+        {
+            clone._rangesByFormula[pair.Key] = [.. pair.Value];
+        }
+        clone._formulaCells.UnionWith(_formulaCells);
+        clone._dirtyCells.UnionWith(_dirtyCells);
+        clone._circularCells.UnionWith(_circularCells);
+        return clone;
     }
 
     /// <summary>
@@ -294,5 +357,82 @@ public sealed class OdfFormulaDependencyGraph
         }
 
         return levels;
+    }
+
+    private void AddRangeDependency(RangeDependency range)
+    {
+        if (!_rangeDependents.TryGetValue(range.SheetName, out List<RangeDependency>? bySheet))
+        {
+            bySheet = [];
+            _rangeDependents[range.SheetName] = bySheet;
+        }
+        bySheet.Add(range);
+
+        if (!_rangesByFormula.TryGetValue(range.Formula, out List<RangeDependency>? byFormula))
+        {
+            byFormula = [];
+            _rangesByFormula[range.Formula] = byFormula;
+        }
+        byFormula.Add(range);
+    }
+
+    private void RemoveFormulaDependencies(OdfCellAddress cell)
+    {
+        if (_dependencies.TryGetValue(cell, out HashSet<OdfCellAddress>? oldDependencies))
+        {
+            _dependencies.Remove(cell);
+            foreach (OdfCellAddress dependency in oldDependencies)
+            {
+                if (_dependents.TryGetValue(dependency, out HashSet<OdfCellAddress>? dependents))
+                {
+                    dependents.Remove(cell);
+                    if (dependents.Count == 0)
+                    {
+                        _dependents.Remove(dependency);
+                    }
+                }
+            }
+        }
+
+        if (_rangesByFormula.TryGetValue(cell, out List<RangeDependency>? ranges))
+        {
+            _rangesByFormula.Remove(cell);
+            foreach (RangeDependency range in ranges)
+            {
+                if (_rangeDependents.TryGetValue(range.SheetName, out List<RangeDependency>? bySheet))
+                {
+                    bySheet.Remove(range);
+                    if (bySheet.Count == 0)
+                    {
+                        _rangeDependents.Remove(range.SheetName);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void CopySets(
+        Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> source,
+        Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> destination)
+    {
+        foreach (KeyValuePair<OdfCellAddress, HashSet<OdfCellAddress>> pair in source)
+        {
+            destination[pair.Key] = [.. pair.Value];
+        }
+    }
+
+    private readonly record struct RangeDependency(
+        OdfCellAddress Formula,
+        string SheetName,
+        int StartRow,
+        int EndRow,
+        int StartColumn,
+        int EndColumn)
+    {
+        internal bool Contains(OdfCellAddress address) =>
+            address.Row >= StartRow &&
+            address.Row <= EndRow &&
+            address.Column >= StartColumn &&
+            address.Column <= EndColumn;
     }
 }

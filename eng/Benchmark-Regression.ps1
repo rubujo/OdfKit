@@ -57,15 +57,16 @@ $definitions = @(
     },
     [PSCustomObject]@{
         Key = "FormulaEvaluationBenchmarks.FullRecalculation10000"
-        Filter = "*FormulaEvaluationBenchmarks.FullRecalculation(FormulaCount: 10000)"
+        Filter = "*FormulaEvaluationBenchmarks.FullRecalculation*"
         Method = "FullRecalculation"
         ParameterValue = 10000
+        InProcess = $true
     },
     [PSCustomObject]@{
-        Key = "FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation10000"
-        Filter = "*FormulaEvaluationBenchmarks.IncrementalOnePercentDirtyPropagation(FormulaCount: 10000)"
-        Method = "IncrementalOnePercentDirtyPropagation"
-        ParameterValue = 10000
+        Key = "FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation10000"
+        Filter = "*FormulaEvaluationBenchmarks.IncrementalOnePercentRecalculation*"
+        Method = "IncrementalOnePercentRecalculation"
+        InProcess = $true
     }
 )
 
@@ -103,12 +104,25 @@ function Invoke-ProtectedBenchmark {
     param([PSCustomObject]$Definition)
 
     Write-Host "執行 BenchmarkDotNet（filter: $($Definition.Filter)）…"
-    $output = dotnet run --project $benchmarkProject -c $Configuration -- `
-        --filter $Definition.Filter `
-        --job short `
-        --warmupCount 3 `
-        --iterationCount 8 `
-        2>&1 | Out-String
+    $benchmarkArgs = @(
+        'run',
+        '--project', $benchmarkProject,
+        '-c', $Configuration
+    )
+    if ($Definition.InProcess) {
+        $benchmarkArgs += '--no-build'
+    }
+    $benchmarkArgs += @(
+        '--',
+        '--filter', $Definition.Filter,
+        '--job', 'short',
+        '--warmupCount', '3',
+        '--iterationCount', '8'
+    )
+    if ($Definition.InProcess) {
+        $benchmarkArgs += '--inProcess'
+    }
+    $output = dotnet @benchmarkArgs 2>&1 | Out-String
 
     Write-Host $output
 

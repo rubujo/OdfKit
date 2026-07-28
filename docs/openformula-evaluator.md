@@ -141,6 +141,28 @@ sheet.Ranges["A1:B2"].ClearArrayFormula();
 `NOW` 在不同儲存格漂移。直接呼叫評估器的應用程式也可提供固定時鐘與隨機來源，
 建立可重現測試或受稽核的批次計算；未提供介面時維持系統時鐘與程序內隨機來源。
 
+## 持久化增量重算
+
+`CreateFormulaEvaluationSession` 會保留公式、值與相依圖快照。第一次
+`Recalculate` 執行完整交易式重算；後續呼叫只評估已變更輸入或公式的下游子圖。
+未變更的活頁簿會回報零個評估與零個寫回。公式新增、移除或改寫會在候選相依圖上
+處理，只有整輪成功才取代工作階段狀態；失敗或取消不會污染下一輪重算。
+
+```csharp
+OdfFormulaEvaluationSession session =
+    document.CreateFormulaEvaluationSession(options);
+session.Recalculate(cancellationToken);
+
+document.Worksheets["Data"].Cells["A1"].CellValue = 42;
+OdfFormulaEvaluationReport incremental =
+    session.Recalculate(cancellationToken);
+Console.WriteLine($"只重算 {incremental.EvaluatedFormulaCount} 個公式");
+```
+
+相依圖以公式對公式拓撲邊搭配每工作表範圍索引追蹤輸入；整欄或大型範圍不會展開成
+逐格相依集合。工作階段不是執行緒安全物件；文件結構由非儲存格 API 大幅改寫後，可
+呼叫 `Invalidate`，讓下一次重算重新建立完整狀態。
+
 ## 外部後援
 
 文件評估預設採 `CachedOnly`：外部參照只能讀取文件內既有快取，不會呼叫應用程式
@@ -172,8 +194,11 @@ LibreOffice 進行重算，結果代表該 LibreOffice 版本的行為，不代�
 
 機器可讀的 [OpenFormula conformance manifest](openformula-conformance-manifest.json)
 逐一列出 388 個 Large Group 函式、ODF 1.2／1.3／1.4、Safe Large 分類與測試證據。
-其中尚未具備逐函式七維度案例者會明確標示
-`pending-function-specific-corpus`，不得被工具或文件當成正式語意一致性通過。
+每個函式都對應參數數量、正常型別、隱含轉換、空值、錯誤傳播、邊界及版本差異
+七個可執行安全契約，共 2,716 個案例，並標示為 `safe-contract-covered`。
+這些案例保證剖析、派送、封閉結果型別與安全排除，不是獨立的 OASIS 數值 oracle；
+`normativeOracleStatus` 仍會如實標示 `pending-independent-oasis-oracle`，不得被工具
+或文件當成官方 Large 正式一致性通過。
 `pwsh eng/Generate-OpenFormulaConformanceManifest.ps1 -VerifyOnly` 會防止 manifest
 與實際強制函式清單漂移。
 
