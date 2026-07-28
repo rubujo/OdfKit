@@ -9,6 +9,7 @@ namespace OdfKit.Formula;
 /// </summary>
 internal sealed class OdfFormulaMutationJournal
 {
+    private const int MaximumRetainedMutations = 65_536;
     private readonly List<OdfFormulaCellMutation> _mutations = [];
     private long _version;
 
@@ -25,13 +26,27 @@ internal sealed class OdfFormulaMutationJournal
             address,
             node,
             formulaChanged));
+        if (_mutations.Count > MaximumRetainedMutations)
+        {
+            _mutations.RemoveRange(0, MaximumRetainedMutations / 4);
+        }
     }
 
-    internal IReadOnlyList<OdfFormulaCellMutation> GetChangesSince(long version)
+    internal bool TryGetChangesSince(
+        long version,
+        out IReadOnlyList<OdfFormulaCellMutation> mutations)
     {
         if (version >= _version)
         {
-            return [];
+            mutations = [];
+            return true;
+        }
+
+        if (_mutations.Count == 0 ||
+            version < _mutations[0].Version - 1)
+        {
+            mutations = [];
+            return false;
         }
 
         int start = _mutations.Count;
@@ -40,7 +55,8 @@ internal sealed class OdfFormulaMutationJournal
             start--;
         }
 
-        return _mutations.GetRange(start, _mutations.Count - start);
+        mutations = _mutations.GetRange(start, _mutations.Count - start);
+        return true;
     }
 }
 

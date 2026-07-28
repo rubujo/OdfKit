@@ -12,7 +12,8 @@ public sealed class OdfFormulaDependencyGraph
 {
     private readonly Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> _dependencies = new();
     private readonly Dictionary<OdfCellAddress, HashSet<OdfCellAddress>> _dependents = new();
-    private readonly Dictionary<string, List<RangeDependency>> _rangeDependents = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, RangeDependencyIndex> _rangeDependents =
+        new(StringComparer.Ordinal);
     private readonly Dictionary<OdfCellAddress, List<RangeDependency>> _rangesByFormula = new();
     private readonly HashSet<OdfCellAddress> _formulaCells = new();
     private readonly HashSet<OdfCellAddress> _dirtyCells = new();
@@ -43,13 +44,19 @@ public sealed class OdfFormulaDependencyGraph
         OdfCellAddress cell,
         string formula,
         IEvaluationContext context) =>
-        UpdateFormulaDependencies(cell, formula, context, propagateDirty: true);
+        UpdateFormulaDependencies(
+            cell,
+            formula,
+            context,
+            propagateDirty: true,
+            evaluator: null);
 
     internal void UpdateFormulaDependencies(
         OdfCellAddress cell,
         string formula,
         IEvaluationContext context,
-        bool propagateDirty)
+        bool propagateDirty,
+        DefaultFormulaEvaluator? evaluator)
     {
         RemoveFormulaDependencies(cell);
         _formulaCells.Add(cell);
@@ -67,8 +74,9 @@ public sealed class OdfFormulaDependencyGraph
                 }
                 cleanFormula = FormulaPrefixNormalizer.RemovePrefix(cleanFormula);
 
-                var parser = new FormulaParser(cleanFormula);
-                var ast = parser.Parse();
+                var ast = evaluator is null
+                    ? new FormulaParser(cleanFormula).Parse()
+                    : evaluator.GetOrParseAst(cleanFormula);
                 var ranges = ast.GetRanges(context);
 
                 foreach (var range in ranges)
@@ -191,14 +199,11 @@ public sealed class OdfFormulaDependencyGraph
             }
 
             string sheetName = current.SheetName ?? string.Empty;
-            if (_rangeDependents.TryGetValue(sheetName, out List<RangeDependency>? ranges))
+            if (_rangeDependents.TryGetValue(sheetName, out RangeDependencyIndex? ranges))
             {
-                foreach (RangeDependency range in ranges)
+                foreach (RangeDependency range in ranges.Find(current))
                 {
-                    if (range.Contains(current))
-                    {
-                        pending.Push(range.Formula);
-                    }
+                    pending.Push(range.Formula);
                 }
             }
         }
@@ -242,9 +247,9 @@ public sealed class OdfFormulaDependencyGraph
         var clone = new OdfFormulaDependencyGraph();
         CopySets(_dependencies, clone._dependencies);
         CopySets(_dependents, clone._dependents);
-        foreach (KeyValuePair<string, List<RangeDependency>> pair in _rangeDependents)
+        foreach (KeyValuePair<string, RangeDependencyIndex> pair in _rangeDependents)
         {
-            clone._rangeDependents[pair.Key] = [.. pair.Value];
+            clone._rangeDependents[pair.Key] = pair.Value.Clone();
         }
         foreach (KeyValuePair<OdfCellAddress, List<RangeDependency>> pair in _rangesByFormula)
         {
@@ -361,9 +366,9 @@ public sealed class OdfFormulaDependencyGraph
 
     private void AddRangeDependency(RangeDependency range)
     {
-        if (!_rangeDependents.TryGetValue(range.SheetName, out List<RangeDependency>? bySheet))
+        if (!_rangeDependents.TryGetValue(range.SheetName, out RangeDependencyIndex? bySheet))
         {
-            bySheet = [];
+            bySheet = new RangeDependencyIndex();
             _rangeDependents[range.SheetName] = bySheet;
         }
         bySheet.Add(range);
@@ -399,10 +404,10 @@ public sealed class OdfFormulaDependencyGraph
             _rangesByFormula.Remove(cell);
             foreach (RangeDependency range in ranges)
             {
-                if (_rangeDependents.TryGetValue(range.SheetName, out List<RangeDependency>? bySheet))
+                if (_rangeDependents.TryGetValue(range.SheetName, out RangeDependencyIndex? bySheet))
                 {
                     bySheet.Remove(range);
-                    if (bySheet.Count == 0)
+                    if (bySheet.IsEmpty)
                     {
                         _rangeDependents.Remove(range.SheetName);
                     }
@@ -434,5 +439,122 @@ public sealed class OdfFormulaDependencyGraph
             address.Row <= EndRow &&
             address.Column >= StartColumn &&
             address.Column <= EndColumn;
+    }
+
+    /// <summary>
+    /// 以列區間樹縮小單點變更需要檢查的範圍相依集合。
+    /// </summary>
+    private sealed class RangeDependencyIndex
+    {
+        private readonly List<RangeDependency> _ranges;
+        private IntervalNode? _root;
+        private bool _requiresRebuild = true;
+
+        internal RangeDependencyIndex()
+        {
+            _ranges = [];
+        }
+
+        private RangeDependencyIndex(List<RangeDependency> ranges)
+        {
+            _ranges = ranges;
+        }
+
+        internal bool IsEmpty => _ranges.Count == 0;
+
+        internal void Add(RangeDependency range)
+        {
+            _ranges.Add(range);
+            _requiresRebuild = true;
+        }
+
+        internal void Remove(RangeDependency range)
+        {
+            _ranges.Remove(range);
+            _requiresRebuild = true;
+        }
+
+        internal IEnumerable<RangeDependency> Find(OdfCellAddress address)
+        {
+            if (_requiresRebuild)
+            {
+                _root = Build([.. _ranges]);
+                _requiresRebuild = false;
+            }
+
+            return _root?.Find(address) ?? [];
+        }
+
+        internal RangeDependencyIndex Clone() =>
+            new([.. _ranges]);
+
+        private static IntervalNode? Build(List<RangeDependency> ranges)
+        {
+            if (ranges.Count == 0)
+            {
+                return null;
+            }
+
+            int[] centers = new int[ranges.Count];
+            for (int index = 0; index < ranges.Count; index++)
+            {
+                centers[index] = ranges[index].StartRow +
+                    ((ranges[index].EndRow - ranges[index].StartRow) / 2);
+            }
+            Array.Sort(centers);
+            int center = centers[centers.Length / 2];
+            var left = new List<RangeDependency>();
+            var right = new List<RangeDependency>();
+            var overlapping = new List<RangeDependency>();
+            foreach (RangeDependency range in ranges)
+            {
+                if (range.EndRow < center)
+                {
+                    left.Add(range);
+                }
+                else if (range.StartRow > center)
+                {
+                    right.Add(range);
+                }
+                else
+                {
+                    overlapping.Add(range);
+                }
+            }
+
+            return new IntervalNode(
+                center,
+                overlapping,
+                Build(left),
+                Build(right));
+        }
+
+        private sealed class IntervalNode(
+            int center,
+            List<RangeDependency> overlapping,
+            IntervalNode? left,
+            IntervalNode? right)
+        {
+            internal IEnumerable<RangeDependency> Find(OdfCellAddress address)
+            {
+                foreach (RangeDependency range in overlapping)
+                {
+                    if (range.Contains(address))
+                    {
+                        yield return range;
+                    }
+                }
+
+                IntervalNode? branch = address.Row < center ? left :
+                    address.Row > center ? right : null;
+                if (branch is not null)
+                {
+                    foreach (RangeDependency range in branch.Find(address))
+                    {
+                        yield return range;
+                    }
+                }
+            }
+        }
     }
 }

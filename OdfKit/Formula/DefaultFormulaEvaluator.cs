@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -19,7 +20,7 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     private readonly HashSet<OdfCellAddress> _evaluatingStack = new();
 
     // 以公式字串為鍵的剖析樹快取；AST 節點於剖析後不可變，可安全跨次評估重用。
-    private readonly Dictionary<string, AstNode> _astCache = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, AstNode> _astCache;
 
     // 剖析樹快取的筆數上限；達到上限時整批清除，避免長時間執行時無上限累積。
     private const int AstCacheCapacity = 4096;
@@ -52,11 +53,21 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     public DefaultFormulaEvaluator(
         OdfFormulaFunctionRegistry functions,
         IOdfFormulaEvaluationFallback? fallback)
+        : this(functions, fallback, new ConcurrentDictionary<string, AstNode>(
+            StringComparer.Ordinal))
+    {
+    }
+
+    private DefaultFormulaEvaluator(
+        OdfFormulaFunctionRegistry functions,
+        IOdfFormulaEvaluationFallback? fallback,
+        ConcurrentDictionary<string, AstNode> astCache)
     {
         Functions = functions ?? throw new ArgumentNullException(
             nameof(functions),
             OdfLocalizer.GetMessage("Err_DefaultFormulaEvaluator_FunctionRegistryNull"));
         Fallback = fallback;
+        _astCache = astCache;
     }
 
     /// <summary>
@@ -160,16 +171,7 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
             }
 
             formula = FormulaPrefixNormalizer.RemovePrefix(formula);
-            if (!_astCache.TryGetValue(formula, out var ast))
-            {
-                var parser = new FormulaParser(formula);
-                ast = parser.Parse();
-                if (_astCache.Count >= AstCacheCapacity)
-                {
-                    _astCache.Clear();
-                }
-                _astCache[formula] = ast;
-            }
+            AstNode ast = GetOrParseAst(formula);
 
             var dispatchContext = new OdfFormulaDispatchContext(context, Functions);
             object result = ast.Evaluate(dispatchContext);
@@ -206,6 +208,26 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     {
         _cache[cellAddress] = value;
     }
+
+    internal AstNode GetOrParseAst(string formula)
+    {
+        if (_astCache.TryGetValue(formula, out AstNode? ast))
+        {
+            return ast;
+        }
+
+        var parser = new FormulaParser(formula);
+        ast = parser.Parse();
+        if (_astCache.Count >= AstCacheCapacity)
+        {
+            _astCache.Clear();
+        }
+
+        return _astCache.GetOrAdd(formula, ast);
+    }
+
+    internal DefaultFormulaEvaluator CreateWorkerEvaluator() =>
+        new(Functions, Fallback, _astCache);
 
     /// <summary>
     /// Evaluates all document formulas under the specified content root and updates their display text and attributes.

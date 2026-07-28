@@ -164,24 +164,30 @@ internal static class FormulaDocumentEvaluationEngine
         var diagnostics = new List<OdfFormulaDiagnostic>();
         var budget = new OdfFormulaEvaluationBudget(options, cancellationToken);
         var volatileSession = new OdfFormulaVolatileSession();
-        IReadOnlyList<OdfFormulaCellMutation> mutations = previousState is null
-            ? []
-            : mutationJournal.GetChangesSince(previousState.MutationVersion);
-        if (previousState is not null && mutations.Count == 0)
+        IReadOnlyList<OdfFormulaCellMutation> retainedMutations = [];
+        bool hasCompleteJournal = previousState is null ||
+            mutationJournal.TryGetChangesSince(
+                previousState.MutationVersion,
+                out retainedMutations);
+        IReadOnlyList<OdfFormulaCellMutation> mutations = retainedMutations;
+        OdfFormulaIncrementalState? baselineState = hasCompleteJournal
+            ? previousState
+            : null;
+        if (baselineState is not null && mutations.Count == 0)
         {
             return (
                 CreateReport(
-                    previousState.Formulas.Count,
+                    baselineState.Formulas.Count,
                     0,
                     0,
                     0,
                     0,
                     budget,
                     diagnostics),
-                previousState);
+                baselineState);
         }
 
-        var originalContext = previousState is null
+        var originalContext = baselineState is null
             ? new OdfDomEvaluationContext(
                 contentRoot,
                 evaluator,
@@ -190,7 +196,7 @@ internal static class FormulaDocumentEvaluationEngine
                 budget,
                 options.ExternalReferencePolicy)
             : new OdfDomEvaluationContext(
-                previousState,
+                baselineState,
                 mutations,
                 contentRoot,
                 evaluator,
@@ -201,11 +207,16 @@ internal static class FormulaDocumentEvaluationEngine
 
         try
         {
-            OdfFormulaDependencyGraph graph =
-                previousState?.Graph.Clone() ?? new OdfFormulaDependencyGraph();
+            bool hasStructuralChanges = baselineState is not null &&
+                mutations.Any(static mutation => mutation.FormulaChanged);
+            OdfFormulaDependencyGraph graph = baselineState is null
+                ? new OdfFormulaDependencyGraph()
+                : hasStructuralChanges
+                    ? baselineState.Graph.Clone()
+                    : baselineState.Graph;
             var changedFormulas = new HashSet<OdfCellAddress>();
 
-            if (previousState is null)
+            if (baselineState is null)
             {
                 changedFormulas.UnionWith(originalContext.CellFormulas.Keys);
             }
@@ -244,10 +255,11 @@ internal static class FormulaDocumentEvaluationEngine
                     address,
                     originalContext.CellFormulas[address],
                     originalContext,
-                    propagateDirty: previousState is not null);
+                    propagateDirty: baselineState is not null,
+                    evaluator);
             }
 
-            if (previousState is not null)
+            if (baselineState is not null)
             {
                 var changedAddresses = new HashSet<OdfCellAddress>();
                 foreach (OdfFormulaCellMutation mutation in mutations)
@@ -257,7 +269,7 @@ internal static class FormulaDocumentEvaluationEngine
 
                 foreach (OdfCellAddress address in changedAddresses)
                 {
-                    bool hadOld = previousState.Values.TryGetValue(address, out object? oldValue);
+                    bool hadOld = baselineState.Values.TryGetValue(address, out object? oldValue);
                     bool hasCurrent = originalContext.CellValues.TryGetValue(address, out object? currentValue);
                     if (hadOld != hasCurrent || !Equals(oldValue, currentValue))
                     {
@@ -406,7 +418,8 @@ internal static class FormulaDocumentEvaluationEngine
                 kvp.Key,
                 kvp.Value,
                 context,
-                propagateDirty: false);
+                propagateDirty: false,
+                evaluator);
         }
 
         return EvaluateDirtyCore(
@@ -693,7 +706,7 @@ internal static class FormulaDocumentEvaluationEngine
         OdfFormulaDependencyGraph graph,
         OdfFormulaEvaluationBudget budget)
     {
-        var localEvaluator = new DefaultFormulaEvaluator(evaluator.Functions, evaluator.Fallback);
+        DefaultFormulaEvaluator localEvaluator = evaluator.CreateWorkerEvaluator();
         localEvaluator.ThrowOnEvaluationFailure = true;
         OdfDomEvaluationContext localContext = context.CreateWorkerView(localEvaluator);
 
@@ -761,7 +774,7 @@ internal static class FormulaDocumentEvaluationEngine
                 }
 
                 normalized = FormulaPrefixNormalizer.RemovePrefix(normalized);
-                _ = new FormulaParser(normalized).Parse();
+                _ = evaluator.GetOrParseAst(normalized);
             }
             catch (Exception ex)
             {
