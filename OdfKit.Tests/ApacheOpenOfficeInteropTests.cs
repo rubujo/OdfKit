@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Drawing;
 using OdfKit.Presentation;
@@ -167,9 +171,19 @@ public sealed class ApacheOpenOfficeInteropTests
         string outputExtension,
         string inputPath)
     {
-        Directory.CreateDirectory(profileDirectory);
         Directory.CreateDirectory(outputDirectory);
-        var startInfo = new ProcessStartInfo
+        string pythonPath = Path.Combine(Path.GetDirectoryName(sofficePath)!, "python.exe");
+        Assert.True(File.Exists(pythonPath), "Apache OpenOffice 安裝未包含官方 Python UNO runtime。");
+
+        int port = GetAvailableTcpPort();
+        string bridgePath = Path.Combine(outputDirectory, "odfkit-aoo-bridge.py");
+        File.WriteAllText(bridgePath, CreateUnoConversionScript(), new UTF8Encoding(false));
+        string outputPath = Path.Combine(
+            outputDirectory,
+            Path.GetFileNameWithoutExtension(inputPath) + "." + outputExtension);
+        string filterName = GetUnoFilterName(inputPath, outputExtension);
+
+        var officeStartInfo = new ProcessStartInfo
         {
             FileName = sofficePath,
             RedirectStandardError = true,
@@ -177,44 +191,168 @@ public sealed class ApacheOpenOfficeInteropTests
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        startInfo.ArgumentList.Add(
+        officeStartInfo.ArgumentList.Add(
             "-env:UserInstallation=" +
             new Uri(profileDirectory + Path.DirectorySeparatorChar).AbsoluteUri);
-        startInfo.ArgumentList.Add("-headless");
-        startInfo.ArgumentList.Add("-invisible");
-        startInfo.ArgumentList.Add("-nologo");
-        startInfo.ArgumentList.Add("-nodefault");
-        startInfo.ArgumentList.Add("-nolockcheck");
-        startInfo.ArgumentList.Add("-nofirststartwizard");
-        startInfo.ArgumentList.Add("--convert-to");
-        startInfo.ArgumentList.Add(outputExtension);
-        startInfo.ArgumentList.Add("--outdir");
-        startInfo.ArgumentList.Add(outputDirectory);
-        startInfo.ArgumentList.Add(inputPath);
+        officeStartInfo.ArgumentList.Add("-headless");
+        officeStartInfo.ArgumentList.Add("-invisible");
+        officeStartInfo.ArgumentList.Add("-nologo");
+        officeStartInfo.ArgumentList.Add("-nodefault");
+        officeStartInfo.ArgumentList.Add("-nolockcheck");
+        officeStartInfo.ArgumentList.Add("-nofirststartwizard");
+        officeStartInfo.ArgumentList.Add("-norestore");
+        officeStartInfo.ArgumentList.Add(
+            $"-accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager");
 
-        using Process process = Process.Start(startInfo) ??
+        using Process officeProcess = Process.Start(officeStartInfo) ??
             throw new InvalidOperationException("Unable to start Apache OpenOffice.");
-        Task<string> standardOutput = process.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
-        Task<string> standardError = process.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
-        if (!process.WaitForExit(ProcessTimeoutMilliseconds))
+        Task<string> officeOutput = officeProcess.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
+        Task<string> officeError = officeProcess.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
+
+        var bridgeStartInfo = new ProcessStartInfo
         {
-            process.Kill(entireProcessTree: true);
-            process.WaitForExit();
-            Assert.Fail("Apache OpenOffice headless conversion timed out.");
+            FileName = pythonPath,
+            WorkingDirectory = Path.GetDirectoryName(pythonPath),
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+        bridgeStartInfo.Environment["PYTHONPATH"] = Path.GetDirectoryName(pythonPath);
+        bridgeStartInfo.ArgumentList.Add(bridgePath);
+        bridgeStartInfo.ArgumentList.Add(port.ToString(CultureInfo.InvariantCulture));
+        bridgeStartInfo.ArgumentList.Add(inputPath);
+        bridgeStartInfo.ArgumentList.Add(outputPath);
+        bridgeStartInfo.ArgumentList.Add(filterName);
+
+        using Process bridgeProcess = Process.Start(bridgeStartInfo) ??
+            throw new InvalidOperationException("Unable to start Apache OpenOffice Python UNO bridge.");
+        Task<string> bridgeOutput = bridgeProcess.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
+        Task<string> bridgeError = bridgeProcess.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
+        bool bridgeExited = bridgeProcess.WaitForExit(ProcessTimeoutMilliseconds);
+        if (!bridgeExited)
+        {
+            bridgeProcess.Kill(entireProcessTree: true);
+            bridgeProcess.WaitForExit();
         }
 
-        string output = standardOutput.GetAwaiter().GetResult() +
-            standardError.GetAwaiter().GetResult();
-        Assert.True(process.ExitCode == 0, "Apache OpenOffice headless conversion failed: " + output);
+        if (!officeProcess.WaitForExit(5_000))
+        {
+            officeProcess.Kill(entireProcessTree: true);
+            officeProcess.WaitForExit();
+        }
 
-        string outputPath = Path.Combine(
-            outputDirectory,
-            Path.GetFileNameWithoutExtension(inputPath) + "." + outputExtension);
+        string diagnostics = bridgeOutput.GetAwaiter().GetResult() +
+            bridgeError.GetAwaiter().GetResult() +
+            officeOutput.GetAwaiter().GetResult() +
+            officeError.GetAwaiter().GetResult();
+        Assert.True(bridgeExited, "Apache OpenOffice Python UNO bridge timed out: " + diagnostics);
+        Assert.True(
+            bridgeProcess.ExitCode == 0,
+            "Apache OpenOffice Python UNO bridge failed: " + diagnostics);
         Assert.True(
             File.Exists(outputPath),
-            "Apache OpenOffice 未產生預期輸出：" + outputPath + Environment.NewLine + output);
+            "Apache OpenOffice 未產生預期輸出：" + outputPath + Environment.NewLine + diagnostics);
         return outputPath;
     }
+
+    private static int GetAvailableTcpPort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        try
+        {
+            return ((IPEndPoint)listener.LocalEndpoint).Port;
+        }
+        finally
+        {
+            listener.Stop();
+        }
+    }
+
+    private static string GetUnoFilterName(string inputPath, string outputExtension)
+    {
+        string inputExtension = Path.GetExtension(inputPath);
+        if (string.Equals(outputExtension, "pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            return inputExtension.ToLowerInvariant() switch
+            {
+                ".odt" => "writer_pdf_Export",
+                ".ods" => "calc_pdf_Export",
+                ".odp" => "impress_pdf_Export",
+                ".odg" => "draw_pdf_Export",
+                _ => throw new ArgumentException("Unsupported Apache OpenOffice PDF input.", nameof(inputPath)),
+            };
+        }
+
+        return outputExtension.ToLowerInvariant() switch
+        {
+            "odt" => "writer8",
+            "ods" => "calc8",
+            "odp" => "impress8",
+            "odg" => "draw8",
+            _ => throw new ArgumentException("Unsupported Apache OpenOffice output format.", nameof(outputExtension)),
+        };
+    }
+
+    private static string CreateUnoConversionScript() =>
+        """
+        # -*- coding: utf-8 -*-
+        import sys
+        import time
+        import uno
+
+        def property_value(name, value):
+            item = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+            item.Name = name
+            item.Value = value
+            return item
+
+        port = int(sys.argv[1])
+        input_path = sys.argv[2]
+        output_path = sys.argv[3]
+        filter_name = sys.argv[4]
+        local_context = uno.getComponentContext()
+        resolver = local_context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.bridge.UnoUrlResolver", local_context)
+        context = None
+        last_error = None
+        for unused in range(300):
+            try:
+                context = resolver.resolve(
+                    "uno:socket,host=127.0.0.1,port=%d;urp;StarOffice.ComponentContext" % port)
+                break
+            except Exception as error:
+                last_error = error
+                time.sleep(0.1)
+        if context is None:
+            raise RuntimeError("Unable to connect to Apache OpenOffice UNO: %s" % last_error)
+
+        desktop = context.ServiceManager.createInstanceWithContext(
+            "com.sun.star.frame.Desktop", context)
+        document = desktop.loadComponentFromURL(
+            uno.systemPathToFileUrl(input_path),
+            "_blank",
+            0,
+            (
+                property_value("Hidden", True),
+                property_value("ReadOnly", False),
+            ))
+        if document is None:
+            raise RuntimeError("Apache OpenOffice did not load the ODF document")
+
+        output_properties = (
+            property_value("FilterName", filter_name),
+            property_value("Overwrite", True),
+        )
+        if filter_name.endswith("_pdf_Export"):
+            document.storeToURL(uno.systemPathToFileUrl(output_path), output_properties)
+        else:
+            document.storeAsURL(uno.systemPathToFileUrl(output_path), output_properties)
+        document.close(True)
+        desktop.terminate()
+        print("stored=%s" % output_path)
+        """;
 
     private static (string Path, string Extension, string Marker) CreateTextDocument(string tempRoot)
     {
@@ -316,9 +454,26 @@ public sealed class ApacheOpenOfficeInteropTests
 
     private static void DeleteTempRoot(string tempRoot)
     {
-        if (Directory.Exists(tempRoot))
+        for (int attempt = 0; attempt < 6; attempt++)
         {
-            Directory.Delete(tempRoot, recursive: true);
+            if (!Directory.Exists(tempRoot))
+            {
+                return;
+            }
+
+            try
+            {
+                Directory.Delete(tempRoot, recursive: true);
+                return;
+            }
+            catch (IOException) when (attempt < 5)
+            {
+                Thread.Sleep(200);
+            }
+            catch (UnauthorizedAccessException) when (attempt < 5)
+            {
+                Thread.Sleep(200);
+            }
         }
     }
 }

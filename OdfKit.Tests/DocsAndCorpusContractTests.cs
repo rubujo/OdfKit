@@ -1114,17 +1114,30 @@ public class DocsAndCorpusContractTests
 
         Assert.Contains("ODFKIT_REQUIRE_OPENOFFICE", script, StringComparison.Ordinal);
         Assert.Contains("ApacheOpenOfficeInteropTests", script, StringComparison.Ordinal);
+        Assert.Contains(
+            "$versionInfo.FileDescription -notmatch \"OpenOffice 4\\.1\\.\"",
+            script,
+            StringComparison.Ordinal);
         Assert.Contains("OPENOFFICE_VERSION: 4.1.16", workflow, StringComparison.Ordinal);
         Assert.Contains(
             "0ea97aedb1c77838b9c6ee9e7a9c5161933b35b703e4ccbafa6a9abde7f669ca",
             workflow,
             StringComparison.Ordinal);
+        Assert.Contains("'/a'", workflow, StringComparison.Ordinal);
+        Assert.Contains("TARGETDIR=", workflow, StringComparison.Ordinal);
+        Assert.Contains("ODFKIT_OPENOFFICE_PATH=", workflow, StringComparison.Ordinal);
+        Assert.Contains("Apache Software Foundation", workflow, StringComparison.Ordinal);
+        Assert.Contains("Get-Content -LiteralPath $msiLog -Tail 200", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("ArgumentList @('/i'", workflow, StringComparison.Ordinal);
         Assert.Contains("-RequireOpenOffice", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
         Assert.Contains("public sealed class ApacheOpenOfficeInteropTests", tests, StringComparison.Ordinal);
         Assert.DoesNotContain("partial class LibreOfficeInteropTests", tests, StringComparison.Ordinal);
         Assert.Contains("ApacheOpenOfficeHeadlessRoundTripsCoreDocumentKinds", tests, StringComparison.Ordinal);
         Assert.Contains("ApacheOpenOfficeHeadlessAdvancedPivotRoundTripsOdsAndPdf", tests, StringComparison.Ordinal);
+        Assert.Contains("CreateUnoConversionScript", tests, StringComparison.Ordinal);
+        Assert.Contains("bridgeStartInfo.Environment[\"PYTHONPATH\"]", tests, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"--convert-to\"", tests, StringComparison.Ordinal);
     }
 
     /// <summary>

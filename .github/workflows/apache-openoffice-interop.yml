@@ -36,15 +36,18 @@ jobs:
           path: ${{ runner.tool_cache }}/odfkit/apache-openoffice/${{ env.OPENOFFICE_VERSION }}
           key: apache-openoffice-installer-${{ runner.os }}-${{ env.OPENOFFICE_VERSION }}
 
-      - name: Install pinned Apache OpenOffice
+      - name: Prepare pinned Apache OpenOffice administrative image
         shell: pwsh
         run: |
           $fileName = "Apache_OpenOffice_$env:OPENOFFICE_VERSION`_Win_x86_install_en-US.exe"
           $uri = "https://downloads.apache.org/openoffice/$env:OPENOFFICE_VERSION/binaries/en-US/$fileName"
           $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE "odfkit/apache-openoffice/$env:OPENOFFICE_VERSION"
           $extractRoot = Join-Path $env:RUNNER_TEMP "odfkit-apache-openoffice-installer"
+          $administrativeRoot = Join-Path $env:RUNNER_TEMP "odfkit-apache-openoffice-image"
+          $msiLog = Join-Path $env:RUNNER_TEMP "odfkit-apache-openoffice-msi.log"
           New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
           New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
+          New-Item -ItemType Directory -Path $administrativeRoot -Force | Out-Null
           $installer = Join-Path $cacheRoot $fileName
           if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) {
             $temporaryPath = "$installer.download"
@@ -74,13 +77,40 @@ jobs:
           if ($null -eq $msi) {
             throw "Extracted Apache OpenOffice installer does not contain an MSI."
           }
+          $arguments = @(
+            '/a',
+            "`"$($msi.FullName)`"",
+            '/qn',
+            '/norestart',
+            "TARGETDIR=`"$administrativeRoot`"",
+            '/L*v',
+            "`"$msiLog`""
+          )
           $process = Start-Process msiexec.exe `
-            -ArgumentList @('/i', $msi.FullName, '/qn', '/norestart') `
+            -ArgumentList $arguments `
+            -WorkingDirectory $msi.DirectoryName `
             -Wait `
             -PassThru
           if ($process.ExitCode -notin @(0, 3010)) {
-            throw "Apache OpenOffice installer failed with exit code $($process.ExitCode)."
+            if (Test-Path -LiteralPath $msiLog -PathType Leaf) {
+              Get-Content -LiteralPath $msiLog -Tail 200 | Write-Host
+            }
+            throw "Apache OpenOffice administrative image failed with exit code $($process.ExitCode)."
           }
+
+          $soffice = Get-ChildItem -LiteralPath $administrativeRoot -Recurse -Filter soffice.exe -File |
+            Where-Object { $_.Directory.Name -eq 'program' } |
+            Select-Object -First 1
+          if ($null -eq $soffice) {
+            throw "Apache OpenOffice administrative image does not contain program/soffice.exe."
+          }
+          $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($soffice.FullName)
+          if ($versionInfo.FileDescription -notmatch 'OpenOffice' -or
+              $versionInfo.CompanyName -notmatch 'Apache Software Foundation') {
+            throw "Administrative image does not contain an authentic Apache OpenOffice binary."
+          }
+          "ODFKIT_OPENOFFICE_PATH=$($soffice.FullName)" |
+            Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Run Apache OpenOffice interoperability tests (net8.0)
         shell: pwsh

@@ -65,10 +65,15 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 Apache OpenOffice／Apache Software Foundation，不得誤用 LibreOffice。實機範圍包含
 ODT／ODS／ODP／ODG 核心文件往返，以及進階 DataPilot ODS 往返與 PDF 匯出。
 
-測試直接使用 soffice headless 轉換，不要求安裝包內附 Python／UNO runtime。未明確要求時，
-沒有安裝 AOO 會略過；`-RequireOpenOffice` 會設定 fail-closed 模式，找不到或路徑偽冒時失敗。
+Windows 版 Apache OpenOffice 不提供可靠的 LibreOffice `--convert-to` CLI；測試因此啟動
+限定 loopback 的 soffice headless listener，再使用 AOO 安裝包隨附的官方 Python／UNO
+runtime 開啟、另存與匯出。`PYTHONPATH` 只設定於 bridge 子程序，不污染 runner 全域環境。
+未明確要求時，沒有安裝 AOO 會略過；`-RequireOpenOffice` 會設定 fail-closed 模式，找不到
+官方 runtime、UNO 連線失敗或路徑偽冒時皆失敗。
 GitHub Actions 的手動 workflow 釘選 Apache OpenOffice 4.1.16，下載後依 Apache 官方
-SHA-256 驗證，再執行 net8.0 與 net10.0。
+SHA-256 驗證。CI 使用 MSI administrative image 取得隔離的可攜執行樹，不修改 runner
+的全機 Office 安裝；確認 `soffice.exe` 的公司為 Apache Software Foundation 後，再執行
+net8.0 與 net10.0。
 
 ```powershell
 pwsh eng/Test-ApacheOpenOfficeInterop.ps1 `

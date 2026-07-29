@@ -104,9 +104,14 @@ function Find-ApacheOpenOfficeSoffice {
 
         if ($IsWindows) {
             $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($executable)
-            if ($versionInfo.FileDescription -notmatch "OpenOffice" -or
+            if ($versionInfo.FileDescription -notmatch "OpenOffice 4\.1\." -or
                 $versionInfo.CompanyName -notmatch "Apache Software Foundation") {
                 continue
+            }
+
+            return [PSCustomObject]@{
+                Path = $executable
+                Version = "$($versionInfo.FileDescription) ($($versionInfo.ProductVersion))"
             }
         }
 
