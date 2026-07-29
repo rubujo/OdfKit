@@ -45,4 +45,10 @@ public sealed class OdfRichTextRun
     /// 字型名稱；<see langword="null"/> 表示繼承。
     /// </summary>
     public string? FontFamily { get; init; }
+
+    /// <summary>
+    /// Gets the font size in points; <see langword="null"/> indicates inheritance.
+    /// 取得以點為單位的字型大小；<see langword="null"/> 表示繼承。
+    /// </summary>
+    public double? FontSizePoints { get; init; }
 }

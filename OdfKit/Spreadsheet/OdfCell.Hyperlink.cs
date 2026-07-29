@@ -105,54 +105,138 @@ public partial class OdfCell
     /// </summary>
     public OdfRichText? GetRichText()
     {
-        OdfRichText? richText = null;
-        foreach (var child in Node.Children)
+        List<OdfNode> paragraphs = [];
+        bool hasSpans = false;
+        foreach (OdfNode child in Node.Children)
         {
             if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text)
                 continue;
-            bool hasSpans = false;
-            foreach (var inner in child.Children)
-            {
-                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text)
-                { hasSpans = true; break; }
-            }
-            if (!hasSpans)
-                continue;
+            paragraphs.Add(child);
+            hasSpans |= ContainsTextSpan(child);
+        }
+        if (!hasSpans)
+            return null;
 
-            richText ??= new OdfRichText();
-            foreach (var inner in child.Children)
-            {
-                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text)
-                {
-                    string styleName = inner.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
-                    bool bold = _doc.StyleEngine.GetStyleProperty(styleName, "font-weight", OdfNamespaces.Fo, "text") == "bold";
-                    bool italic = _doc.StyleEngine.GetStyleProperty(styleName, "font-style", OdfNamespaces.Fo, "text") == "italic";
-                    bool underline = _doc.StyleEngine.GetStyleProperty(styleName, "text-underline-style", OdfNamespaces.Style, "text") != null;
-                    string? colorVal = _doc.StyleEngine.GetStyleProperty(styleName, "color", OdfNamespaces.Fo, "text");
-                    OdfColor? color = colorVal != null && OdfColor.TryParse(colorVal, out OdfColor c) ? c : (OdfColor?)null;
-                    string? fontName = _doc.StyleEngine.GetStyleProperty(styleName, "font-name", OdfNamespaces.Style, "text");
-                    richText.AddRun(
-                        inner.TextContent,
-                        new OdfRichTextRunOptions
-                        {
-                            Bold = bold,
-                            Italic = italic,
-                            Color = color,
-                            FontFamily = fontName,
-                            Underline = underline,
-                        });
-                }
-                else if (inner.NodeType == OdfNodeType.Text && !string.IsNullOrEmpty(inner.TextContent))
-                {
-                    richText.AddRun(inner.TextContent);
-                }
-                else if (inner.LocalName == "line-break" && inner.NamespaceUri == OdfNamespaces.Text)
-                {
-                    richText.AddLineBreak();
-                }
-            }
+        var richText = new OdfRichText();
+        for (int index = 0; index < paragraphs.Count; index++)
+        {
+            if (index > 0)
+                richText.AddLineBreak();
+            AppendRichTextChildren(
+                paragraphs[index],
+                richText,
+                new OdfRichTextRunOptions());
         }
         return richText;
+    }
+
+    private static bool ContainsTextSpan(OdfNode node)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
+                return true;
+            if (ContainsTextSpan(child))
+                return true;
+        }
+        return false;
+    }
+
+    private void AppendRichTextChildren(
+        OdfNode parent,
+        OdfRichText richText,
+        OdfRichTextRunOptions inherited)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType == OdfNodeType.Text)
+            {
+                if (!string.IsNullOrEmpty(child.TextContent))
+                    richText.AddRun(child.TextContent, inherited);
+                continue;
+            }
+            if (child.NodeType != OdfNodeType.Element)
+                continue;
+            if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "line-break")
+            {
+                richText.AddLineBreak();
+                continue;
+            }
+            if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "tab")
+            {
+                richText.AddRun("\t", inherited);
+                continue;
+            }
+            if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "s")
+            {
+                string? countValue = child.GetAttribute("c", OdfNamespaces.Text);
+                int count = int.TryParse(countValue, out int parsedCount) && parsedCount > 0
+                    ? Math.Min(parsedCount, 1_000_000)
+                    : 1;
+                richText.AddRun(new string(' ', count), inherited);
+                continue;
+            }
+
+            OdfRichTextRunOptions effective = child.NamespaceUri == OdfNamespaces.Text &&
+                child.LocalName == "span"
+                    ? ResolveRichTextStyle(child, inherited)
+                    : inherited;
+            AppendRichTextChildren(child, richText, effective);
+        }
+    }
+
+    private OdfRichTextRunOptions ResolveRichTextStyle(
+        OdfNode span,
+        OdfRichTextRunOptions inherited)
+    {
+        string styleName = span.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
+        string? weight = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "font-weight",
+            OdfNamespaces.Fo,
+            "text");
+        string? fontStyle = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "font-style",
+            OdfNamespaces.Fo,
+            "text");
+        string? underlineStyle = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "text-underline-style",
+            OdfNamespaces.Style,
+            "text");
+        string? colorValue = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "color",
+            OdfNamespaces.Fo,
+            "text");
+        OdfColor? color = colorValue is not null &&
+            OdfColor.TryParse(colorValue, out OdfColor parsedColor)
+                ? parsedColor
+                : inherited.Color;
+        string? fontName = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "font-name",
+            OdfNamespaces.Style,
+            "text");
+        string? fontSizeValue = _doc.StyleEngine.GetStyleProperty(
+            styleName,
+            "font-size",
+            OdfNamespaces.Fo,
+            "text");
+        double? fontSize = OdfLength.TryParse(fontSizeValue, out OdfLength parsedFontSize) &&
+            parsedFontSize.Unit == OdfUnit.Points
+                ? parsedFontSize.Value
+                : inherited.FontSizePoints;
+        return new OdfRichTextRunOptions
+        {
+            Bold = weight is null ? inherited.Bold : weight == "bold",
+            Italic = fontStyle is null ? inherited.Italic : fontStyle == "italic",
+            Underline = underlineStyle is null ? inherited.Underline : underlineStyle != "none",
+            Color = color,
+            FontFamily = fontName ?? inherited.FontFamily,
+            FontSizePoints = fontSize,
+        };
     }
 
     /// <summary>
@@ -175,10 +259,17 @@ public partial class OdfCell
         bool needsWrap = false;
         foreach (var run in richText.Runs)
         {
-            bool hasFormatting = run.Bold || run.Italic || run.Underline || run.Color.HasValue || !string.IsNullOrEmpty(run.FontFamily);
+            bool hasFormatting = run.Bold || run.Italic || run.Underline || run.Color.HasValue ||
+                !string.IsNullOrEmpty(run.FontFamily) || run.FontSizePoints.HasValue;
             if (hasFormatting)
             {
-                string styleName = _doc.GetOrCreateCharacterStyle(run.Bold, run.Italic, run.Underline, run.Color, run.FontFamily);
+                string styleName = _doc.GetOrCreateCharacterStyle(
+                    run.Bold,
+                    run.Italic,
+                    run.Underline,
+                    run.Color,
+                    run.FontFamily,
+                    run.FontSizePoints);
                 var span = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
                 span.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
                 AppendTextContent(span, run.Text, ref needsWrap);

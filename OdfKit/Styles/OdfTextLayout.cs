@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 
@@ -30,11 +31,54 @@ public enum OdfAutoFitMode
 }
 
 /// <summary>
+/// Describes one styled run in a text measurement request.
+/// 描述文字量測要求中的單一具樣式片段。
+/// </summary>
+public sealed class OdfTextMeasureRun
+{
+    /// <summary>
+    /// Gets or sets the run text.
+    /// 取得或設定片段文字。
+    /// </summary>
+    public string Text { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the font family.
+    /// 取得或設定字型家族。
+    /// </summary>
+    public string FontFamily { get; set; } = OdfFontContext.DefaultBaseFontFamily;
+
+    /// <summary>
+    /// Gets or sets the font size in points.
+    /// 取得或設定以點為單位的字型大小。
+    /// </summary>
+    public double FontSizePoints { get; set; } = 10;
+
+    /// <summary>
+    /// Gets or sets whether the run is bold.
+    /// 取得或設定片段是否為粗體。
+    /// </summary>
+    public bool IsBold { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the run is italic.
+    /// 取得或設定片段是否為斜體。
+    /// </summary>
+    public bool IsItalic { get; set; }
+}
+
+/// <summary>
 /// Describes a styled text block to be measured.
 /// 描述要量測的具樣式文字區塊。
 /// </summary>
 public sealed class OdfTextMeasureRequest
 {
+    /// <summary>
+    /// Gets optional styled runs that override the single-style text properties when non-empty.
+    /// 取得選用的具樣式片段；非空時會取代單一樣式文字屬性。
+    /// </summary>
+    public IList<OdfTextMeasureRun> Runs { get; } = new List<OdfTextMeasureRun>();
+
     /// <summary>
     /// Gets or sets the text to measure.
     /// 取得或設定要量測的文字。
@@ -94,6 +138,12 @@ public sealed class OdfTextMeasureRequest
     /// 取得或設定量測器接受的最大文字元素數。
     /// </summary>
     public int MaximumTextElements { get; set; } = 1_000_000;
+
+    /// <summary>
+    /// Gets or sets the maximum number of styled runs accepted by the measurer.
+    /// 取得或設定量測器接受的具樣式片段數上限。
+    /// </summary>
+    public int MaximumRuns { get; set; } = 16_384;
 }
 
 /// <summary>
@@ -248,6 +298,34 @@ public sealed class OdfAutoFitOptions
     public int MaximumMeasurementCacheEntries { get; set; } = 4_096;
 
     /// <summary>
+    /// Gets or sets the maximum rich-text runs inspected by one operation.
+    /// 取得或設定單次作業最多檢查的富文字片段數。
+    /// </summary>
+    public int MaximumRichTextRuns { get; set; } = 100_000;
+
+    /// <summary>
+    /// Gets or sets whether precise layout registers fonts embedded in the document.
+    /// 取得或設定精確排版是否註冊文件內嵌字型。
+    /// </summary>
+    /// <remarks>
+    /// Use an isolated document font context; the process-wide default context is rejected.
+    /// 請使用文件專屬字型情境；處理程序共用的預設情境會被拒絕。
+    /// </remarks>
+    public bool UseEmbeddedFonts { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum embedded fonts registered by one layout operation.
+    /// 取得或設定單次排版作業最多註冊的內嵌字型數。
+    /// </summary>
+    public int MaximumEmbeddedFonts { get; set; } = 32;
+
+    /// <summary>
+    /// Gets or sets the maximum total embedded font bytes registered by one layout operation.
+    /// 取得或設定單次排版作業最多註冊的內嵌字型總位元組數。
+    /// </summary>
+    public long MaximumEmbeddedFontBytes { get; set; } = 128 * 1024 * 1024;
+
+    /// <summary>
     /// Gets or sets whether automatic text-box layout may change its width.
     /// 取得或設定文字框自動排版是否可變更寬度。
     /// </summary>
@@ -273,12 +351,9 @@ internal sealed class OdfFastTextLayoutMeasurer : IOdfTextLayoutMeasurer
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(request, nameof(request));
         if (request.MaximumTextElements < 1)
             throw new ArgumentOutOfRangeException(nameof(request));
+        if (request.MaximumRuns < 1 || request.Runs.Count > request.MaximumRuns)
+            throw new ArgumentOutOfRangeException(nameof(request));
 
-        double fontSize = IsFinite(request.FontSizePoints) && request.FontSizePoints > 0
-            ? Math.Min(request.FontSizePoints, 1_000)
-            : 10;
-        double emCm = fontSize * (2.54 / 72);
-        double styleFactor = (request.IsBold ? 1.05 : 1) * (request.IsItalic ? 1.02 : 1);
         double limit = request.Wrap &&
             request.AvailableWidthCentimeters is double available &&
             IsFinite(available) &&
@@ -288,47 +363,78 @@ internal sealed class OdfFastTextLayoutMeasurer : IOdfTextLayoutMeasurer
 
         double current = 0;
         double maximum = 0;
+        double currentLineHeight = 0;
+        double totalHeight = 0;
         int lineCount = 1;
         int elementCount = 0;
-        TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator(request.Text ?? string.Empty);
-        while (enumerator.MoveNext())
+        IEnumerable<OdfTextMeasureRun> runs = request.Runs.Count == 0
+            ? [new OdfTextMeasureRun
+            {
+                Text = request.Text ?? string.Empty,
+                FontFamily = request.FontFamily,
+                FontSizePoints = request.FontSizePoints,
+                IsBold = request.IsBold,
+                IsItalic = request.IsItalic,
+            }]
+            : request.Runs;
+        foreach (OdfTextMeasureRun run in runs)
         {
-            if ((elementCount++ & 0xff) == 0)
-                cancellationToken.ThrowIfCancellationRequested();
-            if (elementCount > request.MaximumTextElements)
-                throw new InvalidOperationException();
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(run, nameof(request));
+            double fontSize = IsFinite(run.FontSizePoints) && run.FontSizePoints > 0
+                ? Math.Min(run.FontSizePoints, 1_000)
+                : 10;
+            double emCm = fontSize * (2.54 / 72);
+            double lineHeight = emCm * 1.2;
+            double styleFactor = (run.IsBold ? 1.05 : 1) * (run.IsItalic ? 1.02 : 1);
+            currentLineHeight = Math.Max(currentLineHeight, lineHeight);
+            TextElementEnumerator enumerator =
+                StringInfo.GetTextElementEnumerator(run.Text ?? string.Empty);
+            while (enumerator.MoveNext())
+            {
+                if ((elementCount++ & 0xff) == 0)
+                    cancellationToken.ThrowIfCancellationRequested();
+                if (elementCount > request.MaximumTextElements)
+                    throw new InvalidOperationException();
 
-            string element = enumerator.GetTextElement();
-            if (element is "\r" or "\n" or "\r\n")
-            {
-                maximum = Math.Max(maximum, current);
-                current = 0;
-                lineCount++;
-                continue;
-            }
+                string element = enumerator.GetTextElement();
+                if (element is "\r" or "\n" or "\r\n")
+                {
+                    maximum = Math.Max(maximum, current);
+                    totalHeight += currentLineHeight;
+                    current = 0;
+                    currentLineHeight = lineHeight;
+                    lineCount++;
+                    continue;
+                }
 
-            double advance = GetAdvanceInEm(element) * emCm * styleFactor;
-            if (current > 0 && current + advance > limit)
-            {
-                maximum = Math.Max(maximum, current);
-                current = advance;
-                lineCount++;
-            }
-            else
-            {
-                current += advance;
+                double advance = GetAdvanceInEm(element) * emCm * styleFactor;
+                if (current > 0 && current + advance > limit)
+                {
+                    maximum = Math.Max(maximum, current);
+                    totalHeight += currentLineHeight;
+                    current = advance;
+                    currentLineHeight = lineHeight;
+                    lineCount++;
+                }
+                else
+                {
+                    current += advance;
+                    currentLineHeight = Math.Max(currentLineHeight, lineHeight);
+                }
             }
         }
 
         maximum = Math.Max(maximum, current);
+        totalHeight += currentLineHeight > 0
+            ? currentLineHeight
+            : Math.Min(Math.Max(request.FontSizePoints, 1), 1_000) * (2.54 / 72) * 1.2;
         if (IsFinite(limit))
             maximum = Math.Min(maximum, limit);
 
-        double lineHeight = emCm * 1.2;
         bool vertical = request.WritingMode is OdfWritingMode.TbLr or OdfWritingMode.TbRl;
         OdfTextMeasureResult result = vertical
-            ? new OdfTextMeasureResult(lineCount * lineHeight, maximum, lineCount, false)
-            : new OdfTextMeasureResult(maximum, lineCount * lineHeight, lineCount, false);
+            ? new OdfTextMeasureResult(totalHeight, maximum, lineCount, false)
+            : new OdfTextMeasureResult(maximum, totalHeight, lineCount, false);
         return Rotate(result, request.RotationDegrees);
     }
 

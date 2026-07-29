@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using HarfBuzzSharp;
 using OdfKit.Styles;
@@ -116,6 +118,8 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
             ThrowIfDisposed();
             if (request.MaximumTextElements < 1)
                 throw new ArgumentOutOfRangeException(nameof(request));
+            if (request.MaximumRuns < 1 || request.Runs.Count > request.MaximumRuns)
+                throw new ArgumentOutOfRangeException(nameof(request));
 
             string text = request.Text ?? string.Empty;
             string fontFamily = string.IsNullOrWhiteSpace(request.FontFamily)
@@ -132,7 +136,8 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
                 request.Wrap,
                 request.RotationDegrees,
                 request.MaximumTextElements);
-            bool cacheable = text.Length <= 512 &&
+            bool cacheable = request.Runs.Count == 0 &&
+                text.Length <= 512 &&
                 _maximumMeasurementCacheEntries > 0;
             if (cacheable &&
                 _measurements.TryGetValue(
@@ -178,6 +183,9 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
         OdfTextMeasureRequest request,
         CancellationToken cancellationToken)
     {
+        if (request.Runs.Count > 0)
+            return MeasureRuns(request, cancellationToken);
+
         double fontSize = IsFinite(request.FontSizePoints) &&
             request.FontSizePoints > 0
                 ? Math.Min(request.FontSizePoints, 1_000)
@@ -282,6 +290,197 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
         return Rotate(result, request.RotationDegrees);
     }
 
+    private OdfTextMeasureResult MeasureRuns(
+        OdfTextMeasureRequest request,
+        CancellationToken cancellationToken)
+    {
+        double? limit = request.Wrap &&
+            request.AvailableWidthCentimeters is double available &&
+            IsFinite(available) &&
+            available > 0
+                ? available
+                : null;
+        double currentWidth = 0;
+        double currentHeight = 0;
+        double maximumWidth = 0;
+        double totalHeight = 0;
+        int lineCount = 1;
+        int textElements = 0;
+
+        foreach (OdfTextMeasureRun run in request.Runs)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(run, nameof(request));
+            var runRequest = new OdfTextMeasureRequest
+            {
+                FontFamily = run.FontFamily,
+                FontSizePoints = run.FontSizePoints,
+                IsBold = run.IsBold,
+                IsItalic = run.IsItalic,
+                WritingMode = request.WritingMode,
+                MaximumTextElements = request.MaximumTextElements,
+            };
+            foreach ((string segment, bool forcedBreak) in EnumerateBreakSegments(run.Text ?? string.Empty))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                textElements += CountTextElements(
+                    segment,
+                    request.MaximumTextElements - textElements,
+                    cancellationToken);
+                if (textElements > request.MaximumTextElements)
+                    throw new InvalidOperationException();
+                if (forcedBreak)
+                {
+                    maximumWidth = Math.Max(maximumWidth, currentWidth);
+                    totalHeight += Math.Max(
+                        currentHeight,
+                        MeasureLine(string.Empty, runRequest, NormalizeFontSize(run.FontSizePoints), cancellationToken)
+                            .HeightCentimeters);
+                    currentWidth = 0;
+                    currentHeight = 0;
+                    lineCount++;
+                    continue;
+                }
+
+                LineMeasurement measured = MeasureLine(
+                    segment,
+                    runRequest,
+                    NormalizeFontSize(run.FontSizePoints),
+                    cancellationToken);
+                if (limit is not null &&
+                    currentWidth > 0 &&
+                    currentWidth + measured.WidthCentimeters > limit.Value)
+                {
+                    maximumWidth = Math.Max(maximumWidth, currentWidth);
+                    totalHeight += currentHeight;
+                    currentWidth = 0;
+                    currentHeight = 0;
+                    lineCount++;
+                }
+                if (limit is not null && measured.WidthCentimeters > limit.Value)
+                {
+                    foreach (string element in EnumerateTextElements(segment))
+                    {
+                        LineMeasurement elementSize = MeasureLine(
+                            element,
+                            runRequest,
+                            NormalizeFontSize(run.FontSizePoints),
+                            cancellationToken);
+                        if (currentWidth > 0 &&
+                            currentWidth + elementSize.WidthCentimeters > limit.Value)
+                        {
+                            maximumWidth = Math.Max(maximumWidth, currentWidth);
+                            totalHeight += currentHeight;
+                            currentWidth = 0;
+                            currentHeight = 0;
+                            lineCount++;
+                        }
+                        currentWidth += elementSize.WidthCentimeters;
+                        currentHeight = Math.Max(currentHeight, elementSize.HeightCentimeters);
+                    }
+                }
+                else
+                {
+                    currentWidth += measured.WidthCentimeters;
+                    currentHeight = Math.Max(currentHeight, measured.HeightCentimeters);
+                }
+            }
+        }
+
+        maximumWidth = Math.Max(maximumWidth, currentWidth);
+        totalHeight += currentHeight;
+        if (totalHeight <= 0)
+            totalHeight = MeasureLine(string.Empty, request, NormalizeFontSize(request.FontSizePoints), cancellationToken)
+                .HeightCentimeters;
+        if (limit is not null)
+            maximumWidth = Math.Min(maximumWidth, limit.Value);
+        bool vertical = request.WritingMode is OdfWritingMode.TbLr or OdfWritingMode.TbRl;
+        OdfTextMeasureResult result = vertical
+            ? new OdfTextMeasureResult(totalHeight, maximumWidth, lineCount, true)
+            : new OdfTextMeasureResult(maximumWidth, totalHeight, lineCount, true);
+        return Rotate(result, request.RotationDegrees);
+    }
+
+    private static IEnumerable<(string Segment, bool ForcedBreak)> EnumerateBreakSegments(string text)
+    {
+        var segment = new StringBuilder();
+        string[] elements = EnumerateTextElements(text).ToArray();
+        for (int index = 0; index < elements.Length; index++)
+        {
+            string element = elements[index];
+            if (element is "\r" or "\n" or "\r\n")
+            {
+                if (segment.Length > 0)
+                {
+                    yield return (segment.ToString(), false);
+                    segment.Clear();
+                }
+                yield return (string.Empty, true);
+                continue;
+            }
+
+            segment.Append(element);
+            string? next = index + 1 < elements.Length ? elements[index + 1] : null;
+            if (CanBreakAfter(element, next))
+            {
+                yield return (segment.ToString(), false);
+                segment.Clear();
+            }
+        }
+        if (segment.Length > 0)
+            yield return (segment.ToString(), false);
+    }
+
+    private static bool CanBreakAfter(string current, string? next)
+    {
+        if (char.IsWhiteSpace(current, 0))
+            return current[0] is not '\u00a0' and not '\u202f';
+        int currentCodePoint = GetCodePoint(current);
+        if (!IsCjkBreakCharacter(currentCodePoint) || IsOpeningPunctuation(currentCodePoint))
+            return false;
+        if (next is null)
+            return true;
+        int nextCodePoint = GetCodePoint(next);
+        return !IsClosingPunctuation(nextCodePoint) &&
+            CharUnicodeInfo.GetUnicodeCategory(next, 0) is not
+                UnicodeCategory.NonSpacingMark and not
+                UnicodeCategory.EnclosingMark;
+    }
+
+    private static int GetCodePoint(string element) =>
+        element.Length >= 2 && char.IsSurrogatePair(element, 0)
+            ? char.ConvertToUtf32(element, 0)
+            : element[0];
+
+    private static bool IsOpeningPunctuation(int codePoint) =>
+        codePoint is 0x0028 or 0x005b or 0x007b or 0x2018 or 0x201c or
+            0x3008 or 0x300a or 0x300c or 0x300e or 0x3010 or 0x3014 or 0x3016;
+
+    private static bool IsClosingPunctuation(int codePoint) =>
+        codePoint is 0x0021 or 0x0025 or 0x0029 or 0x002c or 0x002e or 0x003a or
+            0x003b or 0x003f or 0x005d or 0x007d or 0x2019 or 0x201d or
+            0x3001 or 0x3002 or 0x3009 or 0x300b or 0x300d or 0x300f or
+            0x3011 or 0x3015 or 0x3017 or 0xff01 or 0xff0c or 0xff0e or 0xff1a or
+            0xff1b or 0xff1f;
+
+    private static IEnumerable<string> EnumerateTextElements(string text)
+    {
+        TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator(text);
+        while (enumerator.MoveNext())
+            yield return enumerator.GetTextElement();
+    }
+
+    private static bool IsCjkBreakCharacter(int codePoint) =>
+        codePoint is >= 0x2e80 and <= 0x9fff or
+            >= 0xac00 and <= 0xd7a3 or
+            >= 0xf900 and <= 0xfaff or
+            >= 0x20000 and <= 0x3fffd;
+
+    private static double NormalizeFontSize(double fontSize) =>
+        IsFinite(fontSize) && fontSize > 0
+            ? Math.Min(fontSize, 1_000)
+            : 10;
+
     private LineMeasurement MeasureLine(
         string text,
         OdfTextMeasureRequest request,
@@ -361,12 +560,22 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
     private FontResource LoadFont(FontKey key)
     {
         string? resolvedPath = _fontContext.ResolveFontPath(key.FontFamily);
+        byte[]? registeredData = _fontContext.ResolveFontData(key.FontFamily);
         SKTypeface? typeface = null;
         bool ownsTypeface = false;
         byte[]? fontData = null;
         int faceIndex = 0;
 
-        if (!string.IsNullOrEmpty(resolvedPath))
+        if (registeredData is not null)
+        {
+            if (registeredData.Length > _maximumFontBytes)
+                throw new InvalidOperationException();
+            fontData = registeredData;
+            using SKData data = SKData.CreateCopy(fontData);
+            typeface = SKTypeface.FromData(data, faceIndex);
+            ownsTypeface = typeface is not null;
+        }
+        else if (!string.IsNullOrEmpty(resolvedPath))
         {
             string fullPath = Path.GetFullPath(resolvedPath);
             try

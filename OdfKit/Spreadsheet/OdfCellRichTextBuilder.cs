@@ -88,6 +88,7 @@ public sealed class OdfCellRichTextBuilder
                     Italic = run.Italic,
                     Color = run.Color,
                     FontFamily = run.FontFamily,
+                    FontSizePoints = run.FontSizePoints,
                     Underline = run.Underline,
                 });
         }

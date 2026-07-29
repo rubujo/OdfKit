@@ -52,6 +52,7 @@ public sealed class OdfRichText
             Underline = options.Underline,
             Color = options.Color,
             FontFamily = options.FontFamily,
+            FontSizePoints = options.FontSizePoints,
         });
 
         return this;

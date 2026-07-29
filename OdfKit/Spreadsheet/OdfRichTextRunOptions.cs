@@ -47,4 +47,10 @@ public sealed class OdfRichTextRunOptions
     /// 取得或設定字型家族名稱；<see langword="null"/> 表示繼承。
     /// </summary>
     public string? FontFamily { get; set; }
+
+    /// <summary>
+    /// Gets or sets the font size in points; <see langword="null"/> indicates inheritance.
+    /// 取得或設定以點為單位的字型大小；<see langword="null"/> 表示繼承。
+    /// </summary>
+    public double? FontSizePoints { get; set; }
 }

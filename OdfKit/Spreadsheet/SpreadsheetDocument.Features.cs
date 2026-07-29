@@ -1296,9 +1296,16 @@ public partial class SpreadsheetDocument
 
     private readonly Dictionary<string, string> _richTextStyleCache = new(StringComparer.Ordinal);
 
-    internal string GetOrCreateCharacterStyle(bool bold, bool italic, bool underline, OdfColor? color, string? fontFamily)
+    internal string GetOrCreateCharacterStyle(
+        bool bold,
+        bool italic,
+        bool underline,
+        OdfColor? color,
+        string? fontFamily,
+        double? fontSizePoints)
     {
-        string key = $"b:{bold}|i:{italic}|u:{underline}|c:{color?.Value ?? ""}|f:{fontFamily ?? ""}";
+        string key = FormattableString.Invariant(
+            $"b:{bold}|i:{italic}|u:{underline}|c:{color?.Value ?? ""}|f:{fontFamily ?? ""}|s:{fontSizePoints}");
         if (_richTextStyleCache.TryGetValue(key, out string? cached))
             return cached;
 
@@ -1332,6 +1339,18 @@ public partial class SpreadsheetDocument
             props.SetAttribute("color", OdfNamespaces.Fo, color.Value.Value, "fo");
         if (!string.IsNullOrEmpty(fontFamily))
             props.SetAttribute("font-name", OdfNamespaces.Style, fontFamily!, "style");
+        if (fontSizePoints is double fontSize &&
+            !double.IsNaN(fontSize) &&
+            !double.IsInfinity(fontSize) &&
+            fontSize > 0 &&
+            fontSize <= 1_000)
+        {
+            props.SetAttribute(
+                "font-size",
+                OdfNamespaces.Fo,
+                fontSize.ToString("0.###", CultureInfo.InvariantCulture) + "pt",
+                "fo");
+        }
         styleNode.AppendChild(props);
         autoStyles.AppendChild(styleNode);
         StyleEngine.RebuildStyleIndex();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using OdfKit.Compliance;
@@ -50,6 +51,8 @@ public sealed class OdfFontContext
 
     private readonly object _lock = new();
     private readonly Dictionary<string, string> _fontMap = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, byte[]> _fontDataMap = new(StringComparer.OrdinalIgnoreCase);
+    private long _registeredFontDataBytes;
     private readonly Dictionary<string, string> _fallbackMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<string> _customDirectories = [];
     private readonly HashSet<string> _warnedMissingFonts = new(StringComparer.OrdinalIgnoreCase);
@@ -122,6 +125,96 @@ public sealed class OdfFontContext
         lock (_lock)
         {
             _fontMap[fontName] = filePath;
+        }
+    }
+
+    /// <summary>
+    /// Registers an in-memory font for precise layout without creating a temporary file.
+    /// 註冊記憶體中字型，供精確排版使用且不建立暫存檔。
+    /// </summary>
+    /// <param name="fontName">The font name. / 字型名稱。</param>
+    /// <param name="fontData">The OpenType or TrueType bytes, copied by this method. / OpenType 或 TrueType 位元組；本方法會複製內容。</param>
+    public void RegisterFontData(string fontName, byte[] fontData)
+    {
+        if (string.IsNullOrWhiteSpace(fontName))
+            throw new ArgumentNullException(nameof(fontName));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(fontData, nameof(fontData));
+        const int maximumFontBytes = 64 * 1024 * 1024;
+        if (fontData.Length == 0 || fontData.Length > maximumFontBytes)
+            throw new ArgumentOutOfRangeException(nameof(fontData));
+        byte[] copy = (byte[])fontData.Clone();
+        lock (_lock)
+        {
+            long previousLength = _fontDataMap.TryGetValue(fontName, out byte[]? previous)
+                ? previous.Length
+                : 0;
+            long nextTotal = checked(_registeredFontDataBytes - previousLength + copy.Length);
+            if ((_fontDataMap.Count >= 64 && previous is null) ||
+                nextTotal > 256L * 1024 * 1024)
+            {
+                throw new InvalidOperationException();
+            }
+            _fontDataMap[fontName] = copy;
+            _registeredFontDataBytes = nextTotal;
+        }
+    }
+
+    /// <summary>
+    /// Registers fonts embedded through ODF font-face URI declarations.
+    /// 註冊透過 ODF font-face URI 宣告內嵌的字型。
+    /// </summary>
+    /// <param name="document">The source document. / 來源文件。</param>
+    /// <param name="maximumFonts">The maximum embedded font count. / 內嵌字型數上限。</param>
+    /// <param name="maximumTotalBytes">The maximum total embedded font bytes. / 內嵌字型總位元組上限。</param>
+    /// <returns>The registered font count. / 已註冊的字型數。</returns>
+    public int RegisterEmbeddedFonts(
+        OdfDocument document,
+        int maximumFonts,
+        long maximumTotalBytes)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(
+            maximumFonts,
+            1,
+            nameof(maximumFonts));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(
+            maximumTotalBytes,
+            1,
+            nameof(maximumTotalBytes));
+        List<OdfNode> fontFaces = [];
+        GatherFontFaces(document.ContentRoot, fontFaces);
+        GatherFontFaces(document.StylesRoot, fontFaces);
+        int count = 0;
+        long total = 0;
+        foreach (OdfNode fontFace in fontFaces)
+        {
+            if (count >= maximumFonts)
+                throw new InvalidOperationException();
+            string? fontName = fontFace.GetAttribute("name", OdfNamespaces.Style);
+            OdfNode? uri = FindDescendant(fontFace, "font-face-uri", OdfNamespaces.Svg);
+            string? href = uri?.GetAttribute("href", OdfNamespaces.XLink);
+            if (string.IsNullOrWhiteSpace(fontName) || string.IsNullOrWhiteSpace(href))
+                continue;
+            string entryName = OdfPackage.SanitizeEntryName(href!);
+            if (!document.Package.GetEntries().Any(entry => string.Equals(entry.Path, entryName, StringComparison.Ordinal)))
+                continue;
+            byte[] bytes = document.Package.ReadEntry(entryName);
+            total = checked(total + bytes.Length);
+            if (total > maximumTotalBytes)
+                throw new InvalidOperationException();
+            RegisterFontData(fontName!, bytes);
+            count++;
+        }
+        return count;
+    }
+
+    internal byte[]? ResolveFontData(string fontName)
+    {
+        lock (_lock)
+        {
+            return _fontDataMap.TryGetValue(fontName, out byte[]? bytes)
+                ? bytes
+                : null;
         }
     }
 
@@ -856,6 +949,19 @@ public sealed class OdfFontContext
             }
         }
 
+        return null;
+    }
+
+    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == namespaceUri)
+                return child;
+            OdfNode? nested = FindDescendant(child, localName, namespaceUri);
+            if (nested is not null)
+                return nested;
+        }
         return null;
     }
 

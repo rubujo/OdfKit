@@ -415,6 +415,7 @@ internal static class OdfTableSheetLayoutEngine
         LayoutOperation operation)
     {
         operation.RecordCell();
+        operation.EnsureEmbeddedFonts(context.Document);
         var cell = new OdfCell(cellNode, row, column, context.Document, context.SheetName);
         string text = cell.FormattedValue;
         operation.RecordText(text);
@@ -478,6 +479,30 @@ internal static class OdfTableSheetLayoutEngine
             RotationDegrees = rotation,
             MaximumTextElements = operation.Options.MaximumTextElementsPerBlock
         };
+        OdfRichText? richText = cell.GetRichText();
+        if (richText is not null && richText.Runs.Count > 0)
+        {
+            operation.RecordRuns(richText.Runs.Count);
+            foreach (OdfRichTextRun run in richText.Runs)
+            {
+                request.Runs.Add(
+                    new OdfTextMeasureRun
+                    {
+                        Text = run.Text,
+                        FontFamily = string.IsNullOrWhiteSpace(run.FontFamily)
+                            ? fontFamily
+                            : run.FontFamily!,
+                        FontSizePoints = run.FontSizePoints is double runSize &&
+                            IsFinite(runSize) &&
+                            runSize > 0
+                                ? Math.Min(runSize, 1_000)
+                                : fontSize,
+                        IsBold = run.Bold || bold,
+                        IsItalic = run.Italic || italic,
+                    });
+            }
+            request.MaximumRuns = operation.Options.MaximumRichTextRuns;
+        }
 
         OdfTextMeasureResult measured = operation.Measure(request);
         double width = measured.WidthCentimeters + horizontalInset;
@@ -769,6 +794,10 @@ internal static class OdfTableSheetLayoutEngine
             throw new ArgumentOutOfRangeException(nameof(options));
         if (options.MaximumMeasurementCacheEntries < 0)
             throw new ArgumentOutOfRangeException(nameof(options));
+        if (options.MaximumRichTextRuns < 1)
+            throw new ArgumentOutOfRangeException(nameof(options));
+        if (options.MaximumEmbeddedFonts < 1 || options.MaximumEmbeddedFontBytes < 1)
+            throw new ArgumentOutOfRangeException(nameof(options));
         if (!IsFinite(options.DefaultFontSizePoints) ||
             options.DefaultFontSizePoints <= 0)
         {
@@ -857,6 +886,8 @@ internal static class OdfTableSheetLayoutEngine
         private readonly CancellationToken _cancellationToken;
         private int _cellCount;
         private long _textElementCount;
+        private int _richTextRunCount;
+        private bool _embeddedFontsInitialized;
 
         internal LayoutOperation(
             OdfAutoFitOptions options,
@@ -884,8 +915,39 @@ internal static class OdfTableSheetLayoutEngine
                 throw new InvalidOperationException();
         }
 
+        internal void RecordRuns(int count)
+        {
+            _richTextRunCount = checked(_richTextRunCount + count);
+            if (_richTextRunCount > Options.MaximumRichTextRuns)
+                throw new InvalidOperationException();
+        }
+
+        internal void EnsureEmbeddedFonts(SpreadsheetDocument document)
+        {
+            if (_embeddedFontsInitialized ||
+                Options.Mode != OdfAutoFitMode.Precise ||
+                !Options.UseEmbeddedFonts)
+            {
+                return;
+            }
+            if (ReferenceEquals(document.FontContext, OdfFontContext.Default))
+                throw new InvalidOperationException();
+            document.FontContext.RegisterEmbeddedFonts(
+                document,
+                Options.MaximumEmbeddedFonts,
+                Options.MaximumEmbeddedFontBytes);
+            _embeddedFontsInitialized = true;
+        }
+
         internal OdfTextMeasureResult Measure(OdfTextMeasureRequest request)
         {
+            if (request.Runs.Count > 0)
+            {
+                IOdfTextLayoutMeasurer runMeasurer = Options.Mode == OdfAutoFitMode.Precise
+                    ? Options.TextMeasurer!
+                    : OdfFastTextLayoutMeasurer.Instance;
+                return runMeasurer.Measure(request, _cancellationToken);
+            }
             var key = new MeasurementKey(
                 request.Text,
                 request.FontFamily,
