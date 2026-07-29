@@ -185,7 +185,7 @@ OdfPivotRefreshResult report = pivot.Refresh(
 編譯一次；未知函式、未知欄位、循環相依、除以零、非有限結果或任何資源乘積超限都會在寫入
 結果前失敗。
 
-進階 Pivot 可使用 ODF 1.0～1.4 的標準 DataPilot 結構保存分組、版面、總計與
+進階 Pivot 可使用 ODF 1.0～1.4 的標準 DataPilot 結構儲存分組、版面、總計與
 `Show Values As`，並在重新載入後由 `SpreadsheetDocument.RefreshPivotTable` 刷新：
 
 ```csharp
