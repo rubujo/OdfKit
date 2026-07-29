@@ -59,6 +59,7 @@ public static class OdtOperationsExporter
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
 
         options ??= new OdtOperationCompatibilityOptions();
+        ValidateSafety(options.Safety);
         List<OdtOperation> operations = [];
         int bodyIndex = 0;
 
@@ -77,19 +78,20 @@ public static class OdtOperationsExporter
                     Start = [bodyIndex],
                     Attrs = BuildParagraphAttributes(child),
                 });
+                EnsureOperationCount(operations, options.Safety);
 
                 int characterIndex = 0;
-                AppendTextOperations(child, bodyIndex, ref characterIndex, operations);
+                AppendTextOperations(child, bodyIndex, ref characterIndex, operations, options.Safety);
                 bodyIndex++;
             }
         }
 
-        if (options.EnvelopeMode == OdtOperationEnvelopeMode.TdfChangesObject)
-        {
-            return JsonSerializer.Serialize(new OdtOperationEnvelope(operations), SerializerOptions);
-        }
-
-        return JsonSerializer.Serialize(operations, SerializerOptions);
+        string json = options.EnvelopeMode == OdtOperationEnvelopeMode.TdfChangesObject
+            ? JsonSerializer.Serialize(new OdtOperationEnvelope(operations), SerializerOptions)
+            : JsonSerializer.Serialize(operations, SerializerOptions);
+        if (json.Length > options.Safety.MaxJsonLength)
+            throw new InvalidOperationException();
+        return json;
     }
 
     private static Dictionary<string, object>? BuildParagraphAttributes(OdfNode paragraphNode)
@@ -110,13 +112,14 @@ public static class OdtOperationsExporter
         OdfNode paragraphNode,
         int bodyIndex,
         ref int characterIndex,
-        List<OdtOperation> operations)
+        List<OdtOperation> operations,
+        OdtOperationSafetyOptions safety)
     {
         foreach (OdfNode child in paragraphNode.Children)
         {
             if (child.NodeType == OdfNodeType.Text)
             {
-                AppendAddTextOperation(bodyIndex, ref characterIndex, child.TextContent ?? string.Empty, operations);
+                AppendAddTextOperation(bodyIndex, ref characterIndex, child.TextContent ?? string.Empty, operations, safety);
                 continue;
             }
 
@@ -127,13 +130,15 @@ public static class OdtOperationsExporter
 
             if (child.LocalName == "span")
             {
-                AppendTextOperations(child, bodyIndex, ref characterIndex, operations);
+                AppendTextOperations(child, bodyIndex, ref characterIndex, operations, safety);
             }
             else if (child.LocalName == "s")
             {
                 string? countAttr = child.GetAttribute("c", OdfNamespaces.Text);
                 int count = int.TryParse(countAttr, out int parsed) && parsed > 0 ? parsed : 1;
-                AppendAddTextOperation(bodyIndex, ref characterIndex, new string(' ', count), operations);
+                if (count > safety.MaxTextLength)
+                    throw new InvalidOperationException();
+                AppendAddTextOperation(bodyIndex, ref characterIndex, new string(' ', count), operations, safety);
             }
             else if (child.LocalName == "tab")
             {
@@ -142,6 +147,7 @@ public static class OdtOperationsExporter
                     Name = "addTab",
                     Start = [bodyIndex, characterIndex],
                 });
+                EnsureOperationCount(operations, safety);
                 characterIndex++;
             }
             else if (child.LocalName == "line-break")
@@ -151,17 +157,18 @@ public static class OdtOperationsExporter
                     Name = "addLineBreak",
                     Start = [bodyIndex, characterIndex],
                 });
+                EnsureOperationCount(operations, safety);
                 characterIndex++;
             }
             else if (!string.IsNullOrEmpty(child.TextContent))
             {
-                AppendAddTextOperation(bodyIndex, ref characterIndex, child.TextContent ?? string.Empty, operations);
+                AppendAddTextOperation(bodyIndex, ref characterIndex, child.TextContent ?? string.Empty, operations, safety);
             }
         }
 
         if (characterIndex == 0 && !string.IsNullOrEmpty(paragraphNode.TextContent))
         {
-            AppendAddTextOperation(bodyIndex, ref characterIndex, paragraphNode.TextContent, operations);
+            AppendAddTextOperation(bodyIndex, ref characterIndex, paragraphNode.TextContent, operations, safety);
         }
     }
 
@@ -169,12 +176,15 @@ public static class OdtOperationsExporter
         int bodyIndex,
         ref int characterIndex,
         string text,
-        List<OdtOperation> operations)
+        List<OdtOperation> operations,
+        OdtOperationSafetyOptions safety)
     {
         if (string.IsNullOrEmpty(text))
         {
             return;
         }
+        if (text.Length > safety.MaxTextLength)
+            throw new InvalidOperationException();
 
         operations.Add(new OdtOperation
         {
@@ -182,7 +192,27 @@ public static class OdtOperationsExporter
             Start = [bodyIndex, characterIndex],
             Text = text,
         });
-        characterIndex += text.Length;
+        EnsureOperationCount(operations, safety);
+        characterIndex = checked(characterIndex + text.Length);
+        if (characterIndex > safety.MaxPositionComponent)
+            throw new InvalidOperationException();
+    }
+
+    private static void EnsureOperationCount(List<OdtOperation> operations, OdtOperationSafetyOptions safety)
+    {
+        if (operations.Count > safety.MaxOperationCount)
+            throw new InvalidOperationException();
+    }
+
+    private static void ValidateSafety(OdtOperationSafetyOptions safety)
+    {
+        if (safety.MaxJsonLength < 1 ||
+            safety.MaxOperationCount < 1 ||
+            safety.MaxTextLength < 1 ||
+            safety.MaxPositionComponent < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(safety));
+        }
     }
 
     private sealed class OdtOperation

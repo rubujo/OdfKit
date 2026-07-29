@@ -817,6 +817,26 @@ public sealed class CollaborationOperationsTests
         Assert.Equal(0, report.UnsupportedCount);
     }
 
+    /// <summary>
+    /// 驗證公開相容 profile 與匯出資源限制保持一致。
+    /// </summary>
+    [Fact]
+    public void CompatibilityProfileAndExporterBudgetsAreAuditable()
+    {
+        Assert.True(OdtOperationCompatibilityProfile.SupportsImport("addTable"));
+        Assert.False(OdtOperationCompatibilityProfile.SupportsExport("addTable"));
+        Assert.True(OdtOperationCompatibilityProfile.SupportsExport("addText"));
+
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("too long");
+        var options = new OdtOperationCompatibilityOptions
+        {
+            Safety = new OdtOperationSafetyOptions { MaxTextLength = 3 },
+        };
+        Assert.Throws<InvalidOperationException>(
+            () => OdtOperationsExporter.ExportToJson(document, options));
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
