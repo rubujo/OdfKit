@@ -2,7 +2,7 @@
 title: Immaterielle rettigheter og samsvar
 _lang: nb
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # Immaterielle rettigheter og samsvar

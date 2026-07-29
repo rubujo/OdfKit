@@ -2,7 +2,7 @@
 title: Propiedad intelectual y conformidad
 _lang: es
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # Propiedad intelectual y conformidad (IP Compliance)
@@ -81,7 +81,7 @@ Las normas de Git del proyecto también exigen la firma GPG.
 | Licencias | Lea `LICENSE` y `THIRD-PARTY-NOTICES.md`; incorpore el SBOM y el análisis de licencias a la integración continua |
 | Versión | La versión actual es `0.x`; consulte los compromisos de compatibilidad en `CHANGELOG` y [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | Límites funcionales | Use [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) y las evidencias de pruebas; no se base solo en afirmaciones comerciales |
-| Objetivos excluidos | Consulte [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), que incluye el motor de maquetación completo y el recálculo de tablas dinámicas |
+| Objetivos excluidos | Consulte [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), que incluye el motor de maquetación completo y funciones interactivas de suites ofimáticas como la caché de tablas dinámicas y los segmentadores |
 | Seguridad | Use los límites de recursos de `OdfLoadOptions`; ejecute `Validate` y el saneamiento sobre entradas que no sean de confianza |
 | Fuentes | Revise `docs/provenance/`; cuando proceda, compare los directorios de alto riesgo con los proyectos de origen para detectar similitudes |
 | Soporte | El proyecto de código abierto no ofrece SLA; los sistemas críticos deben disponer de redundancia y un plan de mantenimiento propio |

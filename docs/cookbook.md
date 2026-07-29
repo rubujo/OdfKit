@@ -329,6 +329,19 @@ await OdsSparseEditor.ApplyFileAsync(
             Row = 1_000_002,
             Column = 4,
             Text = "合併摘要",
+            AutomaticStyle = new OdsSparseAutomaticCellStyle
+            {
+                Name = "SparseSummary",
+                Bold = true,
+                BackgroundColor = "#E2F0D9",
+                WrapText = true
+            },
+            Annotation = new OdfCellAnnotation
+            {
+                Author = "OdfKit",
+                Text = "由批次作業更新"
+            },
+            MergeMode = OdsSparseMergeMode.Set,
             RowSpan = 2,
             ColumnSpan = 3
         }
@@ -336,14 +349,17 @@ await OdsSparseEditor.ApplyFileAsync(
     new OdsSparseEditorOptions
     {
         MaximumPatches = 10_000,
-        MaximumReplacementCharacters = 100_000
+        MaximumReplacementCharacters = 100_000,
+        MaximumTotalReplacementCharacters = 8_000_000
     },
     cancellationToken);
 ```
 
-公式會先驗證語法；樣式必須已存在，合併覆蓋區也必須是空白且尚未合併。輸入為加密 ODS、
-不存在的座標、重疊 patch 或超出 ZIP／XML／repeat／merge 上限時會失敗，不會降級成全
-DOM 修改。各格式是否適合相同機制，見
+公式會先驗證語法；patch 可引用既有 cell style，或建立具型別且有界的 automatic cell
+style。批註可新增、取代或移除；合併格可建立、調整或解除，但被新增覆蓋的儲存格必須
+是空白，縮小或解除時也不會猜測先前被覆蓋的內容。輸入為加密 ODS、不存在的座標、重疊
+patch、樣式循環／衝突，或超出 ZIP／XML／文字／repeat／merge 上限時會失敗，不會降級成
+全 DOM 修改。各格式是否適合相同機制，見
 [`streaming-local-editing.md`](streaming-local-editing.md)。
 
 ## 建立 ODT
@@ -1023,10 +1039,11 @@ sheet.MaxHotPages = 4; // 約 4 × 655 KB ≈ 2.6 MB 熱記憶體上限
 
 ### 目前的限制
 
-DOM 編輯路徑目前沒有「逐列串流讀取＋修改＋寫回」的中間方案：一旦存取某張工作表，
-該工作表的行結構（`table:table-row` 這層）仍會一次性具現化。若編輯場景是「只改
-少數幾列、其餘原封不動地保留」，建議評估是否能改用 `OdsStreamReader` 讀出所需資料、
-另以 `OdsStreamWriter` 重新輸出整份檔案，而非開啟既有檔案做原地編輯。
+一般 DOM 編輯路徑一旦存取某張工作表，仍會具現化該表的 row structure。只修改少量已知
+座標時，應使用前述 `OdsSparseEditor`：它逐列串流讀寫，只具現化命中的實體 row subtree，
+並支援文字、公式、既有或新建樣式、批註，以及建立、調整與解除合併格。跨工作表結構
+重排、任意 XML 子樹編輯或需要完整物件圖參照修復的操作，仍應使用 DOM；建立全新大型
+文件則使用 `OdsStreamWriter`。
 
 ## CLI 驗證與轉換
 

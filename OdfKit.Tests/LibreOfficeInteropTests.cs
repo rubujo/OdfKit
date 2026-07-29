@@ -153,6 +153,95 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
+    /// 驗證稀疏編輯器建立的 automatic style、批注與合併格可由 LibreOffice 26.x 往返。
+    /// </summary>
+    [Fact]
+    public async Task LibreOfficeHeadlessRoundTripsSparseEditorFeatures()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過稀疏編輯實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeSparseEditor_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string sourcePath = Path.Combine(tempRoot, "source.ods");
+            string patchedPath = Path.Combine(tempRoot, "sparse-editor.ods");
+            using (var document = SpreadsheetDocument.Create())
+            {
+                OdfTableSheet sheet = document.AddSheet("Data");
+                sheet.Cells["A1"].CellValue = "Sparse-Interop-Marker";
+                sheet.Cells["B1"].Style.Fill.Color = "#FFFFFF";
+                sheet.Cells["A2"].Style.Fill.Color = "#FFFFFF";
+                sheet.Cells["B2"].Style.Fill.Color = "#FFFFFF";
+                document.Save(sourcePath);
+            }
+
+            await OdsSparseEditor.ApplyFileAsync(
+                sourcePath,
+                patchedPath,
+                [
+                    new OdsCellPatch
+                    {
+                        SheetName = "Data",
+                        Row = 0,
+                        Column = 0,
+                        AutomaticStyle = new OdsSparseAutomaticCellStyle
+                        {
+                            Name = "ceSparseInterop",
+                            Bold = true,
+                            BackgroundColor = "#E2F0D9",
+                            WrapText = true,
+                        },
+                        Annotation = new OdfCellAnnotation
+                        {
+                            Author = "OdfKit",
+                            Text = "Sparse annotation",
+                        },
+                        MergeMode = OdsSparseMergeMode.Set,
+                        RowSpan = 2,
+                        ColumnSpan = 2,
+                    },
+                ],
+                options: null,
+                cancellationToken: TestContext.Current.CancellationToken);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "ods", patchedPath);
+            string roundTripPath = Path.Combine(outputDir, "sparse-editor.ods");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出稀疏編輯 ODS 的往返結果。");
+
+            using SpreadsheetDocument loaded = SpreadsheetDocument.Load(roundTripPath);
+            OdfCell cell = loaded.Worksheets["Data"].Cells["A1"];
+            Assert.Equal("Sparse-Interop-Marker", cell.CellValue);
+            string contentXml = ReadSpreadsheetContentXml(loaded);
+            Assert.Contains("style:name=\"ceSparseInterop\"", contentXml);
+            Assert.Contains("table:default-cell-style-name=\"ceSparseInterop\"", contentXml);
+            Assert.Contains("fo:background-color=\"#e2f0d9\"", contentXml);
+            Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+            OdfCellAnnotation annotation = Assert.IsType<OdfCellAnnotation>(cell.FindAnnotation());
+            Assert.Equal("OdfKit", annotation.Author);
+            Assert.Equal("Sparse annotation", annotation.Text);
+            Assert.Contains("table:number-columns-spanned=\"2\"", contentXml);
+            Assert.Contains("table:number-rows-spanned=\"2\"", contentXml);
+            Assert.Contains("<table:covered-table-cell", contentXml);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.RejectAllChanges"/> 拒絕全部待處理修訂後的 ODS，
     /// 仍可由 LibreOffice 26.x headless 模式載入並往返，且儲存格已還原為原始內容。
     /// </summary>

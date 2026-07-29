@@ -2,7 +2,7 @@
 title: 知的財産とコンプライアンス
 _lang: ja
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # 知的財産とコンプライアンス (IP Compliance)
@@ -83,7 +83,7 @@ commit メッセージまたは PR の説明に `Signed-off-by: Name <email>` �
 | ライセンス | `LICENSE` と `THIRD-PARTY-NOTICES.md` を読み、SBOM とライセンススキャンを CI に組み込む |
 | バージョン | 現在は `0.x` です。互換性に関する方針は `CHANGELOG` と [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) を参照する |
 | 機能の境界 | [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) とテストの根拠を基準とし、宣伝上の表現だけに依存しない |
-| 対象外 | 完全なレイアウトエンジンやピボットテーブルの再計算などについては [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md) を参照する |
+| 対象外 | 完全なレイアウトエンジンや、pivot cache／slicer などオフィススイートの対話型機能については [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md) を参照する |
 | セキュリティ | `OdfLoadOptions` のリソース上限を使用し、信頼できない入力には `Validate` とサニタイズを実行する |
 | 情報源 | `docs/provenance/` を確認し、必要に応じてリスクの高いディレクトリを上流プロジェクトと比較して類似性を検査する |
 | サポート | オープンソースプロジェクトには SLA がありません。重要なシステムには冗長性と独自の保守計画を用意する |

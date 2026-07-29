@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Globalization;
 using System.Linq;
 using System.Security;
 using System.Text;
@@ -59,6 +60,24 @@ public sealed class OdsCellPatch
     public string? StyleName { get; set; }
 
     /// <summary>
+    /// Gets or sets a bounded automatic cell style to create and apply.
+    /// 取得或設定要建立並套用的有界 automatic cell style。
+    /// </summary>
+    public OdsSparseAutomaticCellStyle? AutomaticStyle { get; set; }
+
+    /// <summary>
+    /// Gets or sets an annotation to add or replace, or null to preserve the current annotation.
+    /// 取得或設定要新增或取代的批注；null 表示保留目前批注。
+    /// </summary>
+    public OdfCellAnnotation? Annotation { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the current cell annotation is removed.
+    /// 取得或設定是否移除目前的儲存格批注。
+    /// </summary>
+    public bool RemoveAnnotation { get; set; }
+
+    /// <summary>
     /// Gets or sets the number of rows merged from the target cell.
     /// 取得或設定自目標儲存格起合併的列數。
     /// </summary>
@@ -69,6 +88,12 @@ public sealed class OdsCellPatch
     /// 取得或設定自目標儲存格起合併的欄數。
     /// </summary>
     public int ColumnSpan { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets how the patch changes an existing merged range.
+    /// 取得或設定修補如何變更既有合併範圍。
+    /// </summary>
+    public OdsSparseMergeMode MergeMode { get; set; }
 }
 
 /// <summary>
@@ -94,6 +119,12 @@ public sealed class OdsSparseEditorOptions
     /// 取得或設定單一取代值允許的最大字元數。
     /// </summary>
     public int MaximumReplacementCharacters { get; set; } = 1_000_000;
+
+    /// <summary>
+    /// Gets or sets the maximum aggregate characters across text, annotations, formulas, and style metadata.
+    /// 取得或設定文字、批注、公式與樣式中繼資料的總字元數上限。
+    /// </summary>
+    public long MaximumTotalReplacementCharacters { get; set; } = 64L * 1024 * 1024;
 
     /// <summary>
     /// Gets or sets the maximum characters accepted in one formula or style name.
@@ -142,8 +173,22 @@ public static class OdsSparseEditor
     private static readonly XNamespace Office = OdfNamespaces.Office;
     private static readonly XNamespace Text = OdfNamespaces.Text;
     private static readonly XNamespace Style = OdfNamespaces.Style;
+    private static readonly XNamespace Fo = OdfNamespaces.Fo;
+    private static readonly XNamespace Dc = OdfNamespaces.Dc;
 
-    private sealed class CellEdit(OdsCellPatch patch, int row, int column, bool covered)
+    private enum CellEditKind
+    {
+        Anchor,
+        Covered,
+        Uncovered
+    }
+
+    private sealed class CellEdit(
+        OdsCellPatch patch,
+        int row,
+        int column,
+        CellEditKind kind,
+        bool belongsToExistingMerge = false)
     {
         internal OdsCellPatch Patch { get; } = patch;
 
@@ -151,7 +196,9 @@ public static class OdsSparseEditor
 
         internal int Column { get; } = column;
 
-        internal bool Covered { get; } = covered;
+        internal CellEditKind Kind { get; } = kind;
+
+        internal bool BelongsToExistingMerge { get; } = belongsToExistingMerge;
     }
 
     /// <summary>
@@ -264,6 +311,38 @@ public static class OdsSparseEditor
             input.GetEntry("styles.xml"),
             options,
             cancellationToken);
+        ZipArchiveEntry? contentEntry = input.GetEntry("content.xml");
+        if (contentEntry is null)
+            throw new InvalidDataException();
+        if (contentEntry.Length > options.LoadOptions.MaxEntrySize)
+        {
+            throw new SecurityException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfPackage_ZipEntrySizeLimitExceeded",
+                    contentEntry.FullName,
+                    contentEntry.Length,
+                    options.LoadOptions.MaxEntrySize));
+        }
+        Dictionary<string, OdsSparseAutomaticCellStyle> automaticStyles =
+            CollectAutomaticStyles(patchMap.Values, options);
+        bool requiresContentPreflight = automaticStyles.Count > 0 ||
+            patchMap.Values.Any(edit =>
+                edit.Patch.MergeMode != OdsSparseMergeMode.Preserve ||
+                edit.Patch.RowSpan > 1 ||
+                edit.Patch.ColumnSpan > 1);
+        bool contentHasAutomaticStyles = false;
+        if (requiresContentPreflight)
+        {
+            patchMap = PrepareCellEdits(
+                contentEntry,
+                patchMap,
+                styleNames,
+                options,
+                cancellationToken,
+                out contentHasAutomaticStyles);
+        }
+        ValidateAutomaticStyles(automaticStyles, styleNames, options);
+        styleNames.UnionWith(automaticStyles.Keys);
         long totalSize = 0;
         bool contentSeen = false;
         var entryNames = new HashSet<string>(StringComparer.Ordinal);
@@ -288,6 +367,8 @@ public static class OdsSparseEditor
                     outputStream,
                     patchMap,
                     styleNames,
+                    automaticStyles,
+                    contentHasAutomaticStyles,
                     options,
                     cancellationToken);
             }
@@ -312,7 +393,7 @@ public static class OdsSparseEditor
     {
         var result = new Dictionary<(string, int, int), CellEdit>();
         int patchCount = 0;
-        long mergedCells = 0;
+        long totalCharacters = 0;
         foreach (OdsCellPatch patch in patches)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -326,37 +407,46 @@ public static class OdsSparseEditor
                 patch.RowSpan > options.MaximumRepeat ||
                 patch.ColumnSpan > options.MaximumRepeat ||
                 (patch.Text?.Length ?? 0) > options.MaximumReplacementCharacters ||
+                (patch.Annotation?.Text.Length ?? 0) > options.MaximumReplacementCharacters ||
                 (patch.Formula?.Length ?? 0) > options.MaximumMetadataCharacters ||
                 (patch.StyleName?.Length ?? 0) > options.MaximumMetadataCharacters ||
-                (patch.Text is not null && patch.Formula is not null))
+                (patch.Annotation?.Author?.Length ?? 0) > options.MaximumMetadataCharacters ||
+                (patch.Text is not null && patch.Formula is not null) ||
+                (patch.Annotation is not null && patch.RemoveAnnotation) ||
+                (patch.MergeMode == OdsSparseMergeMode.Remove &&
+                    (patch.RowSpan != 1 || patch.ColumnSpan != 1)) ||
+                (patch.AutomaticStyle is not null &&
+                    patch.StyleName is not null &&
+                    !string.Equals(
+                        patch.AutomaticStyle.Name,
+                        patch.StyleName,
+                        StringComparison.Ordinal)))
             {
                 throw new ArgumentOutOfRangeException(nameof(patches));
             }
             ValidateFormula(patch.Formula, options);
-            long patchCells = checked((long)patch.RowSpan * patch.ColumnSpan);
-            mergedCells = checked(mergedCells + patchCells);
-            if (mergedCells > options.MaximumMergedCells)
+            totalCharacters = checked(
+                totalCharacters +
+                (patch.Text?.Length ?? 0) +
+                (patch.Formula?.Length ?? 0) +
+                (patch.StyleName?.Length ?? 0) +
+                (patch.Annotation?.Text.Length ?? 0) +
+                (patch.Annotation?.Author?.Length ?? 0) +
+                GetAutomaticStyleCharacterCount(patch.AutomaticStyle));
+            if (totalCharacters > options.MaximumTotalReplacementCharacters)
                 throw new ArgumentOutOfRangeException(nameof(patches));
-            for (int rowOffset = 0; rowOffset < patch.RowSpan; rowOffset++)
+            var key = (patch.SheetName, patch.Row, patch.Column);
+            if (result.ContainsKey(key))
             {
-                int row = checked(patch.Row + rowOffset);
-                for (int columnOffset = 0; columnOffset < patch.ColumnSpan; columnOffset++)
-                {
-                    int column = checked(patch.Column + columnOffset);
-                    var key = (patch.SheetName, row, column);
-                    if (result.ContainsKey(key))
-                    {
-                        throw new ArgumentException(
-                            OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellAddress", column),
-                            nameof(patches));
-                    }
-                    result.Add(key, new CellEdit(
-                        patch,
-                        row,
-                        column,
-                        rowOffset != 0 || columnOffset != 0));
-                }
+                throw new ArgumentException(
+                    OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellAddress", patch.Column),
+                    nameof(patches));
             }
+            result.Add(key, new CellEdit(
+                patch,
+                patch.Row,
+                patch.Column,
+                CellEditKind.Anchor));
         }
         return result;
     }
@@ -403,11 +493,393 @@ public static class OdsSparseEditor
         _ = new FormulaParser(normalized).Parse();
     }
 
+    private static Dictionary<(string Sheet, int Row, int Column), CellEdit> PrepareCellEdits(
+        ZipArchiveEntry contentEntry,
+        Dictionary<(string Sheet, int Row, int Column), CellEdit> anchors,
+        HashSet<string> styleNames,
+        OdsSparseEditorOptions options,
+        CancellationToken cancellationToken,
+        out bool contentHasAutomaticStyles)
+    {
+        var result = new Dictionary<(string, int, int), CellEdit>(anchors);
+        Dictionary<string, Queue<KeyValuePair<int, List<CellEdit>>>> patchRows = anchors
+            .Values
+            .GroupBy(edit => edit.Patch.SheetName, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => new Queue<KeyValuePair<int, List<CellEdit>>>(
+                    group.GroupBy(edit => edit.Row)
+                        .OrderBy(rowGroup => rowGroup.Key)
+                        .Select(rowGroup => new KeyValuePair<int, List<CellEdit>>(
+                            rowGroup.Key,
+                            rowGroup.OrderBy(edit => edit.Column).ToList()))),
+                StringComparer.Ordinal);
+        var readerSettings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersFromEntities = 0,
+            MaxCharactersInDocument = options.LoadOptions.MaxXmlCharactersInDocument,
+            IgnoreWhitespace = true,
+            CloseInput = false,
+        };
+        contentHasAutomaticStyles = false;
+        long mergedCells = 0;
+        string? currentSheet = null;
+        int logicalRow = 0;
+        using Stream stream = contentEntry.Open();
+        using XmlReader reader = XmlReader.Create(stream, readerSettings);
+        bool processCurrent = false;
+        while (processCurrent || reader.Read())
+        {
+            processCurrent = false;
+            cancellationToken.ThrowIfCancellationRequested();
+            if (reader.NodeType != XmlNodeType.Element)
+                continue;
+            IndexStyleDeclaration(reader, styleNames, options);
+            if (reader.NamespaceURI == OdfNamespaces.Office &&
+                reader.LocalName == "automatic-styles")
+            {
+                contentHasAutomaticStyles = true;
+                continue;
+            }
+            if (reader.NamespaceURI == OdfNamespaces.Table &&
+                reader.LocalName == "table")
+            {
+                currentSheet = reader.GetAttribute("name", OdfNamespaces.Table);
+                logicalRow = 0;
+                continue;
+            }
+            if (reader.NamespaceURI != OdfNamespaces.Table ||
+                reader.LocalName != "table-row" ||
+                currentSheet is null)
+            {
+                continue;
+            }
+
+            XElement row = (XElement)XNode.ReadFrom(reader);
+            int repeat = GetRepeat(row, Table + "number-rows-repeated", options.MaximumRepeat);
+            int rowEnd = checked(logicalRow + repeat);
+            if (patchRows.TryGetValue(currentSheet, out Queue<KeyValuePair<int, List<CellEdit>>>? queue))
+            {
+                if (queue.Count > 0 && queue.Peek().Key < logicalRow)
+                    throw new InvalidDataException();
+                while (queue.Count > 0 && queue.Peek().Key < rowEnd)
+                {
+                    KeyValuePair<int, List<CellEdit>> patchRow = queue.Dequeue();
+                    foreach (CellEdit anchor in patchRow.Value)
+                    {
+                        XElement sourceCell = FindCell(row, anchor.Column, options, out int cellRepeat);
+                        PrepareMergeEdits(
+                            sourceCell,
+                            cellRepeat,
+                            anchor,
+                            result,
+                            options,
+                            ref mergedCells);
+                    }
+                }
+            }
+            logicalRow = rowEnd;
+            processCurrent = reader.ReadState == ReadState.Interactive;
+        }
+        if (patchRows.Values.Any(queue => queue.Count != 0))
+            throw new InvalidDataException();
+        return result;
+    }
+
+    private static XElement FindCell(
+        XElement row,
+        int targetColumn,
+        OdsSparseEditorOptions options,
+        out int repeat)
+    {
+        int column = 0;
+        foreach (XElement cell in row.Elements()
+            .Where(element => element.Name == Table + "table-cell" ||
+                element.Name == Table + "covered-table-cell"))
+        {
+            repeat = GetRepeat(cell, Table + "number-columns-repeated", options.MaximumRepeat);
+            int end = checked(column + repeat);
+            if (targetColumn < end)
+                return cell;
+            column = end;
+        }
+        repeat = 0;
+        throw new InvalidDataException();
+    }
+
+    private static void PrepareMergeEdits(
+        XElement sourceCell,
+        int cellRepeat,
+        CellEdit anchor,
+        Dictionary<(string Sheet, int Row, int Column), CellEdit> result,
+        OdsSparseEditorOptions options,
+        ref long mergedCells)
+    {
+        if (sourceCell.Name != Table + "table-cell")
+            throw new InvalidDataException();
+        int oldRows = GetSpan(sourceCell, Table + "number-rows-spanned", options.MaximumRepeat);
+        int oldColumns = GetSpan(sourceCell, Table + "number-columns-spanned", options.MaximumRepeat);
+        if (cellRepeat > 1 && (oldRows > 1 || oldColumns > 1))
+            throw new InvalidDataException();
+
+        OdsCellPatch patch = anchor.Patch;
+        bool legacySet = patch.MergeMode == OdsSparseMergeMode.Preserve &&
+            (patch.RowSpan > 1 || patch.ColumnSpan > 1);
+        int newRows;
+        int newColumns;
+        if (patch.MergeMode == OdsSparseMergeMode.Remove)
+        {
+            newRows = 1;
+            newColumns = 1;
+        }
+        else if (patch.MergeMode == OdsSparseMergeMode.Set || legacySet)
+        {
+            newRows = patch.RowSpan;
+            newColumns = patch.ColumnSpan;
+        }
+        else
+        {
+            newRows = oldRows;
+            newColumns = oldColumns;
+        }
+
+        if (oldRows == newRows && oldColumns == newColumns)
+            return;
+
+        int unionRows = Math.Max(oldRows, newRows);
+        int unionColumns = Math.Max(oldColumns, newColumns);
+        long unionCells = checked((long)unionRows * unionColumns);
+        mergedCells = checked(mergedCells + unionCells);
+#if NET10_0_OR_GREATER
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(
+            mergedCells,
+            options.MaximumMergedCells,
+            nameof(options));
+#else
+        if (mergedCells > options.MaximumMergedCells)
+            throw new ArgumentOutOfRangeException(nameof(options));
+#endif
+
+        for (int rowOffset = 0; rowOffset < unionRows; rowOffset++)
+        {
+            for (int columnOffset = 0; columnOffset < unionColumns; columnOffset++)
+            {
+                if (rowOffset == 0 && columnOffset == 0)
+                    continue;
+                bool inOld = rowOffset < oldRows && columnOffset < oldColumns;
+                bool inNew = rowOffset < newRows && columnOffset < newColumns;
+                if (!inOld && !inNew)
+                    continue;
+                int row = checked(anchor.Row + rowOffset);
+                int column = checked(anchor.Column + columnOffset);
+                var key = (patch.SheetName, row, column);
+                if (result.ContainsKey(key))
+                {
+                    throw new ArgumentException(
+                        OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellAddress", column),
+                        nameof(result));
+                }
+                result.Add(
+                    key,
+                    new CellEdit(
+                        patch,
+                        row,
+                        column,
+                        inNew ? CellEditKind.Covered : CellEditKind.Uncovered,
+                        inOld));
+            }
+        }
+    }
+
+    private static int GetSpan(XElement element, XName attribute, int maximum)
+    {
+        XAttribute? value = element.Attribute(attribute);
+        if (value is null)
+            return 1;
+        if (!int.TryParse(
+                value.Value,
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out int parsed) ||
+            parsed < 1 ||
+            parsed > maximum)
+        {
+            throw new InvalidDataException();
+        }
+        return parsed;
+    }
+
+    private static Dictionary<string, OdsSparseAutomaticCellStyle> CollectAutomaticStyles(
+        IEnumerable<CellEdit> edits,
+        OdsSparseEditorOptions options)
+    {
+        var result = new Dictionary<string, OdsSparseAutomaticCellStyle>(StringComparer.Ordinal);
+        foreach (OdsSparseAutomaticCellStyle style in edits
+            .Select(edit => edit.Patch.AutomaticStyle)
+            .Where(style => style is not null)
+            .Cast<OdsSparseAutomaticCellStyle>())
+        {
+            ValidateAutomaticStyleShape(style, options);
+            if (result.TryGetValue(style.Name, out OdsSparseAutomaticCellStyle? existing))
+            {
+                if (!string.Equals(
+                        GetAutomaticStyleSignature(existing),
+                        GetAutomaticStyleSignature(style),
+                        StringComparison.Ordinal))
+                {
+                    throw new ArgumentException(
+                        OdfLocalizer.GetMessage(
+                            "Err_OdfDatabaseDocument_DuplicateName",
+                            style.Name),
+                        nameof(edits));
+                }
+            }
+            else
+            {
+                result.Add(style.Name, style);
+            }
+        }
+        return result;
+    }
+
+    private static void ValidateAutomaticStyles(
+        IReadOnlyDictionary<string, OdsSparseAutomaticCellStyle> automaticStyles,
+        HashSet<string> existingStyleNames,
+        OdsSparseEditorOptions options)
+    {
+        if (checked(existingStyleNames.Count + automaticStyles.Count) >
+            options.MaximumStyleDeclarations)
+        {
+            throw new InvalidDataException();
+        }
+        foreach (OdsSparseAutomaticCellStyle style in automaticStyles.Values)
+        {
+            if (existingStyleNames.Contains(style.Name))
+                throw new InvalidDataException();
+            if (style.ParentStyleName is not null &&
+                !existingStyleNames.Contains(style.ParentStyleName) &&
+                !automaticStyles.ContainsKey(style.ParentStyleName))
+            {
+                throw new InvalidDataException();
+            }
+        }
+
+        var visiting = new HashSet<string>(StringComparer.Ordinal);
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string name in automaticStyles.Keys)
+            VisitAutomaticStyle(name, automaticStyles, visiting, visited);
+    }
+
+    private static void VisitAutomaticStyle(
+        string name,
+        IReadOnlyDictionary<string, OdsSparseAutomaticCellStyle> automaticStyles,
+        HashSet<string> visiting,
+        HashSet<string> visited)
+    {
+        if (visited.Contains(name))
+            return;
+        if (!visiting.Add(name))
+            throw new InvalidDataException();
+        string? parent = automaticStyles[name].ParentStyleName;
+        if (parent is not null && automaticStyles.ContainsKey(parent))
+            VisitAutomaticStyle(parent, automaticStyles, visiting, visited);
+        visiting.Remove(name);
+        visited.Add(name);
+    }
+
+    private static void ValidateAutomaticStyleShape(
+        OdsSparseAutomaticCellStyle style,
+        OdsSparseEditorOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(style.Name) ||
+            style.Name.Length > options.MaximumMetadataCharacters ||
+            (style.ParentStyleName?.Length ?? 0) > options.MaximumMetadataCharacters ||
+            (style.FontFamily?.Length ?? 0) > options.MaximumMetadataCharacters ||
+            !IsValidColor(style.TextColor, allowTransparent: false) ||
+            !IsValidColor(style.BackgroundColor, allowTransparent: true) ||
+            (style.FontSizePoints.HasValue &&
+                (double.IsNaN(style.FontSizePoints.Value) ||
+                    double.IsInfinity(style.FontSizePoints.Value) ||
+                    style.FontSizePoints.Value <= 0 ||
+                    style.FontSizePoints.Value > 1_000)))
+        {
+            throw new ArgumentOutOfRangeException(nameof(style));
+        }
+        try
+        {
+            XmlConvert.VerifyNCName(style.Name);
+            if (style.ParentStyleName is not null)
+                XmlConvert.VerifyNCName(style.ParentStyleName);
+        }
+        catch (XmlException exception)
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfStyleName_StyleNameValidXml"),
+                nameof(style),
+                exception);
+        }
+    }
+
+    private static bool IsValidColor(string? value, bool allowTransparent)
+    {
+        if (value is null)
+            return true;
+        if (allowTransparent &&
+            string.Equals(value, "transparent", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        if (value.Length != 7 || value[0] != '#')
+            return false;
+        for (int index = 1; index < value.Length; index++)
+        {
+            char character = value[index];
+            if (!((character >= '0' && character <= '9') ||
+                (character >= 'a' && character <= 'f') ||
+                (character >= 'A' && character <= 'F')))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static long GetAutomaticStyleCharacterCount(OdsSparseAutomaticCellStyle? style)
+    {
+        if (style is null)
+            return 0;
+        return checked(
+            style.Name.Length +
+            (style.ParentStyleName?.Length ?? 0) +
+            (style.FontFamily?.Length ?? 0) +
+            (style.TextColor?.Length ?? 0) +
+            (style.BackgroundColor?.Length ?? 0));
+    }
+
+    private static string GetAutomaticStyleSignature(OdsSparseAutomaticCellStyle style) =>
+        string.Join(
+            "\u001F",
+            style.Name,
+            style.ParentStyleName,
+            style.FontFamily,
+            style.FontSizePoints?.ToString("R", CultureInfo.InvariantCulture),
+            style.Bold?.ToString(),
+            style.Italic?.ToString(),
+            style.TextColor,
+            style.BackgroundColor,
+            style.WrapText?.ToString(),
+            style.HorizontalAlignment?.ToString(),
+            style.VerticalAlignment?.ToString());
+
     private static void TransformContent(
         Stream input,
         Stream output,
         Dictionary<(string Sheet, int Row, int Column), CellEdit> patches,
         HashSet<string> styleNames,
+        Dictionary<string, OdsSparseAutomaticCellStyle> automaticStyles,
+        bool contentHasAutomaticStyles,
         OdsSparseEditorOptions options,
         CancellationToken cancellationToken)
     {
@@ -442,6 +914,7 @@ public static class OdsSparseEditor
                 StringComparer.Ordinal);
         string? currentSheet = null;
         int logicalRow = 0;
+        bool automaticStylesSeen = false;
         bool processCurrent = false;
         while (processCurrent || reader.Read())
         {
@@ -449,6 +922,29 @@ public static class OdsSparseEditor
             cancellationToken.ThrowIfCancellationRequested();
             if (reader.NodeType == XmlNodeType.Element)
                 IndexStyleDeclaration(reader, styleNames, options);
+            if (reader.NodeType == XmlNodeType.Element &&
+                reader.NamespaceURI == OdfNamespaces.Office &&
+                reader.LocalName == "automatic-styles")
+            {
+                automaticStylesSeen = true;
+                WriteAutomaticStylesContainer(
+                    reader,
+                    writer,
+                    automaticStyles,
+                    cancellationToken);
+                processCurrent = reader.ReadState == ReadState.Interactive;
+                continue;
+            }
+            if (!contentHasAutomaticStyles &&
+                !automaticStylesSeen &&
+                reader.NodeType == XmlNodeType.Element &&
+                reader.NamespaceURI == OdfNamespaces.Office &&
+                reader.LocalName == "body" &&
+                automaticStyles.Count > 0)
+            {
+                WriteAutomaticStyles(writer, automaticStyles, includeContainer: true);
+                automaticStylesSeen = true;
+            }
             if (reader.NodeType == XmlNodeType.Element &&
                 reader.NamespaceURI == OdfNamespaces.Table &&
                 reader.LocalName == "table")
@@ -489,6 +985,136 @@ public static class OdsSparseEditor
             }
             WriteNode(reader, writer);
         }
+    }
+
+    private static void WriteAutomaticStylesContainer(
+        XmlReader reader,
+        XmlWriter writer,
+        IReadOnlyDictionary<string, OdsSparseAutomaticCellStyle> automaticStyles,
+        CancellationToken cancellationToken)
+    {
+        int containerDepth = reader.Depth;
+        bool empty = reader.IsEmptyElement;
+        WriteStartElement(reader, writer);
+        if (empty)
+        {
+            WriteAutomaticStyles(writer, automaticStyles, includeContainer: false);
+            writer.WriteEndElement();
+            _ = reader.Read();
+            return;
+        }
+
+        while (reader.Read())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (reader.NodeType == XmlNodeType.EndElement &&
+                reader.Depth == containerDepth &&
+                reader.NamespaceURI == OdfNamespaces.Office &&
+                reader.LocalName == "automatic-styles")
+            {
+                WriteAutomaticStyles(writer, automaticStyles, includeContainer: false);
+                writer.WriteFullEndElement();
+                _ = reader.Read();
+                return;
+            }
+            WriteNode(reader, writer);
+        }
+        throw new InvalidDataException();
+    }
+
+    private static void WriteAutomaticStyles(
+        XmlWriter writer,
+        IReadOnlyDictionary<string, OdsSparseAutomaticCellStyle> automaticStyles,
+        bool includeContainer)
+    {
+        if (automaticStyles.Count == 0)
+            return;
+        if (includeContainer)
+            writer.WriteStartElement("office", "automatic-styles", OdfNamespaces.Office);
+        foreach (OdsSparseAutomaticCellStyle style in automaticStyles
+            .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+            .Select(pair => pair.Value))
+            CreateAutomaticStyleElement(style).WriteTo(writer);
+        if (includeContainer)
+            writer.WriteEndElement();
+    }
+
+    private static XElement CreateAutomaticStyleElement(OdsSparseAutomaticCellStyle definition)
+    {
+        var style = new XElement(
+            Style + "style",
+            new XAttribute(Style + "name", definition.Name),
+            new XAttribute(Style + "family", "table-cell"));
+        if (definition.ParentStyleName is not null)
+            style.SetAttributeValue(Style + "parent-style-name", definition.ParentStyleName);
+
+        if (definition.BackgroundColor is not null ||
+            definition.WrapText.HasValue ||
+            definition.VerticalAlignment.HasValue)
+        {
+            var properties = new XElement(Style + "table-cell-properties");
+            if (definition.BackgroundColor is not null)
+                properties.SetAttributeValue(Fo + "background-color", definition.BackgroundColor);
+            if (definition.WrapText.HasValue)
+            {
+                properties.SetAttributeValue(
+                    Fo + "wrap-option",
+                    definition.WrapText.Value ? "wrap" : "no-wrap");
+            }
+            if (definition.VerticalAlignment.HasValue)
+            {
+                properties.SetAttributeValue(
+                    Style + "vertical-align",
+                    definition.VerticalAlignment.Value switch
+                    {
+                        OdsSparseVerticalAlignment.Top => "top",
+                        OdsSparseVerticalAlignment.Middle => "middle",
+                        _ => "bottom"
+                    });
+            }
+            style.Add(properties);
+        }
+
+        if (definition.HorizontalAlignment.HasValue)
+        {
+            style.Add(
+                new XElement(
+                    Style + "paragraph-properties",
+                    new XAttribute(
+                        Fo + "text-align",
+                        definition.HorizontalAlignment.Value switch
+                        {
+                            OdsSparseHorizontalAlignment.Start => "start",
+                            OdsSparseHorizontalAlignment.Center => "center",
+                            OdsSparseHorizontalAlignment.End => "end",
+                            _ => "justify"
+                        })));
+        }
+
+        if (definition.FontFamily is not null ||
+            definition.FontSizePoints.HasValue ||
+            definition.Bold.HasValue ||
+            definition.Italic.HasValue ||
+            definition.TextColor is not null)
+        {
+            var properties = new XElement(Style + "text-properties");
+            if (definition.FontFamily is not null)
+                properties.SetAttributeValue(Fo + "font-family", definition.FontFamily);
+            if (definition.FontSizePoints.HasValue)
+            {
+                properties.SetAttributeValue(
+                    Fo + "font-size",
+                    definition.FontSizePoints.Value.ToString("0.###", CultureInfo.InvariantCulture) + "pt");
+            }
+            if (definition.Bold.HasValue)
+                properties.SetAttributeValue(Fo + "font-weight", definition.Bold.Value ? "bold" : "normal");
+            if (definition.Italic.HasValue)
+                properties.SetAttributeValue(Fo + "font-style", definition.Italic.Value ? "italic" : "normal");
+            if (definition.TextColor is not null)
+                properties.SetAttributeValue(Fo + "color", definition.TextColor);
+            style.Add(properties);
+        }
+        return style;
     }
 
     private static void WritePatchedRows(
@@ -538,10 +1164,6 @@ public static class OdsSparseEditor
             int end = checked(column + repeat);
             if (targetColumn < end)
             {
-                if (cell.Name != Table + "table-cell" ||
-                    cell.Attribute(Table + "number-columns-spanned") is not null ||
-                    cell.Attribute(Table + "number-rows-spanned") is not null)
-                    throw new InvalidDataException();
                 int before = targetColumn - column;
                 int after = repeat - before - 1;
                 if (before > 0)
@@ -564,24 +1186,50 @@ public static class OdsSparseEditor
         HashSet<string> styleNames)
     {
         OdsCellPatch patch = edit.Patch;
-        if (edit.Covered)
+        if (edit.Kind == CellEditKind.Covered)
         {
-            if (!IsBlankCell(source))
+            if (source.Name == Table + "covered-table-cell")
+            {
+                if (!edit.BelongsToExistingMerge)
+                    throw new InvalidDataException();
+            }
+            else if (source.Name != Table + "table-cell" ||
+                source.Attribute(Table + "number-columns-spanned") is not null ||
+                source.Attribute(Table + "number-rows-spanned") is not null ||
+                !IsBlankCell(source))
+            {
                 throw new InvalidDataException();
+            }
             var covered = new XElement(Table + "covered-table-cell");
             XAttribute? style = source.Attribute(Table + "style-name");
             if (style is not null)
                 covered.SetAttributeValue(Table + "style-name", style.Value);
             return covered;
         }
+        if (edit.Kind == CellEditKind.Uncovered)
+        {
+            if (source.Name != Table + "covered-table-cell" ||
+                !edit.BelongsToExistingMerge)
+            {
+                throw new InvalidDataException();
+            }
+            var uncovered = new XElement(Table + "table-cell");
+            XAttribute? style = source.Attribute(Table + "style-name");
+            if (style is not null)
+                uncovered.SetAttributeValue(Table + "style-name", style.Value);
+            return uncovered;
+        }
+        if (source.Name != Table + "table-cell")
+            throw new InvalidDataException();
 
         XElement replacement = new(source);
         replacement.Attribute(Table + "number-columns-repeated")?.Remove();
-        if (patch.StyleName is not null)
+        string? styleName = patch.AutomaticStyle?.Name ?? patch.StyleName;
+        if (styleName is not null)
         {
-            if (!styleNames.Contains(patch.StyleName))
+            if (!styleNames.Contains(styleName))
                 throw new InvalidDataException();
-            replacement.SetAttributeValue(Table + "style-name", patch.StyleName);
+            replacement.SetAttributeValue(Table + "style-name", styleName);
         }
         if (patch.Text is not null)
         {
@@ -594,11 +1242,54 @@ public static class OdsSparseEditor
             ClearCellValue(replacement);
             replacement.SetAttributeValue(Table + "formula", patch.Formula);
         }
-        if (patch.ColumnSpan > 1)
-            replacement.SetAttributeValue(Table + "number-columns-spanned", patch.ColumnSpan);
-        if (patch.RowSpan > 1)
-            replacement.SetAttributeValue(Table + "number-rows-spanned", patch.RowSpan);
+        bool legacySet = patch.MergeMode == OdsSparseMergeMode.Preserve &&
+            (patch.RowSpan > 1 || patch.ColumnSpan > 1);
+        if (patch.MergeMode == OdsSparseMergeMode.Remove)
+        {
+            replacement.Attribute(Table + "number-columns-spanned")?.Remove();
+            replacement.Attribute(Table + "number-rows-spanned")?.Remove();
+        }
+        else if (patch.MergeMode == OdsSparseMergeMode.Set || legacySet)
+        {
+            if (patch.ColumnSpan > 1)
+                replacement.SetAttributeValue(Table + "number-columns-spanned", patch.ColumnSpan);
+            else
+                replacement.Attribute(Table + "number-columns-spanned")?.Remove();
+            if (patch.RowSpan > 1)
+                replacement.SetAttributeValue(Table + "number-rows-spanned", patch.RowSpan);
+            else
+                replacement.Attribute(Table + "number-rows-spanned")?.Remove();
+        }
+        PatchAnnotation(replacement, patch);
         return replacement;
+    }
+
+    private static void PatchAnnotation(XElement cell, OdsCellPatch patch)
+    {
+        if (!patch.RemoveAnnotation && patch.Annotation is null)
+            return;
+        cell.Elements(Office + "annotation").Remove();
+        if (patch.Annotation is null)
+            return;
+
+        OdfCellAnnotation annotation = patch.Annotation;
+        var element = new XElement(
+            Office + "annotation",
+            new XAttribute(Office + "display", annotation.Visible ? "true" : "false"));
+        if (!string.IsNullOrEmpty(annotation.Author))
+            element.Add(new XElement(Dc + "creator", annotation.Author));
+        if (annotation.Date.HasValue)
+        {
+            DateTime date = annotation.Date.Value;
+            string formatted = date == DateTime.MinValue || date == DateTime.MaxValue
+                ? date.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)
+                : date.ToUniversalTime().ToString(
+                    "yyyy-MM-ddTHH:mm:ssZ",
+                    CultureInfo.InvariantCulture);
+            element.Add(new XElement(Dc + "date", formatted));
+        }
+        element.Add(new XElement(Text + "p", annotation.Text));
+        cell.Add(element);
     }
 
     private static void ClearCellValue(XElement cell)
@@ -763,6 +1454,7 @@ public static class OdsSparseEditor
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(options.LoadOptions, nameof(options));
         if (options.MaximumPatches < 1 ||
             options.MaximumReplacementCharacters < 0 ||
+            options.MaximumTotalReplacementCharacters < 0 ||
             options.MaximumMetadataCharacters < 1 ||
             options.MaximumFormulaTokens < 1 ||
             options.MaximumFormulaDepth < 1 ||

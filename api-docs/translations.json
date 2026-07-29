@@ -13,7 +13,7 @@
     {
       "id": "ip-compliance",
       "source": "docs/ip-compliance.md",
-      "sourceSha256": "cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967",
+      "sourceSha256": "08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393",
       "destination": "api-docs/{locale}/project-docs/ip-compliance.md",
       "requiredTokens": ["CC0-1.0 Universal", "Affirmer", "indemnity", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md"]
     },

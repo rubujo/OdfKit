@@ -2,7 +2,7 @@
 title: Propriedade intelectual e conformidade
 _lang: pt-BR
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # Propriedade intelectual e conformidade (IP Compliance)
@@ -81,7 +81,7 @@ Git do projeto também exigem assinatura GPG.
 | Licenças | Leia `LICENSE` e `THIRD-PARTY-NOTICES.md`; inclua o SBOM e a verificação de licenças no CI |
 | Versão | A versão atual é `0.x`; consulte os compromissos de compatibilidade em `CHANGELOG` e [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | Limites funcionais | Use [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) e as evidências de teste; não dependa apenas de alegações de marketing |
-| Objetivos fora do escopo | Consulte [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), incluindo o mecanismo completo de layout e o recálculo de tabelas dinâmicas |
+| Objetivos fora do escopo | Consulte [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), incluindo o mecanismo completo de layout e recursos interativos de suítes de escritório, como cache de tabelas dinâmicas e segmentações de dados |
 | Segurança | Use os limites de recursos de `OdfLoadOptions`; execute `Validate` e a sanitização em entradas não confiáveis |
 | Fontes | Revise `docs/provenance/`; quando necessário, compare diretórios de alto risco com projetos upstream para detectar semelhanças |
 | Suporte | O projeto de código aberto não oferece SLA; sistemas críticos devem ter redundância e um plano próprio de manutenção |

@@ -708,6 +708,10 @@ public partial class LibreOfficeInteropTests
             CreateNoWindow = true
         };
         startInfo.Environment["GNUPGHOME"] = home;
+        // Git for Windows 提供的 MSYS GnuPG 不會轉換繼承的 Windows GNUPGHOME，
+        // 但會轉換命令列路徑。明確傳入 --homedir 可同時相容 native 與 MSYS GnuPG。
+        startInfo.ArgumentList.Add("--homedir");
+        startInfo.ArgumentList.Add(home);
         foreach (string argument in arguments)
             startInfo.ArgumentList.Add(argument);
 

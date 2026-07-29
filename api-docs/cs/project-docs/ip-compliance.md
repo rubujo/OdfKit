@@ -2,7 +2,7 @@
 title: Duševní vlastnictví a shoda
 _lang: cs
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # Duševní vlastnictví a shoda (IP Compliance)
@@ -80,7 +80,7 @@ Git vyžadují také podpis GPG.
 | Licence | Přečtěte `LICENSE` a `THIRD-PARTY-NOTICES.md`; zahrňte SBOM a kontrolu licencí do CI |
 | Verze | Aktuální verze je `0.x`; závazky kompatibility jsou popsány v `CHANGELOG` a [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | Funkční hranice | Řiďte se [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) a testovacími důkazy, nikoli pouze marketingovými výroky |
-| Cíle mimo rozsah | Viz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), včetně úplného modulu rozložení a přepočtu kontingenčních tabulek |
+| Cíle mimo rozsah | Viz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), včetně úplného modulu rozložení a interaktivních funkcí kancelářského balíku, jako jsou pivot cache a slicery |
 | Zabezpečení | Používejte limity prostředků `OdfLoadOptions`; u nedůvěryhodných vstupů spusťte `Validate` a čištění |
 | Zdroje | Projděte `docs/provenance/`; podle potřeby porovnejte vysoce rizikové adresáře s upstream projekty a vyhledejte podobnosti |
 | Podpora | Open-source projekt neposkytuje SLA; kritické systémy musí mít redundanci a vlastní plán údržby |

@@ -16874,13 +16874,21 @@ OdfKit.Spreadsheet.OdfWorksheetCollection.this[int index].get -> OdfKit.Spreadsh
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[string! name].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.TryRemove(string! name, out System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfFormulaCellInfo!>! blockingReferences) -> bool
 OdfKit.Spreadsheet.OdsCellPatch
+OdfKit.Spreadsheet.OdsCellPatch.Annotation.get -> OdfKit.Spreadsheet.OdfCellAnnotation?
+OdfKit.Spreadsheet.OdsCellPatch.Annotation.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.AutomaticStyle.get -> OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle?
+OdfKit.Spreadsheet.OdsCellPatch.AutomaticStyle.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.Column.get -> int
 OdfKit.Spreadsheet.OdsCellPatch.Column.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.ColumnSpan.get -> int
 OdfKit.Spreadsheet.OdsCellPatch.ColumnSpan.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.Formula.get -> string?
 OdfKit.Spreadsheet.OdsCellPatch.Formula.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.MergeMode.get -> OdfKit.Spreadsheet.OdsSparseMergeMode
+OdfKit.Spreadsheet.OdsCellPatch.MergeMode.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.OdsCellPatch() -> void
+OdfKit.Spreadsheet.OdsCellPatch.RemoveAnnotation.get -> bool
+OdfKit.Spreadsheet.OdsCellPatch.RemoveAnnotation.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.Row.get -> int
 OdfKit.Spreadsheet.OdsCellPatch.Row.set -> void
 OdfKit.Spreadsheet.OdsCellPatch.RowSpan.get -> int
@@ -16926,6 +16934,30 @@ OdfKit.Spreadsheet.OdsSheetWriter.WriteCell(double value) -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteCell(string! value) -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteEndRow() -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteStartRow() -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.BackgroundColor.get -> string?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.BackgroundColor.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Bold.get -> bool?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Bold.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.FontFamily.get -> string?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.FontFamily.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.FontSizePoints.get -> double?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.FontSizePoints.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.HorizontalAlignment.get -> OdfKit.Spreadsheet.OdsSparseHorizontalAlignment?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.HorizontalAlignment.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Italic.get -> bool?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Italic.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Name.get -> string!
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.Name.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.OdsSparseAutomaticCellStyle() -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.ParentStyleName.get -> string?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.ParentStyleName.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.TextColor.get -> string?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.TextColor.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.VerticalAlignment.get -> OdfKit.Spreadsheet.OdsSparseVerticalAlignment?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.VerticalAlignment.set -> void
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.WrapText.get -> bool?
+OdfKit.Spreadsheet.OdsSparseAutomaticCellStyle.WrapText.set -> void
 OdfKit.Spreadsheet.OdsSparseEditor
 OdfKit.Spreadsheet.OdsSparseEditorOptions
 OdfKit.Spreadsheet.OdsSparseEditorOptions.LoadOptions.get -> OdfKit.Core.OdfLoadOptions!
@@ -16946,7 +16978,22 @@ OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumReplacementCharacters.get -> in
 OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumReplacementCharacters.set -> void
 OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumStyleDeclarations.get -> int
 OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumStyleDeclarations.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumTotalReplacementCharacters.get -> long
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumTotalReplacementCharacters.set -> void
 OdfKit.Spreadsheet.OdsSparseEditorOptions.OdsSparseEditorOptions() -> void
+OdfKit.Spreadsheet.OdsSparseHorizontalAlignment
+OdfKit.Spreadsheet.OdsSparseHorizontalAlignment.Center = 1 -> OdfKit.Spreadsheet.OdsSparseHorizontalAlignment
+OdfKit.Spreadsheet.OdsSparseHorizontalAlignment.End = 2 -> OdfKit.Spreadsheet.OdsSparseHorizontalAlignment
+OdfKit.Spreadsheet.OdsSparseHorizontalAlignment.Justify = 3 -> OdfKit.Spreadsheet.OdsSparseHorizontalAlignment
+OdfKit.Spreadsheet.OdsSparseHorizontalAlignment.Start = 0 -> OdfKit.Spreadsheet.OdsSparseHorizontalAlignment
+OdfKit.Spreadsheet.OdsSparseMergeMode
+OdfKit.Spreadsheet.OdsSparseMergeMode.Preserve = 0 -> OdfKit.Spreadsheet.OdsSparseMergeMode
+OdfKit.Spreadsheet.OdsSparseMergeMode.Remove = 2 -> OdfKit.Spreadsheet.OdsSparseMergeMode
+OdfKit.Spreadsheet.OdsSparseMergeMode.Set = 1 -> OdfKit.Spreadsheet.OdsSparseMergeMode
+OdfKit.Spreadsheet.OdsSparseVerticalAlignment
+OdfKit.Spreadsheet.OdsSparseVerticalAlignment.Bottom = 2 -> OdfKit.Spreadsheet.OdsSparseVerticalAlignment
+OdfKit.Spreadsheet.OdsSparseVerticalAlignment.Middle = 1 -> OdfKit.Spreadsheet.OdsSparseVerticalAlignment
+OdfKit.Spreadsheet.OdsSparseVerticalAlignment.Top = 0 -> OdfKit.Spreadsheet.OdsSparseVerticalAlignment
 OdfKit.Spreadsheet.OdsStreamReader
 OdfKit.Spreadsheet.OdsStreamReader.GetCell(int ordinal) -> OdfKit.Spreadsheet.OdsCellValue!
 OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(string! path) -> void

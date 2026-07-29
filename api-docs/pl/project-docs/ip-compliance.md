@@ -2,7 +2,7 @@
 title: Własność intelektualna i zgodność
 _lang: pl
 translation_source: docs/ip-compliance.md
-translation_source_sha256: cc7487b322d8fa5796abdafeb883ded43da72adf294d95f25fa2af21f0ade967
+translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
 ---
 
 # Własność intelektualna i zgodność (IP Compliance)
@@ -81,7 +81,7 @@ wymagają również podpisu GPG.
 | Licencje | Przeczytaj `LICENSE` i `THIRD-PARTY-NOTICES.md`; włącz SBOM i skanowanie licencji do CI |
 | Wersja | Bieżąca wersja to `0.x`; zobowiązania dotyczące zgodności opisano w `CHANGELOG` i [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | Granice funkcjonalne | Kieruj się [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) i dowodami testowymi, a nie wyłącznie przekazem marketingowym |
-| Cele poza zakresem | Zobacz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), w tym pełny mechanizm układu i ponowne obliczanie tabel przestawnych |
+| Cele poza zakresem | Zobacz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), w tym pełny mechanizm układu oraz interaktywne funkcje pakietu biurowego, takie jak pamięć podręczna tabel przestawnych i fragmentatory |
 | Bezpieczeństwo | Używaj limitów zasobów `OdfLoadOptions`; dla niezaufanych danych wejściowych uruchamiaj `Validate` i oczyszczanie |
 | Źródła | Przejrzyj `docs/provenance/`; w razie potrzeby porównaj katalogi wysokiego ryzyka z projektami upstream pod kątem podobieństw |
 | Wsparcie | Projekt open source nie zapewnia SLA; systemy krytyczne powinny mieć nadmiarowość i własny plan utrzymania |

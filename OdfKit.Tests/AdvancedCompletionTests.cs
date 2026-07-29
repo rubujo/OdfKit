@@ -176,6 +176,197 @@ public class AdvancedCompletionTests
     }
 
     /// <summary>
+    /// 驗證串流局部編輯可建立有界 automatic style，並新增、覆寫與移除批注。
+    /// </summary>
+    [Fact]
+    public async Task SparseEditorCreatesAutomaticStyleAndMutatesAnnotation()
+    {
+        using MemoryStream source = CreateRepeatedOds();
+        using var styled = new MemoryStream();
+        DateTime annotationDate = new(2026, 7, 29, 8, 30, 0, DateTimeKind.Utc);
+        await OdsSparseEditor.ApplyAsync(
+            source,
+            styled,
+            [
+                new OdsCellPatch
+                {
+                    SheetName = "Data",
+                    Row = 0,
+                    Column = 0,
+                    AutomaticStyle = new OdsSparseAutomaticCellStyle
+                    {
+                        Name = "ceSparse",
+                        FontFamily = "Noto Sans",
+                        FontSizePoints = 12,
+                        Bold = true,
+                        TextColor = "#112233",
+                        BackgroundColor = "#FFEECC",
+                        WrapText = true,
+                        HorizontalAlignment = OdsSparseHorizontalAlignment.Center,
+                        VerticalAlignment = OdsSparseVerticalAlignment.Middle,
+                    },
+                    Annotation = new OdfCellAnnotation
+                    {
+                        Text = "review",
+                        Author = "Ada",
+                        Date = annotationDate,
+                        Visible = true,
+                    },
+                },
+            ],
+            new OdsSparseEditorOptions(),
+            TestContext.Current.CancellationToken);
+
+        styled.Position = 0;
+        using (var archive = new ZipArchive(styled, ZipArchiveMode.Read, leaveOpen: true))
+        {
+            XDocument content = XDocument.Load(archive.GetEntry("content.xml")!.Open());
+            XNamespace table = OdfNamespaces.Table;
+            XNamespace office = OdfNamespaces.Office;
+            XNamespace style = OdfNamespaces.Style;
+            XNamespace text = OdfNamespaces.Text;
+            XNamespace dc = OdfNamespaces.Dc;
+            XElement automaticStyle = content.Descendants(style + "style")
+                .Single(node => (string?)node.Attribute(style + "name") == "ceSparse");
+            Assert.Equal("table-cell", (string?)automaticStyle.Attribute(style + "family"));
+            XElement cell = content.Descendants(table + "table-cell").First();
+            Assert.Equal("ceSparse", (string?)cell.Attribute(table + "style-name"));
+            XElement annotation = Assert.Single(cell.Elements(office + "annotation"));
+            Assert.Equal("Ada", annotation.Element(dc + "creator")?.Value);
+            Assert.Equal("2026-07-29T08:30:00Z", annotation.Element(dc + "date")?.Value);
+            Assert.Equal("review", annotation.Element(text + "p")?.Value);
+        }
+
+        styled.Position = 0;
+        using var removed = new MemoryStream();
+        await OdsSparseEditor.ApplyAsync(
+            styled,
+            removed,
+            [new OdsCellPatch { SheetName = "Data", Row = 0, Column = 0, RemoveAnnotation = true }],
+            new OdsSparseEditorOptions(),
+            TestContext.Current.CancellationToken);
+        removed.Position = 0;
+        using var removedArchive = new ZipArchive(removed, ZipArchiveMode.Read, leaveOpen: true);
+        XDocument removedContent = XDocument.Load(removedArchive.GetEntry("content.xml")!.Open());
+        XNamespace removedOffice = OdfNamespaces.Office;
+        Assert.Empty(removedContent.Descendants(removedOffice + "annotation"));
+    }
+
+    /// <summary>
+    /// 驗證串流局部編輯可調整既有合併範圍並在不遺留 covered cell 的情況下解除合併。
+    /// </summary>
+    [Fact]
+    public async Task SparseEditorResizesAndRemovesExistingMerge()
+    {
+        using MemoryStream source = CreateExistingMergeOds();
+        using var resized = new MemoryStream();
+        await OdsSparseEditor.ApplyAsync(
+            source,
+            resized,
+            [
+                new OdsCellPatch
+                {
+                    SheetName = "Data",
+                    Row = 0,
+                    Column = 0,
+                    MergeMode = OdsSparseMergeMode.Set,
+                    RowSpan = 3,
+                    ColumnSpan = 3,
+                },
+            ],
+            new OdsSparseEditorOptions(),
+            TestContext.Current.CancellationToken);
+
+        resized.Position = 0;
+        using (var archive = new ZipArchive(resized, ZipArchiveMode.Read, leaveOpen: true))
+        {
+            XDocument content = XDocument.Load(archive.GetEntry("content.xml")!.Open());
+            XNamespace table = OdfNamespaces.Table;
+            XElement anchor = content.Descendants(table + "table-cell").First();
+            Assert.Equal("3", (string?)anchor.Attribute(table + "number-rows-spanned"));
+            Assert.Equal("3", (string?)anchor.Attribute(table + "number-columns-spanned"));
+            Assert.Equal(8, content.Descendants(table + "covered-table-cell").Count());
+        }
+
+        resized.Position = 0;
+        using var unmerged = new MemoryStream();
+        await OdsSparseEditor.ApplyAsync(
+            resized,
+            unmerged,
+            [
+                new OdsCellPatch
+                {
+                    SheetName = "Data",
+                    Row = 0,
+                    Column = 0,
+                    MergeMode = OdsSparseMergeMode.Remove,
+                },
+            ],
+            new OdsSparseEditorOptions(),
+            TestContext.Current.CancellationToken);
+        unmerged.Position = 0;
+        using var unmergedArchive = new ZipArchive(unmerged, ZipArchiveMode.Read, leaveOpen: true);
+        XDocument unmergedContent = XDocument.Load(unmergedArchive.GetEntry("content.xml")!.Open());
+        XNamespace unmergedTable = OdfNamespaces.Table;
+        XElement unmergedAnchor = unmergedContent.Descendants(unmergedTable + "table-cell").First();
+        Assert.Null(unmergedAnchor.Attribute(unmergedTable + "number-rows-spanned"));
+        Assert.Null(unmergedAnchor.Attribute(unmergedTable + "number-columns-spanned"));
+        Assert.Empty(unmergedContent.Descendants(unmergedTable + "covered-table-cell"));
+    }
+
+    /// <summary>
+    /// 驗證 automatic style 與批注總文字預算會拒絕不受控輸入。
+    /// </summary>
+    [Fact]
+    public async Task SparseEditorRejectsInvalidAutomaticStyleAndAggregateText()
+    {
+        using (MemoryStream source = CreateRepeatedOds())
+        using (var destination = new MemoryStream())
+        {
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => OdsSparseEditor.ApplyAsync(
+                    source,
+                    destination,
+                    [
+                        new OdsCellPatch
+                        {
+                            SheetName = "Data",
+                            Row = 0,
+                            Column = 0,
+                            AutomaticStyle = new OdsSparseAutomaticCellStyle
+                            {
+                                Name = "ceInvalid",
+                                TextColor = "red",
+                            },
+                        },
+                    ],
+                    new OdsSparseEditorOptions(),
+                    TestContext.Current.CancellationToken));
+        }
+
+        using (MemoryStream source = CreateRepeatedOds())
+        using (var destination = new MemoryStream())
+        {
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => OdsSparseEditor.ApplyAsync(
+                    source,
+                    destination,
+                    [
+                        new OdsCellPatch
+                        {
+                            SheetName = "Data",
+                            Row = 0,
+                            Column = 0,
+                            Text = "1234",
+                            Annotation = new OdfCellAnnotation { Text = "5678" },
+                        },
+                    ],
+                    new OdsSparseEditorOptions { MaximumTotalReplacementCharacters = 7 },
+                    TestContext.Current.CancellationToken));
+        }
+    }
+
+    /// <summary>
     /// 驗證富文字 run 的字級會影響欄寬，且 run 預算會停止不受控輸入。
     /// </summary>
     [Fact]
@@ -380,6 +571,46 @@ public class AdvancedCompletionTests
                       </table:table-row>
                       <table:table-row table:number-rows-repeated="2">
                         <table:table-cell table:number-columns-repeated="3"/>
+                      </table:table-row>
+                    </table:table>
+                  </office:spreadsheet></office:body>
+                </office:document-content>
+                """,
+                CompressionLevel.Optimal);
+        }
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static MemoryStream CreateExistingMergeOds()
+    {
+        var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            WriteEntry(archive, "mimetype", "application/vnd.oasis.opendocument.spreadsheet", CompressionLevel.NoCompression);
+            WriteEntry(
+                archive,
+                "content.xml",
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <office:document-content
+                  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+                  <office:body><office:spreadsheet>
+                    <table:table table:name="Data">
+                      <table:table-row>
+                        <table:table-cell table:number-rows-spanned="2" table:number-columns-spanned="2"
+                          office:value-type="string"><text:p>merged</text:p></table:table-cell>
+                        <table:covered-table-cell/>
+                        <table:table-cell table:number-columns-repeated="2"/>
+                      </table:table-row>
+                      <table:table-row>
+                        <table:covered-table-cell table:number-columns-repeated="2"/>
+                        <table:table-cell table:number-columns-repeated="2"/>
+                      </table:table-row>
+                      <table:table-row>
+                        <table:table-cell table:number-columns-repeated="4"/>
                       </table:table-row>
                     </table:table>
                   </office:spreadsheet></office:body>
