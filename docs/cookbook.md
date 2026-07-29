@@ -185,6 +185,41 @@ OdfPivotRefreshResult report = pivot.Refresh(
 編譯一次；未知函式、未知欄位、循環相依、除以零、非有限結果或任何資源乘積超限都會在寫入
 結果前失敗。
 
+進階 Pivot 可使用 ODF 1.0～1.4 的標準 DataPilot 結構保存分組、版面、總計與
+`Show Values As`，並在重新載入後由 `SpreadsheetDocument.RefreshPivotTable` 刷新：
+
+```csharp
+var pivot = new OdfPivotTableBuilder("SalesPivot", sourceRange, targetStart, outputSheet)
+    .AddRowField("日期")
+    .GroupField("日期", new OdfPivotGroupingOptions
+    {
+        DateGroup = OdfPivotDateGroup.Months,
+    })
+    .AddColumnField("區域")
+    .AddDataField("營收")
+    .ConfigureValueField("營收", new OdfPivotValueOptions
+    {
+        ShowValuesAs = OdfPivotShowValuesAs.PercentageOfRowTotal,
+    })
+    .WithGrandTotals(OdfPivotGrandTotal.Both)
+    .WithLayout(OdfPivotLayout.OutlineSubtotalsTop)
+    .WithFilterButton(true)
+    .WithDrillDown(true);
+
+pivot.Refresh(limits, cancellationToken);
+pivot.Build();
+
+using SpreadsheetDocument loaded = SpreadsheetDocument.Load("sales.ods");
+loaded.RefreshPivotTable("SalesPivot", limits, cancellationToken);
+```
+
+刷新先完成欄位解析、群組與資源乘積檢查，再以交易式輸出清單寫入目標區；取消、無效樣式、
+NaN／Infinity、來源格數、群組數、累加器數或輸出格數超限時，不會留下部分結果。
+日期／數值群組定義會持久化實際成員，並限制最多掃描 1,000,000 筆來源列與保留
+250,000 個成員。這不是完整辦公套件 Pivot runtime：外部資料來源、slicer、pivot chart、
+完整 pivot cache、任意巢狀小計及互動 UI 仍交由 LibreOffice／Apache OpenOffice 等
+consumer。
+
 ## 商業簡報（ODP）
 
 ```csharp

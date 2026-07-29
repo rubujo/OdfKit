@@ -81,6 +81,24 @@ public sealed class OdfPivotTableInfo(
     public IReadOnlyList<OdfPivotTableFilterConditionInfo> FilterConditions { get; } = filterConditions ?? [];
 
     /// <summary>
+    /// Gets the configured grand-total axes.
+    /// 取得已設定的總計軸。
+    /// </summary>
+    public OdfPivotGrandTotal GrandTotals { get; internal set; }
+
+    /// <summary>
+    /// Gets whether the consumer should show a filter button.
+    /// 取得閱讀器是否應顯示篩選按鈕。
+    /// </summary>
+    public bool ShowFilterButton { get; internal set; } = true;
+
+    /// <summary>
+    /// Gets whether drill-down on double-click is enabled.
+    /// 取得是否啟用按兩下向下鑽研。
+    /// </summary>
+    public bool DrillDownOnDoubleClick { get; internal set; }
+
+    /// <summary>
     /// Attempts to parse <see cref="SourceRangeAddress"/> as an <see cref="OdfCellRange"/>.
     /// 嘗試將 <see cref="SourceRangeAddress"/> 解析為 <see cref="OdfCellRange"/>。
     /// </summary>

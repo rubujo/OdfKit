@@ -37,4 +37,22 @@ public sealed class OdfPivotTableFieldInfo(
     /// 取得計算欄位公式。
     /// </summary>
     public string? Formula { get; } = formula;
+
+    /// <summary>
+    /// Gets the field layout when persisted.
+    /// 取得持久化的欄位版面。
+    /// </summary>
+    public OdfPivotLayout? Layout { get; internal set; }
+
+    /// <summary>
+    /// Gets a snapshot of the field grouping options.
+    /// 取得欄位分組選項的快照。
+    /// </summary>
+    public OdfPivotGroupingOptions? Grouping { get; internal set; }
+
+    /// <summary>
+    /// Gets a snapshot of the value display options.
+    /// 取得值顯示選項的快照。
+    /// </summary>
+    public OdfPivotValueOptions? ValueOptions { get; internal set; }
 }

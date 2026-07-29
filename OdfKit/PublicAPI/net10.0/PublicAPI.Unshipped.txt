@@ -16274,6 +16274,14 @@ OdfKit.Spreadsheet.OdfObjectWriteMode
 OdfKit.Spreadsheet.OdfObjectWriteMode.Overwrite = 0 -> OdfKit.Spreadsheet.OdfObjectWriteMode
 OdfKit.Spreadsheet.OdfObjectWriteMode.UpdateExisting = 1 -> OdfKit.Spreadsheet.OdfObjectWriteMode
 OdfKit.Spreadsheet.OdfObjectWriteMode.Upsert = 2 -> OdfKit.Spreadsheet.OdfObjectWriteMode
+OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Days = 3 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Hours = 4 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Minutes = 5 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Months = 2 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Quarters = 1 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Seconds = 6 -> OdfKit.Spreadsheet.OdfPivotDateGroup
+OdfKit.Spreadsheet.OdfPivotDateGroup.Years = 0 -> OdfKit.Spreadsheet.OdfPivotDateGroup
 OdfKit.Spreadsheet.OdfPivotFilterOperator
 OdfKit.Spreadsheet.OdfPivotFilterOperator.Equal = 0 -> OdfKit.Spreadsheet.OdfPivotFilterOperator
 OdfKit.Spreadsheet.OdfPivotFilterOperator.GreaterThan = 2 -> OdfKit.Spreadsheet.OdfPivotFilterOperator
@@ -16288,6 +16296,33 @@ OdfKit.Spreadsheet.OdfPivotFunction.Formula = 5 -> OdfKit.Spreadsheet.OdfPivotFu
 OdfKit.Spreadsheet.OdfPivotFunction.Max = 3 -> OdfKit.Spreadsheet.OdfPivotFunction
 OdfKit.Spreadsheet.OdfPivotFunction.Min = 4 -> OdfKit.Spreadsheet.OdfPivotFunction
 OdfKit.Spreadsheet.OdfPivotFunction.Sum = 0 -> OdfKit.Spreadsheet.OdfPivotFunction
+OdfKit.Spreadsheet.OdfPivotGrandTotal
+OdfKit.Spreadsheet.OdfPivotGrandTotal.Both = 3 -> OdfKit.Spreadsheet.OdfPivotGrandTotal
+OdfKit.Spreadsheet.OdfPivotGrandTotal.Column = 2 -> OdfKit.Spreadsheet.OdfPivotGrandTotal
+OdfKit.Spreadsheet.OdfPivotGrandTotal.None = 0 -> OdfKit.Spreadsheet.OdfPivotGrandTotal
+OdfKit.Spreadsheet.OdfPivotGrandTotal.Row = 1 -> OdfKit.Spreadsheet.OdfPivotGrandTotal
+OdfKit.Spreadsheet.OdfPivotGroupingOptions
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.DateGroup.get -> OdfKit.Spreadsheet.OdfPivotDateGroup?
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.DateGroup.set -> void
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.End.get -> double?
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.End.set -> void
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.Interval.get -> double?
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.Interval.set -> void
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.OdfPivotGroupingOptions() -> void
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.Start.get -> double?
+OdfKit.Spreadsheet.OdfPivotGroupingOptions.Start.set -> void
+OdfKit.Spreadsheet.OdfPivotLayout
+OdfKit.Spreadsheet.OdfPivotLayout.OutlineSubtotalsBottom = 0 -> OdfKit.Spreadsheet.OdfPivotLayout
+OdfKit.Spreadsheet.OdfPivotLayout.OutlineSubtotalsTop = 1 -> OdfKit.Spreadsheet.OdfPivotLayout
+OdfKit.Spreadsheet.OdfPivotLayout.Tabular = 2 -> OdfKit.Spreadsheet.OdfPivotLayout
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.DataStyleName.get -> string?
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.DataStyleName.set -> void
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.GrandTotalStyleName.get -> string?
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.GrandTotalStyleName.set -> void
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.HeaderStyleName.get -> string?
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.HeaderStyleName.set -> void
+OdfKit.Spreadsheet.OdfPivotOutputStyleOptions.OdfPivotOutputStyleOptions() -> void
 OdfKit.Spreadsheet.OdfPivotRefreshOptions
 OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumAggregateSlots.get -> int
 OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumAggregateSlots.set -> void
@@ -16318,6 +16353,15 @@ OdfKit.Spreadsheet.OdfPivotRefreshResult.OdfPivotRefreshResult() -> void
 OdfKit.Spreadsheet.OdfPivotRefreshResult.OdfPivotRefreshResult(int sourceRows, int groupCount, int outputCells) -> void
 OdfKit.Spreadsheet.OdfPivotRefreshResult.OutputCells.get -> int
 OdfKit.Spreadsheet.OdfPivotRefreshResult.SourceRows.get -> int
+OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.DifferenceFrom = 5 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.Index = 7 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.None = 0 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.PercentageDifferenceFrom = 6 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.PercentageOfColumnTotal = 2 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.PercentageOfGrandTotal = 3 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.PercentageOfRowTotal = 1 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotShowValuesAs.RunningTotal = 4 -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
 OdfKit.Spreadsheet.OdfPivotTableBuilder
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddCalculatedField(string! fieldName, string! formula) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddColumnField(string! fieldName) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
@@ -16330,32 +16374,45 @@ OdfKit.Spreadsheet.OdfPivotTableBuilder.AddRowField(string! fieldName) -> OdfKit
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddSortInfo(string! fieldName) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddSortInfo(string! fieldName, bool ascending) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.Build() -> OdfKit.DOM.OdfNode!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.ConfigureValueField(string! fieldName, OdfKit.Spreadsheet.OdfPivotValueOptions! options) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.GroupField(string! fieldName, OdfKit.Spreadsheet.OdfPivotGroupingOptions! options) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.OdfPivotTableBuilder(string! name, OdfKit.Spreadsheet.OdfCellRange sourceRange, OdfKit.Spreadsheet.OdfCellAddress targetStart, OdfKit.Spreadsheet.OdfTableSheet! sheet) -> void
 OdfKit.Spreadsheet.OdfPivotTableBuilder.Refresh() -> OdfKit.Spreadsheet.OdfPivotRefreshResult
 OdfKit.Spreadsheet.OdfPivotTableBuilder.Refresh(OdfKit.Spreadsheet.OdfPivotRefreshOptions? options, System.Threading.CancellationToken cancellationToken) -> OdfKit.Spreadsheet.OdfPivotRefreshResult
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithColumnHeaders() -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithColumnHeaders(bool hasHeaders) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.WithDrillDown(bool enabled) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.WithFilterButton(bool show) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.WithGrandTotals(OdfKit.Spreadsheet.OdfPivotGrandTotal grandTotals) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.WithLayout(OdfKit.Spreadsheet.OdfPivotLayout layout) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
+OdfKit.Spreadsheet.OdfPivotTableBuilder.WithOutputStyles(OdfKit.Spreadsheet.OdfPivotOutputStyleOptions! options) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithRowHeaders() -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithRowHeaders(bool hasHeaders) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo.Formula.get -> string?
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo.Function.get -> string?
+OdfKit.Spreadsheet.OdfPivotTableFieldInfo.Grouping.get -> OdfKit.Spreadsheet.OdfPivotGroupingOptions?
+OdfKit.Spreadsheet.OdfPivotTableFieldInfo.Layout.get -> OdfKit.Spreadsheet.OdfPivotLayout?
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo.OdfPivotTableFieldInfo(string! sourceFieldName, string! orientation, string? function, string? formula) -> void
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo.Orientation.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableFieldInfo.SourceFieldName.get -> string!
+OdfKit.Spreadsheet.OdfPivotTableFieldInfo.ValueOptions.get -> OdfKit.Spreadsheet.OdfPivotValueOptions?
 OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo
 OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo.OdfPivotTableFilterConditionInfo(string! sourceFieldName, string! operator, string! value) -> void
 OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo.Operator.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo.SourceFieldName.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo.Value.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableInfo
+OdfKit.Spreadsheet.OdfPivotTableInfo.DrillDownOnDoubleClick.get -> bool
 OdfKit.Spreadsheet.OdfPivotTableInfo.Fields.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableFieldInfo!>!
 OdfKit.Spreadsheet.OdfPivotTableInfo.FilterConditions.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo!>!
+OdfKit.Spreadsheet.OdfPivotTableInfo.GrandTotals.get -> OdfKit.Spreadsheet.OdfPivotGrandTotal
 OdfKit.Spreadsheet.OdfPivotTableInfo.HasColumnHeaders.get -> bool
 OdfKit.Spreadsheet.OdfPivotTableInfo.HasRowHeaders.get -> bool
 OdfKit.Spreadsheet.OdfPivotTableInfo.Name.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableInfo.OdfPivotTableInfo(string! sheetName, string! name, string! sourceRangeAddress, string! targetRangeAddress, bool hasColumnHeaders, bool hasRowHeaders, System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableFieldInfo!>! fields, System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo!>! sortFields, System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableFilterConditionInfo!>! filterConditions) -> void
 OdfKit.Spreadsheet.OdfPivotTableInfo.SheetName.get -> string!
+OdfKit.Spreadsheet.OdfPivotTableInfo.ShowFilterButton.get -> bool
 OdfKit.Spreadsheet.OdfPivotTableInfo.SortFields.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo!>!
 OdfKit.Spreadsheet.OdfPivotTableInfo.SourceRangeAddress.get -> string!
 OdfKit.Spreadsheet.OdfPivotTableInfo.TargetRangeAddress.get -> string!
@@ -16365,6 +16422,14 @@ OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo
 OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo.Ascending.get -> bool
 OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo.OdfPivotTableSortFieldInfo(string! sourceFieldName, bool ascending) -> void
 OdfKit.Spreadsheet.OdfPivotTableSortFieldInfo.SourceFieldName.get -> string!
+OdfKit.Spreadsheet.OdfPivotValueOptions
+OdfKit.Spreadsheet.OdfPivotValueOptions.BaseFieldName.get -> string?
+OdfKit.Spreadsheet.OdfPivotValueOptions.BaseFieldName.set -> void
+OdfKit.Spreadsheet.OdfPivotValueOptions.BaseMemberName.get -> string?
+OdfKit.Spreadsheet.OdfPivotValueOptions.BaseMemberName.set -> void
+OdfKit.Spreadsheet.OdfPivotValueOptions.OdfPivotValueOptions() -> void
+OdfKit.Spreadsheet.OdfPivotValueOptions.ShowValuesAs.get -> OdfKit.Spreadsheet.OdfPivotShowValuesAs
+OdfKit.Spreadsheet.OdfPivotValueOptions.ShowValuesAs.set -> void
 OdfKit.Spreadsheet.OdfRangeBorderProxy
 OdfKit.Spreadsheet.OdfRangeBorderProxy.SetAll(OdfKit.Styles.OdfBorder border) -> OdfKit.Spreadsheet.OdfRangeBorderProxy!
 OdfKit.Spreadsheet.OdfRangeBorderProxy.SetGrid(OdfKit.Styles.OdfBorder outer, OdfKit.Styles.OdfBorder inner) -> OdfKit.Spreadsheet.OdfRangeBorderProxy!
@@ -17050,6 +17115,8 @@ OdfKit.Spreadsheet.SpreadsheetDocument.ReadRecordsAsync<T>(string! sheetName, st
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader) -> OdfKit.Chart.OdfChartDocument!
 OdfKit.Spreadsheet.SpreadsheetDocument.RefreshChartDataRange(OdfKit.Chart.OdfChartDocument! chart, string! sheetName, OdfKit.Spreadsheet.OdfCellRange range, bool firstRowAsHeader, bool firstColumnAsLabel) -> OdfKit.Chart.OdfChartDocument!
+OdfKit.Spreadsheet.SpreadsheetDocument.RefreshPivotTable(string! name) -> OdfKit.Spreadsheet.OdfPivotRefreshResult
+OdfKit.Spreadsheet.SpreadsheetDocument.RefreshPivotTable(string! name, OdfKit.Spreadsheet.OdfPivotRefreshOptions? options, System.Threading.CancellationToken cancellationToken) -> OdfKit.Spreadsheet.OdfPivotRefreshResult
 OdfKit.Spreadsheet.SpreadsheetDocument.RejectAllChanges() -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.RejectChange(string! changeId) -> void
 OdfKit.Spreadsheet.SpreadsheetDocument.RemoveDatabaseRange(OdfKit.Spreadsheet.OdfDatabaseRange! range) -> bool

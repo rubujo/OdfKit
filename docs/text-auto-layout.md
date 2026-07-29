@@ -71,8 +71,8 @@ handle；需要平行量測時，每個 worker 應各自使用一個工作階段
 - `MaximumCells`、`MaximumTextElements`、`MaximumTextElementsPerBlock` 與
   `MaximumMeasurementCacheEntries` 限制作業資源。
 - `Reader`／`Fast` 不解析字型檔、不建立處理程序、不連網。
-- `Precise` 只解析 `OdfFontContext` 可解析的系統字型或呼叫端明確註冊字型，不會自動
-  下載遠端字型或載入文件內嵌字型。
+- `Precise` 只解析 `OdfFontContext` 可解析的系統字型、呼叫端明確註冊字型，或在
+  `UseEmbeddedFonts` 明確啟用時解析文件封裝內的字型；不會下載遠端字型。
 - 字型檔會先以位元組上限完整讀入，再交給原生解析器；字型快取具數量與總位元組上限。
   HarfBuzz 失敗時改採已建立 typeface 的 Skia 量測。
 - 無效、負值、NaN、Infinity 與超出設定上限的輸出不會寫入文件。

@@ -56,6 +56,20 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType` | ODB | 資料表、查詢、表單封裝 | （封裝層級，無 CLI 轉換） | mimetype／manifest media-type 與真實 LibreOffice 自建 ODB 完全一致；另以 UNO API `desktop.loadComponentFromURL` 人工驗證可成功載入 | ✅ |
 | `LibreOfficeHeadlessExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
 | `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
+| `LibreOfficeHeadlessPivotTableRoundTripsOdsAndPdf` | ODS 1.4 | DataPilot 日期月份分組、列百分比、列欄總計、outline 版面、drill-down | `ods` / `pdf` | 往返後由 OdfKit 讀回 Pivot 定義；PDF 非空 | ✅ |
+
+## Apache OpenOffice Pivot 驗收
+
+`ApacheOpenOfficePivotInteropTests` 使用獨立的 `ODFKIT_OPENOFFICE_PATH`，並核對
+Windows 檔案版本描述與簽署公司必須是 Apache OpenOffice／Apache Software Foundation，
+不得誤用 LibreOffice。測試以隔離的本機 UNO pipe 啟動 headless Calc，實際載入、
+另存 ODS 並匯出 PDF；沒有安裝 AOO 時會明確略過。
+
+```powershell
+$env:ODFKIT_OPENOFFICE_PATH = "C:\Tools\OpenOfficePortable\App\openoffice\program\soffice.exe"
+dotnet test OdfKit.Tests/OdfKit.Tests.csproj -f net10.0 `
+  --filter "FullyQualifiedName~ApacheOpenOfficeHeadlessAdvancedPivotRoundTripsOdsAndPdf"
+```
 
 ## 已知上游限制（非 OdfKit 缺陷）
 
@@ -118,7 +132,8 @@ ODB 資料庫文件的失效模式比 Chart／Image 更隱晦——並非乾淨�
 
 - 像素級視覺 diff（見 [ooxml-visual-golden-matrix.md](ooxml-visual-golden-matrix.md)）
 - Microsoft Word / Excel 開啟驗收
-- 動畫播放、圖表樣式、樞紐表重算等編輯器行為驗證
+- 動畫播放、圖表樣式等編輯器行為驗證；進階 DataPilot 已涵蓋 OdfKit 物化、
+  LibreOffice 往返與 Apache OpenOffice 專用驗收入口
 - 所有 24 種 extension 的封裝層級／互通驗收已於 Batch 1-6（2026-06-23）涵蓋完畢
   （四主格式 template／flat 變體、.odm／.oth、Chart 全族、Formula 全族、Image 全族、
   .odb 皆已驗證並記錄真實 LibreOffice 行為，包含已確認的上游限制）；剩餘僅為本節其餘

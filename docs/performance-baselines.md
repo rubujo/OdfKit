@@ -81,6 +81,7 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 | 三格式標準 | `StandardOdsBenchmarks`、`StandardOdtBenchmarks`、`StandardOdpBenchmarks` | ODS／ODT／ODP 標準讀寫、DOM 與語意檢查碼 |
 | 共通封裝 | `StandardPackageOpenBenchmarks` | 分離 ZIP 封裝開啟與文件模型成本 |
 | 公式 | `FormulaParseBenchmarks`、`FormulaEvaluationBenchmarks` | 公式剖析、1K／10K 全量重算、10K 線性鏈與寬 DAG、1% 交易式增量重算、大範圍及 100 × 100 陣列的配置量與延遲 |
+| 樞紐 | `OdfPivotCalculatedBenchmarks` | 10K 列一般彙總、計算欄位、數值分組、列百分比與雙軸總計的時間及配置量 |
 | 協作 | `CollaborationOperationBenchmarks` | TDF JSON operation 剖析與重播 |
 
 ## 判讀規則

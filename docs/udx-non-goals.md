@@ -8,9 +8,9 @@
 * **說明**：計算文字在 PDF 或實體列印時的精確換頁、孤行控制（Orphan Control）、雙欄對齊等物理分頁計算極為龐大，且受限於作業系統的字型渲染引擎差異。
 * **決策**：OdfKit 將不自行開發完整的物理分頁排版器。物理分頁的渲染（如 ODT 轉 PDF 或圖片）將完全交由後端的 LibreOffice（本地處理程序或雲原生容器）進行高保真轉譯。
 
-## 2. 試算表樞紐表與公式記憶體彙總重算核心
-* **說明**：ODS 試算表中的樞紐表（Pivot Table）、大範圍公式重算（Formula Re-calculation）等記憶體彙總引擎涉及複雜模型依賴圖與高效計算優化。
-* **決策**：OdfKit 不在此階段自研記憶體內的樞紐表彙總重算引擎。圖表與資料的公式計算通常交由辦公軟體（如 Microsoft Excel、LibreOffice Calc）於開檔時由其核心執行實質彙總重算。
+## 2. 完整辦公套件等級的樞紐與公式執行階段
+* **說明**：OdfKit 已提供有界的處理序內樞紐彙總、計算欄位、日期／數值分組、總計、`Show Values As` 與持久化後刷新；大範圍公式亦有受限求值器。完整 Calc／Excel 執行階段仍包含外部資料來源、pivot cache、slicer、pivot chart、任意巢狀小計、完整公式函式與版面互動。
+* **決策**：上述可預測且可設資源上限的 SDK 工作負載納入核心；需要完整辦公套件狀態、互動 UI 或高保真渲染的部分仍交由 LibreOffice Calc 等 consumer，不宣稱 OdfKit 等同 Office Suite。
 
 ## 3. SmartArt 智慧圖形與複雜形狀佈局器
 * **說明**：ODF 規格對 SmartArt 與複合三維圖形的定義極為模糊，且 Microsoft Office 與 LibreOffice 對此類圖形的 XML 實作互不相容。
@@ -33,7 +33,7 @@
 | 巨集管理 | 選用擴充 | `OdfKit.Extensions.Scripting` 管理標準 script、事件繫結及 LibreOffice Basic／Python package profile；核心仍只保留淨化能力 |
 | 巨集執行與簽章 | 不納入執行階段 | 由 LibreOffice 等 consumer 執行；OdfKit 修改巨集後移除失效簽章，不假裝重新簽署或判定原始碼安全 |
 | 高保真渲染與物理分頁 | 後端介面 | 維持第 1 節決策，以 LibreOffice 或其它可替換 renderer 實作，不在核心重建排版器 |
-| 公式與樞紐表完整重算 | consumer 負責 | 維持第 2 節決策；核心可讀寫結構與快取值，但不宣稱具備完整 Calc／Excel 計算語意 |
+| 公式與樞紐表完整重算 | 有界核心＋consumer | 核心可物化受限樞紐、計算欄位、分組、總計與常用 `Show Values As`；外部來源、pivot chart、slicer、完整 cache／UI 與 Calc／Excel 全語意仍由 consumer 負責 |
 | 多人協同與衝突合併 | 限定擴充子集 | 維持第 4 節所列相容 operations；OT、CRDT、任意衝突合併及完整 undo 仍為明確非目標 |
 
 因此，近期實作優先順序是補齊可由規格、corpus 與真實 consumer 驗證的封裝與互通缺口；

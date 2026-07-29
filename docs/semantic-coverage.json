@@ -185,10 +185,10 @@
       "topics": ["validation", "conditional-format", "database-range", "filter", "sort", "pivot-definition", "chart", "external-link"],
       "specification": ["ODF 1.4 Part 3, clauses 9.4, 9.5, 9.6 and 11"],
       "operations": {"Create":"verified","Get":"verified","Find":"verified","Set":"verified","Update":"verified","Remove":"verified","Clear":"verified","RoundTrip":"verified","Interop":"interop-tested"},
-      "implementation": ["OdfKit/Spreadsheet/OdfTableSheet.ConditionalFormats.cs", "OdfKit/Spreadsheet/OdfTableSheet.PivotTables.cs", "OdfKit/Spreadsheet/OdfTableSheet.Charts.cs"],
-      "tests": ["OdfKit.Tests/SpreadsheetHighLevelApiTests.cs", "OdfKit.Tests/ChartHighLevelApiTests.cs"],
+      "implementation": ["OdfKit/Spreadsheet/OdfTableSheet.ConditionalFormats.cs", "OdfKit/Spreadsheet/OdfTableSheet.PivotTables.cs", "OdfKit/Spreadsheet/OdfPivotTableBuilder.cs", "OdfKit/Spreadsheet/SpreadsheetDocument.PivotRefresh.cs", "OdfKit/Spreadsheet/OdfTableSheet.Charts.cs"],
+      "tests": ["OdfKit.Tests/SpreadsheetHighLevelApiTests.cs", "OdfKit.Tests/PivotAdvancedTests.cs", "OdfKit.Tests/ChartHighLevelApiTests.cs"],
       "interop": ["OdfKit.Tests/LibreOfficeInteropTests.cs"],
-      "limitations": "Pivot definitions round-trip, but pivot aggregation is performed by office software.",
+      "limitations": "Pivot definitions and bounded in-process aggregation support calculated fields, date/numeric grouping, grand totals, common Show Values As calculations, and persisted refresh. External sources, slicers, pivot charts, full pivot-cache semantics, arbitrary nested subtotals, and office-suite UI behavior remain consumer responsibilities.",
       "operationEvidence": [
         {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"GetPivotTablesRoundTripsAfterBuild"},
         {"topics":["validation","conditional-format","database-range","filter","sort","pivot-definition","chart","external-link"],"operations":["Interop"],"test":"OdfKit.Tests/LibreOfficeInteropTests.cs","symbol":"LibreOfficeHeadlessChartApplyDefinitionAndClearSeriesRoundTripsOds"},
@@ -198,6 +198,7 @@
         {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Clear"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"SpreadsheetTableFacadeFindTableEditsAndClearsMetadata"},
         {"topics":["filter","sort"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsFiltersAndSortsCompleteLifecycleAndRoundTrip"},
         {"topics":["pivot-definition"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsPivotDefinitionsFindUpdateRemoveClearAndRoundTrip"},
+        {"topics":["pivot-definition"],"operations":["Create","Get","Update","RoundTrip"],"test":"OdfKit.Tests/PivotAdvancedTests.cs","symbol":"AdvancedSettingsRoundTripAndPersistedPivotRefreshes"},
         {"topics":["external-link"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/SpreadsheetHighLevelApiTests.cs","symbol":"ExternalLinkCachedValuesCrudAndUnknownContentRoundTrip"},
         {"topics":["chart"],"operations":["Create","Get","Find","Set","Update","Remove","Clear","RoundTrip"],"test":"OdfKit.Tests/PrimaryFormatCrudCompletionTests.cs","symbol":"OdsEmbeddedChartsFindRemoveClearAndPackageCleanup"}
       ]

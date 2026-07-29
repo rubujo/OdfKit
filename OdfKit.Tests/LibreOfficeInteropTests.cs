@@ -468,25 +468,41 @@ public partial class LibreOfficeInteropTests
                 sheet.Cells["A1"].CellValue = "Category";
                 sheet.Cells["B1"].CellValue = "Region";
                 sheet.Cells["C1"].CellValue = "Sales";
+                sheet.Cells["D1"].CellValue = "Date";
                 sheet.Cells["A2"].CellValue = "OdfKit-Pivot-Marker";
                 sheet.Cells["B2"].CellValue = "North";
                 sheet.Cells["C2"].CellValue = 100d;
+                sheet.Cells["D2"].CellValue = new DateTime(2026, 1, 5);
                 sheet.Cells["A3"].CellValue = "Books";
                 sheet.Cells["B3"].CellValue = "South";
                 sheet.Cells["C3"].CellValue = 200d;
+                sheet.Cells["D3"].CellValue = new DateTime(2026, 1, 20);
 
                 var sourceRange = new OdfCellRange(
                     new OdfCellAddress(0, 0, "Sheet1"),
-                    new OdfCellAddress(2, 2, "Sheet1"));
+                    new OdfCellAddress(2, 3, "Sheet1"));
                 var targetStart = new OdfCellAddress(5, 0, "Sheet1");
 
-                new OdfPivotTableBuilder("InteropPivot", sourceRange, targetStart, sheet)
+                var pivotBuilder = new OdfPivotTableBuilder("InteropPivot", sourceRange, targetStart, sheet)
                     .WithColumnHeaders(true)
                     .WithRowHeaders(false)
-                    .AddRowField("Category")
+                    .AddRowField("Date")
+                    .GroupField("Date", new OdfPivotGroupingOptions
+                    {
+                        DateGroup = OdfPivotDateGroup.Months,
+                    })
                     .AddColumnField("Region")
                     .AddDataField("Sales", OdfPivotFunction.Sum)
-                    .Build();
+                    .ConfigureValueField("Sales", new OdfPivotValueOptions
+                    {
+                        ShowValuesAs = OdfPivotShowValuesAs.PercentageOfRowTotal,
+                    })
+                    .WithGrandTotals(OdfPivotGrandTotal.Both)
+                    .WithLayout(OdfPivotLayout.OutlineSubtotalsTop)
+                    .WithFilterButton(true)
+                    .WithDrillDown(true);
+                pivotBuilder.Refresh();
+                pivotBuilder.Build();
 
                 document.Save(odsPath);
             }
@@ -510,11 +526,14 @@ public partial class LibreOfficeInteropTests
                 Assert.Equal(0, sourceRange.StartAddress.Row);
                 Assert.Equal(0, sourceRange.StartAddress.Column);
                 Assert.Equal(2, sourceRange.EndAddress.Row);
-                Assert.Equal(2, sourceRange.EndAddress.Column);
+                Assert.Equal(3, sourceRange.EndAddress.Column);
 
                 Assert.True(pivot.TryGetTargetStart(out OdfCellAddress targetStart), "TryGetTargetStart 應能解析往返後的目標起點。");
                 Assert.Equal(5, targetStart.Row);
                 Assert.Equal(0, targetStart.Column);
+                Assert.Contains(
+                    pivot.Fields,
+                    field => field.SourceFieldName == "Sales" && field.Orientation == "data");
             }
 
             // 確認 LibreOffice 重新儲存後仍可正常轉出 PDF（驗證樞紐分析表渲染不報錯）。
@@ -2223,12 +2242,12 @@ public partial class LibreOfficeInteropTests
                 System.Diagnostics.Debug.WriteLine(ex);
             }
 
-            Assert.Fail("LibreOffice 轉換逾時。輸出：" + output);
+            Assert.Fail("soffice 轉換逾時。輸出：" + output);
         }
 
         process.WaitForExit(5_000);
         string outputText = output.ToString();
-        Assert.True(process.ExitCode == 0, $"LibreOffice 轉換失敗，輸出：{outputText}");
+        Assert.True(process.ExitCode == 0, $"soffice 轉換失敗，輸出：{outputText}");
         Assert.DoesNotContain("Error", outputText, StringComparison.OrdinalIgnoreCase);
     }
 

@@ -13,6 +13,7 @@ public class OdfPivotCalculatedBenchmarks
     private SpreadsheetDocument? _document;
     private OdfPivotTableBuilder? _standard;
     private OdfPivotTableBuilder? _calculated;
+    private OdfPivotTableBuilder? _groupedPercentage;
     private OdfPivotRefreshOptions? _options;
 
     /// <summary>
@@ -48,6 +49,25 @@ public class OdfPivotCalculatedBenchmarks
                 sheet)
             .AddRowField("Category")
             .AddCalculatedField("Profit", "of:=[.Revenue]-[.Cost]");
+        _groupedPercentage = new OdfPivotTableBuilder(
+                "GroupedPercentage",
+                source,
+                new OdfCellAddress(10_010, 8, "Data"),
+                sheet)
+            .AddRowField("Category")
+            .AddColumnField("Cost")
+            .GroupField("Cost", new OdfPivotGroupingOptions
+            {
+                Start = 0,
+                End = 400,
+                Interval = 50,
+            })
+            .AddDataField("Revenue")
+            .ConfigureValueField("Revenue", new OdfPivotValueOptions
+            {
+                ShowValuesAs = OdfPivotShowValuesAs.PercentageOfRowTotal,
+            })
+            .WithGrandTotals(OdfPivotGrandTotal.Both);
         _options = new OdfPivotRefreshOptions();
     }
 
@@ -68,6 +88,15 @@ public class OdfPivotCalculatedBenchmarks
     [Benchmark]
     public OdfPivotRefreshResult CalculatedAggregate() =>
         _calculated!.Refresh(_options, default);
+
+    /// <summary>
+    /// Materializes grouped percentages and both grand-total axes.
+    /// 物化分組百分比與雙軸總計。
+    /// </summary>
+    /// <returns>The refresh report. / 刷新報告。</returns>
+    [Benchmark]
+    public OdfPivotRefreshResult GroupedPercentageAndGrandTotals() =>
+        _groupedPercentage!.Refresh(_options, default);
 
     /// <summary>
     /// Releases the benchmark document.

@@ -43,7 +43,19 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
                 child.GetAttribute("has-row-headers", OdfNamespaces.Table) != "false",
                 ParseFields(child),
                 ParseSortFields(child),
-                ParseFilterConditions(child)));
+                ParseFilterConditions(child))
+            {
+                GrandTotals = child.GetAttribute("grand-total", OdfNamespaces.Table) switch
+                {
+                    "row" => OdfPivotGrandTotal.Row,
+                    "column" => OdfPivotGrandTotal.Column,
+                    "both" => OdfPivotGrandTotal.Both,
+                    _ => OdfPivotGrandTotal.None,
+                },
+                ShowFilterButton = child.GetAttribute("show-filter-button", OdfNamespaces.Table) != "false",
+                DrillDownOnDoubleClick =
+                    child.GetAttribute("drill-down-on-double-click", OdfNamespaces.Table) == "true",
+            });
         }
 
         return pivotTables.AsReadOnly();
@@ -97,15 +109,108 @@ internal static class SpreadsheetDocumentPivotTableReadEngine
             if (string.IsNullOrEmpty(sourceFieldName))
                 continue;
 
-            fields.Add(new OdfPivotTableFieldInfo(
+            var info = new OdfPivotTableFieldInfo(
                 sourceFieldName!,
                 child.GetAttribute("orientation", OdfNamespaces.Table) ?? string.Empty,
                 child.GetAttribute("function", OdfNamespaces.Table),
-                child.GetAttribute("formula", OdfNamespaces.Table)));
+                child.GetAttribute("formula", OdfNamespaces.Table));
+            ParseAdvancedFieldInfo(child, info);
+            fields.Add(info);
         }
 
         return fields.AsReadOnly();
     }
+
+    private static void ParseAdvancedFieldInfo(OdfNode fieldNode, OdfPivotTableFieldInfo info)
+    {
+        foreach (OdfNode child in fieldNode.Children)
+        {
+            if (child.NamespaceUri != OdfNamespaces.Table)
+                continue;
+            if (child.LocalName == "data-pilot-level")
+            {
+                foreach (OdfNode levelChild in child.Children)
+                {
+                    if (levelChild.NamespaceUri == OdfNamespaces.Table &&
+                        levelChild.LocalName == "data-pilot-layout-info")
+                    {
+                        info.Layout = levelChild.GetAttribute("layout-mode", OdfNamespaces.Table) switch
+                        {
+                            "outline-subtotals-bottom" => OdfPivotLayout.OutlineSubtotalsBottom,
+                            "outline-subtotals-top" => OdfPivotLayout.OutlineSubtotalsTop,
+                            _ => OdfPivotLayout.Tabular,
+                        };
+                    }
+                }
+            }
+            else if (child.LocalName == "data-pilot-groups")
+            {
+                info.Grouping = ParseGrouping(child);
+            }
+            else if (child.LocalName == "data-pilot-field-reference")
+            {
+                info.ValueOptions = new OdfPivotValueOptions
+                {
+                    ShowValuesAs = child.GetAttribute("type", OdfNamespaces.Table) switch
+                    {
+                        "row-percentage" => OdfPivotShowValuesAs.PercentageOfRowTotal,
+                        "column-percentage" => OdfPivotShowValuesAs.PercentageOfColumnTotal,
+                        "total-percentage" => OdfPivotShowValuesAs.PercentageOfGrandTotal,
+                        "running-total" => OdfPivotShowValuesAs.RunningTotal,
+                        "member-difference" => OdfPivotShowValuesAs.DifferenceFrom,
+                        "member-percentage-difference" => OdfPivotShowValuesAs.PercentageDifferenceFrom,
+                        "index" => OdfPivotShowValuesAs.Index,
+                        _ => OdfPivotShowValuesAs.None,
+                    },
+                    BaseFieldName = child.GetAttribute("field-name", OdfNamespaces.Table),
+                    BaseMemberName = child.GetAttribute("member-name", OdfNamespaces.Table),
+                };
+            }
+        }
+    }
+
+    private static OdfPivotGroupingOptions ParseGrouping(OdfNode node)
+    {
+        if (!string.IsNullOrEmpty(node.GetAttribute("start", OdfNamespaces.Table)))
+        {
+            return new OdfPivotGroupingOptions
+            {
+                Start = ParseDouble(node.GetAttribute("start", OdfNamespaces.Table)),
+                End = ParseDouble(node.GetAttribute("end", OdfNamespaces.Table)),
+                Interval = ParseDouble(node.GetAttribute("step", OdfNamespaces.Table)),
+            };
+        }
+        string? groupedBy = node.GetAttribute("grouped-by", OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(groupedBy))
+        {
+            return new OdfPivotGroupingOptions
+            {
+                DateGroup = groupedBy switch
+                {
+                    "years" => OdfPivotDateGroup.Years,
+                    "quarters" => OdfPivotDateGroup.Quarters,
+                    "months" => OdfPivotDateGroup.Months,
+                    "days" => OdfPivotDateGroup.Days,
+                    "hours" => OdfPivotDateGroup.Hours,
+                    "minutes" => OdfPivotDateGroup.Minutes,
+                    "seconds" => OdfPivotDateGroup.Seconds,
+                    _ => null,
+                },
+            };
+        }
+        return new OdfPivotGroupingOptions();
+    }
+
+    private static double? ParseDouble(string? value) =>
+        double.TryParse(
+            value,
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out double parsed) &&
+        !double.IsNaN(parsed) &&
+        !double.IsInfinity(parsed)
+            ? parsed
+            : null;
 
     private static System.Collections.ObjectModel.ReadOnlyCollection<OdfPivotTableSortFieldInfo> ParseSortFields(OdfNode pivotTableNode)
     {

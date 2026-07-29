@@ -45,8 +45,9 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 都必須連結 `Create`、`Get`、`Find`、`Set`、`Update`、`Remove`、`Clear`、`RoundTrip`、
 `Interop`、規格、實作、測試、限制與 clean-room provenance。範本、Flat XML、主控文件及
 Web 文件等變體的 `workflow-verified` 仍表示沿用其基底格式語意模型並滿足本文件 5 項通用
-完成標準，不推導為另一套重複的深度 facade。物理分頁、像素級渲染、完整公式
-與 pivot 重算、SmartArt 佈局、Office 專屬效果模擬及完整協同演算法，均為明列非目標。
+完成標準，不推導為另一套重複的深度 facade。物理分頁、像素級渲染、完整 Calc／Excel
+公式與 Pivot 執行階段、SmartArt 佈局、Office 專屬效果模擬及完整協同演算法，均為明列
+非目標；核心另提供具資源上限的 Pivot 彙總、計算欄位、分組、總計與常用衍生顯示計算。
 Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst`／`RemoveFirst`／
 `ClearMathTokens` 等「尋找→取得→更新→移除／清除」語意編輯 helper；這項完成聲明
 不等同於完整公式重算引擎。

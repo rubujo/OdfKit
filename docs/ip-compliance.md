@@ -66,7 +66,7 @@
 | 授權 | 閱讀 `LICENSE` 與 `THIRD-PARTY-NOTICES.md`；SBOM／授權掃描納入 CI |
 | 版本 | 目前為 `0.x`；相容性承諾見 `CHANGELOG` 與 [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | 功能邊界 | 以 [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) 與測試證據為準，勿僅依賴行銷用語 |
-| 非目標 | 見 [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md)（完整排版引擎、樞紐重算等） |
+| 非目標 | 見 [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md)（完整排版引擎、互動式 pivot cache／slicer 等 office suite 編輯器能力） |
 | 安全 | 使用 `OdfLoadOptions` 資源上限；對不可信輸入跑 `Validate`／sanitize |
 | 來源 | 審閱 `docs/provenance/`；必要時對高風險目錄做與上游的相似掃描 |
 | 支援 | 開源專案無 SLA；關鍵系統應有備援與自行維運計畫 |
