@@ -160,6 +160,31 @@ workbook.Save("financial-model.ods");
 若公式不是單一欄模型，可改用 `SetFormulaRange("D2:F20", (row, column) => ...)`
 依儲存格位置批次產生公式。
 
+樞紐分析表的計算欄位可用來源欄位或其他計算欄位組成純數值公式，並由 `Refresh` 在處理序內
+物化結果：
+
+```csharp
+var pivot = new OdfPivotTableBuilder("ProfitPivot", sourceRange, targetStart, sheet)
+    .AddRowField("月份")
+    .AddCalculatedField("毛利", "of:=[.營收]-[.成本]")
+    .AddCalculatedField("毛利率", "of:=IF([.營收]=0;0;[.毛利]/[.營收]*100)");
+
+OdfPivotRefreshResult report = pivot.Refresh(
+    new OdfPivotRefreshOptions
+    {
+        MaximumSourceCells = 1_000_000,
+        MaximumGroups = 50_000,
+        MaximumAggregateSlots = 250_000,
+        MaximumFormulaEvaluations = 2_000_000,
+    },
+    cancellationToken);
+```
+
+計算欄位支援數值常數、來源／計算欄位參照、算術、比較、百分比，以及 `ABS`、`SQRT`、
+`POWER`、`ROUND`、`IF`、`NOT`、`AND`、`OR`、`SUM`、`MIN`、`MAX`。公式會在掃描來源資料前
+編譯一次；未知函式、未知欄位、循環相依、除以零、非有限結果或任何資源乘積超限都會在寫入
+結果前失敗。
+
 ## 商業簡報（ODP）
 
 ```csharp
@@ -242,6 +267,49 @@ Console.WriteLine(report.ReplayedCount);
 單段落刪除／移動、最上層段落分割／合併、基本清單段落、固定尺寸文字表格填值、欄位、comment、header/footer、font declaration 與安全 drawing placeholder。
 完整 OT／CRDT、任意衝突合併、跨段落刪除／移動、完整 drawing DOM 與 header/footer/note selection
 仍屬非目標；不明或無法安全套用的 operation 會進入 import report 診斷。
+可用 `OdtOperationCompatibilityProfile.ImportOperations` 與 `ExportOperations` 在執行期稽核目前
+clean-room 相容面；匯出端也套用與匯入端相同的 operation、文字、位置與 JSON 大小預算。
+
+## 既有大型 ODS 的局部修改
+
+`OdsSparseEditor` 直接串流重寫 `content.xml`，不會先具現化整張工作表。檔案 API 會先寫入
+同目錄暫存檔，成功後才取代目的檔：
+
+```csharp
+await OdsSparseEditor.ApplyFileAsync(
+    "large.ods",
+    "large.ods",
+    [
+        new OdsCellPatch
+        {
+            SheetName = "Data",
+            Row = 1_000_000,
+            Column = 4,
+            Formula = "of:=[.B1000001]*1.05",
+            StyleName = "CurrencyCell"
+        },
+        new OdsCellPatch
+        {
+            SheetName = "Data",
+            Row = 1_000_002,
+            Column = 4,
+            Text = "合併摘要",
+            RowSpan = 2,
+            ColumnSpan = 3
+        }
+    ],
+    new OdsSparseEditorOptions
+    {
+        MaximumPatches = 10_000,
+        MaximumReplacementCharacters = 100_000
+    },
+    cancellationToken);
+```
+
+公式會先驗證語法；樣式必須已存在，合併覆蓋區也必須是空白且尚未合併。輸入為加密 ODS、
+不存在的座標、重疊 patch 或超出 ZIP／XML／repeat／merge 上限時會失敗，不會降級成全
+DOM 修改。各格式是否適合相同機制，見
+[`streaming-local-editing.md`](streaming-local-editing.md)。
 
 ## 建立 ODT
 

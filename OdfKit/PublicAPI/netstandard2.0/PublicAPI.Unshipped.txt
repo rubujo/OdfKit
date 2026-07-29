@@ -16285,6 +16285,36 @@ OdfKit.Spreadsheet.OdfPivotFunction.Formula = 5 -> OdfKit.Spreadsheet.OdfPivotFu
 OdfKit.Spreadsheet.OdfPivotFunction.Max = 3 -> OdfKit.Spreadsheet.OdfPivotFunction
 OdfKit.Spreadsheet.OdfPivotFunction.Min = 4 -> OdfKit.Spreadsheet.OdfPivotFunction
 OdfKit.Spreadsheet.OdfPivotFunction.Sum = 0 -> OdfKit.Spreadsheet.OdfPivotFunction
+OdfKit.Spreadsheet.OdfPivotRefreshOptions
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumAggregateSlots.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumAggregateSlots.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumCalculatedFields.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumCalculatedFields.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumDataFields.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumDataFields.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFields.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFields.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaCharacters.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaCharacters.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaDepth.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaDepth.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaEvaluations.get -> long
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaEvaluations.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaNodes.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumFormulaNodes.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumGroups.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumGroups.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumOutputCells.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumOutputCells.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumSourceCells.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.MaximumSourceCells.set -> void
+OdfKit.Spreadsheet.OdfPivotRefreshOptions.OdfPivotRefreshOptions() -> void
+OdfKit.Spreadsheet.OdfPivotRefreshResult
+OdfKit.Spreadsheet.OdfPivotRefreshResult.GroupCount.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshResult.OdfPivotRefreshResult() -> void
+OdfKit.Spreadsheet.OdfPivotRefreshResult.OdfPivotRefreshResult(int sourceRows, int groupCount, int outputCells) -> void
+OdfKit.Spreadsheet.OdfPivotRefreshResult.OutputCells.get -> int
+OdfKit.Spreadsheet.OdfPivotRefreshResult.SourceRows.get -> int
 OdfKit.Spreadsheet.OdfPivotTableBuilder
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddCalculatedField(string! fieldName, string! formula) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddColumnField(string! fieldName) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
@@ -16298,6 +16328,8 @@ OdfKit.Spreadsheet.OdfPivotTableBuilder.AddSortInfo(string! fieldName) -> OdfKit
 OdfKit.Spreadsheet.OdfPivotTableBuilder.AddSortInfo(string! fieldName, bool ascending) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.Build() -> OdfKit.DOM.OdfNode!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.OdfPivotTableBuilder(string! name, OdfKit.Spreadsheet.OdfCellRange sourceRange, OdfKit.Spreadsheet.OdfCellAddress targetStart, OdfKit.Spreadsheet.OdfTableSheet! sheet) -> void
+OdfKit.Spreadsheet.OdfPivotTableBuilder.Refresh() -> OdfKit.Spreadsheet.OdfPivotRefreshResult
+OdfKit.Spreadsheet.OdfPivotTableBuilder.Refresh(OdfKit.Spreadsheet.OdfPivotRefreshOptions? options, System.Threading.CancellationToken cancellationToken) -> OdfKit.Spreadsheet.OdfPivotRefreshResult
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithColumnHeaders() -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithColumnHeaders(bool hasHeaders) -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
 OdfKit.Spreadsheet.OdfPivotTableBuilder.WithRowHeaders() -> OdfKit.Spreadsheet.OdfPivotTableBuilder!
@@ -16374,6 +16406,8 @@ OdfKit.Spreadsheet.OdfRichTextRun.Color.get -> OdfKit.DOM.OdfColor?
 OdfKit.Spreadsheet.OdfRichTextRun.Color.init -> void
 OdfKit.Spreadsheet.OdfRichTextRun.FontFamily.get -> string?
 OdfKit.Spreadsheet.OdfRichTextRun.FontFamily.init -> void
+OdfKit.Spreadsheet.OdfRichTextRun.FontSizePoints.get -> double?
+OdfKit.Spreadsheet.OdfRichTextRun.FontSizePoints.init -> void
 OdfKit.Spreadsheet.OdfRichTextRun.Italic.get -> bool
 OdfKit.Spreadsheet.OdfRichTextRun.Italic.init -> void
 OdfKit.Spreadsheet.OdfRichTextRun.OdfRichTextRun() -> void
@@ -16388,6 +16422,8 @@ OdfKit.Spreadsheet.OdfRichTextRunOptions.Color.get -> OdfKit.DOM.OdfColor?
 OdfKit.Spreadsheet.OdfRichTextRunOptions.Color.set -> void
 OdfKit.Spreadsheet.OdfRichTextRunOptions.FontFamily.get -> string?
 OdfKit.Spreadsheet.OdfRichTextRunOptions.FontFamily.set -> void
+OdfKit.Spreadsheet.OdfRichTextRunOptions.FontSizePoints.get -> double?
+OdfKit.Spreadsheet.OdfRichTextRunOptions.FontSizePoints.set -> void
 OdfKit.Spreadsheet.OdfRichTextRunOptions.Italic.get -> bool
 OdfKit.Spreadsheet.OdfRichTextRunOptions.Italic.set -> void
 OdfKit.Spreadsheet.OdfRichTextRunOptions.OdfRichTextRunOptions() -> void
@@ -16772,6 +16808,24 @@ OdfKit.Spreadsheet.OdfWorksheetCollection.Remove(OdfKit.Spreadsheet.OdfTableShee
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[int index].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.this[string! name].get -> OdfKit.Spreadsheet.OdfTableSheet!
 OdfKit.Spreadsheet.OdfWorksheetCollection.TryRemove(string! name, out System.Collections.Generic.IReadOnlyList<OdfKit.Spreadsheet.OdfFormulaCellInfo!>! blockingReferences) -> bool
+OdfKit.Spreadsheet.OdsCellPatch
+OdfKit.Spreadsheet.OdsCellPatch.Column.get -> int
+OdfKit.Spreadsheet.OdsCellPatch.Column.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.ColumnSpan.get -> int
+OdfKit.Spreadsheet.OdsCellPatch.ColumnSpan.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.Formula.get -> string?
+OdfKit.Spreadsheet.OdsCellPatch.Formula.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.OdsCellPatch() -> void
+OdfKit.Spreadsheet.OdsCellPatch.Row.get -> int
+OdfKit.Spreadsheet.OdsCellPatch.Row.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.RowSpan.get -> int
+OdfKit.Spreadsheet.OdsCellPatch.RowSpan.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.SheetName.get -> string!
+OdfKit.Spreadsheet.OdsCellPatch.SheetName.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.StyleName.get -> string?
+OdfKit.Spreadsheet.OdsCellPatch.StyleName.set -> void
+OdfKit.Spreadsheet.OdsCellPatch.Text.get -> string?
+OdfKit.Spreadsheet.OdsCellPatch.Text.set -> void
 OdfKit.Spreadsheet.OdsCellValue
 OdfKit.Spreadsheet.OdsCellValue.Currency.get -> string?
 OdfKit.Spreadsheet.OdsCellValue.DisplayText.get -> string?
@@ -16807,6 +16861,27 @@ OdfKit.Spreadsheet.OdsSheetWriter.WriteCell(double value) -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteCell(string! value) -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteEndRow() -> void
 OdfKit.Spreadsheet.OdsSheetWriter.WriteStartRow() -> void
+OdfKit.Spreadsheet.OdsSparseEditor
+OdfKit.Spreadsheet.OdsSparseEditorOptions
+OdfKit.Spreadsheet.OdsSparseEditorOptions.LoadOptions.get -> OdfKit.Core.OdfLoadOptions!
+OdfKit.Spreadsheet.OdsSparseEditorOptions.LoadOptions.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumFormulaDepth.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumFormulaDepth.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumFormulaTokens.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumFormulaTokens.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumMergedCells.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumMergedCells.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumMetadataCharacters.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumMetadataCharacters.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumPatches.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumPatches.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumRepeat.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumRepeat.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumReplacementCharacters.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumReplacementCharacters.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumStyleDeclarations.get -> int
+OdfKit.Spreadsheet.OdsSparseEditorOptions.MaximumStyleDeclarations.set -> void
+OdfKit.Spreadsheet.OdsSparseEditorOptions.OdsSparseEditorOptions() -> void
 OdfKit.Spreadsheet.OdsStreamReader
 OdfKit.Spreadsheet.OdsStreamReader.GetCell(int ordinal) -> OdfKit.Spreadsheet.OdsCellValue!
 OdfKit.Spreadsheet.OdsStreamReader.OdsStreamReader(string! path) -> void
@@ -17066,8 +17141,14 @@ OdfKit.Styles.OdfAutoFitOptions.MaximumCells.get -> int
 OdfKit.Styles.OdfAutoFitOptions.MaximumCells.set -> void
 OdfKit.Styles.OdfAutoFitOptions.MaximumColumnWidth.get -> OdfKit.Styles.OdfLength
 OdfKit.Styles.OdfAutoFitOptions.MaximumColumnWidth.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumEmbeddedFontBytes.get -> long
+OdfKit.Styles.OdfAutoFitOptions.MaximumEmbeddedFontBytes.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumEmbeddedFonts.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumEmbeddedFonts.set -> void
 OdfKit.Styles.OdfAutoFitOptions.MaximumMeasurementCacheEntries.get -> int
 OdfKit.Styles.OdfAutoFitOptions.MaximumMeasurementCacheEntries.set -> void
+OdfKit.Styles.OdfAutoFitOptions.MaximumRichTextRuns.get -> int
+OdfKit.Styles.OdfAutoFitOptions.MaximumRichTextRuns.set -> void
 OdfKit.Styles.OdfAutoFitOptions.MaximumRowHeight.get -> OdfKit.Styles.OdfLength
 OdfKit.Styles.OdfAutoFitOptions.MaximumRowHeight.set -> void
 OdfKit.Styles.OdfAutoFitOptions.MaximumTextElements.get -> int
@@ -17087,6 +17168,8 @@ OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxWidth.get -> bool
 OdfKit.Styles.OdfAutoFitOptions.ResizeTextBoxWidth.set -> void
 OdfKit.Styles.OdfAutoFitOptions.TextMeasurer.get -> OdfKit.Styles.IOdfTextLayoutMeasurer?
 OdfKit.Styles.OdfAutoFitOptions.TextMeasurer.set -> void
+OdfKit.Styles.OdfAutoFitOptions.UseEmbeddedFonts.get -> bool
+OdfKit.Styles.OdfAutoFitOptions.UseEmbeddedFonts.set -> void
 OdfKit.Styles.OdfAutoFitOptions.VerticalPadding.get -> OdfKit.Styles.OdfLength
 OdfKit.Styles.OdfAutoFitOptions.VerticalPadding.set -> void
 OdfKit.Styles.OdfBorder
@@ -17137,8 +17220,10 @@ OdfKit.Styles.OdfFontContext.GetFontFallbackCandidates(string! fontName) -> Syst
 OdfKit.Styles.OdfFontContext.GetSupplementaryPlaneFontName(string! baseFontFamily, int plane) -> string!
 OdfKit.Styles.OdfFontContext.MapFont(string! fontName) -> string!
 OdfKit.Styles.OdfFontContext.OdfFontContext() -> void
+OdfKit.Styles.OdfFontContext.RegisterEmbeddedFonts(OdfKit.Core.OdfDocument! document, int maximumFonts, long maximumTotalBytes) -> int
 OdfKit.Styles.OdfFontContext.RegisterFallback(string! targetFont, string! replacementFont) -> void
 OdfKit.Styles.OdfFontContext.RegisterFont(string! fontName, string! filePath) -> void
+OdfKit.Styles.OdfFontContext.RegisterFontData(string! fontName, byte[]! fontData) -> void
 OdfKit.Styles.OdfFontContext.RegisterFontDirectory(string! directoryPath) -> void
 OdfKit.Styles.OdfFontContext.RegisterFontSubsetter(OdfKit.Styles.IFontSubsetter! subsetter) -> System.IDisposable!
 OdfKit.Styles.OdfFontContext.RegisterSupplementaryPlaneFontMapping(string! baseFontPattern, System.Collections.Generic.IReadOnlyDictionary<int, string!>! planeFontNames) -> System.IDisposable!
@@ -17302,11 +17387,14 @@ OdfKit.Styles.OdfTextMeasureRequest.IsBold.get -> bool
 OdfKit.Styles.OdfTextMeasureRequest.IsBold.set -> void
 OdfKit.Styles.OdfTextMeasureRequest.IsItalic.get -> bool
 OdfKit.Styles.OdfTextMeasureRequest.IsItalic.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.MaximumRuns.get -> int
+OdfKit.Styles.OdfTextMeasureRequest.MaximumRuns.set -> void
 OdfKit.Styles.OdfTextMeasureRequest.MaximumTextElements.get -> int
 OdfKit.Styles.OdfTextMeasureRequest.MaximumTextElements.set -> void
 OdfKit.Styles.OdfTextMeasureRequest.OdfTextMeasureRequest() -> void
 OdfKit.Styles.OdfTextMeasureRequest.RotationDegrees.get -> double
 OdfKit.Styles.OdfTextMeasureRequest.RotationDegrees.set -> void
+OdfKit.Styles.OdfTextMeasureRequest.Runs.get -> System.Collections.Generic.IList<OdfKit.Styles.OdfTextMeasureRun!>!
 OdfKit.Styles.OdfTextMeasureRequest.Text.get -> string!
 OdfKit.Styles.OdfTextMeasureRequest.Text.set -> void
 OdfKit.Styles.OdfTextMeasureRequest.Wrap.get -> bool
@@ -17320,6 +17408,18 @@ OdfKit.Styles.OdfTextMeasureResult.LineCount.get -> int
 OdfKit.Styles.OdfTextMeasureResult.OdfTextMeasureResult() -> void
 OdfKit.Styles.OdfTextMeasureResult.OdfTextMeasureResult(double widthCentimeters, double heightCentimeters, int lineCount, bool isExact) -> void
 OdfKit.Styles.OdfTextMeasureResult.WidthCentimeters.get -> double
+OdfKit.Styles.OdfTextMeasureRun
+OdfKit.Styles.OdfTextMeasureRun.FontFamily.get -> string!
+OdfKit.Styles.OdfTextMeasureRun.FontFamily.set -> void
+OdfKit.Styles.OdfTextMeasureRun.FontSizePoints.get -> double
+OdfKit.Styles.OdfTextMeasureRun.FontSizePoints.set -> void
+OdfKit.Styles.OdfTextMeasureRun.IsBold.get -> bool
+OdfKit.Styles.OdfTextMeasureRun.IsBold.set -> void
+OdfKit.Styles.OdfTextMeasureRun.IsItalic.get -> bool
+OdfKit.Styles.OdfTextMeasureRun.IsItalic.set -> void
+OdfKit.Styles.OdfTextMeasureRun.OdfTextMeasureRun() -> void
+OdfKit.Styles.OdfTextMeasureRun.Text.get -> string!
+OdfKit.Styles.OdfTextMeasureRun.Text.set -> void
 OdfKit.Styles.OdfUnit
 OdfKit.Styles.OdfUnit.Centimeters = 1 -> OdfKit.Styles.OdfUnit
 OdfKit.Styles.OdfUnit.Em = 8 -> OdfKit.Styles.OdfUnit
@@ -19604,6 +19704,8 @@ static OdfKit.Spreadsheet.OdfSpreadsheetFormula.Reference(string! address) -> Od
 static OdfKit.Spreadsheet.OdfSpreadsheetTableInfo.operator !=(OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? left, OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? right) -> bool
 static OdfKit.Spreadsheet.OdfSpreadsheetTableInfo.operator ==(OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? left, OdfKit.Spreadsheet.OdfSpreadsheetTableInfo? right) -> bool
 static OdfKit.Spreadsheet.OdsRowWriteOptions.Default.get -> OdfKit.Spreadsheet.OdsRowWriteOptions!
+static OdfKit.Spreadsheet.OdsSparseEditor.ApplyAsync(System.IO.Stream! source, System.IO.Stream! destination, System.Collections.Generic.IEnumerable<OdfKit.Spreadsheet.OdsCellPatch!>! patches, OdfKit.Spreadsheet.OdsSparseEditorOptions? options, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+static OdfKit.Spreadsheet.OdsSparseEditor.ApplyFileAsync(string! sourcePath, string! destinationPath, System.Collections.Generic.IEnumerable<OdfKit.Spreadsheet.OdsCellPatch!>! patches, OdfKit.Spreadsheet.OdsSparseEditorOptions? options, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!

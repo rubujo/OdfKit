@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -89,6 +93,104 @@ public enum OdfPivotFilterOperator
     /// 小於或等於。
     /// </summary>
     LessThanOrEqual,
+}
+
+/// <summary>
+/// Configures bounded pivot result materialization.
+/// 設定具資源上限的樞紐結果物化。
+/// </summary>
+public sealed class OdfPivotRefreshOptions
+{
+    /// <summary>
+    /// Gets or sets the maximum source cells inspected.
+    /// 取得或設定最多檢查的來源儲存格數。
+    /// </summary>
+    public int MaximumSourceCells { get; set; } = 5_000_000;
+
+    /// <summary>
+    /// Gets or sets the maximum aggregate groups retained in memory.
+    /// 取得或設定記憶體中保留的彙總群組數上限。
+    /// </summary>
+    public int MaximumGroups { get; set; } = 250_000;
+
+    /// <summary>
+    /// Gets or sets the maximum output cells written.
+    /// 取得或設定最多寫入的輸出儲存格數。
+    /// </summary>
+    public int MaximumOutputCells { get; set; } = 1_000_000;
+
+    /// <summary>
+    /// Gets or sets the maximum total pivot fields inspected.
+    /// 取得或設定最多可檢查的樞紐欄位總數。
+    /// </summary>
+    public int MaximumFields { get; set; } = 4_096;
+
+    /// <summary>
+    /// Gets or sets the maximum data fields aggregated.
+    /// 取得或設定最多可彙總的資料欄位數。
+    /// </summary>
+    public int MaximumDataFields { get; set; } = 1_024;
+
+    /// <summary>
+    /// Gets or sets the maximum aggregate accumulators retained in memory.
+    /// 取得或設定記憶體中最多可保留的彙總累加器數。
+    /// </summary>
+    public int MaximumAggregateSlots { get; set; } = 1_000_000;
+
+    /// <summary>
+    /// Gets or sets the maximum calculated fields compiled for one refresh.
+    /// 取得或設定單次刷新最多可編譯的計算欄位數。
+    /// </summary>
+    public int MaximumCalculatedFields { get; set; } = 128;
+
+    /// <summary>
+    /// Gets or sets the maximum characters in one calculated-field formula.
+    /// 取得或設定單一計算欄位公式的最大字元數。
+    /// </summary>
+    public int MaximumFormulaCharacters { get; set; } = 16_384;
+
+    /// <summary>
+    /// Gets or sets the maximum syntax nodes in one calculated-field formula.
+    /// 取得或設定單一計算欄位公式的最大語法節點數。
+    /// </summary>
+    public int MaximumFormulaNodes { get; set; } = 512;
+
+    /// <summary>
+    /// Gets or sets the maximum nesting depth in one calculated-field formula.
+    /// 取得或設定單一計算欄位公式的最大巢狀深度。
+    /// </summary>
+    public int MaximumFormulaDepth { get; set; } = 64;
+
+    /// <summary>
+    /// Gets or sets the maximum calculated-field evaluations performed.
+    /// 取得或設定最多可執行的計算欄位求值次數。
+    /// </summary>
+    public long MaximumFormulaEvaluations { get; set; } = 10_000_000;
+}
+
+/// <summary>
+/// Reports a completed pivot materialization.
+/// 回報已完成的樞紐結果物化。
+/// </summary>
+public readonly struct OdfPivotRefreshResult(int sourceRows, int groupCount, int outputCells)
+{
+    /// <summary>
+    /// Gets the number of source data rows read.
+    /// 取得讀取的來源資料列數。
+    /// </summary>
+    public int SourceRows { get; } = sourceRows;
+
+    /// <summary>
+    /// Gets the number of aggregate groups.
+    /// 取得彙總群組數。
+    /// </summary>
+    public int GroupCount { get; } = groupCount;
+
+    /// <summary>
+    /// Gets the number of output cells written.
+    /// 取得寫入的輸出儲存格數。
+    /// </summary>
+    public int OutputCells { get; } = outputCells;
 }
 
 /// <summary>
@@ -220,6 +322,11 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddCalculatedField(string fieldName, string formula)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(fieldName, nameof(fieldName));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(formula, nameof(formula));
+        if (string.IsNullOrWhiteSpace(fieldName) || formula.Length > 16_384)
+            throw new ArgumentOutOfRangeException(nameof(formula));
+        OdfPivotCalculatedFormula.ValidateSyntax(formula, 512, 64);
         _fields.Add((fieldName, "data", "formula", formula));
         return this;
     }
@@ -257,6 +364,183 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         _filters.Add((fieldName, op, value));
         return this;
     }
+
+    /// <summary>
+    /// Computes and materializes the current pivot result at the configured target.
+    /// 計算目前樞紐結果並物化至設定的目標位置。
+    /// </summary>
+    /// <param name="options">The resource limits, or null for defaults. / 資源限制；null 表示使用預設值。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>The refresh report. / 刷新報告。</returns>
+    public OdfPivotRefreshResult Refresh(
+        OdfPivotRefreshOptions? options,
+        CancellationToken cancellationToken)
+    {
+        options ??= new OdfPivotRefreshOptions();
+        if (options.MaximumSourceCells < 1 ||
+            options.MaximumGroups < 1 ||
+            options.MaximumOutputCells < 1 ||
+            options.MaximumFields < 1 ||
+            options.MaximumDataFields < 1 ||
+            options.MaximumAggregateSlots < 1 ||
+            options.MaximumCalculatedFields < 1 ||
+            options.MaximumFormulaCharacters < 1 ||
+            options.MaximumFormulaNodes < 1 ||
+            options.MaximumFormulaDepth < 1 ||
+            options.MaximumFormulaEvaluations < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options));
+        }
+        if (_fields.Count > options.MaximumFields)
+            throw new InvalidOperationException();
+
+        int firstRow = Math.Min(_sourceRange.StartAddress.Row, _sourceRange.EndAddress.Row);
+        int lastRow = Math.Max(_sourceRange.StartAddress.Row, _sourceRange.EndAddress.Row);
+        int firstColumn = Math.Min(_sourceRange.StartAddress.Column, _sourceRange.EndAddress.Column);
+        int lastColumn = Math.Max(_sourceRange.StartAddress.Column, _sourceRange.EndAddress.Column);
+        int columnCount = checked(lastColumn - firstColumn + 1);
+        long sourceCells = checked((long)(lastRow - firstRow + 1) * columnCount);
+        if (sourceCells > options.MaximumSourceCells)
+            throw new InvalidOperationException();
+
+        var headers = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        for (int column = 0; column < columnCount; column++)
+        {
+            string header = _sheet.Cells[firstRow, firstColumn + column].FormattedValue;
+            if (string.IsNullOrWhiteSpace(header) || headers.ContainsKey(header))
+                throw new InvalidDataException();
+            headers.Add(header, column);
+        }
+        var rowFields = _fields.Where(field => field.orientation == "row").ToList();
+        var columnFields = _fields.Where(field => field.orientation == "column").ToList();
+        var dataFields = _fields.Where(field => field.orientation == "data").ToList();
+        if (dataFields.Count == 0)
+            throw new NotSupportedException();
+        if (dataFields.Count > options.MaximumDataFields)
+            throw new InvalidOperationException();
+        int[] rowIndexes = ResolveIndexes(rowFields, headers);
+        int[] columnIndexes = ResolveIndexes(columnFields, headers);
+        List<(string name, string orientation, string? function, string? formula)> calculatedFields =
+            dataFields.Where(field => field.function == "formula").ToList();
+        if (calculatedFields.Count > options.MaximumCalculatedFields)
+            throw new InvalidOperationException();
+        long formulaEvaluations = checked((long)(lastRow - firstRow) * calculatedFields.Count);
+        if (formulaEvaluations > options.MaximumFormulaEvaluations)
+            throw new InvalidOperationException();
+        Dictionary<string, int> valueSlots = new(headers, StringComparer.OrdinalIgnoreCase);
+        for (int index = 0; index < calculatedFields.Count; index++)
+        {
+            if (valueSlots.ContainsKey(calculatedFields[index].name))
+                throw new InvalidDataException();
+            valueSlots.Add(calculatedFields[index].name, columnCount + index);
+        }
+        CompiledCalculatedField[] compiledCalculatedFields = CompileCalculatedFields(
+            calculatedFields,
+            valueSlots,
+            columnCount,
+            options);
+        int[] calculatedOrder = BuildCalculatedEvaluationOrder(
+            compiledCalculatedFields,
+            columnCount);
+        int[] dataIndexes = ResolveDataIndexes(dataFields, valueSlots);
+        var groups = new Dictionary<string, PivotAggregate[]>(StringComparer.Ordinal);
+        var rowLabels = new Dictionary<string, string>(StringComparer.Ordinal);
+        var columnLabels = new Dictionary<string, string>(StringComparer.Ordinal);
+        int rowsRead = 0;
+        var values = new object?[columnCount + calculatedFields.Count];
+        for (int row = firstRow + 1; row <= lastRow; row++)
+        {
+            if ((rowsRead++ & 0xff) == 0)
+                cancellationToken.ThrowIfCancellationRequested();
+            for (int column = 0; column < columnCount; column++)
+                values[column] = _sheet.Cells[row, firstColumn + column].CellValue;
+            if (!MatchesFilters(values, headers))
+                continue;
+            foreach (int calculatedIndex in calculatedOrder)
+            {
+                CompiledCalculatedField calculated = compiledCalculatedFields[calculatedIndex];
+                values[calculated.Slot] = calculated.Formula.Evaluate(values);
+            }
+            string rowKey = BuildEncodedKey(values, rowIndexes);
+            string columnKey = BuildEncodedKey(values, columnIndexes);
+            string groupKey = BuildGroupKey(rowKey, columnKey);
+            if (!groups.TryGetValue(groupKey, out PivotAggregate[]? aggregates))
+            {
+                if (groups.Count >= options.MaximumGroups ||
+                    checked((long)(groups.Count + 1) * dataFields.Count) >
+                        options.MaximumAggregateSlots)
+                {
+                    throw new InvalidOperationException();
+                }
+                aggregates = new PivotAggregate[dataFields.Count];
+                for (int index = 0; index < aggregates.Length; index++)
+                    aggregates[index] = new PivotAggregate();
+                groups.Add(groupKey, aggregates);
+                rowLabels[rowKey] = BuildDisplayLabel(values, rowIndexes);
+                columnLabels[columnKey] = BuildDisplayLabel(values, columnIndexes);
+            }
+            for (int index = 0; index < dataFields.Count; index++)
+                aggregates[index].Add(values[dataIndexes[index]]);
+        }
+
+        KeyValuePair<string, string>[] columns = columnLabels.Count == 0
+            ? [new KeyValuePair<string, string>(string.Empty, string.Empty)]
+            : columnLabels.OrderBy(pair => pair.Value, StringComparer.Ordinal).ThenBy(pair => pair.Key, StringComparer.Ordinal).ToArray();
+        KeyValuePair<string, string>[] rows = rowLabels.Count == 0
+            ? [new KeyValuePair<string, string>(string.Empty, string.Empty)]
+            : rowLabels.OrderBy(pair => pair.Value, StringComparer.Ordinal).ThenBy(pair => pair.Key, StringComparer.Ordinal).ToArray();
+        long valuesPerRow = checked(1L + (long)columns.Length * dataFields.Count);
+        long projectedOutputCells = checked(
+            1L +
+            (long)columns.Length * dataFields.Count +
+            (long)rows.Length * valuesPerRow);
+        if (projectedOutputCells > options.MaximumOutputCells ||
+            projectedOutputCells > int.MaxValue)
+        {
+            throw new InvalidOperationException();
+        }
+        var output = new List<(int Row, int Column, object? Value)>((int)projectedOutputCells);
+        output.Add((_targetStart.Row, _targetStart.Column, string.Join(" / ", rowFields.Select(field => field.name))));
+        int outputColumn = _targetStart.Column + 1;
+        foreach (KeyValuePair<string, string> column in columns)
+        {
+            foreach (var dataField in dataFields)
+            {
+                output.Add((_targetStart.Row, outputColumn++, string.IsNullOrEmpty(column.Value)
+                    ? dataField.name
+                    : column.Value + " / " + dataField.name));
+            }
+        }
+        int outputRow = _targetStart.Row + 1;
+        foreach (KeyValuePair<string, string> rowLabel in rows)
+        {
+            output.Add((outputRow, _targetStart.Column, rowLabel.Value));
+            outputColumn = _targetStart.Column + 1;
+            foreach (KeyValuePair<string, string> columnLabel in columns)
+            {
+                groups.TryGetValue(BuildGroupKey(rowLabel.Key, columnLabel.Key), out PivotAggregate[]? aggregates);
+                for (int index = 0; index < dataFields.Count; index++)
+                {
+                    object? value = aggregates is null
+                        ? null
+                        : aggregates[index].GetValue(dataFields[index].function);
+                    output.Add((outputRow, outputColumn++, value));
+                }
+            }
+            outputRow++;
+        }
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach ((int row, int column, object? value) in output)
+            _sheet.Cells[row, column].CellValue = value;
+        return new OdfPivotRefreshResult(rowsRead, groups.Count, output.Count);
+    }
+
+    /// <summary>
+    /// Computes and materializes the current pivot result with default limits.
+    /// 以預設限制計算並物化目前的樞紐結果。
+    /// </summary>
+    /// <returns>The refresh report. / 刷新報告。</returns>
+    public OdfPivotRefreshResult Refresh() => Refresh(null, default);
 
     /// <summary>
     /// Builds and applies the pivot table to the worksheet.
@@ -345,6 +629,248 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
 
         tablesContainer.AppendChild(tableNode);
         return tableNode;
+    }
+
+    private static int[] ResolveIndexes(
+        List<(string name, string orientation, string? function, string? formula)> fields,
+        Dictionary<string, int> headers)
+    {
+        var result = new int[fields.Count];
+        for (int index = 0; index < fields.Count; index++)
+        {
+            if (!headers.TryGetValue(fields[index].name, out result[index]))
+                throw new InvalidDataException();
+        }
+        return result;
+    }
+
+    private static int[] ResolveDataIndexes(
+        List<(string name, string orientation, string? function, string? formula)> fields,
+        Dictionary<string, int> slots)
+    {
+        var result = new int[fields.Count];
+        for (int index = 0; index < fields.Count; index++)
+        {
+            if (!slots.TryGetValue(fields[index].name, out result[index]))
+                throw new InvalidDataException();
+        }
+        return result;
+    }
+
+    private static CompiledCalculatedField[] CompileCalculatedFields(
+        List<(string name, string orientation, string? function, string? formula)> fields,
+        Dictionary<string, int> slots,
+        int sourceColumnCount,
+        OdfPivotRefreshOptions options)
+    {
+        var result = new CompiledCalculatedField[fields.Count];
+        for (int index = 0; index < fields.Count; index++)
+        {
+            string? formula = fields[index].formula;
+            if (formula is null ||
+                string.IsNullOrWhiteSpace(formula) ||
+                formula.Length > options.MaximumFormulaCharacters)
+            {
+                throw new InvalidDataException();
+            }
+            result[index] = new CompiledCalculatedField(
+                sourceColumnCount + index,
+                OdfPivotCalculatedFormula.Compile(
+                    formula,
+                    slots,
+                    options.MaximumFormulaNodes,
+                    options.MaximumFormulaDepth));
+        }
+        return result;
+    }
+
+    private static int[] BuildCalculatedEvaluationOrder(
+        CompiledCalculatedField[] fields,
+        int sourceColumnCount)
+    {
+        var result = new List<int>(fields.Length);
+        var states = new byte[fields.Length];
+        for (int index = 0; index < fields.Length; index++)
+            VisitCalculatedField(index, fields, sourceColumnCount, states, result);
+        return result.ToArray();
+    }
+
+    private static void VisitCalculatedField(
+        int index,
+        CompiledCalculatedField[] fields,
+        int sourceColumnCount,
+        byte[] states,
+        List<int> result)
+    {
+        if (states[index] == 2)
+            return;
+        if (states[index] == 1)
+            throw new InvalidDataException();
+        states[index] = 1;
+        foreach (int reference in fields[index].Formula.References)
+        {
+            if (reference < sourceColumnCount)
+                continue;
+            int dependency = reference - sourceColumnCount;
+            if ((uint)dependency >= (uint)fields.Length)
+                throw new InvalidDataException();
+            VisitCalculatedField(dependency, fields, sourceColumnCount, states, result);
+        }
+        states[index] = 2;
+        result.Add(index);
+    }
+
+    private sealed class CompiledCalculatedField(
+        int slot,
+        OdfPivotCalculatedFormula formula)
+    {
+        internal int Slot { get; } = slot;
+
+        internal OdfPivotCalculatedFormula Formula { get; } = formula;
+    }
+
+    private static string BuildDisplayLabel(object?[] values, int[] indexes)
+    {
+        if (indexes.Length == 0)
+            return string.Empty;
+        return string.Join(
+            " / ",
+            indexes.Select(index => Convert.ToString(values[index], CultureInfo.InvariantCulture) ?? string.Empty));
+    }
+
+    private static string BuildEncodedKey(object?[] values, int[] indexes)
+    {
+        var key = new System.Text.StringBuilder();
+        foreach (int index in indexes)
+        {
+            string value = Convert.ToString(values[index], CultureInfo.InvariantCulture) ?? string.Empty;
+            key.Append(value.Length.ToString(CultureInfo.InvariantCulture));
+            key.Append(':');
+            key.Append(value);
+        }
+        return key.ToString();
+    }
+
+    private static string BuildGroupKey(string rowKey, string columnKey) =>
+        rowKey.Length.ToString(CultureInfo.InvariantCulture) + ":" + rowKey + columnKey;
+
+    private bool MatchesFilters(object?[] values, Dictionary<string, int> headers)
+    {
+        foreach ((string fieldName, OdfPivotFilterOperator op, string expected) in _filters)
+        {
+            if (!headers.TryGetValue(fieldName, out int index))
+                throw new InvalidDataException();
+            string actual = Convert.ToString(values[index], CultureInfo.InvariantCulture) ?? string.Empty;
+            int comparison;
+            if (double.TryParse(actual, NumberStyles.Float, CultureInfo.InvariantCulture, out double actualNumber) &&
+                double.TryParse(expected, NumberStyles.Float, CultureInfo.InvariantCulture, out double expectedNumber))
+            {
+                comparison = actualNumber.CompareTo(expectedNumber);
+            }
+            else
+            {
+                comparison = string.Compare(actual, expected, StringComparison.Ordinal);
+            }
+            bool matches = op switch
+            {
+                OdfPivotFilterOperator.Equal => comparison == 0,
+                OdfPivotFilterOperator.NotEqual => comparison != 0,
+                OdfPivotFilterOperator.GreaterThan => comparison > 0,
+                OdfPivotFilterOperator.GreaterThanOrEqual => comparison >= 0,
+                OdfPivotFilterOperator.LessThan => comparison < 0,
+                OdfPivotFilterOperator.LessThanOrEqual => comparison <= 0,
+                _ => false,
+            };
+            if (!matches)
+                return false;
+        }
+        return true;
+    }
+
+    private sealed class PivotAggregate
+    {
+        private double _sum;
+        private double _minimum = double.PositiveInfinity;
+        private double _maximum = double.NegativeInfinity;
+        private int _numericCount;
+        private int _count;
+
+        internal void Add(object? value)
+        {
+            if (value is null)
+                return;
+            _count++;
+            if (!TryConvertNumber(value, out double number))
+            {
+                return;
+            }
+            _sum += number;
+            if (double.IsNaN(_sum) || double.IsInfinity(_sum))
+                throw new OverflowException();
+            _minimum = Math.Min(_minimum, number);
+            _maximum = Math.Max(_maximum, number);
+            _numericCount++;
+        }
+
+        private static bool TryConvertNumber(object value, out double number)
+        {
+            switch (value)
+            {
+                case double doubleValue:
+                    number = doubleValue;
+                    break;
+                case float floatValue:
+                    number = floatValue;
+                    break;
+                case decimal decimalValue:
+                    number = (double)decimalValue;
+                    break;
+                case long longValue:
+                    number = longValue;
+                    break;
+                case ulong ulongValue:
+                    number = ulongValue;
+                    break;
+                case int intValue:
+                    number = intValue;
+                    break;
+                case uint uintValue:
+                    number = uintValue;
+                    break;
+                case short shortValue:
+                    number = shortValue;
+                    break;
+                case ushort ushortValue:
+                    number = ushortValue;
+                    break;
+                case byte byteValue:
+                    number = byteValue;
+                    break;
+                case sbyte sbyteValue:
+                    number = sbyteValue;
+                    break;
+                case string text when double.TryParse(
+                    text,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out double parsed):
+                    number = parsed;
+                    break;
+                default:
+                    number = 0d;
+                    return false;
+            }
+            return !double.IsNaN(number) && !double.IsInfinity(number);
+        }
+
+        internal object? GetValue(string? function) => function switch
+        {
+            "count" => (double)_count,
+            "average" => _numericCount == 0 ? null : _sum / _numericCount,
+            "max" => _numericCount == 0 ? null : _maximum,
+            "min" => _numericCount == 0 ? null : _minimum,
+            _ => _sum,
+        };
     }
 
     private static string FunctionToString(OdfPivotFunction function) => function switch
