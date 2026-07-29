@@ -1,7 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+#if NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace OdfKit.Core;
 
@@ -47,7 +51,7 @@ public static class OdfRendererRegistry
     {
         get
         {
-            if (_renderer == null && !_attemptedAutoRegister)
+            if (_renderer == null && !_attemptedAutoRegister && IsAutoRegistrationSupported)
             {
                 _attemptedAutoRegister = true;
                 TryAutoRegister();
@@ -56,6 +60,14 @@ public static class OdfRendererRegistry
         }
     }
 
+#if NET8_0_OR_GREATER
+    [FeatureGuard(typeof(RequiresUnreferencedCodeAttribute))]
+    private static bool IsAutoRegistrationSupported => RuntimeFeature.IsDynamicCodeSupported;
+
+    [RequiresUnreferencedCode("依名稱載入選用 PDF renderer；NativeAOT 應呼叫 Register 明確註冊。")]
+#else
+    private static bool IsAutoRegistrationSupported => true;
+#endif
     private static void TryAutoRegister()
     {
         try

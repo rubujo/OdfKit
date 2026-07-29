@@ -44,6 +44,7 @@ public sealed class DomWrappersCSharpWriter
         WriteElementWrappers(writer, sortedElements, elementAttributes, elementChildRelations);
         WriteHandWrittenPartialExtensions(writer, sortedElements, elementChildRelations);
         WriteFactory(writer, sortedElements);
+        WriteCoverageMetadata(writer, sortedElements, elementAttributes, elementChildRelations);
         writer.WriteLine("}");
     }
 
@@ -125,6 +126,17 @@ public sealed class DomWrappersCSharpWriter
         factoryWriter.WriteLine("{");
         WriteFactory(factoryWriter, sortedElements);
         factoryWriter.WriteLine("}");
+
+        string coverageMetadataPath = Path.Combine(outputDirectory, "GeneratedDomCoverageMetadata.g.cs");
+        using var coverageMetadataWriter = new StreamWriter(
+            coverageMetadataPath,
+            append: false,
+            new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        WriteFileHeader(coverageMetadataWriter);
+        coverageMetadataWriter.WriteLine("namespace OdfKit.DOM");
+        coverageMetadataWriter.WriteLine("{");
+        WriteCoverageMetadata(coverageMetadataWriter, sortedElements, elementAttributes, elementChildRelations);
+        coverageMetadataWriter.WriteLine("}");
     }
 
     private static Dictionary<string, string> BuildNamespaceFileKeys(IEnumerable<string> namespaceUris)
@@ -329,6 +341,84 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("            return null;");
         writer.WriteLine("        }");
         writer.WriteLine("    }");
+    }
+
+    private static void WriteCoverageMetadata(
+        TextWriter writer,
+        IReadOnlyList<SchemaNameMetadata> sortedElements,
+        IReadOnlyDictionary<(string, string), List<AttributePropertyMetadata>> elementAttributes,
+        IReadOnlyDictionary<(string, string), List<ChildElementPropertyMetadata>> elementChildRelations)
+    {
+        writer.WriteLine("    internal readonly struct OdfGeneratedDomCoverageEntry");
+        writer.WriteLine("    {");
+        writer.WriteLine("        internal OdfGeneratedDomCoverageEntry(string wrapperTypeName, string[] propertyTypeNames)");
+        writer.WriteLine("        {");
+        writer.WriteLine("            WrapperTypeName = wrapperTypeName;");
+        writer.WriteLine("            PropertyTypeNames = propertyTypeNames;");
+        writer.WriteLine("        }");
+        writer.WriteLine();
+        writer.WriteLine("        internal string WrapperTypeName { get; }");
+        writer.WriteLine();
+        writer.WriteLine("        internal string[] PropertyTypeNames { get; }");
+        writer.WriteLine("    }");
+        writer.WriteLine();
+        writer.WriteLine("    internal static class OdfGeneratedDomCoverageMetadata");
+        writer.WriteLine("    {");
+        writer.WriteLine("        private const char KeySeparator = '\\u001f';");
+        writer.WriteLine();
+        writer.WriteLine("        private static readonly Dictionary<string, OdfGeneratedDomCoverageEntry> Entries =");
+        writer.WriteLine("            new Dictionary<string, OdfGeneratedDomCoverageEntry>(StringComparer.Ordinal)");
+        writer.WriteLine("            {");
+
+        foreach (SchemaNameMetadata element in sortedElements)
+        {
+            string className = GetElementClassName(element.NamespaceUri, element.LocalName);
+            var propertyTypeNames = new List<string>();
+            if (!HandWrittenClasses.Contains(className) &&
+                elementAttributes.TryGetValue((element.NamespaceUri, element.LocalName), out List<AttributePropertyMetadata>? attrs))
+            {
+                propertyTypeNames.AddRange(attrs.Select(attr => GetCoveragePropertyTypeName(attr.ValueKind)));
+            }
+
+            if (elementChildRelations.TryGetValue(
+                (element.NamespaceUri, element.LocalName),
+                out List<ChildElementPropertyMetadata>? childRelations))
+            {
+                propertyTypeNames.AddRange(childRelations.Select(_ => "childElementCollection"));
+            }
+
+            string propertyTypes = propertyTypeNames.Count == 0
+                ? "Array.Empty<string>()"
+                : "new string[] { " +
+                    string.Join(", ", propertyTypeNames.Select(typeName => $"\"{typeName}\"")) +
+                    " }";
+            writer.WriteLine(
+                $"                [\"{element.NamespaceUri}\\u001f{element.LocalName}\"] = " +
+                $"new OdfGeneratedDomCoverageEntry(\"OdfKit.DOM.{className}\", {propertyTypes}),");
+        }
+
+        writer.WriteLine("            };");
+        writer.WriteLine();
+        writer.WriteLine("        internal static bool TryGet(");
+        writer.WriteLine("            string namespaceUri,");
+        writer.WriteLine("            string localName,");
+        writer.WriteLine("            out OdfGeneratedDomCoverageEntry entry) =>");
+        writer.WriteLine("            Entries.TryGetValue(namespaceUri + KeySeparator + localName, out entry);");
+        writer.WriteLine("    }");
+    }
+
+    private static string GetCoveragePropertyTypeName(AttributeValueKind valueKind)
+    {
+        return valueKind switch
+        {
+            AttributeValueKind.Unknown or AttributeValueKind.String => "string",
+            AttributeValueKind.Int32 => "int",
+            AttributeValueKind.Boolean => "bool",
+            AttributeValueKind.DateTime => "dateTime",
+            AttributeValueKind.SignedPercent => "percent",
+            AttributeValueKind.CellAddress => "cellAddress",
+            _ => char.ToLowerInvariant(valueKind.ToString()[0]) + valueKind.ToString().Substring(1)
+        };
     }
 
     private static Dictionary<(string, string), List<AttributePropertyMetadata>> ResolveAllElementAttributes(SchemaMetadata metadata)

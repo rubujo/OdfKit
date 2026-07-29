@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Drawing;
@@ -542,7 +545,7 @@ public static partial class TemplateBinder
                 return BuildToken(expression);
             }
 
-            if (ResolvePath(values, expression) is object value)
+            if (ResolvePath(values, expression, options) is object value)
             {
                 report.ReplacementCount++;
                 AddHit(report, expression);
@@ -583,7 +586,7 @@ public static partial class TemplateBinder
             {
                 replacement = BuildToken(expression);
             }
-            else if (ResolvePath(values, expression) is object value)
+            else if (ResolvePath(values, expression, options) is object value)
             {
                 report.ReplacementCount++;
                 AddHit(report, expression);
@@ -641,9 +644,9 @@ public static partial class TemplateBinder
             {
                 AddHit(report, expression);
                 report.ReplacementCount++;
-                replacement = ConvertValue(ResolvePath(item, expression.Substring(collectionPrefix.Length)));
+                replacement = ConvertValue(ResolvePath(item, expression.Substring(collectionPrefix.Length), options));
             }
-            else if (ResolvePath(rootValues, expression) is object value)
+            else if (ResolvePath(rootValues, expression, options) is object value)
             {
                 AddHit(report, expression);
                 report.ReplacementCount++;
@@ -722,7 +725,7 @@ public static partial class TemplateBinder
         return false;
     }
 
-    private static object? ResolvePath(object? source, string path)
+    private static object? ResolvePath(object? source, string path, OdfTemplateBindOptions options)
     {
         object? current = source;
         foreach (string segment in path.Split('.'))
@@ -745,13 +748,38 @@ public static partial class TemplateBinder
                 continue;
             }
 
-            var property = current.GetType()
-                .GetProperties()
-                .FirstOrDefault(propertyInfo => string.Equals(propertyInfo.Name, segment, StringComparison.OrdinalIgnoreCase));
-            current = property?.GetValue(current);
+            if (options.ValueResolver?.TryResolve(current, segment, out object? resolved) == true)
+            {
+                current = resolved;
+                continue;
+            }
+
+            if (!IsRuntimePropertyReflectionSupported)
+            {
+                return null;
+            }
+
+            current = ResolveReflectedProperty(current, segment);
         }
 
         return current;
+    }
+
+#if NET8_0_OR_GREATER
+    [FeatureGuard(typeof(RequiresUnreferencedCodeAttribute))]
+    private static bool IsRuntimePropertyReflectionSupported => RuntimeFeature.IsDynamicCodeSupported;
+
+    [RequiresUnreferencedCode("任意執行期物件屬性需要保留 metadata；NativeAOT 請設定 ValueResolver。")]
+#else
+    private static bool IsRuntimePropertyReflectionSupported => true;
+#endif
+    private static object? ResolveReflectedProperty(object source, string name)
+    {
+        PropertyInfo? property = source.GetType()
+            .GetProperties()
+            .FirstOrDefault(propertyInfo =>
+                string.Equals(propertyInfo.Name, name, StringComparison.OrdinalIgnoreCase));
+        return property?.GetValue(source);
     }
 
     private static string BuildToken(string name) => "{{" + (name ?? string.Empty).Trim() + "}}";

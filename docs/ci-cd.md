@@ -54,6 +54,7 @@ testhost 收尾不穩。
 | `nuget-pack.yml` | 二十一個 NuGet 套件的單次封裝、完整 SPDX 3.0.1 SBOM、WebFont 發布演練與四平台 consumer smoke，包含 Imaging native runtime | PR / main |
 | `performance-benchmark.yml` | DOM 與 ODS 串流效能／配置量回歸基準 | 每週 / 手動 |
 | `libreoffice-interop.yml` | 目前穩定版 LibreOffice 的真實雙 TFM 互通 | 每週 / 手動 |
+| `apache-openoffice-interop.yml` | 釘選 Apache OpenOffice 4.1.16 與官方 SHA-256 的 ODT／ODS／ODP／ODG、DataPilot 雙 TFM 互通 | 手動 |
 | `api-docs.yml` | 17 語系 GitHub Pages API reference 建置（DocFX）與部署；結構與閘門見 [api-docs-site.md](api-docs-site.md) | PR（僅建置）/ main / 手動 |
 | `github-release.yml` | tag 驅動的發佈流程 | tag |
 | `codeql.yml` | CodeQL 靜態安全分析與 SARIF 上傳 | PR / main / 每週 |
@@ -65,6 +66,7 @@ CI 與專用排程證據持續維持；不得把契約內缺口延後到下一�
 
 LibreOffice、Microsoft Office COM 與 PDF 像素級比對屬外部環境驗收，必須由專用工作流程
 或本機腳本明確啟用，不得混入主 CI 的煙霧測試。LibreOffice 互通由排程工作流程持續驗證；
+Apache OpenOffice 因自動排程數量上限與較大的安裝成本，保留為釘選版本的手動 workflow；
 Microsoft Office COM 與像素級比對仍依可用環境手動執行。
 
 `performance-benchmark.yml` 的每週路徑只執行 Windows／Linux 的必要硬閘門。macOS

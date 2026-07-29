@@ -27,7 +27,13 @@ public static partial class TemplateBinder
                 node.NamespaceUri == OdfNamespaces.Text)
             .ToArray())
         {
-            if (!TryResolveImagePlaceholder(paragraph.TextContent, values, report, out string? expression, out OdfTemplateImageValue? image))
+            if (!TryResolveImagePlaceholder(
+                paragraph.TextContent,
+                values,
+                options,
+                report,
+                out string? expression,
+                out OdfTemplateImageValue? image))
             {
                 ReportNonExclusiveImagePlaceholder(paragraph.TextContent, "TextDocument", paragraph.LocalName, report);
                 continue;
@@ -55,7 +61,13 @@ public static partial class TemplateBinder
         OdfTemplateBindReport report,
         string documentKind)
     {
-        if (!TryResolveImagePlaceholder(frame.TextContent, values, report, out string? expression, out OdfTemplateImageValue? image))
+        if (!TryResolveImagePlaceholder(
+            frame.TextContent,
+            values,
+            options,
+            report,
+            out string? expression,
+            out OdfTemplateImageValue? image))
         {
             ReportNonExclusiveImagePlaceholder(frame.TextContent, documentKind, frame.LocalName, report);
             return 0;
@@ -75,6 +87,7 @@ public static partial class TemplateBinder
     private static bool TryResolveImagePlaceholder(
         string text,
         IReadOnlyDictionary<string, object?> values,
+        OdfTemplateBindOptions options,
         OdfTemplateBindReport report,
         out string? expression,
         out OdfTemplateImageValue? image)
@@ -102,7 +115,7 @@ public static partial class TemplateBinder
             return false;
         }
 
-        object? value = ResolvePath(values, key);
+        object? value = ResolvePath(values, key, options);
         if (value is OdfTemplateImageValue imageValue)
         {
             image = imageValue;

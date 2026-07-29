@@ -58,17 +58,22 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
 | `LibreOfficeHeadlessPivotTableRoundTripsOdsAndPdf` | ODS 1.4 | DataPilot 日期月份分組、列百分比、列欄總計、outline 版面、drill-down | `ods` / `pdf` | 往返後由 OdfKit 讀回 Pivot 定義；PDF 非空 | ✅ |
 
-## Apache OpenOffice Pivot 驗收
+## Apache OpenOffice 獨立驗收
 
-`ApacheOpenOfficePivotInteropTests` 使用獨立的 `ODFKIT_OPENOFFICE_PATH`，並核對
-Windows 檔案版本描述與簽署公司必須是 Apache OpenOffice／Apache Software Foundation，
-不得誤用 LibreOffice。測試以隔離的本機 UNO pipe 啟動 headless Calc，實際載入、
-另存 ODS 並匯出 PDF；沒有安裝 AOO 時會明確略過。
+`ApacheOpenOfficeInteropTests` 不再掛在 `LibreOfficeInteropTests` partial 型別下。測試使用
+獨立的 `ODFKIT_OPENOFFICE_PATH`，並核對 Windows 檔案版本描述與公司必須是
+Apache OpenOffice／Apache Software Foundation，不得誤用 LibreOffice。實機範圍包含
+ODT／ODS／ODP／ODG 核心文件往返，以及進階 DataPilot ODS 往返與 PDF 匯出。
+
+測試直接使用 soffice headless 轉換，不要求安裝包內附 Python／UNO runtime。未明確要求時，
+沒有安裝 AOO 會略過；`-RequireOpenOffice` 會設定 fail-closed 模式，找不到或路徑偽冒時失敗。
+GitHub Actions 的手動 workflow 釘選 Apache OpenOffice 4.1.16，下載後依 Apache 官方
+SHA-256 驗證，再執行 net8.0 與 net10.0。
 
 ```powershell
-$env:ODFKIT_OPENOFFICE_PATH = "C:\Tools\OpenOfficePortable\App\openoffice\program\soffice.exe"
-dotnet test OdfKit.Tests/OdfKit.Tests.csproj -f net10.0 `
-  --filter "FullyQualifiedName~ApacheOpenOfficeHeadlessAdvancedPivotRoundTripsOdsAndPdf"
+pwsh eng/Test-ApacheOpenOfficeInterop.ps1 `
+  -SofficePath "C:\Program Files (x86)\OpenOffice 4\program\soffice.exe" `
+  -RequireOpenOffice
 ```
 
 ## 已知上游限制（非 OdfKit 缺陷）
@@ -144,6 +149,7 @@ ODB 資料庫文件的失效模式比 Chart／Image 更隱晦——並非乾淨�
 | 類別 | 說明 |
 |------|------|
 | `LibreOfficeInteropTests` | 本矩陣的實機 headless 測試 |
+| `ApacheOpenOfficeInteropTests` | Apache OpenOffice 四種核心格式與 DataPilot 實機 headless 測試 |
 | `LibreOfficeScriptingInteropTests` | 使用隔離 profile 實際執行 Basic／Python 文件巨集 |
 | `TrackedChangesInteropTests` | 追蹤修訂語意（非必須 LO） |
 | `LoExtInteropTests` | `loext:decorative` 載入映射 |

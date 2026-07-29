@@ -43,6 +43,12 @@ public sealed class OdfTemplateBindOptions
     public bool StrictMode { get; set; }
 
     /// <summary>
+    /// Gets or sets the optional AOT-safe resolver for object property path segments.
+    /// 取得或設定選用的 AOT-safe 物件屬性路徑片段解析器。
+    /// </summary>
+    public IOdfTemplateValueResolver? ValueResolver { get; set; }
+
+    /// <summary>
     /// Gets or sets how unresolved placeholders are handled.
     /// 取得或設定如何處理未解析占位符。
     /// </summary>

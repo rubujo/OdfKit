@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using OdfKit;
 using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -28,6 +29,9 @@ checks += SmokeDocumentFactoryKinds();
 checks += SmokeFormulaEvaluation();
 checks += SmokeXmlWriterRoundTrip();
 checks += SmokeEmbeddedDocumentFactory();
+checks += SmokeTypedDomCoverage();
+checks += SmokeObjectBindingAndTemplateBinding();
+checks += SmokeExplicitRendererRegistration();
 checks += SmokeOpenPgpRoundTrip();
 
 Console.WriteLine($"TrimSmoke OK: {checks} API 根通過");
@@ -194,6 +198,66 @@ static int SmokeEmbeddedDocumentFactory()
     return 1;
 }
 
+static int SmokeTypedDomCoverage()
+{
+    OdfTypedDomCoverageReport report = OdfTypedDomCoverage.Build();
+    if (report.SchemaElementCount < 550 ||
+        report.TypedElementCount < 550 ||
+        report.WrapperPropertyCount < 2000)
+    {
+        throw new InvalidOperationException("Typed DOM 靜態覆蓋 metadata 不完整。");
+    }
+
+    return 1;
+}
+
+static int SmokeObjectBindingAndTemplateBinding()
+{
+    var rows = new[]
+    {
+        new TrimSmokeRow
+        {
+            Name = "NativeAOT",
+            Value = 42,
+        },
+    };
+    using var reader = new ObjectDataReader<TrimSmokeRow>(rows);
+    if (!reader.Read() ||
+        reader.GetString(reader.GetOrdinal(nameof(TrimSmokeRow.Name))) != "NativeAOT" ||
+        reader.GetInt32(reader.GetOrdinal(nameof(TrimSmokeRow.Value))) != 42)
+    {
+        throw new InvalidOperationException("物件資料繫結 NativeAOT 驗證失敗。");
+    }
+
+    using var document = TextDocument.Create();
+    document.AddParagraph("Hello {{Model.Name}}");
+    OdfTemplateBindReport report = TemplateBinder.Bind(
+        document,
+        new Dictionary<string, object?> { ["Model"] = rows[0] },
+        new OdfTemplateBindOptions
+        {
+            ValueResolver = new TrimSmokeTemplateResolver(),
+        });
+    if (report.ReplacementCount != 1)
+    {
+        throw new InvalidOperationException("範本繫結 NativeAOT 驗證失敗。");
+    }
+
+    return 2;
+}
+
+static int SmokeExplicitRendererRegistration()
+{
+    var renderer = new TrimSmokeRenderer();
+    OdfRendererRegistry.Register(renderer);
+    if (!ReferenceEquals(renderer, OdfRendererRegistry.Instance))
+    {
+        throw new InvalidOperationException("明確 renderer 註冊 NativeAOT 驗證失敗。");
+    }
+
+    return 1;
+}
+
 static int SmokeOpenPgpRoundTrip()
 {
     var random = new SecureRandom();
@@ -282,4 +346,38 @@ file sealed class TrimSmokeEvaluationContext : IEvaluationContext, IOdfBlankChec
     public string? GetCellFormula(OdfCellAddress address) => null;
 
     public object GetNamedRangeOrExpressionValue(string name) => 0.0;
+}
+
+file sealed class TrimSmokeRow
+{
+    public required string Name { get; init; }
+
+    public int Value { get; init; }
+}
+
+file sealed class TrimSmokeRenderer : IOdfRenderer
+{
+    public void ExportToPdf(
+        OdfDocument document,
+        Stream pdfStream,
+        System.Security.Cryptography.X509Certificates.X509Certificate2? certificate = null)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(pdfStream);
+    }
+}
+
+file sealed class TrimSmokeTemplateResolver : IOdfTemplateValueResolver
+{
+    public bool TryResolve(object source, string name, out object? value)
+    {
+        if (source is TrimSmokeRow row && name == nameof(TrimSmokeRow.Name))
+        {
+            value = row.Name;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
 }

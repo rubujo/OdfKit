@@ -39,6 +39,7 @@
 | `Test-CodeCoverage.ps1` | 驗證 Cobertura 全專案 line／branch coverage 最低門檻。 |
 | `Test-GitHubActionsPolicy.ps1` | 驗證第三方 Actions 皆以完整 SHA 固定、附版本註解並由 Dependabot 每週追蹤最新版；`-Online` 會與官方 GitHub API 對照。 |
 | `Test-LibreOfficeInterop.ps1` | 執行 LibreOffice headless 實機互通性測試。 |
+| `Test-ApacheOpenOfficeInterop.ps1` | 執行 Apache OpenOffice ODT／ODS／ODP／ODG 與 DataPilot headless 實機互通性測試。 |
 | `Test-MergeConflictMarkers.ps1` | 掃描原始碼中的合併衝突標記（CS8300 成因）。 |
 | `Test-NoEmptyCatch.ps1` | 掃描所有手寫 C#，拒絕會靜默吞掉例外的空白 `catch`。 |
 | `Test-MarkdownLinks.ps1` | 驗證 `README.md`、`AGENTS.md`、`docs/` 與 eng 文件的本機連結目標及 Markdown anchor 存在，且未越出工作區。 |

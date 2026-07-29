@@ -15144,6 +15144,8 @@ OdfKit.Image.OdfImageNormalizationRequest.RecommendedMediaType.get -> string?
 OdfKit.Image.OdfImageNormalizationRequest.RecommendedMediaType.init -> void
 OdfKit.Image.OdfImageNormalizationRequest.RecommendedName.get -> string?
 OdfKit.Image.OdfImageNormalizationRequest.RecommendedName.init -> void
+OdfKit.IOdfTemplateValueResolver
+OdfKit.IOdfTemplateValueResolver.TryResolve(object! source, string! name, out object? value) -> bool
 OdfKit.OdfBatchUpdateResult
 OdfKit.OdfBatchUpdateResult.AmbiguousNames.get -> System.Collections.Generic.IList<string!>!
 OdfKit.OdfBatchUpdateResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<OdfKit.Core.OdfDiagnostic!>!
@@ -15170,6 +15172,8 @@ OdfKit.OdfTemplateBindOptions.StrictMode.get -> bool
 OdfKit.OdfTemplateBindOptions.StrictMode.set -> void
 OdfKit.OdfTemplateBindOptions.UnknownPlaceholderPolicy.get -> OdfKit.OdfTemplateUnknownPlaceholderPolicy
 OdfKit.OdfTemplateBindOptions.UnknownPlaceholderPolicy.set -> void
+OdfKit.OdfTemplateBindOptions.ValueResolver.get -> OdfKit.IOdfTemplateValueResolver?
+OdfKit.OdfTemplateBindOptions.ValueResolver.set -> void
 OdfKit.OdfTemplateBindReport
 OdfKit.OdfTemplateBindReport.ChangedNodeCount.get -> int
 OdfKit.OdfTemplateBindReport.ChangedNodeCount.set -> void

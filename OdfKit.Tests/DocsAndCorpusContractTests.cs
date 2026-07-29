@@ -507,7 +507,11 @@ public class DocsAndCorpusContractTests
         string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "trim-smoke.yml"));
         string toolsReadme = File.ReadAllText(Path.Combine(repoRoot, "tools", "README.md"));
         string trimProject = File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "OdfKit.TrimSmoke.csproj"));
+        string trimProgram = File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "Program.cs"));
         string openPgpProvider = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Core", "OdfBouncyCastleOpenPgpProvider.cs"));
+        string typedDomCoverage = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "DOM", "OdfTypedDomCoverage.cs"));
+        string generatedCoverageMetadata = File.ReadAllText(
+            Path.Combine(repoRoot, "OdfKit", "DOM", "Generated", "GeneratedDomCoverageMetadata.g.cs"));
 
         Assert.Contains("PublishTrimmed", script, StringComparison.Ordinal);
         Assert.Contains("OdfKit.TrimSmoke.exe", script, StringComparison.Ordinal);
@@ -520,11 +524,17 @@ public class DocsAndCorpusContractTests
         Assert.Contains("osx-arm64", workflow, StringComparison.Ordinal);
         Assert.Contains("RuntimeIdentifier", script, StringComparison.Ordinal);
         Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", toolsReadme, StringComparison.Ordinal);
-        Assert.Contains("SmokeOpenPgpRoundTrip", File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "Program.cs")), StringComparison.Ordinal);
+        Assert.Contains("SmokeOpenPgpRoundTrip", trimProgram, StringComparison.Ordinal);
+        Assert.Contains("SmokeTypedDomCoverage", trimProgram, StringComparison.Ordinal);
+        Assert.Contains("SmokeObjectBindingAndTemplateBinding", trimProgram, StringComparison.Ordinal);
+        Assert.Contains("SmokeExplicitRendererRegistration", trimProgram, StringComparison.Ordinal);
         Assert.DoesNotContain("<TrimmerRootAssembly Include=\"BouncyCastle.Cryptography\" />", trimProject, StringComparison.Ordinal);
         Assert.Contains("<NuGetAudit>false</NuGetAudit>", trimProject, StringComparison.Ordinal);
         Assert.Contains("<NoWarn>$(NoWarn);IL2104;IL3053</NoWarn>", trimProject, StringComparison.Ordinal);
         Assert.DoesNotContain("RequiresDynamicCode", openPgpProvider, StringComparison.Ordinal);
+        Assert.DoesNotContain("RequiresUnreferencedCode", typedDomCoverage, StringComparison.Ordinal);
+        Assert.DoesNotContain("GetProperties(", typedDomCoverage, StringComparison.Ordinal);
+        Assert.Contains("OdfGeneratedDomCoverageMetadata", generatedCoverageMetadata, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -1087,6 +1097,34 @@ public class DocsAndCorpusContractTests
 
         Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP=1", matrix, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 Apache OpenOffice 互通入口獨立、fail-closed，且 CI 釘選官方版本與雜湊。
+    /// </summary>
+    [Fact]
+    public void ApacheOpenOfficeInteropUsesIndependentPinnedEntryPoint()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-ApacheOpenOfficeInterop.ps1"));
+        string workflow = File.ReadAllText(
+            Path.Combine(repoRoot, ".github", "workflows", "apache-openoffice-interop.yml"));
+        string tests = File.ReadAllText(
+            Path.Combine(repoRoot, "OdfKit.Tests", "ApacheOpenOfficeInteropTests.cs"));
+
+        Assert.Contains("ODFKIT_REQUIRE_OPENOFFICE", script, StringComparison.Ordinal);
+        Assert.Contains("ApacheOpenOfficeInteropTests", script, StringComparison.Ordinal);
+        Assert.Contains("OPENOFFICE_VERSION: 4.1.16", workflow, StringComparison.Ordinal);
+        Assert.Contains(
+            "0ea97aedb1c77838b9c6ee9e7a9c5161933b35b703e4ccbafa6a9abde7f669ca",
+            workflow,
+            StringComparison.Ordinal);
+        Assert.Contains("-RequireOpenOffice", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
+        Assert.Contains("public sealed class ApacheOpenOfficeInteropTests", tests, StringComparison.Ordinal);
+        Assert.DoesNotContain("partial class LibreOfficeInteropTests", tests, StringComparison.Ordinal);
+        Assert.Contains("ApacheOpenOfficeHeadlessRoundTripsCoreDocumentKinds", tests, StringComparison.Ordinal);
+        Assert.Contains("ApacheOpenOfficeHeadlessAdvancedPivotRoundTripsOdsAndPdf", tests, StringComparison.Ordinal);
     }
 
     /// <summary>

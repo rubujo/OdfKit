@@ -333,6 +333,28 @@ public class TemplateBinderScenarioTests
         Assert.Contains(report.UnresolvedPlaceholderDetails, detail => detail.Expression == "Missing");
     }
 
+    /// <summary>
+    /// 驗證自訂值解析器可在不依賴執行期反射時解析物件路徑。
+    /// </summary>
+    [Fact]
+    public void BindValueResolverSupportsAotSafeObjectPaths()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("Hello {{Model.Name}}");
+        var model = new TemplateModel("NativeAOT");
+
+        OdfTemplateBindReport report = TemplateBinder.Bind(
+            document,
+            new Dictionary<string, object?> { ["Model"] = model },
+            new OdfTemplateBindOptions
+            {
+                ValueResolver = new TemplateModelResolver(),
+            });
+
+        Assert.Equal(1, report.ReplacementCount);
+        Assert.Contains("Hello NativeAOT", document.BodyTextRoot.TextContent);
+    }
+
 
     /// <summary>
     /// 驗證 ODT 圖片占位符會替換成圖片 frame 並寫入封裝媒體。
@@ -452,4 +474,21 @@ public class TemplateBinderScenarioTests
     private static byte[] CreatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+
+    private sealed record TemplateModel(string Name);
+
+    private sealed class TemplateModelResolver : IOdfTemplateValueResolver
+    {
+        public bool TryResolve(object source, string name, out object? value)
+        {
+            if (source is TemplateModel model && name == nameof(TemplateModel.Name))
+            {
+                value = model.Name;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+    }
 }

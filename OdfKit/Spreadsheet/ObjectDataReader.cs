@@ -491,15 +491,35 @@ public sealed class ObjectDataReader<
         base.Dispose(disposing);
     }
 
-    private readonly struct ColumnAccessor(string name, Type propertyType, Func<T, object?> getter)
+    private readonly struct ColumnAccessor(
+        string name,
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields |
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
+        Type propertyType,
+        Func<T, object?> getter)
     {
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields |
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
+        private readonly Type _propertyType = propertyType;
+
         public string Name { get; } = name;
 
-        public Type PropertyType { get; } = propertyType;
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields |
+            System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
+        public Type PropertyType => _propertyType;
 
         public Func<T, object?> Getter { get; } = getter;
     }
 
+#if NET5_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2072",
+        Justification = "泛型 T 已要求保留公開屬性；欄位型別只來自該已保留的 PropertyInfo 集合，且 NativeAOT smoke 會執行實際讀取。")]
+#endif
     private static ColumnAccessor[] BuildColumns()
     {
         // 只組裝欄位描述、不在型別初始設定式擲出例外：靜態欄位初始設定式失敗會被包成

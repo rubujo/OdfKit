@@ -446,6 +446,9 @@ public class OdfSchemaGeneratorTests
         DomWrappersCSharpWriter.Write(metadata, writer);
 
         string code = writer.ToString();
+        Assert.Contains("internal static class OdfGeneratedDomCoverageMetadata", code);
+        Assert.Contains("\"childElementCollection\"", code);
+        Assert.Contains("\"cellAddress\"", code);
         Assert.Contains("public partial class TableCalculationSettingsElement : OdfElement", code);
         Assert.Contains("public IEnumerable<TextPElement> TextPChildElements", code);
         Assert.Contains("get => ChildElements<TextPElement>();", code);
@@ -969,9 +972,11 @@ public class OdfSchemaGeneratorTests
             Assert.Equal(string.Empty, stderr.ToString());
             Assert.Equal(string.Empty, stdout.ToString());
             Assert.True(File.Exists(Path.Combine(outputDirectory, "GeneratedDomFactory.g.cs")));
+            Assert.True(File.Exists(Path.Combine(outputDirectory, "GeneratedDomCoverageMetadata.g.cs")));
             Assert.Contains(
                 Directory.GetFiles(outputDirectory, "*.g.cs"),
-                path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal));
+                path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal) &&
+                    !path.EndsWith("GeneratedDomCoverageMetadata.g.cs", StringComparison.Ordinal));
         }
         finally
         {
@@ -1016,7 +1021,8 @@ public class OdfSchemaGeneratorTests
             Assert.Equal(0, exitCode);
             Assert.Equal(string.Empty, stderr.ToString());
             string[] wrapperFiles = Directory.GetFiles(outputDirectory, "*.g.cs")
-                .Where(path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal))
+                .Where(path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal) &&
+                    !path.EndsWith("GeneratedDomCoverageMetadata.g.cs", StringComparison.Ordinal))
                 .ToArray();
             Assert.Equal(2, wrapperFiles.Length);
             Assert.Contains(wrapperFiles, path => path.EndsWith("AlphaRootElement.g.cs", StringComparison.Ordinal));

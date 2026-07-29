@@ -1,0 +1,99 @@
+name: Apache OpenOffice interoperability
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apache-openoffice-interop-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  OPENOFFICE_VERSION: 4.1.16
+  OPENOFFICE_SHA256: 0ea97aedb1c77838b9c6ee9e7a9c5161933b35b703e4ccbafa6a9abde7f669ca
+
+jobs:
+  apache-openoffice-interop:
+    name: Apache OpenOffice net8.0 and net10.0 interoperability
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825a76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+
+      - name: Restore pinned Apache OpenOffice installer
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ runner.tool_cache }}/odfkit/apache-openoffice/${{ env.OPENOFFICE_VERSION }}
+          key: apache-openoffice-installer-${{ runner.os }}-${{ env.OPENOFFICE_VERSION }}
+
+      - name: Install pinned Apache OpenOffice
+        shell: pwsh
+        run: |
+          $fileName = "Apache_OpenOffice_$env:OPENOFFICE_VERSION`_Win_x86_install_en-US.exe"
+          $uri = "https://downloads.apache.org/openoffice/$env:OPENOFFICE_VERSION/binaries/en-US/$fileName"
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE "odfkit/apache-openoffice/$env:OPENOFFICE_VERSION"
+          $extractRoot = Join-Path $env:RUNNER_TEMP "odfkit-apache-openoffice-installer"
+          New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+          New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
+          $installer = Join-Path $cacheRoot $fileName
+          if (-not (Test-Path -LiteralPath $installer -PathType Leaf)) {
+            $temporaryPath = "$installer.download"
+            try {
+              Invoke-WebRequest -Uri $uri -OutFile $temporaryPath
+              $downloadHash = (Get-FileHash -LiteralPath $temporaryPath -Algorithm SHA256).Hash
+              if (-not [string]::Equals($downloadHash, $env:OPENOFFICE_SHA256, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Apache OpenOffice installer SHA-256 mismatch."
+              }
+              Move-Item -LiteralPath $temporaryPath -Destination $installer
+            }
+            finally {
+              Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+            }
+          }
+          $cachedHash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash
+          if (-not [string]::Equals($cachedHash, $env:OPENOFFICE_SHA256, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Cached Apache OpenOffice installer SHA-256 mismatch."
+          }
+
+          & 7z x -y "-o$extractRoot" $installer
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to extract Apache OpenOffice installer (exit $LASTEXITCODE)."
+          }
+          $msi = Get-ChildItem -LiteralPath $extractRoot -Recurse -Filter *.msi |
+            Select-Object -First 1
+          if ($null -eq $msi) {
+            throw "Extracted Apache OpenOffice installer does not contain an MSI."
+          }
+          $process = Start-Process msiexec.exe `
+            -ArgumentList @('/i', $msi.FullName, '/qn', '/norestart') `
+            -Wait `
+            -PassThru
+          if ($process.ExitCode -notin @(0, 3010)) {
+            throw "Apache OpenOffice installer failed with exit code $($process.ExitCode)."
+          }
+
+      - name: Run Apache OpenOffice interoperability tests (net8.0)
+        shell: pwsh
+        run: |
+          ./eng/Test-ApacheOpenOfficeInterop.ps1 `
+            -Configuration Release `
+            -Framework net8.0 `
+            -RequireOpenOffice
+
+      - name: Run Apache OpenOffice interoperability tests (net10.0)
+        shell: pwsh
+        run: |
+          ./eng/Test-ApacheOpenOfficeInterop.ps1 `
+            -Configuration Release `
+            -Framework net10.0 `
+            -RequireOpenOffice

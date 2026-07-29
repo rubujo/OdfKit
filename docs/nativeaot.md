@@ -1,14 +1,15 @@
 # NativeAOT 支援與部署邊界
 
-OdfKit 將「可由 NativeAOT 發布」與「整個公開 API 已具靜態一致性保證」分開描述。不能因單一
-smoke 執行成功，就把所有核心、擴充套件及第三方相依一併宣稱為完全支援。
+OdfKit 將核心受控 API 的 NativeAOT 契約與擴充套件、外部程式及任意執行期 plugin 分開描述。
+核心 smoke 必須實際發布並執行原生程式，不能把該結果外推至未個別驗證的第三方相依。
 
 ## 支援矩陣
 
 | 範圍 | 狀態 | 證據與限制 |
 |------|------|------------|
-| ODF 核心主要 API 根 | 支援有界 NativeAOT smoke | `eng/Test-TrimSmoke.ps1 -PublishAot` 在 Windows x64、Linux x64 與 macOS ARM64 建立原生程式，驗證 ODT／ODS／ODP／ODG／ODC／ODF、ZIP／XML、公式與 OpenPGP 主要路徑 |
-| 完整 `OdfKit` 公開 API 表面 | 尚未宣稱完全 AOT 相容 | `OdfTypedDomCoverage.Build` 仍以反射取得 wrapper 公開屬性，已明確標示 `RequiresUnreferencedCode`；此診斷 API 不應由 AOT 應用程式呼叫 |
+| ODF 核心 API 家族 | NativeAOT 實機驗證 | `eng/Test-TrimSmoke.ps1 -PublishAot` 在 Windows x64、Linux x64 與 macOS ARM64 建立原生程式，驗證 ODT／ODS／ODP／ODG／ODC／ODF、ZIP／XML、公式、OpenPGP、typed DOM coverage、物件資料讀取、字典範本繫結與明確 renderer 註冊 |
+| typed DOM coverage | AOT-compatible | `OdfTypedDomCoverage.Build` 使用 schema generator 產生且按需初始化的靜態 wrapper metadata，不掃描執行期屬性；一般文件建立不會初始化 coverage 字典 |
+| 動態探索與任意物件反射 | 明確邊界 | NativeAOT 應以 `OdfRendererRegistry.Register` 明確註冊 renderer，並以 `IOdfTemplateValueResolver` 處理 POCO 範本路徑；任意執行期 plugin 載入不屬核心靜態保證 |
 | `OdfKit.WebFonts.Abstractions` | `net10.0` AOT-compatible | 專案啟用 `IsAotCompatible` |
 | `OdfKit.WebFonts.OpenType` | `net10.0` AOT-compatible | 有界 parser、子集化、WOFF／WOFF2 與 source-generated／無反射熱路徑 |
 | `OdfKit.WebFonts.Worker` | AOT-compatible | durable manifest 改用 `System.Text.Json` source generation |
