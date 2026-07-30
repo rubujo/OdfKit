@@ -89,6 +89,10 @@ jobs:
         shell: pwsh
         run: ./eng/Test-EnvironmentVariableIsolation.ps1
 
+      - name: ProjectReference build race safety
+        shell: pwsh
+        run: ./eng/Test-ProjectReferenceRaceSafety.ps1
+
       - name: One-line XML summary ban
         shell: pwsh
         run: ./eng/Test-OneLineXmlSummary.ps1 -FailOnIssues

@@ -45,6 +45,7 @@ $publishDir = if ($PublishAot) {
 # 只有 NativeAOT 模式需要原生連結工具鏈；PublishTrimmed 純受管路徑不需要。
 $nativeToolchainDirectory = if ($PublishAot) {
     & (Join-Path $PSScriptRoot 'Resolve-NativeToolchainPath.ps1') `
+        -RuntimeIdentifier $RuntimeIdentifier `
         -VisualStudioInstallerDirectory $VisualStudioInstallerDirectory
 } else {
     ''

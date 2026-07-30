@@ -52,6 +52,7 @@ $FontPath = (Resolve-Path -LiteralPath $FontPath).Path
 
 # NativeAOT 原生連結需要 vswhere.exe 可由 PATH 解析；只補進本處理程序，並於 finally 還原。
 $nativeToolchainDirectory = & (Join-Path $PSScriptRoot 'Resolve-NativeToolchainPath.ps1') `
+    -RuntimeIdentifier $RuntimeIdentifier `
     -VisualStudioInstallerDirectory $VisualStudioInstallerDirectory
 $previousPath = $env:PATH
 

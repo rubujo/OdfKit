@@ -19,7 +19,7 @@
 |------|------|
 | `Ensure-OdfKitBuilt.ps1` | 確保 OdfKit net10.0 組件已建置且與來源同步。 |
 | `Get-PackageVersion.ps1` | 讀取 `eng/OdfKit.Package.props` 中的套件版本號。 |
-| `Resolve-NativeToolchainPath.ps1` | 解析 NativeAOT 原生連結所需的 Visual Studio Installer 目錄，順序為 `-VisualStudioInstallerDirectory` → PATH → 已知安裝位置；三者皆無時明確失敗。只做解析不改環境變數，PATH 由呼叫端在 try／finally 內前置並還原。由 `Test-WebFontSidecarAot.ps1` 與 `Test-TrimSmoke.ps1 -PublishAot` 呼叫，兩者同名參數可直接傳入。 |
+| `Resolve-NativeToolchainPath.ps1` | 解析 NativeAOT 原生連結所需的 Visual Studio Installer 目錄，順序為 `-VisualStudioInstallerDirectory` → PATH → 已知安裝位置；三者皆無時明確失敗。是否需要由目標 RID 決定：只有 `win-*` 以 MSVC 連結，`linux-*` 與 `osx-*` 直接放行。只做解析不改環境變數，PATH 由呼叫端在 try／finally 內前置並還原。由 `Test-WebFontSidecarAot.ps1` 與 `Test-TrimSmoke.ps1 -PublishAot` 呼叫，兩者同名參數可直接傳入。 |
 
 ### 格式化
 
