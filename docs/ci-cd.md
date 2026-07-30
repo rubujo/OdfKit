@@ -120,6 +120,15 @@ OdfKit 因此採下列可機器驗證的契約：
   GitHub 配額的治理值，不是主動建立 8 GB cache 的許可。
 - workflow 一律透過 `.github/actions/cache-odfkit`。PR 只使用 `actions/cache/restore`，
   不建立 branch-scoped cache；受信任的非 PR workflow 才能儲存。
+- **`cache-odfkit` 必須由 workflow 直接呼叫，不得被其他 composite action 巢狀包裝。**
+  `actions/cache` 的 post（儲存）步驟在多層 composite 下會取得「最外層 composite 的
+  inputs」而非自己的（[actions/runner#2030](https://github.com/actions/runner/issues/2030)），
+  因此 workflow → `setup-dotnet-odfkit` → `cache-odfkit` → `actions/cache` 的呼叫鏈會讓
+  post 步驟找不到 `path`，輸出 `Input required and not supplied: path` 並使儲存靜默失敗——
+  日誌只會看到還原命中舊 key，`Cache saved` 永遠不出現。NuGet cache 因此由每個 job 在
+  `setup-dotnet-odfkit` 之後直接呼叫 `cache-odfkit`（`NUGET_PACKAGES` 與目錄由 setup
+  步驟建立，順序不可顛倒）。`eng/Test-CiResourcePolicy.ps1` 同時阻擋巢狀包裝與 job 漏接
+  cache 的情形。
 - NuGet global-packages 使用 OS 與明確 revision 的穩定 key；nupkg 可同時包含多個 RID，
   不按 runner 架構複製。cache 是 immutable；相依集合變更後，在 revision 尚未調升前會
   還原既有內容並下載缺少項目，但不會更新既有項目。累積差額或相依變更值得保留時必須調升

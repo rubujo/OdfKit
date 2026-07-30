@@ -1,17 +1,20 @@
 name: Setup .NET for OdfKit
-description: 設定 SDK、關閉遙測，並快取工作區 NuGet 套件目錄以減少 CI 還原耗時。
+description: 設定 SDK 並關閉遙測；NuGet 快取由 workflow 直接呼叫 cache-odfkit，不在此巢狀包裝。
 inputs:
   dotnet-versions:
     description: setup-dotnet 的 dotnet-version（支援多行）
     required: false
     default: 10.0.x
-  nuget-cache-revision:
-    description: 只有需要重建完整 NuGet cache 時才遞增的明確 epoch。
-    required: false
-    default: v1
 runs:
   using: composite
   steps:
+    # 本 action 刻意不包裝 NuGet 快取。actions/cache 的 post（儲存）步驟在多層 composite 下會
+    # 取得「最外層 composite 的 inputs」而非自己的（actions/runner#2030），因此經由
+    # setup-dotnet-odfkit → cache-odfkit → actions/cache 呼叫時，post 步驟找不到 path，
+    # 會輸出「Input required and not supplied: path」並讓儲存靜默失敗。workflow 直接呼叫
+    # cache-odfkit 時最外層就是 cache-odfkit，其 inputs 含 path，儲存正常——repo 內的
+    # webfont 快取一直如此運作。NuGet 快取因此改由各 job 於本步驟之後直接呼叫 cache-odfkit，
+    # 且必須在此之後，因為 NUGET_PACKAGES 與目錄由下方步驟建立。
     - name: Configure .NET environment
       shell: pwsh
       run: |
@@ -19,18 +22,6 @@ runs:
         "DOTNET_CLI_TELEMETRY_OPTOUT=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
         "NUGET_PACKAGES=$($env:GITHUB_WORKSPACE)/.nuget/packages" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
         New-Item -ItemType Directory -Path "$($env:GITHUB_WORKSPACE)/.nuget/packages" -Force | Out-Null
-
-    - name: Cache NuGet packages
-      uses: ./.github/actions/cache-odfkit
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        # Cache 是 immutable；以每次套件版本變更產生 fingerprint 會複製整份
-        # Windows cache。明確 epoch 讓同一 OS 只保留一份；nupkg 可同時包含多個
-        # RID，不再因 x64／ARM64 複製整個 global-packages。套件變更時先
-        # 還原既有內容再下載差額；只有累積差額值得重建時才人工遞增 revision。
-        key: nuget-${{ runner.os }}-${{ inputs.nuget-cache-revision }}
-        restore-keys: |
-          nuget-${{ runner.os }}-
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0

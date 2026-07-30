@@ -1,4 +1,4 @@
-name: CodeQL
+﻿name: CodeQL
 
 # 這個 repo 解析大量不可信輸入（ODF／ZIP／XML／字型），是 SAST 投報率最高的場景，
 # 但先前完全沒有任何 SAST 覆蓋。新增本工作流程補上 C# 的 CodeQL 靜態分析。
@@ -58,6 +58,14 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3

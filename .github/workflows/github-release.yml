@@ -1,4 +1,4 @@
-name: GitHub Release CD
+﻿name: GitHub Release CD
 
 on:
   push:
@@ -30,6 +30,14 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Verify Tag matches Props Version
         shell: pwsh

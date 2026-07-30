@@ -1,4 +1,4 @@
-name: Trim smoke validation
+﻿name: Trim smoke validation
 
 on:
   pull_request:
@@ -74,6 +74,14 @@ jobs:
         with:
           dotnet-versions: |
             10.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Run trim smoke (blocking)
         shell: pwsh

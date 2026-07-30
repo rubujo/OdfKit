@@ -700,20 +700,27 @@ public partial class LibreOfficeInteropTests
         string home,
         params string[] arguments)
     {
+        // Git for Windows 提供的 MSYS GnuPG 會把繼承或傳入的 Windows 絕對路徑（D:\...）
+        // 當成相對路徑接在自己的 POSIX 工作目錄後面，導致找不到 keyring 與 gpg-agent。
+        // 固定工作目錄於 home 的上一層並改傳相對路徑，可同時相容 native 與 MSYS GnuPG。
+        // 與 OpenPgpExternalInteropTests.RunGpg 維持同一策略。
+        string workingDirectory = Directory.GetParent(home)!.FullName;
         var startInfo = new ProcessStartInfo(executable)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
+            WorkingDirectory = workingDirectory
         };
-        startInfo.Environment["GNUPGHOME"] = home;
-        // Git for Windows 提供的 MSYS GnuPG 不會轉換繼承的 Windows GNUPGHOME，
-        // 但會轉換命令列路徑。明確傳入 --homedir 可同時相容 native 與 MSYS GnuPG。
-        startInfo.ArgumentList.Add("--homedir");
-        startInfo.ArgumentList.Add(home);
+        startInfo.Environment["GNUPGHOME"] = Path.GetRelativePath(workingDirectory, home);
         foreach (string argument in arguments)
-            startInfo.ArgumentList.Add(argument);
+        {
+            startInfo.ArgumentList.Add(
+                Path.IsPathRooted(argument)
+                    ? Path.GetRelativePath(workingDirectory, argument)
+                    : argument);
+        }
 
         using Process process = Process.Start(startInfo)
             ?? throw new InvalidOperationException("無法啟動 GnuPG。");

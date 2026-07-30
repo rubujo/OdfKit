@@ -29,12 +29,22 @@ if ($cacheAction -notmatch 'actions/cache/restore@[0-9a-f]{40}\s+# v6\.1\.0' -or
 
 $setupActionPath = Join-Path $repoRoot ".github/actions/setup-dotnet-odfkit/action.yml"
 $setupAction = Get-Content -LiteralPath $setupActionPath -Raw
-if (-not $setupAction.Contains(
-        'key: nuget-${{ runner.os }}-${{ inputs.nuget-cache-revision }}',
-        [StringComparison]::Ordinal) -or
-    $setupAction.Contains("nuget-fingerprint", [StringComparison]::Ordinal)) {
-    throw "NuGet cache 必須使用明確 epoch 的穩定 OS key，不得按架構或提交內容複製完整 cache。"
+# actions/cache 的 post 步驟在多層 composite 下會取得最外層 composite 的 inputs
+# （actions/runner#2030），因此經由 setup action 巢狀包裝時儲存會靜默失敗。NuGet cache 必須
+# 由 workflow 直接呼叫 cache-odfkit，使最外層即為含 path input 的 cache-odfkit。
+# 只比對實際會執行的 uses: 行；描述與註解本身必須能說明這個契約。
+$setupActionUses = @(
+    $setupAction -split "`r?`n" |
+        Where-Object { $_ -match '^\s*(-\s*)?uses:' }
+)
+if ($setupActionUses | Where-Object {
+        $_.Contains("cache-odfkit", [StringComparison]::Ordinal) -or
+        $_.Contains("actions/cache", [StringComparison]::Ordinal)
+    }) {
+    throw "setup-dotnet-odfkit 不得巢狀包裝 cache action，否則 NuGet cache 的儲存會靜默失敗。"
 }
+
+$nugetCacheKey = 'key: nuget-${{ runner.os }}-v1'
 
 foreach ($file in $workflowFiles) {
     $text = Get-Content -LiteralPath $file.FullName -Raw
@@ -45,6 +55,17 @@ foreach ($file in $workflowFiles) {
     }
     if ($text -match '(?m)^\s*key:.*(?:github\.sha|hashFiles\()') {
         throw "$($file.Name) 的 cache key 不得按 commit 或整檔 hash 無界增生。"
+    }
+    if ($text.Contains("nuget-fingerprint", [StringComparison]::Ordinal)) {
+        throw "$($file.Name) 不得以套件指紋複製整份 NuGet cache，必須使用明確 epoch 的穩定 OS key。"
+    }
+
+    # 每個使用 setup-dotnet-odfkit 的 job 都必須自行還原 NuGet cache，且 key 全庫一致。
+    $setupCount = ([regex]::Matches($text, [regex]::Escape('uses: ./.github/actions/setup-dotnet-odfkit'))).Count
+    $nugetCacheCount = ([regex]::Matches($text, [regex]::Escape($nugetCacheKey))).Count
+    if ($setupCount -ne $nugetCacheCount) {
+        throw ("$($file.Name) 的 setup-dotnet-odfkit（$setupCount 處）與 NuGet cache " +
+            "（$nugetCacheCount 處）數量不一致；每個 job 都必須直接呼叫 cache-odfkit。")
     }
 
     $lines = Get-Content -LiteralPath $file.FullName

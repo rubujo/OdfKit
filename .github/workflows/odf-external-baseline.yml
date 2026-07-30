@@ -1,4 +1,4 @@
-name: ODF external validator baseline
+﻿name: ODF external validator baseline
 
 on:
   pull_request:
@@ -60,6 +60,14 @@ jobs:
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Read pinned validator metadata
         id: validator

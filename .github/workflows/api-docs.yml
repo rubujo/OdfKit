@@ -28,6 +28,13 @@ jobs:
       - uses: ./.github/actions/setup-dotnet-odfkit
         with:
           dotnet-versions: 10.0.x
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
       - name: Test translation contract
         shell: pwsh
         run: ./eng/Test-ApiDocsTranslations.Tests.ps1

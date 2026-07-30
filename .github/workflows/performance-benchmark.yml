@@ -1,4 +1,4 @@
-name: Performance benchmark
+﻿name: Performance benchmark
 
 on:
   workflow_dispatch:
@@ -42,6 +42,14 @@ jobs:
           dotnet-versions: |
             10.0.x
 
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
       # windows-latest／ubuntu-latest 皆為硬閘門（超過容忍度即失敗）；跨平台計時雜訊較大，
       # 容忍度沿用既有值，若日後累積數據顯示 Linux 雜訊需要更寬容忍度再個別調整。
       - name: Run benchmark regression
@@ -79,6 +87,14 @@ jobs:
         with:
           dotnet-versions: |
             10.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       # macOS 目前僅量測、不閘門：CI 尚無 macOS 基準線數據可比對，先以 continue-on-error 上傳
       # 量測結果，累積數據後再視情況升級為硬閘門，避免第一輪就因缺乏基準產生誤報。
@@ -120,6 +136,14 @@ jobs:
         with:
           dotnet-versions: |
             10.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Resolve locked CNS font source
         id: cns-font-source

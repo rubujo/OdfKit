@@ -1,4 +1,4 @@
-name: Typed DOM coverage
+﻿name: Typed DOM coverage
 
 on:
   pull_request:
@@ -38,6 +38,14 @@ jobs:
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Generate typed DOM coverage
         shell: pwsh

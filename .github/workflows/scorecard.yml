@@ -32,14 +32,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare Scorecard output directory
-        shell: bash
-        run: mkdir -p artifacts/scorecard
-
+      # publish_results 的 workflow 驗證要求本 job 只能包含 ossf/scorecard-action 允許清單內的
+      # action 步驟（actions/checkout、actions/upload-artifact、github/codeql-action/upload-sarif、
+      # ossf/scorecard-action、step-security/harden-runner），不得有任何 run: 步驟。先前用
+      # run: mkdir 建立 artifacts/scorecard 會讓發布驗證回 HTTP 400 並輸出警告，因此改為輸出到
+      # 工作區根目錄，由 scorecard-action 自行建立檔案。
       - name: Run OpenSSF Scorecard
         uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
         with:
-          results_file: artifacts/scorecard/results.sarif
+          results_file: results.sarif
           results_format: sarif
           publish_results: true
 
@@ -47,11 +48,11 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: openssf-scorecard-sarif
-          path: artifacts/scorecard/results.sarif
+          path: results.sarif
           if-no-files-found: error
           retention-days: 7
 
       - name: Upload Scorecard findings to code scanning
         uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
         with:
-          sarif_file: artifacts/scorecard/results.sarif
+          sarif_file: results.sarif
