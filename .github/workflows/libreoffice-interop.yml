@@ -160,29 +160,49 @@ jobs:
           Write-Host "GnuPG installer 已通過 SHA-1 與 OpenPGP 驗證，簽署者 $signerFingerprint。"
           Remove-Item -LiteralPath $verifyRoot -Recurse -Force
 
-          # NSIS 安裝檔在靜默模式掛住是已知問題（本工作流程曾因此耗盡 60 分鐘 job timeout）。
-          # 因此採有界等待，並且不以程序結束碼判定成敗，而是以「原生 gpg 是否真的可執行」為準：
-          # 安裝常已完成，只是安裝程序未自行結束。
-          $process = Start-Process $installer -ArgumentList '/S' -PassThru
-          if (-not $process.WaitForExit(300000)) {
-            Write-Host "GnuPG installer 未在 300 秒內結束，改以實際安裝結果判定。"
-            Get-Process -ErrorAction SilentlyContinue |
-              Where-Object { $_.Name -match 'gnupg|gpg|gpgconf|gpg-agent' } |
-              ForEach-Object { Write-Host "仍在執行：$($_.Name) (PID $($_.Id))" }
-            $process | Stop-Process -Force -ErrorAction SilentlyContinue
+          # GitHub 託管 runner 的 PATH 過長會讓 NSIS 安裝檔在靜默模式掛住而完全不動工，
+          # 症狀與 community discussion #24933（choco 安裝 gnupg／gpg4win 逾時）相同；
+          # /S 本身是官方與 Chocolatey 套件使用的正確參數。因此僅在本次安裝期間把處理程序
+          # PATH 縮到最小，並於 finally 還原，避免影響後續步驟需要的 dotnet 等路徑。
+          $previousPath = $env:PATH
+          try {
+            $env:PATH = 'C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\'
+            $process = Start-Process $installer -ArgumentList '/S' -PassThru
+            if (-not $process.WaitForExit(300000)) {
+              Write-Host "GnuPG installer 未在 300 秒內結束，改以實際安裝結果判定。"
+              Get-Process -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -match 'gnupg|gpg|gpgconf|gpg-agent' } |
+                ForEach-Object { Write-Host "仍在執行：$($_.Name) (PID $($_.Id))" }
+              $process | Stop-Process -Force -ErrorAction SilentlyContinue
+            }
+            elseif ($process.ExitCode -ne 0) {
+              Write-Host "GnuPG installer 結束碼 $($process.ExitCode)，改以實際安裝結果判定。"
+            }
           }
-          elseif ($process.ExitCode -ne 0) {
-            Write-Host "GnuPG installer 結束碼 $($process.ExitCode)，改以實際安裝結果判定。"
+          finally {
+            $env:PATH = $previousPath
           }
 
-          # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上的 MSYS gpg 版本不同，
-          # 與原生 gpg 共用同一個 GNUPGHOME 與 agent socket 會產生不確定行為。
-          $candidates = @(
-            (Join-Path ${env:ProgramFiles(x86)} 'GnuPG\bin\gpg.exe'),
-            (Join-Path $env:ProgramFiles 'GnuPG\bin\gpg.exe'))
-          $nativeGpg = $candidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+          # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上的 MSYS gpg 是 MSYS 建置，會把
+          # Windows 絕對路徑接在自身 POSIX 工作目錄後面，無法供 gpgme 驅動，且與原生 gpg
+          # 共用同一個 GNUPGHOME 與 agent socket 會產生不確定行為。
+          # 安裝位置依安裝檔版本可能落在 GnuPG 或 GNU\GnuPG 之下，故廣泛搜尋並輸出診斷。
+          $searchRoots = @(${env:ProgramFiles(x86)}, $env:ProgramFiles) | Where-Object { $_ }
+          $found = @(
+            $searchRoots |
+              ForEach-Object {
+                Get-ChildItem -LiteralPath $_ -Filter 'gpg.exe' -Recurse -File -Depth 4 -ErrorAction SilentlyContinue
+              } |
+              Where-Object { $_.FullName -notmatch '\\Git\\' })
+          foreach ($candidate in $found) { Write-Host "偵測到 gpg.exe：$($candidate.FullName)" }
+          $nativeGpg = ($found | Select-Object -First 1).FullName
           if (-not $nativeGpg) {
-            throw "找不到已安裝的原生 GnuPG：$($candidates -join '、')"
+            Write-Host "安裝根目錄內容："
+            $searchRoots |
+              ForEach-Object { Get-ChildItem -LiteralPath $_ -Directory -ErrorAction SilentlyContinue } |
+              Where-Object { $_.Name -match 'GnuPG|GNU|Gpg' } |
+              ForEach-Object { Write-Host "  $($_.FullName)" }
+            throw "GnuPG 安裝後仍找不到原生 gpg.exe。"
           }
           $version = (& $nativeGpg --version | Select-Object -First 1)
           if ($LASTEXITCODE -ne 0) {
