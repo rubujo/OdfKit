@@ -29,6 +29,7 @@
 
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)eng\Shared\ProjectReferenceDefaults.props" />
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)eng\Shared\OdfAssemblyInfo.cs"
              Link="OdfAssemblyInfo.cs" />

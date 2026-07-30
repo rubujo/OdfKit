@@ -1,4 +1,6 @@
 <Project>
+  <!-- 本檔案遮蔽倉庫根目錄的 Directory.Build.props，必須自行匯入共用的 ProjectReference 預設值。 -->
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Shared\ProjectReferenceDefaults.props" />
   <PropertyGroup Condition="'$(UseLocalPackages)' == 'true'">
     <BaseIntermediateOutputPath>obj\packages\</BaseIntermediateOutputPath>
     <BaseOutputPath>bin\packages\</BaseOutputPath>

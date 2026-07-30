@@ -116,6 +116,7 @@
 | 歷史腳本歸檔 | `eng/historical-refactor/` |
 | 產生碼 README | DOM／Compliance `Generated/` |
 | 一行式 summary 閘門 | `eng/Test-OneLineXmlSummary.ps1` |
+| ProjectReference 競態閘門 | `PublishAot` 移除集中於 `Directory.Build.props`；`eng/Test-ProjectReferenceRaceSafety.ps1` 阻擋單一 TFM 被釘 `SetTargetFramework` 與分裂型 metadata 不一致 |
 | 弱 partial 合併 | 合併 `OdfAnimation`；移除空殼 matcher／registry 根檔；合併 `OdfSignatureVerifier.Common` |
 | REVIEW → KEEP | `TemplateBinder`、`OdsStreamReader`、`DrawingDocument`、`OdfTable` 升格 |
 | Public API 基線 | PublicApiAnalyzers 5.6.0 + 雙 TFM Unshipped 基線 |

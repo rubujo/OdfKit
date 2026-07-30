@@ -75,6 +75,7 @@
 | 修改類型 | 最低驗證 |
 | --- | --- |
 | 僅函式庫程式碼 | `pwsh eng/Format-Safe.ps1`，並建置或測試受影響專案與 TFM |
+| 專案檔或 `ProjectReference` | `pwsh eng/Test-ProjectReferenceRaceSafety.ps1`，並以乾淨 `obj`／`bin` 建置受影響專案 |
 | 包含測試程式碼 | `pwsh eng/Format-Safe.ps1 -IncludeTests`，並以 `-p:RunAnalyzersDuringBuild=true` 建置對應測試 TFM |
 | 在地化 | `pwsh eng/Test-LocalizerKeyParity.ps1 -FailOnIssues` 與 `pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly` |
 | 公開 API 或 schema | `pwsh eng/Generate-PublicApiBaseline.ps1 -Verify` |

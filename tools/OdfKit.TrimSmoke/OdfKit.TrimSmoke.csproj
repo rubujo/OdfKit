@@ -21,11 +21,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- 僅建置 net10.0 參考，避免 publish 時連帶編譯 netstandard2.0（621 檔 × 2 加倍耗時）。 -->
+    <!-- 僅建置 net10.0 參考，避免 publish 時連帶編譯 netstandard2.0（621 檔 × 2 加倍耗時）。
+         PublishAot 僅屬最上層可執行檔，不可傳入含 netstandard2.0 的函式庫還原圖；該移除已由
+         Directory.Build.props 對全部 ProjectReference 統一套用，此處不重複宣告。 -->
     <ProjectReference Include="..\..\OdfKit\OdfKit.csproj">
       <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <!-- PublishAot 僅屬最上層可執行檔；不可傳入含 netstandard2.0 的函式庫還原圖。 -->
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>
 

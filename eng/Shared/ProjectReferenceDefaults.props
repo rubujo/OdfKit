@@ -1,0 +1,21 @@
+<Project>
+  <!--
+    全倉庫 ProjectReference 預設 metadata：一律移除 PublishAot 全域屬性。
+    依據：https://learn.microsoft.com/en-us/visualstudio/msbuild/fix-intermittent-build-failures
+
+    PublishAot 只屬最上層可執行檔；以 -p:PublishAot=true 建置時它會灌進含 netstandard2.0 的
+    函式庫還原圖。但這個移除必須對每個消費端一致：MSBuild 以（專案路徑, 全域屬性）判定專案
+    實例，只在部分 ProjectReference 上移除，會讓同一個被參考專案分裂成兩個實例並行寫入同一個
+    obj 路徑，隨機產生 CS2012 或 deps.json 佔用失敗。
+
+    本檔案是該預設值的唯一來源，必須由每個 Directory.Build.props 匯入（含會遮蔽上層的巢狀
+    檔案，否則其下專案會靜默失去預設值）。新增的 ProjectReference 若要自訂
+    GlobalPropertiesToRemove，必須同時包含 PublishAot。以上兩點由
+    eng\Test-ProjectReferenceRaceSafety.ps1 阻擋。
+  -->
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+</Project>

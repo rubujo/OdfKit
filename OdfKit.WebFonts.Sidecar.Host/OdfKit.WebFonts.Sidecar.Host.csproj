@@ -17,26 +17,21 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
   </ItemGroup>
+  <!-- 只有多 TFM 參考需要 SetTargetFramework：釘住 net10.0 可避免 publish 時連帶編譯 netstandard2.0。
+       單一 TFM 參考（Sidecar.Server、Worker）不可加——SDK 本來不會傳 TargetFramework 全域屬性，明確指定會
+       多出一個全域屬性不同的專案實例，與其他消費端並行寫入同一個 obj 路徑，造成 CS2012／deps.json 佔用競態。
+       PublishAot 的移除由 Directory.Build.props 統一套用到全部 ProjectReference，此處不重複宣告。 -->
   <ItemGroup>
     <ProjectReference Include="..\OdfKit.WebFonts.Abstractions\OdfKit.WebFonts.Abstractions.csproj">
       <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
     </ProjectReference>
     <ProjectReference Include="..\OdfKit.WebFonts.OpenType\OdfKit.WebFonts.OpenType.csproj">
       <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
     </ProjectReference>
-    <ProjectReference Include="..\OdfKit.WebFonts.Sidecar.Server\OdfKit.WebFonts.Sidecar.Server.csproj">
-      <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
-    </ProjectReference>
-    <ProjectReference Include="..\OdfKit.WebFonts.Worker\OdfKit.WebFonts.Worker.csproj">
-      <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
-    </ProjectReference>
+    <ProjectReference Include="..\OdfKit.WebFonts.Sidecar.Server\OdfKit.WebFonts.Sidecar.Server.csproj" />
+    <ProjectReference Include="..\OdfKit.WebFonts.Worker\OdfKit.WebFonts.Worker.csproj" />
     <ProjectReference Include="..\OdfKit\OdfKit.csproj">
       <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
-      <GlobalPropertiesToRemove>PublishAot</GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -19,6 +19,7 @@
 |------|------|
 | `Ensure-OdfKitBuilt.ps1` | 確保 OdfKit net10.0 組件已建置且與來源同步。 |
 | `Get-PackageVersion.ps1` | 讀取 `eng/OdfKit.Package.props` 中的套件版本號。 |
+| `Resolve-NativeToolchainPath.ps1` | 解析 NativeAOT 原生連結所需的 Visual Studio Installer 目錄，順序為 `-VisualStudioInstallerDirectory` → PATH → 已知安裝位置；三者皆無時明確失敗。只做解析不改環境變數，PATH 由呼叫端在 try／finally 內前置並還原。由 `Test-WebFontSidecarAot.ps1` 與 `Test-TrimSmoke.ps1 -PublishAot` 呼叫，兩者同名參數可直接傳入。 |
 
 ### 格式化
 
@@ -42,6 +43,7 @@
 | `Test-ApacheOpenOfficeInterop.ps1` | 執行 Apache OpenOffice ODT／ODS／ODP／ODG 與 DataPilot headless 實機互通性測試。 |
 | `Test-MergeConflictMarkers.ps1` | 掃描原始碼中的合併衝突標記（CS8300 成因）。 |
 | `Test-NoEmptyCatch.ps1` | 掃描所有手寫 C#，拒絕會靜默吞掉例外的空白 `catch`。 |
+| `Test-ProjectReferenceRaceSafety.ps1` | 掃描 `ProjectReference` 上會讓同一專案分裂成多個全域屬性實例的 metadata（單一 TFM 被釘 `SetTargetFramework`、覆寫 `GlobalPropertiesToRemove` 漏掉 `PublishAot`、分裂型 metadata 跨消費端不一致），阻擋 CS2012／deps.json 佔用競態。 |
 | `Test-MarkdownLinks.ps1` | 驗證 `README.md`、`AGENTS.md`、`docs/` 與 eng 文件的本機連結目標及 Markdown anchor 存在，且未越出工作區。 |
 | `Test-XmlReaderSecurity.ps1` | 掃描手寫 `XmlReaderSettings`，要求明確禁止 DTD 並停用外部 XML resolver。 |
 | `Test-NuGetPack.ps1` | 驗證 OdfKit NuGet 封裝結構與 net8.0 消費端煙霧建置。 |

@@ -14,13 +14,17 @@
     發佈目標 RID；預設使用目前執行環境的 RID。
 .PARAMETER ForceRebuildOdfKit
     強制重編 OdfKit net10.0。
+.PARAMETER VisualStudioInstallerDirectory
+    含 vswhere.exe 的 Visual Studio Installer 目錄，僅 -PublishAot 需要；未指定時依序改用 PATH
+    與已知安裝位置。
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
     [switch]$PublishAot,
     [string]$RuntimeIdentifier = [System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier,
-    [switch]$ForceRebuildOdfKit
+    [switch]$ForceRebuildOdfKit,
+    [string]$VisualStudioInstallerDirectory
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,8 +42,22 @@ $publishDir = if ($PublishAot) {
     Join-Path $repoRoot "artifacts/trim-smoke-$RuntimeIdentifier"
 }
 
+# 只有 NativeAOT 模式需要原生連結工具鏈；PublishTrimmed 純受管路徑不需要。
+$nativeToolchainDirectory = if ($PublishAot) {
+    & (Join-Path $PSScriptRoot 'Resolve-NativeToolchainPath.ps1') `
+        -VisualStudioInstallerDirectory $VisualStudioInstallerDirectory
+} else {
+    ''
+}
+$previousPath = $env:PATH
+
 Push-Location $repoRoot
 try {
+    if (-not [string]::IsNullOrWhiteSpace($nativeToolchainDirectory)) {
+        $env:PATH = "$nativeToolchainDirectory;$env:PATH"
+        Write-Host "已將 Visual Studio Installer 目錄加入本次執行的 PATH：$nativeToolchainDirectory"
+    }
+
     $ensureArgs = @{ Configuration = $Configuration }
     if ($ForceRebuildOdfKit) { $ensureArgs.Force = $true }
     & $ensureScript @ensureArgs
@@ -106,5 +124,6 @@ try {
     Write-Host "TrimSmoke 通過（$modeLabel）。"
 }
 finally {
+    $env:PATH = $previousPath
     Pop-Location
 }

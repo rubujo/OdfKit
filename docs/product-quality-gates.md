@@ -34,6 +34,18 @@ pwsh eng/Generate-LocalizerExceptionsFromJson.ps1 -VerifyOnly
 Markdown 連結閘門同時驗證本機檔案、GitHub-style heading fragment、重複標題編號與顯式
 HTML anchor；外部 HTTP 連結不在此離線閘門的責任範圍。
 
+專案檔（`*.csproj`、`Directory.Build.*`）變更時必須加上：
+
+```powershell
+pwsh eng/Test-ProjectReferenceRaceSafety.ps1
+```
+
+`ProjectReference` 上的 `SetTargetFramework`、`SetConfiguration`、`SetPlatform`、
+`AdditionalProperties`、`RemoveGlobalProperties` 與 `GlobalPropertiesToRemove` 會改變被參考
+專案的全域屬性；MSBuild 以（專案路徑, 全域屬性）判定專案實例，因此消費端之間不一致會讓同一
+專案被建置兩次並並行寫入同一個 obj 路徑，隨機出現 CS2012 或 `deps.json` 佔用失敗。此閘門把
+可機械判定的情形轉成建置前錯誤，不必靠偶發的 CI 紅燈發現。
+
 ## Corpus 與互通
 
 | 腳本 | 說明 |

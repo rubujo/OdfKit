@@ -10,6 +10,8 @@
     用於實際子集化的 OpenType 字型；未指定時會探測 Windows Fonts。
 .PARAMETER PublishOnly
     只交叉發布目標架構，不在目前主機執行產物。
+.PARAMETER VisualStudioInstallerDirectory
+    含 vswhere.exe 的 Visual Studio Installer 目錄；未指定時依序改用 PATH 與已知安裝位置。
 #>
 [CmdletBinding()]
 param(
@@ -17,7 +19,8 @@ param(
     [ValidateSet("win-x64", "win-arm64")]
     [string]$RuntimeIdentifier = "win-x64",
     [string]$FontPath,
-    [switch]$PublishOnly
+    [switch]$PublishOnly,
+    [string]$VisualStudioInstallerDirectory
 )
 
 $ErrorActionPreference = "Stop"
@@ -47,8 +50,18 @@ if ([string]::IsNullOrWhiteSpace($FontPath) -or -not (Test-Path -LiteralPath $Fo
 }
 $FontPath = (Resolve-Path -LiteralPath $FontPath).Path
 
+# NativeAOT 原生連結需要 vswhere.exe 可由 PATH 解析；只補進本處理程序，並於 finally 還原。
+$nativeToolchainDirectory = & (Join-Path $PSScriptRoot 'Resolve-NativeToolchainPath.ps1') `
+    -VisualStudioInstallerDirectory $VisualStudioInstallerDirectory
+$previousPath = $env:PATH
+
 Push-Location $repoRoot
 try {
+    if (-not [string]::IsNullOrWhiteSpace($nativeToolchainDirectory)) {
+        $env:PATH = "$nativeToolchainDirectory;$env:PATH"
+        Write-Host "已將 Visual Studio Installer 目錄加入本次執行的 PATH：$nativeToolchainDirectory"
+    }
+
     dotnet restore $hostProject -r $RuntimeIdentifier --artifacts-path $hostArtifacts
     if ($LASTEXITCODE -ne 0) {
         throw "NativeAOT sidecar 還原失敗，結束碼 $LASTEXITCODE。"
@@ -170,6 +183,7 @@ finally {
     if (Test-Path -LiteralPath $hostArtifacts) {
         Remove-Item -LiteralPath $hostArtifacts -Recurse -Force
     }
+    $env:PATH = $previousPath
     Pop-Location
 }
 
