@@ -160,9 +160,19 @@ jobs:
           Write-Host "GnuPG installer 已通過 SHA-1 與 OpenPGP 驗證，簽署者 $signerFingerprint。"
           Remove-Item -LiteralPath $verifyRoot -Recurse -Force
 
-          $process = Start-Process $installer -ArgumentList '/S' -Wait -PassThru
-          if ($process.ExitCode -ne 0) {
-            throw "GnuPG installer failed with exit code $($process.ExitCode)."
+          # NSIS 安裝檔在靜默模式掛住是已知問題（本工作流程曾因此耗盡 60 分鐘 job timeout）。
+          # 因此採有界等待，並且不以程序結束碼判定成敗，而是以「原生 gpg 是否真的可執行」為準：
+          # 安裝常已完成，只是安裝程序未自行結束。
+          $process = Start-Process $installer -ArgumentList '/S' -PassThru
+          if (-not $process.WaitForExit(300000)) {
+            Write-Host "GnuPG installer 未在 300 秒內結束，改以實際安裝結果判定。"
+            Get-Process -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -match 'gnupg|gpg|gpgconf|gpg-agent' } |
+              ForEach-Object { Write-Host "仍在執行：$($_.Name) (PID $($_.Id))" }
+            $process | Stop-Process -Force -ErrorAction SilentlyContinue
+          }
+          elseif ($process.ExitCode -ne 0) {
+            Write-Host "GnuPG installer 結束碼 $($process.ExitCode)，改以實際安裝結果判定。"
           }
 
           # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上的 MSYS gpg 版本不同，
