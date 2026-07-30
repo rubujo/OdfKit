@@ -14,6 +14,21 @@ concurrency:
 
 env:
   LIBREOFFICE_VERSION: 26.2.4
+  # LibreOffice 不自帶 OpenPGP 後端：program\ 只有 gpgmepp.dll 與 gpgme-w32spawn.exe，
+  # 官方說明要求另行安裝 OpenPGP 軟體。runner 映像未內含 GnuPG，只有 Git for Windows 的
+  # MSYS gpg，其 POSIX 路徑語意無法供 gpgme 驅動，因此 LibreOffice 無法載入 OpenPGP
+  # 加密文件。以下釘選官方簡易安裝檔；該安裝檔刻意不做 Authenticode 簽章（官方只有
+  # Gpg4win 與 VS-Desktop MSI 有），故改以官方 .sig 對釘選的發布金鑰指紋驗證，並以公告
+  # 公佈的 SHA-1 作為第二道獨立錨點。
+  GNUPG_VERSION: 2.5.21
+  GNUPG_INSTALLER: gnupg-w32-2.5.21_20260702.exe
+  GNUPG_INSTALLER_SHA1: 65e7528baf8ec1bf83d3df56e6e9e377620f2de6
+  # https://gnupg.org/signature_key.html 列出的現行發布金鑰。
+  GNUPG_RELEASE_FINGERPRINTS: >-
+    6DAA6E64A76D2840571B4902528897B826403ADA
+    AC8E115BF73E2D8D47FA9908E98E9B2D19C6C8BD
+    3B761AE4E63BF3519CE7D63BECB664CBE1332EEF
+    D02AE49173BDAD56E4F88223707E56D3DEF4115C
 
 jobs:
   libreoffice-interop:
@@ -71,6 +86,100 @@ jobs:
           if ($process.ExitCode -notin @(0, 3010)) {
             throw "LibreOffice installer failed with exit code $($process.ExitCode)."
           }
+
+      - name: Restore pinned GnuPG installer
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ runner.tool_cache }}/odfkit/gnupg/${{ env.GNUPG_VERSION }}
+          key: gnupg-installer-${{ runner.os }}-${{ env.GNUPG_INSTALLER }}
+
+      - name: Install pinned GnuPG for LibreOffice OpenPGP support
+        shell: pwsh
+        run: |
+          $baseUri = "https://gnupg.org/ftp/gcrypt/binary"
+          $cacheRoot = Join-Path $env:RUNNER_TOOL_CACHE "odfkit/gnupg/$env:GNUPG_VERSION"
+          New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+          $assets = @(
+            @{ Name = $env:GNUPG_INSTALLER; Uri = "$baseUri/$env:GNUPG_INSTALLER" }
+            @{ Name = "$env:GNUPG_INSTALLER.sig"; Uri = "$baseUri/$env:GNUPG_INSTALLER.sig" }
+            @{ Name = 'signature_key.asc'; Uri = 'https://gnupg.org/signature_key.asc' }
+          )
+          foreach ($asset in $assets) {
+            $target = Join-Path $cacheRoot $asset.Name
+            if (Test-Path -LiteralPath $target -PathType Leaf) { continue }
+            $temporaryPath = "$target.download"
+            try {
+              Invoke-WebRequest -Uri $asset.Uri -OutFile $temporaryPath
+              Move-Item -LiteralPath $temporaryPath -Destination $target
+            }
+            finally {
+              Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+          $installer = Join-Path $cacheRoot $env:GNUPG_INSTALLER
+          $actualSha1 = (Get-FileHash -LiteralPath $installer -Algorithm SHA1).Hash.ToLowerInvariant()
+          if ($actualSha1 -ne $env:GNUPG_INSTALLER_SHA1) {
+            throw "GnuPG installer SHA-1 mismatch: expected $env:GNUPG_INSTALLER_SHA1, got $actualSha1."
+          }
+
+          # Git for Windows 的 MSYS gpg 會把 Windows 絕對路徑接在自己的 POSIX 工作目錄後面，
+          # 因此驗證一律在工作區的相對目錄內進行。此處只做驗證，不需要 gpg-agent 或私鑰。
+          $verifyRoot = 'artifacts/gnupg-verify'
+          if (Test-Path -LiteralPath $verifyRoot) { Remove-Item -LiteralPath $verifyRoot -Recurse -Force }
+          New-Item -ItemType Directory -Path "$verifyRoot/home" -Force | Out-Null
+          Copy-Item -LiteralPath $installer -Destination "$verifyRoot/installer.exe"
+          Copy-Item -LiteralPath "$installer.sig" -Destination "$verifyRoot/installer.exe.sig"
+          Copy-Item -LiteralPath (Join-Path $cacheRoot 'signature_key.asc') -Destination "$verifyRoot/keys.asc"
+
+          # gpg --import 在僅有警告時也會回傳非零結束碼，故以實際匯入的金鑰清單判斷成敗。
+          gpg --homedir "$verifyRoot/home" --batch --quiet --import "$verifyRoot/keys.asc" 2>&1 | Out-Null
+          $expected = ($env:GNUPG_RELEASE_FINGERPRINTS -split '\s+' | Where-Object { $_ })
+          $imported = @(
+            gpg --homedir "$verifyRoot/home" --batch --with-colons --fingerprint |
+              Where-Object { $_ -like 'fpr:*' } |
+              ForEach-Object { ($_ -split ':')[9] })
+          if (-not ($expected | Where-Object { $imported -contains $_ })) {
+            throw "官方發布金鑰束未包含任何釘選指紋；匯入 $($imported.Count) 筆。"
+          }
+
+          $status = @(
+            gpg --homedir "$verifyRoot/home" --batch --status-fd 1 `
+              --verify "$verifyRoot/installer.exe.sig" "$verifyRoot/installer.exe" 2>$null)
+          if ($LASTEXITCODE -ne 0) {
+            throw "GnuPG installer 的 OpenPGP 簽章驗證失敗，結束碼 $LASTEXITCODE。"
+          }
+          $validSig = @($status | Where-Object { $_ -like '*VALIDSIG*' })
+          if ($validSig.Count -eq 0) {
+            throw "GnuPG installer 簽章驗證未回報 VALIDSIG。"
+          }
+          $signerFingerprint = ($validSig[0] -split '\s+')[2]
+          if ($expected -notcontains $signerFingerprint) {
+            throw "GnuPG installer 簽署者 $signerFingerprint 不在釘選的官方發布金鑰清單內。"
+          }
+          Write-Host "GnuPG installer 已通過 SHA-1 與 OpenPGP 驗證，簽署者 $signerFingerprint。"
+          Remove-Item -LiteralPath $verifyRoot -Recurse -Force
+
+          $process = Start-Process $installer -ArgumentList '/S' -Wait -PassThru
+          if ($process.ExitCode -ne 0) {
+            throw "GnuPG installer failed with exit code $($process.ExitCode)."
+          }
+
+          # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上的 MSYS gpg 版本不同，
+          # 與原生 gpg 共用同一個 GNUPGHOME 與 agent socket 會產生不確定行為。
+          $candidates = @(
+            (Join-Path ${env:ProgramFiles(x86)} 'GnuPG\bin\gpg.exe'),
+            (Join-Path $env:ProgramFiles 'GnuPG\bin\gpg.exe'))
+          $nativeGpg = $candidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+          if (-not $nativeGpg) {
+            throw "找不到已安裝的原生 GnuPG：$($candidates -join '、')"
+          }
+          $version = (& $nativeGpg --version | Select-Object -First 1)
+          if ($LASTEXITCODE -ne 0) {
+            throw "原生 GnuPG 無法執行，結束碼 $LASTEXITCODE。"
+          }
+          Write-Host "已安裝 $version（$nativeGpg）。"
+          "ODFKIT_GPG_PATH=$nativeGpg" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Run real LibreOffice interoperability tests (net8.0)
         shell: pwsh

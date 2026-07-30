@@ -97,10 +97,12 @@ public class NuGetPackagingTests
         Assert.Contains("-GenerateHashManifest", workflow, StringComparison.Ordinal);
         Assert.Contains("VerifyHashManifest = $true", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("schedule:", workflow, StringComparison.Ordinal);
-        Assert.Contains(
-            "key: nuget-${{ runner.os }}-${{ inputs.nuget-cache-revision }}",
-            setupAction,
-            StringComparison.Ordinal);
+        // NuGet cache 由 workflow 直接呼叫 cache-odfkit：actions/cache 的 post 步驟在多層
+        // composite 下會取得最外層 composite 的 inputs（actions/runner#2030），被 setup action
+        // 巢狀包裝時儲存會靜默失敗。
+        Assert.Contains("key: nuget-${{ runner.os }}-v1", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("uses: ./.github/actions/cache-odfkit", setupAction, StringComparison.Ordinal);
+        Assert.DoesNotContain("uses: actions/cache", setupAction, StringComparison.Ordinal);
         Assert.DoesNotContain("runner.arch", setupAction, StringComparison.Ordinal);
         Assert.DoesNotContain("nuget-fingerprint", setupAction, StringComparison.Ordinal);
         Assert.DoesNotContain("matrix.rid", setupAction, StringComparison.OrdinalIgnoreCase);

@@ -124,7 +124,21 @@ public class OdfCoverageContractTests
         Assert.Contains("steps.jing.outputs.cache_revision", workflow);
         Assert.Contains("steps.jing.outputs.version", workflow);
         Assert.Contains("steps.jing.outputs.sha256", workflow);
-        Assert.DoesNotContain("restore-keys", workflow);
+        // 外部工具 cache 必須以完整精確 key 命中，不得有 fallback；NuGet cache 依 CI 政策
+        // 刻意使用 OS 前綴 fallback，因此只針對非 NuGet 的 restore-keys 斷言。
+        string[] workflowLines = workflow.Split('\n');
+        for (int index = 0; index < workflowLines.Length; index++)
+        {
+            if (!workflowLines[index].Contains("restore-keys", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            Assert.True(
+                index + 1 < workflowLines.Length &&
+                    workflowLines[index + 1].Contains("nuget-${{ runner.os }}-", StringComparison.Ordinal),
+                $"第 {index + 1} 行的 restore-keys 不屬於 NuGet cache；外部工具 cache 不得有 fallback。");
+        }
         Assert.Contains("Get-FileHash", installer);
         Assert.Contains("Get-FileHash", jingInstaller);
         Assert.Contains("binFiles", jingInstaller);

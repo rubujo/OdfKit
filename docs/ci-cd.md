@@ -94,6 +94,19 @@ LibreOffice 每週雙 TFM 工作流程則以 Python UNO 開啟 wholesome 密碼�
 GnuPG RSA 金鑰完成 OpenPGP OdfKit → LibreOffice → OdfKit 修改後雙向 round-trip；已明確
 啟用實機互通時若缺少 UNO runtime，測試必須失敗而非略過。
 
+該工作流程另須安裝**原生 GnuPG**。LibreOffice 不自帶 OpenPGP 後端（`program\` 只有
+`gpgmepp.dll` 與 `gpgme-w32spawn.exe`），官方說明要求另行安裝 OpenPGP 軟體；GitHub 的
+Windows runner 映像未內含 GnuPG，只有 Git for Windows 的 MSYS gpg，其 POSIX 路徑語意無法
+供 gpgme 驅動，因此缺少原生 GnuPG 時 `loadComponentFromURL` 會回傳 `None`，錯誤訊息只說
+文件無法載入。工作流程因此釘選官方簡易安裝檔（`gnupg-w32-<version>_<date>.exe`）。該安裝檔
+刻意不做 Authenticode 簽章——官方只對 Gpg4win 與 VS-Desktop MSI 簽章——所以驗證改為官方
+`.sig` 對釘選的發布金鑰指紋（`gnupg.org/signature_key.html`），並以發布公告公佈的 SHA-1 作
+第二道獨立錨點；`VALIDSIG` 的簽署者指紋必須落在釘選清單內，否則失敗。驗證只需公鑰，不啟動
+gpg-agent，且一律在工作區相對目錄內執行，避免 MSYS gpg 把 Windows 絕對路徑接在自身 POSIX
+工作目錄後面。安裝後將 `ODFKIT_GPG_PATH` 寫入 `GITHUB_ENV` 指向原生 `gpg.exe`，使測試與
+LibreOffice 使用同一個 GnuPG，不讓 PATH 上版本不同的 MSYS gpg 與其共用 `GNUPGHOME` 與
+agent socket。
+
 NuGet 驗證由 Ubuntu 僅封裝一次，產生 `SHA256SUMS` 後以上傳 artifact 將同一份短期快照
 分送至 Linux x64、Windows x64、Windows ARM64 與 macOS ARM64 runner。每個 consumer job
 都會先驗證 SHA-256，再以安裝發布套件的獨立專案執行 managed 與 Imaging native runtime
