@@ -160,49 +160,43 @@ jobs:
           Write-Host "GnuPG installer 已通過 SHA-1 與 OpenPGP 驗證，簽署者 $signerFingerprint。"
           Remove-Item -LiteralPath $verifyRoot -Recurse -Force
 
-          # GitHub 託管 runner 的 PATH 過長會讓 NSIS 安裝檔在靜默模式掛住而完全不動工，
-          # 症狀與 community discussion #24933（choco 安裝 gnupg／gpg4win 逾時）相同；
-          # /S 本身是官方與 Chocolatey 套件使用的正確參數。因此僅在本次安裝期間把處理程序
-          # PATH 縮到最小，並於 finally 還原，避免影響後續步驟需要的 dotnet 等路徑。
-          $previousPath = $env:PATH
-          try {
-            $env:PATH = 'C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\'
-            $process = Start-Process $installer -ArgumentList '/S' -PassThru
-            if (-not $process.WaitForExit(300000)) {
-              Write-Host "GnuPG installer 未在 300 秒內結束，改以實際安裝結果判定。"
-              Get-Process -ErrorAction SilentlyContinue |
-                Where-Object { $_.Name -match 'gnupg|gpg|gpgconf|gpg-agent' } |
-                ForEach-Object { Write-Host "仍在執行：$($_.Name) (PID $($_.Id))" }
-              $process | Stop-Process -Force -ErrorAction SilentlyContinue
-            }
-            elseif ($process.ExitCode -ne 0) {
-              Write-Host "GnuPG installer 結束碼 $($process.ExitCode)，改以實際安裝結果判定。"
-            }
+          # 不執行安裝程序：此 NSIS 安裝檔在託管 runner 上以 /S 執行會建立目標目錄後停住，
+          # 五分鐘內不複製任何檔案也不結束（已連續三次觀察到，縮減 PATH 亦無效；/S 本身是
+          # 官方與 Chocolatey gnupg 套件共用的正確參數）。NSIS 安裝檔可直接以 runner 內建的
+          # 7-Zip 解壓，因此改為解壓同一個已通過 SHA-1 與 OpenPGP 驗證的二進位檔到 GnuPG 的
+          # 標準安裝路徑，供 gpgme 以其預設安裝目錄找到後端。這同時消除掛住的根源，且不引入
+          # 任何額外下載來源。
+          $installRoot = Join-Path $env:ProgramFiles 'GnuPG'
+          if (Test-Path -LiteralPath $installRoot) { Remove-Item -LiteralPath $installRoot -Recurse -Force }
+          New-Item -ItemType Directory -Path $installRoot -Force | Out-Null
+          & 7z x $installer "-o$installRoot" -y > $null
+          if ($LASTEXITCODE -ne 0) {
+            throw "解壓 GnuPG 安裝檔失敗，結束碼 $LASTEXITCODE。"
           }
-          finally {
-            $env:PATH = $previousPath
-          }
+          # NSIS 解壓後會留下安裝器自身的暫存外掛目錄，與 GnuPG 執行檔無關。
+          Get-ChildItem -LiteralPath $installRoot -Directory -Force |
+            Where-Object { $_.Name -like '$PLUGINSDIR' -or $_.Name -like '$*' } |
+            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-          # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上的 MSYS gpg 是 MSYS 建置，會把
+          # 測試與 LibreOffice 必須使用同一個 GnuPG：PATH 上 Git 自帶的是 MSYS 建置，會把
           # Windows 絕對路徑接在自身 POSIX 工作目錄後面，無法供 gpgme 驅動，且與原生 gpg
           # 共用同一個 GNUPGHOME 與 agent socket 會產生不確定行為。
-          # 安裝位置依安裝檔版本可能落在 GnuPG 或 GNU\GnuPG 之下，故廣泛搜尋並輸出診斷。
-          $searchRoots = @(${env:ProgramFiles(x86)}, $env:ProgramFiles) | Where-Object { $_ }
           $found = @(
-            $searchRoots |
-              ForEach-Object {
-                Get-ChildItem -LiteralPath $_ -Filter 'gpg.exe' -Recurse -File -Depth 4 -ErrorAction SilentlyContinue
-              } |
-              Where-Object { $_.FullName -notmatch '\\Git\\' })
-          foreach ($candidate in $found) { Write-Host "偵測到 gpg.exe：$($candidate.FullName)" }
+            Get-ChildItem -LiteralPath $installRoot -Filter 'gpg.exe' -Recurse -File -ErrorAction SilentlyContinue)
+          foreach ($candidate in $found) { Write-Host "解壓後的 gpg.exe：$($candidate.FullName)" }
           $nativeGpg = ($found | Select-Object -First 1).FullName
           if (-not $nativeGpg) {
-            Write-Host "安裝根目錄內容："
-            $searchRoots |
-              ForEach-Object { Get-ChildItem -LiteralPath $_ -Directory -ErrorAction SilentlyContinue } |
-              Where-Object { $_.Name -match 'GnuPG|GNU|Gpg' } |
-              ForEach-Object { Write-Host "  $($_.FullName)" }
-            throw "GnuPG 安裝後仍找不到原生 gpg.exe。"
+            Write-Host "解壓內容："
+            Get-ChildItem -LiteralPath $installRoot -Force |
+              ForEach-Object { Write-Host "  $($_.Name)" }
+            throw "解壓 GnuPG 後仍找不到 gpg.exe。"
+          }
+          # gpgme 以標準安裝目錄定位後端；確認 gpgconf 與 gpg-agent 也在同一個 bin 目錄。
+          $binDirectory = Split-Path -Parent $nativeGpg
+          foreach ($required in @('gpgconf.exe', 'gpg-agent.exe')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $binDirectory $required) -PathType Leaf)) {
+              throw "解壓結果缺少 $required，gpgme 無法驅動此後端。"
+            }
           }
           $version = (& $nativeGpg --version | Select-Object -First 1)
           if ($LASTEXITCODE -ne 0) {
