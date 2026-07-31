@@ -85,6 +85,11 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     internal System.IO.MemoryMappedFiles.MemoryMappedFile? Mmf { get; set; }
     internal Dictionary<string, OdfMmfEntryInfo>? MmfEntries { get; set; }
     internal System.Threading.Tasks.Task? PreloadTask { get; set; }
+    internal int LastMmfParallelPreloadEntryCountForTests { get; set; }
+    internal int LastMmfParallelPreloadMaxDegreeForTests { get; set; }
+    internal int[]? LastMmfParallelPreloadVisitedCountHolderForTests { get; set; }
+    internal int LastMmfParallelPreloadVisitedEntryCountForTests
+        => LastMmfParallelPreloadVisitedCountHolderForTests?[0] ?? 0;
     internal event System.Action? OnRollback;
     internal OdfExternalLinkManager? FormulaExternalLinksForSave { get; set; }
 
@@ -308,8 +313,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         }
         catch
         {
-            if (!leaveOpen)
-                stream.Dispose();
+            // 必須釋放整個 package 而非只有 stream：載入失敗時 package 可能已持有
+            // _lock、_prefetchCts、已註冊 entry 與記憶體映射。Dispose 內部會依
+            // leaveOpen 決定是否關閉底層串流，語意與原先一致。
+            package.Dispose();
             throw;
         }
     }
@@ -446,14 +453,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         }
         catch
         {
-            if (!leaveOpen)
-            {
-                if (stream is IAsyncDisposable asyncDisposable)
-                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-                else
-                    stream.Dispose();
-            }
-
+            // 必須釋放整個 package 而非只有 stream：載入失敗時 package 可能已持有
+            // _lock、_prefetchCts、已註冊 entry 與記憶體映射。DisposeAsync 內部會依
+            // leaveOpen 決定是否關閉底層串流，語意與原先一致。
+            await package.DisposeAsync().ConfigureAwait(false);
             throw;
         }
     }

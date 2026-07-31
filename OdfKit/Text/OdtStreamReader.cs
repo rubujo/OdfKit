@@ -214,9 +214,17 @@ public sealed class OdtStreamReader : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _reader?.Dispose();
-        _contentStream?.Dispose();
-        _zip.Dispose();
+        // 前段任一 Dispose 拋出都不得略過 _zip.Dispose()，否則 ZipArchive 持有的
+        // 底層串流會一併洩漏。讀取模式不寫中央目錄，因此僅是資源問題而非輸出損毀。
+        try
+        {
+            _reader?.Dispose();
+            _contentStream?.Dispose();
+        }
+        finally
+        {
+            _zip.Dispose();
+        }
     }
 
     private void OpenContentReader()

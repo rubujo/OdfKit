@@ -57,6 +57,11 @@ public static partial class OdfPackageValidator
         string? profileId,
         List<OdfValidationIssue> issues)
     {
+        if (package.IsFlatXml)
+        {
+            return;
+        }
+
         if (!package.HasEntry("mimetype"))
         {
             return;

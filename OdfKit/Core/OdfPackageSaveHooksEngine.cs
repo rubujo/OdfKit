@@ -78,8 +78,17 @@ internal static class OdfPackageSaveHooksEngine
         if (formulaStrategy == OdfFormulaSaveStrategy.MarkForRecalculation &&
             ctx.Entries.TryGetValue("settings.xml", out var settingsEntry))
         {
-            using var stream = settingsEntry.OpenReader();
-            settingsRoot = OdfXmlReader.Parse(stream, nonLazyOptions);
+            try
+            {
+                using var stream = settingsEntry.OpenReader();
+                settingsRoot = OdfXmlReader.Parse(stream, nonLazyOptions);
+            }
+            catch (Exception ex)
+            {
+                // 與上方 content.xml／styles.xml 一致：儲存期的輔助解析失敗不應讓整個儲存作業中止。
+                // settings.xml 只影響重算旗標，缺少它時仍能寫出結構完整的封裝。
+                OdfKitDiagnostics.Warn($"Failed to parse settings.xml for save processing: {ex.Message}");
+            }
         }
 
         bool contentModified = false;

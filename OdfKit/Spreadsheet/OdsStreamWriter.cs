@@ -777,43 +777,46 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
         if (disposing)
         {
-            if (_isSheetStarted)
-                WriteEndSheet();
-
-            // 快速路徑交接：先將主要原始緩衝沖入 _writer，之後的緩衝工作表
-            // 與收尾標籤才能以正確順序寫出。
-            _rawWriter.FlushToTarget();
-
-            // 緩衝工作表片段一律透過 _writer.WriteRaw 寫入（而非直接寫原始位元組到
-            // _contentEntryStream），讓 _writer 自己知道先前延後關閉的 <office:spreadsheet>
-            // 起始標籤已被後續寫入操作結束，才能正確補上 '>'；否則會產生
-            // <office:spreadsheet<table:table ...> 這種缺少 '>' 分隔的畸形 XML。
-            WriteBufferedSheets();
-
-            _rawWriter.Dispose();
-
-            // 關閉 spreadsheet、body、document-content 標籤
-            _writer.WriteEndElement(); // office:spreadsheet
-            _writer.WriteEndElement(); // office:body
-            _writer.WriteEndElement(); // office:document-content
-            _writer.WriteEndDocument();
-
-            try
-            { _writer.Dispose(); }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
-            }
-
-            try
-            { _contentEntryStream.Dispose(); }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 content 串流時發生次要錯誤：{ex.Message}", ex);
-            }
-
+            // 收尾寫入（結束工作表、沖洗緩衝、關閉根元素）全部包在 try 內：
+            // 這些步驟任何一步拋出，下方 finally 的 _zip.Dispose() 就是寫出 ZIP 中央目錄的
+            // 唯一機會。少了它，輸出檔案會是無法被任何 ZIP 工具開啟的殘骸。
             try
             {
+                if (_isSheetStarted)
+                    WriteEndSheet();
+
+                // 快速路徑交接：先將主要原始緩衝沖入 _writer，之後的緩衝工作表
+                // 與收尾標籤才能以正確順序寫出。
+                _rawWriter.FlushToTarget();
+
+                // 緩衝工作表片段一律透過 _writer.WriteRaw 寫入（而非直接寫原始位元組到
+                // _contentEntryStream），讓 _writer 自己知道先前延後關閉的 <office:spreadsheet>
+                // 起始標籤已被後續寫入操作結束，才能正確補上 '>'；否則會產生
+                // <office:spreadsheet<table:table ...> 這種缺少 '>' 分隔的畸形 XML。
+                WriteBufferedSheets();
+
+                _rawWriter.Dispose();
+
+                // 關閉 spreadsheet、body、document-content 標籤
+                _writer.WriteEndElement(); // office:spreadsheet
+                _writer.WriteEndElement(); // office:body
+                _writer.WriteEndElement(); // office:document-content
+                _writer.WriteEndDocument();
+
+                try
+                { _writer.Dispose(); }
+                catch (Exception ex)
+                {
+                    OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
+                }
+
+                try
+                { _contentEntryStream.Dispose(); }
+                catch (Exception ex)
+                {
+                    OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 content 串流時發生次要錯誤：{ex.Message}", ex);
+                }
+
                 // 與上方 XmlWriter／content 串流的次要清理錯誤不同，styles.xml 寫入失敗代表輸出封裝
                 // 實際缺少 manifest 已宣告的內容、屬於不完整／損毀的封裝，因此不吞例外，讓呼叫端可感知。
                 WriteStyles();

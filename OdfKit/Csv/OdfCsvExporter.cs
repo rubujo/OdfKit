@@ -84,7 +84,13 @@ public static class OdfCsvExporter
     /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(workbook, nameof(workbook));
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(csvPath, nameof(csvPath));
+        options ??= new OdfCsvOptions();
+
+        if (options.ExportSheetIndex < 0 || options.ExportSheetIndex >= workbook.Worksheets.Count)
+            throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Err_OdfCsvExporter_ExportsheetindexExceedsWorksheetRange"));
+
         using var stream = File.Create(csvPath);
         ExportToStream(workbook, stream, options);
     }
@@ -310,4 +316,3 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
     public override bool NextResult() => false;
     public override IEnumerator GetEnumerator() => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_EnumerableOperation_NotSupported"));
 }
-

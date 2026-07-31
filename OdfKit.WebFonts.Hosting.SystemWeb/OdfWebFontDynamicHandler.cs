@@ -249,8 +249,9 @@ public sealed class OdfWebFontDynamicHandler : IHttpHandler
         }
         catch (ArgumentException)
         {
-            // 要求形狀已驗證完成；有效要求在自訂引擎中找不到 glyph 時視為無內容。
-            response.StatusCode = 204;
+            // 請求語法與 allowlist 已先驗證；若此處仍拋出 ArgumentException，
+            // 代表引擎或相依狀態的伺服器端錯誤，不應偽裝成無內容。
+            response.StatusCode = 500;
         }
         catch (NotSupportedException)
         {

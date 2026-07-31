@@ -155,6 +155,32 @@ public class CsvImportExportTests
     }
 
     /// <summary>
+    /// 驗證當輸出工作表索引無效時，<see cref="OdfCsvExporter.ExportToFile"/> 不會先截斷既有檔案內容。
+    /// </summary>
+    [Fact]
+    public void ExportToFileInvalidSheetIndexDoesNotTruncateDestinationFile()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("Test");
+
+        string tempPath = Path.Combine(Path.GetTempPath(), "OdfKitCsvExport_" + Guid.NewGuid().ToString("N") + ".csv");
+        File.WriteAllText(tempPath, "keep-me", Encoding.UTF8);
+
+        try
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                OdfCsvExporter.ExportToFile(workbook, tempPath, new OdfCsvOptions { ExportSheetIndex = 1 }));
+
+            Assert.Equal("keep-me", File.ReadAllText(tempPath, Encoding.UTF8));
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
+    }
+
+    /// <summary>
     /// Verifies that ExportToStream prefixes dangerous leading characters with an apostrophe by default, per OWASP CSV injection guidance.
     /// 驗證 ExportToStream 預設會為具危險起始字元的儲存格加上單引號前綴，符合 OWASP CSV 注入防護建議。
     /// </summary>

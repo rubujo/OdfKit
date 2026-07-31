@@ -15774,6 +15774,8 @@ OdfKit.Spreadsheet.OdfCell.AppendMarkdown(string! markdown) -> OdfKit.Spreadshee
 OdfKit.Spreadsheet.OdfCell.CellValue.get -> object?
 OdfKit.Spreadsheet.OdfCell.CellValue.set -> void
 OdfKit.Spreadsheet.OdfCell.Column.get -> int
+OdfKit.Spreadsheet.OdfCell.CurrencyCode.get -> string?
+OdfKit.Spreadsheet.OdfCell.CurrencyCode.set -> void
 OdfKit.Spreadsheet.OdfCell.DisplayText.get -> string!
 OdfKit.Spreadsheet.OdfCell.DisplayText.set -> void
 OdfKit.Spreadsheet.OdfCell.FindAnnotation() -> OdfKit.Spreadsheet.OdfCellAnnotation?
@@ -15794,6 +15796,8 @@ OdfKit.Spreadsheet.OdfCell.SetAnnotation(string! text) -> void
 OdfKit.Spreadsheet.OdfCell.SetAnnotation(string! text, string? author) -> void
 OdfKit.Spreadsheet.OdfCell.SetAnnotation(string! text, string? author, bool visible) -> void
 OdfKit.Spreadsheet.OdfCell.SetBorders(OdfKit.Styles.OdfBorder? top, OdfKit.Styles.OdfBorder? bottom, OdfKit.Styles.OdfBorder? left, OdfKit.Styles.OdfBorder? right) -> void
+OdfKit.Spreadsheet.OdfCell.SetCurrencyValue(decimal amount, string! currencyCode) -> void
+OdfKit.Spreadsheet.OdfCell.SetCurrencyValue(decimal amount, string! currencyCode, string! displayText) -> void
 OdfKit.Spreadsheet.OdfCell.SetFormula(string! formula, object? cachedValue) -> void
 OdfKit.Spreadsheet.OdfCell.SetHyperlink(string! url) -> void
 OdfKit.Spreadsheet.OdfCell.SetHyperlink(string! url, string? displayText) -> void

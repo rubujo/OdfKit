@@ -275,6 +275,12 @@ internal sealed class WebFontAssetStore
         var info = new FileInfo(path);
         if (!info.Exists)
         {
+            if (manifest.StylesheetFileName is not null || expectedSha256 is not null)
+            {
+                throw new InvalidDataException(
+                    OdfLocalizer.GetMessage("Err_OdfWebFontAssetStore_ManifestInvalid"));
+            }
+
             return null;
         }
 

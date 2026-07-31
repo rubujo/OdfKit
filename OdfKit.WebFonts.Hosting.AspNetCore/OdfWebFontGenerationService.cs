@@ -101,9 +101,9 @@ internal sealed class OdfWebFontGenerationService
         }
         catch (ArgumentException)
         {
-            // 要求形狀已於進入產字前驗證；此處的 ArgumentException 通常表示自訂引擎
-            // 無法處理所選 glyph。視為沒有可補上的字，不把字型 fallback 誤報為 400。
-            return Results.NoContent();
+            // 輸入已於進入此層前驗證；此處的 ArgumentException 代表產生器或相依狀態
+            // 出現伺服器端錯誤，不應偽裝成「沒有可產生的 glyph」。
+            return Results.StatusCode(StatusCodes.Status500InternalServerError);
         }
         catch (NotSupportedException)
         {

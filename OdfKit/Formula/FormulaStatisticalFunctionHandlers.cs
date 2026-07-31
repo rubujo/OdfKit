@@ -15,6 +15,19 @@ internal static class FormulaStatisticalFunctionHandlers
 {
 
 
+    /// <summary>
+    /// 將彙總結果轉為公式值；溢位或非數值一律回報 <see cref="OdfFormulaError.Num"/>。
+    /// </summary>
+    /// <remarks>
+    /// 與數學運算子節點的收尾檢查一致。少了這層，<c>SUM(1e308, 1e308)</c> 會回傳
+    /// <see cref="double.PositiveInfinity"/> 而非 <c>#NUM!</c>——同一份試算表裡 <c>A1+A2</c> 與
+    /// <c>SUM(A1:A2)</c> 會對相同輸入給出不同結果。
+    /// </remarks>
+    private static object ToNumericResult(double value)
+        => double.IsNaN(value) || double.IsInfinity(value)
+            ? OdfFormulaError.Num
+            : value;
+
     internal static object EvaluateSum(List<AstNode> arguments, IEvaluationContext context)
     {
         double sum = 0;
@@ -38,7 +51,7 @@ internal static class FormulaStatisticalFunctionHandlers
                 }
             }
         }
-        return sum;
+        return ToNumericResult(sum);
     }
 
     internal static object EvaluateAverage(List<AstNode> arguments, IEvaluationContext context)
@@ -69,7 +82,7 @@ internal static class FormulaStatisticalFunctionHandlers
             }
         }
 
-        return count == 0 ? OdfFormulaError.Div0 : sum / count;
+        return count == 0 ? OdfFormulaError.Div0 : ToNumericResult(sum / count);
     }
 
     internal static object EvaluateCount(List<AstNode> arguments, IEvaluationContext context)
@@ -126,7 +139,7 @@ internal static class FormulaStatisticalFunctionHandlers
         if (criteria.TryGetNumericEqualityCriterion(out double numericCriterion) &&
             FormulaNumericAggregation.TrySumIfNumericEqual(rangeValues, sumValues, numericCriterion, out double fastSum))
         {
-            return fastSum;
+            return ToNumericResult(fastSum);
         }
 
         int rows = rangeValues.GetLength(0);
@@ -153,7 +166,7 @@ internal static class FormulaStatisticalFunctionHandlers
             }
         }
 
-        return sum;
+        return ToNumericResult(sum);
     }
 
     internal static object EvaluateCountIf(List<AstNode> arguments, IEvaluationContext context)
@@ -230,7 +243,7 @@ internal static class FormulaStatisticalFunctionHandlers
                 }
             }
         }
-        return hasNumber ? max : 0.0;
+        return hasNumber ? ToNumericResult(max) : 0.0;
     }
 
     internal static object EvaluateMin(List<AstNode> arguments, IEvaluationContext context)
@@ -264,7 +277,7 @@ internal static class FormulaStatisticalFunctionHandlers
                 }
             }
         }
-        return hasNumber ? min : 0.0;
+        return hasNumber ? ToNumericResult(min) : 0.0;
     }
 
 
@@ -291,11 +304,11 @@ internal static class FormulaStatisticalFunctionHandlers
         int mid = nums.Count / 2;
         if (nums.Count % 2 != 0)
         {
-            return nums[mid];
+            return ToNumericResult(nums[mid]);
         }
         else
         {
-            return (nums[mid - 1] + nums[mid]) / 2.0;
+            return ToNumericResult((nums[mid - 1] + nums[mid]) / 2.0);
         }
     }
 
@@ -331,7 +344,7 @@ internal static class FormulaStatisticalFunctionHandlers
             return OdfFormulaError.Div0;
         double avg = nums.Average();
         double sumSq = nums.Sum(d => (d - avg) * (d - avg));
-        return Math.Sqrt(sumSq / (nums.Count - 1));
+        return ToNumericResult(Math.Sqrt(sumSq / (nums.Count - 1)));
     }
 
     internal static object EvaluateStDevP(List<AstNode> arguments, IEvaluationContext context)
@@ -343,7 +356,7 @@ internal static class FormulaStatisticalFunctionHandlers
             return OdfFormulaError.Div0;
         double avg = nums.Average();
         double sumSq = nums.Sum(d => (d - avg) * (d - avg));
-        return Math.Sqrt(sumSq / nums.Count);
+        return ToNumericResult(Math.Sqrt(sumSq / nums.Count));
     }
 
     internal static object EvaluateVar(List<AstNode> arguments, IEvaluationContext context)
@@ -355,7 +368,7 @@ internal static class FormulaStatisticalFunctionHandlers
             return OdfFormulaError.Div0;
         double avg = nums.Average();
         double sumSq = nums.Sum(d => (d - avg) * (d - avg));
-        return sumSq / (nums.Count - 1);
+        return ToNumericResult(sumSq / (nums.Count - 1));
     }
 
     internal static object EvaluateVarP(List<AstNode> arguments, IEvaluationContext context)
@@ -367,7 +380,7 @@ internal static class FormulaStatisticalFunctionHandlers
             return OdfFormulaError.Div0;
         double avg = nums.Average();
         double sumSq = nums.Sum(d => (d - avg) * (d - avg));
-        return sumSq / nums.Count;
+        return ToNumericResult(sumSq / nums.Count);
     }
 
     internal static object EvaluateLarge(List<AstNode> arguments, IEvaluationContext context)
@@ -395,7 +408,7 @@ internal static class FormulaStatisticalFunctionHandlers
         if (k < 1 || k > nums.Count)
             return OdfFormulaError.Num;
         nums.Sort((x, y) => y.CompareTo(x));
-        return nums[k - 1];
+        return ToNumericResult(nums[k - 1]);
     }
 
     internal static object EvaluateSmall(List<AstNode> arguments, IEvaluationContext context)
@@ -423,7 +436,7 @@ internal static class FormulaStatisticalFunctionHandlers
         if (k < 1 || k > nums.Count)
             return OdfFormulaError.Num;
         nums.Sort();
-        return nums[k - 1];
+        return ToNumericResult(nums[k - 1]);
     }
 
     internal static object EvaluateRank(List<AstNode> arguments, IEvaluationContext context)
@@ -497,8 +510,8 @@ internal static class FormulaStatisticalFunctionHandlers
         int i = (int)Math.Floor(idx);
         double f = idx - i;
         if (i >= nums.Count - 1)
-            return nums[nums.Count - 1];
-        return nums[i] + f * (nums[i + 1] - nums[i]);
+            return ToNumericResult(nums[nums.Count - 1]);
+        return ToNumericResult(nums[i] + f * (nums[i + 1] - nums[i]));
     }
 
     internal static object EvaluateQuartile(List<AstNode> arguments, IEvaluationContext context)
@@ -540,8 +553,8 @@ internal static class FormulaStatisticalFunctionHandlers
         int i = (int)Math.Floor(idx);
         double f = idx - i;
         if (i >= nums.Count - 1)
-            return nums[nums.Count - 1];
-        return nums[i] + f * (nums[i + 1] - nums[i]);
+            return ToNumericResult(nums[nums.Count - 1]);
+        return ToNumericResult(nums[i] + f * (nums[i + 1] - nums[i]));
     }
 
 
@@ -630,7 +643,7 @@ internal static class FormulaStatisticalFunctionHandlers
             }
         }
 
-        return count == 0 ? OdfFormulaError.Div0 : sum / count;
+        return count == 0 ? OdfFormulaError.Div0 : ToNumericResult(sum / count);
     }
 
     internal static object EvaluateSumIfs(List<AstNode> arguments, IEvaluationContext context)
@@ -687,7 +700,7 @@ internal static class FormulaStatisticalFunctionHandlers
             }
         }
 
-        return sum;
+        return ToNumericResult(sum);
     }
 
     internal static object EvaluateAverageIfs(List<AstNode> arguments, IEvaluationContext context)
@@ -746,7 +759,7 @@ internal static class FormulaStatisticalFunctionHandlers
             }
         }
 
-        return count == 0 ? OdfFormulaError.Div0 : sum / count;
+        return count == 0 ? OdfFormulaError.Div0 : ToNumericResult(sum / count);
     }
 
     internal static object EvaluateCountIfs(List<AstNode> arguments, IEvaluationContext context)

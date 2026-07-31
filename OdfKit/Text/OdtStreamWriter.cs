@@ -335,8 +335,14 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         }
 
-        FinalizeContentAndArchive();
-        _ownedStream?.Dispose();
+        try
+        {
+            FinalizeContentAndArchive();
+        }
+        finally
+        {
+            _ownedStream?.Dispose();
+        }
     }
 
     /// <summary>
@@ -370,49 +376,71 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
             return;
         cancellationToken.ThrowIfCancellationRequested();
         _disposed = true;
-        if (_isListStarted)
+
+        // _disposed 已設為 true，之後 DisposeAsync() 會直接返回，因此這裡是唯一的清理機會：
+        // 取消或寫入失敗都必須經由 finally 釋放 writer、entry 串流、ZIP 與自有串流，
+        // 否則會留下不完整的 ZIP 並永久洩漏控制代碼。
+        try
         {
-            _rawWriter.WriteEndElement("text:list");
-            _isListStarted = false;
+            if (_isListStarted)
+            {
+                _rawWriter.WriteEndElement("text:list");
+                _isListStarted = false;
+            }
+            _rawWriter.FlushToTarget();
+            _rawWriter.Dispose();
+            _writer.WriteEndElement();
+            _writer.WriteEndElement();
+            _writer.WriteEndElement();
+            _writer.WriteEndDocument();
+            await _writer.FlushAsync().ConfigureAwait(false);
+            await _contentEntryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
         }
-        _rawWriter.FlushToTarget();
-        _rawWriter.Dispose();
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndElement();
-        _writer.WriteEndDocument();
-        await _writer.FlushAsync().ConfigureAwait(false);
-        await _contentEntryStream.FlushAsync(cancellationToken).ConfigureAwait(false);
-        cancellationToken.ThrowIfCancellationRequested();
-        _writer.Dispose();
-        _contentEntryStream.Dispose();
-        _zip.Dispose();
-        if (_ownedStream is IAsyncDisposable asyncDisposable)
-            await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-        else
-            _ownedStream?.Dispose();
+        finally
+        {
+            _writer.Dispose();
+            _contentEntryStream.Dispose();
+            _zip.Dispose();
+            if (_ownedStream is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+            else
+                _ownedStream?.Dispose();
+        }
     }
 
+    /// <remarks>
+    /// 收尾的每個階段都可能拋出（緩衝沖洗、XML 結尾標籤、entry 關閉）。這些步驟必須放在
+    /// <c>try/finally</c> 內：<c>ZipArchive.Dispose()</c> 是寫出中央目錄的唯一時機，若因中間步驟
+    /// 失敗而略過，輸出檔案會是一個沒有中央目錄、任何 ZIP 工具都無法開啟的殘骸。即使內容本身不完整，
+    /// 也應該產生結構完整的封裝並讓例外傳出，而不是同時失去兩者。
+    /// </remarks>
     private void FinalizeContentAndArchive()
     {
         _disposed = true;
-        if (_isListStarted)
+        try
         {
-            _rawWriter.WriteEndElement("text:list");
-            _isListStarted = false;
+            if (_isListStarted)
+            {
+                _rawWriter.WriteEndElement("text:list");
+                _isListStarted = false;
+            }
+
+            // 先沖洗段落／清單快速路徑，再以 XmlWriter 關閉 body／document-content 骨架。
+            _rawWriter.FlushToTarget();
+            _rawWriter.Dispose();
+
+            _writer.WriteEndElement(); // office:text
+            _writer.WriteEndElement(); // office:body
+            _writer.WriteEndElement(); // office:document-content
+            _writer.WriteEndDocument();
+            _writer.Dispose();
+            _contentEntryStream.Dispose();
         }
-
-        // 先沖洗段落／清單快速路徑，再以 XmlWriter 關閉 body／document-content 骨架。
-        _rawWriter.FlushToTarget();
-        _rawWriter.Dispose();
-
-        _writer.WriteEndElement(); // office:text
-        _writer.WriteEndElement(); // office:body
-        _writer.WriteEndElement(); // office:document-content
-        _writer.WriteEndDocument();
-        _writer.Dispose();
-        _contentEntryStream.Dispose();
-        _zip.Dispose();
+        finally
+        {
+            _zip.Dispose();
+        }
     }
 
     private static FileStream CreateFileStream(string path)

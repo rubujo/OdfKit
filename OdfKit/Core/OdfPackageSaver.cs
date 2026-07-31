@@ -468,22 +468,33 @@ internal static class OdfPackageSaver
         && ctx.SaveOptions.CryptographyProvider is null
         && ctx.SaveOptions.EncryptionAlgorithm == OdfEncryptionAlgorithm.Aes256Gcm;
 
+    /// <summary>
+    /// 以完整封裝內容覆寫底層串流。
+    /// </summary>
+    /// <remarks>
+    /// 先複製再截斷，順序不可對調：若先 <see cref="Stream.SetLength"/> 歸零才複製，複製途中的取消或
+    /// I/O 失敗會留下一個已被清空、且原始內容無法復原的檔案。改為複製完成後才截斷到實際寫入長度，
+    /// 失敗時底層檔案至少保有原有長度與尾端資料，仍可由交易日誌或使用者自行判讀。
+    /// </remarks>
     private static void ReplaceUnderlyingStream(Stream underlying, Stream content)
     {
-        underlying.SetLength(0);
+        underlying.Position = 0;
         content.Position = 0;
         content.CopyTo(underlying);
+        underlying.SetLength(underlying.Position);
         underlying.Flush();
     }
 
+    /// <inheritdoc cref="ReplaceUnderlyingStream"/>
     private static async Task ReplaceUnderlyingStreamAsync(
         Stream underlying,
         Stream content,
         CancellationToken cancellationToken)
     {
-        underlying.SetLength(0);
+        underlying.Position = 0;
         content.Position = 0;
         await content.CopyToAsync(underlying, 81920, cancellationToken).ConfigureAwait(false);
+        underlying.SetLength(underlying.Position);
         await underlying.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 

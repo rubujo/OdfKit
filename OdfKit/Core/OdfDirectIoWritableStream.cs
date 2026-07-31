@@ -36,43 +36,75 @@ public sealed class OdfDirectIoWritableStream : Stream
     /// 初始化 <see cref="OdfDirectIoWritableStream"/> 類別的新執行個體。
     /// </summary>
     /// <param name="filePath">The path of the file to write. / 要寫入的檔案路徑。</param>
+    /// <remarks>
+    /// 與 <see cref="OdfDirectIoReadableStream"/> 同理：對齊原生緩衝區依 CA2015 沒有 GC 備援釋放，
+    /// 建構子拋出時呼叫端拿不到執行個體、無從 Dispose，因此必須自行清理。此處的觸發點是後備路徑的
+    /// <see cref="FileStream"/> 建構——<see cref="FileMode.Create"/> 對不存在的目錄會擲出
+    /// <see cref="DirectoryNotFoundException"/>，並非罕見情境。
+    /// </remarks>
     public OdfDirectIoWritableStream(string filePath)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
 #if NET10_0_OR_GREATER
         _directBuffer = new AlignedNativeBuffer(SectorSize, SectorSize);
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            try
-            {
-                _fileHandle = File.OpenHandle(
-                    _filePath,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.Read,
-                    FileFlagNoBuffering | FileOptions.WriteThrough);
-                _isFallback = false;
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"[OdfDirectIo] 無法以 Direct I/O 模式開啟檔案，將退回常規寫入模式。原因: {ex.Message}");
-                _isFallback = true;
-            }
-        }
-        else
-        {
-            _isFallback = true;
-        }
 #else
         _directBuffer = new byte[SectorSize];
-        _isFallback = true;
 #endif
 
-        if (_isFallback)
+        try
         {
-            _fileStream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.Read, SectorSize);
+#if NET10_0_OR_GREATER
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                try
+                {
+                    _fileHandle = File.OpenHandle(
+                        _filePath,
+                        FileMode.Create,
+                        FileAccess.Write,
+                        FileShare.Read,
+                        FileFlagNoBuffering | FileOptions.WriteThrough);
+                    _isFallback = false;
+                }
+                catch (Exception ex)
+                {
+                    OdfKitDiagnostics.Warn($"[OdfDirectIo] 無法以 Direct I/O 模式開啟檔案，將退回常規寫入模式。原因: {ex.Message}");
+                    _isFallback = true;
+                }
+            }
+            else
+            {
+                _isFallback = true;
+            }
+#else
+            _isFallback = true;
+#endif
+
+            if (_isFallback)
+            {
+                _fileStream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.Read, SectorSize);
+            }
         }
+        catch
+        {
+            ReleasePartiallyConstructedResources();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 釋放建構失敗時已取得的資源；呼叫端拿不到執行個體，因此不會有後續的 Dispose。
+    /// </summary>
+    private void ReleasePartiallyConstructedResources()
+    {
+        _fileStream?.Dispose();
+        _fileStream = null;
+#if NET10_0_OR_GREATER
+        _fileHandle?.Dispose();
+        _fileHandle = null;
+        // MemoryManager<T> 以顯式介面實作提供 Dispose()，須經 IDisposable 呼叫。
+        ((IDisposable)_directBuffer).Dispose();
+#endif
     }
 
     /// <summary>

@@ -73,6 +73,11 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
     /// Releases unmanaged resources.
     /// 釋放非受控資源。
     /// </summary>
+    /// <remarks>
+    /// 這個 <see cref="MemoryManager{T}"/> 衍生型別故意不提供終結器或其他 GC 備援釋放路徑，
+    /// 避免在外部仍持有 <see cref="Span{T}"/> 或未關聯 pinnable 的
+    /// <see cref="MemoryHandle"/> 時，因 GC 提前釋放底層記憶體而造成 use-after-free。
+    /// </remarks>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {

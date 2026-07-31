@@ -278,6 +278,17 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void PackageEntryNamesAllowReservedWindowsDeviceLikeNamesInsideZip()
+        {
+            byte[] dummyData = Encoding.UTF8.GetBytes("<root/>");
+            using MemoryStream ms = CreateZipWithCustomEntry("Pictures/CON.xml.bak", dummyData);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            Assert.True(package.HasEntry("Pictures/CON.xml.bak"));
+            Assert.Equal(dummyData, package.ReadEntry("Pictures/CON.xml.bak"));
+        }
+
+        [Fact]
         public void PackageEntryLookupNormalizesRelativeReferenceUris()
         {
             using var stream = new MemoryStream();

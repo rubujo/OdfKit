@@ -690,7 +690,7 @@ public sealed class WebFontHostingTests
             using var client = new HttpClient { BaseAddress = new Uri(GetAddress(application)) };
             client.DefaultRequestHeaders.Add("X-Test-Authorization", "allowed");
 
-            await AssertStatusAsync(client, "argument", HttpStatusCode.NoContent);
+            await AssertStatusAsync(client, "argument", HttpStatusCode.InternalServerError);
             await AssertStatusAsync(client, "unsupported", HttpStatusCode.UnprocessableEntity);
             await AssertStatusAsync(client, "invalid-data", HttpStatusCode.InternalServerError);
             await AssertStatusAsync(client, "io", HttpStatusCode.ServiceUnavailable);
@@ -784,6 +784,39 @@ public sealed class WebFontHostingTests
             [0xC3, 0x28],
             TestContext.Current.CancellationToken);
         await WriteManifestAsync(rootPath, fileName, fontBytes.Length, sha256);
+
+        try
+        {
+            await Assert.ThrowsAsync<InvalidDataException>(() => StartApplicationAsync(rootPath));
+        }
+        finally
+        {
+            DeleteTemporaryRoot(rootPath);
+        }
+    }
+
+    [Fact]
+    public async Task StartupRejectsMissingFingerprintStylesheet()
+    {
+        string rootPath = CreateTemporaryRoot();
+        byte[] fontBytes = "wOF2-missing-css"u8.ToArray();
+        const string fileName = "missing-css.woff2";
+        string sha256 = Convert.ToHexString(SHA256.HashData(fontBytes)).ToLowerInvariant();
+        const string css = "body { font-family: OdfKit Test; }";
+        string cssSha256 = Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(css)))
+            .ToLowerInvariant();
+        string cssFileName = $"webfonts.{cssSha256[..16]}.css";
+        await File.WriteAllBytesAsync(
+            Path.Combine(rootPath, fileName),
+            fontBytes,
+            TestContext.Current.CancellationToken);
+        await WriteManifestAsync(
+            rootPath,
+            fileName,
+            fontBytes.Length,
+            sha256,
+            css);
+        File.Delete(Path.Combine(rootPath, cssFileName));
 
         try
         {

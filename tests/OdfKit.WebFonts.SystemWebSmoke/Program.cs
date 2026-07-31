@@ -232,7 +232,7 @@ try
     var classifiedHandler = new OdfWebFontDynamicHandler(new ClassifiedFailureSmokeEngine(), options);
     foreach ((string scenario, int expectedStatus) in new[]
     {
-        ("argument", 204),
+        ("argument", 500),
         ("unsupported", 422),
         ("invalid-data", 500),
         ("io", 503),

@@ -66,9 +66,79 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets or sets the normalized ISO 4217 currency code stored in <c>office:currency</c>.
+    /// 取得或設定儲存在 <c>office:currency</c> 的正規化 ISO 4217 貨幣代碼。
+    /// </summary>
+    /// <remarks>
+    /// Writing validates the ISO 4217 <i>shape</i> only — exactly three ASCII letters — and normalizes to
+    /// upper case. No list of currently assigned codes is enforced, because such a list would reject
+    /// historical codes, the <c>XTS</c> test code, and codes assigned after this release. Reading is
+    /// deliberately lenient: values already present in a loaded document are normalized but never rejected,
+    /// so documents written by other producers stay readable.
+    /// 寫入時只驗證 ISO 4217 的<b>形狀</b>——恰好三個 ASCII 字母——並正規化為大寫；不比對現行代碼清單，
+    /// 因為那會拒絕歷史代碼、<c>XTS</c> 測試代碼以及本版發佈後才配發的代碼。讀取刻意寬容：已存在於文件中的
+    /// 值只做正規化而不拒絕，確保其他產生器寫出的文件仍可讀取。
+    /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when the value is not three ASCII letters. / 當值不是三個 ASCII 字母時擲出。</exception>
+    public string? CurrencyCode
+    {
+        get
+        {
+            string? currency = Node.GetAttribute("currency", OdfNamespaces.Office);
+            if (string.IsNullOrWhiteSpace(currency))
+            {
+                return null;
+            }
+
+            return currency!.Trim().ToUpperInvariant();
+        }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Node.RemoveAttribute("currency", OdfNamespaces.Office);
+            }
+            else
+            {
+                Node.SetAttribute("currency", OdfNamespaces.Office, NormalizeCurrencyCode(value!, nameof(value)), "office");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ISO 4217 形狀並正規化為大寫；不比對現行代碼清單。
+    /// </summary>
+    private static string NormalizeCurrencyCode(string currencyCode, string parameterName)
+    {
+        string trimmed = currencyCode.Trim();
+        if (trimmed.Length != 3)
+        {
+            throw new ArgumentException(null, parameterName);
+        }
+
+        foreach (char c in trimmed)
+        {
+            // 不使用 char.IsAsciiLetter：該多載自 .NET 7 起才提供，netstandard2.0 目標無法編譯。
+            bool isAsciiLetter = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+            if (!isAsciiLetter)
+            {
+                throw new ArgumentException(null, parameterName);
+            }
+        }
+
+        return trimmed.ToUpperInvariant();
+    }
+
+    /// <summary>
     /// Gets or sets the commonly typed cell value.
     /// 取得或設定儲存格的常用型別值。
     /// </summary>
+    /// <remarks>
+    /// Date cells return <see cref="DateTime"/> when <c>office:date-value</c> can be parsed with
+    /// round-trip semantics; otherwise this accessor preserves the raw date string.
+    /// 日期儲存格若可將 <c>office:date-value</c> 依 round-trip 語意解析，會回傳
+    /// <see cref="DateTime"/>；否則保留原始日期字串。
+    /// </remarks>
     public object? CellValue
     {
         get
@@ -81,7 +151,13 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                 "boolean" => bool.TryParse(Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)
                     ? flag
                     : null,
-                "date" => Node.GetAttribute("date-value", OdfNamespaces.Office),
+                "date" => DateTime.TryParse(
+                    Node.GetAttribute("date-value", OdfNamespaces.Office),
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind,
+                    out DateTime date)
+                    ? date
+                    : Node.GetAttribute("date-value", OdfNamespaces.Office),
                 "string" => DisplayText,
                 _ => string.IsNullOrEmpty(DisplayText) ? null : DisplayText
             };
@@ -178,6 +254,28 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// Gets the cell value as the specified type <typeparamref name="T"/>, returning the default value when conversion fails.
     /// 以指定型別 <typeparamref name="T"/> 取得儲存格值；轉換失敗時回傳預設值。
     /// </summary>
+    /// <remarks>
+    /// When a date cell can round-trip parse <c>office:date-value</c>, <see cref="GetValue{T}"/> first reuses
+    /// the parsed <see cref="DateTime"/> from <see cref="CellValue"/>. Therefore <c>GetValue&lt;DateTime&gt;()</c>
+    /// preserves the parsed instant, while <c>GetValue&lt;string&gt;()</c> converts that
+    /// <see cref="DateTime"/> with <see cref="CultureInfo.InvariantCulture"/> instead of returning the raw ISO text.
+    /// 若日期儲存格的 <c>office:date-value</c> 可依 round-trip 語意解析，<see cref="GetValue{T}"/>
+    /// 會先重用 <see cref="CellValue"/> 產生的 <see cref="DateTime"/>；因此 <c>GetValue&lt;DateTime&gt;()</c>
+    /// 會保留解析後的時間點，而 <c>GetValue&lt;string&gt;()</c> 會以
+    /// <see cref="CultureInfo.InvariantCulture"/> 將該 <see cref="DateTime"/> 轉成字串，而非回傳原始 ISO 文字。
+    /// </remarks>
+    /// <remarks>
+    /// <c>Kind</c> is preserved only for the <c>Z</c> (UTC) and offset-less forms. XSD <c>dateTime</c> also
+    /// permits an explicit offset such as <c>+05:30</c>; <see cref="DateTimeStyles.RoundtripKind"/> cannot
+    /// represent that in a <see cref="DateTime"/>, so those values are converted to local time with
+    /// <see cref="DateTimeKind.Local"/> — the instant is preserved, but the result varies with the machine
+    /// time zone and the original offset is lost. Use <see cref="RawValue"/> or read
+    /// <c>office:date-value</c> directly when the original lexical form matters.
+    /// 只有 <c>Z</c>（UTC）與無時區形式會保留 <c>Kind</c>。XSD <c>dateTime</c> 也允許 <c>+05:30</c> 這類明確
+    /// 位移，而 <see cref="DateTimeStyles.RoundtripKind"/> 無法在 <see cref="DateTime"/> 中表示，因此那些值
+    /// 會被轉為當地時間並標記為 <see cref="DateTimeKind.Local"/>——時間點不變，但結果隨機器時區而異，
+    /// 且原始位移遺失。若需要原始字面形式，請改用 <see cref="RawValue"/> 或直接讀取 <c>office:date-value</c>。
+    /// </remarks>
     /// <typeparam name="T">The target value type. / 目標值型別。</typeparam>
     /// <returns>The converted cell value, or the default value when conversion fails. / 轉換後的儲存格值；轉換失敗時為預設值。</returns>
     public T? GetValue<T>()
@@ -244,9 +342,42 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// <param name="val">The numeric value. / 數值。</param>
     public void SetValue(double val)
     {
+        ClearCachedValueAttributes();
         ValueType = "float";
         RawValue = val.ToString(CultureInfo.InvariantCulture);
         DisplayText = val.ToString(CultureInfo.InvariantCulture);
+        NotifyFormulaCellChanged(formulaChanged: false);
+    }
+
+    /// <summary>
+    /// Sets the currency value of the cell.
+    /// 設定儲存格的貨幣值。
+    /// </summary>
+    /// <param name="amount">The numeric amount stored in <c>office:value</c>. / 儲存在 <c>office:value</c> 的數值金額。</param>
+    /// <param name="currencyCode">The ISO 4217 currency code. / ISO 4217 貨幣代碼。</param>
+    public void SetCurrencyValue(decimal amount, string currencyCode)
+        => SetCurrencyValue(amount, currencyCode, amount.ToString(CultureInfo.InvariantCulture));
+
+    /// <summary>
+    /// Sets the currency value and display text of the cell.
+    /// 設定儲存格的貨幣值與顯示文字。
+    /// </summary>
+    /// <param name="amount">The numeric amount stored in <c>office:value</c>. / 儲存在 <c>office:value</c> 的數值金額。</param>
+    /// <param name="currencyCode">The ISO 4217 currency code. / ISO 4217 貨幣代碼。</param>
+    /// <param name="displayText">The plain-text display value written into <c>text:p</c>. / 寫入 <c>text:p</c> 的純文字顯示值。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="currencyCode"/> is not three ASCII letters. / 當 <paramref name="currencyCode"/> 不是三個 ASCII 字母時擲出。</exception>
+    public void SetCurrencyValue(decimal amount, string currencyCode, string displayText)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(currencyCode, nameof(currencyCode));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(displayText, nameof(displayText));
+
+        string normalizedCurrencyCode = NormalizeCurrencyCode(currencyCode, nameof(currencyCode));
+
+        ClearCachedValueAttributes();
+        ValueType = "currency";
+        RawValue = amount.ToString(CultureInfo.InvariantCulture);
+        CurrencyCode = normalizedCurrencyCode;
+        DisplayText = displayText;
         NotifyFormulaCellChanged(formulaChanged: false);
     }
 
@@ -257,6 +388,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// <param name="val">The Boolean value. / 布林值。</param>
     public void SetValue(bool val)
     {
+        ClearCachedValueAttributes();
         ValueType = "boolean";
         Node.SetAttribute("boolean-value", OdfNamespaces.Office, val ? "true" : "false", "office");
         DisplayText = val ? "TRUE" : "FALSE";
@@ -277,6 +409,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// <param name="useTimezoneNaive">Whether to ignore time zone conversion and use local time formatting. / 是否忽略時區轉換，使用當地時間格式。</param>
     public void SetValue(DateTime date, bool useTimezoneNaive)
     {
+        ClearCachedValueAttributes();
         ValueType = "date";
         string isoDate;
         if (date == DateTime.MinValue || date == DateTime.MaxValue)
@@ -304,6 +437,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// <param name="text">The text string. / 文字字串。</param>
     public void SetValue(string text)
     {
+        ClearCachedValueAttributes();
         ValueType = "string";
         DisplayText = text;
         NotifyFormulaCellChanged(formulaChanged: false);
@@ -330,11 +464,19 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     private void ClearValue()
     {
         Node.RemoveAttribute("value-type", OdfNamespaces.Office);
-        Node.RemoveAttribute("value", OdfNamespaces.Office);
-        Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
-        Node.RemoveAttribute("date-value", OdfNamespaces.Office);
+        ClearCachedValueAttributes();
         DisplayText = string.Empty;
         NotifyFormulaCellChanged(formulaChanged: false);
+    }
+
+    private void ClearCachedValueAttributes()
+    {
+        Node.RemoveAttribute("value", OdfNamespaces.Office);
+        Node.RemoveAttribute("string-value", OdfNamespaces.Office);
+        Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
+        Node.RemoveAttribute("currency", OdfNamespaces.Office);
+        Node.RemoveAttribute("date-value", OdfNamespaces.Office);
+        Node.RemoveAttribute("time-value", OdfNamespaces.Office);
     }
 
     private void SetCellTextContent(string text)

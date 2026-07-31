@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.IO.Compression;
+using System.Reflection;
+using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -274,6 +279,162 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void SpreadsheetCellDateValueRoundTripsAsDateTimeAndClearsStaleAttributes()
+        {
+            using var ms = new MemoryStream();
+            using var package = OdfPackage.Create(ms);
+            var doc = new SpreadsheetDocument(package);
+            var sheet = doc.AddSheet("Sheet1");
+            var cell = sheet.GetCell(0, 0);
+
+            cell.SetValue(true);
+            var date = new DateTime(2026, 7, 31, 5, 6, 7, DateTimeKind.Utc);
+            cell.SetValue(date, useTimezoneNaive: false);
+
+            Assert.Equal("date", cell.ValueType);
+            Assert.Equal(date, Assert.IsType<DateTime>(cell.CellValue));
+            DateTime roundTrippedDate = cell.GetValue<DateTime>();
+            Assert.Equal(date, roundTrippedDate);
+            Assert.Equal(DateTimeKind.Utc, roundTrippedDate.Kind);
+            Assert.Equal("07/31/2026 05:06:07", cell.GetValue<string>());
+            Assert.Null(cell.Node.GetAttribute("boolean-value", OdfNamespaces.Office));
+            Assert.Null(cell.Node.GetAttribute("value", OdfNamespaces.Office));
+
+            cell.ValueType = "time";
+            cell.Node.SetAttribute("string-value", OdfNamespaces.Office, "stale", "office");
+            cell.Node.SetAttribute("time-value", OdfNamespaces.Office, "PT01H30M", "office");
+            cell.Node.SetAttribute("currency", OdfNamespaces.Office, "TWD", "office");
+            cell.SetValue("plain text");
+
+            Assert.Equal("string", cell.ValueType);
+            Assert.Null(cell.Node.GetAttribute("date-value", OdfNamespaces.Office));
+            Assert.Null(cell.Node.GetAttribute("string-value", OdfNamespaces.Office));
+            Assert.Null(cell.Node.GetAttribute("time-value", OdfNamespaces.Office));
+            Assert.Null(cell.Node.GetAttribute("currency", OdfNamespaces.Office));
+            Assert.Equal("plain text", cell.CellValue);
+        }
+
+        [Fact]
+        public void SpreadsheetCellCurrencyValueWritesCurrencyMetadataAndRoundTripsThroughReader()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new SpreadsheetDocument(package);
+                var sheet = doc.AddSheet("Sheet1");
+                var cell = sheet.GetCell(0, 0);
+
+                cell.SetCurrencyValue(1234.50m, "twd", "NT$1,234.50");
+
+                Assert.Equal("currency", cell.ValueType);
+                Assert.Equal("1234.50", cell.RawValue);
+                Assert.Equal("TWD", cell.CurrencyCode);
+                Assert.Equal("NT$1,234.50", cell.DisplayText);
+                cell.Node.SetAttribute("currency", OdfNamespaces.Office, " twd ", "office");
+                Assert.Equal("TWD", cell.CurrencyCode);
+                // getter 正規化僅發生於讀取時，不寫回底層屬性。
+                Assert.Equal(" twd ", cell.Node.GetAttribute("currency", OdfNamespaces.Office));
+                // 必須透過 setter 寫回，底層 XML 屬性才會更新為正規化值。
+                cell.CurrencyCode = "twd";
+                Assert.Equal("TWD", cell.Node.GetAttribute("currency", OdfNamespaces.Office));
+
+                // 寫入驗證 ISO 4217 形狀（三個 ASCII 字母），但不比對現行代碼清單。
+                Assert.Throws<ArgumentException>(() => cell.CurrencyCode = "US");
+                Assert.Throws<ArgumentException>(() => cell.CurrencyCode = "USDX");
+                Assert.Throws<ArgumentException>(() => cell.CurrencyCode = "12A");
+                Assert.Throws<ArgumentException>(() => cell.SetCurrencyValue(1m, "臺幣"));
+                cell.CurrencyCode = "xts";   // 測試用代碼不得被拒絕
+                Assert.Equal("XTS", cell.CurrencyCode);
+                cell.CurrencyCode = "TWD";
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using var reader = new OdsStreamReader(ms, new OdsStreamReaderOptions { LeaveOpen = true });
+            Assert.True(reader.Read());
+            OdsCellValue cellValue = reader.GetCell(0);
+            Assert.Equal(OdsCellValueKind.Currency, cellValue.Kind);
+            Assert.Equal(1234.5d, Assert.IsType<double>(cellValue.Value));
+            Assert.Equal("TWD", cellValue.Currency);
+            Assert.Equal("NT$1,234.50", cellValue.DisplayText);
+        }
+
+        [Fact]
+        public void ResetMmfLoadStateDisposesRegisteredEntriesBeforeClearingThem()
+        {
+            using var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true);
+            OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
+            var trackedStream = new TrackingMemoryStream();
+            ctx.Entries["content.xml"] = new OdfPackageEntry("content.xml", trackedStream);
+            ctx.EntryOrder.Add("content.xml");
+            ctx.DuplicateEntryNames.Add("content.xml");
+            package.Mmf = MemoryMappedFile.CreateNew(null, 4096);
+            package.MmfEntries = [];
+            package.PreloadTask = Task.CompletedTask;
+
+            MethodInfo resetMethod = typeof(OdfPackageZipLoader).GetMethod(
+                "ResetMmfLoadState",
+                BindingFlags.NonPublic | BindingFlags.Static)!;
+            resetMethod.Invoke(null, new object?[] { package, ctx });
+
+            Assert.True(trackedStream.DisposeCalled);
+            Assert.Null(package.Mmf);
+            Assert.Null(package.MmfEntries);
+            Assert.Null(package.PreloadTask);
+            Assert.Empty(ctx.Entries);
+            Assert.Empty(ctx.EntryOrder);
+            Assert.Empty(ctx.DuplicateEntryNames);
+        }
+
+        [Fact]
+        public void OdfPackageFallsBackToBclZipWhenMmfLoadResetsMidStream()
+        {
+            string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_fallback_{Guid.NewGuid():N}.odt");
+            try
+            {
+                byte[] contentXml = Encoding.UTF8.GetBytes("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"><office:body/></office:document-content>");
+                byte[] stylesXml = Encoding.UTF8.GetBytes("<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"/>");
+                byte[] manifestXml = Encoding.UTF8.GetBytes("""
+                    <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+                      <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text" />
+                      <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml" />
+                      <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml" />
+                    </manifest:manifest>
+                    """);
+                using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+                using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+                {
+                    WriteZipEntry(archive, "mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.text"));
+                    WriteZipEntry(archive, "content.xml", contentXml);
+                    WriteZipEntry(archive, "styles.xml", stylesXml);
+                    WriteZipEntry(archive, "META-INF/manifest.xml", manifestXml);
+                }
+
+                OdfPackageZipLoader.MmfLoadFailureInjectorForTestContext = count =>
+                    count == 1 ? new SecurityException("Injected MMF load failure for fallback regression test.") : null;
+
+                using OdfPackage package = OdfPackage.Open(tempPath, new OdfLoadOptions { AllowLazyLoading = true });
+                Assert.Null(package.Mmf);
+                Assert.Null(package.MmfEntries);
+                Assert.Equal("application/vnd.oasis.opendocument.text", package.MimeType);
+                Assert.Equal(contentXml, package.ReadEntry("content.xml"));
+                Assert.Equal(stylesXml, package.ReadEntry("styles.xml"));
+                // 回退至 BCL 路徑後，MMF 期間已部分登錄的 entry 應被清空；
+                // 確認沒有因重複登錄而產生假重複。
+                Assert.Empty(package.DuplicateEntryNames);
+            }
+            finally
+            {
+                OdfPackageZipLoader.MmfLoadFailureInjectorForTestContext = null;
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
+        }
+
+        [Fact]
         public void TestOdfCommentDateTimeBoundaryValues()
         {
             var commentMin = new OdfComment("Author", "MinValText", DateTime.MinValue, "c_min");
@@ -300,6 +461,24 @@ namespace OdfKit.Tests
             var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
             parent.AppendChild(node);
             return node;
+        }
+
+        private static void WriteZipEntry(ZipArchive archive, string name, byte[] content)
+        {
+            ZipArchiveEntry entry = archive.CreateEntry(name, CompressionLevel.NoCompression);
+            using Stream stream = entry.Open();
+            stream.Write(content, 0, content.Length);
+        }
+
+        private sealed class TrackingMemoryStream : MemoryStream
+        {
+            public bool DisposeCalled { get; private set; }
+
+            protected override void Dispose(bool disposing)
+            {
+                DisposeCalled = true;
+                base.Dispose(disposing);
+            }
         }
 
         /// <summary>

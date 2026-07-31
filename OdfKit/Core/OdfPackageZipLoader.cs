@@ -18,11 +18,13 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageZipLoader
 {
-    internal static int LastMmfParallelPreloadEntryCountForTests;
+    private static readonly AsyncLocal<Func<int, Exception?>?> MmfLoadFailureInjectorForTests = new();
 
-    internal static int LastMmfParallelPreloadVisitedEntryCountForTests;
-
-    internal static int LastMmfParallelPreloadMaxDegreeForTests;
+    internal static Func<int, Exception?>? MmfLoadFailureInjectorForTestContext
+    {
+        get => MmfLoadFailureInjectorForTests.Value;
+        set => MmfLoadFailureInjectorForTests.Value = value;
+    }
 
     /// <summary>
     /// 自 ZIP 封存讀取所有專案至載入內容。
@@ -32,9 +34,10 @@ internal static class OdfPackageZipLoader
         OdfPackage package = ctx.Package;
         if (package.FilePath != null)
         {
+            MemoryMappedFile? mmf = null;
+            bool handedOffToPackage = false;
             try
             {
-                MemoryMappedFile mmf;
                 if (ctx.UnderlyingStream is FileStream ufs)
                 {
                     mmf = MemoryMappedFile.CreateFromFile(ufs, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
@@ -57,15 +60,24 @@ internal static class OdfPackageZipLoader
 
                         package.Mmf = mmf;
                         package.MmfEntries = mmfDirectory.Entries;
+                        handedOffToPackage = true;
                         ctx.DuplicateEntryNames.AddRange(mmfDirectory.DuplicateEntryNames);
                         LoadEntriesFromMmf(ctx);
                         return;
                     }
                 }
-                mmf.Dispose();
             }
             catch (Exception ex)
             {
+                if (handedOffToPackage)
+                {
+                    ResetMmfLoadState(package, ctx);
+                }
+                else
+                {
+                    mmf?.Dispose();
+                }
+
                 OdfKitDiagnostics.Warn($"[OdfPackage] 無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
             }
         }
@@ -159,9 +171,10 @@ internal static class OdfPackageZipLoader
         OdfPackage package = ctx.Package;
         if (package.FilePath != null)
         {
+            MemoryMappedFile? mmf = null;
+            bool handedOffToPackage = false;
             try
             {
-                MemoryMappedFile mmf;
                 if (ctx.UnderlyingStream is FileStream ufs)
                 {
                     mmf = MemoryMappedFile.CreateFromFile(ufs, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
@@ -184,15 +197,24 @@ internal static class OdfPackageZipLoader
 
                         package.Mmf = mmf;
                         package.MmfEntries = mmfDirectory.Entries;
+                        handedOffToPackage = true;
                         ctx.DuplicateEntryNames.AddRange(mmfDirectory.DuplicateEntryNames);
                         LoadEntriesFromMmf(ctx);
                         return;
                     }
                 }
-                mmf.Dispose();
             }
             catch (Exception ex)
             {
+                if (handedOffToPackage)
+                {
+                    ResetMmfLoadState(package, ctx);
+                }
+                else
+                {
+                    mmf?.Dispose();
+                }
+
                 OdfKitDiagnostics.Warn($"[OdfPackage] 非同步作業無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
             }
         }
@@ -527,6 +549,24 @@ internal static class OdfPackageZipLoader
         return owned;
     }
 
+    private static void ResetMmfLoadState(OdfPackage package, OdfPackage.OdfPackageLoadCollaborators ctx)
+    {
+        // MMF handoff 發生在任何高階 XML／manifest 物件化之前；失敗時只需回復 entry 註冊與
+        // MMF 關聯狀態。先釋放已註冊 entry，可與其他清理路徑維持相同的 view／stream 釋放慣例。
+        foreach (OdfPackageEntry existing in ctx.Entries.Values)
+        {
+            existing.Dispose();
+        }
+
+        package.Mmf?.Dispose();
+        package.Mmf = null;
+        package.MmfEntries = null;
+        package.PreloadTask = null;
+        ctx.Entries.Clear();
+        ctx.EntryOrder.Clear();
+        ctx.DuplicateEntryNames.Clear();
+    }
+
     // 靜態快取 BCL 私有欄位的反射結果：只在型別初始化時探測一次，
     // 之後每個 entry 直接讀取；欄位在未來 .NET 版本消失或反射受限（如 AOT）時
     // 整體改採至長度比對啟發式，且不得讓探測例外升級為 TypeInitializationException。
@@ -579,6 +619,7 @@ internal static class OdfPackageZipLoader
         var mmfEntries = package.MmfEntries!;
 
         long totalUncompressedSize = 0;
+        int loadedEntryCount = 0;
         List<OdfPackageEntry> entriesToPreload = new();
         HashSet<string> entryOrderSet = new(ctx.EntryOrder, StringComparer.Ordinal);
 
@@ -626,14 +667,22 @@ internal static class OdfPackageZipLoader
             ctx.Entries[name] = pkgEntry;
             if (entryOrderSet.Add(name))
                 ctx.EntryOrder.Add(name);
+
+            loadedEntryCount++;
+            Exception? injectedFailure = MmfLoadFailureInjectorForTestContext?.Invoke(loadedEntryCount);
+            if (injectedFailure is not null)
+            {
+                throw injectedFailure;
+            }
         }
 
         if (ctx.LoadOptions.AllowLazyLoading && entriesToPreload.Count > 0)
         {
-            LastMmfParallelPreloadEntryCountForTests = entriesToPreload.Count;
-            LastMmfParallelPreloadVisitedEntryCountForTests = 0;
+            package.LastMmfParallelPreloadEntryCountForTests = entriesToPreload.Count;
+            int[] visitedHolder = [0];
+            package.LastMmfParallelPreloadVisitedCountHolderForTests = visitedHolder;
             ParallelOptions preloadOptions = CreatePreloadParallelOptions();
-            LastMmfParallelPreloadMaxDegreeForTests = preloadOptions.MaxDegreeOfParallelism;
+            package.LastMmfParallelPreloadMaxDegreeForTests = preloadOptions.MaxDegreeOfParallelism;
 
             package.PreloadTask = Task.Run(() =>
             {
@@ -644,7 +693,7 @@ internal static class OdfPackageZipLoader
                         try
                         {
                             using Stream stream = entry.OpenReader();
-                            Interlocked.Increment(ref LastMmfParallelPreloadVisitedEntryCountForTests);
+                            Interlocked.Increment(ref visitedHolder[0]);
                         }
                         catch
                         {

@@ -1155,6 +1155,21 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void ValidatorDoesNotApplyZipOnlyMimetypeRulesToFlatXmlPackages()
+        {
+            using MemoryStream ms = new();
+            OdfDocumentFactory.WriteFlatXml(ms, OdfDocumentKind.FlatText);
+            ms.Position = 0;
+
+            using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+            Assert.True(package.IsFlatXml);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            Assert.DoesNotContain(report.Issues, issue => issue.RuleId is "ODF0003" or "ODF0004");
+        }
+
+        [Fact]
         public void ValidatorReportsProfileDisallowedPackageExtension()
         {
             using MemoryStream ms = CreatePackage(

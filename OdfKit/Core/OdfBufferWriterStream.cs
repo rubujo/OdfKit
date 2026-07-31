@@ -48,6 +48,24 @@ internal sealed class OdfBufferWriterStream(IBufferWriter<byte> writer) : Stream
         buffer.CopyTo(_writer.GetSpan(buffer.Length));
         _writer.Advance(buffer.Length);
     }
+
+    /// <summary>
+    /// 直接寫入底層 <see cref="System.Buffers.IBufferWriter{T}"/>，不經基底類別的陣列轉接。
+    /// </summary>
+    /// <remarks>
+    /// 基底 <see cref="Stream.WriteAsync(ReadOnlyMemory{byte}, CancellationToken)"/> 會嘗試取出底層陣列，
+    /// 取不到時（例如來源為 <see cref="System.Buffers.MemoryManager{T}"/>）會另行配置並複製。寫入此串流
+    /// 本身是同步的記憶體複製，因此直接覆寫可省去該配置與 Task 包裝。
+    /// </remarks>
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return ValueTask.FromCanceled(cancellationToken);
+
+        buffer.Span.CopyTo(_writer.GetSpan(buffer.Length));
+        _writer.Advance(buffer.Length);
+        return ValueTask.CompletedTask;
+    }
 #endif
 }
 

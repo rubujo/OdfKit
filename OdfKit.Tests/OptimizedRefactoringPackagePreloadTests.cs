@@ -71,11 +71,68 @@ public partial class OptimizedRefactoringTests
 
             await package.PreloadTask!.WaitAsync(TestContext.Current.CancellationToken);
 
-            Assert.Equal(4, OdfPackageZipLoader.LastMmfParallelPreloadEntryCountForTests);
-            Assert.Equal(4, OdfPackageZipLoader.LastMmfParallelPreloadVisitedEntryCountForTests);
+            Assert.Equal(4, package.LastMmfParallelPreloadEntryCountForTests);
+            Assert.Equal(4, package.LastMmfParallelPreloadVisitedEntryCountForTests);
             Assert.Equal(
                 OdfParallelScheduler.GetEffectiveConcurrency(),
-                OdfPackageZipLoader.LastMmfParallelPreloadMaxDegreeForTests);
+                package.LastMmfParallelPreloadMaxDegreeForTests);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證非同步檔案路徑載入同樣可觀測 MMF 平行預讀計數，不受 ExecutionContext 邊界影響。
+    /// </summary>
+    [Fact]
+    public async Task TestOdfPackageOpenAsyncMmfPreloadCountersRemainObservable()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_preload_async_{Guid.NewGuid():N}.ods");
+        byte[] xml = Encoding.UTF8.GetBytes("<root><item>payload</item></root>");
+        byte[] manifest = Encoding.UTF8.GetBytes("""
+            <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+              <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet" />
+              <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml" />
+              <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml" />
+              <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml" />
+              <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml" />
+            </manifest:manifest>
+            """);
+
+        try
+        {
+            using (MemoryStream packageStream = CreateZipPackage(
+                ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet")),
+                ("content.xml", xml),
+                ("styles.xml", xml),
+                ("meta.xml", xml),
+                ("settings.xml", xml),
+                ("META-INF/manifest.xml", manifest),
+                ("Pictures/image.bin", [1, 2, 3, 4])))
+            {
+                File.WriteAllBytes(tempFile, packageStream.ToArray());
+            }
+
+            using OdfPackage package = await OdfPackage.OpenAsync(
+                tempFile,
+                new OdfLoadOptions { AllowLazyLoading = true },
+                TestContext.Current.CancellationToken);
+
+            Assert.NotNull(package.MmfEntries);
+            Assert.NotNull(package.PreloadTask);
+
+            await package.PreloadTask!.WaitAsync(TestContext.Current.CancellationToken);
+
+            Assert.Equal(4, package.LastMmfParallelPreloadEntryCountForTests);
+            Assert.Equal(4, package.LastMmfParallelPreloadVisitedEntryCountForTests);
+            Assert.Equal(
+                OdfParallelScheduler.GetEffectiveConcurrency(),
+                package.LastMmfParallelPreloadMaxDegreeForTests);
         }
         finally
         {

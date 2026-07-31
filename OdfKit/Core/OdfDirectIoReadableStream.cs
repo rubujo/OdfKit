@@ -52,55 +52,91 @@ public sealed class OdfDirectIoReadableStream : Stream
     /// 初始化 <see cref="OdfDirectIoReadableStream"/> 類別的新執行個體。
     /// </summary>
     /// <param name="filePath">The path of the file to read. / 要讀取的檔案路徑。</param>
+    /// <remarks>
+    /// 建構期間配置的對齊原生緩衝區由 <c>AlignedNativeBuffer</c> 持有，而該型別依 CA2015 刻意
+    /// 不提供 GC 備援釋放，只能由 <see cref="Dispose(bool)"/> 釋放。建構子若中途拋出，呼叫端永遠拿不到
+    /// 執行個體、也就沒有機會 Dispose，因此這裡必須自行清理後再重新擲出——否則例如以不存在的路徑建構時，
+    /// <see cref="FileInfo.Length"/> 擲出的 <see cref="FileNotFoundException"/> 會直接洩漏兩個 64 KiB 的
+    /// 原生緩衝區。
+    /// </remarks>
     public OdfDirectIoReadableStream(string filePath)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
 #if NET10_0_OR_GREATER
         _bufferA = new AlignedNativeBuffer(PrefetchSize, SectorSize);
-        _bufferB = new AlignedNativeBuffer(PrefetchSize, SectorSize);
+        _bufferB = null!;
 #else
         _bufferA = new byte[PrefetchSize];
         _bufferB = new byte[PrefetchSize];
 #endif
-        _activeBuffer = _bufferA;
-        _backBuffer = _bufferB;
 
-        var fileInfo = new FileInfo(_filePath);
-        _totalLength = fileInfo.Length;
-        _alignedLimit = (_totalLength / SectorSize) * SectorSize;
-        _currentPosition = 0;
+        try
+        {
+#if NET10_0_OR_GREATER
+            _bufferB = new AlignedNativeBuffer(PrefetchSize, SectorSize);
+#endif
+            _activeBuffer = _bufferA;
+            _backBuffer = _bufferB;
+
+            var fileInfo = new FileInfo(_filePath);
+            _totalLength = fileInfo.Length;
+            _alignedLimit = (_totalLength / SectorSize) * SectorSize;
+            _currentPosition = 0;
 
 #if NET10_0_OR_GREATER
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            try
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                _fileHandle = File.OpenHandle(
-                    _filePath,
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.ReadWrite,
-                    FileFlagNoBuffering);
-                _isFallback = false;
+                try
+                {
+                    _fileHandle = File.OpenHandle(
+                        _filePath,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite,
+                        FileFlagNoBuffering);
+                    _isFallback = false;
+                }
+                catch (Exception ex)
+                {
+                    OdfKitDiagnostics.Warn($"[OdfDirectIo] 無法以 Direct I/O 模式開啟檔案讀取，將退回常規讀取模式。原因: {ex.Message}");
+                    _isFallback = true;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                OdfKitDiagnostics.Warn($"[OdfDirectIo] 無法以 Direct I/O 模式開啟檔案讀取，將退回常規讀取模式。原因: {ex.Message}");
                 _isFallback = true;
             }
-        }
-        else
-        {
-            _isFallback = true;
-        }
 #else
-        _isFallback = true;
+            _isFallback = true;
 #endif
 
-        if (_isFallback)
-        {
-            _fileStream = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, SectorSize);
+            if (_isFallback)
+            {
+                _fileStream = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, SectorSize);
+            }
         }
+        catch
+        {
+            ReleasePartiallyConstructedResources();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 釋放建構失敗時已取得的資源；呼叫端拿不到執行個體，因此不會有後續的 Dispose。
+    /// </summary>
+    private void ReleasePartiallyConstructedResources()
+    {
+        _fileStream?.Dispose();
+        _fileStream = null;
+#if NET10_0_OR_GREATER
+        _fileHandle?.Dispose();
+        _fileHandle = null;
+        // MemoryManager<T> 以顯式介面實作提供 Dispose()，須經 IDisposable 呼叫。
+        if (_bufferB is not null)
+            ((IDisposable)_bufferB).Dispose();
+        ((IDisposable)_bufferA).Dispose();
+#endif
     }
 
     /// <summary>
