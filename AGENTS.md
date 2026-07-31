@@ -15,6 +15,12 @@
 - **本機資源清理**：高負載建置／測試或逾時中止後，檢查本工作區衍生的 `dotnet`、MSBuild、
   VBCSCompiler 與 testhost；不再需要時優先執行 `dotnet build-server shutdown` 正常釋放，
   且不得終止無法確認屬於本工作區的程序。
+- **工作區清理與所有權**：清理時只移除已確認位於方案根目錄內的建置／測試產物（例如
+  `bin`、`obj`、`TestResults` 與 `artifacts`），不得以廣域 `git clean` 刪除用途不明的 ignored
+  檔案。Windows 上完成工作後應以 `Get-Acl` 抽查方案根目錄與本次建立的資料夾 owner；預期
+  為目前登入的本機使用者，不得留為 Agent、sandbox 或其他服務帳號。只有發現不符時才針對
+  已解析且位於方案內的確切路徑修正 owner，並保留既有 ACL 與繼承；禁止對磁碟、使用者家目錄
+  或未驗證的遞迴路徑執行 `takeown`／`icacls /setowner`。
 - 必要需求不明且不同選擇會實質改變結果時，只詢問最小必要資訊；若可由專案內容安全
   推斷，明示假設並繼續。
 
