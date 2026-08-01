@@ -796,7 +796,7 @@ public partial class TextDocument : OdfDocument
         // 確保目前文件的內容已序列化寫入封裝
         Save();
 
-        // 使用隨關閉刪除的暫存檔保存範本封裝，避免大型文件在記憶體中保留完整副本。
+        // 使用隨關閉刪除的暫存檔儲存範本封裝，避免大型文件在記憶體中保留完整副本。
         using Stream templateStream = OdfTempStreamFactory.Create(
             long.MaxValue,
             temporaryDirectory: null,
