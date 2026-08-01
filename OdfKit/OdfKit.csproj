@@ -85,6 +85,7 @@
     <PackageReference Include="System.Memory" />
     <PackageReference Include="System.Buffers" />
     <PackageReference Include="System.Threading.Tasks.Extensions" />
+    <PackageReference Include="System.Threading.Channels" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
     <PackageReference Include="Microsoft.Bcl.HashCode" />
     <PackageReference Include="System.Text.Encoding.CodePages" />

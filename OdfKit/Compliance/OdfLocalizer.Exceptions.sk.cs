@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Možnosti vyhodnotenia nesmú byť null pri výpočte počas ukladania.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Možnosti vyhodnotenia vzorcov nesmú byť null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Externý odkaz „{0}“ nemá hodnotu vo vyrovnávacej pamäti a nakonfigurované resolvery sú vypnuté.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "Identifikátor URI distribúcie CRL musí používať HTTP alebo HTTPS a smerovať iba na verejné sieťové adresy.",
         };
     }
 }

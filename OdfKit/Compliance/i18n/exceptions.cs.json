@@ -628,15 +628,16 @@
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Nepodporovany algoritmus otisku certifikatu: {0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Otisk podepisujiciho certifikatu neodpovida hodnote CertDigest XAdES.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Seriove cislo certifikatu {0} neodpovida XAdES IssuerSerial {1}.",
-  "Err_OdfImageExporter_InvalidDimensions": "Možnost exportu obrázku „{0}“ musí být kladná a v podporovaném rozsahu vykreslování."
-  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "Časový limit vyhodnocení vzorců musí být kladný."
-  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "Možnost vyhodnocení vzorců „{0}“ nesmí být záporná."
-  ,"Err_OdfFormulaEvaluationOptions_Positive": "Možnost vyhodnocení vzorců „{0}“ musí být kladná."
-  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Vyhodnocení vzorců překročilo limit prostředků „{0}“."
-  ,"Err_OdfFormulaEvaluation_Failed": "Vyhodnocení vzorců selhalo: {0}"
-  ,"Err_OdfFormulaEvaluation_InvalidFormula": "Vzorec v buňce {0} se nepodařilo analyzovat."
-  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "Vzorec v buňce {0} používá nepodporovanou funkci."
-  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Možnosti vyhodnocení nesmějí být null při výpočtu během ukládání."
-  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Možnosti vyhodnocení vzorců nesmějí být null."
-  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Externí odkaz „{0}“ nemá hodnotu v mezipaměti a nakonfigurované resolvery jsou zakázány."
+  "Err_OdfImageExporter_InvalidDimensions": "Možnost exportu obrázku „{0}“ musí být kladná a v podporovaném rozsahu vykreslování.",
+  "Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "Časový limit vyhodnocení vzorců musí být kladný.",
+  "Err_OdfFormulaEvaluationOptions_NonNegative": "Možnost vyhodnocení vzorců „{0}“ nesmí být záporná.",
+  "Err_OdfFormulaEvaluationOptions_Positive": "Možnost vyhodnocení vzorců „{0}“ musí být kladná.",
+  "Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Vyhodnocení vzorců překročilo limit prostředků „{0}“.",
+  "Err_OdfFormulaEvaluation_Failed": "Vyhodnocení vzorců selhalo: {0}",
+  "Err_OdfFormulaEvaluation_InvalidFormula": "Vzorec v buňce {0} se nepodařilo analyzovat.",
+  "Err_OdfFormulaEvaluation_UnsupportedFormula": "Vzorec v buňce {0} používá nepodporovanou funkci.",
+  "Err_OdfPackageSaveHooks_FormulaOptionsNull": "Možnosti vyhodnocení nesmějí být null při výpočtu během ukládání.",
+  "Err_SpreadsheetDocument_FormulaOptionsNull": "Možnosti vyhodnocení vzorců nesmějí být null.",
+  "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Externí odkaz „{0}“ nemá hodnotu v mezipaměti a nakonfigurované resolvery jsou zakázány.",
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "Identifikátor URI distribuce CRL musí používat HTTP nebo HTTPS a směřovat pouze na veřejné síťové adresy."
 }

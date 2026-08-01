@@ -49,15 +49,21 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
 
         string ext = LibreOfficeRenderer.GetInputExtension(document);
 
-        // 儲存文件為位元組陣列
-        byte[] docBytes = document.SaveToBytes();
-        using var inputMs = new MemoryStream(docBytes);
+        // 文件大小事前不可可靠估算；直接使用自動刪除的暫存檔，避免 SaveToBytes
+        // 與 MemoryStream 同時保留完整封裝的兩份常駐配置。
+        using Stream inputStream = OdfTempStreamFactory.Create(
+            estimatedSize: 0,
+            temporaryDirectory: null,
+            async: true,
+            thresholdBytes: 0);
+        await document.SaveToStreamAsync(inputStream, ct).ConfigureAwait(false);
+        inputStream.Position = 0;
 
         // 併發閘道限流
         await _semaphore.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            using Stream resultStream = await _backend.ConvertAsync(inputMs, ext, targetFormat, ct).ConfigureAwait(false);
+            using Stream resultStream = await _backend.ConvertAsync(inputStream, ext, targetFormat, ct).ConfigureAwait(false);
             await resultStream.CopyToAsync(outputStream, 81920, ct).ConfigureAwait(false);
         }
         finally

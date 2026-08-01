@@ -66,50 +66,53 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         if (string.IsNullOrEmpty(convertTo))
             throw new ArgumentNullException(nameof(convertTo));
 
-        // 先將輸入完整緩衝為位元組陣列：重試需要可重複讀取的來源，
-        // 且不可依賴呼叫端傳入的串流是否可尋覽。每次嘗試以此緩衝建立新的
-        // 內容，避免 MultipartFormDataContent 釋放時連帶關閉呼叫端的串流，
-        // 導致下一次重試擲出 ObjectDisposedException。
-        byte[] inputBytes;
-        using (var buffer = new MemoryStream())
+        // 重試需要可重播來源；使用刪除即關閉的暫存檔，避免大型文件同時存在
+        // MemoryStream 與 ToArray 複本而造成數 GB 的常駐配置。
+        string inputPath = CreateTemporaryPath();
+        try
         {
-            if (input.CanSeek)
+            using (var buffer = CreateTemporaryStream(inputPath, deleteOnClose: false))
             {
-                input.Position = 0;
+                if (input.CanSeek)
+                {
+                    input.Position = 0;
+                }
+
+                await CopyToBoundedAsync(input, buffer, MaxRequestBytes, "Err_UnoserverRestBackend_RequestSizeLimitExceeded", ct)
+                    .ConfigureAwait(false);
             }
 
-            await CopyToBoundedAsync(input, buffer, MaxRequestBytes, "Err_UnoserverRestBackend_RequestSizeLimitExceeded", ct)
-                .ConfigureAwait(false);
-            inputBytes = buffer.ToArray();
-        }
+            int delayMs = 1000;
 
-        int maxRetries = 3;
-        int delayMs = 1000;
-
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
+            for (int attempt = 1; ; attempt++)
             {
-                return await SendRequestAsync(inputBytes, inputExtension, convertTo, ct).ConfigureAwait(false);
-            }
-            catch (Exception ex) when (attempt < maxRetries && (ex is HttpRequestException || ex is TaskCanceledException))
-            {
-                // Polly 風格之重試與指數型延遲
-                await Task.Delay(delayMs * attempt, ct).ConfigureAwait(false);
+                try
+                {
+                    return await SendRequestAsync(inputPath, inputExtension, convertTo, ct).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (attempt < 3 && (ex is HttpRequestException || ex is TaskCanceledException))
+                {
+                    await Task.Delay(delayMs * attempt, ct).ConfigureAwait(false);
+                }
             }
         }
-
-        // 最後一次重試直接拋出例外
-        return await SendRequestAsync(inputBytes, inputExtension, convertTo, ct).ConfigureAwait(false);
+        finally
+        {
+            File.Delete(inputPath);
+        }
     }
 
-    private async Task<Stream> SendRequestAsync(byte[] inputBytes, string inputExtension, string convertTo, CancellationToken ct)
+    private async Task<Stream> SendRequestAsync(string inputPath, string inputExtension, string convertTo, CancellationToken ct)
     {
         using var requestContent = new MultipartFormDataContent();
 
-        // 每次嘗試都以緩衝位元組建立全新的 ByteArrayContent，
-        // 使重試彼此獨立，且不觸及呼叫端原始串流的生命週期。
-        var fileContent = new ByteArrayContent(inputBytes);
+        var fileContent = new StreamContent(new FileStream(
+            inputPath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            81920,
+            FileOptions.Asynchronous | FileOptions.SequentialScan));
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
 
         // unoserver-rest-api 要求 file 欄位名稱必須是 "file"，並包含副檔名 filename
@@ -128,24 +131,42 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        // 讀取為 MemoryStream，防止與原網路連線生命週期強綁定，導致呼叫端讀取時連線已關閉。
         long? responseLength = response.Content.Headers.ContentLength;
         if (responseLength.HasValue && responseLength.Value > MaxResponseBytes)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_UnoserverRestBackend_ResponseSizeLimitExceeded", responseLength.Value, MaxResponseBytes));
         }
 
-        var ms = new MemoryStream(responseLength.HasValue && responseLength.Value <= int.MaxValue
-            ? (int)responseLength.Value
-            : 0);
-        using (var responseStream = await OdfKit.Internal.OdfAsyncHelper.ReadAsStreamAsync(response.Content, ct).ConfigureAwait(false))
+        string responsePath = CreateTemporaryPath();
+        FileStream result = CreateTemporaryStream(responsePath, deleteOnClose: true);
+        try
         {
-            await CopyToBoundedAsync(responseStream, ms, MaxResponseBytes, "Err_UnoserverRestBackend_ResponseSizeLimitExceeded", ct)
-                .ConfigureAwait(false);
+            using (var responseStream = await OdfKit.Internal.OdfAsyncHelper.ReadAsStreamAsync(response.Content, ct).ConfigureAwait(false))
+            {
+                await CopyToBoundedAsync(responseStream, result, MaxResponseBytes, "Err_UnoserverRestBackend_ResponseSizeLimitExceeded", ct)
+                    .ConfigureAwait(false);
+            }
+            result.Position = 0;
+            return result;
         }
-        ms.Position = 0;
-        return ms;
+        catch
+        {
+            result.Dispose();
+            throw;
+        }
     }
+
+    private static string CreateTemporaryPath() =>
+        Path.Combine(Path.GetTempPath(), $"odfkit-unoserver-{Guid.NewGuid():N}.tmp");
+
+    private static FileStream CreateTemporaryStream(string path, bool deleteOnClose) => new(
+        path,
+        FileMode.CreateNew,
+        FileAccess.ReadWrite,
+        FileShare.Read,
+        81920,
+        FileOptions.Asynchronous | FileOptions.SequentialScan |
+        (deleteOnClose ? FileOptions.DeleteOnClose : FileOptions.None));
 
     private static async Task CopyToBoundedAsync(
         Stream source,

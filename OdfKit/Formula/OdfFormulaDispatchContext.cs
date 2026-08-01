@@ -129,7 +129,7 @@ internal sealed class OdfFormulaDispatchContext(
             values[index] = arguments[index].Evaluate(this);
         }
 
-        result = handler(values, this);
+        result = FormulaNumericResult.Normalize(handler(values, this));
         return true;
     }
 }

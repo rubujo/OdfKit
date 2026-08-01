@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Pilihan penilaian formula tidak boleh null apabila mengira semasa simpan.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Pilihan penilaian formula tidak boleh null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Rujukan luaran '{0}' tiada nilai cache dan penyelesai yang dikonfigurasi dinyahdayakan.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "URI pengedaran CRL mesti menggunakan HTTP atau HTTPS dan hanya menyelesaikan kepada alamat rangkaian awam.",
         };
     }
 }

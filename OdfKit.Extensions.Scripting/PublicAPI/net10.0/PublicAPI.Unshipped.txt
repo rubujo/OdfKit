@@ -118,6 +118,8 @@ OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Column.get -> int
 OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Detail.get -> string?
 OdfKit.Extensions.Scripting.OdfScriptCompilerDiagnostic.Line.get -> int
 OdfKit.Extensions.Scripting.OdfScriptCompilerOptions
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.BackgroundOutputFailureHandler.get -> System.Action<System.Exception!>?
+OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.BackgroundOutputFailureHandler.set -> void
 OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficeExecutablePath.get -> string?
 OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficeExecutablePath.set -> void
 OdfKit.Extensions.Scripting.OdfScriptCompilerOptions.LibreOfficePythonExecutablePath.get -> string?

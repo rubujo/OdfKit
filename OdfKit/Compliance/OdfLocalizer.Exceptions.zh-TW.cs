@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "要求儲存時計算公式時，公式評估選項不得為 null。",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "公式評估選項不得為 null。",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "外部參照「{0}」沒有快取值，且已停用設定的解析器。",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL 分發 URI 必須使用 HTTP 或 HTTPS，且只能解析至公用網路位址。",
         };
     }
 }

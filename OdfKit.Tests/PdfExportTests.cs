@@ -16,6 +16,30 @@ namespace OdfKit.Tests;
 /// </summary>
 public class PdfExportTests
 {
+    [Fact]
+    public async Task ExportToPathValidationDoesNotTruncateExistingFile()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"odfkit-pdf-{Guid.NewGuid():N}.pdf");
+        byte[] original = Encoding.UTF8.GetBytes("existing");
+        await File.WriteAllBytesAsync(path, original, TestContext.Current.CancellationToken);
+        try
+        {
+            Assert.Throws<ArgumentNullException>(() => OdfPdfExporter.ExportToPath(null!, path));
+            Assert.Equal(original, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
+
+            using TextDocument document = TextDocument.Create();
+            using var cancellationSource = new CancellationTokenSource();
+            cancellationSource.Cancel();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                OdfPdfExporter.ExportToPathAsync(document, path, cancellationSource.Token));
+            Assert.Equal(original, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
     /// <summary>
     /// 驗證含標題與段落的 ODT 可匯出為非空 PDF 位元組流。
     /// </summary>

@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Formule-evaluatieopties mogen niet null zijn bij berekening tijdens opslaan.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Formule-evaluatieopties mogen niet null zijn.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "De externe verwijzing '{0}' heeft geen cachewaarde en geconfigureerde oplossers zijn uitgeschakeld.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "De CRL-distributie-URI moet HTTP of HTTPS gebruiken en mag alleen naar openbare netwerkadressen verwijzen.",
         };
     }
 }

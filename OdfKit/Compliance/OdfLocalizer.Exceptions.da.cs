@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Indstillinger for formevaluering må ikke være null ved beregning under lagring.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Indstillinger for formevaluering må ikke være null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Den eksterne reference '{0}' har ingen cacheværdi, og konfigurerede opløsere er deaktiveret.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL-distributionsadressen skal bruge HTTP eller HTTPS og må kun pege på offentlige netværksadresser.",
         };
     }
 }

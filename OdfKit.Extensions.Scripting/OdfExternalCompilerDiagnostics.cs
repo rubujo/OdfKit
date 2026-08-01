@@ -100,6 +100,16 @@ public sealed class OdfScriptCompilerOptions
     /// 取得或設定 worker 的最長執行時間。
     /// </summary>
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// Gets or sets a callback that observes failures while draining a background worker output stream.
+    /// 取得或設定用於觀察背景 worker 輸出資料流讀取失敗的回呼。
+    /// </summary>
+    /// <remarks>
+    /// Exceptions thrown by this callback are isolated from compiler execution.
+    /// 此回呼所擲出的例外會與編譯器執行隔離。
+    /// </remarks>
+    public Action<Exception>? BackgroundOutputFailureHandler { get; set; }
 }
 
 /// <summary>
@@ -297,7 +307,7 @@ public static class OdfExternalScriptCompiler
             string bridgePath = Path.Combine(root, "compile-basic.py");
             File.WriteAllText(bridgePath, LibreOfficeBasicCompilerWorker, new UTF8Encoding(false));
             int port = ReserveTcpPort();
-            office = StartLibreOffice(soffice, profile, port);
+            office = StartLibreOffice(soffice, profile, port, options.BackgroundOutputFailureHandler);
             string uri = $"vnd.sun.star.script:Standard.Module1.{entryPoint}?language=Basic&location=document";
             ProcessResult worker = RunProcess(
                 python,
@@ -326,7 +336,11 @@ public static class OdfExternalScriptCompiler
         }
     }
 
-    private static Process StartLibreOffice(string executable, string profile, int port)
+    private static Process StartLibreOffice(
+        string executable,
+        string profile,
+        int port,
+        Action<Exception>? backgroundOutputFailureHandler)
     {
         string profileUrl = new Uri(profile + Path.DirectorySeparatorChar).AbsoluteUri;
         var startInfo = new ProcessStartInfo
@@ -343,9 +357,29 @@ public static class OdfExternalScriptCompiler
         Process? process = Process.Start(startInfo);
         if (process is null)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfScriptManager_UnsupportedOperation"));
-        _ = process.StandardOutput.ReadToEndAsync();
-        _ = process.StandardError.ReadToEndAsync();
+        ObserveBackgroundRead(process.StandardOutput.ReadToEndAsync(), backgroundOutputFailureHandler);
+        ObserveBackgroundRead(process.StandardError.ReadToEndAsync(), backgroundOutputFailureHandler);
         return process;
+    }
+
+    private static void ObserveBackgroundRead(Task<string> task, Action<Exception>? failureHandler)
+    {
+        _ = task.ContinueWith(
+            completedTask =>
+            {
+                Exception exception = completedTask.Exception!.GetBaseException();
+                try
+                {
+                    failureHandler?.Invoke(exception);
+                }
+                catch (Exception callbackException)
+                {
+                    OdfKitDiagnostics.Warn("外部編譯器背景輸出失敗回呼擲出例外。", callbackException);
+                }
+            },
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
     }
 
     private static ProcessResult RunProcess(

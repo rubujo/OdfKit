@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "保存時に計算する場合、数式評価オプションを null にすることはできません。",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "数式評価オプションを null にすることはできません。",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "外部参照「{0}」にキャッシュ値がなく、構成済みリゾルバーは無効です。",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL 配布 URI は HTTP または HTTPS を使用し、公開ネットワークアドレスだけに解決される必要があります。",
         };
     }
 }

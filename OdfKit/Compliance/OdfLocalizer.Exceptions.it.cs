@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Le opzioni di valutazione non possono essere null per il calcolo al salvataggio.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Le opzioni di valutazione delle formule non possono essere null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Il riferimento esterno '{0}' non ha un valore in cache e i resolver configurati sono disabilitati.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "L URI di distribuzione CRL deve usare HTTP o HTTPS e risolversi solo in indirizzi di rete pubblici.",
         };
     }
 }

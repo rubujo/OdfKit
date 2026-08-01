@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Drawing;
 using OdfKit.Export;
@@ -47,6 +48,34 @@ public class ExportFacadeTests
         Assert.True(svgReport.BytesWritten > 0);
         Assert.True(html.CanWrite);
         Assert.Contains("Export facade", Encoding.UTF8.GetString(html.ToArray()), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證預先取消的非同步路徑匯出不會截斷既有檔案。
+    /// </summary>
+    [Fact]
+    public async Task ManagedPathExportPreCancellationDoesNotTruncateExistingFile()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"odfkit-export-{Guid.NewGuid():N}.html");
+        byte[] original = Encoding.UTF8.GetBytes("existing content");
+        await File.WriteAllBytesAsync(path, original, TestContext.Current.CancellationToken);
+
+        try
+        {
+            using TextDocument text = TextDocument.Create();
+            text.AddParagraph("replacement");
+            using var cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                OdfHtmlExporter.ExportToPathAsync(text, path, null, cancellation.Token));
+
+            Assert.Equal(original, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     /// <summary>

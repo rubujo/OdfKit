@@ -151,7 +151,11 @@ internal static partial class OdfSignatureVerifier
                     var downloadTasks = new Task<(byte[]? Bytes, Exception? Error)>[urls.Count];
                     for (int i = 0; i < urls.Count; i++)
                     {
-                        downloadTasks[i] = DownloadCrlSafeAsync(urls[i], options.HttpClient, remainingDownloadsCts.Token);
+                        downloadTasks[i] = DownloadCrlSafeAsync(
+                            urls[i],
+                            options.HttpClient,
+                            options.AllowedCrlHosts,
+                            remainingDownloadsCts.Token);
                     }
 
                     for (int i = 0; i < urls.Count; i++)
@@ -260,11 +264,16 @@ internal static partial class OdfSignatureVerifier
     private static async Task<(byte[]? Bytes, Exception? Error)> DownloadCrlSafeAsync(
         string url,
         HttpClient? httpClient,
+        ISet<string>? allowedHosts,
         CancellationToken cancellationToken)
     {
         try
         {
-            byte[] bytes = await OdfSignatureTsaClient.DownloadCrlAsync(url, httpClient, cancellationToken).ConfigureAwait(false);
+            byte[] bytes = await OdfSignatureTsaClient.DownloadCrlAsync(
+                url,
+                httpClient,
+                allowedHosts,
+                cancellationToken).ConfigureAwait(false);
             return (bytes, null);
         }
         catch (Exception ex)

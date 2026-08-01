@@ -39,6 +39,14 @@
       "unit": "ms",
       "note": "Updated by Benchmark-Regression.ps1 on 2026-07-12"
     },
+    "OdfPackageLoadBenchmarks.LoadFileMmf128": {
+      "meanNanoseconds": 2161000,
+      "toleranceRatio": 0.4,
+      "allocatedBytes": 131707,
+      "allocationToleranceRatio": 0.15,
+      "unit": "ms",
+      "note": "Updated by Benchmark-Regression.ps1 on 2026-08-01"
+    },
     "FormulaEvaluationBenchmarks.FullRecalculation10000": {
       "meanNanoseconds": 223900000,
       "toleranceRatio": 0.4,

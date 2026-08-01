@@ -46,6 +46,12 @@ $definitions = @(
         Method = "OpenOdt"
     },
     [PSCustomObject]@{
+        Key = "OdfPackageLoadBenchmarks.LoadFileMmf128"
+        Filter = "*OdfPackageLoadBenchmarks.LoadFileMmf*"
+        Method = "LoadFileMmf"
+        ParameterValue = 128
+    },
+    [PSCustomObject]@{
         Key = "CollaborationOperationBenchmarks.Replay_10kTextOperations"
         Filter = "*CollaborationOperationBenchmarks*"
         Method = "Replay_10kTextOperations"

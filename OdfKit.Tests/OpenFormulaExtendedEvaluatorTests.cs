@@ -23,6 +23,20 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         "ISERR", "N", "NPV", "PROPER", "SYD", "T", "VALUE"
     ];
 
+    [Theory]
+    [InlineData("EXP(1000)")]
+    [InlineData("POWER(1E308,2)")]
+    [InlineData("SUMSQ(1E308)")]
+    [InlineData("ABS(EXP(1000))")]
+    public void NonFiniteNumericResultsReturnNumError(string formula)
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+
+        object result = evaluator.Evaluate(formula, new ExtendedEvaluationContext());
+
+        Assert.Equal(OdfFormulaError.Num, result);
+    }
+
     /// <summary>
     /// Verifies that every formerly missing mandatory Small-group function is advertised.
     /// 驗證先前缺少的 Small Group 強制函式皆已列入支援表。

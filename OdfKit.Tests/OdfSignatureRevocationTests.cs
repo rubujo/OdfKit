@@ -57,6 +57,46 @@ public class OdfSignatureRevocationTests
     #region 分發點下載失敗與彙整
 
     [Fact]
+    public async Task CrlHostAllowListRejectsUnlistedHostBeforeSendingRequest()
+    {
+        int requestCount = 0;
+        var handler = new MockHttpMessageHandler((request, ct) =>
+        {
+            requestCount++;
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+        });
+        using var httpClient = new HttpClient(handler);
+        var allowedHosts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "allowed.example.test" };
+
+        await Assert.ThrowsAsync<HttpRequestException>(() => OdfSignatureTsaClient.DownloadCrlAsync(
+            "https://blocked.example.test/list.crl",
+            httpClient,
+            allowedHosts,
+            TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, requestCount);
+    }
+
+    [Fact]
+    public async Task CrlHostAllowListAllowsExactCaseInsensitiveHost()
+    {
+        var handler = new MockHttpMessageHandler((request, ct) => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new ByteArrayContent([1, 2, 3])
+        }));
+        using var httpClient = new HttpClient(handler);
+        var allowedHosts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "CRL.EXAMPLE.TEST" };
+
+        byte[] content = await OdfSignatureTsaClient.DownloadCrlAsync(
+            "https://crl.example.test/list.crl",
+            httpClient,
+            allowedHosts,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(new byte[] { 1, 2, 3 }, content);
+    }
+
+    [Fact]
     public async Task AllDistributionPointsFailReturnsAggregatedFailureWithBothUrls()
     {
         byte[] cdp = BuildCdpExtension(
@@ -662,6 +702,17 @@ public class OdfSignatureRevocationTests
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
             OdfSignatureTsaClient.DownloadCrlAsync("http://crl.example.test/a.crl", httpClient, cts.Token));
+    }
+
+    [Theory]
+    [InlineData("file:///etc/passwd")]
+    [InlineData("http://127.0.0.1/a.crl")]
+    [InlineData("http://169.254.169.254/latest/meta-data")]
+    [InlineData("http://[::1]/a.crl")]
+    public async Task ValidatePublicHttpUriAsyncRejectsUnsafeDistributionPoints(string uri)
+    {
+        await Assert.ThrowsAsync<HttpRequestException>(() =>
+            OdfSignatureTsaClient.ValidatePublicHttpUriAsync(uri, TestContext.Current.CancellationToken));
     }
 
     [Fact]

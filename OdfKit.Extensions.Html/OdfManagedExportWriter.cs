@@ -64,6 +64,7 @@ internal static class OdfManagedExportWriter
         string backend,
         CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         EnsureDirectory(path);
         using FileStream stream = File.Create(path);
         return await WriteAsync(stream, content, format, backend, cancellationToken).ConfigureAwait(false);

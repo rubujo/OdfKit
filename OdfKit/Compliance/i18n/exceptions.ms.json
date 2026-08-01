@@ -628,15 +628,16 @@
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Algoritma digest sijil tidak disokong: {0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "Digest sijil penandatangan tidak sepadan dengan nilai CertDigest XAdES.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "Nombor siri sijil {0} tidak sepadan dengan XAdES IssuerSerial {1}.",
-  "Err_OdfImageExporter_InvalidDimensions": "Pilihan eksport imej '{0}' mesti positif dan dalam julat pemaparan yang disokong."
-  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "Had masa penilaian formula mesti positif."
-  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "Pilihan penilaian formula '{0}' tidak boleh negatif."
-  ,"Err_OdfFormulaEvaluationOptions_Positive": "Pilihan penilaian formula '{0}' mesti positif."
-  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Penilaian formula melebihi had sumber '{0}'."
-  ,"Err_OdfFormulaEvaluation_Failed": "Penilaian formula gagal: {0}"
-  ,"Err_OdfFormulaEvaluation_InvalidFormula": "Formula dalam sel {0} tidak dapat dihuraikan."
-  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "Formula dalam sel {0} menggunakan ciri yang tidak disokong."
-  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null apabila mengira semasa simpan."
-  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null."
-  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Rujukan luaran '{0}' tiada nilai cache dan penyelesai yang dikonfigurasi dinyahdayakan."
+  "Err_OdfImageExporter_InvalidDimensions": "Pilihan eksport imej '{0}' mesti positif dan dalam julat pemaparan yang disokong.",
+  "Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "Had masa penilaian formula mesti positif.",
+  "Err_OdfFormulaEvaluationOptions_NonNegative": "Pilihan penilaian formula '{0}' tidak boleh negatif.",
+  "Err_OdfFormulaEvaluationOptions_Positive": "Pilihan penilaian formula '{0}' mesti positif.",
+  "Err_OdfFormulaEvaluation_ResourceLimitExceeded": "Penilaian formula melebihi had sumber '{0}'.",
+  "Err_OdfFormulaEvaluation_Failed": "Penilaian formula gagal: {0}",
+  "Err_OdfFormulaEvaluation_InvalidFormula": "Formula dalam sel {0} tidak dapat dihuraikan.",
+  "Err_OdfFormulaEvaluation_UnsupportedFormula": "Formula dalam sel {0} menggunakan ciri yang tidak disokong.",
+  "Err_OdfPackageSaveHooks_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null apabila mengira semasa simpan.",
+  "Err_SpreadsheetDocument_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null.",
+  "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Rujukan luaran '{0}' tiada nilai cache dan penyelesai yang dikonfigurasi dinyahdayakan.",
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "URI pengedaran CRL mesti menggunakan HTTP atau HTTPS dan hanya menyelesaikan kepada alamat rangkaian awam."
 }

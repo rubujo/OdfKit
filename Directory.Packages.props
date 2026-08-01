@@ -57,6 +57,7 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="10.0.10" />
     <PackageVersion Include="System.Text.Json" Version="10.0.10" />
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageVersion Include="System.Threading.Channels" Version="10.0.10" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3.mtp-off" Version="3.2.2" />
   </ItemGroup>

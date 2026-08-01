@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Channels;
 using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -1103,22 +1104,74 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// Short overload of ToAsyncEnumerable that accepts version and cancellationToken; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 version 與 cancellationToken；其餘可選參數使用預設值並轉呼叫最長 ToAsyncEnumerable 多載。
     /// </summary>
-    public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+    public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
         Func<OdsStreamWriter, Task> writeAction,
+        OdfVersion version,
+        CancellationToken cancellationToken)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writeAction, nameof(writeAction));
+        return ToAsyncEnumerable((writer, _) => writeAction(writer), version, cancellationToken);
+    }
+
+    /// <summary>
+    /// Converts a cancellation-aware asynchronous ODS write action to byte chunks.
+    /// 將可感知取消的非同步 ODS 寫入動作轉換為位元組區段。
+    /// </summary>
+    /// <param name="writeAction">The write callback that receives producer cancellation. / 接收 producer 取消訊號的寫入回呼。</param>
+    /// <returns>An asynchronous sequence of byte chunks. / 非同步位元組區段序列。</returns>
+    public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Func<OdsStreamWriter, CancellationToken, Task> writeAction) =>
+        ToAsyncEnumerable(writeAction, OdfVersion.Odf14, default);
+
+    /// <summary>
+    /// Converts a cancellation-aware asynchronous ODS write action to byte chunks.
+    /// 將可感知取消的非同步 ODS 寫入動作轉換為位元組區段。
+    /// </summary>
+    /// <param name="writeAction">The write callback that receives producer cancellation. / 接收 producer 取消訊號的寫入回呼。</param>
+    /// <param name="cancellationToken">The consumer cancellation token. / consumer 取消語彙基元。</param>
+    /// <returns>An asynchronous sequence of byte chunks. / 非同步位元組區段序列。</returns>
+    public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Func<OdsStreamWriter, CancellationToken, Task> writeAction,
+        CancellationToken cancellationToken) =>
+        ToAsyncEnumerable(writeAction, OdfVersion.Odf14, cancellationToken);
+
+    /// <summary>
+    /// Converts a version-specific cancellation-aware ODS write action to byte chunks.
+    /// 將指定版本且可感知取消的 ODS 寫入動作轉換為位元組區段。
+    /// </summary>
+    /// <param name="writeAction">The write callback that receives producer cancellation. / 接收 producer 取消訊號的寫入回呼。</param>
+    /// <param name="version">The ODF version. / ODF 版本。</param>
+    /// <returns>An asynchronous sequence of byte chunks. / 非同步位元組區段序列。</returns>
+    public static IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Func<OdsStreamWriter, CancellationToken, Task> writeAction,
+        OdfVersion version) =>
+        ToAsyncEnumerable(writeAction, version, default);
+
+    /// <summary>
+    /// Converts a version-specific cancellation-aware ODS write action to byte chunks.
+    /// 將指定版本且可感知取消的 ODS 寫入動作轉換為位元組區段。
+    /// </summary>
+    /// <param name="writeAction">The write callback that receives producer cancellation. / 接收 producer 取消訊號的寫入回呼。</param>
+    /// <param name="version">The ODF version. / ODF 版本。</param>
+    /// <param name="cancellationToken">The consumer cancellation token. / consumer 取消語彙基元。</param>
+    /// <returns>An asynchronous sequence of byte chunks. / 非同步位元組區段序列。</returns>
+    public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Func<OdsStreamWriter, CancellationToken, Task> writeAction,
         OdfVersion version,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writeAction, nameof(writeAction));
 
-        var stream = new AsyncProducerConsumerStream();
+        var stream = new AsyncProducerConsumerStream(cancellationToken);
+        bool consumedToCompletion = false;
 
-        _ = Task.Run(async () =>
+        Task producer = Task.Run(async () =>
         {
             try
             {
                 using (var writer = new OdsStreamWriter(stream, version))
                 {
-                    await writeAction(writer).ConfigureAwait(false);
+                    await writeAction(writer, stream.ProducerCancellationToken).ConfigureAwait(false);
                 }
                 stream.Complete();
             }
@@ -1126,15 +1179,48 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             {
                 stream.Fault(ex);
             }
-        }, cancellationToken);
+        }, CancellationToken.None);
 
-        while (true)
+        try
         {
-            var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
-            if (chunk is null)
-                break;
+            while (true)
+            {
+                var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
+                if (chunk is null)
+                {
+                    consumedToCompletion = true;
+                    break;
+                }
 
-            yield return chunk;
+                yield return chunk;
+            }
+        }
+        finally
+        {
+            stream.Cancel();
+            if (consumedToCompletion)
+            {
+                try
+                {
+                    await producer.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (stream.IsCancellationRequested)
+                {
+                }
+                finally
+                {
+                    stream.Dispose();
+                }
+            }
+            else
+            {
+                _ = producer.ContinueWith(
+                    static (_, state) => ((AsyncProducerConsumerStream)state!).Dispose(),
+                    stream,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default);
+            }
         }
     }
 
@@ -1174,9 +1260,10 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(writeAction, nameof(writeAction));
 
-        var stream = new AsyncProducerConsumerStream();
+        var stream = new AsyncProducerConsumerStream(cancellationToken);
+        bool consumedToCompletion = false;
 
-        _ = Task.Run(() =>
+        Task producer = Task.Run(() =>
         {
             try
             {
@@ -1190,24 +1277,70 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             {
                 stream.Fault(ex);
             }
-        }, cancellationToken);
+        }, CancellationToken.None);
 
-        while (true)
+        try
         {
-            var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
-            if (chunk is null)
-                break;
+            while (true)
+            {
+                var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
+                if (chunk is null)
+                {
+                    consumedToCompletion = true;
+                    break;
+                }
 
-            yield return chunk;
+                yield return chunk;
+            }
+        }
+        finally
+        {
+            stream.Cancel();
+            if (consumedToCompletion)
+            {
+                try
+                {
+                    await producer.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (stream.IsCancellationRequested)
+                {
+                }
+                finally
+                {
+                    stream.Dispose();
+                }
+            }
+            else
+            {
+                _ = producer.ContinueWith(
+                    static (_, state) => ((AsyncProducerConsumerStream)state!).Dispose(),
+                    stream,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default);
+            }
         }
     }
 
     private sealed class AsyncProducerConsumerStream : Stream
     {
-        private readonly System.Collections.Concurrent.ConcurrentQueue<byte[]> _queue = new();
-        private readonly SemaphoreSlim _semaphore = new(0);
-        private bool _isCompleted;
-        private Exception? _exception;
+        private const int Capacity = 1;
+        private readonly Channel<byte[]> _channel;
+        private readonly CancellationTokenSource _cancellationSource;
+
+        internal AsyncProducerConsumerStream(CancellationToken cancellationToken)
+        {
+            _cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _channel = Channel.CreateBounded<byte[]>(new BoundedChannelOptions(Capacity)
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = true
+            });
+        }
+
+        internal bool IsCancellationRequested => _cancellationSource.IsCancellationRequested;
+        internal CancellationToken ProducerCancellationToken => _cancellationSource.Token;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
@@ -1231,8 +1364,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         /// </summary>
         public void Complete()
         {
-            _isCompleted = true;
-            _semaphore.Release();
+            _channel.Writer.TryComplete();
         }
 
         /// <summary>
@@ -1241,9 +1373,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         /// </summary>
         public void Fault(Exception ex)
         {
-            _exception = ex;
-            _isCompleted = true;
-            _semaphore.Release();
+            _channel.Writer.TryComplete(ex);
         }
 
         /// <summary>
@@ -1256,8 +1386,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                 return;
             var copy = new byte[count];
             Buffer.BlockCopy(buffer, offset, copy, 0, count);
-            _queue.Enqueue(copy);
-            _semaphore.Release();
+            _channel.Writer.WriteAsync(copy, _cancellationSource.Token).AsTask().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1266,24 +1395,28 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         /// </summary>
         public async Task<byte[]?> ReadChunkAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (await _channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                if (_queue.TryDequeue(out var chunk))
-                {
+                if (_channel.Reader.TryRead(out byte[]? chunk))
                     return chunk;
-                }
-
-                if (_isCompleted)
-                {
-                    if (_exception is not null)
-                    {
-                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(_exception).Throw();
-                    }
-                    return null;
-                }
-
-                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             }
+
+            await _channel.Reader.Completion.ConfigureAwait(false);
+            return null;
+        }
+
+        internal void Cancel() => _cancellationSource.Cancel();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _cancellationSource.Cancel();
+                _channel.Writer.TryComplete();
+                _cancellationSource.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

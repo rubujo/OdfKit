@@ -20,6 +20,7 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfSignatureCrlUtilities
 {
+    private const int MaxDistributionPointUrls = 16;
     /// <summary>
     /// 解析 CRL 並取得其中的已撤銷序號集合。呼叫端輸入可能來自不可信來源（例如 ODF 文件內嵌 CRL），
     /// 因此本方法不吞掉任何解析例外：CRL 內容無法解析或個別項目格式異常時一律向外拋出，
@@ -138,6 +139,10 @@ internal static class OdfSignatureCrlUtilities
                     if (!urls.Contains(url))
                     {
                         urls.Add(url);
+                        if (urls.Count == MaxDistributionPointUrls)
+                        {
+                            return urls;
+                        }
                     }
                 }
             }
@@ -163,7 +168,11 @@ internal static class OdfSignatureCrlUtilities
                     end++;
                 string url = ascii.Substring(idx, end - idx);
                 if (!urls.Contains(url))
+                {
                     urls.Add(url);
+                    if (urls.Count == MaxDistributionPointUrls)
+                        return;
+                }
                 idx = end;
             }
         }

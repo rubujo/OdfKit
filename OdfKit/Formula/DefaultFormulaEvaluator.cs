@@ -179,10 +179,10 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
                 Fallback is not null &&
                 Fallback.TryEvaluate(formula, context, out object fallbackResult))
             {
-                return fallbackResult;
+                return FormulaNumericResult.Normalize(fallbackResult);
             }
 
-            return result;
+            return FormulaNumericResult.Normalize(result);
         }
         catch (Exception ex)
         {

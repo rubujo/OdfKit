@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Alternativer for formelevaluering kan ikke være null ved beregning under lagring.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Alternativer for formelevaluering kan ikke være null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Den eksterne referansen «{0}» har ingen hurtigbufret verdi, og konfigurerte løsere er deaktivert.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "URI-en for CRL-distribusjon må bruke HTTP eller HTTPS og bare løses til offentlige nettverksadresser.",
         };
     }
 }

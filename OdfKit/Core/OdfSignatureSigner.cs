@@ -288,6 +288,7 @@ internal static class OdfSignatureSigner
                             byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(
                                 url,
                                 options.HttpClient,
+                                options.AllowedCrlHosts,
                                 cancellationToken).ConfigureAwait(false);
                             if (crlBytes is { Length: > 0 })
                             {

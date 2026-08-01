@@ -1306,6 +1306,7 @@ OdfKit.Core.OdfSignatureValidationResult.OdfSignatureValidationResult() -> void
 OdfKit.Core.OdfSignatureValidationResult.Signatures.get -> System.Collections.Generic.List<OdfKit.Core.OdfSingleSignatureValidationResult!>!
 OdfKit.Core.OdfSigner
 OdfKit.Core.OdfSigningOptions
+OdfKit.Core.OdfSigningOptions.AllowedCrlHosts.get -> System.Collections.Generic.ISet<string!>!
 OdfKit.Core.OdfSigningOptions.AllowUntrustedRoot.get -> bool
 OdfKit.Core.OdfSigningOptions.AllowUntrustedRoot.set -> void
 OdfKit.Core.OdfSigningOptions.AllowUntrustedTimestamp.get -> bool
@@ -19832,6 +19833,10 @@ static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, OdfKit.Compliance.OdfVersion version, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Action<OdfKit.Spreadsheet.OdsStreamWriter!>! writeAction, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
+static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! writeAction) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
+static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! writeAction, OdfKit.Compliance.OdfVersion version) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
+static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! writeAction, OdfKit.Compliance.OdfVersion version, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
+static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! writeAction, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.Tasks.Task!>! writeAction) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.Tasks.Task!>! writeAction, OdfKit.Compliance.OdfVersion version) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!
 static OdfKit.Spreadsheet.OdsStreamWriter.ToAsyncEnumerable(System.Func<OdfKit.Spreadsheet.OdsStreamWriter!, System.Threading.Tasks.Task!>! writeAction, OdfKit.Compliance.OdfVersion version, System.Threading.CancellationToken cancellationToken) -> System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>>!

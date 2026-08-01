@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "저장할 때 계산하는 경우 수식 평가 옵션은 null일 수 없습니다.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "수식 평가 옵션은 null일 수 없습니다.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "외부 참조 '{0}'에 캐시된 값이 없으며 구성된 확인자가 비활성화되었습니다.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL 배포 URI는 HTTP 또는 HTTPS를 사용하고 공용 네트워크 주소로만 확인되어야 합니다.",
         };
     }
 }

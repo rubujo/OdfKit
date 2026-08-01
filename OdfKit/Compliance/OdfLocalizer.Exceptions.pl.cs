@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Opcje obliczania nie mogą być null podczas obliczania przy zapisie.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Opcje obliczania formuł nie mogą być null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Odwołanie zewnętrzne „{0}” nie ma wartości w pamięci podręcznej, a skonfigurowane resolvery są wyłączone.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "Identyfikator URI dystrybucji CRL musi używać protokołu HTTP lub HTTPS i wskazywać wyłącznie publiczne adresy sieciowe.",
         };
     }
 }

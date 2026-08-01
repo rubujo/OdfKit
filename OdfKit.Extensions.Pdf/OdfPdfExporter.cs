@@ -45,6 +45,7 @@ public static class OdfPdfExporter
     /// </summary>
     public static OdfExportReport ExportToPath(TextDocument document, string path)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException(null, nameof(path));
         string? directory = Path.GetDirectoryName(path);
@@ -78,8 +79,10 @@ public static class OdfPdfExporter
     /// </summary>
     public static async Task<OdfExportReport> ExportToPathAsync(TextDocument document, string path, CancellationToken cancellationToken)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(document, nameof(document));
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException(null, nameof(path));
+        cancellationToken.ThrowIfCancellationRequested();
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);

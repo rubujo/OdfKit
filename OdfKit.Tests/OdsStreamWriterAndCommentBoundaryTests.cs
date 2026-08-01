@@ -428,6 +428,67 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public async Task ToAsyncEnumerableReturnsWhenConsumerLeavesEarly()
+        {
+            await foreach (ReadOnlyMemory<byte> _ in OdsStreamWriter.ToAsyncEnumerable(
+                writer =>
+                {
+                    writer.WriteStartSheet("Rows");
+                    for (int row = 0; row < 10_000; row++)
+                    {
+                        writer.WriteStartRow();
+                        writer.WriteCell(string.Concat(Enumerable.Range(0, 256).Select(_ => Guid.NewGuid())));
+                        writer.WriteEndRow();
+                    }
+                },
+                cancellationToken: TestContext.Current.CancellationToken))
+            {
+                break;
+            }
+        }
+
+        [Fact]
+        public async Task ToAsyncEnumerableCancellationAwareProducerStopsWhenConsumerCancels()
+        {
+            var producerStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var producerStopped = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+
+            IAsyncEnumerable<ReadOnlyMemory<byte>> chunks = OdsStreamWriter.ToAsyncEnumerable(
+                async (writer, producerCancellationToken) =>
+                {
+                    try
+                    {
+                        writer.WriteStartSheet("Rows");
+                        producerStarted.TrySetResult(true);
+                        await Task.Delay(Timeout.InfiniteTimeSpan, producerCancellationToken);
+                    }
+                    finally
+                    {
+                        producerStopped.TrySetResult(true);
+                    }
+                },
+                cancellationToken: cancellation.Token);
+
+            await using IAsyncEnumerator<ReadOnlyMemory<byte>> enumerator = chunks.GetAsyncEnumerator(TestContext.Current.CancellationToken);
+            Task<bool> moveNext;
+            do
+            {
+                moveNext = enumerator.MoveNextAsync().AsTask();
+                Task completed = await Task.WhenAny(moveNext, producerStarted.Task).WaitAsync(TestContext.Current.CancellationToken);
+                if (completed == producerStarted.Task)
+                    break;
+                Assert.True(await moveNext);
+            }
+            while (true);
+
+            cancellation.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => moveNext);
+            Assert.True(await producerStopped.Task.WaitAsync(TestContext.Current.CancellationToken));
+        }
+
+        [Fact]
         public void OdsStreamReaderLoadsRowsThroughDbDataReader()
         {
             using var tempStream = new MemoryStream();

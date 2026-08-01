@@ -527,6 +527,25 @@ public sealed class OdfScriptingExtensionTests
     }
 
     [Fact]
+    public async Task ExternalCompilerBackgroundOutputFailureInvokesConfiguredHandler()
+    {
+        var observed = new TaskCompletionSource<Exception>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var expected = new IOException("background read failed");
+        var options = new OdfScriptCompilerOptions
+        {
+            BackgroundOutputFailureHandler = exception => observed.TrySetResult(exception)
+        };
+        System.Reflection.MethodInfo method = typeof(OdfExternalScriptCompiler).GetMethod(
+            "ObserveBackgroundRead",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            ?? throw new InvalidOperationException("找不到背景輸出觀察方法。");
+
+        method.Invoke(null, new object?[] { Task.FromException<string>(expected), options.BackgroundOutputFailureHandler });
+
+        Assert.Same(expected, await observed.Task.WaitAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public void FlatDocumentsSupportInlineScriptsButRejectPackageScripts()
     {
         using OdfDocument document = OdfDocumentFactory.CreateDocument(OdfDocumentKind.FlatText);

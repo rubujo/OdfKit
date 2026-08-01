@@ -628,15 +628,16 @@
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "不支援的憑證摘要演算法：{0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "簽章憑證的摘要值與 XAdES CertDigest 不符。",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "憑證序號 {0} 與 XAdES IssuerSerial {1} 不符。",
-  "Err_OdfImageExporter_InvalidDimensions": "影像匯出選項「{0}」必須為正值，且在支援的轉譯範圍內。"
-  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "公式評估時間上限必須為正值。"
-  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "公式評估選項「{0}」不得為負值。"
-  ,"Err_OdfFormulaEvaluationOptions_Positive": "公式評估選項「{0}」必須為正值。"
-  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "公式評估超過資源上限「{0}」。"
-  ,"Err_OdfFormulaEvaluation_Failed": "公式評估失敗：{0}"
-  ,"Err_OdfFormulaEvaluation_InvalidFormula": "無法剖析儲存格 {0} 中的公式。"
-  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "儲存格 {0} 中的公式使用了不支援的功能。"
-  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "要求儲存時計算公式時，公式評估選項不得為 null。"
-  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "公式評估選項不得為 null。"
-  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "外部參照「{0}」沒有快取值，且已停用設定的解析器。"
+  "Err_OdfImageExporter_InvalidDimensions": "影像匯出選項「{0}」必須為正值，且在支援的轉譯範圍內。",
+  "Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "公式評估時間上限必須為正值。",
+  "Err_OdfFormulaEvaluationOptions_NonNegative": "公式評估選項「{0}」不得為負值。",
+  "Err_OdfFormulaEvaluationOptions_Positive": "公式評估選項「{0}」必須為正值。",
+  "Err_OdfFormulaEvaluation_ResourceLimitExceeded": "公式評估超過資源上限「{0}」。",
+  "Err_OdfFormulaEvaluation_Failed": "公式評估失敗：{0}",
+  "Err_OdfFormulaEvaluation_InvalidFormula": "無法剖析儲存格 {0} 中的公式。",
+  "Err_OdfFormulaEvaluation_UnsupportedFormula": "儲存格 {0} 中的公式使用了不支援的功能。",
+  "Err_OdfPackageSaveHooks_FormulaOptionsNull": "要求儲存時計算公式時，公式評估選項不得為 null。",
+  "Err_SpreadsheetDocument_FormulaOptionsNull": "公式評估選項不得為 null。",
+  "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "外部參照「{0}」沒有快取值，且已停用設定的解析器。",
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "CRL 分發 URI 必須使用 HTTP 或 HTTPS，且只能解析至公用網路位址。"
 }

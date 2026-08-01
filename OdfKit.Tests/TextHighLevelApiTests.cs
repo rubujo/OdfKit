@@ -185,6 +185,34 @@ public class TextHighLevelApiTests
         AssertWellFormedXml(contentXml);
     }
 
+    [Fact]
+    public async Task StreamingMailMergeBatchDoesNotReenumerateSourceForEmbeddedContent()
+    {
+        using MemoryStream template = CreateStreamingTemplateZipWithStylesFirst(BatchTemplateContentXml);
+        using (var archive = new ZipArchive(template, ZipArchiveMode.Update, leaveOpen: true))
+        {
+            WriteZipEntry(archive, "Object 1/content.xml", BatchTemplateContentXml);
+        }
+        template.Position = 0;
+        using MemoryStream output = new();
+        var queue = new Queue<IDictionary<string, object?>>();
+        queue.Enqueue(new Dictionary<string, object?> { ["Name"] = "First" });
+        queue.Enqueue(new Dictionary<string, object?> { ["Name"] = "Second" });
+
+        await OdfStreamingMailMerge.ApplyBatchTemplateAsync(
+            template,
+            output,
+            DrainSinglePassAsync(queue),
+            TestContext.Current.CancellationToken);
+
+        string rootContent = ReadZipEntryText(output, "content.xml");
+        string embeddedContent = ReadZipEntryText(output, "Object 1/content.xml");
+        Assert.Contains("Hello First", rootContent);
+        Assert.Contains("Hello Second", rootContent);
+        Assert.Contains("Hello First", embeddedContent);
+        Assert.DoesNotContain("Hello Second", embeddedContent);
+    }
+
     private static void AssertWellFormedXml(string xml)
     {
         var document = new XmlDocument { XmlResolver = null };

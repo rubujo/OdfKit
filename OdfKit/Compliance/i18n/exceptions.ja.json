@@ -628,15 +628,16 @@
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "サポートされていない証明書ダイジェストアルゴリズム:{0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "署名証明書のダイジェストがXAdESのCertDigest値と一致しません。",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "証明書のシリアル番号{0}がXAdESのIssuerSerial{1}と一致しません。",
-  "Err_OdfImageExporter_InvalidDimensions": "画像エクスポートオプション「{0}」は正の値で、サポートされる描画範囲内である必要があります。"
-  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "数式評価の制限時間は正の値でなければなりません。"
-  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "数式評価オプション「{0}」に負の値は指定できません。"
-  ,"Err_OdfFormulaEvaluationOptions_Positive": "数式評価オプション「{0}」は正の値でなければなりません。"
-  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "数式評価がリソース制限「{0}」を超えました。"
-  ,"Err_OdfFormulaEvaluation_Failed": "数式評価に失敗しました: {0}"
-  ,"Err_OdfFormulaEvaluation_InvalidFormula": "セル {0} の数式を解析できませんでした。"
-  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "セル {0} の数式はサポートされていない機能を使用しています。"
-  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "保存時に計算する場合、数式評価オプションを null にすることはできません。"
-  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "数式評価オプションを null にすることはできません。"
-  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "外部参照「{0}」にキャッシュ値がなく、構成済みリゾルバーは無効です。"
+  "Err_OdfImageExporter_InvalidDimensions": "画像エクスポートオプション「{0}」は正の値で、サポートされる描画範囲内である必要があります。",
+  "Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "数式評価の制限時間は正の値でなければなりません。",
+  "Err_OdfFormulaEvaluationOptions_NonNegative": "数式評価オプション「{0}」に負の値は指定できません。",
+  "Err_OdfFormulaEvaluationOptions_Positive": "数式評価オプション「{0}」は正の値でなければなりません。",
+  "Err_OdfFormulaEvaluation_ResourceLimitExceeded": "数式評価がリソース制限「{0}」を超えました。",
+  "Err_OdfFormulaEvaluation_Failed": "数式評価に失敗しました: {0}",
+  "Err_OdfFormulaEvaluation_InvalidFormula": "セル {0} の数式を解析できませんでした。",
+  "Err_OdfFormulaEvaluation_UnsupportedFormula": "セル {0} の数式はサポートされていない機能を使用しています。",
+  "Err_OdfPackageSaveHooks_FormulaOptionsNull": "保存時に計算する場合、数式評価オプションを null にすることはできません。",
+  "Err_SpreadsheetDocument_FormulaOptionsNull": "数式評価オプションを null にすることはできません。",
+  "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "外部参照「{0}」にキャッシュ値がなく、構成済みリゾルバーは無効です。",
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "CRL 配布 URI は HTTP または HTTPS を使用し、公開ネットワークアドレスだけに解決される必要があります。"
 }

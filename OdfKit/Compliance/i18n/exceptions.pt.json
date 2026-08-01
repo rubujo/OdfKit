@@ -628,15 +628,16 @@
   "Err_OdfSignatureX509Utilities_UnsupportedCertDigestAlgorithm": "Algoritmo de digest de certificado nao suportado: {0}",
   "Err_OdfSignatureX509Utilities_CertDigestMismatch": "O digest do certificado de assinatura nao corresponde ao valor CertDigest do XAdES.",
   "Err_OdfSignatureX509Utilities_SerialNumberMismatch": "O numero de serie do certificado {0} nao corresponde ao IssuerSerial {1} do XAdES.",
-  "Err_OdfImageExporter_InvalidDimensions": "A opção de exportação de imagem '{0}' deve ser positiva e estar dentro do intervalo de renderização suportado."
-  ,"Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "O limite de tempo da avaliação de fórmulas tem de ser positivo."
-  ,"Err_OdfFormulaEvaluationOptions_NonNegative": "A opção de avaliação de fórmulas \"{0}\" não pode ser negativa."
-  ,"Err_OdfFormulaEvaluationOptions_Positive": "A opção de avaliação de fórmulas \"{0}\" tem de ser positiva."
-  ,"Err_OdfFormulaEvaluation_ResourceLimitExceeded": "A avaliação de fórmulas excedeu o limite de recursos \"{0}\"."
-  ,"Err_OdfFormulaEvaluation_Failed": "A avaliação de fórmulas falhou: {0}"
-  ,"Err_OdfFormulaEvaluation_InvalidFormula": "Não foi possível analisar a fórmula na célula {0}."
-  ,"Err_OdfFormulaEvaluation_UnsupportedFormula": "A fórmula na célula {0} utiliza uma funcionalidade não suportada."
-  ,"Err_OdfPackageSaveHooks_FormulaOptionsNull": "As opções de avaliação não podem ser nulas ao calcular durante a gravação."
-  ,"Err_SpreadsheetDocument_FormulaOptionsNull": "As opções de avaliação de fórmulas não podem ser nulas."
-  ,"Err_OdfFormulaEvaluation_ExternalReferenceDenied": "A referência externa \"{0}\" não tem valor em cache e os resolvedores configurados estão desativados."
+  "Err_OdfImageExporter_InvalidDimensions": "A opção de exportação de imagem '{0}' deve ser positiva e estar dentro do intervalo de renderização suportado.",
+  "Err_OdfFormulaEvaluationOptions_PositiveTimeLimit": "O limite de tempo da avaliação de fórmulas tem de ser positivo.",
+  "Err_OdfFormulaEvaluationOptions_NonNegative": "A opção de avaliação de fórmulas \"{0}\" não pode ser negativa.",
+  "Err_OdfFormulaEvaluationOptions_Positive": "A opção de avaliação de fórmulas \"{0}\" tem de ser positiva.",
+  "Err_OdfFormulaEvaluation_ResourceLimitExceeded": "A avaliação de fórmulas excedeu o limite de recursos \"{0}\".",
+  "Err_OdfFormulaEvaluation_Failed": "A avaliação de fórmulas falhou: {0}",
+  "Err_OdfFormulaEvaluation_InvalidFormula": "Não foi possível analisar a fórmula na célula {0}.",
+  "Err_OdfFormulaEvaluation_UnsupportedFormula": "A fórmula na célula {0} utiliza uma funcionalidade não suportada.",
+  "Err_OdfPackageSaveHooks_FormulaOptionsNull": "As opções de avaliação não podem ser nulas ao calcular durante a gravação.",
+  "Err_SpreadsheetDocument_FormulaOptionsNull": "As opções de avaliação de fórmulas não podem ser nulas.",
+  "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "A referência externa \"{0}\" não tem valor em cache e os resolvedores configurados estão desativados.",
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "O URI de distribuição da CRL tem de utilizar HTTP ou HTTPS e resolver apenas para endereços de rede públicos."
 }

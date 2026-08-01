@@ -657,6 +657,7 @@ public static partial class OdfLocalizer
             ["Err_OdfPackageSaveHooks_FormulaOptionsNull"] = "Formelauswertungsoptionen dürfen bei der Berechnung beim Speichern nicht null sein.",
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Formelauswertungsoptionen dürfen nicht null sein.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Die externe Referenz „{0}“ hat keinen Cachewert und konfigurierte Resolver sind deaktiviert.",
+            ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "Der CRL-Verteilungs-URI muss HTTP oder HTTPS verwenden und darf nur in öffentliche Netzwerkadressen aufgelöst werden.",
         };
     }
 }

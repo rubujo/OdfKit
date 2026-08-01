@@ -156,7 +156,6 @@ public static partial class OdfStreamingMailMerge
             ValidateEntryCount(sourceZip, loadOptions);
             long totalUncompressedSize = 0;
 
-            bool replaySequenceUsed = false;
             foreach (ZipArchiveEntry entry in sourceZip.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -169,31 +168,19 @@ public static partial class OdfStreamingMailMerge
                     using Stream srcStream = entry.Open();
                     using Stream destStream = newEntry.Open();
 
-                    if (entryName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(entryName, "content.xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        // 重播序列只能走訪一次；範本含多個 content.xml（如內嵌物件的
-                        // Object 1/content.xml）時，後續項目改以來源序列重新列舉——
-                        // 可重複列舉的來源（清單、陣列）可完整重播，單向來源則盡力而為。
-                        IAsyncEnumerable<IDictionary<string, object?>> rows;
-                        if (!replaySequenceUsed)
-                        {
-                            rows = ReplayFirstThenRest(firstData, hasFirst, enumerator);
-                            replaySequenceUsed = true;
-                        }
-                        else
-                        {
-                            rows = dataSequence;
-                        }
-
                         await ProcessXmlTemplateBatchAsync(
                             srcStream,
                             destStream,
-                            rows,
+                            ReplayFirstThenRest(firstData, hasFirst, enumerator),
                             loadOptions,
                             cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
+                        // 批次記錄只展開封裝根層 content.xml。內嵌物件的 content.xml 與
+                        // styles.xml 套用首筆資料，避免重新列舉 DbDataReader 等單向來源。
                         await ProcessXmlTemplateAsync(srcStream, destStream, firstData, loadOptions, cancellationToken).ConfigureAwait(false);
                     }
                 }

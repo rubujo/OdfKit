@@ -45,7 +45,7 @@ internal static class FormulaBuiltinFunctionRegistry
     {
         if (s_registry.Value.TryGetValue(name, out FormulaBuiltinHandler? handler))
         {
-            result = handler(arguments, context);
+            result = FormulaNumericResult.Normalize(handler(arguments, context));
             return true;
         }
 
