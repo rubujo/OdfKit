@@ -37,6 +37,7 @@
     { "id": "System.Text.Encoding.CodePages", "version": "10.0.10", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "System.Text.Encodings.Web", "version": "10.0.10", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "System.Text.Json", "version": "10.0.10", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
+    { "id": "System.Threading.Channels", "version": "10.0.10", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "System.Threading.Tasks.Extensions", "version": "4.6.3", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "System.ValueTuple", "version": "4.6.2", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" }
   ]
