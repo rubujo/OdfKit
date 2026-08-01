@@ -708,11 +708,32 @@ public class OdfSignatureRevocationTests
     [InlineData("file:///etc/passwd")]
     [InlineData("http://127.0.0.1/a.crl")]
     [InlineData("http://169.254.169.254/latest/meta-data")]
+    [InlineData("http://192.0.2.1/a.crl")]
+    [InlineData("http://198.18.0.1/a.crl")]
+    [InlineData("http://198.51.100.1/a.crl")]
+    [InlineData("http://203.0.113.1/a.crl")]
     [InlineData("http://[::1]/a.crl")]
+    [InlineData("http://[100::1]/a.crl")]
+    [InlineData("http://[2001:db8::1]/a.crl")]
+    [InlineData("http://[3fff::1]/a.crl")]
+    [InlineData("http://[5f00::1]/a.crl")]
     public async Task ValidatePublicHttpUriAsyncRejectsUnsafeDistributionPoints(string uri)
     {
         await Assert.ThrowsAsync<HttpRequestException>(() =>
             OdfSignatureTsaClient.ValidatePublicHttpUriAsync(uri, TestContext.Current.CancellationToken));
+    }
+
+    [Theory]
+    [InlineData("http://8.8.8.8/a.crl")]
+    [InlineData("http://192.0.0.9/a.crl")]
+    [InlineData("http://[2001:4860:4860::8888]/a.crl")]
+    public async Task ValidatePublicHttpUriAsyncAllowsGloballyReachableAddresses(string uri)
+    {
+        Uri result = await OdfSignatureTsaClient.ValidatePublicHttpUriAsync(
+            uri,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(uri, result.AbsoluteUri);
     }
 
     [Fact]

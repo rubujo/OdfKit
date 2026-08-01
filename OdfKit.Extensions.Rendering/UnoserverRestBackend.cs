@@ -98,7 +98,19 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         }
         finally
         {
-            File.Delete(inputPath);
+            TryDeleteTemporaryFile(inputPath, File.Delete);
+        }
+    }
+
+    internal static void TryDeleteTemporaryFile(string path, Action<string> deleteFile)
+    {
+        try
+        {
+            deleteFile(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            OdfKitDiagnostics.Warn($"無法刪除 unoserver 輸入暫存檔：{ex.Message}", ex);
         }
     }
 

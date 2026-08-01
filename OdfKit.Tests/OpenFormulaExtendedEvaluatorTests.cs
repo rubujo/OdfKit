@@ -37,6 +37,19 @@ public sealed class OpenFormulaExtendedEvaluatorTests
         Assert.Equal(OdfFormulaError.Num, result);
     }
 
+    [Fact]
+    public void CustomSinglePrecisionNonFiniteResultsReturnNumError()
+    {
+        var functions = new OdfFormulaFunctionRegistry();
+        functions.Register("SINGLE_NAN", (_, _) => float.NaN);
+        functions.Register("SINGLE_INFINITY", (_, _) => float.PositiveInfinity);
+        var evaluator = new DefaultFormulaEvaluator(functions);
+        var context = new ExtendedEvaluationContext();
+
+        Assert.Equal(OdfFormulaError.Num, evaluator.Evaluate("SINGLE_NAN()", context));
+        Assert.Equal(OdfFormulaError.Num, evaluator.Evaluate("SINGLE_INFINITY()", context));
+    }
+
     /// <summary>
     /// Verifies that every formerly missing mandatory Small-group function is advertised.
     /// 驗證先前缺少的 Small Group 強制函式皆已列入支援表。

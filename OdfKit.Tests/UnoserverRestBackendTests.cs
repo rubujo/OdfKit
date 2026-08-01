@@ -45,6 +45,17 @@ public sealed class UnoserverRestBackendTests
         Assert.True(input.CanRead);
     }
 
+    [Fact]
+    public void TemporaryFileCleanupFailureDoesNotEscape()
+    {
+        Exception? exception = Record.Exception(() =>
+            UnoserverRestBackend.TryDeleteTemporaryFile(
+                "unavailable.tmp",
+                _ => throw new IOException("Simulated cleanup failure.")));
+
+        Assert.Null(exception);
+    }
+
     private static async Task<byte[]> ReadAllBytesAsync(Stream stream)
     {
         using var buffer = new MemoryStream();

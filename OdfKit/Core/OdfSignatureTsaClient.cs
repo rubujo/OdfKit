@@ -194,7 +194,14 @@ internal static class OdfSignatureTsaClient
         if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6 &&
             !address.IsIPv4MappedToIPv6)
         {
-            return (originalBytes[0] & 0xfe) == 0xfc;
+            return (originalBytes[0] & 0xfe) == 0xfc ||
+                IsIpv6Prefix(originalBytes, [0x00, 0x64, 0xff, 0x9b, 0x00, 0x01], 48) ||
+                IsIpv6Prefix(originalBytes, [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 64) ||
+                IsIpv6Prefix(originalBytes, [0x20, 0x01, 0x00, 0x02, 0x00, 0x00], 48) ||
+                IsIpv6Prefix(originalBytes, [0x20, 0x01, 0x00, 0x10], 28) ||
+                IsIpv6Prefix(originalBytes, [0x20, 0x01, 0x0d, 0xb8], 32) ||
+                IsIpv6Prefix(originalBytes, [0x3f, 0xff, 0x00], 20) ||
+                IsIpv6Prefix(originalBytes, [0x5f, 0x00], 16);
         }
 
         byte[] bytes = address.MapToIPv4().GetAddressBytes();
@@ -202,7 +209,30 @@ internal static class OdfSignatureTsaClient
             (bytes[0] == 169 && bytes[1] == 254) ||
             (bytes[0] == 172 && bytes[1] is >= 16 and <= 31) ||
             (bytes[0] == 192 && bytes[1] == 168) ||
-            (bytes[0] == 100 && bytes[1] is >= 64 and <= 127);
+            (bytes[0] == 100 && bytes[1] is >= 64 and <= 127) ||
+            (bytes[0] == 192 && bytes[1] == 0 && bytes[2] == 0 && bytes[3] is not (9 or 10)) ||
+            (bytes[0] == 192 && bytes[1] == 0 && bytes[2] == 2) ||
+            (bytes[0] == 192 && bytes[1] == 88 && bytes[2] == 99) ||
+            (bytes[0] == 198 && bytes[1] is 18 or 19) ||
+            (bytes[0] == 198 && bytes[1] == 51 && bytes[2] == 100) ||
+            (bytes[0] == 203 && bytes[1] == 0 && bytes[2] == 113);
+    }
+
+    private static bool IsIpv6Prefix(byte[] address, byte[] prefix, int prefixLength)
+    {
+        int completeBytes = prefixLength / 8;
+        for (int index = 0; index < completeBytes; index++)
+        {
+            if (address[index] != prefix[index])
+                return false;
+        }
+
+        int remainingBits = prefixLength % 8;
+        if (remainingBits == 0)
+            return true;
+
+        int mask = 0xff << (8 - remainingBits);
+        return (address[completeBytes] & mask) == (prefix[completeBytes] & mask);
     }
 
     internal static async Task<byte[]> QueryTsaAsync(
