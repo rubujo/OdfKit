@@ -6,6 +6,23 @@ namespace OdfKit.WebFonts.Tests;
 public sealed class SidecarTests
 {
     [Fact]
+    public void ProtocolRejectsOversizedFieldsBeforeSerializingPayload()
+    {
+        var request = new WebFontSubsetRequest
+        {
+            Face = CreateFace(),
+            ProfileId = "sidecar-test@1",
+            FontFamily = new string('x', 1025),
+            Sequences = [WebFontTextSequence.Create("A")],
+            Formats = [WebFontFormat.Woff2]
+        };
+
+        Assert.Throws<ArgumentException>(() => SidecarProtocol.CreateGenerateRequest(
+            new string('a', 64),
+            request));
+    }
+
+    [Fact]
     public async Task AuthenticatedClientNegotiatesAndDelegatesOperations()
     {
         string root = Path.Combine(Path.GetTempPath(), "odfkit-sidecar-test-" + Guid.NewGuid().ToString("N"));

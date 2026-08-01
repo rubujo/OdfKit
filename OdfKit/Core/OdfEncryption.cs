@@ -114,6 +114,24 @@ public static partial class OdfEncryption
     public const int DefaultPbkdf2IterationCount = 100_000;
 
     /// <summary>
+    /// Maximum accepted Argon2id iteration count when reading untrusted manifests.
+    /// 讀取不受信任 manifest 時允許的 Argon2id 最大迭代次數。
+    /// </summary>
+    internal const int MaxArgon2IterationCount = 10;
+
+    /// <summary>
+    /// Maximum accepted Argon2id memory cost in KiB when reading untrusted manifests.
+    /// 讀取不受信任 manifest 時允許的 Argon2id 最大記憶體成本（KiB）。
+    /// </summary>
+    internal const int MaxArgon2MemoryKib = 256 * 1024;
+
+    /// <summary>
+    /// Maximum accepted Argon2id parallelism when reading untrusted manifests.
+    /// 讀取不受信任 manifest 時允許的 Argon2id最大平行度。
+    /// </summary>
+    internal const int MaxArgon2Parallelism = 16;
+
+    /// <summary>
     /// Blowfish 傳統加密的金鑰長度（位元組）；`manifest:key-size` 缺席時的規範預設。
     /// </summary>
     public const int BlowfishKeySizeBytes = 16;
@@ -129,6 +147,48 @@ public static partial class OdfEncryption
     private static readonly int Argon2MaxConcurrentOperations = Math.Max(1, Environment.ProcessorCount / 2);
 
     private static readonly SemaphoreSlim Argon2ConcurrencyGate = new(Argon2MaxConcurrentOperations, Argon2MaxConcurrentOperations);
+
+    internal static void ValidateArgon2Parameters(int iterations, int memoryKib, int parallelism)
+    {
+        ValidateArgon2Parameter("iterations", iterations, 1, MaxArgon2IterationCount);
+        ValidateArgon2Parameter("lanes", parallelism, 1, MaxArgon2Parallelism);
+        ValidateArgon2Parameter("memory", memoryKib, 8 * parallelism, MaxArgon2MemoryKib);
+    }
+
+    internal static void EnterArgon2Operation() => Argon2ConcurrencyGate.Wait();
+
+    internal static void ExitArgon2Operation() => Argon2ConcurrencyGate.Release();
+
+    internal static void ValidateEncryptionKeySize(string algorithmUri, int keySize)
+    {
+        int expectedSize = IsBlowfishCfbAlgorithm(algorithmUri) || IsLegacyBlowfishCbcAlgorithm(algorithmUri)
+            ? BlowfishKeySizeBytes
+            : Aes256KeySizeBytes;
+
+        if (keySize != expectedSize)
+        {
+            throw new CryptographicException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm",
+                    keySize,
+                    algorithmUri,
+                    expectedSize));
+        }
+    }
+
+    private static void ValidateArgon2Parameter(string name, int value, int minimum, int maximum)
+    {
+        if (value < minimum || value > maximum)
+        {
+            throw new CryptographicException(
+                OdfLocalizer.GetMessage(
+                    "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange",
+                    name,
+                    value,
+                    minimum,
+                    maximum));
+        }
+    }
 
     /// <summary>
     /// Performs pbkdf 2.

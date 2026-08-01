@@ -144,6 +144,63 @@ public partial class OptimizedRefactoringTests
     }
 
     /// <summary>
+    /// 驗證 PrefetchAsync 會等待 MMF entry 的實際載入完成，而非只等待排入背景通道。
+    /// </summary>
+    [Fact]
+    public async Task TestOdfPackageEntryPrefetchAsyncWaitsForActualMmfLoad()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_prefetch_completion_{Guid.NewGuid():N}.ods");
+        byte[] payload = [1, 2, 3, 4];
+        byte[] manifest = Encoding.UTF8.GetBytes("""
+            <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+              <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet" />
+              <manifest:file-entry manifest:full-path="Pictures/image.bin" manifest:media-type="application/octet-stream" />
+            </manifest:manifest>
+            """);
+        try
+        {
+            using (MemoryStream packageStream = CreateZipPackage(
+                ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet")),
+                ("META-INF/manifest.xml", manifest),
+                ("Pictures/image.bin", payload)))
+            {
+                File.WriteAllBytes(tempFile, packageStream.ToArray());
+            }
+
+            using OdfPackage package = OdfPackage.Open(
+                tempFile,
+                new OdfLoadOptions { AllowLazyLoading = true });
+
+            OdfPackageEntry entry = package.LoadCollaborators.Entries["Pictures/image.bin"];
+            object loadLock = typeof(OdfPackageEntry)
+                .GetField("_loadLock", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(entry)!;
+            Task prefetchTask;
+            Monitor.Enter(loadLock);
+            try
+            {
+                entry.Prefetch();
+                prefetchTask = entry.PrefetchAsync(TestContext.Current.CancellationToken);
+                Assert.False(prefetchTask.IsCompleted);
+            }
+            finally
+            {
+                Monitor.Exit(loadLock);
+            }
+
+            await prefetchTask;
+            Assert.Equal(payload, entry.GetCachedBytes());
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    /// <summary>
     /// 驗證平行調度器會在工作委派期間暫時套用執行緒優先權，並於完成後還原。
     /// </summary>
     [Fact]

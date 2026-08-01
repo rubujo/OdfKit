@@ -16,6 +16,7 @@ public static partial class OdfStreamingMailMerge
 
     private static class MailMergeExpressionCache
     {
+        private const int Capacity = 4096;
         private static readonly Dictionary<(Type, string), Func<object, object?>> _cache = new();
         private static readonly object _lock = new();
 
@@ -54,6 +55,12 @@ public static partial class OdfStreamingMailMerge
                     {
                         accessor = static _ => null;
                     }
+
+                    if (_cache.Count >= Capacity)
+                    {
+                        _cache.Clear();
+                    }
+
                     _cache[(type, propertyName)] = accessor;
                 }
             }

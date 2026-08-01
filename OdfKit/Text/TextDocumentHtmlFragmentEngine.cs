@@ -13,9 +13,15 @@ namespace OdfKit.Text;
 /// </summary>
 internal static class TextDocumentHtmlFragmentEngine
 {
-    private static readonly Regex TagNameRegex = new(@"^<\s*(/?)\s*([a-zA-Z0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    private static readonly Regex HrefAttributeRegex = new(@"href\s*=\s*['""]?([^'""\s>]+)['""]?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    private static readonly Regex StyleAttributeRegex = new(@"style\s*=\s*(?:""([^""]*)""|'([^']*)')", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(2);
+    private static readonly Regex TagNameRegex = new(@"^<\s*(/?)\s*([a-zA-Z0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex HrefAttributeRegex = new(@"href\s*=\s*['""]?([^'""\s>]+)['""]?", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex StyleAttributeRegex = new(@"style\s*=\s*(?:""([^""]*)""|'([^']*)')", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex CommentRegex = new(@"<!--[\s\S]*?-->", RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex ScriptStylePairRegex = new(@"<(script|style)\b[^>]*>([\s\S]*?)<\/\1\s*>", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex ScriptStyleSelfClosingRegex = new(@"<(script|style)\b[^>]*\/>", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex ScriptStyleUnclosedRegex = new(@"<(script|style)\b[^>]*>([\s\S]*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+    private static readonly Regex TokenRegex = new(@"(<!--[\s\S]*?-->|</?[a-zA-Z][^>]*>|[^<]+|<)", RegexOptions.Compiled, RegexTimeout);
     private static readonly ConcurrentDictionary<string, Regex> CssValueRegexCache = new(StringComparer.OrdinalIgnoreCase);
 
     private sealed class SpanState
@@ -42,13 +48,12 @@ internal static class TextDocumentHtmlFragmentEngine
         if (string.IsNullOrWhiteSpace(html))
             return;
 
-        html = Regex.Replace(html, @"<!--[\s\S]*?-->", string.Empty);
-        html = Regex.Replace(html, @"<(script|style)\b[^>]*>([\s\S]*?)<\/\1\s*>", string.Empty, RegexOptions.IgnoreCase);
-        html = Regex.Replace(html, @"<(script|style)\b[^>]*\/>", string.Empty, RegexOptions.IgnoreCase);
-        html = Regex.Replace(html, @"<(script|style)\b[^>]*>([\s\S]*)$", string.Empty, RegexOptions.IgnoreCase);
+        html = CommentRegex.Replace(html, string.Empty);
+        html = ScriptStylePairRegex.Replace(html, string.Empty);
+        html = ScriptStyleSelfClosingRegex.Replace(html, string.Empty);
+        html = ScriptStyleUnclosedRegex.Replace(html, string.Empty);
 
-        var tokenRegex = new Regex(@"(<!--[\s\S]*?-->|</?[a-zA-Z][^>]*>|[^<]+|<)", RegexOptions.Compiled);
-        var matches = tokenRegex.Matches(html);
+        MatchCollection matches = TokenRegex.Matches(html);
 
         InlineFormat format = default;
         string? currentHref = null;
@@ -333,7 +338,10 @@ internal static class TextDocumentHtmlFragmentEngine
     {
         Regex regex = CssValueRegexCache.GetOrAdd(
             name,
-            static n => new Regex(Regex.Escape(n) + @"\s*:\s*([^;]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            static n => new Regex(
+                Regex.Escape(n) + @"\s*:\s*([^;]+)",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled,
+                RegexTimeout));
         Match match = regex.Match(style);
         return match.Success ? match.Groups[1].Value.Trim() : null;
     }

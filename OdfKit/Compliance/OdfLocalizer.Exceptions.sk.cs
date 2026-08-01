@@ -658,6 +658,9 @@ public static partial class OdfLocalizer
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Možnosti vyhodnotenia vzorcov nesmú byť null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Externý odkaz „{0}“ nemá hodnotu vo vyrovnávacej pamäti a nakonfigurované resolvery sú vypnuté.",
             ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "Identifikátor URI distribúcie CRL musí používať HTTP alebo HTTPS a smerovať iba na verejné sieťové adresy.",
+            ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Hodnota {1} parametra Argon2 {0} je mimo povoleného rozsahu {2} až {3}.",
+            ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Šifrovací algoritmus {1} nepodporuje veľkosť kľúča {0} bajtov; očakáva sa {2} bajtov.",
+            ["Err_OdfNode_CyclicTreeInsertion"] = "Uzol nemožno vložiť do seba samého ani do žiadneho zo svojich potomkov.",
         };
     }
 }

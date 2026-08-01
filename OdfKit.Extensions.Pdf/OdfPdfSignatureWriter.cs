@@ -15,6 +15,7 @@ internal static class OdfPdfSignatureWriter
 {
     private const int ContentsHexLength = 65536;
     private const string ByteRangePlaceholder = "/ByteRange [0000000000 0000000000 0000000000 0000000000]";
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(2);
 
     internal static void Sign(Stream unsignedPdfStream, Stream destination, X509Certificate2 certificate)
     {
@@ -86,7 +87,7 @@ internal static class OdfPdfSignatureWriter
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_UnableGeneratePdfReference"));
         }
 
-        Match match = Regex.Match(pdfText.Substring(marker), @"startxref\s+(?<offset>\d+)");
+        Match match = Regex.Match(pdfText.Substring(marker), @"startxref\s+(?<offset>\d+)", RegexOptions.None, RegexTimeout);
         return match.Success && int.TryParse(match.Groups["offset"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int offset)
             ? offset
             : throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_UnableGeneratePdfReference"));
@@ -94,7 +95,7 @@ internal static class OdfPdfSignatureWriter
 
     private static (int ObjectNumber, int Generation) FindRootReference(string pdfText)
     {
-        Match match = Regex.Match(pdfText, @"/Root\s+(?<obj>\d+)\s+(?<gen>\d+)\s+R", RegexOptions.RightToLeft);
+        Match match = Regex.Match(pdfText, @"/Root\s+(?<obj>\d+)\s+(?<gen>\d+)\s+R", RegexOptions.RightToLeft, RegexTimeout);
         if (!match.Success ||
             !int.TryParse(match.Groups["obj"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int objectNumber) ||
             !int.TryParse(match.Groups["gen"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int generation))
@@ -108,7 +109,7 @@ internal static class OdfPdfSignatureWriter
     private static int FindNextObjectNumber(string pdfText)
     {
         int max = 0;
-        foreach (Match match in Regex.Matches(pdfText, @"(?m)^\s*(?<obj>\d+)\s+\d+\s+obj\b"))
+        foreach (Match match in Regex.Matches(pdfText, @"(?m)^\s*(?<obj>\d+)\s+\d+\s+obj\b", RegexOptions.None, RegexTimeout))
         {
             if (int.TryParse(match.Groups["obj"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int objectNumber))
             {
@@ -156,16 +157,23 @@ internal static class OdfPdfSignatureWriter
     {
         Match match = Regex.Match(
             pdfText,
-            $@"(?s){rootObjectNumber}\s+{rootGeneration}\s+obj\s*(?<body><<.*?>>)\s*endobj");
+            $@"(?s){rootObjectNumber}\s+{rootGeneration}\s+obj\s*(?<body><<.*?>>)\s*endobj",
+            RegexOptions.None,
+            RegexTimeout);
         if (!match.Success)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_UnableGeneratePdfReference"));
         }
 
         string body = match.Groups["body"].Value;
-        if (Regex.IsMatch(body, @"/AcroForm\s+\d+\s+\d+\s+R"))
+        if (Regex.IsMatch(body, @"/AcroForm\s+\d+\s+\d+\s+R", RegexOptions.None, RegexTimeout))
         {
-            body = Regex.Replace(body, @"/AcroForm\s+\d+\s+\d+\s+R", $"/AcroForm {acroFormObjectNumber} 0 R");
+            body = Regex.Replace(
+                body,
+                @"/AcroForm\s+\d+\s+\d+\s+R",
+                $"/AcroForm {acroFormObjectNumber} 0 R",
+                RegexOptions.None,
+                RegexTimeout);
         }
         else
         {

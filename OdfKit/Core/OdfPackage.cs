@@ -216,11 +216,15 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
                 {
                     try
                     {
-                        entry.EnsureBytesLoaded();
+                        entry.LoadBytesForPrefetch();
                     }
                     catch (Exception ex)
                     {
                         OdfKitDiagnostics.Warn("背景預讀失敗；後續主線程存取將重新載入並回報錯誤。", ex);
+                    }
+                    finally
+                    {
+                        entry.CompletePrefetch();
                     }
                 }
             }
@@ -228,6 +232,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         catch (OperationCanceledException) when (_prefetchCts.IsCancellationRequested)
         {
             OdfKitDiagnostics.Info("背景預讀處理器已依封裝處置要求停止。");
+        }
+        finally
+        {
+            while (reader.TryRead(out OdfPackageEntry? pendingEntry))
+            {
+                pendingEntry.CompletePrefetch();
+            }
         }
     }
 #endif

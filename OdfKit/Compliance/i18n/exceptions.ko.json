@@ -639,5 +639,8 @@
   "Err_OdfPackageSaveHooks_FormulaOptionsNull": "저장할 때 계산하는 경우 수식 평가 옵션은 null일 수 없습니다.",
   "Err_SpreadsheetDocument_FormulaOptionsNull": "수식 평가 옵션은 null일 수 없습니다.",
   "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "외부 참조 '{0}'에 캐시된 값이 없으며 구성된 확인자가 비활성화되었습니다.",
-  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "CRL 배포 URI는 HTTP 또는 HTTPS를 사용하고 공용 네트워크 주소로만 확인되어야 합니다."
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "CRL 배포 URI는 HTTP 또는 HTTPS를 사용하고 공용 네트워크 주소로만 확인되어야 합니다.",
+  "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange": "Argon2 매개 변수 {0}의 값 {1}이 허용 범위 {2}~{3}을 벗어났습니다.",
+  "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm": "암호화 알고리즘 {1}은 {0}바이트 키 크기를 지원하지 않습니다. 예상 크기는 {2}바이트입니다.",
+  "Err_OdfNode_CyclicTreeInsertion": "노드는 자신 또는 자신의 하위 노드에 삽입할 수 없습니다."
 }

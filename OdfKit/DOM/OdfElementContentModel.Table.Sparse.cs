@@ -1173,28 +1173,40 @@ public partial class TableTableElement
     private static IntPtr DecompressPage(byte[] compressed)
     {
         IntPtr ptr = AllocatePageMemory();
+        bool succeeded = false;
 
-        using (var ms = new MemoryStream(compressed))
-        using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
-        using (var reader = new BinaryReader(ds, Encoding.UTF8, leaveOpen: false))
+        try
         {
-            unsafe
+            using (var ms = new MemoryStream(compressed))
+            using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+            using (var reader = new BinaryReader(ds, Encoding.UTF8, leaveOpen: false))
             {
-                NativeCell* cells = (NativeCell*)ptr;
-                for (int i = 0; i < PageSize * PageSize; i++)
+                unsafe
                 {
-                    cells[i].Type = reader.ReadByte();
-                    cells[i].FloatValue = reader.ReadDouble();
-                    cells[i].Ticks = reader.ReadInt64();
-                    cells[i].BoolValue = reader.ReadBoolean();
-                    cells[i].StyleNamePtr = StringToUtf8Ptr(reader.ReadString());
-                    cells[i].FormulaPtr = StringToUtf8Ptr(reader.ReadString());
-                    cells[i].StringValuePtr = StringToUtf8Ptr(reader.ReadString());
+                    NativeCell* cells = (NativeCell*)ptr;
+                    for (int i = 0; i < PageSize * PageSize; i++)
+                    {
+                        cells[i].Type = reader.ReadByte();
+                        cells[i].FloatValue = reader.ReadDouble();
+                        cells[i].Ticks = reader.ReadInt64();
+                        cells[i].BoolValue = reader.ReadBoolean();
+                        cells[i].StyleNamePtr = StringToUtf8Ptr(reader.ReadString());
+                        cells[i].FormulaPtr = StringToUtf8Ptr(reader.ReadString());
+                        cells[i].StringValuePtr = StringToUtf8Ptr(reader.ReadString());
+                    }
                 }
             }
-        }
 
-        return ptr;
+            succeeded = true;
+            return ptr;
+        }
+        finally
+        {
+            if (!succeeded)
+            {
+                ReleasePageMemory(ptr);
+            }
+        }
     }
 
     private static void ReleasePageMemory(IntPtr ptr)

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Xml.Linq;
 using OdfKit.Compliance;
@@ -41,6 +42,28 @@ public class OdfSecurityBoundaryTests
 
         options.MaxXmlCharactersInDocument = 0;
         Assert.Equal(0, options.MaxXmlCharactersInDocument);
+    }
+
+    /// <summary>
+    /// Verifies aggregate ZIP size accounting cannot wrap around and bypass the configured limit.
+    /// 驗證 ZIP 總大小累加不會因整數溢位而繞過設定的限制。
+    /// </summary>
+    [Fact]
+    public void AggregateZipSizeAccountingRejectsLongOverflow()
+    {
+        SecurityException exception = Assert.Throws<SecurityException>(() =>
+            OdfBoundedStreamReader.AddBytes(
+                long.MaxValue - 4,
+                8,
+                long.MaxValue,
+                "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded"));
+
+        Assert.Equal(
+            OdfLocalizer.GetMessage(
+                "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded",
+                long.MaxValue,
+                long.MaxValue),
+            exception.Message);
     }
 
     /// <summary>

@@ -182,4 +182,36 @@ public class StreamWriterExceptionSafetyTests
             }
         }
     }
+
+    /// <summary>
+    /// 驗證路徑式非同步儲存在取消時不會先截斷既有目的檔。
+    /// </summary>
+    [Fact]
+    public async Task DocumentSaveAsyncCancellationPreservesExistingDestination()
+    {
+        string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_document_save_cancel_{Guid.NewGuid():N}.odt");
+        byte[] original = Encoding.UTF8.GetBytes("existing destination must survive");
+        try
+        {
+            File.WriteAllBytes(tempPath, original);
+            using TextDocument document = TextDocument.Create();
+            document.AddParagraph("new content");
+            using var cts = new CancellationTokenSource();
+            await cts.CancelAsync();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => document.SaveAsync(tempPath, cts.Token));
+
+            Assert.Equal(original, File.ReadAllBytes(tempPath));
+            string pattern = $".{Path.GetFileName(tempPath)}.odfkit-save-*.tmp";
+            Assert.Empty(Directory.GetFiles(Path.GetDirectoryName(tempPath)!, pattern));
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
+    }
 }

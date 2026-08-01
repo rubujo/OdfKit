@@ -105,7 +105,16 @@ public static class OdfSvgExporter
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllText(path, Export(document, options), Encoding.UTF8);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            File.WriteAllText(temporaryPath, Export(document, options), Encoding.UTF8);
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     private static void WriteDrawingNode(OdfNode node, StringBuilder sb, SvgExportContext context)

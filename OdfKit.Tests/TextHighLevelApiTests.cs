@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Core;
@@ -21,6 +24,75 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class TextHighLevelApiTests
 {
+    /// <summary>
+    /// Verifies arbitrary mail-merge field names cannot grow the static accessor cache without bound.
+    /// 驗證任意套印欄位名稱不會使靜態存取器快取無上限成長。
+    /// </summary>
+    [Fact]
+    public void StreamingMailMergeExpressionCacheIsBounded()
+    {
+        Type cacheType = typeof(OdfStreamingMailMerge).GetNestedType(
+            "MailMergeExpressionCache",
+            BindingFlags.NonPublic) ?? throw new InvalidOperationException();
+        FieldInfo cacheField = cacheType.GetField("_cache", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException();
+        FieldInfo lockField = cacheType.GetField("_lock", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException();
+        MethodInfo getValue = cacheType.GetMethod("GetValue", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new InvalidOperationException();
+        var cache = (IDictionary)(cacheField.GetValue(null) ?? throw new InvalidOperationException());
+        object sync = lockField.GetValue(null) ?? throw new InvalidOperationException();
+        lock (sync)
+        {
+            cache.Clear();
+        }
+        var row = new { Known = "value" };
+
+        for (int index = 0; index < 5000; index++)
+        {
+            getValue.Invoke(null, [row, "Missing" + index.ToString(System.Globalization.CultureInfo.InvariantCulture)]);
+        }
+
+        lock (sync)
+        {
+            Assert.InRange(cache.Count, 1, 4096);
+        }
+    }
+
+    /// <summary>
+    /// Verifies every regular expression used for untrusted HTML fragments has a finite timeout.
+    /// 驗證處理不受信任 HTML 片段的每個規則運算式皆設定有限逾時。
+    /// </summary>
+    [Fact]
+    public void HtmlFragmentRegexesUseFiniteTimeouts()
+    {
+        _ = TextDocumentHtmlFragmentEngine.ParseHtmlSegments("<span style=\"color:red\">value</span>");
+        Type engineType = typeof(TextDocument).Assembly.GetType(
+            "OdfKit.Text.TextDocumentHtmlFragmentEngine",
+            throwOnError: true)!;
+
+        Type formulaShifterType = typeof(TextDocument).Assembly.GetType(
+            "OdfKit.Spreadsheet.OdfSpreadsheetFormulaReferenceShifter",
+            throwOnError: true)!;
+        Regex[] staticRegexes = new[] { engineType, typeof(TextDocument), formulaShifterType }
+            .SelectMany(type => type.GetFields(BindingFlags.NonPublic | BindingFlags.Static))
+            .Where(field => field.FieldType == typeof(Regex))
+            .Select(field => (Regex)field.GetValue(null)!)
+            .ToArray();
+
+        Assert.NotEmpty(staticRegexes);
+        Assert.All(staticRegexes, regex => Assert.NotEqual(Regex.InfiniteMatchTimeout, regex.MatchTimeout));
+
+        object cssCache = engineType.GetField(
+            "CssValueRegexCache",
+            BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
+        foreach (object entry in (IEnumerable)cssCache)
+        {
+            var regex = (Regex)entry.GetType().GetProperty("Value")!.GetValue(entry)!;
+            Assert.NotEqual(Regex.InfiniteMatchTimeout, regex.MatchTimeout);
+        }
+    }
+
     /// <summary>
     /// 驗證流式套印會以預編譯 XML 位元組區段輸出並正確逸出欄位值。
     /// </summary>

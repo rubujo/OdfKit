@@ -129,9 +129,26 @@ public static class OdfHybridPdfHelper
     {
         using var pdfSrc = new FileStream(pdfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var odfSrc = new FileStream(odfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        using var pdfDest = new FileStream(outputPdfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+        string? directory = Path.GetDirectoryName(outputPdfPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
 
-        InjectOdfToPdf(pdfSrc, odfSrc, pdfDest, Path.GetFileName(odfPath), password);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(outputPdfPath);
+        try
+        {
+            using (var pdfDest = new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None))
+            {
+                InjectOdfToPdf(pdfSrc, odfSrc, pdfDest, Path.GetFileName(odfPath), password);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(outputPdfPath));
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     /// <summary>

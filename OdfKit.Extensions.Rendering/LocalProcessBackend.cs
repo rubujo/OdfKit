@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using OdfKit.Compliance;
+using OdfKit.Core;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
@@ -58,14 +59,27 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
                 throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"));
             }
 
-            // 讀取為獨立的 MemoryStream
-            var ms = new MemoryStream();
-            using (var fs = new FileStream(outputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            // 回傳關閉即刪除的獨立暫存檔資料流，避免大型轉檔結果完整常駐記憶體。
+            Stream result = OdfTempStreamFactory.Create(
+                estimatedSize: 0,
+                temporaryDirectory: null,
+                async: true,
+                thresholdBytes: 0);
+            try
             {
-                await fs.CopyToAsync(ms, 81920, ct).ConfigureAwait(false);
+                using (var fs = new FileStream(outputFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, FileOptions.Asynchronous | FileOptions.SequentialScan))
+                {
+                    await fs.CopyToAsync(result, 81920, ct).ConfigureAwait(false);
+                }
+
+                result.Position = 0;
+                return result;
             }
-            ms.Position = 0;
-            return ms;
+            catch
+            {
+                result.Dispose();
+                throw;
+            }
         }
         finally
         {

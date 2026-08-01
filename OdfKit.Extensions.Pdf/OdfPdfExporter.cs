@@ -51,8 +51,22 @@ public static class OdfPdfExporter
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
-        using FileStream stream = File.Create(path);
-        return ExportToStream(document, stream);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            OdfExportReport report;
+            using (FileStream stream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                report = ExportToStream(document, stream);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+            return report;
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     /// <summary>
@@ -86,8 +100,22 @@ public static class OdfPdfExporter
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
-        using FileStream stream = File.Create(path);
-        return await ExportToStreamAsync(document, stream, cancellationToken).ConfigureAwait(false);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            OdfExportReport report;
+            using (FileStream stream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
+            {
+                report = await ExportToStreamAsync(document, stream, cancellationToken).ConfigureAwait(false);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+            return report;
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     static OdfPdfExporter()

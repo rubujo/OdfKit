@@ -75,10 +75,21 @@ public static class SqlServerWebFontTextReader
         }
 
         var bytes = new byte[(int)length];
-        long read = reader.GetBytes(ordinal, 0, bytes, 0, bytes.Length);
-        if (read != length)
+        int totalRead = 0;
+        while (totalRead < bytes.Length)
         {
-            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            long read = reader.GetBytes(
+                ordinal,
+                totalRead,
+                bytes,
+                totalRead,
+                bytes.Length - totalRead);
+            if (read <= 0 || read > bytes.Length - totalRead)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
+            }
+
+            totalRead = checked(totalRead + (int)read);
         }
 
         return WebFontTextSequence.Create(mappingProvider.Decode(bytes));

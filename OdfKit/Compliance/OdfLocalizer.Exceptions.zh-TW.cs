@@ -658,6 +658,9 @@ public static partial class OdfLocalizer
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "公式評估選項不得為 null。",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "外部參照「{0}」沒有快取值，且已停用設定的解析器。",
             ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL 分發 URI 必須使用 HTTP 或 HTTPS，且只能解析至公用網路位址。",
+            ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Argon2 參數 {0} 的值 {1} 超出允許範圍 {2} 至 {3}。",
+            ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "加密演算法 {1} 不支援 {0} 位元組的金鑰大小；預期為 {2} 位元組。",
+            ["Err_OdfNode_CyclicTreeInsertion"] = "節點不可插入自身或其任一後代節點。",
         };
     }
 }

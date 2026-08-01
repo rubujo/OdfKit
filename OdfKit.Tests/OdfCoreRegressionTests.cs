@@ -388,6 +388,36 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void OdfPackageDisposeReleasesEntriesWhenUnderlyingDisposeFails()
+        {
+            var underlying = new ThrowingDisposeMemoryStream();
+            var package = OdfPackage.Create(underlying, leaveOpen: false);
+            var entryStream = new TrackingMemoryStream();
+            package.LoadCollaborators.Entries["content.xml"] = new OdfPackageEntry("content.xml", entryStream);
+
+            IOException exception = Assert.Throws<IOException>(package.Dispose);
+
+            Assert.Equal("Expected dispose failure.", exception.Message);
+            Assert.True(entryStream.DisposeCalled);
+            package.Dispose();
+        }
+
+        [Fact]
+        public async Task OdfPackageDisposeAsyncReleasesEntriesWhenUnderlyingDisposeFails()
+        {
+            var underlying = new ThrowingAsyncDisposeMemoryStream();
+            var package = OdfPackage.Create(underlying, leaveOpen: false);
+            var entryStream = new TrackingMemoryStream();
+            package.LoadCollaborators.Entries["content.xml"] = new OdfPackageEntry("content.xml", entryStream);
+
+            IOException exception = await Assert.ThrowsAsync<IOException>(async () => await package.DisposeAsync());
+
+            Assert.Equal("Expected async dispose failure.", exception.Message);
+            Assert.True(entryStream.DisposeCalled);
+            await package.DisposeAsync();
+        }
+
+        [Fact]
         public void OdfPackageFallsBackToBclZipWhenMmfLoadResetsMidStream()
         {
             string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_fallback_{Guid.NewGuid():N}.odt");
@@ -478,6 +508,24 @@ namespace OdfKit.Tests
             {
                 DisposeCalled = true;
                 base.Dispose(disposing);
+            }
+        }
+
+        private sealed class ThrowingDisposeMemoryStream : MemoryStream
+        {
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+                throw new IOException("Expected dispose failure.");
+            }
+        }
+
+        private sealed class ThrowingAsyncDisposeMemoryStream : MemoryStream
+        {
+            public override async ValueTask DisposeAsync()
+            {
+                await base.DisposeAsync();
+                throw new IOException("Expected async dispose failure.");
             }
         }
 

@@ -639,5 +639,8 @@
   "Err_OdfPackageSaveHooks_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null apabila mengira semasa simpan.",
   "Err_SpreadsheetDocument_FormulaOptionsNull": "Pilihan penilaian formula tidak boleh null.",
   "Err_OdfFormulaEvaluation_ExternalReferenceDenied": "Rujukan luaran '{0}' tiada nilai cache dan penyelesai yang dikonfigurasi dinyahdayakan.",
-  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "URI pengedaran CRL mesti menggunakan HTTP atau HTTPS dan hanya menyelesaikan kepada alamat rangkaian awam."
+  "Err_OdfSignatureTsaClient_UnsafeCrlUri": "URI pengedaran CRL mesti menggunakan HTTP atau HTTPS dan hanya menyelesaikan kepada alamat rangkaian awam.",
+  "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange": "Nilai {1} bagi parameter Argon2 {0} berada di luar julat yang dibenarkan, {2} hingga {3}.",
+  "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm": "Algoritma penyulitan {1} tidak menyokong saiz kunci {0} bait; {2} bait dijangkakan.",
+  "Err_OdfNode_CyclicTreeInsertion": "Nod tidak boleh disisipkan ke dalam dirinya sendiri atau mana-mana nod turunannya."
 }

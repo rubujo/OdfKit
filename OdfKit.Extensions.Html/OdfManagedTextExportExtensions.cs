@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using OdfKit.Core;
 using OdfKit.Drawing;
 using OdfKit.Text;
 
@@ -151,6 +152,15 @@ public static class OdfManagedTextExportExtensions
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllText(path, content, Encoding.UTF8);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            File.WriteAllText(temporaryPath, content, Encoding.UTF8);
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 }

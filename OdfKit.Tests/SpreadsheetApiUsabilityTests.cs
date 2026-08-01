@@ -286,6 +286,69 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證公式評估通道在滿載時不會靜默丟棄請求，且非同步送入會等待可用容量。
+    /// </summary>
+    [Fact]
+    public async Task FormulaEvaluationChannelEnforcesCapacityWithoutDroppingRequestsAsync()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        using var evaluationStarted = new ManualResetEventSlim();
+        using var releaseEvaluation = new ManualResetEventSlim();
+        var channel = new OdfFormulaEvaluationChannel(
+            workbook,
+            capacity: 1,
+            () =>
+            {
+                evaluationStarted.Set();
+                releaseEvaluation.Wait(TestContext.Current.CancellationToken);
+            },
+            TestContext.Current.CancellationToken);
+
+        try
+        {
+            Assert.True(channel.TryEnqueue());
+            Assert.True(evaluationStarted.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+            Assert.False(channel.TryEnqueue());
+
+            ValueTask pendingEnqueue = channel.EnqueueAsync(TestContext.Current.CancellationToken);
+            Assert.False(pendingEnqueue.IsCompleted);
+
+            releaseEvaluation.Set();
+            await pendingEnqueue;
+            await channel.WaitForIdleAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+            Assert.Equal(2, channel.SubmittedCount);
+            Assert.Equal(2, channel.CompletedCount);
+        }
+        finally
+        {
+            releaseEvaluation.Set();
+            await channel.DisposeAsync();
+        }
+    }
+
+    /// <summary>
+    /// 驗證公式評估背景工作失敗會直接傳遞原始例外，而非誤報閒置等待逾時。
+    /// </summary>
+    [Fact]
+    public async Task FormulaEvaluationChannelPropagatesWorkerFailureAsync()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var channel = new OdfFormulaEvaluationChannel(
+            workbook,
+            capacity: 1,
+            () => throw new InvalidOperationException("Expected evaluation failure."),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(channel.TryEnqueue());
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => channel.WaitForIdleAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+
+        Assert.Equal("Expected evaluation failure.", exception.Message);
+        Assert.Throws<InvalidOperationException>(channel.Dispose);
+    }
+
+    /// <summary>
     /// 驗證可直接保存到路徑再從路徑載入。
     /// </summary>
     [Fact]

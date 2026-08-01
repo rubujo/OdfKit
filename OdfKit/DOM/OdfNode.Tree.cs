@@ -27,6 +27,8 @@ public partial class OdfNode
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
         }
 
+        EnsureCanAdoptChild(child);
+
         IsModified = true;
         child.Parent?.RemoveChild(child);
         Children.Append(child);
@@ -55,6 +57,13 @@ public partial class OdfNode
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_ReferenceNodeChildNode_2"));
         }
+
+        if (ReferenceEquals(newChild, refChild))
+        {
+            return;
+        }
+
+        EnsureCanAdoptChild(newChild);
 
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
@@ -85,6 +94,13 @@ public partial class OdfNode
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_ReferenceNodeChildNode_2"));
         }
 
+        if (ReferenceEquals(newChild, refChild))
+        {
+            return;
+        }
+
+        EnsureCanAdoptChild(newChild);
+
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
         Children.InsertAfter(newChild, refChild);
@@ -109,10 +125,21 @@ public partial class OdfNode
         }
 
         IsModified = true;
-        Children.Remove(child);
+        Children.Unlink(child);
         child.InvalidateStyle();
         InvalidateStyle();
         return true;
+    }
+
+    internal void EnsureCanAdoptChild(OdfNode child)
+    {
+        for (OdfNode? ancestor = this; ancestor is not null; ancestor = ancestor.Parent)
+        {
+            if (ReferenceEquals(ancestor, child))
+            {
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CyclicTreeInsertion"));
+            }
+        }
     }
 
     /// <summary>

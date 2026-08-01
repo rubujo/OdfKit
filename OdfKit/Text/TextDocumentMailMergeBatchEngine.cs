@@ -17,14 +17,30 @@ internal static class TextDocumentMailMergeBatchEngine
         where T : notnull
     {
         var result = new List<TextDocument>();
-        foreach (T record in records)
+        try
         {
-            TextDocument clone = Clone(template);
-            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
-            result.Add(clone);
-        }
+            foreach (T record in records)
+            {
+                TextDocument clone = Clone(template);
+                try
+                {
+                    new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
+                    result.Add(clone);
+                }
+                catch
+                {
+                    DisposeWithoutThrowing(clone);
+                    throw;
+                }
+            }
 
-        return result;
+            return result;
+        }
+        catch
+        {
+            DisposeWithoutThrowing(result);
+            throw;
+        }
     }
 
     /// <summary>
@@ -35,14 +51,30 @@ internal static class TextDocumentMailMergeBatchEngine
         IEnumerable<IReadOnlyDictionary<string, object?>> records)
     {
         var result = new List<TextDocument>();
-        foreach (IReadOnlyDictionary<string, object?> record in records)
+        try
         {
-            TextDocument clone = Clone(template);
-            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
-            result.Add(clone);
-        }
+            foreach (IReadOnlyDictionary<string, object?> record in records)
+            {
+                TextDocument clone = Clone(template);
+                try
+                {
+                    new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
+                    result.Add(clone);
+                }
+                catch
+                {
+                    DisposeWithoutThrowing(clone);
+                    throw;
+                }
+            }
 
-        return result;
+            return result;
+        }
+        catch
+        {
+            DisposeWithoutThrowing(result);
+            throw;
+        }
     }
 
     private static TextDocument Clone(TextDocument document)
@@ -51,5 +83,25 @@ internal static class TextDocumentMailMergeBatchEngine
         document.SaveToStream(ms);
         ms.Position = 0;
         return (TextDocument)OdfDocumentFactory.LoadDocument(ms);
+    }
+
+    private static void DisposeWithoutThrowing(IEnumerable<TextDocument> documents)
+    {
+        foreach (TextDocument document in documents)
+        {
+            DisposeWithoutThrowing(document);
+        }
+    }
+
+    private static void DisposeWithoutThrowing(TextDocument document)
+    {
+        try
+        {
+            document.Dispose();
+        }
+        catch
+        {
+            // Preserve the primary mail-merge failure while making a best effort to release every clone.
+        }
     }
 }

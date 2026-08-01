@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Core;
 
 namespace OdfKit.Export;
 
@@ -53,8 +54,22 @@ internal static class OdfManagedExportWriter
     internal static OdfExportReport WritePath(string path, string content, OdfExportFormat format, string backend)
     {
         EnsureDirectory(path);
-        using FileStream stream = File.Create(path);
-        return Write(stream, content, format, backend);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            OdfExportReport report;
+            using (FileStream stream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                report = Write(stream, content, format, backend);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+            return report;
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     internal static async Task<OdfExportReport> WritePathAsync(
@@ -66,8 +81,22 @@ internal static class OdfManagedExportWriter
     {
         cancellationToken.ThrowIfCancellationRequested();
         EnsureDirectory(path);
-        using FileStream stream = File.Create(path);
-        return await WriteAsync(stream, content, format, backend, cancellationToken).ConfigureAwait(false);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            OdfExportReport report;
+            using (FileStream stream = new(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
+            {
+                report = await WriteAsync(stream, content, format, backend, cancellationToken).ConfigureAwait(false);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+            return report;
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     private static void EnsureDirectory(string path)

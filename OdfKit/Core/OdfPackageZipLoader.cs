@@ -102,12 +102,11 @@ internal static class OdfPackageZipLoader
                     OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, entry.Length, ctx.LoadOptions.MaxEntrySize));
             }
 
-            totalUncompressedSize += entry.Length;
-            if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
-            {
-                throw new SecurityException(
-                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
-            }
+            totalUncompressedSize = OdfBoundedStreamReader.AddBytes(
+                totalUncompressedSize,
+                entry.Length,
+                ctx.LoadOptions.MaxTotalUncompressedSize,
+                "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded");
 
             OdfPackageEntry pkgEntry;
             if (ctx.LoadOptions.AllowLazyLoading)
@@ -241,12 +240,11 @@ internal static class OdfPackageZipLoader
                     OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, entry.Length, ctx.LoadOptions.MaxEntrySize));
             }
 
-            totalUncompressedSize += entry.Length;
-            if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
-            {
-                throw new SecurityException(
-                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
-            }
+            totalUncompressedSize = OdfBoundedStreamReader.AddBytes(
+                totalUncompressedSize,
+                entry.Length,
+                ctx.LoadOptions.MaxTotalUncompressedSize,
+                "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded");
 
             OdfPackageEntry pkgEntry;
             if (ctx.LoadOptions.AllowLazyLoading)
@@ -632,12 +630,11 @@ internal static class OdfPackageZipLoader
                     OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, mmfEntry.UncompressedSize, ctx.LoadOptions.MaxEntrySize));
             }
 
-            totalUncompressedSize += mmfEntry.UncompressedSize;
-            if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
-            {
-                throw new SecurityException(
-                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
-            }
+            totalUncompressedSize = OdfBoundedStreamReader.AddBytes(
+                totalUncompressedSize,
+                mmfEntry.UncompressedSize,
+                ctx.LoadOptions.MaxTotalUncompressedSize,
+                "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded");
 
             OdfPackageEntry pkgEntry;
             if (ctx.LoadOptions.AllowLazyLoading)

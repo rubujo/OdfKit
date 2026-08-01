@@ -36,25 +36,37 @@ internal static class SidecarProtocol
     private static readonly UTF8Encoding StrictUtf8 = new(false, true);
 
     public static byte[] CreateHealthRequest(string token)
-        => CreatePayload(writer => WriteString(writer, token));
+    {
+        ValidateStringForWire(token, 512);
+        return CreatePayload(writer => WriteString(writer, token));
+    }
 
     public static byte[] CreateGenerateRequest(string token, WebFontSubsetRequest request)
-        => CreatePayload(writer =>
+    {
+        ValidateStringForWire(token, 512);
+        ValidateRequestForWire(request);
+        return CreatePayload(writer =>
         {
             WriteString(writer, token);
             WriteRequest(writer, request);
         });
+    }
 
     public static byte[] CreateFilterRequest(
         string token,
         WebFontFaceIdentity face,
         IReadOnlyList<WebFontTextSequence> sequences)
-        => CreatePayload(writer =>
+    {
+        ValidateStringForWire(token, 512);
+        ValidateFaceForWire(face);
+        ValidateSequencesForWire(sequences);
+        return CreatePayload(writer =>
         {
             WriteString(writer, token);
             WriteFace(writer, face);
             WriteSequences(writer, sequences);
         });
+    }
 
     public static string ReadToken(BinaryReader reader)
         => ReadString(reader, 512);
@@ -270,6 +282,84 @@ internal static class SidecarProtocol
         WriteSequences(writer, request.Sequences);
         WriteEnums(writer, request.Formats);
         WriteEnums(writer, request.RequiredBrowserTargets);
+    }
+
+    private static void ValidateRequestForWire(WebFontSubsetRequest request)
+    {
+        if (request is null)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+
+        ValidateFaceForWire(request.Face);
+        ValidateStringForWire(request.ProfileId, 1024);
+        ValidateStringForWire(request.FontFamily, 1024);
+        ValidateSequencesForWire(request.Sequences);
+        ValidateEnumsForWire(request.Formats, 4);
+        ValidateEnumsForWire(request.RequiredBrowserTargets, 3);
+    }
+
+    private static void ValidateFaceForWire(WebFontFaceIdentity face)
+    {
+        if (face is null || face.FaceIndex < 0)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+
+        ValidateStringForWire(face.FontSourceId, 1024);
+        ValidateStringForWire(face.SourceSha256, 128);
+    }
+
+    private static void ValidateSequencesForWire(IReadOnlyList<WebFontTextSequence> sequences)
+    {
+        if (sequences is null || sequences.Count > 4096)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+
+        long scalarCount = 0;
+        foreach (WebFontTextSequence sequence in sequences)
+        {
+            if (sequence is null)
+            {
+                throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+            }
+
+            scalarCount += sequence.UnicodeScalars.Count;
+            if (scalarCount > 65536)
+            {
+                throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+            }
+
+            ValidateStringForWire(sequence.Text, 65536 * 4);
+        }
+    }
+
+    private static void ValidateEnumsForWire<T>(IReadOnlyList<T> values, int maximumCount)
+        where T : struct, Enum
+    {
+        if (values is null || values.Count > maximumCount || values.Any(value => !IsDefinedEnum(value)))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
+    }
+
+    private static bool IsDefinedEnum<T>(T value)
+        where T : struct, Enum
+    {
+#if NET6_0_OR_GREATER
+        return Enum.IsDefined(value);
+#else
+        return Enum.IsDefined(typeof(T), value);
+#endif
+    }
+
+    private static void ValidateStringForWire(string value, int maximumBytes)
+    {
+        if (value is null || StrictUtf8.GetByteCount(value) > maximumBytes)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
     }
 
     private static void WriteFace(BinaryWriter writer, WebFontFaceIdentity face)

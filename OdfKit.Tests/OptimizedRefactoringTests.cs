@@ -1281,6 +1281,32 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
+    public void TestOdfDoubleBufferedWritableStreamValidatesSyncWriteRange()
+    {
+        using var target = new MemoryStream();
+        using var stream = new OdfDoubleBufferedWritableStream(target, bufferSize: 16, leaveOpen: true);
+        byte[] buffer = new byte[4];
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(buffer, 0, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(buffer, -1, 1));
+        Assert.Throws<ArgumentException>(() => stream.Write(buffer, 3, 2));
+    }
+
+    [Fact]
+    public void TestOdfDoubleBufferedWritableStreamDisposePropagatesFlushFailureAndReturnsBuffers()
+    {
+        int returnedBefore = OdfDoubleBufferedWritableStream.ReturnedBufferCountForTests;
+        var target = new MemoryStream();
+        var stream = new OdfDoubleBufferedWritableStream(target, bufferSize: 16, leaveOpen: true);
+        stream.WriteByte(42);
+        target.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(stream.Dispose);
+        Assert.Equal(returnedBefore + 2, OdfDoubleBufferedWritableStream.ReturnedBufferCountForTests);
+        Assert.False(stream.CanWrite);
+    }
+
+    [Fact]
     public async Task TestOdfPagedGatherWritableStreamBatchesPagesAndFallsBackForNonFileStream()
     {
         byte[] expected = Enumerable.Range(0, 192)
@@ -1639,6 +1665,43 @@ public partial class OptimizedRefactoringTests
                 int read = await reader.ReadAsync(buffer.AsMemory(), TestContext.Current.CancellationToken);
                 Assert.Equal(payload.Length, read);
                 Assert.Equal(payload, buffer.Take(read).ToArray());
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public void TestDirectIoWritableStreamFlushPublishesBufferedTailAndAllowsFurtherWrites()
+    {
+        static byte[] ReadShared(string path)
+        {
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var buffer = new MemoryStream();
+            stream.CopyTo(buffer);
+            return buffer.ToArray();
+        }
+
+        string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoFlush_{Guid.NewGuid():N}.bin");
+        try
+        {
+            byte[] first = Enumerable.Range(0, 123).Select(i => (byte)i).ToArray();
+            byte[] second = Enumerable.Range(0, 57).Select(i => (byte)(200 - i)).ToArray();
+
+            using (var writer = new OdfDirectIoWritableStream(tempFile))
+            {
+                writer.Write(first);
+                writer.Flush();
+                Assert.Equal(first, ReadShared(tempFile));
+
+                writer.Write(second);
+                writer.Flush();
+                Assert.Equal(first.Concat(second), ReadShared(tempFile));
             }
         }
         finally

@@ -88,7 +88,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// 執行 Add 作業。
     /// </summary>
     /// <inheritdoc />
-    public void Add(OdfNode item) => Append(item);
+    public void Add(OdfNode item) => _owner.AppendChild(item);
 
     /// <summary>
     /// Performs the Clear operation.
@@ -98,11 +98,9 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     public void Clear()
     {
         _owner.EnsureMaterialized();
-        for (OdfNode? node = _owner.FirstChild; node is not null;)
+        while (_owner.FirstChild is OdfNode child)
         {
-            OdfNode? next = node.NextSibling;
-            Unlink(node);
-            node = next;
+            _owner.RemoveChild(child);
         }
     }
 
@@ -202,12 +200,12 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
         if (index == _count)
         {
-            Append(item);
+            _owner.AppendChild(item);
             return;
         }
 
         OdfNode refChild = this[index];
-        InsertBefore(item, refChild);
+        _owner.InsertBefore(item, refChild);
     }
 
     /// <summary>
@@ -222,8 +220,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
             return false;
         }
 
-        Unlink(item);
-        return true;
+        return _owner.RemoveChild(item);
     }
 
     /// <summary>
@@ -234,7 +231,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     public void RemoveAt(int index)
     {
         OdfNode child = this[index];
-        Unlink(child);
+        _owner.RemoveChild(child);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -243,6 +240,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(child, nameof(child));
 
+        _owner.EnsureCanAdoptChild(child);
         child.DetachFromParent();
         LinkLast(child);
     }
@@ -257,6 +255,12 @@ public sealed class OdfNodeChildList : IList<OdfNode>
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
         }
 
+        if (ReferenceEquals(newChild, refChild))
+        {
+            return;
+        }
+
+        _owner.EnsureCanAdoptChild(newChild);
         newChild.DetachFromParent();
         LinkBefore(newChild, refChild);
     }
@@ -271,6 +275,12 @@ public sealed class OdfNodeChildList : IList<OdfNode>
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
         }
 
+        if (ReferenceEquals(newChild, refChild))
+        {
+            return;
+        }
+
+        _owner.EnsureCanAdoptChild(newChild);
         newChild.DetachFromParent();
         if (refChild.NextSibling is null)
         {

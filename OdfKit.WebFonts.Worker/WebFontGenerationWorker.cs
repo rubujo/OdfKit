@@ -131,9 +131,13 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
         WebFontFaceIdentity face,
         IReadOnlyList<WebFontTextSequence> sequences,
         CancellationToken cancellationToken = default)
-        => _engine is IWebFontTextCoverageFilter coverageFilter
+    {
+        ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposeState) != 0, this);
+        ValidateCoverageRequest(face, sequences);
+        return _engine is IWebFontTextCoverageFilter coverageFilter
             ? coverageFilter.FilterSupportedSequencesAsync(face, sequences, cancellationToken)
             : Task.FromResult(sequences);
+    }
 
     /// <summary>
     /// Stops worker consumers and releases owned resources asynchronously.
@@ -260,11 +264,17 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
             || !IsSha256(request.Face.SourceSha256)
             || request.Face.FaceIndex < 0
             || string.IsNullOrWhiteSpace(request.ProfileId)
+            || request.ProfileId.Length > 1024
             || string.IsNullOrWhiteSpace(request.FontFamily)
+            || request.FontFamily.Length > 1024
             || request.Sequences is not { Count: > 0 }
+            || request.Sequences.Count > 4096
             || request.Sequences.Any(sequence => sequence is null)
+            || request.Sequences.Sum(sequence => (long)sequence.UnicodeScalars.Count) > 65536
             || request.Formats is not { Count: > 0 }
+            || request.Formats.Count > 4
             || request.RequiredBrowserTargets is null
+            || request.RequiredBrowserTargets.Count > 3
             || string.IsNullOrWhiteSpace(destinationDirectory))
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
@@ -306,6 +316,24 @@ public sealed class WebFontGenerationWorker : IWebFontSubsetEngine, IWebFontText
         }
 
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString())));
+    }
+
+    private static void ValidateCoverageRequest(
+        WebFontFaceIdentity face,
+        IReadOnlyList<WebFontTextSequence> sequences)
+    {
+        if (face is null
+            || string.IsNullOrWhiteSpace(face.FontSourceId)
+            || face.FontSourceId.Length > 1024
+            || !IsSha256(face.SourceSha256)
+            || face.FaceIndex < 0
+            || sequences is null
+            || sequences.Count > 4096
+            || sequences.Any(sequence => sequence is null)
+            || sequences.Sum(sequence => (long)sequence.UnicodeScalars.Count) > 65536)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_WebFont_RequestInvalid"));
+        }
     }
 
     private void TryCacheCompleted(string key, WebFontManifest manifest)

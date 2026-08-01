@@ -340,6 +340,11 @@ public sealed class WebFontWorkerTests
             CreateRequest("disposed"),
             Path.GetTempPath(),
             TestContext.Current.CancellationToken));
+        WebFontSubsetRequest disposedRequest = CreateRequest("disposed-filter");
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => worker.FilterSupportedSequencesAsync(
+            disposedRequest.Face,
+            disposedRequest.Sequences,
+            TestContext.Current.CancellationToken));
     }
 
     [Fact]

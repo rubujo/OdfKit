@@ -1620,7 +1620,11 @@ public static class OdfToXlsxConverter
 
     private static ValidationRule? ParseValidationRule(string condition)
     {
-        Match match = Regex.Match(condition, @"is-between\(([^,]+),([^)]+)\)", RegexOptions.CultureInvariant);
+        Match match = Regex.Match(
+            condition,
+            @"is-between\(([^,]+),([^)]+)\)",
+            RegexOptions.CultureInvariant,
+            TimeSpan.FromSeconds(2));
         if (!match.Success)
         {
             return null;

@@ -106,6 +106,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     /// <inheritdoc />
     public override void Flush()
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDoubleBufferedWritableStream));
         _writeTask.GetAwaiter().GetResult();
         if (_activeCount > 0)
         {
@@ -122,6 +123,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     /// <inheritdoc />
     public override async Task FlushAsync(CancellationToken cancellationToken)
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDoubleBufferedWritableStream));
         await _writeTask.ConfigureAwait(false);
         if (_activeCount > 0)
         {
@@ -164,6 +166,16 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     public override void Write(byte[] buffer, int offset, int count)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDoubleBufferedWritableStream));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(buffer, nameof(buffer));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(offset, nameof(offset));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(count, nameof(count));
+        if (buffer.Length - offset < count)
+        {
+            throw new ArgumentException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_ArgumentOutOfRange_Count"),
+                nameof(count));
+        }
+
         int bytesWritten = 0;
         while (bytesWritten < count)
         {
@@ -270,20 +282,25 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
                 {
                     Flush();
                 }
-                catch
+                finally
                 {
-                    // 忽略處置期間的刷寫異常
+                    try
+                    {
+                        _semaphore.Dispose();
+                        if (!_leaveOpen)
+                        {
+                            _underlyingStream.Dispose();
+                        }
+                    }
+                    finally
+                    {
+                        // 歸還前抹除緩衝區內容，避免文件明文殘留於共用集區被其他租用者讀到。
+                        ArrayPool<byte>.Shared.Return(_bufferA, clearArray: true);
+                        ArrayPool<byte>.Shared.Return(_bufferB, clearArray: true);
+                        Interlocked.Add(ref ReturnedBufferCountForTests, 2);
+                        _isDisposed = true;
+                    }
                 }
-                _semaphore.Dispose();
-                if (!_leaveOpen)
-                {
-                    _underlyingStream.Dispose();
-                }
-
-                // 歸還前抹除緩衝區內容，避免文件明文殘留於共用集區被其他租用者讀到。
-                ArrayPool<byte>.Shared.Return(_bufferA, clearArray: true);
-                ArrayPool<byte>.Shared.Return(_bufferB, clearArray: true);
-                Interlocked.Add(ref ReturnedBufferCountForTests, 2);
             }
             _isDisposed = true;
         }

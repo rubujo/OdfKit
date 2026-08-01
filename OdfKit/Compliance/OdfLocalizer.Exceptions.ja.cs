@@ -658,6 +658,9 @@ public static partial class OdfLocalizer
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "数式評価オプションを null にすることはできません。",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "外部参照「{0}」にキャッシュ値がなく、構成済みリゾルバーは無効です。",
             ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "CRL 配布 URI は HTTP または HTTPS を使用し、公開ネットワークアドレスだけに解決される必要があります。",
+            ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Argon2 パラメーター {0} の値 {1} は許可範囲 {2}～{3} 外です。",
+            ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "暗号化アルゴリズム {1} は {0} バイトのキーサイズをサポートしていません。{2} バイトが必要です。",
+            ["Err_OdfNode_CyclicTreeInsertion"] = "ノードを自身またはその子孫に挿入することはできません。",
         };
     }
 }

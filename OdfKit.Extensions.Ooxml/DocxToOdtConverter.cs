@@ -20,6 +20,8 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class DocxToOdtConverter
 {
+    private const long MaxConverterXmlCharactersInPart = 64L * 1024 * 1024;
+
     /// <summary>
     /// Converts a DOCX document to ODT.
     /// 從 DOCX 資料流讀取並建立對應的 ODT 文字文件。
@@ -32,7 +34,10 @@ public static class DocxToOdtConverter
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(docxStream, nameof(docxStream));
 
-        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        using var wordDocument = WordprocessingDocument.Open(
+            docxStream,
+            false,
+            new OpenSettings { MaxCharactersInPart = MaxConverterXmlCharactersInPart });
         MainDocumentPart mainPart = wordDocument.MainDocumentPart
             ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_DocxToOdtConverter_DocxNotFound"));
         WP.Document document = mainPart.Document

@@ -26,6 +26,11 @@ public static class XlsxToOdfConverter
     private const long MaxConverterPackageBytes = 1024L * 1024 * 1024;
     private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
 
+    private static OpenSettings CreateOpenSettings() => new()
+    {
+        MaxCharactersInPart = MaxConverterXmlCharactersInDocument
+    };
+
     /// <summary>
     /// 以禁用外部 DTD／實體解析的安全設定載入 XML 子部件，防禦 XXE。
     /// </summary>
@@ -121,7 +126,7 @@ public static class XlsxToOdfConverter
 
     private static bool HasPivotTables(Stream xlsxStream)
     {
-        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false, CreateOpenSettings());
         WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
         if (workbookPart?.Workbook is null)
         {
@@ -135,7 +140,7 @@ public static class XlsxToOdfConverter
 
     private static void CopyWorkbookFromOpenXml(Stream xlsxStream, OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook)
     {
-        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false, CreateOpenSettings());
         WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
         if (workbookPart?.Workbook?.Sheets is null)
         {
@@ -634,7 +639,7 @@ public static class XlsxToOdfConverter
     {
         try
         {
-            using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+            using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false, CreateOpenSettings());
             WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
             if (workbookPart?.Workbook is null)
             {
@@ -773,7 +778,7 @@ public static class XlsxToOdfConverter
     {
         try
         {
-            using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+            using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false, CreateOpenSettings());
             WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
             if (workbookPart?.Workbook is null)
             {

@@ -6,9 +6,11 @@ namespace OdfKit.Spreadsheet;
 
 internal static class OdfSpreadsheetFormulaReferenceShifter
 {
+    private static readonly TimeSpan s_regexTimeout = TimeSpan.FromSeconds(2);
     private static readonly Regex s_cellReferenceRegex = new(
         @"(?<sheet>(?:'[^']+'|[A-Za-z_][A-Za-z0-9_ ]*)\.)?(?<columnAbs>\$?)(?<column>[A-Za-z]+)(?<rowAbs>\$?)(?<row>\d+)",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        s_regexTimeout);
 
     internal static string ShiftRelativeRows(string formula, int rowOffset)
     {

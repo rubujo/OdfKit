@@ -22,6 +22,7 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class PptxToOdpConverter
 {
+    private const long MaxConverterXmlCharactersInPart = 64L * 1024 * 1024;
     private const string OoxmlCompatNamespace = "urn:odfkit:ooxml:compatibility";
     private const string PresentationMlNamespace = "http://schemas.openxmlformats.org/presentationml/2006/main";
     private const double EmusPerPoint = OdfLength.EmusPerInch / 72d;
@@ -41,7 +42,10 @@ public static class PptxToOdpConverter
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(pptxStream, nameof(pptxStream));
 
-        using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
+        using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(
+            pptxStream,
+            false,
+            new OpenSettings { MaxCharactersInPart = MaxConverterXmlCharactersInPart });
         var odp = OdfPresentationDocument.Create();
         PresentationPart? presentationPart = pptx.PresentationPart;
         if (presentationPart is null)

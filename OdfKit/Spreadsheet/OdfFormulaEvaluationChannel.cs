@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
-#if NET10_0_OR_GREATER
-using System.Threading.Channels;
-#endif
 using System.Threading.Tasks;
 using OdfKit.Core;
 
@@ -15,13 +12,10 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 {
-    private readonly SpreadsheetDocument _document;
-#if NET10_0_OR_GREATER
-    private readonly Channel<bool> _channel;
-#else
+    private readonly Action _evaluateFormulas;
     private readonly ConcurrentQueue<bool> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
-#endif
+    private readonly SemaphoreSlim _availableSlots;
     private readonly CancellationTokenSource _cts;
     private readonly Task _worker;
     private int _submittedCount;
@@ -29,18 +23,25 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     private bool _disposed;
 
     internal OdfFormulaEvaluationChannel(SpreadsheetDocument document, int capacity, CancellationToken cancellationToken)
+        : this(
+            document,
+            capacity,
+            () => (document ?? throw new ArgumentNullException(nameof(document))).EvaluateFormulas(),
+            cancellationToken)
     {
-        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    internal OdfFormulaEvaluationChannel(
+        SpreadsheetDocument document,
+        int capacity,
+        Action evaluateFormulas,
+        CancellationToken cancellationToken)
+    {
+        _ = document ?? throw new ArgumentNullException(nameof(document));
+        _evaluateFormulas = evaluateFormulas ?? throw new ArgumentNullException(nameof(evaluateFormulas));
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegativeOrZero(capacity, nameof(capacity));
 
-#if NET10_0_OR_GREATER
-        _channel = Channel.CreateBounded<bool>(new BoundedChannelOptions(capacity)
-        {
-            FullMode = BoundedChannelFullMode.DropOldest,
-            SingleReader = true,
-            SingleWriter = false
-        });
-#endif
+        _availableSlots = new SemaphoreSlim(capacity, capacity);
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _worker = Task.Run(ProcessAsync, CancellationToken.None);
     }
@@ -65,15 +66,18 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     public bool TryEnqueue()
     {
         ThrowIfDisposed();
-#if NET10_0_OR_GREATER
-        if (!_channel.Writer.TryWrite(true))
+        if (!_availableSlots.Wait(0))
             return false;
-#else
-        _queue.Enqueue(true);
-        _signal.Release();
-#endif
+
+        if (_cts.IsCancellationRequested)
+        {
+            _availableSlots.Release();
+            return false;
+        }
 
         Interlocked.Increment(ref _submittedCount);
+        _queue.Enqueue(true);
+        _signal.Release();
         return true;
     }
     /// <summary>
@@ -92,15 +96,21 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     public async ValueTask EnqueueAsync(CancellationToken cancellationToken)
     {
         ThrowIfDisposed();
-#if NET10_0_OR_GREATER
-        await _channel.Writer.WriteAsync(true, cancellationToken).ConfigureAwait(false);
-#else
-        cancellationToken.ThrowIfCancellationRequested();
-        _queue.Enqueue(true);
-        _signal.Release();
-        await Task.CompletedTask.ConfigureAwait(false);
-#endif
-        Interlocked.Increment(ref _submittedCount);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cts.Token);
+        await _availableSlots.WaitAsync(linkedCts.Token).ConfigureAwait(false);
+        try
+        {
+            _cts.Token.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            Interlocked.Increment(ref _submittedCount);
+            _queue.Enqueue(true);
+            _signal.Release();
+        }
+        catch
+        {
+            _availableSlots.Release();
+            throw;
+        }
     }
 
     /// <summary>
@@ -119,10 +129,16 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     /// <returns>A task that represents the wait operation. / 代表等待作業的工作。</returns>
     public async Task WaitForIdleAsync(TimeSpan timeout, CancellationToken cancellationToken)
     {
+        int targetCount = SubmittedCount;
         DateTimeOffset deadline = DateTimeOffset.UtcNow + timeout;
-        while (CompletedCount < SubmittedCount)
+        while (CompletedCount < targetCount)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (_worker.IsCompleted)
+            {
+                await _worker.ConfigureAwait(false);
+            }
+
             if (DateTimeOffset.UtcNow >= deadline)
             {
                 throw new TimeoutException(
@@ -146,11 +162,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 
         _disposed = true;
         _cts.Cancel();
-#if NET10_0_OR_GREATER
-        _channel.Writer.TryComplete();
-#else
         _signal.Release();
-#endif
         try
         {
             _worker.GetAwaiter().GetResult();
@@ -159,10 +171,12 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         {
             OdfKitDiagnostics.Info("公式評估背景工作已在同步處置期間停止。");
         }
-        _cts.Dispose();
-#if !NET10_0_OR_GREATER
-        _signal.Dispose();
-#endif
+        finally
+        {
+            _cts.Dispose();
+            _signal.Dispose();
+            _availableSlots.Dispose();
+        }
     }
 
     /// <summary>
@@ -177,11 +191,7 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 
         _disposed = true;
         _cts.Cancel();
-#if NET10_0_OR_GREATER
-        _channel.Writer.TryComplete();
-#else
         _signal.Release();
-#endif
         try
         {
             await _worker.ConfigureAwait(false);
@@ -190,34 +200,41 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
         {
             OdfKitDiagnostics.Info("公式評估背景工作已在非同步處置期間停止。");
         }
-        _cts.Dispose();
-#if !NET10_0_OR_GREATER
-        _signal.Dispose();
-#endif
+        finally
+        {
+            _cts.Dispose();
+            _signal.Dispose();
+            _availableSlots.Dispose();
+        }
     }
 
     private async Task ProcessAsync()
     {
-#if NET10_0_OR_GREATER
-        while (await _channel.Reader.WaitToReadAsync(_cts.Token).ConfigureAwait(false))
+        try
         {
-            while (_channel.Reader.TryRead(out _))
+            while (true)
             {
-                _document.EvaluateFormulas();
-                Interlocked.Increment(ref _completedCount);
+                await _signal.WaitAsync(_cts.Token).ConfigureAwait(false);
+                while (_queue.TryDequeue(out _))
+                {
+                    try
+                    {
+                        _evaluateFormulas();
+                    }
+                    finally
+                    {
+                        _availableSlots.Release();
+                    }
+
+                    Interlocked.Increment(ref _completedCount);
+                }
             }
         }
-#else
-        while (true)
+        catch
         {
-            await _signal.WaitAsync(_cts.Token).ConfigureAwait(false);
-            while (_queue.TryDequeue(out _))
-            {
-                _document.EvaluateFormulas();
-                Interlocked.Increment(ref _completedCount);
-            }
+            _cts.Cancel();
+            throw;
         }
-#endif
     }
 
     private void ThrowIfDisposed()

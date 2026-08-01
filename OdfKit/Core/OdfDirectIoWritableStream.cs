@@ -153,10 +153,14 @@ public sealed class OdfDirectIoWritableStream : Stream
     /// <inheritdoc />
     public override void Flush()
     {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfDisposed(_isDisposed, nameof(OdfDirectIoWritableStream));
         if (_isFallback)
         {
             _fileStream?.Flush();
+            return;
         }
+
+        SwitchToFallbackAndFlush();
     }
 
     /// <summary>
@@ -264,6 +268,46 @@ public sealed class OdfDirectIoWritableStream : Stream
         _totalAlignedWritten += SectorSize;
     }
 
+    private void SwitchToFallbackAndFlush()
+    {
+#if NET10_0_OR_GREATER
+        _fileHandle?.Dispose();
+        _fileHandle = null;
+#endif
+
+        var fallbackStream = new FileStream(
+            _filePath,
+            FileMode.Open,
+            FileAccess.Write,
+            FileShare.ReadWrite,
+            SectorSize);
+
+        try
+        {
+            fallbackStream.Seek(_totalAlignedWritten, SeekOrigin.Begin);
+            if (_bufferOffset > 0)
+            {
+#if NET10_0_OR_GREATER
+                fallbackStream.Write(DirectSpan.Slice(0, _bufferOffset));
+#else
+                fallbackStream.Write(_directBuffer, 0, _bufferOffset);
+#endif
+                _totalAlignedWritten += _bufferOffset;
+                _bufferOffset = 0;
+            }
+
+            fallbackStream.SetLength(_totalAlignedWritten);
+            fallbackStream.Flush();
+            _fileStream = fallbackStream;
+            _isFallback = true;
+        }
+        catch
+        {
+            fallbackStream.Dispose();
+            throw;
+        }
+    }
+
     /// <summary>
     /// Writes async.
     /// 寫入 Async。
@@ -333,40 +377,25 @@ public sealed class OdfDirectIoWritableStream : Stream
 
         if (disposing)
         {
-            if (!_isFallback)
+            try
+            {
+                if (!_isFallback)
+                {
+                    SwitchToFallbackAndFlush();
+                }
+
+                _fileStream?.Dispose();
+                _fileStream = null;
+            }
+            finally
             {
 #if NET10_0_OR_GREATER
                 _fileHandle?.Dispose();
                 _fileHandle = null;
+                ((IDisposable)_directBuffer).Dispose();
 #endif
-                if (_bufferOffset > 0)
-                {
-                    using var fallbackStream = new FileStream(
-                        _filePath,
-                        FileMode.Open,
-                        FileAccess.Write,
-                        FileShare.ReadWrite);
-                    fallbackStream.Seek(_totalAlignedWritten, SeekOrigin.Begin);
-#if NET10_0_OR_GREATER
-                    fallbackStream.Write(DirectSpan.Slice(0, _bufferOffset));
-                    fallbackStream.SetLength(_totalAlignedWritten + _bufferOffset);
-                    fallbackStream.Flush(true);
-#else
-                    fallbackStream.Write(_directBuffer, 0, _bufferOffset);
-                    fallbackStream.SetLength(_totalAlignedWritten + _bufferOffset);
-                    fallbackStream.Flush();
-#endif
-                }
+                _isDisposed = true;
             }
-            else
-            {
-                _fileStream?.Dispose();
-                _fileStream = null;
-            }
-
-#if NET10_0_OR_GREATER
-            ((IDisposable)_directBuffer).Dispose();
-#endif
         }
 
         _isDisposed = true;

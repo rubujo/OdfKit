@@ -36,6 +36,58 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void DomMutationRejectsAncestorCyclesWithoutChangingTheTree()
+        {
+            var root = new OdfNode(OdfNodeType.Element, "root", "urn:test");
+            var child = new OdfNode(OdfNodeType.Element, "child", "urn:test");
+            root.AppendChild(child);
+
+            Assert.Throws<InvalidOperationException>(() => child.AppendChild(root));
+
+            Assert.Null(root.Parent);
+            Assert.Same(root, child.Parent);
+            Assert.Same(child, Assert.Single(root.Children));
+            Assert.Empty(child.Children);
+        }
+
+        [Fact]
+        public void DomChildCollectionUsesTheSameMutationGuardsAndStateTracking()
+        {
+            var parent = new OdfNode(OdfNodeType.Element, "parent", "urn:test");
+            var child = new OdfNode(OdfNodeType.Element, "child", "urn:test");
+            parent.ResetModifiedState();
+
+            parent.Children.Add(child);
+
+            Assert.True(parent.IsModified);
+            Assert.Same(parent, child.Parent);
+
+            parent.ResetModifiedState();
+            Assert.True(parent.Children.Remove(child));
+            Assert.True(parent.IsModified);
+            Assert.Null(child.Parent);
+
+            var text = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty);
+            Assert.Throws<InvalidOperationException>(() => text.Children.Add(child));
+        }
+
+        [Fact]
+        public void DomInsertRelativeToSameNodeIsANoOp()
+        {
+            var parent = new OdfNode(OdfNodeType.Element, "parent", "urn:test");
+            var child = new OdfNode(OdfNodeType.Element, "child", "urn:test");
+            parent.AppendChild(child);
+            parent.ResetModifiedState();
+
+            parent.InsertBefore(child, child);
+            parent.InsertAfter(child, child);
+
+            Assert.False(parent.IsModified);
+            Assert.Same(parent, child.Parent);
+            Assert.Same(child, Assert.Single(parent.Children));
+        }
+
+        [Fact]
         public void TestBasicDomParsingAndWriting()
         {
             string xml = @"<office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"" office:version=""1.3"">

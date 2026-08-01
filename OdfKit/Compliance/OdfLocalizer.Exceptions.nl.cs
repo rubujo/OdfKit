@@ -658,6 +658,9 @@ public static partial class OdfLocalizer
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Formule-evaluatieopties mogen niet null zijn.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "De externe verwijzing '{0}' heeft geen cachewaarde en geconfigureerde oplossers zijn uitgeschakeld.",
             ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "De CRL-distributie-URI moet HTTP of HTTPS gebruiken en mag alleen naar openbare netwerkadressen verwijzen.",
+            ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "De waarde {1} van Argon2-parameter {0} ligt buiten het toegestane bereik van {2} tot {3}.",
+            ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Versleutelingsalgoritme {1} ondersteunt geen sleutelgrootte van {0} bytes; {2} bytes werden verwacht.",
+            ["Err_OdfNode_CyclicTreeInsertion"] = "Een knooppunt kan niet in zichzelf of een van zijn afstammelingen worden ingevoegd.",
         };
     }
 }

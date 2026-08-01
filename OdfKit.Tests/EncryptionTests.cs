@@ -49,6 +49,57 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
+        /// Verifies attacker-controlled Argon2 manifest costs are rejected before key derivation allocates memory.
+        /// 驗證攻擊者控制的 Argon2 manifest 成本會在金鑰衍生配置記憶體前遭拒絕。
+        /// </summary>
+        [Theory]
+        [InlineData(11, 65536, 4)]
+        [InlineData(3, 262145, 4)]
+        [InlineData(3, 65536, 17)]
+        [InlineData(3, 65536, 0)]
+        [InlineData(3, 31, 4)]
+        public void Argon2ResourceLimitsRejectUnsafeManifestParameters(int iterations, int memoryKib, int lanes)
+        {
+            Assert.Throws<CryptographicException>(() =>
+                OdfEncryption.DecryptEntry(
+                    new byte[32],
+                    "password",
+                    OdfEncryption.Aes256GcmAlgorithmUri,
+                    OdfEncryption.Argon2idDerivationUri,
+                    OdfEncryption.Aes256KeySizeBytes,
+                    0,
+                    new byte[16],
+                    new byte[12],
+                    "sha256",
+                    "argon2id",
+                    iterations,
+                    memoryKib,
+                    lanes));
+        }
+
+        /// <summary>
+        /// Verifies an untrusted manifest cannot request an oversized derived-key allocation.
+        /// 驗證不受信任 manifest 無法要求配置超大衍生金鑰。
+        /// </summary>
+        [Theory]
+        [InlineData(OdfEncryption.Aes256AlgorithmUri, 33)]
+        [InlineData(OdfEncryption.Aes256GcmAlgorithmUri, int.MaxValue)]
+        [InlineData(OdfEncryption.BlowfishAlgorithmUri, 32)]
+        public void EncryptionRejectsUnsupportedManifestKeySize(string algorithmUri, int keySize)
+        {
+            Assert.Throws<CryptographicException>(() =>
+                OdfEncryption.DecryptEntry(
+                    new byte[32],
+                    "password",
+                    algorithmUri,
+                    "PBKDF2",
+                    keySize,
+                    1,
+                    new byte[16],
+                    new byte[16]));
+        }
+
+        /// <summary>
         /// LibreOffice 26.x 的傳統加密文件寫入 100,000 次 PBKDF2；上限必須高於實務值才能讀取。
         /// </summary>
         [Fact]

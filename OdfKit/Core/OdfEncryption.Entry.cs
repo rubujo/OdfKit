@@ -138,11 +138,14 @@ public static partial class OdfEncryption
             keySize = isBlowfishCfb || isLegacyBlowfishCbc ? BlowfishKeySizeBytes : Aes256KeySizeBytes;
         }
 
+        ValidateEncryptionKeySize(algorithmUri, keySize);
+
         byte[] derivedKey;
         if (isArgon2)
         {
+            ValidateArgon2Parameters(argon2T, argon2M, argon2P);
             int effectiveParallelism = Math.Max(1, Math.Min(argon2P, Environment.ProcessorCount));
-            Argon2ConcurrencyGate.Wait();
+            EnterArgon2Operation();
             try
             {
                 var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
@@ -159,7 +162,7 @@ public static partial class OdfEncryption
             }
             finally
             {
-                Argon2ConcurrencyGate.Release();
+                ExitArgon2Operation();
             }
         }
         else

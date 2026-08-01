@@ -224,27 +224,31 @@ internal static class OdfWholesomeEncryption
         int lanes = ReadArgon2Parameter(info, "argon2-lanes", "argon2-p", Argon2Lanes);
         int keySize = info.KeySize > 0 ? info.KeySize : OdfEncryption.Aes256KeySizeBytes;
 
-        var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
-            .WithVersion(Argon2Parameters.Version13)
-            .WithIterations(iterations)
-            .WithMemoryAsKB(memoryKib)
-            .WithParallelism(lanes)
-            .WithSalt(info.Salt);
+        OdfEncryption.ValidateArgon2Parameters(iterations, memoryKib, lanes);
+        OdfEncryption.ValidateEncryptionKeySize(OdfEncryption.Aes256GcmAlgorithmUri, keySize);
 
-        var generator = new Argon2BytesGenerator();
-        generator.Init(builder.Build());
-
-        byte[] derivedKey = new byte[keySize];
+        OdfEncryption.EnterArgon2Operation();
         try
         {
+            var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
+                .WithVersion(Argon2Parameters.Version13)
+                .WithIterations(iterations)
+                .WithMemoryAsKB(memoryKib)
+                .WithParallelism(lanes)
+                .WithSalt(info.Salt);
+
+            var generator = new Argon2BytesGenerator();
+            generator.Init(builder.Build());
+
+            byte[] derivedKey = new byte[keySize];
             generator.GenerateBytes(startKey, derivedKey, 0, derivedKey.Length);
+            return derivedKey;
         }
         finally
         {
             Array.Clear(startKey, 0, startKey.Length);
+            OdfEncryption.ExitArgon2Operation();
         }
-
-        return derivedKey;
     }
 
     /// <summary>

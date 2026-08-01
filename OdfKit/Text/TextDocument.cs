@@ -796,13 +796,16 @@ public partial class TextDocument : OdfDocument
         // 確保目前文件的內容已序列化寫入封裝
         Save();
 
-        // 建立暫存的記憶體串流以儲存當前範本文件封裝
-        using var tempMemoryStream = new MemoryStream();
-        Package.Save(tempMemoryStream);
-        tempMemoryStream.Position = 0;
+        // 使用隨關閉刪除的暫存檔保存範本封裝，避免大型文件在記憶體中保留完整副本。
+        using Stream templateStream = OdfTempStreamFactory.Create(
+            long.MaxValue,
+            temporaryDirectory: null,
+            async: true);
+        Package.Save(templateStream);
+        templateStream.Position = 0;
 
         // 呼叫流式郵件合併引擎執行套印
-        await OdfStreamingMailMerge.ApplyTemplateAsync(tempMemoryStream, outputStream, dataSource, cancellationToken).ConfigureAwait(false);
+        await OdfStreamingMailMerge.ApplyTemplateAsync(templateStream, outputStream, dataSource, cancellationToken).ConfigureAwait(false);
     }
 
 

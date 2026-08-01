@@ -13,6 +13,16 @@ namespace OdfKit.Text;
 
 public partial class TextDocument
 {
+    private static readonly TimeSpan HtmlStylesRegexTimeout = TimeSpan.FromSeconds(2);
+    private static readonly Regex CssCommentRegex = new(
+        @"\/\*[\s\S]*?\*\/",
+        RegexOptions.Compiled,
+        HtmlStylesRegexTimeout);
+    private static readonly Regex CssRuleRegex = new(
+        @"(?<selectors>[^{}]+)\{(?<body>[^{}]*)\}",
+        RegexOptions.Multiline | RegexOptions.Compiled,
+        HtmlStylesRegexTimeout);
+
     /// <summary>
     /// Imports an HTML / CSS stylesheet, writing mappable rules into the ODT's <c>styles.xml</c>.
     /// 匯入 HTML / CSS 樣式表，並將可對應的規則寫入 ODT 的 <c>styles.xml</c>。
@@ -24,8 +34,8 @@ public partial class TextDocument
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(cssString, nameof(cssString));
 
         Dictionary<string, string> imported = new(StringComparer.Ordinal);
-        string css = Regex.Replace(cssString, @"/\*[\s\S]*?\*/", string.Empty);
-        foreach (Match rule in Regex.Matches(css, @"(?<selectors>[^{}]+)\{(?<body>[^{}]*)\}", RegexOptions.Multiline))
+        string css = CssCommentRegex.Replace(cssString, string.Empty);
+        foreach (Match rule in CssRuleRegex.Matches(css))
         {
             Dictionary<string, string> declarations = ParseCssDeclarations(rule.Groups["body"].Value);
             if (declarations.Count == 0)

@@ -54,14 +54,24 @@ public abstract partial class OdfDocument
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-
-        Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            ? new OdfDirectIoWritableStream(path)
-            : new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-
-        using (stream)
+        string destinationPath = Path.GetFullPath(path);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+        try
         {
-            Package.SaveToStream(stream, options);
+            Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                ? new OdfDirectIoWritableStream(temporaryPath)
+                : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+
+            using (stream)
+            {
+                Package.SaveToStream(stream, options);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, destinationPath);
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
         }
     }
 
@@ -129,14 +139,24 @@ public abstract partial class OdfDocument
 
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-
-        Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            ? new OdfDirectIoWritableStream(path)
-            : new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
-
-        using (stream)
+        string destinationPath = Path.GetFullPath(path);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+        try
         {
-            await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
+            Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                ? new OdfDirectIoWritableStream(temporaryPath)
+                : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+
+            using (stream)
+            {
+                await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, destinationPath);
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
         }
     }
 

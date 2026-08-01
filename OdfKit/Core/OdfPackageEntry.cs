@@ -19,7 +19,11 @@ internal class OdfPackageEntry : IDisposable
     private bool _isModified;
     public bool IsCompressed { get; set; } = true;
     public OdfEncryptionInfo? EncryptionInfo { get; set; }
+    private readonly object _loadLock = new();
     private Task? _prefetchTask;
+#if NET10_0_OR_GREATER
+    private TaskCompletionSource<bool>? _prefetchCompletion;
+#endif
     internal OdfMmfEntryInfo? MmfEntry => _mmfEntry;
 
     private System.IO.MemoryMappedFiles.MemoryMappedViewAccessor? _viewAccessor;
@@ -171,28 +175,37 @@ internal class OdfPackageEntry : IDisposable
             return;
         }
 
-        if (_prefetchTask == null)
+        lock (_loadLock)
         {
+            if (_prefetchTask != null)
+                return;
+
 #if NET10_0_OR_GREATER
             if (_package?._prefetchChannel != null)
             {
-                _prefetchTask = _package._prefetchChannel.Writer.WriteAsync(this).AsTask();
-            }
-            else
-#endif
-            {
-                _prefetchTask = Task.Run(() =>
+                var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                _prefetchCompletion = completion;
+                _prefetchTask = completion.Task;
+                if (_package._prefetchChannel.Writer.TryWrite(this))
                 {
-                    try
-                    {
-                        EnsureBytesLoaded();
-                    }
-                    catch
-                    {
-                        // 預載階段異常留待讀取時拋出
-                    }
-                });
+                    return;
+                }
+
+                _prefetchCompletion = null;
+                _prefetchTask = null;
             }
+#endif
+            _prefetchTask = Task.Run(() =>
+            {
+                try
+                {
+                    LoadBytesCore();
+                }
+                catch
+                {
+                    // 預載階段異常留待讀取時拋出
+                }
+            });
         }
     }
 
@@ -220,6 +233,38 @@ internal class OdfPackageEntry : IDisposable
     }
 
     internal void EnsureBytesLoaded()
+    {
+        Task? pendingPrefetch;
+        lock (_loadLock)
+        {
+            pendingPrefetch = _prefetchTask;
+        }
+
+        pendingPrefetch?.GetAwaiter().GetResult();
+        LoadBytesCore();
+    }
+
+    internal void LoadBytesForPrefetch()
+    {
+        LoadBytesCore();
+    }
+
+#if NET10_0_OR_GREATER
+    internal void CompletePrefetch()
+    {
+        _prefetchCompletion?.TrySetResult(true);
+    }
+#endif
+
+    private void LoadBytesCore()
+    {
+        lock (_loadLock)
+        {
+            LoadBytesCoreLocked();
+        }
+    }
+
+    private void LoadBytesCoreLocked()
     {
         if (_bytes != null)
             return;

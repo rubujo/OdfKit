@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using OdfKit.Compliance;
+using OdfKit.Core;
 using OdfKit.Presentation;
 namespace OdfKit.Conversion;
 
@@ -40,8 +41,20 @@ public static class OdfPresentationOoxmlExtensions
             Directory.CreateDirectory(directory);
         }
 
-        using FileStream fileStream = File.Create(path);
-        OdpToPptxConverter.Convert(presentation, fileStream);
+        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(path);
+        try
+        {
+            using (FileStream fileStream = new(temporaryPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None))
+            {
+                OdpToPptxConverter.Convert(presentation, fileStream);
+            }
+
+            OdfAtomicFile.Publish(temporaryPath, Path.GetFullPath(path));
+        }
+        finally
+        {
+            OdfAtomicFile.TryDelete(temporaryPath);
+        }
     }
 
     /// <summary>

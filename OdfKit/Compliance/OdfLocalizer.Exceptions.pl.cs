@@ -658,6 +658,9 @@ public static partial class OdfLocalizer
             ["Err_SpreadsheetDocument_FormulaOptionsNull"] = "Opcje obliczania formuł nie mogą być null.",
             ["Err_OdfFormulaEvaluation_ExternalReferenceDenied"] = "Odwołanie zewnętrzne „{0}” nie ma wartości w pamięci podręcznej, a skonfigurowane resolvery są wyłączone.",
             ["Err_OdfSignatureTsaClient_UnsafeCrlUri"] = "Identyfikator URI dystrybucji CRL musi używać protokołu HTTP lub HTTPS i wskazywać wyłącznie publiczne adresy sieciowe.",
+            ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Wartość {1} parametru Argon2 {0} wykracza poza dozwolony zakres od {2} do {3}.",
+            ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Algorytm szyfrowania {1} nie obsługuje klucza o rozmiarze {0} bajtów; oczekiwano {2} bajtów.",
+            ["Err_OdfNode_CyclicTreeInsertion"] = "Węzła nie można wstawić do niego samego ani do żadnego z jego potomków.",
         };
     }
 }
