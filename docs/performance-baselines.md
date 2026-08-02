@@ -98,7 +98,7 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 - `LoadComplexDomAndReadLastSheet`：驗證定位最後一張工作表不會連帶具現化前面的工作表。
 
 核心 XML entry 已完成 ZIP 大小與 CRC 驗證後，直接以既有 UTF-8 記憶體交給 span parser；
-大型 `table:table` 保存來源 memory slice，避免 `ReadInnerXml()` 建立大型 UTF-16 字串後再
+大型 `table:table` 保留來源 memory slice，避免 `ReadInnerXml()` 建立大型 UTF-16 字串後再
 複製成 UTF-8 陣列。載入期的 LibreOffice 擴充屬性正規化延後至該 lazy subtree 首次
 具現化，且多執行緒首次存取只允許單次具現化。完整儲存仍會因文件統計、媒體引用掃描與
 sparse cell 序列化而走訪必要內容，不能把 `LoadOnly` 數字宣稱為 round-trip 成本。

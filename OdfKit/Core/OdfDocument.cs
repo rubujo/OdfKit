@@ -514,7 +514,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
                 }
 
                 // OdfPackageEntry 本來就會將壓縮 entry 解壓並快取。直接把同一塊 UTF-8
-                // 記憶體交給 span parser，可讓大型 table 節點保存來源 slice，避免
+                // 記憶體交給 span parser，可讓大型 table 節點保留來源 slice，避免
                 // XmlReader.ReadInnerXml() 先配置 UTF-16 string、再複製成 UTF-8 byte[]。
                 ReadOnlyMemory<byte> xml = entry.GetCachedMemory();
                 return OdfXmlReader.Parse(xml, Package.LoadOptions);
