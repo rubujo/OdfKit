@@ -13,7 +13,7 @@
 - `ZipArchive.Dispose()` 會完成 archive 與中央目錄，因此 Writer 不把半完成 ZIP 描述為
   可安全恢復的文件。見 [Microsoft ZipArchive.Dispose][zip-dispose]。
 - DEFLATE 格式本身沒有原生隨機存取。稀疏 access point 可以改善特定工作負載，但需要
-  額外保存壓縮與 parser 狀態，並不屬於一般 forward-only Reader 的必要條件。
+  額外儲存壓縮與 parser 狀態，並不屬於一般 forward-only Reader 的必要條件。
 
 上述來源於 2026-08-02 重新核對。專案公開效能數值仍只使用可重現的 OdfKit benchmark，
 不以外部專案數字代替同機、同資料、同語意驗證。
@@ -31,12 +31,12 @@
 
 ### Writer
 
-1. 維持嚴格順序寫入；預設熱路徑不保存完整工作表或文件 DOM。
+1. 維持嚴格順序寫入；預設熱路徑不儲存完整工作表或文件 DOM。
 2. `mimetype` 先寫且不壓縮；大量 `content.xml` 使用偏重吞吐量的壓縮設定，小型 metadata
    entry 可使用較高壓縮率。
 3. `FlushAsync` 只保證已產生 XML 傳遞到底層 entry，不代表 ZIP 已完成；只有完成／處置
    archive 後才是完整 ODF package。
-4. 長時間輸出若需要失敗復原，由呼叫端保存資料來源 cursor，寫入暫存檔，完整關閉與驗證後
+4. 長時間輸出若需要失敗復原，由呼叫端儲存資料來源 cursor，寫入暫存檔，完整關閉與驗證後
    再替換正式檔案；不序列化半完成 `ZipArchive`、壓縮器或 `XmlWriter` 狀態。
 
 ## 隨機存取與 Checkpoint
@@ -50,7 +50,7 @@
 
 - ODS／ODT 的主要串流情境是單次循序匯入、匯出與文字擷取；Checkpoint 對首次完整讀取
   沒有普遍收益。
-- BCL 的 DEFLATE stream 不支援 seek；可恢復實作必須自行保存 dictionary、bit offset、
+- BCL 的 DEFLATE stream 不支援 seek；可恢復實作必須自行儲存 dictionary、bit offset、
   XML stack 與 namespace，顯著擴大安全與相容測試矩陣。
 - 自有 parser 會繞過目前 `XmlReaderSettings` 提供的 DTD、resolver 與字元預算契約。
 - Reader 的高頻熱資料重複查詢應由上層有界 cache 或 DOM 模型處理，不應改變 forward-only
