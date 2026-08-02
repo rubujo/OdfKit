@@ -348,15 +348,15 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
-    /// Gets the Republic of China (Taiwan) ODF CNS15251 policy profile.
-    /// 取得中華民國（臺灣）ODF CNS15251 政策規範。
+    /// Gets the Republic of China (Taiwan) CNS 15251 ODF 1.2 national-standard profile.
+    /// 取得中華民國（臺灣）CNS 15251 ODF 1.2 國家標準規範。
     /// </summary>
     public static OdfComplianceProfile RocTaiwanOdfCns15251 { get; } = new(
         "ROC_Taiwan_ODF_CNS15251",
         "Republic of China (Taiwan)",
-        "Government ODF-CNS15251 policy",
-        new Uri("https://www.cnsonline.com.tw/?node=detail&generalno=15251&classno=X5018"),
-        "2015-06-25",
+        "Bureau of Standards, Metrology and Inspection / CNS 15251-1 to CNS 15251-3",
+        new Uri("https://www.cnsonline.com.tw/?node=detail&generalno=15251-1&classno=X5018"),
+        "2019-09-05",
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf12),
@@ -364,7 +364,7 @@ public static class OdfComplianceProfiles
         OpenDocumentMimeTypes,
         [
             .. StandardRules,
-            Rule("RequireCns15251Mapping", "Profile metadata must identify the ODF to CNS15251 mapping once an active official source is confirmed.", OdfIssueSeverity.Warning),
+            Rule("RequireCns15251Mapping", "Profile metadata must identify CNS 15251-1, CNS 15251-2, and CNS 15251-3 as the national adoption of ODF 1.2.", OdfIssueSeverity.Warning),
             Rule("RequireTraditionalChineseMetadataSupport", "Traditional Chinese metadata, language tags, CJK text, and font names must round-trip without damage.", OdfIssueSeverity.Warning),
             Rule("PreferEditableOdfForGovernmentDocuments", "Editable government documents should target ODF for creation, preservation, and exchange.", OdfIssueSeverity.Info),
             Rule("AllowPdfForFinalPublication", "Final non-editable publications may use PDF or PDF/A alongside editable ODF sources.", OdfIssueSeverity.Info),
@@ -401,18 +401,18 @@ public static class OdfComplianceProfiles
         new CultureInfo("zh-TW"));
 
     /// <summary>
-    /// Gets the German federal government ODF document compatibility profile.
-    /// 取得德國聯邦政府 ODF 文件相容性規範。
+    /// Gets the German federal-government Deutschland-Stack ODF profile.
+    /// 取得德國聯邦政府 Deutschland-Stack ODF 規範。
     /// </summary>
     public static OdfComplianceProfile DeGovernmentOdf { get; } = new(
         "DE_Government_ODF",
         "Germany",
         "Federal IT Council (IT-Planungsrat) / Deutschland-Stack",
-        new Uri("https://www.it-planungsrat.de/"),
+        new Uri("https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf"),
         "2026",
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
-        OdfVersionRange.Exact(OdfVersion.Odf12),
+        OdfVersionRange.AllKnown,
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
         [
@@ -524,8 +524,8 @@ public static class OdfComplianceProfiles
         "NATO_ODF",
         "NATO",
         "NATO Standardization Office (NSO) / STANAG",
-        new Uri("https://www.nato.int/"),
-        null,
+        new Uri("https://nhqc3s.hq.nato.int/apps/architecture/nisp/pdf/NISP-Vol3-v15-release.pdf"),
+        "2024",
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf12),
@@ -547,8 +547,8 @@ public static class OdfComplianceProfiles
         "PT_Government_ODF_RNID",
         "Portugal",
         "AMA (Agência para a Modernização Administrativa) / RNID",
-        new Uri("https://www.ama.gov.pt/"),
-        null,
+        new Uri("https://files.dre.pt/1s/2018/01/00400/0012100127.pdf"),
+        "2018-01-05",
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf12),
@@ -601,8 +601,8 @@ public static class OdfComplianceProfiles
         "AgID (Agenzia per l'Italia Digitale) / CAD",
         new Uri("https://www.agid.gov.it/"),
         null,
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.Exact(OdfVersion.Odf12),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
@@ -623,7 +623,7 @@ public static class OdfComplianceProfiles
         "United Kingdom",
         "UK Government Cabinet Office",
         new Uri("https://www.gov.uk/government/publications/open-standards-for-government/sharing-or-collaborating-with-government-documents"),
-        null,
+        "2026-01-29",
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf12),
@@ -668,11 +668,11 @@ public static class OdfComplianceProfiles
         "SK_Government_ODF",
         "Slovakia",
         "Ministry of Investments, Regional Development and Informatization",
-        new Uri("https://www.mirri.gov.sk/"),
+        new Uri("https://mirri.gov.sk/sekcie/informatizacia/dokumenty/standardy-isvs/"),
         null,
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
-        OdfVersionRange.AllKnown,
+        OdfVersionRange.Exact(OdfVersion.Odf12),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
         [
@@ -692,8 +692,8 @@ public static class OdfComplianceProfiles
         "Danish Agency for Digitisation (Digitaliseringsstyrelsen)",
         new Uri("https://digst.dk/it-loesninger/standarder/"),
         null,
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.Exact(OdfVersion.Odf12),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
@@ -736,8 +736,8 @@ public static class OdfComplianceProfiles
         "Ministry of the Interior and Safety (MOIS) / KS X ISO/IEC 26300",
         new Uri("https://www.mois.go.kr/"),
         null,
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.Exact(OdfVersion.Odf12),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
@@ -758,8 +758,8 @@ public static class OdfComplianceProfiles
         "Department of Public Service and Administration (DPSA) / SAGA",
         new Uri("https://www.dpsa.gov.za/"),
         null,
-        OdfPolicyAuthorityLevel.Normative,
-        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfPolicyAuthorityLevel.Draft,
+        OdfProfileVerificationStatus.NeedsActiveSource,
         OdfVersionRange.AllKnown,
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,

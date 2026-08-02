@@ -66,6 +66,10 @@ namespace OdfKit.Tests
 
             Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.Equal("2019-09-05", OdfComplianceProfiles.RocTaiwanOdfCns15251.SourceDate);
+            Assert.Equal(
+                "https://www.cnsonline.com.tw/?node=detail&generalno=15251-1&classno=X5018",
+                OdfComplianceProfiles.RocTaiwanOdfCns15251.SourceUrl!.AbsoluteUri);
             Assert.True(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf12));
             Assert.False(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf14));
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
@@ -75,6 +79,37 @@ namespace OdfKit.Tests
             Assert.False(OdfComplianceProfiles.NlGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf14));
             Assert.Equal("pt-BR", OdfComplianceProfiles.BrGovernmentOdf.TargetCulture?.Name);
             Assert.Equal("pt", OdfComplianceProfiles.PtGovernmentOdf.TargetCulture?.Name);
+        }
+
+        [Fact]
+        public void ProfileSourceAuditPreservesCurrentEvidenceBoundaries()
+        {
+            Assert.Equal(OdfVersionRange.AllKnown, OdfComplianceProfiles.DeGovernmentOdf.SupportedVersions);
+            Assert.Equal(
+                "https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf",
+                OdfComplianceProfiles.DeGovernmentOdf.SourceUrl!.AbsoluteUri);
+
+            Assert.Equal("2024", OdfComplianceProfiles.NatoOdf.SourceDate);
+            Assert.Contains("NISP-Vol3-v15-release.pdf", OdfComplianceProfiles.NatoOdf.SourceUrl!.AbsoluteUri);
+            Assert.Equal("2018-01-05", OdfComplianceProfiles.PtGovernmentOdf.SourceDate);
+            Assert.Contains("0012100127.pdf", OdfComplianceProfiles.PtGovernmentOdf.SourceUrl!.AbsoluteUri);
+            Assert.Equal("2026-01-29", OdfComplianceProfiles.UkGovernmentOdf12.SourceDate);
+            Assert.True(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf13));
+
+            OdfComplianceProfile[] profilesNeedingActiveSources =
+            [
+                OdfComplianceProfiles.ItGovernmentOdf,
+                OdfComplianceProfiles.DkGovernmentOdf,
+                OdfComplianceProfiles.KrGovernmentOdf,
+                OdfComplianceProfiles.ZaGovernmentOdf
+            ];
+
+            foreach (OdfComplianceProfile profile in profilesNeedingActiveSources)
+            {
+                Assert.Equal(OdfPolicyAuthorityLevel.Draft, profile.AuthorityLevel);
+                Assert.Equal(OdfProfileVerificationStatus.NeedsActiveSource, profile.VerificationStatus);
+            }
         }
 
         [Fact]
