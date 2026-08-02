@@ -261,7 +261,7 @@ public sealed class OdtStreamReader : IDisposable
             ThrowResourceLimit(Text.Length, _options.MaxNodeTextCharacters);
     }
 
-    private static async Task<string> ReadCurrentElementTextAsync(XmlReader reader, CancellationToken cancellationToken)
+    private async Task<string> ReadCurrentElementTextAsync(XmlReader reader, CancellationToken cancellationToken)
     {
         if (reader.IsEmptyElement)
             return string.Empty;
@@ -272,7 +272,7 @@ public sealed class OdtStreamReader : IDisposable
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (subtree.NodeType is XmlNodeType.Text or XmlNodeType.CDATA)
-                builder.Append(subtree.Value);
+                AppendBounded(builder, subtree.Value);
             else if (subtree.NodeType == XmlNodeType.Element && subtree.NamespaceURI == OdfNamespaces.Text)
                 AppendTextControl(builder, subtree);
         }
@@ -304,7 +304,7 @@ public sealed class OdtStreamReader : IDisposable
         throw new InvalidDataException(OdfLocalizer.GetMessage("Err_StreamReader_ResourceLimitExceeded",
             value.ToString(CultureInfo.InvariantCulture), limit.ToString(CultureInfo.InvariantCulture)));
 
-    private static string ReadCurrentElementText(XmlReader reader)
+    private string ReadCurrentElementText(XmlReader reader)
     {
         if (reader.IsEmptyElement)
         {
@@ -318,7 +318,7 @@ public sealed class OdtStreamReader : IDisposable
         {
             if (subtree.NodeType is XmlNodeType.Text or XmlNodeType.CDATA)
             {
-                builder.Append(subtree.Value);
+                AppendBounded(builder, subtree.Value);
             }
             else if (subtree.NodeType == XmlNodeType.Element && subtree.NamespaceURI == OdfNamespaces.Text)
             {
@@ -329,20 +329,44 @@ public sealed class OdtStreamReader : IDisposable
         return builder.ToString();
     }
 
-    private static void AppendTextControl(StringBuilder builder, XmlReader reader)
+    private void AppendTextControl(StringBuilder builder, XmlReader reader)
     {
         if (reader.LocalName == "s")
         {
             int count = ParsePositiveInt(reader.GetAttribute("c", OdfNamespaces.Text), defaultValue: 1);
+            EnsureAppendWithinLimit(builder.Length, count);
             builder.Append(' ', count);
         }
         else if (reader.LocalName == "tab")
         {
-            builder.Append('\t');
+            AppendBounded(builder, '\t');
         }
         else if (reader.LocalName == "line-break")
         {
-            builder.Append('\n');
+            AppendBounded(builder, '\n');
+        }
+    }
+
+    private void AppendBounded(StringBuilder builder, string value)
+    {
+        EnsureAppendWithinLimit(builder.Length, value.Length);
+        builder.Append(value);
+    }
+
+    private void AppendBounded(StringBuilder builder, char value)
+    {
+        EnsureAppendWithinLimit(builder.Length, 1);
+        builder.Append(value);
+    }
+
+    private void EnsureAppendWithinLimit(int currentLength, int appendLength)
+    {
+        if (appendLength > _options.MaxNodeTextCharacters - currentLength)
+        {
+            int attemptedLength = appendLength > int.MaxValue - currentLength
+                ? int.MaxValue
+                : currentLength + appendLength;
+            ThrowResourceLimit(attemptedLength, _options.MaxNodeTextCharacters);
         }
     }
 

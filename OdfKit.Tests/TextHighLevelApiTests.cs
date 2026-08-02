@@ -1356,6 +1356,35 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 ODT 文字控制字元會在配置前套用單一節點文字上限。
+    /// </summary>
+    [Fact]
+    public void OdtStreamReaderRejectsRepeatedSpacesBeforeAllocatingExpandedText()
+    {
+        using var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = archive.CreateEntry("content.xml");
+            using var entryStream = entry.Open();
+            using var writer = new StreamWriter(entryStream, Encoding.UTF8, 1024, leaveOpen: true);
+            writer.Write(
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <office:document-content
+                    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+                  <office:body><office:text><text:p><text:s text:c="100000000" /></text:p></office:text></office:body>
+                </office:document-content>
+                """);
+        }
+
+        stream.Position = 0;
+        using var reader = new OdtStreamReader(stream, new OdtStreamReaderOptions { MaxNodeTextCharacters = 32 });
+
+        Assert.Throws<InvalidDataException>(() => reader.Read());
+    }
+
+    /// <summary>
     /// 驗證 ODT Writer 可非同步完成 XML 與封裝輸出。
     /// </summary>
     [Fact]

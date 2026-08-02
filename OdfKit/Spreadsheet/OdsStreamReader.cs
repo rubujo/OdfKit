@@ -27,6 +27,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private int _selectedSheetIndex;
     private bool _started;
     private bool _isFirstRowBuffered;
+    private bool _hasRows;
     private bool _closed;
     private XmlReader? _xmlReader;
     private Stream? _contentStream;
@@ -35,13 +36,21 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private readonly List<object?> _currentRowData = [];
     private readonly List<OdsCellValue> _currentRowCells = [];
     private readonly List<string> _sheetNames = [];
+    private bool _sheetNamesScanned;
     private int _readInProgress;
 
     /// <summary>
     /// Gets the sheet name list scanned from the top level of <c>content.xml</c>.
     /// 工作表名稱清單（從 content.xml 頂層掃描取得）
     /// </summary>
-    public IReadOnlyList<string> SheetNames => _sheetNames;
+    public IReadOnlyList<string> SheetNames
+    {
+        get
+        {
+            EnsureSheetNamesScanned();
+            return _sheetNames;
+        }
+    }
 
     /// <summary>
     /// Gets the current zero-based row number.
@@ -85,7 +94,6 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
         _options = ValidateOptions(options);
         _zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: _options.LeaveOpen);
-        ScanSheetNames();
     }
 
     /// <summary>
@@ -108,14 +116,17 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
         _options = ValidateOptions(options);
         _zip = ZipFile.OpenRead(path);
-        ScanSheetNames();
     }
 
-    private void ScanSheetNames()
+    private void EnsureSheetNamesScanned()
     {
+        if (_sheetNamesScanned)
+            return;
+
         var entry = _zip.GetEntry("content.xml")
             ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_OdsNotFound_2"));
 
+        _sheetNames.Clear();
         using var stream = entry.Open();
         using var reader = XmlReader.Create(stream, CreateXmlSettings(_options));
 
@@ -131,6 +142,8 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                 // 改用逐節點掃描（僅收集 table 元素名稱，忽略其內容）
             }
         }
+
+        _sheetNamesScanned = true;
     }
 
     /// <summary>
@@ -142,7 +155,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     {
         if (_started)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_SelectsheetCalledBeforeFirst"));
-        if (sheetIndex < 0 || sheetIndex >= _sheetNames.Count)
+        if (sheetIndex < 0)
+            throw new ArgumentOutOfRangeException(nameof(sheetIndex),
+                OdfLocalizer.GetMessage("Err_OdsStreamReader_SheetIndexOutOfRange", sheetIndex.ToString(CultureInfo.InvariantCulture), _sheetNames.Count.ToString(CultureInfo.InvariantCulture)));
+        if (_sheetNamesScanned && sheetIndex >= _sheetNames.Count)
             throw new ArgumentOutOfRangeException(nameof(sheetIndex),
                 OdfLocalizer.GetMessage("Err_OdsStreamReader_SheetIndexOutOfRange", sheetIndex.ToString(CultureInfo.InvariantCulture), _sheetNames.Count.ToString(CultureInfo.InvariantCulture)));
         _selectedSheetIndex = sheetIndex;
@@ -265,6 +281,8 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                 }
             }
         }
+
+        ThrowSheetIndexOutOfRange(_selectedSheetIndex, tableIndex);
     }
 
     private async Task OpenReaderAtSheetAsync(CancellationToken cancellationToken)
@@ -280,11 +298,17 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             if (_xmlReader.NodeType != XmlNodeType.Element || _xmlReader.LocalName != "table" ||
                 _xmlReader.NamespaceURI != OdfNamespaces.Table)
                 continue;
-            if (tableIndex++ == _selectedSheetIndex)
+            if (tableIndex == _selectedSheetIndex)
                 return;
+            tableIndex++;
             if (!_xmlReader.IsEmptyElement)
-                await _xmlReader.ReadOuterXmlAsync().ConfigureAwait(false);
+            {
+                using var subtree = _xmlReader.ReadSubtree();
+                while (await subtree.ReadAsync().ConfigureAwait(false))
+                    cancellationToken.ThrowIfCancellationRequested();
+            }
         }
+        ThrowSheetIndexOutOfRange(_selectedSheetIndex, tableIndex);
     }
 
     private bool ReadNextRow()
@@ -302,6 +326,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                     ParseCurrentRow(_xmlReader);
                     EnsureWithinLimit(_rowIndex + 2, _options.MaxRows);
                     _rowIndex++;
+                    _hasRows = true;
                     return true;
                 }
 
@@ -330,14 +355,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             if (_xmlReader.NodeType == XmlNodeType.Element && _xmlReader.LocalName == "table-row" &&
                 _xmlReader.NamespaceURI == OdfNamespaces.Table)
             {
-                string rowXml = await _xmlReader.ReadOuterXmlAsync().ConfigureAwait(false);
-                cancellationToken.ThrowIfCancellationRequested();
-                using var stringReader = new StringReader(rowXml);
-                using var rowReader = XmlReader.Create(stringReader, CreateXmlSettings(_options));
-                rowReader.MoveToContent();
-                ParseCurrentRow(rowReader);
+                await ParseCurrentRowAsync(_xmlReader, cancellationToken).ConfigureAwait(false);
                 EnsureWithinLimit(_rowIndex + 2, _options.MaxRows);
                 _rowIndex++;
+                _hasRows = true;
                 return true;
             }
             if ((_xmlReader.NodeType is XmlNodeType.Element or XmlNodeType.EndElement) &&
@@ -346,6 +367,11 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         }
         return false;
     }
+
+    private static void ThrowSheetIndexOutOfRange(int sheetIndex, int sheetCount) =>
+        throw new ArgumentOutOfRangeException(nameof(sheetIndex),
+            OdfLocalizer.GetMessage("Err_OdsStreamReader_SheetIndexOutOfRange",
+                sheetIndex.ToString(CultureInfo.InvariantCulture), sheetCount.ToString(CultureInfo.InvariantCulture)));
 
     private void ParseCurrentRow(XmlReader rowReader)
     {
@@ -393,6 +419,60 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             }
         }
 
+        CompleteCurrentRow(rowRepeat, isEmpty, cells);
+    }
+
+    private async Task ParseCurrentRowAsync(XmlReader rowReader, CancellationToken cancellationToken)
+    {
+        int rowRepeat = ParseRepeat(rowReader.GetAttribute("number-rows-repeated", OdfNamespaces.Table), _options.MaxRepeatedRows);
+        bool isEmpty = true;
+        var cells = new List<(int Col, OdsCellValue Cell)>();
+        int colIndex = 0;
+
+        if (!rowReader.IsEmptyElement)
+        {
+            using var rowSub = rowReader.ReadSubtree();
+            await rowSub.ReadAsync().ConfigureAwait(false);
+            while (await rowSub.ReadAsync().ConfigureAwait(false))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (rowSub.NodeType != XmlNodeType.Element ||
+                    (rowSub.LocalName != "table-cell" && rowSub.LocalName != "covered-table-cell") ||
+                    rowSub.NamespaceURI != OdfNamespaces.Table)
+                {
+                    continue;
+                }
+
+                int colRepeat = ParseRepeat(rowSub.GetAttribute("number-columns-repeated", OdfNamespaces.Table), _options.MaxRepeatedColumns);
+                string? valueType = rowSub.GetAttribute("value-type", OdfNamespaces.Office);
+                string? numValue = rowSub.GetAttribute("value", OdfNamespaces.Office);
+                string? dateValue = rowSub.GetAttribute("date-value", OdfNamespaces.Office);
+                string? boolValue = rowSub.GetAttribute("boolean-value", OdfNamespaces.Office);
+                string? timeValue = rowSub.GetAttribute("time-value", OdfNamespaces.Office);
+                string? stringValue = rowSub.GetAttribute("string-value", OdfNamespaces.Office);
+                string? currency = rowSub.GetAttribute("currency", OdfNamespaces.Office);
+                string? formula = rowSub.GetAttribute("formula", OdfNamespaces.Table);
+
+                string? textContent = await ReadCellTextAsync(rowSub, cancellationToken).ConfigureAwait(false);
+                OdsCellValue cell = ParseCellValue(valueType, numValue, dateValue, boolValue, timeValue,
+                    stringValue, formula, currency, textContent);
+                if (cell.Kind != OdsCellValueKind.Empty || cell.Formula is not null)
+                {
+                    isEmpty = false;
+                    for (int i = 0; i < colRepeat; i++)
+                        cells.Add((colIndex + i, cell));
+                }
+
+                colIndex += colRepeat;
+                EnsureWithinLimit(colIndex, _options.MaxColumns);
+            }
+        }
+
+        CompleteCurrentRow(rowRepeat, isEmpty, cells);
+    }
+
+    private void CompleteCurrentRow(int rowRepeat, bool isEmpty, List<(int Col, OdsCellValue Cell)> cells)
+    {
         // LibreOffice 以大型 number-rows-repeated 表示結尾空白列 — 跳過重複
         _rowRepeatRemaining = isEmpty ? 0 : rowRepeat - 1;
 
@@ -487,6 +567,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         if (cellReader.IsEmptyElement)
             return null;
         var paragraphs = new List<string>();
+        int totalLength = 0;
         using var subtree = cellReader.ReadSubtree();
         subtree.Read();
         while (subtree.Read())
@@ -495,10 +576,35 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                 subtree.NamespaceURI == OdfNamespaces.Text)
             {
                 string paragraph = subtree.ReadElementContentAsString();
+                totalLength = checked(totalLength + paragraph.Length + (paragraphs.Count == 0 ? 0 : 1));
+                EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
                 paragraphs.Add(paragraph);
-                EnsureWithinLimit(paragraphs.Sum(static value => value.Length) + paragraphs.Count - 1,
-                    _options.MaxCellTextCharacters);
             }
+        }
+        return paragraphs.Count == 0 ? null : string.Join("\n", paragraphs);
+    }
+
+    private async Task<string?> ReadCellTextAsync(XmlReader cellReader, CancellationToken cancellationToken)
+    {
+        if (cellReader.IsEmptyElement)
+            return null;
+        var paragraphs = new List<string>();
+        int totalLength = 0;
+        using var subtree = cellReader.ReadSubtree();
+        await subtree.ReadAsync().ConfigureAwait(false);
+        while (await subtree.ReadAsync().ConfigureAwait(false))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (subtree.NodeType != XmlNodeType.Element || subtree.LocalName != "p" ||
+                subtree.NamespaceURI != OdfNamespaces.Text)
+            {
+                continue;
+            }
+
+            string paragraph = await subtree.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            totalLength = checked(totalLength + paragraph.Length + (paragraphs.Count == 0 ? 0 : 1));
+            EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
+            paragraphs.Add(paragraph);
         }
         return paragraphs.Count == 0 ? null : string.Join("\n", paragraphs);
     }

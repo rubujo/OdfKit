@@ -28,7 +28,15 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// Gets a value indicating whether the data reader contains one or more rows.
     /// 取得一個值，指出資料讀取器是否包含一或多個資料列。
     /// </summary>
-    public override bool HasRows => _sheetNames.Count > 0;
+    public override bool HasRows
+    {
+        get
+        {
+            if (!_started)
+                InitializeAndBufferFirstRow();
+            return _hasRows;
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the data reader is closed.

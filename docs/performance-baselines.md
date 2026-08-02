@@ -2,6 +2,9 @@
 
 本文件說明 OdfKit 的效能基準線、穩定量測設定檔與報告產生方式。基準測試結果受 CPU、記憶體、磁碟、作業系統、電源設定與 JIT 狀態影響，因此本文件記錄「如何量測」與「目前關卡」，不把單一本機輸出宣告為跨機器服務等級承諾。
 
+ODS／ODT 串流 I/O 的維護決策、隨機存取邊界與安全依據見
+[ODS／ODT 串流 Reader／Writer 設計與最佳化準則](streaming-reader-writer-design.md)。
+
 ## 目前回歸關卡
 
 `eng/Benchmark-Regression.ps1` 會執行 `DomInsertBenchmarks.SequentialInsertAfter` 與

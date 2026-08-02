@@ -11,6 +11,26 @@ namespace OdfKit.Tests;
 public class SpreadsheetTests
 {
     /// <summary>
+    /// 驗證建構 Reader 時不會為了工作表名稱預先剖析 content.xml。
+    /// </summary>
+    [Fact]
+    public void OdsStreamReaderConstructionDefersContentXmlParsing()
+    {
+        using var stream = new MemoryStream();
+        using (var archive = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = archive.CreateEntry("content.xml");
+            using var entryStream = entry.Open();
+            entryStream.WriteByte((byte)'<');
+        }
+
+        stream.Position = 0;
+        using var reader = new OdsStreamReader(stream);
+
+        Assert.Throws<System.Xml.XmlException>(() => _ = reader.SheetNames.Count);
+    }
+
+    /// <summary>
     /// 驗證基本流式讀取：字串、浮點數、布林值均正確讀取。
     /// </summary>
     [Fact]
@@ -241,6 +261,30 @@ public class SpreadsheetTests
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
         await Assert.ThrowsAsync<OperationCanceledException>(() => reader.ReadAsync(cancellation.Token));
+    }
+
+    /// <summary>
+    /// 驗證非同步 Reader 可直接剖析寬列並保留儲存格語意。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamReaderReadAsyncParsesWideRowWithoutIntermediateRowDocument()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("Sheet1");
+            writer.WriteStartRow();
+            for (int column = 0; column < 512; column++)
+                writer.WriteCell($"value-{column}");
+            writer.WriteEndRow();
+        }
+
+        stream.Position = 0;
+        using var reader = new OdsStreamReader(stream);
+
+        Assert.True(await reader.ReadAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(512, reader.FieldCount);
+        Assert.Equal("value-511", reader.GetValue(511));
     }
 
     /// <summary>
