@@ -88,6 +88,40 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 | 樞紐 | `OdfPivotCalculatedBenchmarks` | 10K 列一般彙總、計算欄位、數值分組、列百分比與雙軸總計的時間及配置量 |
 | 協作 | `CollaborationOperationBenchmarks` | TDF JSON operation 剖析與重播 |
 
+### ODS 可編輯 DOM 載入分層
+
+`StandardOdsBenchmarks` 將一般 `SpreadsheetDocument.Load` 拆成三個不可混為單一
+「開檔時間」的情境：
+
+- `LoadComplexDomAndEnumerateSheets`：只建立外層 DOM 與列舉工作表中繼資料，工作表列維持 lazy。
+- `LoadComplexDomAndReadFirstSheet`：載入後首次具現化第一張工作表。
+- `LoadComplexDomAndReadLastSheet`：驗證定位最後一張工作表不會連帶具現化前面的工作表。
+
+核心 XML entry 已完成 ZIP 大小與 CRC 驗證後，直接以既有 UTF-8 記憶體交給 span parser；
+大型 `table:table` 保存來源 memory slice，避免 `ReadInnerXml()` 建立大型 UTF-16 字串後再
+複製成 UTF-8 陣列。載入期的 LibreOffice 擴充屬性正規化延後至該 lazy subtree 首次
+具現化，且多執行緒首次存取只允許單次具現化。完整儲存仍會因文件統計、媒體引用掃描與
+sparse cell 序列化而走訪必要內容，不能把 `LoadOnly` 數字宣稱為 round-trip 成本。
+
+此設計借鑑 [Deflux](https://github.com/daniilvaino/Deflux) 將工作表發現與內容讀取分離的
+產品邏輯，但不引用其實作，也不加入 Checkpoint／DEFLATE 狀態引擎。安全與資源邊界依
+[Microsoft .NET ZIP 最佳實踐](https://learn.microsoft.com/dotnet/standard/io/zip-tar-best-practices)、
+[Microsoft XML Reader 安全設定](https://learn.microsoft.com/dotnet/fundamentals/runtime-libraries/system-xml-xmlreadersettings)
+及 [OASIS ODF 1.4 Package 標準](https://docs.oasis-open.org/office/OpenDocument/v1.4/part2-packages/OpenDocument-v1.4-os-part2-packages.html)
+維持 entry 數量／大小、解壓總量、DTD、resolver、XML 字元數、巢狀深度與路徑防護。
+
+相同核心路徑也服務 ODT、ODP 與 ODG：大型 `text:p`／`text:list`、內嵌表格及
+styles／meta／settings subtree 都保留 UTF-8 lazy slice。`StandardOdtBenchmarks` 另以
+`LoadLargeParagraphAndEnumerateParagraphs` 與 `LoadLargeParagraphAndReadText` 分離 ODT
+外層載入和首次段落內容存取；ODP／ODG 的投影片／頁面索引只列舉外層 `draw:page`，不會
+因建立集合而讀取其大型段落內容。四格式共同的快速 parser 必須拒絕 DTD／其他 XML markup
+declaration，並將 lazy payload 計入呼叫端指定的 `MaxXmlCharactersInDocument`；首次具現化
+沿用原始 `StrictXmlParsing` 與字元上限，不可退回較寬鬆的預設值。
+
+執行緒邊界維持「單一文件不保證無鎖並行讀寫」：不同文件可平行處理，同一 lazy subtree
+的首次具現化與 ODS worksheet facade 建立具備同步保護；但 DOM Children／Attributes、
+投影片／繪圖頁面集合及儲存管線仍須由呼叫端避免和修改操作並行。
+
 ## 判讀規則
 
 - 先看配置量，再看平均值；配置量突增通常比小幅平均值波動更值得追。

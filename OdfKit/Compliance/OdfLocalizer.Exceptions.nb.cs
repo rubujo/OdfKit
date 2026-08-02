@@ -661,6 +661,7 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Verdien {1} for Argon2-parameteren {0} er utenfor det tillatte området {2} til {3}.",
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Krypteringsalgoritmen {1} støtter ikke en nøkkelstørrelse på {0} byte; forventet {2} byte.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "En node kan ikke settes inn i seg selv eller en av sine etterkommere.",
+            ["Err_OdfXmlReader_DtdProhibited"] = "DTD- og XML-markeringsdeklarasjoner er forbudt.",
         };
     }
 }

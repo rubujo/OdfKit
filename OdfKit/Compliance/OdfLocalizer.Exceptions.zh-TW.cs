@@ -661,6 +661,7 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Argon2 參數 {0} 的值 {1} 超出允許範圍 {2} 至 {3}。",
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "加密演算法 {1} 不支援 {0} 位元組的金鑰大小；預期為 {2} 位元組。",
             ["Err_OdfNode_CyclicTreeInsertion"] = "節點不可插入自身或其任一後代節點。",
+            ["Err_OdfXmlReader_DtdProhibited"] = "禁止使用 DTD 與 XML 標記宣告。",
         };
     }
 }

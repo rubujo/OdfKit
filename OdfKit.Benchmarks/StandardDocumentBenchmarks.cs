@@ -29,6 +29,42 @@ public class StandardOdsBenchmarks
     [Benchmark]
     public ulong ReadStreaming() => StandardPerformanceWorkloads.ChecksumStreamingOds(_streaming);
 
+    /// <summary>
+    /// Loads the editable ODS model and enumerates sheet metadata without materializing sheet rows.
+    /// 載入可編輯 ODS 模型並列舉工作表中繼資料，但不具現化工作表資料列。
+    /// </summary>
+    [Benchmark]
+    public int LoadComplexDomAndEnumerateSheets()
+    {
+        using var input = new MemoryStream(_complex, writable: false);
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(input, "complex.ods");
+        return document.Worksheets.Count;
+    }
+
+    /// <summary>
+    /// Loads the editable ODS model and materializes the first worksheet on first cell access.
+    /// 載入可編輯 ODS 模型，並於首次儲存格存取時具現化第一張工作表。
+    /// </summary>
+    [Benchmark]
+    public object? LoadComplexDomAndReadFirstSheet()
+    {
+        using var input = new MemoryStream(_complex, writable: false);
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(input, "complex.ods");
+        return document.Worksheets[0].GetCell(0, 0).CellValue;
+    }
+
+    /// <summary>
+    /// Loads the editable ODS model and materializes only the last worksheet on first cell access.
+    /// 載入可編輯 ODS 模型，並於首次儲存格存取時僅具現化最後一張工作表。
+    /// </summary>
+    [Benchmark]
+    public object? LoadComplexDomAndReadLastSheet()
+    {
+        using var input = new MemoryStream(_complex, writable: false);
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(input, "complex.ods");
+        return document.Worksheets[document.Worksheets.Count - 1].GetCell(0, 0).CellValue;
+    }
+
     [Benchmark]
     public long LoadAndSaveComplexDom()
     {
@@ -49,12 +85,18 @@ public class StandardOdtBenchmarks
 {
     private byte[] _streaming = null!;
     private byte[] _complex = null!;
+    private byte[] _largeParagraph = null!;
 
     [GlobalSetup]
     public void Setup()
     {
         _streaming = StandardPerformanceWorkloads.CreateStreamingOdt(StandardPerformanceWorkloads.StandardOdtNodeCount);
         _complex = StandardPerformanceWorkloads.CreateComplexOdt(20_000);
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph(new string('x', 1_000_000));
+        using var output = new MemoryStream();
+        document.SaveToStream(output);
+        _largeParagraph = output.ToArray();
     }
 
     [Benchmark]
@@ -62,6 +104,30 @@ public class StandardOdtBenchmarks
 
     [Benchmark]
     public ulong ReadStreaming() => StandardPerformanceWorkloads.ChecksumStreamingOdt(_streaming);
+
+    /// <summary>
+    /// Loads an editable ODT and enumerates paragraph metadata without materializing the large paragraph body.
+    /// 載入可編輯 ODT 並列舉段落中繼資料，但不具現化大型段落內容。
+    /// </summary>
+    [Benchmark]
+    public int LoadLargeParagraphAndEnumerateParagraphs()
+    {
+        using var input = new MemoryStream(_largeParagraph, writable: false);
+        using TextDocument document = TextDocument.Load(input, "large-paragraph.odt");
+        return document.Body.Paragraphs.Items.Count;
+    }
+
+    /// <summary>
+    /// Loads an editable ODT and materializes the large paragraph on first text access.
+    /// 載入可編輯 ODT，並於首次文字存取時具現化大型段落。
+    /// </summary>
+    [Benchmark]
+    public int LoadLargeParagraphAndReadText()
+    {
+        using var input = new MemoryStream(_largeParagraph, writable: false);
+        using TextDocument document = TextDocument.Load(input, "large-paragraph.odt");
+        return document.Body.Paragraphs.Items[0].TextContent.Length;
+    }
 
     [Benchmark]
     public long LoadAndSaveComplexDom()

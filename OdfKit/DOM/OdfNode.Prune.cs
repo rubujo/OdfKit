@@ -95,6 +95,8 @@ public partial class OdfNode
         _lazyXmlPtr = IntPtr.Zero;
         _lazyXmlLen = 0;
         _xmlByteRange = null;
+        _lazyMaxXmlCharactersInDocument = 0;
+        _lazyStrictXmlParsing = false;
         _isLazy = false;
         IsModified = false;
         Document = null;

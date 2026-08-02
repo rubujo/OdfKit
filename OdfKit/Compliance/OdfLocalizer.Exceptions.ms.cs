@@ -661,6 +661,7 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Nilai {1} bagi parameter Argon2 {0} berada di luar julat yang dibenarkan, {2} hingga {3}.",
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Algoritma penyulitan {1} tidak menyokong saiz kunci {0} bait; {2} bait dijangkakan.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "Nod tidak boleh disisipkan ke dalam dirinya sendiri atau mana-mana nod turunannya.",
+            ["Err_OdfXmlReader_DtdProhibited"] = "Pengisytiharan DTD dan penanda XML adalah dilarang.",
         };
     }
 }

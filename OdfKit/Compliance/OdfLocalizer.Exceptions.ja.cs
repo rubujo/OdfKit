@@ -661,6 +661,7 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Argon2 パラメーター {0} の値 {1} は許可範囲 {2}～{3} 外です。",
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "暗号化アルゴリズム {1} は {0} バイトのキーサイズをサポートしていません。{2} バイトが必要です。",
             ["Err_OdfNode_CyclicTreeInsertion"] = "ノードを自身またはその子孫に挿入することはできません。",
+            ["Err_OdfXmlReader_DtdProhibited"] = "DTD および XML マークアップ宣言は禁止されています。",
         };
     }
 }

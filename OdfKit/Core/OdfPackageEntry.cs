@@ -403,6 +403,16 @@ internal class OdfPackageEntry : IDisposable
     }
 
     /// <summary>
+    /// 取得已完成大小限制與 CRC 驗證的 entry 唯讀記憶體，供不需要 <see cref="Stream"/> 介面的解析器直接使用。
+    /// </summary>
+    internal ReadOnlyMemory<byte> GetCachedMemory()
+    {
+        _prefetchTask?.GetAwaiter().GetResult();
+        EnsureBytesLoaded();
+        return _bytes ?? ReadOnlyMemory<byte>.Empty;
+    }
+
+    /// <summary>
     /// Gets a value indicating whether the entry can expose a direct memory-mapped pointer.
     /// 取得是否可直接暴露記憶體映射指標。
     /// </summary>

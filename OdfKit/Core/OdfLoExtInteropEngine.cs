@@ -20,6 +20,11 @@ internal static class OdfLoExtInteropEngine
     }
 
     /// <summary>
+    /// 在 lazy XML 子樹首次具現化後套用相同的 LibreOffice 擴充屬性正規化。
+    /// </summary>
+    internal static void NormalizeLoadedSubtree(OdfNode root) => NormalizeDecorativeAttributes(root);
+
+    /// <summary>
     /// 判斷繪圖節點是否標記為裝飾性（支援標準 <c>draw:decorative</c> 與 LibreOffice <c>loext:decorative</c>）。
     /// </summary>
     /// <param name="node">繪圖外框或圖形節點</param>
@@ -45,6 +50,11 @@ internal static class OdfLoExtInteropEngine
             }
 
             node.RemoveAttribute("decorative", OdfNamespaces.LoExt);
+        }
+
+        if (node._isLazy && node.Children.LoadedCount == 0)
+        {
+            return;
         }
 
         foreach (OdfNode child in node.Children)

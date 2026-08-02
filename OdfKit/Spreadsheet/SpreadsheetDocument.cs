@@ -22,6 +22,7 @@ public partial class SpreadsheetDocument : OdfDocument
 {
     private OdfWorksheetCollection? _worksheets;
     private readonly Dictionary<OdfNode, OdfTableSheet> _sheetFacades = [];
+    private readonly object _sheetFacadeLock = new();
 
     /// <summary>
     /// 取得活頁簿中所有工作表的根節點。
@@ -218,13 +219,16 @@ public partial class SpreadsheetDocument : OdfDocument
     /// </summary>
     internal OdfTableSheet GetOrCreateSheetFacade(OdfNode tableNode)
     {
-        if (!_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? sheet))
+        lock (_sheetFacadeLock)
         {
-            sheet = new OdfTableSheet(tableNode, this);
-            _sheetFacades.Add(tableNode, sheet);
-        }
+            if (!_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? sheet))
+            {
+                sheet = new OdfTableSheet(tableNode, this);
+                _sheetFacades.Add(tableNode, sheet);
+            }
 
-        return sheet;
+            return sheet;
+        }
     }
 
     /// <summary>
@@ -232,10 +236,13 @@ public partial class SpreadsheetDocument : OdfDocument
     /// </summary>
     internal void ReleaseSheetFacade(OdfNode tableNode, OdfTableSheet sheet)
     {
-        if (_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? registered) &&
-            ReferenceEquals(registered, sheet))
+        lock (_sheetFacadeLock)
         {
-            _sheetFacades.Remove(tableNode);
+            if (_sheetFacades.TryGetValue(tableNode, out OdfTableSheet? registered) &&
+                ReferenceEquals(registered, sheet))
+            {
+                _sheetFacades.Remove(tableNode);
+            }
         }
     }
 

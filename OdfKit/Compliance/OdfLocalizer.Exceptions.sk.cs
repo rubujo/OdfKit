@@ -661,6 +661,7 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_Argon2ParameterOutsideAllowedRange"] = "Hodnota {1} parametra Argon2 {0} je mimo povoleného rozsahu {2} až {3}.",
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Šifrovací algoritmus {1} nepodporuje veľkosť kľúča {0} bajtov; očakáva sa {2} bajtov.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "Uzol nemožno vložiť do seba samého ani do žiadneho zo svojich potomkov.",
+            ["Err_OdfXmlReader_DtdProhibited"] = "Deklarácie DTD a značiek XML sú zakázané.",
         };
     }
 }

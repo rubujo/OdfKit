@@ -503,8 +503,21 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
             }
             else
             {
-                using var stream = entry.OpenReader();
-                return OdfXmlReader.Parse(stream, Package.LoadOptions);
+                // LibreOffice 公式文件的 content.xml 可直接以裸 MathML 根節點表示。
+                // 目前高階公式正規化依賴完整 XmlReader 語意；在 UTF-8 快速 parser
+                // 達成同等相容性前保留既有路徑，避免一般載入最佳化改變公式內容。
+                if (entryName == "content.xml" &&
+                    Package.MimeType == "application/vnd.oasis.opendocument.formula")
+                {
+                    using Stream stream = entry.OpenReader();
+                    return OdfXmlReader.Parse(stream, Package.LoadOptions);
+                }
+
+                // OdfPackageEntry 本來就會將壓縮 entry 解壓並快取。直接把同一塊 UTF-8
+                // 記憶體交給 span parser，可讓大型 table 節點保存來源 slice，避免
+                // XmlReader.ReadInnerXml() 先配置 UTF-16 string、再複製成 UTF-8 byte[]。
+                ReadOnlyMemory<byte> xml = entry.GetCachedMemory();
+                return OdfXmlReader.Parse(xml, Package.LoadOptions);
             }
         }
         else

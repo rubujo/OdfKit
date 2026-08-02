@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Xml;
@@ -122,6 +123,10 @@ public static class OdfXmlReader
                             int innerLen = innerEnd - innerStart;
                             if (innerLen >= 8192)
                             {
+                                AddXmlCharacters(
+                                    options,
+                                    ref xmlCharacterCount,
+                                    GetUtf8CharacterCount(xmlData.Slice(innerStart, innerLen)));
                                 node._xmlByteRange = new OdfXmlByteRange(
                                     token.Offset,
                                     lazyReader.Position - token.Offset,
@@ -136,6 +141,8 @@ public static class OdfXmlReader
                                 {
                                     node._lazyXmlMemory = xmlData.Slice(innerStart, innerLen);
                                 }
+                                node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
+                                node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                 node._isLazy = true;
                                 reader = lazyReader;
                             }
@@ -174,15 +181,28 @@ public static class OdfXmlReader
                     break;
 
                 case OdfUtf8XmlTokenKind.Comment:
+                    if (IsProhibitedMarkupDeclaration(token.Value))
+                    {
+                        throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfXmlReader_DtdProhibited"));
+                    }
+
                     if (stack.Count > 0)
                     {
-                        string commentVal = token.GetValueString();
-                        AddXmlCharacters(options, ref xmlCharacterCount, commentVal.Length);
-                        OdfNode commentNode = new(OdfNodeType.Comment, string.Empty, string.Empty)
+                        bool isCData = token.Value.StartsWith("<![CDATA["u8);
+                        int prefixLength = isCData ? 9 : 4;
+                        ReadOnlySpan<byte> content = token.Value.Length >= prefixLength + 3
+                            ? token.Value.Slice(prefixLength, token.Value.Length - prefixLength - 3)
+                            : ReadOnlySpan<byte>.Empty;
+                        string value = OdfUtf8XmlReader.GetStringMaybeDecoded(content);
+                        AddXmlCharacters(options, ref xmlCharacterCount, value.Length);
+                        OdfNode contentNode = new(
+                            isCData ? OdfNodeType.Text : OdfNodeType.Comment,
+                            string.Empty,
+                            string.Empty)
                         {
-                            TextContent = commentVal
+                            TextContent = value
                         };
-                        stack.Peek().AppendChild(commentNode);
+                        stack.Peek().AppendChild(contentNode);
                     }
                     break;
 
@@ -543,7 +563,10 @@ public static class OdfXmlReader
                                 if (localName == "table" && nsUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0")
                                 {
                                     string innerXml = reader.ReadInnerXml();
+                                    AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     node._lazyXmlMemory = Encoding.UTF8.GetBytes(innerXml);
+                                    node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
+                                    node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                     node._isLazy = true;
                                     shouldLazy = true;
                                     currentDepth--;
@@ -552,9 +575,12 @@ public static class OdfXmlReader
                                 else if (localName == "meta" || localName == "settings" || localName == "styles" || localName == "p" || localName == "list")
                                 {
                                     string innerXml = reader.ReadInnerXml();
+                                    AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     if (innerXml.Length >= 8192)
                                     {
                                         node._lazyXmlMemory = Encoding.UTF8.GetBytes(innerXml);
+                                        node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
+                                        node._lazyStrictXmlParsing = options.StrictXmlParsing;
                                         node._isLazy = true;
                                         shouldLazy = true;
                                     }
@@ -700,6 +726,31 @@ public static class OdfXmlReader
             throw new SecurityException(
                 OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlCharacterLimitExceeded", CultureInfo.InvariantCulture, $"{total} > {options.MaxXmlCharactersInDocument}"));
         }
+    }
+
+    private static long GetUtf8CharacterCount(ReadOnlyMemory<byte> utf8)
+    {
+#if NETSTANDARD2_0
+        if (MemoryMarshal.TryGetArray(utf8, out ArraySegment<byte> segment) && segment.Array is byte[] bytes)
+        {
+            return Encoding.UTF8.GetCharCount(bytes, segment.Offset, segment.Count);
+        }
+
+        byte[] copy = utf8.ToArray();
+        return Encoding.UTF8.GetCharCount(copy, 0, copy.Length);
+#else
+        return Encoding.UTF8.GetCharCount(utf8.Span);
+#endif
+    }
+
+    private static bool IsProhibitedMarkupDeclaration(ReadOnlySpan<byte> value)
+    {
+        if (!value.StartsWith("<!"u8))
+        {
+            return false;
+        }
+
+        return !value.StartsWith("<!--"u8) && !value.StartsWith("<![CDATA["u8);
     }
 
     private static bool IsXmlSizeLimitExceeded(XmlException exception)

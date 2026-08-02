@@ -642,5 +642,6 @@
   "Err_OdfSignatureTsaClient_UnsafeCrlUri": "L URI di distribuzione CRL deve usare HTTP o HTTPS e risolversi solo in indirizzi di rete pubblici.",
   "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange": "Il valore {1} del parametro Argon2 {0} non rientra nell'intervallo consentito da {2} a {3}.",
   "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm": "L'algoritmo di cifratura {1} non supporta una chiave di {0} byte; sono previsti {2} byte.",
-  "Err_OdfNode_CyclicTreeInsertion": "Un nodo non può essere inserito in sé stesso o in uno dei suoi discendenti."
+  "Err_OdfNode_CyclicTreeInsertion": "Un nodo non può essere inserito in sé stesso o in uno dei suoi discendenti.",
+  "Err_OdfXmlReader_DtdProhibited": "Le dichiarazioni DTD e di markup XML sono vietate."
 }

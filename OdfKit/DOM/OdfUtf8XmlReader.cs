@@ -122,12 +122,26 @@ public ref struct OdfUtf8XmlReader
             {
                 // Processing Instruction
                 _position++;
+                int nameStart = _position;
+                while (_position < _xml.Length &&
+                       !IsWhitespace(_xml[_position]) &&
+                       !(_xml[_position] == (byte)'?' && _position + 1 < _xml.Length && _xml[_position + 1] == (byte)'>'))
+                {
+                    _position++;
+                }
+                ReadOnlySpan<byte> name = _xml.Slice(nameStart, _position - nameStart);
+                while (_position < _xml.Length && IsWhitespace(_xml[_position]))
+                {
+                    _position++;
+                }
+                int valueStart = _position;
                 while (_position < _xml.Length && !(_xml[_position] == (byte)'?' && _position + 1 < _xml.Length && _xml[_position + 1] == (byte)'>'))
                 {
                     _position++;
                 }
+                ReadOnlySpan<byte> value = _xml.Slice(valueStart, _position - valueStart);
                 _position = Math.Min(_position + 2, _xml.Length); // consume '?>'（若未找到終止符則夾限至緩衝區尾端）
-                token = new OdfUtf8XmlToken(OdfUtf8XmlTokenKind.ProcessingInstruction, _xml.Slice(start, _position - start), offset: start, length: _position - start);
+                token = new OdfUtf8XmlToken(OdfUtf8XmlTokenKind.ProcessingInstruction, name, value, offset: start, length: _position - start);
                 return true;
             }
             else
@@ -857,7 +871,7 @@ public readonly ref struct OdfUtf8XmlToken
     /// Provides the Value member.
     /// 取得標記值的 UTF-8 位元組 Span。
     /// </summary>
-    public ReadOnlySpan<byte> Value => Name;
+    public ReadOnlySpan<byte> Value => Kind == OdfUtf8XmlTokenKind.ProcessingInstruction ? Attributes : Name;
 
     internal OdfUtf8XmlToken(OdfUtf8XmlTokenKind kind, ReadOnlySpan<byte> name, ReadOnlySpan<byte> attributes = default, int offset = 0, int length = 0)
     {

@@ -91,6 +91,8 @@ public partial class OdfNode
         clone._lazyXmlPtr = _lazyXmlPtr;
         clone._lazyXmlLen = _lazyXmlLen;
         clone._xmlByteRange = _xmlByteRange;
+        clone._lazyMaxXmlCharactersInDocument = _lazyMaxXmlCharactersInDocument;
+        clone._lazyStrictXmlParsing = _lazyStrictXmlParsing;
         return true;
     }
 

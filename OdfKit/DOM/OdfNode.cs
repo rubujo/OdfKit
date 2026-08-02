@@ -140,7 +140,9 @@ public partial class OdfNode
     public void ResetModifiedState()
     {
         IsModified = false;
-        foreach (var child in Children)
+        // 載入完成後重設 dirty state 不應成為 lazy subtree 的隱性讀取點。
+        // 未具現化 payload 本來就是來源文件的乾淨快照；只需處理已載入子節點。
+        for (OdfNode? child = _firstChild; child is not null; child = child.NextSibling)
         {
             child.ResetModifiedState();
         }
@@ -261,7 +263,11 @@ public partial class OdfNode
     internal IntPtr _lazyXmlPtr;
     internal int _lazyXmlLen;
     internal OdfXmlByteRange? _xmlByteRange;
-    internal bool _isLazy;
+    internal volatile bool _isLazy;
+    internal long _lazyMaxXmlCharactersInDocument;
+    internal bool _lazyStrictXmlParsing;
+    private object? _lazyMaterializationLock;
+    private bool _isMaterializing;
 
     /// <summary>
     /// Attempts to get the byte range of this node within the source UTF-8 XML buffer.
@@ -287,24 +293,61 @@ public partial class OdfNode
     /// </summary>
     public void EnsureMaterialized()
     {
-        if (_isLazy)
+        if (!_isLazy)
         {
-            _isLazy = false;
-            if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+            return;
+        }
+
+        object? syncRoot = _lazyMaterializationLock;
+        if (syncRoot is null)
+        {
+            object created = new();
+            syncRoot = System.Threading.Interlocked.CompareExchange(
+                ref _lazyMaterializationLock,
+                created,
+                null) ?? created;
+        }
+        lock (syncRoot)
+        {
+            if (!_isLazy)
             {
-                unsafe
-                {
-                    using var manager = new UnmanagedMemoryManager(_lazyXmlPtr, _lazyXmlLen);
-                    MaterializeChildren(manager.Memory);
-                }
-                _lazyXmlPtr = IntPtr.Zero;
-                _lazyXmlLen = 0;
+                return;
             }
-            else if (!_lazyXmlMemory.IsEmpty)
+
+            // MaterializeChildren 會透過 AppendChild 回到本節點的 child list。Monitor
+            // 允許同一執行緒重入，因此需要獨立狀態避免遞迴具現化；其他執行緒仍會
+            // 阻塞在外層 lock，直到完整 DOM 公布。
+            if (_isMaterializing)
             {
-                var data = _lazyXmlMemory;
+                return;
+            }
+
+            _isMaterializing = true;
+            try
+            {
+                if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+                {
+                    unsafe
+                    {
+                        using var manager = new UnmanagedMemoryManager(_lazyXmlPtr, _lazyXmlLen);
+                        MaterializeChildren(manager.Memory);
+                    }
+                    _lazyXmlPtr = IntPtr.Zero;
+                    _lazyXmlLen = 0;
+                }
+                else if (!_lazyXmlMemory.IsEmpty)
+                {
+                    MaterializeChildren(_lazyXmlMemory);
+                }
+
+                // 只有完整具現化成功後才釋放來源 payload 並公布完成狀態；解析失敗時保留
+                // lazy 狀態，避免其他執行緒觀察到半完成的 Children 清單。
                 _lazyXmlMemory = default;
-                MaterializeChildren(data);
+                _isLazy = false;
+            }
+            finally
+            {
+                _isMaterializing = false;
             }
         }
     }
@@ -350,8 +393,16 @@ public partial class OdfNode
 
     private void MaterializeChildren(ReadOnlyMemory<byte> xmlData)
     {
+        bool wasModified = IsModified;
         using var seqStream = new OdfSequenceStream(WrapperPrefixBytes, xmlData, WrapperSuffixBytes);
-        OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions { AllowLazyLoading = false });
+        OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions
+        {
+            AllowLazyLoading = false,
+            // wrapper 是具現化時由 OdfKit 人工加入的 XML 外殼，不應消耗呼叫端對
+            // 原始文件設定的字元預算。
+            MaxXmlCharactersInDocument = AddWrapperAllowance(_lazyMaxXmlCharactersInDocument),
+            StrictXmlParsing = _lazyStrictXmlParsing
+        });
         if (tempRoot is not null)
         {
             OdfNode? nextChild = tempRoot.FirstChild;
@@ -363,6 +414,28 @@ public partial class OdfNode
                 nextChild = sibling;
             }
         }
+
+        // 初始載入時略過的互通正規化在 subtree 真正需要時補做，之後將新建立的
+        // 子節點視為來源文件的乾淨基線；保留 lazy 父節點在具現化前已有的修改旗標。
+        for (OdfNode? child = _firstChild; child is not null; child = child.NextSibling)
+        {
+            OdfLoExtInteropEngine.NormalizeLoadedSubtree(child);
+            child.ResetModifiedState();
+        }
+        IsModified = wasModified;
+    }
+
+    private static long AddWrapperAllowance(long characterLimit)
+    {
+        if (characterLimit <= 0)
+        {
+            return 0;
+        }
+
+        int wrapperCharacters = WrapperPrefixBytes.Length + WrapperSuffixBytes.Length;
+        return characterLimit > long.MaxValue - wrapperCharacters
+            ? long.MaxValue
+            : characterLimit + wrapperCharacters;
     }
 
     private sealed class OdfSequenceStream : System.IO.Stream
