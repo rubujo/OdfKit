@@ -198,6 +198,35 @@ public partial class OptimizedRefactoringTests
         Assert.False(paragraphNode._isLazy);
     }
 
+    /// <summary>
+    /// 驗證大型 ODT pointer-backed 段落在重複儲存後，原文件仍可安全具現化內容。
+    /// </summary>
+    [Fact]
+    public void MemoryMappedOdtParagraphRemainsReadableAfterRepeatedSave()
+    {
+        string paragraph = $"<text:p>{new string('t', 5 * 1024 * 1024)}</text:p>";
+        using MemoryStream package = CreateDocumentPackage(
+            "application/vnd.oasis.opendocument.text",
+            BuildDocumentContent(string.Empty, $"<office:text>{paragraph}</office:text>"));
+        using OdfDocument document = OdfDocumentFactory.LoadDocument(package, new OdfLoadOptions(), "large-save.odt");
+        OdfKit.DOM.OdfNode body = document.ContentDom.Children.Single(node =>
+            node.LocalName == "body" && node.NamespaceUri == OdfNamespaces.Office);
+        OdfKit.DOM.OdfNode text = body.Children.Single(node =>
+            node.LocalName == "text" && node.NamespaceUri == OdfNamespaces.Office);
+        OdfKit.DOM.OdfNode paragraphNode = text.Children.Single(node =>
+            node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+
+        Assert.True(paragraphNode._isLazy);
+        Assert.NotEqual(IntPtr.Zero, paragraphNode._lazyXmlPtr);
+        using var firstSave = new MemoryStream();
+        using var secondSave = new MemoryStream();
+        document.SaveToStream(firstSave);
+        document.SaveToStream(secondSave);
+
+        Assert.True(paragraphNode._isLazy);
+        Assert.Equal(5 * 1024 * 1024, paragraphNode.TextContent.Length);
+    }
+
     private static string BuildDocumentContent(string declaration, string body)
     {
         return $"""

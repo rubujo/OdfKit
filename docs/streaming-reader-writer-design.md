@@ -89,7 +89,8 @@ fuzzing 與威脅模型驗證；核心 Reader 不為尚未驗證的需求預先�
 4. 常見 ODF qualified name 使用既有 bounded hash switch 與靜態 namespace/prefix；未知擴充名稱
    只在目前節點解析，不加入程序級無界 intern/cache，避免不可信名稱造成記憶體常駐。
 5. 大型壓縮核心 XML 在完成 entry 大小、總解壓量與 CRC 驗證後，以匿名 MMF 作 parser backing；
-   小型 entry 保留 byte array，內容覆寫會先釋放舊映射，避免陳舊指標與大型 LOH 常駐。
+   小型 entry 保留 byte array。已發布給 lazy DOM 的 view 在 entry 覆寫時轉為 retired backing，
+   維持到 package dispose 才釋放；未發布的映射則立即釋放，避免懸空指標與大型 LOH 常駐。
 6. ODS 隨機 cell access 沿用 worksheet 範圍內的 row/cell sparse cache，並以細粒度 lock 保護首次
    發布與失效；同一 worksheet facade 的並行 `GetCell` 不會建立重複 DOM 節點。
 

@@ -79,6 +79,12 @@ public sealed partial class OdfPackage
             TryCleanup(() => _underlyingStream?.Dispose());
         }
 
+        foreach (OdfPackageEntry entry in _retiredEntries)
+        {
+            if (!_entries.ContainsValue(entry))
+                TryCleanup(entry.Dispose);
+        }
+        _retiredEntries.Clear();
         foreach (OdfPackageEntry entry in _entries.Values)
         {
             TryCleanup(entry.Dispose);
@@ -184,6 +190,12 @@ public sealed partial class OdfPackage
             }
         }
 
+        foreach (OdfPackageEntry entry in _retiredEntries)
+        {
+            if (!_entries.ContainsValue(entry))
+                TryCleanup(entry.Dispose);
+        }
+        _retiredEntries.Clear();
         foreach (OdfPackageEntry entry in _entries.Values)
         {
             TryCleanup(entry.Dispose);

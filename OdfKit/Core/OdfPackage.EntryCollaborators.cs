@@ -75,6 +75,14 @@ public sealed partial class OdfPackage
 
         internal void SetMimeTypeValue(string mimetype) => _package._mimetype = mimetype;
 
+        internal void RetireEntry(OdfPackageEntry entry)
+        {
+            if (entry.HasPublishedParserPointer)
+            {
+                _package._retiredEntries.Add(entry);
+            }
+        }
+
         internal void RemoveOutdatedSignatures() => _package.RemoveOutdatedSignatures();
     }
 }

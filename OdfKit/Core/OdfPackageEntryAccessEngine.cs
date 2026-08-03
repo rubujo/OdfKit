@@ -64,12 +64,14 @@ internal static class OdfPackageEntryAccessEngine
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         bool isCompressed = true;
-        bool existed = ctx.Entries.ContainsKey(name);
-        if (ctx.Entries.TryGetValue(name, out var oldEntry))
+        bool existed = ctx.Entries.TryGetValue(name, out OdfPackageEntry? oldEntry);
+        if (oldEntry is not null)
         {
             isCompressed = oldEntry.IsCompressed;
         }
         OdfPackageEntry entry = new(name, content) { IsCompressed = isCompressed };
+        if (oldEntry is not null)
+            ctx.RetireEntry(oldEntry);
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
         if (!existed && !ctx.EntryOrder.Contains(name))
@@ -96,8 +98,8 @@ internal static class OdfPackageEntryAccessEngine
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         bool isCompressed = true;
-        bool existed = ctx.Entries.ContainsKey(name);
-        if (ctx.Entries.TryGetValue(name, out var oldEntry))
+        bool existed = ctx.Entries.TryGetValue(name, out OdfPackageEntry? oldEntry);
+        if (oldEntry is not null)
         {
             isCompressed = oldEntry.IsCompressed;
         }
@@ -114,6 +116,8 @@ internal static class OdfPackageEntryAccessEngine
         }
 
         OdfPackageEntry entry = new(name, bytes) { IsCompressed = isCompressed };
+        if (oldEntry is not null)
+            ctx.RetireEntry(oldEntry);
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
         if (!existed && !ctx.EntryOrder.Contains(name))

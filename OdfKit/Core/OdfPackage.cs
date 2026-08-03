@@ -70,6 +70,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 
     private ZipArchive? _archive;
     private readonly Dictionary<string, OdfPackageEntry> _entries = new(StringComparer.Ordinal);
+    private readonly HashSet<OdfPackageEntry> _retiredEntries = [];
     private readonly Dictionary<string, string> _manifest = new(StringComparer.Ordinal);
     private readonly List<string> _entryOrder = new();
     private readonly List<string> _duplicateEntryNames = new();

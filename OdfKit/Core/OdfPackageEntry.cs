@@ -18,6 +18,7 @@ internal class OdfPackageEntry : IDisposable
     private byte[]? _bytes;
     private MemoryMappedFile? _ownedMmf;
     private long _ownedMmfLength;
+    private List<RetiredParserBacking>? _retiredParserBackings;
     private Stream? _stream;
     private bool _isModified;
     public bool IsCompressed { get; set; } = true;
@@ -28,6 +29,7 @@ internal class OdfPackageEntry : IDisposable
     private TaskCompletionSource<bool>? _prefetchCompletion;
 #endif
     internal OdfMmfEntryInfo? MmfEntry => _mmfEntry;
+    internal bool HasPublishedParserPointer => _viewAccessor is not null;
 
     private System.IO.MemoryMappedFiles.MemoryMappedViewAccessor? _viewAccessor;
     private unsafe byte* _viewPointer;
@@ -82,7 +84,7 @@ internal class OdfPackageEntry : IDisposable
     /// </summary>
     public void SetContent(byte[] bytes)
     {
-        ReleaseOwnedParserBacking();
+        RetirePublishedParserBacking();
         _stream?.Dispose();
         _bytes = bytes;
         _stream = null;
@@ -93,7 +95,7 @@ internal class OdfPackageEntry : IDisposable
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
-        ReleaseOwnedParserBacking();
+        RetirePublishedParserBacking();
         if (_stream != null && !ReferenceEquals(_stream, stream))
             _stream.Dispose();
 
@@ -551,6 +553,29 @@ internal class OdfPackageEntry : IDisposable
         }
     }
 
+    private void RetirePublishedParserBacking()
+    {
+        if (_viewAccessor is null)
+        {
+            _ownedMmf?.Dispose();
+        }
+        else
+        {
+            // DOM lazy slices may still point into this view after the package entry is
+            // replaced during Save. Detach it from the active entry state, but keep the
+            // acquired pointer and optional anonymous MMF alive until entry disposal.
+            (_retiredParserBackings ??= []).Add(new RetiredParserBacking(_viewAccessor, _ownedMmf));
+            _viewAccessor = null;
+            unsafe
+            {
+                _viewPointer = null;
+            }
+        }
+
+        _ownedMmf = null;
+        _ownedMmfLength = 0;
+    }
+
     private void ReleaseOwnedParserBacking()
     {
         ReleaseMmfView();
@@ -567,6 +592,37 @@ internal class OdfPackageEntry : IDisposable
     {
         _stream?.Dispose();
         ReleaseOwnedParserBacking();
+        if (_retiredParserBackings is not null)
+        {
+            foreach (RetiredParserBacking backing in _retiredParserBackings)
+                backing.Dispose();
+            _retiredParserBackings = null;
+        }
+    }
+
+    private sealed class RetiredParserBacking : IDisposable
+    {
+        private MemoryMappedViewAccessor? _accessor;
+        private MemoryMappedFile? _ownedMmf;
+
+        internal RetiredParserBacking(MemoryMappedViewAccessor accessor, MemoryMappedFile? ownedMmf)
+        {
+            _accessor = accessor;
+            _ownedMmf = ownedMmf;
+        }
+
+        public void Dispose()
+        {
+            if (_accessor is not null)
+            {
+                _accessor.SafeMemoryMappedViewHandle.ReleasePointer();
+                _accessor.Dispose();
+                _accessor = null;
+            }
+
+            _ownedMmf?.Dispose();
+            _ownedMmf = null;
+        }
     }
 }
 

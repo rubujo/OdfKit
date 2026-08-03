@@ -139,10 +139,49 @@ public partial class OptimizedRefactoringTests
         Assert.True(table._isLazy);
         Assert.NotEqual(IntPtr.Zero, table._lazyXmlPtr);
         Assert.True(table._lazyXmlMemory.IsEmpty);
+
+        using var firstSave = new MemoryStream();
+        using var secondSave = new MemoryStream();
+        document.SaveToStream(firstSave);
+        document.SaveToStream(secondSave);
+
+        OdfPackageEntry currentEntry = Assert.IsType<OdfPackageEntry>(document.Package.GetEntry("content.xml"));
+        Assert.NotSame(entry, currentEntry);
+        Assert.False(currentEntry.CanExposeMmfPointer);
+        Assert.True(table._isLazy);
+        Assert.NotEqual(IntPtr.Zero, table._lazyXmlPtr);
         string text = document.Worksheets[0].GetCell(0, 0).DisplayText;
         Assert.Equal(5 * 1024 * 1024, text.Length);
         Assert.Equal('x', text[0]);
         Assert.Equal('x', text[^1]);
+
+        document.Dispose();
+        Assert.False(entry.CanExposeMmfPointer);
+    }
+
+    /// <summary>
+    /// 驗證 pointer-backed lazy 節點深層複製後改持有受控記憶體，來源文件釋放後仍可具現化。
+    /// </summary>
+    [Fact]
+    public void MemoryMappedLazyCloneSurvivesSourceDocumentDisposal()
+    {
+        string body = $"<office:spreadsheet><table:table table:name=\"Sheet1\"><table:table-row><table:table-cell><text:p>{new string('c', 5 * 1024 * 1024)}</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet>";
+        using MemoryStream package = CreateDocumentPackage(
+            "application/vnd.oasis.opendocument.spreadsheet",
+            BuildDocumentContent(string.Empty, body));
+        SpreadsheetDocument document = SpreadsheetDocument.Load(package, "clone-mmf.ods");
+        TableTableElement sourceTable = GetOnlyTable(document);
+
+        Assert.NotEqual(IntPtr.Zero, sourceTable._lazyXmlPtr);
+        TableTableElement clone = Assert.IsType<TableTableElement>(sourceTable.CloneNode(deep: true));
+        Assert.Equal(IntPtr.Zero, clone._lazyXmlPtr);
+        Assert.False(clone._lazyXmlMemory.IsEmpty);
+
+        document.Dispose();
+
+        OdfNode paragraph = clone.Descendants().Single(node =>
+            node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal(5 * 1024 * 1024, paragraph.TextContent.Length);
     }
 
     /// <summary>

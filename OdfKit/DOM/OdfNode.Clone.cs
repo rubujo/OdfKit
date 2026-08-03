@@ -87,9 +87,23 @@ public partial class OdfNode
         }
 
         clone._isLazy = true;
-        clone._lazyXmlMemory = _lazyXmlMemory;
-        clone._lazyXmlPtr = _lazyXmlPtr;
-        clone._lazyXmlLen = _lazyXmlLen;
+        if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+        {
+            byte[] ownedXml = new byte[_lazyXmlLen];
+            unsafe
+            {
+                new ReadOnlySpan<byte>((void*)_lazyXmlPtr, _lazyXmlLen).CopyTo(ownedXml);
+            }
+            clone._lazyXmlMemory = ownedXml;
+            clone._lazyXmlPtr = IntPtr.Zero;
+            clone._lazyXmlLen = 0;
+        }
+        else
+        {
+            clone._lazyXmlMemory = _lazyXmlMemory;
+            clone._lazyXmlPtr = IntPtr.Zero;
+            clone._lazyXmlLen = 0;
+        }
         clone._xmlByteRange = _xmlByteRange;
         clone._lazyMaxXmlCharactersInDocument = _lazyMaxXmlCharactersInDocument;
         clone._lazyStrictXmlParsing = _lazyStrictXmlParsing;
