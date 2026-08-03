@@ -12,6 +12,11 @@
   [OWASP XXE Prevention Cheat Sheet][owasp-xxe]。
 - `ZipArchive.Dispose()` 會完成 archive 與中央目錄，因此 Writer 不把半完成 ZIP 描述為
   可安全恢復的文件。見 [Microsoft ZipArchive.Dispose][zip-dispose]。
+- ZIP instance 不在多執行緒間共享；大型不可信封裝避免 `Update`，並維持 entry／總解壓量限制。
+  見 [Microsoft .NET ZIP／TAR 最佳實踐][zip-best-practices]。
+- 真正的非同步檔案 I/O 由 Stream async API 與 cancellation token 承擔；大型 parser backing
+  可使用作業系統虛擬記憶體，而不是宣稱所有 CPU DOM preparation 都是非同步。見
+  [Microsoft 非同步檔案 I/O][async-file-io] 與 [Memory-mapped files][memory-mapped-files]。
 - DEFLATE 格式本身沒有原生隨機存取。稀疏 access point 可以改善特定工作負載，但需要
   額外儲存壓縮與 parser 狀態，並不屬於一般 forward-only Reader 的必要條件。
 
@@ -70,6 +75,29 @@ fuzzing 與威脅模型驗證；核心 Reader 不為尚未驗證的需求預先�
 | ODT Reader | 文字與 `text:s` 在 append 前檢查上限 | 防止先大量配置、事後才拒絕惡意輸入 |
 | ODS／ODT Writer | 保留 sequential raw XML 熱路徑 | 維持低常駐與可理解的封裝生命週期 |
 
+## 一般 DOM 載入／儲存的六項最佳化
+
+一般 `SpreadsheetDocument`／`TextDocument` 需要可編輯 DOM，與 forward-only Reader 的契約不同；
+因此採用下列可局部驗證、無 Checkpoint 狀態引擎的最佳化：
+
+1. 未具現化的 lazy subtree 儲存時直接複製既有 UTF-8 payload；文件統計與媒體清理遇到未知
+   lazy 內容時採保守策略，不為附帶最佳化強迫展開或誤刪引用。
+2. XML 字元預算先走 ASCII 快速路徑，遇到非 ASCII 才執行 UTF-8 字元計數；安全上仍以
+   `MaxXmlCharactersInDocument` 限制完整 lazy payload，而不是以 byte 數冒充字元數。
+3. parser 僅在元素實際宣告 namespace 時複製 scope dictionary，否則安全共用父 scope；writer
+   保留來源 URI／prefix 對應，擴充 namespace 在 lazy 與具現化 round-trip 都不遺失。
+4. 常見 ODF qualified name 使用既有 bounded hash switch 與靜態 namespace/prefix；未知擴充名稱
+   只在目前節點解析，不加入程序級無界 intern/cache，避免不可信名稱造成記憶體常駐。
+5. 大型壓縮核心 XML 在完成 entry 大小、總解壓量與 CRC 驗證後，以匿名 MMF 作 parser backing；
+   小型 entry 保留 byte array，內容覆寫會先釋放舊映射，避免陳舊指標與大型 LOH 常駐。
+6. ODS 隨機 cell access 沿用 worksheet 範圍內的 row/cell sparse cache，並以細粒度 lock 保護首次
+   發布與失效；同一 worksheet facade 的並行 `GetCell` 不會建立重複 DOM 節點。
+
+非同步儲存會以文件範圍 semaphore 序列化同一 `OdfDocument` 的 package/DOM snapshot，再把
+cancellation token 傳入非同步 I/O；這不代表可一邊修改 DOM 一邊儲存。不同文件可平行，單一
+文件的 mutation 與 save/dispose 仍應由呼叫端安排明確生命週期。`ZipArchive` 本身不視為可並行
+共享物件，符合 Microsoft 對 archive instance 避免跨執行緒共用的建議。
+
 ## 後續量測原則
 
 Reader 基準至少分開量測第一張表、後段工作表、完整 metadata 掃描、同步與非同步讀取、寬列、
@@ -81,4 +109,7 @@ Reader 基準至少分開量測第一張表、後段工作表、完整 metadata 
 [xml-reader-settings]: https://learn.microsoft.com/dotnet/fundamentals/runtime-libraries/system-xml-xmlreadersettings
 [owasp-xxe]: https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
 [zip-dispose]: https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.dispose
+[zip-best-practices]: https://learn.microsoft.com/dotnet/standard/io/zip-tar-best-practices
+[async-file-io]: https://learn.microsoft.com/dotnet/standard/io/asynchronous-file-i-o
+[memory-mapped-files]: https://learn.microsoft.com/dotnet/standard/io/memory-mapped-files
 [deflux]: https://github.com/daniilvaino/Deflux

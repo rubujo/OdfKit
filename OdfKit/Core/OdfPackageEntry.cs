@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.IO.MemoryMappedFiles;
 using System.Reflection;
 using OdfKit.DOM;
 
@@ -15,6 +16,8 @@ internal class OdfPackageEntry : IDisposable
     private readonly OdfMmfEntryInfo? _mmfEntry;
     private readonly OdfPackage? _package;
     private byte[]? _bytes;
+    private MemoryMappedFile? _ownedMmf;
+    private long _ownedMmfLength;
     private Stream? _stream;
     private bool _isModified;
     public bool IsCompressed { get; set; } = true;
@@ -28,6 +31,8 @@ internal class OdfPackageEntry : IDisposable
 
     private System.IO.MemoryMappedFiles.MemoryMappedViewAccessor? _viewAccessor;
     private unsafe byte* _viewPointer;
+
+    private const long ParserMmfThreshold = 4L * 1024 * 1024;
 
     private bool? _wasStoredInZip;
     public bool WasStoredInZip
@@ -77,6 +82,7 @@ internal class OdfPackageEntry : IDisposable
     /// </summary>
     public void SetContent(byte[] bytes)
     {
+        ReleaseOwnedParserBacking();
         _stream?.Dispose();
         _bytes = bytes;
         _stream = null;
@@ -87,6 +93,7 @@ internal class OdfPackageEntry : IDisposable
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(stream, nameof(stream));
 
+        ReleaseOwnedParserBacking();
         if (_stream != null && !ReferenceEquals(_stream, stream))
             _stream.Dispose();
 
@@ -199,7 +206,7 @@ internal class OdfPackageEntry : IDisposable
             {
                 try
                 {
-                    LoadBytesCore();
+                    PrepareParserBacking();
                 }
                 catch
                 {
@@ -244,9 +251,79 @@ internal class OdfPackageEntry : IDisposable
         LoadBytesCore();
     }
 
+    /// <summary>
+    /// 準備 XML parser 的穩定 backing storage；大型 ZIP entry 使用匿名 MMF，避免長生命週期 LOH 陣列。
+    /// </summary>
+    internal void PrepareParserBacking()
+    {
+        lock (_loadLock)
+        {
+            if (_ownedMmf is not null || CanExposeMmfPointer)
+                return;
+
+            if (_bytes is not null)
+            {
+                if (_isModified || _bytes.LongLength < ParserMmfThreshold)
+                    return;
+
+                MemoryMappedFile cachedMmf = MemoryMappedFile.CreateNew(null, _bytes.LongLength, MemoryMappedFileAccess.ReadWrite);
+                try
+                {
+                    using (MemoryMappedViewStream destination = cachedMmf.CreateViewStream(0, _bytes.LongLength, MemoryMappedFileAccess.Write))
+                        destination.Write(_bytes, 0, _bytes.Length);
+
+                    _ownedMmf = cachedMmf;
+                    _ownedMmfLength = _bytes.LongLength;
+                    _bytes = null;
+                }
+                catch
+                {
+                    cachedMmf.Dispose();
+                    throw;
+                }
+
+                return;
+            }
+
+            if (_zipEntry is null || _zipEntry.Length < ParserMmfThreshold || _zipEntry.Length > int.MaxValue)
+            {
+                LoadBytesCoreLocked();
+                return;
+            }
+
+            lock (_zipEntry.Archive)
+            {
+#if NET10_0_OR_GREATER
+                uint expectedCrc = (uint)_zipEntry.Crc32;
+#else
+                uint expectedCrc = 0;
+                FieldInfo? crcField = typeof(ZipArchiveEntry).GetField("_crc32", BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?? typeof(ZipArchiveEntry).GetField("crc32", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (crcField is not null)
+                    expectedCrc = Convert.ToUInt32(crcField.GetValue(_zipEntry), System.Globalization.CultureInfo.InvariantCulture);
+#endif
+                MemoryMappedFile mmf = MemoryMappedFile.CreateNew(null, _zipEntry.Length, MemoryMappedFileAccess.ReadWrite);
+                try
+                {
+                    using (MemoryMappedViewStream destination = mmf.CreateViewStream(0, _zipEntry.Length, MemoryMappedFileAccess.Write))
+                    using (var source = new OdfCrc32Stream(_zipEntry.Open(), expectedCrc))
+                        source.CopyTo(destination);
+
+                    _ownedMmf = mmf;
+                    _ownedMmfLength = _zipEntry.Length;
+                }
+                catch
+                {
+                    mmf.Dispose();
+                    throw;
+                }
+            }
+        }
+    }
+
     internal void LoadBytesForPrefetch()
     {
-        LoadBytesCore();
+        PrepareParserBacking();
     }
 
 #if NET10_0_OR_GREATER
@@ -349,6 +426,9 @@ internal class OdfPackageEntry : IDisposable
             return new MemoryStream(_bytes, false);
         }
 
+        if (_ownedMmf is not null)
+            return _ownedMmf.CreateViewStream(0, _ownedMmfLength, MemoryMappedFileAccess.Read);
+
         if (!string.IsNullOrEmpty(Name) && (global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '/') || global::OdfKit.Internal.OdfStringHelper.EndsWith(Name, '\\')))
         {
             _bytes = Array.Empty<byte>();
@@ -421,7 +501,8 @@ internal class OdfPackageEntry : IDisposable
     /// 因為映射區仍指向封裝中的原始位元組。解密就是這個情形：明文寫在 <c>_bytes</c>，
     /// 而映射區留著密文；若仍走零拷貝路徑，消費端會拿到密文。
     /// </remarks>
-    public bool CanExposeMmfPointer => !_isModified && _mmfEntry != null && _mmfEntry.CompressionMethod == 0 && _package != null && _package.Mmf != null;
+    public bool CanExposeMmfPointer => _ownedMmf is not null ||
+        (!_isModified && _mmfEntry != null && _mmfEntry.CompressionMethod == 0 && _package != null && _package.Mmf != null);
 
     /// <summary>
     /// 取得 entry 在記憶體映射檔案 (MMF) 中的直接唯讀記憶體指標。
@@ -430,6 +511,18 @@ internal class OdfPackageEntry : IDisposable
     public unsafe IntPtr GetMmfPointer(out int length)
     {
         length = 0;
+        if (_ownedMmf is not null)
+        {
+            if (_viewAccessor is null)
+            {
+                _viewAccessor = _ownedMmf.CreateViewAccessor(0, _ownedMmfLength, MemoryMappedFileAccess.Read);
+                _viewAccessor.SafeMemoryMappedViewHandle.AcquirePointer(ref _viewPointer);
+            }
+
+            length = checked((int)_ownedMmfLength);
+            return (IntPtr)(_viewPointer + _viewAccessor.PointerOffset);
+        }
+
         if (_isModified)
             return IntPtr.Zero;
 
@@ -458,6 +551,14 @@ internal class OdfPackageEntry : IDisposable
         }
     }
 
+    private void ReleaseOwnedParserBacking()
+    {
+        ReleaseMmfView();
+        _ownedMmf?.Dispose();
+        _ownedMmf = null;
+        _ownedMmfLength = 0;
+    }
+
     /// <summary>
     /// Creates or invokes Dispose using default values for optional parameters.
     /// 以可選參數的預設值建立或呼叫 Dispose。
@@ -465,12 +566,7 @@ internal class OdfPackageEntry : IDisposable
     public void Dispose()
     {
         _stream?.Dispose();
-        if (_viewAccessor != null)
-        {
-            _viewAccessor.SafeMemoryMappedViewHandle.ReleasePointer();
-            _viewAccessor.Dispose();
-            _viewAccessor = null;
-        }
+        ReleaseOwnedParserBacking();
     }
 }
 

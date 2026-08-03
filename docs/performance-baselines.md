@@ -100,8 +100,9 @@ pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*" -OutputPath ar
 核心 XML entry 已完成 ZIP 大小與 CRC 驗證後，直接以既有 UTF-8 記憶體交給 span parser；
 大型 `table:table` 保留來源 memory slice，避免 `ReadInnerXml()` 建立大型 UTF-16 字串後再
 複製成 UTF-8 陣列。載入期的 LibreOffice 擴充屬性正規化延後至該 lazy subtree 首次
-具現化，且多執行緒首次存取只允許單次具現化。完整儲存仍會因文件統計、媒體引用掃描與
-sparse cell 序列化而走訪必要內容，不能把 `LoadOnly` 數字宣稱為 round-trip 成本。
+具現化，且多執行緒首次存取只允許單次具現化。完整儲存對未觸碰的 lazy subtree 會直接傳遞
+原始 UTF-8；若 subtree 已具現化或需要 sparse cell 序列化，仍會走訪必要內容。`LoadOnly` 與
+`LoadAndSaveUntouchedLazyDom` 必須分別量測，不能把前者宣稱為 round-trip 成本。
 
 此設計借鑑 [Deflux](https://github.com/daniilvaino/Deflux) 將工作表發現與內容讀取分離的
 產品邏輯，但不引用其實作，也不加入 Checkpoint／DEFLATE 狀態引擎。安全與資源邊界依
@@ -118,9 +119,9 @@ styles／meta／settings subtree 都保留 UTF-8 lazy slice。`StandardOdtBenchm
 declaration，並將 lazy payload 計入呼叫端指定的 `MaxXmlCharactersInDocument`；首次具現化
 沿用原始 `StrictXmlParsing` 與字元上限，不可退回較寬鬆的預設值。
 
-執行緒邊界維持「單一文件不保證無鎖並行讀寫」：不同文件可平行處理，同一 lazy subtree
-的首次具現化與 ODS worksheet facade 建立具備同步保護；但 DOM Children／Attributes、
-投影片／繪圖頁面集合及儲存管線仍須由呼叫端避免和修改操作並行。
+執行緒邊界維持「單一文件不保證無鎖並行讀寫」：不同文件可平行處理，同一 lazy subtree、
+ODS worksheet facade 與 row/cell sparse cache 的首次發布具備同步保護；同一文件的多個儲存
+操作會序列化，但 DOM Children／Attributes、投影片／繪圖頁面集合仍不得與修改或儲存並行。
 
 ## 判讀規則
 

@@ -59,6 +59,7 @@ public static class OdfXmlReader
         OdfNode? rootNode = null;
         Stack<OdfNode> stack = new();
         Stack<Dictionary<string, string>> namespaceScopes = new();
+        Dictionary<string, string> sourceNamespacePrefixes = new(StringComparer.Ordinal);
         int currentDepth = 0;
         long xmlCharacterCount = 0;
 
@@ -76,10 +77,32 @@ public static class OdfXmlReader
                         throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlElementNestingDepth", CultureInfo.InvariantCulture, currentDepth, MaxElementDepth));
                     }
 
-                    Dictionary<string, string> elementNamespaces = namespaceScopes.Count > 0
-                        ? new Dictionary<string, string>(namespaceScopes.Peek(), StringComparer.Ordinal)
-                        : new Dictionary<string, string>(StringComparer.Ordinal);
-                    AddNamespaceDeclarations(token.Attributes, elementNamespaces);
+                    Dictionary<string, string> elementNamespaces;
+                    if (namespaceScopes.Count == 0)
+                    {
+                        elementNamespaces = new Dictionary<string, string>(StringComparer.Ordinal);
+                        AddNamespaceDeclarations(token.Attributes, elementNamespaces);
+                    }
+                    else if (HasNamespaceDeclarations(token.Attributes))
+                    {
+                        elementNamespaces = new Dictionary<string, string>(namespaceScopes.Peek(), StringComparer.Ordinal);
+                        AddNamespaceDeclarations(token.Attributes, elementNamespaces);
+                    }
+                    else
+                    {
+                        // Namespace scope is immutable after the element is parsed. Reuse the parent
+                        // map when this element has no xmlns delta instead of cloning a Dictionary
+                        // for every row, cell and paragraph.
+                        elementNamespaces = namespaceScopes.Peek();
+                    }
+                    if (namespaceScopes.Count == 0 || HasNamespaceDeclarations(token.Attributes))
+                    {
+                        foreach (KeyValuePair<string, string> declaration in elementNamespaces)
+                        {
+                            if (!string.IsNullOrEmpty(declaration.Value))
+                                sourceNamespacePrefixes[declaration.Value] = declaration.Key;
+                        }
+                    }
                     ResolveQualifiedName(token.Name, elementNamespaces, out string prefix, out string localName, out string nsUri);
 
                     AddXmlCharacters(options, ref xmlCharacterCount, localName.Length + nsUri.Length + prefix.Length);
@@ -123,10 +146,10 @@ public static class OdfXmlReader
                             int innerLen = innerEnd - innerStart;
                             if (innerLen >= 8192)
                             {
-                                AddXmlCharacters(
+                                AddUtf8XmlCharacters(
                                     options,
                                     ref xmlCharacterCount,
-                                    GetUtf8CharacterCount(xmlData.Slice(innerStart, innerLen)));
+                                    xmlData.Slice(innerStart, innerLen));
                                 node._xmlByteRange = new OdfXmlByteRange(
                                     token.Offset,
                                     lazyReader.Position - token.Offset,
@@ -239,6 +262,7 @@ public static class OdfXmlReader
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfXmlReader_InvalidNotFound"));
         }
 
+        rootNode._sourceNamespacePrefixes = sourceNamespacePrefixes;
         stopwatch.Stop();
         OdfPerformanceTelemetry.RecordXmlParse(stopwatch.Elapsed.TotalMilliseconds);
         return rootNode;
@@ -333,6 +357,33 @@ public static class OdfXmlReader
                 namespaces[attrFullName.Substring("xmlns:".Length)] = OdfUtf8XmlReader.GetStringMaybeDecoded(attrValueSpan);
             }
         }
+    }
+
+    private static bool HasNamespaceDeclarations(ReadOnlySpan<byte> attrsSpan)
+    {
+        int index = 0;
+        while (index < attrsSpan.Length)
+        {
+            while (index < attrsSpan.Length && IsWhitespace(attrsSpan[index]))
+                index++;
+            int nameStart = index;
+            while (index < attrsSpan.Length && attrsSpan[index] != (byte)'=' && !IsWhitespace(attrsSpan[index]))
+                index++;
+            if (index > nameStart && IsNamespaceDeclaration(attrsSpan.Slice(nameStart, index - nameStart)))
+                return true;
+
+            while (index < attrsSpan.Length && attrsSpan[index] != (byte)'"' && attrsSpan[index] != (byte)'\'')
+                index++;
+            if (index >= attrsSpan.Length)
+                break;
+            byte quote = attrsSpan[index++];
+            while (index < attrsSpan.Length && attrsSpan[index] != quote)
+                index++;
+            if (index < attrsSpan.Length)
+                index++;
+        }
+
+        return false;
     }
 
     private static void ParseAttributes(
@@ -741,6 +792,42 @@ public static class OdfXmlReader
 #else
         return Encoding.UTF8.GetCharCount(utf8.Span);
 #endif
+    }
+
+    private static void AddUtf8XmlCharacters(
+        OdfLoadOptions options,
+        ref long total,
+        ReadOnlyMemory<byte> utf8)
+    {
+        long limit = options.MaxXmlCharactersInDocument;
+        if (limit <= 0 || utf8.IsEmpty)
+            return;
+
+        if (IsAscii(utf8.Span))
+        {
+            // ASCII has an exact 1:1 byte-to-character mapping. This keeps limit semantics exact
+            // while avoiding decoder setup for the common ODF structural and numeric payload.
+            total += utf8.Length;
+            if (total > limit)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlCharacterLimitExceeded", CultureInfo.InvariantCulture, $"{total} > {limit}"));
+            }
+            return;
+        }
+
+        AddXmlCharacters(options, ref total, GetUtf8CharacterCount(utf8));
+    }
+
+    private static bool IsAscii(ReadOnlySpan<byte> value)
+    {
+        foreach (byte item in value)
+        {
+            if (item >= 0x80)
+                return false;
+        }
+
+        return true;
     }
 
     private static bool IsProhibitedMarkupDeclaration(ReadOnlySpan<byte> value)

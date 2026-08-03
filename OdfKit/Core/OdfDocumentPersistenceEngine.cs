@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -23,7 +24,11 @@ internal static class OdfDocumentPersistenceEngine
         // 嵌入子文件共用外層封裝時，最外層文件的情境為最終有效值。
         ctx.Package.FontContext = ctx.FontContext;
         ctx.FontContext.EmbedFontSubsets(ctx.Package, ctx.ContentDom, ctx.StylesDom);
-        OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
+        // Statistics are optional ODF metadata. Preserve the source values when untouched lazy
+        // payload exists; forcing a full DOM solely to recompute advisory counters defeats
+        // proportional saves and can expose large untrusted inputs to avoidable allocation.
+        if (!HasUnmaterializedLazySubtree(ctx.ContentDom))
+            OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
         ReportVersionCompatibility(ctx, options);
         ApplySaveVersionOptions(ctx, options);
         WriteAllDomEntries(ctx, options);
@@ -35,12 +40,21 @@ internal static class OdfDocumentPersistenceEngine
     /// </summary>
     internal static void WriteAllDomEntries(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
-        foreach (var desc in ctx.ContentXmlForPersistence.Descendants())
+        var pending = new Stack<OdfNode>();
+        pending.Push(ctx.ContentXmlForPersistence);
+        while (pending.Count > 0)
         {
-            if (desc is TableTableElement table)
+            OdfNode node = pending.Pop();
+            if (node is TableTableElement table && (!node._isLazy || node.Children.LoadedCount > 0))
             {
                 table.MaterializeSparseCells();
             }
+
+            if (node._isLazy && node.Children.LoadedCount == 0)
+                continue;
+
+            foreach (OdfNode child in node.Children)
+                pending.Push(child);
         }
 
         WriteDomToEntry(ctx, "content.xml", ctx.ContentXmlForPersistence, options);
@@ -106,12 +120,31 @@ internal static class OdfDocumentPersistenceEngine
 
     private static void PruneUnusedMedia(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
-        if (!options.PruneUnusedMedia || !string.IsNullOrEmpty(ctx.SubPath))
+        if (!options.PruneUnusedMedia ||
+            !string.IsNullOrEmpty(ctx.SubPath) ||
+            HasUnmaterializedLazySubtree(ctx.ContentXmlForPersistence))
         {
             return;
         }
 
         ctx.Package.PruneUnusedMedia(CollectReferencedPackageMediaPaths(ctx));
+    }
+
+    private static bool HasUnmaterializedLazySubtree(OdfNode root)
+    {
+        var pending = new Stack<OdfNode>();
+        pending.Push(root);
+        while (pending.Count > 0)
+        {
+            OdfNode node = pending.Pop();
+            if (node._isLazy && node.Children.LoadedCount == 0)
+                return true;
+
+            foreach (OdfNode child in node.Children)
+                pending.Push(child);
+        }
+
+        return false;
     }
 
     private static System.Collections.Generic.IEnumerable<string> CollectReferencedPackageMediaPaths(

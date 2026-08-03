@@ -15,6 +15,8 @@ namespace OdfKit.Core;
 
 public abstract partial class OdfDocument
 {
+    private readonly SemaphoreSlim _persistenceGate = new(1, 1);
+
     #region Package Lifecycle & Persistence
 
     /// <summary>
@@ -33,9 +35,17 @@ public abstract partial class OdfDocument
     /// </summary>
     public virtual void Save(OdfSaveOptions? options)
     {
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        Package.Save(options);
+        _persistenceGate.Wait();
+        try
+        {
+            options ??= OdfSaveOptions.Default;
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            Package.Save(options);
+        }
+        finally
+        {
+            _persistenceGate.Release();
+        }
     }
 
     /// <summary>
@@ -52,26 +62,34 @@ public abstract partial class OdfDocument
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        string destinationPath = Path.GetFullPath(path);
-        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+        _persistenceGate.Wait();
         try
         {
-            Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                ? new OdfDirectIoWritableStream(temporaryPath)
-                : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-
-            using (stream)
+            options ??= OdfSaveOptions.Default;
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            string destinationPath = Path.GetFullPath(path);
+            string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+            try
             {
-                Package.SaveToStream(stream, options);
-            }
+                Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    ? new OdfDirectIoWritableStream(temporaryPath)
+                    : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
 
-            OdfAtomicFile.Publish(temporaryPath, destinationPath);
+                using (stream)
+                {
+                    Package.SaveToStream(stream, options);
+                }
+
+                OdfAtomicFile.Publish(temporaryPath, destinationPath);
+            }
+            finally
+            {
+                OdfAtomicFile.TryDelete(temporaryPath);
+            }
         }
         finally
         {
-            OdfAtomicFile.TryDelete(temporaryPath);
+            _persistenceGate.Release();
         }
     }
 
@@ -98,9 +116,18 @@ public abstract partial class OdfDocument
     /// </summary>
     public virtual async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken)
     {
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        await Package.SaveAsync(options, cancellationToken).ConfigureAwait(false);
+        await _persistenceGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            options ??= OdfSaveOptions.Default;
+            cancellationToken.ThrowIfCancellationRequested();
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            await Package.SaveAsync(options, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _persistenceGate.Release();
+        }
     }
 
     /// <summary>
@@ -137,26 +164,35 @@ public abstract partial class OdfDocument
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(path, nameof(path));
 
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        string destinationPath = Path.GetFullPath(path);
-        string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+        await _persistenceGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                ? new OdfDirectIoWritableStream(temporaryPath)
-                : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
-
-            using (stream)
+            options ??= OdfSaveOptions.Default;
+            cancellationToken.ThrowIfCancellationRequested();
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            string destinationPath = Path.GetFullPath(path);
+            string temporaryPath = OdfAtomicFile.CreateTemporaryPath(destinationPath);
+            try
             {
-                await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
-            }
+                Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    ? new OdfDirectIoWritableStream(temporaryPath)
+                    : new FileStream(temporaryPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
 
-            OdfAtomicFile.Publish(temporaryPath, destinationPath);
+                using (stream)
+                {
+                    await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
+                }
+
+                OdfAtomicFile.Publish(temporaryPath, destinationPath);
+            }
+            finally
+            {
+                OdfAtomicFile.TryDelete(temporaryPath);
+            }
         }
         finally
         {
-            OdfAtomicFile.TryDelete(temporaryPath);
+            _persistenceGate.Release();
         }
     }
 
@@ -190,13 +226,19 @@ public abstract partial class OdfDocument
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        Package.SaveToStream(destinationStream, options);
-
-        if (destinationStream.CanSeek)
+        _persistenceGate.Wait();
+        try
         {
-            destinationStream.Position = 0;
+            options ??= OdfSaveOptions.Default;
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            Package.SaveToStream(destinationStream, options);
+
+            if (destinationStream.CanSeek)
+                destinationStream.Position = 0;
+        }
+        finally
+        {
+            _persistenceGate.Release();
         }
     }
 
@@ -265,12 +307,21 @@ public abstract partial class OdfDocument
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(destinationStream, nameof(destinationStream));
 
-        options ??= OdfSaveOptions.Default;
-        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
-        await Package.SaveToStreamAsync(destinationStream, options, cancellationToken).ConfigureAwait(false);
+        await _persistenceGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            options ??= OdfSaveOptions.Default;
+            cancellationToken.ThrowIfCancellationRequested();
+            OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+            await Package.SaveToStreamAsync(destinationStream, options, cancellationToken).ConfigureAwait(false);
 
-        if (destinationStream.CanSeek)
-            destinationStream.Position = 0;
+            if (destinationStream.CanSeek)
+                destinationStream.Position = 0;
+        }
+        finally
+        {
+            _persistenceGate.Release();
+        }
     }
 
     #endregion

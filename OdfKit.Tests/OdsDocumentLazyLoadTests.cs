@@ -30,10 +30,10 @@ public partial class OptimizedRefactoringTests
     }
 
     /// <summary>
-    /// 驗證未預先存取的大型工作表仍可由完整儲存管線正確具現化並完成 round-trip。
+    /// 驗證未預先存取的大型工作表可直接複製 UTF-8 payload，無須具現化即可完成 round-trip。
     /// </summary>
     [Fact]
-    public void SpreadsheetStreamLoadRoundTripsPreviouslyUntouchedLazySheet()
+    public void SpreadsheetStreamLoadRoundTripsUntouchedLazySheetWithoutMaterialization()
     {
         using MemoryStream package = CreateLargeLazyOdsPackage();
         using SpreadsheetDocument document = SpreadsheetDocument.Load(package, "large.ods");
@@ -42,9 +42,13 @@ public partial class OptimizedRefactoringTests
         using var output = new MemoryStream();
         document.SaveToStream(output);
 
-        Assert.False(table._isLazy);
-        Assert.Equal(260, table.Children.Count);
+        Assert.True(table._isLazy);
+        Assert.Equal(0, table.Children.LoadedCount);
         Assert.True(output.Length > 0);
+
+        output.Position = 0;
+        using SpreadsheetDocument reopened = SpreadsheetDocument.Load(output, "roundtrip.ods");
+        Assert.Equal("Sheet 0 Row 0", reopened.Worksheets[0].GetCell(0, 0).CellValue);
     }
 
     /// <summary>
@@ -81,6 +85,87 @@ public partial class OptimizedRefactoringTests
         Assert.False(table._isLazy);
         Assert.Equal(260, table.Children.Count);
         Assert.Equal(260, table.TableTableRowChildElements.Count());
+    }
+
+    /// <summary>
+    /// 驗證多執行緒同時建立同一儲存格時，列／格索引快取與 DOM 只發布同一節點。
+    /// </summary>
+    [Fact]
+    public void ConcurrentRandomCellAccessPublishesSingleNode()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        OdfNode?[] nodes = new OdfNode[32];
+
+        Parallel.For(0, nodes.Length, index => nodes[index] = sheet.GetCell(128, 64).Node);
+
+        Assert.All(nodes, node => Assert.Same(nodes[0], node));
+    }
+
+    /// <summary>
+    /// 驗證大型壓縮 XML entry 使用匿名 MMF 作為 lazy backing，而非保留大型 LOH 陣列。
+    /// </summary>
+    [Fact]
+    public void LargeCompressedContentUsesMemoryMappedLazyBacking()
+    {
+        string body = $"<office:spreadsheet><table:table table:name=\"Sheet1\"><table:table-row><table:table-cell><text:p>{new string('x', 5 * 1024 * 1024)}</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet>";
+        string mimeType = "application/vnd.oasis.opendocument.spreadsheet";
+        string content = BuildDocumentContent(string.Empty, body);
+        using var package = new MemoryStream();
+        using (var archive = new System.IO.Compression.ZipArchive(package, System.IO.Compression.ZipArchiveMode.Create, leaveOpen: true))
+        {
+            System.IO.Compression.ZipArchiveEntry mimeEntry = archive.CreateEntry("mimetype", System.IO.Compression.CompressionLevel.NoCompression);
+            using (Stream stream = mimeEntry.Open())
+                stream.Write(Encoding.ASCII.GetBytes(mimeType));
+
+            System.IO.Compression.ZipArchiveEntry contentEntry = archive.CreateEntry("content.xml", System.IO.Compression.CompressionLevel.Optimal);
+            using (Stream stream = contentEntry.Open())
+                stream.Write(Encoding.UTF8.GetBytes(content));
+
+            const string manifest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.4\"><manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.spreadsheet\" manifest:version=\"1.4\"/><manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\"/></manifest:manifest>";
+            System.IO.Compression.ZipArchiveEntry manifestEntry = archive.CreateEntry("META-INF/manifest.xml", System.IO.Compression.CompressionLevel.Optimal);
+            using (Stream stream = manifestEntry.Open())
+                stream.Write(Encoding.UTF8.GetBytes(manifest));
+        }
+
+        package.Position = 0;
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(package, "large-mmf.ods");
+        OdfPackageEntry entry = Assert.IsType<OdfPackageEntry>(document.Package.GetEntry("content.xml"));
+        Assert.True(entry.CanExposeMmfPointer);
+        Assert.NotEqual(IntPtr.Zero, entry.GetMmfPointer(out int entryLength));
+        Assert.True(entryLength > 5 * 1024 * 1024);
+        TableTableElement table = GetOnlyTable(document);
+
+        Assert.True(table._isLazy);
+        Assert.NotEqual(IntPtr.Zero, table._lazyXmlPtr);
+        Assert.True(table._lazyXmlMemory.IsEmpty);
+        string text = document.Worksheets[0].GetCell(0, 0).DisplayText;
+        Assert.Equal(5 * 1024 * 1024, text.Length);
+        Assert.Equal('x', text[0]);
+        Assert.Equal('x', text[^1]);
+    }
+
+    /// <summary>
+    /// 驗證同一文件的並行非同步儲存會序列化封裝存取，且兩份輸出都可重新載入。
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentAsyncSavesAreSerializedAndValid()
+    {
+        using MemoryStream package = CreateLargeLazyOdsPackage();
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(package, "large.ods");
+        using var first = new MemoryStream();
+        using var second = new MemoryStream();
+
+        await Task.WhenAll(
+            document.SaveToStreamAsync(first, TestContext.Current.CancellationToken),
+            document.SaveToStreamAsync(second, TestContext.Current.CancellationToken));
+
+        first.Position = 0;
+        second.Position = 0;
+        using SpreadsheetDocument firstDocument = SpreadsheetDocument.Load(first, "first.ods");
+        using SpreadsheetDocument secondDocument = SpreadsheetDocument.Load(second, "second.ods");
+        Assert.Equal("Sheet 0 Row 0", firstDocument.Worksheets[0].GetCell(0, 0).CellValue);
+        Assert.Equal("Sheet 0 Row 0", secondDocument.Worksheets[0].GetCell(0, 0).CellValue);
     }
 
     private static TableTableElement GetOnlyTable(SpreadsheetDocument document)

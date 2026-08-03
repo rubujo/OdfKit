@@ -38,6 +38,7 @@ public partial class OdfTableSheet
     // 其快取前綴會持續成長，而不必整個重建。
     private List<OdfNode>? _rowNodeCache;
     private readonly Dictionary<OdfNode, RowCellCache> _cellNodeCacheByRow = [];
+    private readonly object _accessCacheLock = new();
 
     private sealed class RowCellCache
     {
@@ -53,59 +54,68 @@ public partial class OdfTableSheet
     /// <returns>The cell XML node, or <see langword="null"/> when it does not exist. / 儲存格 XML 節點；不存在時為 <see langword="null"/>。</returns>
     internal OdfNode? TryGetCellNode(int row, int col)
     {
-        if (TryGetCachedRowNode(row, out OdfNode? cachedRowNode) &&
-            TryGetCachedCellNode(cachedRowNode, col, out OdfNode? cachedCellNode))
+        lock (_accessCacheLock)
         {
-            return cachedCellNode;
-        }
-
-        return OdfTableSheetDomAccessEngine.TryGetCellNode(TableNode, row, col);
-    }
-
-    private OdfNode GetOrCreateCellNode(int row, int col)
-    {
-        bool rowWasCached = TryGetCachedRowNode(row, out OdfNode? cachedRowNode);
-        if (rowWasCached)
-        {
-            if (TryGetCachedCellNode(cachedRowNode, col, out OdfNode? cachedCellNode))
+            if (TryGetCachedRowNode(row, out OdfNode? cachedRowNode) &&
+                TryGetCachedCellNode(cachedRowNode, col, out OdfNode? cachedCellNode))
             {
                 return cachedCellNode;
             }
 
-            // The row is already known, so go straight to the row-scoped cell lookup/creation instead
-            // of OdfTableSheetDomAccessEngine.GetOrCreateCellNode(TableNode, row, col), which would
-            // otherwise redundantly re-scan the whole table to re-derive the same row node.
-            OdfTableSheetDomAccessEngine.EnsureColumnDefinitions(TableNode, col);
-            OdfNode rowScopedCellNode = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(cachedRowNode, col, forWrite: true);
-            TryExtendCellCache(row, col, rowScopedCellNode);
-            return rowScopedCellNode;
+            return OdfTableSheetDomAccessEngine.TryGetCellNode(TableNode, row, col);
         }
+    }
 
-        OdfNode cellNode = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(TableNode, row, col);
-        TryExtendRowCache(row);
-        TryExtendCellCache(row, col, cellNode);
-        return cellNode;
+    private OdfNode GetOrCreateCellNode(int row, int col)
+    {
+        lock (_accessCacheLock)
+        {
+            bool rowWasCached = TryGetCachedRowNode(row, out OdfNode? cachedRowNode);
+            if (rowWasCached)
+            {
+                if (TryGetCachedCellNode(cachedRowNode, col, out OdfNode? cachedCellNode))
+                    return cachedCellNode;
+
+                OdfTableSheetDomAccessEngine.EnsureColumnDefinitions(TableNode, col);
+                OdfNode rowScopedCellNode = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(cachedRowNode, col, forWrite: true);
+                TryExtendCellCache(row, col, rowScopedCellNode);
+                return rowScopedCellNode;
+            }
+
+            OdfNode cellNode = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(TableNode, row, col);
+            TryExtendRowCache(row);
+            TryExtendCellCache(row, col, cellNode);
+            return cellNode;
+        }
     }
 
     private void ReplaceCellNode(int row, int col, OdfNode newCellNode)
     {
-        OdfTableSheetDomAccessEngine.ReplaceCellNode(TableNode, row, col, newCellNode);
-        InvalidateAccessCache();
+        lock (_accessCacheLock)
+        {
+            OdfTableSheetDomAccessEngine.ReplaceCellNode(TableNode, row, col, newCellNode);
+            _rowNodeCache = null;
+            _cellNodeCacheByRow.Clear();
+        }
     }
 
     internal OdfNode GetOrCreateColumnNode(int col)
-        => OdfTableSheetDomAccessEngine.GetOrCreateColumnNode(TableNode, col);
+    {
+        lock (_accessCacheLock)
+            return OdfTableSheetDomAccessEngine.GetOrCreateColumnNode(TableNode, col);
+    }
 
     private OdfNode GetOrCreateRowNode(int row)
     {
-        if (TryGetCachedRowNode(row, out OdfNode? cachedRowNode))
+        lock (_accessCacheLock)
         {
-            return cachedRowNode;
-        }
+            if (TryGetCachedRowNode(row, out OdfNode? cachedRowNode))
+                return cachedRowNode;
 
-        OdfNode rowNode = OdfTableSheetDomAccessEngine.GetOrCreateRowNode(TableNode, row, forWrite: true);
-        TryExtendRowCache(row, rowNode);
-        return rowNode;
+            OdfNode rowNode = OdfTableSheetDomAccessEngine.GetOrCreateRowNode(TableNode, row, forWrite: true);
+            TryExtendRowCache(row, rowNode);
+            return rowNode;
+        }
     }
 
     /// <summary>
@@ -116,8 +126,11 @@ public partial class OdfTableSheet
     /// </summary>
     internal void InvalidateAccessCache()
     {
-        _rowNodeCache = null;
-        _cellNodeCacheByRow.Clear();
+        lock (_accessCacheLock)
+        {
+            _rowNodeCache = null;
+            _cellNodeCacheByRow.Clear();
+        }
     }
 
     private bool TryGetCachedRowNode(int row, out OdfNode rowNode)

@@ -82,6 +82,49 @@ public partial class OptimizedRefactoringTests
     }
 
     /// <summary>
+    /// 驗證 UTF-8 快速字元計數以 Unicode 字元數執行，不把多位元組中文字元誤算為 bytes。
+    /// </summary>
+    [Fact]
+    public void FastPathCharacterLimitCountsMultibyteTextAsCharacters()
+    {
+        string body = $"<office:spreadsheet><table:table table:name=\"Sheet1\"><table:table-row><table:table-cell><text:p>{new string('臺', 9_000)}</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet>";
+        using MemoryStream package = CreateDocumentPackage(
+            "application/vnd.oasis.opendocument.spreadsheet",
+            BuildDocumentContent(string.Empty, body));
+
+        using OdfDocument document = OdfDocumentFactory.LoadDocument(
+            package,
+            new OdfLoadOptions { MaxXmlCharactersInDocument = 12_000 },
+            "multibyte.ods");
+
+        Assert.IsType<SpreadsheetDocument>(document);
+    }
+
+    /// <summary>
+    /// 驗證 lazy subtree 使用區域 namespace declaration 時，具現化後仍可正確 round-trip。
+    /// </summary>
+    [Fact]
+    public void LazySubtreeNamespaceScopeRoundTripsAfterMaterialization()
+    {
+        const string extensionNamespace = "urn:odfkit:test:extension";
+        string body = $"<office:spreadsheet><table:table table:name=\"Sheet1\" xmlns:ext=\"{extensionNamespace}\" ext:flag=\"yes\"><table:table-row><table:table-cell><text:p>{new string('x', 9_000)}</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet>";
+        using MemoryStream package = CreateDocumentPackage(
+            "application/vnd.oasis.opendocument.spreadsheet",
+            BuildDocumentContent(string.Empty, body));
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(package, "namespace.ods");
+
+        Assert.Equal(9_000, document.Worksheets[0].GetCell(0, 0).DisplayText.Length);
+        using var output = new MemoryStream();
+        document.SaveToStream(output);
+        output.Position = 0;
+        using SpreadsheetDocument reopened = SpreadsheetDocument.Load(output, "namespace-roundtrip.ods");
+        OdfKit.DOM.OdfNode table = reopened.ContentDom.Descendants().Single(node =>
+            node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
+
+        Assert.Equal("yes", table.GetAttribute("flag", extensionNamespace));
+    }
+
+    /// <summary>
     /// 驗證 lazy subtree 首次具現化會沿用原始 StrictXmlParsing 選項。
     /// </summary>
     [Fact]

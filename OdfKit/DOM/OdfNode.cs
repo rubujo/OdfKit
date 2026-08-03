@@ -266,6 +266,7 @@ public partial class OdfNode
     internal volatile bool _isLazy;
     internal long _lazyMaxXmlCharactersInDocument;
     internal bool _lazyStrictXmlParsing;
+    internal Dictionary<string, string>? _sourceNamespacePrefixes;
     private object? _lazyMaterializationLock;
     private bool _isMaterializing;
 
@@ -389,6 +390,40 @@ public partial class OdfNode
         }
 
         return false;
+    }
+
+    internal bool TryCopyLazyXmlTo(Stream destination)
+    {
+        if (!_isLazy || Children.LoadedCount != 0)
+            return false;
+
+        if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+        {
+            unsafe
+            {
+                using var source = new UnmanagedMemoryStream((byte*)_lazyXmlPtr, _lazyXmlLen);
+                source.CopyTo(destination);
+            }
+            return true;
+        }
+
+        if (_lazyXmlMemory.IsEmpty)
+            return false;
+
+        if (System.Runtime.InteropServices.MemoryMarshal.TryGetArray(
+                _lazyXmlMemory,
+                out ArraySegment<byte> segment) &&
+            segment.Array is byte[] bytes)
+        {
+            destination.Write(bytes, segment.Offset, segment.Count);
+        }
+        else
+        {
+            byte[] copy = _lazyXmlMemory.ToArray();
+            destination.Write(copy, 0, copy.Length);
+        }
+
+        return true;
     }
 
     private void MaterializeChildren(ReadOnlyMemory<byte> xmlData)

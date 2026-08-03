@@ -40,6 +40,11 @@ public static class OdfXmlWriter
         };
 
         Dictionary<string, string> nsDict = new(StringComparer.Ordinal);
+        if (rootNode._sourceNamespacePrefixes is not null)
+        {
+            foreach (KeyValuePair<string, string> mapping in rootNode._sourceNamespacePrefixes)
+                nsDict[mapping.Key] = mapping.Value;
+        }
         CollectNamespaces(rootNode, nsDict);
 
         // 確保標準 XML 命名空間不會被重複宣告為 xmlns:xml
@@ -53,7 +58,7 @@ public static class OdfXmlWriter
                 writer.WriteStartDocument();
 
                 // 單次走訪寫入；命名空間於根元素一次宣告（PERF-4j：避免子元素插入 xmlns 破壞屬性順序）
-                WriteNode(rootNode, writer, nsDict, ref openElementsCount, isRoot: true, depth: 1);
+                WriteNode(rootNode, writer, stream, nsDict, ref openElementsCount, isRoot: true, depth: 1);
 
                 writer.WriteEndDocument();
             }
@@ -84,6 +89,15 @@ public static class OdfXmlWriter
     internal static void WriteNode(
         OdfNode node,
         XmlWriter writer,
+        Dictionary<string, string> nsDict,
+        ref int openElementsCount,
+        bool isRoot,
+        int depth) => WriteNode(node, writer, null, nsDict, ref openElementsCount, isRoot, depth);
+
+    private static void WriteNode(
+        OdfNode node,
+        XmlWriter writer,
+        Stream? stream,
         Dictionary<string, string> nsDict,
         ref int openElementsCount,
         bool isRoot,
@@ -160,16 +174,30 @@ public static class OdfXmlWriter
             }
         }
 
-        if (node.TryWriteLazyXml(writer))
+        if (node._isLazy && node.Children.LoadedCount == 0)
         {
-            writer.WriteEndElement();
+            if (stream is null && node.TryWriteLazyXml(writer))
+            {
+                writer.WriteFullEndElement();
+                openElementsCount--;
+                return;
+            }
+
+            // Mark the XmlWriter element as content-bearing, flush its encoding buffer, then
+            // copy the already validated UTF-8 slice directly. This avoids a transient UTF-16
+            // string while preserving the writer's element state.
+            writer.WriteRaw(string.Empty);
+            writer.Flush();
+            if (stream is null || !node.TryCopyLazyXmlTo(stream))
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_InvalidOdfpackageentryState"));
+            writer.WriteFullEndElement();
             openElementsCount--;
             return;
         }
 
         foreach (var child in node.Children)
         {
-            WriteNode(child, writer, nsDict, ref openElementsCount, isRoot: false, depth: depth + 1);
+            WriteNode(child, writer, stream, nsDict, ref openElementsCount, isRoot: false, depth: depth + 1);
         }
 
         writer.WriteEndElement();
@@ -203,6 +231,9 @@ public static class OdfXmlWriter
             {
                 continue;
             }
+
+            if (current._isLazy && current.Children.LoadedCount == 0)
+                continue;
 
             if (!string.IsNullOrEmpty(current.NamespaceUri) &&
                 !nsDict.ContainsKey(current.NamespaceUri))

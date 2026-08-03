@@ -74,6 +74,16 @@ public class StandardOdsBenchmarks
         document.SaveToStream(output);
         return output.Length;
     }
+
+    [Benchmark]
+    public long LoadAndSaveUntouchedLazyDom()
+    {
+        using var input = new MemoryStream(_complex, writable: false);
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(input, "complex.ods");
+        using var output = new MemoryStream();
+        document.SaveToStream(output);
+        return output.Length;
+    }
 }
 
 /// <summary>
@@ -134,6 +144,16 @@ public class StandardOdtBenchmarks
     {
         using var input = new MemoryStream(_complex, writable: false);
         using TextDocument document = TextDocument.Load(input, "complex.odt");
+        using var output = new MemoryStream();
+        document.SaveToStream(output);
+        return output.Length;
+    }
+
+    [Benchmark]
+    public long LoadAndSaveUntouchedLargeParagraph()
+    {
+        using var input = new MemoryStream(_largeParagraph, writable: false);
+        using TextDocument document = TextDocument.Load(input, "large-paragraph.odt");
         using var output = new MemoryStream();
         document.SaveToStream(output);
         return output.Length;

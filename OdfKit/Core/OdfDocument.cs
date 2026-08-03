@@ -491,6 +491,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         var entry = Package.GetEntry(path);
         if (entry != null)
         {
+            entry.PrepareParserBacking();
             int len;
             IntPtr ptr = entry.GetMmfPointer(out len);
             if (ptr != IntPtr.Zero)
@@ -587,14 +588,24 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="disposing">If <see langword="true"/>, managed resources are released. / 若為 <see langword="true"/>，則釋放受控資源。</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_isDisposed)
+        if (!disposing || _isDisposed)
         {
-            if (disposing)
+            return;
+        }
+
+        _persistenceGate.Wait();
+        try
+        {
+            if (!_isDisposed)
             {
                 Package.OnRollback -= ReloadDoms;
                 Package.Dispose();
+                _isDisposed = true;
             }
-            _isDisposed = true;
+        }
+        finally
+        {
+            _persistenceGate.Release();
         }
     }
 
@@ -605,12 +616,26 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <returns>A value task representing the asynchronous release operation. / 代表非同步釋放作業的值工作。</returns>
     public async ValueTask DisposeAsync()
     {
-        if (!_isDisposed)
+        if (_isDisposed)
         {
-            Package.OnRollback -= ReloadDoms;
-            await Package.DisposeAsync().ConfigureAwait(false);
-            _isDisposed = true;
+            return;
         }
+
+        await _persistenceGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!_isDisposed)
+            {
+                Package.OnRollback -= ReloadDoms;
+                await Package.DisposeAsync().ConfigureAwait(false);
+                _isDisposed = true;
+            }
+        }
+        finally
+        {
+            _persistenceGate.Release();
+        }
+
         GC.SuppressFinalize(this);
     }
 
