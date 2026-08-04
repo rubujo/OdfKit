@@ -609,7 +609,7 @@ public class DocsAndCorpusContractTests
         string provenance = File.ReadAllText(Path.Combine(repoRoot, "docs", "provenance", "README.md"));
         string readme = File.ReadAllText(Path.Combine(repoRoot, "README.md"));
 
-        Assert.Contains("CC0-1.0", ipCompliance, StringComparison.Ordinal);
+        Assert.Contains("CC0 1.0 Universal", ipCompliance, StringComparison.Ordinal);
         Assert.Contains("THIRD-PARTY-NOTICES", ipCompliance, StringComparison.Ordinal);
         Assert.Contains("clean-room", ipCompliance, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("ip-compliance.md", docsIndex, StringComparison.Ordinal);

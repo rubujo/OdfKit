@@ -77,14 +77,12 @@ article li {
 }
 
 article table {
-  display: block;
-  width: max-content;
+  width: 100%;
   max-width: 100%;
   margin-block: 1.25rem 2rem;
-  overflow-x: auto;
   border-collapse: separate;
   border-spacing: 0;
-  scrollbar-width: thin;
+  table-layout: fixed;
 }
 
 article table.table {
@@ -100,7 +98,16 @@ article table.table th {
 article table.table th,
 article table.table td {
   padding: 0.7rem 0.85rem;
+  overflow-wrap: anywhere;
   vertical-align: top;
+}
+
+article table.table:has(tr > :nth-child(3):last-child) th:first-child {
+  width: 38%;
+}
+
+article table.table:has(tr > :nth-child(3):last-child) th:last-child {
+  width: 20%;
 }
 
 article pre {
@@ -322,6 +329,36 @@ main:has(.odfkit-home-hero) .affix {
 }
 
 @media (max-width: 767.98px) {
+  article table {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    overflow-x: auto;
+    table-layout: auto;
+    scrollbar-width: thin;
+  }
+
+  article table.table th,
+  article table.table td {
+    width: auto !important;
+    overflow-wrap: normal;
+  }
+
+  article table.table:has(tr > :nth-child(3):last-child) > thead,
+  article table.table:has(tr > :nth-child(3):last-child) > tbody {
+    display: table;
+    width: 44rem;
+    table-layout: fixed;
+  }
+
+  article table.table:has(tr > :nth-child(3):last-child) th:first-child {
+    width: 32% !important;
+  }
+
+  article table.table:has(tr > :nth-child(3):last-child) th:last-child {
+    width: 18% !important;
+  }
+
   article > h1 {
     font-size: 2rem;
   }
