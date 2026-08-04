@@ -11,7 +11,7 @@ Dokumentacja API jest generowana z publicznych zestawów `net10.0` i dokumentacj
 
 ## Licencja i tworzenie z użyciem AI
 
-Oryginalny kod i dokumentacja OdfKit korzystają z CC0-1.0 Universal. Pakiety, schematy, narzędzia i dane testowe stron trzecich zachowują własne licencje. Publiczna zawartość jest pisana, porządkowana lub tworzona za pomocą narzędzi AI. Witryna nie stanowi porady prawnej i nie zapewnia umowy SLA ani odszkodowania komercyjnego.
+Oryginalny kod i dokumentacja OdfKit korzystają z CC0 1.0 Universal. Pakiety, schematy, narzędzia i dane testowe stron trzecich zachowują własne licencje. Publiczna zawartość jest pisana, porządkowana lub tworzona za pomocą narzędzi AI. Witryna nie stanowi porady prawnej i nie zapewnia umowy SLA ani odszkodowania komercyjnego.
 
 ## Granice bezpieczeństwa i interoperacyjności
 

@@ -2,7 +2,7 @@
 title: Licence
 _lang: fr
 translation_source: api-docs/articles/license.md
-translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
+translation_source_sha256: 45b5611eb2f3c14efeb361ef7d8c1a15b48334b533d31923337cd26617fd1ab5
 ---
 
 # Licence
@@ -10,7 +10,7 @@ translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c1
 > Cette traduction est fournie à titre informatif. Le texte juridique original et les avis de tiers applicables prévalent.
 
 Le code original d’OdfKit et la documentation originale du site sont placés sous
-[CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Le texte juridique complet se
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Le texte juridique complet se
 trouve dans le fichier [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) à la racine du dépôt.
 
 Les dépendances, schémas, outils et données de test de tiers conservent leurs licences respectives et ne

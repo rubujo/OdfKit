@@ -2,7 +2,7 @@
 title: Propriedade intelectual e conformidade
 _lang: pt-BR
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Propriedade intelectual e conformidade (IP Compliance)
@@ -21,7 +21,7 @@ Consulte as auditorias de fontes relacionadas em
 
 | Escopo | Licença | Descrição |
 |---|---|---|
-| Código original do projeto OdfKit | [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | O projeto procura renunciar aos direitos autorais na máxima extensão possível; consulte o arquivo `LICENSE` na raiz |
+| Código original do projeto OdfKit | [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | O projeto procura renunciar aos direitos autorais na máxima extensão possível; consulte o arquivo `LICENSE` na raiz |
 | Dependências de compilação e execução | Principalmente MIT, BSD e similares | **Não se tornam domínio público em razão da CC0**; os respectivos avisos e declarações de direitos autorais devem ser preservados na redistribuição |
 | Esquemas OASIS ODF RELAX NG | OASIS Copyright | Localizados em `tools/OdfSchemaGenerator/schemas/`; consulte `THIRD-PARTY-NOTICES.md` |
 | Casos de teste de Corpus e Collaboration | Campo `license` de cada caso | Consulte `docs/corpus-manifest.md` e cada arquivo `manifest.json` |
@@ -38,7 +38,7 @@ Não se deve afirmar publicamente que “todo o produto resultante está em dom�
 ### Limites da CC0 para patentes e marcas
 
 Nos termos da seção 4(a) da CC0 1.0, direitos de patente e marca não são concedidos nem renunciados. OdfKit
-não oferece licença de patente, garantia de não violação, pesquisa de patentes ou indemnity. Os adotantes
+não oferece licença de patente, garantia de não violação, pesquisa de patentes ou indenização. Os adotantes
 devem realizar sua própria diligência. Prevalece o
 [texto jurídico da CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
@@ -46,7 +46,7 @@ devem realizar sua própria diligência. Prevalece o
 
 - O README declara que grande parte do código-fonte, da documentação, dos exemplos e dos testes publicados foi escrita, organizada ou produzida com o uso de ferramentas de IA.
 - O Affirmer da CC0 deve ter autoridade para dispor dos direitos aos quais renuncia. Antes de enviar uma contribuição, o colaborador deve confirmar que tem o direito de incorporá-la sob a licença do projeto; consulte a seção sobre DCO abaixo.
-- O reconhecimento de direitos autorais sobre conteúdo produzido exclusivamente por máquinas varia entre jurisdições. Um adotante que necessite de um titular de direitos claramente identificado e de um compromisso de indenização por violação deve avaliar alternativas comerciais ou negociar um contrato de suporte separado. **Este projeto de código aberto não fornece indemnity comercial por padrão**.
+- O reconhecimento de direitos autorais sobre conteúdo produzido exclusivamente por máquinas varia entre jurisdições. Um adotante que necessite de um titular de direitos claramente identificado e de um compromisso de indenização por violação deve avaliar alternativas comerciais ou negociar um contrato de suporte separado. **Este projeto de código aberto não fornece indenização comercial por padrão**.
 
 ## 3. Processo clean-room e fontes proibidas
 

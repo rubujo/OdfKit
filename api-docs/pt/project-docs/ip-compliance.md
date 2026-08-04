@@ -2,7 +2,7 @@
 title: Propriedade intelectual e conformidade
 _lang: pt
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Propriedade intelectual e conformidade
@@ -13,7 +13,7 @@ Serve à diligência de conformidade e aquisição e aos contribuidores; consult
 [proveniência](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Licenciamento composto
-O código original usa CC0-1.0 Universal; dependências, esquemas OASIS e fixtures mantêm as próprias
+O código original usa CC0 1.0 Universal; dependências, esquemas OASIS e fixtures mantêm as próprias
 licenças e OASIS Copyright. A distribuição deve cumprir `LICENSE` e
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), sem afirmar
 que o produto inteiro é domínio público.
@@ -21,13 +21,13 @@ que o produto inteiro é domínio público.
 ### Limites da CC0 para patentes e marcas
 
 Nos termos da secção 4(a) da CC0 1.0, direitos de patente e marca não são concedidos nem renunciados.
-OdfKit não oferece licença de patente, garantia de não infração, pesquisa de patentes ou indemnity. Os
+OdfKit não oferece licença de patente, garantia de não infração, pesquisa de patentes ou indemnização. Os
 utilizadores devem realizar a própria diligência. Prevalece o
 [texto jurídico da CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Direitos e conteúdo de IA
 Código, documentos, exemplos e testes são maioritariamente produzidos ou organizados com IA. O CC0
-Affirmer e os contribuidores devem deter os direitos; o tratamento varia por jurisdição. Não há indemnity comercial.
+Affirmer e os contribuidores devem deter os direitos; o tratamento varia por jurisdição. Não há indemnização comercial.
 
 ## 3. Clean-room
 São permitidas normas públicas OASIS/ISO/RFC/W3C, formatos públicos, fixtures redistribuíveis e testes

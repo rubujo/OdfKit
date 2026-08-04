@@ -84,15 +84,21 @@ article table {
   overflow-x: auto;
   border-collapse: separate;
   border-spacing: 0;
+  scrollbar-width: thin;
 }
 
-article table th {
+article table.table {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--bs-border-color);
+}
+
+article table.table th {
   background: rgba(var(--odfkit-accent), 0.08);
   font-weight: 700;
 }
 
-article table th,
-article table td {
+article table.table th,
+article table.table td {
   padding: 0.7rem 0.85rem;
   vertical-align: top;
 }

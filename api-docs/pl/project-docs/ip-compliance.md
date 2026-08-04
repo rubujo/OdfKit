@@ -2,7 +2,7 @@
 title: Własność intelektualna i zgodność
 _lang: pl
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Własność intelektualna i zgodność (IP Compliance)
@@ -21,7 +21,7 @@ Powiązane audyty źródeł opisano w
 
 | Zakres | Licencja | Opis |
 |---|---|---|
-| Oryginalny kod projektu OdfKit | [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | Projekt zrzeka się praw autorskich w największym możliwym zakresie; zobacz `LICENSE` w katalogu głównym |
+| Oryginalny kod projektu OdfKit | [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | Projekt zrzeka się praw autorskich w największym możliwym zakresie; zobacz `LICENSE` w katalogu głównym |
 | Zależności czasu kompilacji i wykonania | Głównie MIT, BSD i podobne | **Nie stają się domeną publiczną wskutek użycia CC0**; podczas dalszego rozpowszechniania należy zachować odpowiednie informacje i oświadczenia o prawach autorskich |
 | Schematy OASIS ODF RELAX NG | OASIS Copyright | Znajdują się w `tools/OdfSchemaGenerator/schemas/`; zobacz `THIRD-PARTY-NOTICES.md` |
 | Przypadki testowe Corpus i Collaboration | Pole `license` każdego przypadku | Zobacz `docs/corpus-manifest.md` i poszczególne pliki `manifest.json` |
@@ -38,7 +38,7 @@ Nie wolno publicznie twierdzić, że „cały produkt wynikowy znajduje się w d
 ### Granice CC0 dotyczące patentów i znaków towarowych
 
 Zgodnie z sekcją 4(a) CC0 1.0 prawa patentowe i prawa do znaków towarowych nie są udzielane ani zrzekane.
-OdfKit nie zapewnia licencji patentowej, gwarancji nieingerencji, wyszukiwania patentów ani indemnity.
+OdfKit nie zapewnia licencji patentowej, gwarancji nienaruszania patentów, wyszukiwania patentów ani odszkodowania.
 Użytkownicy muszą przeprowadzić własną analizę. Rozstrzyga
 [tekst prawny CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
@@ -46,7 +46,7 @@ Użytkownicy muszą przeprowadzić własną analizę. Rozstrzyga
 
 - README informuje, że znaczna część opublikowanego kodu źródłowego, dokumentacji, przykładów i testów została napisana, uporządkowana lub utworzona przy użyciu narzędzi AI.
 - Affirmer licencji CC0 musi mieć prawo rozporządzania prawami, których się zrzeka. Przed przesłaniem wkładu współtwórca powinien potwierdzić, że ma prawo włączyć treść na licencji projektu; zobacz część dotyczącą DCO poniżej.
-- Ocena praw autorskich do treści utworzonych wyłącznie przez maszyny różni się między jurysdykcjami. Podmiot wymagający jasno określonego właściciela praw i zobowiązania do odszkodowania za naruszenie powinien rozważyć rozwiązania komercyjne lub osobną umowę wsparcia. **Ten projekt open source domyślnie nie zapewnia komercyjnego indemnity**.
+- Ocena praw autorskich do treści utworzonych wyłącznie przez maszyny różni się między jurysdykcjami. Podmiot wymagający jasno określonego właściciela praw i zobowiązania do odszkodowania za naruszenie powinien rozważyć rozwiązania komercyjne lub osobną umowę wsparcia. **Ten projekt o otwartym kodzie źródłowym domyślnie nie zapewnia komercyjnego odszkodowania**.
 
 ## 3. Proces clean-room i źródła zabronione
 
@@ -91,7 +91,7 @@ wymagają również podpisu GPG.
 | Cele poza zakresem | Zobacz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), w tym pełny mechanizm układu oraz interaktywne funkcje pakietu biurowego, takie jak pamięć podręczna tabel przestawnych i fragmentatory |
 | Bezpieczeństwo | Używaj limitów zasobów `OdfLoadOptions`; dla niezaufanych danych wejściowych uruchamiaj `Validate` i oczyszczanie |
 | Źródła | Przejrzyj `docs/provenance/`; w razie potrzeby porównaj katalogi wysokiego ryzyka z projektami upstream pod kątem podobieństw |
-| Wsparcie | Projekt open source nie zapewnia SLA; systemy krytyczne powinny mieć nadmiarowość i własny plan utrzymania |
+| Wsparcie | Projekt o otwartym kodzie źródłowym nie zapewnia SLA; systemy krytyczne powinny mieć nadmiarowość i własny plan utrzymania |
 
 ## 7. Zgłaszanie luk i problemów bezpieczeństwa
 

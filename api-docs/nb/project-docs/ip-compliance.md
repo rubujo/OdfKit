@@ -2,7 +2,7 @@
 title: Immaterielle rettigheter og samsvar
 _lang: nb
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Immaterielle rettigheter og samsvar
@@ -13,7 +13,7 @@ For samsvars- og innkjøpskontroll og bidragsytere; se
 [proveniensen](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Sammensatt lisensmodell
-Originalkode bruker CC0-1.0 Universal; avhengigheter, OASIS-skjemaer og fixtures beholder lisens og OASIS
+Originalkode bruker CC0 1.0 Universal; avhengigheter, OASIS-skjemaer og fixtures beholder lisens og OASIS
 Copyright. Distribusjon må følge `LICENSE` og
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), og hele
 produktet må ikke omtales som offentlig eiendom.
@@ -21,12 +21,12 @@ produktet må ikke omtales som offentlig eiendom.
 ### CC0s grenser for patenter og varemerker
 
 Etter CC0 1.0 avsnitt 4(a) gis eller fraskrives ingen patent- eller varemerkerettigheter. OdfKit gir ingen
-patentlisens, garanti mot patentinngrep, patentsøk eller indemnity. Brukere må selv utføre kontroll. Ved
+patentlisens, garanti mot patentinngrep, patentsøk eller skadesløsholdelse. Brukere må selv utføre kontroll. Ved
 motstrid gjelder [CC0s juridiske tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rettigheter og KI-innhold
 Offentlig kode, dokumentasjon, eksempler og tester er hovedsakelig laget eller organisert med KI. CC0
-Affirmer og bidragsytere må ha rettighetene; vern varierer mellom jurisdiksjoner. Ingen kommersiell indemnity.
+Affirmer og bidragsytere må ha rettighetene; vern varierer mellom jurisdiksjoner. Ingen kommersiell skadesløsholdelse.
 
 ## 3. Clean-room
 Offentlige OASIS/ISO/RFC/W3C-standarder, åpne formater, redistribuerbare fixtures og uavhengige tester er

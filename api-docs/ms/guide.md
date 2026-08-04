@@ -11,7 +11,7 @@ Rujukan API dijana daripada assembly awam `net10.0` dan dokumentasi XML. API ter
 
 ## Lesen dan penghasilan AI
 
-Kod asal OdfKit dan dokumentasi asal tapak menggunakan CC0-1.0 Universal. Pakej, skema, alat dan fixture pihak ketiga mengekalkan lesen masing-masing. Kandungan projek awam ditulis, disusun atau dihasilkan dengan alat AI. Tapak ini bukan nasihat undang-undang dan tidak menyediakan SLA atau indemniti komersial. OdfKit bukan projek rasmi atau yang disokong oleh OASIS, The Document Foundation, LibreOffice atau Apache.
+Kod asal OdfKit dan dokumentasi asal tapak menggunakan CC0 1.0 Universal. Pakej, skema, alat dan fixture pihak ketiga mengekalkan lesen masing-masing. Kandungan projek awam ditulis, disusun atau dihasilkan dengan alat AI. Tapak ini bukan nasihat undang-undang dan tidak menyediakan SLA atau indemniti komersial. OdfKit bukan projek rasmi atau yang disokong oleh OASIS, The Document Foundation, LibreOffice atau Apache.
 
 ## Batas keselamatan dan saling kendali
 

@@ -61,9 +61,9 @@ try {
         if ($localeContent -notmatch [regex]::Escape('(xref:OdfKit)')) { throw "$localePath 缺少 API reference 入口。" }
         if ($localeContent -notmatch [regex]::Escape('[en + zh-TW]')) { throw "$localePath 的 API 入口缺少內容語系標示。" }
         if ($localeContent -notmatch [regex]::Escape('(guide.md)')) { throw "$localePath 缺少語系指南連結。" }
-        if ($localeContent -notmatch 'CC0-1\.0' -or $localeContent -notmatch '\b(AI|KI|IA)\b') { throw "$localePath 缺少授權或 AI 產製聲明。" }
+        if ($localeContent -notmatch 'CC0 1\.0 Universal' -or $localeContent -notmatch '\b(AI|KI|IA)\b') { throw "$localePath 缺少授權或 AI 產製聲明。" }
         if ($guideContent -notmatch "(?m)^_lang:\s*$([regex]::Escape($locale))\s*$") { throw "$guidePath 缺少正確的 _lang metadata。" }
-        foreach ($required in @('PackageFidelity', 'SemanticApiDepth', 'InteropEvidence', 'CC0-1.0', 'xref:OdfKit')) {
+        foreach ($required in @('PackageFidelity', 'SemanticApiDepth', 'InteropEvidence', 'CC0 1.0 Universal', 'xref:OdfKit')) {
             if ($guideContent -notmatch [regex]::Escape($required)) { throw "$guidePath 缺少必要內容：$required。" }
         }
         foreach ($requiredLink in $requiredOfficialLinks) {

@@ -11,7 +11,7 @@ Referencia API sa generuje z verejných assemblies `net10.0` a dokumentácie XML
 
 ## Licencia a tvorba pomocou AI
 
-Pôvodný kód OdfKit a pôvodná dokumentácia lokality používajú CC0-1.0 Universal. Balíky, schémy, nástroje a fixtures tretích strán si zachovávajú vlastné licencie. Verejný obsah projektu je napísaný, usporiadaný alebo vytvorený pomocou nástrojov AI. Lokalita neposkytuje právne poradenstvo, SLA ani komerčné odškodnenie. OdfKit nie je oficiálnym ani schváleným projektom organizácií OASIS, The Document Foundation, LibreOffice alebo Apache.
+Pôvodný kód OdfKit a pôvodná dokumentácia lokality používajú CC0 1.0 Universal. Balíky, schémy, nástroje a fixtures tretích strán si zachovávajú vlastné licencie. Verejný obsah projektu je napísaný, usporiadaný alebo vytvorený pomocou nástrojov AI. Lokalita neposkytuje právne poradenstvo, SLA ani komerčné odškodnenie. OdfKit nie je oficiálnym ani schváleným projektom organizácií OASIS, The Document Foundation, LibreOffice alebo Apache.
 
 ## Hranice bezpečnosti a interoperability
 

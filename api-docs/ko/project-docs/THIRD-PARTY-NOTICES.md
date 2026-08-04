@@ -2,14 +2,14 @@
 title: 제3자 고지
 _lang: ko
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
+translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
 ---
 
 # 제3자 고지
 
 > 설명만 번역합니다. 패키지·라이선스 이름, 저작권 고지와 원문 법률 문서가 우선합니다.
 
-OdfKit은 CC0-1.0 Universal을 사용합니다. 다음 종속성에는 각각의 라이선스가 유지됩니다.
+OdfKit은 CC0 1.0 Universal을 사용합니다. 다음 종속성에는 각각의 라이선스가 유지됩니다.
 
 | 패키지 | 용도 | 라이선스 |
 |---|---|---|

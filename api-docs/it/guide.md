@@ -11,7 +11,7 @@ Il riferimento API viene generato dagli assembly pubblici `net10.0` e dalla docu
 
 ## Licenza e produzione tramite IA
 
-Il codice originale OdfKit e la documentazione originale del sito adottano CC0-1.0 Universal. Pacchetti, schemi, strumenti e fixture di terze parti conservano le proprie licenze. I contenuti pubblici del progetto sono scritti, organizzati o prodotti con strumenti di IA. Il sito non costituisce consulenza legale e non offre SLA o indennizzi commerciali. OdfKit non è un progetto ufficiale né approvato da OASIS, The Document Foundation, LibreOffice o Apache.
+Il codice originale OdfKit e la documentazione originale del sito adottano CC0 1.0 Universal. Pacchetti, schemi, strumenti e fixture di terze parti conservano le proprie licenze. I contenuti pubblici del progetto sono scritti, organizzati o prodotti con strumenti di IA. Il sito non costituisce consulenza legale e non offre SLA o indennizzi commerciali. OdfKit non è un progetto ufficiale né approvato da OASIS, The Document Foundation, LibreOffice o Apache.
 
 ## Limiti di sicurezza e interoperabilità
 

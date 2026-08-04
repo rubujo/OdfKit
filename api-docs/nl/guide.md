@@ -11,7 +11,7 @@ De API-referentie wordt gegenereerd uit de openbare `net10.0`-assemblies en XML-
 
 ## Licentie en AI-productie
 
-Oorspronkelijke OdfKit-code en oorspronkelijke websitedocumentatie gebruiken CC0-1.0 Universal. Pakketten, schema's, hulpmiddelen en fixtures van derden behouden hun eigen licenties. Openbare projectinhoud is geschreven, geordend of geproduceerd met AI-hulpmiddelen. Deze website is geen juridisch advies en biedt geen SLA of commerciële vrijwaring. OdfKit is geen officieel of onderschreven project van OASIS, The Document Foundation, LibreOffice of Apache.
+Oorspronkelijke OdfKit-code en oorspronkelijke websitedocumentatie gebruiken CC0 1.0 Universal. Pakketten, schema's, hulpmiddelen en fixtures van derden behouden hun eigen licenties. Openbare projectinhoud is geschreven, geordend of geproduceerd met AI-hulpmiddelen. Deze website is geen juridisch advies en biedt geen SLA of commerciële vrijwaring. OdfKit is geen officieel of onderschreven project van OASIS, The Document Foundation, LibreOffice of Apache.
 
 ## Grenzen van beveiliging en interoperabiliteit
 

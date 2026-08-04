@@ -2,7 +2,7 @@
 title: Immaterielle rettigheder og compliance
 _lang: da
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Immaterielle rettigheder og compliance
@@ -13,7 +13,7 @@ For compliance- og indkøbskontrol og bidragydere; se
 [proveniensen](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Sammensat licensmodell
-Originalkode bruger CC0-1.0 Universal; afhængigheder, OASIS-skemaer og fixtures bevarer licens og OASIS
+Originalkode bruger CC0 1.0 Universal; afhængigheder, OASIS-skemaer og fixtures bevarer licens og OASIS
 Copyright. Distribution skal overholde `LICENSE` og
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), og hele
 produktet må ikke betegnes som offentligt domæne.
@@ -22,12 +22,12 @@ produktet må ikke betegnes som offentligt domæne.
 
 CC0 omfatter kun ophavsret og beslægtede rettigheder. Efter CC0 1.0 afsnit 4(a) gives eller fraskrives
 ingen patent- eller varemærkerettigheder. OdfKit giver ingen patentlicens, garanti mod patentkrænkelser,
-patentsøgning eller indemnity. Brugere skal selv foretage kontrol. Ved uoverensstemmelse gælder
+patentsøgning eller skadesløsholdelse. Brugere skal selv foretage kontrol. Ved uoverensstemmelse gælder
 [CC0's juridiske tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rettigheder og KI-indhold
 Offentlig kode, dokumentation, eksempler og tester er hovedsageligt udarbejdet eller organiseret med KI. CC0
-Affirmer og bidragydere skal have rettighederne; vern varierer mellem jurisdiksjoner. Ingen kommersiell indemnity.
+Affirmer og bidragydere skal have rettighederne; beskyttelsen varierer mellem jurisdiktioner. Ingen kommerciel skadesløsholdelse.
 
 ## 3. Clean-room
 Offentlige OASIS/ISO/RFC/W3C-standarder, offentlige formater, redistribuerbare fixtures og uafhængige tester er

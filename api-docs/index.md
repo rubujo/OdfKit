@@ -68,9 +68,9 @@ also provides a localized usage, compliance, security, and evidence guide.
   <p><strong>AI 產製聲明 / AI disclosure</strong><br>
   本專案目前公開之原始碼、文件、範例、測試與相關內容，均為使用 AI 工具撰寫、整理或產製。<br>
   <span lang="en">This project content is written, organized, or produced with AI tools.</span></p>
-  <p>網站原創內容與 OdfKit 原創程式碼採 CC0-1.0 Universal；第三方內容維持各自授權。OdfKit 並非
+  <p>網站原創內容與 OdfKit 原創程式碼採 CC0 1.0 Universal；第三方內容維持各自授權。OdfKit 並非
   OASIS、The Document Foundation、LibreOffice 或 Apache 的官方專案，亦未受其認證或背書；
   本專案不提供服務等級協定（SLA）或商業賠償保障。</p>
-  <p lang="en">Original OdfKit content is CC0-1.0. Third-party content retains its own license. This is not
+  <p lang="en">Original OdfKit content is CC0 1.0 Universal. Third-party content retains its own license. This is not
   an official OASIS, TDF, LibreOffice, or Apache project. No SLA or commercial indemnity is provided.</p>
 </details>

@@ -2,7 +2,7 @@
 title: Lisens
 _lang: nb
 translation_source: api-docs/articles/license.md
-translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
+translation_source_sha256: 45b5611eb2f3c14efeb361ef7d8c1a15b48334b533d31923337cd26617fd1ab5
 ---
 
 # Lisens
@@ -10,7 +10,7 @@ translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c1
 > Informativ oversettelse: den opprinnelige juridiske teksten og gjeldende tredjepartsmerknader gjelder.
 
 Opprinnelig OdfKit-kode og nettstedets originaldokumentasjon bruker
-[CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Full juridisk tekst finnes i
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Full juridisk tekst finnes i
 [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE). Tredjepartsavhengigheter, skjemaer,
 verktøy og testdata beholder egne lisenser og blir ikke offentlig eiendom på grunn av CC0. Les
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md) før videredistribusjon.

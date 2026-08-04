@@ -2,7 +2,7 @@
 title: Intellectueel eigendom en naleving
 _lang: nl
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Intellectueel eigendom en naleving
@@ -13,7 +13,7 @@ Voor nalevings- en inkooponderzoek en bijdragers; zie de
 [herkomstindex](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Samengesteld licentiemodel
-Originele code gebruikt CC0-1.0 Universal; afhankelijkheden, OASIS-schema’s en fixtures behouden hun
+Originele code gebruikt CC0 1.0 Universal; afhankelijkheden, OASIS-schema’s en fixtures behouden hun
 licentie en OASIS Copyright. Verspreiding moet `LICENSE` en
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md) naleven en mag
 het gehele product niet als publiek domein voorstellen.
@@ -21,13 +21,13 @@ het gehele product niet als publiek domein voorstellen.
 ### Grenzen van CC0 voor octrooien en merken
 
 Volgens sectie 4(a) van CC0 1.0 worden octrooi- en merkrechten niet verleend of prijsgegeven. OdfKit biedt
-geen octrooilicentie, garantie van niet-inbreuk, octrooionderzoek of indemnity. Gebruikers moeten zelf due
-diligence uitvoeren. Bij verschil geldt de [juridische CC0-tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
+geen octrooilicentie, garantie van niet-inbreuk, octrooionderzoek of vrijwaring. Gebruikers moeten zelf een
+zorgvuldigheidsonderzoek uitvoeren. Bij verschil geldt de [juridische CC0-tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rechten en AI-inhoud
 Publieke code, documentatie, voorbeelden en tests zijn grotendeels met AI gemaakt of geordend. De CC0
 Affirmer en bijdragers moeten bevoegd zijn; rechtsbescherming verschilt per rechtsgebied. Er is geen
-commerciële indemnity.
+commerciële vrijwaring.
 
 ## 3. Clean-room
 Openbare OASIS/ISO/RFC/W3C-specificaties, openbare formats, herdistribueerbare fixtures en onafhankelijke

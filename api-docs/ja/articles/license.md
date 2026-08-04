@@ -2,7 +2,7 @@
 title: ライセンス
 _lang: ja
 translation_source: api-docs/articles/license.md
-translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
+translation_source_sha256: 45b5611eb2f3c14efeb361ef7d8c1a15b48334b533d31923337cd26617fd1ab5
 ---
 
 # ライセンス
@@ -10,7 +10,7 @@ translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c1
 > この翻訳は参考情報です。原文の法的文書および該当する第三者通知が優先されます。
 
 OdfKit 独自のコードおよび本サイト独自のドキュメントは、
-[CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) の下で提供されます。完全な
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) の下で提供されます。完全な
 法的文書については、リポジトリのルートにある
 [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) を参照してください。
 

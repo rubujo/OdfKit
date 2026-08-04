@@ -2,7 +2,7 @@
 title: Propriété intellectuelle et conformité
 _lang: fr
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Propriété intellectuelle et conformité
@@ -14,7 +14,7 @@ Ce document aide les vérifications de conformité, les achats et les contribute
 
 ## 1. Modèle de licences composé
 
-Le code original utilise CC0-1.0 Universal ; les dépendances conservent leurs licences MIT, BSD ou autres,
+Le code original utilise CC0 1.0 Universal ; les dépendances conservent leurs licences MIT, BSD ou autres,
 les schémas OASIS leur OASIS Copyright et les fixtures la licence de leur manifeste. Une redistribution
 doit respecter `LICENSE` et [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
 Il ne faut pas présenter l’ensemble distribué comme appartenant au domaine public.
@@ -22,7 +22,7 @@ Il ne faut pas présenter l’ensemble distribué comme appartenant au domaine p
 ### Limites de CC0 concernant les brevets et les marques
 
 Selon la section 4(a) de CC0 1.0, aucun droit de brevet ou de marque n’est accordé ni abandonné. OdfKit ne
-fournit aucune licence de brevet, garantie de non-contrefaçon, recherche de brevets ou indemnity. Les
+fournit aucune licence de brevet, garantie de non-contrefaçon, recherche de brevets ou indemnisation. Les
 utilisateurs doivent effectuer leur propre diligence. Le
 [texte juridique CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode) prévaut.
 
@@ -30,7 +30,7 @@ utilisateurs doivent effectuer leur propre diligence. Le
 
 Le code public, la documentation, les exemples et les tests ont majoritairement été rédigés ou organisés
 avec des outils d’IA. L’Affirmer CC0 et les contributeurs doivent disposer des droits concernés. Le statut
-des productions purement automatiques varie selon les juridictions. Le projet ne fournit aucune indemnity commerciale.
+des productions purement automatiques varie selon les juridictions. Le projet ne fournit aucune indemnisation commerciale.
 
 ## 3. Clean-room et sources interdites
 

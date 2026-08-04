@@ -2,14 +2,14 @@
 title: Tredjepartsmerknader
 _lang: nb
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
+translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
 ---
 
 # Tredjepartsmerknader
 
 > Bare forklaringer oversettes; opprinnelige navn, copyright og juridiske tekster gjelder.
 
-OdfKit bruker CC0-1.0 Universal. Disse avhengighetene beholder lisensene sine:
+OdfKit bruker CC0 1.0 Universal. Disse avhengighetene beholder lisensene sine:
 
 | Pakke | Formål | Lisens |
 |---|---|---|

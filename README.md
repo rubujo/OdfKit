@@ -163,7 +163,7 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 ## 授權與合規
 
 OdfKit 專案原創程式碼採用
-[CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。
 第三方相依套件維持各自授權；再散布時請保留必要聲明，詳見
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 CC0 僅處理著作權及相關權利，不授予、拋棄或以其他方式影響任何人的專利權或商標權；

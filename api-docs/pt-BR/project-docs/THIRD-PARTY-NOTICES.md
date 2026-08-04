@@ -2,14 +2,14 @@
 title: Avisos de terceiros
 _lang: pt-BR
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
+translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
 ---
 
 # Avisos de terceiros
 
 > Tradução informativa; os nomes dos pacotes e das licenças são mantidos na forma original.
 
-O projeto OdfKit é disponibilizado sob a licença [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). As dependências de compilação e execução abaixo mantêm suas próprias licenças.
+O projeto OdfKit é disponibilizado sob a licença [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). As dependências de compilação e execução abaixo mantêm suas próprias licenças.
 
 | Pacote | Finalidade | Licença |
 |---|---|---|

@@ -2,7 +2,7 @@
 title: 라이선스
 _lang: ko
 translation_source: api-docs/articles/license.md
-translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
+translation_source_sha256: 45b5611eb2f3c14efeb361ef7d8c1a15b48334b533d31923337cd26617fd1ab5
 ---
 
 # 라이선스
@@ -10,7 +10,7 @@ translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c1
 > 이 번역은 참고용입니다. 원문 법률 문서와 해당 제3자 고지가 우선합니다.
 
 OdfKit의 원본 코드와 웹사이트의 원본 문서는
-[CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)로 제공됩니다. 전체 법률
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)로 제공됩니다. 전체 법률
 문서는 저장소 루트의 [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE)를 참조하십시오.
 
 제3자 종속성, 스키마, 도구와 테스트 데이터에는 각각의 라이선스가 계속 적용되며, OdfKit이

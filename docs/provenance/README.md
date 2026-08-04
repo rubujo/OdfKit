@@ -9,7 +9,7 @@
 
 | 範圍 | 授權 |
 |------|------|
-| OdfKit 原創程式碼 | CC0-1.0 Universal |
+| OdfKit 原創程式碼 | CC0 1.0 Universal |
 | PDFsharp | MIT |
 | CommunityToolkit.HighPerformance | MIT |
 | System.Security.Cryptography.Xml | MIT |

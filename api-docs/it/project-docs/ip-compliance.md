@@ -2,19 +2,19 @@
 title: Proprietà intellettuale e conformità
 _lang: it
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Proprietà intellettuale e conformità
 
 > Traduzione informativa, non consulenza legale. Prevalgono i testi legali originali.
 
-Il documento serve alla due diligence di conformità e acquisto e ai contributori. Consultare l’
+Il documento serve alla verifica di conformità e acquisto e ai contributori. Consultare l’
 [indice di provenienza](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Modello di licenze composto
 
-Il codice originale usa CC0-1.0 Universal; dipendenze, schemi OASIS e fixture mantengono licenze e OASIS
+Il codice originale usa CC0 1.0 Universal; dipendenze, schemi OASIS e fixture mantengono licenze e OASIS
 Copyright propri. La distribuzione deve rispettare `LICENSE` e
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md); non si deve
 dichiarare di pubblico dominio l’intero prodotto.
@@ -22,7 +22,7 @@ dichiarare di pubblico dominio l’intero prodotto.
 ### Limiti di CC0 per brevetti e marchi
 
 Ai sensi della sezione 4(a) di CC0 1.0, i diritti di brevetto e marchio non vengono concessi né rinunciati.
-OdfKit non offre licenze brevettuali, garanzie di non violazione, ricerche brevettuali o indemnity. Gli
+OdfKit non offre licenze brevettuali, garanzie di non violazione, ricerche brevettuali o indennizzi. Gli
 adottanti devono svolgere la propria verifica. Prevale il
 [testo legale CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
@@ -30,7 +30,7 @@ adottanti devono svolgere la propria verifica. Prevale il
 
 Codice, documenti, esempi e test pubblici sono in gran parte prodotti o organizzati con strumenti IA.
 L’Affirmer CC0 e i contributori devono disporre dei diritti; la tutela delle opere puramente automatiche
-varia fra ordinamenti. Il progetto non offre indemnity commerciale.
+varia fra ordinamenti. Il progetto non offre indennizzi commerciali.
 
 ## 3. Clean-room e fonti vietate
 
@@ -49,7 +49,7 @@ I contributori devono attestare origine o diritto di invio, assenza di codice no
 rispetto del clean-room e aggiornamento degli avvisi. Usare `Signed-off-by: Name <email>` quando indicato;
 i commit richiedono anche firma GPG.
 
-## 6. Due diligence degli adottanti
+## 6. Verifica degli adottanti
 
 Verificare licenze e SBOM, versione `0.x`, limiti funzionali e di risorse, provenienza e supporto. Non è
 previsto alcun SLA; i sistemi critici richiedono piani di fallback e manutenzione.

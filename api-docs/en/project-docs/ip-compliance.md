@@ -2,7 +2,7 @@
 title: Intellectual property and compliance
 _lang: en
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Intellectual property and compliance
@@ -16,7 +16,7 @@ the [provenance overview](https://github.com/rubujo/OdfKit/blob/main/docs/proven
 
 ## 1. Composite licensing model
 
-Original OdfKit code uses [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+Original OdfKit code uses [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
 Build and runtime dependencies retain their MIT, BSD, or other licenses. OASIS ODF RELAX NG schemas
 retain OASIS copyright, and corpus or collaboration fixtures retain the licenses recorded in their
 manifests. Redistribution must satisfy both the repository `LICENSE` and

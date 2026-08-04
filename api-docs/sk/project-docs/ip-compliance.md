@@ -2,7 +2,7 @@
 title: Duševné vlastníctvo a súlad
 _lang: sk
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Duševné vlastníctvo a súlad
@@ -13,7 +13,7 @@ Dokument slúži na kontrolu súladu, obstarávanie a pre prispievateľov. Pozri
 [register pôvodu](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Zložený licenčný model
-Pôvodný kód používa CC0-1.0 Universal; závislosti, schémy OASIS a fixtures si zachovávajú vlastné licencie
+Pôvodný kód používa CC0 1.0 Universal; závislosti, schémy OASIS a fixtures si zachovávajú vlastné licencie
 a OASIS Copyright. Distribúcia musí dodržiavať `LICENSE` aj
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md) a celý produkt
 sa nesmie označovať za verejné vlastníctvo.
@@ -21,13 +21,13 @@ sa nesmie označovať za verejné vlastníctvo.
 ### Patentové a známkové hranice CC0
 
 Podľa oddielu 4(a) CC0 1.0 sa patentové práva ani ochranné známky neudeľujú ani nevzdávajú. OdfKit
-neposkytuje patentovú licenciu, záruku neporušenia, patentovú rešerš ani indemnity. Používatelia musia
+neposkytuje patentovú licenciu, záruku neporušenia, patentovú rešerš ani odškodnenie. Používatelia musia
 vykonať vlastnú kontrolu. Rozhoduje [právny text CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Práva a obsah AI
 Verejný kód, dokumentácia, príklady a testy boli prevažne vytvorené alebo usporiadané pomocou AI. CC0
 Affirmer a prispievatelia musia mať príslušné práva; ochrana sa líši podľa jurisdikcie. Projekt neposkytuje
-komerčnú indemnity.
+komerčné odškodnenie.
 
 ## 3. Clean-room a zakázané zdroje
 Verejné normy OASIS/ISO/RFC/W3C, verejné formáty, redistribuovateľné fixtures a nezávislé testy sú povolené.

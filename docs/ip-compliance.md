@@ -12,7 +12,7 @@
 
 | 範圍 | 授權 | 說明 |
 |------|------|------|
-| OdfKit 專案原創程式碼 | [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | 專案盡量拋棄著作權；詳見根目錄 `LICENSE` |
+| OdfKit 專案原創程式碼 | [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | 專案盡量拋棄著作權；詳見根目錄 `LICENSE` |
 | 建置與執行期相依套件 | 多為 MIT／BSD 等 | **不因 CC0 變成公有領域**；再散布時須保留各自 NOTICE／著作權聲明 |
 | OASIS ODF RELAX NG schema | OASIS Copyright | 置於 `tools/OdfSchemaGenerator/schemas/`；詳見 `THIRD-PARTY-NOTICES.md` |
 | Corpus／Collaboration fixture | 各 fixture 的 `license` 欄 | 見 `docs/corpus-manifest.md` 與各 `manifest.json` |
@@ -33,7 +33,7 @@ CC0 僅拋棄或授權其定義的著作權及相關權利。依 CC0 1.0 第 4(a
   其他技術必然不涉及第三方專利；
 - 專案未聲明持有任何涵蓋 OdfKit 的專利，也不提供專利不侵權保證、專利檢索或侵權賠償；
 - 採用者應依部署地、用途與整合技術自行執行專利及商標盡職調查；需要明確專利授權或
-  indemnity 時，應取得合格法律意見或評估提供相應契約的替代方案。
+  侵權賠償時，應取得合格法律意見或評估提供相應契約的替代方案。
 
 本段僅摘要授權邊界；如與 [CC0 法律文字](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
 不一致，以法律文字為準。
@@ -42,7 +42,7 @@ CC0 僅拋棄或授權其定義的著作權及相關權利。依 CC0 1.0 第 4(a
 
 - README 已聲明：公開之原始碼、文件、範例與測試內容，目前多為使用 AI 工具撰寫、整理或產製。  
 - CC0 的 Affirmer 必須對其拋棄之權利有處分權。貢獻者提交前應確認自己有權將內容以專案授權納入（見下文 DCO）。  
-- 部分法域對純機器產出著作權之認定不同；採用者若需「明確版權人＋侵權賠償承諾」，應評估商業替代方案或另行洽詢支援契約——**本開源專案預設不提供商業 indemnity**。
+- 部分法域對純機器產出著作權之認定不同；採用者若需「明確版權人＋侵權賠償承諾」，應評估商業替代方案或另行洽詢支援契約——**本開源專案預設不提供商業侵權賠償**。
 
 ## 3. Clean-room 與禁止來源
 

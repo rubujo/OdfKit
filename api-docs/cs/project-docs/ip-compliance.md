@@ -2,14 +2,14 @@
 title: Duševní vlastnictví a shoda
 _lang: cs
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Duševní vlastnictví a shoda (IP Compliance)
 
 > Tento překlad je pouze informativní; nejde o právní radu ani náhradu konzultace práva příslušné jurisdikce.
 
-Tento dokument je určen pro **kontrolu shody a nákupní due diligence uživatelů projektu** a pro
+Tento dokument je určen pro **kontrolu shody a náležitou péči při nákupu ze strany uživatelů projektu** a pro
 **přispěvatele**. Nejde o právní radu ani náhradu konzultace práva příslušné jurisdikce.
 
 Související audity zdrojů naleznete v
@@ -20,7 +20,7 @@ Související audity zdrojů naleznete v
 
 | Rozsah | Licence | Popis |
 |---|---|---|
-| Původní kód projektu OdfKit | [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | Projekt se v maximální možné míře vzdává autorských práv; viz `LICENSE` v kořenovém adresáři |
+| Původní kód projektu OdfKit | [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | Projekt se v maximální možné míře vzdává autorských práv; viz `LICENSE` v kořenovém adresáři |
 | Závislosti pro sestavení a běh | Převážně MIT, BSD a podobné | **Použitím CC0 se nestávají volným dílem**; při dalším šíření je nutné zachovat příslušná oznámení a prohlášení o autorských právech |
 | Schémata OASIS ODF RELAX NG | OASIS Copyright | Jsou v `tools/OdfSchemaGenerator/schemas/`; viz `THIRD-PARTY-NOTICES.md` |
 | Testovací případy Corpus a Collaboration | Pole `license` každého případu | Viz `docs/corpus-manifest.md` a jednotlivé soubory `manifest.json` |
@@ -38,7 +38,7 @@ Není dovoleno veřejně tvrdit, že „celý výsledný produkt je volným díl
 
 CC0 se vztahuje pouze na autorská a související práva. Podle oddílu 4(a) CC0 1.0 nejsou patentová práva
 ani ochranné známky uděleny, vzdány ani jinak dotčeny. OdfKit proto neposkytuje výslovnou ani
-implicitní patentovou licenci, záruku neporušení patentů, patentovou rešerši ani indemnity. Uživatelé musí
+implicitní patentovou licenci, záruku neporušení patentů, patentovou rešerši ani odškodnění. Uživatelé musí
 provést vlastní kontrolu podle jurisdikce, účelu a integrovaných technologií. V případě rozporu má přednost
 [právní text CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
@@ -46,7 +46,7 @@ provést vlastní kontrolu podle jurisdikce, účelu a integrovaných technologi
 
 - README uvádí, že velká část zveřejněného zdrojového kódu, dokumentace, příkladů a testů byla napsána, uspořádána nebo vytvořena pomocí nástrojů AI.
 - Affirmer licence CC0 musí být oprávněn nakládat s právy, kterých se vzdává. Přispěvatel musí před odesláním ověřit, že má právo začlenit obsah pod licencí projektu; viz část o DCO níže.
-- Posouzení autorských práv k obsahu vytvořenému výhradně strojem se v jednotlivých jurisdikcích liší. Uživatel, který potřebuje jasně určeného držitele práv a závazek odškodnění za porušení práv, by měl posoudit komerční alternativy nebo sjednat samostatnou smlouvu o podpoře. **Tento open-source projekt standardně neposkytuje komerční indemnity**.
+- Posouzení autorských práv k obsahu vytvořenému výhradně strojem se v jednotlivých jurisdikcích liší. Uživatel, který potřebuje jasně určeného držitele práv a závazek odškodnění za porušení práv, by měl posoudit komerční alternativy nebo sjednat samostatnou smlouvu o podpoře. **Tento projekt s otevřeným zdrojovým kódem standardně neposkytuje komerční odškodnění**.
 
 ## 3. Postup clean-room a zakázané zdroje
 
@@ -81,7 +81,7 @@ Origin prohlásit:
 Doporučuje se uvést `Signed-off-by: Name <email>` ve zprávě commitu nebo v popisu PR. Pravidla projektu pro
 Git vyžadují také podpis GPG.
 
-## 6. Kontrolní seznam due diligence pro uživatele projektu
+## 6. Kontrolní seznam náležité péče pro uživatele projektu
 
 | Položka | Doporučený postup |
 |---|---|
@@ -91,7 +91,7 @@ Git vyžadují také podpis GPG.
 | Cíle mimo rozsah | Viz [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md), včetně úplného modulu rozložení a interaktivních funkcí kancelářského balíku, jako jsou pivot cache a slicery |
 | Zabezpečení | Používejte limity prostředků `OdfLoadOptions`; u nedůvěryhodných vstupů spusťte `Validate` a čištění |
 | Zdroje | Projděte `docs/provenance/`; podle potřeby porovnejte vysoce rizikové adresáře s upstream projekty a vyhledejte podobnosti |
-| Podpora | Open-source projekt neposkytuje SLA; kritické systémy musí mít redundanci a vlastní plán údržby |
+| Podpora | Projekt s otevřeným zdrojovým kódem neposkytuje SLA; kritické systémy musí mít redundanci a vlastní plán údržby |
 
 ## 7. Hlášení zranitelností a bezpečnostních problémů
 

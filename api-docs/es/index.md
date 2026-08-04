@@ -16,4 +16,4 @@ El contenido de los miembros de la API se ofrece actualmente en inglés y chino 
 > **Declaración sobre IA**
 > El contenido de este proyecto se redacta, organiza o produce con herramientas de IA.
 
-El contenido original de OdfKit utiliza CC0-1.0. El contenido de terceros conserva su propia licencia. Este no es un proyecto oficial de OASIS, TDF, LibreOffice ni Apache. No se proporciona ningún SLA ni indemnización comercial.
+El contenido original de OdfKit utiliza CC0 1.0 Universal. El contenido de terceros conserva su propia licencia. Este no es un proyecto oficial de OASIS, TDF, LibreOffice ni Apache. No se proporciona ningún SLA ni indemnización comercial.

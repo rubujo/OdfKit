@@ -2,7 +2,7 @@
 
 > 內容語系：正體中文（臺灣）（`zh-TW`）；套件與授權名稱保留英文原文。
 
-OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW) 授權。下列建置與執行期相依套件維持各自授權。
+OdfKit 專案採用 [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW) 授權。下列建置與執行期相依套件維持各自授權。
 
 | 套件 (Package) | 用途 (Purpose) | 授權 (License) |
 |---|---|---|

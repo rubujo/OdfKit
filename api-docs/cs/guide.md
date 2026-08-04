@@ -11,7 +11,7 @@ Referenční dokumentace API se generuje z veřejných sestavení `net10.0` a do
 
 ## Licence a tvorba pomocí AI
 
-Původní kód a dokumentace OdfKit používají CC0-1.0 Universal. Balíčky, schémata, nástroje a testovací data třetích stran si zachovávají vlastní licence. Veřejný obsah je psán, uspořádán nebo vytvářen pomocí nástrojů AI. Web neposkytuje právní poradenství, SLA ani obchodní odškodnění.
+Původní kód a dokumentace OdfKit používají CC0 1.0 Universal. Balíčky, schémata, nástroje a testovací data třetích stran si zachovávají vlastní licence. Veřejný obsah je psán, uspořádán nebo vytvářen pomocí nástrojů AI. Web neposkytuje právní poradenství, SLA ani obchodní odškodnění.
 
 ## Hranice zabezpečení a interoperability
 

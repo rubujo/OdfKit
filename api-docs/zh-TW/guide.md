@@ -11,7 +11,7 @@ API 參考文件由 `net10.0` 公開組件與 XML 文件產生。手寫核心 AP
 
 ## 授權與 AI 產製
 
-OdfKit 原創程式碼與網站原創文件採 CC0-1.0 Universal。第三方套件、結構描述、工具與測試資料維持各自授權。本專案公開內容使用 AI 工具撰寫、整理或產製；本站內容不構成法律意見，亦不提供服務等級協定（SLA）或商業賠償保障。OdfKit 並非 OASIS、The Document Foundation、LibreOffice 或 Apache 的官方專案，亦未受其認證或背書。
+OdfKit 原創程式碼與網站原創文件採 CC0 1.0 Universal。第三方套件、結構描述、工具與測試資料維持各自授權。本專案公開內容使用 AI 工具撰寫、整理或產製；本站內容不構成法律意見，亦不提供服務等級協定（SLA）或商業賠償保障。OdfKit 並非 OASIS、The Document Foundation、LibreOffice 或 Apache 的官方專案，亦未受其認證或背書。
 
 ## 安全與互通邊界
 

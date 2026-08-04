@@ -16,6 +16,6 @@ API-medlemsinnholdet er for øyeblikket tilgjengelig på engelsk og tradisjonell
 > **Erklæring om AI-produksjon**
 > Prosjektets offentlige kildekode, dokumentasjon, eksempler, tester og tilknyttede innhold er skrevet, organisert eller produsert ved hjelp av AI-verktøy.
 
-Originalt OdfKit-innhold er utgitt under CC0-1.0 Universal. Tredjepartsinnhold beholder sine
+Originalt OdfKit-innhold er utgitt under CC0 1.0 Universal. Tredjepartsinnhold beholder sine
 egne lisenser. OdfKit er ikke et offisielt eller godkjent prosjekt fra OASIS, TDF, LibreOffice
 eller Apache. Det gis ingen SLA eller kommersiell skadesløsholdelse.

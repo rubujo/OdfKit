@@ -6,16 +6,16 @@
     {
       "id": "license",
       "source": "api-docs/articles/license.md",
-      "sourceSha256": "c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129",
+      "sourceSha256": "45b5611eb2f3c14efeb361ef7d8c1a15b48334b533d31923337cd26617fd1ab5",
       "destination": "api-docs/{locale}/articles/license.md",
-      "requiredTokens": ["CC0-1.0 Universal", "LICENSE", "THIRD-PARTY-NOTICES"]
+      "requiredTokens": ["CC0 1.0 Universal", "LICENSE", "THIRD-PARTY-NOTICES"]
     },
     {
       "id": "ip-compliance",
       "source": "docs/ip-compliance.md",
-      "sourceSha256": "02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c",
+      "sourceSha256": "bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f",
       "destination": "api-docs/{locale}/project-docs/ip-compliance.md",
-      "requiredTokens": ["CC0-1.0 Universal", "Affirmer", "indemnity", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md", "4(a)", "legalcode"]
+      "requiredTokens": ["CC0 1.0 Universal", "Affirmer", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md", "4(a)", "legalcode"]
     },
     {
       "id": "security-limits",
@@ -34,7 +34,7 @@
     {
       "id": "third-party-notices",
       "source": "THIRD-PARTY-NOTICES.md",
-      "sourceSha256": "b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8",
+      "sourceSha256": "3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4",
       "destination": "api-docs/{locale}/project-docs/THIRD-PARTY-NOTICES.md",
       "requiredTokens": ["BouncyCastle.Cryptography", "CommunityToolkit.HighPerformance", "CSharpMath", "Microsoft.Win32.Registry", "Microsoft.Extensions.Hosting.WindowsServices", "Markdig", "SkiaSharp", "ScottPlot", "ClosedXML", "PDFsharp-MigraDoc", "dotNetRdf.Core", "OASIS OpenDocument Relax-NG Schemas", "Noto Sans", "Noto Color Emoji", "IPAmj Mincho", "Copyright (c) OASIS Open 2021. All Rights Reserved."]
     }

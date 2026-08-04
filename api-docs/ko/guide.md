@@ -11,7 +11,7 @@ API 참조는 `net10.0` 공개 어셈블리와 XML 문서에서 생성됩니다.
 
 ## 라이선스 및 AI 제작
 
-OdfKit의 독창적인 코드와 사이트 문서는 CC0-1.0 Universal을 사용합니다. 제3자 패키지, 스키마, 도구 및 fixture에는 각자의 라이선스가 유지됩니다. 공개 프로젝트 콘텐츠는 AI 도구를 사용하여 작성, 정리 또는 제작되었습니다. 이 사이트는 법률 자문이 아니며 SLA 또는 상업적 면책을 제공하지 않습니다. OdfKit은 OASIS, The Document Foundation, LibreOffice 또는 Apache의 공식 프로젝트나 승인받은 프로젝트가 아닙니다.
+OdfKit의 독창적인 코드와 사이트 문서는 CC0 1.0 Universal을 사용합니다. 제3자 패키지, 스키마, 도구 및 fixture에는 각자의 라이선스가 유지됩니다. 공개 프로젝트 콘텐츠는 AI 도구를 사용하여 작성, 정리 또는 제작되었습니다. 이 사이트는 법률 자문이 아니며 SLA 또는 상업적 면책을 제공하지 않습니다. OdfKit은 OASIS, The Document Foundation, LibreOffice 또는 Apache의 공식 프로젝트나 승인받은 프로젝트가 아닙니다.
 
 ## 보안 및 상호 운용성 범위
 

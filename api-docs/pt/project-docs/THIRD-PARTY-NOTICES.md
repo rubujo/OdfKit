@@ -2,14 +2,14 @@
 title: Avisos de terceiros
 _lang: pt
 translation_source: THIRD-PARTY-NOTICES.md
-translation_source_sha256: b0ba390341f4a420d80fa33f1650b4936608967f357074f1a19dbbd09070aef8
+translation_source_sha256: 3054a12dbbd6566e4e509e1cf9a7b9cf5eb94c767afcd9d25acf4b0eb90be7d4
 ---
 
 # Avisos de terceiros
 
 > Só as explicações são traduzidas; prevalecem nomes, copyright e textos jurídicos originais.
 
-OdfKit usa CC0-1.0 Universal. Estas dependências mantêm as suas licenças:
+OdfKit usa CC0 1.0 Universal. Estas dependências mantêm as suas licenças:
 
 | Pacote | Finalidade | Licença |
 |---|---|---|

@@ -16,6 +16,6 @@ Kandungan ahli API kini disediakan dalam bahasa Inggeris dan bahasa Cina Tradisi
 > **Pengisytiharan penghasilan AI**
 > Kod sumber awam, dokumentasi, contoh, ujian dan kandungan berkaitan projek ini ditulis, disusun atau dihasilkan dengan menggunakan alat AI.
 
-Kandungan asal OdfKit dilesenkan di bawah CC0-1.0 Universal. Kandungan pihak ketiga kekal
+Kandungan asal OdfKit dilesenkan di bawah CC0 1.0 Universal. Kandungan pihak ketiga kekal
 tertakluk pada lesen masing-masing. OdfKit bukan projek rasmi atau yang disokong oleh OASIS,
 TDF, LibreOffice atau Apache. Tiada SLA atau indemniti komersial disediakan.

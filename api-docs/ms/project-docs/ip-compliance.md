@@ -2,7 +2,7 @@
 title: Harta intelek dan pematuhan
 _lang: ms
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Harta intelek dan pematuhan
@@ -13,7 +13,7 @@ Dokumen ini membantu usaha wajar pematuhan dan perolehan serta penyumbang. Lihat
 [indeks asal usul](https://github.com/rubujo/OdfKit/blob/main/docs/provenance/README.md).
 
 ## 1. Model pelesenan gabungan
-Kod asal menggunakan CC0-1.0 Universal; kebergantungan, skema OASIS dan fixture mengekalkan lesen serta
+Kod asal menggunakan CC0 1.0 Universal; kebergantungan, skema OASIS dan fixture mengekalkan lesen serta
 OASIS Copyright masing-masing. Pengedaran mesti mematuhi `LICENSE` dan
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), dan keseluruhan
 produk tidak boleh didakwa sebagai domain awam.
@@ -21,12 +21,12 @@ produk tidak boleh didakwa sebagai domain awam.
 ### Batas paten dan tanda dagangan CC0
 
 Menurut seksyen 4(a) CC0 1.0, hak paten dan tanda dagangan tidak diberikan atau diketepikan. OdfKit tidak
-menawarkan lesen paten, jaminan bukan pelanggaran, carian paten atau indemnity. Pengguna mesti menjalankan
+menawarkan lesen paten, jaminan bukan pelanggaran, carian paten atau ganti rugi. Pengguna mesti menjalankan
 usaha wajar sendiri. Jika bercanggah, [teks undang-undang CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode) mengatasi ringkasan ini.
 
 ## 2. Hak dan kandungan AI
 Kod, dokumen, contoh dan ujian awam kebanyakannya dihasilkan atau disusun dengan AI. CC0 Affirmer dan
-penyumbang mesti mempunyai hak berkenaan; perlindungan berbeza mengikut bidang kuasa. Tiada indemnity komersial.
+penyumbang mesti mempunyai hak berkenaan; perlindungan berbeza mengikut bidang kuasa. Tiada ganti rugi komersial.
 
 ## 3. Clean-room dan sumber terlarang
 Standard awam OASIS/ISO/RFC/W3C, format awam, fixture boleh edar semula dan ujian bebas dibenarkan.

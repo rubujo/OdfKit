@@ -2,7 +2,7 @@
 title: Geistiges Eigentum und Compliance
 _lang: de
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # Geistiges Eigentum und Compliance
@@ -14,7 +14,7 @@ stehen im [Provenienzüberblick](https://github.com/rubujo/OdfKit/blob/main/docs
 
 ## 1. Zusammengesetztes Lizenzmodell
 
-Eigener OdfKit-Code nutzt CC0-1.0 Universal; Abhängigkeiten behalten MIT-, BSD- oder andere Lizenzen,
+Eigener OdfKit-Code nutzt CC0 1.0 Universal; Abhängigkeiten behalten MIT-, BSD- oder andere Lizenzen,
 OASIS-Schemas ihr OASIS Copyright und Fixtures die im Manifest angegebene Lizenz. Weitergabe muss
 `LICENSE` und [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)
 erfüllen. Das Gesamtprodukt darf nicht als gemeinfrei bezeichnet werden.
@@ -22,7 +22,7 @@ erfüllen. Das Gesamtprodukt darf nicht als gemeinfrei bezeichnet werden.
 ### Patent- und Markengrenzen von CC0
 
 Nach Abschnitt 4(a) von CC0 1.0 werden Patent- und Markenrechte weder eingeräumt noch aufgegeben. OdfKit
-gewährt keine Patentlizenz, Nichtverletzungsgarantie, Patentrecherche oder indemnity. Anwender müssen selbst
+gewährt keine Patentlizenz, Nichtverletzungsgarantie, Patentrecherche oder Freistellung. Anwender müssen selbst
 prüfen. Maßgeblich ist der [CC0-Rechtstext](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rechteinhaber und KI-Inhalte
@@ -30,7 +30,7 @@ prüfen. Maßgeblich ist der [CC0-Rechtstext](https://creativecommons.org/public
 Öffentlicher Code, Dokumentation, Beispiele und Tests wurden überwiegend mit KI-Werkzeugen erstellt oder
 geordnet. Ein CC0 Affirmer und jeder Beitragende muss über die eingeräumten Rechte verfügen. Die
 urheberrechtliche Bewertung rein maschineller Werke unterscheidet sich je nach Rechtsordnung. Das Projekt
-bietet keine kommerzielle indemnity.
+bietet keine kommerzielle Freistellung.
 
 ## 3. Clean-room und verbotene Quellen
 

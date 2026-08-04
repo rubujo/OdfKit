@@ -11,7 +11,7 @@ Die API-Referenz wird aus den öffentlichen `net10.0`-Assemblies und der XML-Dok
 
 ## Lizenz und KI-Erstellung
 
-Ursprünglicher OdfKit-Code und ursprüngliche Website-Dokumentation stehen unter CC0-1.0 Universal. Pakete, Schemas, Werkzeuge und Fixtures Dritter behalten ihre Lizenzen. Öffentliche Projektinhalte wurden mit KI-Werkzeugen geschrieben, organisiert oder erstellt. Die Website ist keine Rechtsberatung und bietet weder SLA noch kommerzielle Freistellung. OdfKit ist kein offizielles oder bestätigtes Projekt von OASIS, The Document Foundation, LibreOffice oder Apache.
+Ursprünglicher OdfKit-Code und ursprüngliche Website-Dokumentation stehen unter CC0 1.0 Universal. Pakete, Schemas, Werkzeuge und Fixtures Dritter behalten ihre Lizenzen. Öffentliche Projektinhalte wurden mit KI-Werkzeugen geschrieben, organisiert oder erstellt. Die Website ist keine Rechtsberatung und bietet weder SLA noch kommerzielle Freistellung. OdfKit ist kein offizielles oder bestätigtes Projekt von OASIS, The Document Foundation, LibreOffice oder Apache.
 
 ## Sicherheits- und Interoperabilitätsgrenzen
 

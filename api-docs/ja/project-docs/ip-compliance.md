@@ -2,7 +2,7 @@
 title: 知的財産とコンプライアンス
 _lang: ja
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
+translation_source_sha256: bccec797a382b4bf3fae941a34d0dd406fdc97cac84a38d6c20dc09109164b6f
 ---
 
 # 知的財産とコンプライアンス (IP Compliance)
@@ -22,7 +22,7 @@ translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca
 
 | 対象 | ライセンス | 説明 |
 |---|---|---|
-| OdfKit プロジェクト独自のコード | [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | プロジェクトは可能な限り著作権を放棄します。ルートの `LICENSE` を参照してください |
+| OdfKit プロジェクト独自のコード | [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) | プロジェクトは可能な限り著作権を放棄します。ルートの `LICENSE` を参照してください |
 | ビルド時および実行時の依存パッケージ | 主に MIT、BSD など | **CC0 によってパブリックドメインになることはありません**。再配布時には各 NOTICE および著作権表示を保持する必要があります |
 | OASIS ODF RELAX NG schema | OASIS Copyright | `tools/OdfSchemaGenerator/schemas/` にあります。`THIRD-PARTY-NOTICES.md` を参照してください |
 | Corpus および Collaboration のフィクスチャ | 各フィクスチャの `license` フィールド | `docs/corpus-manifest.md` および各 `manifest.json` を参照してください |
@@ -39,14 +39,14 @@ translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca
 ### CC0 における特許権および商標権の範囲
 
 CC0 1.0 第 4(a) 項により、特許権および商標権は許諾も放棄もされません。OdfKit は特許ライセンス、
-非侵害保証、特許調査、indemnity を提供しません。採用者は自ら確認してください。相違がある場合は
+非侵害保証、特許調査、補償を提供しません。採用者は自ら確認してください。相違がある場合は
 [CC0 の法的条項](https://creativecommons.org/publicdomain/zero/1.0/legalcode) が優先します。
 
 ## 2. 権利者と AI による生成に関する声明
 
 - README では、公開されているソースコード、ドキュメント、例、およびテストの多くが、AI ツールを使用して作成、整理、または生成されたことを明示しています。
 - CC0 の Affirmer は、放棄する権利を処分できる立場でなければなりません。コントリビューターは、提出前に、その内容をプロジェクトのライセンスの下で提供する権利があることを確認する必要があります。後述の DCO を参照してください。
-- 機械のみが生成した内容の著作権に関する判断は法域によって異なります。「明確な著作権者と侵害に対する補償の約束」が必要な導入者は、商用の代替製品を評価するか、別途サポート契約を相談してください。**このオープンソースプロジェクトは、既定では商用の indemnity を提供しません**。
+- 機械のみが生成した内容の著作権に関する判断は法域によって異なります。「明確な著作権者と侵害に対する補償の約束」が必要な導入者は、商用の代替製品を評価するか、別途サポート契約を相談してください。**このオープンソースプロジェクトは、既定では商用の補償を提供しません**。
 
 ## 3. クリーンルーム方式と禁止される情報源
 

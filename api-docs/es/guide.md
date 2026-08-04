@@ -11,7 +11,7 @@ La referencia de la API se genera a partir de los ensamblados públicos `net10.0
 
 ## Licencia y producción con IA
 
-El código y la documentación originales de OdfKit usan CC0-1.0 Universal. Los paquetes, esquemas, herramientas y datos de prueba de terceros conservan sus propias licencias. El contenido público se redacta, organiza o produce con herramientas de IA. Este sitio no constituye asesoramiento jurídico y no proporciona ningún SLA ni indemnización comercial.
+El código y la documentación originales de OdfKit usan CC0 1.0 Universal. Los paquetes, esquemas, herramientas y datos de prueba de terceros conservan sus propias licencias. El contenido público se redacta, organiza o produce con herramientas de IA. Este sitio no constituye asesoramiento jurídico y no proporciona ningún SLA ni indemnización comercial.
 
 ## Límites de seguridad e interoperabilidad
 
