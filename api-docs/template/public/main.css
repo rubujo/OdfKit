@@ -77,36 +77,67 @@ article li {
 }
 
 article table {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--bs-border-color);
   width: 100%;
   max-width: 100%;
   margin-block: 1.25rem 2rem;
+  overflow: hidden;
+  border: 1px solid var(--bs-table-border-color);
+  border-radius: 0.65rem;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
 }
 
-article table.table {
-  --bs-table-bg: transparent;
-  --bs-table-border-color: var(--bs-border-color);
-}
-
-article table.table th {
+article table th {
   background: rgba(var(--odfkit-accent), 0.08);
   font-weight: 700;
 }
 
-article table.table th,
-article table.table td {
+article table th,
+article table td {
   padding: 0.7rem 0.85rem;
+  border-right: 1px solid var(--bs-table-border-color);
+  border-bottom: 1px solid var(--bs-table-border-color);
   overflow-wrap: anywhere;
   vertical-align: top;
 }
 
-article table.table:has(tr > :nth-child(3):last-child) th:first-child {
+article table th:last-child,
+article table td:last-child {
+  border-right: 0;
+}
+
+article table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+article table.table.table-bordered > :not(caption) > * > * {
+  padding: 0.7rem 0.85rem;
+  border-right: 1px solid var(--bs-table-border-color);
+  border-bottom: 1px solid var(--bs-table-border-color);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+article table.table.table-bordered > thead > tr > th {
+  background-color: rgba(var(--odfkit-accent), 0.08);
+}
+
+article table.table.table-bordered > :not(caption) > * > :last-child {
+  border-right: 0;
+}
+
+article table.table.table-bordered > tbody > :last-child > td {
+  border-bottom: 0;
+}
+
+article table:has(tr > :nth-child(3):last-child) th:first-child {
   width: 38%;
 }
 
-article table.table:has(tr > :nth-child(3):last-child) th:last-child {
+article table:has(tr > :nth-child(3):last-child) th:last-child {
   width: 20%;
 }
 
@@ -338,24 +369,24 @@ main:has(.odfkit-home-hero) .affix {
     scrollbar-width: thin;
   }
 
-  article table.table th,
-  article table.table td {
+  article table th,
+  article table td {
     width: auto !important;
-    overflow-wrap: normal;
+    overflow-wrap: anywhere;
   }
 
-  article table.table:has(tr > :nth-child(3):last-child) > thead,
-  article table.table:has(tr > :nth-child(3):last-child) > tbody {
+  article table:has(tr > :nth-child(3):last-child) > thead,
+  article table:has(tr > :nth-child(3):last-child) > tbody {
     display: table;
     width: 44rem;
     table-layout: fixed;
   }
 
-  article table.table:has(tr > :nth-child(3):last-child) th:first-child {
+  article table:has(tr > :nth-child(3):last-child) th:first-child {
     width: 32% !important;
   }
 
-  article table.table:has(tr > :nth-child(3):last-child) th:last-child {
+  article table:has(tr > :nth-child(3):last-child) th:last-child {
     width: 18% !important;
   }
 
