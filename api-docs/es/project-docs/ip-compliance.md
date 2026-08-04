@@ -2,7 +2,7 @@
 title: Propiedad intelectual y conformidad
 _lang: es
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Propiedad intelectual y conformidad (IP Compliance)
@@ -34,6 +34,13 @@ cumplir simultáneamente:
    [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
 
 No se debe afirmar públicamente que «todo el producto está en el dominio público».
+
+### Límites de CC0 respecto de patentes y marcas
+
+Conforme a la sección 4(a) de CC0 1.0, los derechos de patente y de marca no se conceden ni se renuncian.
+OdfKit no ofrece licencia de patente, garantía de no infracción, búsqueda de patentes ni indemnity. Cada
+adoptante debe realizar su propia diligencia. Prevalece el
+[texto legal de CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Titulares de derechos y declaración sobre contenido generado con IA
 

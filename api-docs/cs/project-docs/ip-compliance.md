@@ -2,7 +2,7 @@
 title: Duševní vlastnictví a shoda
 _lang: cs
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Duševní vlastnictví a shoda (IP Compliance)
@@ -33,6 +33,14 @@ splnit:
    [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
 
 Není dovoleno veřejně tvrdit, že „celý výsledný produkt je volným dílem“.
+
+### Patentové a známkové hranice CC0
+
+CC0 se vztahuje pouze na autorská a související práva. Podle oddílu 4(a) CC0 1.0 nejsou patentová práva
+ani ochranné známky uděleny, vzdány ani jinak dotčeny. OdfKit proto neposkytuje výslovnou ani
+implicitní patentovou licenci, záruku neporušení patentů, patentovou rešerši ani indemnity. Uživatelé musí
+provést vlastní kontrolu podle jurisdikce, účelu a integrovaných technologií. V případě rozporu má přednost
+[právní text CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Držitelé práv a prohlášení o obsahu vytvořeném pomocí AI
 

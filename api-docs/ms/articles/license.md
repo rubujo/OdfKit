@@ -2,7 +2,7 @@
 title: Lesen
 _lang: ms
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Lesen
@@ -14,3 +14,6 @@ Kod asal OdfKit dan dokumentasi asal laman diberikan di bawah
 dalam [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) di akar repositori. Kebergantungan,
 skema, alat dan data ujian pihak ketiga mengekalkan lesen masing-masing dan tidak menjadi domain awam
 kerana CC0. Baca [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md) sebelum pengedaran semula.
+
+> **Hak paten dan tanda dagangan berada di luar skop CC0:** CC0 hanya meliputi hak cipta dan hak berkaitan;
+> ia tidak memberikan atau mengetepikan hak paten atau tanda dagangan. Pengguna mesti menilai risiko pihak ketiga.

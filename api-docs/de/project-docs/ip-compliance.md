@@ -2,7 +2,7 @@
 title: Geistiges Eigentum und Compliance
 _lang: de
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Geistiges Eigentum und Compliance
@@ -18,6 +18,12 @@ Eigener OdfKit-Code nutzt CC0-1.0 Universal; Abhängigkeiten behalten MIT-, BSD-
 OASIS-Schemas ihr OASIS Copyright und Fixtures die im Manifest angegebene Lizenz. Weitergabe muss
 `LICENSE` und [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)
 erfüllen. Das Gesamtprodukt darf nicht als gemeinfrei bezeichnet werden.
+
+### Patent- und Markengrenzen von CC0
+
+Nach Abschnitt 4(a) von CC0 1.0 werden Patent- und Markenrechte weder eingeräumt noch aufgegeben. OdfKit
+gewährt keine Patentlizenz, Nichtverletzungsgarantie, Patentrecherche oder indemnity. Anwender müssen selbst
+prüfen. Maßgeblich ist der [CC0-Rechtstext](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rechteinhaber und KI-Inhalte
 

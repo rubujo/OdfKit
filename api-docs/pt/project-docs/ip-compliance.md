@@ -2,7 +2,7 @@
 title: Propriedade intelectual e conformidade
 _lang: pt
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Propriedade intelectual e conformidade
@@ -17,6 +17,13 @@ O código original usa CC0-1.0 Universal; dependências, esquemas OASIS e fixtur
 licenças e OASIS Copyright. A distribuição deve cumprir `LICENSE` e
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), sem afirmar
 que o produto inteiro é domínio público.
+
+### Limites da CC0 para patentes e marcas
+
+Nos termos da secção 4(a) da CC0 1.0, direitos de patente e marca não são concedidos nem renunciados.
+OdfKit não oferece licença de patente, garantia de não infração, pesquisa de patentes ou indemnity. Os
+utilizadores devem realizar a própria diligência. Prevalece o
+[texto jurídico da CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Direitos e conteúdo de IA
 Código, documentos, exemplos e testes são maioritariamente produzidos ou organizados com IA. O CC0

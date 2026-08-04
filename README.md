@@ -39,12 +39,12 @@ Windows NativeAOT sidecar。CLI 與測試專案覆蓋 `net10.0` 與 `net8.0`。
 | 核心 SDK | `OdfKit` | ODF 文件建立、載入、儲存、驗證、來回讀寫 |
 | 匯出與轉換擴充 | `OdfKit.Extensions.Html`、`OdfKit.Extensions.Pdf`、`OdfKit.Extensions.Ooxml` | HTML / Markdown / RTF、PDF、DOCX / XLSX 互通 |
 | 渲染與資料擴充 | `OdfKit.Extensions.Imaging`、`OdfKit.Extensions.Rendering`、`OdfKit.Extensions.Rdf`、`OdfKit.Extensions.Collaboration`、`OdfKit.Extensions.Scripting` | 影像渲染、LibreOffice 後端渲染、RDF、協作操作與選用巨集管理 |
+| WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
+| 工具 | `OdfKit.Cli`、samples、測試與 corpus 工具 | 自動化驗證、批次轉檔、範例與工程驗證 |
 
 試算表欄寬、確定性列高，以及 ODT／ODP／ODG 文字框可共用具資源上限的
 Fast／Precise／Reader 文字版面配置；詳見
 [跨格式文字自動版面配置](docs/text-auto-layout.md)。
-| WebFont 套件組 | `OdfKit.WebFonts.*`、`OdfKit.Extensions.Html.WebFonts` | 多國罕字子集、預產生、動態託管、Profile、legacy mapping 與 HTML 整合 |
-| 工具 | `OdfKit.Cli`、samples、測試與 corpus 工具 | 自動化驗證、批次轉檔、範例與工程驗證 |
 
 套件挑選與相依說明請見 [套件目錄與選型指南](docs/package-catalog.md)；
 指令碼與巨集安全邊界請見 [ODF 指令碼與巨集管理](docs/scripting.md)；
@@ -166,6 +166,8 @@ OdfKit 專案原創程式碼採用
 [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。
 第三方相依套件維持各自授權；再散布時請保留必要聲明，詳見
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+CC0 僅處理著作權及相關權利，不授予、拋棄或以其他方式影響任何人的專利權或商標權；
+採用者仍應自行評估實作與使用情境涉及的第三方專利風險。
 
 複合授權、AI 產製聲明、clean-room 原則、貢獻者 DCO 與採用者盡職調查清單見
 [智慧財產與合規說明](docs/ip-compliance.md) 與

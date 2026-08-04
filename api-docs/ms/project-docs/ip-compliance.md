@@ -2,7 +2,7 @@
 title: Harta intelek dan pematuhan
 _lang: ms
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Harta intelek dan pematuhan
@@ -17,6 +17,12 @@ Kod asal menggunakan CC0-1.0 Universal; kebergantungan, skema OASIS dan fixture 
 OASIS Copyright masing-masing. Pengedaran mesti mematuhi `LICENSE` dan
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), dan keseluruhan
 produk tidak boleh didakwa sebagai domain awam.
+
+### Batas paten dan tanda dagangan CC0
+
+Menurut seksyen 4(a) CC0 1.0, hak paten dan tanda dagangan tidak diberikan atau diketepikan. OdfKit tidak
+menawarkan lesen paten, jaminan bukan pelanggaran, carian paten atau indemnity. Pengguna mesti menjalankan
+usaha wajar sendiri. Jika bercanggah, [teks undang-undang CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode) mengatasi ringkasan ini.
 
 ## 2. Hak dan kandungan AI
 Kod, dokumen, contoh dan ujian awam kebanyakannya dihasilkan atau disusun dengan AI. CC0 Affirmer dan

@@ -2,7 +2,7 @@
 title: Licens
 _lang: da
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licens
@@ -14,3 +14,7 @@ Oprindelig OdfKit-kode og nettstedets originaldokumentation bruger
 [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE). Tredjepartsafhængigheder, skemaer,
 værktøjer og testdata bevarer egne licenser og bliver ikke offentligt domæne på grund af CC0. Læs
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md) før videredistribution.
+
+> **Patent- og varemærkerettigheder ligger uden for CC0:** CC0 omfatter kun ophavsret og beslægtede
+> rettigheder og giver ikke afkald på eller licens til patent- eller varemærkerettigheder. Brugere skal
+> selv vurdere tredjeparts patentrisici ved implementering og brug.

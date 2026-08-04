@@ -2,7 +2,7 @@
 title: Własność intelektualna i zgodność
 _lang: pl
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Własność intelektualna i zgodność (IP Compliance)
@@ -34,6 +34,13 @@ jednocześnie spełnić:
    [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md).
 
 Nie wolno publicznie twierdzić, że „cały produkt wynikowy znajduje się w domenie publicznej”.
+
+### Granice CC0 dotyczące patentów i znaków towarowych
+
+Zgodnie z sekcją 4(a) CC0 1.0 prawa patentowe i prawa do znaków towarowych nie są udzielane ani zrzekane.
+OdfKit nie zapewnia licencji patentowej, gwarancji nieingerencji, wyszukiwania patentów ani indemnity.
+Użytkownicy muszą przeprowadzić własną analizę. Rozstrzyga
+[tekst prawny CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Podmioty uprawnione i oświadczenie o treściach tworzonych przy użyciu AI
 

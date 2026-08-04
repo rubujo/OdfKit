@@ -2,7 +2,7 @@
 title: Intellectual property and compliance
 _lang: en
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Intellectual property and compliance
@@ -22,6 +22,14 @@ retain OASIS copyright, and corpus or collaboration fixtures retain the licenses
 manifests. Redistribution must satisfy both the repository `LICENSE` and
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md). Do not claim
 that the entire distributed product is public domain.
+
+### Patent and trademark boundaries of CC0
+
+CC0 covers copyright and related rights only. Under CC0 1.0 section 4(a), patent and trademark rights
+are not granted, waived, or otherwise affected. OdfKit therefore provides no express or implied patent
+license, patent non-infringement warranty, patent search, or indemnity. Adopters should perform due
+diligence for their jurisdiction, use, and integrated technologies. If this summary conflicts with the
+[CC0 legal code](https://creativecommons.org/publicdomain/zero/1.0/legalcode), the legal code prevails.
 
 ## 2. Rights holders and AI-produced content
 

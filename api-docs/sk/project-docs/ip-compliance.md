@@ -2,7 +2,7 @@
 title: Duševné vlastníctvo a súlad
 _lang: sk
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Duševné vlastníctvo a súlad
@@ -17,6 +17,12 @@ Pôvodný kód používa CC0-1.0 Universal; závislosti, schémy OASIS a fixture
 a OASIS Copyright. Distribúcia musí dodržiavať `LICENSE` aj
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md) a celý produkt
 sa nesmie označovať za verejné vlastníctvo.
+
+### Patentové a známkové hranice CC0
+
+Podľa oddielu 4(a) CC0 1.0 sa patentové práva ani ochranné známky neudeľujú ani nevzdávajú. OdfKit
+neposkytuje patentovú licenciu, záruku neporušenia, patentovú rešerš ani indemnity. Používatelia musia
+vykonať vlastnú kontrolu. Rozhoduje [právny text CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Práva a obsah AI
 Verejný kód, dokumentácia, príklady a testy boli prevažne vytvorené alebo usporiadané pomocou AI. CC0

@@ -2,7 +2,7 @@
 title: Licencja
 _lang: pl
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licencja
@@ -16,3 +16,6 @@ pliku [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) w katalogu g
 Zależności, schematy, narzędzia i dane testowe innych firm zachowują własne licencje i nie stają się domeną
 publiczną wskutek zastosowania CC0 przez OdfKit. Przed dalszym rozpowszechnianiem zapoznaj się z plikiem
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Prawa patentowe i prawa do znaków towarowych są poza zakresem CC0:** CC0 dotyczy wyłącznie praw
+> autorskich i pokrewnych; nie udziela ani nie zrzeka się praw patentowych lub do znaków towarowych.

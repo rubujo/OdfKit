@@ -24,6 +24,20 @@
 
 不可對外宣稱「整包產物皆為公有領域」。
 
+### CC0 的專利與商標邊界
+
+CC0 僅拋棄或授權其定義的著作權及相關權利。依 CC0 1.0 第 4(a) 條，任何人的專利權與商標權
+均不會因 CC0 被拋棄、授權或以其他方式受影響。因此：
+
+- OdfKit 採用 CC0 **不構成明示或默示的專利授權**，也不代表實作 ODF、OOXML、字型、加密或
+  其他技術必然不涉及第三方專利；
+- 專案未聲明持有任何涵蓋 OdfKit 的專利，也不提供專利不侵權保證、專利檢索或侵權賠償；
+- 採用者應依部署地、用途與整合技術自行執行專利及商標盡職調查；需要明確專利授權或
+  indemnity 時，應取得合格法律意見或評估提供相應契約的替代方案。
+
+本段僅摘要授權邊界；如與 [CC0 法律文字](https://creativecommons.org/publicdomain/zero/1.0/legalcode)
+不一致，以法律文字為準。
+
 ## 2. 權利人與 AI 產製聲明
 
 - README 已聲明：公開之原始碼、文件、範例與測試內容，目前多為使用 AI 工具撰寫、整理或產製。  
@@ -64,6 +78,7 @@
 | 項目 | 建議動作 |
 |------|----------|
 | 授權 | 閱讀 `LICENSE` 與 `THIRD-PARTY-NOTICES.md`；SBOM／授權掃描納入 CI |
+| 專利與商標 | CC0 不授予專利或商標權；依部署地、用途與整合技術自行執行盡職調查 |
 | 版本 | 目前為 `0.x`；相容性承諾見 `CHANGELOG` 與 [version-delivery.md](https://github.com/rubujo/OdfKit/blob/main/docs/version-delivery.md) |
 | 功能邊界 | 以 [odf-format-support.md](https://github.com/rubujo/OdfKit/blob/main/docs/odf-format-support.md) 與測試證據為準，勿僅依賴行銷用語 |
 | 非目標 | 見 [udx-non-goals.md](https://github.com/rubujo/OdfKit/blob/main/docs/udx-non-goals.md)（完整排版引擎、互動式 pivot cache／slicer 等 office suite 編輯器能力） |

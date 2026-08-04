@@ -2,7 +2,7 @@
 title: ライセンス
 _lang: ja
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # ライセンス
@@ -18,3 +18,6 @@ OdfKit 独自のコードおよび本サイト独自のドキュメントは、
 引き続き適用されます。OdfKit が CC0 を採用していることによって、これらがパブリックドメインに
 なることはありません。再配布する前に、
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md) を確認してください。
+
+> **特許権および商標権は CC0 の対象外です：** CC0 が扱うのは著作権および関連する権利のみであり、
+> 特許権または商標権を許諾または放棄するものではありません。採用者は第三者の特許リスクを自ら評価してください。

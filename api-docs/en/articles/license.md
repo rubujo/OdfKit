@@ -2,7 +2,7 @@
 title: License
 _lang: en
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # License
@@ -18,3 +18,7 @@ Original OdfKit code and original website documentation are made available under
 Third-party dependencies, schemas, tools, and test data retain their respective licenses and do not
 become public domain because OdfKit uses CC0. Before redistribution, read the
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Patent and trademark rights are outside CC0:** CC0 addresses copyright and related rights only;
+> it does not grant, waive, or otherwise affect anyone's patent or trademark rights. Adopters remain
+> responsible for assessing third-party patent risks arising from their implementation and use.

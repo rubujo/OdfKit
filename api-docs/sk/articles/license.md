@@ -2,7 +2,7 @@
 title: Licencia
 _lang: sk
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licencia
@@ -15,3 +15,6 @@ Pôvodný kód OdfKit a pôvodná dokumentácia webu sú poskytované pod licenc
 nástroje a testovacie údaje tretích strán si zachovávajú vlastné licencie a použitím CC0 sa nestávajú
 verejným vlastníctvom. Pred ďalšou distribúciou si prečítajte
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Patentové práva a ochranné známky sú mimo rozsahu CC0:** CC0 sa týka iba autorských a súvisiacich
+> práv; neudeľuje ani sa nevzdáva patentových práv alebo ochranných známok.

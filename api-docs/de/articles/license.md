@@ -2,7 +2,7 @@
 title: Lizenz
 _lang: de
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Lizenz
@@ -17,3 +17,6 @@ enthält die [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) im St
 Abhängigkeiten, Schemas, Werkzeuge und Testdaten Dritter behalten ihre jeweiligen Lizenzen und werden
 durch CC0 nicht gemeinfrei. Lesen Sie vor einer Weitergabe die
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Patent- und Markenrechte liegen außerhalb von CC0:** CC0 betrifft nur Urheber- und verwandte Rechte;
+> Patent- oder Markenrechte werden weder eingeräumt noch aufgegeben. Anwender müssen Patentrisiken Dritter prüfen.

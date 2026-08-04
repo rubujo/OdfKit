@@ -2,7 +2,7 @@
 title: 知的財産とコンプライアンス
 _lang: ja
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # 知的財産とコンプライアンス (IP Compliance)
@@ -35,6 +35,12 @@ translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d5
    に記載された第三者ライセンスの義務。
 
 「成果物全体がパブリックドメインである」と対外的に表明してはいけません。
+
+### CC0 における特許権および商標権の範囲
+
+CC0 1.0 第 4(a) 項により、特許権および商標権は許諾も放棄もされません。OdfKit は特許ライセンス、
+非侵害保証、特許調査、indemnity を提供しません。採用者は自ら確認してください。相違がある場合は
+[CC0 の法的条項](https://creativecommons.org/publicdomain/zero/1.0/legalcode) が優先します。
 
 ## 2. 権利者と AI による生成に関する声明
 

@@ -2,7 +2,7 @@
 title: Intellectueel eigendom en naleving
 _lang: nl
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Intellectueel eigendom en naleving
@@ -17,6 +17,12 @@ Originele code gebruikt CC0-1.0 Universal; afhankelijkheden, OASIS-schema’s en
 licentie en OASIS Copyright. Verspreiding moet `LICENSE` en
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md) naleven en mag
 het gehele product niet als publiek domein voorstellen.
+
+### Grenzen van CC0 voor octrooien en merken
+
+Volgens sectie 4(a) van CC0 1.0 worden octrooi- en merkrechten niet verleend of prijsgegeven. OdfKit biedt
+geen octrooilicentie, garantie van niet-inbreuk, octrooionderzoek of indemnity. Gebruikers moeten zelf due
+diligence uitvoeren. Bij verschil geldt de [juridische CC0-tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rechten en AI-inhoud
 Publieke code, documentatie, voorbeelden en tests zijn grotendeels met AI gemaakt of geordend. De CC0

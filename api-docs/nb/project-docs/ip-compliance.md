@@ -2,7 +2,7 @@
 title: Immaterielle rettigheter og samsvar
 _lang: nb
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # Immaterielle rettigheter og samsvar
@@ -17,6 +17,12 @@ Originalkode bruker CC0-1.0 Universal; avhengigheter, OASIS-skjemaer og fixtures
 Copyright. Distribusjon må følge `LICENSE` og
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md), og hele
 produktet må ikke omtales som offentlig eiendom.
+
+### CC0s grenser for patenter og varemerker
+
+Etter CC0 1.0 avsnitt 4(a) gis eller fraskrives ingen patent- eller varemerkerettigheter. OdfKit gir ingen
+patentlisens, garanti mot patentinngrep, patentsøk eller indemnity. Brukere må selv utføre kontroll. Ved
+motstrid gjelder [CC0s juridiske tekst](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
 ## 2. Rettigheter og KI-innhold
 Offentlig kode, dokumentasjon, eksempler og tester er hovedsakelig laget eller organisert med KI. CC0

@@ -2,7 +2,7 @@
 title: Licence
 _lang: fr
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licence
@@ -16,3 +16,6 @@ trouve dans le fichier [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICE
 Les dépendances, schémas, outils et données de test de tiers conservent leurs licences respectives et ne
 deviennent pas du domaine public du fait de CC0. Avant toute redistribution, consultez les
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Les brevets et marques sont hors du champ de CC0 :** CC0 porte uniquement sur le droit d’auteur et
+> les droits voisins ; il n’accorde ni n’abandonne aucun droit de brevet ou de marque.

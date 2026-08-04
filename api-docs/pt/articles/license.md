@@ -2,7 +2,7 @@
 title: Licença
 _lang: pt
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licença
@@ -15,3 +15,6 @@ na [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) da raiz do repo
 esquemas, ferramentas e dados de teste de terceiros mantêm as suas licenças e não se tornam domínio
 público devido à CC0. Antes de redistribuir, leia os
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Os direitos de patente e de marca estão fora do âmbito da CC0:** a CC0 abrange apenas direitos de
+> autor e conexos; não concede nem renuncia direitos de patente ou de marca.

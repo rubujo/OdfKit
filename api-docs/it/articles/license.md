@@ -2,7 +2,7 @@
 title: Licenza
 _lang: it
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licenza
@@ -16,3 +16,6 @@ file [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) alla radice d
 Dipendenze, schemi, strumenti e dati di test di terze parti conservano le rispettive licenze e non
 diventano di pubblico dominio per effetto di CC0. Prima della ridistribuzione leggere
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Brevetti e marchi sono fuori dall'ambito di CC0:** CC0 riguarda solo il diritto d'autore e i diritti
+> connessi; non concede né rinuncia a brevetti o marchi. Gli adottanti devono valutare i rischi di terzi.

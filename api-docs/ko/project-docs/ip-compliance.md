@@ -2,7 +2,7 @@
 title: 지식재산권 및 규정 준수
 _lang: ko
 translation_source: docs/ip-compliance.md
-translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393
+translation_source_sha256: 02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c
 ---
 
 # 지식재산권 및 규정 준수
@@ -17,6 +17,12 @@ translation_source_sha256: 08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d5
 OASIS 스키마는 OASIS Copyright를, fixture는 manifest의 라이선스를 유지합니다. 배포 시 `LICENSE`와
 [THIRD-PARTY-NOTICES.md](https://github.com/rubujo/OdfKit/blob/main/THIRD-PARTY-NOTICES.md)를 모두
 준수해야 하며 전체 제품이 퍼블릭 도메인이라고 주장해서는 안 됩니다.
+
+### CC0의 특허권 및 상표권 범위
+
+CC0 1.0 제4(a)항에 따라 특허권과 상표권은 허여되거나 포기되지 않습니다. OdfKit은 특허 라이선스,
+비침해 보증, 특허 조사 또는 indemnity를 제공하지 않습니다. 채택자는 직접 실사해야 합니다. 내용이
+다를 경우 [CC0 법적 원문](https://creativecommons.org/publicdomain/zero/1.0/legalcode)이 우선합니다.
 
 ## 2. 권리자와 AI 제작 콘텐츠
 공개 코드, 문서, 예제와 테스트는 현재 대부분 AI 도구로 작성·정리·생성되었습니다. CC0

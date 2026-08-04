@@ -6,16 +6,16 @@
     {
       "id": "license",
       "source": "api-docs/articles/license.md",
-      "sourceSha256": "2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2",
+      "sourceSha256": "c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129",
       "destination": "api-docs/{locale}/articles/license.md",
       "requiredTokens": ["CC0-1.0 Universal", "LICENSE", "THIRD-PARTY-NOTICES"]
     },
     {
       "id": "ip-compliance",
       "source": "docs/ip-compliance.md",
-      "sourceSha256": "08b6d07122f43cfd3d3095b67a7ecb1fc837c8fc23cd940c8b0d580b0f799393",
+      "sourceSha256": "02ec7aa4649cae3c94cd515424f1c787d21909239c98c0fedffca85214a7eb6c",
       "destination": "api-docs/{locale}/project-docs/ip-compliance.md",
-      "requiredTokens": ["CC0-1.0 Universal", "Affirmer", "indemnity", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md"]
+      "requiredTokens": ["CC0-1.0 Universal", "Affirmer", "indemnity", "DCO", "Signed-off-by:", "THIRD-PARTY-NOTICES.md", "4(a)", "legalcode"]
     },
     {
       "id": "security-limits",

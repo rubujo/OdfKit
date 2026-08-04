@@ -2,7 +2,7 @@
 title: Licence
 _lang: cs
 translation_source: api-docs/articles/license.md
-translation_source_sha256: 2589d4d57299e1ee02a6d9fd5a6263b31cd1e77a39d8d83bb474ea1f878857b2
+translation_source_sha256: c74fd671bf9df14c20e784d39260ba1125f63098ab851ba6570c183479cbd129
 ---
 
 # Licence
@@ -16,3 +16,7 @@ souboru [LICENSE](https://github.com/rubujo/OdfKit/blob/main/LICENSE) v kořenov
 Závislosti, schémata, nástroje a testovací data třetích stran si zachovávají vlastní licence a použitím CC0
 v OdfKit se nestávají volným dílem. Před dalším šířením si přečtěte
 [THIRD-PARTY-NOTICES](../project-docs/THIRD-PARTY-NOTICES.md).
+
+> **Patentová práva a ochranné známky nespadají do rozsahu CC0:** CC0 se týká pouze autorských a
+> souvisejících práv; neuděluje, nevzdává se ani jinak neovlivňuje patentová práva nebo ochranné známky.
+> Uživatelé musí sami posoudit patentová rizika třetích stran spojená s implementací a použitím.
