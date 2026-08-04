@@ -398,6 +398,28 @@ Console.WriteLine(loadedSheet.NamedRanges[0].Name);
 Console.WriteLine(loadedSheet.FrozenPanes.Rows);
 ```
 
+### 寫入與讀取貨幣儲存格
+
+`SetCurrencyValue` 會同時設定 ODF 的數值、貨幣代碼與顯示文字，避免只寫入格式化字串而失去
+可計算的數值語意：
+
+```csharp
+using OdfKit.Spreadsheet;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+OdfTableSheet sheet = workbook.Worksheets.Add("Invoices");
+sheet.Cells["A1"].SetCurrencyValue(1250m, "TWD", "NT$1,250");
+workbook.Save("invoices.ods");
+
+using SpreadsheetDocument loaded = SpreadsheetDocument.Load("invoices.ods");
+OdfCell amount = loaded.Worksheets["Invoices"].Cells["A1"];
+Console.WriteLine($"{amount.RawValue} {amount.CurrencyCode}: {amount.DisplayText}");
+```
+
+寫入時只驗證 ISO 4217 代碼的形狀（恰好三個 ASCII 字母）並正規化為大寫，不比對現行
+代碼清單；因此歷史代碼、`XTS` 測試代碼及日後配發的代碼仍可使用。讀取既有文件時則只做
+去空白與大寫正規化，不會因其他產生器寫入未知代碼而拒絕載入。
+
 ## 讀取儲存格
 
 ```csharp
@@ -873,6 +895,35 @@ Console.WriteLine(loaded.FindDataSourceSetting("AppendTableAliasName")?.Values[0
 Console.WriteLine(loaded.Tables[0].Name);
 Console.WriteLine(loaded.FindQuery("ActiveCustomers")?.Command);
 ```
+
+## 以 CRL allowlist 驗證數位簽章
+
+伺服器啟用 CRL 線上撤銷檢查時，若已知憑證發行者的 CRL 主機，應以確切 DNS 名稱縮小
+目的地範圍。自訂 `HttpClient` 是受信任的傳輸政策邊界，必須停用自動重新導向，讓 OdfKit
+逐一驗證每個目的地：
+
+```csharp
+using OdfKit.Core;
+using OdfKit.Text;
+
+using var handler = new HttpClientHandler { AllowAutoRedirect = false };
+using var client = new HttpClient(handler);
+var options = new OdfSigningOptions
+{
+    CheckRevocation = true,
+    HttpClient = client
+};
+options.AllowedCrlHosts.Add("crl.example-ca.test");
+
+using TextDocument document = TextDocument.Load("signed.odt");
+OdfSignatureValidationResult result =
+    await document.VerifySignaturesAsync(options, cancellationToken);
+```
+
+`AllowedCrlHosts` 不區分大小寫，但不支援萬用字元或父網域後綴比對；空集合表示允許任何
+通過公用網路目的地檢查的主機，不表示停用網路。自訂 client 還必須阻止 private、loopback、
+link-local 與 DNS rebinding 目的地；未提供 client 時，OdfKit 使用內建的 fail-closed CRL
+傳輸政策。
 
 ## 驗證文件
 

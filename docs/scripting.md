@@ -90,6 +90,25 @@ OdfScriptCompilationResult compiled = await OdfExternalScriptCompiler.DiagnoseAs
     cancellationToken);
 ```
 
+LibreOffice Basic probe 會在背景排空 `soffice` 的輸出資料流。需要將罕見的背景讀取失敗送入
+既有記錄系統時，可設定觀測回呼；回呼本身擲出的例外會與編譯器執行隔離：
+
+```csharp
+var basicCompiler = new OdfScriptCompilerOptions
+{
+    LibreOfficeExecutablePath = @"C:\Program Files\LibreOffice\program\soffice.exe",
+    LibreOfficePythonExecutablePath = @"C:\Program Files\LibreOffice\program\python.exe",
+    Timeout = TimeSpan.FromSeconds(30),
+    BackgroundOutputFailureHandler = exception =>
+        Console.Error.WriteLine($"LibreOffice output drain failed: {exception.Message}")
+};
+OdfScriptCompilationResult basicResult = await OdfExternalScriptCompiler.DiagnoseAsync(
+    basicSource,
+    OdfScriptCompilerBackend.LibreOfficeBasic,
+    basicCompiler,
+    cancellationToken);
+```
+
 修改完成後可建立巨集簽章；簽章與信任是兩個不同步驟：
 
 ```csharp

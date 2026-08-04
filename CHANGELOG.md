@@ -43,9 +43,9 @@
 - 新增 ODS／ODT 串流 Reader 資源限制選項與真正非同步讀取；repeat、列欄、節點及文字超限時改為失敗，不再靜默截斷。
 - 修正 `OdsStreamReader.GetValue` 的 `DbDataReader` 語意：空值回傳 `DBNull.Value`，公式儲存格回傳已儲存快取值；新增 `GetCell` 保留公式、值類型、貨幣及顯示文字。這是 1.0 前的刻意破壞性修正。
 - ODS／ODT Writer 新增非同步 flush／complete 路徑；ZIP 中央目錄提交因 BCL `ZipArchive` 限制仍為同步步驟。
-- 新增效能預算、能力 claims、證據索引及 12 語系 GitHub Pages API reference 建置流程。
-- API 文件站台重構為 DocFX 站內多語系結構（根層導覽與首頁、12 語系入口改為站內內容頁）：修復模板 logo 全站 404、搜尋框不可見與語系入口孤立問題；移除指向未渲染 `OdfKit.DOM.*` 頁面的失效連結；建置腳本新增語系契約驗證與站內連結健檢閘門（見 `docs/api-docs-site.md`）。
-- API 文件站升級至 DocFX 2.78.5 modern 模板，加入 12 語系原生 TOC、站內權威聲明、sitemap、共用 footer 及 modern 輸出驗證。
+- 新增效能預算、能力 claims、證據索引及 GitHub Pages API reference 建置流程；站台初始提供 12 語系，後續擴充為目前的 17 語系。
+- API 文件站台重構為 DocFX 站內多語系結構（根層導覽與首頁、初始 12 語系入口改為站內內容頁，後續擴充為 17 語系）：修復模板 logo 全站 404、搜尋框不可見與語系入口孤立問題；移除指向未渲染 `OdfKit.DOM.*` 頁面的失效連結；建置腳本新增語系契約驗證與站內連結健檢閘門（見 `docs/api-docs-site.md`）。
+- API 文件站升級至 DocFX 2.78.5 modern 模板，初始加入 12 語系原生 TOC，後續擴充為目前的 17 語系；同時加入站內權威聲明、sitemap、共用 footer 及 modern 輸出驗證。
 - API 文件站新增自訂 404 頁（DocFX 內容頁）：建置時注入站台根 `<base>` 使任意深度缺失路徑下樣式與導覽正常、自 sitemap 移除 404 條目，並新增對應建置閘門。
 
 ## [0.0.1] - 持續維護
@@ -72,14 +72,14 @@ GitHub Release 資產若建立，只代表特定提交的交付快照；目前�
 - **圖表深度 API**：新增 `OdfChartPreset` 任務導向預設（長條、折線、圓餅、面積、散佈等）、泡泡圖與股價圖系列（`OdfBubbleChartSeriesInfo`／`OdfBubbleChartSeriesRequest`、`OdfStockChartSeriesInfo`／`OdfStockChartSeriesRequest`）與 `OdfChart3DOptions`（投影模式、角度偏移、雙面光照、光源清單），補齊圖表建立與樣式高階 API 深度。
 - **TemplateBinder 情境強化**：擴充文字、試算表、簡報、影像與繪圖等文件類型的占位符繫結情境涵蓋範圍，並補上對應 cookbook 範例。
 - **ODF 1.4 coverage 契約**：新增 `OdfCoverageContractTests` 等測試鎖定 ODF 1.4 規格覆蓋契約與 typed DOM audit 入口，明確區分規格覆蓋、package lifecycle、high-level facade 與 interop behavior 四個持續追蹤層次。
-- **套件與發行**：8 個套件（`OdfKit` 核心 + 7 個 `OdfKit.Extensions.*`）雙 TFM（`net10.0` + `netstandard2.0`）NuGet 封裝，透過 GitHub Release 資產發佈（非 nuget.org）。
+- **套件與發行**：此里程碑當時包含 8 個套件（`OdfKit` 核心 + 7 個 `OdfKit.Extensions.*`）雙 TFM（`net10.0` + `netstandard2.0`）NuGet 封裝，後續已擴充；目前完整套件與 TFM 清單以 [`docs/package-catalog.md`](docs/package-catalog.md) 為準。GitHub Release 資產不發布至 nuget.org。
 - **串流寫入熱路徑（ODS／ODT）**：將批次原始 XML 組裝與字元防線抽至共用 `OdfRawXmlWriter`／`OdfXmlCharacterGuard`（`OdfKit.Core`），`OdsStreamWriter` 與 `OdtStreamWriter` 段落／標題／清單／儲存格熱路徑共用；關閉 `XmlWriter.CheckCharacters` 後仍以 `Err_OdfStreamWriter_InvalidXmlCharacter` 快速失敗；補齊 ODS／ODT fast-path 與字元邊界測試。`docs/performance-comparison.md` 於 2026-07-09 重跑 ODS 百萬列對比（第 2 次：約 4.96 s／472 MB 配置／38 MB 峰值，與 MiniExcel 耗時接近持平）。
 - **合規文件**：新增 `docs/ip-compliance.md`（複合授權、AI 產製、clean-room、DCO、採用者盡職調查）；README 補強「何時使用／不使用」與效能敘事對齊。
-- **可維護性**：`OdfLocalizer.Exceptions` 按 12 語系拆檔；新增 `docs/maintainability.md`、產生碼目錄 README、`eng/Test-OneLineXmlSummary.ps1`；歷史 `Split-*`／`Merge-*` 等腳本移至 `eng/historical-refactor/`；合併弱 partial（`OdfAnimation`、簽章 `Common`）並移除空殼 partial 根檔。
+- **可維護性**：`OdfLocalizer.Exceptions` 初始按 12 語系拆檔，後續擴充為目前的 17 語系；新增 `docs/maintainability.md`、產生碼目錄 README、`eng/Test-OneLineXmlSummary.ps1`；歷史 `Split-*`／`Merge-*` 等腳本移至 `eng/historical-refactor/`；合併弱 partial（`OdfAnimation`、簽章 `Common`）並移除空殼 partial 根檔。
 - **公開 API 形狀與文件完滿基線（v0.0.1）**：
   - 手寫公開 API 將 RS0026／RS0027 升為 **error**；產生 DOM／schema 目錄覆寫為 none，且禁止手改 `.g.cs`。
   - 單一尾端可選參數改明確多載鏈；多可選高頻面改 **options 物件**（`OdfRichTextRunOptions`、`OdsRowWriteOptions`、`OdfValidationOptions`、`OdfFlatXmlWriteOptions`、`OdfSchemaRegistrationOptions`）；其餘展開為短多載轉呼叫（`Expand-OptionalParameters.py --dry-run` = 0）。0.x **不**保留舊多可選相容層。
-  - PublicApiAnalyzers 雙 TFM Unshipped 基線與 Package Validation；在地化 JSON 產線（12 語系 × 鍵對等閘門）。
+  - PublicApiAnalyzers 雙 TFM Unshipped 基線與 Package Validation；在地化 JSON 產線初始涵蓋 12 語系，後續擴充為目前的 17 語系與鍵對等閘門。
   - 雙語 XML **missing** 清零；`Test-BilingualXmlDocs.ps1` 基線 `TOTAL=0`／`FILES=0`。
   - 高頻 API（`OdfDocumentFactory`、`OdfPackage`、`OdfDocument`、`OdfValidator`、`OdsStreamWriter` 等）便利多載摘要差異化（`eng/Rewrite-ConvenienceSummaries.py`）。
   - 產品品質分層入口見 `docs/product-quality-gates.md`（提交前 A／PR 與 main 之 B／外部環境與穩定量測之 C）。
