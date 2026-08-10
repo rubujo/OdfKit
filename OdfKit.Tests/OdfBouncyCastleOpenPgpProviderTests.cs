@@ -188,6 +188,26 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
+    public void DecryptSessionKeyUnsupportedPacketVersionThrowsCryptographicException()
+    {
+        var (_, secKeyRingBytes) = GenerateRsaKeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        // BouncyCastle 2.7.0 的完整 message parser 會將此畸形輸入誤判為 public-key packet，
+        // 並擲出 UnsupportedPacketVersionException；公開邊界必須維持 CryptographicException 契約。
+        byte[] packet =
+        [
+            0xBB, 0x79, 0xB7, 0x0B, 0x99, 0xCC, 0x1E, 0xF3,
+            0x0F, 0x0B, 0x0A, 0x5C, 0xF5, 0xA5, 0xBC,
+        ];
+
+        Assert.Throws<CryptographicException>(
+            () => provider.DecryptSessionKey(packet, "test"));
+    }
+
+    [Fact]
     public void DecryptSessionKeyTruncatedFiveByteLengthHeaderThrowsCryptographicException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();

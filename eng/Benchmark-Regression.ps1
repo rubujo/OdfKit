@@ -11,12 +11,15 @@
     以本次量測更新所選基準線（僅限本機調整基準時使用）。
 .PARAMETER Filter
     選用的 BenchmarkDotNet 篩選器；省略時驗證全部受保護基準。
+.PARAMETER ReportTimingRegression
+    將容易受共享主機影響的耗時回歸改為報告；配置量回歸仍維持失敗。
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
     [switch]$UpdateBaseline,
-    [string]$Filter = ""
+    [string]$Filter = "",
+    [switch]$ReportTimingRegression
 )
 
 $ErrorActionPreference = "Stop"
@@ -187,7 +190,13 @@ try {
         Write-Host "  本次 Mean：$([math]::Round($measurement.MeanNanoseconds / 1000000, 3)) ms"
         Write-Host "  容許上限：$([math]::Round($maxMean / 1000000, 3)) ms (+$([math]::Round([double]$entry.toleranceRatio * 100))%)"
         if ($measurement.MeanNanoseconds -gt $maxMean) {
-            throw "效能回歸：$($definition.Key) 的 Mean 超過基準上限。"
+            $message = "效能回歸：$($definition.Key) 的 Mean 超過基準上限。"
+            if ($ReportTimingRegression) {
+                Write-Host "::notice title=效能耗時差異::$message"
+            }
+            else {
+                throw $message
+            }
         }
 
         if ($null -ne $entry.allocatedBytes -and $null -ne $measurement.AllocatedBytes) {
@@ -199,7 +208,12 @@ try {
             }
         }
 
-        Write-Host "通過：未超過回歸門檻。"
+        if ($ReportTimingRegression -and $measurement.MeanNanoseconds -gt $maxMean) {
+            Write-Host "通過：耗時差異已報告，配置量未超過硬性回歸門檻。"
+        }
+        else {
+            Write-Host "通過：未超過回歸門檻。"
+        }
     }
 
     if ($UpdateBaseline) {

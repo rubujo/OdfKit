@@ -50,11 +50,10 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      # windows-latest／ubuntu-latest 皆為硬閘門（超過容忍度即失敗）；跨平台計時雜訊較大，
-      # 容忍度沿用既有值，若日後累積數據顯示 Linux 雜訊需要更寬容忍度再個別調整。
+      # 共享 runner 的耗時只作警告；配置量不受主機速度影響，仍維持硬閘門。
       - name: Run benchmark regression
         shell: pwsh
-        run: ./eng/Benchmark-Regression.ps1 -Configuration Release
+        run: ./eng/Benchmark-Regression.ps1 -Configuration Release -ReportTimingRegression
 
       - name: Measure standard ODS ODT ODP workloads
         shell: pwsh
@@ -65,12 +64,12 @@ jobs:
         run: ./eng/Test-PerformanceBudgets.ps1 -SamplePath artifacts/performance/standard-documents.json
 
       - name: Upload standard document measurements
-        if: always()
+        if: always() && hashFiles('artifacts/performance/standard-documents.json') != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: standard-document-performance-${{ matrix.os }}
           path: artifacts/performance/standard-documents.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
 
   benchmark-regression-macos:
@@ -114,12 +113,12 @@ jobs:
         run: ./eng/Test-PerformanceBudgets.ps1 -SamplePath artifacts/performance/standard-documents.json
 
       - name: Upload standard document measurements
-        if: always()
+        if: always() && hashFiles('artifacts/performance/standard-documents.json') != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: standard-document-performance-macos-latest
           path: artifacts/performance/standard-documents.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
 
   webfont-iis-sustained-load:

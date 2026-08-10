@@ -24,6 +24,9 @@ ODS／ODT 串流 I/O 的維護決策、隨機存取邊界與安全依據見
 pwsh eng/Benchmark-Regression.ps1 -Configuration Release
 ```
 
+排程 CI 另傳入 `-ReportTimingRegression`：共享 runner 的耗時超標會保留明確 notice，
+配置量超標仍為硬性失敗。本機穩定環境省略此參數時，耗時與配置量都維持硬閘門。
+
 更新基準線只應在刻意重訂效能基準時執行：
 
 ```powershell

@@ -8,6 +8,9 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- BenchmarkDotNet scenario names intentionally use underscores, benchmark methods remain
+         instance members, and disposable fields are released through its cleanup lifecycle. -->
+    <NoWarn>$(NoWarn);CA1001;CA1707;CA1822</NoWarn>
     <RootNamespace>OdfKit.Benchmarks</RootNamespace>
     <AssemblyName>OdfKit.Benchmarks</AssemblyName>
   </PropertyGroup>

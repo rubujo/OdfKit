@@ -126,10 +126,11 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
             if (messageKey is not null)
                 return messageKey;
         }
-        catch (Exception ex) when (ex is IOException or PgpException)
+        catch (Exception ex) when (ex is IOException or PgpException or UnsupportedPacketVersionException)
         {
             // 早期 OdfKit 版本只儲存 PKESK packet；若輸入不是完整 OpenPGP message，
-            // 退回既有的 RFC 4880 packet 解碼路徑。
+            // 或 BouncyCastle 將 PKESK 位元組誤判為不支援版本的 key packet，退回既有的
+            // RFC 4880 packet 解碼路徑，並維持格式錯誤皆為 CryptographicException 的契約。
         }
 
         (long pkeskKeyId, PublicKeyAlgorithmTag algorithm, byte[][] encMpis) =

@@ -22,6 +22,9 @@ public class OdsStreamWriterBenchmarks
         _outputStream.Position = 0;
     }
 
+    [GlobalCleanup]
+    public void Cleanup() => _outputStream.Dispose();
+
     [Benchmark]
     public long WriteRows()
     {

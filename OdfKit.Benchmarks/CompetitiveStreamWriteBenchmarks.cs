@@ -40,6 +40,13 @@ public class CompetitiveStreamWriteBenchmarks
     public void IterationSetup() => _outputStream = new MemoryStream();
 
     /// <summary>
+    /// Releases the output buffer after each measured invocation.
+    /// 在每次量測呼叫後釋放輸出緩衝區。
+    /// </summary>
+    [IterationCleanup]
+    public void IterationCleanup() => _outputStream.Dispose();
+
+    /// <summary>
     /// Writes 1,000,000 mixed-type rows using OdfKit's <c>OdsStreamWriter</c>.
     /// 使用 OdfKit 的 <c>OdsStreamWriter</c> 寫入一百萬列混合型別資料。
     /// </summary>

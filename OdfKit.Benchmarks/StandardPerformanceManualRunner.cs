@@ -9,6 +9,8 @@ namespace OdfKit.Benchmarks;
 
 internal static class StandardPerformanceManualRunner
 {
+    private static readonly JsonSerializerOptions s_indentedJsonOptions = new() { WriteIndented = true };
+
     private static readonly string[] s_scenarios =
     [
         "OdsStreamWrite", "OdsStreamRead", "OdsDomRoundTrip",
@@ -44,7 +46,7 @@ internal static class StandardPerformanceManualRunner
                 results.Add(result);
             }
 
-            Console.WriteLine(JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine(JsonSerializer.Serialize(results, s_indentedJsonOptions));
             return 0;
         }
         finally
