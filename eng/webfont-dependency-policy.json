@@ -1,12 +1,12 @@
 {
   "schemaVersion": 2,
-  "reviewedAt": "2026-07-24",
+  "reviewedAt": "2026-08-10",
   "allowedLicenses": [
     "BSD-2-Clause",
     "MIT"
   ],
   "packages": [
-    { "id": "BouncyCastle.Cryptography", "version": "2.6.2", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
+    { "id": "BouncyCastle.Cryptography", "version": "2.7.0", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "CommunityToolkit.HighPerformance", "version": "8.4.2", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "CSharpMath", "version": "1.0.0-pre.1", "license": "MIT", "declarationKind": "expression", "declaration": "MIT" },
     { "id": "Markdig", "version": "1.3.2", "license": "BSD-2-Clause", "declarationKind": "expression", "declaration": "BSD-2-Clause" },

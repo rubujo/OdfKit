@@ -543,7 +543,7 @@ LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKi
   `odf-external-baseline.yml` 再以 Jing 驗證執行期產生的 manifest。
 - 反向讀取完整 RFC 4880 OpenPGP message、LibrePGP tag 20 v1 AES-OCB message 與早期
   OdfKit 單一 PKESK payload 均保留。tag 20 由 OdfKit 驗證分塊與 final authentication tag，
-  因為 BouncyCastle.Cryptography 2.6.2 的高階 OpenPGP parser 尚未支援此封包；實機測試
+  因為 BouncyCastle.Cryptography 2.7.0 的高階 OpenPGP parser 尚未支援此封包；實機測試
   強制 GnuPG 2.5.21 產生 tag 20，並確認末端竄改會遭拒絕。
 - `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` 以臨時 RSA 金鑰驗證 OdfKit 寫入後
   LibreOffice 26.2.4.2 可解密並重新儲存；LibreOffice 轉出的 wholesome AES-256-GCM +
