@@ -114,12 +114,12 @@ Windows 開發機或 CI 可用官方 CNS 字型執行真實 IIS Express smoke。
 pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
   -Pipeline Integrated `
   -FontPath <TW-Sung-Ext-B-98_1.ttf> `
-  -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+  -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
 pwsh eng/Test-WebFontIisExpressSmoke.ps1 `
   -Pipeline Classic `
   -Destination artifacts/webfont-iis-express-classic-smoke `
   -FontPath <TW-Sung-Ext-B-98_1.ttf> `
-  -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+  -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
 ```
 
 此測試會將隨機 key 寫入隔離站台的 `web.config`、清除環境變數、實際編譯頁面、經 HTTP 動態

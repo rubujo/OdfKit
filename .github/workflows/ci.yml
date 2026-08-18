@@ -328,7 +328,7 @@ jobs:
           dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj `
             -c Release -- `
             --font artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            --sha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+            --sha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
           dotnet run --project tests/OdfKit.WebFonts.SystemWebSmoke/OdfKit.WebFonts.SystemWebSmoke.csproj `
             -c Release -- `
             --font artifacts/webfont-format-matrix/sources/SourceHanSansTW-VF.otf `
@@ -340,20 +340,20 @@ jobs:
             -Pipeline Integrated `
             -Destination artifacts/webfont-iis-express-integrated-smoke `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+            -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
           ./eng/Test-WebFontIisExpressSmoke.ps1 `
             -NoBuild `
             -Pipeline Classic `
             -Destination artifacts/webfont-iis-express-classic-smoke `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+            -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
           ./eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 `
             -NoBuild `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+            -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
           ./eng/Test-WebFontPackageConsumer.ps1 `
             -FontPath artifacts/webfont-format-matrix/sources/Fonts_Sung/TW-Sung-Ext-B-98_1.ttf `
-            -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583 `
+            -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5 `
             -Cff2FontPath artifacts/webfont-format-matrix/sources/SourceHanSansTW-VF.otf `
             -Cff2SourceSha256 e66bca1da93f068521f3ab10dc7fa0c6691a37c64a0ccfdb6bb3a2ee879deb77
 

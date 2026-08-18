@@ -41,7 +41,7 @@
             body: JSON.stringify({
                 fontSourceId: route.fontSourceId,
                 faceIndex: 0,
-                profileId: "cns11643-euc-tw-2026-05-05",
+                profileId: "cns11643-euc-tw-2026-08-05",
                 fontFamily,
                 sequences,
                 formats: [requestedFormat],
