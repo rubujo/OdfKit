@@ -90,7 +90,7 @@ odfkit-webfonts build `
   --content-root . `
   --content-extensions .cshtml,.razor,.resx,.html,.txt `
   --output wwwroot/_odf-fonts `
-  --profile cns11643-euc-tw-2026-05-05 `
+  --profile cns11643-euc-tw-2026-08-05 `
   --formats woff2
 ```
 
@@ -114,7 +114,7 @@ selector 保持在同一個 slice。預設只產生 WOFF2；需要舊瀏覽器�
 WOFF／TTF。WOFF writer 會逐 table 產生 zlib stream，只有壓縮後較小時才採用壓縮內容。
 
 `pwsh eng/Test-WebFontFormatMatrix.ps1` 使用 SHA-256
-`eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583` 的官方 CNS Ext-B
+`a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5` 的官方 CNS Ext-B
 TrueType 字型與 `A𠆩` 真實子集重現：TTF 1,044,104 bytes、WOFF 297,692 bytes、WOFF2
 138,660 bytes。該案例的 WOFF 比 TTF 小約 71.5%；這是鎖定 corpus 的證據，不是所有字型的固定
 壓縮承諾。相同矩陣另以 [Adobe Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/tag/2.042R-u/1.062R-i/1.026R-vf)
@@ -376,7 +376,7 @@ Handler 真實產生 WOFF2。
 {
   "fontSourceId": "cns-sung-plus",
   "faceIndex": 0,
-  "profileId": "cns11643-euc-tw-2026-05-05",
+  "profileId": "cns11643-euc-tw-2026-08-05",
   "fontFamily": "OdfKit CNS Sung Plus",
   "sequences": ["󿫠"],
   "formats": ["Woff", "TrueType"]
@@ -576,11 +576,11 @@ EUDC 字型不得在未授權時散布或上傳 CDN。
 ## 全字庫 CNS 11643 Profile
 
 `OdfKit.WebFonts.Profiles` 提供可追溯的 EUC-TW provider 與資料身分，不把全字庫字型或完整
-第三方資料塞入 nupkg。目前鎖定的 Profile 為 `cns11643-euc-tw-2026-05-05`，對應官方
+第三方資料塞入 nupkg。目前鎖定的 Profile 為 `cns11643-euc-tw-2026-08-05`，對應官方
 `MapingTables.zip`，SHA-256：
 
 ```text
-f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659
+4502fcf7b433d679dee51127298929543ec7f4aa99be93cd219df1552bc3d2bf
 ```
 
 ### 下載與私有部署 Plus 字型

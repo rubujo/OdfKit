@@ -21,7 +21,7 @@ IConfigurationSection settings = builder.Configuration.GetSection("OdfKit:WebFon
 string assetRoot = ResolvePath(
     builder.Environment.ContentRootPath,
     settings["AssetRoot"] ?? "wwwroot/_odf-fonts");
-string profileId = settings["ProfileId"] ?? "cns11643-euc-tw-2026-05-05";
+string profileId = settings["ProfileId"] ?? "cns11643-euc-tw-2026-08-05";
 string? publicBaseUrl = settings["PublicBaseUrl"];
 string? apiKey = settings["ApiKey"];
 
