@@ -28,7 +28,7 @@ $headers = @{ 'X-OdfKit-WebFont-Key' = $env:OdfKit__WebFonts__ApiKey }
 $body = @{
   fontSourceId = 'cns-sung-plus'
   faceIndex = 0
-  profileId = 'cns11643-euc-tw-2026-05-05'
+  profileId = 'cns11643-euc-tw-2026-08-05'
   fontFamily = 'OdfKit Dynamic CNS'
   sequences = @([char]::ConvertFromUtf32(0xFFAE0))
   formats = @('Woff2')
@@ -112,7 +112,7 @@ Windows CI 可用官方 CNS 字型，透過 IIS Express 與 ANCM 實際驗證 In
 ```powershell
 pwsh eng/Test-WebFontAspNetCoreIisExpressSmoke.ps1 `
   -FontPath <TW-Sung-Ext-B-98_1.ttf> `
-  -SourceSha256 eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583
+  -SourceSha256 a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5
 ```
 
 Smoke 另對 In-Process／Out-of-Process 的 WOFF2 資產執行 16 路、256～1,024 次有界 GET 負載，

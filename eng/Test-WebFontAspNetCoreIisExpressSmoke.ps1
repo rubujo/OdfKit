@@ -170,7 +170,7 @@ function Invoke-HostingModelSmoke {
     $env:OdfKit__WebFonts__FontPath = $resolvedFontPath
     $env:OdfKit__WebFonts__FontSourceId = "cns-ext-b"
     $env:OdfKit__WebFonts__SourceSha256 = $actualSourceSha256
-    $env:OdfKit__WebFonts__ProfileId = "cns11643-euc-tw-2026-05-05"
+    $env:OdfKit__WebFonts__ProfileId = "cns11643-euc-tw-2026-08-05"
     $env:OdfKit__WebFonts__FaceIndex = "0"
     $env:OdfKit__WebFonts__RateLimitPermitLimit = $rateLimitPermitLimit.ToString(
         [Globalization.CultureInfo]::InvariantCulture)
@@ -317,7 +317,7 @@ function Invoke-HostingModelSmoke {
         $requestBody = @{
             fontSourceId = "cns-ext-b"
             faceIndex = 0
-            profileId = "cns11643-euc-tw-2026-05-05"
+            profileId = "cns11643-euc-tw-2026-08-05"
             fontFamily = "OdfKit ASP.NET Core IIS"
             sequences = @("𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹")
             formats = @("Woff2")

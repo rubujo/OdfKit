@@ -45,7 +45,7 @@ public sealed class ProfileTests
         string decoded = provider.Decode([0x41, 0xA1, 0xA1, 0x8E, 0xA2, 0xA1, 0xA1]);
 
         Assert.Equal("A一𠀀", decoded);
-        Assert.Equal("cns11643-euc-tw-2026-05-05", provider.ProfileId);
+        Assert.Equal("cns11643-euc-tw-2026-08-05", provider.ProfileId);
         Assert.Equal(Cns11643EucTwMappingProvider.VerifiedArchiveSha256, provider.SourceSha256);
     }
 

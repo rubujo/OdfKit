@@ -27,13 +27,13 @@
     {
       "id": "cns-sung-plus",
       "path": "Fonts/TW-Sung-Plus-98_1.ttf",
-      "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
+      "sha256": "7dfc11b3dbc0c3142e1fa690f9d310dc9716508b54560c08e2df8db450687e40",
       "faceIndex": 0,
       "fontFamily": "OdfKit CNS Sung Plus"
     }
   ],
   "allowedProfileIds": [
-    "cns11643-euc-tw-2026-05-05"
+    "cns11643-euc-tw-2026-08-05"
   ],
   "allowedFormats": [
     "Woff2",

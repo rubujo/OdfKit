@@ -1,7 +1,7 @@
 ﻿#nullable enable
 const OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.OfficialSourceUri = "https://www.cns11643.gov.tw/opendata/MapingTables.zip" -> string!
-const OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.VerifiedArchiveSha256 = "f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659" -> string!
-const OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.VerifiedDataVersion = "2026-05-05" -> string!
+const OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.VerifiedArchiveSha256 = "4502fcf7b433d679dee51127298929543ec7f4aa99be93cd219df1552bc3d2bf" -> string!
+const OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.VerifiedDataVersion = "2026-08-05" -> string!
 OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider
 OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.Attribution.get -> string!
 OdfKit.WebFonts.Profiles.Cns11643EucTwMappingProvider.DataVersion.get -> string!

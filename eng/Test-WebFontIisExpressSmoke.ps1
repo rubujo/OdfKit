@@ -116,7 +116,7 @@ $dynamicConfiguration = @{
             fontFamily = "OdfKit CNS Ext-B"
         }
     )
-    allowedProfileIds = @("cns11643-euc-tw-2026-05-05")
+    allowedProfileIds = @("cns11643-euc-tw-2026-08-05")
     allowedFormats = @("Woff", "TrueType")
 }
 $dynamicConfiguration |
@@ -230,7 +230,7 @@ try {
     $requestBody = @{
         fontSourceId = "cns-ext-b"
         faceIndex = 0
-        profileId = "cns11643-euc-tw-2026-05-05"
+        profileId = "cns11643-euc-tw-2026-08-05"
         fontFamily = "OdfKit CNS Ext-B"
         sequences = @("𪚥 𩙡 𦚡 𨏿 𠆩 𡘙 𡌂 𠀀一二三丨ㄩ幹")
         formats = @("Woff", "TrueType")

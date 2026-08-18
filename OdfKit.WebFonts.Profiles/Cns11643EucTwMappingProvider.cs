@@ -20,13 +20,13 @@ public sealed class Cns11643EucTwMappingProvider : ITraceableCharacterMappingPro
     /// Gets the currently verified official data version.
     /// 取得目前已驗證的官方資料版本。
     /// </summary>
-    public const string VerifiedDataVersion = "2026-05-05";
+    public const string VerifiedDataVersion = "2026-08-05";
 
     /// <summary>
     /// Gets the SHA-256 digest of the verified official mapping archive.
     /// 取得已驗證官方對照表封存檔的 SHA-256 摘要。
     /// </summary>
-    public const string VerifiedArchiveSha256 = "f59dacc4dbdef334d7a887c3da671af02778e2c80adb2a7fd1053f64dbf9e659";
+    public const string VerifiedArchiveSha256 = "4502fcf7b433d679dee51127298929543ec7f4aa99be93cd219df1552bc3d2bf";
 
     /// <summary>
     /// Gets the official mapping archive URI.

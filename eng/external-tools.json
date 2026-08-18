@@ -150,13 +150,13 @@
         "license": "IPA-Font-1.0"
       },
       "cnsExtB": {
-        "cacheRevision": "1",
+        "cacheRevision": "2",
         "version": "98_1",
         "archiveFileName": "Fonts_Sung.zip",
         "fileName": "TW-Sung-Ext-B-98_1.ttf",
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Sung.zip",
-        "archiveSha256": "25cb90ddf7c98bfeebd9e88a79c63dcde7eaaf81409a15b323ace744bade7867",
-        "sha256": "eb3f27d9c58e05d23a292e59371fb6afb8d9c5da28d592b18671f1f28d7c8583",
+        "archiveSha256": "8212daab91a32f8c1ccc8ebc69d272df33780e8928210bf858f201241fc6afa5",
+        "sha256": "a0ddaf5ba5ea1823e853f82514819cf27e6512ef2865ad562c0bba3e879242a5",
         "license": "OGDL-Taiwan-1.0"
       },
       "cnsPlus": {
@@ -164,18 +164,18 @@
         "archiveFileName": "Fonts_Sung.zip",
         "fileName": "TW-Sung-Plus-98_1.ttf",
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Sung.zip",
-        "archiveSha256": "25cb90ddf7c98bfeebd9e88a79c63dcde7eaaf81409a15b323ace744bade7867",
-        "sha256": "f7989df6a707bc11a75e9995654741b1a4b748aa61b4c6d254434e7a0f771450",
+        "archiveSha256": "8212daab91a32f8c1ccc8ebc69d272df33780e8928210bf858f201241fc6afa5",
+        "sha256": "7dfc11b3dbc0c3142e1fa690f9d310dc9716508b54560c08e2df8db450687e40",
         "license": "OGDL-Taiwan-1.0"
       },
       "cnsKaiExtB": {
-        "cacheRevision": "1",
+        "cacheRevision": "2",
         "version": "98_1",
         "archiveFileName": "Fonts_Kai.zip",
         "fileName": "TW-Kai-Ext-B-98_1.ttf",
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Kai.zip",
-        "archiveSha256": "d03cc7960f5204b50da1a33a4537242f45bd96370ef169f2c9010d79353e9228",
-        "sha256": "562d19fde56dfa52a3fed88a53154698e1d66e4b9c0a1faa9ba4ffa98e9d7a92",
+        "archiveSha256": "50fdfafabb40a382b74e7f6cf813bcd036a446b7700be0099de8372fee9c9e38",
+        "sha256": "e5d0128aa3ebec5a42195970470ef0a178195e12e4dd50e0fb66eccaf8c97ade",
         "license": "OGDL-Taiwan-1.0"
       },
       "cnsKaiPlus": {
@@ -183,8 +183,8 @@
         "archiveFileName": "Fonts_Kai.zip",
         "fileName": "TW-Kai-Plus-98_1.ttf",
         "uri": "https://www.cns11643.gov.tw/opendata/Fonts_Kai.zip",
-        "archiveSha256": "d03cc7960f5204b50da1a33a4537242f45bd96370ef169f2c9010d79353e9228",
-        "sha256": "acd099424c70c2baf3fe8d7b31abbbc6a97af76ef210e94c07eb1eb84d1c62fb",
+        "archiveSha256": "50fdfafabb40a382b74e7f6cf813bcd036a446b7700be0099de8372fee9c9e38",
+        "sha256": "9924c3831521ec676f8bd52de6e72aee390e66184cce3646ed5b265c2233d498",
         "license": "OGDL-Taiwan-1.0"
       }
     }
