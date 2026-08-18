@@ -18,9 +18,8 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "nuget"
+    # 使用 Dependabot 預設的 dependencies 與 nuget labels；預設 labels 缺少時
+    # GitHub 會自動建立，避免自訂 labels 不存在時被忽略並產生 PR 警告。
     groups:
       # .NET 10 runtime／BCL 套件同批發版；合併成單一 PR 以免洗版。
       dotnet-runtime:
@@ -36,6 +35,13 @@ updates:
         exclude-patterns:
           - "System.*"
           - "Microsoft.*"
+    ignore:
+      # FsCheck.Xunit.v3 3.3.4 仍依賴 xUnit v3 的 discovery ABI；xUnit 4 會在
+      # Property 測試探索時擲出 MissingMethodException。維持最新 3.x，直到
+      # FsCheck 發布相容版本。
+      - dependency-name: "xunit.v3.mtp-off"
+        update-types:
+          - "version-update:semver-major"
     commit-message:
       # 對齊 docs/agent-guides/commits.md 的 Conventional Commits 慣例
       # （type(scope): subject）；Dependabot 產生的提交不會經人工 GPG 簽署流程，
@@ -50,9 +56,8 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "github-actions"
+    # 使用 Dependabot 預設的 dependencies 與 github-actions labels；預設 labels
+    # 缺少時 GitHub 會自動建立。
     groups:
       # 官方 actions/* 與 github/* 通常同批發版（例如本次新增的
       # actions/checkout、actions/upload-artifact、github/codeql-action），

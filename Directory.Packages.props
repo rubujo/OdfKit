@@ -49,16 +49,16 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="4.151.1" />
     <PackageVersion Include="Sylvan.Data.Csv" Version="1.4.4" />
     <PackageVersion Include="System.Buffers" Version="4.6.1" />
-    <PackageVersion Include="System.IO.Hashing" Version="10.0.10" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.11" />
     <PackageVersion Include="System.Memory" Version="4.6.3" />
-    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.10" />
-    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.10" />
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.11" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.11" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.11" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="10.0.11" />
     <PackageVersion Include="System.Text.Json" Version="10.0.11" />
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
-    <PackageVersion Include="System.Threading.Channels" Version="10.0.10" />
+    <PackageVersion Include="System.Threading.Channels" Version="10.0.11" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Include="xunit.v3.mtp-off" Version="4.0.0" />
+    <PackageVersion Include="xunit.v3.mtp-off" Version="3.2.2" />
   </ItemGroup>
 </Project>
