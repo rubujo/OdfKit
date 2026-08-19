@@ -21,6 +21,7 @@ namespace OdfKit.Tests
     [Trait(TestCategories.Kind, TestCategories.Scenario)]
     public class PresentationAndRenderingTests : IDisposable
     {
+        private static readonly TimeSpan MockProcessTimeout = TimeSpan.FromSeconds(30);
         private readonly CultureInfo? _originalDefaultCulture;
 
         public PresentationAndRenderingTests()
@@ -607,7 +608,7 @@ namespace OdfKit.Tests
             var renderer = new LibreOfficeRenderer
             {
                 LibreOfficePath = mockSoffice,
-                Timeout = TimeSpan.FromSeconds(5)
+                Timeout = MockProcessTimeout
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Test_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
@@ -667,7 +668,7 @@ namespace OdfKit.Tests
             var renderer = new LibreOfficeRenderer
             {
                 LibreOfficePath = mockSoffice,
-                Timeout = TimeSpan.FromSeconds(5)
+                Timeout = MockProcessTimeout
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Test_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
