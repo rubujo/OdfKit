@@ -70,7 +70,7 @@
   "prereleaseExceptions": [
     {
       "id": "CSharpMath",
-      "version": "1.0.0-pre.1",
+      "version": "1.0.0-pre.2",
       "scope": "transitive-via-odfkit-core",
       "reason": "OdfKit core formula APIs use the 1.0 atom model; WebFont does not directly reference this package. The older 0.5.1 stable line is not API-compatible with the current formula implementation.",
       "removeWhen": "OdfKit ships a stable compatible CSharpMath version or WebFont localization is separated from the core package dependency.",
