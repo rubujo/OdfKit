@@ -722,7 +722,7 @@ moderate 以上 advisory、audit 來源失效或通訊失敗都會使 CI 失敗�
 `pwsh eng/Test-WebFontStandardsAndDependencies.ps1 -Online` 會從 NuGet 官方資料確認 WebFont direct
 相依仍是最新穩定版，並以 90 天期限追蹤 OpenType errata、Unicode、WOFF／WOFF2、CSS Fonts 與
 IFT。Preview 不得直接加入 WebFont；目前唯一例外是 OdfKit core 傳遞的
-`CSharpMath 1.0.0-pre.1`，具有精確理由、移除條件與複查期限。
+`CSharpMath 1.0.0-pre.2`，具有精確理由、移除條件與複查期限。
 
 真實大型傳輸基準以官方 CNS Ext-B 67,492,856-byte 字型的 2,048 個 supplementary-plane
 scalar 執行：256 code-point bucket 產生 8 個 WOFF2，兩輪 hash 一致；冷啟字型、CSS 與 manifest

@@ -445,7 +445,7 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
 - OpenType 1.9.1 加官方 errata、Unicode 17.0、W3C WOFF／WOFF2／CSS Fonts Level 4 與 IFT
   2025-11-18 CRD 的 90 天複查閘門；WebFont direct NuGet 相依須在線上 CI 比對官方最新穩定版。
   Preview 相依必須有精確版本、理由、移除條件及到期日。目前唯一例外是經由 OdfKit core
-  傳遞的 `CSharpMath 1.0.0-pre.1`，WebFont 本身未直接參照，且到期前必須重新評估拆除 core
+  傳遞的 `CSharpMath 1.0.0-pre.2`，WebFont 本身未直接參照，且到期前必須重新評估拆除 core
   localization 相依或升級至相容穩定版。
 - 官方 CNS Ext-B 67,492,856-byte 字型的 2,048 個真實 supplementary-plane scalar 已依 256
   code-point bucket 產生 8 個 deterministic WOFF2；冷啟 CSS、manifest 與字型 payload 合計
