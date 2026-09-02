@@ -52,8 +52,9 @@ if (bmpScalars.Length < 20_000)
     return 2;
 }
 
-// dense：取連續區段，合併後 segment 數少，format 4 應存在且字元數遠超 8,188。
-int[] dense = bmpScalars.Take(12_000).ToArray();
+// dense：取連續區段，合併後 segment 數少；9,000 仍高於會觸發既有缺陷的 8,188 邊界，
+// 同時減少三個瀏覽器在 CI 上解壓與 sanitizer 驗證大型 CFF 字型的成本。
+int[] dense = bmpScalars.Take(9_000).ToArray();
 
 // sparse：每隔一個取一個，使相鄰碼位不連續而無法合併，segment 數超過上限。
 int[] sparse = bmpScalars.Where((_, index) => index % 2 == 0).Take(9_000).ToArray();
