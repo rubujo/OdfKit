@@ -740,7 +740,9 @@ public partial class LibreOfficeInteropTests
             Assert.Contains("style:row-height", roundTripContentXml + roundTripStylesXml);
             Assert.Contains("style:use-optimal-row-height=\"true\"", roundTripContentXml + roundTripStylesXml);
 
-            RunSoffice(sofficePath!, userInstallationDir, outputDir, "pdf", roundTripPath);
+            // 含自動欄寬與最佳列高的試算表在共享 CI runner 上轉 PDF 偶爾會超過一般
+            // 轉檔的 60 秒上限；只放寬此較昂貴的版面配置轉檔，避免掩蓋其他互通測試掛起。
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "pdf", roundTripPath, timeoutMilliseconds: 120_000);
             string pdfPath = Path.Combine(outputDir, "interop-sheet-layout.pdf");
             Assert.True(File.Exists(pdfPath), "LibreOffice 應能將套用版面配置設定後的 ODS 轉出 PDF。");
             Assert.True(new FileInfo(pdfPath).Length > 0, "版面配置 PDF 轉換結果不應為空。");
@@ -2288,7 +2290,13 @@ public partial class LibreOfficeInteropTests
             output.Contains("NU1900", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void RunSoffice(string sofficePath, string userInstallationDir, string outputDir, string targetFormat, string inputPath)
+    private static void RunSoffice(
+        string sofficePath,
+        string userInstallationDir,
+        string outputDir,
+        string targetFormat,
+        string inputPath,
+        int timeoutMilliseconds = 60_000)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -2320,7 +2328,7 @@ public partial class LibreOfficeInteropTests
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        if (!process.WaitForExit(60_000))
+        if (!process.WaitForExit(timeoutMilliseconds))
         {
             try
             {
@@ -2331,7 +2339,7 @@ public partial class LibreOfficeInteropTests
                 System.Diagnostics.Debug.WriteLine(ex);
             }
 
-            Assert.Fail("soffice 轉換逾時。輸出：" + output);
+            Assert.Fail($"soffice 轉換 {Path.GetFileName(inputPath)} 至 {targetFormat} 超過 {timeoutMilliseconds} ms。輸出：{output}");
         }
 
         process.WaitForExit(5_000);
