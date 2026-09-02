@@ -71,7 +71,19 @@ jobs:
           if (-not (Test-Path -LiteralPath $msi -PathType Leaf)) {
             $temporaryPath = "$msi.download"
             try {
-              Invoke-WebRequest -Uri $uri -OutFile $temporaryPath
+              for ($attempt = 1; $attempt -le 4; $attempt++) {
+                Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+                try {
+                  Invoke-WebRequest -Uri $uri -OutFile $temporaryPath -TimeoutSec 300
+                  break
+                }
+                catch {
+                  if ($attempt -eq 4) { throw }
+                  $delay = 5 * $attempt
+                  Write-Warning "LibreOffice installer download attempt $attempt failed; retrying in $delay seconds."
+                  Start-Sleep -Seconds $delay
+                }
+              }
               Move-Item -LiteralPath $temporaryPath -Destination $msi
             }
             finally {
@@ -109,7 +121,19 @@ jobs:
             if (Test-Path -LiteralPath $target -PathType Leaf) { continue }
             $temporaryPath = "$target.download"
             try {
-              Invoke-WebRequest -Uri $asset.Uri -OutFile $temporaryPath
+              for ($attempt = 1; $attempt -le 4; $attempt++) {
+                Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
+                try {
+                  Invoke-WebRequest -Uri $asset.Uri -OutFile $temporaryPath -TimeoutSec 300
+                  break
+                }
+                catch {
+                  if ($attempt -eq 4) { throw }
+                  $delay = 5 * $attempt
+                  Write-Warning "$($asset.Name) download attempt $attempt failed; retrying in $delay seconds."
+                  Start-Sleep -Seconds $delay
+                }
+              }
               Move-Item -LiteralPath $temporaryPath -Destination $target
             }
             finally {
