@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-08-18",
+  "reviewedAt": "2026-09-12",
   "maximumReviewAgeDays": 90,
   "standards": [
     {
@@ -48,7 +48,7 @@
     },
     {
       "id": "Microsoft.Extensions.Hosting.WindowsServices",
-      "version": "10.0.11"
+      "version": "10.0.12"
     },
     {
       "id": "Microsoft.NETFramework.ReferenceAssemblies.net48",
@@ -60,11 +60,11 @@
     },
     {
       "id": "System.Text.Encoding.CodePages",
-      "version": "10.0.11"
+      "version": "10.0.12"
     },
     {
       "id": "System.Text.Json",
-      "version": "10.0.11"
+      "version": "10.0.12"
     }
   ],
   "prereleaseExceptions": [
