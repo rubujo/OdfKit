@@ -12,7 +12,7 @@ using OdfKit.Text;
 using OdfKit.Styles;
 using OdfKit.Formula;
 
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: Xunit.v3.Parallelization(Mode = Xunit.Sdk.ParallelMode.None)]
 
 namespace OdfKit.Tests
 {

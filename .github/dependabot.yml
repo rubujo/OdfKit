@@ -35,13 +35,6 @@ updates:
         exclude-patterns:
           - "System.*"
           - "Microsoft.*"
-    ignore:
-      # FsCheck.Xunit.v3 3.3.4 仍依賴 xUnit v3 的 discovery ABI；xUnit 4 會在
-      # Property 測試探索時擲出 MissingMethodException。維持最新 3.x，直到
-      # FsCheck 發布相容版本。
-      - dependency-name: "xunit.v3.mtp-off"
-        update-types:
-          - "version-update:semver-major"
     commit-message:
       # 對齊 docs/agent-guides/commits.md 的 Conventional Commits 慣例
       # （type(scope): subject）；Dependabot 產生的提交不會經人工 GPG 簽署流程，
