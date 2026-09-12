@@ -527,16 +527,23 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
 **不需要本機 LibreOffice 即可在 CI 執行**，並掛在主 CI 的 `core-security` 煙霧分片。
 還原任一項修正都會讓對應素材失敗（已實測）。
 
-**寫入方向已納入專用排程驗證**：`libreoffice-interop.yml` 在同一個 Windows runner 安裝一次
-LibreOffice（目前釘選 26.8.0；先前於 26.2 一致通過），依序以 net8.0 與 net10.0 執行 UNO
-測試，開啟 OdfKit 產生的 wholesome ODT 並核對本文；缺少 Python UNO runtime 時該排程會失敗，
-不會以略過偽裝成功。本文上方以 26.2／26.2.4.2 記載的具體互通結果為該版本當時的實測證據，
-版本提升後尚待下一次排程執行覆核，不因此自動推導為已在 26.8 verified。
+**寫入方向的一般互通已納入專用排程驗證**：`libreoffice-interop.yml` 在同一個 Windows runner
+安裝一次 LibreOffice（目前釘選 26.8.0），以 `--filter FullyQualifiedName~LibreOfficeInteropTests`
+依序對 net8.0 與 net10.0 執行 `LibreOfficeInteropTests.cs` 整個測試類別——涵蓋追蹤修訂、圖表、
+樞紐分析表、範本／母片／Flat XML、公式、內嵌字型等大量文件類型與功能面向的真機開啟／轉檔驗證；
+缺少 Python UNO runtime 時該排程會失敗，不會以略過偽裝成功。2026-09-12 已以 workflow_dispatch
+在 26.8.0 上完整重跑並通過（net8.0／net10.0 皆成功）；上方以 26.2／26.2.4.2 記載的逐項加密演算法
+與 manifest schema 位元組級比對結果，仍是對該版本當時所做的專項驗證，尚未針對 26.8 重跑。
 `odf-external-baseline.yml` 另由目前 CLI 產生 wholesome 封裝，抽出 manifest 後以固定版本、
-固定 SHA-256 的 LibreOffice extended schema 與 Jing 作阻擋驗證。
+固定 SHA-256 的 LibreOffice extended schema 與 Jing 作阻擋驗證（不涉及真機開啟）。
 
 已知缺口：
 
+- `libreoffice-interop.yml` 目前不含任何以真實 LibreOffice 開啟 wholesome（AES-256-GCM）加密
+  文件的測試——soffice headless 命令列本身未提供傳遞開啟密碼的旗標（僅互動式 GUI 才會彈出密碼
+  對話框），因此無法比照其他文件類型走 `RunSoffice` 真機轉檔驗證；wholesome 的互通證據目前僅
+  來自上方 `EncryptionInteropCorpusTests`（靜態 fixture）與 `odf-external-baseline.yml` 的
+  Jing schema 驗證，不包含真機開啟。
 - OpenPGP 寫入已改為 ODF 1.4 Part 2 的封裝形狀：整個 package 共用 256-bit session key，
   entry 先 deflate、以壓縮後未加密資料前 1024 bytes 計算 `#sha256-1k`，再以 AES-256-CBC
   加密並以 ZIP `STORED` 儲存。收件人的完整 OpenPGP encrypted message 位於根層
