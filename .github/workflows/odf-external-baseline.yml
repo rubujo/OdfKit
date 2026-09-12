@@ -18,6 +18,8 @@ on:
       - 'tools/OdfCorpusGenerator/**'
       - 'tools/OdfSchemaGenerator/schemas/**'
       - 'eng/external-tools.json'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-external-baseline.yml'
   push:
@@ -39,6 +41,8 @@ on:
       - 'tools/OdfCorpusGenerator/**'
       - 'tools/OdfSchemaGenerator/schemas/**'
       - 'eng/external-tools.json'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-external-baseline.yml'
   workflow_dispatch:

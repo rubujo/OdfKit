@@ -18,6 +18,8 @@ on:
       - 'eng/Test-WebFontSidecarAot.ps1'
       - 'eng/Manage-WebFontSidecarService.ps1'
       - 'eng/Test-WebFontSidecarWindowsService.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   push:
@@ -39,6 +41,8 @@ on:
       - 'eng/Test-WebFontSidecarAot.ps1'
       - 'eng/Manage-WebFontSidecarService.ps1'
       - 'eng/Test-WebFontSidecarWindowsService.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/trim-smoke.yml'
   workflow_dispatch:

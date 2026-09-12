@@ -7,6 +7,8 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'tests/fixtures/corpus/**'
       - 'eng/Test-OdfCorpus.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-corpus.yml'
   push:
@@ -17,6 +19,8 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'tests/fixtures/corpus/**'
       - 'eng/Test-OdfCorpus.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-corpus.yml'
   workflow_dispatch:

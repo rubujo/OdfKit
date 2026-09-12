@@ -7,6 +7,8 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'tools/OdfSchemaGenerator/**'
       - 'eng/Test-OdfTypedDomCoverage.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/typed-dom-coverage.yml'
   push:
@@ -17,6 +19,8 @@ on:
       - 'tools/OdfKit.Cli/**'
       - 'tools/OdfSchemaGenerator/**'
       - 'eng/Test-OdfTypedDomCoverage.ps1'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/typed-dom-coverage.yml'
   workflow_dispatch:

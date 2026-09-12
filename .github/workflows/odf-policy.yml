@@ -10,6 +10,8 @@ on:
       - 'eng/Test-SemanticCoverage.ps1'
       - 'docs/claims.json'
       - 'docs/semantic-coverage.json'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   push:
@@ -23,6 +25,8 @@ on:
       - 'eng/Test-SemanticCoverage.ps1'
       - 'docs/claims.json'
       - 'docs/semantic-coverage.json'
+      - 'Directory.Packages.props'
+      - 'global.json'
       - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/odf-policy.yml'
   workflow_dispatch:
