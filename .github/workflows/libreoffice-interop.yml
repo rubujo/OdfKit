@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LIBREOFFICE_VERSION: 26.2.4
+  LIBREOFFICE_VERSION: 26.8.0
   # LibreOffice 不自帶 OpenPGP 後端：program\ 只有 gpgmepp.dll 與 gpgme-w32spawn.exe，
   # 官方說明要求另行安裝 OpenPGP 軟體。runner 映像未內含 GnuPG，只有 Git for Windows 的
   # MSYS gpg，其 POSIX 路徑語意無法供 gpgme 驅動，因此 LibreOffice 無法載入 OpenPGP
