@@ -528,8 +528,10 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
 還原任一項修正都會讓對應素材失敗（已實測）。
 
 **寫入方向已納入專用排程驗證**：`libreoffice-interop.yml` 在同一個 Windows runner 安裝一次
-LibreOffice 26.2，依序以 net8.0 與 net10.0 執行 UNO 測試，開啟 OdfKit 產生的 wholesome ODT
-並核對本文；缺少 Python UNO runtime 時該排程會失敗，不會以略過偽裝成功。
+LibreOffice（目前釘選 26.8.0；先前於 26.2 一致通過），依序以 net8.0 與 net10.0 執行 UNO
+測試，開啟 OdfKit 產生的 wholesome ODT 並核對本文；缺少 Python UNO runtime 時該排程會失敗，
+不會以略過偽裝成功。本文上方以 26.2／26.2.4.2 記載的具體互通結果為該版本當時的實測證據，
+版本提升後尚待下一次排程執行覆核，不因此自動推導為已在 26.8 verified。
 `odf-external-baseline.yml` 另由目前 CLI 產生 wholesome 封裝，抽出 manifest 後以固定版本、
 固定 SHA-256 的 LibreOffice extended schema 與 Jing 作阻擋驗證。
 
