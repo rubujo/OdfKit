@@ -34,13 +34,13 @@
 | `NO_Government_ODF` | `https://lovdata.no/forskrift/2009-09-25-1222` | `2009-09-25` | `Draft` | `NeedsActiveSource` | `1.1` | 原引用法規已於 2013 年廢止（Lovdata 標註 Opphevet），且該法規原文規定的版本為 ODF 1.1（OASIS, 2007-02-12），並非先前誤植的 1.2；降級並等待確認現行有效來源（可能為 Digitaliseringsdirektoratet 的 IT 標準參考目錄）。 |
 | `BR_Government_ODF_ePING` | `https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/interoperabilidade/padroes-de-interoperabilidade` | `2025` | `Draft` | `NeedsActiveSource` | `all-known` | 巴西 e-PING 來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
 | `US_NARA_ODF` | `https://www.archives.gov/records-mgmt/policy/transfer-guidance-tables.html` | `null` | `Compatibility` | `OfficialButIndirect` | `all-known` | 美國 NARA 電子檔案移轉格式接受規則映射，不是完整 ODF 規格 profile。 |
-| `NATO_ODF` | `https://nhqc3s.hq.nato.int/apps/architecture/nisp/pdf/NISP-Vol3-v15-release.pdf` | `2024` | `Normative` | `VerifiedOfficial` | `1.2` | NATO Interoperability Standards and Profiles 第 3 卷直接列出 ISO/IEC 26300-1～26300-3:2015。 |
+| `NATO_ODF` | `https://nhqc3s.hq.nato.int/apps/nisp/NISP_Catalogue_02_APR_2026.pdf` | `2026-04-02` | `Normative` | `VerifiedOfficial` | `1.2-1.3` | NISP Version 17（2026-04-02）：ISO/IEC 26300-1～26300-3:2015（對應 ODF 1.2）於 [PFL-00269]／[PFL-00355]／[PFL-00592]／[PFL-00765] 列為 Mandatory；[PFL-00765] "Document File Formats (DM)" 同時將 OASIS OpenDocument V1.3 (2021) 列為 Mandatory，屬本次複查新發現的版本擴展，非單純來源更新。原引用的 `NISP-Vol3-v15-release.pdf` 路徑已失效（改為整合式目錄 PDF）。 |
 | `PT_Government_ODF_RNID` | `https://files.dre.pt/1s/2018/01/00400/0012100127.pdf` | `2018-01-05` | `Normative` | `VerifiedOfficial` | `1.2` | 葡萄牙 RNID 表 II 將 ODF 1.2 列為可編輯文件的強制規格。 |
 | `BE_Government_ODF` | `https://bosa.belgium.be/` | `null` | `Draft` | `NeedsActiveSource` | `all-known` | 比利時 BOSA 來源入口；ODF 義務源自 2006-06-23 部長會議決議與 2007 年聯邦備忘錄，但 BOSA 站內查無直接列出 ODF 的現行條目（`dt.bosa.be` 的開放標準頁目前不可達），仍需確認有效官方條目。 |
 | `IT_Government_ODF_CAD` | `https://www.agid.gov.it/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | AgID 舊版附件可證明 ODF 使用，但本次找不到直接且現行的 ODF 1.2 規範來源，故不得宣稱已驗證。 |
 | `UK_Government_ODF_1_2` | `https://www.gov.uk/government/publications/open-standards-for-government/sharing-or-collaborating-with-government-documents` | `2026-01-29` | `Normative` | `VerifiedOfficial` | `1.2` | 英國政府 ODF 1.2 相容性規範；官方頁面於 2026-01-29 更新後仍明定使用 ODF 1.2。 |
 | `NL_Government_ODF` | `https://www.forumstandaardisatie.nl/open-standaarden/odf` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 荷蘭政府 ODF 1.2 相容性規範。 |
-| `SK_Government_ODF` | `https://mirri.gov.sk/sekcie/informatizacia/dokumenty/standardy-isvs/` | `null` | `Normative` | `VerifiedOfficial` | `1.2` | 斯洛伐克 ITVS 標準與官方文件將可編輯 ODF 文件上限明定為 1.2；不再錯誤宣稱所有版本。 |
+| `SK_Government_ODF` | `https://www.slov-lex.sk/pravne-predpisy/SK/ZZ/2020/78/` | `2020-04-16` | `Normative` | `VerifiedOfficial` | `1.2` | Vyhláška č. 78/2020 Z. z. §19 ods. 1 písm. b) bod 1：直接讀取官方法規原文，確認條文寫「Open Document Format (.odt) najviac vo verzii 1.2 podľa... (OASIS)」（.odt 檔案最高至 1.2 版）。來源網址已由入口頁改指法規原文本身。 |
 | `DK_Government_ODF` | `https://digst.dk/it-loesninger/standarder/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | 本次未找到現行且直接限定 ODF 1.2 的官方規範條目，故降級等待有效來源。 |
 | `MY_Government_ODF` | `https://www.digital.gov.my/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | 馬來西亞數位政府來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
 | `KR_Government_ODF` | `https://www.mois.go.kr/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | 本次未找到 MOIS 直接且現行的 KS X ISO/IEC 26300 規範條目，故不得維持已驗證狀態。 |
@@ -84,10 +84,15 @@
   2026-03-11）、`PT_Government_ODF_RNID`（直接讀取官方公報原文確認 TABELA II 列
   「ODF 1.2 Obrigatório」）、`UK_Government_ODF_1_2`（頁面更新日 2026-01-29）、
   `NL_Government_ODF`（ODF 1.2 仍為強制下限，官方頁面另建議轉往 1.3）。
-- **待人工確認**：`NATO_ODF` 原引用 PDF 路徑目前回應 404，NATO NHQC3S 入口網站本身
-  也顯示系統錯誤；無法判斷是文件搬遷或暫時性服務中斷，未降級，但下次複查須優先處理。
-  `SK_Government_ODF` 官方頁面仍可連上且與既有引用一致，但本次未能在頁面摘要中直接
-  看到 ODF 1.2 上限文字，建議下次複查時取得完整法規文件確認。
+- **後續追蹤已解決**：`NATO_ODF` 原引用 PDF 路徑確認是文件搬遷，不是服務中斷——NATO
+  NHQC3S 入口網站（`nhqc3s.hq.nato.int`）本身可正常連上，NISP 已改用整合式目錄
+  PDF（`apps/nisp/NISP_Catalogue_02_APR_2026.pdf`，NISP Version 17）。直接下載並以
+  `pdftotext` 轉出全文檢索確認：ISO/IEC 26300 三部（ODF 1.2）仍在多個 FMN Spiral
+  profile 與 [PFL-00765] "Document File Formats (DM)" 列為 Mandatory，且 [PFL-00765]
+  同時新增將 OASIS OpenDocument V1.3 (2021) 列為 Mandatory，故 `SupportedVersions`
+  由 `1.2` 擴大為 `1.2, 1.3`。`SK_Government_ODF` 也已取得完整法規文件（Vyhláška
+  č. 78/2020 Z. z.）確認：§19 ods. 1 písm. b) bod 1 原文寫「Open Document Format
+  (.odt) najviac vo verzii 1.2」，與既有引用一致，來源改指法規原文本身。
 - **新國家候選（尚未新增，僅記錄待辦）**：交叉比對英文維基百科 OpenDocument 條目
   Adoption 段落，找到本文件目前未收錄、且非本次既有草稿項目重複的候選名單：阿根廷、
   克羅埃西亞、芬蘭、匈牙利、印度、日本、拉脫維亞、波蘭、俄羅斯、塞爾維亞、瑞士、

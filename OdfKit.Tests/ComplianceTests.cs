@@ -89,11 +89,16 @@ namespace OdfKit.Tests
                 "https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf",
                 OdfComplianceProfiles.DeGovernmentOdf.SourceUrl!.AbsoluteUri);
 
-            Assert.Equal("2024", OdfComplianceProfiles.NatoOdf.SourceDate);
-            Assert.Contains("NISP-Vol3-v15-release.pdf", OdfComplianceProfiles.NatoOdf.SourceUrl!.AbsoluteUri);
+            Assert.Equal("2026-04-02", OdfComplianceProfiles.NatoOdf.SourceDate);
+            Assert.Contains("NISP_Catalogue_02_APR_2026.pdf", OdfComplianceProfiles.NatoOdf.SourceUrl!.AbsoluteUri);
+            Assert.True(OdfComplianceProfiles.NatoOdf.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.True(OdfComplianceProfiles.NatoOdf.SupportedVersions.Contains(OdfVersion.Odf13));
+            Assert.False(OdfComplianceProfiles.NatoOdf.SupportedVersions.Contains(OdfVersion.Odf14));
             Assert.Equal("2018-01-05", OdfComplianceProfiles.PtGovernmentOdf.SourceDate);
             Assert.Contains("0012100127.pdf", OdfComplianceProfiles.PtGovernmentOdf.SourceUrl!.AbsoluteUri);
             Assert.Equal("2026-01-29", OdfComplianceProfiles.UkGovernmentOdf12.SourceDate);
+            Assert.Equal("2020-04-16", OdfComplianceProfiles.SkGovernmentOdf.SourceDate);
+            Assert.Contains("ZZ/2020/78", OdfComplianceProfiles.SkGovernmentOdf.SourceUrl!.AbsoluteUri);
             Assert.True(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
             Assert.False(OdfComplianceProfiles.SkGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf13));
 
