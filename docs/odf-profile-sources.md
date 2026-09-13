@@ -31,7 +31,7 @@
 | `ROC_Taiwan_GovernmentODFTools` | `https://moda.gov.tw/digital-affairs/digital-service/app-services/248` | `null` | `Compatibility` | `CompatibilityOnly` | `all-known` | 中華民國 (臺灣) 政府 ODF 文件應用工具相容性規範。 |
 | `DE_Government_ODF` | `https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf` | `2026` | `Normative` | `VerifiedOfficial` | `all-known` | Deutschland-Stack 標準附件直接列出 ODF，但未限定 ODF 版本；本 Profile 因此不宣稱特定版本。 |
 | `FR_Government_ODF_RGI` | `https://www.numerique.gouv.fr/offre-accompagnement/reference-interoperabilite-rgi/` | `null` | `Draft` | `NeedsActiveSource` | `1.2` | 法國 RGI 來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
-| `NO_Government_ODF` | `https://lovdata.no/forskrift/2009-09-25-1222` | `2009-09-25` | `Normative` | `VerifiedOfficial` | `1.2` | 挪威政府 ODF 文件相容性規範。 |
+| `NO_Government_ODF` | `https://lovdata.no/forskrift/2009-09-25-1222` | `2009-09-25` | `Draft` | `NeedsActiveSource` | `1.1` | 原引用法規已於 2013 年廢止（Lovdata 標註 Opphevet），且該法規原文規定的版本為 ODF 1.1（OASIS, 2007-02-12），並非先前誤植的 1.2；降級並等待確認現行有效來源（可能為 Digitaliseringsdirektoratet 的 IT 標準參考目錄）。 |
 | `BR_Government_ODF_ePING` | `https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/interoperabilidade/padroes-de-interoperabilidade` | `2025` | `Draft` | `NeedsActiveSource` | `all-known` | 巴西 e-PING 來源入口；仍需確認目前有效且直接列出 ODF 的官方條目。 |
 | `US_NARA_ODF` | `https://www.archives.gov/records-mgmt/policy/transfer-guidance-tables.html` | `null` | `Compatibility` | `OfficialButIndirect` | `all-known` | 美國 NARA 電子檔案移轉格式接受規則映射，不是完整 ODF 規格 profile。 |
 | `NATO_ODF` | `https://nhqc3s.hq.nato.int/apps/architecture/nisp/pdf/NISP-Vol3-v15-release.pdf` | `2024` | `Normative` | `VerifiedOfficial` | `1.2` | NATO Interoperability Standards and Profiles 第 3 卷直接列出 ISO/IEC 26300-1～26300-3:2015。 |
@@ -65,3 +65,33 @@
   斯洛伐克改用直接官方來源，並收斂其實際版本邊界。
 - **不以泛稱建立 Profile**：僅提到 ODF、只連到機關首頁、產品支援矩陣或非現行歷史採用證據，
   均不足以新增 `VerifiedOfficial` Profile。
+
+## 2026-09-13 全量複查
+
+- **ODF 核心規格版本**：確認 OASIS 目前最新標準仍為 ODF 1.4（正式文本時間戳記
+  2025-10-06），沒有 1.5 或更新草案在進行；本文件與 [odf14-gap-audit.md](odf14-gap-audit.md)
+  的追蹤維持不變。
+- **降級**：`NO_Government_ODF` 原引用的 2009 年挪威法規已於 2013 年被廢止（Lovdata
+  標註 Opphevet），且該法規原文規定版本為 ODF **1.1**，並非先前誤植的 1.2；已降為
+  `Draft`／`NeedsActiveSource`，版本欄同步更正。
+- **維持現狀（逐一複查，未發現新來源）**：`FrGovernmentOdfRgi`、`BeGovernmentOdf`、
+  `BrGovernmentOdfEPing`、`ItGovernmentOdfCad`、`DkGovernmentOdf`、`MyGovernmentOdf`、
+  `KrGovernmentOdf`、`ZaGovernmentOdf` 逐一重新查證官方入口頁，均未找到可直接驗證、
+  現行有效的 ODF 版本條文，維持既有 `Draft`／`NeedsActiveSource` 狀態。
+- **重新確認為現行有效**：`OASIS_ODF_1_4_*`、`ISO_IEC_26300_2025`、`EU_*`、
+  `ROC_Taiwan_ODF_CNS15251`（2025-03-10 五年重新確認）、`ROC_Taiwan_GovernmentODFTools`、
+  `DE_Government_ODF`（直接讀取官方 PDF 原文確認列出 ODF）、`US_NARA_ODF`（頁面審查日期
+  2026-03-11）、`PT_Government_ODF_RNID`（直接讀取官方公報原文確認 TABELA II 列
+  「ODF 1.2 Obrigatório」）、`UK_Government_ODF_1_2`（頁面更新日 2026-01-29）、
+  `NL_Government_ODF`（ODF 1.2 仍為強制下限，官方頁面另建議轉往 1.3）。
+- **待人工確認**：`NATO_ODF` 原引用 PDF 路徑目前回應 404，NATO NHQC3S 入口網站本身
+  也顯示系統錯誤；無法判斷是文件搬遷或暫時性服務中斷，未降級，但下次複查須優先處理。
+  `SK_Government_ODF` 官方頁面仍可連上且與既有引用一致，但本次未能在頁面摘要中直接
+  看到 ODF 1.2 上限文字，建議下次複查時取得完整法規文件確認。
+- **新國家候選（尚未新增，僅記錄待辦）**：交叉比對英文維基百科 OpenDocument 條目
+  Adoption 段落，找到本文件目前未收錄、且非本次既有草稿項目重複的候選名單：阿根廷、
+  克羅埃西亞、芬蘭、匈牙利、印度、日本、拉脫維亞、波蘭、俄羅斯、塞爾維亞、瑞士、
+  土耳其、烏拉圭、委內瑞拉，以及次國家層級的香港、美國麻州等。抽查瑞士 eCH-0014
+  發現：官方頁面摘要無法確認是否列出 ODF，需下載完整 PDF 逐條核對——這代表每個候選
+  國家都需要類似本文件其他項目的一手來源查證工作量，維基百科條目本身不足以構成
+  `VerifiedOfficial` 或甚至 `Draft` 來源。在個別完成官方來源查證前，不新增這些國家。
