@@ -128,8 +128,11 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 
 ## 版本與交付資訊
 
-- 目前主要交付管道為 **GitHub 原始碼** 與 CI 產生的 commit-bound 候選資產；
-  尚未建立公開 GitHub Release，亦**未發佈至 nuget.org**。
+- 目前主要交付管道為 **GitHub 原始碼**，以及 `v0.0.1` tag 每次更新時由
+  `github-release.yml` 自動建置、簽署並發布的 **GitHub Release**（逐套件
+  NuGet 封裝、SBOM 與雜湊清單）；此 Release 隨 tag 移動持續覆蓋更新，代表
+  目前 commit 的交付快照，不是固定不變的版本歷史。仍**未發佈至
+  nuget.org**。
 - OdfKit 以 `v0.0.1` 持續維護；版本號不表示必要功能會留待未來版本補完。
   相容性承諾與破壞性變更記錄於 [CHANGELOG](CHANGELOG.md)。
 - 版本、交付與安裝參考已整理於
@@ -157,8 +160,8 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
   但其高階語意 API 仍以對應主格式為主，完整變體專屬物件模型不屬於目前承諾範圍。
 - `OdfKit.Extensions.Rendering` 需本機 LibreOffice 或相容程序後端，
   不屬於核心 OdfKit 的純受控路徑。
-- 目前主要交付為 GitHub 原始碼與 CI 候選資產；尚無公開 GitHub Release，亦
-  **尚未發佈至 nuget.org**。
+- 目前主要交付為 GitHub 原始碼，以及隨 `v0.0.1` tag 自動更新的 GitHub
+  Release 交付快照；仍**尚未發佈至 nuget.org**。
 
 ## 授權與合規
 
