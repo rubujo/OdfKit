@@ -8,12 +8,15 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 回歸測試：以引數作為迴圈上限的公式函式不得空轉數十億次。
 /// 修正前：<c>CRITBINOM(2000000000;0.5;0.5)</c> 超過 25 秒仍未完成（迴圈內每次還呼叫 O(k) 的 Combination）；
-/// <c>MULTINOMIAL(1E9;1E9)</c> 約 4.2 秒；<c>FACT(1E9)</c> 在已溢位後仍迭代 10 億次。
+/// <c>MULTINOMIAL(1E9;1E9)</c> 約 4.2 秒；<c>FACT(1E9)</c> 在已溢位後仍迭代 10 億次；
+/// <c>COMBIN(1E9;5E8)</c> 在已溢位後仍迭代約 5 億次（本機約 0.5 秒，慢速 Ubuntu runner 上 4–9 秒，使 CI 失敗）。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Boundary)]
 public sealed class FormulaIterationLimitTests
 {
-    private static readonly TimeSpan Budget = TimeSpan.FromSeconds(3);
+    // 預算需容得下慢速 CI runner（Ubuntu 加覆蓋率收集約比本機慢 17 倍；CRITBINOM 本機約 0.1 秒），
+    // 又要遠低於修正前的空轉時間（數十秒以上），才能抓到迴圈上限回歸。
+    private static readonly TimeSpan Budget = TimeSpan.FromSeconds(10);
 
     private static (object? Value, TimeSpan Elapsed) Evaluate(string formula)
     {
