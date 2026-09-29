@@ -316,6 +316,22 @@ public static class OdfChartRenderer
         return 0.0;
     }
 
+    /// <summary>
+    /// 圖表 fallback 影像單一邊的像素上限（約 108 cm，遠大於 A3 的 1,600 px）。
+    /// </summary>
+    internal const int MaxDimensionPx = 4096;
+
+    private static int ClampToPixels(double centimeters)
+    {
+        double pixels = centimeters * 37.795;
+        if (double.IsNaN(pixels) || pixels < 0)
+        {
+            return 0;
+        }
+
+        return pixels >= MaxDimensionPx ? MaxDimensionPx : (int)pixels;
+    }
+
     private static (int width, int height) ParseDimensions(OdfNode frame)
     {
         double wCm = 12;
@@ -328,8 +344,10 @@ public static class OdfChartRenderer
         if (hStr is not null && TryParseCm(hStr, out double h))
             hCm = h;
 
-        int widthPx = (int)(wCm * 37.795);
-        int heightPx = (int)(hCm * 37.795);
+        // 尺寸來自文件（svg:width／svg:height），屬不受信任輸入：未設上限時，數百公分的圖表框即需數秒與
+        // 數百 MB，更大時 Skia 會直接拒絕。fallback 影像只需合理的解析度，因此夾限至 MaxDimensionPx。
+        int widthPx = ClampToPixels(wCm);
+        int heightPx = ClampToPixels(hCm);
 
         if (widthPx < 100)
             widthPx = 800;
