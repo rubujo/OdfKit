@@ -284,6 +284,15 @@ public static class OdfExternalScriptCompiler
         if (python is null)
             return Result(OdfScriptCompilerBackend.LibreOfficeBasic, OdfScriptCompilationStatus.Unavailable);
 
+        // 診斷會在最低巨集安全等級下載入並呼叫模組；含模組層級可執行程式碼時不啟動 LibreOffice。
+        if (HasModuleLevelExecutableCode(source))
+        {
+            return Result(
+                OdfScriptCompilerBackend.LibreOfficeBasic,
+                OdfScriptCompilationStatus.Indeterminate,
+                "ODFSCRIPT_COMPILER_MODULE_LEVEL_CODE_SKIPPED");
+        }
+
         string root = CreateWorkerDirectory();
         Process? office = null;
         try
@@ -520,6 +529,125 @@ public static class OdfExternalScriptCompiler
         return false;
     }
 
+    /// <summary>
+    /// 判斷來源是否含有位於程序（Sub／Function／Property）之外的可執行陳述式。
+    /// LibreOffice 載入模組時可能執行模組層級程式碼，而診斷是在最低巨集安全等級下進行，
+    /// 因此只接受宣告與註解；無法確認的行一律視為可執行（保守失敗）。
+    /// </summary>
+    private static bool HasModuleLevelExecutableCode(string source)
+    {
+        string[] lines = source.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        int depth = 0;
+        foreach (string rawLine in lines)
+        {
+            string line = rawLine.Trim();
+            if (line.Length == 0 || line[0] == '\'' || IsBasicKeyword(line, "rem"))
+                continue;
+
+            string lower = line.ToLowerInvariant();
+            if (depth > 0)
+            {
+                if (IsBasicKeyword(lower, "end sub") || IsBasicKeyword(lower, "end function") || IsBasicKeyword(lower, "end property"))
+                    depth--;
+                continue;
+            }
+
+            string stripped = StripScopeModifiers(lower);
+            if (IsBasicKeyword(stripped, "sub") || IsBasicKeyword(stripped, "function") || IsBasicKeyword(stripped, "property"))
+            {
+                depth++;
+                continue;
+            }
+
+            if (IsBasicKeyword(stripped, "option") ||
+                IsBasicKeyword(stripped, "declare") ||
+                IsBasicKeyword(stripped, "type") ||
+                IsBasicKeyword(stripped, "end type") ||
+                IsBasicKeyword(stripped, "enum") ||
+                IsBasicKeyword(stripped, "end enum") ||
+                IsBasicKeyword(stripped, "const"))
+            {
+                // Const 需要常數運算式；不接受在其中呼叫函式。
+                if (line.IndexOf('(') >= 0 && IsBasicKeyword(stripped, "const"))
+                    return true;
+                continue;
+            }
+
+            if (IsBasicKeyword(stripped, "dim") || IsBasicKeyword(stripped, "redim"))
+            {
+                // 不接受初始化運算式或連續行，避免以宣告夾帶呼叫；陣列上界運算式在模組初始化時會被求值，
+                // 因此括號內只接受數字、逗號與 To（例如 Dim a(1 To 10)），不接受 Dim a(Shell("x"))。
+                if (line.IndexOf('=') >= 0 || line.EndsWith("_", StringComparison.Ordinal) || line.IndexOf(':') >= 0 ||
+                    HasNonLiteralArrayBounds(line))
+                    return true;
+                continue;
+            }
+
+            // 帶範圍修飾詞的變數宣告（如 Private name As String）：同樣不接受初始化、連續行或運算式上界。
+            if (stripped != lower &&
+                line.IndexOf('=') < 0 && line.IndexOf(':') < 0 && !line.EndsWith("_", StringComparison.Ordinal) &&
+                !HasNonLiteralArrayBounds(line))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return depth != 0;
+    }
+
+    /// <summary>
+    /// 判斷宣告行的括號內是否含有數字、逗號與 <c>To</c> 以外的內容（即需要求值的上界運算式）。
+    /// </summary>
+    private static bool HasNonLiteralArrayBounds(string line)
+    {
+        int index = line.IndexOf('(');
+        while (index >= 0)
+        {
+            int close = line.IndexOf(')', index + 1);
+            string content = close < 0 ? line.Substring(index + 1) : line.Substring(index + 1, close - index - 1);
+            string withoutTo = System.Text.RegularExpressions.Regex.Replace(
+                content,
+                @"\bto\b",
+                string.Empty,
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant,
+                TimeSpan.FromSeconds(1));
+            foreach (char c in withoutTo)
+            {
+                if (!(char.IsDigit(c) || c is ',' or ' ' or '\t'))
+                {
+                    return true;
+                }
+            }
+
+            if (close < 0)
+            {
+                return true;
+            }
+
+            index = line.IndexOf('(', close + 1);
+        }
+
+        return false;
+    }
+
+    private static string StripScopeModifiers(string lower)
+    {
+        string current = lower;
+        foreach (string modifier in new[] { "public ", "private ", "global ", "static " })
+        {
+            if (current.StartsWith(modifier, StringComparison.Ordinal))
+                current = current.Substring(modifier.Length).TrimStart();
+        }
+
+        return current;
+    }
+
+    private static bool IsBasicKeyword(string lowerLine, string keyword) =>
+        lowerLine.StartsWith(keyword, StringComparison.OrdinalIgnoreCase) &&
+        (lowerLine.Length == keyword.Length || char.IsWhiteSpace(lowerLine[keyword.Length]) || lowerLine[keyword.Length] == '(');
+
     private static string PrepareBasicCompileModule(string source, out string entryPoint)
     {
         string[] lines = source.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
@@ -569,12 +697,12 @@ public static class OdfExternalScriptCompiler
             if (end < 0)
                 continue;
 
-            var output = new List<string>(lines.Length + 2);
+            // 以緊接宣告後的 Exit 讓入口立即返回。不可改用 If False Then…End If 包住主體：
+            // 來源可自帶 End If 提早關閉包裝，使後續陳述式在呼叫入口時被真正執行。
+            var output = new List<string>(lines.Length + 1);
             output.AddRange(lines.Take(index + 1));
-            output.Add("If False Then");
-            output.AddRange(lines.Skip(index + 1).Take(end - index - 1));
-            output.Add("End If");
-            output.AddRange(lines.Skip(end));
+            output.Add("Exit " + kind);
+            output.AddRange(lines.Skip(index + 1));
             return string.Join(Environment.NewLine, output);
         }
 
