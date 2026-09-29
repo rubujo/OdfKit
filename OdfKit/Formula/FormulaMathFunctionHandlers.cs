@@ -489,7 +489,14 @@ internal static class FormulaMathFunctionHandlers
         int n = (int)d;
         double fact = 1.0;
         for (int i = 1; i <= n; i++)
+        {
             fact *= i;
+
+            // 超過 170! 即溢位為無限大；不提早離開會對 FACT(1E9) 空轉數十億次。
+            if (double.IsInfinity(fact))
+                break;
+        }
+
         return fact;
     }
 

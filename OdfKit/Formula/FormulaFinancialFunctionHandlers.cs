@@ -533,7 +533,8 @@ internal static class FormulaFinancialFunctionHandlers
                 return OdfFormulaError.Value;
         }
 
-        if (cost < 0 || salvage < 0 || life <= 0 || period <= 0 || period > life || factor <= 0)
+        if (cost < 0 || salvage < 0 || life <= 0 || period <= 0 || period > life || factor <= 0 ||
+            period > FormulaCoercion.MaxIterativeArgument)
             return OdfFormulaError.Num;
 
         double bookValue = cost;

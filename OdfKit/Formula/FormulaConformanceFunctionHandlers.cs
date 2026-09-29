@@ -278,9 +278,14 @@ internal static class FormulaConformanceFunctionHandlers
         int trials = (int)Math.Truncate(v[0]);
         if (trials < 0 || v[1] is < 0 or > 1 || v[2] is < 0 or > 1)
             return OdfFormulaError.Num;
+        // 引數可達 Int32 範圍，而此迴圈每次迭代都呼叫 Combination；一個公式即可空轉數十億次。
+        // trials 超過 1,030 時 Combination 已溢位為無限大（結果本來就不可用），因此在此設定迭代上限。
+        if (trials > MaxDistributionIterations)
+            return OdfFormulaError.Num;
         double cumulative = 0;
         for (int value = 0; value <= trials; value++)
         {
+            ChargeIteration(context);
             cumulative += Combination(trials, value) * Math.Pow(v[1], value) *
                 Math.Pow(1 - v[1], trials - value);
             if (cumulative >= v[2])
@@ -307,8 +312,17 @@ internal static class FormulaConformanceFunctionHandlers
         if (!cumulative)
             return Probability(successes);
         double result = 0;
-        for (int k = Math.Max(0, sample - (population - populationSuccesses)); k <= successes; k++)
-            result += Probability(k);
+        int firstTerm = Math.Max(0, sample - (population - populationSuccesses));
+        if ((long)successes - firstTerm > MaxDistributionIterations)
+            return OdfFormulaError.Num;
+
+        // 計數器必須用 long：successes 為 Int32.MaxValue 時，int 的 k++ 會溢位而形成無窮迴圈。
+        for (long k = firstTerm; k <= successes; k++)
+        {
+            ChargeIteration(context);
+            result += Probability((int)k);
+        }
+
         return result;
     }
 
@@ -839,7 +853,7 @@ internal static class FormulaConformanceFunctionHandlers
         int end = (int)Math.Truncate(v[4]);
         int type = (int)Math.Truncate(v[5]);
         if (v[0] <= 0 || periods <= 0 || start < 1 || end < start || end > periods ||
-            (type != 0 && type != 1))
+            (type != 0 && type != 1) || end > FormulaCoercion.MaxIterativeArgument)
             return OdfFormulaError.Num;
         double payment = Payment(v[0], periods, v[2], 0, type);
         double balance = v[2];
@@ -866,7 +880,8 @@ internal static class FormulaConformanceFunctionHandlers
                 return error;
             int period = (int)Math.Truncate(v[3]);
             int months = v.Length == 5 ? (int)Math.Truncate(v[4]) : 12;
-            if (v[0] < 0 || v[1] < 0 || v[2] <= 0 || period < 1 || months is < 1 or > 12)
+            if (v[0] < 0 || v[1] < 0 || v[2] <= 0 || period < 1 || months is < 1 or > 12 ||
+                period > FormulaCoercion.MaxIterativeArgument)
                 return OdfFormulaError.Num;
             double rate = Math.Round(1 - Math.Pow(v[1] / v[0], 1 / v[2]), 3);
             double book = v[0];
@@ -893,7 +908,8 @@ internal static class FormulaConformanceFunctionHandlers
             return err;
         double factor = values.Length == 7 ? values[6] : 2;
         if (values[0] < 0 || values[1] < 0 || values[2] <= 0 ||
-            values[3] < 0 || values[4] < values[3] || factor <= 0)
+            values[3] < 0 || values[4] < values[3] || factor <= 0 ||
+            values[4] > FormulaCoercion.MaxIterativeArgument)
             return OdfFormulaError.Num;
         double bookValue = values[0];
         double result = 0;
@@ -2091,6 +2107,22 @@ internal static class FormulaConformanceFunctionHandlers
     private static double FCdf(double value, double d1, double d2)
         => RegularizedBeta((d1 * value) / ((d1 * value) + d2), d1 / 2, d2 / 2);
 
+    /// <summary>
+    /// 分佈函式以引數作為迴圈上限時的最大迭代次數。
+    /// </summary>
+    private const int MaxDistributionIterations = 100_000;
+
+    /// <summary>
+    /// 迴圈式函式每次迭代計入評估預算，使 <see cref="OdfFormulaEvaluationOptions.MaxOperations"/> 能中止失控的公式。
+    /// </summary>
+    private static void ChargeIteration(IEvaluationContext context)
+    {
+        if (context is OdfDomEvaluationContext domContext)
+        {
+            domContext.Budget?.ChargeOperation();
+        }
+    }
+
     private static double Combination(int n, int k)
     {
         if (k < 0 || k > n)
@@ -2098,7 +2130,15 @@ internal static class FormulaConformanceFunctionHandlers
         k = Math.Min(k, n - k);
         double result = 1;
         for (int i = 1; i <= k; i++)
+        {
             result *= (n - k + i) / (double)i;
+
+            // C(n,k) 在 k 約 1,030 以上即溢位為無限大；引數可達 Int32 範圍，
+            // 且本函式被 CRITBINOM、HYPGEOMDIST 等放在迴圈內呼叫，不提早離開會使成本呈平方成長。
+            if (double.IsInfinity(result))
+                break;
+        }
+
         return result;
     }
 

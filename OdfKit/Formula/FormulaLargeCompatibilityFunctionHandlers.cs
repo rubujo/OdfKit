@@ -412,6 +412,12 @@ internal static class FormulaLargeCompatibilityFunctionHandlers
         for (long index = 1; index <= chosen; index++)
         {
             result *= (number - chosen + index) / (double)index;
+
+            // 溢位為無限大後結果已不可用；chosen 可達 Int64 範圍，不提早離開會空轉數十億次。
+            if (double.IsInfinity(result))
+            {
+                break;
+            }
         }
 
         return result;

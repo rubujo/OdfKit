@@ -166,6 +166,12 @@ internal static class FormulaExtendedMathFunctionHandlers
         for (long value = number; value > 1; value -= 2)
         {
             result *= value;
+
+            // 溢位為無限大後結果必為 #NUM!，不需繼續迭代（引數可達 Int64 範圍）。
+            if (double.IsInfinity(result))
+            {
+                break;
+            }
         }
 
         return double.IsInfinity(result) ? OdfFormulaError.Num : result;
@@ -422,6 +428,12 @@ internal static class FormulaExtendedMathFunctionHandlers
         for (long value = 2; value <= number; value++)
         {
             result *= value;
+
+            // 超過 170! 即溢位為無限大；引數可達 Int64 範圍，不提早離開會空轉數十億次。
+            if (double.IsInfinity(result))
+            {
+                break;
+            }
         }
 
         return result;

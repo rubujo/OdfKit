@@ -70,6 +70,10 @@ internal static class FormulaDistributionFunctionHandlers
             return OdfFormulaError.Num;
         if (!IsTrue(values[3]))
             return BinomialProbability(trials, successes, probability);
+
+        // 累積迴圈的每一項都呼叫 O(k) 的 Combination，成本為 O(successes × k)；successes 可達 Int64 範圍。
+        if (successes > FormulaCoercion.MaxIterativeArgument / 10)
+            return OdfFormulaError.Num;
         double result = 0;
         for (long current = 0; current <= successes; current++)
         {
@@ -103,6 +107,10 @@ internal static class FormulaDistributionFunctionHandlers
             return OdfFormulaError.Num;
         if (!IsTrue(values[2]))
             return PoissonProbability(events, mean);
+
+        // events 可達 Int64 範圍；累積迴圈不設上限會空轉數十億次以上。
+        if (events > FormulaCoercion.MaxIterativeArgument)
+            return OdfFormulaError.Num;
         double result = 0;
         for (long current = 0; current <= events; current++)
         {
@@ -193,6 +201,12 @@ internal static class FormulaDistributionFunctionHandlers
         for (long index = 1; index <= chosen; index++)
         {
             result *= (number - chosen + index) / (double)index;
+
+            // 溢位為無限大後結果已不可用；chosen 可達 Int64 範圍，不提早離開會空轉數十億次。
+            if (double.IsInfinity(result))
+            {
+                break;
+            }
         }
 
         return result;

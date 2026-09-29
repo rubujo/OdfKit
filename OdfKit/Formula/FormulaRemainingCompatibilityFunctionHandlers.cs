@@ -152,7 +152,14 @@ internal static class FormulaRemainingCompatibilityFunctionHandlers
             return OdfFormulaError.Num;
         double result = 1;
         for (long value = number - chosen + 1; value <= number; value++)
+        {
             result *= value;
+
+            // 溢位為無限大後結果必為 #NUM!；引數可達 Int64 範圍，不提早離開會空轉數十億次。
+            if (double.IsInfinity(result))
+                break;
+        }
+
         return IsFinite(result) ? result : OdfFormulaError.Num;
     }
 
