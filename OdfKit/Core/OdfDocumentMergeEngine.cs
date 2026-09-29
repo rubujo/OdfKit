@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -19,6 +20,15 @@ internal static class OdfDocumentMergeEngine
         OdfMergeOptions options)
     {
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(sourceDoc, nameof(sourceDoc));
+
+        // 附加自身時，迭代來源子節點的同時又持續把節點加到同一份 DOM，迴圈永遠不會結束，
+        // 記憶體在數秒內暴增到數 GB；必須在動手前拒絕。
+        if (ReferenceEquals(sourceDoc.ContentDom, dest.ContentDom))
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_OdfDocumentMerge_CannotMergeIntoItself"),
+                nameof(sourceDoc));
+        }
 
         var styleRenameMap = new Dictionary<string, string>(StringComparer.Ordinal);
 
