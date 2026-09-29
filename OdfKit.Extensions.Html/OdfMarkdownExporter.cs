@@ -468,7 +468,7 @@ public static class OdfMarkdownExporter
     private static void WriteImageReference(OdfNode frameNode, StringBuilder sb)
     {
         sb.Append("![");
-        AppendEscaped(sb, GetImageAltText(frameNode));
+        AppendEscaped(sb, GetImageAltText(frameNode).Replace('\r', ' ').Replace('\n', ' '));
         sb.Append("](");
         AppendLinkDestination(sb, GetImageHref(frameNode));
         sb.Append(')');
@@ -476,9 +476,9 @@ public static class OdfMarkdownExporter
 
     private static void AppendRawImageReference(OdfNode frameNode, StringBuilder sb)
     {
-        sb.Append("![")
-            .Append(GetImageAltText(frameNode))
-            .Append("](");
+        sb.Append("![");
+        AppendEscaped(sb, GetImageAltText(frameNode).Replace('\r', ' ').Replace('\n', ' '));
+        sb.Append("](");
         AppendLinkDestination(sb, GetImageHref(frameNode));
         sb.Append(')');
     }
@@ -746,12 +746,60 @@ public static class OdfMarkdownExporter
     private static void AppendLinkDestination(StringBuilder sb, string? href)
     {
         sb.Append('<');
-        if (!string.IsNullOrEmpty(href))
+        if (!string.IsNullOrEmpty(href) && !IsScriptableUrlScheme(href!))
         {
-            sb.Append(href!.Replace(">", "%3E"));
+            // CommonMark 的 <...> 連結目的地不得含換行、未跳脫的 '<' 或 '>'，且反斜線會跳脫結尾的 '>'。
+            // 否則 ODF 中以字元參照（如 &#10;）夾帶的換行會使連結語法中斷，後續內容被當成原始 HTML 輸出。
+            foreach (char c in href!)
+            {
+                switch (c)
+                {
+                    case '<':
+                        sb.Append("%3C");
+                        break;
+                    case '>':
+                        sb.Append("%3E");
+                        break;
+                    case '\\':
+                        sb.Append("%5C");
+                        break;
+                    case '\r':
+                        sb.Append("%0D");
+                        break;
+                    case '\n':
+                        sb.Append("%0A");
+                        break;
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
         }
 
         sb.Append('>');
+    }
+
+    /// <summary>
+    /// 判斷連結是否使用可在瀏覽器中執行指令碼的 URL 配置（<c>javascript:</c>、<c>vbscript:</c>、非影像的 <c>data:</c>）。
+    /// Markdown 常被下游轉為 HTML，這類連結一律以空目的地輸出，避免匯出不受信任的 ODF 時產生 XSS 載體。
+    /// </summary>
+    private static bool IsScriptableUrlScheme(string href)
+    {
+        // 瀏覽器解析 URL 配置時會忽略前導空白、控制字元與內嵌的 TAB／換行，因此先移除再比對。
+        var normalized = new StringBuilder(href.Length);
+        foreach (char c in href)
+        {
+            if (c > ' ')
+            {
+                normalized.Append(c);
+            }
+        }
+
+        string value = normalized.ToString();
+        return value.StartsWith("javascript:", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("vbscript:", StringComparison.OrdinalIgnoreCase)
+            || (value.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
+                && !value.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase));
     }
 
     private static void AppendBlockSeparator(StringBuilder sb, OdfMarkdownExportOptions options)
