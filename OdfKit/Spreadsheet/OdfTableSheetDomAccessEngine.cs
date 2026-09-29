@@ -108,6 +108,25 @@ internal static class OdfTableSheetDomAccessEngine
     }
 
     /// <summary>
+    /// 驗證列索引落在格線範圍內。負數索引會讓補列迴圈不執行而回傳 null（後續 NullReferenceException）；
+    /// 過大的索引則會逐一建立數十億個列節點。與匯入與稀疏編輯路徑使用相同的格線上限。
+    /// </summary>
+    private static void EnsureRowIndex(int row)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(row, nameof(row));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThan(row, OdfSpreadsheetLimits.MaxRowIndex, nameof(row));
+    }
+
+    /// <summary>
+    /// 驗證欄索引落在格線範圍內，理由同 <see cref="EnsureRowIndex"/>（負數回傳 null、極大值建立數十億個節點）。
+    /// </summary>
+    private static void EnsureColumnIndex(int col)
+    {
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfNegative(col, nameof(col));
+        global::OdfKit.Internal.OdfThrowHelper.ThrowIfGreaterThan(col, OdfSpreadsheetLimits.MaxColumnIndex, nameof(col));
+    }
+
+    /// <summary>
     /// 取得指定列節點中的所有儲存格節點。
     /// </summary>
     internal static List<OdfNode> GetCellsInRow(OdfNode rowNode)
@@ -126,6 +145,8 @@ internal static class OdfTableSheetDomAccessEngine
     /// </summary>
     internal static OdfNode GetOrCreateRowNode(OdfNode tableNode, int row, bool forWrite)
     {
+        EnsureRowIndex(row);
+
         int currentRowIndex = 0;
         foreach (var child in tableNode.Children)
         {
@@ -203,6 +224,8 @@ internal static class OdfTableSheetDomAccessEngine
     /// </summary>
     internal static OdfNode GetOrCreateCellNode(OdfNode rowNode, int col, bool forWrite)
     {
+        EnsureColumnIndex(col);
+
         int currentColIndex = 0;
         foreach (var child in rowNode.Children)
         {
@@ -247,6 +270,8 @@ internal static class OdfTableSheetDomAccessEngine
     /// </summary>
     internal static void EnsureColumnDefinitions(OdfNode tableNode, int col)
     {
+        EnsureColumnIndex(col);
+
         int currentColumnIndex = 0;
         OdfNode? lastColumn = null;
         foreach (OdfNode child in tableNode.Children)
@@ -407,6 +432,8 @@ internal static class OdfTableSheetDomAccessEngine
     /// </summary>
     internal static OdfNode GetOrCreateColumnNode(OdfNode tableNode, int col)
     {
+        EnsureColumnIndex(col);
+
         int currentColIndex = 0;
         OdfNode? insertBeforeNode = null;
         var cols = new List<OdfNode>();
