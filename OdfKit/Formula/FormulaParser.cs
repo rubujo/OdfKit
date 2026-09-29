@@ -12,8 +12,24 @@ namespace OdfKit.Formula;
 /// </summary>
 public ref struct FormulaParser
 {
+    /// <summary>
+    /// 括號、函式引數與內嵌陣列的最大巢狀深度，也是連續前置運算子的最大長度。
+    /// 遞迴下降剖析與後續求值都以遞迴實作，過深的輸入會造成無法攔截的堆疊溢位而使整個處理程序崩潰。
+    /// </summary>
+    internal const int MaxNestingDepth = 256;
+
+    /// <summary>
+    /// 單一公式允許的運算子節點總數（二元、前置、百分比、聯集、交集與範圍運算子）。
+    /// 左結合的運算子鏈（<c>1+1+…</c>、<c>1%%%…</c>）會產生與運算子個數等高的 AST，
+    /// 而求值、序列化與相依性分析都以遞迴走訪；數千層即可讓堆疊 ≤1 MB 的執行緒溢位而使整個處理程序崩潰。
+    /// 4,096 個運算子對應 LibreOffice／Excel 自身約 8,192 個記號的公式上限。
+    /// </summary>
+    internal const int MaxOperatorNodes = 4096;
+
     private Tokenizer _tokenizer;
     private FormulaParserToken _currentToken;
+    private int _nestingDepth;
+    private int _operatorNodeCount;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FormulaParser"/> struct with the specified formula string.
@@ -56,7 +72,7 @@ public ref struct FormulaParser
             string op = _currentToken.Span.ToString();
             Consume();
             var right = ParseConcat();
-            node = new BinaryNode(op, node, right);
+            node = CountOperator(new BinaryNode(op, node, right));
         }
         return node;
     }
@@ -79,7 +95,7 @@ public ref struct FormulaParser
         {
             Consume();
             var right = ParseTerm();
-            node = new BinaryNode("&", node, right);
+            node = CountOperator(new BinaryNode("&", node, right));
         }
         return node;
     }
@@ -94,7 +110,7 @@ public ref struct FormulaParser
             string op = _currentToken.Span.ToString();
             Consume();
             var right = ParseFactor();
-            node = new BinaryNode(op, node, right);
+            node = CountOperator(new BinaryNode(op, node, right));
         }
         return node;
     }
@@ -109,7 +125,7 @@ public ref struct FormulaParser
             string op = _currentToken.Span.ToString();
             Consume();
             var right = ParsePower();
-            node = new BinaryNode(op, node, right);
+            node = CountOperator(new BinaryNode(op, node, right));
         }
         return node;
     }
@@ -121,16 +137,56 @@ public ref struct FormulaParser
     // For example, -2^2 should be parsed as (-2)^2 = 4.
     private AstNode ParseUnary()
     {
-        if (_currentToken.Type == FormulaTokenType.Operator &&
+        // 以迴圈收集連續的前置運算子（而非遞迴），並限制長度，避免超長的 '-' 鏈造成堆疊溢位。
+        List<char>? operators = null;
+        while (_currentToken.Type == FormulaTokenType.Operator &&
            (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
         {
-            char op = _currentToken.Span[0];
+            if (operators is { Count: >= MaxNestingDepth })
+            {
+                throw CreateNestingTooDeepException();
+            }
+
+            (operators ??= []).Add(_currentToken.Span[0]);
             Consume();
-            var child = ParseUnary();
-            return new UnaryNode(op, child);
         }
 
-        return ParsePercent();
+        AstNode node = ParsePercent();
+        if (operators is not null)
+        {
+            // 第一個運算子在最外層。
+            for (int index = operators.Count - 1; index >= 0; index--)
+            {
+                node = CountOperator(new UnaryNode(operators[index], node));
+            }
+        }
+
+        return node;
+    }
+
+    private AstNode CountOperator(AstNode node)
+    {
+        if (++_operatorNodeCount > MaxOperatorNodes)
+        {
+            throw CreateNestingTooDeepException();
+        }
+
+        return node;
+    }
+
+    private static InvalidOperationException CreateNestingTooDeepException() =>
+        new(OdfLocalizer.GetMessage("Err_OdfFormulaEvaluation_ResourceLimitExceeded", "MaxAstDepth"));
+
+    private AstNode ParseNestedExpression()
+    {
+        if (++_nestingDepth > MaxNestingDepth)
+        {
+            throw CreateNestingTooDeepException();
+        }
+
+        AstNode node = ParseExpression();
+        _nestingDepth--;
+        return node;
     }
 
     // 優先權 6：乘方運算 (^)（左結合）
@@ -141,7 +197,7 @@ public ref struct FormulaParser
         {
             Consume();
             var right = ParseUnary();
-            node = new BinaryNode("^", node, right);
+            node = CountOperator(new BinaryNode("^", node, right));
         }
         return node;
     }
@@ -154,7 +210,7 @@ public ref struct FormulaParser
         while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("%", StringComparison.Ordinal))
         {
             Consume();
-            node = new UnaryNode('%', node);
+            node = CountOperator(new UnaryNode('%', node));
         }
 
         return node;
@@ -167,7 +223,7 @@ public ref struct FormulaParser
         {
             Consume();
             var right = ParseIntersectionExpression();
-            node = new ReferenceUnionNode(node, right);
+            node = CountOperator(new ReferenceUnionNode(node, right));
         }
         return node;
     }
@@ -184,9 +240,10 @@ public ref struct FormulaParser
                 StringComparison.Ordinal);
             Consume();
             var right = ParseRangeExpression();
-            node = automatic
+            AstNode intersection = automatic
                 ? new AutomaticIntersectionNode(node, right)
                 : new ReferenceIntersectionNode(node, right);
+            node = CountOperator(intersection);
         }
         return node;
     }
@@ -198,7 +255,7 @@ public ref struct FormulaParser
         {
             Consume();
             AstNode right = ParsePrimary();
-            node = CreateRangeNode(node, right);
+            node = CountOperator(CreateRangeNode(node, right));
         }
 
         return node;
@@ -269,7 +326,7 @@ public ref struct FormulaParser
         if (_currentToken.Type == FormulaTokenType.OpenParen)
         {
             Consume();
-            var node = ParseExpression();
+            var node = ParseNestedExpression();
             if (_currentToken.Type != FormulaTokenType.CloseParen)
             {
                 throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_MismatchedParenthesesExpectedCloseparen"));
@@ -298,11 +355,11 @@ public ref struct FormulaParser
                 List<AstNode> args = [];
                 if (_currentToken.Type != FormulaTokenType.CloseParen)
                 {
-                    args.Add(ParseExpression());
+                    args.Add(ParseNestedExpression());
                     while (_currentToken.Type == FormulaTokenType.Separator)
                     {
                         Consume();
-                        args.Add(ParseExpression());
+                        args.Add(ParseNestedExpression());
                     }
                 }
                 if (_currentToken.Type != FormulaTokenType.CloseParen)
@@ -361,7 +418,7 @@ public ref struct FormulaParser
                         _currentToken.Type));
             }
 
-            currentRow.Add(ParseExpression());
+            currentRow.Add(ParseNestedExpression());
             if (_currentToken.Type == FormulaTokenType.Separator)
             {
                 Consume();
