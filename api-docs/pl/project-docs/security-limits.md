@@ -2,7 +2,7 @@
 title: Limity bezpieczeństwa ładowania i czytników strumieniowych
 _lang: pl
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # Limity bezpieczeństwa ładowania i czytników strumieniowych
@@ -49,6 +49,27 @@ operacji automatycznie z wyłączonymi limitami.
 Domyślna wartość opcji `LeaveOpen` to `false`. Po ustawieniu jej na `true` zwolnienie Readeru nadal zamyka
 strumień wpisu XML i ZIP Reader, ale pozostawia otwarty najbardziej zewnętrzny strumień dostarczony przez
 obiekt wywołujący.
+
+## Pozostałe zabezpieczenia zasobów i danych wyjściowych
+
+Oprócz limitów pakietu i czytników strumieniowych przed niezaufanymi danymi wejściowymi chronią także poniższe stałe limity. Obecnie są to stałe w kodzie i nie można ich jeszcze konfigurować przez `OdfLoadOptions` ani obiekt opcji. Przed podniesieniem lub usunięciem limitu oceń wpływ na pamięć i stos.
+
+| Obszar | Limit | Zachowanie po przekroczeniu |
+|---|---|---|
+| Rzeczywisty rozmiar rozpakowanego wpisu ZIP | Nie może przekraczać nieskompresowanego rozmiaru zadeklarowanego w nagłówku (ścieżka MMF przy wczytywaniu z ścieżki pliku) | `SecurityException` |
+| Uszkodzony katalog centralny ZIP lub ZIP64 | Szybka ścieżka MMF nie obsługuje ZIP64, a żaden rekord, którego nie da się w pełni przeanalizować, nie może zostać po cichu pominięty | Powrót do weryfikacji i odczytu przez `ZipArchive` |
+| Głębokość zagnieżdżenia elementów XML | 256 poziomów (`OdfXmlReader.MaxElementDepth`); dotyczy wczytywania DOM, wczytywania Flat ODF, walidacji reguł profilu i analizy RDF | Wczytywanie zgłasza `SecurityException`; walidacja raportuje `ODF0303` lub `ODF0301` |
+| Głębokość zagnieżdżenia przy analizie formuł | Po 256 poziomów dla nawiasów, argumentów funkcji, tablic wbudowanych i kolejnych operatorów przedrostkowych | `InvalidOperationException` |
+| Łączna liczba węzłów operatorów formuły | 4096 (`FormulaParser.MaxOperatorNodes`); operatory binarne, unarne, procentowe i referencyjne łącznie. Formuły łańcuchowe tworzą drzewa głębokie w lewo, których obliczanie i serializacja rekurencyjnie schodzą poziom po poziomie; limit ten zapewnia, że wystarczy zwykły stos wątku | `InvalidOperationException` |
+| Zapas stosu przy rekurencji formuł | Analiza, obliczanie, pobieranie zakresów i serializacja sprawdzają pozostały stos (`RuntimeHelpers.EnsureSufficientExecutionStack`) przed wejściem na każdy poziom rekurencji; nawet formuły bliskie limitom nie powodują awarii procesu na wątkach z małym stosem 128–256 KB | `InsufficientExecutionStackException`; `EvaluateFormulas` zamienia go na wyjątek obliczania formuły lub `#VALUE!` |
+| Długość tekstowego wyniku formuły | 1 048 576 znaków (`&`, wyniki funkcji, `SUBSTITUTE`, `REPT`) | Zwraca `#VALUE!` |
+| Funkcje formuł, których granicą pętli jest argument | `BINOMDIST` skumulowane 100 000; `CRITBINOM`, `HYPGEOMDIST` skumulowane 100 000; `POISSON` skumulowane 1 000 000; `DB`, `DDB`, `VDB`, `CUMIPMT` okresy 1 000 000 | Zwraca `#NUM!` |
+| Indeks wiersza/kolumny arkusza | Wiersz 1 048 575, kolumna 16 383 (`OdfSpreadsheetLimits`) | `ArgumentOutOfRangeException` |
+| Dołączanie dokumentu | Dokumentu nie można dołączyć do niego samego | `ArgumentException` |
+| Collaboration `addColumns` | Ograniczone liczbą kolumn i łączną liczbą komórek w `OdtOperationSafetyOptions` | Zapisuje limit bezpieczeństwa w dzienniku i pomija operację |
+| Zastępczy obraz wykresu | 4096 px na bok | Ograniczany do limitu |
+| Format konwersji LibreOffice | Część rozszerzenia przed dwukropkiem nie może być pusta ani zawierać `..`, NUL, CR lub LF | `ArgumentException` |
+| Zapytanie SPARQL | Klauzule `SERVICE` nie są dozwolone (zapobiega wysyłaniu przez silnik zapytań żądań sieciowych do dowolnych punktów końcowych) | `ArgumentException` |
 
 ## Granica zaufania
 

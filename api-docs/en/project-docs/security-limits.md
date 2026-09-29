@@ -2,7 +2,7 @@
 title: Loading and streaming reader security limits
 _lang: en
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # Loading and streaming reader security limits
@@ -51,6 +51,27 @@ unlimited settings.
 
 The `LeaveOpen` option defaults to `false`. When it is `true`, disposing the reader still closes its
 XML entry stream and ZIP reader, but leaves the outermost caller-provided stream open.
+
+## Other resource and output safeguards
+
+Besides the package and streaming reader limits, the following fixed limits also defend against untrusted input. These values are currently fixed constants in code; they cannot yet be configured through `OdfLoadOptions` or an options object. Evaluate the impact on memory and stack before raising or removing a limit.
+
+| Aspect | Limit | Behavior when exceeded |
+|---|---|---|
+| Actual decompressed size of a ZIP entry | Must not exceed the uncompressed size declared in the header (MMF path of file-path loading) | `SecurityException` |
+| Damaged ZIP central directory or ZIP64 | The MMF fast path does not support ZIP64, and no record that cannot be fully parsed may be skipped silently | Falls back to `ZipArchive` validation and reading |
+| XML element nesting depth | 256 levels (`OdfXmlReader.MaxElementDepth`); applies to DOM loading, Flat ODF loading, profile rule validation, and RDF parsing | Loading throws `SecurityException`; validation reports `ODF0303` or `ODF0301` |
+| Formula parse nesting depth | 256 levels each for parentheses, function arguments, inline arrays, and consecutive prefix operators | `InvalidOperationException` |
+| Total formula operator nodes | 4,096 (`FormulaParser.MaxOperatorNodes`); binary, unary, percent, and reference operators combined. Chained formulas form left-deep trees whose evaluation and serialization recurse level by level; this limit keeps ordinary thread stacks sufficient | `InvalidOperationException` |
+| Formula recursion stack headroom | Parsing, evaluation, range retrieval, and serialization check the remaining stack (`RuntimeHelpers.EnsureSufficientExecutionStack`) before entering each recursion level; even formulas near the limits do not crash the process on small 128–256 KB stack threads | `InsufficientExecutionStackException`; `EvaluateFormulas` converts it into a formula evaluation exception or `#VALUE!` |
+| Formula string result length | 1,048,576 characters (`&`, function results, `SUBSTITUTE`, `REPT`) | Returns `#VALUE!` |
+| Formula functions whose loop bound is an argument | `BINOMDIST` cumulative 100,000; `CRITBINOM`, `HYPGEOMDIST` cumulative 100,000; `POISSON` cumulative 1,000,000; `DB`, `DDB`, `VDB`, `CUMIPMT` periods 1,000,000 | Returns `#NUM!` |
+| Spreadsheet row/column index | Row 1,048,575, column 16,383 (`OdfSpreadsheetLimits`) | `ArgumentOutOfRangeException` |
+| Document append | A document must not be appended to itself | `ArgumentException` |
+| Collaboration `addColumns` | Bounded by the column count and total cell count of `OdtOperationSafetyOptions` | Logs the safety limit and skips the operation |
+| Chart fallback image | 4,096 px per side | Clamped to the limit |
+| LibreOffice conversion format | The extension part before the colon must not be empty and must not contain `..`, NUL, CR, or LF | `ArgumentException` |
+| SPARQL query | `SERVICE` clauses are not allowed (prevents the query engine from sending network requests to arbitrary endpoints) | `ArgumentException` |
 
 ## Trust boundary
 

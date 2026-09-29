@@ -2,7 +2,7 @@
 title: Limites de segurança do carregamento e dos leitores em fluxo
 _lang: pt-BR
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # Limites de segurança do carregamento e dos leitores em fluxo
@@ -48,6 +48,27 @@ automática com os limites desativados.
 
 O valor padrão de `LeaveOpen` nas opções é `false`. Quando definido como `true`, o descarte do Reader ainda
 fecha o fluxo da entrada XML e o ZIP Reader, mas mantém aberto o fluxo mais externo fornecido pelo chamador.
+
+## Outras proteções de recursos e de saída
+
+Além dos limites do pacote e dos leitores de streaming, os seguintes limites fixos também protegem contra entradas não confiáveis. Esses valores são atualmente constantes fixas no código e ainda não podem ser configurados por meio de `OdfLoadOptions` ou de um objeto de opções. Avalie o impacto na memória e na pilha antes de aumentar ou remover um limite.
+
+| Aspecto | Limite | Comportamento ao exceder |
+|---|---|---|
+| Tamanho descompactado real de uma entrada ZIP | Não pode exceder o tamanho não compactado declarado no cabeçalho (caminho MMF do carregamento por caminho de arquivo) | `SecurityException` |
+| Diretório central ZIP danificado ou ZIP64 | O caminho rápido MMF não oferece suporte a ZIP64 e nenhum registro que não possa ser totalmente analisado pode ser ignorado silenciosamente | Recorre à validação e leitura por meio de `ZipArchive` |
+| Profundidade de aninhamento de elementos XML | 256 níveis (`OdfXmlReader.MaxElementDepth`); aplica-se ao carregamento DOM, ao carregamento de Flat ODF, à validação de regras de perfil e à análise RDF | O carregamento lança `SecurityException`; a validação informa `ODF0303` ou `ODF0301` |
+| Profundidade de aninhamento na análise de fórmulas | 256 níveis cada para parênteses, argumentos de função, matrizes em linha e operadores prefixo consecutivos | `InvalidOperationException` |
+| Total de nós de operador de uma fórmula | 4.096 (`FormulaParser.MaxOperatorNodes`); operadores binários, unários, de porcentagem e de referência somados. Fórmulas encadeadas formam árvores profundas à esquerda cuja avaliação e serialização recursam nível a nível; esse limite garante que uma pilha de thread comum seja suficiente | `InvalidOperationException` |
+| Margem de pilha na recursão de fórmulas | A análise, a avaliação, a obtenção de intervalos e a serialização verificam a pilha restante (`RuntimeHelpers.EnsureSufficientExecutionStack`) antes de entrar em cada nível de recursão; mesmo fórmulas próximas dos limites não derrubam o processo em threads com pilha pequena de 128–256 KB | `InsufficientExecutionStackException`; `EvaluateFormulas` a converte em uma exceção de avaliação de fórmula ou em `#VALUE!` |
+| Comprimento do resultado de texto de uma fórmula | 1.048.576 caracteres (`&`, resultados de funções, `SUBSTITUTE`, `REPT`) | Retorna `#VALUE!` |
+| Funções de fórmula cujo limite de laço é um argumento | `BINOMDIST` acumulado 100.000; `CRITBINOM`, `HYPGEOMDIST` acumulado 100.000; `POISSON` acumulado 1.000.000; `DB`, `DDB`, `VDB`, `CUMIPMT` períodos 1.000.000 | Retorna `#NUM!` |
+| Índice de linha/coluna da planilha | Linha 1.048.575, coluna 16.383 (`OdfSpreadsheetLimits`) | `ArgumentOutOfRangeException` |
+| Anexação de documentos | Um documento não pode ser anexado a si mesmo | `ArgumentException` |
+| Collaboration `addColumns` | Limitado pelo número de colunas e pelo total de células de `OdtOperationSafetyOptions` | Registra o limite de segurança e ignora a operação |
+| Imagem alternativa do gráfico | 4.096 px por lado | Limitada ao valor máximo |
+| Formato de conversão do LibreOffice | A parte da extensão antes dos dois-pontos não pode estar vazia nem conter `..`, NUL, CR ou LF | `ArgumentException` |
+| Consulta SPARQL | Cláusulas `SERVICE` não são permitidas (impede que o mecanismo de consulta envie solicitações de rede a endpoints arbitrários) | `ArgumentException` |
 
 ## Limite de confiança
 

@@ -66,6 +66,8 @@ options 的 `LeaveOpen` 預設為 `false`。設為 `true` 時，處置 Reader �
 | ZIP 中央目錄殘缺或 ZIP64 | MMF 快速路徑不支援 ZIP64，且任何無法完整解析的記錄都不得無聲略過 | 退回 `ZipArchive` 驗證並讀取 |
 | XML 元素巢狀深度 | 256 層（`OdfXmlReader.MaxElementDepth`）；套用於 DOM 載入、Flat ODF 載入、Profile 規則驗證與 RDF 解析 | 載入擲出 `SecurityException`；驗證回報 `ODF0303` 或 `ODF0301` |
 | 公式剖析巢狀深度 | 括號、函式引數、內嵌陣列與連續前置運算子各 256 層 | `InvalidOperationException` |
+| 公式運算子節點總數 | 4,096（`FormulaParser.MaxOperatorNodes`）；二元、單元、百分比與參照運算子合計。連鎖公式是左深樹，求值與序列化會逐層遞迴，此上限確保一般執行緒堆疊足夠 | `InvalidOperationException` |
+| 公式遞迴堆疊餘量 | 剖析、求值、取得範圍與序列化每進入一層遞迴前先檢查剩餘堆疊（`RuntimeHelpers.EnsureSufficientExecutionStack`）；在 128–256 KB 的小堆疊執行緒上，接近上限的公式也不會使處理程序崩潰 | `InsufficientExecutionStackException`；`EvaluateFormulas` 將其轉為公式評估例外或 `#VALUE!` |
 | 公式字串結果長度 | 1,048,576 字元（`&`、函式結果、`SUBSTITUTE`、`REPT`） | 回傳 `#VALUE!` |
 | 以引數為迴圈上限的公式函式 | `BINOMDIST` 累計 100,000；`CRITBINOM`、`HYPGEOMDIST` 累計 100,000；`POISSON` 累計 1,000,000；`DB`、`DDB`、`VDB`、`CUMIPMT` 期數 1,000,000 | 回傳 `#NUM!` |
 | 試算表列／欄索引 | 列 1,048,575、欄 16,383（`OdfSpreadsheetLimits`） | `ArgumentOutOfRangeException` |

@@ -2,7 +2,7 @@
 title: 読み込みとストリーミングリーダーのセキュリティ制限
 _lang: ja
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # 読み込みとストリーミングリーダーのセキュリティ制限
@@ -49,6 +49,27 @@ translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d9
 オプションの `LeaveOpen` の既定値は `false` です。`true` に設定した場合でも、Reader を破棄すると
 XML エントリのストリームと ZIP Reader は閉じられますが、呼び出し元が指定した最外層のストリームは
 開いたままになります。
+
+## その他のリソースおよび出力の保護
+
+パッケージおよびストリーミングリーダーの制限に加えて、次の固定制限も信頼できない入力から保護します。これらの値は現在コード内の固定定数であり、`OdfLoadOptions` やオプションオブジェクトではまだ設定できません。制限を引き上げたり解除したりする前に、メモリとスタックへの影響を評価してください。
+
+| 項目 | 制限 | 超過時の動作 |
+|---|---|---|
+| ZIP エントリの実際の展開サイズ | ヘッダーで宣言された非圧縮サイズを超えてはならない（ファイルパス読み込みの MMF パス） | `SecurityException` |
+| ZIP セントラルディレクトリの破損または ZIP64 | MMF 高速パスは ZIP64 をサポートせず、完全に解析できないレコードを黙ってスキップしてはならない | `ZipArchive` による検証と読み取りにフォールバックする |
+| XML 要素のネスト深度 | 256 階層（`OdfXmlReader.MaxElementDepth`）。DOM 読み込み、Flat ODF 読み込み、プロファイル規則の検証、RDF 解析に適用される | 読み込みは `SecurityException` をスローし、検証は `ODF0303` または `ODF0301` を報告する |
+| 数式解析のネスト深度 | 括弧、関数引数、インライン配列、連続する前置演算子のそれぞれ 256 階層 | `InvalidOperationException` |
+| 数式の演算子ノード総数 | 4,096（`FormulaParser.MaxOperatorNodes`）。二項、単項、パーセント、参照の各演算子の合計。連鎖した数式は左に深い木になり、評価とシリアル化は階層ごとに再帰するため、この上限により通常のスレッドスタックで足りることを保証する | `InvalidOperationException` |
+| 数式の再帰に対するスタック余裕 | 解析、評価、範囲取得、シリアル化は、再帰の各階層に入る前に残りスタック（`RuntimeHelpers.EnsureSufficientExecutionStack`）を確認する。128〜256 KB の小さなスタックのスレッドでも、上限に近い数式でプロセスがクラッシュしない | `InsufficientExecutionStackException`。`EvaluateFormulas` はこれを数式評価例外または `#VALUE!` に変換する |
+| 数式の文字列結果の長さ | 1,048,576 文字（`&`、関数の結果、`SUBSTITUTE`、`REPT`） | `#VALUE!` を返す |
+| 引数がループ上限になる数式関数 | `BINOMDIST` 累積 100,000、`CRITBINOM`・`HYPGEOMDIST` 累積 100,000、`POISSON` 累積 1,000,000、`DB`・`DDB`・`VDB`・`CUMIPMT` 期間 1,000,000 | `#NUM!` を返す |
+| スプレッドシートの行／列インデックス | 行 1,048,575、列 16,383（`OdfSpreadsheetLimits`） | `ArgumentOutOfRangeException` |
+| ドキュメントの追加 | ドキュメントを自分自身に追加してはならない | `ArgumentException` |
+| Collaboration `addColumns` | `OdtOperationSafetyOptions` の列数とセル総数の制限を受ける | 安全上限を記録し、その操作をスキップする |
+| グラフのフォールバック画像 | 1 辺 4,096 px | 上限に丸められる |
+| LibreOffice の変換形式 | コロンより前の拡張子部分は空であってはならず、`..`、NUL、CR、LF を含んではならない | `ArgumentException` |
+| SPARQL クエリ | `SERVICE` 句は許可されない（クエリエンジンが任意のエンドポイントへネットワーク要求を送るのを防ぐ） | `ArgumentException` |
 
 ## 信頼境界
 

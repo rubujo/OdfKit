@@ -2,7 +2,7 @@
 title: Límites de seguridad de carga y lectores en flujo
 _lang: es
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # Límites de seguridad de carga y lectores en flujo
@@ -49,6 +49,27 @@ automáticamente con límites desactivados.
 El valor predeterminado de `LeaveOpen` en las opciones es `false`. Cuando se establece en `true`, al desechar
 el Reader se cierran el flujo de la entrada XML y el ZIP Reader, pero se mantiene abierto el flujo exterior
 proporcionado por el autor de la llamada.
+
+## Otras protecciones de recursos y de salida
+
+Además de los límites del paquete y de los lectores de streaming, los siguientes límites fijos también protegen frente a entradas no fiables. Por ahora son constantes fijas en el código y todavía no se pueden configurar mediante `OdfLoadOptions` ni un objeto de opciones. Evalúe el impacto en memoria y pila antes de aumentar o quitar un límite.
+
+| Aspecto | Límite | Comportamiento al superarlo |
+|---|---|---|
+| Tamaño descomprimido real de una entrada ZIP | No debe superar el tamaño sin comprimir declarado en la cabecera (ruta MMF al cargar desde una ruta de archivo) | `SecurityException` |
+| Directorio central ZIP dañado o ZIP64 | La ruta rápida MMF no admite ZIP64 y ningún registro que no pueda analizarse por completo puede omitirse en silencio | Recurre a la validación y lectura mediante `ZipArchive` |
+| Profundidad de anidamiento de elementos XML | 256 niveles (`OdfXmlReader.MaxElementDepth`); se aplica a la carga DOM, la carga de Flat ODF, la validación de reglas de perfil y el análisis RDF | La carga lanza `SecurityException`; la validación informa `ODF0303` u `ODF0301` |
+| Profundidad de anidamiento al analizar fórmulas | 256 niveles cada uno para paréntesis, argumentos de función, matrices en línea y operadores prefijo consecutivos | `InvalidOperationException` |
+| Total de nodos de operador de una fórmula | 4.096 (`FormulaParser.MaxOperatorNodes`); operadores binarios, unarios, de porcentaje y de referencia en conjunto. Las fórmulas encadenadas forman árboles profundos por la izquierda cuya evaluación y serialización recursan nivel a nivel; este límite garantiza que baste una pila de hilo normal | `InvalidOperationException` |
+| Margen de pila en la recursión de fórmulas | El análisis, la evaluación, la obtención de rangos y la serialización comprueban la pila restante (`RuntimeHelpers.EnsureSufficientExecutionStack`) antes de entrar en cada nivel de recursión; incluso las fórmulas cercanas a los límites no bloquean el proceso en hilos con pila pequeña de 128–256 KB | `InsufficientExecutionStackException`; `EvaluateFormulas` la convierte en una excepción de evaluación de fórmula o en `#VALUE!` |
+| Longitud del resultado de cadena de una fórmula | 1.048.576 caracteres (`&`, resultados de funciones, `SUBSTITUTE`, `REPT`) | Devuelve `#VALUE!` |
+| Funciones de fórmula cuyo límite de bucle es un argumento | `BINOMDIST` acumulado 100.000; `CRITBINOM`, `HYPGEOMDIST` acumulado 100.000; `POISSON` acumulado 1.000.000; `DB`, `DDB`, `VDB`, `CUMIPMT` periodos 1.000.000 | Devuelve `#NUM!` |
+| Índice de fila/columna de la hoja de cálculo | Fila 1.048.575, columna 16.383 (`OdfSpreadsheetLimits`) | `ArgumentOutOfRangeException` |
+| Anexado de documentos | Un documento no puede anexarse a sí mismo | `ArgumentException` |
+| Collaboration `addColumns` | Limitado por el número de columnas y el total de celdas de `OdtOperationSafetyOptions` | Registra el límite de seguridad y omite la operación |
+| Imagen alternativa de gráfico | 4.096 px por lado | Se ajusta al límite |
+| Formato de conversión de LibreOffice | La parte de extensión anterior a los dos puntos no puede estar vacía ni contener `..`, NUL, CR o LF | `ArgumentException` |
+| Consulta SPARQL | No se permiten cláusulas `SERVICE` (evita que el motor de consultas envíe solicitudes de red a puntos de conexión arbitrarios) | `ArgumentException` |
 
 ## Límite de confianza
 

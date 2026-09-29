@@ -2,7 +2,7 @@
 title: Bezpečnostní limity načítání a proudových čteček
 _lang: cs
 translation_source: docs/security-limits.md
-translation_source_sha256: 717f100dcc24a436ae8dd8c64601585f59320489dc452918dd8d97837e4fd8f0
+translation_source_sha256: cb823c0029b8beeed0a9f910875163ea7d358fc9a7903f571f4136c59e968ff9
 ---
 
 # Bezpečnostní limity načítání a proudových čteček
@@ -50,6 +50,27 @@ limity.
 
 Výchozí hodnota možnosti `LeaveOpen` je `false`. Při nastavení na `true` se po uvolnění Readeru stále zavře
 datový proud položky XML a ZIP Reader, ale nejvzdálenější datový proud poskytnutý volajícím zůstane otevřený.
+
+## Další ochrany zdrojů a výstupu
+
+Kromě limitů balíčku a streamovaných readerů chrání před nedůvěryhodným vstupem také následující pevné limity. Tyto hodnoty jsou zatím pevné konstanty v kódu a nelze je nastavit přes `OdfLoadOptions` ani objekt voleb. Před zvýšením nebo odstraněním limitu posuďte dopad na paměť a zásobník.
+
+| Oblast | Limit | Chování při překročení |
+|---|---|---|
+| Skutečná dekomprimovaná velikost položky ZIP | Nesmí překročit nekomprimovanou velikost deklarovanou v hlavičce (cesta MMF při načítání ze souboru) | `SecurityException` |
+| Poškozený centrální adresář ZIP nebo ZIP64 | Rychlá cesta MMF nepodporuje ZIP64 a žádný záznam, který nelze plně zpracovat, nesmí být mlčky přeskočen | Přechod na ověření a čtení přes `ZipArchive` |
+| Hloubka vnoření elementů XML | 256 úrovní (`OdfXmlReader.MaxElementDepth`); platí pro načítání DOM, načítání Flat ODF, ověřování pravidel profilu a parsování RDF | Načtení vyvolá `SecurityException`; ověření hlásí `ODF0303` nebo `ODF0301` |
+| Hloubka vnoření při parsování vzorců | Po 256 úrovních pro závorky, argumenty funkcí, vložená pole a po sobě jdoucí prefixové operátory | `InvalidOperationException` |
+| Celkový počet uzlů operátorů ve vzorci | 4 096 (`FormulaParser.MaxOperatorNodes`); dohromady binární, unární, procentní a referenční operátory. Řetězené vzorce tvoří levostranně hluboké stromy, jejichž vyhodnocení a serializace rekurzí procházejí úroveň po úrovni; tento limit zajišťuje dostatečný běžný zásobník vlákna | `InvalidOperationException` |
+| Rezerva zásobníku při rekurzi vzorců | Parsování, vyhodnocení, získání rozsahů a serializace před vstupem do každé úrovně rekurze kontrolují zbývající zásobník (`RuntimeHelpers.EnsureSufficientExecutionStack`); ani vzorce blízké limitům neshodí proces na vláknech s malým zásobníkem 128–256 KB | `InsufficientExecutionStackException`; `EvaluateFormulas` ji převede na výjimku vyhodnocení vzorce nebo `#VALUE!` |
+| Délka řetězcového výsledku vzorce | 1 048 576 znaků (`&`, výsledky funkcí, `SUBSTITUTE`, `REPT`) | Vrací `#VALUE!` |
+| Funkce vzorců s mezí cyklu daným argumentem | `BINOMDIST` kumulativně 100 000; `CRITBINOM`, `HYPGEOMDIST` kumulativně 100 000; `POISSON` kumulativně 1 000 000; `DB`, `DDB`, `VDB`, `CUMIPMT` období 1 000 000 | Vrací `#NUM!` |
+| Index řádku/sloupce tabulky | Řádek 1 048 575, sloupec 16 383 (`OdfSpreadsheetLimits`) | `ArgumentOutOfRangeException` |
+| Připojení dokumentu | Dokument nelze připojit sám k sobě | `ArgumentException` |
+| Collaboration `addColumns` | Omezeno počtem sloupců a celkovým počtem buněk v `OdtOperationSafetyOptions` | Zaznamená bezpečnostní limit a operaci přeskočí |
+| Záložní obrázek grafu | 4 096 px na stranu | Omezeno na limit |
+| Formát převodu LibreOffice | Část přípony před dvojtečkou nesmí být prázdná a nesmí obsahovat `..`, NUL, CR ani LF | `ArgumentException` |
+| Dotaz SPARQL | Klauzule `SERVICE` není povolena (brání dotazovacímu enginu odesílat síťové požadavky na libovolné koncové body) | `ArgumentException` |
 
 ## Hranice důvěry
 
