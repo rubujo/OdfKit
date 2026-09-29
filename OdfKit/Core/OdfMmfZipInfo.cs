@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.IO.MemoryMappedFiles;
+using System.Security;
 using System.Text;
+
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -87,8 +90,74 @@ internal sealed class OdfMmfEntryInfo
         {
             var viewStream = mmf.CreateViewStream(CompressedDataOffset, CompressedSize, MemoryMappedFileAccess.Read);
             var deflateStream = new DeflateStream(viewStream, CompressionMode.Decompress);
-            return new OdfCrc32Stream(deflateStream, Crc32);
+            // 標頭宣告的大小不可信：以宣告值限制實際解壓量，避免謊報大小的解壓縮炸彈。
+            var boundedStream = new OdfSizeLimitedReadStream(deflateStream, UncompressedSize, Name);
+            return new OdfCrc32Stream(boundedStream, Crc32);
         }
+    }
+}
+
+/// <summary>
+/// 限制唯讀資料流可讀出的位元組數；超過限制時擲出 <see cref="SecurityException"/>（內部協作者）。
+/// </summary>
+internal sealed class OdfSizeLimitedReadStream(Stream inner, long limit, string entryName) : Stream
+{
+    private readonly Stream _inner = inner;
+    private readonly long _limit = limit;
+    private readonly string _entryName = entryName;
+    private long _total;
+
+    public override bool CanRead => true;
+
+    public override bool CanSeek => false;
+
+    public override bool CanWrite => false;
+
+    public override long Length => throw new NotSupportedException();
+
+    public override long Position
+    {
+        get => throw new NotSupportedException();
+        set => throw new NotSupportedException();
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        long remaining = _limit - _total;
+        if (remaining <= 0)
+        {
+            // 已達宣告大小：若底層仍有資料，表示標頭謊報大小。
+            byte[] probe = new byte[1];
+            if (_inner.Read(probe, 0, 1) > 0)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", _entryName, _total + 1, _limit));
+            }
+
+            return 0;
+        }
+
+        int read = _inner.Read(buffer, offset, (int)Math.Min(count, remaining));
+        _total += read;
+        return read;
+    }
+
+    public override void Flush() { }
+
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+    public override void SetLength(long value) => throw new NotSupportedException();
+
+    public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _inner.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }
 
