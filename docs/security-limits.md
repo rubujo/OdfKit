@@ -55,6 +55,26 @@ profile 規則應另以 `OdfPackageValidator`、`SanitizeMacros`、簽章驗證 
 options 的 `LeaveOpen` 預設為 `false`。設為 `true` 時，處置 Reader 仍會關閉其 XML entry
 串流及 ZIP Reader，但保留呼叫端提供的最外層資料流。
 
+## 其他資源與輸出防護
+
+除封裝與串流 Reader 之外，下列固定限制同樣防禦不可信輸入。這些值目前為程式內固定常數，
+尚未提供 `OdfLoadOptions` 或選項物件設定；提高或移除限制前應先評估對記憶體與堆疊的影響。
+
+| 面向 | 限制 | 超過時的行為 |
+|---|---|---|
+| ZIP 項目實際解壓量 | 不得超過標頭宣告的未壓縮大小（檔案路徑載入的 MMF 路徑） | `SecurityException` |
+| ZIP 中央目錄殘缺或 ZIP64 | MMF 快速路徑不支援 ZIP64，且任何無法完整解析的記錄都不得無聲略過 | 退回 `ZipArchive` 驗證並讀取 |
+| XML 元素巢狀深度 | 256 層（`OdfXmlReader.MaxElementDepth`）；套用於 DOM 載入、Flat ODF 載入、Profile 規則驗證與 RDF 解析 | 載入擲出 `SecurityException`；驗證回報 `ODF0303` 或 `ODF0301` |
+| 公式剖析巢狀深度 | 括號、函式引數、內嵌陣列與連續前置運算子各 256 層 | `InvalidOperationException` |
+| 公式字串結果長度 | 1,048,576 字元（`&`、函式結果、`SUBSTITUTE`、`REPT`） | 回傳 `#VALUE!` |
+| 以引數為迴圈上限的公式函式 | `BINOMDIST` 累計 100,000；`CRITBINOM`、`HYPGEOMDIST` 累計 100,000；`POISSON` 累計 1,000,000；`DB`、`DDB`、`VDB`、`CUMIPMT` 期數 1,000,000 | 回傳 `#NUM!` |
+| 試算表列／欄索引 | 列 1,048,575、欄 16,383（`OdfSpreadsheetLimits`） | `ArgumentOutOfRangeException` |
+| 文件附加 | 不得附加至自身 | `ArgumentException` |
+| Collaboration `addColumns` | 受 `OdtOperationSafetyOptions` 的欄數與儲存格總數限制 | 記錄安全上限並略過該操作 |
+| 圖表 fallback 影像 | 單邊 4,096 px | 夾限至上限 |
+| LibreOffice 轉換格式 | 冒號前的副檔名部分不得為空，且不得含 `..`、NUL、CR 或 LF | `ArgumentException` |
+| SPARQL 查詢 | 不允許 `SERVICE` 子句（避免查詢引擎對任意端點發出網路要求） | `ArgumentException` |
+
 ## 信任邊界
 
 不可信文件應保留預設限制，並先執行 package／schema 驗證。可信且確實需要處理大型文件
