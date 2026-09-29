@@ -37,6 +37,12 @@ public partial class OdfTableSheet
     // TryExtendRowCache／TryExtendCellCache 自然將前綴向後延伸一格；因此以循序方式逐步解析的壓縮區塊，
     // 其快取前綴會持續成長，而不必整個重建。
     private List<OdfNode>? _rowNodeCache;
+
+    // True when _rowNodeCache covers every logical row of the table (no container or repeat-compressed
+    // row ended the verified prefix early), so an index equal to the cache count is a brand-new row.
+    // 為 true 表示 _rowNodeCache 涵蓋表格全部邏輯列（沒有列容器或壓縮列提早結束已驗證前綴），
+    // 因此等於快取數量的索引必為全新的列。
+    private bool _rowCacheComplete;
     private readonly Dictionary<OdfNode, RowCellCache> _cellNodeCacheByRow = [];
     private readonly object _accessCacheLock = new();
 
@@ -82,6 +88,13 @@ public partial class OdfTableSheet
                 return rowScopedCellNode;
             }
 
+            if (TryAppendRowAtEnd(row, col, out OdfNode appendedRow))
+            {
+                OdfNode appendedCell = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(appendedRow, col, forWrite: true);
+                TryExtendCellCache(row, col, appendedCell);
+                return appendedCell;
+            }
+
             OdfNode cellNode = OdfTableSheetDomAccessEngine.GetOrCreateCellNode(TableNode, row, col);
             TryExtendRowCache(row);
             TryExtendCellCache(row, col, cellNode);
@@ -112,10 +125,60 @@ public partial class OdfTableSheet
             if (TryGetCachedRowNode(row, out OdfNode? cachedRowNode))
                 return cachedRowNode;
 
+            if (TryAppendRowAtEnd(row, 0, out OdfNode appendedRow))
+                return appendedRow;
+
             OdfNode rowNode = OdfTableSheetDomAccessEngine.GetOrCreateRowNode(TableNode, row, forWrite: true);
             TryExtendRowCache(row, rowNode);
             return rowNode;
         }
+    }
+
+    /// <summary>
+    /// Appends a new row in O(1) when <paramref name="row"/> is exactly one past a fully verified row cache,
+    /// which is what the engine would do after a full-table scan (the sequential "build a sheet row by row" pattern).
+    /// 當 <paramref name="row"/> 恰好是完整已驗證列快取的下一列時，以 O(1) 附加新列；
+    /// 其結果與引擎全表掃描後的行為相同（逐列建立工作表的循序模式）。
+    /// </summary>
+    /// <param name="row">The zero-based row index to create. / 以 0 為基準、要建立的列索引。</param>
+    /// <param name="col">The column index that will be accessed; validated and column definitions ensured. / 即將存取的欄索引；會驗證並確保欄定義。</param>
+    /// <param name="rowNode">The appended row node. / 新附加的列節點。</param>
+    /// <returns><see langword="true"/> when the fast path applied; otherwise <see langword="false"/> and nothing was changed. / 套用快速路徑時為 <see langword="true"/>；否則為 <see langword="false"/> 且未做任何變更。</returns>
+    private bool TryAppendRowAtEnd(int row, int col, out OdfNode rowNode)
+    {
+        rowNode = null!;
+        if (_rowNodeCache is null ||
+            !_rowCacheComplete ||
+            row != _rowNodeCache.Count ||
+            row > OdfSpreadsheetLimits.MaxRowIndex ||
+            !IsLastRowLikeChild(_rowNodeCache.Count == 0 ? null : _rowNodeCache[_rowNodeCache.Count - 1]))
+        {
+            return false;
+        }
+
+        // 與引擎相同的順序：先驗證欄索引並補欄定義，再附加列。
+        OdfTableSheetDomAccessEngine.EnsureColumnDefinitions(TableNode, col);
+        rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+        TableNode.AppendChild(rowNode);
+        _rowNodeCache.Add(rowNode);
+        return true;
+    }
+
+    // 保護快取：確認表格中最後一個列類子節點確實是快取的最後一列（或表格根本沒有列），
+    // 否則代表 DOM 已被快取不知道的路徑改動，交還給引擎處理。從尾端往前掃，通常 O(1)。
+    private bool IsLastRowLikeChild(OdfNode? lastCachedRow)
+    {
+        // 不可用 Children[i]：其索引快取在每次附加後都失效，重建為 O(n)；改走兄弟連結。
+        for (OdfNode? child = TableNode.LastChild; child is not null; child = child.PreviousSibling)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Table &&
+                (child.LocalName == "table-row" || OdfTableSheetDomAccessEngine.RowContainerNames.Contains(child.LocalName)))
+            {
+                return ReferenceEquals(child, lastCachedRow);
+            }
+        }
+
+        return lastCachedRow is null;
     }
 
     /// <summary>
@@ -159,12 +222,14 @@ public partial class OdfTableSheet
         }
 
         List<OdfNode> rows = [];
+        bool complete = true;
         foreach (OdfNode child in TableNode.Children)
         {
             if (OdfTableSheetDomAccessEngine.RowContainerNames.Contains(child.LocalName) && child.NamespaceUri == OdfNamespaces.Table)
             {
                 // Nested row containers are not indexed by this flat cache; stop extending the
                 // verified prefix here but keep whatever plain rows were already collected before it.
+                complete = false;
                 break;
             }
 
@@ -180,6 +245,7 @@ public partial class OdfTableSheet
                 // This row and every logical row after it always falls back to the engine path, same
                 // as before, but earlier rows (e.g. real data preceding LibreOffice's typical trailing
                 // empty-row padding) keep the fast path instead of losing it for the whole sheet.
+                complete = false;
                 break;
             }
 
@@ -187,12 +253,24 @@ public partial class OdfTableSheet
         }
 
         _rowNodeCache = rows;
+        _rowCacheComplete = complete;
     }
 
     private void TryExtendRowCache(int row)
     {
-        if (_rowNodeCache is null || row != _rowNodeCache.Count)
+        if (_rowNodeCache is null)
         {
+            return;
+        }
+
+        if (row != _rowNodeCache.Count)
+        {
+            // 引擎可能為了到達更後面的索引而補建了多列；快取已不再涵蓋全部列，延後重建。
+            if (row > _rowNodeCache.Count)
+            {
+                _rowNodeCache = null;
+            }
+
             return;
         }
 
@@ -224,6 +302,7 @@ public partial class OdfTableSheet
         {
             // Still repeat-compressed (e.g. a write landed exactly on a not-yet-split repeated node);
             // leave the verified prefix exactly as-is rather than growing past an unsafe boundary.
+            _rowCacheComplete = false;
             return;
         }
 
