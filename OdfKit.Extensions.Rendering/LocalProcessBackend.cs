@@ -37,6 +37,8 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
             throw new ArgumentNullException(nameof(inputExtension));
         if (string.IsNullOrEmpty(convertTo))
             throw new ArgumentNullException(nameof(convertTo));
+        LibreOfficeRenderer.EnsureValidFormat(inputExtension, nameof(inputExtension));
+        LibreOfficeRenderer.EnsureValidFormat(convertTo, nameof(convertTo));
 
         // 建立臨時工作沙盒
         string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_LocalBackend_" + Guid.NewGuid().ToString("N"));
@@ -50,7 +52,9 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
                 await input.CopyToAsync(fs, 81920, ct).ConfigureAwait(false);
             }
 
-            string outputFilePath = Path.Combine(tempSandbox, $"converted.{convertTo}");
+            // 檔名只使用副檔名部分：convertTo 可能帶有 "pdf:writer_pdf_Export" 這類濾鏡選項，
+            // 冒號在 Windows 檔名中無效，且濾鏡選項本來就不該進入路徑。
+            string outputFilePath = Path.Combine(tempSandbox, $"converted.{LibreOfficeRenderer.GetOutputExtension(convertTo)}");
 
             await _renderer.ConvertFileAsync(inputFilePath, outputFilePath, convertTo, ct).ConfigureAwait(false);
 

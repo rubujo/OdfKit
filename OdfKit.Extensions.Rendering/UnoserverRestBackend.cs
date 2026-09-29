@@ -65,6 +65,8 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
             throw new ArgumentNullException(nameof(inputExtension));
         if (string.IsNullOrEmpty(convertTo))
             throw new ArgumentNullException(nameof(convertTo));
+        LibreOfficeRenderer.EnsureValidFormat(inputExtension, nameof(inputExtension));
+        LibreOfficeRenderer.EnsureValidFormat(convertTo, nameof(convertTo));
 
         // 重試需要可重播來源；使用刪除即關閉的暫存檔，避免大型文件同時存在
         // MemoryStream 與 ToArray 複本而造成數 GB 的常駐配置。

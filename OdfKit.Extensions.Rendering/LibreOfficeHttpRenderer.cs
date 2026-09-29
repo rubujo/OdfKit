@@ -46,6 +46,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfNull(outputStream, nameof(outputStream));
         if (string.IsNullOrEmpty(targetFormat))
             throw new ArgumentNullException(nameof(targetFormat));
+        LibreOfficeRenderer.EnsureValidFormat(targetFormat, nameof(targetFormat));
 
         string ext = LibreOfficeRenderer.GetInputExtension(document);
 

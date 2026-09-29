@@ -280,6 +280,7 @@ public class LibreOfficeRenderer
             throw new ArgumentNullException(nameof(outputPath));
         if (string.IsNullOrEmpty(format))
             throw new ArgumentNullException(nameof(format));
+        EnsureValidFormat(format, nameof(format));
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -549,7 +550,36 @@ public class LibreOfficeRenderer
             : "odt";
     }
 
-    private static string GetOutputExtension(string format)
+    /// <summary>
+    /// 驗證呼叫端提供的轉換格式（或輸入副檔名）不會讓檔案路徑逃出沙盒。
+    /// 格式的副檔名部分（冒號之前）會被直接拼進 <c>document.&lt;副檔名&gt;</c> 這個沙盒內的檔案路徑，
+    /// 並作為 <c>File.Move</c> 的來源；含 <c>..</c> 區段時，沙盒外的任意既有檔案都可能被搬走或讀取。
+    /// 檔名固定以 <c>document.</c> 開頭，因此不含 <c>..</c> 就只能往沙盒內部走。
+    /// 空格、引號與 shell 特殊字元則不在此限制：它們只會以 <c>ProcessStartInfo.ArgumentList</c>
+    /// （或 netstandard2.0 上經跳脫的單一引數）傳給 LibreOffice，既有的參數注入測試即是驗證這一點。
+    /// </summary>
+    internal static void EnsureValidFormat(string format, string paramName)
+    {
+        // 檢查原始的冒號前片段：GetOutputExtension 會先 TrimStart('.')，"../x" 的前導 ".." 會被吃掉；
+        // 但遠端 unoserver 收到的是原始字串，因此要以未修剪的內容判斷。
+        string head = format;
+        int colonIndex = head.IndexOf(':');
+        if (colonIndex >= 0)
+        {
+            head = head.Substring(0, colonIndex);
+        }
+
+        if (GetOutputExtension(format).Length == 0 ||
+            head.Contains("..", StringComparison.Ordinal) ||
+            format.IndexOfAny(['\0', '\r', '\n']) >= 0)
+        {
+            throw new ArgumentException(
+                OdfLocalizer.GetMessage("Err_LibreOfficeRenderer_InvalidTargetFormat", format),
+                paramName);
+        }
+    }
+
+    internal static string GetOutputExtension(string format)
     {
         string trimmed = format.Trim();
         int colonIndex = trimmed.IndexOf(':');
