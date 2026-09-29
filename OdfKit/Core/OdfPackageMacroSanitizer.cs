@@ -12,6 +12,26 @@ namespace OdfKit.Core;
 internal static class OdfPackageMacroSanitizer
 {
     /// <summary>
+    /// 判斷封裝項目是否為巨集或巨集簽章。內嵌物件（如 <c>Object 1/</c>）本身是完整的 ODF 子文件，
+    /// 其 <c>Basic/</c>、<c>Scripts/</c> 與巨集簽章同樣必須移除，因此比對任意深度的路徑區段。
+    /// </summary>
+    private static bool IsMacroEntry(string key)
+    {
+        string[] segments = key.Split('/');
+        for (int i = 0; i < segments.Length - 1; i++)
+        {
+            if (segments[i].Equals("basic", StringComparison.OrdinalIgnoreCase) ||
+                segments[i].Equals("Scripts", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return key.Equals("macrosignatures.xml", StringComparison.OrdinalIgnoreCase) ||
+               key.EndsWith("/macrosignatures.xml", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// 淨化封裝以移除所有 VBA、StarBasic 巨集指令碼、簽章以及指令碼參考。
     /// </summary>
     internal static void Sanitize(OdfPackage.OdfPackageMacroSanitizeCollaborators ctx)
@@ -19,10 +39,7 @@ internal static class OdfPackageMacroSanitizer
         var entriesToRemove = new List<string>();
         foreach (string key in ctx.Entries.Keys)
         {
-            if (key.StartsWith("basic/", StringComparison.OrdinalIgnoreCase) ||
-                key.StartsWith("Scripts/", StringComparison.OrdinalIgnoreCase) ||
-                key.Equals("macrosignatures.xml", StringComparison.OrdinalIgnoreCase) ||
-                key.Equals("META-INF/macrosignatures.xml", StringComparison.OrdinalIgnoreCase))
+            if (IsMacroEntry(key))
             {
                 entriesToRemove.Add(key);
             }
