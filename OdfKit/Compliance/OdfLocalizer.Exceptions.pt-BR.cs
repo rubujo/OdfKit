@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "O algoritmo de criptografia {1} não aceita chave de {0} bytes; eram esperados {2} bytes.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "Um nó não pode ser inserido em si mesmo nem em um de seus descendentes.",
             ["Err_OdfXmlReader_DtdProhibited"] = "Declarações DTD e de marcação XML são proibidas.",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Um documento não pode ser anexado ou mesclado a si mesmo.",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "O formato de conversão '{0}' é inválido: a parte da extensão não pode estar vazia nem conter '..' ou quebras de linha.",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Consultas federadas SPARQL (cláusula SERVICE) não são permitidas: elas fariam a biblioteca enviar solicitações de rede aos pontos de extremidade indicados na consulta.",
         };
     }
 }

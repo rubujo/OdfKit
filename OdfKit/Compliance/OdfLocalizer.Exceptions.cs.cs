@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Šifrovací algoritmus {1} nepodporuje velikost klíče {0} bajtů; očekává se {2} bajtů.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "Uzel nelze vložit do sebe samého ani do žádného ze svých potomků.",
             ["Err_OdfXmlReader_DtdProhibited"] = "Deklarace DTD a značek XML jsou zakázány.",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Dokument nelze připojit ani sloučit sám do sebe.",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Formát převodu '{0}' je neplatný: část přípony nesmí být prázdná ani obsahovat '..' nebo zalomení řádků.",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Federované dotazy SPARQL (klauzule SERVICE) nejsou povoleny: způsobily by, že knihovna odesílá síťové požadavky na koncové body uvedené v dotazu.",
         };
     }
 }

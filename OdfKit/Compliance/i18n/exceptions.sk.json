@@ -643,5 +643,8 @@
   "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange": "Hodnota {1} parametra Argon2 {0} je mimo povoleného rozsahu {2} až {3}.",
   "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm": "Šifrovací algoritmus {1} nepodporuje veľkosť kľúča {0} bajtov; očakáva sa {2} bajtov.",
   "Err_OdfNode_CyclicTreeInsertion": "Uzol nemožno vložiť do seba samého ani do žiadneho zo svojich potomkov.",
-  "Err_OdfXmlReader_DtdProhibited": "Deklarácie DTD a značiek XML sú zakázané."
+  "Err_OdfXmlReader_DtdProhibited": "Deklarácie DTD a značiek XML sú zakázané.",
+  "Err_OdfDocumentMerge_CannotMergeIntoItself": "Dokument nemožno pripojiť ani zlúčiť sám so sebou.",
+  "Err_LibreOfficeRenderer_InvalidTargetFormat": "Formát konverzie '{0}' je neplatný: časť prípony nesmie byť prázdna ani obsahovať '..' alebo zalomenia riadkov.",
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Federované dotazy SPARQL (klauzula SERVICE) nie sú povolené: spôsobili by, že knižnica odosiela sieťové požiadavky na koncové body uvedené v dotaze."
 }

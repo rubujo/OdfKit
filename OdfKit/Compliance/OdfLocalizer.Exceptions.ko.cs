@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "암호화 알고리즘 {1}은 {0}바이트 키 크기를 지원하지 않습니다. 예상 크기는 {2}바이트입니다.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "노드는 자신 또는 자신의 하위 노드에 삽입할 수 없습니다.",
             ["Err_OdfXmlReader_DtdProhibited"] = "DTD 및 XML 마크업 선언은 금지됩니다.",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "문서를 자기 자신에 추가하거나 병합할 수 없습니다.",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "변환 형식 '{0}'이(가) 잘못되었습니다. 확장명 부분은 비어 있을 수 없으며 '..' 또는 줄 바꿈을 포함할 수 없습니다.",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "SPARQL 페더레이션 쿼리(SERVICE 절)는 허용되지 않습니다. 쿼리에 지정된 엔드포인트로 라이브러리가 네트워크 요청을 보내게 되기 때문입니다.",
         };
     }
 }

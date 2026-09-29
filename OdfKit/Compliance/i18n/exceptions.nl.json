@@ -643,5 +643,8 @@
   "Err_OdfEncryption_Argon2ParameterOutsideAllowedRange": "De waarde {1} van Argon2-parameter {0} ligt buiten het toegestane bereik van {2} tot {3}.",
   "Err_OdfEncryption_KeySizeUnsupportedForAlgorithm": "Versleutelingsalgoritme {1} ondersteunt geen sleutelgrootte van {0} bytes; {2} bytes werden verwacht.",
   "Err_OdfNode_CyclicTreeInsertion": "Een knooppunt kan niet in zichzelf of een van zijn afstammelingen worden ingevoegd.",
-  "Err_OdfXmlReader_DtdProhibited": "DTD- en XML-markeringsdeclaraties zijn verboden."
+  "Err_OdfXmlReader_DtdProhibited": "DTD- en XML-markeringsdeclaraties zijn verboden.",
+  "Err_OdfDocumentMerge_CannotMergeIntoItself": "Een document kan niet aan zichzelf worden toegevoegd of met zichzelf worden samengevoegd.",
+  "Err_LibreOfficeRenderer_InvalidTargetFormat": "De conversie-indeling '{0}' is ongeldig: het extensiedeel mag niet leeg zijn en mag geen '..' of regeleinden bevatten.",
+  "Err_OdfRdfGraphBridge_ServiceClauseNotAllowed": "Gefedereerde SPARQL-query's (SERVICE-clausule) zijn niet toegestaan: ze zouden de bibliotheek netwerkverzoeken laten sturen naar de eindpunten die in de query worden genoemd."
 }

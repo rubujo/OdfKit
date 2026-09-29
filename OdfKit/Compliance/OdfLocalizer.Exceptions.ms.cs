@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Algoritma penyulitan {1} tidak menyokong saiz kunci {0} bait; {2} bait dijangkakan.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "Nod tidak boleh disisipkan ke dalam dirinya sendiri atau mana-mana nod turunannya.",
             ["Err_OdfXmlReader_DtdProhibited"] = "Pengisytiharan DTD dan penanda XML adalah dilarang.",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Dokumen tidak boleh ditambah atau digabungkan dengan dirinya sendiri.",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Format penukaran '{0}' tidak sah: bahagian sambungan tidak boleh kosong dan tidak boleh mengandungi '..' atau pemisah baris.",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Pertanyaan bersekutu SPARQL (klausa SERVICE) tidak dibenarkan: ia akan menyebabkan pustaka menghantar permintaan rangkaian ke titik akhir yang dinamakan dalam pertanyaan.",
         };
     }
 }

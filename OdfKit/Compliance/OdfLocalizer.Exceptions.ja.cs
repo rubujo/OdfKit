@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "暗号化アルゴリズム {1} は {0} バイトのキーサイズをサポートしていません。{2} バイトが必要です。",
             ["Err_OdfNode_CyclicTreeInsertion"] = "ノードを自身またはその子孫に挿入することはできません。",
             ["Err_OdfXmlReader_DtdProhibited"] = "DTD および XML マークアップ宣言は禁止されています。",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "ドキュメントを自分自身に追加またはマージすることはできません。",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "変換形式 '{0}' は無効です。拡張子部分は空にできず、'..' や改行を含めることはできません。",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "SPARQL のフェデレーテッドクエリ（SERVICE 句）は使用できません。クエリで指定されたエンドポイントへネットワーク要求が送信されるためです。",
         };
     }
 }

@@ -662,6 +662,9 @@ public static partial class OdfLocalizer
             ["Err_OdfEncryption_KeySizeUnsupportedForAlgorithm"] = "Krypteringsalgoritmen {1} understøtter ikke en nøglestørrelse på {0} byte; forventede {2} byte.",
             ["Err_OdfNode_CyclicTreeInsertion"] = "En node kan ikke indsættes i sig selv eller en af sine efterkommere.",
             ["Err_OdfXmlReader_DtdProhibited"] = "DTD- og XML-markupdeklarationer er forbudt.",
+            ["Err_OdfDocumentMerge_CannotMergeIntoItself"] = "Et dokument kan ikke tilføjes til eller flettes med sig selv.",
+            ["Err_LibreOfficeRenderer_InvalidTargetFormat"] = "Konverteringsformatet '{0}' er ugyldigt: filtypenavnsdelen må ikke være tom og må ikke indeholde '..' eller linjeskift.",
+            ["Err_OdfRdfGraphBridge_ServiceClauseNotAllowed"] = "Fødererede SPARQL-forespørgsler (SERVICE-klausulen) er ikke tilladt: de ville få biblioteket til at sende netværksanmodninger til de slutpunkter, der er angivet i forespørgslen.",
         };
     }
 }
