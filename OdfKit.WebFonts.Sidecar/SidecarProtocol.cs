@@ -228,16 +228,48 @@ internal static class SidecarProtocol
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_WebFont_DataInvalid"));
         }
 
-        byte[] payload = new byte[payloadLength];
-        if (payloadLength > 0)
-        {
-            await ReadExactlyAsync(stream, payload, cancellationToken).ConfigureAwait(false);
-        }
+        byte[] payload = await ReadPayloadAsync(stream, payloadLength, cancellationToken).ConfigureAwait(false);
 
         return new SidecarFrame(
             (SidecarOperation)header[6],
             (SidecarStatus)header[7],
             payload);
+    }
+
+    // 酬載依實際收到的位元組逐段累積，而不是依標頭宣告的長度一次配置。
+    // 權杖位於酬載內，認證之前就配置最多 16 MB 會讓未認證的連線只送標頭即占用記憶體；
+    // 逐段讀取後，占用量與對方實際送出的資料量成正比。
+    private const int PayloadChunkBytes = 64 * 1024;
+
+    private static async Task<byte[]> ReadPayloadAsync(
+        Stream stream,
+        int payloadLength,
+        CancellationToken cancellationToken)
+    {
+        if (payloadLength == 0)
+        {
+            return [];
+        }
+
+        if (payloadLength <= PayloadChunkBytes)
+        {
+            byte[] small = new byte[payloadLength];
+            await ReadExactlyAsync(stream, small, cancellationToken).ConfigureAwait(false);
+            return small;
+        }
+
+        using var collected = new MemoryStream();
+        byte[] chunk = new byte[PayloadChunkBytes];
+        int remaining = payloadLength;
+        while (remaining > 0)
+        {
+            byte[] target = remaining >= PayloadChunkBytes ? chunk : new byte[remaining];
+            await ReadExactlyAsync(stream, target, cancellationToken).ConfigureAwait(false);
+            collected.Write(target, 0, target.Length);
+            remaining -= target.Length;
+        }
+
+        return collected.ToArray();
     }
 
     private static async Task ReadExactlyAsync(

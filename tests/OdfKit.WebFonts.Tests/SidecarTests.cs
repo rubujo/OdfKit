@@ -22,6 +22,62 @@ public sealed class SidecarTests
             request));
     }
 
+    private static byte[] CreateFrameHeader(int declaredPayloadLength)
+    {
+        // 與 SidecarProtocol 相同的 12 位元組標頭：magic、版本、操作、狀態、酬載長度（小端序）。
+        byte[] header = new byte[SidecarProtocol.HeaderLength];
+        BitConverter.GetBytes(0x5746444Fu).CopyTo(header, 0);
+        BitConverter.GetBytes(SidecarProtocol.Version).CopyTo(header, 4);
+        header[6] = (byte)SidecarOperation.Health;
+        header[7] = (byte)SidecarStatus.Success;
+        BitConverter.GetBytes(declaredPayloadLength).CopyTo(header, 8);
+        return header;
+    }
+
+    [Fact]
+    public void FrameReaderDoesNotAllocateTheDeclaredPayloadBeforeItArrives()
+    {
+        // 未認證的連線只送標頭並宣告 16 MB：修正前會先配置 16 MB 才等待資料。
+        const int declared = 16 * 1024 * 1024;
+        using var stream = new MemoryStream(CreateFrameHeader(declared));
+        long before = GC.GetAllocatedBytesForCurrentThread();
+
+        // MemoryStream 同步完成，整個流程停留在目前的執行緒，配置量可準確量測。
+        Assert.Throws<EndOfStreamException>(() => SidecarProtocol
+            .ReadRequestFrameAsync(stream, declared, CancellationToken.None)
+            .GetAwaiter()
+            .GetResult());
+
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.True(allocated < 1024 * 1024, $"配置了 {allocated} 位元組。");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(64 * 1024)]
+    [InlineData(64 * 1024 + 1)]
+    [InlineData(300_000)]
+    public async Task FrameReaderRoundTripsPayloadsAcrossChunkBoundaries(int length)
+    {
+        byte[] payload = new byte[length];
+        new Random(length).NextBytes(payload);
+        using var buffer = new MemoryStream();
+        await SidecarProtocol.WriteRequestFrameAsync(
+            buffer,
+            SidecarOperation.Health,
+            payload,
+            TestContext.Current.CancellationToken);
+        buffer.Position = 0;
+
+        SidecarFrame frame = await SidecarProtocol.ReadRequestFrameAsync(
+            buffer,
+            1024 * 1024,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(payload, frame.Payload);
+    }
+
     [Fact]
     public async Task AuthenticatedClientNegotiatesAndDelegatesOperations()
     {
