@@ -131,7 +131,7 @@ internal static partial class OdfProfileRuleValidator
 
             using Stream stream = package.GetEntryStream(entryName);
             using XmlReader reader = XmlReader.Create(stream, settings);
-            XDocument document = XDocument.Load(reader, LoadOptions.None);
+            XDocument document = XDocument.Load(new OdfKit.Core.OdfDepthLimitedXmlReader(reader), LoadOptions.None);
             if (document.Root is null)
             {
                 issues.Add(new OdfValidationIssue(

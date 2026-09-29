@@ -32,7 +32,7 @@ internal static class OdfRdfParser
         XDocument document;
         using (var reader = XmlReader.Create(stream, settings))
         {
-            document = XDocument.Load(reader);
+            document = XDocument.Load(new OdfDepthLimitedXmlReader(reader));
         }
 
         foreach (var description in document.Descendants(RdfNs + "Description"))

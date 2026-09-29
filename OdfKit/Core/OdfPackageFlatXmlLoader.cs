@@ -69,6 +69,16 @@ internal static class OdfPackageFlatXmlLoader
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
+                        // 後續以 XDocument 處理，其複製與走訪為遞迴；先於串流階段限制深度，與 OdfXmlReader 一致。
+                        if (reader.Depth + 1 > OdfKit.DOM.OdfXmlReader.MaxElementDepth)
+                        {
+                            throw new SecurityException(OdfLocalizer.GetMessage(
+                                "Err_OdfXmlReader_XmlElementNestingDepth",
+                                CultureInfo.InvariantCulture,
+                                reader.Depth + 1,
+                                OdfKit.DOM.OdfXmlReader.MaxElementDepth));
+                        }
+
                         bool isEmpty = reader.IsEmptyElement;
                         if (reader.LocalName == "binary-data" && reader.NamespaceURI == OdfNamespaces.Office)
                         {

@@ -86,6 +86,19 @@ internal static partial class OdfProfileRuleValidator
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
+                // 每一層都會保存完整 XPath，記憶體隨深度呈二次方成長；過深的巢狀可用極小的文件耗盡記憶體。
+                // 與 OdfXmlReader 相同的上限，超過即停止掃描並回報，而不是繼續累積。
+                if (reader.Depth + 1 > OdfKit.DOM.OdfXmlReader.MaxElementDepth)
+                {
+                    issues.Add(new OdfValidationIssue(
+                        OdfIssueSeverity.Fatal,
+                        "ODF0303",
+                        $"ODF XML entry failed security validation during profile checks: element nesting depth exceeds {OdfKit.DOM.OdfXmlReader.MaxElementDepth}.",
+                        packagePath,
+                        profileId: profile.Id));
+                    return;
+                }
+
                 string prefix = OdfNamespaces.GetPrefix(reader.NamespaceURI);
                 if (string.IsNullOrEmpty(prefix))
                 {
