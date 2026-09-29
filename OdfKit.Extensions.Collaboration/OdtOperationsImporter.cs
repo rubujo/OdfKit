@@ -111,6 +111,8 @@ public static class OdtOperationsImporter
         OdfTable? currentTable = null;
         int currentTableRow = 0;
         int currentTableColumn = 0;
+        long currentTableRowCount = 0;
+        long currentTableColumnCount = 0;
 
         foreach (OdtOperation parsedOperation in operationLog.Operations)
         {
@@ -218,10 +220,12 @@ public static class OdtOperationsImporter
                     break;
 
                 case "addTable":
-                    if (TryCreateTable(document, operation, options.Safety, report, out currentTable))
+                    if (TryCreateTable(document, operation, options.Safety, report, out currentTable, out int createdRows, out int createdColumns))
                     {
                         currentTableRow = 0;
                         currentTableColumn = 0;
+                        currentTableRowCount = createdRows;
+                        currentTableColumnCount = createdColumns;
                         report.RecordReplayed(parsedOperation);
                     }
                     else
@@ -258,19 +262,21 @@ public static class OdtOperationsImporter
 
                 case "addColumn":
                 case "addColumns":
-                    if (currentTable is not null && TryMutateColumns(currentTable, operation, insert: true))
+                    if (currentTable is not null &&
+                        TryMutateColumns(currentTable, operation, insert: true, options.Safety, report, currentTableRowCount, ref currentTableColumnCount))
                     {
                         report.RecordReplayed(parsedOperation);
                     }
                     else
                     {
-                        report.RecordUnsupported(name, options, parsedOperation);
+                        report.RecordUnsupported(name, options, parsedOperation, report.SafetyLimitHitReason);
                     }
 
                     break;
 
                 case "deleteColumns":
-                    if (currentTable is not null && TryMutateColumns(currentTable, operation, insert: false))
+                    if (currentTable is not null &&
+                        TryMutateColumns(currentTable, operation, insert: false, options.Safety, report, currentTableRowCount, ref currentTableColumnCount))
                     {
                         report.RecordReplayed(parsedOperation);
                     }
@@ -590,8 +596,12 @@ public static class OdtOperationsImporter
         JsonElement operation,
         OdtOperationSafetyOptions safety,
         OdtOperationImportReport report,
-        out OdfTable table)
+        out OdfTable table,
+        out int tableRows,
+        out int tableColumns)
     {
+        tableRows = 0;
+        tableColumns = 0;
         JsonElement attrs = operation.TryGetProperty("attrs", out JsonElement parsedAttrs) && parsedAttrs.ValueKind == JsonValueKind.Object
             ? parsedAttrs
             : operation;
@@ -624,6 +634,8 @@ public static class OdtOperationsImporter
         }
 
         table = document.AddTable(rows, columns);
+        tableRows = rows;
+        tableColumns = columns;
         if (TryGetStringAttribute(attrs, "name", out string? name) ||
             TryGetStringAttribute(attrs, "tableName", out name))
         {
@@ -670,7 +682,14 @@ public static class OdtOperationsImporter
         return true;
     }
 
-    private static bool TryMutateColumns(OdfTable table, JsonElement operation, bool insert)
+    private static bool TryMutateColumns(
+        OdfTable table,
+        JsonElement operation,
+        bool insert,
+        OdtOperationSafetyOptions safety,
+        OdtOperationImportReport report,
+        long tableRowCount,
+        ref long tableColumnCount)
     {
         JsonElement attrs = operation.TryGetProperty("attrs", out JsonElement parsedAttrs) && parsedAttrs.ValueKind == JsonValueKind.Object
             ? parsedAttrs
@@ -695,14 +714,33 @@ public static class OdtOperationsImporter
             return false;
         }
 
+        // addTable 有 MaxTableRows／MaxTableColumns／MaxTableCells 限制，插入欄同樣必須受限；
+        // 否則一個約 100 位元組的操作（count 可達 Int32.MaxValue）即可耗盡記憶體。
+        long resultingColumns = tableColumnCount + count;
+        if (insert &&
+            (resultingColumns > safety.MaxTableColumns || tableRowCount * resultingColumns > safety.MaxTableCells))
+        {
+            report.RecordSafetyLimit(OdfLocalizer.GetMessage(
+                "Err_OdtOperationLog_SafetyLimitExceeded",
+                "tableSize",
+                tableRowCount.ToString(CultureInfo.InvariantCulture) + "x" + resultingColumns.ToString(CultureInfo.InvariantCulture),
+                safety.MaxTableRows.ToString(CultureInfo.InvariantCulture) + "x" +
+                safety.MaxTableColumns.ToString(CultureInfo.InvariantCulture) + "/" +
+                safety.MaxTableCells.ToString(CultureInfo.InvariantCulture)));
+            return false;
+        }
+
         try
         {
             if (insert)
             {
                 table.InsertColumns(position, count);
+                tableColumnCount = resultingColumns;
             }
             else
             {
+                // 要求刪除的欄數可能多於實際移除的欄數（超出範圍會被截斷）；追蹤值只能高估、不能低估，
+                // 否則「插入 1000 欄、刪 1 欄卻把追蹤值歸零」的循環會讓實際欄數無限增長並繞過上限，因此刪除時不遞減。
                 table.DeleteColumns(position, count);
             }
 
