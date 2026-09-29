@@ -706,8 +706,12 @@ public static class OdfRtfExporter
         {
             switch (c)
             {
+                // RTF 的大括號是群組界線，即使位於欄位指令的引號內也一樣會被剖析器視為群組開始／結束；
+                // 未跳脫的 '}' 會提早結束欄位群組，使後續內容脫離欄位、整份文件括號不再平衡。
                 case '\\':
                 case '"':
+                case '{':
+                case '}':
                     sb.Append('\\').Append(c);
                     break;
                 case '\r':
