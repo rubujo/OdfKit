@@ -192,6 +192,7 @@ public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
     /// <returns>The resolved cell ranges. / 已解析的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         List<OdfCellRange> leftRanges = left.GetRanges(context);
         List<OdfCellRange> rightRanges = right.GetRanges(context);
         var result = new List<OdfCellRange>();
@@ -330,8 +331,11 @@ public sealed class ReferenceRangeNode(AstNode left, AstNode right) : AstNode
     /// 序列化參照範圍運算式。
     /// </summary>
     /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
-    public override string Serialize() =>
-        $"{left.Serialize()}:{right.Serialize()}";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"{left.Serialize()}:{right.Serialize()}";
+    }
 }
 
 /// <summary>
@@ -350,6 +354,7 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
     /// <returns>The combined cell ranges. / 合併後的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         var list = new List<OdfCellRange>();
         list.AddRange(left.GetRanges(context));
         list.AddRange(right.GetRanges(context));
@@ -378,7 +383,11 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
     /// 序列化參照聯集運算式。
     /// </summary>
     /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
-    public override string Serialize() => $"{left.Serialize()}~{right.Serialize()}";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"{left.Serialize()}~{right.Serialize()}";
+    }
 }
 
 /// <summary>
@@ -396,6 +405,7 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         var leftRanges = left.GetRanges(context);
         var rightRanges = right.GetRanges(context);
         var list = new List<OdfCellRange>();
@@ -442,7 +452,11 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
     /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
-    public override string Serialize() => $"{left.Serialize()}!{right.Serialize()}";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"{left.Serialize()}!{right.Serialize()}";
+    }
 }
 
 /// <summary>
@@ -461,6 +475,7 @@ public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : Ast
     /// <returns>The intersecting cell ranges. / 相交的儲存格範圍。</returns>
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         var intersections = new List<OdfCellRange>();
         foreach (OdfCellRange leftRange in left.GetRanges(context))
         {
@@ -498,6 +513,9 @@ public sealed class AutomaticIntersectionNode(AstNode left, AstNode right) : Ast
     /// 序列化自動交集運算式。
     /// </summary>
     /// <returns>The OpenFormula expression text. / OpenFormula 運算式文字。</returns>
-    public override string Serialize() =>
-        $"{left.Serialize()}!!{right.Serialize()}";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"{left.Serialize()}!!{right.Serialize()}";
+    }
 }

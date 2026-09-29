@@ -24,6 +24,13 @@ public class OdfReferenceList
 public abstract class AstNode
 {
     /// <summary>
+    /// Throws <see cref="InsufficientExecutionStackException"/> instead of overflowing the stack when the remaining stack is too small for another recursion level.
+    /// 剩餘堆疊不足以再進入一層遞迴時，擲出 <see cref="InsufficientExecutionStackException"/>，而不是讓堆疊溢位使整個處理程序崩潰。
+    /// </summary>
+    protected static void EnsureStack() =>
+        System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
+
+    /// <summary>
     /// Evaluates this node.
     /// 評估此節點的值。
     /// </summary>

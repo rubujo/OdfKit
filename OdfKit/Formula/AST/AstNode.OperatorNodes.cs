@@ -18,7 +18,11 @@ public class UnaryNode(char op, AstNode child) : AstNode
     /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
-    public override List<OdfCellRange> GetRanges(IEvaluationContext context) => child.GetRanges(context);
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        EnsureStack();
+        return child.GetRanges(context);
+    }
 
     /// <summary>
     /// Performs evaluate.
@@ -27,6 +31,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
+        EnsureStack();
         var val = child.Evaluate(context);
         val = FormulaCoercion.ToScalar(child, val, context);
         if (val is OdfFormulaError err)
@@ -79,6 +84,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
     /// <inheritdoc />
     public override string Serialize()
     {
+        EnsureStack();
         if (op == '%')
             return $"{child.Serialize()}%";
         return $"{op}{child.Serialize()}";
@@ -101,6 +107,7 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         var list = new List<OdfCellRange>();
         list.AddRange(left.GetRanges(context));
         list.AddRange(right.GetRanges(context));
@@ -114,6 +121,7 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
+        EnsureStack();
         var leftVal = left.Evaluate(context);
         leftVal = FormulaCoercion.ToScalar(left, leftVal, context);
         if (leftVal is OdfFormulaError)
@@ -287,5 +295,9 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
-    public override string Serialize() => $"{left.Serialize()}{op}{right.Serialize()}";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"{left.Serialize()}{op}{right.Serialize()}";
+    }
 }

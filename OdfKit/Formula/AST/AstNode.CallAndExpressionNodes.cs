@@ -32,6 +32,7 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
+        EnsureStack();
         var list = new List<OdfCellRange>();
         foreach (var arg in Arguments)
         {
@@ -47,6 +48,7 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
+        EnsureStack();
         if (context is IOdfFormulaFunctionDispatchContext dispatchContext &&
             dispatchContext.TryEvaluateFunction(Name, Arguments, out object result))
         {
@@ -63,6 +65,7 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     /// <inheritdoc />
     public override string Serialize()
     {
+        EnsureStack();
         var args = new List<string>();
         foreach (var arg in Arguments)
         {
@@ -90,21 +93,33 @@ public class ParenthesizedNode(AstNode inner) : AstNode
     /// 執行 Evaluate。
     /// </summary>
     /// <inheritdoc />
-    public override object Evaluate(IEvaluationContext context) => inner.Evaluate(context);
+    public override object Evaluate(IEvaluationContext context)
+    {
+        EnsureStack();
+        return inner.Evaluate(context);
+    }
 
     /// <summary>
     /// Gets ranges.
     /// 取得 Ranges。
     /// </summary>
     /// <inheritdoc />
-    public override List<OdfCellRange> GetRanges(IEvaluationContext context) => inner.GetRanges(context);
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        EnsureStack();
+        return inner.GetRanges(context);
+    }
 
     /// <summary>
     /// Performs serialize.
     /// 執行 Serialize。
     /// </summary>
     /// <inheritdoc />
-    public override string Serialize() => $"({inner.Serialize()})";
+    public override string Serialize()
+    {
+        EnsureStack();
+        return $"({inner.Serialize()})";
+    }
 }
 
 /// <summary>

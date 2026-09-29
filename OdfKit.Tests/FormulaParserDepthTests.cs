@@ -129,6 +129,39 @@ public sealed class FormulaParserDepthTests
         Assert.ThrowsAny<Exception>(() => document.EvaluateFormulas());
     }
 
+    [Theory]
+    [InlineData(256)]
+    [InlineData(128)]
+    public void MaxOperatorChain_OnSmallStackThread_FailsCatchablyInsteadOfOverflowing(int stackKb)
+    {
+        // 修正前，接近 4,096 運算子上限的連鎖公式在 256 KB 堆疊上會使處理程序崩潰（無法攔截）。
+        string formula = "1" + string.Concat(System.Linq.Enumerable.Repeat("+1", 4_000));
+        Exception? failure = null;
+        bool completed = false;
+
+        var thread = new System.Threading.Thread(
+            () =>
+            {
+                try
+                {
+                    var parser = new FormulaParser(formula);
+                    Formula.AST.AstNode ast = parser.Parse();
+                    _ = ast.Serialize();
+                    completed = true;
+                }
+                catch (Exception ex)
+                {
+                    failure = ex;
+                }
+            },
+            stackKb * 1024);
+        thread.Start();
+        thread.Join();
+
+        // 能跑完或以可攔截的例外結束皆可；關鍵是測試處理程序仍存活。
+        Assert.True(completed || failure is InsufficientExecutionStackException or InvalidOperationException, failure?.ToString());
+    }
+
     [Fact]
     public void EvaluateFormulas_WithReasonableUnaryChain_ProducesTheExpectedSign()
     {

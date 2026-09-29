@@ -184,6 +184,8 @@ public ref struct FormulaParser
             throw CreateNestingTooDeepException();
         }
 
+        // 小堆疊執行緒上，256 層巢狀也可能先耗盡堆疊；改為可攔截的例外，而非讓處理程序崩潰。
+        System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
         AstNode node = ParseExpression();
         _nestingDepth--;
         return node;
