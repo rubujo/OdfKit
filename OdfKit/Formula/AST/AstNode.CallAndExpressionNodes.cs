@@ -50,10 +50,10 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
         if (context is IOdfFormulaFunctionDispatchContext dispatchContext &&
             dispatchContext.TryEvaluateFunction(Name, Arguments, out object result))
         {
-            return result;
+            return FormulaCoercion.LimitStringResult(result);
         }
 
-        return DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context);
+        return FormulaCoercion.LimitStringResult(DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context));
     }
 
     /// <summary>

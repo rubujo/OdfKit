@@ -182,10 +182,12 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 
         if (op == "&")
         {
-            return string.Concat(
-                FormatValue(leftVal),
-                FormatValue(rightVal)
-            );
+            string leftText = FormatValue(leftVal);
+            string rightText = FormatValue(rightVal);
+            if ((long)leftText.Length + rightText.Length > FormulaCoercion.MaxStringResultLength)
+                return OdfFormulaError.Value;
+
+            return string.Concat(leftText, rightText);
         }
 
         // 數學運算子

@@ -14,6 +14,26 @@ namespace OdfKit.Formula;
 internal static class FormulaCoercion
 {
     /// <summary>
+    /// 單一公式字串結果的最大長度（字元）。
+    /// 沒有上限時，<c>A2=A1&amp;A1</c>、<c>A3=A2&amp;A2</c> … 這類加倍鏈用十幾個微小公式即可產生數 GB 的字串，
+    /// <c>SUBSTITUTE</c> 也能以一個公式放大數百倍。超過時傳回 <c>#VALUE!</c>。
+    /// </summary>
+    internal const int MaxStringResultLength = 1_048_576;
+
+    /// <summary>
+    /// 以引數（期數、事件數、試驗次數等）作為迴圈上限的函式所接受的最大迭代次數。
+    /// 引數可達 Int32／Int64 範圍，一個公式即可空轉數十億次（部分還會因計數器溢位而變成無窮迴圈）；
+    /// 超過時傳回 <c>#NUM!</c>。
+    /// </summary>
+    internal const int MaxIterativeArgument = 1_000_000;
+
+    /// <summary>
+    /// 若字串結果超過 <see cref="MaxStringResultLength"/>，傳回 <c>#VALUE!</c>；否則原樣傳回。
+    /// </summary>
+    internal static object LimitStringResult(object result) =>
+        result is string text && text.Length > MaxStringResultLength ? OdfFormulaError.Value : result;
+
+    /// <summary>
     /// Flattens a cell value, array, or reference list into a single value sequence.
     /// 將儲存格值、陣列或參照清單展平為單一值序列。
     /// </summary>

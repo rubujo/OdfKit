@@ -146,6 +146,22 @@ internal static class FormulaStringFunctionHandlers
                 return text;
             return global::OdfKit.Internal.OdfStringHelper.ReplaceSegment(text, pos, pos + oldText.Length, newText);
         }
+
+        // 先估算結果長度再配置：以短公式即可讓結果放大數百倍（"a"×16000 取代為 "b"×16000 得到 2.56 億字元）。
+        if (newText.Length > oldText.Length)
+        {
+            long occurrences = 0;
+            for (int found = text.IndexOf(oldText, StringComparison.Ordinal);
+                 found >= 0;
+                 found = text.IndexOf(oldText, found + oldText.Length, StringComparison.Ordinal))
+            {
+                occurrences++;
+            }
+
+            if (text.Length + occurrences * (newText.Length - oldText.Length) > FormulaCoercion.MaxStringResultLength)
+                return OdfFormulaError.Value;
+        }
+
         return text.Replace(oldText, newText);
     }
 
@@ -224,12 +240,13 @@ internal static class FormulaStringFunctionHandlers
         string text = textVal?.ToString() ?? "";
         if (!FormulaCoercion.TryCoerceDouble(timesVal, out double d) || d < 0)
             return OdfFormulaError.Value;
-        int times = (int)d;
-
-        if (times == 0)
+        // 以 double 檢查長度：int 乘法會溢位（"ab" × 2147483647 得到 -2 而通過檢查），
+        // 進而建構數十億字元的字串並耗用數 GB 記憶體；空字串則需避免空轉 (int)d 次。
+        if (text.Length == 0 || d < 1)
             return "";
-        if (text.Length * times > 32767)
+        if (d * text.Length > 32767)
             return OdfFormulaError.Value;
+        int times = (int)d;
         return string.Concat(Enumerable.Repeat(text, times));
     }
 
