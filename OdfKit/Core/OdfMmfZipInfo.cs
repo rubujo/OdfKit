@@ -198,16 +198,23 @@ internal static class OdfZipDirectoryParser
                 uint cdSize = reader.ReadUInt32();
                 uint cdOffset = reader.ReadUInt32();
 
+                // ZIP64（APPNOTE 4.4.1.4）：EOCD 欄位為 sentinel 時，真實值位於 ZIP64 EOCD；
+                // 本快速解析器不支援，交由 ZipArchive 處理，避免誤讀。
+                if (totalRecords == 0xFFFF || cdSize == 0xFFFFFFFF || cdOffset == 0xFFFFFFFF)
+                    return null;
+
                 // 前往中央目錄起點
                 stream.Position = cdOffset;
                 for (int i = 0; i < totalRecords; i++)
                 {
+                    // 任何無法完整解析的記錄都不得無聲略過：回傳 null 讓呼叫端退回 ZipArchive，
+                    // 由其驗證並擲出明確例外，避免僅載入部分項目而在儲存時造成資料遺失。
                     if (stream.Position + 46 > stream.Length)
-                        break;
+                        return null;
 
                     uint signature = reader.ReadUInt32();
                     if (signature != 0x02014b50)
-                        break;
+                        return null;
 
                     stream.Position += 4; // 跳過版本
                     ushort flags = reader.ReadUInt16();
@@ -222,8 +229,12 @@ internal static class OdfZipDirectoryParser
                     stream.Position += 8; // 跳過磁碟與屬性
                     uint localHeaderOffset = reader.ReadUInt32();
 
+                    // ZIP64 sentinel：真實大小與偏移位於 0x0001 extra field，本解析器不支援。
+                    if (compressedSize == 0xFFFFFFFF || uncompressedSize == 0xFFFFFFFF || localHeaderOffset == 0xFFFFFFFF)
+                        return null;
+
                     if (stream.Position + fileNameLength + extraFieldLength + commentLength > stream.Length)
-                        break;
+                        return null;
 
                     byte[] fileNameBytes = reader.ReadBytes(fileNameLength);
                     string fileName = Encoding.UTF8.GetString(fileNameBytes);
@@ -233,28 +244,28 @@ internal static class OdfZipDirectoryParser
                     // 解析 Local File Header 以決定實際的壓縮資料起始偏移量
                     long savedPos = stream.Position;
                     stream.Position = localHeaderOffset;
-                    if (stream.Position + 30 <= stream.Length)
+                    if (stream.Position + 30 > stream.Length)
+                        return null;
+
+                    uint lfhSig = reader.ReadUInt32();
+                    if (lfhSig != 0x04034b50)
+                        return null;
+
+                    stream.Position += 22; // 跳過屬性欄位
+                    ushort lfhNameLen = reader.ReadUInt16();
+                    ushort lfhExtraLen = reader.ReadUInt16();
+                    long dataOffset = localHeaderOffset + 30 + lfhNameLen + lfhExtraLen;
+
+                    if (dataOffset < 0 || dataOffset + compressedSize > stream.Length)
+                        return null;
+
+                    string sanitized = OdfPackage.SanitizeEntryName(fileName);
+                    if (entries.ContainsKey(sanitized))
                     {
-                        uint lfhSig = reader.ReadUInt32();
-                        if (lfhSig == 0x04034b50)
-                        {
-                            stream.Position += 22; // 跳過屬性欄位
-                            ushort lfhNameLen = reader.ReadUInt16();
-                            ushort lfhExtraLen = reader.ReadUInt16();
-                            long dataOffset = localHeaderOffset + 30 + lfhNameLen + lfhExtraLen;
-
-                            if (dataOffset >= 0 && dataOffset + compressedSize <= stream.Length)
-                            {
-                                string sanitized = OdfPackage.SanitizeEntryName(fileName);
-                                if (entries.ContainsKey(sanitized))
-                                {
-                                    duplicateEntryNames.Add(sanitized);
-                                }
-
-                                entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
-                            }
-                        }
+                        duplicateEntryNames.Add(sanitized);
                     }
+
+                    entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
                     stream.Position = savedPos;
                 }
 
