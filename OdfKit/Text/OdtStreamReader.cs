@@ -243,7 +243,7 @@ public sealed class OdtStreamReader : IDisposable
         HeadingLevel = headingLevel;
         string styleNamespace = nodeType == OdtNodeType.TableCell ? OdfNamespaces.Table : OdfNamespaces.Text;
         StyleName = _reader!.GetAttribute("style-name", styleNamespace);
-        Text = ReadCurrentElementText(_reader);
+        Text = ReadCurrentElementText(_reader, nodeType);
         if (Text.Length > _options.MaxNodeTextCharacters)
             ThrowResourceLimit(Text.Length, _options.MaxNodeTextCharacters);
     }
@@ -256,27 +256,9 @@ public sealed class OdtStreamReader : IDisposable
         HeadingLevel = headingLevel;
         string styleNamespace = nodeType == OdtNodeType.TableCell ? OdfNamespaces.Table : OdfNamespaces.Text;
         StyleName = _reader!.GetAttribute("style-name", styleNamespace);
-        Text = await ReadCurrentElementTextAsync(_reader, cancellationToken).ConfigureAwait(false);
+        Text = await ReadCurrentElementTextAsync(_reader, nodeType, cancellationToken).ConfigureAwait(false);
         if (Text.Length > _options.MaxNodeTextCharacters)
             ThrowResourceLimit(Text.Length, _options.MaxNodeTextCharacters);
-    }
-
-    private async Task<string> ReadCurrentElementTextAsync(XmlReader reader, CancellationToken cancellationToken)
-    {
-        if (reader.IsEmptyElement)
-            return string.Empty;
-        var builder = new StringBuilder();
-        using var subtree = reader.ReadSubtree();
-        await subtree.ReadAsync().ConfigureAwait(false);
-        while (await subtree.ReadAsync().ConfigureAwait(false))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (subtree.NodeType is XmlNodeType.Text or XmlNodeType.CDATA)
-                AppendBounded(builder, subtree.Value);
-            else if (subtree.NodeType == XmlNodeType.Element && subtree.NamespaceURI == OdfNamespaces.Text)
-                AppendTextControl(builder, subtree);
-        }
-        return builder.ToString();
     }
 
     private static OdtNodeType? GetCurrentNodeType(XmlReader reader)
@@ -304,30 +286,203 @@ public sealed class OdtStreamReader : IDisposable
         throw new InvalidDataException(OdfLocalizer.GetMessage("Err_StreamReader_ResourceLimitExceeded",
             value.ToString(CultureInfo.InvariantCulture), limit.ToString(CultureInfo.InvariantCulture)));
 
-    private string ReadCurrentElementText(XmlReader reader)
+    // 讀取目前元素（段落、標題、清單項目、表格儲存格）的文字。不使用 ReadSubtree：範圍以深度判斷，
+    // 讀完後讀取器停在該元素的 EndElement（遇到巢狀清單或表格而提前結束時，停在該巢狀元素的開頭）。
+    //
+    // - 段落與標題：行內文字。text:s、text:tab、text:line-break 轉為對應字元；office:annotation 與
+    //   text:note（註解與註腳）不屬於段落文字，整段略過。
+    // - 清單項目與儲存格：容器內每個段落各自成一行，以 "\n" 相接。遇到巢狀 text:list 或 table:table 就停止，
+    //   把巢狀結構留給外層迴圈，使內層清單項目與儲存格各自成為獨立節點，而不是併入外層節點。
+    // - 只有位於段落內的 Whitespace 節點才算文字；容器內段落之間排版用的空白不算。
+    private string ReadCurrentElementText(XmlReader reader, OdtNodeType nodeType)
     {
         if (reader.IsEmptyElement)
         {
             return string.Empty;
         }
 
+        int startDepth = reader.Depth;
+        bool isContainer = nodeType is OdtNodeType.ListItem or OdtNodeType.TableCell;
+        var state = new TextCaptureState(isContainer);
         var builder = new StringBuilder();
-        using var subtree = reader.ReadSubtree();
-        subtree.Read();
-        while (subtree.Read())
+        bool advance = true;
+        while (true)
         {
-            if (subtree.NodeType is XmlNodeType.Text or XmlNodeType.CDATA)
+            if (advance && !reader.Read())
             {
-                AppendBounded(builder, subtree.Value);
+                break;
             }
-            else if (subtree.NodeType == XmlNodeType.Element && subtree.NamespaceURI == OdfNamespaces.Text)
+
+            advance = true;
+            if (reader.Depth <= startDepth)
             {
-                AppendTextControl(builder, subtree);
+                break;
+            }
+
+            TextCaptureAction action = ProcessCaptureNode(reader, builder, ref state);
+            if (action == TextCaptureAction.Stop)
+            {
+                break;
+            }
+
+            if (action == TextCaptureAction.SkipElement)
+            {
+                reader.Skip();
+                advance = false;
             }
         }
 
         return builder.ToString();
     }
+
+    private async Task<string> ReadCurrentElementTextAsync(
+        XmlReader reader,
+        OdtNodeType nodeType,
+        CancellationToken cancellationToken)
+    {
+        if (reader.IsEmptyElement)
+        {
+            return string.Empty;
+        }
+
+        int startDepth = reader.Depth;
+        bool isContainer = nodeType is OdtNodeType.ListItem or OdtNodeType.TableCell;
+        var state = new TextCaptureState(isContainer);
+        var builder = new StringBuilder();
+        bool advance = true;
+        while (true)
+        {
+            if (advance && !await reader.ReadAsync().ConfigureAwait(false))
+            {
+                break;
+            }
+
+            advance = true;
+            cancellationToken.ThrowIfCancellationRequested();
+            if (reader.Depth <= startDepth)
+            {
+                break;
+            }
+
+            TextCaptureAction action = ProcessCaptureNode(reader, builder, ref state);
+            if (action == TextCaptureAction.Stop)
+            {
+                break;
+            }
+
+            if (action == TextCaptureAction.SkipElement)
+            {
+                await reader.SkipAsync().ConfigureAwait(false);
+                advance = false;
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private enum TextCaptureAction
+    {
+        Continue,
+        SkipElement,
+        Stop,
+    }
+
+    private struct TextCaptureState
+    {
+        public TextCaptureState(bool isContainer)
+        {
+            IsContainer = isContainer;
+            OpenParagraphs = isContainer ? 0 : 1;
+            Segments = isContainer ? 0 : 1;
+        }
+
+        public bool IsContainer;
+        public int OpenParagraphs;
+        public int Segments;
+    }
+
+    private TextCaptureAction ProcessCaptureNode(XmlReader reader, StringBuilder builder, ref TextCaptureState state)
+    {
+        switch (reader.NodeType)
+        {
+            case XmlNodeType.Text:
+            case XmlNodeType.CDATA:
+                AppendBounded(builder, reader.Value);
+                break;
+            case XmlNodeType.Whitespace:
+            case XmlNodeType.SignificantWhitespace:
+                if (state.OpenParagraphs > 0)
+                {
+                    AppendBounded(builder, reader.Value);
+                }
+
+                break;
+            case XmlNodeType.EndElement:
+                if (IsTextParagraphElement(reader))
+                {
+                    state.OpenParagraphs = Math.Max(0, state.OpenParagraphs - 1);
+                }
+
+                break;
+            case XmlNodeType.Element:
+                return ProcessCaptureElement(reader, builder, ref state);
+        }
+
+        return TextCaptureAction.Continue;
+    }
+
+    private TextCaptureAction ProcessCaptureElement(XmlReader reader, StringBuilder builder, ref TextCaptureState state)
+    {
+        if (reader.NamespaceURI == OdfNamespaces.Text)
+        {
+            switch (reader.LocalName)
+            {
+                case "p":
+                case "h":
+                    // 容器內同層的段落以換行分隔；段落內再出現的段落（例如錨定的文字方塊）直接相接。
+                    if (state.OpenParagraphs == 0 && state.Segments > 0)
+                    {
+                        AppendBounded(builder, '\n');
+                    }
+
+                    state.Segments++;
+                    if (!reader.IsEmptyElement)
+                    {
+                        state.OpenParagraphs++;
+                    }
+
+                    break;
+                case "s":
+                case "tab":
+                case "line-break":
+                    AppendTextControl(builder, reader);
+                    break;
+                case "note":
+                    return TextCaptureAction.SkipElement;
+                case "list":
+                    if (state.IsContainer)
+                    {
+                        return TextCaptureAction.Stop;
+                    }
+
+                    break;
+            }
+        }
+        else if (reader.NamespaceURI == OdfNamespaces.Office &&
+                 (reader.LocalName == "annotation" || reader.LocalName == "annotation-end"))
+        {
+            return TextCaptureAction.SkipElement;
+        }
+        else if (state.IsContainer && reader.NamespaceURI == OdfNamespaces.Table && reader.LocalName == "table")
+        {
+            return TextCaptureAction.Stop;
+        }
+
+        return TextCaptureAction.Continue;
+    }
+
+    private static bool IsTextParagraphElement(XmlReader reader) =>
+        reader.NamespaceURI == OdfNamespaces.Text && (reader.LocalName == "p" || reader.LocalName == "h");
 
     private void AppendTextControl(StringBuilder builder, XmlReader reader)
     {
