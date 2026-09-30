@@ -1,9 +1,11 @@
-# OdfKit 與同類套件的串流寫入效能對比
+# OdfKit 與同類套件的串流寫入與讀取效能對比
 
 本文件記錄 `OdsStreamWriter` 與兩套知名 .NET 試算表套件（MiniExcel、ClosedXML）
 在「一百萬列 × 十欄混合型別資料」情境下的實測效能對比，包含方法論限制、
 環境資訊、結果數字、重現步驟與結果解讀。目的是為「大量資料匯出低記憶體」
 這項主張提供公開、可重現的量化證據，而不只是內部宣稱。
+第 1 至 6 節為寫入對比；第 7 節為讀取對比。讀取對比的第一次量測發現 `OdsStreamReader` 比
+MiniExcel 慢，經成因分析與最佳化後已成為三者中最快，第 7 節同時記錄最佳化前後的數字與成因。
 
 ## 1. 方法論
 
@@ -159,6 +161,10 @@ pwsh eng/Benchmark-Competitive.ps1
 # 或直接呼叫組件：
 dotnet OdfKit.Benchmarks/bin/Release/net10.0/OdfKit.Benchmarks.dll --manual-competitive
 
+# 只執行寫入對比，或只執行讀取對比（預設兩者都執行）
+pwsh eng/Benchmark-Competitive.ps1 -Mode Write
+pwsh eng/Benchmark-Competitive.ps1 -Mode Read
+
 # 3. BenchmarkDotNet 模式（正式統計工作，耗時較長）
 dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStreamWriteBenchmarks*
 ```
@@ -195,7 +201,158 @@ dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStream
 - 手動計時模式的耗時量測未排除子處理程序啟動（JIT 暖身、組件載入）的一次性
   成本；`OdsStreamWriter`、`MiniExcel`、`ClosedXml` 三者皆同樣受此影響，
   相對比較仍具參考價值，但不宜視為「穩態吞吐量」的精確數字。
-- 未涵蓋讀取（匯入）路徑、樣式／格式化密集情境，也未涵蓋 NPOI、EPPlus
-  （見第 1.3 節授權裁定）。
+- 寫入對比未涵蓋樣式／格式化密集情境，也未涵蓋 NPOI、EPPlus（見第 1.3 節授權裁定）。
+  讀取路徑見第 7 節。
 - 未於 Linux／macOS 上驗證；`Process.PeakWorkingSet64` 之取得方式在其他
   作業系統上是否可用未經測試。
+
+## 7. 讀取對比
+
+本節是第 1 至 6 節寫入對比的讀取端對應：同一份 `1,000,000` 列 × `10` 欄的決定性混合型別資料，
+比較 `OdsStreamReader` 與 MiniExcel（串流）、ClosedXML（DOM 對照組）的讀取成本。
+
+### 7.1 方法論
+
+- **輸入檔：** 每個讀取器讀取由對應寫入器產生的檔案。OdfKit 讀取 `OdsStreamWriter` 產生的
+  `.ods`（`95.3 MB`）；MiniExcel 與 ClosedXML 讀取**同一份**由 MiniExcel 串流寫入器產生的
+  `.xlsx`（`111.0 MB`），讓兩者面對相同輸入。輸入檔的產生時間不計入量測。
+- **仍是跨格式參考對比：** 與第 1.2 節相同，ODS 與 XLSX 的 schema 與容器細節不同，這不是同格式對決。
+- **內容檢查碼（正確性）：** 每個讀取器逐列累加檢查碼（列數、各欄位的總和或總長度、日期分鐘數、
+  布林旗標計數），並與直接由產生器算出的預期值比對。整數欄位必須完全相同，浮點總和允許
+  `1e-9` 相對誤差；任何一個不符，整次量測作廢且指令碼失敗。這是為了避免讀得快卻略過或讀錯資料。
+- **量測模式：** 與第 1.4 節相同。手動計時模式，每個情境在**獨立子處理程序**讀取一次，量測
+  耗時、GC 累積配置量與峰值工作集；本文件另外重複執行一次以確認穩定性。
+  BenchmarkDotNet 對應類別為 `CompetitiveStreamReadBenchmarks`。
+- **ClosedXML 是非串流對照組：** 它把整份活頁簿載入記憶體，預期耗時與記憶體都較高。
+
+**必須揭露的設定：** `OdsStreamReader` 預設限制單一 XML 文件為 `64 MiB` 字元，這是對不可信輸入的
+預設防護（見 [安全限制](security-limits.md)）。`1,000,000` 列 × `10` 欄的 `content.xml` 遠超過此上限，
+未調整時會擲出 `XmlException`。此基準資料是自行產生的可信任資料，因此**只**把
+`MaxXmlCharactersInDocument` 設為 `0`（停用這一項）；列數、欄數、repeat 與儲存格文字等其他限制維持預設。
+本文件未調整 MiniExcel 與 ClosedXML 的任何限制設定。處理不可信文件時不應停用該上限。
+
+### 7.2 環境
+
+| 項目 | 內容 |
+|------|------|
+| 作業系統 | Windows 11 Pro for Workstations（組建 10.0.26300） |
+| CPU | Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz（6 實體核心 / 12 邏輯核心） |
+| 記憶體 | 約 31.8 GB |
+| .NET SDK | `10.0.401` |
+| .NET 執行階段 | `.NET 10.0.12` |
+| MiniExcel | `1.46.0`（`Apache-2.0`） |
+| ClosedXML | `0.105.1`（`MIT`） |
+
+第 2 節的環境表對應的是第 3 節寫入數字的量測時點（MiniExcel `1.45.0`、ClosedXML `0.105.0`）；本節使用
+目前專案鎖定的版本，兩節的數字不可直接混合比較。
+
+### 7.3 實測結果（2026-09-30）
+
+情境：`1,000,000` 列 × `10` 欄混合型別資料，手動計時模式，各情境獨立子處理程序執行一次，
+共執行兩次。三個情境的內容檢查碼在兩次都**完全相符**。
+
+**最佳化後（目前的程式碼）：**
+
+| 情境 | 套件（授權） | 輸入格式 | 輸入檔案大小 | 耗時（第 1 次／第 2 次） | GC 累積配置量 | 峰值工作集 |
+|------|--------------|----------|--------------|---------------------------|----------------|------------|
+| `OdsStreamReader` | OdfKit（CC0-1.0） | `.ods` | 95.3 MB | **7,616 ms／7,755 ms** | **1,837.6 MB** | **39.8 MB** |
+| `MiniExcel` | MiniExcel 1.46.0（Apache-2.0） | `.xlsx` | 111.0 MB | 23,359 ms／20,371 ms | 19,688.4 MB／19,690.3 MB | 46.8 MB |
+| `ClosedXml` | ClosedXML 0.105.1（MIT，DOM 對照組） | `.xlsx` | 111.0 MB | 47,661 ms／47,109 ms | 10,383.9 MB／10,332.6 MB | 1,211.2 MB／1,211.8 MB |
+
+（粗體標示各欄位表現最佳者。`ClosedXml` 的 GC 累積配置量低於 MiniExcel，是因為 DOM 載入把資料留在記憶體內，
+而不是對每個儲存格配置暫時物件；它的代價反映在峰值工作集。）
+
+**`OdsStreamReader` 最佳化前（同日、同機器、同版本的 MiniExcel 與 ClosedXML）：**
+
+| 情境 | 耗時（第 1 次／第 2 次） | GC 累積配置量 | 峰值工作集 |
+|------|---------------------------|----------------|------------|
+| `OdsStreamReader`（最佳化前） | 25,276 ms／29,538 ms | 13,472.5 MB | 47.5 MB／47.6 MB |
+| `MiniExcel` | 19,510 ms／18,674 ms | 19,688.6 MB／19,686.8 MB | 43.5 MB／43.6 MB |
+| `ClosedXml` | 45,486 ms／45,641 ms | 10,385.1 MB／10,384.3 MB | 1,211.8 MB／1,210.8 MB |
+
+最佳化前 `OdsStreamReader` 比 MiniExcel 慢，經成因分析（第 7.6 節）並最佳化後，耗時約降為原來的
+`0.26` 至 `0.30` 倍、配置量降 `86%`。MiniExcel 在兩組量測之間的耗時有落差（約 `18.7` 至 `23.4` 秒），
+顯示絕對耗時易受背景負載影響；`OdsStreamReader` 與 ClosedXML 的重複量測則較為穩定。
+
+### 7.4 重現步驟
+
+```powershell
+# 讀取對比（本節數字的量測方式，每情境獨立子處理程序執行一次，含內容檢查碼）
+pwsh eng/Benchmark-Competitive.ps1 -Mode Read
+
+# 或直接呼叫組件：
+dotnet OdfKit.Benchmarks/bin/Release/net10.0/OdfKit.Benchmarks.dll --manual-competitive-read
+
+# BenchmarkDotNet 模式（正式統計工作，耗時較長）
+dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStreamReadBenchmarks*
+```
+
+### 7.5 結果解讀
+
+- **耗時：最佳化後 OdfKit 是三者中最快的。** `OdsStreamReader` 約 `7.6` 至 `7.8` 秒，MiniExcel 約
+  `20.4` 至 `23.4` 秒（約為前者的 `2.6` 至 `3.1` 倍），ClosedXML 約 `47` 秒（約 `6.1` 至 `6.2` 倍）。
+  這個結論是在第 7.6 節的最佳化之後才成立；最佳化前的結果相反（見第 7.3 節的對照表）。
+- **GC 累積配置量：`OdsStreamReader` 約為 MiniExcel 的十分之一。** `1,837.6 MB` 對 `19,688 MB`；
+  每個儲存格約 `183 B`。
+- **峰值工作集：兩個串流讀取器相近，都遠低於 DOM 路徑。** `OdsStreamReader` 約 `39.8 MB`、MiniExcel
+  約 `46.8 MB`，而 `ClosedXml` 約 `1,211 MB`，約為前者的 30 倍。
+- **MiniExcel 的讀取方式會影響它的數字。** 本文件使用 `Query(useHeaderRow: false)`，每列會建立
+  `IDictionary<string, object>`（動態列）；強型別的 `Query<T>` 對映可能較快，本文件未量測。
+- **輸入檔案大小僅供參考**，理由同第 1.2 節。
+- 此資料集每個儲存格只有單一段落、無行內元素，檢查碼驗證的是這個情境下的資料一致性；第 7.6 節提到的
+  缺陷修正由單元測試（`OdsStreamReaderCharacterizationTests`）涵蓋。
+
+### 7.6 成因分析與最佳化
+
+最佳化前 `OdsStreamReader` 比 MiniExcel 慢，且每個儲存格配置約 `1.3 KB`。以下是當時以 20 萬列（200 萬個
+儲存格）拆解成本的實測，每個實驗只改變一個變因；配置量按型別的分布由 .NET 執行階段的 `AllocationTick`
+事件取樣統計，耗時與配置量為單一執行緒、單次量測。
+
+| 實驗 | 耗時 | GC 累積配置量 | 每格配置 |
+|------|------|----------------|----------|
+| 純 `XmlReader` 走訪（下限，只解析 XML） | 1,370 ms | 0.8 MB | 0 B |
+| 加上每格 9 次 `GetAttribute` | 2,582 ms | 121 MB | 64 B |
+| 加上每列 `ReadSubtree`（無屬性） | 2,155 ms | 306 MB | 160 B |
+| 每列子樹加屬性 | 3,141 ms | 426 MB | 224 B |
+| 模擬原本 `OdsStreamReader` 結構（列子樹、屬性、每格子樹與文字串接） | 5,220 ms | 2,197 MB | 1,152 B |
+| 原本 `OdsStreamReader` 實際 | 6,265 ms | 2,680 MB | 1,405 B |
+
+模擬結構只用純 `XmlReader` 的 API，就已配置 `1,152 B` 每格，而實際實作只多 `253 B`，因此慢的主因是
+**讀取結構**，而非 OdfKit 特有的物件。以 `6,265 ms` 為 100% 的粗略分解：
+
+| 成本來源 | 約佔比 |
+|----------|--------|
+| XML 解析本身（下限） | 22% |
+| 每格 9 次以名稱查詢的 `GetAttribute` | 19% |
+| 每列 `ReadSubtree` | 11% |
+| **每格 `ReadSubtree`（`ReadCellText`）與文字串接** | **35%** |
+| OdfKit 自己的物件（`OdsCellValue`、空白佔位物件、每列 `List`、裝箱） | 16% |
+
+配置量按型別：`NamespaceDeclaration[]` 16.4%、`NodeData` 14.4%、`XmlSubtreeReader` 9.6%、
+`XmlNamespaceManager` 5.5%、`NodeData[]` 4.3%，合計約 50% 來自 `ReadSubtree` 的內部物件。
+
+**已實作的最佳化**（`OdfKit/Spreadsheet/OdsStreamReader.cs`）：
+
+1. 每列與每格不再呼叫 `ReadSubtree`，改以深度判斷範圍。
+2. 屬性改為一次走訪，只對需要的屬性取值。
+3. 重用每列的暫存清單、所有空白欄位共用同一個不可變的空白儲存格，單一段落時不建立 `List` 與 `Join`。
+
+最佳化後以同樣的 20 萬列實驗量測為 `3,173` 至 `3,497 ms`、`352.5 MB`、每格 `185 B`（耗時約減半、配置量降 87%）。
+剩餘的配置主要是字串（約 55%，屬性值與文字）與每格一個 `OdsCellValue`（約 34%），後者是公開資料形狀。
+在 100 萬列規模，實測改善更大（耗時降為約 `0.26` 至 `0.30` 倍，見第 7.3 節）：這比成因分析當時
+「下限約降 40%」的推估更好。可能是大量配置在長時間讀取下觸發更多世代 GC，但這一點未另外驗證。
+
+這次分析同時發現並修正 `OdsStreamReader` 的三個資料正確性缺陷（與最佳化無關）：多段落儲存格會遺失每隔一個的段落；
+段落內含 `text:span`、`text:s`、`text:tab` 等行內元素會擲出 `XmlException`；第一列為空列時同步的 `Read()`
+讀不到任何列。三者都由 `OdsStreamReaderCharacterizationTests` 鎖定（同步與非同步兩條路徑的逐格結果），
+最佳化在未修正缺陷的狀態下先以該測試驗證為行為不變，之後才修正缺陷。
+
+### 7.7 已知限制
+
+- 僅涵蓋單一讀取情境與單一機器；手動計時為單次量測，本節另外重複一次。
+- 耗時包含子處理程序啟動（JIT 暖身、組件載入）的一次性成本，三者相同。
+- 讀取端停用了 `OdsStreamReader` 的 XML 字元上限，見第 7.1 節的揭露。
+- OdfKit 與另外兩者讀取的是不同格式；MiniExcel 與 ClosedXML 讀取的 `.xlsx` 由 MiniExcel 寫出，
+  若改用其他工具寫出的 `.xlsx`，讀取成本可能不同。
+- MiniExcel 使用動態列讀取，未量測強型別對映（見第 7.5 節）。
+- 未涵蓋 DOM 式讀取（例如 `SpreadsheetDocument.Load`）、樣式密集情境，以及 Linux／macOS。

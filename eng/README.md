@@ -87,7 +87,7 @@
 | `Benchmark-BaselineReport.ps1` | 執行 stable benchmark profile 並產生 Markdown 效能基準報告。 |
 | `Test-PerformanceBudgets.ps1` | 驗證效能預算、schema v2 樣本與候選；active 時執行 allocation 硬閘門及耗時／峰值提醒。 |
 | `New-PerformanceBudgetCandidate.ps1` | 從至少三份同 OS／架構／runtime／CPU 且執行身分唯一的 schema v2 樣本計算九情境中位數候選；不會自動啟用門檻。 |
-| `Benchmark-Competitive.ps1` | 執行 `OdsStreamWriter` 與 MiniExcel、ClosedXML 的跨套件串流寫入對比，是 [performance-comparison.md](../docs/performance-comparison.md) 公開數值的來源。 |
+| `Benchmark-Competitive.ps1` | 執行 OdfKit 與 MiniExcel、ClosedXML 的跨套件串流寫入與讀取對比（`-Mode Write｜Read｜All`，預設 `All`；讀取含內容檢查碼），是 [performance-comparison.md](../docs/performance-comparison.md) 公開數值的來源。 |
 | `Benchmark-StandardDocuments.ps1` | 以獨立子處理程序執行 ODS／ODT／ODP 標準工作負載，輸出耗時、配置量、峰值工作集與語意 checksum，見 [performance-standard-documents.md](../docs/performance-standard-documents.md)。 |
 
 ### 封裝與發行

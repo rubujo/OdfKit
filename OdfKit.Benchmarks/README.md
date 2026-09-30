@@ -54,6 +54,20 @@ pwsh eng/Benchmark-Stress.ps1
 也可直接執行 `dotnet run -c Release --project OdfKit.Benchmarks -- --stress`。情境與判定方式見
 [效能基準線](../docs/performance-baselines.md)。
 
+## 跨套件對比（寫入與讀取）
+
+`CompetitiveStreamWriteBenchmarks` 與 `CompetitiveStreamReadBenchmarks` 以同一份 `1,000,000` 列 ×
+`10` 欄的決定性混合型別資料，比較 `OdsStreamWriter`／`OdsStreamReader` 與 MiniExcel、ClosedXML。
+讀取對比會以內容檢查碼驗證讀回的資料與產生器一致，不符即失敗。
+
+```powershell
+pwsh eng/Benchmark-Competitive.ps1            # 寫入與讀取（預設）
+pwsh eng/Benchmark-Competitive.ps1 -Mode Read # 只執行讀取對比
+```
+
+這是 ODS 對 XLSX 的跨格式參考對比。方法論、環境、結果與讀取端較慢的成因分析見
+[效能對比](../docs/performance-comparison.md)。
+
 ## 其他基準測試類別
 
 - `DomInsertBenchmarks`：DOM 節點循序插入效能。

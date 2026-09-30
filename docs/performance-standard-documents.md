@@ -52,22 +52,30 @@ pwsh eng/Benchmark-Stable.ps1 -Filter "*StandardPackageOpenBenchmarks*"
 
 ## 最新本機重新驗證
 
-2026-07-26 於 Windows 10.0.26200、.NET 10.0.10 執行
-`pwsh eng/Benchmark-StandardDocuments.ps1 -NoRestore`。Release 建置為
-0 警告、0 錯誤；下列九個大型情境各自在獨立子處理程序執行一次，且都完成
-決定性語意檢查碼驗證。這些是單機冷啟動量測，不是跨機器效能承諾。
+2026-10-01 於 Windows 10.0.26300、.NET 10.0.12 執行
+`pwsh eng/Benchmark-StandardDocuments.ps1 -NoRestore`。量測對象是 `d5be9a05` 加上尚未提交的
+`OdsStreamReader` 與 `OdtStreamReader` 變更的工作樹。Release 建置為 0 警告、0 錯誤；下列九個大型
+情境各自在獨立子處理程序執行一次，且都完成決定性語意檢查碼驗證。這些是單機冷啟動量測，不是跨機器
+效能承諾。
 
 | 情境 | API／模型 | 規模 | 耗時 | GC 累積配置量 | 峰值工作集 |
 |------|----------|------|------|----------------|------------|
-| ODS 串流寫入 | `OdsStreamWriter` | 1,000,000 列 × 10 欄 | `5,793.4 ms` | `716.4 MB` | `316.0 MB` |
-| ODS 串流讀取 | `OdsStreamReader` | 50,000 列 × 10 欄 | `2,758.3 ms` | `699.0 MB` | `56.8 MB` |
-| ODS DOM 來回讀寫 | `SpreadsheetDocument` | 三工作表複雜 DOM | `2,154.5 ms` | `330.4 MB` | `220.3 MB` |
-| ODT 串流寫入 | `OdtStreamWriter` | 100,000 個結構節點 | `281.3 ms` | `9.2 MB` | `39.5 MB` |
-| ODT 串流讀取 | `OdtStreamReader` | 100,000 個結構節點 | `320.2 ms` | `101.2 MB` | `46.0 MB` |
-| ODT DOM 來回讀寫 | `TextDocument` | 20,000 個複合節點 | `1,313.3 ms` | `337.2 MB` | `86.5 MB` |
-| ODP 結構寫入 | `PresentationDocument` | 500 張結構密集投影片 | `373.5 ms` | `49.4 MB` | `58.2 MB` |
-| ODP 結構讀取 | `PresentationDocument` | 500 張結構密集投影片 | `297.3 ms` | `56.9 MB` | `70.1 MB` |
-| ODP 媒體 DOM 來回讀寫 | `PresentationDocument` | 100 張媒體密集投影片 | `223.1 ms` | `22.8 MB` | `63.6 MB` |
+| ODS 串流寫入 | `OdsStreamWriter` | 1,000,000 列 × 10 欄 | `5,293.9 ms` | `714.8 MB` | `318.7 MB` |
+| ODS 串流讀取 | `OdsStreamReader` | 50,000 列 × 10 欄 | `1,043.9 ms` | `100.9 MB` | `52.5 MB` |
+| ODS DOM 來回讀寫 | `SpreadsheetDocument` | 三工作表複雜 DOM | `212.2 ms` | `68.4 MB` | `197.6 MB` |
+| ODT 串流寫入 | `OdtStreamWriter` | 100,000 個結構節點 | `234.3 ms` | `8.6 MB` | `41.8 MB` |
+| ODT 串流讀取 | `OdtStreamReader` | 100,000 個結構節點 | `160.3 ms` | `35.5 MB` | `46.5 MB` |
+| ODT DOM 來回讀寫 | `TextDocument` | 20,000 個複合節點 | `269.8 ms` | `35.6 MB` | `82.9 MB` |
+| ODP 結構寫入 | `PresentationDocument` | 500 張結構密集投影片 | `376.2 ms` | `66.9 MB` | `58.3 MB` |
+| ODP 結構讀取 | `PresentationDocument` | 500 張結構密集投影片 | `203.8 ms` | `13.3 MB` | `67.6 MB` |
+| ODP 媒體 DOM 來回讀寫 | `PresentationDocument` | 100 張媒體密集投影片 | `137.9 ms` | `10.7 MB` | `63.4 MB` |
+
+**與前次（2026-07-26）數字的關係：** ODS 與 ODT 串流讀取兩列受這次 Reader 最佳化直接影響
+（不再為每列、每格建立 `XmlSubtreeReader`）：ODS 串流讀取由 `2,758.3 ms`／`699.0 MB` 降為
+`1,043.9 ms`／`100.9 MB`，ODT 串流讀取由 `320.2 ms`／`101.2 MB` 降為 `160.3 ms`／`35.5 MB`。
+其餘各列與前次的差異**不能全部歸因於本次變更**：兩次量測之間還有其他提交，.NET 執行階段也由
+`10.0.10` 變為 `10.0.12`，單次冷啟動量測本身的變動也很大（例如 ODS、ODT 的 DOM 來回讀寫耗時降幅
+遠大於任何單一變更的預期）。本表為當下的單次量測，未逐列歸因。
 
 Reader 覆蓋依產品 API 分層：ODS 與 ODT 使用專用串流 Reader；ODP 目前沒有串流
 Reader，因此以 `PresentationDocument` 載入及遍歷完整結構。三種格式另由
