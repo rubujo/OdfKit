@@ -190,8 +190,9 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 
         if (_isFirstRowBuffered)
         {
+            // 只有 ReadNextRow() 解析到列時才會緩衝；第一列即使是空列也是一列（與非同步路徑及其後的空列一致）。
             _isFirstRowBuffered = false;
-            return _currentRowData.Count > 0;
+            return true;
         }
 
         if (_rowRepeatRemaining > 0)
@@ -225,7 +226,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             if (_isFirstRowBuffered)
             {
                 _isFirstRowBuffered = false;
-                return _currentRowData.Count > 0;
+                return true;
             }
             if (_rowRepeatRemaining > 0)
             {
@@ -373,49 +374,135 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             OdfLocalizer.GetMessage("Err_OdsStreamReader_SheetIndexOutOfRange",
                 sheetIndex.ToString(CultureInfo.InvariantCulture), sheetCount.ToString(CultureInfo.InvariantCulture)));
 
+    // 單一儲存格元素上會用到的屬性。一次走訪屬性取得，而不是對每個屬性各做一次以名稱查詢的 GetAttribute。
+    private struct CellAttributes
+    {
+        public string? ColumnsRepeated;
+        public string? ValueType;
+        public string? Value;
+        public string? DateValue;
+        public string? BooleanValue;
+        public string? TimeValue;
+        public string? StringValue;
+        public string? Currency;
+        public string? Formula;
+    }
+
+    // 空白儲存格為不可變物件，所有空白欄位共用同一個實例，避免每列為每個欄位配置一個佔位物件。
+    private static readonly OdsCellValue s_emptyCell = new(OdsCellValueKind.Empty, null, null, null, null, null);
+
+    // 每列重複使用的暫存清單；讀取由 EnterRead 保證不會同時進入，因此不需要額外同步。
+    private readonly List<(int Col, OdsCellValue Cell)> _rowCellsScratch = [];
+
+    private static CellAttributes ReadCellAttributes(XmlReader reader)
+    {
+        var attributes = new CellAttributes();
+        if (!reader.HasAttributes || !reader.MoveToFirstAttribute())
+        {
+            return attributes;
+        }
+
+        do
+        {
+            string namespaceUri = reader.NamespaceURI;
+            if (string.Equals(namespaceUri, OdfNamespaces.Office, StringComparison.Ordinal))
+            {
+                switch (reader.LocalName)
+                {
+                    case "value-type":
+                        attributes.ValueType = reader.Value;
+                        break;
+                    case "value":
+                        attributes.Value = reader.Value;
+                        break;
+                    case "date-value":
+                        attributes.DateValue = reader.Value;
+                        break;
+                    case "boolean-value":
+                        attributes.BooleanValue = reader.Value;
+                        break;
+                    case "time-value":
+                        attributes.TimeValue = reader.Value;
+                        break;
+                    case "string-value":
+                        attributes.StringValue = reader.Value;
+                        break;
+                    case "currency":
+                        attributes.Currency = reader.Value;
+                        break;
+                }
+            }
+            else if (string.Equals(namespaceUri, OdfNamespaces.Table, StringComparison.Ordinal))
+            {
+                switch (reader.LocalName)
+                {
+                    case "number-columns-repeated":
+                        attributes.ColumnsRepeated = reader.Value;
+                        break;
+                    case "formula":
+                        attributes.Formula = reader.Value;
+                        break;
+                }
+            }
+        }
+        while (reader.MoveToNextAttribute());
+
+        reader.MoveToElement();
+        return attributes;
+    }
+
+    private static bool IsCellElement(XmlReader reader) =>
+        reader.NodeType == XmlNodeType.Element &&
+        (reader.LocalName == "table-cell" || reader.LocalName == "covered-table-cell") &&
+        string.Equals(reader.NamespaceURI, OdfNamespaces.Table, StringComparison.Ordinal);
+
+    private static void AddCell(
+        List<(int Col, OdsCellValue Cell)> cells,
+        int colIndex,
+        int colRepeat,
+        in CellAttributes attributes,
+        string? textContent,
+        ref bool isEmpty)
+    {
+        OdsCellValue cell = ParseCellValue(
+            attributes.ValueType, attributes.Value, attributes.DateValue, attributes.BooleanValue,
+            attributes.TimeValue, attributes.StringValue, attributes.Formula, attributes.Currency, textContent);
+        if (cell.Kind != OdsCellValueKind.Empty || cell.Formula is not null)
+        {
+            isEmpty = false;
+            for (int i = 0; i < colRepeat; i++)
+                cells.Add((colIndex + i, cell));
+        }
+    }
+
+    // 不使用 ReadSubtree：每列與每格各建一個 XmlSubtreeReader（連同其命名空間與節點暫存）在實測中占了
+    // 約一半的配置量。改以深度判斷列的範圍；讀完後讀取器停在列的 EndElement，與子樹釋放後的位置相同。
     private void ParseCurrentRow(XmlReader rowReader)
     {
         int rowRepeat = ParseRepeat(rowReader.GetAttribute("number-rows-repeated", OdfNamespaces.Table), _options.MaxRepeatedRows);
 
         bool isEmpty = true;
-        var cells = new List<(int Col, OdsCellValue Cell)>();
+        List<(int Col, OdsCellValue Cell)> cells = _rowCellsScratch;
+        cells.Clear();
         int colIndex = 0;
 
         if (!rowReader.IsEmptyElement)
         {
-            using var rowSub = rowReader.ReadSubtree();
-            rowSub.Read();
-
-            while (rowSub.Read())
+            int rowDepth = rowReader.Depth;
+            while (rowReader.Read() && rowReader.Depth > rowDepth)
             {
-                if (rowSub.NodeType == XmlNodeType.Element &&
-                    (rowSub.LocalName == "table-cell" || rowSub.LocalName == "covered-table-cell") &&
-                    rowSub.NamespaceURI == OdfNamespaces.Table)
+                if (!IsCellElement(rowReader))
                 {
-                    int colRepeat = ParseRepeat(rowSub.GetAttribute("number-columns-repeated", OdfNamespaces.Table), _options.MaxRepeatedColumns);
-
-                    string? valueType = rowSub.GetAttribute("value-type", OdfNamespaces.Office);
-                    string? numValue = rowSub.GetAttribute("value", OdfNamespaces.Office);
-                    string? dateValue = rowSub.GetAttribute("date-value", OdfNamespaces.Office);
-                    string? boolValue = rowSub.GetAttribute("boolean-value", OdfNamespaces.Office);
-                    string? timeValue = rowSub.GetAttribute("time-value", OdfNamespaces.Office);
-                    string? stringValue = rowSub.GetAttribute("string-value", OdfNamespaces.Office);
-                    string? currency = rowSub.GetAttribute("currency", OdfNamespaces.Office);
-                    string? formula = rowSub.GetAttribute("formula", OdfNamespaces.Table);
-
-                    string? textContent = ReadCellText(rowSub);
-                    OdsCellValue cell = ParseCellValue(valueType, numValue, dateValue, boolValue, timeValue,
-                        stringValue, formula, currency, textContent);
-                    if (cell.Kind != OdsCellValueKind.Empty || cell.Formula is not null)
-                    {
-                        isEmpty = false;
-                        for (int i = 0; i < colRepeat; i++)
-                            cells.Add((colIndex + i, cell));
-                    }
-
-                    colIndex += colRepeat;
-                    EnsureWithinLimit(colIndex, _options.MaxColumns);
+                    continue;
                 }
+
+                CellAttributes attributes = ReadCellAttributes(rowReader);
+                int colRepeat = ParseRepeat(attributes.ColumnsRepeated, _options.MaxRepeatedColumns);
+                string? textContent = ReadCellText(rowReader);
+                AddCell(cells, colIndex, colRepeat, in attributes, textContent, ref isEmpty);
+
+                colIndex += colRepeat;
+                EnsureWithinLimit(colIndex, _options.MaxColumns);
             }
         }
 
@@ -426,42 +513,30 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     {
         int rowRepeat = ParseRepeat(rowReader.GetAttribute("number-rows-repeated", OdfNamespaces.Table), _options.MaxRepeatedRows);
         bool isEmpty = true;
-        var cells = new List<(int Col, OdsCellValue Cell)>();
+        List<(int Col, OdsCellValue Cell)> cells = _rowCellsScratch;
+        cells.Clear();
         int colIndex = 0;
 
         if (!rowReader.IsEmptyElement)
         {
-            using var rowSub = rowReader.ReadSubtree();
-            await rowSub.ReadAsync().ConfigureAwait(false);
-            while (await rowSub.ReadAsync().ConfigureAwait(false))
+            int rowDepth = rowReader.Depth;
+            while (await rowReader.ReadAsync().ConfigureAwait(false))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (rowSub.NodeType != XmlNodeType.Element ||
-                    (rowSub.LocalName != "table-cell" && rowSub.LocalName != "covered-table-cell") ||
-                    rowSub.NamespaceURI != OdfNamespaces.Table)
+                if (rowReader.Depth <= rowDepth)
+                {
+                    break;
+                }
+
+                if (!IsCellElement(rowReader))
                 {
                     continue;
                 }
 
-                int colRepeat = ParseRepeat(rowSub.GetAttribute("number-columns-repeated", OdfNamespaces.Table), _options.MaxRepeatedColumns);
-                string? valueType = rowSub.GetAttribute("value-type", OdfNamespaces.Office);
-                string? numValue = rowSub.GetAttribute("value", OdfNamespaces.Office);
-                string? dateValue = rowSub.GetAttribute("date-value", OdfNamespaces.Office);
-                string? boolValue = rowSub.GetAttribute("boolean-value", OdfNamespaces.Office);
-                string? timeValue = rowSub.GetAttribute("time-value", OdfNamespaces.Office);
-                string? stringValue = rowSub.GetAttribute("string-value", OdfNamespaces.Office);
-                string? currency = rowSub.GetAttribute("currency", OdfNamespaces.Office);
-                string? formula = rowSub.GetAttribute("formula", OdfNamespaces.Table);
-
-                string? textContent = await ReadCellTextAsync(rowSub, cancellationToken).ConfigureAwait(false);
-                OdsCellValue cell = ParseCellValue(valueType, numValue, dateValue, boolValue, timeValue,
-                    stringValue, formula, currency, textContent);
-                if (cell.Kind != OdsCellValueKind.Empty || cell.Formula is not null)
-                {
-                    isEmpty = false;
-                    for (int i = 0; i < colRepeat; i++)
-                        cells.Add((colIndex + i, cell));
-                }
+                CellAttributes attributes = ReadCellAttributes(rowReader);
+                int colRepeat = ParseRepeat(attributes.ColumnsRepeated, _options.MaxRepeatedColumns);
+                string? textContent = await ReadCellTextAsync(rowReader, cancellationToken).ConfigureAwait(false);
+                AddCell(cells, colIndex, colRepeat, in attributes, textContent, ref isEmpty);
 
                 colIndex += colRepeat;
                 EnsureWithinLimit(colIndex, _options.MaxColumns);
@@ -480,15 +555,13 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         _currentRowCells.Clear();
         if (cells.Count > 0)
         {
-            int maxCol = -1;
-            foreach (var (col, _) in cells)
-                if (col > maxCol)
-                    maxCol = col;
+            // 欄索引嚴格遞增，最後一個項目就是最大欄。
+            int maxCol = cells[cells.Count - 1].Col;
 
             for (int i = 0; i <= maxCol; i++)
             {
                 _currentRowData.Add(null);
-                _currentRowCells.Add(new OdsCellValue(OdsCellValueKind.Empty, null, null, null, null, null));
+                _currentRowCells.Add(s_emptyCell);
             }
 
             foreach (var (col, cell) in cells)
@@ -497,6 +570,8 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                 _currentRowData[col] = cell.Value;
             }
         }
+
+        cells.Clear();
     }
 
     private static OdsCellValue ParseCellValue(
@@ -562,51 +637,249 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private static double? ParseNumber(string? value) =>
         double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number) ? number : null;
 
+    // 讀取儲存格的顯示文字：每個 text:p 各自讀成一段，段落之間以 "\n" 相接。
+    // 不使用 ReadSubtree（理由見 ParseCurrentRow）。讀完每個段落後，讀取器停在該段落的 EndElement
+    // （空元素段落則停在元素本身），外層迴圈的下一次 Read() 才會推進；不可在此之後再多讀一個節點，
+    // 否則會略過緊接在後的下一個 text:p（相鄰段落中每隔一個會遺失）。
     private string? ReadCellText(XmlReader cellReader)
     {
         if (cellReader.IsEmptyElement)
             return null;
-        var paragraphs = new List<string>();
+        int cellDepth = cellReader.Depth;
+        string? first = null;
+        StringBuilder? joined = null;
+        int count = 0;
         int totalLength = 0;
-        using var subtree = cellReader.ReadSubtree();
-        subtree.Read();
-        while (subtree.Read())
+        while (cellReader.Read() && cellReader.Depth > cellDepth)
         {
-            if (subtree.NodeType == XmlNodeType.Element && subtree.LocalName == "p" &&
-                subtree.NamespaceURI == OdfNamespaces.Text)
+            if (!IsTextParagraph(cellReader))
+                continue;
+            if (count > 0)
             {
-                string paragraph = subtree.ReadElementContentAsString();
-                totalLength = checked(totalLength + paragraph.Length + (paragraphs.Count == 0 ? 0 : 1));
+                totalLength = checked(totalLength + 1);
                 EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
-                paragraphs.Add(paragraph);
             }
+
+            AppendParagraph(ref first, ref joined, ref count, ReadParagraph(cellReader, ref totalLength));
         }
-        return paragraphs.Count == 0 ? null : string.Join("\n", paragraphs);
+
+        return count == 0 ? null : joined?.ToString() ?? first;
     }
 
     private async Task<string?> ReadCellTextAsync(XmlReader cellReader, CancellationToken cancellationToken)
     {
         if (cellReader.IsEmptyElement)
             return null;
-        var paragraphs = new List<string>();
+        int cellDepth = cellReader.Depth;
+        string? first = null;
+        StringBuilder? joined = null;
+        int count = 0;
         int totalLength = 0;
-        using var subtree = cellReader.ReadSubtree();
-        await subtree.ReadAsync().ConfigureAwait(false);
-        while (await subtree.ReadAsync().ConfigureAwait(false))
+        while (await cellReader.ReadAsync().ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (subtree.NodeType != XmlNodeType.Element || subtree.LocalName != "p" ||
-                subtree.NamespaceURI != OdfNamespaces.Text)
-            {
+            if (cellReader.Depth <= cellDepth)
+                break;
+            if (!IsTextParagraph(cellReader))
                 continue;
+            if (count > 0)
+            {
+                totalLength = checked(totalLength + 1);
+                EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
             }
 
-            string paragraph = await subtree.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            totalLength = checked(totalLength + paragraph.Length + (paragraphs.Count == 0 ? 0 : 1));
-            EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
-            paragraphs.Add(paragraph);
+            (string paragraph, int newTotal) = await ReadParagraphAsync(cellReader, totalLength, cancellationToken)
+                .ConfigureAwait(false);
+            totalLength = newTotal;
+            AppendParagraph(ref first, ref joined, ref count, paragraph);
         }
-        return paragraphs.Count == 0 ? null : string.Join("\n", paragraphs);
+
+        return count == 0 ? null : joined?.ToString() ?? first;
+    }
+
+    private static bool IsTextParagraph(XmlReader reader) =>
+        reader.NodeType == XmlNodeType.Element &&
+        reader.LocalName == "p" &&
+        string.Equals(reader.NamespaceURI, OdfNamespaces.Text, StringComparison.Ordinal);
+
+    // 讀取單一 text:p 的文字內容。行內元素依 ODF 的顯示文字語意處理：
+    // text:span、text:a 等容器元素只取其內文；text:s 為 text:c 個空白（預設 1）；text:tab 為定位字元；
+    // text:line-break 為換行；office:annotation 與 text:note 不是儲存格的顯示文字，整段略過。
+    // 完成後讀取器停在 text:p 的 EndElement（空元素則停在元素本身）。
+    private string ReadParagraph(XmlReader reader, ref int totalLength)
+    {
+        if (reader.IsEmptyElement)
+            return string.Empty;
+        int paragraphDepth = reader.Depth;
+        string? single = null;
+        StringBuilder? builder = null;
+        bool advance = true;
+        while (true)
+        {
+            if (advance && !reader.Read())
+                break;
+            advance = true;
+            if (reader.Depth <= paragraphDepth)
+                break;
+
+            switch (reader.NodeType)
+            {
+                case XmlNodeType.Text:
+                case XmlNodeType.CDATA:
+                case XmlNodeType.Whitespace:
+                case XmlNodeType.SignificantWhitespace:
+                    AddParagraphText(reader.Value, ref totalLength, ref single, ref builder);
+                    break;
+                case XmlNodeType.Element:
+                    string? inlineText = GetInlineElementText(reader, ref totalLength, out bool skipSubtree);
+                    if (inlineText is not null)
+                    {
+                        AddParagraphText(inlineText, ref totalLength, ref single, ref builder);
+                    }
+                    else if (skipSubtree)
+                    {
+                        reader.Skip();
+                        advance = false;
+                    }
+
+                    break;
+            }
+        }
+
+        return builder?.ToString() ?? single ?? string.Empty;
+    }
+
+    private async Task<(string Paragraph, int TotalLength)> ReadParagraphAsync(
+        XmlReader reader,
+        int totalLength,
+        CancellationToken cancellationToken)
+    {
+        if (reader.IsEmptyElement)
+            return (string.Empty, totalLength);
+        int paragraphDepth = reader.Depth;
+        string? single = null;
+        StringBuilder? builder = null;
+        bool advance = true;
+        while (true)
+        {
+            if (advance && !await reader.ReadAsync().ConfigureAwait(false))
+                break;
+            advance = true;
+            cancellationToken.ThrowIfCancellationRequested();
+            if (reader.Depth <= paragraphDepth)
+                break;
+
+            switch (reader.NodeType)
+            {
+                case XmlNodeType.Text:
+                case XmlNodeType.CDATA:
+                case XmlNodeType.Whitespace:
+                case XmlNodeType.SignificantWhitespace:
+                    AddParagraphText(reader.Value, ref totalLength, ref single, ref builder);
+                    break;
+                case XmlNodeType.Element:
+                    string? inlineText = GetInlineElementText(reader, ref totalLength, out bool skipSubtree);
+                    if (inlineText is not null)
+                    {
+                        AddParagraphText(inlineText, ref totalLength, ref single, ref builder);
+                    }
+                    else if (skipSubtree)
+                    {
+                        await reader.SkipAsync().ConfigureAwait(false);
+                        advance = false;
+                    }
+
+                    break;
+            }
+        }
+
+        return (builder?.ToString() ?? single ?? string.Empty, totalLength);
+    }
+
+    // 行內元素對顯示文字的貢獻：回傳非 null 表示要加入的文字；skipSubtree 為 true 表示整個元素（含子節點）略過。
+    // 其他元素（例如 text:span、text:a）回傳 null 且不略過，讀取器會自然進入其內容。
+    private string? GetInlineElementText(XmlReader reader, ref int totalLength, out bool skipSubtree)
+    {
+        skipSubtree = false;
+        if (string.Equals(reader.NamespaceURI, OdfNamespaces.Text, StringComparison.Ordinal))
+        {
+            switch (reader.LocalName)
+            {
+                case "s":
+                    int spaces = ParseSpaceCount(reader.GetAttribute("c", OdfNamespaces.Text));
+                    // 先檢查上限再配置，避免 text:c 宣告極大值時配置巨量字串。
+                    totalLength = checked(totalLength + spaces);
+                    EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
+                    totalLength -= spaces;
+                    return new string(' ', spaces);
+                case "tab":
+                    return "\t";
+                case "line-break":
+                    return "\n";
+                case "note":
+                    skipSubtree = true;
+                    return null;
+            }
+        }
+        else if (string.Equals(reader.NamespaceURI, OdfNamespaces.Office, StringComparison.Ordinal) &&
+                 (reader.LocalName == "annotation" || reader.LocalName == "annotation-end"))
+        {
+            skipSubtree = true;
+        }
+
+        return null;
+    }
+
+    private int ParseSpaceCount(string? attribute)
+    {
+        if (attribute is null || attribute.Length == 0)
+            return 1;
+        // 宣告值非數字時視為 1；溢位（純數字但超過 int）時視為超過上限，由呼叫端的上限檢查拒絕。
+        if (int.TryParse(attribute, NumberStyles.None, CultureInfo.InvariantCulture, out int count))
+            return Math.Min(count, _options.MaxCellTextCharacters + 1);
+        foreach (char digit in attribute)
+        {
+            if (digit < '0' || digit > '9')
+                return 1;
+        }
+
+        return _options.MaxCellTextCharacters + 1;
+    }
+
+    private void AddParagraphText(string text, ref int totalLength, ref string? single, ref StringBuilder? builder)
+    {
+        totalLength = checked(totalLength + text.Length);
+        EnsureWithinLimit(totalLength, _options.MaxCellTextCharacters);
+        if (builder is not null)
+        {
+            builder.Append(text);
+        }
+        else if (single is null)
+        {
+            single = text;
+        }
+        else
+        {
+            string previous = single;
+            builder = new StringBuilder(previous, previous.Length + text.Length).Append(text);
+            single = null;
+        }
+    }
+
+    // 單一段落是最常見的情況，直接回傳該字串；第二段起才建立 StringBuilder，結果與 string.Join("\n", ...) 相同。
+    private static void AppendParagraph(ref string? first, ref StringBuilder? joined, ref int count, string paragraph)
+    {
+        if (count == 0)
+        {
+            first = paragraph;
+        }
+        else
+        {
+            joined ??= new StringBuilder(first);
+            joined.Append('\n').Append(paragraph);
+        }
+
+        count++;
     }
 
     /// <summary>
