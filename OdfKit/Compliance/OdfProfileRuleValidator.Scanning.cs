@@ -86,7 +86,7 @@ internal static partial class OdfProfileRuleValidator
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                // 每一層都會保存完整 XPath，記憶體隨深度呈二次方成長；過深的巢狀可用極小的文件耗盡記憶體。
+                // 每一層都會儲存完整 XPath，記憶體隨深度呈二次方成長；過深的巢狀可用極小的文件耗盡記憶體。
                 // 與 OdfXmlReader 相同的上限，超過即停止掃描並回報，而不是繼續累積。
                 if (reader.Depth + 1 > OdfKit.DOM.OdfXmlReader.MaxElementDepth)
                 {
