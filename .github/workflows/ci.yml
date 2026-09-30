@@ -420,7 +420,7 @@ jobs:
             -c Release `
             -f ${{ matrix.framework }}
 
-          # coverlet.collector 10.0.1 已由 OdfKit.Tests.csproj PackageReference 帶入，
+          # coverlet.collector 10.1.0 已由 OdfKit.Tests.csproj PackageReference 帶入，
           # --collect 只是啟用它作為 VSTest data collector，不需要額外還原或建置，
           # 與既有的 --no-build --no-restore 相容。
           dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
