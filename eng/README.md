@@ -82,6 +82,7 @@
 |------|------|
 | `Benchmark-Performance.ps1` | 執行 OdfKit 效能相關單元測試與簡易計時。 |
 | `Benchmark-Regression.ps1` | 執行 BenchmarkDotNet 微基準並與 `eng/baselines/performance-baselines.json` 基準線比對。 |
+| `Benchmark-Stress.ps1` | 以獨立子處理程序執行資源限制壓力測試：逐列建立工作表的縮放比、連鎖公式在小堆疊執行緒上不得崩潰、超長運算子鏈與大引數公式的上限，見 [performance-baselines.md](../docs/performance-baselines.md)。 |
 | `Benchmark-Stable.ps1` | 以較長且時間導向的 BenchmarkDotNet profile 執行本機穩定效能量測。 |
 | `Benchmark-BaselineReport.ps1` | 執行 stable benchmark profile 並產生 Markdown 效能基準報告。 |
 | `Test-PerformanceBudgets.ps1` | 驗證效能預算、schema v2 樣本與候選；active 時執行 allocation 硬閘門及耗時／峰值提醒。 |

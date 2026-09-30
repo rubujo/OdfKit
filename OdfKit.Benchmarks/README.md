@@ -41,6 +41,19 @@ dotnet run -c Release --project OdfKit.Benchmarks -- --filter *CollaborationOper
 dotnet run -c Release --project OdfKit.Benchmarks -- --filter *OdfTableSheetCellAccessBenchmarks*
 ```
 
+## 資源限制壓力測試
+
+`ResourceLimitStressRunner` 不是 BenchmarkDotNet 基準，而是把資源限制轉為可執行檢查：每個情境
+在獨立子處理程序執行（崩潰即失敗），並對「資料量放大 4 倍」的情境檢查耗時縮放比，以偵測二次方
+成本回歸。
+
+```powershell
+pwsh eng/Benchmark-Stress.ps1
+```
+
+也可直接執行 `dotnet run -c Release --project OdfKit.Benchmarks -- --stress`。情境與判定方式見
+[效能基準線](../docs/performance-baselines.md)。
+
 ## 其他基準測試類別
 
 - `DomInsertBenchmarks`：DOM 節點循序插入效能。

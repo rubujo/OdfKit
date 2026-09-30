@@ -55,6 +55,12 @@ jobs:
         shell: pwsh
         run: ./eng/Benchmark-Regression.ps1 -Configuration Release -ReportTimingRegression
 
+      # 資源限制壓力測試以縮放比與「不得崩潰」判定，不依賴機器速度，因此只在排程與手動觸發時執行，
+      # 不進入 PR 必跑的 CI；每個情境在獨立子處理程序執行，崩潰即失敗。
+      - name: Run resource limit stress tests
+        shell: pwsh
+        run: ./eng/Benchmark-Stress.ps1 -Configuration Release
+
       - name: Measure standard ODS ODT ODP workloads
         shell: pwsh
         run: ./eng/Benchmark-StandardDocuments.ps1 -Configuration Release -ArtifactName "standard-document-performance-${{ matrix.os }}"

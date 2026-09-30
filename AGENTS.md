@@ -89,6 +89,7 @@
 | API／文件網站 | 依 `docs/api-docs-site.md` 執行 `Build-ApiDocs.ps1`，並檢查桌面與窄螢幕 |
 | 封裝或跨套件 TFM | `pwsh eng/Test-NuGetPack.ps1` |
 | 效能文件數值 | `pwsh eng/Benchmark-Competitive.ps1` |
+| 資源限制、迴圈上限或效能複雜度 | `pwsh eng/Benchmark-Stress.ps1` |
 
 `Format-Safe.ps1` 已包含合併衝突、環境變數隔離、一行式 XML summary 與雙語 XML
 文件閘門。不要以重跑 CI 取代本機可重現的診斷。
