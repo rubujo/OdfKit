@@ -513,52 +513,9 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
 
     private static void AppendTextContent(OdfNode parentNode, string text, ref bool needsWrap)
     {
-        int i = 0;
-        while (i < text.Length)
+        if (OdfTextWhitespace.AppendEncoded(parentNode, text))
         {
-            if (text[i] == '\n')
-            {
-                parentNode.AppendChild(new OdfNode(OdfNodeType.Element, "line-break", OdfNamespaces.Text, "text"));
-                needsWrap = true;
-                i++;
-            }
-            else if (text[i] == '\t')
-            {
-                parentNode.AppendChild(new OdfNode(OdfNodeType.Element, "tab", OdfNamespaces.Text, "text"));
-                i++;
-            }
-            else if (text[i] == ' ')
-            {
-                int spaceCount = 0;
-                while (i < text.Length && text[i] == ' ')
-                {
-                    spaceCount++;
-                    i++;
-                }
-
-                if (spaceCount == 1)
-                {
-                    parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
-                }
-                else
-                {
-                    parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
-                    var sNode = new OdfNode(OdfNodeType.Element, "s", OdfNamespaces.Text, "text");
-                    sNode.SetAttribute("c", OdfNamespaces.Text, (spaceCount - 1).ToString(CultureInfo.InvariantCulture), "text");
-                    parentNode.AppendChild(sNode);
-                }
-            }
-            else
-            {
-                int start = i;
-                while (i < text.Length && text[i] != '\n' && text[i] != '\t' && text[i] != ' ')
-                {
-                    i++;
-                }
-
-                string segment = text.Substring(start, i - start);
-                parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = segment });
-            }
+            needsWrap = true;
         }
     }
 

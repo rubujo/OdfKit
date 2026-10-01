@@ -158,7 +158,7 @@ public partial class OdfTableSheet
 
         // 與引擎相同的順序：先驗證欄索引並補欄定義，再附加列。
         OdfTableSheetDomAccessEngine.EnsureColumnDefinitions(TableNode, col);
-        rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+        rowNode = OdfTableSheetDomAccessEngine.CreateRowNode();
         TableNode.AppendChild(rowNode);
         _rowNodeCache.Add(rowNode);
         return true;

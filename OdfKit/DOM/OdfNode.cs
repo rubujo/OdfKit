@@ -185,6 +185,16 @@ public partial class OdfNode
             {
                 _value = value;
             }
+            else if (value is not null
+                && NodeType == OdfNodeType.Element
+                && NamespaceUri == OdfNamespaces.Text
+                && IsParagraphContentElement(LocalName)
+                && OdfTextWhitespace.NeedsEncoding(value))
+            {
+                // ODF 1.3 §6.1.2：消費端會折疊 text:p／text:h 與其行內元素中的空白，需以 text:s／text:tab／text:line-break 寫出。
+                Children.Clear();
+                OdfTextWhitespace.AppendEncoded(this, value);
+            }
             else
             {
                 Children.Clear();
@@ -200,6 +210,9 @@ public partial class OdfNode
             }
         }
     }
+
+    private static bool IsParagraphContentElement(string localName) =>
+        localName is "p" or "h" or "span" or "a" or "meta" or "ruby-base" or "ruby-text";
 
     /// <summary>
     /// Walks up to the root node to get the ODF version of the document this node belongs to.

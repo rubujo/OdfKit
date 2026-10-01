@@ -260,6 +260,7 @@ internal static class TextDocumentHtmlFragmentEngine
         if (href is not null)
         {
             var aNode = new OdfNode(OdfNodeType.Element, "a", OdfNamespaces.Text, "text");
+            aNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
             aNode.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
             AppendFormattedOrPlainText(document, aNode, text, format);
             paragraphNode.AppendChild(aNode);

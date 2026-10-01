@@ -179,11 +179,23 @@ internal static class OdfTableSheetDomAccessEngine
         OdfNode? lastRow = null;
         while (currentRowIndex <= row)
         {
-            lastRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+            lastRow = CreateRowNode();
             tableNode.AppendChild(lastRow);
             currentRowIndex++;
         }
         return lastRow!;
+    }
+
+    /// <summary>
+    /// 建立新的列節點。ODF schema 規定 <c>table:table-row</c> 至少含一個 <c>table:table-cell</c>
+    /// 或 <c>table:covered-table-cell</c>；沒有儲存格的列（例如位址跳過的中間列）會讓文件不符合 schema，
+    /// 因此新列一律預先放入一個空白儲存格。
+    /// </summary>
+    internal static OdfNode CreateRowNode()
+    {
+        var row = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+        row.AppendChild(new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table"));
+        return row;
     }
 
     /// <summary>

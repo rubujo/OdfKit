@@ -135,6 +135,7 @@ internal static class TextDocumentNotesEngine
     internal static void AddHyperlink(OdfParagraph paragraph, string url, string text)
     {
         var aNode = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
+        aNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         aNode.SetAttribute("href", OdfNamespaces.XLink, url, "xlink");
         aNode.TextContent = text;
         paragraph.Node.AppendChild(aNode);
