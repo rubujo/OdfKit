@@ -70,6 +70,11 @@ pwsh eng/Benchmark-Stress.ps1
 縮放比與「不得崩潰」不受機器速度影響，因此這組檢查不需要基準線 JSON；絕對耗時只列印供參考。
 它只在 `performance-benchmark.yml` 的排程與手動觸發時執行，不進入 PR 必跑的 CI。
 
+跨套件寫入與讀取對比（MiniExcel、ClosedXML；[效能對比](performance-comparison.md)）耗時與記憶體都高，
+只能在 `performance-benchmark.yml` 手動觸發並勾選 `run_competitive_comparison` 時執行，會在 Ubuntu 與
+Windows 各跑一次完整的一百萬列寫入與讀取，並把輸出存為 `competitive-comparison-<os>` 產物（保留 14 天）。
+讀取對比含內容檢查碼，不符即失敗。
+
 ## 穩定本機量測設定檔
 
 正式比較效能變更時，使用較長且時間導向的穩定量測設定檔：

@@ -136,7 +136,8 @@ if (-not $ciText.Contains("os: [windows-latest]", [StringComparison]::Ordinal) -
 $performanceText = Get-Content -LiteralPath (Join-Path $workflowRoot "performance-benchmark.yml") -Raw
 foreach ($condition in @(
         "inputs.run_webfont_iis_sustained_load",
-        "inputs.run_macos_informational")) {
+        "inputs.run_macos_informational",
+        "inputs.run_competitive_comparison")) {
     if (-not $performanceText.Contains($condition, [StringComparison]::Ordinal)) {
         throw "高成本或 informational performance job 必須維持明確手動 opt-in。"
     }

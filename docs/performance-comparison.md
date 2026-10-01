@@ -287,6 +287,10 @@ dotnet OdfKit.Benchmarks/bin/Release/net10.0/OdfKit.Benchmarks.dll --manual-comp
 dotnet run --project OdfKit.Benchmarks -c Release -- --filter *CompetitiveStreamReadBenchmarks*
 ```
 
+也可在 GitHub Actions 手動觸發 `Performance benchmark` 並勾選 `run_competitive_comparison`，於 Ubuntu 與
+Windows runner 各執行一次寫入與讀取對比（輸出存為 `competitive-comparison-<os>` 產物）。runner 的硬體與
+本節的本機環境不同，數字不可直接比較。
+
 ### 7.5 結果解讀
 
 - **耗時：最佳化後 OdfKit 是三者中最快的。** `OdsStreamReader` 約 `7.6` 至 `7.8` 秒，MiniExcel 約

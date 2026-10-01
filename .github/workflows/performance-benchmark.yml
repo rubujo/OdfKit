@@ -13,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      run_competitive_comparison:
+        description: 'Run the opt-in cross-package write and read comparison (MiniExcel, ClosedXML)'
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '17 3 * * 1'
 
@@ -124,6 +129,52 @@ jobs:
         with:
           name: standard-document-performance-macos-latest
           path: artifacts/performance/standard-documents.json
+          if-no-files-found: error
+          retention-days: 14
+
+  competitive-comparison:
+    name: Competitive comparison (${{ matrix.os }})
+    # 一百萬列 x 十欄的跨套件寫入與讀取對比（MiniExcel、ClosedXML）：耗時與記憶體都高，
+    # 且 ClosedXML 對照組會整份載入記憶體，因此只在手動觸發並明確選用時執行。
+    if: github.event_name == 'workflow_dispatch' && inputs.run_competitive_comparison
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+
+      - name: Cache NuGet packages
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-v1
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # 讀取對比會以內容檢查碼驗證每個讀取器讀回的資料與產生器一致；不符時腳本失敗，該次量測無效。
+      - name: Run competitive comparison (write and read)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts/performance | Out-Null
+          ./eng/Benchmark-Competitive.ps1 -Configuration Release -Mode All 2>&1 |
+            Tee-Object -FilePath artifacts/performance/competitive-comparison.txt
+
+      - name: Upload competitive comparison
+        if: always() && hashFiles('artifacts/performance/competitive-comparison.txt') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: competitive-comparison-${{ matrix.os }}
+          path: artifacts/performance/competitive-comparison.txt
           if-no-files-found: error
           retention-days: 14
 
