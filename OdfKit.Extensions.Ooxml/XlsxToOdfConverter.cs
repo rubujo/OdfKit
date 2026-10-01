@@ -94,6 +94,7 @@ public static class XlsxToOdfConverter
                 }
 
                 CopySheetData(xlSheet, odsSheet);
+                CopyMergedRanges(xlSheet, odsSheet);
                 CopyDataValidations(xlSheet, odsSheet);
                 CopyConditionalFormats(xlSheet, odsSheet);
             }
@@ -1076,10 +1077,14 @@ public static class XlsxToOdfConverter
         if (usedRange is null)
             return;
 
-        foreach (var xlRow in usedRange.Rows())
+        // 只走訪實際存在的儲存格（有內容或格式）；以 Rows()/Cells() 走訪整個已使用範圍會把空白儲存格全部具現化，
+        // 一個位於遠端位址的儲存格就能讓輸出膨脹成數十萬甚至數十億個空白儲存格。
+        foreach (var rowGroup in usedRange.CellsUsed(XLCellsUsedOptions.All)
+                     .GroupBy(cell => cell.Address.RowNumber)
+                     .OrderBy(group => group.Key))
         {
-            int r = xlRow.RowNumber() - 1;
-            foreach (var xlCell in xlRow.Cells())
+            int r = rowGroup.Key - 1;
+            foreach (var xlCell in rowGroup.OrderBy(cell => cell.Address.ColumnNumber))
             {
                 int c = xlCell.Address.ColumnNumber - 1;
                 object? val = xlCell.Value.IsBlank ? null :
@@ -1093,8 +1098,15 @@ public static class XlsxToOdfConverter
                     odsCell.Formula = TranslateFormulaToOdf(xlCell.FormulaA1);
                 }
 
-                if (val is not null)
+                if (val is DateTime date)
+                {
+                    // Excel 的日期序號沒有時區；以當地時間轉成 UTC 會讓日期隨執行機器的時區位移。
+                    odsCell.SetValue(date, useTimezoneNaive: true);
+                }
+                else if (val is not null)
+                {
                     odsCell.CellValue = val;
+                }
 
                 CopyCellStyle(xlCell, odsCell);
             }
@@ -1163,6 +1175,30 @@ public static class XlsxToOdfConverter
         var systemColor = color.Color;
         hex = $"#{systemColor.R:X2}{systemColor.G:X2}{systemColor.B:X2}";
         return true;
+    }
+
+    // 每個工作表最多轉換的被覆蓋儲存格數。合併範圍可寫成 A1:XFD1048576 這種極小的輸入，
+    // 逐格建立 covered-table-cell 會使輸出膨脹到無法接受；超出預算的範圍略過而不是中止轉換。
+    private const long MaxMergedCoveredCellsPerSheet = 1_000_000;
+
+    private static void CopyMergedRanges(IXLWorksheet xlSheet, OdfTableSheet odsSheet)
+    {
+        long budget = MaxMergedCoveredCellsPerSheet;
+        foreach (IXLRange merged in xlSheet.MergedRanges)
+        {
+            int firstRow = merged.RangeAddress.FirstAddress.RowNumber - 1;
+            int firstColumn = merged.RangeAddress.FirstAddress.ColumnNumber - 1;
+            int lastRow = merged.RangeAddress.LastAddress.RowNumber - 1;
+            int lastColumn = merged.RangeAddress.LastAddress.ColumnNumber - 1;
+            long cellCount = (long)(lastRow - firstRow + 1) * (lastColumn - firstColumn + 1);
+            if (cellCount <= 1 || cellCount > budget)
+            {
+                continue;
+            }
+
+            budget -= cellCount;
+            odsSheet.MergeCells(new OdfCellRange(firstRow, firstColumn, lastRow, lastColumn));
+        }
     }
 
     private static void CopyDataValidations(IXLWorksheet xlSheet, OdfTableSheet odsSheet)

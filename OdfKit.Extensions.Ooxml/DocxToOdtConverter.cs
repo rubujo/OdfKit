@@ -129,6 +129,14 @@ public static class DocxToOdtConverter
             {
                 AppendDeletedRun(odtDocument, odtParagraph.Node, deletedRun);
             }
+            else if (child is WP.Hyperlink hyperlink)
+            {
+                AppendHyperlink(mainPart, hyperlink, odtDocument, odtParagraph);
+            }
+            else if (IsInlineContainer(child))
+            {
+                ConvertInlineContainer(mainPart, child, odtDocument, odtParagraph);
+            }
         }
 
         if (!odtParagraph.Node.Children.Any(child =>
@@ -431,6 +439,105 @@ public static class DocxToOdtConverter
         AppendChangeEnd(paragraphNode, changeId);
     }
 
+    private static bool IsInlineContainer(OpenXmlElement element) =>
+        element is WP.SdtRun or WP.SdtContentRun or WP.SimpleField or WP.CustomXmlRun;
+
+    /// <summary>
+    /// 展開內容控制項、智慧標籤、簡單欄位與自訂 XML 等行內容器，避免其中的文字被整段丟棄。
+    /// </summary>
+    private static void ConvertInlineContainer(
+        MainDocumentPart mainPart,
+        OpenXmlElement container,
+        TextDocument odtDocument,
+        OdfParagraph odtParagraph)
+    {
+        foreach (OpenXmlElement child in container.ChildElements)
+        {
+            if (child is WP.Run run)
+            {
+                ConvertRun(mainPart, run, odtDocument, odtParagraph);
+            }
+            else if (child is WP.Hyperlink hyperlink)
+            {
+                AppendHyperlink(mainPart, hyperlink, odtDocument, odtParagraph);
+            }
+            else if (IsInlineContainer(child))
+            {
+                ConvertInlineContainer(mainPart, child, odtDocument, odtParagraph);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 將 DOCX 超連結轉為 <c>text:a</c>；目標無法解析或為不安全的協定時，退回保留連結文字。
+    /// </summary>
+    private static void AppendHyperlink(
+        MainDocumentPart mainPart,
+        WP.Hyperlink hyperlink,
+        TextDocument odtDocument,
+        OdfParagraph odtParagraph)
+    {
+        string? target = ResolveHyperlinkTarget(mainPart, hyperlink);
+        if (target is null)
+        {
+            foreach (WP.Run run in hyperlink.Elements<WP.Run>())
+            {
+                ConvertRun(mainPart, run, odtDocument, odtParagraph);
+            }
+
+            return;
+        }
+
+        string text = string.Concat(hyperlink.Elements<WP.Run>().Select(ExtractRunText));
+        if (text.Length > 0)
+        {
+            odtParagraph.AddHyperlink(target, text);
+        }
+    }
+
+    private static string? ResolveHyperlinkTarget(MainDocumentPart mainPart, WP.Hyperlink hyperlink)
+    {
+        string? relationshipId = hyperlink.Id?.Value;
+        if (!string.IsNullOrEmpty(relationshipId))
+        {
+            HyperlinkRelationship? relationship = mainPart.HyperlinkRelationships
+                .FirstOrDefault(item => item.Id == relationshipId);
+            if (relationship is not null)
+            {
+                string uri = relationship.Uri.OriginalString;
+                string? fragment = hyperlink.Anchor?.Value;
+                if (!string.IsNullOrEmpty(fragment) && uri.IndexOf('#') < 0)
+                {
+                    uri += "#" + fragment;
+                }
+
+                return IsSafeHyperlinkTarget(uri) ? uri : null;
+            }
+        }
+
+        string? anchor = hyperlink.Anchor?.Value;
+        return string.IsNullOrEmpty(anchor) ? null : "#" + anchor;
+    }
+
+    private static bool IsSafeHyperlinkTarget(string uri)
+    {
+        if (string.IsNullOrWhiteSpace(uri))
+        {
+            return false;
+        }
+
+        int colon = uri.IndexOf(':');
+        if (colon <= 0)
+        {
+            return true;
+        }
+
+        string scheme = uri.Substring(0, colon);
+        return !scheme.Equals("javascript", StringComparison.OrdinalIgnoreCase)
+            && !scheme.Equals("vbscript", StringComparison.OrdinalIgnoreCase)
+            && !scheme.Equals("data", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static void ConvertRun(MainDocumentPart mainPart, WP.Run run, TextDocument odtDocument, OdfParagraph odtParagraph)
     {
         AppendRunText(odtDocument, odtParagraph, ExtractRunText(run), run.RunProperties);
@@ -499,7 +606,30 @@ public static class DocxToOdtConverter
 
     private static string ExtractRunText(WP.Run run)
     {
-        return string.Concat(run.Descendants<WP.Text>().Select(node => node.Text));
+        var builder = new System.Text.StringBuilder();
+        foreach (OpenXmlElement node in run.Descendants())
+        {
+            switch (node)
+            {
+                case WP.Text text:
+                    builder.Append(text.Text);
+                    break;
+                case WP.TabChar:
+                    builder.Append('\t');
+                    break;
+                case WP.CarriageReturn:
+                    builder.Append('\n');
+                    break;
+                case WP.Break lineBreak when lineBreak.Type is null || lineBreak.Type.Value == WP.BreakValues.TextWrapping:
+                    builder.Append('\n');
+                    break;
+                case WP.NoBreakHyphen:
+                    builder.Append('\u2011');
+                    break;
+            }
+        }
+
+        return builder.ToString();
     }
 
     private readonly struct TextFormattingProperties
@@ -841,6 +971,12 @@ public static class DocxToOdtConverter
             return;
         }
 
+        if (OdfTextWhitespace.NeedsEncoding(text))
+        {
+            OdfTextWhitespace.AppendEncoded(parent, text);
+            return;
+        }
+
         parent.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text });
     }
 
@@ -882,36 +1018,128 @@ public static class DocxToOdtConverter
         parent.InsertAfter(endNode, node);
     }
 
+    private const int MaxTableColumns = 1024;
+
+    private sealed class TableCellPlacement(int row, int column, int columnSpan, WP.TableCell cell)
+    {
+        internal int Row { get; } = row;
+
+        internal int Column { get; } = column;
+
+        internal int ColumnSpan { get; } = columnSpan;
+
+        internal int RowSpan { get; set; } = 1;
+
+        internal WP.TableCell Cell { get; } = cell;
+    }
+
     private static void ConvertTable(WP.Table wordTable, TextDocument odtDocument)
     {
-        var rows = wordTable.Elements<WP.TableRow>().ToList();
-        int rowCount = rows.Count;
-        int columnCount = rows.Count == 0
-            ? 0
-            : rows.Max(row => row.Elements<WP.TableCell>().Count());
-
+        (int rowCount, int columnCount, List<TableCellPlacement> placements) = BuildTableGrid(wordTable);
         if (rowCount == 0 || columnCount == 0)
         {
             return;
         }
 
         OdfTable odtTable = odtDocument.AddTable(rowCount, columnCount);
-        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
-        {
-            var cells = rows[rowIndex].Elements<WP.TableCell>().ToList();
-            for (int columnIndex = 0; columnIndex < cells.Count; columnIndex++)
-            {
-                string cellText = string.Join("\n", cells[columnIndex]
-                    .Elements<WP.Paragraph>()
-                    .Select(paragraph => paragraph.InnerText)
-                    .Where(text => !string.IsNullOrEmpty(text)));
+        PopulateTable(odtTable, placements);
+    }
 
-                if (!string.IsNullOrEmpty(cellText))
+    /// <summary>
+    /// 依 <c>w:gridSpan</c>、<c>w:gridBefore</c> 與 <c>w:vMerge</c> 計算每個實際儲存格所在的格線位置與跨度，
+    /// 而不是以儲存格在列中的順序當作欄索引（合併儲存格之後的欄位會整排錯位）。
+    /// </summary>
+    private static (int RowCount, int ColumnCount, List<TableCellPlacement> Placements) BuildTableGrid(WP.Table wordTable)
+    {
+        var rows = wordTable.Elements<WP.TableRow>().ToList();
+        var placements = new List<TableCellPlacement>();
+        var openMerges = new Dictionary<int, TableCellPlacement>();
+        int columnCount = 0;
+        for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
+        {
+            int column = Math.Min(
+                MaxTableColumns,
+                Math.Max(0, rows[rowIndex].TableRowProperties?.GetFirstChild<WP.GridBefore>()?.Val?.Value ?? 0));
+            foreach (WP.TableCell cell in rows[rowIndex].Elements<WP.TableCell>())
+            {
+                if (column >= MaxTableColumns)
                 {
-                    odtTable.GetCell(rowIndex, columnIndex).AddParagraph(cellText);
+                    break;
+                }
+
+                WP.TableCellProperties? properties = cell.TableCellProperties;
+                int span = Math.Min(MaxTableColumns - column, Math.Max(1, properties?.GridSpan?.Val?.Value ?? 1));
+                WP.VerticalMerge? merge = properties?.VerticalMerge;
+                bool continuesMerge = merge is not null
+                    && (merge.Val is null || merge.Val.Value == WP.MergedCellValues.Continue);
+                if (continuesMerge
+                    && openMerges.TryGetValue(column, out TableCellPlacement? origin)
+                    && origin.ColumnSpan == span)
+                {
+                    origin.RowSpan++;
+                }
+                else
+                {
+                    var placement = new TableCellPlacement(rowIndex, column, span, cell);
+                    placements.Add(placement);
+                    if (merge?.Val is not null && merge.Val.Value == WP.MergedCellValues.Restart)
+                    {
+                        openMerges[column] = placement;
+                    }
+                    else
+                    {
+                        openMerges.Remove(column);
+                    }
+                }
+
+                column += span;
+            }
+
+            columnCount = Math.Max(columnCount, column);
+        }
+
+        return (rows.Count, columnCount, placements);
+    }
+
+    private static void PopulateTable(OdfTable odtTable, List<TableCellPlacement> placements)
+    {
+        System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
+        foreach (TableCellPlacement placement in placements)
+        {
+            foreach (OpenXmlElement child in placement.Cell.ChildElements)
+            {
+                if (child is WP.Paragraph paragraph)
+                {
+                    string text = GetParagraphPlainText(paragraph);
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        odtTable.GetCell(placement.Row, placement.Column).AddParagraph(text);
+                    }
+                }
+                else if (child is WP.Table nestedWordTable)
+                {
+                    (int nestedRows, int nestedColumns, List<TableCellPlacement> nestedPlacements) = BuildTableGrid(nestedWordTable);
+                    if (nestedRows > 0 && nestedColumns > 0)
+                    {
+                        OdfTable nestedTable = odtTable.AddNestedTable(placement.Row, placement.Column, nestedRows, nestedColumns);
+                        PopulateTable(nestedTable, nestedPlacements);
+                    }
                 }
             }
+
+            if (placement.RowSpan > 1 || placement.ColumnSpan > 1)
+            {
+                odtTable.MergeCells(placement.Row, placement.Column, placement.RowSpan, placement.ColumnSpan);
+            }
         }
+    }
+
+    private static string GetParagraphPlainText(WP.Paragraph paragraph)
+    {
+        string text = string.Concat(paragraph.Descendants<WP.Run>()
+            .Where(run => ReferenceEquals(run.Ancestors<WP.Paragraph>().FirstOrDefault(), paragraph))
+            .Select(ExtractRunText));
+        return text.Length > 0 ? text : paragraph.InnerText ?? string.Empty;
     }
 
     private static int GetHeadingLevel(WP.Paragraph paragraph)
