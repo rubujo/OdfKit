@@ -28,6 +28,7 @@ namespace OdfKit.Tests;
 public sealed class RealWorldConverterFidelityTests
 {
     private static readonly XNamespace s_text = OdfNamespaces.Text;
+    private static readonly XNamespace s_style = OdfNamespaces.Style;
     private static readonly XNamespace s_table = OdfNamespaces.Table;
     private static readonly XNamespace s_office = OdfNamespaces.Office;
     private static readonly XNamespace s_xlink = OdfNamespaces.XLink;
@@ -580,6 +581,111 @@ public sealed class RealWorldConverterFidelityTests
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
     }
 
+    /// <summary>
+    /// 驗證頁首與頁尾走與本文相同的段落轉換（原本只取純文字串接）：超連結（關係屬於頁首部件）、
+    /// 頁碼與總頁數轉成 ODF 欄位（複雜欄位與簡單欄位，Word 儲存的結果文字不會變成固定的「1」），
+    /// <c>w:titlePg</c> 與 <c>w:evenAndOddHeaders</c> 建立首頁與偶數頁的版本；沒有實際內容的預設頁首不建立區域。
+    /// </summary>
+    [Fact]
+    public void DocxHeadersAndFootersKeepRichContentAndPageFields()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(new WP.Paragraph(new WP.Run(new WP.Text("本文"))));
+            },
+            main =>
+            {
+                HeaderPart header = main.AddNewPart<HeaderPart>();
+                header.AddHyperlinkRelationship(new Uri("https://example.org/header"), true, "rIdHeaderLink");
+                header.Header = new WP.Header(new WP.Paragraph(
+                    new WP.Run(new WP.Text("頁首")),
+                    new WP.Hyperlink(new WP.Run(new WP.Text("連結"))) { Id = "rIdHeaderLink" }));
+                header.Header.Save();
+
+                HeaderPart firstHeader = main.AddNewPart<HeaderPart>();
+                firstHeader.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("首頁頁首"))));
+                firstHeader.Header.Save();
+
+                HeaderPart evenHeader = main.AddNewPart<HeaderPart>();
+                evenHeader.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("偶數頁頁首"))));
+                evenHeader.Header.Save();
+
+                FooterPart footer = main.AddNewPart<FooterPart>();
+                footer.Footer = new WP.Footer(new WP.Paragraph(
+                    new WP.Run(new WP.Text("第 ") { Space = SpaceProcessingModeValues.Preserve }),
+                    new WP.Run(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Begin }),
+                    new WP.Run(new WP.FieldCode(" PAGE ") { Space = SpaceProcessingModeValues.Preserve }),
+                    new WP.Run(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Separate }),
+                    new WP.Run(new WP.Text("1")),
+                    new WP.Run(new WP.FieldChar { FieldCharType = WP.FieldCharValues.End }),
+                    new WP.Run(new WP.Text(" 頁，共 ") { Space = SpaceProcessingModeValues.Preserve }),
+                    new WP.SimpleField(new WP.Run(new WP.Text("9"))) { Instruction = " NUMPAGES " },
+                    new WP.Run(new WP.Text(" 頁") { Space = SpaceProcessingModeValues.Preserve })));
+                footer.Footer.Save();
+
+                // 預設頁首之外再放一個只有空段落的首頁頁尾：不應建立區域。
+                FooterPart emptyFirstFooter = main.AddNewPart<FooterPart>();
+                emptyFirstFooter.Footer = new WP.Footer(new WP.Paragraph());
+                emptyFirstFooter.Footer.Save();
+
+                DocumentSettingsPart settings = main.AddNewPart<DocumentSettingsPart>();
+                settings.Settings = new WP.Settings(new WP.EvenAndOddHeaders());
+                settings.Settings.Save();
+
+                main.Document!.Body!.Append(new WP.SectionProperties(
+                    new WP.HeaderReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(header) },
+                    new WP.HeaderReference { Type = WP.HeaderFooterValues.First, Id = main.GetIdOfPart(firstHeader) },
+                    new WP.HeaderReference { Type = WP.HeaderFooterValues.Even, Id = main.GetIdOfPart(evenHeader) },
+                    new WP.FooterReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(footer) },
+                    new WP.FooterReference { Type = WP.HeaderFooterValues.First, Id = main.GetIdOfPart(emptyFirstFooter) },
+                    new WP.TitlePage()));
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement styles = XElement.Parse(SaveStylesXml(odt));
+        XElement masterPage = styles.Descendants(s_style + "master-page").First();
+
+        XElement header = masterPage.Element(s_style + "header")!;
+        Assert.StartsWith("頁首", header.Value, StringComparison.Ordinal);
+        XElement headerLink = header.Descendants(s_text + "a").Single();
+        Assert.Equal("https://example.org/header", (string?)headerLink.Attribute(s_xlink + "href"));
+        Assert.Equal("首頁頁首", masterPage.Element(s_style + "header-first")!.Value);
+        Assert.Equal("偶數頁頁首", masterPage.Element(s_style + "header-left")!.Value);
+
+        XElement footer = masterPage.Element(s_style + "footer")!;
+        XElement pageNumber = footer.Descendants(s_text + "page-number").Single();
+        Assert.Equal("current", (string?)pageNumber.Attribute(s_text + "select-page"));
+        Assert.Single(footer.Descendants(s_text + "page-count"));
+        Assert.Equal(
+            new[] { "第", "s:1", "page-number", "s:1", "頁，共", "s:1", "page-count", "s:1", "頁" },
+            DescribeChildren(footer.Element(s_text + "p")!));
+        Assert.Null(masterPage.Element(s_style + "footer-first"));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證沒有章節屬性參照的 DOCX 仍會沿用第一個頁首部件作為預設頁首（保持原本的容錯行為）。
+    /// </summary>
+    [Fact]
+    public void DocxHeaderWithoutSectionReferenceIsUsedAsDefault()
+    {
+        using MemoryStream docx = CreateDocx(
+            body => body.Append(new WP.Paragraph(new WP.Run(new WP.Text("本文")))),
+            main =>
+            {
+                HeaderPart header = main.AddNewPart<HeaderPart>();
+                header.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("無參照頁首"))));
+                header.Header.Save();
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement styles = XElement.Parse(SaveStylesXml(odt));
+        Assert.Equal("無參照頁首", styles.Descendants(s_style + "header").Single().Value);
+    }
+
     // ---------- helpers ----------
 
     private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>
@@ -614,8 +720,8 @@ public sealed class RealWorldConverterFidelityTests
             MainDocumentPart main = document.AddMainDocumentPart();
             var body = new WP.Body();
             main.Document = new WP.Document(body);
-            configure?.Invoke(main);
             fill(body);
+            configure?.Invoke(main);
         }
 
         stream.Position = 0;
@@ -631,6 +737,18 @@ public sealed class RealWorldConverterFidelityTests
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
         using Stream contentStream = package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);
+        return reader.ReadToEnd();
+    }
+
+    private static string SaveStylesXml(OdfDocument document)
+    {
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream stylesStream = package.GetEntryStream("styles.xml");
+        using var reader = new StreamReader(stylesStream);
         return reader.ReadToEnd();
     }
 

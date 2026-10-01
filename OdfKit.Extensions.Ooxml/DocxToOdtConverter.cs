@@ -46,8 +46,8 @@ public static partial class DocxToOdtConverter
             ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_DocxToOdtConverter_DocxNotFound_3"));
 
         TextDocument odtDocument = TextDocument.Create();
-        ConvertHeaderFooter(mainPart, odtDocument);
         var context = new BodyContext(mainPart, odtDocument);
+        ConvertHeaderFooter(context, body);
         foreach (var child in body.ChildElements)
         {
             if (child is WP.Paragraph paragraph)
@@ -63,28 +63,7 @@ public static partial class DocxToOdtConverter
         return odtDocument;
     }
 
-    private static void ConvertHeaderFooter(MainDocumentPart mainPart, TextDocument odtDocument)
-    {
-        string headerText = string.Concat(mainPart.HeaderParts.Select(part => part.Header?.InnerText ?? string.Empty));
-        string footerText = string.Concat(mainPart.FooterParts.Select(part => part.Footer?.InnerText ?? string.Empty));
-        if (string.IsNullOrEmpty(headerText) && string.IsNullOrEmpty(footerText))
-        {
-            return;
-        }
-
-        OdfPageSetup setup = odtDocument.GetDefaultPageSetup();
-        if (!string.IsNullOrEmpty(headerText))
-        {
-            setup.HeaderText = headerText;
-        }
-
-        if (!string.IsNullOrEmpty(footerText))
-        {
-            setup.FooterText = footerText;
-        }
-    }
-
-    private static void ConvertParagraph(MainDocumentPart mainPart, WP.Paragraph paragraph, TextDocument odtDocument)
+    private static void ConvertParagraph(OpenXmlPartContainer mainPart, WP.Paragraph paragraph, TextDocument odtDocument)
     {
         int headingLevel = GetHeadingLevel(paragraph);
         OdfParagraph odtParagraph = headingLevel > 0
@@ -116,11 +95,21 @@ public static partial class DocxToOdtConverter
             }
         }
 
+        FieldScanner? fieldScanner = null;
         foreach (var child in paragraph.ChildElements)
         {
             if (child is WP.Run run)
             {
+                if (TryConsumeFieldRun(ref fieldScanner, run, odtParagraph))
+                {
+                    continue;
+                }
+
                 ConvertRun(mainPart, run, odtDocument, odtParagraph);
+            }
+            else if (child is WP.SimpleField simpleField && TryAppendSimpleField(simpleField, odtParagraph))
+            {
+                // 頁碼與總頁數已轉成 ODF 欄位。
             }
             else if (child is WP.InsertedRun insertedRun)
             {
@@ -447,7 +436,7 @@ public static partial class DocxToOdtConverter
     /// 展開內容控制項、智慧標籤、簡單欄位與自訂 XML 等行內容器，避免其中的文字被整段丟棄。
     /// </summary>
     private static void ConvertInlineContainer(
-        MainDocumentPart mainPart,
+        OpenXmlPartContainer mainPart,
         OpenXmlElement container,
         TextDocument odtDocument,
         OdfParagraph odtParagraph)
@@ -473,7 +462,7 @@ public static partial class DocxToOdtConverter
     /// 將 DOCX 超連結轉為 <c>text:a</c>；目標無法解析或為不安全的協定時，退回保留連結文字。
     /// </summary>
     private static void AppendHyperlink(
-        MainDocumentPart mainPart,
+        OpenXmlPartContainer mainPart,
         WP.Hyperlink hyperlink,
         TextDocument odtDocument,
         OdfParagraph odtParagraph)
@@ -496,7 +485,7 @@ public static partial class DocxToOdtConverter
         }
     }
 
-    private static string? ResolveHyperlinkTarget(MainDocumentPart mainPart, WP.Hyperlink hyperlink)
+    private static string? ResolveHyperlinkTarget(OpenXmlPartContainer mainPart, WP.Hyperlink hyperlink)
     {
         string? relationshipId = hyperlink.Id?.Value;
         if (!string.IsNullOrEmpty(relationshipId))
@@ -539,7 +528,7 @@ public static partial class DocxToOdtConverter
             && !scheme.Equals("data", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void ConvertRun(MainDocumentPart mainPart, WP.Run run, TextDocument odtDocument, OdfParagraph odtParagraph)
+    private static void ConvertRun(OpenXmlPartContainer mainPart, WP.Run run, TextDocument odtDocument, OdfParagraph odtParagraph)
     {
         AppendRunText(odtDocument, odtParagraph, ExtractRunText(run), run.RunProperties);
         AppendNotes(mainPart, run, odtDocument, odtParagraph);
@@ -550,7 +539,7 @@ public static partial class DocxToOdtConverter
         }
     }
 
-    private static void AppendDrawing(MainDocumentPart mainPart, WP.Drawing drawing, TextDocument odtDocument, OdfParagraph odtParagraph)
+    private static void AppendDrawing(OpenXmlPartContainer mainPart, WP.Drawing drawing, TextDocument odtDocument, OdfParagraph odtParagraph)
     {
         A.Blip? blip = drawing.Descendants<A.Blip>().FirstOrDefault();
         string? relationshipId = blip?.Embed?.Value;
