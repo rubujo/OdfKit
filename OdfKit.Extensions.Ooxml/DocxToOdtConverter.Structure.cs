@@ -13,7 +13,8 @@ using WP = DocumentFormat.OpenXml.Wordprocessing;
 namespace OdfKit.Conversion;
 
 /// <summary>
-/// DOCX → ODT 轉換的清單、分頁符號與註腳／章節附註。
+/// Structural conversion for DOCX to ODT: lists, page breaks, footnotes and endnotes, headers and footers, and page fields.
+/// DOCX → ODT 轉換的結構轉換：清單、分頁符號、註腳與章節附註、頁首與頁尾，以及頁碼欄位。
 /// </summary>
 public static partial class DocxToOdtConverter
 {

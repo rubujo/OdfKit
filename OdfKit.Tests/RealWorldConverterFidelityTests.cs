@@ -462,13 +462,15 @@ public sealed class RealWorldConverterFidelityTests
             .Where(item => item.Element(style + "paragraph-properties")?.Attribute(fo + "break-before")?.Value == "page")
             .Select(item => (string)item.Attribute(style + "name")!)
             .ToHashSet();
-        string?[] styleNames = paragraphs.Select(paragraph => (string?)paragraph.Attribute(s_text + "style-name")).ToArray();
+        string[] styleNames = paragraphs
+            .Select(paragraph => (string?)paragraph.Attribute(s_text + "style-name") ?? string.Empty)
+            .ToArray();
 
-        Assert.Null(styleNames[0]);
-        Assert.True(breakStyles.Contains(styleNames[1] ?? string.Empty));
-        Assert.Null(styleNames[2]);
-        Assert.True(breakStyles.Contains(styleNames[3] ?? string.Empty));
-        Assert.True(breakStyles.Contains(styleNames[4] ?? string.Empty));
+        Assert.Equal(string.Empty, styleNames[0]);
+        Assert.Contains(styleNames[1], breakStyles);
+        Assert.Equal(string.Empty, styleNames[2]);
+        Assert.Contains(styleNames[3], breakStyles);
+        Assert.Contains(styleNames[4], breakStyles);
     }
 
     /// <summary>

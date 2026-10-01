@@ -32,7 +32,7 @@ internal sealed class OdfPositionSet : IEnumerable<int>
     {
         if (position < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(position));
+            ThrowNegativePosition();
         }
 
         int word = position >> 6;
@@ -164,6 +164,11 @@ internal sealed class OdfPositionSet : IEnumerable<int>
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    // Add 在比對的內層迴圈中被大量呼叫，例外集中在不內嵌的輔助方法，讓熱路徑只剩一次比較。
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void ThrowNegativePosition() =>
+        throw new ArgumentOutOfRangeException("position");
 
     private static int TrailingZeroCount(ulong value)
     {
