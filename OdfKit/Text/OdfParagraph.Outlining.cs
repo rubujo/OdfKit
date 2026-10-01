@@ -82,7 +82,7 @@ public partial class OdfParagraph
             levelNode.SetAttribute("level", OdfNamespaces.Text, level.ToString(CultureInfo.InvariantCulture), "text");
             levelNode.SetAttribute("num-format", OdfNamespaces.Style, "1", "style");
             levelNode.SetAttribute("display-levels", OdfNamespaces.Text, level.ToString(CultureInfo.InvariantCulture), "text");
-            levelNode.SetAttribute("num-suffix", OdfNamespaces.Text, ". ", "text");
+            levelNode.SetAttribute("num-suffix", OdfNamespaces.Style, ". ", "style");
         }
     }
 

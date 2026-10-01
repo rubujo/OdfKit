@@ -92,11 +92,11 @@ internal static class TextDocumentFieldsEngine
             else
             {
                 levelNode = OdfNodeFactory.CreateElement("list-level-style-number", OdfNamespaces.Text, "text");
-                levelNode.SetAttribute("num-format", OdfNamespaces.Fo, lvl.NumFormat, "fo");
+                levelNode.SetAttribute("num-format", OdfNamespaces.Style, lvl.NumFormat, "style");
                 if (!string.IsNullOrEmpty(lvl.NumPrefix))
-                    levelNode.SetAttribute("num-prefix", OdfNamespaces.Text, lvl.NumPrefix!, "text");
+                    levelNode.SetAttribute("num-prefix", OdfNamespaces.Style, lvl.NumPrefix!, "style");
                 if (lvl.NumSuffix is not null)
-                    levelNode.SetAttribute("num-suffix", OdfNamespaces.Text, lvl.NumSuffix, "text");
+                    levelNode.SetAttribute("num-suffix", OdfNamespaces.Style, lvl.NumSuffix, "style");
             }
 
             levelNode.SetAttribute("level", OdfNamespaces.Text, lvl.Level.ToString(CultureInfo.InvariantCulture), "text");

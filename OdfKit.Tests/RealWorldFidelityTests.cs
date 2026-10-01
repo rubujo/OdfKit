@@ -437,6 +437,47 @@ public sealed class RealWorldFidelityTests
         Assert.Equal("前 粗體 與 斜體 後 ", reloaded.Body.Paragraphs.First().TextContent);
     }
 
+    /// <summary>
+    /// 驗證 <c>AddListWithStyle</c> 寫出的清單層級樣式符合 ODF 1.4 schema：編號格式、前綴、後綴在
+    /// <c>style</c> 命名空間（<c>style:num-format</c>、<c>style:num-prefix</c>、<c>style:num-suffix</c>）。
+    /// 修正前寫成 <c>fo:num-format</c> 與 <c>text:num-prefix</c>／<c>text:num-suffix</c>，不符 schema，
+    /// LibreOffice 也忽略這些屬性（<c>a)</c> 與 <c>(I)</c> 都顯示成 <c>1</c>）。
+    /// </summary>
+    [Fact]
+    public void ListStyleLevelsPassOdf14SchemaValidation()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfList list = document.AddListWithStyle(
+            "LS",
+            new[]
+            {
+                new OdfListLevelStyle { Level = 1, Type = OdfListLevelType.Number, NumFormat = "a", NumSuffix = ")" },
+                new OdfListLevelStyle { Level = 2, Type = OdfListLevelType.Number, NumFormat = "I", NumPrefix = "(", NumSuffix = ")" },
+                new OdfListLevelStyle { Level = 3, Type = OdfListLevelType.Bullet, BulletChar = "•" },
+            });
+        list.AddItem("第一項", 1);
+        list.AddItem("巢狀", 2);
+        list.AddItem("深層", 3);
+
+        string stylesXml;
+        using (var stream = new MemoryStream())
+        {
+            document.SaveToStream(stream);
+            stream.Position = 0;
+            using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+            using var reader = new StreamReader(package.GetEntryStream("styles.xml"));
+            stylesXml = reader.ReadToEnd();
+        }
+
+        Assert.Contains("style:num-format=\"a\"", stylesXml);
+        Assert.Contains("style:num-suffix=\")\"", stylesXml);
+        Assert.Contains("style:num-prefix=\"(\"", stylesXml);
+        Assert.DoesNotContain("fo:num-format", stylesXml);
+
+        OdfValidationReport report = Validate14(document);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
     // ---------- helpers ----------
 
     private static MemoryStream RewriteContentXml(MemoryStream source, Func<string, string> transform)

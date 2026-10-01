@@ -75,9 +75,9 @@ public class MultiLevelListTests
         Assert.Contains("text:level=\"1\"", stylesXml);
         Assert.Contains("text:level=\"2\"", stylesXml);
         Assert.Contains("text:level=\"3\"", stylesXml);
-        Assert.Contains("fo:num-format=\"1\"", stylesXml);
-        Assert.Contains("fo:num-format=\"a\"", stylesXml);
-        Assert.Contains("fo:num-format=\"i\"", stylesXml);
+        Assert.Contains("style:num-format=\"1\"", stylesXml);
+        Assert.Contains("style:num-format=\"a\"", stylesXml);
+        Assert.Contains("style:num-format=\"i\"", stylesXml);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public class MultiLevelListTests
     }
 
     /// <summary>
-    /// 驗證 NumPrefix 寫入正確的 text:num-prefix 屬性。
+    /// 驗證 NumPrefix 寫入正確的 style:num-prefix 屬性。
     /// </summary>
     [Fact]
     public void AddListWithStyleWithNumPrefixWritesNumPrefix()
@@ -202,7 +202,7 @@ public class MultiLevelListTests
         doc.AddListWithStyle("SectionList", levels);
 
         string stylesXml = GetStylesXml(doc);
-        Assert.Contains("text:num-prefix=\"§\"", stylesXml);
+        Assert.Contains("style:num-prefix=\"§\"", stylesXml);
     }
 
     /// <summary>
