@@ -303,6 +303,212 @@ public sealed class RealWorldConverterFidelityTests
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
     }
 
+    /// <summary>
+    /// 驗證 DOCX 的清單（<c>w:numPr</c>）轉成巢狀的 <c>text:list</c>／<c>text:list-item</c>，
+    /// 並依編號定義建立 <c>text:list-style</c>（專案符號、編號格式、前綴與後綴）；
+    /// 被其他內容打斷後回到同一份編號時延續編號。轉出的文件通過 ODF 1.4 schema 驗證。
+    /// </summary>
+    [Fact]
+    public void DocxListsConvertToNestedListsWithListStyles()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(ListParagraph("項目一", numberingId: 1, level: 0));
+                body.Append(ListParagraph("子項 a", numberingId: 1, level: 1));
+                body.Append(ListParagraph("子項 b", numberingId: 1, level: 1));
+                body.Append(ListParagraph("項目二", numberingId: 1, level: 0));
+                body.Append(new WP.Paragraph(new WP.Run(new WP.Text("插入的普通段落"))));
+                body.Append(ListParagraph("回到編號", numberingId: 1, level: 0));
+            },
+            main =>
+            {
+                NumberingDefinitionsPart numbering = main.AddNewPart<NumberingDefinitionsPart>();
+                numbering.Numbering = new WP.Numbering(
+                    new WP.AbstractNum(
+                        new WP.Level(
+                            new WP.StartNumberingValue { Val = 1 },
+                            new WP.NumberingFormat { Val = WP.NumberFormatValues.Bullet },
+                            new WP.LevelText { Val = "•" },
+                            new WP.PreviousParagraphProperties(new WP.Indentation { Left = "720", Hanging = "360" }))
+                        { LevelIndex = 0 },
+                        new WP.Level(
+                            new WP.StartNumberingValue { Val = 3 },
+                            new WP.NumberingFormat { Val = WP.NumberFormatValues.LowerLetter },
+                            new WP.LevelText { Val = "(%2)" },
+                            new WP.PreviousParagraphProperties(new WP.Indentation { Left = "1440", Hanging = "360" }))
+                        { LevelIndex = 1 })
+                    { AbstractNumberId = 0 },
+                    new WP.NumberingInstance(new WP.AbstractNumId { Val = 0 }) { NumberID = 1 });
+                numbering.Numbering.Save();
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+
+        XElement[] topLists = content.Descendants(s_text + "list").Where(list => list.Parent!.Name != s_text + "list-item").ToArray();
+        Assert.Equal(2, topLists.Length);
+        Assert.Equal("DocxList1", (string?)topLists[0].Attribute(s_text + "style-name"));
+        Assert.Null(topLists[0].Attribute(s_text + "continue-numbering"));
+        Assert.Equal("true", (string?)topLists[1].Attribute(s_text + "continue-numbering"));
+
+        XElement[] firstItems = topLists[0].Elements(s_text + "list-item").ToArray();
+        Assert.Equal(2, firstItems.Length);
+        Assert.Equal("項目一", firstItems[0].Element(s_text + "p")!.Value);
+        XElement nested = Assert.Single(firstItems[0].Elements(s_text + "list"));
+        Assert.Equal(new[] { "子項 a", "子項 b" }, nested.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
+        Assert.Equal("回到編號", Assert.Single(topLists[1].Elements(s_text + "list-item")).Value);
+
+        XElement listStyle = content.Descendants(s_text + "list-style").Single();
+        XElement bullet = listStyle.Elements(s_text + "list-level-style-bullet").First();
+        Assert.Equal("1", (string?)bullet.Attribute(s_text + "level"));
+        Assert.Equal("•", (string?)bullet.Attribute(s_text + "bullet-char"));
+        XElement numbered = listStyle.Elements(s_text + "list-level-style-number").First();
+        Assert.Equal("2", (string?)numbered.Attribute(s_text + "level"));
+        XNamespace style = OdfNamespaces.Style;
+        Assert.Equal("a", (string?)numbered.Attribute(style + "num-format"));
+        Assert.Equal("(", (string?)numbered.Attribute(style + "num-prefix"));
+        Assert.Equal(")", (string?)numbered.Attribute(style + "num-suffix"));
+        Assert.Equal("3", (string?)numbered.Attribute(s_text + "start-value"));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證 DOCX 的註腳與章節附註（原本整個被丟棄）轉成 <c>text:note</c>：引用標記依序編號，
+    /// 多個段落的內文各自成為 <c>text:p</c>，內文開頭的標記空白被移除。
+    /// </summary>
+    [Fact]
+    public void DocxFootnotesAndEndnotesConvertToNotes()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(new WP.Paragraph(
+                    new WP.Run(new WP.Text("前文")),
+                    new WP.Run(new WP.FootnoteReference { Id = 2 }),
+                    new WP.Run(new WP.Text("中間")),
+                    new WP.Run(new WP.EndnoteReference { Id = 2 }),
+                    new WP.Run(new WP.Text("結尾"))));
+            },
+            main =>
+            {
+                FootnotesPart footnotes = main.AddNewPart<FootnotesPart>();
+                footnotes.Footnotes = new WP.Footnotes(
+                    new WP.Footnote(new WP.Paragraph(new WP.Run(new WP.Text("分隔線")))) { Type = WP.FootnoteEndnoteValues.Separator, Id = -1 },
+                    new WP.Footnote(
+                        new WP.Paragraph(new WP.Run(new WP.FootnoteReferenceMark()), new WP.Run(new WP.Text(" 註腳第一段"))),
+                        new WP.Paragraph(new WP.Run(new WP.Text("註腳第二段"))))
+                    { Id = 2 });
+                footnotes.Footnotes.Save();
+
+                EndnotesPart endnotes = main.AddNewPart<EndnotesPart>();
+                endnotes.Endnotes = new WP.Endnotes(
+                    new WP.Endnote(new WP.Paragraph(new WP.Run(new WP.EndnoteReferenceMark()), new WP.Run(new WP.Text(" 章節附註內文")))) { Id = 2 });
+                endnotes.Endnotes.Save();
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+
+        XElement[] notes = content.Descendants(s_text + "note").ToArray();
+        Assert.Equal(2, notes.Length);
+
+        XElement footnote = notes.Single(note => (string?)note.Attribute(s_text + "note-class") == "footnote");
+        Assert.Equal("1", footnote.Element(s_text + "note-citation")!.Value);
+        Assert.Equal(
+            new[] { "註腳第一段", "註腳第二段" },
+            footnote.Element(s_text + "note-body")!.Elements(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
+
+        XElement endnote = notes.Single(note => (string?)note.Attribute(s_text + "note-class") == "endnote");
+        Assert.Equal("1", endnote.Element(s_text + "note-citation")!.Value);
+        Assert.Equal("章節附註內文", endnote.Element(s_text + "note-body")!.Element(s_text + "p")!.Value);
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證 DOCX 的分頁符號（<c>w:br w:type="page"</c>）與 <c>w:pageBreakBefore</c> 轉成
+    /// <c>fo:break-before="page"</c>：只承載分頁符號的段落不產生空白段落，段落中間的分頁符號把段落切成兩段。
+    /// </summary>
+    [Fact]
+    public void DocxPageBreaksConvertToBreakBeforeStyles()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(new WP.Run(new WP.Text("第一頁"))));
+            body.Append(new WP.Paragraph(new WP.Run(new WP.Break { Type = WP.BreakValues.Page })));
+            body.Append(new WP.Paragraph(new WP.Run(new WP.Text("第二頁"))));
+            body.Append(new WP.Paragraph(
+                new WP.Run(new WP.Text("切開前")),
+                new WP.Run(new WP.Break { Type = WP.BreakValues.Page }, new WP.Text("切開後"))));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.PageBreakBefore()),
+                new WP.Run(new WP.Text("段前分頁"))));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XNamespace fo = OdfNamespaces.Fo;
+        XNamespace style = OdfNamespaces.Style;
+
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+        Assert.Equal(new[] { "第一頁", "第二頁", "切開前", "切開後", "段前分頁" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+
+        HashSet<string> breakStyles = content.Descendants(style + "style")
+            .Where(item => item.Element(style + "paragraph-properties")?.Attribute(fo + "break-before")?.Value == "page")
+            .Select(item => (string)item.Attribute(style + "name")!)
+            .ToHashSet();
+        string?[] styleNames = paragraphs.Select(paragraph => (string?)paragraph.Attribute(s_text + "style-name")).ToArray();
+
+        Assert.Null(styleNames[0]);
+        Assert.True(breakStyles.Contains(styleNames[1] ?? string.Empty));
+        Assert.Null(styleNames[2]);
+        Assert.True(breakStyles.Contains(styleNames[3] ?? string.Empty));
+        Assert.True(breakStyles.Contains(styleNames[4] ?? string.Empty));
+    }
+
+    /// <summary>
+    /// 驗證轉換時建立的自動樣式（段落對齊、縮排）放在 <c>office:body</c> 之前，文件通過 ODF 1.4 schema 驗證。
+    /// 修正前 <c>office:automatic-styles</c> 以附加方式建立在 <c>office:body</c> 之後，
+    /// 違反 <c>office:document-content</c> 的子元素順序。
+    /// </summary>
+    [Fact]
+    public void DocxParagraphLayoutStylesPrecedeBodyAndPassSchemaValidation()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(
+                    new WP.Justification { Val = WP.JustificationValues.Center },
+                    new WP.Indentation { Left = "720" }),
+                new WP.Run(new WP.Text("置中且縮排"))));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement root = XElement.Parse(SaveContentXml(odt));
+        XNamespace office = OdfNamespaces.Office;
+        string[] order = root.Elements().Select(element => element.Name.LocalName).ToArray();
+        Assert.True(
+            Array.IndexOf(order, "automatic-styles") >= 0 && Array.IndexOf(order, "automatic-styles") < Array.IndexOf(order, "body"),
+            string.Join(" > ", order));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    // ---------- helpers ----------
+
+    private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>
+        new(
+            new WP.ParagraphProperties(
+                new WP.NumberingProperties(
+                    new WP.NumberingLevelReference { Val = level },
+                    new WP.NumberingId { Val = numberingId })),
+            new WP.Run(new WP.Text(text)));
+
     private static WP.TableCell Cell(string text, int? span = null, WP.MergedCellValues? verticalMerge = null)
     {
         var properties = new WP.TableCellProperties();

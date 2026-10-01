@@ -18,7 +18,7 @@ namespace OdfKit.Conversion;
 /// Converts DOCX documents into ODT text documents.
 /// 將 DOCX 格式轉換為 <see cref="TextDocument"/> 的轉換器。
 /// </summary>
-public static class DocxToOdtConverter
+public static partial class DocxToOdtConverter
 {
     private const long MaxConverterXmlCharactersInPart = 64L * 1024 * 1024;
 
@@ -47,15 +47,16 @@ public static class DocxToOdtConverter
 
         TextDocument odtDocument = TextDocument.Create();
         ConvertHeaderFooter(mainPart, odtDocument);
+        var context = new BodyContext(mainPart, odtDocument);
         foreach (var child in body.ChildElements)
         {
             if (child is WP.Paragraph paragraph)
             {
-                ConvertParagraph(mainPart, paragraph, odtDocument);
+                ConvertBodyParagraph(context, paragraph);
             }
             else if (child is WP.Table table)
             {
-                ConvertTable(table, odtDocument);
+                ConvertBodyTable(context, table);
             }
         }
 
@@ -541,6 +542,7 @@ public static class DocxToOdtConverter
     private static void ConvertRun(MainDocumentPart mainPart, WP.Run run, TextDocument odtDocument, OdfParagraph odtParagraph)
     {
         AppendRunText(odtDocument, odtParagraph, ExtractRunText(run), run.RunProperties);
+        AppendNotes(mainPart, run, odtDocument, odtParagraph);
 
         foreach (var drawing in run.Descendants<WP.Drawing>())
         {

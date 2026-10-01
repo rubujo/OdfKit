@@ -1,4 +1,5 @@
 ﻿using System;
+using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Text;
@@ -34,8 +35,52 @@ internal static class TextDocumentDomHelper
         }
 
         var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
-        parent.AppendChild(node);
+        OdfNode? successor = FindSchemaSuccessor(parent, localName, ns);
+        if (successor is not null)
+        {
+            parent.InsertBefore(node, successor);
+        }
+        else
+        {
+            parent.AppendChild(node);
+        }
+
         return node;
+    }
+
+    // office:document-content 與 office:document-styles 的子元素在 ODF schema 中有固定順序；
+    // 例如 automatic-styles 必須在 body 之前，附加在最後會使文件不符合 schema。
+    private static readonly string[] s_documentContentOrder = ["scripts", "font-face-decls", "automatic-styles", "body"];
+    private static readonly string[] s_documentStylesOrder = ["font-face-decls", "styles", "automatic-styles", "master-styles"];
+
+    private static OdfNode? FindSchemaSuccessor(OdfNode parent, string localName, string ns)
+    {
+        if (ns != OdfNamespaces.Office || parent.NamespaceUri != OdfNamespaces.Office)
+        {
+            return null;
+        }
+
+        string[]? order = parent.LocalName switch
+        {
+            "document-content" => s_documentContentOrder,
+            "document-styles" => s_documentStylesOrder,
+            _ => null,
+        };
+        int index = order is null ? -1 : Array.IndexOf(order, localName);
+        if (order is null || index < 0)
+        {
+            return null;
+        }
+
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Office && Array.IndexOf(order, child.LocalName) > index)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
