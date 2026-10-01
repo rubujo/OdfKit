@@ -335,24 +335,74 @@ public sealed class RealWorldFidelityTests
     }
 
     /// <summary>
-    /// 驗證結構性元素之間的縮排空白仍不會成為子節點，只有段落內容元素保留僅含空白的文字。
+    /// 驗證結構性元素之間的縮排空白不會成為子節點，只有段落內容元素保留僅含空白的文字；
+    /// UTF-8 快速路徑與 <c>XmlReader</c> 路徑的結果一致。
     /// </summary>
-    [Fact]
-    public void ParserStillDropsIndentationBetweenStructuralElements()
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    public void ParserDropsIndentationBetweenStructuralElements(bool allowLazyLoading, bool fromStream)
     {
         const string Xml = """
             <office:body xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
                          xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
               <office:text>
                 <text:p>內容</text:p>
+                <text:p>前 <text:span>粗</text:span> 後</text:p>
               </office:text>
             </office:body>
             """;
+        var options = new OdfLoadOptions { AllowLazyLoading = allowLazyLoading };
 
-        OdfNode body = OdfXmlReader.Parse(Encoding.UTF8.GetBytes(Xml), new OdfLoadOptions { AllowLazyLoading = true });
+        OdfNode body;
+        if (fromStream)
+        {
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(Xml));
+            body = OdfXmlReader.Parse(stream, options);
+        }
+        else
+        {
+            body = OdfXmlReader.Parse(Encoding.UTF8.GetBytes(Xml), options);
+        }
+
         OdfNode text = Assert.Single(body.Children);
         Assert.Equal("text", text.LocalName);
-        Assert.Equal("p", Assert.Single(text.Children).LocalName);
+        Assert.Equal(new[] { "p", "p" }, text.Children.Select(child => child.LocalName).ToArray());
+        Assert.Equal("前 粗 後", text.Children.Last().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <c>XmlReader</c> 路徑延遲具現化的大段落（8 KB 以上）保留 <c>text:span</c> 之間僅含單一空格的文字，
+    /// 而延遲具現化的結構性子樹（大表格）仍略過縮排空白。
+    /// </summary>
+    [Fact]
+    public void StreamParserLazySubtreesKeepSpacesOnlyInParagraphContent()
+    {
+        string spans = string.Join(" ", Enumerable.Range(0, 500).Select(i => $"<text:span>片段{i}</text:span>"));
+        string expected = string.Join(" ", Enumerable.Range(0, 500).Select(i => $"片段{i}"));
+        string rows = string.Concat(Enumerable.Range(0, 400).Select(i =>
+            $"\n    <table:table-row><table:table-cell><text:p>列{i}</text:p></table:table-cell></table:table-row>"));
+        string xml =
+            "<office:body xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+            "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
+            "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\">\n" +
+            $"  <text:p>{spans}</text:p>\n" +
+            $"  <table:table table:name=\"T\">{rows}\n  </table:table>\n</office:body>";
+        Assert.True(spans.Length > 8192);
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        OdfNode body = OdfXmlReader.Parse(stream, new OdfLoadOptions { AllowLazyLoading = true });
+
+        OdfNode paragraph = body.Children.First(child => child.LocalName == "p");
+        paragraph.EnsureMaterialized();
+        Assert.Equal(expected, paragraph.TextContent);
+
+        OdfNode table = body.Children.First(child => child.LocalName == "table");
+        table.EnsureMaterialized();
+        Assert.Equal(400, table.Children.Count);
+        Assert.All(table.Children, child => Assert.Equal("table-row", child.LocalName));
     }
 
     /// <summary>

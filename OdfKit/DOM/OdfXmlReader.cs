@@ -649,8 +649,10 @@ public static class OdfXmlReader
                                     }
                                     else if (innerXml.Length > 0)
                                     {
-                                        byte[] wrapperPrefix = OdfNode.BuildWrapperPrefixBytes(inScopeNamespaces);
-                                        byte[] innerBody = Encoding.UTF8.GetBytes(innerXml + "</wrapper>");
+                                        bool mixedInner = localName == "p";
+                                        byte[] wrapperPrefix = OdfNode.BuildWrapperPrefixBytes(inScopeNamespaces, mixedInner);
+                                        byte[] innerBody = Encoding.UTF8.GetBytes(
+                                            innerXml + (mixedInner ? "</" + OdfNode.MixedWrapperName + ">" : "</wrapper>"));
                                         byte[] innerBytes = new byte[wrapperPrefix.Length + innerBody.Length];
                                         Buffer.BlockCopy(wrapperPrefix, 0, innerBytes, 0, wrapperPrefix.Length);
                                         Buffer.BlockCopy(innerBody, 0, innerBytes, wrapperPrefix.Length, innerBody.Length);
@@ -724,6 +726,13 @@ public static class OdfXmlReader
                         case XmlNodeType.Whitespace:
                             if (stack.Count > 0)
                             {
+                                // 與 UTF-8 快速路徑一致：結構性元素之間的縮排空白沒有意義而略過，
+                                // 只有段落內容元素與 xml:space="preserve" 內的空白會保留。
+                                if (reader.NodeType == XmlNodeType.Whitespace && !IsMixedContentElement(stack.Peek()))
+                                {
+                                    break;
+                                }
+
                                 string textVal = reader.Value;
                                 AddXmlCharacters(options, ref xmlCharacterCount, textVal.Length);
                                 OdfNode textNode = new(OdfNodeType.Text, string.Empty, string.Empty)
@@ -785,9 +794,10 @@ public static class OdfXmlReader
         return true;
     }
 
-    private static bool IsMixedContentElement(OdfNode element) =>
+    internal static bool IsMixedContentElement(OdfNode element) =>
         element.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-        && element.LocalName is "p" or "h" or "span" or "a" or "meta" or "ruby-base" or "ruby-text";
+            ? element.LocalName is "p" or "h" or "span" or "a" or "meta" or "ruby-base" or "ruby-text"
+            : element.NamespaceUri.Length == 0 && element.LocalName == OdfNode.MixedWrapperName;
 
     private static Dictionary<string, string> CaptureInScopeNamespaces(XmlReader reader)
     {

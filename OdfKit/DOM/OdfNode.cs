@@ -21,6 +21,13 @@ public partial class OdfNode
         " xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"" +
         " xmlns:xlink=\"http://www.w3.org/1999/xlink\">");
     private static readonly byte[] WrapperSuffixBytes = Encoding.UTF8.GetBytes("</wrapper>");
+    private static readonly byte[] MixedWrapperSuffixBytes = Encoding.UTF8.GetBytes("</mixed-wrapper>");
+
+    /// <summary>
+    /// 具現化段落內容元素（<c>text:p</c> 等）的延遲子樹時使用的外殼元素名稱；
+    /// 解析器看到此名稱時會保留僅含空白的文字，其他外殼（結構性子樹）則略過縮排空白。
+    /// </summary>
+    internal const string MixedWrapperName = "mixed-wrapper";
 
     /// <summary>
     /// Gets the type of the node.
@@ -448,24 +455,30 @@ public partial class OdfNode
     /// 宣告在文件根元素。外殼若只宣告固定的幾個前綴，重新解析時會因前綴未宣告而失敗，寬鬆模式再把失敗
     /// 「搶救」成空的子樹，整張表的資料就靜默遺失。因此外殼必須帶入該節點當時在作用域內的全部宣告。
     /// </remarks>
-    internal static byte[] BuildWrapperPrefixBytes(IReadOnlyDictionary<string, string>? inScopeNamespaces)
+    internal static byte[] BuildWrapperPrefixBytes(IReadOnlyDictionary<string, string>? inScopeNamespaces) =>
+        BuildWrapperPrefixBytes(inScopeNamespaces, mixedContent: false);
+
+    internal static byte[] BuildWrapperPrefixBytes(IReadOnlyDictionary<string, string>? inScopeNamespaces, bool mixedContent)
     {
-        if (inScopeNamespaces is null || inScopeNamespaces.Count == 0)
+        if (!mixedContent && (inScopeNamespaces is null || inScopeNamespaces.Count == 0))
         {
             return WrapperPrefixBytes;
         }
 
-        var builder = new StringBuilder("<wrapper");
+        var builder = new StringBuilder(mixedContent ? "<" + MixedWrapperName : "<wrapper");
         var declared = new HashSet<string>(StringComparer.Ordinal);
-        foreach (KeyValuePair<string, string> declaration in inScopeNamespaces)
+        if (inScopeNamespaces is not null)
         {
-            if (declaration.Key is "xml" or "xmlns" || string.IsNullOrEmpty(declaration.Value))
+            foreach (KeyValuePair<string, string> declaration in inScopeNamespaces)
             {
-                continue;
-            }
+                if (declaration.Key is "xml" or "xmlns" || string.IsNullOrEmpty(declaration.Value))
+                {
+                    continue;
+                }
 
-            declared.Add(declaration.Key);
-            AppendNamespaceDeclaration(builder, declaration.Key, declaration.Value);
+                declared.Add(declaration.Key);
+                AppendNamespaceDeclaration(builder, declaration.Key, declaration.Value);
+            }
         }
 
         foreach (KeyValuePair<string, string> fallback in s_wrapperDefaultNamespaces)
@@ -507,14 +520,16 @@ public partial class OdfNode
     private void MaterializeChildren(ReadOnlyMemory<byte> xmlData)
     {
         bool wasModified = IsModified;
-        byte[] wrapperPrefix = BuildWrapperPrefixBytes(_lazyInScopeNamespaces);
-        using var seqStream = new OdfSequenceStream(wrapperPrefix, xmlData, WrapperSuffixBytes);
+        bool mixedContent = OdfXmlReader.IsMixedContentElement(this);
+        byte[] wrapperPrefix = BuildWrapperPrefixBytes(_lazyInScopeNamespaces, mixedContent);
+        byte[] wrapperSuffix = mixedContent ? MixedWrapperSuffixBytes : WrapperSuffixBytes;
+        using var seqStream = new OdfSequenceStream(wrapperPrefix, xmlData, wrapperSuffix);
         OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions
         {
             AllowLazyLoading = false,
             // wrapper 是具現化時由 OdfKit 人工加入的 XML 外殼，不應消耗呼叫端對
             // 原始文件設定的字元預算。
-            MaxXmlCharactersInDocument = AddWrapperAllowance(_lazyMaxXmlCharactersInDocument, wrapperPrefix.Length),
+            MaxXmlCharactersInDocument = AddWrapperAllowance(_lazyMaxXmlCharactersInDocument, wrapperPrefix.Length + wrapperSuffix.Length),
             StrictXmlParsing = _lazyStrictXmlParsing
         });
         if (tempRoot is not null)
@@ -539,14 +554,14 @@ public partial class OdfNode
         IsModified = wasModified;
     }
 
-    private static long AddWrapperAllowance(long characterLimit, int wrapperPrefixLength)
+    private static long AddWrapperAllowance(long characterLimit, int wrapperLength)
     {
         if (characterLimit <= 0)
         {
             return 0;
         }
 
-        int wrapperCharacters = wrapperPrefixLength + WrapperSuffixBytes.Length;
+        int wrapperCharacters = wrapperLength;
         return characterLimit > long.MaxValue - wrapperCharacters
             ? long.MaxValue
             : characterLimit + wrapperCharacters;
