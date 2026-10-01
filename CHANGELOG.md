@@ -4,6 +4,13 @@
 
 ## 尚未發佈
 
+以 LibreOffice 26.2.4.2 的實機輸出再驗證一輪（Portable 版 LibreOffice 把測試用的 XLSX、DOCX、HTML 轉成真正的 ODS／ODT，再由 OdfKit 讀取；反向則讓 LibreOffice 開啟 OdfKit 的輸出並匯出成 XLSX 與文字）。OdfKit 轉換出的 ODS 經 LibreOffice 匯出為 XLSX 後，1,143 個儲存格與合併範圍全部與原始真值一致；ODT 的空白、定位字元、換行、超連結、表格與巢狀表格也都正確。同時抓到下列四個先前沒有被發現的缺陷，其中第一個會讓 LibreOffice 儲存的試算表在載入後資料全部遺失。
+
+- **修正載入 LibreOffice 文件時資料靜默遺失（嚴重）**：`OdfNode` 對 8 KB 以上的 `table:table`、`text:p`、`text:list` 等子樹採延遲具現化，具現化時用只宣告七個前綴（office、text、table、style、draw、fo、xlink）的外殼重新解析原始 XML。LibreOffice 在每個儲存格寫 `calcext:value-type`，該前綴只宣告在文件根元素，外殼未宣告使解析失敗，寬鬆模式（預設）又把失敗「搶救」成空的子樹，只留一則診斷警告：LibreOffice 儲存的 ODS 只要有一張工作表超過約 8 KB，`SpreadsheetDocument.Load` 後該表的儲存格全部讀不到，修改後再儲存就把資料永久清掉（`OdsStreamReader` 不受影響，所以兩種讀取器的結果不一致）。現在具現化時帶入該節點當時在作用域內的全部命名空間宣告。OdfKit 自己產生的文件只用到這七個前綴，因此既有測試都沒有發現。
+- **修正 DOM 載入時段落內元素之間的空白遺失**：UTF-8 快速解析器在每個標記前跳過所有空白，使文字節點的開頭空白與僅含空白的文字節點全部遺失，結果與 `XmlReader` 路徑不同。LibreOffice 的 ODT 載入後再儲存，會把「粗體 與 斜體」（兩個 `text:span` 之間為單一空格）變成「粗體與 斜體」。現在保留段落內容元素（`text:p`、`text:h`、`text:span`、`text:a`、`text:meta`、`text:ruby-base`、`text:ruby-text`）中僅含空白的文字；結構性元素之間的縮排空白仍然略過。
+- 修正 schema 驗證器對屬性值為空字串的處理：`<empty/>` 模式在屬性值上未被支援，使規格允許的空值（`styleNameRef` 為 NCName 或 empty，LibreOffice 寫出 `style:list-style-name=""`）被判為不符；另外 `XmlConvert.VerifyName`、`VerifyNCName`、`VerifyNMTOKEN` 對空字串擲出 `ArgumentException` 而非 `XmlException`，驗證 LibreOffice 的 ODT 時整個驗證器因此中止。
+- 驗證器對 LibreOffice 輸出仍會回報一項真正的規格不符，並非 OdfKit 的缺陷：LibreOffice 的 HTML 匯入寫出 `style:border-line-width-bottom="0cm 0.004cm 0.002cm"`，而官方 ODF schema 的 `positiveLength` 要求嚴格為正，`0cm` 不符。
+
 以官方 ODFDOM 範例與 Office 風格的 XLSX／DOCX（含樣式、合併儲存格、清單、巢狀表格、超連結、註腳與稀疏資料）做了一輪真實性驗證，並以產生器已知的真值逐格、逐段對照。官方範例本身內容極少（試算表與文字範例皆無資料），驗證力有限；真正的發現來自後者。
 
 - 修正段落內空白字元的編碼（ODF 1.3 Part 1 §6.1.2）：消費端會把 `text:p`、`text:h` 及其行內元素中的定位字元與換行視為空格、移除開頭與結尾空格、並把連續空格折疊為單一空格，只有 `text:s`、`text:tab`、`text:line-break` 保留有意義的空白。先前 `TextDocument.AddParagraph(...)`、`OdfParagraph.AddTextRun(...)`、`OdfNode.TextContent` 等路徑把含連續空格、定位字元或換行的文字原樣寫成單一文字節點，LibreOffice 等符合規範的消費端會把 `a    b` 讀成 `a b`；OdfKit 自己的讀取器不折疊空白，因此來回讀寫看不出問題。現在 `text:p`／`text:h`／`text:span`／`text:a` 等段落內容元素的 `TextContent` 在文字含這類空白時會寫成 `text:s`／`text:tab`／`text:line-break`，不含時維持單一文字節點。儲存格文字開頭與結尾的空格原本寫成「字面空格＋`text:s`」，開頭那一個字面空格同樣會被消費端移除，現在整段以 `text:s` 表示。
