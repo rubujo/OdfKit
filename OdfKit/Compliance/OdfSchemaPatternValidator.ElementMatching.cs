@@ -28,6 +28,21 @@ public static partial class OdfSchemaPatternValidator
         XElement element,
         OdfSchemaPatternMatchContext context)
     {
+        if (context.TryGetCachedElementMatch(node, element, out bool cached))
+        {
+            return cached;
+        }
+
+        bool result = MatchesElementNodeUncached(node, element, context);
+        context.CacheElementMatch(node, element, result);
+        return result;
+    }
+
+    private static bool MatchesElementNodeUncached(
+        OdfSchemaPatternNode node,
+        XElement element,
+        OdfSchemaPatternMatchContext context)
+    {
         if (node.Kind == OdfSchemaPatternNodeKind.Ref)
         {
             return MatchesReference(node.ReferenceName, element, context);

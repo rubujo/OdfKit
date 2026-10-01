@@ -107,7 +107,7 @@ internal static partial class OdfSchemaPatternContentMatcher
             return new HashSet<int>();
         }
 
-        var childContext = new OdfSchemaPatternMatchContext(context.Schema);
+        OdfSchemaPatternMatchContext childContext = context.CreateChildContext();
         return OdfSchemaPatternValidator.MatchesElementNode(node, childElements[index], childContext)
             ? new HashSet<int> { index + 1 }
             : new HashSet<int>();
