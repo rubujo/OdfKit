@@ -1035,7 +1035,7 @@ public static partial class DocxToOdtConverter
         internal WP.TableCell Cell { get; } = cell;
     }
 
-    private static void ConvertTable(WP.Table wordTable, TextDocument odtDocument)
+    private static void ConvertTable(BodyContext context, WP.Table wordTable)
     {
         (int rowCount, int columnCount, List<TableCellPlacement> placements) = BuildTableGrid(wordTable);
         if (rowCount == 0 || columnCount == 0)
@@ -1043,8 +1043,8 @@ public static partial class DocxToOdtConverter
             return;
         }
 
-        OdfTable odtTable = odtDocument.AddTable(rowCount, columnCount);
-        PopulateTable(odtTable, placements);
+        OdfTable odtTable = context.Document.AddTable(rowCount, columnCount);
+        PopulateTable(context, odtTable, placements);
     }
 
     /// <summary>
@@ -1103,28 +1103,31 @@ public static partial class DocxToOdtConverter
         return (rows.Count, columnCount, placements);
     }
 
-    private static void PopulateTable(OdfTable odtTable, List<TableCellPlacement> placements)
+    private static void PopulateTable(BodyContext context, OdfTable odtTable, List<TableCellPlacement> placements)
     {
         System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
         foreach (TableCellPlacement placement in placements)
         {
+            OdfNode cellNode = odtTable.GetCell(placement.Row, placement.Column).Node;
+            ListState? cellList = null;
             foreach (OpenXmlElement child in placement.Cell.ChildElements)
             {
                 if (child is WP.Paragraph paragraph)
                 {
-                    string text = GetParagraphPlainText(paragraph);
-                    if (!string.IsNullOrEmpty(text))
+                    // Word 的每個儲存格至少含一個段落，空段落不轉成空白的 text:p。
+                    if (ParagraphHasContent(paragraph))
                     {
-                        odtTable.GetCell(placement.Row, placement.Column).AddParagraph(text);
+                        AppendContainerParagraph(context, cellNode, paragraph, ref cellList);
                     }
                 }
                 else if (child is WP.Table nestedWordTable)
                 {
+                    cellList = null;
                     (int nestedRows, int nestedColumns, List<TableCellPlacement> nestedPlacements) = BuildTableGrid(nestedWordTable);
                     if (nestedRows > 0 && nestedColumns > 0)
                     {
                         OdfTable nestedTable = odtTable.AddNestedTable(placement.Row, placement.Column, nestedRows, nestedColumns);
-                        PopulateTable(nestedTable, nestedPlacements);
+                        PopulateTable(context, nestedTable, nestedPlacements);
                     }
                 }
             }

@@ -183,7 +183,7 @@ public static partial class DocxToOdtConverter
         context.PendingPageBreak = false;
 
         OdfNode? previous = context.Document.BodyTextRoot.LastChild;
-        ConvertTable(table, context.Document);
+        ConvertTable(context, table);
         OdfNode? produced = context.Document.BodyTextRoot.LastChild;
         if (breakBefore && produced is not null && !ReferenceEquals(produced, previous))
         {
@@ -374,8 +374,20 @@ public static partial class DocxToOdtConverter
     {
         OdfNode body = context.Document.BodyTextRoot;
         body.RemoveChild(paragraphNode);
+        context.CurrentList = PlaceInList(context, body, paragraphNode, info, context.CurrentList);
+    }
 
-        ListState? state = context.CurrentList;
+    /// <summary>
+    /// 把已建立的段落節點放進 <paramref name="container"/>（本文、儲存格或頁首頁尾區域）內的清單，
+    /// 並傳回更新後的清單狀態；<paramref name="state"/> 為容器內目前的清單。
+    /// </summary>
+    private static ListState PlaceInList(
+        BodyContext context,
+        OdfNode container,
+        OdfNode paragraphNode,
+        ParagraphListInfo info,
+        ListState? state)
+    {
         if (state is null || state.NumberingId != info.NumberingId)
         {
             var rootList = new OdfNode(OdfNodeType.Element, "list", OdfNamespaces.Text, "text");
@@ -386,9 +398,8 @@ public static partial class DocxToOdtConverter
                 rootList.SetAttribute("continue-numbering", OdfNamespaces.Text, "true", "text");
             }
 
-            body.AppendChild(rootList);
+            container.AppendChild(rootList);
             state = new ListState(info.NumberingId, rootList);
-            context.CurrentList = state;
         }
 
         while (state.LevelLists.Count - 1 < info.Level)
@@ -417,6 +428,40 @@ public static partial class DocxToOdtConverter
         item.AppendChild(paragraphNode);
         targetList.AppendChild(item);
         state.LastItems[targetList] = item;
+        return state;
+    }
+
+    private static bool ParagraphHasContent(WP.Paragraph paragraph) =>
+        GetParagraphPlainText(paragraph).Length > 0
+        || paragraph.Descendants<WP.Drawing>().Any()
+        || paragraph.Descendants<WP.FootnoteReference>().Any()
+        || paragraph.Descendants<WP.EndnoteReference>().Any();
+
+    /// <summary>
+    /// 以與本文相同的段落轉換建立儲存格（或頁首頁尾）內的段落：樣式、標題階層、清單、註腳與圖片都保留。
+    /// 先照原流程建立段落，再把產生的節點搬進容器。
+    /// </summary>
+    private static void AppendContainerParagraph(
+        BodyContext context,
+        OdfNode container,
+        WP.Paragraph paragraph,
+        ref ListState? containerList)
+    {
+        OdfNode body = context.Document.BodyTextRoot;
+        ConvertParagraph(context.MainPart, paragraph, context.Document);
+        OdfNode produced = body.LastChild!;
+        body.RemoveChild(produced);
+
+        ParagraphListInfo? list = GetListInfo(context, paragraph);
+        if (list is not null)
+        {
+            containerList = PlaceInList(context, container, produced, list.Value, containerList);
+        }
+        else
+        {
+            containerList = null;
+            container.AppendChild(produced);
+        }
     }
 
     private static string EnsureListStyle(BodyContext context, int numberingId)

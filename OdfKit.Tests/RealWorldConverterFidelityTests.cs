@@ -499,6 +499,87 @@ public sealed class RealWorldConverterFidelityTests
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
     }
 
+    /// <summary>
+    /// 驗證表格儲存格內的段落走與本文相同的段落轉換：標題階層、定位字元與換行、超連結、清單與註腳都保留，
+    /// 而不是被壓成純文字。轉出的文件通過 ODF 1.4 schema 驗證。
+    /// </summary>
+    [Fact]
+    public void DocxTableCellsKeepRichParagraphContent()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                var heading = new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.ParagraphStyleId { Val = "Heading1" }),
+                    new WP.Run(new WP.Text("儲存格標題")));
+                var rich = new WP.Paragraph(
+                    new WP.Run(new WP.Text("前")),
+                    new WP.Run(new WP.TabChar()),
+                    new WP.Run(new WP.Text("後")),
+                    new WP.Hyperlink(new WP.Run(new WP.Text("連結"))) { Id = "rIdCell" });
+                var withNote = new WP.Paragraph(
+                    new WP.Run(new WP.Text("有註腳")),
+                    new WP.Run(new WP.FootnoteReference { Id = 2 }));
+                body.Append(new WP.Table(
+                    new WP.TableRow(
+                        new WP.TableCell(heading, rich),
+                        new WP.TableCell(
+                            ListParagraph("清單一", numberingId: 1, level: 0),
+                            ListParagraph("清單二", numberingId: 1, level: 0))),
+                    new WP.TableRow(
+                        new WP.TableCell(withNote),
+                        new WP.TableCell(new WP.Paragraph(new WP.Run(new WP.Text("純文字")))))));
+            },
+            main =>
+            {
+                main.AddHyperlinkRelationship(new Uri("https://example.org/cell"), true, "rIdCell");
+
+                NumberingDefinitionsPart numbering = main.AddNewPart<NumberingDefinitionsPart>();
+                numbering.Numbering = new WP.Numbering(
+                    new WP.AbstractNum(
+                        new WP.Level(
+                            new WP.NumberingFormat { Val = WP.NumberFormatValues.Bullet },
+                            new WP.LevelText { Val = "•" })
+                        { LevelIndex = 0 })
+                    { AbstractNumberId = 0 },
+                    new WP.NumberingInstance(new WP.AbstractNumId { Val = 0 }) { NumberID = 1 });
+                numbering.Numbering.Save();
+
+                FootnotesPart footnotes = main.AddNewPart<FootnotesPart>();
+                footnotes.Footnotes = new WP.Footnotes(
+                    new WP.Footnote(new WP.Paragraph(new WP.Run(new WP.FootnoteReferenceMark()), new WP.Run(new WP.Text(" 儲存格註腳")))) { Id = 2 });
+                footnotes.Footnotes.Save();
+
+                StyleDefinitionsPart styles = main.AddNewPart<StyleDefinitionsPart>();
+                styles.Styles = new WP.Styles(
+                    new WP.Style(new WP.StyleName { Val = "heading 1" }) { Type = WP.StyleValues.Paragraph, StyleId = "Heading1" });
+                styles.Styles.Save();
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XElement[] rows = content.Descendants(s_table + "table-row").ToArray();
+        XElement[] firstRowCells = rows[0].Elements(s_table + "table-cell").ToArray();
+
+        XElement heading = Assert.Single(firstRowCells[0].Elements(s_text + "h"));
+        Assert.Equal("1", (string?)heading.Attribute(s_text + "outline-level"));
+        Assert.Equal("儲存格標題", heading.Value);
+
+        XElement rich = firstRowCells[0].Elements(s_text + "p").Single();
+        Assert.Contains("tab", DescribeChildren(rich));
+        XElement anchor = Assert.Single(rich.Elements(s_text + "a"));
+        Assert.Equal("https://example.org/cell", (string?)anchor.Attribute(s_xlink + "href"));
+
+        XElement list = Assert.Single(firstRowCells[1].Elements(s_text + "list"));
+        Assert.Equal(new[] { "清單一", "清單二" }, list.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
+
+        XElement note = Assert.Single(rows[1].Descendants(s_text + "note"));
+        Assert.Equal("儲存格註腳", note.Element(s_text + "note-body")!.Value);
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
     // ---------- helpers ----------
 
     private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>
