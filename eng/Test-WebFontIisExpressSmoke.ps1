@@ -31,6 +31,11 @@ param(
     [ValidateRange(1, 60)]
     [int]$HostedLoadMinimumDurationSeconds = 5,
 
+    # IIS Express 啟動後的第一個要求會觸發 ASP.NET Web Forms 頁面的首次編譯，在較慢的 runner
+    # 映像上可能超過後續要求使用的 30 秒逾時；啟動探測使用獨立的期限。
+    [ValidateRange(30, 900)]
+    [int]$StartupTimeoutSeconds = 240,
+
     [switch]$NoBuild
 )
 
@@ -191,13 +196,19 @@ try {
         -RedirectStandardOutput $standardOutputPath `
         -RedirectStandardError $standardErrorPath
 
+    # 啟動探測：第一個要求會讓 IIS Express 編譯 Web Forms 頁面並載入整個應用程式，可能很慢。
+    # 使用獨立的探測 HttpClient（每次 20 秒），逾時視為「仍在啟動」而重試，直到整體期限；
+    # 之後的要求仍使用 30 秒逾時的 $client。
+    $probeClient = [Net.Http.HttpClient]::new($httpHandler, $false)
+    $probeClient.Timeout = [TimeSpan]::FromSeconds(20)
+    $startupWatch = [Diagnostics.Stopwatch]::StartNew()
     $started = $false
-    for ($attempt = 0; $attempt -lt 60; $attempt++) {
+    while ($startupWatch.Elapsed -lt [TimeSpan]::FromSeconds($StartupTimeoutSeconds)) {
         if ($process.HasExited) {
             break
         }
         try {
-            $probe = $client.GetAsync($baseUri).GetAwaiter().GetResult()
+            $probe = $probeClient.GetAsync($baseUri).GetAwaiter().GetResult()
             $probe.Dispose()
             $started = $true
             break
@@ -205,13 +216,25 @@ try {
         catch [Net.Http.HttpRequestException] {
             Start-Sleep -Milliseconds 250
         }
+        catch [Threading.Tasks.TaskCanceledException] {
+            # 要求逾時：伺服器已接受連線但仍在編譯或啟動，直接進行下一次探測。
+        }
+    }
+    $probeClient.Dispose()
+    if ($started) {
+        Write-Host ("IIS Express 首次回應耗時 {0:N1} 秒（{1} pipeline）。" -f $startupWatch.Elapsed.TotalSeconds, $Pipeline)
     }
     if (-not $started) {
         $stderr = if (Test-Path -LiteralPath $standardErrorPath) {
             Get-Content -LiteralPath $standardErrorPath -Raw
         }
         else { "" }
-        throw "IIS Express 未在期限內啟動。$stderr"
+        $stdout = if (Test-Path -LiteralPath $standardOutputPath) {
+            Get-Content -LiteralPath $standardOutputPath -Raw
+        }
+        else { "" }
+        throw ("IIS Express 未在期限內（{0:N0} 秒，已結束：{1}）啟動。stdout：{2} stderr：{3}" -f
+            $startupWatch.Elapsed.TotalSeconds, $process.HasExited, $stdout, $stderr)
     }
 
     $pageResponse = $client.GetAsync($baseUri).GetAwaiter().GetResult()
