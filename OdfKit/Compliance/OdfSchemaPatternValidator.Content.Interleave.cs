@@ -17,7 +17,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         bool[] used,
         bool[] oneOrMoreSatisfied,
         HashSet<string> visited,
-        HashSet<int> matches)
+        OdfPositionSet matches)
     {
         string stateKey = CreateInterleaveStateKey(index, used, oneOrMoreSatisfied);
         if (!visited.Add(stateKey))

@@ -8,17 +8,23 @@ internal static partial class OdfSchemaPatternContentMatcher
 {
     #region Content Matching - Sequence
 
-    internal static HashSet<int> MatchSequence(
+    internal static OdfPositionSet MatchSequence(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int startIndex,
         OdfSchemaPatternMatchContext context)
     {
-        var indices = new HashSet<int> { startIndex };
+        // 單一節點的序列直接回傳該節點的結果集，避免為每次重複展開複製整個集合（結果集唯讀）。
+        if (nodes.Count == 1)
+        {
+            return MatchContentNode(nodes[0], parent, childElements, startIndex, context);
+        }
+
+        var indices = new OdfPositionSet { startIndex };
         foreach (OdfSchemaPatternNode node in nodes)
         {
-            var next = new HashSet<int>();
+            var next = new OdfPositionSet();
             foreach (int index in indices)
             {
                 foreach (int matched in MatchContentNode(node, parent, childElements, index, context))
@@ -38,7 +44,41 @@ internal static partial class OdfSchemaPatternContentMatcher
         return indices;
     }
 
-    internal static HashSet<int> MatchContentNode(
+    internal static OdfPositionSet MatchContentNode(
+        OdfSchemaPatternNode node,
+        XElement parent,
+        IReadOnlyList<XElement> childElements,
+        int index,
+        OdfSchemaPatternMatchContext context)
+    {
+        // 結構性節點的結果只取決於（節點、子元素清單、起點）。巢狀重複會從大量起點重複詢問同一組結果，
+        // 沒有記憶時每個起點都重新走過整棵語法樹。循環參照防護介入過的結果可能被截斷，不記憶。
+        if (node.Kind is not (OdfSchemaPatternNodeKind.Ref
+            or OdfSchemaPatternNodeKind.Group
+            or OdfSchemaPatternNodeKind.Choice
+            or OdfSchemaPatternNodeKind.Optional
+            or OdfSchemaPatternNodeKind.ZeroOrMore
+            or OdfSchemaPatternNodeKind.OneOrMore))
+        {
+            return MatchContentNodeUncached(node, parent, childElements, index, context);
+        }
+
+        if (context.TryGetContentMatch(node, childElements, index, out OdfPositionSet? cached))
+        {
+            return cached;
+        }
+
+        long guardHitsBefore = context.GuardHits;
+        OdfPositionSet result = MatchContentNodeUncached(node, parent, childElements, index, context);
+        if (context.GuardHits == guardHitsBefore)
+        {
+            context.StoreContentMatch(node, childElements, index, result);
+        }
+
+        return result;
+    }
+
+    private static OdfPositionSet MatchContentNodeUncached(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
@@ -50,7 +90,7 @@ internal static partial class OdfSchemaPatternContentMatcher
             case OdfSchemaPatternNodeKind.Ref:
                 return MatchContentReference(node.ReferenceName, parent, childElements, index, context);
             case OdfSchemaPatternNodeKind.NotAllowed:
-                return new HashSet<int>();
+                return new OdfPositionSet();
             case OdfSchemaPatternNodeKind.Element:
             case OdfSchemaPatternNodeKind.AnyName:
             case OdfSchemaPatternNodeKind.NamespaceName:
@@ -72,31 +112,34 @@ internal static partial class OdfSchemaPatternContentMatcher
             case OdfSchemaPatternNodeKind.OneOrMore:
                 return MatchRepeated(node, parent, childElements, index, context, requireOne: true);
             case OdfSchemaPatternNodeKind.Empty:
-                return new HashSet<int> { index };
+                return new OdfPositionSet { index };
             case OdfSchemaPatternNodeKind.Text:
-                return new HashSet<int> { index };
+                return new OdfPositionSet { index };
             case OdfSchemaPatternNodeKind.Data:
                 return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesDataValue(node, parent.Value, context)
-                    ? new HashSet<int> { index }
-                    : new HashSet<int>();
+                    ? new OdfPositionSet { index }
+                    : new OdfPositionSet();
             case OdfSchemaPatternNodeKind.Value:
                 return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesLiteralValue(node, parent.Value)
-                    ? new HashSet<int> { index }
-                    : new HashSet<int>();
+                    ? new OdfPositionSet { index }
+                    : new OdfPositionSet();
             case OdfSchemaPatternNodeKind.List:
                 return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesListValue(node.Children, parent.Value, context)
-                    ? new HashSet<int> { index }
-                    : new HashSet<int>();
+                    ? new OdfPositionSet { index }
+                    : new OdfPositionSet();
             case OdfSchemaPatternNodeKind.Attribute:
                 return OdfSchemaPatternAttributeMatcher.MatchesAttributeNode(node, parent, context)
-                    ? new HashSet<int> { index }
-                    : new HashSet<int>();
+                    ? new OdfPositionSet { index }
+                    : new OdfPositionSet();
             default:
-                return new HashSet<int>();
+                return new OdfPositionSet();
         }
     }
 
-    private static HashSet<int> MatchSingleElement(
+    // 比對失敗的共用空結果集；所有呼叫端只讀取結果集，不會修改。
+    private static readonly OdfPositionSet s_emptyMatch = new();
+
+    private static OdfPositionSet MatchSingleElement(
         OdfSchemaPatternNode node,
         IReadOnlyList<XElement> childElements,
         int index,
@@ -104,16 +147,16 @@ internal static partial class OdfSchemaPatternContentMatcher
     {
         if (index >= childElements.Count)
         {
-            return new HashSet<int>();
+            return new OdfPositionSet();
         }
 
         OdfSchemaPatternMatchContext childContext = context.CreateChildContext();
         return OdfSchemaPatternValidator.MatchesElementNode(node, childElements[index], childContext)
-            ? new HashSet<int> { index + 1 }
-            : new HashSet<int>();
+            ? context.GetSingletonSet(index + 1)
+            : s_emptyMatch;
     }
 
-    private static HashSet<int> MatchContentReference(
+    private static OdfPositionSet MatchContentReference(
         string referenceName,
         XElement parent,
         IReadOnlyList<XElement> childElements,
@@ -122,7 +165,7 @@ internal static partial class OdfSchemaPatternContentMatcher
     {
         if (string.IsNullOrWhiteSpace(referenceName))
         {
-            return new HashSet<int>();
+            return new OdfPositionSet();
         }
 
         bool entered = context.EnterReference(referenceName);
@@ -130,7 +173,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         {
             OdfSchemaPatternMatchContext? recursiveContext = context.CreateRecursiveContext();
             return recursiveContext is null
-                ? new HashSet<int>()
+                ? new OdfPositionSet()
                 : MatchContentReferenceWithoutActiveGuard(referenceName, parent, childElements, index, recursiveContext);
         }
 
@@ -144,7 +187,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         }
     }
 
-    private static HashSet<int> MatchContentReferenceWithoutActiveGuard(
+    private static OdfPositionSet MatchContentReferenceWithoutActiveGuard(
         string referenceName,
         XElement parent,
         IReadOnlyList<XElement> childElements,
@@ -154,48 +197,43 @@ internal static partial class OdfSchemaPatternContentMatcher
         OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
         if (pattern == null)
         {
-            return new HashSet<int>();
+            return new OdfPositionSet();
         }
 
-        var matches = new HashSet<int>();
+        var matches = new OdfPositionSet();
         foreach (OdfSchemaPatternNode root in pattern.Roots)
         {
-            OdfSchemaPatternNode? contentRoot =
-                OdfSchemaPatternAttributeMatcher.StripAttributePatterns(root, context);
+            OdfSchemaPatternNode? contentRoot = context.GetStrippedRoot(
+                root,
+                OdfSchemaPatternAttributeMatcher.StripAttributePatterns);
             if (contentRoot is null)
             {
                 matches.Add(index);
                 continue;
             }
 
-            foreach (int matched in MatchContentNode(contentRoot, parent, childElements, index, context))
-            {
-                matches.Add(matched);
-            }
+            matches.UnionWith(MatchContentNode(contentRoot, parent, childElements, index, context));
         }
         return matches;
     }
 
-    private static HashSet<int> MatchChoice(
+    private static OdfPositionSet MatchChoice(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
         OdfSchemaPatternMatchContext context)
     {
-        var matches = new HashSet<int>();
+        var matches = new OdfPositionSet();
         foreach (OdfSchemaPatternNode child in node.Children)
         {
-            foreach (int matched in MatchContentNode(child, parent, childElements, index, context))
-            {
-                matches.Add(matched);
-            }
+            matches.UnionWith(MatchContentNode(child, parent, childElements, index, context));
         }
 
         return matches;
     }
 
-    private static HashSet<int> MatchInterleave(
+    private static OdfPositionSet MatchInterleave(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
@@ -204,7 +242,7 @@ internal static partial class OdfSchemaPatternContentMatcher
     {
         List<OdfSchemaPatternNode> interleavedNodes =
             ExpandInterleaveReferences(node.Children, context);
-        var matches = new HashSet<int>();
+        var matches = new OdfPositionSet();
         var used = new bool[interleavedNodes.Count];
         var oneOrMoreSatisfied = new bool[interleavedNodes.Count];
         var visited = new HashSet<string>();

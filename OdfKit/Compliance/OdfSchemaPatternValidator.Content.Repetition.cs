@@ -155,23 +155,19 @@ internal static partial class OdfSchemaPatternContentMatcher
         return new string(chars);
     }
 
-    private static HashSet<int> MatchOptional(
+    private static OdfPositionSet MatchOptional(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
         OdfSchemaPatternMatchContext context)
     {
-        var matches = new HashSet<int> { index };
-        foreach (int matched in MatchSequence(node.Children, parent, childElements, index, context))
-        {
-            matches.Add(matched);
-        }
-
+        var matches = new OdfPositionSet { index };
+        matches.UnionWith(MatchSequence(node.Children, parent, childElements, index, context));
         return matches;
     }
 
-    private static HashSet<int> MatchRepeated(
+    private static OdfPositionSet MatchRepeated(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
@@ -179,10 +175,28 @@ internal static partial class OdfSchemaPatternContentMatcher
         OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
-        return OdfSchemaPatternFrontierMatcher.ExpandRepeated(
-            index,
-            requireOne,
-            current => MatchSequence(node.Children, parent, childElements, current, context));
+        // 已記憶的 reach 只用於同一個重複節點與同一份子元素清單；防護介入過的結果不記憶（可能被截斷）。
+        if (!context.TryGetReach(node, childElements, index, out OdfPositionSet? reach))
+        {
+            long guardHitsBefore = context.GuardHits;
+            reach = OdfSchemaPatternFrontierMatcher.ComputeReach(
+                index,
+                current => MatchSequence(node.Children, parent, childElements, current, context),
+                state => context.TryGetReach(node, childElements, state, out OdfPositionSet? known) ? known : null);
+            if (context.GuardHits == guardHitsBefore)
+            {
+                context.StoreReach(node, childElements, index, reach);
+            }
+        }
+
+        if (requireOne)
+        {
+            return reach;
+        }
+
+        var withStart = new OdfPositionSet { index };
+        withStart.UnionWith(reach);
+        return withStart;
     }
 
 

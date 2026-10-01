@@ -15,6 +15,50 @@ namespace OdfKit.Compliance;
 internal static class OdfSchemaPatternFrontierMatcher
 {
     /// <summary>
+    /// 內容比對專用：計算由起點重複套用內容至少一次所能到達的子元素位置（集合以位元集合表示）。
+    /// </summary>
+    /// <remarks>
+    /// 位置只會遞增，且某位置 p 的「可到達位置」與起點無關。已知 p 的可到達集合時直接併入，不必再展開；
+    /// 前緣位置由大到小處理，使較小位置展開時所需的較大位置結果已經記憶。巢狀重複
+    /// （<c>oneOrMore(oneOrMore(table-row))</c>）因此由平方次展開降為每個位置一次集合聯集。
+    /// </remarks>
+    internal static OdfPositionSet ComputeReach(
+        int initialPosition,
+        Func<int, OdfPositionSet> expand,
+        Func<int, OdfPositionSet?> tryGetKnownReach)
+    {
+        var reach = new OdfPositionSet();
+        var frontier = new List<int> { initialPosition };
+        while (frontier.Count > 0)
+        {
+            frontier.Sort();
+            var next = new List<int>();
+            for (int i = frontier.Count - 1; i >= 0; i--)
+            {
+                int current = frontier[i];
+                OdfPositionSet? known = current == initialPosition ? null : tryGetKnownReach(current);
+                if (known is not null)
+                {
+                    reach.UnionWith(known);
+                    continue;
+                }
+
+                foreach (int matched in expand(current))
+                {
+                    if (matched != current && reach.Add(matched))
+                    {
+                        next.Add(matched);
+                    }
+                }
+            }
+
+            frontier = next;
+        }
+
+        return reach;
+    }
+
+    /// <summary>
     /// 從初始狀態開始，反覆以 <paramref name="expand"/> 展開目前的前緣狀態集合，直到不再產生新狀態為止，
     /// 並回傳所有曾經到達過的狀態（RELAX NG <c>zeroOrMore</c>／<c>oneOrMore</c> 重複比對的共用實作）。
     /// </summary>
