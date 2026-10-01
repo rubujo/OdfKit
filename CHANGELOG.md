@@ -2,7 +2,7 @@
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
 
-## 尚未發佈
+## 0.0.1 - 2026-10-01
 
 - 修正 `OdtStreamReader` 的文字擷取：（1）兩個行內元素（例如 `text:span`）之間只隔單一空白時，空白被丟掉而使字黏在一起（`Hello world` 讀成 `Helloworld`），現在保留段落內的空白節點；（2）清單項目與表格儲存格內的多個段落原本直接相接（`A`、`B` 讀成 `AB`），現在以換行分隔；（3）巢狀清單與巢狀表格的內層項目原本被併入外層節點，現在外層節點只含自己的段落，遇到巢狀 `text:list` 或 `table:table` 即結束，內層清單項目與儲存格各自成為獨立節點（文件順序不變）；（4）段落內的 `office:annotation` 與 `text:note`（註解與註腳）內文原本混入段落文字（`AnoteB`），現在略過。標準 ODT 資料集（10 萬個結構節點）的語意檢查碼與修正前完全相同；同時因不再為每個元素建立 `XmlSubtreeReader`，該情境的讀取耗時約 250 ms 降為約 209 ms、GC 配置量約 106 MB 降為約 37 MB。由 `OdtStreamReaderBehaviorTests` 涵蓋同步與非同步兩條路徑。
 - 修正 `OdsStreamReader` 的三個資料正確性缺陷，並大幅降低讀取配置量。**缺陷**：（1）多段落儲存格會遺失每隔一個的段落（`A`、`B` 讀成 `A`；讀取一個段落後多讀了一個節點，略過緊接的下一個 `text:p`）；（2）段落內含 `text:span`、`text:a`、`text:s`（連續空白）、`text:tab` 或 `text:line-break` 會擲出 `XmlException`，現在依 ODF 語意讀出顯示文字（`text:s` 為 `text:c` 個空白、`text:tab` 為定位字元、`text:line-break` 為換行，`office:annotation` 與 `text:note` 不計入），並在累積時就套用 `MaxCellTextCharacters`，避免 `text:c` 宣告極大值時配置巨量字串；（3）第一列為空列時，同步的 `Read()` 直接回傳 `false` 而讀不到任何列（非同步路徑正常），現在與非同步路徑一致。（4）空白列區塊（`table:number-rows-repeated`）只回傳一列，但後續列的 `RowIndex` 原本沒有計入被略過的空白列而與實際列號不一致，現在後續列的 `RowIndex` 會加上略過的列數（空白區塊本身的 `RowIndex` 是區塊的第一列；標準 ODS 資料集的語意檢查碼不變）。**最佳化**：不再對每列與每格建立 `XmlSubtreeReader`、屬性改為一次走訪、重用每列暫存並共用空白儲存格實例；100 萬列 × 10 欄的讀取耗時由約 25 至 30 秒降為約 7.7 秒、GC 配置量由約 13.5 GB 降為約 1.8 GB（同機器的 MiniExcel 約 20 至 23 秒、19.7 GB），見 `docs/performance-comparison.md` 第 7 節。由 `OdsStreamReaderCharacterizationTests` 鎖定同步與非同步兩條路徑的逐格結果。
