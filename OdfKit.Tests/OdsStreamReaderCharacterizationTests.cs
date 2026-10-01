@@ -20,7 +20,8 @@ namespace OdfKit.Tests;
 /// 多段落儲存格會遺失每隔一個的段落；段落內含 <c>text:span</c>、<c>text:s</c> 或 <c>text:tab</c> 會擲出
 /// <see cref="System.Xml.XmlException"/>；第一列為空列時同步路徑讀不到任何列（非同步路徑讀得到）。
 /// 仍維持原行為的已知特性：巢狀表格與儲存格層級註解（<c>office:annotation</c> 作為儲存格的直接子節點）的
-/// 段落文字會混入儲存格文字；連續的空白列只回傳一個空列。
+/// 段落文字會混入儲存格文字；連續的空白列只回傳一個空列（但後續列的 <see cref="OdsStreamReader.RowIndex"/>
+/// 會計入被略過的空白列，與實際列號一致）。
 /// </remarks>
 [Trait(TestCategories.Kind, TestCategories.Boundary)]
 public sealed class OdsStreamReaderCharacterizationTests
@@ -266,6 +267,82 @@ public sealed class OdsStreamReaderCharacterizationTests
         (_, string xml, _, string expected) = Array.Find(s_cases, candidate => candidate.Name == name);
 
         Assert.Equal(expected, await ReadAsyncPathAsync(xml));
+    }
+
+    // 空白列區塊（number-rows-repeated）只回傳一列，但後續列的 RowIndex 必須計入被略過的空白列。
+    private static string Data(int value) =>
+        "<table:table-row><table:table-cell office:value-type=\"float\" office:value=\"" + value + "\"><text:p>" + value + "</text:p></table:table-cell></table:table-row>";
+
+    private static string EmptyBlock(int repeat) =>
+        "<table:table-row table:number-rows-repeated=\"" + repeat + "\"><table:table-cell/></table:table-row>";
+
+    private static readonly (string Name, string Xml, string Expected)[] s_rowIndexCases =
+    [
+        ("empty-block-between-data", Data(1) + EmptyBlock(3) + Data(2), "0,1,4"),
+        ("leading-empty-block", EmptyBlock(3) + Data(1), "0,3"),
+        ("trailing-empty-block-only", Data(1) + EmptyBlock(1048570), "0,1"),
+        ("two-empty-blocks", Data(1) + EmptyBlock(2) + Data(2) + EmptyBlock(3) + Data(3), "0,1,3,4,7"),
+        ("empty-row-elements-without-repeat", Data(1) + "<table:table-row/>" + "<table:table-row/>" + Data(2), "0,1,2,3"),
+        ("repeated-non-empty-rows", "<table:table-row table:number-rows-repeated=\"3\"><table:table-cell office:value-type=\"float\" office:value=\"1\"><text:p>1</text:p></table:table-cell></table:table-row>" + Data(2), "0,1,2,3"),
+        ("block-of-one-is-not-skipped", Data(1) + EmptyBlock(1) + Data(2), "0,1,2"),
+        ("empty-block-pushing-past-the-row-limit", Data(1) + EmptyBlock(1048576) + Data(2), "0,1,EXCEPTION InvalidDataException"),
+    ];
+
+    public static TheoryData<string> RowIndexCaseNames()
+    {
+        var data = new TheoryData<string>();
+        foreach ((string name, _, _) in s_rowIndexCases)
+        {
+            data.Add(name);
+        }
+
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(RowIndexCaseNames))]
+    public void SyncPath_RowIndexAccountsForSkippedEmptyRows(string name)
+    {
+        (_, string xml, string expected) = Array.Find(s_rowIndexCases, candidate => candidate.Name == name);
+        var indexes = new System.Collections.Generic.List<string>();
+        try
+        {
+            using MemoryStream stream = CreateOds(xml);
+            using var reader = new OdsStreamReader(stream);
+            while (reader.Read())
+            {
+                indexes.Add(reader.RowIndex.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+        catch (Exception exception)
+        {
+            indexes.Add("EXCEPTION " + exception.GetType().Name);
+        }
+
+        Assert.Equal(expected, string.Join(",", indexes));
+    }
+
+    [Theory]
+    [MemberData(nameof(RowIndexCaseNames))]
+    public async Task AsyncPath_RowIndexAccountsForSkippedEmptyRows(string name)
+    {
+        (_, string xml, string expected) = Array.Find(s_rowIndexCases, candidate => candidate.Name == name);
+        var indexes = new System.Collections.Generic.List<string>();
+        try
+        {
+            using MemoryStream stream = CreateOds(xml);
+            using var reader = new OdsStreamReader(stream);
+            while (await reader.ReadAsync(TestContext.Current.CancellationToken))
+            {
+                indexes.Add(reader.RowIndex.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+        catch (Exception exception)
+        {
+            indexes.Add("EXCEPTION " + exception.GetType().Name);
+        }
+
+        Assert.Equal(expected, string.Join(",", indexes));
     }
 
     [Fact]

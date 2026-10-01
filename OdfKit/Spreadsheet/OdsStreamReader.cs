@@ -32,6 +32,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private XmlReader? _xmlReader;
     private Stream? _contentStream;
     private int _rowRepeatRemaining;
+
+    // 空白列區塊（number-rows-repeated）只回傳一列，其餘被略過的空白列數暫存於此，
+    // 在讀到下一個 table-row 時計入 RowIndex，使後續列的列號與實際列號一致。
+    private int _skippedEmptyRows;
     private int _rowIndex = -1;
     private readonly List<object?> _currentRowData = [];
     private readonly List<OdsCellValue> _currentRowCells = [];
@@ -324,7 +328,11 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
                 if (_xmlReader.LocalName == "table-row" &&
                     _xmlReader.NamespaceURI == OdfNamespaces.Table)
                 {
+                    // 先取走上一個空白列區塊略過的列數：ParseCurrentRow 會以目前這一列覆寫它。
+                    int skippedBefore = _skippedEmptyRows;
+                    _skippedEmptyRows = 0;
                     ParseCurrentRow(_xmlReader);
+                    _rowIndex += skippedBefore;
                     EnsureWithinLimit(_rowIndex + 2, _options.MaxRows);
                     _rowIndex++;
                     _hasRows = true;
@@ -356,7 +364,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
             if (_xmlReader.NodeType == XmlNodeType.Element && _xmlReader.LocalName == "table-row" &&
                 _xmlReader.NamespaceURI == OdfNamespaces.Table)
             {
+                int skippedBefore = _skippedEmptyRows;
+                _skippedEmptyRows = 0;
                 await ParseCurrentRowAsync(_xmlReader, cancellationToken).ConfigureAwait(false);
+                _rowIndex += skippedBefore;
                 EnsureWithinLimit(_rowIndex + 2, _options.MaxRows);
                 _rowIndex++;
                 _hasRows = true;
@@ -550,6 +561,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     {
         // LibreOffice 以大型 number-rows-repeated 表示結尾空白列 — 跳過重複
         _rowRepeatRemaining = isEmpty ? 0 : rowRepeat - 1;
+        _skippedEmptyRows = isEmpty ? rowRepeat - 1 : 0;
 
         _currentRowData.Clear();
         _currentRowCells.Clear();
