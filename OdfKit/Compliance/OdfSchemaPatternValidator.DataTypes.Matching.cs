@@ -232,6 +232,12 @@ public static partial class OdfSchemaPatternValidator
         {
             return false;
         }
+        catch (ArgumentException)
+        {
+            // XmlConvert.VerifyName／VerifyNCName／VerifyNMTOKEN 對空字串擲出 ArgumentException 而非 XmlException；
+            // 空值只是不符合該資料型別，不應讓驗證器中止。
+            return false;
+        }
     }
 
     private static bool IsAnyUri(string value)

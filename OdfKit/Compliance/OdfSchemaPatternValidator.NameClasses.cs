@@ -111,6 +111,10 @@ public static partial class OdfSchemaPatternValidator
         {
             case OdfSchemaPatternNodeKind.Text:
                 return true;
+            case OdfSchemaPatternNodeKind.Empty:
+                // RELAX NG 的 <empty/> 在屬性值上只匹配空字串；例如 styleNameRef 為 NCName 或 empty，
+                // LibreOffice 會寫出 style:list-style-name=""。
+                return value.Length == 0;
             case OdfSchemaPatternNodeKind.Data:
                 return MatchesDataValue(node, value, context);
             case OdfSchemaPatternNodeKind.Value:
