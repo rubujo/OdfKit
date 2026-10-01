@@ -14,7 +14,7 @@ on:
         default: false
         type: boolean
       run_competitive_comparison:
-        description: 'Run the opt-in cross-package write and read comparison (MiniExcel, ClosedXML)'
+        description: 'Run the opt-in cross-package write, read and ODT-versus-DOCX comparison (MiniExcel, ClosedXML, Open XML SDK)'
         required: false
         default: false
         type: boolean
@@ -162,7 +162,7 @@ jobs:
             nuget-${{ runner.os }}-
 
       # 讀取對比會以內容檢查碼驗證每個讀取器讀回的資料與產生器一致；不符時腳本失敗，該次量測無效。
-      - name: Run competitive comparison (write and read)
+      - name: Run competitive comparison (write, read and document)
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts/performance | Out-Null

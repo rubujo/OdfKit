@@ -63,7 +63,11 @@ pwsh eng/Benchmark-Stress.ps1
 ```powershell
 pwsh eng/Benchmark-Competitive.ps1            # 寫入與讀取（預設）
 pwsh eng/Benchmark-Competitive.ps1 -Mode Read # 只執行讀取對比
+pwsh eng/Benchmark-Competitive.ps1 -Mode Document # 只執行 ODT 對 DOCX 的串流對比
 ```
+
+另有 ODT 對 DOCX 的串流寫入與讀取對比（`OdtStreamWriter`／`OdtStreamReader` 對 Open XML SDK 的
+`OpenXmlWriter`／`OpenXmlReader`），同樣含內容檢查碼。
 
 這是 ODS 對 XLSX 的跨格式參考對比。方法論、環境、結果與讀取端較慢的成因分析見
 [效能對比](../docs/performance-comparison.md)。

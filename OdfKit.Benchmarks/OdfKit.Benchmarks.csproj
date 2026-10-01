@@ -22,6 +22,9 @@
          不會為建置此 repo 之使用者帶來授權負擔；詳見 docs/performance-comparison.md 的授權裁定說明。 -->
     <PackageReference Include="MiniExcel" />
     <PackageReference Include="ClosedXML" />
+    <!-- Open XML SDK（MIT）：ODT 對 DOCX 串流對比的對照組（OpenXmlWriter／OpenXmlReader）。
+         OdfKit.Extensions.Ooxml 本來就相依此套件，不會新增授權或相依負擔。 -->
+    <PackageReference Include="DocumentFormat.OpenXml" />
   </ItemGroup>
 
   <ItemGroup>

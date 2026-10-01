@@ -41,6 +41,16 @@ internal static class Program
             return CompetitiveStreamReadManualRunner.RunSingleScenario(args[1], args[2]);
         }
 
+        if (args.Length > 0 && string.Equals(args[0], "--manual-competitive-document", StringComparison.OrdinalIgnoreCase))
+        {
+            return CompetitiveDocumentManualRunner.RunOrchestrator();
+        }
+
+        if (args.Length >= 3 && string.Equals(args[0], "--run-document-single", StringComparison.OrdinalIgnoreCase))
+        {
+            return CompetitiveDocumentManualRunner.RunSingleScenario(args[1], args[2]);
+        }
+
         if (args.Length > 0 && string.Equals(args[0], "--stress", StringComparison.OrdinalIgnoreCase))
         {
             return ResourceLimitStressRunner.RunOrchestrator();

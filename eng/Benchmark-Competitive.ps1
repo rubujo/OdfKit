@@ -14,12 +14,14 @@
 .PARAMETER Configuration
     建置組態，預設 Release。
 .PARAMETER Mode
-    Write 只執行寫入對比；Read 只執行讀取對比；All（預設）兩者都執行。
+    Write 只執行寫入對比；Read 只執行讀取對比；Document 只執行 ODT 對 DOCX 的串流對比
+    （OdtStreamWriter／OdtStreamReader 對 Open XML SDK 的 OpenXmlWriter／OpenXmlReader，含內容檢查碼）；
+    All（預設）三者都執行。
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
-    [ValidateSet("Write", "Read", "All")]
+    [ValidateSet("Write", "Read", "Document", "All")]
     [string]$Mode = "All"
 )
 
@@ -56,6 +58,15 @@ try {
         dotnet $assemblyPath --manual-competitive-read
         if ($LASTEXITCODE -ne 0) {
             throw "跨套件讀取效能對比執行失敗（exit code $LASTEXITCODE）"
+        }
+    }
+
+    if ($Mode -in @("Document", "All")) {
+        Write-Host ""
+        Write-Host "執行 ODT 對 DOCX 的串流對比（手動計時模式，各情境獨立子行程執行一次，含內容檢查碼）…"
+        dotnet $assemblyPath --manual-competitive-document
+        if ($LASTEXITCODE -ne 0) {
+            throw "ODT 對 DOCX 串流對比執行失敗（exit code $LASTEXITCODE）"
         }
     }
 
