@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -17,7 +19,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定以真實性驗證（把 Office 風格的文件轉成 ODF 並對照已知真值）所發現的核心缺陷：
 /// 空白字元編碼（ODF 1.3 §6.1.2）、超連結的 <c>xlink:type</c>、空列的 schema 有效性，
-/// 以及列數多的工作表 schema 驗證耗時。
+/// 列數多的工作表 schema 驗證耗時，以及延遲載入與驗證器對 LibreOffice 真實文件的處理。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Regression)]
 public sealed class RealWorldFidelityTests
@@ -186,7 +188,251 @@ public sealed class RealWorldFidelityTests
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(60), $"驗證 2,000 列耗時 {stopwatch.Elapsed.TotalSeconds:N1} 秒。");
     }
 
+    // ---------- 延遲載入與驗證器對真實 LibreOffice 文件的處理 ----------
+
+    private const string CalcExtNamespace = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";
+    private const string LoExtNamespace = "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0";
+
+    /// <summary>
+    /// 驗證 8 KB 以上的 <c>table:table</c>（延遲具現化的子樹）含有宣告在文件根元素的額外前綴
+    /// （LibreOffice 在每個儲存格寫 <c>calcext:value-type</c>）時，載入後資料完整。
+    /// 修正前具現化用的外殼只宣告七個前綴，額外前綴未宣告使解析失敗，寬鬆模式再把失敗搶救成空的表格，
+    /// 整張工作表的資料靜默遺失（儲存後即永久遺失）。
+    /// </summary>
+    [Fact]
+    public void LazyLoadedTableKeepsCellsUsingExtraNamespacePrefixes()
+    {
+        using var original = new MemoryStream();
+        using (var document = OdfSpreadsheetDocument.Create())
+        {
+            OdfTableSheet sheet = document.Worksheets.Add("S");
+            for (int row = 0; row < 60; row++)
+            {
+                for (int column = 0; column < 6; column++)
+                {
+                    sheet.GetCell(row, column).CellValue = $"R{row}C{column} 資料內容";
+                }
+            }
+
+            document.SaveToStream(original);
+        }
+
+        original.Position = 0;
+        using MemoryStream rewritten = RewriteContentXml(original, xml =>
+            xml.Replace("<office:document-content ", $"<office:document-content xmlns:calcext=\"{CalcExtNamespace}\" ")
+                .Replace("<table:table-cell ", "<table:table-cell calcext:value-type=\"string\" "));
+        Assert.True(ReadContentXml(rewritten).Length > 8192);
+
+        rewritten.Position = 0;
+        using OdfSpreadsheetDocument loaded = OdfSpreadsheetDocument.Load(rewritten);
+        OdfTableSheet loadedSheet = loaded.GetSheets().Single(sheet => sheet.Name == "S");
+        Assert.Equal(360, loadedSheet.GetUsedCells().Count());
+        Assert.Equal("R59C5 資料內容", loadedSheet.GetCell(59, 5).CellValue);
+
+        using var saved = new MemoryStream();
+        loaded.SaveToStream(saved);
+        saved.Position = 0;
+        using OdfSpreadsheetDocument reloaded = OdfSpreadsheetDocument.Load(saved);
+        Assert.Equal(360, reloaded.GetSheets().Single(sheet => sheet.Name == "S").GetUsedCells().Count());
+    }
+
+    /// <summary>
+    /// 驗證 8 KB 以上的 <c>text:p</c>（延遲具現化的子樹）含有宣告在文件根元素的額外前綴屬性時，載入後文字完整。
+    /// </summary>
+    [Fact]
+    public void LazyLoadedParagraphKeepsContentUsingExtraNamespacePrefixes()
+    {
+        string expected = string.Concat(Enumerable.Range(0, 400).Select(i => $"片段{i};"));
+        using var original = new MemoryStream();
+        using (TextDocument document = TextDocument.Create())
+        {
+            OdfParagraph paragraph = document.AddParagraph(string.Empty);
+            for (int i = 0; i < 400; i++)
+            {
+                paragraph.AddTextRun($"片段{i};");
+            }
+
+            document.SaveToStream(original);
+        }
+
+        original.Position = 0;
+        using MemoryStream rewritten = RewriteContentXml(original, xml =>
+            xml.Replace("<office:document-content ", $"<office:document-content xmlns:loext=\"{LoExtNamespace}\" ")
+                .Replace("<text:span", "<text:span loext:marker=\"1\""));
+        Assert.True(ReadContentXml(rewritten).Length > 8192);
+
+        rewritten.Position = 0;
+        using TextDocument loaded = TextDocument.Load(rewritten);
+        Assert.Equal(expected, loaded.Body.Paragraphs.First().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 schema 驗證器接受屬性值為空字串的 <c>styleNameRef</c>（規格為 NCName 或 empty，
+    /// LibreOffice 會寫出 <c>style:list-style-name=""</c>），也不會因空字串丟出例外。
+    /// </summary>
+    [Fact]
+    public void SchemaValidationAcceptsEmptyStyleNameReference()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("內容");
+        paragraph.Node.SetAttribute("style-name", OdfNamespaces.Text, string.Empty, "text");
+
+        OdfValidationReport report = Validate14(document);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證只允許 NCName 的屬性值為空字串（<c>style:name=""</c>）時，驗證器回報不符而不是丟出例外
+    /// （<c>XmlConvert.VerifyNCName</c> 對空字串擲出 <see cref="ArgumentException"/> 而非 <see cref="System.Xml.XmlException"/>）。
+    /// </summary>
+    [Fact]
+    public void SchemaValidationReportsEmptyNcNameInsteadOfThrowing()
+    {
+        using var original = new MemoryStream();
+        using (TextDocument document = TextDocument.Create())
+        {
+            document.AddParagraph("內容");
+            document.SaveToStream(original);
+        }
+
+        original.Position = 0;
+        using MemoryStream rewritten = RewriteContentXml(original, xml =>
+            xml.Replace(
+                "<office:body>",
+                "<office:automatic-styles><style:style style:name=\"\" style:family=\"paragraph\"/></office:automatic-styles><office:body>"));
+        Assert.Contains("style:name=\"\"", ReadContentXml(rewritten));
+
+        rewritten.Position = 0;
+        using OdfPackage package = OdfPackage.Open(rewritten, leaveOpen: true);
+        OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+        Assert.False(report.IsValid);
+    }
+
+    /// <summary>
+    /// 驗證 UTF-8 快速解析器保留段落內元素之間的空白：<c>&lt;/text:span&gt; 與 &lt;text:span&gt;</c> 之間的空格、
+    /// 以及僅含空白的結尾文字。修正前解析器在每個標記前跳過所有空白，文字節點的開頭空白與僅含空白的文字節點全部遺失，
+    /// 與 <c>XmlReader</c> 路徑的結果不一致，載入 LibreOffice 文件再儲存會把「粗體 與 斜體」變成「粗體與 斜體」。
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ParserKeepsWhitespaceBetweenInlineElements(bool allowLazyLoading)
+    {
+        const string Xml =
+            "<text:p xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">a <text:span>b</text:span> c <text:span>d</text:span> </text:p>";
+        var options = new OdfLoadOptions { AllowLazyLoading = allowLazyLoading };
+
+        OdfNode fromBytes = OdfXmlReader.Parse(Encoding.UTF8.GetBytes(Xml), options);
+        Assert.Equal("a b c d ", fromBytes.TextContent);
+        Assert.Equal(
+            new[] { "a ", "b", " c ", "d", " " },
+            fromBytes.Children.Select(child => child.TextContent).ToArray());
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(Xml));
+        OdfNode fromStream = OdfXmlReader.Parse(stream, options);
+        Assert.Equal(fromStream.TextContent, fromBytes.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證結構性元素之間的縮排空白仍不會成為子節點，只有段落內容元素保留僅含空白的文字。
+    /// </summary>
+    [Fact]
+    public void ParserStillDropsIndentationBetweenStructuralElements()
+    {
+        const string Xml = """
+            <office:body xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                         xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+              <office:text>
+                <text:p>內容</text:p>
+              </office:text>
+            </office:body>
+            """;
+
+        OdfNode body = OdfXmlReader.Parse(Encoding.UTF8.GetBytes(Xml), new OdfLoadOptions { AllowLazyLoading = true });
+        OdfNode text = Assert.Single(body.Children);
+        Assert.Equal("text", text.LocalName);
+        Assert.Equal("p", Assert.Single(text.Children).LocalName);
+    }
+
+    /// <summary>
+    /// 驗證載入含「粗體 與 斜體」（兩個 <c>text:span</c> 之間為單一空格）的段落後儲存再載入，空格仍在。
+    /// </summary>
+    [Fact]
+    public void SaveAndReloadKeepsSpaceBetweenSpans()
+    {
+        using var original = new MemoryStream();
+        using (TextDocument document = TextDocument.Create())
+        {
+            document.AddParagraph("佔位");
+            document.SaveToStream(original);
+        }
+
+        original.Position = 0;
+        using MemoryStream rewritten = RewriteContentXml(original, xml =>
+            xml.Replace(
+                "<text:p>佔位</text:p>",
+                "<text:p>前 <text:span>粗體</text:span> 與 <text:span>斜體</text:span> 後 </text:p>"));
+        Assert.Contains("</text:span> 與 <text:span>", ReadContentXml(rewritten));
+
+        rewritten.Position = 0;
+        using TextDocument loaded = TextDocument.Load(rewritten);
+        Assert.Equal("前 粗體 與 斜體 後 ", loaded.Body.Paragraphs.First().TextContent);
+
+        using var saved = new MemoryStream();
+        loaded.SaveToStream(saved);
+        Assert.Contains("</text:span> 與 <text:span", ReadContentXml(saved));
+        saved.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(saved);
+        Assert.Equal("前 粗體 與 斜體 後 ", reloaded.Body.Paragraphs.First().TextContent);
+    }
+
     // ---------- helpers ----------
+
+    private static MemoryStream RewriteContentXml(MemoryStream source, Func<string, string> transform)
+    {
+        var result = new MemoryStream();
+        using (var input = new ZipArchive(source, ZipArchiveMode.Read, leaveOpen: true))
+        using (var output = new ZipArchive(result, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach (ZipArchiveEntry entry in input.Entries)
+            {
+                ZipArchiveEntry copy = output.CreateEntry(
+                    entry.FullName,
+                    entry.FullName == "mimetype" ? CompressionLevel.NoCompression : CompressionLevel.Optimal);
+                using Stream inputStream = entry.Open();
+                using Stream outputStream = copy.Open();
+                if (entry.FullName == "content.xml")
+                {
+                    using var reader = new StreamReader(inputStream, Encoding.UTF8);
+                    byte[] bytes = new UTF8Encoding(false).GetBytes(transform(reader.ReadToEnd()));
+                    outputStream.Write(bytes, 0, bytes.Length);
+                }
+                else
+                {
+                    inputStream.CopyTo(outputStream);
+                }
+            }
+        }
+
+        result.Position = 0;
+        return result;
+    }
+
+    private static string ReadContentXml(MemoryStream package)
+    {
+        long position = package.Position;
+        try
+        {
+            package.Position = 0;
+            using var archive = new ZipArchive(package, ZipArchiveMode.Read, leaveOpen: true);
+            using var reader = new StreamReader(archive.GetEntry("content.xml")!.Open(), Encoding.UTF8);
+            return reader.ReadToEnd();
+        }
+        finally
+        {
+            package.Position = position;
+        }
+    }
 
     private static string SaveContentXml(OdfDocument document)
     {

@@ -97,6 +97,7 @@ public partial class OdfNode
         _xmlByteRange = null;
         _lazyMaxXmlCharactersInDocument = 0;
         _lazyStrictXmlParsing = false;
+        _lazyInScopeNamespaces = null;
         _sourceNamespacePrefixes = null;
         _isLazy = false;
         IsModified = false;

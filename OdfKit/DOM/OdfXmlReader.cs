@@ -166,6 +166,7 @@ public static class OdfXmlReader
                                 }
                                 node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                 node._lazyStrictXmlParsing = options.StrictXmlParsing;
+                                node._lazyInScopeNamespaces = elementNamespaces;
                                 node._isLazy = true;
                                 reader = lazyReader;
                             }
@@ -245,6 +246,13 @@ public static class OdfXmlReader
                 case OdfUtf8XmlTokenKind.Text:
                     if (stack.Count > 0)
                     {
+                        // 結構性元素（office:body、table:table 等）之間的縮排空白沒有意義而略過；
+                        // 段落內容元素中僅含空白的文字是有意義的內容（例如兩個 text:span 之間的空格）。
+                        if (IsWhitespaceOnly(token.Value) && !IsMixedContentElement(stack.Peek()))
+                        {
+                            break;
+                        }
+
                         string textVal = OdfUtf8XmlReader.GetStringMaybeDecoded(token.Value);
                         AddXmlCharacters(options, ref xmlCharacterCount, textVal.Length);
                         OdfNode textNode = new(OdfNodeType.Text, string.Empty, string.Empty)
@@ -613,11 +621,13 @@ public static class OdfXmlReader
                             {
                                 if (localName == "table" && nsUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0")
                                 {
+                                    Dictionary<string, string> inScopeNamespaces = CaptureInScopeNamespaces(reader);
                                     string innerXml = reader.ReadInnerXml();
                                     AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     node._lazyXmlMemory = Encoding.UTF8.GetBytes(innerXml);
                                     node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                     node._lazyStrictXmlParsing = options.StrictXmlParsing;
+                                    node._lazyInScopeNamespaces = inScopeNamespaces;
                                     node._isLazy = true;
                                     shouldLazy = true;
                                     currentDepth--;
@@ -625,6 +635,7 @@ public static class OdfXmlReader
                                 }
                                 else if (localName == "meta" || localName == "settings" || localName == "styles" || localName == "p" || localName == "list")
                                 {
+                                    Dictionary<string, string> inScopeNamespaces = CaptureInScopeNamespaces(reader);
                                     string innerXml = reader.ReadInnerXml();
                                     AddXmlCharacters(options, ref xmlCharacterCount, innerXml.Length);
                                     if (innerXml.Length >= 8192)
@@ -632,20 +643,17 @@ public static class OdfXmlReader
                                         node._lazyXmlMemory = Encoding.UTF8.GetBytes(innerXml);
                                         node._lazyMaxXmlCharactersInDocument = options.MaxXmlCharactersInDocument;
                                         node._lazyStrictXmlParsing = options.StrictXmlParsing;
+                                        node._lazyInScopeNamespaces = inScopeNamespaces;
                                         node._isLazy = true;
                                         shouldLazy = true;
                                     }
                                     else if (innerXml.Length > 0)
                                     {
-                                        byte[] innerBytes = Encoding.UTF8.GetBytes("<wrapper" +
-                                            " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
-                                            " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
-                                            " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
-                                            " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
-                                            " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
-                                            " xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"" +
-                                            " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
-                                            ">" + innerXml + "</wrapper>");
+                                        byte[] wrapperPrefix = OdfNode.BuildWrapperPrefixBytes(inScopeNamespaces);
+                                        byte[] innerBody = Encoding.UTF8.GetBytes(innerXml + "</wrapper>");
+                                        byte[] innerBytes = new byte[wrapperPrefix.Length + innerBody.Length];
+                                        Buffer.BlockCopy(wrapperPrefix, 0, innerBytes, 0, wrapperPrefix.Length);
+                                        Buffer.BlockCopy(innerBody, 0, innerBytes, wrapperPrefix.Length, innerBody.Length);
                                         using var tempMs = new MemoryStream(innerBytes);
                                         OdfNode? tempRoot = OdfXmlReader.Parse(tempMs, new OdfLoadOptions { AllowLazyLoading = false });
                                         if (tempRoot is not null)
@@ -762,6 +770,37 @@ public static class OdfXmlReader
         OdfPerformanceTelemetry.RecordXmlParse(stopwatch.Elapsed.TotalMilliseconds);
 
         return rootNode;
+    }
+
+    private static bool IsWhitespaceOnly(ReadOnlySpan<byte> value)
+    {
+        foreach (byte b in value)
+        {
+            if (b != (byte)' ' && b != (byte)'\t' && b != (byte)'\r' && b != (byte)'\n')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsMixedContentElement(OdfNode element) =>
+        element.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+        && element.LocalName is "p" or "h" or "span" or "a" or "meta" or "ruby-base" or "ruby-text";
+
+    private static Dictionary<string, string> CaptureInScopeNamespaces(XmlReader reader)
+    {
+        var captured = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (reader is IXmlNamespaceResolver resolver)
+        {
+            foreach (KeyValuePair<string, string> declaration in resolver.GetNamespacesInScope(XmlNamespaceScope.ExcludeXml))
+            {
+                captured[declaration.Key] = declaration.Value;
+            }
+        }
+
+        return captured;
     }
 
     private static void AddXmlCharacters(OdfLoadOptions options, ref long total, long count)

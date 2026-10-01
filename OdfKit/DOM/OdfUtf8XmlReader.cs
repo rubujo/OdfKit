@@ -54,15 +54,9 @@ public ref struct OdfUtf8XmlReader
         if (_position >= _xml.Length)
             return false;
 
-        // 跳過空白字元
-        while (_position < _xml.Length && IsWhitespace(_xml[_position]))
-        {
-            _position++;
-        }
-
-        if (_position >= _xml.Length)
-            return false;
-
+        // 不可跳過標記前的空白：混合內容（text:p、text:span 等）中的空白是有意義的文字，
+        // 例如 <text:span>粗體</text:span> 與 <text:span>斜體</text:span> 之間的空格，
+        // 以及僅含空白的文字節點；跳過會使 DOM 載入後再儲存時遺失這些空白。
         int start = _position;
         if (_xml[_position] == (byte)'<')
         {

@@ -107,6 +107,7 @@ public partial class OdfNode
         clone._xmlByteRange = _xmlByteRange;
         clone._lazyMaxXmlCharactersInDocument = _lazyMaxXmlCharactersInDocument;
         clone._lazyStrictXmlParsing = _lazyStrictXmlParsing;
+        clone._lazyInScopeNamespaces = _lazyInScopeNamespaces;
         clone._sourceNamespacePrefixes = _sourceNamespacePrefixes is null
             ? null
             : new Dictionary<string, string>(_sourceNamespacePrefixes, StringComparer.Ordinal);
