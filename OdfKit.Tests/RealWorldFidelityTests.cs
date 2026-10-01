@@ -25,6 +25,7 @@ namespace OdfKit.Tests;
 public sealed class RealWorldFidelityTests
 {
     private static readonly XNamespace s_text = OdfNamespaces.Text;
+    private static readonly XNamespace s_style = OdfNamespaces.Style;
     private static readonly XNamespace s_table = OdfNamespaces.Table;
     private static readonly XNamespace s_office = OdfNamespaces.Office;
     private static readonly XNamespace s_xlink = OdfNamespaces.XLink;
@@ -473,6 +474,73 @@ public sealed class RealWorldFidelityTests
         Assert.Contains("style:num-suffix=\")\"", stylesXml);
         Assert.Contains("style:num-prefix=\"(\"", stylesXml);
         Assert.DoesNotContain("fo:num-format", stylesXml);
+
+        OdfValidationReport report = Validate14(document);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證頁首頁尾區域以 schema 規定的順序（header、header-left、header-first、footer、footer-left、
+    /// footer-first）放進 <c>style:master-page</c>，不論建立的先後。修正前每個區域都附加在最後，
+    /// 先設定首頁頁首或頁尾再設定預設頁首會使文件不符合 schema。
+    /// </summary>
+    [Fact]
+    public void PageSetupRegionsFollowSchemaOrderRegardlessOfCreationOrder()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfPageSetup setup = document.GetDefaultPageSetup();
+        setup.Footer.Text = "頁尾";
+        setup.HeaderFirst.Text = "首頁頁首";
+        setup.HeaderLeft.Text = "左頁頁首";
+        setup.HeaderText = "頁首";
+        setup.FooterFirst.Text = "首頁頁尾";
+
+        string stylesXml;
+        using (var stream = new MemoryStream())
+        {
+            document.SaveToStream(stream);
+            stream.Position = 0;
+            using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+            using var reader = new StreamReader(package.GetEntryStream("styles.xml"));
+            stylesXml = reader.ReadToEnd();
+        }
+
+        XElement masterPage = XElement.Parse(stylesXml).Descendants(s_style + "master-page").First();
+        Assert.Equal(
+            new[] { "header", "header-left", "header-first", "footer", "footer-first" },
+            masterPage.Elements().Select(element => element.Name.LocalName).ToArray());
+
+        OdfValidationReport report = Validate14(document);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證 <c>AddPageCountField</c> 寫出 <c>text:page-count</c>，而不是 <c>text:select-page="last"</c>
+    /// （schema 只允許 previous、current、next；LibreOffice 把 last 當成一般頁碼，總頁數會顯示成目前頁碼）。
+    /// </summary>
+    [Fact]
+    public void PageCountFieldUsesPageCountElement()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfPageSetup setup = document.GetDefaultPageSetup();
+        setup.Footer.AddPageNumberField();
+        setup.Footer.AddPageCountField();
+
+        string stylesXml;
+        using (var stream = new MemoryStream())
+        {
+            document.SaveToStream(stream);
+            stream.Position = 0;
+            using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+            using var reader = new StreamReader(package.GetEntryStream("styles.xml"));
+            stylesXml = reader.ReadToEnd();
+        }
+
+        XElement footer = XElement.Parse(stylesXml).Descendants(s_style + "footer").Single();
+        XElement pageNumber = footer.Descendants(s_text + "page-number").Single();
+        Assert.Equal("current", (string?)pageNumber.Attribute(s_text + "select-page"));
+        Assert.Single(footer.Descendants(s_text + "page-count"));
+        Assert.DoesNotContain("select-page=\"last\"", stylesXml);
 
         OdfValidationReport report = Validate14(document);
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));

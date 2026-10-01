@@ -1035,8 +1035,8 @@ public class TextHighLevelApiTests
         Assert.Contains("首頁專用頁首", stylesXml);
         Assert.Contains("首頁專用頁尾", stylesXml);
         Assert.Contains("text:page-number", stylesXml);
-        Assert.Contains("text:select-page=\"last\"", stylesXml);
-        Assert.DoesNotContain("text:page-count", stylesXml);
+        Assert.Contains("text:page-count", stylesXml);
+        Assert.DoesNotContain("text:select-page=\"last\"", stylesXml);
         Assert.Contains("style:header-style", stylesXml);
         Assert.Contains("style:footer-style", stylesXml);
         Assert.Contains("fo:min-height=\"1.2cm\"", stylesXml);
@@ -1103,8 +1103,8 @@ public class TextHighLevelApiTests
 
         var contentXml = SaveAndGetContentXml(document);
         Assert.Contains("text:page-number", contentXml);
-        Assert.Contains("text:select-page=\"last\"", contentXml);
-        Assert.DoesNotContain("text:page-count", contentXml);
+        Assert.Contains("text:page-count", contentXml);
+        Assert.DoesNotContain("text:select-page=\"last\"", contentXml);
         Assert.Contains("text:date", contentXml);
         Assert.Contains("text:sequence", contentXml);
         Assert.Contains("text:sequence-ref", contentXml);

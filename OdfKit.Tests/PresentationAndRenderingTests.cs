@@ -122,9 +122,11 @@ namespace OdfKit.Tests
                 var pageNumbers = pNode.Children
                     .Where(node => node.LocalName == "page-number" && node.NamespaceUri == OdfNamespaces.Text)
                     .ToArray();
-                Assert.Equal(2, pageNumbers.Length);
-                Assert.Contains(pageNumbers, node => node.GetAttribute("select-page", OdfNamespaces.Text) == "current");
-                Assert.Contains(pageNumbers, node => node.GetAttribute("select-page", OdfNamespaces.Text) == "last");
+                OdfNode pageNumber = Assert.Single(pageNumbers);
+                Assert.Equal("current", pageNumber.GetAttribute("select-page", OdfNamespaces.Text));
+                Assert.Single(
+                    pNode.Children,
+                    node => node.LocalName == "page-count" && node.NamespaceUri == OdfNamespaces.Text);
             }
         }
 

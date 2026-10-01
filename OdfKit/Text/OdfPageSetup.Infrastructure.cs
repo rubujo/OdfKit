@@ -105,9 +105,38 @@ public partial class OdfPageSetup
         }
 
         var region = new OdfNode(OdfNodeType.Element, localName, OdfNamespaces.Style, "style");
-        masterPage.AppendChild(region);
+        int order = Array.IndexOf(s_headerFooterOrder, localName);
+        OdfNode? successor = null;
+        foreach (OdfNode child in masterPage.Children)
+        {
+            // ODF 的 style:master-page 子元素順序固定：header、header-left、header-first、footer、
+            // footer-left、footer-first，之後才是 draw:layer-set、表單與圖形；附加在最後會使文件不符合 schema。
+            int childOrder = child.NamespaceUri == OdfNamespaces.Style
+                ? Array.IndexOf(s_headerFooterOrder, child.LocalName)
+                : -1;
+            if (order >= 0 && (childOrder < 0 || childOrder > order))
+            {
+                successor = child;
+                break;
+            }
+        }
+
+        if (successor is not null)
+        {
+            masterPage.InsertBefore(region, successor);
+        }
+        else
+        {
+            masterPage.AppendChild(region);
+        }
+
         return region;
     }
+
+    private static readonly string[] s_headerFooterOrder =
+    [
+        "header", "header-left", "header-first", "footer", "footer-left", "footer-first",
+    ];
 
     private string? GetHeaderFooterText(string localName)
     {

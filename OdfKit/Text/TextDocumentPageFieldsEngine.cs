@@ -23,8 +23,8 @@ internal static class TextDocumentPageFieldsEngine
     /// </summary>
     internal static void AddPageCountField(OdfParagraph paragraph)
     {
-        var fNode = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
-        fNode.SetAttribute("select-page", OdfNamespaces.Text, "last", "text");
-        paragraph.Node.AppendChild(fNode);
+        // text:select-page 只允許 previous、current、next；總頁數是 text:page-count 元素。
+        // 寫成 select-page="last" 不符 schema，LibreOffice 也當成一般頁碼（總頁數顯示成目前頁碼）。
+        paragraph.Node.AppendChild(new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text"));
     }
 }
