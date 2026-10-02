@@ -173,7 +173,7 @@ public sealed class ZipDirectoryIntegrityTests
     }
 
     [Fact]
-    public void FileLoad_WithCorruptedCentralDirectoryRecord_NeverLoadsPartialEntries()
+    public void FileLoadWithCorruptedCentralDirectoryRecordNeverLoadsPartialEntries()
     {
         byte[] data = BuildStandardPackage();
 
@@ -201,7 +201,7 @@ public sealed class ZipDirectoryIntegrityTests
     }
 
     [Fact]
-    public void FileLoad_WithOverstatedRecordCount_NeverLoadsPartialEntries()
+    public void FileLoadWithOverstatedRecordCountNeverLoadsPartialEntries()
     {
         byte[] data = BuildStandardPackage();
         int eocd = data.AsSpan().LastIndexOf(new byte[] { 0x50, 0x4B, 0x05, 0x06 });
@@ -224,7 +224,7 @@ public sealed class ZipDirectoryIntegrityTests
     }
 
     [Fact]
-    public void FileLoad_WithZip64Sentinels_LoadsEntriesLikeStreamLoad()
+    public void FileLoadWithZip64SentinelsLoadsEntriesLikeStreamLoad()
     {
         byte[] data = BuildZip64Package();
 
@@ -248,7 +248,7 @@ public sealed class ZipDirectoryIntegrityTests
     }
 
     [Fact]
-    public void FileLoad_WithWellFormedPackage_LoadsAllEntries()
+    public void FileLoadWithWellFormedPackageLoadsAllEntries()
     {
         string path = WriteTempFile(BuildStandardPackage());
         try

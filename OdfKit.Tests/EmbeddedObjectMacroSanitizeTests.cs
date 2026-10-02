@@ -81,7 +81,7 @@ public sealed class EmbeddedObjectMacroSanitizeTests
     }
 
     [Fact]
-    public void SanitizeMacros_RemovesMacrosAtAnyDepthAndKeepsBenignEntries()
+    public void SanitizeMacrosRemovesMacrosAtAnyDepthAndKeepsBenignEntries()
     {
         using var package = OdfPackage.Open(new MemoryStream(BuildPackage()));
         foreach (string name in MacroEntries)

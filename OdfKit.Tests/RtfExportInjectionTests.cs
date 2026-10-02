@@ -60,7 +60,7 @@ public sealed class RtfExportInjectionTests
     [InlineData("http://x/{{{{{{")]
     [InlineData("http://x/}{\\field{\\*\\fldinst DDEAUTO}}")]
     [InlineData("http://x/a\"}b\\")]
-    public void Hyperlink_WithBracesOrControlCharacters_KeepsGroupsBalanced(string href)
+    public void HyperlinkWithBracesOrControlCharactersKeepsGroupsBalanced(string href)
     {
         string rtf = Export(href);
 
@@ -69,7 +69,7 @@ public sealed class RtfExportInjectionTests
     }
 
     [Fact]
-    public void Hyperlink_WithControlWordAttempt_DoesNotProduceControlWord()
+    public void HyperlinkWithControlWordAttemptDoesNotProduceControlWord()
     {
         string rtf = Export("http://x/}{\\field{\\*\\fldinst DDEAUTO calc}}");
 
@@ -78,7 +78,7 @@ public sealed class RtfExportInjectionTests
     }
 
     [Fact]
-    public void Hyperlink_WithBenignTarget_IsUnchanged()
+    public void HyperlinkWithBenignTargetIsUnchanged()
     {
         string rtf = Export("https://example.com/a?b=1&c=2");
 

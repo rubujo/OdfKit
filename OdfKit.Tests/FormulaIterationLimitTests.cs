@@ -36,7 +36,7 @@ public sealed class FormulaIterationLimitTests
     [InlineData("of:=FACTDOUBLE(1000000000)")]
     [InlineData("of:=COMBIN(1000000000;500000000)")]
     [InlineData("of:=HYPGEOMDIST(1000000000;2000000000;1000000000;3000000000;1)")]
-    public void LargeArguments_FinishQuicklyWithNumError(string formula)
+    public void LargeArgumentsFinishQuicklyWithNumError(string formula)
     {
         (object? value, TimeSpan elapsed) = Evaluate(formula);
 
@@ -64,7 +64,7 @@ public sealed class FormulaIterationLimitTests
     [InlineData("of:=VDB(1E18;1E18;1E18;1E18;1E18)")]
     [InlineData("of:=CUMIPMT(0.05;2147483647;1000;1;2147483647;0)")]
     [InlineData("of:=HYPGEOMDIST(2147483647;2147483647;2147483647;2147483647;1)")]
-    public void FuzzFoundCases_FinishQuickly(string formula)
+    public void FuzzFoundCasesFinishQuickly(string formula)
     {
         (_, TimeSpan elapsed) = Evaluate(formula);
 
@@ -78,7 +78,7 @@ public sealed class FormulaIterationLimitTests
     [InlineData("of:=DB(1000000;100000;6;1;7)", 186083.33333333334d)]
     [InlineData("of:=DDB(2400;300;10;1)", 480d)]
     [InlineData("of:=VDB(2400;300;10;0;1)", 480d)]
-    public void ReasonableArguments_OfFuzzFoundFunctions_KeepTheirValues(string formula, double expected)
+    public void ReasonableArgumentsOfFuzzFoundFunctionsKeepTheirValues(string formula, double expected)
     {
         (object? value, _) = Evaluate(formula);
 
@@ -93,7 +93,7 @@ public sealed class FormulaIterationLimitTests
     [InlineData("of:=COMBIN(52;5)", 2598960d)]
     [InlineData("of:=MULTINOMIAL(2;3;4)", 1260d)]
     [InlineData("of:=CRITBINOM(10;0.5;0.5)", 5d)]
-    public void ReasonableArguments_StillComputeExactly(string formula, double expected)
+    public void ReasonableArgumentsStillComputeExactly(string formula, double expected)
     {
         (object? value, _) = Evaluate(formula);
 

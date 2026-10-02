@@ -27,7 +27,7 @@ public sealed class SpreadsheetIndexBoundsTests
     [InlineData(int.MinValue)]
     [InlineData(OdfSpreadsheetLimits.MaxColumnIndex + 1)]
     [InlineData(int.MaxValue)]
-    public void SetColumnVisible_WithOutOfRangeIndex_ThrowsArgumentOutOfRange(int column)
+    public void SetColumnVisibleWithOutOfRangeIndexThrowsArgumentOutOfRange(int column)
     {
         OdfTableSheet sheet = CreateSheet(out SpreadsheetDocument document);
         using (document)
@@ -43,7 +43,7 @@ public sealed class SpreadsheetIndexBoundsTests
     [InlineData(int.MinValue)]
     [InlineData(OdfSpreadsheetLimits.MaxRowIndex + 1)]
     [InlineData(int.MaxValue)]
-    public void SetRowVisible_WithOutOfRangeIndex_ThrowsArgumentOutOfRange(int row)
+    public void SetRowVisibleWithOutOfRangeIndexThrowsArgumentOutOfRange(int row)
     {
         OdfTableSheet sheet = CreateSheet(out SpreadsheetDocument document);
         using (document)
@@ -55,7 +55,7 @@ public sealed class SpreadsheetIndexBoundsTests
     }
 
     [Fact]
-    public void Visibility_WithinGrid_StillWorks()
+    public void VisibilityWithinGridStillWorks()
     {
         OdfTableSheet sheet = CreateSheet(out SpreadsheetDocument document);
         using (document)

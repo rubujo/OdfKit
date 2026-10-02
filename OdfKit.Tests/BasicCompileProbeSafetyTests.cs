@@ -32,7 +32,7 @@ public sealed class BasicCompileProbeSafetyTests
     [InlineData("Sub Main\nShell(\"calc\")\nEnd Sub")]
     [InlineData("Sub Main\nEnd If\nShell(\"calc\")\nIf True Then\nEnd Sub")]
     [InlineData("Function Run\nEnd If\nShell(\"calc\")\nIf True Then\nEnd Function")]
-    public void EntryPoint_ReturnsImmediately_AndCannotBeEscapedByCraftedSource(string source)
+    public void EntryPointReturnsImmediatelyAndCannotBeEscapedByCraftedSource(string source)
     {
         (string module, string entry) = Prepare(source);
         string[] lines = module.Replace("\r\n", "\n").Split('\n');
@@ -62,7 +62,7 @@ public sealed class BasicCompileProbeSafetyTests
     [InlineData("Public a(1 To Shell(\"calc\")) As Integer")]
     [InlineData("Dim a(MaxN) As Integer")]
     [InlineData("Dim a(10")]
-    public void ModuleLevelExecutableCode_IsDetected(string source)
+    public void ModuleLevelExecutableCodeIsDetected(string source)
     {
         Assert.True(HasModuleLevelCode(source));
     }
@@ -79,7 +79,7 @@ public sealed class BasicCompileProbeSafetyTests
     [InlineData("Dim grid(10, 5) As Double")]
     [InlineData("Public buffer(0 To 255) As Byte")]
     [InlineData("Dim names(3) As String")]
-    public void DeclarationsCommentsAndProcedureBodies_AreNotModuleLevelCode(string source)
+    public void DeclarationsCommentsAndProcedureBodiesAreNotModuleLevelCode(string source)
     {
         Assert.False(HasModuleLevelCode(source));
     }

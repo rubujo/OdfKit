@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
@@ -51,13 +52,13 @@ public sealed class SpreadsheetSequentialRowAppendTests
     }
 
     [Fact]
-    public void SequentialAppend_ProducesTheSameDomAsTheEnginePath()
+    public void SequentialAppendProducesTheSameDomAsTheEnginePath()
     {
         Assert.Equal(Build(true, 40, 5), Build(false, 40, 5));
     }
 
     [Fact]
-    public void SequentialAppend_AfterGapFillAndRepeatedRows_StaysConsistent()
+    public void SequentialAppendAfterGapFillAndRepeatedRowsStaysConsistent()
     {
         static string Run(bool invalidate)
         {
@@ -85,7 +86,7 @@ public sealed class SpreadsheetSequentialRowAppendTests
     }
 
     [Fact]
-    public void SequentialAppend_WithInvalidColumn_DoesNotLeaveAnEmptyRowBehind()
+    public void SequentialAppendWithInvalidColumnDoesNotLeaveAnEmptyRowBehind()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("D");
@@ -98,7 +99,7 @@ public sealed class SpreadsheetSequentialRowAppendTests
     }
 
     [Fact]
-    public void SequentialAppend_OfManyRows_IsNotQuadratic()
+    public void SequentialAppendOfManyRowsIsNotQuadratic()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("D");
@@ -109,6 +110,6 @@ public sealed class SpreadsheetSequentialRowAppendTests
 
         // 修正前 8,000 列即約 9.5 秒；20,000 列在線性成本下遠低於此預算。
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(5), stopwatch.Elapsed.ToString());
-        Assert.Equal(19_999d, Convert.ToDouble(sheet.GetCell(19_999, 0).CellValue));
+        Assert.Equal(19_999d, Convert.ToDouble(sheet.GetCell(19_999, 0).CellValue, CultureInfo.InvariantCulture));
     }
 }

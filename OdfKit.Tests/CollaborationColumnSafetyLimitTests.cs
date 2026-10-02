@@ -36,7 +36,7 @@ public sealed class CollaborationColumnSafetyLimitTests
     [Theory]
     [InlineData(1_000_000)]
     [InlineData(int.MaxValue)]
-    public void AddColumns_BeyondColumnLimit_IsRejectedWithoutAllocating(int count)
+    public void AddColumnsBeyondColumnLimitIsRejectedWithoutAllocating(int count)
     {
         OdtOperationImportReport report = Merge(AddTableThenColumns(2, 2, count));
 
@@ -46,7 +46,7 @@ public sealed class CollaborationColumnSafetyLimitTests
     }
 
     [Fact]
-    public void AddColumns_CumulativeGrowthBeyondLimit_IsRejected()
+    public void AddColumnsCumulativeGrowthBeyondLimitIsRejected()
     {
         OdtOperationImportReport report = Merge(AddTableThenColumns(2, 2, 600, 600));
 
@@ -56,7 +56,7 @@ public sealed class CollaborationColumnSafetyLimitTests
     }
 
     [Fact]
-    public void AddColumns_BeyondCellLimit_IsRejected()
+    public void AddColumnsBeyondCellLimitIsRejected()
     {
         // 10,000 列 × 21 欄 = 210,000 格，超過預設 MaxTableCells（200,000）。
         OdtOperationImportReport report = Merge(AddTableThenColumns(10_000, 1, 21));
@@ -66,7 +66,7 @@ public sealed class CollaborationColumnSafetyLimitTests
     }
 
     [Fact]
-    public void AddColumns_WithinLimits_StillReplays()
+    public void AddColumnsWithinLimitsStillReplays()
     {
         OdtOperationImportReport report = Merge(AddTableThenColumns(2, 2, 3));
 

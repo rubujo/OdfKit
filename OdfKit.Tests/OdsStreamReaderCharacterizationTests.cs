@@ -253,7 +253,7 @@ public sealed class OdsStreamReaderCharacterizationTests
 
     [Theory]
     [MemberData(nameof(CaseNames))]
-    public void SyncPath_ProducesTheRecordedResult(string name)
+    public void SyncPathProducesTheRecordedResult(string name)
     {
         (_, string xml, string expected, _) = Array.Find(s_cases, candidate => candidate.Name == name);
 
@@ -262,7 +262,7 @@ public sealed class OdsStreamReaderCharacterizationTests
 
     [Theory]
     [MemberData(nameof(CaseNames))]
-    public async Task AsyncPath_ProducesTheRecordedResult(string name)
+    public async Task AsyncPathProducesTheRecordedResult(string name)
     {
         (_, string xml, _, string expected) = Array.Find(s_cases, candidate => candidate.Name == name);
 
@@ -301,7 +301,7 @@ public sealed class OdsStreamReaderCharacterizationTests
 
     [Theory]
     [MemberData(nameof(RowIndexCaseNames))]
-    public void SyncPath_RowIndexAccountsForSkippedEmptyRows(string name)
+    public void SyncPathRowIndexAccountsForSkippedEmptyRows(string name)
     {
         (_, string xml, string expected) = Array.Find(s_rowIndexCases, candidate => candidate.Name == name);
         var indexes = new System.Collections.Generic.List<string>();
@@ -324,7 +324,7 @@ public sealed class OdsStreamReaderCharacterizationTests
 
     [Theory]
     [MemberData(nameof(RowIndexCaseNames))]
-    public async Task AsyncPath_RowIndexAccountsForSkippedEmptyRows(string name)
+    public async Task AsyncPathRowIndexAccountsForSkippedEmptyRows(string name)
     {
         (_, string xml, string expected) = Array.Find(s_rowIndexCases, candidate => candidate.Name == name);
         var indexes = new System.Collections.Generic.List<string>();
@@ -346,7 +346,7 @@ public sealed class OdsStreamReaderCharacterizationTests
     }
 
     [Fact]
-    public async Task WriterOutput_RoundTripsThroughBothReadPaths()
+    public async Task WriterOutputRoundTripsThroughBothReadPaths()
     {
         const int rowCount = 3_000;
         var output = new MemoryStream();

@@ -94,7 +94,7 @@ public partial class LibreOfficeInteropTests
         string[] instructions = Regex.Matches(footerXml, "<w:instrText[^>]*>([^<]*)</w:instrText>")
             .Select(match => match.Groups[1].Value.Trim())
             .ToArray();
-        Assert.Equal(new[] { "PAGE", "NUMPAGES" }, instructions);
+        Assert.Equal(["PAGE", "NUMPAGES"], instructions);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class LibreOfficeInteropTests
 
         string pdfPath = workspace.Convert(sofficePath!, odtPath, "pdf");
         string pdf = Encoding.Latin1.GetString(File.ReadAllBytes(pdfPath));
-        Assert.Equal(2, Regex.Matches(pdf, @"/Type\s*/Page(?![a-z])").Count);
+        Assert.Equal(2, Regex.Count(pdf, @"/Type\s*/Page(?![a-z])"));
 
         string roundTripDocx = workspace.Convert(sofficePath!, odtPath, "docx");
         string footnotes = ReadOoxmlPartMatching(roundTripDocx, new Regex(@"^word/footnotes\.xml$"));
@@ -184,7 +184,7 @@ public partial class LibreOfficeInteropTests
         string[] instructions = Regex.Matches(footer, "<w:instrText[^>]*>([^<]*)</w:instrText>")
             .Select(match => match.Groups[1].Value.Trim())
             .ToArray();
-        Assert.Equal(new[] { "PAGE", "NUMPAGES" }, instructions);
+        Assert.Equal(["PAGE", "NUMPAGES"], instructions);
     }
 
     /// <summary>
@@ -241,7 +241,7 @@ public partial class LibreOfficeInteropTests
 
         string pdfPath = workspace.Convert(sofficePath!, odtPath, "pdf");
         string pdf = Encoding.Latin1.GetString(File.ReadAllBytes(pdfPath));
-        Assert.Equal(2, Regex.Matches(pdf, @"/Type\s*/Page(?![a-z])").Count);
+        Assert.Equal(2, Regex.Count(pdf, @"/Type\s*/Page(?![a-z])"));
         string[] mediaBoxes = Regex.Matches(pdf, @"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]")
             .Select(match => double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) < double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture)
                 ? "portrait"

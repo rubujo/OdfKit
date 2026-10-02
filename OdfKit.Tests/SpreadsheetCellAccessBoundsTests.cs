@@ -21,7 +21,7 @@ public sealed class SpreadsheetCellAccessBoundsTests
     [InlineData(int.MinValue)]
     [InlineData(OdfSpreadsheetLimits.MaxColumnIndex + 1)]
     [InlineData(int.MaxValue)]
-    public void GetCell_WithOutOfRangeColumn_ThrowsArgumentOutOfRange(int column)
+    public void GetCellWithOutOfRangeColumnThrowsArgumentOutOfRange(int column)
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("D");
@@ -32,7 +32,7 @@ public sealed class SpreadsheetCellAccessBoundsTests
     }
 
     [Fact]
-    public void GetCell_AtGridEdges_StillWorks()
+    public void GetCellAtGridEdgesStillWorks()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("D");

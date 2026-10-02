@@ -67,7 +67,7 @@ public sealed class ChartFallbackImageSizeLimitTests
     [InlineData("300cm", "300cm")]
     [InlineData("3000cm", "3000cm")]
     [InlineData("1e30cm", "1e30cm")]
-    public void RenderedImage_IsClampedToMaximumDimension(string width, string height)
+    public void RenderedImageIsClampedToMaximumDimension(string width, string height)
     {
         (int pngWidth, int pngHeight) = RenderWithFrameSize(width, height);
 
@@ -76,7 +76,7 @@ public sealed class ChartFallbackImageSizeLimitTests
     }
 
     [Fact]
-    public void RenderedImage_WithNormalFrameSize_KeepsRequestedResolution()
+    public void RenderedImageWithNormalFrameSizeKeepsRequestedResolution()
     {
         (int pngWidth, int pngHeight) = RenderWithFrameSize("12cm", "7cm");
 

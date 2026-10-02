@@ -59,7 +59,7 @@ public sealed class RealWorldConverterFidelityTests
             .Where(value => value is not null)
             .ToArray();
 
-        Assert.Equal(new[] { "2017-09-23T00:00:00", "2024-02-29T13:45:30" }, values);
+        Assert.Equal(["2017-09-23T00:00:00", "2024-02-29T13:45:30"], values);
     }
 
     /// <summary>
@@ -237,9 +237,9 @@ public sealed class RealWorldConverterFidelityTests
             .Select(row => row.Elements().Select(cell => cell.Name.LocalName == "covered-table-cell" ? "~" : cell.Value).ToList())
             .ToList();
 
-        Assert.Equal(new[] { "跨兩欄", "~", "C1" }, grid[0]);
-        Assert.Equal(new[] { "A2", "B2", "C2" }, grid[1]);
-        Assert.Equal(new[] { "~", "B3", "C3" }, grid[2]);
+        Assert.Equal(["跨兩欄", "~", "C1"], grid[0]);
+        Assert.Equal(["A2", "B2", "C2"], grid[1]);
+        Assert.Equal(["~", "B3", "C3"], grid[2]);
 
         XElement header = table.Elements(s_table + "table-row").First().Elements().First();
         Assert.Equal("2", (string?)header.Attribute(s_table + "number-columns-spanned"));
@@ -269,10 +269,10 @@ public sealed class RealWorldConverterFidelityTests
         XElement outerCell = outer.Elements(s_table + "table-row").Single().Elements(s_table + "table-cell").First();
 
         Assert.Equal(
-            new[] { "p", "table", "p" },
+            ["p", "table", "p"],
             outerCell.Elements().Select(element => element.Name.LocalName).ToArray());
         Assert.Equal(
-            new[] { "內層一", "內層二" },
+            ["內層一", "內層二"],
             outerCell.Element(s_table + "table")!.Descendants(s_table + "table-cell").Select(cell => cell.Value).ToArray());
     }
 
@@ -357,7 +357,7 @@ public sealed class RealWorldConverterFidelityTests
         Assert.Equal(2, firstItems.Length);
         Assert.Equal("項目一", firstItems[0].Element(s_text + "p")!.Value);
         XElement nested = Assert.Single(firstItems[0].Elements(s_text + "list"));
-        Assert.Equal(new[] { "子項 a", "子項 b" }, nested.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
+        Assert.Equal(["子項 a", "子項 b"], nested.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
         Assert.Equal("回到編號", Assert.Single(topLists[1].Elements(s_text + "list-item")).Value);
 
         XElement listStyle = content.Descendants(s_text + "list-style").Single();
@@ -419,7 +419,7 @@ public sealed class RealWorldConverterFidelityTests
         XElement footnote = notes.Single(note => (string?)note.Attribute(s_text + "note-class") == "footnote");
         Assert.Equal("1", footnote.Element(s_text + "note-citation")!.Value);
         Assert.Equal(
-            new[] { "註腳第一段", "註腳第二段" },
+            ["註腳第一段", "註腳第二段"],
             footnote.Element(s_text + "note-body")!.Elements(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
 
         XElement endnote = notes.Single(note => (string?)note.Attribute(s_text + "note-class") == "endnote");
@@ -456,7 +456,7 @@ public sealed class RealWorldConverterFidelityTests
         XNamespace style = OdfNamespaces.Style;
 
         XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
-        Assert.Equal(new[] { "第一頁", "第二頁", "切開前", "切開後", "段前分頁" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+        Assert.Equal(["第一頁", "第二頁", "切開前", "切開後", "段前分頁"], paragraphs.Select(paragraph => paragraph.Value).ToArray());
 
         HashSet<string> breakStyles = content.Descendants(style + "style")
             .Where(item => item.Element(style + "paragraph-properties")?.Attribute(fo + "break-before")?.Value == "page")
@@ -574,7 +574,7 @@ public sealed class RealWorldConverterFidelityTests
         Assert.Equal("https://example.org/cell", (string?)anchor.Attribute(s_xlink + "href"));
 
         XElement list = Assert.Single(firstRowCells[1].Elements(s_text + "list"));
-        Assert.Equal(new[] { "清單一", "清單二" }, list.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
+        Assert.Equal(["清單一", "清單二"], list.Elements(s_text + "list-item").Select(item => item.Value).ToArray());
 
         XElement note = Assert.Single(rows[1].Descendants(s_text + "note"));
         Assert.Equal("儲存格註腳", note.Element(s_text + "note-body")!.Value);
@@ -660,7 +660,7 @@ public sealed class RealWorldConverterFidelityTests
         Assert.Equal("current", (string?)pageNumber.Attribute(s_text + "select-page"));
         Assert.Single(footer.Descendants(s_text + "page-count"));
         Assert.Equal(
-            new[] { "第", "s:1", "page-number", "s:1", "頁，共", "s:1", "page-count", "s:1", "頁" },
+            ["第", "s:1", "page-number", "s:1", "頁，共", "s:1", "page-count", "s:1", "頁"],
             DescribeChildren(footer.Element(s_text + "p")!));
         Assert.Null(masterPage.Element(s_style + "footer-first"));
 
@@ -762,7 +762,7 @@ public sealed class RealWorldConverterFidelityTests
         // 內容：第一章沒有主頁面；第二章與第三章的第一個段落分別套用各自的主頁面。
         XElement content = XElement.Parse(SaveContentXml(odt));
         XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
-        Assert.Equal(new[] { "第一章", "第二章", "第三章" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+        Assert.Equal(["第一章", "第二章", "第三章"], paragraphs.Select(paragraph => paragraph.Value).ToArray());
 
         string? MasterOf(XElement paragraph)
         {
@@ -822,7 +822,7 @@ public sealed class RealWorldConverterFidelityTests
         using TextDocument odt = DocxToOdtConverter.Convert(docx);
         XElement content = XElement.Parse(SaveContentXml(odt));
         XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
-        Assert.Equal(new[] { "前段", "後段" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+        Assert.Equal(["前段", "後段"], paragraphs.Select(paragraph => paragraph.Value).ToArray());
         Assert.All(
             paragraphs,
             paragraph => Assert.Equal(
@@ -873,8 +873,8 @@ public sealed class RealWorldConverterFidelityTests
         XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
 
         XElement[] anchors = paragraphs[0].Elements(s_text + "a").ToArray();
-        Assert.Equal(new[] { "https://example.org/field", "#mark" }, anchors.Select(item => (string?)item.Attribute(s_xlink + "href")).ToArray());
-        Assert.Equal(new[] { "欄位連結", "書籤連結" }, anchors.Select(item => item.Value).ToArray());
+        Assert.Equal(["https://example.org/field", "#mark"], anchors.Select(item => (string?)item.Attribute(s_xlink + "href")).ToArray());
+        Assert.Equal(["欄位連結", "書籤連結"], anchors.Select(item => item.Value).ToArray());
         Assert.Equal("見：欄位連結；書籤連結", paragraphs[0].Value);
 
         Assert.Empty(paragraphs[1].Descendants(s_text + "a"));

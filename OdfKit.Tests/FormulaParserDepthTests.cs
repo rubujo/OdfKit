@@ -22,7 +22,7 @@ public sealed class FormulaParserDepthTests
     [Theory]
     [InlineData(20_000)]
     [InlineData(1_000_000)]
-    public void UnaryOperatorChain_BeyondLimit_IsRejected(int length)
+    public void UnaryOperatorChainBeyondLimitIsRejected(int length)
     {
         string formula = new string('-', length) + "1";
 
@@ -30,7 +30,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void MixedUnaryOperatorChain_BeyondLimit_IsRejected()
+    public void MixedUnaryOperatorChainBeyondLimitIsRejected()
     {
         string formula = string.Concat(System.Linq.Enumerable.Repeat("-+", 5_000)) + "1";
 
@@ -40,7 +40,7 @@ public sealed class FormulaParserDepthTests
     [Theory]
     [InlineData(2_000)]
     [InlineData(200_000)]
-    public void NestedParentheses_BeyondLimit_AreRejected(int depth)
+    public void NestedParenthesesBeyondLimitAreRejected(int depth)
     {
         string formula = new string('(', depth) + "1" + new string(')', depth);
 
@@ -48,7 +48,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void NestedFunctionCalls_BeyondLimit_AreRejected()
+    public void NestedFunctionCallsBeyondLimitAreRejected()
     {
         string formula = string.Concat(System.Linq.Enumerable.Repeat("ABS(", 5_000)) + "1" + new string(')', 5_000);
 
@@ -56,7 +56,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void NestedInlineArrays_BeyondLimit_AreRejected()
+    public void NestedInlineArraysBeyondLimitAreRejected()
     {
         string formula = new string('{', 5_000) + "1" + new string('}', 5_000);
 
@@ -76,7 +76,7 @@ public sealed class FormulaParserDepthTests
     [InlineData("&1", 5_000)]
     [InlineData("=1", 5_000)]
     [InlineData("<>1", 5_000)]
-    public void OperatorChain_BeyondLimit_IsRejected(string unit, int count)
+    public void OperatorChainBeyondLimitIsRejected(string unit, int count)
     {
         string formula = "1" + string.Concat(System.Linq.Enumerable.Repeat(unit, count));
 
@@ -84,13 +84,13 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void PercentChain_BeyondLimit_IsRejected()
+    public void PercentChainBeyondLimitIsRejected()
     {
         Assert.Throws<InvalidOperationException>(() => Parse("1" + new string('%', 5_000)));
     }
 
     [Fact]
-    public void MixedOperatorChain_BeyondLimit_IsRejected()
+    public void MixedOperatorChainBeyondLimitIsRejected()
     {
         string formula = "1" + string.Concat(System.Linq.Enumerable.Repeat("+1*2-3", 1_500));
 
@@ -98,7 +98,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void OperatorChain_WithinLimit_StillParses()
+    public void OperatorChainWithinLimitStillParses()
     {
         Parse("1" + string.Concat(System.Linq.Enumerable.Repeat("+1", 4_000)));
         Parse("1" + new string('%', 4_000));
@@ -110,7 +110,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void ReasonableNesting_StillParses()
+    public void ReasonableNestingStillParses()
     {
         Parse(new string('(', 200) + "1" + new string(')', 200));
         Parse(string.Concat(System.Linq.Enumerable.Repeat("ABS(", 100)) + "1" + new string(')', 100));
@@ -120,7 +120,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void EvaluateFormulas_WithOverlyDeepUnaryChain_FailsWithoutCrashing()
+    public void EvaluateFormulasWithOverlyDeepUnaryChainFailsWithoutCrashing()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");
@@ -132,7 +132,7 @@ public sealed class FormulaParserDepthTests
     [Theory]
     [InlineData(256)]
     [InlineData(128)]
-    public void MaxOperatorChain_OnSmallStackThread_FailsCatchablyInsteadOfOverflowing(int stackKb)
+    public void MaxOperatorChainOnSmallStackThreadFailsCatchablyInsteadOfOverflowing(int stackKb)
     {
         // 修正前，接近 4,096 運算子上限的連鎖公式在 256 KB 堆疊上會使處理程序崩潰（無法攔截）。
         string formula = "1" + string.Concat(System.Linq.Enumerable.Repeat("+1", 4_000));
@@ -163,7 +163,7 @@ public sealed class FormulaParserDepthTests
     }
 
     [Fact]
-    public void EvaluateFormulas_WithReasonableUnaryChain_ProducesTheExpectedSign()
+    public void EvaluateFormulasWithReasonableUnaryChainProducesTheExpectedSign()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Data");

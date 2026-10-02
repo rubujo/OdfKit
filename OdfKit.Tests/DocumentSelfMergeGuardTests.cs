@@ -18,7 +18,7 @@ public sealed class DocumentSelfMergeGuardTests
     private static readonly TimeSpan Budget = TimeSpan.FromSeconds(3);
 
     [Fact]
-    public void TextDocument_AppendSelf_ThrowsArgumentException()
+    public void TextDocumentAppendSelfThrowsArgumentException()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("x");
@@ -32,7 +32,7 @@ public sealed class DocumentSelfMergeGuardTests
     }
 
     [Fact]
-    public void TextDocument_AppendSelf_LeavesDocumentUnchanged()
+    public void TextDocumentAppendSelfLeavesDocumentUnchanged()
     {
         using TextDocument document = TextDocument.Create();
         document.AddParagraph("only");
@@ -44,7 +44,7 @@ public sealed class DocumentSelfMergeGuardTests
     }
 
     [Fact]
-    public void SpreadsheetDocument_AppendSelf_ThrowsArgumentException()
+    public void SpreadsheetDocumentAppendSelfThrowsArgumentException()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         document.AddSheet("D").Cells["A1"].CellValue = 1d;
@@ -53,7 +53,7 @@ public sealed class DocumentSelfMergeGuardTests
     }
 
     [Fact]
-    public void TextDocument_AppendDifferentDocument_StillWorks()
+    public void TextDocumentAppendDifferentDocumentStillWorks()
     {
         using TextDocument target = TextDocument.Create();
         target.AddParagraph("first");

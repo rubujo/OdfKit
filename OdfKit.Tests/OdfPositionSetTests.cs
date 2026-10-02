@@ -34,7 +34,7 @@ public sealed class OdfPositionSetTests
         Assert.True(set.Contains(64));
         Assert.False(set.Contains(1));
         Assert.False(set.Contains(-1));
-        Assert.Equal(new[] { 0, 5, 63, 64 }, set.ToArray());
+        Assert.Equal([0, 5, 63, 64], set.ToArray());
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public sealed class OdfPositionSetTests
             Assert.True(set.Add(position));
         }
 
-        Assert.Equal(new[] { 5, 70_000, 99_999, 100_000, 1_000_000 }, set.ToArray());
+        Assert.Equal([5, 70_000, 99_999, 100_000, 1_000_000], set.ToArray());
         Assert.False(set.Contains(6));
         Assert.True(set.Contains(1_000_000));
     }
@@ -101,11 +101,11 @@ public sealed class OdfPositionSetTests
         var set = new OdfPositionSet { 3, 9 };
         set.UnionWith(new OdfPositionSet());
         set.UnionWith(set);
-        Assert.Equal(new[] { 3, 9 }, set.ToArray());
+        Assert.Equal([3, 9], set.ToArray());
 
         var empty = new OdfPositionSet();
         empty.UnionWith(set);
-        Assert.Equal(new[] { 3, 9 }, empty.ToArray());
+        Assert.Equal([3, 9], empty.ToArray());
         Assert.Equal(2, empty.Count);
     }
 
@@ -120,8 +120,8 @@ public sealed class OdfPositionSetTests
         copy.Add(5);
         original.Add(300);
 
-        Assert.Equal(new[] { 3, 5, 70, 200 }, copy.ToArray());
-        Assert.Equal(new[] { 3, 70, 200, 300 }, original.ToArray());
+        Assert.Equal([3, 5, 70, 200], copy.ToArray());
+        Assert.Equal([3, 70, 200, 300], original.ToArray());
         Assert.Equal(4, copy.Count);
         Assert.Empty(new OdfPositionSet().Clone());
     }
@@ -165,6 +165,108 @@ public sealed class OdfPositionSetTests
                     left.Where(value => !right.Contains(value)).OrderBy(value => value).ToArray(),
                     leftSet.PositionsNotIn(rightSet).ToArray());
             }
+        }
+    }
+
+    /// <summary>
+    /// 驗證連續區間的精簡表示：逐一附加相鄰位置、與相鄰或重疊的區間合併都維持區間，
+    /// 加入不相鄰的位置時轉成位元圖而內容不變。
+    /// </summary>
+    [Fact]
+    public void ContiguousRunsStayCorrectWhenGrowingAndWhenConvertedToBitmap()
+    {
+        var set = new OdfPositionSet();
+        for (int position = 100; position < 300; position++)
+        {
+            Assert.True(set.Add(position));
+        }
+
+        Assert.False(set.Add(150));
+        Assert.True(set.Add(99));
+        Assert.Equal(201, set.Count);
+        Assert.Equal(Enumerable.Range(99, 201).ToArray(), set.ToArray());
+
+        var adjacent = new OdfPositionSet();
+        for (int position = 300; position < 320; position++)
+        {
+            adjacent.Add(position);
+        }
+
+        set.UnionWith(adjacent);
+        Assert.Equal(Enumerable.Range(99, 221).ToArray(), set.ToArray());
+
+        Assert.True(set.Add(1000));
+        Assert.Equal(222, set.Count);
+        Assert.True(set.Contains(1000));
+        Assert.True(set.Contains(99));
+        Assert.True(set.Contains(319));
+        Assert.False(set.Contains(500));
+        Assert.Equal(Enumerable.Range(99, 221).Append(1000).ToArray(), set.ToArray());
+    }
+
+    /// <summary>
+    /// 以固定種子的隨機操作比對 <see cref="HashSet{T}"/>：位置集合混合連續區間與零散位置，
+    /// 聯集、複製、超集合判斷、差集、包含與列舉在區間與位元圖兩種表示之間都必須一致。
+    /// </summary>
+    [Fact]
+    public void RandomOperationsMatchHashSetAcrossRangeAndBitmapRepresentations()
+    {
+        var random = new Random(20260502);
+
+        (OdfPositionSet Set, HashSet<int> Reference) Build()
+        {
+            var set = new OdfPositionSet();
+            var reference = new HashSet<int>();
+            int runs = random.Next(0, 4);
+            for (int run = 0; run < runs; run++)
+            {
+                int start = random.Next(0, 400);
+                int length = random.Next(1, 150);
+                for (int position = start; position < start + length; position++)
+                {
+                    Assert.Equal(reference.Add(position), set.Add(position));
+                }
+            }
+
+            int scattered = random.Next(0, 4);
+            for (int index = 0; index < scattered; index++)
+            {
+                int position = random.Next(0, 700);
+                Assert.Equal(reference.Add(position), set.Add(position));
+            }
+
+            return (set, reference);
+        }
+
+        for (int iteration = 0; iteration < 600; iteration++)
+        {
+            (OdfPositionSet left, HashSet<int> leftReference) = Build();
+            (OdfPositionSet right, HashSet<int> rightReference) = Build();
+
+            Assert.Equal(leftReference.Count, left.Count);
+            Assert.Equal(leftReference.OrderBy(value => value).ToArray(), left.ToArray());
+            Assert.Equal(leftReference.IsSupersetOf(rightReference), left.IsSupersetOf(right));
+            Assert.Equal(
+                leftReference.Where(value => !rightReference.Contains(value)).OrderBy(value => value).ToArray(),
+                left.PositionsNotIn(right).ToArray());
+            for (int probe = 0; probe < 12; probe++)
+            {
+                int position = random.Next(-2, 720);
+                Assert.Equal(leftReference.Contains(position), left.Contains(position));
+            }
+
+            int[] snapshot = left.ToArray();
+            OdfPositionSet copy = left.Clone();
+            copy.UnionWith(right);
+            leftReference.UnionWith(rightReference);
+            Assert.Equal(leftReference.Count, copy.Count);
+            Assert.Equal(leftReference.OrderBy(value => value).ToArray(), copy.ToArray());
+            Assert.True(copy.IsSupersetOf(left));
+            Assert.True(copy.IsSupersetOf(right));
+
+            // 複製與聯集不得影響原集合。
+            Assert.Equal(snapshot, left.ToArray());
+            Assert.Equal(snapshot.Length, left.Count);
         }
     }
 

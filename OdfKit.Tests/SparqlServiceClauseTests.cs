@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -63,7 +64,7 @@ public sealed class SparqlServiceClauseTests : IDisposable
     private static object Query(string sparql) => OdfRdfGraphBridge.ExecuteQuery(new OdfRdfMetadata(), sparql);
 
     [Fact]
-    public async Task ServiceClause_IsRejectedAndSendsNoNetworkRequest()
+    public async Task ServiceClauseIsRejectedAndSendsNoNetworkRequest()
     {
         string query = $"SELECT * WHERE {{ SERVICE <{_prefix}sparql> {{ ?s ?p ?o }} }}";
 
@@ -85,9 +86,9 @@ public sealed class SparqlServiceClauseTests : IDisposable
     [InlineData("SELECT * WHERE {{ ?s ?p <http://a/b>.SERVICE <{0}sparql> {{ ?a ?b ?c }} }}")]
     [InlineData("SELECT * WHERE {{ ?s ?p ?o.SERVICE <{0}sparql> {{ ?a ?b ?c }} }}")]
     [InlineData("SELECT * WHERE {{ ?s ?p \"lit\".SERVICE <{0}sparql> {{ ?a ?b ?c }} }}")]
-    public async Task ServiceClause_InAnyPosition_IsRejected(string template)
+    public async Task ServiceClauseInAnyPositionIsRejected(string template)
     {
-        string query = string.Format(template, _prefix);
+        string query = string.Format(CultureInfo.InvariantCulture, template, _prefix);
 
         Assert.Throws<ArgumentException>(() => Query(query));
 
@@ -104,7 +105,7 @@ public sealed class SparqlServiceClauseTests : IDisposable
     [InlineData("SELECT ?service WHERE { ?service ?p ?o }")]
     [InlineData("SELECT * WHERE { ?s ?p ?o } # SERVICE <http://x/y> { }")]
     [InlineData("ASK { ?s ?p ?o }")]
-    public void QueriesMentioningServiceOnlyInsideLiteralsIrisOrNames_StillRun(string query)
+    public void QueriesMentioningServiceOnlyInsideLiteralsIrisOrNamesStillRun(string query)
     {
         object result = Query(query);
 

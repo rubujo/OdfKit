@@ -65,7 +65,7 @@ public sealed class XmlNestingDepthLimitTests
     [Theory]
     [InlineData(1_000)]
     [InlineData(100_000)]
-    public void FlatDocumentLoad_WithExcessiveNesting_IsRejectedWithoutCrashing(int depth)
+    public void FlatDocumentLoadWithExcessiveNestingIsRejectedWithoutCrashing(int depth)
     {
         byte[] flat = BuildFlatDocument(depth);
 
@@ -76,7 +76,7 @@ public sealed class XmlNestingDepthLimitTests
     }
 
     [Fact]
-    public void FlatDocumentLoad_WithReasonableNesting_Succeeds()
+    public void FlatDocumentLoadWithReasonableNestingSucceeds()
     {
         using OdfDocument document = OdfDocument.Load(new MemoryStream(BuildFlatDocument(100)));
 
@@ -84,7 +84,7 @@ public sealed class XmlNestingDepthLimitTests
     }
 
     [Fact]
-    public void FlatDocumentLoad_WithNestingBeyondLimit_ThrowsSecurityException()
+    public void FlatDocumentLoadWithNestingBeyondLimitThrowsSecurityException()
     {
         byte[] flat = BuildFlatDocument(1_000);
 
@@ -97,7 +97,7 @@ public sealed class XmlNestingDepthLimitTests
     [Theory]
     [InlineData(1_000)]
     [InlineData(100_000)]
-    public void ProfileValidation_WithExcessiveNesting_ReportsFatalIssueInsteadOfCrashing(int depth)
+    public void ProfileValidationWithExcessiveNestingReportsFatalIssueInsteadOfCrashing(int depth)
     {
         using OdfPackage package = OdfPackage.Open(new MemoryStream(BuildPackage(depth)));
 
@@ -108,7 +108,7 @@ public sealed class XmlNestingDepthLimitTests
     }
 
     [Fact]
-    public void ProfileValidation_WithReasonableNesting_DoesNotReportNestingIssue()
+    public void ProfileValidationWithReasonableNestingDoesNotReportNestingIssue()
     {
         using OdfPackage package = OdfPackage.Open(new MemoryStream(BuildPackage(100)));
 

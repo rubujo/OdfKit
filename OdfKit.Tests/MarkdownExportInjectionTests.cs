@@ -27,7 +27,7 @@ public sealed class MarkdownExportInjectionTests
     [InlineData("http://x/a\n\n<img src=x onerror=alert(1) x=")]
     [InlineData("http://x/a\r\n\r\n<script>alert(1)</script>")]
     [InlineData("http://x/a>\n\n<img src=x onerror=alert(1) x=")]
-    public void Href_WithLineBreaksAndMarkup_CannotBreakOutOfLink(string href)
+    public void HrefWithLineBreaksAndMarkupCannotBreakOutOfLink(string href)
     {
         (string markdown, string html) = Export(href);
 
@@ -40,7 +40,7 @@ public sealed class MarkdownExportInjectionTests
     [Theory]
     [InlineData("http://x/a\\")]
     [InlineData("http://x/<a")]
-    public void Href_WithBackslashOrAngleBracket_RemainsAWellFormedLink(string href)
+    public void HrefWithBackslashOrAngleBracketRemainsAWellFormedLink(string href)
     {
         (_, string html) = Export(href);
 
@@ -56,7 +56,7 @@ public sealed class MarkdownExportInjectionTests
     [InlineData("java\nscript:alert(1)")]
     [InlineData("vbscript:msgbox(1)")]
     [InlineData("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==")]
-    public void Href_WithScriptableScheme_IsNotEmittedAsExecutableLink(string href)
+    public void HrefWithScriptableSchemeIsNotEmittedAsExecutableLink(string href)
     {
         (string markdown, string html) = Export(href);
 
@@ -71,7 +71,7 @@ public sealed class MarkdownExportInjectionTests
     [InlineData("mailto:someone@example.com")]
     [InlineData("#bookmark")]
     [InlineData("data:image/png;base64,iVBORw0KGgo=")]
-    public void Href_WithBenignTarget_IsPreserved(string href)
+    public void HrefWithBenignTargetIsPreserved(string href)
     {
         (string markdown, string html) = Export(href);
 

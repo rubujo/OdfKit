@@ -28,25 +28,25 @@ public sealed class FormulaStringResultLimitTests
     [InlineData("of:=REPT(\"ab\";2147483647)")]
     [InlineData("of:=REPT(\"abc\";1431655766)")]
     [InlineData("of:=REPT(\"ab\";20000)")]
-    public void Rept_BeyondStringLimit_ReturnsValueError(string formula)
+    public void ReptBeyondStringLimitReturnsValueError(string formula)
     {
         Assert.Equal("#VALUE!", Evaluate(formula)?.ToString());
     }
 
     [Fact]
-    public void Rept_WithEmptyText_ReturnsEmptyWithoutSpinning()
+    public void ReptWithEmptyTextReturnsEmptyWithoutSpinning()
     {
         Assert.Equal(string.Empty, Evaluate("of:=REPT(\"\";2147483647)")?.ToString() ?? string.Empty);
     }
 
     [Fact]
-    public void Rept_WithinLimit_StillWorks()
+    public void ReptWithinLimitStillWorks()
     {
         Assert.Equal("ababab", Evaluate("of:=REPT(\"ab\";3)"));
     }
 
     [Fact]
-    public void Substitute_ExpandingBeyondLimit_ReturnsValueError()
+    public void SubstituteExpandingBeyondLimitReturnsValueError()
     {
         object? value = Evaluate("of:=SUBSTITUTE(REPT(\"a\";16000);\"a\";REPT(\"b\";16000))");
 
@@ -54,14 +54,14 @@ public sealed class FormulaStringResultLimitTests
     }
 
     [Fact]
-    public void Substitute_WithinLimit_StillWorks()
+    public void SubstituteWithinLimitStillWorks()
     {
         Assert.Equal("xbcx", Evaluate("of:=SUBSTITUTE(\"abca\";\"a\";\"x\")"));
         Assert.Equal("aaaa", Evaluate("of:=SUBSTITUTE(\"aa\";\"a\";\"aa\")"));
     }
 
     [Fact]
-    public void ConcatenationDoublingChain_IsCappedInsteadOfExhaustingMemory()
+    public void ConcatenationDoublingChainIsCappedInsteadOfExhaustingMemory()
     {
         using SpreadsheetDocument document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("D");
@@ -80,7 +80,7 @@ public sealed class FormulaStringResultLimitTests
     }
 
     [Fact]
-    public void Concatenation_WithinLimit_StillWorks()
+    public void ConcatenationWithinLimitStillWorks()
     {
         Assert.Equal("ab", Evaluate("of:=\"a\"&\"b\""));
     }

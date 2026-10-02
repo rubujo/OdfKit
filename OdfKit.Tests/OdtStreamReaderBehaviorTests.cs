@@ -129,7 +129,7 @@ public sealed class OdtStreamReaderBehaviorTests
 
     [Theory]
     [MemberData(nameof(CaseNames))]
-    public void SyncPath_ProducesTheExpectedNodes(string name)
+    public void SyncPathProducesTheExpectedNodes(string name)
     {
         (_, string xml, string expected) = Array.Find(s_cases, candidate => candidate.Name == name);
 
@@ -138,7 +138,7 @@ public sealed class OdtStreamReaderBehaviorTests
 
     [Theory]
     [MemberData(nameof(CaseNames))]
-    public async Task AsyncPath_ProducesTheExpectedNodes(string name)
+    public async Task AsyncPathProducesTheExpectedNodes(string name)
     {
         (_, string xml, string expected) = Array.Find(s_cases, candidate => candidate.Name == name);
 
@@ -146,7 +146,7 @@ public sealed class OdtStreamReaderBehaviorTests
     }
 
     [Fact]
-    public async Task WriterOutput_RoundTripsThroughBothReadPaths()
+    public async Task WriterOutputRoundTripsThroughBothReadPaths()
     {
         const int paragraphCount = 2_000;
         var output = new MemoryStream();

@@ -44,7 +44,7 @@ public sealed class RealWorldFidelityTests
 
         XElement element = ParseContentParagraph(SaveContentXml(document), 0);
         Assert.Equal(
-            new[] { "a ", "s:3", "b", "tab", "c", "line-break", "d" },
+            ["a ", "s:3", "b", "tab", "c", "line-break", "d"],
             DescribeChildren(element));
         Assert.Equal("a    b\tc\nd", paragraph.TextContent);
     }
@@ -61,9 +61,9 @@ public sealed class RealWorldFidelityTests
         document.AddParagraph(" ");
 
         string contentXml = SaveContentXml(document);
-        Assert.Equal(new[] { "s:2", "lead" }, DescribeChildren(ParseContentParagraph(contentXml, 0)));
-        Assert.Equal(new[] { "trail", "s:2" }, DescribeChildren(ParseContentParagraph(contentXml, 1)));
-        Assert.Equal(new[] { "s:1" }, DescribeChildren(ParseContentParagraph(contentXml, 2)));
+        Assert.Equal(["s:2", "lead"], DescribeChildren(ParseContentParagraph(contentXml, 0)));
+        Assert.Equal(["trail", "s:2"], DescribeChildren(ParseContentParagraph(contentXml, 1)));
+        Assert.Equal(["s:1"], DescribeChildren(ParseContentParagraph(contentXml, 2)));
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public sealed class RealWorldFidelityTests
         document.AddParagraph("一般 文字 沒有 連續空白");
 
         Assert.Equal(
-            new[] { "一般 文字 沒有 連續空白" },
+            ["一般 文字 沒有 連續空白"],
             DescribeChildren(ParseContentParagraph(SaveContentXml(document), 0)));
     }
 
@@ -113,9 +113,9 @@ public sealed class RealWorldFidelityTests
 
         XElement content = XElement.Parse(SaveContentXml(document));
         List<XElement> paragraphs = content.Descendants(s_text + "p").ToList();
-        Assert.Equal(new[] { "s:2", "lead" }, DescribeChildren(paragraphs[0]));
-        Assert.Equal(new[] { "trail", "s:1" }, DescribeChildren(paragraphs[1]));
-        Assert.Equal(new[] { "mid ", "s:1", "dle" }, DescribeChildren(paragraphs[2]));
+        Assert.Equal(["s:2", "lead"], DescribeChildren(paragraphs[0]));
+        Assert.Equal(["trail", "s:1"], DescribeChildren(paragraphs[1]));
+        Assert.Equal(["mid ", "s:1", "dle"], DescribeChildren(paragraphs[2]));
     }
 
     // ---------- 超連結與 schema 有效性 ----------
@@ -359,7 +359,7 @@ public sealed class RealWorldFidelityTests
         OdfNode fromBytes = OdfXmlReader.Parse(Encoding.UTF8.GetBytes(Xml), options);
         Assert.Equal("a b c d ", fromBytes.TextContent);
         Assert.Equal(
-            new[] { "a ", "b", " c ", "d", " " },
+            ["a ", "b", " c ", "d", " "],
             fromBytes.Children.Select(child => child.TextContent).ToArray());
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(Xml));
@@ -402,7 +402,7 @@ public sealed class RealWorldFidelityTests
 
         OdfNode text = Assert.Single(body.Children);
         Assert.Equal("text", text.LocalName);
-        Assert.Equal(new[] { "p", "p" }, text.Children.Select(child => child.LocalName).ToArray());
+        Assert.Equal(["p", "p"], text.Children.Select(child => child.LocalName).ToArray());
         Assert.Equal("前 粗 後", text.Children.Last().TextContent);
     }
 
@@ -539,7 +539,7 @@ public sealed class RealWorldFidelityTests
 
         XElement masterPage = XElement.Parse(stylesXml).Descendants(s_style + "master-page").First();
         Assert.Equal(
-            new[] { "header", "header-left", "header-first", "footer", "footer-first" },
+            ["header", "header-left", "header-first", "footer", "footer-first"],
             masterPage.Elements().Select(element => element.Name.LocalName).ToArray());
 
         OdfValidationReport report = Validate14(document);
