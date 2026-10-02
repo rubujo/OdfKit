@@ -110,6 +110,65 @@ public sealed class OdfPositionSetTests
     }
 
     /// <summary>
+    /// 驗證複製出的集合與原集合互不影響。
+    /// </summary>
+    [Fact]
+    public void CloneIsIndependentOfTheOriginal()
+    {
+        var original = new OdfPositionSet { 3, 70, 200 };
+        OdfPositionSet copy = original.Clone();
+        copy.Add(5);
+        original.Add(300);
+
+        Assert.Equal(new[] { 3, 5, 70, 200 }, copy.ToArray());
+        Assert.Equal(new[] { 3, 70, 200, 300 }, original.ToArray());
+        Assert.Equal(4, copy.Count);
+        Assert.Empty(new OdfPositionSet().Clone());
+    }
+
+    /// <summary>
+    /// 驗證超集合判斷與差集：基準位置不同、跨字組與空集合的情形都與 <see cref="HashSet{T}"/> 一致。
+    /// </summary>
+    [Fact]
+    public void SupersetAndDifferenceMatchHashSetSemantics()
+    {
+        int[][] samples =
+        [
+            [],
+            [0],
+            [5, 9],
+            [5, 9, 64, 130],
+            [64, 65],
+            [130, 700],
+            [1, 5, 9, 64, 130, 700],
+        ];
+
+        foreach (int[] left in samples)
+        {
+            foreach (int[] right in samples)
+            {
+                var leftSet = new OdfPositionSet();
+                foreach (int value in left)
+                {
+                    leftSet.Add(value);
+                }
+
+                var rightSet = new OdfPositionSet();
+                foreach (int value in right)
+                {
+                    rightSet.Add(value);
+                }
+
+                var leftReference = new HashSet<int>(left);
+                Assert.Equal(leftReference.IsSupersetOf(right), leftSet.IsSupersetOf(rightSet));
+                Assert.Equal(
+                    left.Where(value => !right.Contains(value)).OrderBy(value => value).ToArray(),
+                    leftSet.PositionsNotIn(rightSet).ToArray());
+            }
+        }
+    }
+
+    /// <summary>
     /// 驗證負的位置會被拒絕。
     /// </summary>
     [Fact]

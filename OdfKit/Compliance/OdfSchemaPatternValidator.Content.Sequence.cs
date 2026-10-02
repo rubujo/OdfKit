@@ -22,17 +22,9 @@ internal static partial class OdfSchemaPatternContentMatcher
         }
 
         var indices = new OdfPositionSet { startIndex };
-        foreach (OdfSchemaPatternNode node in nodes)
+        for (int position = 0; position < nodes.Count; position++)
         {
-            var next = new OdfPositionSet();
-            foreach (int index in indices)
-            {
-                foreach (int matched in MatchContentNode(node, parent, childElements, index, context))
-                {
-                    next.Add(matched);
-                }
-            }
-
+            OdfPositionSet next = AdvanceSequence(nodes, position, parent, childElements, indices, context);
             if (next.Count == 0)
             {
                 return next;
@@ -42,6 +34,62 @@ internal static partial class OdfSchemaPatternContentMatcher
         }
 
         return indices;
+    }
+
+    /// <summary>
+    /// 取得目前執行緒上序列推進逐一走訪的位置累計數，供測試鎖定成長階數（與執行器速度無關）。
+    /// </summary>
+    [ThreadStatic]
+    internal static long SequenceStepPositionVisits;
+
+    /// <summary>
+    /// 把序列中第 <paramref name="position"/> 個節點套用到每個輸入位置並取聯集。
+    /// </summary>
+    /// <remarks>
+    /// 前面的重複節點會回傳與列數同階的位置集合，而同一個序列又會從許多起點被詢問；逐一走訪輸入集合使總成本
+    /// 隨列數平方成長。起點依遞減順序詢問時，後一次的輸入集合包含前一次的輸入集合，因此記住最近一次的輸入與輸出，
+    /// 只對新增的位置計算並併入前一次的輸出（結果等於逐一聯集，因為聯集對輸入集合單調）。
+    /// </remarks>
+    private static OdfPositionSet AdvanceSequence(
+        IReadOnlyList<OdfSchemaPatternNode> nodes,
+        int position,
+        XElement parent,
+        IReadOnlyList<XElement> childElements,
+        OdfPositionSet indices,
+        OdfSchemaPatternMatchContext context)
+    {
+        OdfSchemaPatternNode node = nodes[position];
+        bool memoizable = indices.Count > 1;
+        long guardHitsBefore = context.GuardHits;
+        OdfPositionSet next;
+        if (memoizable
+            && context.TryGetSequenceStep(nodes, position, childElements, out OdfSchemaPatternMatchContext.SequenceStepEntry? previous)
+            && indices.IsSupersetOf(previous.Input))
+        {
+            next = previous.Output.Clone();
+            List<int> added = indices.PositionsNotIn(previous.Input);
+            SequenceStepPositionVisits += added.Count;
+            foreach (int index in added)
+            {
+                next.UnionWith(MatchContentNode(node, parent, childElements, index, context));
+            }
+        }
+        else
+        {
+            next = new OdfPositionSet();
+            SequenceStepPositionVisits += indices.Count;
+            foreach (int index in indices)
+            {
+                next.UnionWith(MatchContentNode(node, parent, childElements, index, context));
+            }
+        }
+
+        if (memoizable && context.GuardHits == guardHitsBefore)
+        {
+            context.StoreSequenceStep(nodes, position, childElements, indices, next);
+        }
+
+        return next;
     }
 
     internal static OdfPositionSet MatchContentNode(

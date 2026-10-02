@@ -61,6 +61,7 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeRecognizesPageNumberAndPageCountFields` | ODT | 頁尾的頁碼與總頁數欄位 | `docx` | 頁尾還原為 `PAGE` 與 `NUMPAGES`（修正前總頁數也變成 `PAGE`） | ✅ |
 | `LibreOfficeReadsOdfKitConvertedXlsxWithDatesMergesAndSparseCells` | XLSX → ODS | 日期、合併儲存格、前導空白、遠端位址的儲存格 | `xlsx` | 以 ClosedXML 讀回：日期不位移、合併範圍與空白保留、遠端儲存格在原位置 | ✅ |
 | `LibreOfficeOpensOdfKitConvertedDocxWithListsNotesBreaksAndFooter` | DOCX → ODT | 清單、註腳、分頁符號、頁尾欄位、表格儲存格內的清單 | `txt` / `pdf` / `docx` | 專案符號與巢狀編號、註腳引用與內文、PDF 恰為兩頁、頁尾欄位與儲存格清單保留 | ✅ |
+| `LibreOfficeOpensOdfKitConvertedDocxWithSectionsAndHyperlinkFields` | DOCX → ODT | 直向與橫向兩個章節各有頁首、`HYPERLINK` 複雜欄位 | `pdf` / `docx` | PDF 兩頁且同時含直向與橫向頁面；匯出的 DOCX 含兩個章節的頁首文字，超連結目標保留在關係檔 | ✅ |
 | `OdfKitLoadsLibreOfficeSpreadsheetCompletelyAndKeepsItOnSave` | LibreOffice 儲存的 ODS | 儲存格帶有宣告在根元素的 `calcext:` 前綴、表格超過 8 KB | （OdfKit 載入、修改、儲存） | DOM 載入後資料完整，修改後儲存再載入仍完整（修正前整張工作表被讀成空表） | ✅ |
 | `OdfKitKeepsSpaceBetweenSpansOfLibreOfficeWrittenOdt` | LibreOffice 儲存的 ODT | 兩個 `text:span` 之間的單一空格 | （OdfKit 載入、儲存） | 載入與儲存後 `</text:span> 與 <text:span` 的空格仍在 | ✅ |
 

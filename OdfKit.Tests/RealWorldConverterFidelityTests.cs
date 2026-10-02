@@ -688,6 +688,207 @@ public sealed class RealWorldConverterFidelityTests
         Assert.Equal("無參照頁首", styles.Descendants(s_style + "header").Single().Value);
     }
 
+    /// <summary>
+    /// 驗證多個章節各自的頁首、頁面大小與繼承：第一個章節使用預設主頁面；之後頁面設定不同的章節
+    /// 建立自己的主頁面並套用在該章節的第一個段落；沒有自己參照的章節沿用前一個章節的頁首，
+    /// 與前一個章節相同的章節不再建立主頁面。修正前只採用文件最後一個章節的設定。
+    /// </summary>
+    [Fact]
+    public void DocxSectionsKeepTheirOwnHeadersAndPageGeometry()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.SectionProperties(
+                        new WP.PageSize { Width = 11906U, Height = 16838U },
+                        new WP.PageMargin { Top = 1440, Bottom = 1440, Left = 1134U, Right = 1134U })),
+                    new WP.Run(new WP.Text("第一章"))));
+                body.Append(new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.SectionProperties(
+                        new WP.PageSize { Width = 16838U, Height = 11906U, Orient = WP.PageOrientationValues.Landscape })),
+                    new WP.Run(new WP.Text("第二章"))));
+                body.Append(new WP.Paragraph(new WP.Run(new WP.Text("第三章"))));
+            },
+            main =>
+            {
+                HeaderPart first = main.AddNewPart<HeaderPart>();
+                first.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("頁首一"))));
+                first.Header.Save();
+                HeaderPart third = main.AddNewPart<HeaderPart>();
+                third.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("頁首三"))));
+                third.Header.Save();
+
+                // 第一個章節與最後一個章節各有頁首；中間的章節沒有參照，繼承第一個章節的頁首。
+                WP.SectionProperties firstSection = main.Document!.Body!
+                    .Elements<WP.Paragraph>().First().ParagraphProperties!.SectionProperties!;
+                firstSection.InsertAt(new WP.HeaderReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(first) }, 0);
+                main.Document.Body.Append(new WP.SectionProperties(
+                    new WP.HeaderReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(third) },
+                    new WP.PageSize { Width = 16838U, Height = 11906U, Orient = WP.PageOrientationValues.Landscape }));
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement styles = XElement.Parse(SaveStylesXml(odt));
+        XElement[] masterPages = styles.Descendants(s_style + "master-page").ToArray();
+
+        XElement standard = masterPages.Single(item => (string?)item.Attribute(s_style + "name") == "Standard");
+        Assert.Equal("頁首一", standard.Element(s_style + "header")!.Value);
+
+        // 第二章（橫向、繼承頁首一）與第三章（橫向、頁首三）頁面設定不同，各自建立主頁面。
+        XElement second = masterPages.Single(item => (string?)item.Attribute(s_style + "name") == "DocxSection1");
+        Assert.Equal("頁首一", second.Element(s_style + "header")!.Value);
+        XElement third = masterPages.Single(item => (string?)item.Attribute(s_style + "name") == "DocxSection2");
+        Assert.Equal("頁首三", third.Element(s_style + "header")!.Value);
+        Assert.Equal(3, masterPages.Length);
+
+        XNamespace fo = OdfNamespaces.Fo;
+        double WidthOf(XElement master)
+        {
+            string layoutName = (string)master.Attribute(s_style + "page-layout-name")!;
+            XElement layout = styles.Descendants(s_style + "page-layout")
+                .Single(item => (string?)item.Attribute(s_style + "name") == layoutName);
+            string width = (string)layout.Element(s_style + "page-layout-properties")!.Attribute(fo + "page-width")!;
+            return double.Parse(width.Replace("cm", string.Empty), System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        Assert.InRange(WidthOf(standard), 20.9, 21.1);
+        Assert.InRange(WidthOf(second), 29.6, 29.8);
+        string marginLeft = (string)styles.Descendants(s_style + "page-layout")
+            .Single(item => (string?)item.Attribute(s_style + "name") == (string)standard.Attribute(s_style + "page-layout-name")!)
+            .Element(s_style + "page-layout-properties")!.Attribute(fo + "margin-left")!;
+        Assert.StartsWith("2", marginLeft, StringComparison.Ordinal);
+
+        // 內容：第一章沒有主頁面；第二章與第三章的第一個段落分別套用各自的主頁面。
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+        Assert.Equal(new[] { "第一章", "第二章", "第三章" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+
+        string? MasterOf(XElement paragraph)
+        {
+            string? styleName = (string?)paragraph.Attribute(s_text + "style-name");
+            return content.Descendants(s_style + "style")
+                .FirstOrDefault(item => (string?)item.Attribute(s_style + "name") == styleName)
+                ?.Attribute(s_style + "master-page-name")?.Value;
+        }
+
+        Assert.Null(MasterOf(paragraphs[0]));
+        Assert.Equal("DocxSection1", MasterOf(paragraphs[1]));
+        Assert.Equal("DocxSection2", MasterOf(paragraphs[2]));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證頁面設定完全相同的章節（含繼承來的頁首）不會建立多餘的主頁面。
+    /// </summary>
+    [Fact]
+    public void DocxSectionsWithIdenticalPageSetupShareTheMasterPage()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(new WP.PageSize { Width = 11906U, Height = 16838U })),
+                new WP.Run(new WP.Text("甲"))));
+            body.Append(new WP.Paragraph(new WP.Run(new WP.Text("乙"))));
+            body.Append(new WP.SectionProperties(new WP.PageSize { Width = 11906U, Height = 16838U }));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement styles = XElement.Parse(SaveStylesXml(odt));
+        Assert.Single(styles.Descendants(s_style + "master-page"));
+        Assert.DoesNotContain("master-page-name", SaveContentXml(odt), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證超連結內的分頁符號：連結在分頁處切成兩段，兩段各自保留相同的目標，後一段從新的一頁開始。
+    /// 修正前只處理段落直接子層的分頁符號，連結內的分頁符號被丟棄而兩段文字黏在一起。
+    /// </summary>
+    [Fact]
+    public void DocxPageBreakInsideHyperlinkSplitsTheLink()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(new WP.Paragraph(
+                    new WP.Hyperlink(
+                        new WP.Run(new WP.Text("前段")),
+                        new WP.Run(new WP.Break { Type = WP.BreakValues.Page }),
+                        new WP.Run(new WP.Text("後段"))) { Id = "rIdLink" }));
+            },
+            main => main.AddHyperlinkRelationship(new Uri("https://example.org/split"), true, "rIdLink"));
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+        Assert.Equal(new[] { "前段", "後段" }, paragraphs.Select(paragraph => paragraph.Value).ToArray());
+        Assert.All(
+            paragraphs,
+            paragraph => Assert.Equal(
+                "https://example.org/split",
+                (string?)paragraph.Element(s_text + "a")!.Attribute(s_xlink + "href")));
+
+        XNamespace fo = OdfNamespaces.Fo;
+        string? secondStyle = (string?)paragraphs[1].Attribute(s_text + "style-name");
+        Assert.Equal(
+            "page",
+            content.Descendants(s_style + "style")
+                .Single(item => (string?)item.Attribute(s_style + "name") == secondStyle)
+                .Element(s_style + "paragraph-properties")!.Attribute(fo + "break-before")!.Value);
+        Assert.Null(paragraphs[0].Attribute(s_text + "style-name"));
+    }
+
+    /// <summary>
+    /// 驗證超連結欄位（<c>HYPERLINK</c>，Word 常以複雜欄位儲存）轉成 <c>text:a</c>、日期與文件屬性欄位轉成對應的
+    /// ODF 欄位，且文件通過 ODF 1.4 schema 驗證。修正前這些欄位只留下結果文字，連結與自動更新都遺失。
+    /// </summary>
+    [Fact]
+    public void DocxHyperlinkAndMetadataFieldsConvertToOdfFields()
+    {
+        static WP.Run Begin() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Begin });
+        static WP.Run Separate() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Separate });
+        static WP.Run End() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.End });
+        static WP.Run Code(string text) => new(new WP.FieldCode(text) { Space = SpaceProcessingModeValues.Preserve });
+        static WP.Run Text(string text) => new(new WP.Text(text) { Space = SpaceProcessingModeValues.Preserve });
+
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                Text("見："),
+                Begin(), Code(" HYPERLINK \"https://example.org/field\" "), Separate(), Text("欄位連結"), End(),
+                Text("；"),
+                Begin(), Code(" HYPERLINK \\l \"mark\" "), Separate(), Text("書籤連結"), End()));
+            body.Append(new WP.Paragraph(
+                Begin(), Code(" HYPERLINK \"javascript:alert(1)\" "), Separate(), Text("危險連結"), End()));
+            body.Append(new WP.Paragraph(
+                Text("日期："),
+                new WP.SimpleField(Text("2026年1月2日")) { Instruction = " DATE \\@ \"yyyy年M月d日\" " },
+                Text(" 標題："),
+                Begin(), Code(" TITLE "), Separate(), Text("範例標題"), End()));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+
+        XElement[] anchors = paragraphs[0].Elements(s_text + "a").ToArray();
+        Assert.Equal(new[] { "https://example.org/field", "#mark" }, anchors.Select(item => (string?)item.Attribute(s_xlink + "href")).ToArray());
+        Assert.Equal(new[] { "欄位連結", "書籤連結" }, anchors.Select(item => item.Value).ToArray());
+        Assert.Equal("見：欄位連結；書籤連結", paragraphs[0].Value);
+
+        Assert.Empty(paragraphs[1].Descendants(s_text + "a"));
+        Assert.Equal("危險連結", paragraphs[1].Value);
+
+        XElement date = paragraphs[2].Element(s_text + "date")!;
+        Assert.Equal("false", (string?)date.Attribute(s_text + "fixed"));
+        Assert.Equal("2026年1月2日", date.Value);
+        Assert.Equal("範例標題", paragraphs[2].Element(s_text + "title")!.Value);
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
     // ---------- helpers ----------
 
     private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>

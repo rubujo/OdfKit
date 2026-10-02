@@ -191,6 +191,37 @@ public sealed class RealWorldFidelityTests
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(120), $"驗證 4,000 列耗時 {stopwatch.Elapsed.TotalSeconds:N1} 秒。");
     }
 
+    /// <summary>
+    /// 驗證 schema 驗證的工作量隨列數近乎線性成長：列數變成兩倍，序列推進走訪的位置數不應接近四倍（平方成長）。
+    /// 序列中的重複節點會回傳與列數同階的位置集合，而同一個序列又從每個起點被詢問；
+    /// 逐一走訪輸入集合使總成本隨列數平方成長（修正前 20,000 列約十四秒、80,000 列約兩分鐘）。
+    /// 以走訪的位置數而不是耗時判斷：位置數是確定的，不受執行器速度與並行測試影響。
+    /// </summary>
+    [Fact]
+    public void SchemaValidationWorkGrowsLinearlyWithRowCount()
+    {
+        static long VisitsFor(int rows)
+        {
+            using var document = OdfSpreadsheetDocument.Create();
+            OdfTableSheet sheet = document.Worksheets.Add("S");
+            for (int row = 0; row < rows; row++)
+            {
+                sheet.GetCell(row, 0).CellValue = row;
+            }
+
+            OdfSchemaPatternContentMatcher.SequenceStepPositionVisits = 0;
+            Assert.True(Validate14(document).IsValid);
+            return OdfSchemaPatternContentMatcher.SequenceStepPositionVisits;
+        }
+
+        long small = VisitsFor(2000);
+        long large = VisitsFor(4000);
+
+        // 線性約 2 倍、平方約 4 倍；小規模時固定成本占比較高，因此門檻取 3。
+        Assert.True(large < small * 3, $"2,000 列走訪 {small:N0} 個位置、4,000 列走訪 {large:N0} 個位置。");
+        Assert.True(large < 4000L * 200, $"4,000 列走訪 {large:N0} 個位置，超過每列 200 個。");
+    }
+
     // ---------- 延遲載入與驗證器對真實 LibreOffice 文件的處理 ----------
 
     private const string CalcExtNamespace = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";

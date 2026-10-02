@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -187,6 +188,78 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
+    /// 驗證 OdfKit 把多章節 DOCX 轉成 ODT 後由 LibreOffice 開啟：直向與橫向章節各自的頁面大小、各自的頁首，
+    /// 以及 <c>HYPERLINK</c> 欄位與超連結內的分頁符號都保留。修正前只採用最後一個章節的設定。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeOpensOdfKitConvertedDocxWithSectionsAndHyperlinkFields()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 DOCX 多章節互通性測試。");
+        }
+
+        using var workspace = new InteropWorkspace();
+        string docxPath = Path.Combine(workspace.Root, "sections.docx");
+        using (WordprocessingDocument document = WordprocessingDocument.Create(docxPath, WordprocessingDocumentType.Document))
+        {
+            MainDocumentPart main = document.AddMainDocumentPart();
+            HeaderPart first = main.AddNewPart<HeaderPart>();
+            first.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("縱向頁首"))));
+            first.Header.Save();
+            HeaderPart second = main.AddNewPart<HeaderPart>();
+            second.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text("橫向頁首"))));
+            second.Header.Save();
+
+            static WP.Run Field(WP.FieldCharValues type) => new(new WP.FieldChar { FieldCharType = type });
+
+            main.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.SectionProperties(
+                        new WP.HeaderReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(first) },
+                        new WP.PageSize { Width = 11906U, Height = 16838U })),
+                    new WP.Run(new WP.Text("縱向內文")),
+                    Field(WP.FieldCharValues.Begin),
+                    new WP.Run(new WP.FieldCode(" HYPERLINK \"https://example.org/field\" ") { Space = SpaceProcessingModeValues.Preserve }),
+                    Field(WP.FieldCharValues.Separate),
+                    new WP.Run(new WP.Text("欄位連結")),
+                    Field(WP.FieldCharValues.End)),
+                new WP.Paragraph(new WP.Run(new WP.Text("橫向內文"))),
+                new WP.SectionProperties(
+                    new WP.HeaderReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(second) },
+                    new WP.PageSize { Width = 16838U, Height = 11906U, Orient = WP.PageOrientationValues.Landscape })));
+            main.Document.Save();
+        }
+
+        string odtPath = Path.Combine(workspace.Root, "converted.odt");
+        using (var input = File.OpenRead(docxPath))
+        using (TextDocument converted = DocxToOdtConverter.Convert(input))
+        {
+            converted.Save(odtPath);
+        }
+
+        string pdfPath = workspace.Convert(sofficePath!, odtPath, "pdf");
+        string pdf = Encoding.Latin1.GetString(File.ReadAllBytes(pdfPath));
+        Assert.Equal(2, Regex.Matches(pdf, @"/Type\s*/Page(?![a-z])").Count);
+        string[] mediaBoxes = Regex.Matches(pdf, @"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]")
+            .Select(match => double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) < double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture)
+                ? "portrait"
+                : "landscape")
+            .ToArray();
+        Assert.Contains("portrait", mediaBoxes);
+        Assert.Contains("landscape", mediaBoxes);
+
+        string roundTripDocx = workspace.Convert(sofficePath!, odtPath, "docx");
+        string headers = string.Concat(Regex.Matches(ReadAllOoxmlParts(roundTripDocx, new Regex(@"^word/header\d*\.xml$")), "<w:t[^>]*>([^<]*)</w:t>")
+            .Select(match => match.Groups[1].Value));
+        Assert.Contains("縱向頁首", headers);
+        Assert.Contains("橫向頁首", headers);
+        string rels = ReadAllOoxmlParts(roundTripDocx, new Regex(@"^word/_rels/document\.xml\.rels$"));
+        Assert.Contains("https://example.org/field", rels);
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice 儲存的 ODS（儲存格帶有宣告在根元素的 <c>calcext:</c> 前綴屬性、表格超過 8 KB）
     /// 由 OdfKit DOM 載入後資料完整，修改後再儲存仍完整。修正前延遲具現化的外殼只宣告七個前綴，
     /// 解析失敗後整張工作表被搶救成空表，儲存就把資料永久清掉。
@@ -279,6 +352,19 @@ public partial class LibreOfficeInteropTests
         using ZipArchive archive = ZipFile.OpenRead(odfPath);
         using var reader = new StreamReader(archive.GetEntry("content.xml")!.Open(), Encoding.UTF8);
         return reader.ReadToEnd();
+    }
+
+    private static string ReadAllOoxmlParts(string ooxmlPath, Regex namePattern)
+    {
+        using ZipArchive archive = ZipFile.OpenRead(ooxmlPath);
+        var builder = new StringBuilder();
+        foreach (ZipArchiveEntry entry in archive.Entries.Where(item => namePattern.IsMatch(item.FullName)))
+        {
+            using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
+            builder.Append(reader.ReadToEnd());
+        }
+
+        return builder.ToString();
     }
 
     private static string ReadOoxmlPartMatching(string ooxmlPath, Regex namePattern)

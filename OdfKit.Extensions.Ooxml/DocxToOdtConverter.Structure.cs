@@ -60,6 +60,8 @@ public static partial class DocxToOdtConverter
         internal bool PendingPageBreak { get; set; }
 
         internal int PageBreakStyleCount { get; set; }
+
+        internal int SectionStyleCount { get; set; }
     }
 
     private sealed class ListState(int numberingId, OdfNode rootList)
@@ -219,7 +221,8 @@ public static partial class DocxToOdtConverter
     /// </summary>
     private static List<(WP.Paragraph Segment, bool BreakAfter)> SplitAtPageBreaks(WP.Paragraph paragraph)
     {
-        if (!paragraph.Elements<WP.Run>().Any(RunHasPageBreak))
+        if (!paragraph.Elements<WP.Run>().Any(RunHasPageBreak)
+            && !paragraph.Elements<WP.Hyperlink>().Any(link => link.Elements<WP.Run>().Any(RunHasPageBreak)))
         {
             return [(paragraph, false)];
         }
@@ -265,6 +268,10 @@ public static partial class DocxToOdtConverter
                     current.Append(part);
                 }
             }
+            else if (child is WP.Hyperlink link && link.Elements<WP.Run>().Any(RunHasPageBreak))
+            {
+                current = SplitHyperlinkAtPageBreaks(paragraph, link, current, result);
+            }
             else
             {
                 current.Append(child.CloneNode(true));
@@ -273,6 +280,69 @@ public static partial class DocxToOdtConverter
 
         result.Add((current, false));
         return result;
+    }
+
+    /// <summary>
+    /// 在超連結內的分頁符號處切開：每段保留同一個超連結（目標與錨點相同），傳回目前尚未封口的片段。
+    /// </summary>
+    private static WP.Paragraph SplitHyperlinkAtPageBreaks(
+        WP.Paragraph paragraph,
+        WP.Hyperlink link,
+        WP.Paragraph current,
+        List<(WP.Paragraph Segment, bool BreakAfter)> result)
+    {
+        var partLink = (WP.Hyperlink)link.CloneNode(false);
+        foreach (OpenXmlElement linkChild in link.ChildElements)
+        {
+            if (linkChild is not WP.Run linkRun || !RunHasPageBreak(linkRun))
+            {
+                partLink.Append(linkChild.CloneNode(true));
+                continue;
+            }
+
+            WP.Run part = CreateRunShell(linkRun);
+            foreach (OpenXmlElement runChild in linkRun.ChildElements)
+            {
+                if (runChild is WP.RunProperties)
+                {
+                    continue;
+                }
+
+                if (IsPageBreak(runChild))
+                {
+                    if (part.ChildElements.Any(item => item is not WP.RunProperties))
+                    {
+                        partLink.Append(part);
+                    }
+
+                    if (partLink.HasChildren)
+                    {
+                        current.Append(partLink);
+                    }
+
+                    result.Add((current, true));
+                    current = CreateSegment(paragraph);
+                    partLink = (WP.Hyperlink)link.CloneNode(false);
+                    part = CreateRunShell(linkRun);
+                }
+                else
+                {
+                    part.Append(runChild.CloneNode(true));
+                }
+            }
+
+            if (part.ChildElements.Any(item => item is not WP.RunProperties))
+            {
+                partLink.Append(part);
+            }
+        }
+
+        if (partLink.HasChildren)
+        {
+            current.Append(partLink);
+        }
+
+        return current;
     }
 
     private static WP.Paragraph CreateSegment(WP.Paragraph source)
@@ -751,77 +821,311 @@ public static partial class DocxToOdtConverter
         }
     }
 
-    // ---------- 頁首與頁尾 ----------
+    // ---------- 章節、頁首與頁尾 ----------
+
+    private sealed class SectionInfo
+    {
+        internal WP.SectionProperties? Properties { get; set; }
+
+        // 沒有自己的參照時沿用前一個章節的設定（Word 的繼承規則），以區域種類（default、first、even）為鍵。
+        internal Dictionary<string, WP.HeaderReference> Headers { get; } = [];
+
+        internal Dictionary<string, WP.FooterReference> Footers { get; } = [];
+
+        internal bool TitlePage { get; set; }
+
+        internal bool Continuous { get; set; }
+
+        internal string Signature { get; set; } = string.Empty;
+
+        // 這個章節起頭需要套用的主頁面名稱；與前一個章節的頁面設定相同時為 null。
+        internal string? MasterPageName { get; set; }
+    }
+
+    private static string RegionKey(WP.HeaderFooterValues? type)
+    {
+        if (type is null || type.Value == WP.HeaderFooterValues.Default)
+        {
+            return "default";
+        }
+
+        return type.Value == WP.HeaderFooterValues.First ? "first" : "even";
+    }
 
     /// <summary>
-    /// 轉換頁首與頁尾：內容走與本文相同的段落與表格轉換（樣式、清單、圖片、欄位都保留），
+    /// 依文件順序收集章節：段落內的 <c>w:sectPr</c> 結束一個章節，本文最後的 <c>w:sectPr</c> 屬於最後一個章節。
+    /// </summary>
+    private static List<SectionInfo> CollectSections(WP.Body body)
+    {
+        var properties = new List<WP.SectionProperties?>();
+        foreach (OpenXmlElement child in body.ChildElements)
+        {
+            if (child is WP.Paragraph paragraph && paragraph.ParagraphProperties?.SectionProperties is { } section)
+            {
+                properties.Add(section);
+            }
+        }
+
+        WP.SectionProperties? last = body.Elements<WP.SectionProperties>().LastOrDefault();
+        if (last is not null || properties.Count == 0)
+        {
+            properties.Add(last);
+        }
+
+        var result = new List<SectionInfo>();
+        SectionInfo? previous = null;
+        foreach (WP.SectionProperties? section in properties)
+        {
+            var info = new SectionInfo { Properties = section };
+            if (previous is not null)
+            {
+                foreach (KeyValuePair<string, WP.HeaderReference> pair in previous.Headers)
+                {
+                    info.Headers[pair.Key] = pair.Value;
+                }
+
+                foreach (KeyValuePair<string, WP.FooterReference> pair in previous.Footers)
+                {
+                    info.Footers[pair.Key] = pair.Value;
+                }
+            }
+
+            if (section is not null)
+            {
+                foreach (WP.HeaderReference reference in section.Elements<WP.HeaderReference>())
+                {
+                    info.Headers[RegionKey(reference.Type?.Value)] = reference;
+                }
+
+                foreach (WP.FooterReference reference in section.Elements<WP.FooterReference>())
+                {
+                    info.Footers[RegionKey(reference.Type?.Value)] = reference;
+                }
+
+                info.TitlePage = section.GetFirstChild<WP.TitlePage>() is { } titlePage
+                    && (titlePage.Val is null || titlePage.Val.Value);
+                info.Continuous = section.GetFirstChild<WP.SectionType>()?.Val?.Value == WP.SectionMarkValues.Continuous;
+            }
+
+            info.Signature = BuildSectionSignature(info);
+            result.Add(info);
+            previous = info;
+        }
+
+        return result;
+    }
+
+    private static string BuildSectionSignature(SectionInfo info)
+    {
+        var builder = new System.Text.StringBuilder();
+        foreach (KeyValuePair<string, WP.HeaderReference> pair in info.Headers.OrderBy(item => item.Key, StringComparer.Ordinal))
+        {
+            builder.Append("h:").Append(pair.Key).Append('=').Append(pair.Value.Id?.Value).Append(';');
+        }
+
+        foreach (KeyValuePair<string, WP.FooterReference> pair in info.Footers.OrderBy(item => item.Key, StringComparer.Ordinal))
+        {
+            builder.Append("f:").Append(pair.Key).Append('=').Append(pair.Value.Id?.Value).Append(';');
+        }
+
+        builder.Append("t=").Append(info.TitlePage).Append(';');
+        if (info.Properties?.GetFirstChild<WP.PageSize>() is { } size)
+        {
+            builder.Append("s=").Append(size.Width?.Value).Append('x').Append(size.Height?.Value).Append(';');
+        }
+
+        if (info.Properties?.GetFirstChild<WP.PageMargin>() is { } margin)
+        {
+            builder.Append("m=").Append(margin.Top?.Value).Append(',').Append(margin.Bottom?.Value)
+                .Append(',').Append(margin.Left?.Value).Append(',').Append(margin.Right?.Value).Append(';');
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// 為每個章節建立頁面設定：第一個章節使用預設主頁面，之後頁面大小、邊界、頁首或頁尾與前一個不同的章節
+    /// 各建立一個主頁面（<c>DocxSection{n}</c>），並記錄於章節資訊，供本文迴圈在該章節的第一個區塊套用。
+    /// 連續章節（<c>continuous</c>）不換頁，因此不建立新的主頁面。
+    /// </summary>
+    private static void ConfigureSections(BodyContext context, List<SectionInfo> sections)
+    {
+        bool evenAndOdd = context.MainPart.DocumentSettingsPart?.Settings?.GetFirstChild<WP.EvenAndOddHeaders>() is { } evenAndOddElement
+            && (evenAndOddElement.Val is null || evenAndOddElement.Val.Value);
+        bool anyReference = sections.Any(section => section.Headers.Count > 0 || section.Footers.Count > 0);
+        string activeSignature = string.Empty;
+
+        for (int index = 0; index < sections.Count; index++)
+        {
+            SectionInfo section = sections[index];
+            OdfPageSetup setup;
+            string masterPageName;
+            if (index == 0)
+            {
+                masterPageName = "Standard";
+                setup = context.Document.GetDefaultPageSetup();
+            }
+            else
+            {
+                if (section.Continuous || section.Signature == activeSignature)
+                {
+                    continue;
+                }
+
+                masterPageName = "DocxSection" + index.ToString(CultureInfo.InvariantCulture);
+                context.Document.AddPageStyle(masterPageName);
+                setup = context.Document.GetPageSetup(masterPageName);
+                section.MasterPageName = masterPageName;
+            }
+
+            activeSignature = section.Signature;
+            ApplyPageGeometry(context.Document, masterPageName, setup, section.Properties);
+            ApplyHeaderFooter(context, setup, section, evenAndOdd, useFallback: index == 0 && !anyReference);
+        }
+    }
+
+    private static double TwipsToCentimeters(double twips) => twips / 1440d * 2.54d;
+
+    private static string FormatCentimeters(double value) =>
+        value.ToString("0.###", CultureInfo.InvariantCulture) + "cm";
+
+    /// <summary>
+    /// 套用章節的頁面大小與四邊邊界（<c>w:pgSz</c>、<c>w:pgMar</c>）。
+    /// </summary>
+    private static void ApplyPageGeometry(TextDocument document, string masterPageName, OdfPageSetup setup, WP.SectionProperties? section)
+    {
+        if (section is null)
+        {
+            return;
+        }
+
+        if (section.GetFirstChild<WP.PageSize>() is { } size
+            && size.Width?.Value is uint width && width > 0
+            && size.Height?.Value is uint height && height > 0)
+        {
+            setup.PageWidth = Math.Round(TwipsToCentimeters(width), 3);
+            setup.PageHeight = Math.Round(TwipsToCentimeters(height), 3);
+        }
+
+        if (section.GetFirstChild<WP.PageMargin>() is not { } margin)
+        {
+            return;
+        }
+
+        OdfNode? properties = FindPageLayoutProperties(document, masterPageName);
+        if (properties is null)
+        {
+            return;
+        }
+
+        SetMargin(properties, "margin-top", margin.Top?.Value);
+        SetMargin(properties, "margin-bottom", margin.Bottom?.Value);
+        SetMargin(properties, "margin-left", margin.Left?.Value);
+        SetMargin(properties, "margin-right", margin.Right?.Value);
+    }
+
+    private static void SetMargin(OdfNode properties, string name, double? twips)
+    {
+        if (twips is double value && value >= 0)
+        {
+            properties.SetAttribute(name, OdfNamespaces.Fo, FormatCentimeters(TwipsToCentimeters(value)), "fo");
+        }
+    }
+
+    private static OdfNode? FindPageLayoutProperties(TextDocument document, string masterPageName)
+    {
+        OdfNode? masterStyles = document.StylesDom.Children.FirstOrDefault(
+            child => child.LocalName == "master-styles" && child.NamespaceUri == OdfNamespaces.Office);
+        OdfNode? masterPage = masterStyles?.Children.FirstOrDefault(
+            child => child.LocalName == "master-page"
+                && child.GetAttribute("name", OdfNamespaces.Style) == masterPageName);
+        string? layoutName = masterPage?.GetAttribute("page-layout-name", OdfNamespaces.Style);
+        if (layoutName is null)
+        {
+            return null;
+        }
+
+        OdfNode? automaticStyles = document.StylesDom.Children.FirstOrDefault(
+            child => child.LocalName == "automatic-styles" && child.NamespaceUri == OdfNamespaces.Office);
+        OdfNode? layout = automaticStyles?.Children.FirstOrDefault(
+            child => child.LocalName == "page-layout"
+                && child.GetAttribute("name", OdfNamespaces.Style) == layoutName);
+        if (layout is null)
+        {
+            return null;
+        }
+
+        OdfNode? properties = layout.Children.FirstOrDefault(child => child.LocalName == "page-layout-properties");
+        if (properties is null)
+        {
+            properties = new OdfNode(OdfNodeType.Element, "page-layout-properties", OdfNamespaces.Style, "style");
+            layout.AppendChild(properties);
+        }
+
+        return properties;
+    }
+
+    /// <summary>
+    /// 轉換章節的頁首與頁尾：內容走與本文相同的段落與表格轉換（樣式、清單、圖片、欄位都保留），
     /// 依 <c>w:titlePg</c> 與 <c>w:evenAndOddHeaders</c> 建立首頁與偶數頁的版本。
     /// </summary>
-    private static void ConvertHeaderFooter(BodyContext context, WP.Body body)
+    private static void ApplyHeaderFooter(BodyContext context, OdfPageSetup setup, SectionInfo section, bool evenAndOdd, bool useFallback)
     {
         MainDocumentPart mainPart = context.MainPart;
-        WP.SectionProperties? section = body.Elements<WP.SectionProperties>().LastOrDefault();
-        bool titlePage = section?.GetFirstChild<WP.TitlePage>() is { } titlePageElement
-            && (titlePageElement.Val is null || titlePageElement.Val.Value);
-        bool evenAndOdd = mainPart.DocumentSettingsPart?.Settings?.GetFirstChild<WP.EvenAndOddHeaders>() is { } evenAndOddElement
-            && (evenAndOddElement.Val is null || evenAndOddElement.Val.Value);
-        OdfPageSetup setup = context.Document.GetDefaultPageSetup();
+        bool titlePage = section.TitlePage;
 
         bool anyHeader = false;
         bool anyFooter = false;
         var produced = new HashSet<string>(StringComparer.Ordinal);
-        if (section is not null)
+        foreach (WP.HeaderReference reference in section.Headers.Values)
         {
-            foreach (WP.HeaderReference reference in section.Elements<WP.HeaderReference>())
+            HeaderPart? part = FindPart<HeaderPart>(mainPart, reference.Id?.Value);
+            OdfPageHeaderFooter? region = SelectRegion(
+                reference.Type?.Value,
+                titlePage,
+                evenAndOdd,
+                setup.Header,
+                setup.HeaderFirst,
+                setup.HeaderLeft,
+                out string regionKey);
+            if (part?.Header is not null && region is not null)
             {
-                HeaderPart? part = FindPart<HeaderPart>(mainPart, reference.Id?.Value);
-                OdfPageHeaderFooter? region = SelectRegion(
-                    reference.Type?.Value,
-                    titlePage,
-                    evenAndOdd,
-                    setup.Header,
-                    setup.HeaderFirst,
-                    setup.HeaderLeft,
-                    out string regionKey);
-                if (part?.Header is not null && region is not null)
+                anyHeader = true;
+                if (FillRegion(context, region, part, part.Header.ChildElements))
                 {
-                    anyHeader = true;
-                    if (FillRegion(context, region, part, part.Header.ChildElements))
-                    {
-                        produced.Add("header" + regionKey);
-                    }
-                }
-            }
-
-            foreach (WP.FooterReference reference in section.Elements<WP.FooterReference>())
-            {
-                FooterPart? part = FindPart<FooterPart>(mainPart, reference.Id?.Value);
-                OdfPageHeaderFooter? region = SelectRegion(
-                    reference.Type?.Value,
-                    titlePage,
-                    evenAndOdd,
-                    setup.Footer,
-                    setup.FooterFirst,
-                    setup.FooterLeft,
-                    out string regionKey);
-                if (part?.Footer is not null && region is not null)
-                {
-                    anyFooter = true;
-                    if (FillRegion(context, region, part, part.Footer.ChildElements))
-                    {
-                        produced.Add("footer" + regionKey);
-                    }
+                    produced.Add("header" + regionKey);
                 }
             }
         }
 
-        // 沒有章節屬性或沒有參照時，沿用第一個頁首與頁尾部件作為預設版本。
-        if (!anyHeader && mainPart.HeaderParts.FirstOrDefault() is { Header: not null } headerPart)
+        foreach (WP.FooterReference reference in section.Footers.Values)
+        {
+            FooterPart? part = FindPart<FooterPart>(mainPart, reference.Id?.Value);
+            OdfPageHeaderFooter? region = SelectRegion(
+                reference.Type?.Value,
+                titlePage,
+                evenAndOdd,
+                setup.Footer,
+                setup.FooterFirst,
+                setup.FooterLeft,
+                out string regionKey);
+            if (part?.Footer is not null && region is not null)
+            {
+                anyFooter = true;
+                if (FillRegion(context, region, part, part.Footer.ChildElements))
+                {
+                    produced.Add("footer" + regionKey);
+                }
+            }
+        }
+
+        // 整份文件都沒有頁首頁尾參照時，沿用第一個頁首與頁尾部件作為預設版本。
+        if (useFallback && !anyHeader && mainPart.HeaderParts.FirstOrDefault() is { Header: not null } headerPart)
         {
             FillRegion(context, setup.Header, headerPart, headerPart.Header.ChildElements);
         }
 
-        if (!anyFooter && mainPart.FooterParts.FirstOrDefault() is { Footer: not null } footerPart)
+        if (useFallback && !anyFooter && mainPart.FooterParts.FirstOrDefault() is { Footer: not null } footerPart)
         {
             FillRegion(context, setup.Footer, footerPart, footerPart.Footer.ChildElements);
         }
@@ -837,6 +1141,69 @@ public static partial class DocxToOdtConverter
         {
             setup.Footer.GetOrCreateParagraph();
         }
+    }
+
+    /// <summary>
+    /// 在章節的第一個區塊上指定主頁面（<c>style:master-page-name</c>），ODF 會在該處換頁並改用新的頁面設定。
+    /// </summary>
+    private static void ApplyMasterPage(BodyContext context, OdfNode block, string masterPageName)
+    {
+        OdfNode target = FindFirstTextBlock(block) ?? block;
+        OdfNode autoStyles = TextDocumentDomHelper.FindOrCreateChild(
+            context.Document.ContentDom, "automatic-styles", OdfNamespaces.Office, "office");
+        string styleName = "DocxSectionStyle" + (++context.SectionStyleCount).ToString(CultureInfo.InvariantCulture);
+        var style = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+        style.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
+        style.SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName, "style");
+
+        if (target.LocalName == "table" && target.NamespaceUri == OdfNamespaces.Table)
+        {
+            style.SetAttribute("family", OdfNamespaces.Style, "table", "style");
+            string? existing = target.GetAttribute("style-name", OdfNamespaces.Table);
+            if (!string.IsNullOrEmpty(existing))
+            {
+                style.SetAttribute("parent-style-name", OdfNamespaces.Style, existing!, "style");
+            }
+
+            target.SetAttribute("style-name", OdfNamespaces.Table, styleName, "table");
+        }
+        else
+        {
+            style.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
+            string? existing = target.GetAttribute("style-name", OdfNamespaces.Text);
+            if (!string.IsNullOrEmpty(existing))
+            {
+                style.SetAttribute("parent-style-name", OdfNamespaces.Style, existing!, "style");
+            }
+
+            target.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
+        }
+
+        autoStyles.AppendChild(style);
+    }
+
+    // 清單或表格內第一個可指定主頁面的區塊：段落或標題；表格本身可直接套用。
+    private static OdfNode? FindFirstTextBlock(OdfNode node)
+    {
+        if (node.NamespaceUri == OdfNamespaces.Text && node.LocalName is "p" or "h")
+        {
+            return node;
+        }
+
+        if (node.NamespaceUri == OdfNamespaces.Table && node.LocalName == "table")
+        {
+            return node;
+        }
+
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element && FindFirstTextBlock(child) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     private static TPart? FindPart<TPart>(MainDocumentPart mainPart, string? relationshipId)
@@ -942,66 +1309,226 @@ public static partial class DocxToOdtConverter
         }
     }
 
-    // ---------- 欄位（頁碼與總頁數） ----------
+    // ---------- 欄位 ----------
 
     private enum FieldKind
     {
         None,
         PageNumber,
         PageCount,
+        Hyperlink,
+        Date,
+        Time,
+        Title,
+        Subject,
+        Author,
+        FileName,
+        WordCount,
+        CharacterCount,
     }
 
     private sealed class FieldScanner
     {
         internal System.Text.StringBuilder Instruction { get; } = new();
 
+        internal System.Text.StringBuilder ResultText { get; } = new();
+
         internal bool InResult { get; set; }
 
         internal FieldKind Kind { get; set; }
+
+        internal string? HyperlinkTarget { get; set; }
     }
 
-    private static FieldKind ClassifyField(string instruction)
+    private static FieldKind ClassifyField(string instruction, out string? hyperlinkTarget)
     {
+        hyperlinkTarget = null;
         string trimmed = instruction.Trim();
         int space = trimmed.IndexOf(' ');
         string name = (space < 0 ? trimmed : trimmed.Substring(0, space)).ToUpperInvariant();
-        return name switch
+        switch (name)
         {
-            "PAGE" => FieldKind.PageNumber,
-            "NUMPAGES" or "SECTIONPAGES" => FieldKind.PageCount,
-            _ => FieldKind.None,
-        };
+            case "PAGE":
+                return FieldKind.PageNumber;
+            case "NUMPAGES":
+            case "SECTIONPAGES":
+                return FieldKind.PageCount;
+            case "HYPERLINK":
+                hyperlinkTarget = ParseHyperlinkInstruction(space < 0 ? string.Empty : trimmed.Substring(space + 1));
+                return hyperlinkTarget is null ? FieldKind.None : FieldKind.Hyperlink;
+            case "DATE":
+                return FieldKind.Date;
+            case "TIME":
+                return FieldKind.Time;
+            case "TITLE":
+                return FieldKind.Title;
+            case "SUBJECT":
+                return FieldKind.Subject;
+            case "AUTHOR":
+                return FieldKind.Author;
+            case "FILENAME":
+                return FieldKind.FileName;
+            case "NUMWORDS":
+                return FieldKind.WordCount;
+            case "NUMCHARS":
+                return FieldKind.CharacterCount;
+            default:
+                return FieldKind.None;
+        }
     }
 
-    private static void AppendFieldNode(OdfParagraph paragraph, FieldKind kind)
+    /// <summary>
+    /// 解析 <c>HYPERLINK</c> 欄位指令的參數：第一個未帶開關的字串是目標，<c>\l</c> 後接書籤錨點。
+    /// 目標為空或使用不安全的協定時傳回 <see langword="null"/>，由呼叫端保留結果文字。
+    /// </summary>
+    private static string? ParseHyperlinkInstruction(string arguments)
     {
-        if (kind == FieldKind.PageNumber)
+        string? target = null;
+        string? anchor = null;
+        string? pendingSwitch = null;
+        int index = 0;
+        while (index < arguments.Length)
         {
-            var node = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
-            node.SetAttribute("select-page", OdfNamespaces.Text, "current", "text");
-            paragraph.Node.AppendChild(node);
+            char current = arguments[index];
+            if (char.IsWhiteSpace(current))
+            {
+                index++;
+                continue;
+            }
+
+            string token;
+            if (current == '"')
+            {
+                int end = arguments.IndexOf('"', index + 1);
+                if (end < 0)
+                {
+                    end = arguments.Length;
+                }
+
+                token = arguments.Substring(index + 1, end - index - 1);
+                index = Math.Min(end + 1, arguments.Length);
+            }
+            else
+            {
+                int end = index;
+                while (end < arguments.Length && !char.IsWhiteSpace(arguments[end]))
+                {
+                    end++;
+                }
+
+                token = arguments.Substring(index, end - index);
+                index = end;
+            }
+
+            if (current != '"' && token.Length >= 2 && token[0] == '\\')
+            {
+                pendingSwitch = token.Substring(1).ToLowerInvariant();
+                continue;
+            }
+
+            if (pendingSwitch == "l")
+            {
+                anchor = token;
+            }
+            else if (pendingSwitch is null && target is null)
+            {
+                target = token;
+            }
+
+            pendingSwitch = null;
         }
-        else if (kind == FieldKind.PageCount)
+
+        string? result = target;
+        if (!string.IsNullOrEmpty(anchor))
         {
-            paragraph.Node.AppendChild(new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text"));
+            result = (target ?? string.Empty) + "#" + anchor;
+        }
+
+        if (string.IsNullOrEmpty(result))
+        {
+            return null;
+        }
+
+        return result![0] == '#' || IsSafeHyperlinkTarget(result) ? result : null;
+    }
+
+    private static void AppendFieldNode(OdfParagraph paragraph, FieldKind kind, string resultText, string? hyperlinkTarget)
+    {
+        switch (kind)
+        {
+            case FieldKind.PageNumber:
+                {
+                    var node = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
+                    node.SetAttribute("select-page", OdfNamespaces.Text, "current", "text");
+                    paragraph.Node.AppendChild(node);
+                    break;
+                }
+
+            case FieldKind.PageCount:
+                paragraph.Node.AppendChild(new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text"));
+                break;
+
+            case FieldKind.Hyperlink:
+                if (hyperlinkTarget is not null && resultText.Length > 0)
+                {
+                    paragraph.AddHyperlink(hyperlinkTarget, resultText);
+                }
+
+                break;
+
+            case FieldKind.Date:
+            case FieldKind.Time:
+                {
+                    // 保留自動更新的語意；Word 儲存的結果文字依地區格式化，只作為顯示內容。
+                    bool isDate = kind == FieldKind.Date;
+                    var node = new OdfNode(OdfNodeType.Element, isDate ? "date" : "time", OdfNamespaces.Text, "text");
+                    node.SetAttribute("fixed", OdfNamespaces.Text, "false", "text");
+                    node.TextContent = resultText;
+                    paragraph.Node.AppendChild(node);
+                    break;
+                }
+
+            case FieldKind.Title:
+            case FieldKind.Subject:
+            case FieldKind.Author:
+            case FieldKind.FileName:
+            case FieldKind.WordCount:
+            case FieldKind.CharacterCount:
+                {
+                    string name = kind switch
+                    {
+                        FieldKind.Title => "title",
+                        FieldKind.Subject => "subject",
+                        FieldKind.Author => "initial-creator",
+                        FieldKind.FileName => "file-name",
+                        FieldKind.WordCount => "word-count",
+                        _ => "character-count",
+                    };
+                    var node = new OdfNode(OdfNodeType.Element, name, OdfNamespaces.Text, "text");
+                    node.TextContent = resultText;
+                    paragraph.Node.AppendChild(node);
+                    break;
+                }
         }
     }
 
     private static bool TryAppendSimpleField(WP.SimpleField field, OdfParagraph paragraph)
     {
-        FieldKind kind = ClassifyField(field.Instruction?.Value ?? string.Empty);
+        FieldKind kind = ClassifyField(field.Instruction?.Value ?? string.Empty, out string? target);
         if (kind == FieldKind.None)
         {
             return false;
         }
 
-        AppendFieldNode(paragraph, kind);
+        string resultText = string.Concat(field.Descendants<WP.Run>().Select(ExtractRunText));
+        AppendFieldNode(paragraph, kind, resultText, target);
         return true;
     }
 
     /// <summary>
     /// 處理由多個執行區段組成的複雜欄位（<c>begin</c>、指令、<c>separate</c>、結果、<c>end</c>）：
-    /// 頁碼與總頁數轉成 ODF 欄位並略過 Word 儲存的結果文字（否則會變成固定的「1」），
+    /// 頁碼與總頁數轉成 ODF 欄位並略過 Word 儲存的結果文字（否則會變成固定的「1」）；
+    /// 超連結欄位轉成 <c>text:a</c>，日期、時間與文件屬性欄位轉成對應的 ODF 欄位，結果文字作為顯示內容；
     /// 其他欄位保留結果文字。傳回該執行區段是否已被欄位處理而不需再轉換。
     /// </summary>
     private static bool TryConsumeFieldRun(ref FieldScanner? scanner, WP.Run run, OdfParagraph paragraph)
@@ -1020,12 +1547,19 @@ public static partial class DocxToOdtConverter
                 else if (type == WP.FieldCharValues.Separate && scanner is not null)
                 {
                     scanner.InResult = true;
-                    scanner.Kind = ClassifyField(scanner.Instruction.ToString());
+                    scanner.Kind = ClassifyField(scanner.Instruction.ToString(), out string? target);
+                    scanner.HyperlinkTarget = target;
                 }
                 else if (type == WP.FieldCharValues.End && scanner is not null)
                 {
-                    FieldKind kind = scanner.InResult ? scanner.Kind : ClassifyField(scanner.Instruction.ToString());
-                    AppendFieldNode(paragraph, kind);
+                    FieldKind kind = scanner.Kind;
+                    string? target = scanner.HyperlinkTarget;
+                    if (!scanner.InResult)
+                    {
+                        kind = ClassifyField(scanner.Instruction.ToString(), out target);
+                    }
+
+                    AppendFieldNode(paragraph, kind, scanner.ResultText.ToString(), target);
                     scanner = null;
                 }
             }
@@ -1039,6 +1573,10 @@ public static partial class DocxToOdtConverter
         if (!consumed && scanner is not null && (!scanner.InResult || scanner.Kind != FieldKind.None))
         {
             consumed = true;
+            if (scanner.InResult)
+            {
+                scanner.ResultText.Append(ExtractRunText(run));
+            }
         }
 
         return consumed;

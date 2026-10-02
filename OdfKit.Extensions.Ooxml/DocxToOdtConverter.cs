@@ -47,9 +47,19 @@ public static partial class DocxToOdtConverter
 
         TextDocument odtDocument = TextDocument.Create();
         var context = new BodyContext(mainPart, odtDocument);
-        ConvertHeaderFooter(context, body);
+        List<SectionInfo> sections = CollectSections(body);
+        ConfigureSections(context, sections);
+        int sectionIndex = 0;
+        string? pendingMasterPage = sectionIndex < sections.Count ? sections[sectionIndex].MasterPageName : null;
         foreach (var child in body.ChildElements)
         {
+            if (child is not (WP.Paragraph or WP.Table))
+            {
+                continue;
+            }
+
+            OdfNode bodyRoot = odtDocument.BodyTextRoot;
+            OdfNode? before = bodyRoot.LastChild;
             if (child is WP.Paragraph paragraph)
             {
                 ConvertBodyParagraph(context, paragraph);
@@ -57,6 +67,22 @@ public static partial class DocxToOdtConverter
             else if (child is WP.Table table)
             {
                 ConvertBodyTable(context, table);
+            }
+
+            // 新章節的第一個區塊套用該章節的主頁面；區塊尚未產生（例如只承載分頁符號的段落）時延後。
+            OdfNode? first = before is null ? bodyRoot.FirstChild : before.NextSibling;
+            if (pendingMasterPage is not null && first is not null)
+            {
+                ApplyMasterPage(context, first, pendingMasterPage);
+                pendingMasterPage = null;
+            }
+
+            // 帶有 w:sectPr 的段落是該章節的最後一個段落：下一個區塊屬於下一個章節。
+            if (child is WP.Paragraph { ParagraphProperties.SectionProperties: not null }
+                && sectionIndex < sections.Count - 1)
+            {
+                sectionIndex++;
+                pendingMasterPage = sections[sectionIndex].MasterPageName ?? pendingMasterPage;
             }
         }
 

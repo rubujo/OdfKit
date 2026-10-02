@@ -145,25 +145,139 @@ internal sealed class OdfPositionSet : IEnumerable<int>
     }
 
     /// <summary>
-    /// 傳回依遞增順序列舉位置的列舉器。
+    /// 複製此集合；複本可獨立修改。
     /// </summary>
-    public IEnumerator<int> GetEnumerator()
+    public OdfPositionSet Clone()
     {
-        ulong[] words = _words;
-        int baseWord = _baseWord;
-        for (int i = 0; i < words.Length; i++)
+        var copy = new OdfPositionSet
         {
-            ulong value = words[i];
+            _words = (ulong[])_words.Clone(),
+            _baseWord = _baseWord,
+            _count = _count,
+        };
+        return copy;
+    }
+
+    /// <summary>
+    /// 判斷此集合是否包含另一個集合的所有位置。
+    /// </summary>
+    public bool IsSupersetOf(OdfPositionSet other)
+    {
+        if (other._count == 0)
+        {
+            return true;
+        }
+
+        if (_count < other._count)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < other._words.Length; i++)
+        {
+            ulong needed = other._words[i];
+            if (needed == 0)
+            {
+                continue;
+            }
+
+            int index = other._baseWord + i - _baseWord;
+            if (index < 0 || index >= _words.Length || (needed & ~_words[index]) != 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 傳回在此集合但不在另一個集合內的位置（遞增順序）。
+    /// </summary>
+    public List<int> PositionsNotIn(OdfPositionSet other)
+    {
+        var result = new List<int>();
+        for (int i = 0; i < _words.Length; i++)
+        {
+            ulong value = _words[i];
+            int otherIndex = _baseWord + i - other._baseWord;
+            if (otherIndex >= 0 && otherIndex < other._words.Length)
+            {
+                value &= ~other._words[otherIndex];
+            }
+
             while (value != 0)
             {
-                int bit = TrailingZeroCount(value);
-                yield return ((baseWord + i) << 6) + bit;
+                result.Add(((_baseWord + i) << 6) + TrailingZeroCount(value));
                 value &= value - 1;
             }
         }
+
+        return result;
     }
 
+    /// <summary>
+    /// 傳回依遞增順序列舉位置的列舉器（結構型別，避免每次列舉配置物件）。
+    /// </summary>
+    public Enumerator GetEnumerator() => new(_words, _baseWord);
+
+    IEnumerator<int> IEnumerable<int>.GetEnumerator() => GetEnumerator();
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// 位置集合的結構列舉器。
+    /// </summary>
+    internal struct Enumerator : IEnumerator<int>
+    {
+        private readonly ulong[] _words;
+        private readonly int _baseWord;
+        private int _index;
+        private ulong _value;
+        private int _current;
+
+        internal Enumerator(ulong[] words, int baseWord)
+        {
+            _words = words;
+            _baseWord = baseWord;
+            _index = -1;
+            _value = 0;
+            _current = -1;
+        }
+
+        public readonly int Current => _current;
+
+        readonly object IEnumerator.Current => _current;
+
+        public bool MoveNext()
+        {
+            while (_value == 0)
+            {
+                _index++;
+                if (_index >= _words.Length)
+                {
+                    return false;
+                }
+
+                _value = _words[_index];
+            }
+
+            _current = ((_baseWord + _index) << 6) + TrailingZeroCount(_value);
+            _value &= _value - 1;
+            return true;
+        }
+
+        public void Reset()
+        {
+            _index = -1;
+            _value = 0;
+            _current = -1;
+        }
+
+        public readonly void Dispose()
+        {
+        }
+    }
 
     // Add 在比對的內層迴圈中被大量呼叫，例外集中在不內嵌的輔助方法，讓熱路徑只剩一次比較。
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

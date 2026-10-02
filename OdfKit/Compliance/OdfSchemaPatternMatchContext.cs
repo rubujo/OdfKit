@@ -18,6 +18,19 @@ internal sealed class OdfSchemaPatternMatchContext
     private readonly Dictionary<ReachKey, OdfPositionSet> _reachMemo = new();
     private readonly Dictionary<ReachKey, OdfPositionSet> _contentMemo = new();
     private const int MaxReachMemoEntries = 2_000_000;
+    private readonly Dictionary<(object Nodes, int Position), SequenceStepEntry> _sequenceMemo = new();
+
+    /// <summary>
+    /// 序列中某個節點上一次推進的輸入與輸出（輸入位置集合 → 各位置比對結果的聯集）。
+    /// </summary>
+    internal sealed class SequenceStepEntry(object childElements, OdfPositionSet input, OdfPositionSet output)
+    {
+        internal object ChildElements { get; } = childElements;
+
+        internal OdfPositionSet Input { get; } = input;
+
+        internal OdfPositionSet Output { get; } = output;
+    }
 
     private readonly struct ReachKey(OdfSchemaPatternNode node, object childElements, int start) : IEquatable<ReachKey>
     {
@@ -68,6 +81,18 @@ internal sealed class OdfSchemaPatternMatchContext
             _contentMemo[new ReachKey(node, childElements, start)] = matches;
         }
     }
+
+    /// <summary>
+    /// 取得序列節點上一次推進的記錄；子元素清單不同時視為沒有記錄。
+    /// </summary>
+    public bool TryGetSequenceStep(object nodes, int position, object childElements, out SequenceStepEntry entry) =>
+        _sequenceMemo.TryGetValue((nodes, position), out entry!) && ReferenceEquals(entry.ChildElements, childElements);
+
+    /// <summary>
+    /// 記錄序列節點這一次推進的輸入與輸出，每個節點只保留最近一次，記憶體隨節點數而不隨輸入數成長。
+    /// </summary>
+    public void StoreSequenceStep(object nodes, int position, object childElements, OdfPositionSet input, OdfPositionSet output) =>
+        _sequenceMemo[(nodes, position)] = new SequenceStepEntry(childElements, input, output);
 
     /// <summary>
     /// 記錄「由某位置起重複比對（至少一次）可到達的位置集合」；超過上限後不再記錄以限制記憶體。
