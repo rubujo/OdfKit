@@ -38,6 +38,8 @@
     href: reference/exporting.md
   - name: 互通性
     href: reference/interop.md
+  - name: OOXML 轉換涵蓋範圍
+    href: ooxml-conversion.md
   - name: 診斷
     href: reference/diagnostics.md
   - name: ODF 格式支援

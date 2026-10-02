@@ -57,6 +57,12 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeHeadlessExecutesManagedDocumentMacros` | ODT 1.0～1.4 | Basic 與 Python 文件巨集 | UNO script provider | 每個版本的兩個巨集各自寫出標記檔，並核對完整內容；Windows Portable 26.2.4.2 實測 | ✅ |
 | `LibreOfficeUnoOpenPgpRealKeyBidirectionalRoundTrip` | OpenPGP ODT | 臨時 GnuPG RSA 金鑰、加密本文 | UNO 解密、修改、重新儲存 | 核對本文、LibreOffice 新增標記、wholesome OpenPGP manifest，再由 OdfKit 解密 | ✅ |
 | `LibreOfficeHeadlessPivotTableRoundTripsOdsAndPdf` | ODS 1.4 | DataPilot 日期月份分組、列百分比、列欄總計、outline 版面、drill-down | `ods` / `pdf` | 往返後由 OdfKit 讀回 Pivot 定義；PDF 非空 | ✅ |
+| `LibreOfficeKeepsWhitespaceAndListNumberingOfOdfKitText` | ODT | 連續空格、定位字元、換行；`AddListWithStyle` 的 `a)` 與 `(I)` 編號 | `txt` | 空白原樣保留；清單顯示 `a)`、`b)`、`(I)`（修正前顯示成 `1`） | ✅ |
+| `LibreOfficeRecognizesPageNumberAndPageCountFields` | ODT | 頁尾的頁碼與總頁數欄位 | `docx` | 頁尾還原為 `PAGE` 與 `NUMPAGES`（修正前總頁數也變成 `PAGE`） | ✅ |
+| `LibreOfficeReadsOdfKitConvertedXlsxWithDatesMergesAndSparseCells` | XLSX → ODS | 日期、合併儲存格、前導空白、遠端位址的儲存格 | `xlsx` | 以 ClosedXML 讀回：日期不位移、合併範圍與空白保留、遠端儲存格在原位置 | ✅ |
+| `LibreOfficeOpensOdfKitConvertedDocxWithListsNotesBreaksAndFooter` | DOCX → ODT | 清單、註腳、分頁符號、頁尾欄位、表格儲存格內的清單 | `txt` / `pdf` / `docx` | 專案符號與巢狀編號、註腳引用與內文、PDF 恰為兩頁、頁尾欄位與儲存格清單保留 | ✅ |
+| `OdfKitLoadsLibreOfficeSpreadsheetCompletelyAndKeepsItOnSave` | LibreOffice 儲存的 ODS | 儲存格帶有宣告在根元素的 `calcext:` 前綴、表格超過 8 KB | （OdfKit 載入、修改、儲存） | DOM 載入後資料完整，修改後儲存再載入仍完整（修正前整張工作表被讀成空表） | ✅ |
+| `OdfKitKeepsSpaceBetweenSpansOfLibreOfficeWrittenOdt` | LibreOffice 儲存的 ODT | 兩個 `text:span` 之間的單一空格 | （OdfKit 載入、儲存） | 載入與儲存後 `</text:span> 與 <text:span` 的空格仍在 | ✅ |
 
 ## Apache OpenOffice 獨立驗收
 
@@ -82,6 +88,13 @@ pwsh eng/Test-ApacheOpenOfficeInterop.ps1 `
 ```
 
 ## 已知上游限制（非 OdfKit 缺陷）
+
+以 LibreOffice 26.2.4.2 驗證時另外確認兩項與 OdfKit 無關的行為，避免誤判為 OdfKit 缺陷：
+
+- LibreOffice 的 HTML 匯入會寫出 `style:border-line-width-bottom="0cm 0.004cm 0.002cm"`；官方 ODF schema 的
+  `positiveLength` 要求嚴格為正，`0cm` 不符合，OdfKit 的 schema 驗證器因此正確地回報不符。
+- LibreOffice 的 `txt` 匯出遇到巢狀表格時，會把表格之後的段落重複輸出；以 LibreOffice 重新儲存的 ODT
+  結構正確（該段落只出現一次），因此判斷為匯出濾鏡的行為。
 
 獨立（非嵌入 ODS/ODT/ODP）的 ODC／OTC／FODC 圖表文件，實測確認 LibreOffice 26.2.1 不接受
 為可直接開啟的主文件：
