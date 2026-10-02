@@ -568,7 +568,7 @@ public static class OdfExternalScriptCompiler
                 IsBasicKeyword(stripped, "const"))
             {
                 // Const 需要常數運算式；不接受在其中呼叫函式。
-                if (line.IndexOf('(') >= 0 && IsBasicKeyword(stripped, "const"))
+                if (ContainsChar(line, '(') && IsBasicKeyword(stripped, "const"))
                     return true;
                 continue;
             }
@@ -577,7 +577,7 @@ public static class OdfExternalScriptCompiler
             {
                 // 不接受初始化運算式或連續行，避免以宣告夾帶呼叫；陣列上界運算式在模組初始化時會被求值，
                 // 因此括號內只接受數字、逗號與 To（例如 Dim a(1 To 10)），不接受 Dim a(Shell("x"))。
-                if (line.IndexOf('=') >= 0 || line.EndsWith("_", StringComparison.Ordinal) || line.IndexOf(':') >= 0 ||
+                if (ContainsChar(line, '=') || EndsWithUnderscore(line) || ContainsChar(line, ':') ||
                     HasNonLiteralArrayBounds(line))
                     return true;
                 continue;
@@ -585,7 +585,7 @@ public static class OdfExternalScriptCompiler
 
             // 帶範圍修飾詞的變數宣告（如 Private name As String）：同樣不接受初始化、連續行或運算式上界。
             if (stripped != lower &&
-                line.IndexOf('=') < 0 && line.IndexOf(':') < 0 && !line.EndsWith("_", StringComparison.Ordinal) &&
+                !ContainsChar(line, '=') && !ContainsChar(line, ':') && !EndsWithUnderscore(line) &&
                 !HasNonLiteralArrayBounds(line))
             {
                 continue;
@@ -596,6 +596,20 @@ public static class OdfExternalScriptCompiler
 
         return depth != 0;
     }
+
+    private static bool ContainsChar(string text, char value) =>
+#if NETSTANDARD2_0
+        text.IndexOf(value) >= 0;
+#else
+        text.Contains(value);
+#endif
+
+    private static bool EndsWithUnderscore(string text) =>
+#if NETSTANDARD2_0
+        text.EndsWith("_", StringComparison.Ordinal);
+#else
+        text.EndsWith('_');
+#endif
 
     /// <summary>
     /// 判斷宣告行的括號內是否含有數字、逗號與 <c>To</c> 以外的內容（即需要求值的上界運算式）。
