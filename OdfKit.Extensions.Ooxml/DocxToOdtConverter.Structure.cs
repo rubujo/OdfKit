@@ -62,6 +62,10 @@ public static partial class DocxToOdtConverter
         internal int PageBreakStyleCount { get; set; }
 
         internal int SectionStyleCount { get; set; }
+
+        internal int TocCount { get; set; }
+
+        internal int ColumnSectionCount { get; set; }
     }
 
     private sealed class ListState(int numberingId, OdfNode rootList)
@@ -840,6 +844,15 @@ public static partial class DocxToOdtConverter
 
         // 這個章節起頭需要套用的主頁面名稱；與前一個章節的頁面設定相同時為 null。
         internal string? MasterPageName { get; set; }
+
+        // 頁面設定與前一個章節相同、但不是連續章節時，Word 仍會換頁。
+        internal bool NeedsPageBreak { get; set; }
+
+        // 多欄設定（欄數大於 1 時才記錄）。
+        internal WP.Columns? Columns { get; set; }
+
+        // 頁碼重新起算的起始值（w:pgNumType 的 w:start）。
+        internal int? PageNumberStart { get; set; }
     }
 
     private static string RegionKey(WP.HeaderFooterValues? type)
@@ -905,6 +918,12 @@ public static partial class DocxToOdtConverter
                 info.TitlePage = section.GetFirstChild<WP.TitlePage>() is { } titlePage
                     && (titlePage.Val is null || titlePage.Val.Value);
                 info.Continuous = section.GetFirstChild<WP.SectionType>()?.Val?.Value == WP.SectionMarkValues.Continuous;
+                if (section.GetFirstChild<WP.Columns>() is { } columns && (columns.ColumnCount?.Value ?? 1) > 1)
+                {
+                    info.Columns = columns;
+                }
+
+                info.PageNumberStart = section.GetFirstChild<WP.PageNumberType>()?.Start?.Value;
             }
 
             info.Signature = BuildSectionSignature(info);
@@ -981,6 +1000,11 @@ public static partial class DocxToOdtConverter
             activeSignature = section.Signature;
             ApplyPageGeometry(context.Document, masterPageName, setup, section.Properties);
             ApplyHeaderFooter(context, setup, section, evenAndOdd, useFallback: index == 0 && !anyReference);
+        }
+
+        for (int index = 1; index < sections.Count; index++)
+        {
+            sections[index].NeedsPageBreak = !sections[index].Continuous && sections[index].MasterPageName is null;
         }
     }
 
@@ -1143,45 +1167,6 @@ public static partial class DocxToOdtConverter
         }
     }
 
-    /// <summary>
-    /// 在章節的第一個區塊上指定主頁面（<c>style:master-page-name</c>），ODF 會在該處換頁並改用新的頁面設定。
-    /// </summary>
-    private static void ApplyMasterPage(BodyContext context, OdfNode block, string masterPageName)
-    {
-        OdfNode target = FindFirstTextBlock(block) ?? block;
-        OdfNode autoStyles = TextDocumentDomHelper.FindOrCreateChild(
-            context.Document.ContentDom, "automatic-styles", OdfNamespaces.Office, "office");
-        string styleName = "DocxSectionStyle" + (++context.SectionStyleCount).ToString(CultureInfo.InvariantCulture);
-        var style = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
-        style.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
-        style.SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName, "style");
-
-        if (target.LocalName == "table" && target.NamespaceUri == OdfNamespaces.Table)
-        {
-            style.SetAttribute("family", OdfNamespaces.Style, "table", "style");
-            string? existing = target.GetAttribute("style-name", OdfNamespaces.Table);
-            if (!string.IsNullOrEmpty(existing))
-            {
-                style.SetAttribute("parent-style-name", OdfNamespaces.Style, existing!, "style");
-            }
-
-            target.SetAttribute("style-name", OdfNamespaces.Table, styleName, "table");
-        }
-        else
-        {
-            style.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
-            string? existing = target.GetAttribute("style-name", OdfNamespaces.Text);
-            if (!string.IsNullOrEmpty(existing))
-            {
-                style.SetAttribute("parent-style-name", OdfNamespaces.Style, existing!, "style");
-            }
-
-            target.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
-        }
-
-        autoStyles.AppendChild(style);
-    }
-
     // 清單或表格內第一個可指定主頁面的區塊：段落或標題；表格本身可直接套用。
     private static OdfNode? FindFirstTextBlock(OdfNode node)
     {
@@ -1265,7 +1250,7 @@ public static partial class DocxToOdtConverter
         try
         {
             ListState? list = null;
-            foreach (OpenXmlElement child in content)
+            foreach (OpenXmlElement child in FlattenBlocks(content))
             {
                 if (child is WP.Paragraph paragraph)
                 {
@@ -1309,6 +1294,58 @@ public static partial class DocxToOdtConverter
         }
     }
 
+    // ---------- 書籤 ----------
+
+    // Word 的書籤起點與終點以編號配對（終點沒有名稱），轉換期間以執行緒靜態表保存編號對名稱的對應。
+    [ThreadStatic]
+    private static Dictionary<string, string>? t_bookmarkNames;
+
+    private static void CollectBookmarkNames(WP.Body body)
+    {
+        var names = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (WP.BookmarkStart start in body.Descendants<WP.BookmarkStart>())
+        {
+            string? id = start.Id?.Value;
+            string? name = start.Name?.Value;
+            if (!string.IsNullOrEmpty(id) && IsConvertibleBookmark(name))
+            {
+                names[id!] = name!;
+            }
+        }
+
+        t_bookmarkNames = names;
+    }
+
+    // Word 自動建立、只用於游標位置的 _GoBack 不轉換；其餘書籤（含 _Toc、_Ref 隱藏書籤）都是連結與交互參照的目標。
+    private static bool IsConvertibleBookmark(string? name) =>
+        !string.IsNullOrEmpty(name) && !string.Equals(name, "_GoBack", StringComparison.Ordinal);
+
+    private static void AppendBookmarkStart(OdfNode paragraphNode, WP.BookmarkStart start)
+    {
+        string? name = start.Name?.Value;
+        if (!IsConvertibleBookmark(name))
+        {
+            return;
+        }
+
+        var node = new OdfNode(OdfNodeType.Element, "bookmark-start", OdfNamespaces.Text, "text");
+        node.SetAttribute("name", OdfNamespaces.Text, name!, "text");
+        paragraphNode.AppendChild(node);
+    }
+
+    private static void AppendBookmarkEnd(OdfNode paragraphNode, WP.BookmarkEnd end)
+    {
+        string? id = end.Id?.Value;
+        if (string.IsNullOrEmpty(id) || t_bookmarkNames is null || !t_bookmarkNames.TryGetValue(id!, out string? name))
+        {
+            return;
+        }
+
+        var node = new OdfNode(OdfNodeType.Element, "bookmark-end", OdfNamespaces.Text, "text");
+        node.SetAttribute("name", OdfNamespaces.Text, name, "text");
+        paragraphNode.AppendChild(node);
+    }
+
     // ---------- 欄位 ----------
 
     private enum FieldKind
@@ -1317,6 +1354,8 @@ public static partial class DocxToOdtConverter
         PageNumber,
         PageCount,
         Hyperlink,
+        BookmarkText,
+        BookmarkPage,
         Date,
         Time,
         Title,
@@ -1337,12 +1376,12 @@ public static partial class DocxToOdtConverter
 
         internal FieldKind Kind { get; set; }
 
-        internal string? HyperlinkTarget { get; set; }
+        internal string? Argument { get; set; }
     }
 
-    private static FieldKind ClassifyField(string instruction, out string? hyperlinkTarget)
+    private static FieldKind ClassifyField(string instruction, out string? argument)
     {
-        hyperlinkTarget = null;
+        argument = null;
         string trimmed = instruction.Trim();
         int space = trimmed.IndexOf(' ');
         string name = (space < 0 ? trimmed : trimmed.Substring(0, space)).ToUpperInvariant();
@@ -1354,8 +1393,17 @@ public static partial class DocxToOdtConverter
             case "SECTIONPAGES":
                 return FieldKind.PageCount;
             case "HYPERLINK":
-                hyperlinkTarget = ParseHyperlinkInstruction(space < 0 ? string.Empty : trimmed.Substring(space + 1));
-                return hyperlinkTarget is null ? FieldKind.None : FieldKind.Hyperlink;
+                argument = ParseHyperlinkInstruction(space < 0 ? string.Empty : trimmed.Substring(space + 1));
+                return argument is null ? FieldKind.None : FieldKind.Hyperlink;
+            case "REF":
+            case "PAGEREF":
+                argument = FirstFieldArgument(space < 0 ? string.Empty : trimmed.Substring(space + 1));
+                if (argument is null)
+                {
+                    return FieldKind.None;
+                }
+
+                return name == "REF" ? FieldKind.BookmarkText : FieldKind.BookmarkPage;
             case "DATE":
                 return FieldKind.Date;
             case "TIME":
@@ -1375,6 +1423,56 @@ public static partial class DocxToOdtConverter
             default:
                 return FieldKind.None;
         }
+    }
+
+    /// <summary>
+    /// 取得欄位指令的第一個不帶開關的參數（例如 <c>REF _Ref123 \h</c> 的書籤名稱）。
+    /// </summary>
+    private static string? FirstFieldArgument(string arguments)
+    {
+        int index = 0;
+        while (index < arguments.Length)
+        {
+            if (char.IsWhiteSpace(arguments[index]))
+            {
+                index++;
+                continue;
+            }
+
+            string token;
+            bool quoted = arguments[index] == '"';
+            if (quoted)
+            {
+                int end = arguments.IndexOf('"', index + 1);
+                if (end < 0)
+                {
+                    end = arguments.Length;
+                }
+
+                token = arguments.Substring(index + 1, end - index - 1);
+                index = Math.Min(end + 1, arguments.Length);
+            }
+            else
+            {
+                int end = index;
+                while (end < arguments.Length && !char.IsWhiteSpace(arguments[end]))
+                {
+                    end++;
+                }
+
+                token = arguments.Substring(index, end - index);
+                index = end;
+            }
+
+            if (!quoted && token.Length > 0 && token[0] == '\\')
+            {
+                continue;
+            }
+
+            return token.Length == 0 ? null : token;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -1452,7 +1550,7 @@ public static partial class DocxToOdtConverter
         return result![0] == '#' || IsSafeHyperlinkTarget(result) ? result : null;
     }
 
-    private static void AppendFieldNode(OdfParagraph paragraph, FieldKind kind, string resultText, string? hyperlinkTarget)
+    private static void AppendFieldNode(OdfParagraph paragraph, FieldKind kind, string resultText, string? argument)
     {
         switch (kind)
         {
@@ -1469,9 +1567,27 @@ public static partial class DocxToOdtConverter
                 break;
 
             case FieldKind.Hyperlink:
-                if (hyperlinkTarget is not null && resultText.Length > 0)
+                if (argument is not null && resultText.Length > 0)
                 {
-                    paragraph.AddHyperlink(hyperlinkTarget, resultText);
+                    paragraph.AddHyperlink(argument, resultText);
+                }
+
+                break;
+
+            case FieldKind.BookmarkText:
+            case FieldKind.BookmarkPage:
+                if (argument is not null)
+                {
+                    // 書籤文字或書籤所在頁碼的交互參照；Word 儲存的結果文字作為顯示內容。
+                    var node = new OdfNode(OdfNodeType.Element, "bookmark-ref", OdfNamespaces.Text, "text");
+                    node.SetAttribute(
+                        "reference-format",
+                        OdfNamespaces.Text,
+                        kind == FieldKind.BookmarkPage ? "page" : "text",
+                        "text");
+                    node.SetAttribute("ref-name", OdfNamespaces.Text, argument, "text");
+                    node.TextContent = resultText;
+                    paragraph.Node.AppendChild(node);
                 }
 
                 break;
@@ -1548,12 +1664,12 @@ public static partial class DocxToOdtConverter
                 {
                     scanner.InResult = true;
                     scanner.Kind = ClassifyField(scanner.Instruction.ToString(), out string? target);
-                    scanner.HyperlinkTarget = target;
+                    scanner.Argument = target;
                 }
                 else if (type == WP.FieldCharValues.End && scanner is not null)
                 {
                     FieldKind kind = scanner.Kind;
-                    string? target = scanner.HyperlinkTarget;
+                    string? target = scanner.Argument;
                     if (!scanner.InResult)
                     {
                         kind = ClassifyField(scanner.Instruction.ToString(), out target);

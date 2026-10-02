@@ -260,6 +260,82 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
+    /// 驗證 OdfKit 把含目錄、書籤、分欄與起始頁碼的 DOCX 轉成 ODT 後由 LibreOffice 開啟：目錄項目與標題都在文字裡，
+    /// 匯出的 DOCX 還原出 <c>TOC</c> 欄位、書籤、<c>w:cols</c> 與 <c>w:pgNumType</c>，內部連結的目標存在。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeOpensOdfKitConvertedDocxWithTocBookmarksColumnsAndPageNumbering()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 DOCX 目錄與分欄互通性測試。");
+        }
+
+        using var workspace = new InteropWorkspace();
+        string docxPath = Path.Combine(workspace.Root, "toc.docx");
+        using (WordprocessingDocument document = WordprocessingDocument.Create(docxPath, WordprocessingDocumentType.Document))
+        {
+            MainDocumentPart main = document.AddMainDocumentPart();
+
+            static WP.Run Field(WP.FieldCharValues type) => new(new WP.FieldChar { FieldCharType = type });
+            static WP.Run Code(string text) => new(new WP.FieldCode(text) { Space = SpaceProcessingModeValues.Preserve });
+
+            var tocEntry = new WP.Paragraph(
+                Field(WP.FieldCharValues.Begin),
+                Code(" TOC \\o \"1-3\" \\h \\z \\u "),
+                Field(WP.FieldCharValues.Separate),
+                new WP.Hyperlink(
+                    new WP.Run(new WP.Text("第一章")),
+                    new WP.Run(new WP.TabChar()),
+                    new WP.Run(new WP.Text("1"))) { Anchor = "_Toc1" });
+            var tocEnd = new WP.Paragraph(Field(WP.FieldCharValues.End));
+
+            main.Document = new WP.Document(new WP.Body(
+                new WP.SdtBlock(new WP.SdtContentBlock(new WP.Paragraph(new WP.Run(new WP.Text("目錄"))), tocEntry, tocEnd)),
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.ParagraphStyleId { Val = "Heading1" }),
+                    new WP.BookmarkStart { Id = "1", Name = "_Toc1" },
+                    new WP.Run(new WP.Text("第一章")),
+                    new WP.BookmarkEnd { Id = "1" }),
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.SectionProperties(new WP.PageSize { Width = 11906U, Height = 16838U })),
+                    new WP.Run(new WP.Text("單欄內文"))),
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(new WP.SectionProperties(
+                        new WP.SectionType { Val = WP.SectionMarkValues.Continuous },
+                        new WP.PageSize { Width = 11906U, Height = 16838U },
+                        new WP.Columns { ColumnCount = 2, Space = "720" })),
+                    new WP.Run(new WP.Text("雙欄內文"))),
+                new WP.Paragraph(new WP.Run(new WP.Text("最後一節內文"))),
+                new WP.SectionProperties(
+                    new WP.PageSize { Width = 11906U, Height = 16838U },
+                    new WP.PageNumberType { Start = 5 })));
+            main.Document.Save();
+        }
+
+        string odtPath = Path.Combine(workspace.Root, "converted.odt");
+        using (var input = File.OpenRead(docxPath))
+        using (TextDocument converted = DocxToOdtConverter.Convert(input))
+        {
+            converted.Save(odtPath);
+        }
+
+        string txt = workspace.ConvertToText(sofficePath!, odtPath);
+        Assert.Contains("目錄", txt);
+        Assert.Contains("單欄內文", txt);
+        Assert.Contains("雙欄內文", txt);
+        Assert.Contains("最後一節內文", txt);
+
+        string roundTripDocx = workspace.Convert(sofficePath!, odtPath, "docx");
+        string documentXml = ReadOoxmlPartMatching(roundTripDocx, new Regex(@"^word/document\.xml$"));
+        Assert.Matches(@"<w:instrText[^>]*>\s*TOC\b", documentXml);
+        Assert.Contains("w:name=\"_Toc1\"", documentXml);
+        Assert.Matches(@"<w:cols [^>]*w:num=""2""", documentXml);
+        Assert.Matches(@"<w:pgNumType [^>]*w:start=""5""", documentXml);
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice 儲存的 ODS（儲存格帶有宣告在根元素的 <c>calcext:</c> 前綴屬性、表格超過 8 KB）
     /// 由 OdfKit DOM 載入後資料完整，修改後再儲存仍完整。修正前延遲具現化的外殼只宣告七個前綴，
     /// 解析失敗後整張工作表被搶救成空表，儲存就把資料永久清掉。

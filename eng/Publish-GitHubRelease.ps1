@@ -17,7 +17,8 @@
 .PARAMETER SkipValidation
     略過 Test-NuGetPack.ps1。
 .PARAMETER NotesFile
-    Release 說明 Markdown 檔案路徑（選用）。
+    Release 說明 Markdown 檔案路徑（選用）。未指定時，若存在 release-notes/<Tag>.md 就使用它；
+    兩者都沒有才退回 GitHub 自動產生的說明（只列出合併的 PR，沒有功能與修正摘要）。
 .PARAMETER UseExistingBundle
     使用已由本次工作流程建立並簽署證明的 bundle，不重新壓縮。
 #>
@@ -174,6 +175,13 @@ try {
         @($sidecarAssets | ForEach-Object { $_.FullName }) +
         ($packages | ForEach-Object { $_.FullName })
     $ghArgs = @("release", "create", $Tag, "--title", $Title)
+    if ([string]::IsNullOrWhiteSpace($NotesFile)) {
+        $curatedNotes = Join-Path (Join-Path $repoRoot "release-notes") "$Tag.md"
+        if (Test-Path -LiteralPath $curatedNotes) {
+            $NotesFile = $curatedNotes
+        }
+    }
+
     if (-not [string]::IsNullOrWhiteSpace($NotesFile)) {
         $ghArgs += @("--notes-file", $NotesFile)
     }

@@ -889,6 +889,273 @@ public sealed class RealWorldConverterFidelityTests
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
     }
 
+    private static WP.Run FieldBegin() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Begin });
+
+    private static WP.Run FieldSeparate() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.Separate });
+
+    private static WP.Run FieldEnd() => new(new WP.FieldChar { FieldCharType = WP.FieldCharValues.End });
+
+    private static WP.Run FieldCode(string text) => new(new WP.FieldCode(text) { Space = SpaceProcessingModeValues.Preserve });
+
+    private static WP.Run PlainRun(string text) => new(new WP.Text(text) { Space = SpaceProcessingModeValues.Preserve });
+
+    /// <summary>
+    /// 驗證書籤與交互參照：書籤起訖轉成 <c>text:bookmark-start</c> 與 <c>text:bookmark-end</c>（終點以編號配對名稱），
+    /// <c>REF</c> 與 <c>PAGEREF</c> 欄位轉成 <c>text:bookmark-ref</c>，內部超連結的 <c>#書籤</c> 目標因此不再懸空。
+    /// 修正前書籤整個被丟棄，所有內部連結與交互參照都指向不存在的目標。
+    /// </summary>
+    [Fact]
+    public void DocxBookmarksAndCrossReferencesConvert()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                new WP.BookmarkStart { Id = "1", Name = "Target" },
+                PlainRun("目標文字"),
+                new WP.BookmarkEnd { Id = "1" },
+                new WP.BookmarkStart { Id = "2", Name = "_GoBack" },
+                new WP.BookmarkEnd { Id = "2" }));
+            body.Append(new WP.Paragraph(
+                PlainRun("見"),
+                FieldBegin(), FieldCode(" REF Target \\h "), FieldSeparate(), PlainRun("目標文字"), FieldEnd(),
+                PlainRun("，第"),
+                FieldBegin(), FieldCode(" PAGEREF Target \\h "), FieldSeparate(), PlainRun("3"), FieldEnd(),
+                PlainRun("頁；"),
+                new WP.Hyperlink(new WP.Run(new WP.Text("內部連結"))) { Anchor = "Target" }));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+
+        Assert.Equal("Target", (string?)paragraphs[0].Element(s_text + "bookmark-start")!.Attribute(s_text + "name"));
+        Assert.Equal("Target", (string?)paragraphs[0].Element(s_text + "bookmark-end")!.Attribute(s_text + "name"));
+        Assert.DoesNotContain("_GoBack", SaveContentXml(odt), StringComparison.Ordinal);
+
+        XElement[] references = paragraphs[1].Elements(s_text + "bookmark-ref").ToArray();
+        Assert.Equal(["text", "page"], references.Select(item => (string?)item.Attribute(s_text + "reference-format")).ToArray());
+        Assert.All(references, item => Assert.Equal("Target", (string?)item.Attribute(s_text + "ref-name")));
+        Assert.Equal(["目標文字", "3"], references.Select(item => item.Value).ToArray());
+        Assert.Equal("#Target", (string?)paragraphs[1].Element(s_text + "a")!.Attribute(s_xlink + "href"));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證區塊層級的內容控制項（<c>w:sdt</c>）內的段落與表格視為本文：封面、書目與目錄常包在其中，
+    /// 修正前整個區塊被丟棄；頁首頁尾內的頁碼建置區塊也一樣包在內容控制項裡。
+    /// </summary>
+    [Fact]
+    public void DocxBlockLevelContentControlsKeepTheirContent()
+    {
+        using MemoryStream docx = CreateDocx(
+            body =>
+            {
+                body.Append(new WP.SdtBlock(new WP.SdtContentBlock(
+                    new WP.Paragraph(PlainRun("內容控制項段落")),
+                    new WP.SdtBlock(new WP.SdtContentBlock(new WP.Paragraph(PlainRun("巢狀內容控制項段落")))))));
+                body.Append(new WP.Paragraph(PlainRun("一般段落")));
+            },
+            main =>
+            {
+                FooterPart footer = main.AddNewPart<FooterPart>();
+                footer.Footer = new WP.Footer(new WP.SdtBlock(new WP.SdtContentBlock(new WP.Paragraph(
+                    PlainRun("第"),
+                    FieldBegin(), FieldCode(" PAGE "), FieldSeparate(), PlainRun("1"), FieldEnd(),
+                    PlainRun("頁")))));
+                footer.Footer.Save();
+                main.Document!.Body!.Append(new WP.SectionProperties(
+                    new WP.FooterReference { Type = WP.HeaderFooterValues.Default, Id = main.GetIdOfPart(footer) }));
+            });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        Assert.Equal(
+            ["內容控制項段落", "巢狀內容控制項段落", "一般段落"],
+            content.Descendants(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
+
+        XElement styles = XElement.Parse(SaveStylesXml(odt));
+        Assert.Single(styles.Descendants(s_style + "footer").Descendants(s_text + "page-number"));
+    }
+
+    /// <summary>
+    /// 驗證目錄欄位（<c>TOC</c>）轉成 <c>text:table-of-content</c>：標題層級範圍寫入來源，Word 儲存的目錄項目
+    /// （含超連結與巢狀的 <c>PAGEREF</c>）放在 <c>text:index-body</c>，欄位起訖字元不產生空白段落。
+    /// 修正前目錄項目只剩一般段落，欄位的目錄語意與更新能力都遺失。
+    /// </summary>
+    [Fact]
+    public void DocxTableOfContentsConvertsToIndex()
+    {
+        static WP.Paragraph Entry(string style, string text, string bookmark, string page, bool first, bool last)
+        {
+            var paragraph = new WP.Paragraph(new WP.ParagraphProperties(new WP.ParagraphStyleId { Val = style }));
+            if (first)
+            {
+                paragraph.Append(FieldBegin(), FieldCode(" TOC \\o \"1-3\" \\h \\z \\u "), FieldSeparate());
+            }
+
+            paragraph.Append(new WP.Hyperlink(
+                new WP.Run(new WP.Text(text)),
+                new WP.Run(new WP.TabChar()),
+                FieldBegin(), FieldCode(" PAGEREF " + bookmark + " \\h "), FieldSeparate(), PlainRun(page), FieldEnd()) { Anchor = bookmark });
+            if (last)
+            {
+                paragraph.Append(FieldEnd());
+            }
+
+            return paragraph;
+        }
+
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.SdtBlock(new WP.SdtContentBlock(
+                new WP.Paragraph(PlainRun("目錄")),
+                Entry("TOC1", "第一章", "_Toc1", "1", first: true, last: false),
+                Entry("TOC2", "第一節", "_Toc2", "2", first: false, last: false),
+                new WP.Paragraph(FieldEnd()))));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.ParagraphStyleId { Val = "Heading1" }),
+                new WP.BookmarkStart { Id = "10", Name = "_Toc1" },
+                PlainRun("第一章"),
+                new WP.BookmarkEnd { Id = "10" }));
+            body.Append(new WP.Paragraph(new WP.Run(new WP.Text("內文"))));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+
+        XElement toc = content.Descendants(s_text + "table-of-content").Single();
+        XElement source = toc.Element(s_text + "table-of-content-source")!;
+        Assert.Equal("3", (string?)source.Attribute(s_text + "outline-level"));
+        Assert.Equal("true", (string?)source.Attribute(s_text + "use-outline-level"));
+
+        XElement[] entries = toc.Element(s_text + "index-body")!.Elements(s_text + "p").ToArray();
+        Assert.Equal(2, entries.Length);
+        Assert.Equal(["#_Toc1", "#_Toc2"], entries.Select(entry => (string?)entry.Descendants(s_text + "a").Single().Attribute(s_xlink + "href")).ToArray());
+
+        // 目錄之外：標題與內文照常轉換，標題上的 _Toc 書籤保留（目錄連結的目標）。
+        Assert.Equal("目錄", content.Descendants(s_text + "p").First().Value);
+        Assert.Single(content.Descendants(s_text + "h"));
+        Assert.Equal("_Toc1", (string?)content.Descendants(s_text + "bookmark-start").Single().Attribute(s_text + "name"));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證分欄：多欄章節的內容包進套用 <c>style:columns</c> 的 <c>text:section</c>（欄數、欄距、分隔線與不等寬的欄寬），
+    /// 單欄章節不包。修正前分欄設定完全被忽略。
+    /// </summary>
+    [Fact]
+    public void DocxColumnsConvertToSectionsWithColumnStyles()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(new WP.Columns { ColumnCount = 1 })),
+                PlainRun("單欄")));
+            body.Append(new WP.Paragraph(PlainRun("雙欄甲")));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(
+                    new WP.SectionType { Val = WP.SectionMarkValues.Continuous },
+                    new WP.Columns { ColumnCount = 2, Space = "720", Separator = true })),
+                PlainRun("雙欄乙")));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(
+                    new WP.SectionType { Val = WP.SectionMarkValues.Continuous },
+                    new WP.Columns(
+                        new WP.Column { Width = "2000", Space = "400" },
+                        new WP.Column { Width = "6000" }) { ColumnCount = 2, EqualWidth = false })),
+                PlainRun("不等寬")));
+            body.Append(new WP.Paragraph(PlainRun("結尾")));
+            body.Append(new WP.SectionProperties(new WP.SectionType { Val = WP.SectionMarkValues.Continuous }));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XNamespace fo = OdfNamespaces.Fo;
+
+        XElement[] sections = content.Descendants(s_text + "section").ToArray();
+        Assert.Equal(2, sections.Length);
+        Assert.Equal(["雙欄甲", "雙欄乙"], sections[0].Elements(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
+        Assert.Equal(["不等寬"], sections[1].Elements(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
+
+        XElement Columns(XElement section)
+        {
+            string styleName = (string)section.Attribute(s_text + "style-name")!;
+            return content.Descendants(s_style + "style")
+                .Single(item => (string?)item.Attribute(s_style + "name") == styleName)
+                .Element(s_style + "section-properties")!.Element(s_style + "columns")!;
+        }
+
+        XElement equal = Columns(sections[0]);
+        Assert.Equal("2", (string?)equal.Attribute(fo + "column-count"));
+        Assert.StartsWith("1.27", (string?)equal.Attribute(fo + "column-gap"), StringComparison.Ordinal);
+        Assert.NotNull(equal.Element(s_style + "column-sep"));
+
+        XElement unequal = Columns(sections[1]);
+        Assert.Equal(["2000*", "6000*"], unequal.Elements(s_style + "column").Select(item => (string?)item.Attribute(s_style + "rel-width")).ToArray());
+
+        // 單欄與結尾章節不包進 text:section。
+        Assert.Equal(["單欄", "結尾"], content.Element(s_office + "body")!.Element(s_office + "text")!.Elements(s_text + "p").Select(paragraph => paragraph.Value).ToArray());
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
+    /// <summary>
+    /// 驗證章節起點：頁面設定相同的下一頁章節仍換頁（<c>fo:break-before</c>）、連續章節不換頁、
+    /// <c>w:pgNumType</c> 的起始頁碼寫成 <c>style:page-number</c>（搭配主頁面）。修正前同設定的章節沒有換頁，頁碼起始值被忽略。
+    /// </summary>
+    [Fact]
+    public void DocxSectionStartsBreakPagesAndRestartPageNumbers()
+    {
+        using MemoryStream docx = CreateDocx(body =>
+        {
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(new WP.PageSize { Width = 11906U, Height = 16838U })),
+                PlainRun("第一節")));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(
+                    new WP.PageSize { Width = 11906U, Height = 16838U },
+                    new WP.PageNumberType { Start = 5 })),
+                PlainRun("第二節")));
+            body.Append(new WP.Paragraph(
+                new WP.ParagraphProperties(new WP.SectionProperties(
+                    new WP.SectionType { Val = WP.SectionMarkValues.Continuous },
+                    new WP.PageSize { Width = 11906U, Height = 16838U })),
+                PlainRun("第三節連續")));
+            body.Append(new WP.Paragraph(PlainRun("第四節")));
+            body.Append(new WP.SectionProperties(new WP.PageSize { Width = 11906U, Height = 16838U }));
+        });
+
+        using TextDocument odt = DocxToOdtConverter.Convert(docx);
+        XElement content = XElement.Parse(SaveContentXml(odt));
+        XNamespace fo = OdfNamespaces.Fo;
+        XElement[] paragraphs = content.Descendants(s_text + "p").ToArray();
+
+        XElement? StyleOf(XElement paragraph)
+        {
+            string? name = (string?)paragraph.Attribute(s_text + "style-name");
+            return content.Descendants(s_style + "style").FirstOrDefault(item => (string?)item.Attribute(s_style + "name") == name);
+        }
+
+        Assert.Null(StyleOf(paragraphs[0]));
+
+        // 重新起算頁碼的章節以帶主頁面的換頁表示（LibreOffice 只在這種換頁上套用起始頁碼）。
+        XElement secondStyle = StyleOf(paragraphs[1])!;
+        Assert.Equal("Standard", (string?)secondStyle.Attribute(s_style + "master-page-name"));
+        Assert.Equal("5", (string?)secondStyle.Element(s_style + "paragraph-properties")!.Attribute(s_style + "page-number"));
+
+        // 連續章節沒有任何起點設定；最後一個下一頁章節（設定相同）換頁。
+        Assert.Null(StyleOf(paragraphs[2]));
+        Assert.Equal("page", (string?)StyleOf(paragraphs[3])!.Element(s_style + "paragraph-properties")!.Attribute(fo + "break-before"));
+
+        OdfValidationReport report = Validate14(odt);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+    }
+
     // ---------- helpers ----------
 
     private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>
