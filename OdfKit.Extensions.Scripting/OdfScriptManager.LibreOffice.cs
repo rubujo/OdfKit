@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using OdfKit.Compliance;
@@ -402,14 +403,22 @@ public sealed partial class OdfScriptManager
         return SerializeXml(document);
     }
 
+    // LibreOffice 寫出的 Basic 模組、程式庫與容器都帶 <!DOCTYPE ... "module.dtd"> 這類簡單宣告。
+    // XML reader 依政策必須禁止 DTD，因此先去掉不含內部子集的宣告再解析；
+    // 含內部子集（可定義實體）的宣告不會被去掉，仍由 reader 拒絕。
+    private static readonly Regex SimpleDoctype = new(
+        @"<!DOCTYPE[^>\[]*>",
+        RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(2));
+
     private static XDocument LoadXml(byte[] bytes)
     {
-        using var stream = new MemoryStream(bytes, writable: false);
+        string text = SimpleDoctype.Replace(Encoding.UTF8.GetString(bytes), string.Empty, 1);
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text), writable: false);
         using XmlReader reader = XmlReader.Create(stream, new XmlReaderSettings
         {
-            // LibreOffice 寫出的 Basic 模組、程式庫與容器都帶 <!DOCTYPE ... "module.dtd"> 這類宣告；禁止 DTD 會讓
-            // 讀取任何 LibreOffice 的巨集文件都擲出例外。改為忽略宣告：不載入外部 DTD、不展開實體。
-            DtdProcessing = DtdProcessing.Ignore,
+            DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             MaxCharactersFromEntities = 0,
             MaxCharactersInDocument = MaxMetadataCharacters
