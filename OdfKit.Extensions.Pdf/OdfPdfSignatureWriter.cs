@@ -46,6 +46,7 @@ internal static class OdfPdfSignatureWriter
             originalPdf.Length,
             previousXrefOffset,
             nextObjectNumber,
+            CopyTrailerEntries(originalText),
             (rootObjectNumber, catalogObject),
             (signatureObjectNumber, signatureObject),
             (fieldObjectNumber, fieldObject),
@@ -193,10 +194,29 @@ internal static class OdfPdfSignatureWriter
             """;
     }
 
+    // 增量更新的 trailer 要沿用原檔的 /Info 與 /ID（PDF/A 與許多驗證器要求 /ID）。
+    private static string CopyTrailerEntries(string pdfText)
+    {
+        int trailer = pdfText.LastIndexOf("trailer", StringComparison.Ordinal);
+        if (trailer < 0)
+            return string.Empty;
+
+        string tail = pdfText.Substring(trailer);
+        var entries = new StringBuilder();
+        Match info = Regex.Match(tail, @"/Info\s+\d+\s+\d+\s+R", RegexOptions.None, RegexTimeout);
+        if (info.Success)
+            entries.Append(' ').Append(info.Value);
+        Match id = Regex.Match(tail, @"/ID\s*\[\s*<[0-9A-Fa-f]*>\s*<[0-9A-Fa-f]*>\s*\]", RegexOptions.None, RegexTimeout);
+        if (id.Success)
+            entries.Append(' ').Append(id.Value);
+        return entries.ToString();
+    }
+
     private static byte[] BuildIncrementalUpdate(
         int originalLength,
         int previousXrefOffset,
         int size,
+        string trailerEntries,
         params (int ObjectNumber, string Body)[] objects)
     {
         using var stream = new MemoryStream();
@@ -217,7 +237,7 @@ internal static class OdfPdfSignatureWriter
         }
 
         WriteAscii(stream, "trailer\n");
-        WriteAscii(stream, FormattableString.Invariant($"<< /Size {size} /Root {objects[0].ObjectNumber} 0 R /Prev {previousXrefOffset} >>\n"));
+        WriteAscii(stream, FormattableString.Invariant($"<< /Size {size} /Root {objects[0].ObjectNumber} 0 R /Prev {previousXrefOffset}{trailerEntries} >>\n"));
         WriteAscii(stream, "startxref\n");
         WriteAscii(stream, FormattableString.Invariant($"{xrefOffset}\n%%EOF\n"));
         return stream.ToArray();

@@ -512,15 +512,108 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
                 fontName,
                 request.IsBold,
                 request.IsItalic);
-            width += resource.MeasureWidthCentimeters(
+            width += MeasureWithGlyphFallback(
+                resource,
                 segmentText,
                 fontSizePoints,
-                request.WritingMode);
+                request);
             height = Math.Max(
                 height,
                 resource.GetLineHeightCentimeters(fontSizePoints));
         }
         return new LineMeasurement(width, height);
+    }
+
+    // 字型沒有的字元（例如拉丁字型遇到中文）瀏覽器與排版軟體會改用備援字型；不這麼做會以 .notdef
+    // 的寬度量測，中文字寬被低估 20–45%。缺字的連續字元改用系統備援字型量測。
+    private static double MeasureWithGlyphFallback(
+        FontResource resource,
+        string text,
+        double fontSizePoints,
+        OdfTextMeasureRequest request)
+    {
+        if (!resource.HasMissingGlyph(text))
+        {
+            return resource.MeasureWidthCentimeters(
+                text,
+                fontSizePoints,
+                request.WritingMode);
+        }
+
+        double width = 0;
+        var run = new StringBuilder();
+        bool runMissing = false;
+        int index = 0;
+        while (index < text.Length)
+        {
+            int length = char.IsHighSurrogate(text[index]) &&
+                index + 1 < text.Length &&
+                char.IsLowSurrogate(text[index + 1])
+                    ? 2
+                    : 1;
+            int codePoint = length == 2 ? char.ConvertToUtf32(text, index) : text[index];
+            bool missing = resource.IsMissingGlyph(codePoint);
+            if (run.Length > 0 && missing != runMissing)
+            {
+                width += MeasureRun(resource, run.ToString(), runMissing, fontSizePoints, request);
+                run.Clear();
+            }
+
+            runMissing = missing;
+            run.Append(text, index, length);
+            index += length;
+        }
+
+        if (run.Length > 0)
+            width += MeasureRun(resource, run.ToString(), runMissing, fontSizePoints, request);
+        return width;
+    }
+
+    private static double MeasureRun(
+        FontResource resource,
+        string run,
+        bool missing,
+        double fontSizePoints,
+        OdfTextMeasureRequest request)
+    {
+        if (!missing)
+        {
+            return resource.MeasureWidthCentimeters(
+                run,
+                fontSizePoints,
+                request.WritingMode);
+        }
+
+        double width = 0;
+        int index = 0;
+        while (index < run.Length)
+        {
+            int length = char.IsHighSurrogate(run[index]) &&
+                index + 1 < run.Length &&
+                char.IsLowSurrogate(run[index + 1])
+                    ? 2
+                    : 1;
+            int codePoint = length == 2 ? char.ConvertToUtf32(run, index) : run[index];
+            using SKTypeface? substitute = resource.MatchSubstitute(codePoint);
+            if (substitute is not null)
+            {
+                using var font = new SKFont(
+                    substitute,
+                    (float)(fontSizePoints * (96.0 / 72.0)));
+                width += font.MeasureText(run.AsSpan(index, length)) * (2.54 / 96);
+            }
+            else
+            {
+                width += resource.MeasureWidthCentimeters(
+                    run.Substring(index, length),
+                    fontSizePoints,
+                    request.WritingMode);
+            }
+
+            index += length;
+        }
+
+        return width;
     }
 
     private FontResource GetFont(
@@ -576,6 +669,17 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
             ownsTypeface = typeface is not null;
         }
         else if (!string.IsNullOrEmpty(resolvedPath))
+        {
+            // 字型對照表一個家族名稱只對應一個檔案（通常是 Regular）；要求粗體或斜體時改用系統上同家族的
+            // 真實粗體或斜體字面，否則粗體文字會用正常字重量測而偏窄（Arial 粗體約少 4–7%）。
+            if (key.IsBold || key.IsItalic)
+            {
+                typeface = TryMatchStyledSystemFace(key);
+                ownsTypeface = typeface is not null;
+            }
+        }
+
+        if (typeface is null && !string.IsNullOrEmpty(resolvedPath))
         {
             string fullPath = Path.GetFullPath(resolvedPath);
             try
@@ -636,6 +740,27 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
             ownsTypeface,
             fontData,
             faceIndex);
+    }
+
+    private static SKTypeface? TryMatchStyledSystemFace(FontKey key)
+    {
+        SKTypeface? styled = SKTypeface.FromFamilyName(
+            key.FontFamily,
+            new SKFontStyle(
+                key.IsBold ? (int)SKFontStyleWeight.Bold : (int)SKFontStyleWeight.Normal,
+                (int)SKFontStyleWidth.Normal,
+                key.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright));
+        // 系統找不到該家族時 Skia 會回傳預設字型；家族名稱不符就不採用。
+        if (styled is not null &&
+            string.Equals(styled.FamilyName, key.FontFamily, StringComparison.OrdinalIgnoreCase) &&
+            (!key.IsBold || styled.FontWeight >= (int)SKFontStyleWeight.SemiBold) &&
+            (!key.IsItalic || styled.FontSlant != SKFontStyleSlant.Upright))
+        {
+            return styled;
+        }
+
+        styled?.Dispose();
+        return null;
     }
 
     private static byte[] ReadBoundedStream(
@@ -801,6 +926,59 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
             _faceIndex = faceIndex;
         }
 
+        internal bool HasMissingGlyph(string text)
+        {
+            int index = 0;
+            while (index < text.Length)
+            {
+                int length = char.IsHighSurrogate(text[index]) &&
+                    index + 1 < text.Length &&
+                    char.IsLowSurrogate(text[index + 1])
+                        ? 2
+                        : 1;
+                int codePoint = length == 2 ? char.ConvertToUtf32(text, index) : text[index];
+                if (IsMissingGlyph(codePoint))
+                    return true;
+                index += length;
+            }
+
+            return false;
+        }
+
+        internal bool IsMissingGlyph(int codePoint)
+        {
+            if (codePoint < 0x20 || codePoint is 0x200B or 0x200C or 0x200D or 0xFEFF ||
+                codePoint is >= 0xFE00 and <= 0xFE0F || codePoint is >= 0xE0100 and <= 0xE01EF ||
+                codePoint is >= 0xD800 and <= 0xDFFF)
+            {
+                return false;
+            }
+
+            string element = char.ConvertFromUtf32(codePoint);
+            UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(element, 0);
+            if (category is UnicodeCategory.Control or UnicodeCategory.Format or
+                UnicodeCategory.NonSpacingMark or UnicodeCategory.OtherNotAssigned or
+                UnicodeCategory.PrivateUse)
+            {
+                return false;
+            }
+
+            return GlyphFont.GetGlyphs(element)[0] == 0;
+        }
+
+        internal SKTypeface? MatchSubstitute(int codePoint) =>
+            SKFontManager.Default.MatchCharacter(
+                _typeface.FamilyName,
+                _typeface.FontWeight,
+                (int)SKFontStyleWidth.Normal,
+                _typeface.FontSlant,
+                null,
+                codePoint);
+
+        private SKFont? _glyphFont;
+
+        private SKFont GlyphFont => _glyphFont ??= new SKFont(_typeface, 12);
+
         internal long FontByteCount => _fontData?.LongLength ?? 0;
 
         internal double MeasureWidthCentimeters(
@@ -887,6 +1065,7 @@ public sealed class OdfTextLayoutSession : IOdfTextLayoutMeasurer, IDisposable
 
         public void Dispose()
         {
+            _glyphFont?.Dispose();
             if (_ownsTypeface)
                 _typeface.Dispose();
         }

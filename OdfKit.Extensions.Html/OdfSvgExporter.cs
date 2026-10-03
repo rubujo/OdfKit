@@ -64,7 +64,7 @@ public static class OdfSvgExporter
             throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Err_OdfSvgExporter_SpecifiedDrawingPageIndex"));
 
         OdfDrawPage page = document.Pages[options.PageIndex];
-        CanvasBounds bounds = MeasurePage(page, options);
+        CanvasBounds bounds = MeasurePage(page, options, document);
         var context = new SvgExportContext(document, options);
         context.DiscoverGradientReferences(page.Node);
         var sb = new StringBuilder(4096);
@@ -182,6 +182,13 @@ public static class OdfSvgExporter
         AppendAttribute(sb, "y", FormatPoints(y));
         AppendAttribute(sb, "width", FormatPoints(width));
         AppendAttribute(sb, "height", FormatPoints(height));
+        double radius = ToPoints(node.GetAttribute("corner-radius", OdfNamespaces.Draw));
+        if (radius > 0)
+        {
+            AppendAttribute(sb, "rx", FormatPoints(radius));
+            AppendAttribute(sb, "ry", FormatPoints(radius));
+        }
+
         AppendShapeStyle(node, sb, context);
         sb.Append(" />");
     }
@@ -349,10 +356,18 @@ public static class OdfSvgExporter
         AppendAttribute(sb, "width", FormatPoints(width));
         AppendAttribute(sb, "height", FormatPoints(height));
         AppendShapeStyle(frame, sb, context);
+        // 文字從框的內距開始，第一行基線在內距加上升部（約字級的 0.9）之下；沒有樣式資訊時沿用 4／16 點。
+        double paddingLeft = ReadPadding(frame, context, "padding-left", 4);
+        double paddingTop = ReadPadding(frame, context, "padding-top", 0);
+        double firstSize = paragraphs.Count > 0 && paragraphs[0].Runs.Count > 0
+            ? ParseFontSizePoints(paragraphs[0].Runs[0].Style.FontSize, 12)
+            : 12;
+        double textX = x + paddingLeft;
+        double baselineY = y + (paddingTop > 0 ? paddingTop + (firstSize * 0.905) : 16);
         sb.Append(" /><text");
-        AppendAttribute(sb, "x", FormatPoints(x + 4));
-        AppendAttribute(sb, "y", FormatPoints(y + 16));
-        AppendAttribute(sb, "font-family", "sans-serif");
+        AppendAttribute(sb, "x", FormatPoints(textX));
+        AppendAttribute(sb, "y", FormatPoints(baselineY));
+        AppendAttribute(sb, "font-family", ResolveFontFamily(frame, textBox, context));
         if (paragraphs.Count == 1 && paragraphs[0].Runs.Count == 1)
         {
             AppendTextStyle(paragraphs[0].Runs[0].Style, sb);
@@ -371,7 +386,7 @@ public static class OdfSvgExporter
                 sb.Append("<tspan");
                 if (dy > 0)
                 {
-                    AppendAttribute(sb, "x", FormatPoints(x + 4));
+                    AppendAttribute(sb, "x", FormatPoints(textX));
                     AppendAttribute(sb, "dy", FormatPoints(dy));
                     dy = 0;
                 }
@@ -382,6 +397,51 @@ public static class OdfSvgExporter
         }
 
         sb.Append("</text></g>");
+    }
+
+    private static double ReadPadding(OdfNode frame, SvgExportContext context, string name, double fallback)
+    {
+        string? value = GetGraphicProperty(frame, context, name, OdfNamespaces.Fo) ??
+            GetGraphicProperty(frame, context, "padding", OdfNamespaces.Fo);
+        return OdfLength.TryParse(value, out OdfLength length) ? length.ToPoints() : fallback;
+    }
+
+    private static double ParseFontSizePoints(string? value, double fallback) =>
+        OdfLength.TryParse(value, out OdfLength length) && length.ToPoints() > 0 ? length.ToPoints() : fallback;
+
+    // 文字段落樣式指定的字型（style:font-name 指到 font-face-decls，或 fo:font-family）；找不到就用 sans-serif。
+    private static string ResolveFontFamily(OdfNode frame, OdfNode textBox, SvgExportContext context)
+    {
+        foreach (OdfNode child in textBox.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != "p" ||
+                child.NamespaceUri != OdfNamespaces.Text)
+            {
+                continue;
+            }
+
+            foreach (OdfNode run in new[] { child }.Concat(child.Children.Where(static c => c.NodeType is OdfNodeType.Element)))
+            {
+                string? name = run.GetAttribute("style-name", OdfNamespaces.Text);
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                string family = run == child ? "paragraph" : "text";
+                string? font = context.Document.StyleEngine.GetStyleProperty(name!, "font-family", OdfNamespaces.Fo, family) ??
+                    context.Document.StyleEngine.GetStyleProperty(name!, "font-name", OdfNamespaces.Style, family);
+                if (!string.IsNullOrWhiteSpace(font))
+                {
+                    return font!.Trim('\'', '"') + ", sans-serif";
+                }
+            }
+
+            break;
+        }
+
+        return "sans-serif";
     }
 
     private static List<TextParagraph> ReadTextParagraphs(OdfNode textBox, DrawingDocument document)
@@ -622,11 +682,64 @@ public static class OdfSvgExporter
             ")";
     }
 
-    private static CanvasBounds MeasurePage(OdfDrawPage page, OdfSvgExportOptions options)
+    private static CanvasBounds MeasurePage(OdfDrawPage page, OdfSvgExportOptions options, DrawingDocument document)
     {
+        // 頁面大小以版面主頁（draw:master-page-name → style:page-layout）為準；沒有就用預設大小並依內容撐大。
+        if (TryReadPageSize(page, document, out double pageWidth, out double pageHeight))
+        {
+            return new CanvasBounds(pageWidth, pageHeight);
+        }
+
         var bounds = new CanvasBounds(options.DefaultWidth.ToPoints(), options.DefaultHeight.ToPoints());
         MeasureChildren(page.Node, bounds);
         return bounds;
+    }
+
+    private static bool TryReadPageSize(OdfDrawPage page, DrawingDocument document, out double width, out double height)
+    {
+        width = 0;
+        height = 0;
+        string? masterName = page.Node.GetAttribute("master-page-name", OdfNamespaces.Draw);
+        OdfNode? masterStyles = FindChild(document.StylesRoot, "master-styles", OdfNamespaces.Office);
+        OdfNode? automatic = FindChild(document.StylesRoot, "automatic-styles", OdfNamespaces.Office);
+        if (string.IsNullOrWhiteSpace(masterName) || masterStyles is null || automatic is null)
+        {
+            return false;
+        }
+
+        string? layoutName = null;
+        foreach (OdfNode master in masterStyles.Children)
+        {
+            if (master.NodeType is OdfNodeType.Element &&
+                master.LocalName == "master-page" &&
+                master.NamespaceUri == OdfNamespaces.Style &&
+                master.GetAttribute("name", OdfNamespaces.Style) == masterName)
+            {
+                layoutName = master.GetAttribute("page-layout-name", OdfNamespaces.Style);
+                break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(layoutName))
+        {
+            return false;
+        }
+
+        foreach (OdfNode layout in automatic.Children)
+        {
+            if (layout.NodeType is OdfNodeType.Element &&
+                layout.LocalName == "page-layout" &&
+                layout.NamespaceUri == OdfNamespaces.Style &&
+                layout.GetAttribute("name", OdfNamespaces.Style) == layoutName)
+            {
+                OdfNode? properties = FindChild(layout, "page-layout-properties", OdfNamespaces.Style);
+                width = ToPoints(properties?.GetAttribute("page-width", OdfNamespaces.Fo));
+                height = ToPoints(properties?.GetAttribute("page-height", OdfNamespaces.Fo));
+                return width > 0 && height > 0;
+            }
+        }
+
+        return false;
     }
 
     private static void MeasureChildren(OdfNode parent, CanvasBounds bounds)
@@ -702,64 +815,155 @@ public static class OdfSvgExporter
         AppendAttribute(sb, "stroke-width", "1");
     }
 
+    // 真實文件（LibreOffice 等）把填色、線條、線寬、虛線都放在圖形樣式（draw:style-name，含 parent-style-name 繼承），
+    // 圖形元素本身不帶屬性；內嵌屬性優先，其次才是樣式。
+    private static string? GetGraphicProperty(OdfNode node, SvgExportContext context, string name, string namespaceUri)
+    {
+        string? inline = node.GetAttribute(name, namespaceUri);
+        if (!string.IsNullOrWhiteSpace(inline))
+        {
+            return inline;
+        }
+
+        string styleName = node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty;
+        return context.Document.StyleEngine.GetStyleProperty(styleName, name, namespaceUri, "graphic");
+    }
+
     private static void AppendShapeStyle(OdfNode node, StringBuilder sb, SvgExportContext context)
     {
-        string? fillMode = node.GetAttribute("fill", OdfNamespaces.Draw);
-        string? fillColor = node.GetAttribute("fill-color", OdfNamespaces.Draw);
-        string? strokeMode = node.GetAttribute("stroke", OdfNamespaces.Draw);
-        string? strokeColor = node.GetAttribute("stroke-color", OdfNamespaces.Svg);
-
-        if (string.IsNullOrWhiteSpace(fillColor) || string.IsNullOrWhiteSpace(strokeColor))
-        {
-            var shape = new OdfShape(node, context.Document);
-            fillColor ??= shape.FillColor;
-            strokeColor ??= shape.StrokeColor;
-        }
+        string? fillMode = GetGraphicProperty(node, context, "fill", OdfNamespaces.Draw);
+        string? fillColor = GetGraphicProperty(node, context, "fill-color", OdfNamespaces.Draw);
+        string? strokeMode = GetGraphicProperty(node, context, "stroke", OdfNamespaces.Draw);
+        string? strokeColor = GetGraphicProperty(node, context, "stroke-color", OdfNamespaces.Svg);
 
         string? gradientFill = context.TryGetGradientFill(node, out string? svgGradientFill) ? svgGradientFill : null;
         AppendAttribute(sb, "fill", string.Equals(fillMode, "none", StringComparison.Ordinal) ? "none" : gradientFill ?? fillColor ?? "none");
         AppendAttribute(sb, "stroke", string.Equals(strokeMode, "none", StringComparison.Ordinal) ? "none" : strokeColor ?? "#000000");
-        AppendStrokeWidth(node, sb);
-        AppendStrokePresentation(node, sb);
+        AppendStrokeWidth(node, sb, context);
+        AppendStrokePresentation(node, sb, context);
         AppendMarkers(node, sb, context);
         AppendOptionalAttribute(sb, "fill-rule", node.GetAttribute("fill-rule", OdfNamespaces.Svg));
-        AppendOpacity(node, sb);
+        AppendOpacity(node, sb, context);
     }
 
     private static void AppendLineStyle(OdfNode node, StringBuilder sb, SvgExportContext context)
     {
-        string? strokeMode = node.GetAttribute("stroke", OdfNamespaces.Draw);
-        string? strokeColor = node.GetAttribute("stroke-color", OdfNamespaces.Svg);
-
-        if (string.IsNullOrWhiteSpace(strokeColor))
-        {
-            strokeColor = new OdfShape(node, context.Document).StrokeColor;
-        }
+        string? strokeMode = GetGraphicProperty(node, context, "stroke", OdfNamespaces.Draw);
+        string? strokeColor = GetGraphicProperty(node, context, "stroke-color", OdfNamespaces.Svg);
 
         AppendAttribute(sb, "stroke", string.Equals(strokeMode, "none", StringComparison.Ordinal) ? "none" : strokeColor ?? "#000000");
-        AppendStrokeWidth(node, sb);
-        AppendStrokePresentation(node, sb);
+        AppendStrokeWidth(node, sb, context);
+        AppendStrokePresentation(node, sb, context);
         AppendMarkers(node, sb, context);
-        AppendOpacity(node, sb);
+        AppendOpacity(node, sb, context);
     }
 
-    private static void AppendStrokeWidth(OdfNode node, StringBuilder sb)
+    private static void AppendStrokeWidth(OdfNode node, StringBuilder sb, SvgExportContext context)
     {
-        double strokeWidth = ToPoints(node.GetAttribute("stroke-width", OdfNamespaces.Svg));
+        double strokeWidth = ToPoints(GetGraphicProperty(node, context, "stroke-width", OdfNamespaces.Svg));
         AppendAttribute(sb, "stroke-width", strokeWidth > 0 ? FormatPoints(strokeWidth) : "1");
     }
 
-    private static void AppendOpacity(OdfNode node, StringBuilder sb)
+    private static void AppendOpacity(OdfNode node, StringBuilder sb, SvgExportContext context)
     {
-        AppendOptionalAttribute(sb, "opacity", NormalizeOpacity(node.GetAttribute("opacity", OdfNamespaces.Draw)));
-        AppendOptionalAttribute(sb, "fill-opacity", NormalizeOpacity(node.GetAttribute("fill-opacity", OdfNamespaces.Draw)));
-        AppendOptionalAttribute(sb, "stroke-opacity", NormalizeOpacity(node.GetAttribute("stroke-opacity", OdfNamespaces.Svg)));
+        AppendOptionalAttribute(sb, "opacity", NormalizeOpacity(GetGraphicProperty(node, context, "opacity", OdfNamespaces.Draw)));
+        AppendOptionalAttribute(sb, "fill-opacity", NormalizeOpacity(GetGraphicProperty(node, context, "fill-opacity", OdfNamespaces.Draw)));
+        AppendOptionalAttribute(sb, "stroke-opacity", NormalizeOpacity(GetGraphicProperty(node, context, "stroke-opacity", OdfNamespaces.Svg)));
     }
 
-    private static void AppendStrokePresentation(OdfNode node, StringBuilder sb)
+    private static void AppendStrokePresentation(OdfNode node, StringBuilder sb, SvgExportContext context)
     {
-        AppendOptionalAttribute(sb, "stroke-linecap", node.GetAttribute("stroke-linecap", OdfNamespaces.Svg));
-        AppendOptionalAttribute(sb, "stroke-linejoin", node.GetAttribute("stroke-linejoin", OdfNamespaces.Draw));
+        AppendOptionalAttribute(sb, "stroke-linecap", GetGraphicProperty(node, context, "stroke-linecap", OdfNamespaces.Svg));
+        string? lineJoin = GetGraphicProperty(node, context, "stroke-linejoin", OdfNamespaces.Draw);
+        AppendOptionalAttribute(sb, "stroke-linejoin", lineJoin is "middle" ? "miter" : lineJoin);
+        AppendOptionalAttribute(sb, "stroke-dasharray", CreateDashArray(node, context));
+    }
+
+    // draw:stroke="dash" 以 draw:stroke-dash 指名 office:styles 裡的虛線定義（點數、長度、間距，長度可為線寬的百分比）。
+    private static string? CreateDashArray(OdfNode node, SvgExportContext context)
+    {
+        if (GetGraphicProperty(node, context, "stroke", OdfNamespaces.Draw) is not "dash")
+        {
+            return null;
+        }
+
+        string? dashName = GetGraphicProperty(node, context, "stroke-dash", OdfNamespaces.Draw);
+        if (string.IsNullOrWhiteSpace(dashName))
+        {
+            return null;
+        }
+
+        OdfNode? definition = FindStyleDefinition(context.Document, "stroke-dash", dashName!);
+        if (definition is null)
+        {
+            return null;
+        }
+
+        double strokeWidth = ToPoints(GetGraphicProperty(node, context, "stroke-width", OdfNamespaces.Svg));
+        double width = strokeWidth > 0 ? strokeWidth : 1;
+
+        double Measure(string? value, double fallback)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return fallback;
+            }
+
+            string trimmed = value!.Trim();
+            if (global::OdfKit.Internal.OdfStringHelper.EndsWith(trimmed, '%'))
+            {
+                string number = trimmed.Substring(0, trimmed.Length - 1);
+                if (double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
+                {
+                    return percent / 100.0 * width;
+                }
+            }
+
+            double points = ToPoints(trimmed);
+            return points > 0 ? points : fallback;
+        }
+
+        double distance = Math.Max(Measure(definition.GetAttribute("distance", OdfNamespaces.Draw), width), 0.1);
+        var parts = new List<string>();
+        for (int group = 1; group <= 2; group++)
+        {
+            string suffix = group.ToString(CultureInfo.InvariantCulture);
+            if (!int.TryParse(definition.GetAttribute("dots" + suffix, OdfNamespaces.Draw), NumberStyles.Integer, CultureInfo.InvariantCulture, out int dots) || dots <= 0)
+            {
+                continue;
+            }
+
+            double length = Math.Max(Measure(definition.GetAttribute("dots" + suffix + "-length", OdfNamespaces.Draw), width), 0.1);
+            for (int i = 0; i < Math.Min(dots, 16); i++)
+            {
+                parts.Add(FormatPoints(length));
+                parts.Add(FormatPoints(distance));
+            }
+        }
+
+        return parts.Count == 0 ? null : string.Join(" ", parts);
+    }
+
+    private static OdfNode? FindStyleDefinition(DrawingDocument document, string localName, string name)
+    {
+        OdfNode? styles = FindChild(document.StylesRoot, "styles", OdfNamespaces.Office);
+        if (styles is null)
+        {
+            return null;
+        }
+
+        foreach (OdfNode child in styles.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Draw &&
+                child.GetAttribute("name", OdfNamespaces.Draw) == name)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private static void AppendMarkers(OdfNode node, StringBuilder sb, SvgExportContext context)

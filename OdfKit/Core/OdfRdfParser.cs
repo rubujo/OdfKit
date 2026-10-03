@@ -35,16 +35,25 @@ internal static class OdfRdfParser
             document = XDocument.Load(new OdfDepthLimitedXmlReader(reader));
         }
 
-        foreach (var description in document.Descendants(RdfNs + "Description"))
+        // rdf:Description 與「具型別節點」（如 <pkg:Document rdf:about="">，等同加上一個 rdf:type 屬性）都是主詞。
+        foreach (var description in document.Descendants().Where(element =>
+            element.Name == RdfNs + "Description" ||
+            (element.Parent?.Name == RdfNs + "RDF" && element.Name.NamespaceName != RdfNamespace)))
         {
             if (!TryGetDescriptionSubject(description, out string? subject))
             {
                 continue;
             }
 
+            if (description.Name != RdfNs + "Description")
+            {
+                metadata.AddLoadedTriple(new OdfRdfTriple(subject!, RdfNamespace + "type", description.Name.NamespaceName + description.Name.LocalName, isLiteral: false));
+            }
+
             foreach (var property in description.Elements())
             {
-                if (property.Name.NamespaceName == RdfNamespace)
+                // rdf:type 要保留（manifest.rdf 用它標示 ContentFile、StylesFile、Document 等）；其他 rdf: 結構（rdf:li 等）略過。
+                if (property.Name.NamespaceName == RdfNamespace && property.Name.LocalName != "type")
                 {
                     continue;
                 }
@@ -96,6 +105,11 @@ internal static class OdfRdfParser
                 foreach (var triple in subjectGroup)
                 {
                     var (namespaceUri, localName) = SplitPredicate(triple.Predicate);
+                    if (namespaceUri == RdfNamespace)
+                    {
+                        namespacePrefixes[namespaceUri] = "rdf";
+                    }
+
                     if (!namespacePrefixes.TryGetValue(namespaceUri, out string? prefix))
                     {
                         prefix = "ns" + namespaceIndex++;

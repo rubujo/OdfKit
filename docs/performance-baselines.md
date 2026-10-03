@@ -101,6 +101,8 @@ Windows 各跑一次完整的一百萬列寫入與讀取，並把輸出存為 `c
 每個起點都記憶一份位元圖，40,000 列約 1.3 GB。完整驗證也會把整份 DOM 載入記憶體，更大的工作表仍建議使用
 串流讀取器而不是完整驗證。
 
+配置量（垃圾）另外量測：20,000 列的總配置約 3.6 GB（每列約 180 KB；以索引迴圈取代比對路徑的 LINQ、以小型陣列集合取代屬性狀態的 `HashSet<BigInteger>` 之前約 5.4 GB、每列約 270 KB）。剩下的配置主要是重複子元素的記憶字典與位置集合，與上述保留的記憶體同源，不是短命的垃圾；預先配置字典容量沒有效果，已還原。
+
 `RealWorldFidelityTests.SchemaValidationWorkGrowsLinearlyWithRowCount` 以序列推進走訪的位置數（確定的計數，
 不受執行器速度影響）鎖定成長階數：列數變成兩倍，走訪數不得接近四倍；修正前為 2,025,057 與 8,050,057（四倍）。
 `SchemaValidationOfManyRowsCompletesInReasonableTime` 另以寬鬆的絕對上限（4,000 列在 120 秒內）攔截其他退化。

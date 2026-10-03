@@ -54,7 +54,7 @@ public enum OdfPackageMode
 [DebuggerTypeProxy(typeof(OdfPackageDebugView))]
 public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 {
-    private const string RdfMetadataPath = "META-INF/manifest.rdf";
+    private const string RdfMetadataPath = "manifest.rdf";
 
     /// <summary>
     /// 存檔掛鉤（字型內嵌）所使用的字型情境；由擁有此封裝的文件於存檔準備時指派，
@@ -125,8 +125,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Gets the package's RDF metadata collection, corresponding to <c>META-INF/manifest.rdf</c>.
-    /// 取得封裝的 RDF metadata 集合，對應 <c>META-INF/manifest.rdf</c>。
+    /// Gets the package's RDF metadata collection, corresponding to <c>manifest.rdf</c>.
+    /// 取得封裝的 RDF metadata 集合，對應封裝根目錄的 <c>manifest.rdf</c>。
     /// </summary>
     public OdfRdfMetadata RdfMetadata { get; private set; } = new();
 

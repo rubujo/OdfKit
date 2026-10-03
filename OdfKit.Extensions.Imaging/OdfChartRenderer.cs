@@ -69,11 +69,14 @@ public static class OdfChartRenderer
                         var series = seriesList[0];
                         double[] values = GetRangeDoubles(document, series.ValuesCellRangeAddress);
                         var pies = plot.Add.Pie(values);
+                        plot.Axes.Frameless();
+                        plot.HideGrid();
                         if (categories.Length == values.Length)
                         {
                             for (int i = 0; i < pies.Slices.Count; i++)
                             {
                                 pies.Slices[i].Label = categories[i];
+                                pies.Slices[i].LabelStyle.FontName = CjkFontFor(categories[i]);
                             }
 
                             plot.ShowLegend();
@@ -103,13 +106,24 @@ public static class OdfChartRenderer
                 }
                 else
                 {
+                    // 多個系列分組並排（每組寬 0.8，依系列數均分）；否則所有系列畫在同一個位置而互相蓋住。
+                    int seriesCount = Math.Max(1, seriesList.Count);
+                    double barWidth = 0.8 / seriesCount;
                     for (int s = 0; s < seriesList.Count; s++)
                     {
                         var series = seriesList[s];
                         double[] values = GetRangeDoubles(document, series.ValuesCellRangeAddress);
 
                         string seriesName = GetSeriesName(document, series.LabelCellAddress) ?? $"Series {s + 1}";
-                        var barPlot = plot.Add.Bars(values);
+                        double offset = (s - ((seriesCount - 1) / 2.0)) * barWidth;
+                        ScottPlot.Color color = plot.Add.Palette.GetColor(s);
+                        var bars = new List<ScottPlot.Bar>(values.Length);
+                        for (int i = 0; i < values.Length; i++)
+                        {
+                            bars.Add(new ScottPlot.Bar { Position = i + offset, Value = values[i], Size = barWidth, FillColor = color });
+                        }
+
+                        var barPlot = plot.Add.Bars(bars);
                         barPlot.LegendText = seriesName;
 
                         if (s == 0 && categories.Length == values.Length)
@@ -120,6 +134,8 @@ public static class OdfChartRenderer
 
                     plot.ShowLegend();
                 }
+
+                ApplyCjkFont(plot, title, categories, seriesList, document);
 
                 (int wPx, int hPx) = ParseDimensions(frame);
                 byte[] pngBytes = plot.GetImageBytes(wPx, hPx, ScottPlot.ImageFormat.Png);
@@ -144,6 +160,63 @@ public static class OdfChartRenderer
                 imgNode.SetAttribute("href", OdfNamespaces.XLink, fallbackImagePath, "xlink");
             }
         }
+    }
+
+    // 文字含非 ASCII 字元時回傳系統上有該字形的字型名稱；純 ASCII 回傳預設字型。
+    private static string CjkFontFor(string text)
+    {
+        foreach (char c in text)
+        {
+            if (c > 0x7F)
+            {
+                return ScottPlot.Fonts.Detect(text);
+            }
+        }
+
+        return ScottPlot.Fonts.Default;
+    }
+
+    // ScottPlot 預設字型沒有中文字形，標題、刻度與圖例的中文會畫成方框；文字含非 ASCII 字元時改用系統上
+    // 有該字形的字型。
+    private static void ApplyCjkFont(
+        ScottPlot.Plot plot,
+        string? title,
+        string[] categories,
+        IReadOnlyList<OdfChartSeriesInfo> seriesList,
+        SpreadsheetDocument document)
+    {
+        var text = new System.Text.StringBuilder(title);
+        foreach (string category in categories)
+        {
+            text.Append(category);
+        }
+
+        foreach (OdfChartSeriesInfo series in seriesList)
+        {
+            text.Append(GetSeriesName(document, series.LabelCellAddress));
+        }
+
+        string all = text.ToString();
+        bool nonAscii = false;
+        foreach (char c in all)
+        {
+            if (c > 0x7F)
+            {
+                nonAscii = true;
+                break;
+            }
+        }
+
+        if (!nonAscii)
+        {
+            return;
+        }
+
+        string font = ScottPlot.Fonts.Detect(all);
+        plot.Axes.Title.Label.FontName = font;
+        plot.Axes.Bottom.TickLabelStyle.FontName = font;
+        plot.Axes.Left.TickLabelStyle.FontName = font;
+        plot.Legend.FontName = font;
     }
 
     private static IEnumerable<OdfNode> EnumerateDrawFrames(OdfNode root)

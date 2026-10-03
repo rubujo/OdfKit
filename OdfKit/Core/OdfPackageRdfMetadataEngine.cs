@@ -11,7 +11,11 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageRdfMetadataEngine
 {
-    internal const string RdfMetadataPath = "META-INF/manifest.rdf";
+    // ODF 1.2 的中繼資料清單是封裝根目錄的 manifest.rdf（LibreOffice 也寫在這裡）；
+    // 較早版本的 OdfKit 寫成 META-INF/manifest.rdf，載入時仍接受，存檔時搬到根目錄。
+    internal const string RdfMetadataPath = "manifest.rdf";
+
+    internal const string LegacyRdfMetadataPath = "META-INF/manifest.rdf";
 
     /// <summary>
     /// 從封裝項目載入 RDF 中繼資料。
@@ -19,8 +23,18 @@ internal static class OdfPackageRdfMetadataEngine
     internal static OdfRdfMetadata Load(OdfPackage.OdfPackageLoadCollaborators ctx)
     {
         var metadata = new OdfRdfMetadata();
-        if (!ctx.Entries.TryGetValue(RdfMetadataPath, out var entry))
+        if (!ctx.Entries.TryGetValue(RdfMetadataPath, out var entry) &&
+            !ctx.Entries.TryGetValue(LegacyRdfMetadataPath, out entry))
+        {
             return metadata;
+        }
+
+        // 逐項目加密的封裝（LibreOffice 連 manifest.rdf 一起加密）在解密前讀到的是密文，不能當 RDF 解析；
+        // 此時不載入也不改寫，項目維持原狀。
+        if (entry.EncryptionInfo is not null)
+        {
+            return metadata;
+        }
 
         try
         {
@@ -38,7 +52,7 @@ internal static class OdfPackageRdfMetadataEngine
     /// </summary>
     internal static void Save(OdfPackage.OdfPackageSaveCollaborators ctx)
     {
-        bool hadRdfEntry = ctx.Entries.ContainsKey(RdfMetadataPath);
+        bool hadRdfEntry = ctx.Entries.ContainsKey(RdfMetadataPath) || ctx.Entries.ContainsKey(LegacyRdfMetadataPath);
         if (ctx.RdfMetadata.Triples.Count > 0 || ctx.RdfMetadata.IsDirty)
         {
             ctx.RdfMetadata.SyncWithPackageEntries(ctx.Entries.Keys, ctx.Manifest);
@@ -52,5 +66,9 @@ internal static class OdfPackageRdfMetadataEngine
 
         byte[] content = OdfRdfParser.Serialize(ctx.RdfMetadata, ctx.SaveOptions.IndentXml);
         ctx.WriteEntry(RdfMetadataPath, content, "application/rdf+xml");
+        if (ctx.Entries.Remove(LegacyRdfMetadataPath))
+        {
+            ctx.Manifest.Remove(LegacyRdfMetadataPath);
+        }
     }
 }

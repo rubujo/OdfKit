@@ -51,6 +51,6 @@ public static class OdfScriptingExtensions
             OdfKit.Compliance.OdfDocumentKind.FlatChart or
             OdfKit.Compliance.OdfDocumentKind.FlatFormula or
             OdfKit.Compliance.OdfDocumentKind.FlatImage);
-        return new OdfScriptManager(document.Package, supportsPackageScripts);
+        return new OdfScriptManager(document, supportsPackageScripts);
     }
 }

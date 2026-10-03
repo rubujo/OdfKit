@@ -63,28 +63,64 @@ public static class OdtOperationsExporter
         List<OdtOperation> operations = [];
         int bodyIndex = 0;
 
-        foreach (OdfNode child in document.BodyTextRoot.Children)
+        // 段落、標題、清單（含巢狀）、表格與區段內容都要輸出；先前只輸出最上層的 p／h，
+        // 真實文件裡的清單項目與表格內文會整個遺失。
+        void VisitBlocks(OdfNode container, string? listStyle, int listLevel)
         {
-            if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Text)
+            foreach (OdfNode child in container.Children)
             {
-                continue;
-            }
-
-            if (child.LocalName is "p" or "h")
-            {
-                operations.Add(new OdtOperation
+                if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Text &&
+                    child.NamespaceUri != OdfNamespaces.Table)
                 {
-                    Name = "addParagraph",
-                    Start = [bodyIndex],
-                    Attrs = BuildParagraphAttributes(child),
-                });
-                EnsureOperationCount(operations, options.Safety);
+                    continue;
+                }
 
-                int characterIndex = 0;
-                AppendTextOperations(child, bodyIndex, ref characterIndex, operations, options.Safety);
-                bodyIndex++;
+                if (child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    if (child.LocalName == "table")
+                    {
+                        ExportTable(child, operations, options.Safety);
+                    }
+
+                    continue;
+                }
+
+                switch (child.LocalName)
+                {
+                    case "p" or "h":
+                        operations.Add(new OdtOperation
+                        {
+                            Name = "addParagraph",
+                            Start = [bodyIndex],
+                            Attrs = BuildParagraphAttributes(child, listStyle, listLevel),
+                        });
+                        EnsureOperationCount(operations, options.Safety);
+
+                        int characterIndex = 0;
+                        AppendTextOperations(child, bodyIndex, ref characterIndex, operations, options.Safety);
+                        bodyIndex++;
+                        break;
+                    case "list":
+                        string? style = child.GetAttribute("style-name", OdfNamespaces.Text) ?? listStyle ?? "OdfKitList";
+                        foreach (OdfNode item in child.Children)
+                        {
+                            if (item.NodeType == OdfNodeType.Element &&
+                                item.NamespaceUri == OdfNamespaces.Text &&
+                                item.LocalName is "list-item" or "list-header")
+                            {
+                                VisitBlocks(item, style, listLevel + 1);
+                            }
+                        }
+
+                        break;
+                    case "section":
+                        VisitBlocks(child, listStyle, listLevel);
+                        break;
+                }
             }
         }
+
+        VisitBlocks(document.BodyTextRoot, null, 0);
 
         string json = options.EnvelopeMode == OdtOperationEnvelopeMode.TdfChangesObject
             ? JsonSerializer.Serialize(new OdtOperationEnvelope(operations), SerializerOptions)
@@ -94,18 +130,185 @@ public static class OdtOperationsExporter
         return json;
     }
 
-    private static Dictionary<string, object>? BuildParagraphAttributes(OdfNode paragraphNode)
+    private static Dictionary<string, object>? BuildParagraphAttributes(OdfNode paragraphNode, string? listStyle, int listLevel)
     {
         string? styleName = paragraphNode.GetAttribute("style-name", OdfNamespaces.Text);
-        if (string.IsNullOrEmpty(styleName))
+        string? outline = paragraphNode.LocalName == "h" ? paragraphNode.GetAttribute("outline-level", OdfNamespaces.Text) : null;
+        if (string.IsNullOrEmpty(styleName) && listStyle is null && string.IsNullOrEmpty(outline))
         {
             return null;
         }
 
-        return new Dictionary<string, object>(StringComparer.Ordinal)
+        var attributes = new Dictionary<string, object>(StringComparer.Ordinal);
+        if (!string.IsNullOrEmpty(styleName))
         {
-            ["styleName"] = styleName!,
-        };
+            attributes["styleName"] = styleName!;
+        }
+
+        if (listStyle is not null)
+        {
+            attributes["listStyleName"] = listStyle;
+            attributes["listLevel"] = Math.Max(1, listLevel);
+        }
+
+        if (int.TryParse(outline, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int outlineLevel) && outlineLevel > 0)
+        {
+            attributes["outlineLevel"] = outlineLevel;
+        }
+
+        return attributes;
+    }
+
+    // 表格輸出成 addTable（列數、欄數）與每列一個 addCells（儲存格文字）；合併儲存格的被涵蓋格輸出為空字串。
+    private static void ExportTable(OdfNode table, List<OdtOperation> operations, OdtOperationSafetyOptions safety)
+    {
+        int columns = 0;
+        var rows = new List<List<string>>();
+
+        void CollectColumns(OdfNode parent)
+        {
+            foreach (OdfNode child in parent.Children)
+            {
+                if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Table)
+                {
+                    continue;
+                }
+
+                if (child.LocalName == "table-column")
+                {
+                    columns = checked(columns + ReadRepeat(child, "number-columns-repeated", safety.MaxTableColumns));
+                }
+                else if (child.LocalName is "table-columns" or "table-header-columns" or "table-column-group")
+                {
+                    CollectColumns(child);
+                }
+            }
+        }
+
+        void CollectRows(OdfNode parent)
+        {
+            foreach (OdfNode child in parent.Children)
+            {
+                if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Table)
+                {
+                    continue;
+                }
+
+                if (child.LocalName == "table-row")
+                {
+                    var values = new List<string>();
+                    foreach (OdfNode cell in child.Children)
+                    {
+                        if (cell.NodeType != OdfNodeType.Element ||
+                            cell.NamespaceUri != OdfNamespaces.Table ||
+                            cell.LocalName is not ("table-cell" or "covered-table-cell"))
+                        {
+                            continue;
+                        }
+
+                        string text = cell.LocalName == "covered-table-cell" ? string.Empty : ReadCellText(cell);
+                        int repeat = ReadRepeat(cell, "number-columns-repeated", safety.MaxTableColumns);
+                        for (int i = 0; i < repeat && values.Count < safety.MaxTableColumns; i++)
+                        {
+                            values.Add(text);
+                        }
+                    }
+
+                    // LibreOffice 對有欄格式的資料會寫到 1,048,576 列的空白重複列；空列只保留一列，尾端空列去掉。
+                    int rowRepeat = ReadRepeat(child, "number-rows-repeated", safety.MaxTableRows);
+                    bool empty = values.All(static value => value.Length == 0);
+                    for (int i = 0; i < (empty ? Math.Min(rowRepeat, 1) : rowRepeat) && rows.Count < safety.MaxTableRows; i++)
+                    {
+                        rows.Add(values);
+                    }
+                }
+                else if (child.LocalName is "table-rows" or "table-header-rows" or "table-row-group")
+                {
+                    CollectRows(child);
+                }
+            }
+        }
+
+        CollectColumns(table);
+        CollectRows(table);
+        while (rows.Count > 1 && rows[rows.Count - 1].All(static value => value.Length == 0))
+        {
+            rows.RemoveAt(rows.Count - 1);
+        }
+
+        columns = Math.Max(columns, rows.Count == 0 ? 0 : rows.Max(static row => row.Count));
+        if (rows.Count == 0 || columns == 0)
+        {
+            return;
+        }
+
+        if (rows.Count > safety.MaxTableRows || columns > safety.MaxTableColumns || (long)rows.Count * columns > safety.MaxTableCells)
+        {
+            throw new InvalidOperationException();
+        }
+
+        operations.Add(new OdtOperation
+        {
+            Name = "addTable",
+            Start = [],
+            Attrs = new Dictionary<string, object> { ["rows"] = rows.Count, ["columns"] = columns },
+        });
+        EnsureOperationCount(operations, safety);
+        for (int row = 0; row < rows.Count; row++)
+        {
+            if (rows[row].All(static value => value.Length == 0))
+            {
+                continue;
+            }
+
+            operations.Add(new OdtOperation
+            {
+                Name = "addCells",
+                Start = [],
+                Attrs = new Dictionary<string, object>
+                {
+                    ["row"] = row,
+                    ["column"] = 0,
+                    ["values"] = rows[row].ToArray(),
+                },
+            });
+            EnsureOperationCount(operations, safety);
+        }
+    }
+
+    private static int ReadRepeat(OdfNode node, string attribute, int limit)
+    {
+        string? text = node.GetAttribute(attribute, OdfNamespaces.Table);
+        return int.TryParse(text, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int value) && value > 1
+            ? Math.Min(value, Math.Max(1, limit))
+            : 1;
+    }
+
+    private static string ReadCellText(OdfNode cell)
+    {
+        var paragraphs = new List<string>();
+        void Collect(OdfNode parent)
+        {
+            foreach (OdfNode child in parent.Children)
+            {
+                if (child.NodeType != OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Text)
+                {
+                    continue;
+                }
+
+                if (child.LocalName is "p" or "h")
+                {
+                    paragraphs.Add(child.TextContent ?? string.Empty);
+                }
+                else if (child.LocalName is "list" or "list-item" or "section")
+                {
+                    Collect(child);
+                }
+            }
+        }
+
+        Collect(cell);
+        return string.Join(" ", paragraphs.Where(static text => text.Length > 0));
     }
 
     private static void AppendTextOperations(

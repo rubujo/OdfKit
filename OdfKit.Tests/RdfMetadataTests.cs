@@ -38,7 +38,7 @@ public class RdfMetadataTests
         stream.Position = 0;
         using var reopened = OdfPackage.Open(stream, leaveOpen: true);
 
-        Assert.True(reopened.HasEntry("META-INF/manifest.rdf"));
+        Assert.True(reopened.HasEntry("manifest.rdf"));
         Assert.Contains(
             reopened.RdfMetadata.Triples,
             triple => triple.Subject == "./content.xml" &&
@@ -70,7 +70,7 @@ public class RdfMetadataTests
         {
             package.SetMimeType("application/vnd.oasis.opendocument.text");
             package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-            package.WriteEntry("META-INF/manifest.rdf", Encoding.UTF8.GetBytes(rdfXml), "application/rdf+xml");
+            package.WriteEntry("manifest.rdf", Encoding.UTF8.GetBytes(rdfXml), "application/rdf+xml");
             package.Save();
         }
 
@@ -216,7 +216,7 @@ public class RdfMetadataTests
         stream.Position = 0;
         using TextDocument loaded = TextDocument.Load(stream);
 
-        Assert.True(loaded.Package.HasEntry("META-INF/manifest.rdf"));
+        Assert.True(loaded.Package.HasEntry("manifest.rdf"));
         Assert.True(loaded.Package.RdfMetadata.TryGetLiteral(string.Empty, dublinCoreTitle, out string loadedTitle));
         Assert.Equal(title, loadedTitle);
         Assert.Contains("content.xml", loaded.Package.RdfMetadata.GetLinkedPartPaths(string.Empty));
@@ -265,7 +265,7 @@ public class RdfMetadataTests
         {
             package.SetMimeType("application/vnd.oasis.opendocument.text");
             package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-            package.WriteEntry("META-INF/manifest.rdf", Encoding.UTF8.GetBytes(rdfXml), "application/rdf+xml");
+            package.WriteEntry("manifest.rdf", Encoding.UTF8.GetBytes(rdfXml), "application/rdf+xml");
             package.Save();
         }
 

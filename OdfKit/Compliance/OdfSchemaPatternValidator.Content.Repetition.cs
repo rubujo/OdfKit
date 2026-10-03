@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
+using static OdfKit.Compliance.OdfSchemaPatternNodeLists;
+
 namespace OdfKit.Compliance;
 
 internal static partial class OdfSchemaPatternContentMatcher
@@ -15,7 +17,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         bool hasChildElements,
         OdfSchemaPatternMatchContext context)
     {
-        return nodes.Any(node => ContentAllowsDirectText(node, hasChildElements, context));
+        return AnyNode(nodes, (hasChildElements, context), static (node, s) => ContentAllowsDirectText(node, s.Item1, s.Item2));
     }
 
     internal static bool ContentAllowsDirectText(
@@ -37,14 +39,14 @@ internal static partial class OdfSchemaPatternContentMatcher
             case OdfSchemaPatternNodeKind.Ref:
                 return ReferenceAllowsDirectText(node.ReferenceName, hasChildElements, context);
             case OdfSchemaPatternNodeKind.Choice:
-                return node.Children.Any(child => ContentAllowsDirectText(child, hasChildElements, context));
+                return AnyNode(node.Children, (hasChildElements, context), static (child, s) => ContentAllowsDirectText(child, s.Item1, s.Item2));
             case OdfSchemaPatternNodeKind.Group:
             case OdfSchemaPatternNodeKind.Interleave:
             case OdfSchemaPatternNodeKind.Optional:
             case OdfSchemaPatternNodeKind.ZeroOrMore:
             case OdfSchemaPatternNodeKind.OneOrMore:
             case OdfSchemaPatternNodeKind.Other:
-                return node.Children.Any(child => ContentAllowsDirectText(child, false, context));
+                return AnyNode(node.Children, (false, context), static (child, s) => ContentAllowsDirectText(child, s.Item1, s.Item2));
             default:
                 return false;
         }
@@ -64,7 +66,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         {
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
             return pattern != null &&
-                pattern.Roots.Any(root => ContentAllowsDirectText(root, hasChildElements, context));
+                AnyNode(pattern.Roots, (hasChildElements, context), static (root, s) => ContentAllowsDirectText(root, s.Item1, s.Item2));
         }
         finally
         {
@@ -93,15 +95,15 @@ internal static partial class OdfSchemaPatternContentMatcher
             case OdfSchemaPatternNodeKind.Text:
                 return true;
             case OdfSchemaPatternNodeKind.Choice:
-                return node.Children.Any(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                return AnyNode(node.Children, (context, visitingReferences), static (child, s) => ContentNodeCanMatchEmpty(child, s.Item1, s.Item2));
             case OdfSchemaPatternNodeKind.Group:
             case OdfSchemaPatternNodeKind.Interleave:
             case OdfSchemaPatternNodeKind.Mixed:
             case OdfSchemaPatternNodeKind.Other:
-                return node.Children.All(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                return AllNode(node.Children, (context, visitingReferences), static (child, s) => ContentNodeCanMatchEmpty(child, s.Item1, s.Item2));
             case OdfSchemaPatternNodeKind.OneOrMore:
                 return node.Children.Count > 0 &&
-                    node.Children.All(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                    AllNode(node.Children, (context, visitingReferences), static (child, s) => ContentNodeCanMatchEmpty(child, s.Item1, s.Item2));
             case OdfSchemaPatternNodeKind.Ref:
                 return ReferenceCanMatchEmpty(node.ReferenceName, context, visitingReferences);
             default:
@@ -124,7 +126,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         {
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
             return pattern is not null &&
-                pattern.Roots.Any(root => ContentNodeCanMatchEmpty(root, context, visitingReferences));
+                AnyNode(pattern.Roots, (context, visitingReferences), static (root, s) => ContentNodeCanMatchEmpty(root, s.Item1, s.Item2));
         }
         finally
         {

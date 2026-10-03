@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
+using static OdfKit.Compliance.OdfSchemaPatternNodeLists;
+
 namespace OdfKit.Compliance;
 
 internal static partial class OdfSchemaPatternAttributeMatcher
@@ -16,7 +18,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
     {
         foreach (XAttribute attribute in element.Attributes().Where(attribute => !attribute.IsNamespaceDeclaration))
         {
-            if (!attributeNodes.Any(node => AttributePatternAllowsAttribute(node, attribute, context)))
+            if (!AnyNode(attributeNodes, (attribute, context), static (node, s) => AttributePatternAllowsAttribute(node, s.Item1, s.Item2)))
             {
                 return false;
             }
@@ -51,7 +53,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             case OdfSchemaPatternNodeKind.ZeroOrMore:
             case OdfSchemaPatternNodeKind.OneOrMore:
             case OdfSchemaPatternNodeKind.Other:
-                return node.Children.Any(child => AttributePatternAllowsAttribute(child, attribute, context));
+                return AnyNode(node.Children, (attribute, context), static (child, s) => AttributePatternAllowsAttribute(child, s.Item1, s.Item2));
             default:
                 return false;
         }
@@ -71,7 +73,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         {
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
             return pattern != null &&
-                pattern.Roots.Any(root => AttributePatternAllowsAttribute(root, attribute, context));
+                AnyNode(pattern.Roots, (attribute, context), static (root, s) => AttributePatternAllowsAttribute(root, s.Item1, s.Item2));
         }
         finally
         {
@@ -191,7 +193,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
 
         return node.Kind == OdfSchemaPatternNodeKind.Attribute ||
             ReferenceContainsAttributePattern(node, context) ||
-            node.Children.Any(child => ContainsAttributePattern(child, context));
+            AnyNode(node.Children, context, static (child, s) => ContainsAttributePattern(child, s));
     }
 
     private static bool ReferenceContainsAttributePattern(
@@ -209,7 +211,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         {
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
             return pattern is not null &&
-                pattern.Roots.Any(root => ContainsAttributePattern(root, context));
+                AnyNode(pattern.Roots, context, static (root, s) => ContainsAttributePattern(root, s));
         }
         finally
         {
@@ -233,7 +235,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
             return pattern is not null &&
                 pattern.Roots.Count > 0 &&
-                pattern.Roots.All(root => IsPureAttributePattern(root, context));
+                AllNode(pattern.Roots, context, static (root, s) => IsPureAttributePattern(root, s));
         }
         finally
         {
@@ -260,7 +262,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             case OdfSchemaPatternNodeKind.OneOrMore:
             case OdfSchemaPatternNodeKind.Other:
                 return node.Children.Count > 0 &&
-                    node.Children.All(child => IsPureAttributePattern(child, context));
+                    AllNode(node.Children, context, static (child, s) => IsPureAttributePattern(child, s));
             default:
                 return false;
         }
@@ -283,7 +285,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         try
         {
             OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            return pattern != null && pattern.Roots.Any(root => MatchesAttributeNode(root, element, context));
+            return pattern != null && AnyNode(pattern.Roots, (element, context), static (root, s) => MatchesAttributeNode(root, s.Item1, s.Item2));
         }
         finally
         {
@@ -312,7 +314,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
 
         List<OdfSchemaPatternNode> nameClassNodes = GetAttributeNameClassNodes(node.Children);
         return nameClassNodes.Count > 0 &&
-            nameClassNodes.Any(child => MatchesAttributeNameClassNode(child, attribute));
+            AnyNode(nameClassNodes, attribute, static (child, s) => MatchesAttributeNameClassNode(child, s));
     }
 
     private static bool MatchesAttributeNameClassNode(OdfSchemaPatternNode node, XAttribute attribute)
@@ -326,12 +328,12 @@ internal static partial class OdfSchemaPatternAttributeMatcher
 
         if (node.Kind == OdfSchemaPatternNodeKind.Choice)
         {
-            return node.Children.Any(child => MatchesAttributeNameClassNode(child, attribute));
+            return AnyNode(node.Children, attribute, static (child, s) => MatchesAttributeNameClassNode(child, s));
         }
 
         if (node.Kind == OdfSchemaPatternNodeKind.Except)
         {
-            return !node.Children.Any(child => MatchesAttributeNameClassNode(child, attribute));
+            return !AnyNode(node.Children, attribute, static (child, s) => MatchesAttributeNameClassNode(child, s));
         }
 
         return false;
@@ -381,7 +383,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             node.Kind == OdfSchemaPatternNodeKind.OneOrMore ||
             node.Kind == OdfSchemaPatternNodeKind.Other)
         {
-            return node.Children.Count > 0 && node.Children.All(IsAttributeNameClassPattern);
+            return node.Children.Count > 0 && AllNode(node.Children, IsAttributeNameClassPattern);
         }
 
         return false;
@@ -390,7 +392,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
     private static bool ContainsNameClassPattern(OdfSchemaPatternNode node)
     {
         return IsNameClassSyntaxNode(node) ||
-            node.Children.Any(ContainsNameClassPattern);
+            AnyNode(node.Children, ContainsNameClassPattern);
     }
 
     private static bool IsNameClassSyntaxNode(OdfSchemaPatternNode node)
@@ -437,7 +439,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             try
             {
                 OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
-                return pattern != null && pattern.Roots.Any(root => AttributePatternHasCandidate(root, element, context));
+                return pattern != null && AnyNode(pattern.Roots, (element, context), static (root, s) => AttributePatternHasCandidate(root, s.Item1, s.Item2));
             }
             finally
             {
@@ -445,7 +447,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             }
         }
 
-        return node.Children.Any(child => AttributePatternHasCandidate(child, element, context));
+        return AnyNode(node.Children, (element, context), static (child, s) => AttributePatternHasCandidate(child, s.Item1, s.Item2));
     }
 
     #endregion

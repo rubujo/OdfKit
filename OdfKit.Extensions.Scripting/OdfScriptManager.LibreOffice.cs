@@ -407,7 +407,9 @@ public sealed partial class OdfScriptManager
         using var stream = new MemoryStream(bytes, writable: false);
         using XmlReader reader = XmlReader.Create(stream, new XmlReaderSettings
         {
-            DtdProcessing = DtdProcessing.Prohibit,
+            // LibreOffice 寫出的 Basic 模組、程式庫與容器都帶 <!DOCTYPE ... "module.dtd"> 這類宣告；禁止 DTD 會讓
+            // 讀取任何 LibreOffice 的巨集文件都擲出例外。改為忽略宣告：不載入外部 DTD、不展開實體。
+            DtdProcessing = DtdProcessing.Ignore,
             XmlResolver = null,
             MaxCharactersFromEntities = 0,
             MaxCharactersInDocument = MaxMetadataCharacters

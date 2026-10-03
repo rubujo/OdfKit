@@ -15,12 +15,21 @@ public sealed partial class OdfScriptManager
     private const string LegacyMacroSignaturePath = "macrosignatures.xml";
 
     private readonly OdfPackage _package;
+    private readonly OdfDocument? _document;
     private readonly bool _supportsPackageScripts;
 
     internal OdfScriptManager(OdfPackage package, bool supportsPackageScripts = true)
     {
         _package = package;
         _supportsPackageScripts = supportsPackageScripts;
+    }
+
+    // 以文件建立時直接讀寫文件載入的 content.xml DOM：存檔時文件會把 DOM 重新寫回 content.xml，
+    // 只改封裝裡的 content.xml 位元組會在 doc.Save() 時整個被蓋掉（事件繫結與內嵌指令碼全部消失）。
+    internal OdfScriptManager(OdfDocument document, bool supportsPackageScripts)
+        : this(document.Package, supportsPackageScripts)
+    {
+        _document = document;
     }
 
     /// <summary>
@@ -288,14 +297,23 @@ public sealed partial class OdfScriptManager
         EnsureSupportedVersion(root);
         mutation(root);
 
-        using var output = new MemoryStream();
-        OdfXmlWriter.Write(root, output);
-        _package.WriteEntry(ContentPath, output.ToArray(), "text/xml");
+        if (_document is null)
+        {
+            using var output = new MemoryStream();
+            OdfXmlWriter.Write(root, output);
+            _package.WriteEntry(ContentPath, output.ToArray(), "text/xml");
+        }
+
         RemoveInvalidatedMacroSignatures();
     }
 
     private OdfNode ReadContentRoot()
     {
+        if (_document is not null)
+        {
+            return _document.GetContentXmlForPersistence();
+        }
+
         using Stream stream = _package.GetEntryStream(ContentPath);
         return OdfXmlReader.Parse(stream);
     }

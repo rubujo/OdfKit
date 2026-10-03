@@ -120,7 +120,11 @@ public static class OdfImageExporter
                     string? text = TryGetCellDisplayText(cellNode);
                     if (!string.IsNullOrEmpty(text))
                     {
-                        canvas.DrawText(text, x + 3, y + rowHeight - 4, SKTextAlign.Left, font, textPaint);
+                        // 文字不得溢出到鄰格（與試算表軟體的顯示一致）。
+                        canvas.Save();
+                        canvas.ClipRect(new SKRect(x + 1, y + 1, x + colWidth, y + rowHeight));
+                        DrawTextWithFallback(canvas, text!, x + 3, y + rowHeight - 4, font, textPaint);
+                        canvas.Restore();
                     }
                 }
             }
@@ -141,8 +145,102 @@ public static class OdfImageExporter
         }
     }
 
+    // 預設字型沒有的字元（中日韓文字、增補平面字）會畫成方框；缺字的連續字元改用系統備援字型繪製。
+    private static void DrawTextWithFallback(SKCanvas canvas, string text, float x, float y, SKFont font, SKPaint paint)
+    {
+        var run = new System.Text.StringBuilder();
+        SKTypeface? runTypeface = null;
+        bool ownsRunTypeface = false;
+        float cursor = x;
+
+        void Flush()
+        {
+            if (run.Length == 0)
+            {
+                return;
+            }
+
+            string chunk = run.ToString();
+            if (runTypeface is null)
+            {
+                canvas.DrawText(chunk, cursor, y, SKTextAlign.Left, font, paint);
+                cursor += font.MeasureText(chunk);
+            }
+            else
+            {
+                using var fallbackFont = new SKFont(runTypeface, font.Size);
+                canvas.DrawText(chunk, cursor, y, SKTextAlign.Left, fallbackFont, paint);
+                cursor += fallbackFont.MeasureText(chunk);
+            }
+
+            run.Clear();
+            if (ownsRunTypeface)
+            {
+                runTypeface?.Dispose();
+            }
+
+            runTypeface = null;
+            ownsRunTypeface = false;
+        }
+
+        int index = 0;
+        while (index < text.Length)
+        {
+            int length = char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1]) ? 2 : 1;
+            string element = text.Substring(index, length);
+            bool missing = (length == 2 || !char.IsSurrogate(text[index])) &&
+                font.GetGlyphs(element)[0] == 0 &&
+                !char.IsWhiteSpace(text[index]) &&
+                !char.IsControl(text[index]);
+            SKTypeface? substitute = null;
+            if (missing)
+            {
+                substitute = SKFontManager.Default.MatchCharacter(
+                    font.Typeface.FamilyName,
+                    font.Typeface.FontWeight,
+                    (int)SKFontStyleWidth.Normal,
+                    font.Typeface.FontSlant,
+                    null,
+                    length == 2 ? char.ConvertToUtf32(text, index) : text[index]);
+            }
+
+            bool sameRun = run.Length > 0 &&
+                ((substitute is null && runTypeface is null) ||
+                 (substitute is not null && runTypeface is not null && substitute.FamilyName == runTypeface.FamilyName));
+            if (run.Length > 0 && !sameRun)
+            {
+                Flush();
+            }
+
+            if (run.Length == 0)
+            {
+                runTypeface = substitute;
+                ownsRunTypeface = substitute is not null;
+            }
+            else
+            {
+                substitute?.Dispose();
+            }
+
+            run.Append(element);
+            index += length;
+        }
+
+        Flush();
+    }
+
     private static string? TryGetCellDisplayText(OdfNode cellNode)
     {
+        // 儲存格顯示的文字（含千分位、百分比、貨幣與日期格式）存在 text:p；原始值只在沒有顯示文字時才用。
+        foreach (var paragraph in cellNode.Children)
+        {
+            if (paragraph.LocalName == "p" && paragraph.NamespaceUri == OdfNamespaces.Text &&
+                !string.IsNullOrEmpty(paragraph.TextContent))
+            {
+                return paragraph.TextContent;
+            }
+        }
+
         string? valueType = cellNode.GetAttribute("value-type", OdfNamespaces.Office);
         if (valueType is "float")
         {

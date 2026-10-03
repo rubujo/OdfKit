@@ -7,7 +7,7 @@ namespace OdfKit.Core;
 
 /// <summary>
 /// Provides the OdfRdfMetadata API.
-/// 表示 ODF 封裝中 <c>META-INF/manifest.rdf</c> 的 RDF metadata 集合。
+/// 表示 ODF 封裝中 封裝根目錄的 <c>manifest.rdf</c> 的 RDF metadata 集合。
 /// </summary>
 public sealed class OdfRdfMetadata
 {
@@ -269,6 +269,7 @@ public sealed class OdfRdfMetadata
         !string.IsNullOrEmpty(path) &&
         !string.Equals(path, "mimetype", StringComparison.Ordinal) &&
         !string.Equals(path, "META-INF/manifest.xml", StringComparison.Ordinal) &&
+        !string.Equals(path, "manifest.rdf", StringComparison.Ordinal) &&
         !string.Equals(path, "META-INF/manifest.rdf", StringComparison.Ordinal) &&
         !global::OdfKit.Internal.OdfStringHelper.EndsWith(path, '/');
 

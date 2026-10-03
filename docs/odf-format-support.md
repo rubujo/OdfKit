@@ -569,7 +569,7 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
   CRUD 完整化／條件式載入／合併為單一文件／大綱階層位移、Flat XML ↔ ZIP 就地轉換 API 與
   大型文件記憶體優化。原規劃中基於推測而非實際 schema 查證的項目（ODB 檢視表定義、
   報表詳細設計、ODI 中繼資料擴充與分組圖層）已查證為不可行並從規劃中移除。
-- RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。
+- RDF-1 基礎 ✅：封裝根目錄的 `manifest.rdf`（與 LibreOffice 一致；舊版 OdfKit 寫在 `META-INF/manifest.rdf`，載入仍接受、存檔時搬到根目錄）文件層往返、`rdf:type` 與具型別節點、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`、`RdfRealWorldLayoutTests`）。
 - LOEXT-1 基礎 ✅：`loext:decorative` 載入映射至 `draw:decorative`（`OdfLoExtInteropEngine`、`LoExtInteropTests`）。
 - repo 內 corpus 已擴充至 266 筆 fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例，詳見 [Corpus Manifest 規則](corpus-manifest.md)）；
   外部 ODF Validator baseline corpus 仍可依 `ODFKIT_PARITY_CORPUS_ROOT` 選用擴充。

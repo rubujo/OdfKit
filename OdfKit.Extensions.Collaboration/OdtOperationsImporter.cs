@@ -450,6 +450,15 @@ public static class OdtOperationsImporter
                 : currentList.AddItem(string.Empty, level).Paragraphs[0];
         }
 
+        // 標題用 outlineLevel 還原（匯出端對 text:h 輸出此屬性）。
+        if (operation.TryGetProperty("attrs", out JsonElement headingAttrs) &&
+            headingAttrs.ValueKind == JsonValueKind.Object &&
+            TryGetInt32Attribute(headingAttrs, "outlineLevel", out int outlineLevel) &&
+            outlineLevel is >= 1 and <= 10)
+        {
+            return document.AddHeading(string.Empty, outlineLevel);
+        }
+
         return document.AddParagraph();
     }
 

@@ -409,7 +409,7 @@ public class FourFormatApiScenarioTests
         stream.Position = 0;
         using TextDocument loaded = TextDocument.Load(stream);
 
-        Assert.True(loaded.Package.HasEntry("META-INF/manifest.rdf"));
+        Assert.True(loaded.Package.HasEntry("manifest.rdf"));
         Assert.True(loaded.Package.RdfMetadata.TryGetLiteral(string.Empty, DublinCoreTitle, out string loadedTitle));
         Assert.Equal(title, loadedTitle);
         Assert.Contains("content.xml", loaded.Package.RdfMetadata.GetLinkedPartPaths(string.Empty));

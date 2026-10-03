@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 
+using static OdfKit.Compliance.OdfSchemaPatternNodeLists;
+
 namespace OdfKit.Compliance;
 /// <summary>
 /// Provides the OdfSchemaPatternValidator API.
@@ -157,7 +159,7 @@ public static partial class OdfSchemaPatternValidator
                 List<OdfSchemaPatternNode> nameClassNodes =
                     OdfSchemaPatternAttributeMatcher.GetNameClassNodes(node.Children);
                 return nameClassNodes.Count > 0 &&
-                    nameClassNodes.Any(child => MatchesNameClassNode(child, namespaceUri, localName));
+                    AnyNode(nameClassNodes, (namespaceUri, localName), static (child, s) => MatchesNameClassNode(child, s.Item1, s.Item2));
             }
 
             return string.Equals(node.NamespaceUri, namespaceUri, StringComparison.Ordinal) &&
