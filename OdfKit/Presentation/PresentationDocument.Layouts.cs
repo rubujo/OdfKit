@@ -194,15 +194,11 @@ public partial class PresentationDocument
     /// <returns>The added presentation page layout instance. / 新增的投影片版面配置執行個體。</returns>
     public OdfPresentationPageLayout CreatePresentationPageLayout(string name)
     {
-        var autoStyles = FindChildElement(StylesRoot, "automatic-styles", OdfNamespaces.Office);
-        if (autoStyles is null)
-        {
-            autoStyles = new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
-            StylesRoot.AppendChild(autoStyles);
-        }
+        // ODF schema：style:presentation-page-layout 屬於 office:styles（通用樣式），放在 automatic-styles 不符合規範。
+        OdfNode styles = OdfKit.Text.TextDocumentDomHelper.FindOrCreateChild(StylesRoot, "styles", OdfNamespaces.Office, "office");
         var layoutNode = new OdfNode(OdfNodeType.Element, "presentation-page-layout", OdfNamespaces.Style, "style");
         layoutNode.SetAttribute("name", OdfNamespaces.Style, name, "style");
-        autoStyles.AppendChild(layoutNode);
+        styles.AppendChild(layoutNode);
         return new OdfPresentationPageLayout(layoutNode);
     }
 
@@ -214,34 +210,29 @@ public partial class PresentationDocument
     /// <returns>The presentation page layout instance, or <see langword="null"/> if it does not exist. / 投影片版面配置執行個體，若不存在則為 <see langword="null"/>。</returns>
     public OdfPresentationPageLayout? FindPresentationPageLayout(string name)
     {
-        // 優先搜尋 ContentDom
-        var autoStyles = FindChildElement(ContentRoot, "automatic-styles", OdfNamespaces.Office);
-        if (autoStyles is not null)
+        // 新版寫在 office:styles；舊版與其他工具可能寫在 office:automatic-styles，兩處、兩個文件根都搜尋。
+        foreach (OdfNode root in new[] { StylesRoot, ContentRoot })
         {
-            foreach (var child in autoStyles.Children)
+            foreach (string sectionName in new[] { "styles", "automatic-styles" })
             {
-                if (child.LocalName is "presentation-page-layout" &&
-                    child.NamespaceUri == OdfNamespaces.Style &&
-                    child.GetAttribute("name", OdfNamespaces.Style) == name)
+                OdfNode? section = FindChildElement(root, sectionName, OdfNamespaces.Office);
+                if (section is null)
                 {
-                    return new OdfPresentationPageLayout(child);
+                    continue;
+                }
+
+                foreach (OdfNode child in section.Children)
+                {
+                    if (child.LocalName is "presentation-page-layout" &&
+                        child.NamespaceUri == OdfNamespaces.Style &&
+                        child.GetAttribute("name", OdfNamespaces.Style) == name)
+                    {
+                        return new OdfPresentationPageLayout(child);
+                    }
                 }
             }
         }
-        // 搜尋 StylesDom
-        autoStyles = FindChildElement(StylesRoot, "automatic-styles", OdfNamespaces.Office);
-        if (autoStyles is not null)
-        {
-            foreach (var child in autoStyles.Children)
-            {
-                if (child.LocalName is "presentation-page-layout" &&
-                    child.NamespaceUri == OdfNamespaces.Style &&
-                    child.GetAttribute("name", OdfNamespaces.Style) == name)
-                {
-                    return new OdfPresentationPageLayout(child);
-                }
-            }
-        }
+
         return null;
     }
 

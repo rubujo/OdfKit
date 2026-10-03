@@ -104,6 +104,14 @@ public static class OdfRtfImporter
                         continue;
                     }
 
+                    // 標頭區的資訊群組（樣式表、清單定義、編號資訊、產生器等）不是文件內容：
+                    // 清單定義裡的 \leveltext 含 '01 這類控制字元，當成文字輸出會污染本文（儲存時還會因非法 XML 字元失敗）。
+                    if (StartsIgnoredHeaderGroup(i))
+                    {
+                        i = FindGroupEnd(i) + 1;
+                        continue;
+                    }
+
                     if (StartsGroup(i, "colortbl"))
                     {
                         ReadColorTable(i);
@@ -191,6 +199,26 @@ public static class OdfRtfImporter
             FlushText();
             FlushPendingTable();
             return _document;
+        }
+
+        private static readonly string[] s_ignoredHeaderGroups =
+        [
+            "stylesheet", "listtable", "listoverridetable", "rsidtbl", "generator", "latentstyles",
+            "themedata", "colorschememapping", "datastore", "xmlnstbl", "listtext", "pntext", "pgdsctbl",
+            "revtbl", "filetbl", "defchp", "defpap",
+        ];
+
+        private bool StartsIgnoredHeaderGroup(int index)
+        {
+            foreach (string name in s_ignoredHeaderGroups)
+            {
+                if (StartsGroup(index, name) || StartsDestinationGroup(index, name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private int ReadControl(int index)

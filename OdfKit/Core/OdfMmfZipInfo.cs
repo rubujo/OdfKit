@@ -81,6 +81,13 @@ internal sealed class OdfMmfEntryInfo
     /// </summary>
     public Stream OpenStream(MemoryMappedFile mmf)
     {
+        // 大小為 0 的項目不能建立檢視：CreateViewStream 的 size 為 0 代表「從位移到檔案結尾」，
+        // 讀取空項目會讀到後面不相干的位元組。
+        if (CompressedSize == 0)
+        {
+            return new OdfCrc32Stream(new MemoryStream([], writable: false), Crc32);
+        }
+
         if (CompressionMethod == 0)
         {
             var viewStream = mmf.CreateViewStream(CompressedDataOffset, CompressedSize, MemoryMappedFileAccess.Read);

@@ -699,7 +699,9 @@ internal static class ColorFontValidator
                 throw SfntFont.DataInvalid($"{locationTag}-indexArray");
             }
 
-            uint arrayEnd = checked(arrayOffset + arraySize);
+            // 重疊判斷只看各 strike 的 indexSubTableArray 本身（subtableCount × 8 位元組）；
+            // indexTablesSize 在真實字型（例如新細明體）裡常包含其他 strike 的 subtable，範圍彼此重疊。
+            uint arrayEnd = checked(arrayOffset + (subtableCount * 8));
             foreach ((uint start, uint end) in strikeRanges)
             {
                 if (arrayOffset < end && start < arrayEnd)
@@ -727,7 +729,11 @@ internal static class ColorFontValidator
 
                 uint subtableOffset = checked(arrayOffset + additionalOffset);
                 EnsureOffsetRange(location!, subtableOffset, 8, $"{locationTag}-subtable");
-                if (subtableOffset < checked(arrayOffset + (subtableCount * 8)) || subtableOffset >= arrayEnd)
+
+                // 真實字型的 indexTablesSize 常低估實際佔用的範圍（例如 Windows 的新細明體 mingliu.ttc：
+                // 第一個 strike 的第二個 subtable 就超出它宣告的大小，FreeType 與 GDI 都只看位移）。
+                // 以整個 EBLC／CBLC 表的長度作為界限，保有記憶體安全（所有位移仍必須落在表內）而不拒絕可用的字型。
+                if (subtableOffset < checked(arrayOffset + (subtableCount * 8)) || subtableOffset >= (uint)location!.Length)
                 {
                     throw SfntFont.DataInvalid($"{locationTag}-subtableOffset");
                 }
@@ -739,7 +745,7 @@ internal static class ColorFontValidator
                     dataTag,
                     locationTag,
                     subtableOffset,
-                    arrayEnd,
+                    (uint)location!.Length,
                     first,
                     last);
             }

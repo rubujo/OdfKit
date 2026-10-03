@@ -222,6 +222,106 @@ public sealed class RealWorldFidelityTests
         Assert.True(large < 4000L * 200, $"4,000 列走訪 {large:N0} 個位置，超過每列 200 個。");
     }
 
+    // ---------- 封裝寫出：空項目與原始檔案複製 ----------
+
+    /// <summary>
+    /// 驗證載入檔案後儲存時，大小為 0 的項目（LibreOffice 的封裝含空的 <c>Configurations2/</c> 目錄項目）
+    /// 不會把原始檔案其餘的位元組複製進輸出。修正前以 <c>CreateViewStream(offset, 0)</c>（0 代表「到檔案結尾」）
+    /// 複製空項目，輸出在項目之間留下約等於原始檔案大小的垃圾，LibreOffice 會因此拒絕載入整個封裝
+    /// （「source file could not be loaded」）。
+    /// </summary>
+    [Fact]
+    public void SavingLoadedPackageWithEmptyDirectoryEntryLeavesNoGapsBetweenEntries()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "odfkit-zip-gap-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string source = Path.Combine(directory, "source.odt");
+            using (var original = TextDocument.Create())
+            {
+                for (int index = 0; index < 40; index++)
+                {
+                    original.AddParagraph("段落內容 " + index);
+                }
+
+                original.Save(source);
+            }
+
+            // 模擬 LibreOffice 的封裝：在 mimetype 之後加入空的目錄項目。
+            using (ZipArchive archive = ZipFile.Open(source, ZipArchiveMode.Update))
+            {
+                archive.CreateEntry("Configurations2/");
+            }
+
+            string saved = Path.Combine(directory, "saved.odt");
+            using (TextDocument loaded = TextDocument.Load(source))
+            {
+                loaded.Save(saved);
+            }
+
+            byte[] bytes = File.ReadAllBytes(saved);
+            Assert.Equal(string.Empty, FindZipGap(bytes));
+            Assert.True(
+                bytes.Length < new FileInfo(source).Length * 2,
+                $"輸出 {bytes.Length} 位元組遠大於來源 {new FileInfo(source).Length} 位元組。");
+
+            using TextDocument reloaded = TextDocument.Load(saved);
+            Assert.Equal(40, reloaded.Body.Paragraphs.Count());
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    // 解析中央目錄，確認本機檔案區段由頭到尾連續（沒有未被任何項目引用的位元組）；有間隙時回傳說明，否則為空字串。
+    private static string FindZipGap(byte[] bytes)
+    {
+        int eocd = bytes.Length - 22;
+        while (eocd >= 0 && BitConverter.ToUInt32(bytes, eocd) != 0x06054b50)
+        {
+            eocd--;
+        }
+
+        Assert.True(eocd >= 0, "找不到 ZIP 結尾記錄。");
+        int entryCount = BitConverter.ToUInt16(bytes, eocd + 10);
+        int centralDirectoryOffset = (int)BitConverter.ToUInt32(bytes, eocd + 16);
+
+        var extents = new List<(int Start, int End, string Name)>();
+        int position = centralDirectoryOffset;
+        for (int index = 0; index < entryCount; index++)
+        {
+            Assert.Equal(0x02014b50u, BitConverter.ToUInt32(bytes, position));
+            int compressedSize = (int)BitConverter.ToUInt32(bytes, position + 20);
+            int nameLength = BitConverter.ToUInt16(bytes, position + 28);
+            int extraLength = BitConverter.ToUInt16(bytes, position + 30);
+            int commentLength = BitConverter.ToUInt16(bytes, position + 32);
+            int localOffset = (int)BitConverter.ToUInt32(bytes, position + 42);
+            string name = System.Text.Encoding.UTF8.GetString(bytes, position + 46, nameLength);
+
+            int localNameLength = BitConverter.ToUInt16(bytes, localOffset + 26);
+            int localExtraLength = BitConverter.ToUInt16(bytes, localOffset + 28);
+            extents.Add((localOffset, localOffset + 30 + localNameLength + localExtraLength + compressedSize, name));
+            position += 46 + nameLength + extraLength + commentLength;
+        }
+
+        int expected = 0;
+        foreach ((int start, int end, string name) in extents.OrderBy(item => item.Start))
+        {
+            if (start != expected)
+            {
+                return $"在 {name} 之前有 {start - expected} 個未被引用的位元組（位移 {expected}）。";
+            }
+
+            expected = end;
+        }
+
+        return expected == centralDirectoryOffset
+            ? string.Empty
+            : $"最後一個項目之後到中央目錄之間有 {centralDirectoryOffset - expected} 個未被引用的位元組。";
+    }
+
     // ---------- 延遲載入與驗證器對真實 LibreOffice 文件的處理 ----------
 
     private const string CalcExtNamespace = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";

@@ -1156,6 +1156,311 @@ public sealed class RealWorldConverterFidelityTests
         Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
     }
 
+    private const string FlatOdtWithLists = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+            xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+            xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+            xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+            office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+          <office:automatic-styles>
+            <text:list-style style:name="Bullets">
+              <text:list-level-style-bullet text:level="1" text:bullet-char="&#xF0B7;">
+                <style:list-level-properties text:space-before="0.75cm" text:min-label-width="0.5cm"/>
+              </text:list-level-style-bullet>
+              <text:list-level-style-bullet text:level="2" text:bullet-char="o">
+                <style:list-level-properties text:space-before="2cm" text:min-label-width="0.5cm"/>
+              </text:list-level-style-bullet>
+            </text:list-style>
+            <text:list-style style:name="Steps">
+              <text:list-level-style-number text:level="1" style:num-suffix=")" style:num-format="a" text:start-value="3">
+                <style:list-level-properties text:space-before="0.5cm" text:min-label-width="0.6cm"/>
+              </text:list-level-style-number>
+              <text:list-level-style-number text:level="2" style:num-format="I" text:display-levels="2">
+                <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+                  <style:list-level-label-alignment text:label-followed-by="listtab" fo:margin-left="2cm" fo:text-indent="-0.5cm"/>
+                </style:list-level-properties>
+              </text:list-level-style-number>
+            </text:list-style>
+          </office:automatic-styles>
+          <office:body><office:text>
+            <text:list text:style-name="Bullets">
+              <text:list-item><text:p>項目甲</text:p>
+                <text:list><text:list-item><text:p>子項乙</text:p></text:list-item></text:list>
+              </text:list-item>
+              <text:list-item><text:p>項目丙</text:p></text:list-item>
+            </text:list>
+            <text:p>清單之間的段落</text:p>
+            <text:list text:style-name="Steps">
+              <text:list-item><text:p>步驟一</text:p>
+                <text:list><text:list-item><text:p>步驟一之一</text:p></text:list-item></text:list>
+              </text:list-item>
+            </text:list>
+            <text:list text:style-name="Steps">
+              <text:list-item><text:p>另一份編號清單</text:p></text:list-item>
+            </text:list>
+          </office:text></office:body>
+        </office:document>
+        """;
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 的清單：ODF 清單樣式轉成編號定義（項目符號、字母與羅馬數字格式、前後綴、起始值、縮排），
+    /// 項目轉成帶 <c>w:numPr</c> 的段落且層級正確，各自獨立的清單重新編號，輸出通過 Open XML SDK 驗證。
+    /// 修正前轉換器完全不處理 <c>text:list</c>，所有清單項目整個消失。
+    /// </summary>
+    [Fact]
+    public void OdtListsConvertToDocxNumbering()
+    {
+        using var source = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(FlatOdtWithLists));
+        using var odt = (TextDocument)OdfDocument.Load(source, "lists.fodt");
+
+        using var docx = new MemoryStream();
+        OdfToDocxConverter.Convert(odt, docx);
+        docx.Position = 0;
+
+        using WordprocessingDocument document = WordprocessingDocument.Open(docx, false);
+        WP.Paragraph[] paragraphs = document.MainDocumentPart!.Document!.Body!.Elements<WP.Paragraph>().ToArray();
+        Assert.Equal(
+            ["項目甲", "子項乙", "項目丙", "清單之間的段落", "步驟一", "步驟一之一", "另一份編號清單"],
+            paragraphs.Select(paragraph => paragraph.InnerText).ToArray());
+
+        (int? Level, int? Id) Numbering(WP.Paragraph paragraph) =>
+            (paragraph.ParagraphProperties?.NumberingProperties?.NumberingLevelReference?.Val?.Value,
+             paragraph.ParagraphProperties?.NumberingProperties?.NumberingId?.Val?.Value);
+
+        Assert.Equal(new int?[] { 0, 1, 0 }, paragraphs.Take(3).Select(paragraph => Numbering(paragraph).Level).ToArray());
+        Assert.Null(Numbering(paragraphs[3]).Id);
+        Assert.Equal(new int?[] { 0, 1 }, paragraphs.Skip(4).Take(2).Select(paragraph => Numbering(paragraph).Level).ToArray());
+
+        // 兩份「Steps」清單共用同一個樣式定義但各自重新編號（不同的 w:num）。
+        int? firstSteps = Numbering(paragraphs[4]).Id;
+        int? secondSteps = Numbering(paragraphs[6]).Id;
+        Assert.NotNull(firstSteps);
+        Assert.NotEqual(firstSteps, secondSteps);
+        Assert.NotEqual(Numbering(paragraphs[0]).Id, firstSteps);
+
+        WP.Numbering numbering = document.MainDocumentPart.NumberingDefinitionsPart!.Numbering!;
+        WP.AbstractNum[] abstracts = numbering.Elements<WP.AbstractNum>().ToArray();
+        Assert.Equal(2, abstracts.Length);
+
+        WP.Level[] bulletLevels = abstracts[0].Elements<WP.Level>().ToArray();
+        Assert.Equal("bullet", bulletLevels[0].NumberingFormat!.Val!.InnerText);
+        Assert.Equal("•", bulletLevels[0].LevelText!.Val!.Value);
+        Assert.Equal("o", bulletLevels[1].LevelText!.Val!.Value);
+        Assert.Equal("708", bulletLevels[0].PreviousParagraphProperties!.Indentation!.Left!.Value);
+        Assert.Equal("283", bulletLevels[0].PreviousParagraphProperties!.Indentation!.Hanging!.Value);
+
+        WP.Level[] stepLevels = abstracts[1].Elements<WP.Level>().ToArray();
+        Assert.Equal("lowerLetter", stepLevels[0].NumberingFormat!.Val!.InnerText);
+        Assert.Equal("%1)", stepLevels[0].LevelText!.Val!.Value);
+        Assert.Equal(3, stepLevels[0].StartNumberingValue!.Val!.Value);
+        Assert.Equal("upperRoman", stepLevels[1].NumberingFormat!.Val!.InnerText);
+        Assert.Equal("%1.%2", stepLevels[1].LevelText!.Val!.Value);
+        Assert.Equal("1134", stepLevels[1].PreviousParagraphProperties!.Indentation!.Left!.Value);
+        Assert.Equal("283", stepLevels[1].PreviousParagraphProperties!.Indentation!.Hanging!.Value);
+
+        var validator = new DocumentFormat.OpenXml.Validation.OpenXmlValidator(DocumentFormat.OpenXml.FileFormatVersions.Office2019);
+        Assert.Empty(validator.Validate(document, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 的輸出符合 ECMA-376 的元素順序並有表格欄格線：段落屬性的 <c>w:spacing</c> 在 <c>w:ind</c> 之前、
+    /// 表格邊框依上左下右排列、樣式的 <c>w:b</c> 在 <c>w:sz</c> 之前、表格有 <c>w:tblGrid</c>。
+    /// 修正前輸出違反 schema（Word 對元素順序很嚴格，可能提示檔案損毀）。
+    /// </summary>
+    [Fact]
+    public void OdtToDocxOutputFollowsSchemaOrderAndHasTableGrids()
+    {
+        using var odt = TextDocument.Create();
+        odt.AddHeading("標題", 1);
+        OdfParagraph paragraph = odt.AddParagraph("段落");
+        paragraph.Node.SetAttribute("style-name", OdfNamespaces.Text, "Indented", "text");
+        odt.AddHeading("三級標題", 3);
+        OdfTable table = odt.AddTable(2, 3);
+        table.GetCell(0, 0).TextContent = "甲";
+        table.GetCell(1, 2).TextContent = "乙";
+
+        using var docx = new MemoryStream();
+        OdfToDocxConverter.Convert(odt, docx);
+        docx.Position = 0;
+        using WordprocessingDocument document = WordprocessingDocument.Open(docx, false);
+
+        WP.Table wordTable = document.MainDocumentPart!.Document!.Body!.Elements<WP.Table>().Single();
+        Assert.Equal(3, wordTable.Elements<WP.TableGrid>().Single().Elements<WP.GridColumn>().Count());
+        Assert.IsType<WP.TableProperties>(wordTable.ChildElements[0]);
+        Assert.IsType<WP.TableGrid>(wordTable.ChildElements[1]);
+        Assert.Equal(
+            ["top", "left", "bottom", "right", "insideH", "insideV"],
+            wordTable.TableProperties!.TableBorders!.ChildElements.Select(child => child.LocalName).ToArray());
+
+        WP.Style heading3 = document.MainDocumentPart.StyleDefinitionsPart!.Styles!.Elements<WP.Style>()
+            .Single(style => style.StyleId?.Value == "Heading3");
+        Assert.Equal(["b", "sz"], heading3.StyleRunProperties!.ChildElements.Select(child => child.LocalName).ToArray());
+
+        var validator = new DocumentFormat.OpenXml.Validation.OpenXmlValidator(DocumentFormat.OpenXml.FileFormatVersions.Office2019);
+        Assert.Empty(validator.Validate(document, TestContext.Current.CancellationToken));
+    }
+
+    private const string FlatOdsFromLibreOffice = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+            xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+            xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+            xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+            xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+            xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+            office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.spreadsheet">
+          <office:automatic-styles>
+            <number:date-style style:name="N49">
+              <number:year number:style="long"/><number:text>-</number:text><number:month number:style="long"/><number:text>-</number:text><number:day number:style="long"/>
+            </number:date-style>
+            <number:number-style style:name="N4"><number:number number:decimal-places="2" number:min-integer-digits="1" number:grouping="true"/></number:number-style>
+            <number:percentage-style style:name="N11"><number:number number:decimal-places="1" number:min-integer-digits="1"/><number:text>%</number:text></number:percentage-style>
+            <number:currency-style style:name="N105"><number:currency-symbol>NT$</number:currency-symbol><number:number number:decimal-places="0" number:grouping="true"/></number:currency-style>
+            <style:style style:name="ceDate" style:family="table-cell" style:data-style-name="N49"/>
+            <style:style style:name="ceNumber" style:family="table-cell" style:data-style-name="N4"/>
+            <style:style style:name="cePercent" style:family="table-cell" style:data-style-name="N11"/>
+            <style:style style:name="ceCurrency" style:family="table-cell" style:data-style-name="N105"/>
+          </office:automatic-styles>
+          <office:body><office:spreadsheet>
+            <table:table table:name="資料">
+              <table:table-row>
+                <table:table-cell table:style-name="ceDate" office:value-type="date" office:date-value="2024-01-03"><text:p>2024-01-03</text:p></table:table-cell>
+                <table:table-cell table:style-name="ceNumber" office:value-type="float" office:value="1234567.891"><text:p>1,234,567.89</text:p></table:table-cell>
+                <table:table-cell table:style-name="cePercent" office:value-type="percentage" office:value="0.256"><text:p>25.6%</text:p></table:table-cell>
+                <table:table-cell table:style-name="ceCurrency" office:value-type="currency" office:currency="TWD" office:value="1500"><text:p>NT$1,500</text:p></table:table-cell>
+                <table:table-cell office:value-type="time" office:time-value="PT01H30M00S"><text:p>01:30:00</text:p></table:table-cell>
+                <table:table-cell table:number-columns-spanned="2" table:number-rows-spanned="2" office:value-type="string"><text:p>合併</text:p></table:table-cell>
+                <table:covered-table-cell/>
+              </table:table-row>
+              <table:table-row>
+                <table:table-cell table:formula="of:=[.B1]*2" office:value-type="float" office:value="2469135.782"><text:p>2469135.78</text:p></table:table-cell>
+                <table:table-cell table:formula="of:=SUM([.B1:.B1];[$第二頁.A1])" office:value-type="float" office:value="1234568.891"><text:p>1234568.89</text:p></table:table-cell>
+                <table:table-cell table:formula="of:=IF([.A1]&gt;0;&quot;a;b&quot;;[$'含 空白'.C3])" office:value-type="string"><text:p>a;b</text:p></table:table-cell>
+              </table:table-row>
+              <table:table-row table:number-rows-repeated="1048000">
+                <table:table-cell table:style-name="ceDate" table:number-columns-repeated="1024"/>
+              </table:table-row>
+            </table:table>
+            <table:table table:name="第二頁">
+              <table:table-row><table:table-cell office:value-type="float" office:value="1"><text:p>1</text:p></table:table-cell></table:table-row>
+            </table:table>
+          </office:spreadsheet></office:body>
+        </office:document>
+        """;
+
+    /// <summary>
+    /// 驗證 ODS → XLSX 涵蓋 LibreOffice 儲存的試算表常見的結構：OpenFormula 方括號參照（含跨工作表與需要引號的名稱）與分號分隔、
+    /// 日期、時間、百分比與貨幣值、合併儲存格、數字格式（日期、千分位小數、百分比、貨幣），
+    /// 以及「只有樣式的重複列」（LibreOffice 對有欄格式的資料會一路寫到第 1,048,576 列），輸出通過 Open XML SDK 驗證。
+    /// 修正前公式保留方括號（Excel 無法計算）、日期變成文字、合併儲存格遺失、數字格式遺失，
+    /// 且只有樣式的重複列使轉換幾乎不會結束。
+    /// </summary>
+    [Fact(Timeout = 120_000)]
+    public void OdsFromLibreOfficeConvertsFormulasDatesMergesAndNumberFormats()
+    {
+        using var source = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(FlatOdsFromLibreOffice));
+        using var ods = (OdfSpreadsheetDocument)OdfDocument.Load(source, "libreoffice.fods");
+
+        var stopwatch = Stopwatch.StartNew();
+        using var xlsx = new MemoryStream();
+        OdfToXlsxConverter.Convert(ods, xlsx);
+        stopwatch.Stop();
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(60), $"轉換耗時 {stopwatch.Elapsed.TotalSeconds:N1} 秒。");
+
+        xlsx.Position = 0;
+        using var workbook = new XLWorkbook(xlsx);
+        IXLWorksheet sheet = workbook.Worksheet("資料");
+
+        Assert.Equal(ClosedXML.Excel.XLDataType.DateTime, sheet.Cell("A1").DataType);
+        Assert.Equal(new DateTime(2024, 1, 3), sheet.Cell("A1").GetDateTime());
+        Assert.Equal("yyyy-mm-dd", sheet.Cell("A1").Style.DateFormat.Format);
+
+        Assert.Equal(1234567.891, sheet.Cell("B1").GetDouble(), 3);
+        Assert.Equal("#,##0.00", sheet.Cell("B1").Style.NumberFormat.Format);
+        Assert.Equal(0.256, sheet.Cell("C1").GetDouble(), 3);
+        Assert.Equal("0.0%", sheet.Cell("C1").Style.NumberFormat.Format);
+        Assert.Equal(1500, sheet.Cell("D1").GetDouble(), 3);
+        Assert.Equal("NT$#,##0", sheet.Cell("D1").Style.NumberFormat.Format.Replace("\"", string.Empty));
+        Assert.Equal(ClosedXML.Excel.XLDataType.TimeSpan, sheet.Cell("E1").DataType);
+        Assert.Equal("1:30:00", sheet.Cell("E1").GetString());
+        Assert.Equal("[h]:mm:ss", sheet.Cell("E1").Style.NumberFormat.Format);
+
+        Assert.Contains(sheet.MergedRanges, range => range.RangeAddress.ToStringRelative() == "F1:G2");
+
+        Assert.Equal("B1*2", sheet.Cell("A2").FormulaA1);
+        Assert.Equal("SUM(B1:B1,第二頁!A1)", sheet.Cell("B2").FormulaA1);
+        Assert.Equal("IF(A1>0,\"a;b\",'含 空白'!C3)", sheet.Cell("C2").FormulaA1);
+
+        // 只有樣式的重複列轉成整欄的預設格式，而不是數百萬個空白儲存格。
+        Assert.Equal("yyyy-mm-dd", sheet.Column(1).Style.DateFormat.Format);
+        Assert.True(sheet.CellsUsed().Count() < 50, $"已使用儲存格 {sheet.CellsUsed().Count()} 個。");
+
+        xlsx.Position = 0;
+        using DocumentFormat.OpenXml.Packaging.SpreadsheetDocument package = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsx, false);
+        var validator = new DocumentFormat.OpenXml.Validation.OpenXmlValidator(DocumentFormat.OpenXml.FileFormatVersions.Office2019);
+        Assert.Empty(validator.Validate(package, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// 驗證簡報的表格與版面配置符合 ODF 1.4 schema：嵌入表格有 <c>table:table-column</c>（欄定義在列之前），
+    /// 版面配置（<c>style:presentation-page-layout</c>）寫在 <c>office:styles</c> 而不是 <c>office:automatic-styles</c>，
+    /// 版面配置的預留位置以 <c>presentation:object</c> 標示類型；經 PPTX 往返後（PPTX → ODP 的表格放在
+    /// <c>draw:frame</c> 內而不是 <c>draw:rect</c>）仍然合法。修正前這些都違反 schema，嚴格驗證回報整份文件不符。
+    /// </summary>
+    [Fact]
+    public void PresentationTablesAndLayoutsAreSchemaValidAndSurvivePptxRoundTrip()
+    {
+        using var presentation = OdfKit.Presentation.PresentationDocument.Create();
+        OdfKit.Presentation.OdfSlide first = presentation.AddSlide();
+        first.AddTextBox(
+            OdfKit.Styles.OdfLength.FromCentimeters(2),
+            OdfKit.Styles.OdfLength.FromCentimeters(1),
+            OdfKit.Styles.OdfLength.FromCentimeters(20),
+            OdfKit.Styles.OdfLength.FromCentimeters(3),
+            "標題");
+        OdfKit.Presentation.OdfSlide second = presentation.AddSlide();
+        second.AddTable(
+            2,
+            3,
+            OdfKit.Styles.OdfLength.FromCentimeters(2),
+            OdfKit.Styles.OdfLength.FromCentimeters(5),
+            OdfKit.Styles.OdfLength.FromCentimeters(15),
+            OdfKit.Styles.OdfLength.FromCentimeters(4));
+        presentation.CreatePresentationPageLayout("LayoutTitle").AddPlaceholder(
+            OdfKit.Presentation.OdfPlaceholderType.Title,
+            OdfKit.Styles.OdfLength.FromCentimeters(2),
+            OdfKit.Styles.OdfLength.FromCentimeters(1.5),
+            OdfKit.Styles.OdfLength.FromCentimeters(24),
+            OdfKit.Styles.OdfLength.FromCentimeters(3));
+
+        OdfValidationReport original = Validate14(presentation);
+        Assert.True(original.IsValid, string.Join("; ", original.Issues.Select(issue => issue.Message)));
+
+        XElement stylesXml = XElement.Parse(SaveStylesXml(presentation));
+        XElement layout = stylesXml.Element(s_office + "styles")!.Element(s_style + "presentation-page-layout")!;
+        Assert.Equal("LayoutTitle", (string?)layout.Attribute(s_style + "name"));
+        XNamespace presentationNs = OdfNamespaces.Presentation;
+        Assert.Equal("title", (string?)layout.Element(presentationNs + "placeholder")!.Attribute(presentationNs + "object"));
+        Assert.Empty(stylesXml.Element(s_office + "automatic-styles")?.Elements(s_style + "presentation-page-layout") ?? []);
+        Assert.NotNull(presentation.FindPresentationPageLayout("LayoutTitle"));
+
+        XElement table = XElement.Parse(SaveContentXml(presentation)).Descendants(s_table + "table").Single();
+        Assert.Equal("3", (string?)table.Element(s_table + "table-column")!.Attribute(s_table + "number-columns-repeated"));
+        Assert.Equal(s_table + "table-column", table.Elements().First().Name);
+
+        using var pptx = new MemoryStream();
+        OdpToPptxConverter.Convert(presentation, pptx);
+        pptx.Position = 0;
+        using OdfKit.Presentation.PresentationDocument roundTrip = PptxToOdpConverter.Convert(pptx);
+        OdfValidationReport report = Validate14(roundTrip);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+
+        XElement roundTripContent = XElement.Parse(SaveContentXml(roundTrip));
+        XElement roundTripTable = roundTripContent.Descendants(s_table + "table").Single();
+        Assert.Equal(XName.Get("frame", OdfNamespaces.Draw), roundTripTable.Parent!.Name);
+    }
+
     // ---------- helpers ----------
 
     private static WP.Paragraph ListParagraph(string text, int numberingId, int level) =>

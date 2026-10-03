@@ -24,7 +24,7 @@ namespace OdfKit.Conversion;
 /// Converts ODF spreadsheets to XLSX.
 /// 將 SpreadsheetDocument 轉換為 XLSX 格式的轉換器。
 /// </summary>
-public static class OdfToXlsxConverter
+public static partial class OdfToXlsxConverter
 {
     private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
 
@@ -131,7 +131,17 @@ public static class OdfToXlsxConverter
 
     private static void CopySheetData(OdfTableSheet odsSheet, IXLWorksheet xlSheet)
     {
-        foreach (var (row, col, data) in EnumerateSheetCells(odsSheet))
+        // LibreOffice 從有欄格式的 XLSX 轉出 ODS 時，會在資料列之後寫出「只有樣式、沒有內容」的重複列
+        // （一路到第 1,048,576 列）。逐格展開會建立數百萬個空白儲存格，轉換幾乎不會結束；
+        // 這些列的意義是欄的預設格式，改套用在整欄上。
+        var columnDefaults = new List<(int Column, string StyleName)>();
+        var cells = EnumerateSheetCells(odsSheet, columnDefaults).ToList();
+        foreach ((int column, string columnStyle) in columnDefaults)
+        {
+            ApplyCellStyle(odsSheet, xlSheet.Column(column + 1).Style, columnStyle);
+        }
+
+        foreach (var (row, col, data) in cells)
         {
             var val = data.Value;
             var xlCell = xlSheet.Cell(row + 1, col + 1);
@@ -141,6 +151,10 @@ public static class OdfToXlsxConverter
             }
 
             ApplyCellStyle(odsSheet, xlCell, data.StyleName);
+            if (data.ColumnSpan > 1 || data.RowSpan > 1)
+            {
+                xlSheet.Range(row + 1, col + 1, row + data.RowSpan, col + data.ColumnSpan).Merge();
+            }
         }
 
         CopyDataValidations(odsSheet, xlSheet);
@@ -1131,6 +1145,8 @@ public static class OdfToXlsxConverter
     {
         public object? Value { get; set; }
         public string? StyleName { get; set; }
+        public int ColumnSpan { get; set; } = 1;
+        public int RowSpan { get; set; } = 1;
     }
 
     private enum ValidationKind
@@ -1206,6 +1222,10 @@ public static class OdfToXlsxConverter
             case DateTime dt:
                 cell.Value = dt;
                 break;
+            case TimeSpan time:
+                cell.Value = time;
+                cell.Style.NumberFormat.Format = "[h]:mm:ss";
+                break;
             case string str:
                 cell.Value = str;
                 break;
@@ -1217,10 +1237,15 @@ public static class OdfToXlsxConverter
 
     private const int MaxTableRepeat = 1_048_576;
 
+    // 只有樣式、沒有內容的重複列達到這個數量，就視為欄的預設格式而不逐格展開。
+    private const int StyledEmptyRowRepeatThreshold = 64;
+
     /// <summary>
     /// 以流式方式列舉工作表儲存格，避免全表 <c>Dictionary</c> 快取（PERF-4g）。
     /// </summary>
-    private static IEnumerable<(int Row, int Col, CellData Data)> EnumerateSheetCells(OdfTableSheet sheet)
+    private static IEnumerable<(int Row, int Col, CellData Data)> EnumerateSheetCells(
+        OdfTableSheet sheet,
+        List<(int Column, string StyleName)>? columnDefaults = null)
     {
         int currentRowIndex = 0;
         foreach (var rowChild in sheet.TableNode.Children)
@@ -1246,7 +1271,13 @@ public static class OdfToXlsxConverter
                 string? styleName = cellChild.GetAttribute("style-name", OdfNamespaces.Table);
                 if (cellValue is not null || !string.IsNullOrEmpty(styleName))
                 {
-                    var data = new CellData { Value = cellValue, StyleName = styleName };
+                    var data = new CellData
+                    {
+                        Value = cellValue,
+                        StyleName = styleName,
+                        ColumnSpan = ReadSpan(cellChild, "number-columns-spanned"),
+                        RowSpan = ReadSpan(cellChild, "number-rows-spanned"),
+                    };
                     for (int i = 0; i < colRepeatedCount; i++)
                     {
                         rowCells.Add((currentColIndex + i, data));
@@ -1254,6 +1285,21 @@ public static class OdfToXlsxConverter
                 }
 
                 currentColIndex += colRepeatedCount;
+            }
+
+            bool onlyStyles = rowCells.Count > 0 && rowCells.All(cell => cell.Data.Value is null);
+            if (columnDefaults is not null && onlyStyles && rowRepeatedCount >= StyledEmptyRowRepeatThreshold)
+            {
+                foreach (var cell in rowCells)
+                {
+                    if (cell.Data.StyleName is { Length: > 0 } styleName && columnDefaults.All(item => item.Column != cell.Col))
+                    {
+                        columnDefaults.Add((cell.Col, styleName));
+                    }
+                }
+
+                currentRowIndex += rowRepeatedCount;
+                continue;
             }
 
             for (int r = 0; r < rowRepeatedCount; r++)
@@ -1323,6 +1369,12 @@ public static class OdfToXlsxConverter
         return false;
     }
 
+    private static int ReadSpan(OdfNode cell, string attributeLocalName)
+    {
+        string? span = cell.GetAttribute(attributeLocalName, OdfNamespaces.Table);
+        return !string.IsNullOrEmpty(span) && int.TryParse(span, out int count) && count > 1 ? Math.Min(count, 16384) : 1;
+    }
+
     private static int GetRepeatCount(OdfNode node, string attributeLocalName)
     {
         string? repeat = node.GetAttribute(attributeLocalName, OdfNamespaces.Table);
@@ -1334,7 +1386,10 @@ public static class OdfToXlsxConverter
         return 1;
     }
 
-    private static void ApplyCellStyle(OdfTableSheet odsSheet, IXLCell xlCell, string? styleName)
+    private static void ApplyCellStyle(OdfTableSheet odsSheet, IXLCell xlCell, string? styleName) =>
+        ApplyCellStyle(odsSheet, xlCell.Style, styleName);
+
+    private static void ApplyCellStyle(OdfTableSheet odsSheet, IXLStyle style, string? styleName)
     {
         if (string.IsNullOrEmpty(styleName))
         {
@@ -1343,29 +1398,35 @@ public static class OdfToXlsxConverter
 
         var styleEngine = odsSheet.Document.StyleEngine;
 
+        string? numberFormat = GetExcelNumberFormat(odsSheet, styleName!);
+        if (numberFormat is not null)
+        {
+            style.NumberFormat.Format = numberFormat;
+        }
+
         if (string.Equals(styleEngine.GetStyleProperty(styleName!, "font-weight", OdfNamespaces.Fo, "table-cell"), "bold", StringComparison.OrdinalIgnoreCase))
         {
-            xlCell.Style.Font.Bold = true;
+            style.Font.Bold = true;
         }
 
         if (string.Equals(styleEngine.GetStyleProperty(styleName!, "font-style", OdfNamespaces.Fo, "table-cell"), "italic", StringComparison.OrdinalIgnoreCase))
         {
-            xlCell.Style.Font.Italic = true;
+            style.Font.Italic = true;
         }
 
         string? underline = styleEngine.GetStyleProperty(styleName!, "text-underline-style", OdfNamespaces.Style, "table-cell");
         if (!string.IsNullOrEmpty(underline) && !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase))
         {
-            xlCell.Style.Font.Underline = XLFontUnderlineValues.Single;
+            style.Font.Underline = XLFontUnderlineValues.Single;
         }
 
-        ApplyColor(styleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "table-cell"), color => xlCell.Style.Font.FontColor = color);
-        ApplyColor(styleEngine.GetStyleProperty(styleName!, "background-color", OdfNamespaces.Fo, "table-cell"), color => xlCell.Style.Fill.BackgroundColor = color);
-        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border", OdfNamespaces.Fo, "table-cell"), xlCell.Style.Border);
-        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-top", OdfNamespaces.Fo, "table-cell"), xlCell.Style.Border, "top");
-        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-bottom", OdfNamespaces.Fo, "table-cell"), xlCell.Style.Border, "bottom");
-        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-left", OdfNamespaces.Fo, "table-cell"), xlCell.Style.Border, "left");
-        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-right", OdfNamespaces.Fo, "table-cell"), xlCell.Style.Border, "right");
+        ApplyColor(styleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "table-cell"), color => style.Font.FontColor = color);
+        ApplyColor(styleEngine.GetStyleProperty(styleName!, "background-color", OdfNamespaces.Fo, "table-cell"), color => style.Fill.BackgroundColor = color);
+        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border", OdfNamespaces.Fo, "table-cell"), style.Border);
+        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-top", OdfNamespaces.Fo, "table-cell"), style.Border, "top");
+        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-bottom", OdfNamespaces.Fo, "table-cell"), style.Border, "bottom");
+        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-left", OdfNamespaces.Fo, "table-cell"), style.Border, "left");
+        ApplyBorder(styleEngine.GetStyleProperty(styleName!, "border-right", OdfNamespaces.Fo, "table-cell"), style.Border, "right");
     }
 
     private static void ApplyColor(string? value, Action<XLColor> apply)
@@ -1733,7 +1794,29 @@ public static class OdfToXlsxConverter
                     return flag;
                 return null;
             case "date":
-                return node.GetAttribute("date-value", OdfNamespaces.Office);
+                {
+                    string? dateValue = node.GetAttribute("date-value", OdfNamespaces.Office);
+                    return DateTime.TryParse(dateValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                        ? date
+                        : dateValue;
+                }
+            case "time":
+                {
+                    string? timeValue = node.GetAttribute("time-value", OdfNamespaces.Office);
+                    try
+                    {
+                        return string.IsNullOrEmpty(timeValue) ? null : XmlConvert.ToTimeSpan(timeValue);
+                    }
+                    catch (FormatException)
+                    {
+                        return textContent;
+                    }
+                }
+            case "percentage":
+            case "currency":
+                return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double amount)
+                    ? amount
+                    : null;
             case "string":
                 return textContent;
             default:
@@ -1765,6 +1848,9 @@ public static class OdfToXlsxConverter
 
         if (!global::OdfKit.Internal.OdfStringHelper.StartsWith(f, '='))
             f = "=" + f;
+
+        // OpenFormula 的方括號參照與分號分隔。
+        f = TranslateOpenFormulaSyntax(f);
 
         // 轉換工作表參照：Sheet.A1 → Sheet!A1；
         // 僅在字串常數以外的片段套用，避免 ="File.Name" 內的點被誤改寫。

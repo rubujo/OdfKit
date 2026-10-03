@@ -332,6 +332,80 @@ public sealed class ColorFontValidatorTests
         return table;
     }
 
+    /// <summary>
+    /// 真實字型（Windows 的新細明體 mingliu.ttc）的 EBLC 有兩個問題：strike 宣告的 indexTablesSize 低估實際範圍
+    /// （subtable 超出宣告的大小），而且不同 strike 宣告的範圍彼此重疊。FreeType 與 GDI 只看位移，
+    /// 驗證器以整個表的長度為界，不能因此拒絕整個字型；位移超出表長度仍然必須拒絕。
+    /// </summary>
+    [Fact]
+    public void ValidateAcceptsUnderstatedAndOverlappingIndexTableSizes()
+    {
+        (byte[] data, byte[] location) = CreateTwoStrikeBitmapPair(secondSubtableBeyondTable: false);
+        var tables = new Dictionary<string, byte[]> { ["EBDT"] = data, ["EBLC"] = location };
+
+        ColorGlyphClosure closure = ColorFontValidator.Validate(
+            tables,
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(ColorFontTechnology.Ebdt, closure.Technologies);
+
+        (byte[] brokenData, byte[] brokenLocation) = CreateTwoStrikeBitmapPair(secondSubtableBeyondTable: true);
+        Assert.Throws<InvalidDataException>(() => ColorFontValidator.Validate(
+            new Dictionary<string, byte[]> { ["EBDT"] = brokenData, ["EBLC"] = brokenLocation },
+            glyphCount: 2,
+            cancellationToken: TestContext.Current.CancellationToken));
+    }
+
+    // 兩個 strike、各一個 format 1 subtable；各自宣告的 indexTablesSize 只有 28 位元組，
+    // 不足以涵蓋自己的 subtable（20 位元組），且兩個 strike 宣告的範圍重疊。
+    private static (byte[] Data, byte[] Location) CreateTwoStrikeBitmapPair(bool secondSubtableBeyondTable)
+    {
+        var data = new byte[4];
+        WriteUInt32(data, 0, 0x00020000u);
+
+        var location = new byte[160];
+        WriteUInt32(location, 0, 0x00020000u);
+        WriteUInt32(location, 4, 2);
+
+        void WriteStrike(int record, uint arrayOffset)
+        {
+            WriteUInt32(location, record, arrayOffset);
+            WriteUInt32(location, record + 4, 28);
+            WriteUInt32(location, record + 8, 1);
+            WriteUInt16(location, record + 40, 0);
+            WriteUInt16(location, record + 42, 1);
+        }
+
+        WriteStrike(8, 104);
+        WriteStrike(56, 112);
+
+        void WriteArrayEntry(int arrayOffset, uint additionalOffset)
+        {
+            WriteUInt16(location, arrayOffset, 0);
+            WriteUInt16(location, arrayOffset + 2, 1);
+            WriteUInt32(location, arrayOffset + 4, additionalOffset);
+        }
+
+        WriteArrayEntry(104, 16);
+        WriteArrayEntry(112, secondSubtableBeyondTable ? 400u : 28u);
+
+        void WriteSubtable(int offset)
+        {
+            WriteUInt16(location, offset, 1);
+            WriteUInt16(location, offset + 2, 1);
+            WriteUInt32(location, offset + 4, 4);
+        }
+
+        WriteSubtable(120);
+        if (!secondSubtableBeyondTable)
+        {
+            WriteSubtable(140);
+        }
+
+        return (data, location);
+    }
+
     private static (byte[] Data, byte[] Location) CreateBitmapPair(
         uint version,
         ushort imageFormat,

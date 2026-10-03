@@ -10,15 +10,16 @@ namespace OdfKit.Compliance;
 internal sealed class OdfSchemaPatternMatchContext
 {
     private const int MaxRecursiveDepth = 128;
-    private readonly HashSet<string> _activeReferences = new(StringComparer.Ordinal);
+    // 每個子元素都會建立一個比對內容，多數是沒有子層的葉節點；以下集合與字典延遲到第一次使用才配置。
+    private HashSet<string>? _activeReferences;
     private readonly int _recursiveDepth;
     private readonly Dictionary<(OdfSchemaPatternNode Node, XElement Element), bool> _elementMatchCache;
     private readonly Dictionary<OdfSchemaPatternNode, OdfSchemaPatternNode?> _strippedRootCache;
-    private readonly Dictionary<int, OdfPositionSet> _singletonSets = new();
-    private readonly Dictionary<ReachKey, OdfPositionSet> _reachMemo = new();
-    private readonly Dictionary<ReachKey, OdfPositionSet> _contentMemo = new();
+    private Dictionary<int, OdfPositionSet>? _singletonSets;
+    private Dictionary<ReachKey, OdfPositionSet>? _reachMemo;
+    private Dictionary<ReachKey, OdfPositionSet>? _contentMemo;
     private const int MaxReachMemoEntries = 2_000_000;
-    private readonly Dictionary<(object Nodes, int Position), SequenceStepEntry> _sequenceMemo = new();
+    private Dictionary<(object Nodes, int Position), SequenceStepEntry>? _sequenceMemo;
 
     /// <summary>
     /// 序列中某個節點上一次推進的輸入與輸出（輸入位置集合 → 各位置比對結果的聯集）。
@@ -51,6 +52,19 @@ internal sealed class OdfSchemaPatternMatchContext
             _start;
     }
 
+    private static bool TryGet<TKey, TValue>(Dictionary<TKey, TValue>? map, TKey key, out TValue value)
+        where TKey : notnull
+    {
+        if (map is not null && map.TryGetValue(key, out TValue? found))
+        {
+            value = found;
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
     /// <summary>
     /// 取得循環參照防護攔下重複進入的累計次數。
     /// </summary>
@@ -63,19 +77,20 @@ internal sealed class OdfSchemaPatternMatchContext
     /// 取得先前記錄的「由某位置起重複比對（至少一次）可到達的位置集合」；回傳的集合唯讀。
     /// </summary>
     public bool TryGetReach(OdfSchemaPatternNode node, object childElements, int start, out OdfPositionSet reach) =>
-        _reachMemo.TryGetValue(new ReachKey(node, childElements, start), out reach!);
+        TryGet(_reachMemo, new ReachKey(node, childElements, start), out reach);
 
     /// <summary>
     /// 取得先前記錄的「模式節點由某位置起比對子元素內容」的結果集；回傳的集合唯讀。
     /// </summary>
     public bool TryGetContentMatch(OdfSchemaPatternNode node, object childElements, int start, out OdfPositionSet matches) =>
-        _contentMemo.TryGetValue(new ReachKey(node, childElements, start), out matches!);
+        TryGet(_contentMemo, new ReachKey(node, childElements, start), out matches);
 
     /// <summary>
     /// 記錄「模式節點由某位置起比對子元素內容」的結果集；超過上限後不再記錄以限制記憶體。
     /// </summary>
     public void StoreContentMatch(OdfSchemaPatternNode node, object childElements, int start, OdfPositionSet matches)
     {
+        _contentMemo ??= new();
         if (_contentMemo.Count < MaxReachMemoEntries)
         {
             _contentMemo[new ReachKey(node, childElements, start)] = matches;
@@ -86,19 +101,20 @@ internal sealed class OdfSchemaPatternMatchContext
     /// 取得序列節點上一次推進的記錄；子元素清單不同時視為沒有記錄。
     /// </summary>
     public bool TryGetSequenceStep(object nodes, int position, object childElements, out SequenceStepEntry entry) =>
-        _sequenceMemo.TryGetValue((nodes, position), out entry!) && ReferenceEquals(entry.ChildElements, childElements);
+        TryGet(_sequenceMemo, (nodes, position), out entry) && ReferenceEquals(entry.ChildElements, childElements);
 
     /// <summary>
     /// 記錄序列節點這一次推進的輸入與輸出，每個節點只保留最近一次，記憶體隨節點數而不隨輸入數成長。
     /// </summary>
     public void StoreSequenceStep(object nodes, int position, object childElements, OdfPositionSet input, OdfPositionSet output) =>
-        _sequenceMemo[(nodes, position)] = new SequenceStepEntry(childElements, input, output);
+        (_sequenceMemo ??= new())[(nodes, position)] = new SequenceStepEntry(childElements, input, output);
 
     /// <summary>
     /// 記錄「由某位置起重複比對（至少一次）可到達的位置集合」；超過上限後不再記錄以限制記憶體。
     /// </summary>
     public void StoreReach(OdfSchemaPatternNode node, object childElements, int start, OdfPositionSet reach)
     {
+        _reachMemo ??= new();
         if (_reachMemo.Count < MaxReachMemoEntries)
         {
             _reachMemo[new ReachKey(node, childElements, start)] = reach;
@@ -140,6 +156,7 @@ internal sealed class OdfSchemaPatternMatchContext
     /// </summary>
     public bool EnterReference(string referenceName)
     {
+        _activeReferences ??= new HashSet<string>(StringComparer.Ordinal);
         if (_activeReferences.Add(referenceName))
         {
             return true;
@@ -187,6 +204,7 @@ internal sealed class OdfSchemaPatternMatchContext
     /// </summary>
     public OdfPositionSet GetSingletonSet(int position)
     {
+        _singletonSets ??= new();
         if (!_singletonSets.TryGetValue(position, out OdfPositionSet? set))
         {
             set = new OdfPositionSet { position };
@@ -216,5 +234,5 @@ internal sealed class OdfSchemaPatternMatchContext
     /// <summary>
     /// 離開具名參照。
     /// </summary>
-    public void LeaveReference(string referenceName) => _activeReferences.Remove(referenceName);
+    public void LeaveReference(string referenceName) => _activeReferences?.Remove(referenceName);
 }

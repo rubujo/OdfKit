@@ -20,8 +20,25 @@
 | 公式 | 轉為 OpenFormula，保留 Excel 儲存的結果值 |
 | 合併儲存格 | 轉為 `number-columns-spanned`、`number-rows-spanned` 與 `table:covered-table-cell`。每個工作表被覆蓋的儲存格上限為 1,000,000，超過的範圍略過，避免 `A1:XFD1048576` 這類極小的輸入展開成無法完成的轉換 |
 | 稀疏資料 | 只走訪實際存在的儲存格（有內容或格式）。先前走訪整個已使用範圍並為每個空白儲存格建立節點，位於遠端位址的少數儲存格就會膨脹成數十萬個空白儲存格 |
+| 公式（LibreOffice 儲存的 ODS） | OpenFormula 的方括號參照改成 A1 參照（`[.B2]`、`[.B2:.C5]`、`[$Sheet.B2]`、需要引號的工作表名稱），函數參數分隔的分號改成逗號；字串常數內的分號與點不動 |
+| 值的類型 | 日期（`office:date-value`）、時間、百分比與貨幣轉成對應的 Excel 值；日期與時間不會變成文字 |
+| 合併儲存格（ODS → XLSX） | `number-columns-spanned`、`number-rows-spanned` 轉為合併範圍 |
+| 數字格式 | ODF 資料樣式轉成 Excel 格式字串：日期與時間（年月日、星期、時分秒、AM/PM）、千分位與小數位數、百分比、貨幣 |
+| 只有樣式的重複列 | LibreOffice 對有欄格式的資料會一路寫到第 1,048,576 列的空白重複列；轉成整欄的預設格式而不逐格展開（修正前這類檔案使轉換幾乎不會結束） |
 | 資料驗證、條件式格式、基本儲存格格式 | 保留（色階、資料橫條、圖示集、整數區間等） |
 | 圖表、樞紐分析表 | 轉換結構；樞紐分析表另有保留資料驗證與格式的後備路徑 |
+
+## ODT → DOCX
+
+| 內容 | 行為 |
+|------|------|
+| 段落、標題、字元格式 | 段落樣式、標題階層、粗體、斜體、底線、色彩、字級 |
+| 清單 | `text:list` 轉為帶 `w:numPr` 的段落並依 ODF 清單樣式建立編號定義：項目符號字元（LibreOffice 的 OpenSymbol 私用區字元改用標準圓點）、編號格式（數字、字母、羅馬數字、國字數字）、前綴後綴、起始值、顯示多層編號、縮排與懸掛縮排；巢狀清單層級正確。各個頂層清單獨立重新編號（ODF 的預設），標示延續編號的清單沿用前一份編號 |
+| 表格 | 基本表格與邊框 |
+| 圖片、追蹤修訂 | 保留 |
+| 輸出的合法性 | 屬性容器（`w:pPr`、`w:rPr`、`w:tblPr`、`w:tblBorders`、`w:tcPr` 等）的子元素依 ECMA-376 序列排列，表格都有 `w:tblGrid`；輸出通過 Open XML SDK 驗證（Word 對元素順序很嚴格，違反時可能提示檔案損毀） |
+
+已知限制：頁首與頁尾只轉換純文字；註腳、章節分欄、目錄、書籤與欄位未轉換；表格儲存格以單一段落輸出。
 
 ## DOCX → ODT
 
@@ -64,6 +81,8 @@
 另有以真實 LibreOffice 驗證的互通測試（`LibreOfficeInteropTests.RealDocuments.cs`，沒有 LibreOffice 時略過），
 涵蓋日期、合併儲存格、稀疏資料、清單、註腳、分頁、頁尾欄位、多章節頁面設定、超連結欄位、目錄、書籤、分欄與起始頁碼，以及 OdfKit 載入 LibreOffice 儲存的文件，
 見 [LibreOffice 互通性矩陣](libreoffice-interop-matrix.md)。
+
+簡報方面，ODP ↔ PPTX 以 LibreOffice 當裁判驗證（頁數與文字，並用 Open XML SDK 驗證 PPTX）：嵌入表格有 `table:table-column` 並放在 `draw:frame` 內，版面配置（`style:presentation-page-layout`）寫在 `office:styles`，預留位置以 `presentation:object` 標示類型，輸出符合 ODF 1.4 schema。
 
 官方 ODFDOM 範例檔（`docs/examples/odfdom-sample-corpus/manifest.json`）的試算表與文字範例本身幾乎沒有內容，
 驗證力有限；轉換缺陷主要由上述含已知真值的文件與 LibreOffice 的輸出發現。

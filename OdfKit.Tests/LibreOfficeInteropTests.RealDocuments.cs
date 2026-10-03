@@ -336,6 +336,104 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
+    /// 驗證 LibreOffice 產生的 ODT（由含清單、表格、超連結、換行與圖片的 HTML 匯入）經 OdfKit 載入後，
+    /// 匯出成 DOCX、HTML、Markdown、RTF 與 PDF 的文字都完整，DOCX 通過 Open XML SDK 驗證，
+    /// 且重新儲存的 ODT 仍能被 LibreOffice 開啟。修正前：重新儲存的 ODT 會被 LibreOffice 拒絕載入
+    /// （空項目複製出垃圾位元組）、DOCX 缺清單且違反 schema、HTML 與 PDF 缺連結、清單與表格內文。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeAuthoredOdtKeepsAllTextInEveryExportFormat()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過匯出格式互通性測試。");
+        }
+
+        using var workspace = new InteropWorkspace();
+        string htmlPath = Path.Combine(workspace.Root, "rich.html");
+        File.WriteAllText(htmlPath, """
+            <!DOCTYPE html><html><head><meta charset="utf-8"><title>文件標題</title></head><body>
+            <h1>第一章 概觀 Alpha</h1>
+            <p>這是<b>粗體Bravo</b>、<i>斜體Charlie</i>，含<a href="https://example.org/foxtrot">連結Foxtrot</a>。</p>
+            <ul><li>項目Hotel<ul><li>子項India</li></ul></li><li>項目Kilo</li></ul>
+            <ol><li>步驟Lima</li><li>步驟Mike</li></ol>
+            <table border="1"><tr><th>標題Oscar</th><th>標題Papa</th></tr>
+            <tr><td colspan="2">合併Quebec</td></tr><tr><td rowspan="2">縱合Romeo</td><td>格Sierra</td></tr><tr><td>格Tango</td></tr></table>
+            <p>換行前Uniform<br>換行後Victor</p>
+            <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" width="40" height="40" alt="圖片Zulu"></p>
+            </body></html>
+            """);
+        string odtPath = workspace.Convert(sofficePath!, htmlPath, "odt");
+        string sourceText = workspace.ConvertToText(sofficePath!, odtPath);
+        HashSet<string> expected = TokenizeWords(sourceText);
+        Assert.Contains("hotel", expected);
+        Assert.Contains("tango", expected);
+
+        using TextDocument document = TextDocument.Load(odtPath);
+
+        // DOCX：文字完整且通過 Open XML SDK 驗證。
+        string docxPath = Path.Combine(workspace.Root, "export.docx");
+        using (FileStream stream = File.Create(docxPath))
+        {
+            OdfToDocxConverter.Convert(document, stream);
+        }
+
+        AssertWordsPresent("DOCX", expected, workspace.ConvertToText(sofficePath!, docxPath));
+        using (WordprocessingDocument word = WordprocessingDocument.Open(docxPath, false))
+        {
+            var validator = new DocumentFormat.OpenXml.Validation.OpenXmlValidator(DocumentFormat.OpenXml.FileFormatVersions.Office2019);
+            Assert.Empty(validator.Validate(word, TestContext.Current.CancellationToken));
+        }
+
+        // HTML：以 LibreOffice 重新讀入後文字完整。
+        string htmlExportPath = Path.Combine(workspace.Root, "export.html");
+        File.WriteAllText(htmlExportPath, OdfKit.Export.OdfHtmlExporter.Export(document), new UTF8Encoding(false));
+        AssertWordsPresent("HTML", expected, workspace.ConvertToText(sofficePath!, htmlExportPath));
+
+        // Markdown 與 RTF。
+        AssertWordsPresent("Markdown", expected, OdfKit.Export.OdfMarkdownExporter.Export(document));
+        string rtfPath = Path.Combine(workspace.Root, "export.rtf");
+        File.WriteAllText(rtfPath, OdfKit.Export.OdfRtfExporter.Export(document), Encoding.ASCII);
+        AssertWordsPresent("RTF", expected, workspace.ConvertToText(sofficePath!, rtfPath));
+
+        // PDF：以 LibreOffice Draw 匯入成 Flat XML 後文字完整。
+        string pdfPath = Path.Combine(workspace.Root, "export.pdf");
+        using (FileStream stream = File.Create(pdfPath))
+        {
+            OdfKit.Export.OdfPdfExporter.ExportToStream(document, stream);
+        }
+
+        string fodgPath = workspace.Convert(sofficePath!, pdfPath, "fodg", inputFilter: "draw_pdf_import");
+        string drawing = Regex.Replace(File.ReadAllText(fodgPath, Encoding.UTF8), "<office:automatic-styles>.*?</office:automatic-styles>", " ", RegexOptions.Singleline);
+        AssertWordsPresent("PDF", expected, Regex.Replace(drawing, "<[^>]+>", " "));
+
+        // 重新儲存的 ODT 仍能被 LibreOffice 開啟，且文字完整。
+        string resavedPath = Path.Combine(workspace.Root, "resaved.odt");
+        document.Save(resavedPath);
+        AssertWordsPresent("重新儲存的 ODT", expected, workspace.ConvertToText(sofficePath!, resavedPath));
+    }
+
+    // 文字比對只看字詞：每個中日韓字元一個詞，拉丁字母與數字連續字串一個詞（小寫）。
+    private static HashSet<string> TokenizeWords(string text)
+    {
+        var words = new HashSet<string>(StringComparer.Ordinal);
+        foreach (Match match in Regex.Matches(text, @"[㐀-鿿]|[A-Za-z][A-Za-z0-9]*"))
+        {
+            words.Add(match.Value.ToLowerInvariant());
+        }
+
+        return words;
+    }
+
+    private static void AssertWordsPresent(string label, HashSet<string> expected, string actualText)
+    {
+        HashSet<string> actual = TokenizeWords(actualText);
+        string[] missing = expected.Where(word => !actual.Contains(word)).OrderBy(word => word, StringComparer.Ordinal).ToArray();
+        Assert.True(missing.Length == 0, $"{label} 遺失 {missing.Length}/{expected.Count} 個詞：{string.Join(",", missing.Take(30))}");
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice 儲存的 ODS（儲存格帶有宣告在根元素的 <c>calcext:</c> 前綴屬性、表格超過 8 KB）
     /// 由 OdfKit DOM 載入後資料完整，修改後再儲存仍完整。修正前延遲具現化的外殼只宣告七個前綴，
     /// 解析失敗後整張工作表被搶救成空表，儲存就把資料永久清掉。
@@ -536,9 +634,9 @@ public partial class LibreOfficeInteropTests
         internal string Root { get; }
 
         /// <summary>以 LibreOffice 轉換成指定格式並傳回輸出檔路徑。</summary>
-        internal string Convert(string sofficePath, string inputPath, string targetFormat)
+        internal string Convert(string sofficePath, string inputPath, string targetFormat, string? inputFilter = null)
         {
-            RunSoffice(sofficePath, _profile, _output, targetFormat, inputPath);
+            RunSoffice(sofficePath, _profile, _output, targetFormat, inputPath, inputFilter: inputFilter);
             string extension = targetFormat.Split(':')[0];
             string outputPath = Path.Combine(_output, Path.GetFileNameWithoutExtension(inputPath) + "." + extension);
             Assert.True(File.Exists(outputPath), $"LibreOffice 應輸出 {Path.GetFileName(outputPath)}。");

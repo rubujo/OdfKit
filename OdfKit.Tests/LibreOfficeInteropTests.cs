@@ -2296,7 +2296,8 @@ public partial class LibreOfficeInteropTests
         string outputDir,
         string targetFormat,
         string inputPath,
-        int timeoutMilliseconds = 60_000)
+        int timeoutMilliseconds = 60_000,
+        string? inputFilter = null)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -2307,6 +2308,11 @@ public partial class LibreOfficeInteropTests
         };
         startInfo.ArgumentList.Add("-env:UserInstallation=" + new Uri(userInstallationDir + Path.DirectorySeparatorChar).AbsoluteUri);
         startInfo.ArgumentList.Add("--headless");
+        if (!string.IsNullOrEmpty(inputFilter))
+        {
+            startInfo.ArgumentList.Add("--infilter=" + inputFilter);
+        }
+
         startInfo.ArgumentList.Add("--convert-to");
         startInfo.ArgumentList.Add(targetFormat);
         startInfo.ArgumentList.Add("--outdir");

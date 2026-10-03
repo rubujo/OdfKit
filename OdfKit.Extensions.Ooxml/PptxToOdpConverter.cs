@@ -661,12 +661,13 @@ public static class PptxToOdpConverter
         int rowCount = Math.Max(rows.Length, 1);
         int columnCount = Math.Max(rows.Select(row => row.Elements<A.TableCell>().Count()).DefaultIfEmpty(1).Max(), 1);
         Bounds bounds = GetBounds(graphicFrame.Transform);
-        OdfKit.Presentation.OdfShape shape = slide.AddShape(OdfShapeType.Rectangle, bounds.X, bounds.Y, bounds.Width, bounds.Height);
-        RegisterAnimationTarget(
-            ReadShapeId(graphicFrame.NonVisualGraphicFrameProperties?.NonVisualDrawingProperties),
-            shape,
-            animationTargets);
-        OdfKit.Presentation.OdfEmbeddedTable embeddedTable = shape.AddEmbeddedTable(rowCount, columnCount);
+        // 表格必須放在 draw:frame 內（放在 draw:rect 內不符合 ODF schema）。
+        OdfKit.Presentation.OdfEmbeddedTable embeddedTable = slide.AddTable(rowCount, columnCount, bounds.X, bounds.Y, bounds.Width, bounds.Height);
+        uint? tableSourceId = ReadShapeId(graphicFrame.NonVisualGraphicFrameProperties?.NonVisualDrawingProperties);
+        if (tableSourceId.HasValue && !string.IsNullOrWhiteSpace(embeddedTable.Id))
+        {
+            animationTargets[tableSourceId.Value] = embeddedTable.Id;
+        }
         string? tableStyleId = table.TableProperties?.GetFirstChild<A.TableStyleId>()?.Text;
         if (!string.IsNullOrWhiteSpace(tableStyleId))
         {

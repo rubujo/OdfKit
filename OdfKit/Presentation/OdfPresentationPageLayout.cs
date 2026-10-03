@@ -61,7 +61,7 @@ public class OdfPresentationPageLayout(OdfNode node)
     public OdfPlaceholderTemplate AddPlaceholder(OdfPlaceholderType type, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode phNode = new(OdfNodeType.Element, "placeholder", OdfNamespaces.Presentation, "presentation");
-        phNode.SetAttribute("class", OdfNamespaces.Presentation, OdfPlaceholderTemplate.TypeToKebab(type), "presentation");
+        phNode.SetAttribute("object", OdfNamespaces.Presentation, OdfPlaceholderTemplate.TypeToKebab(type), "presentation");
         phNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         phNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         phNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -84,7 +84,7 @@ public class OdfPresentationPageLayout(OdfNode node)
         {
             if (child.LocalName is "placeholder" && child.NamespaceUri == OdfNamespaces.Presentation)
             {
-                if (child.GetAttribute("class", OdfNamespaces.Presentation) == clsVal)
+                if ((child.GetAttribute("object", OdfNamespaces.Presentation) ?? child.GetAttribute("class", OdfNamespaces.Presentation)) == clsVal)
                 {
                     toRemove.Add(child);
                 }

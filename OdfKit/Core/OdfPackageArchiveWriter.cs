@@ -441,11 +441,17 @@ internal static partial class OdfPackageArchiveWriter
                         flags,
                         timeDate);
 
-                    using Stream rawStream = ctx.Package.Mmf!.CreateViewStream(
-                        mmfEntry.CompressedDataOffset,
-                        mmfEntry.CompressedSize,
-                        System.IO.MemoryMappedFiles.MemoryMappedFileAccess.Read);
-                    CopyStreamWithCancellation(rawStream, countingTarget, cancellationToken);
+                    // 大小為 0 的項目（例如 Configurations2/ 目錄項目）不能建立檢視：
+                    // CreateViewStream 的 size 為 0 代表「從位移到檔案結尾」，會把原始檔案其餘的位元組
+                    // 全部複製進輸出，在項目之間留下大片垃圾，LibreOffice 會因此拒絕載入整個封裝。
+                    if (mmfEntry.CompressedSize > 0)
+                    {
+                        using Stream rawStream = ctx.Package.Mmf!.CreateViewStream(
+                            mmfEntry.CompressedDataOffset,
+                            mmfEntry.CompressedSize,
+                            System.IO.MemoryMappedFiles.MemoryMappedFileAccess.Read);
+                        CopyStreamWithCancellation(rawStream, countingTarget, cancellationToken);
+                    }
 
                     centralDirectory.Add(new RawZipCentralDirectoryEntry(
                         name,

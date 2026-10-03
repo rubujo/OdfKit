@@ -175,29 +175,26 @@ public partial class PresentationDocument
         OdfNode root,
         Dictionary<string, OdfPresentationPageLayout> layouts)
     {
-        OdfNode? autoStyles = null;
-        foreach (OdfNode child in root.Children)
+        // 版面配置在 office:styles（規範位置）；也讀取舊版寫在 office:automatic-styles 的。
+        foreach (OdfNode section in root.Children)
         {
-            if (child.LocalName == "automatic-styles" && child.NamespaceUri == OdfNamespaces.Office)
+            if (section.NamespaceUri != OdfNamespaces.Office
+                || (section.LocalName != "styles" && section.LocalName != "automatic-styles"))
             {
-                autoStyles = child;
-                break;
+                continue;
             }
-        }
 
-        if (autoStyles is null)
-            return;
+            foreach (OdfNode child in section.Children)
+            {
+                if (child.LocalName is not "presentation-page-layout" || child.NamespaceUri != OdfNamespaces.Style)
+                    continue;
 
-        foreach (OdfNode child in autoStyles.Children)
-        {
-            if (child.LocalName is not "presentation-page-layout" || child.NamespaceUri != OdfNamespaces.Style)
-                continue;
+                string? name = child.GetAttribute("name", OdfNamespaces.Style);
+                if (string.IsNullOrEmpty(name))
+                    continue;
 
-            string? name = child.GetAttribute("name", OdfNamespaces.Style);
-            if (string.IsNullOrEmpty(name))
-                continue;
-
-            layouts[name!] = new OdfPresentationPageLayout(child);
+                layouts[name!] = new OdfPresentationPageLayout(child);
+            }
         }
     }
 

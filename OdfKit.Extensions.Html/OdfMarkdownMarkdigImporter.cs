@@ -74,6 +74,9 @@ internal static class OdfMarkdownMarkdigImporter
             case Table table:
                 AppendTable(context, table);
                 break;
+            case CodeBlock codeBlock:
+                AppendCodeBlock(codeBlock, context.Document.AddParagraph);
+                break;
             case FootnoteGroup:
             case ThematicBreakBlock:
                 break;
@@ -104,6 +107,11 @@ internal static class OdfMarkdownMarkdigImporter
                 {
                     OdfParagraph odfParagraph = listItem.AddParagraph();
                     AppendInlines(context, odfParagraph, paragraph.Inline, InlineImportStyle.Empty);
+                    wroteParagraph = true;
+                }
+                else if (child is CodeBlock codeBlock)
+                {
+                    AppendCodeBlock(codeBlock, listItem.AddParagraph);
                     wroteParagraph = true;
                 }
                 else if (child is ListBlock nested)
@@ -237,6 +245,9 @@ internal static class OdfMarkdownMarkdigImporter
             case EmphasisInline emphasis:
                 AppendInlines(context, paragraph, emphasis, MergeEmphasisStyle(style, emphasis));
                 break;
+            case CodeInline code:
+                AppendText(paragraph, code.Content, style with { Code = true });
+                break;
             case LinkInline link when link.IsImage:
                 AppendImage(paragraph, link);
                 break;
@@ -322,6 +333,29 @@ internal static class OdfMarkdownMarkdigImporter
         if (style.Strikethrough)
         {
             run.IsStrikethrough = true;
+        }
+
+        if (style.Code)
+        {
+            run.FontName = MonospaceFontName;
+        }
+    }
+
+    private const string MonospaceFontName = "Liberation Mono";
+
+    // 程式碼區塊（含圍欄與縮排）：每一行一個段落並使用等寬字型，保留空行與行首空白。
+    private static void AppendCodeBlock(CodeBlock codeBlock, Func<OdfParagraph> addParagraph)
+    {
+        int lineCount = codeBlock.Lines.Count;
+        while (lineCount > 0 && string.IsNullOrWhiteSpace(codeBlock.Lines.Lines[lineCount - 1].ToString()))
+        {
+            lineCount--;
+        }
+
+        for (int index = 0; index < lineCount; index++)
+        {
+            OdfParagraph paragraph = addParagraph();
+            AppendText(paragraph, codeBlock.Lines.Lines[index].ToString(), new InlineImportStyle(Code: true));
         }
     }
 
@@ -418,7 +452,8 @@ internal static class OdfMarkdownMarkdigImporter
         bool Bold = false,
         bool Italic = false,
         bool Underline = false,
-        bool Strikethrough = false)
+        bool Strikethrough = false,
+        bool Code = false)
     {
         public static InlineImportStyle Empty => default;
     }

@@ -23,8 +23,16 @@ public class OdfPlaceholderTemplate(OdfNode node)
     /// </summary>
     public OdfPlaceholderType PlaceholderType
     {
-        get => KebabToType(Node.GetAttribute("class", OdfNamespaces.Presentation) ?? "text");
-        set => Node.SetAttribute("class", OdfNamespaces.Presentation, TypeToKebab(value), "presentation");
+        // 版面配置的預留位置範本以 presentation:object 標示類型（ODF schema 要求）；讀取時也接受舊版寫出的 presentation:class。
+        get => KebabToType(
+            Node.GetAttribute("object", OdfNamespaces.Presentation)
+            ?? Node.GetAttribute("class", OdfNamespaces.Presentation)
+            ?? "text");
+        set
+        {
+            Node.RemoveAttribute("class", OdfNamespaces.Presentation);
+            Node.SetAttribute("object", OdfNamespaces.Presentation, TypeToKebab(value), "presentation");
+        }
     }
 
     /// <summary>

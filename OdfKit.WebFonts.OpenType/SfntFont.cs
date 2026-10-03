@@ -541,9 +541,19 @@ internal sealed class SfntFont
             BinaryPrimitives.WriteUInt32BigEndian(loca.AsSpan(glyph * 4, 4), checked((uint)stream.Length));
             if (selectedGlyphs.Contains(glyph))
             {
-                // 直接由來源 glyf 位移寫出，避免每個字圖多配置一份陣列副本。
+                // 直接由來源 glyf 位移寫出，避免每個字圖多配置一份陣列副本；
+                // 只有簡單字圖的旗標含保留位元（bit 7）時才複製一份清除後的資料。
                 (int offset, int length) = GetGlyphRange(glyph);
-                stream.Write(glyf, offset, length);
+                byte[]? sanitized = ClearReservedSimpleGlyphFlagBit(glyf.AsSpan(offset, length));
+                if (sanitized is not null)
+                {
+                    stream.Write(sanitized, 0, sanitized.Length);
+                }
+                else
+                {
+                    stream.Write(glyf, offset, length);
+                }
+
                 while ((stream.Length & 3) != 0)
                 {
                     stream.WriteByte(0);
@@ -553,6 +563,64 @@ internal sealed class SfntFont
 
         BinaryPrimitives.WriteUInt32BigEndian(loca.AsSpan(_glyphCount * 4, 4), checked((uint)stream.Length));
         return stream.ToArray();
+    }
+
+    /// <summary>
+    /// 清除簡單字圖旗標的保留位元（bit 7）；沒有任何旗標需要清除時傳回 null（呼叫端直接使用原始資料）。
+    /// </summary>
+    /// <remarks>
+    /// TrueType 規範保留 bit 7，Windows 與 FreeType 容忍它（Windows 的新細明體 mingliu.ttc 的字圖就帶有這個位元），
+    /// 但瀏覽器的字型檢查（OTS）會以「Bad glyph flag, reserved bit 7 must be set to zero」拒絕整個 glyf 表，
+    /// 使產生的網頁字型完全載入失敗。旗標的其餘位元與座標資料不動。
+    /// </remarks>
+    internal static byte[]? ClearReservedSimpleGlyphFlagBit(ReadOnlySpan<byte> glyph)
+    {
+        if (glyph.Length < 12)
+        {
+            return null;
+        }
+
+        short contours = BinaryPrimitives.ReadInt16BigEndian(glyph);
+        if (contours <= 0)
+        {
+            return null;
+        }
+
+        int endPointsOffset = 10;
+        int instructionLengthOffset = endPointsOffset + (contours * 2);
+        if (instructionLengthOffset + 2 > glyph.Length)
+        {
+            return null;
+        }
+
+        int points = BinaryPrimitives.ReadUInt16BigEndian(glyph.Slice(instructionLengthOffset - 2, 2)) + 1;
+        int position = instructionLengthOffset + 2 + BinaryPrimitives.ReadUInt16BigEndian(glyph.Slice(instructionLengthOffset, 2));
+        byte[]? copy = null;
+        int covered = 0;
+        while (covered < points && position < glyph.Length)
+        {
+            byte flag = glyph[position];
+            if ((flag & 0x80) != 0)
+            {
+                copy ??= glyph.ToArray();
+                copy[position] = (byte)(flag & 0x7F);
+            }
+
+            position++;
+            covered++;
+            if ((flag & 0x08) != 0)
+            {
+                if (position >= glyph.Length)
+                {
+                    break;
+                }
+
+                covered += glyph[position];
+                position++;
+            }
+        }
+
+        return copy;
     }
 
     private ReadOnlySpan<byte> GetGlyph(ushort glyph)

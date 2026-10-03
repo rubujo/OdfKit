@@ -401,6 +401,9 @@ internal static class GsubGlyphClosure
         }
     }
 
+    // 無效 coverage 項目的哨兵值：字形編號最大為 65534，所以 0xFFFF 永遠不會出現在字形集合裡。
+    private const ushort InvalidCoverageGlyph = 0xFFFF;
+
     private static IReadOnlyList<ushort> ReadCoverage(
         byte[] table,
         int offset,
@@ -416,10 +419,21 @@ internal static class GsubGlyphClosure
             SfntFont.EnsureRange(table, offset + 4, checked(count * 2), "GSUB-coverageGlyphs");
             var glyphs = new ushort[count];
             ushort previous = 0;
+            bool sawOutOfRange = false;
             for (int index = 0; index < count; index++)
             {
                 ushort glyph = SfntFont.ReadUInt16(table, offset + 4 + (index * 2), "GSUB-coverageGlyph");
-                if (glyph >= glyphCount || (index > 0 && glyph <= previous))
+                if (glyph >= glyphCount)
+                {
+                    // 舊版字型（例如 Windows 的標楷體 kaiu.ttf）會在 coverage 尾端放 0xFFFF 之類的無效字形編號；
+                    // 瀏覽器載入時視為不存在。以永遠不會出現在字形集合裡的哨兵值保留項目位置（替代字形陣列以
+                    // 項目位置對應，不能刪掉項目），而不是拒絕整個字型。只容許尾端出現，中間出現視為毀損。
+                    sawOutOfRange = true;
+                    glyphs[index] = InvalidCoverageGlyph;
+                    continue;
+                }
+
+                if (sawOutOfRange || (index > 0 && glyph <= previous))
                 {
                     throw SfntFont.DataInvalid("GSUB-coverageGlyph");
                 }
@@ -439,20 +453,30 @@ internal static class GsubGlyphClosure
             budget.Consume(Math.Max((int)rangeCount, 1));
             var glyphs = new List<ushort>();
             ushort previousEnd = 0;
+            bool sawOutOfRange = false;
             for (int index = 0; index < rangeCount; index++)
             {
                 int range = offset + 4 + (index * 6);
                 ushort first = SfntFont.ReadUInt16(table, range, "GSUB-coverageStart");
                 ushort end = SfntFont.ReadUInt16(table, range + 2, "GSUB-coverageEnd");
                 ushort startIndex = SfntFont.ReadUInt16(table, range + 4, "GSUB-coverageIndex");
-                if (first > end || end >= glyphCount || (index > 0 && first <= previousEnd) || startIndex != glyphs.Count)
+                if (first > end || (index > 0 && first <= previousEnd) || startIndex != glyphs.Count || (sawOutOfRange && first < glyphCount))
                 {
                     throw SfntFont.DataInvalid("GSUB-coverageRange");
                 }
 
+                // 範圍超出字形數量的部分以哨兵值保留項目位置（理由同 format 1）；只容許出現在尾端。
                 for (int glyph = first; glyph <= end; glyph++)
                 {
-                    glyphs.Add((ushort)glyph);
+                    if (glyph >= glyphCount)
+                    {
+                        sawOutOfRange = true;
+                        glyphs.Add(InvalidCoverageGlyph);
+                    }
+                    else
+                    {
+                        glyphs.Add((ushort)glyph);
+                    }
                 }
 
                 previousEnd = end;

@@ -4,6 +4,19 @@
 
 ## 0.0.1 - 2026-10-02
 
+再以 LibreOffice 26.2.4.2 當裁判，對 OdfKit 的匯出、轉換與匯入做一輪驗證（真實 LibreOffice 產生的 ODT、ODS、ODP 與 RTF 交給 OdfKit，輸出再交回 LibreOffice 開啟，OOXML 輸出另以 Open XML SDK 驗證，字型以真實系統字型加 Chrome 渲染比對）：
+
+- **修正載入 LibreOffice 檔案再儲存後 LibreOffice 拒絕開啟（嚴重）**：原始檔複製路徑對大小為 0 的項目（LibreOffice 的封裝含空的 `Configurations2/` 目錄項目）建立記憶體對應檢視，而 `CreateViewStream(offset, 0)` 的 0 代表「到檔案結尾」，結果把原始檔案其餘的位元組全複製進輸出，在項目之間留下約等於原始檔案大小的垃圾，LibreOffice 回報「source file could not be loaded」。同一個問題也使讀取空項目讀到不相干的位元組。
+- **修正 ODS → XLSX 轉換幾乎不會結束**：LibreOffice 從有欄格式的 XLSX 轉出 ODS 時，會在資料列之後寫出只有樣式的重複列（一路到第 1,048,576 列），逐格展開會建立數百萬個空白儲存格；現在轉成整欄的預設格式。另外補上先前遺失的內容：OpenFormula 方括號參照（`[.B2]` 原樣留在 XLSX 公式裡，Excel 無法計算）與分號分隔、日期（原本變成文字）、時間、百分比與貨幣值、合併儲存格、數字格式。
+- **修正 ODT → DOCX**：（1）完全沒有清單支援，所有清單項目整個消失，現在轉成編號定義與帶 `w:numPr` 的段落（項目符號、編號格式、前後綴、起始值、縮排、巢狀、各清單獨立重新編號）；（2）輸出違反 Open XML schema（`w:pPr`、`w:rPr`、`w:tblBorders` 的元素順序錯誤，表格缺少 `w:tblGrid`），Word 可能提示檔案損毀，現在依 ECMA-376 序列排列並補上欄格線，輸出通過 Open XML SDK 驗證。
+- **修正 HTML 匯出**：超連結文字整個消失、巢狀清單被壓平、有序清單變成無序清單、表格被輸出成一堆段落；現在涵蓋超連結（不安全協定只保留文字）、有序與巢狀清單、含標題列與合併儲存格的表格、連續空格、定位字元、換行、書籤、圖片（資料 URI）、段落對齊與亞洲字型粗體斜體。
+- **修正 PDF 匯出**：清單只輸出單層、表格內文與超連結文字整個不見、字元樣式被忽略；現在涵蓋超連結、巢狀有序與無序清單、表格（合併儲存格、標題列）、圖片、段落對齊、粗體斜體底線色彩字級，頁面大小沿用文件設定。
+- **修正簡報**：嵌入表格缺少 `table:table-column`、版面配置（`style:presentation-page-layout`）寫在 `office:automatic-styles`（規範位置是 `office:styles`）、版面配置的預留位置用 `presentation:class` 而不是規範的 `presentation:object`、PPTX → ODP 把表格放在 `draw:rect` 內（應在 `draw:frame`）；現在 OdfKit 建立的簡報與 PPTX → ODP 的輸出都通過 ODF 1.4 schema 驗證。
+- **修正 RTF 匯入**：標頭區的樣式表、清單定義、清單標籤等資訊群組被當成文字輸出，清單定義裡的 `\'01` 變成控制字元 U+0001 寫進文件，儲存時因非法 XML 字元失敗；現在略過這些群組。寫出層也改為略過 XML 1.0 不允許的字元（文字與屬性值），不再讓整份文件無法儲存。
+- **修正 Markdown 匯入**：行內程式碼與程式碼區塊（含圍欄與縮排）的文字整個消失；現在保留並使用等寬字型。
+- **修正 WebFont 引擎拒絕或輸出無法載入的真實 Windows 字型**：（1）Windows 的 `kaiu.ttf`（標楷體）在 GSUB 的 coverage 尾端有無效的字形編號 0xFFFF，瀏覽器照常載入，引擎卻拒絕整個字型；現在尾端的無效項目保留位置但不觸發替代（中間出現或排序錯誤仍視為毀損）。（2）`mingliu.ttc`（新細明體）的 EBLC 宣告的 `indexTablesSize` 低估實際範圍且各 strike 的範圍重疊，驗證器因此拒絕；現在以整個表的長度為界。（3）新細明體的字圖旗標帶有保留位元（bit 7），引擎照搬，產生的 WOFF2 被 Chrome 的字型檢查拒絕（「reserved bit 7 must be set to zero」），網頁字型完全載入失敗；現在輸出時清除該位元。以 238 個 Windows 系統字型逐一產生子集：229 個成功，其餘 9 個是符號或圖示字型（沒有拉丁字母與數字）與標頭無效的 `mstmc.ttf`，被正確拒絕。arial、consolas、kaiu 的子集在 Chrome 以同一條基線對齊繪製時與原字型逐像素相同，新細明體的子集在 Chrome 可載入。
+- 新增 `RealWorldImportTests.cs`，並擴充 `RealWorldConverterFidelityTests.cs`、`HtmlExportTests.cs`、`LibreOfficeInteropTests.RealDocuments.cs` 與 `GsubCoverageToleranceTests.cs` 鎖定上述行為。
+
 以 LibreOffice 26.2.4.2 的實機輸出再驗證一輪（Portable 版 LibreOffice 把測試用的 XLSX、DOCX、HTML 轉成真正的 ODS／ODT，再由 OdfKit 讀取；反向則讓 LibreOffice 開啟 OdfKit 的輸出並匯出成 XLSX 與文字）。OdfKit 轉換出的 ODS 經 LibreOffice 匯出為 XLSX 後，1,143 個儲存格與合併範圍全部與原始真值一致；ODT 的空白、定位字元、換行、超連結、表格與巢狀表格也都正確。同時抓到下列四個先前沒有被發現的缺陷，其中第一個會讓 LibreOffice 儲存的試算表在載入後資料全部遺失。
 
 - **修正載入 LibreOffice 文件時資料靜默遺失（嚴重）**：`OdfNode` 對 8 KB 以上的 `table:table`、`text:p`、`text:list` 等子樹採延遲具現化，具現化時用只宣告七個前綴（office、text、table、style、draw、fo、xlink）的外殼重新解析原始 XML。LibreOffice 在每個儲存格寫 `calcext:value-type`，該前綴只宣告在文件根元素，外殼未宣告使解析失敗，寬鬆模式（預設）又把失敗「搶救」成空的子樹，只留一則診斷警告：LibreOffice 儲存的 ODS 只要有一張工作表超過約 8 KB，`SpreadsheetDocument.Load` 後該表的儲存格全部讀不到，修改後再儲存就把資料永久清掉（`OdsStreamReader` 不受影響，所以兩種讀取器的結果不一致）。現在具現化時帶入該節點當時在作用域內的全部命名空間宣告。OdfKit 自己產生的文件只用到這七個前綴，因此既有測試都沒有發現。

@@ -85,6 +85,15 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
         global::OdfKit.Internal.OdfThrowHelper.ThrowIfLessThan(columns, 1, nameof(columns));
 
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+
+        // ODF schema 規定 table:table 至少要有一個 table:table-column（欄定義在列之前）。
+        var columnNode = new OdfNode(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
+        if (columns > 1)
+        {
+            columnNode.SetAttribute("number-columns-repeated", OdfNamespaces.Table, columns.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
+        }
+
+        table.AppendChild(columnNode);
         for (int row = 0; row < rows; row++)
         {
             var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");

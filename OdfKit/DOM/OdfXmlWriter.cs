@@ -94,6 +94,65 @@ public static class OdfXmlWriter
         bool isRoot,
         int depth) => WriteNode(node, writer, null, nsDict, ref openElementsCount, isRoot, depth);
 
+    /// <summary>
+    /// 移除 XML 1.0 不允許的字元（例如 U+0001 等控制字元與未配對的代理字元）。
+    /// </summary>
+    /// <remarks>
+    /// 匯入器與使用者程式碼可能把控制字元放進文字或屬性值（例如 RTF 清單定義裡的 <c>'01</c>）；
+    /// XML 無法表示這些字元，交給 <see cref="XmlWriter"/> 會擲出例外而使整份文件無法儲存。
+    /// 這些字元沒有任何可顯示的意義，寫出時直接略過；全部合法的字串（絕大多數情況）原樣傳回、不配置新字串。
+    /// </remarks>
+    internal static string RemoveInvalidXmlCharacters(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value ?? string.Empty;
+        }
+
+        string text = value!;
+        int firstInvalid = -1;
+        for (int index = 0; index < text.Length; index++)
+        {
+            char current = text[index];
+            if (XmlConvert.IsXmlChar(current))
+            {
+                continue;
+            }
+
+            if (char.IsHighSurrogate(current) && index + 1 < text.Length && XmlConvert.IsXmlSurrogatePair(text[index + 1], current))
+            {
+                index++;
+                continue;
+            }
+
+            firstInvalid = index;
+            break;
+        }
+
+        if (firstInvalid < 0)
+        {
+            return text;
+        }
+
+        var builder = new System.Text.StringBuilder(text.Length);
+        builder.Append(text, 0, firstInvalid);
+        for (int index = firstInvalid; index < text.Length; index++)
+        {
+            char current = text[index];
+            if (XmlConvert.IsXmlChar(current))
+            {
+                builder.Append(current);
+            }
+            else if (char.IsHighSurrogate(current) && index + 1 < text.Length && XmlConvert.IsXmlSurrogatePair(text[index + 1], current))
+            {
+                builder.Append(current).Append(text[index + 1]);
+                index++;
+            }
+        }
+
+        return builder.ToString();
+    }
+
     private static void WriteNode(
         OdfNode node,
         XmlWriter writer,
@@ -125,7 +184,7 @@ public static class OdfXmlWriter
 
         if (node.NodeType == OdfNodeType.Text)
         {
-            writer.WriteString(node.TextContent);
+            writer.WriteString(RemoveInvalidXmlCharacters(node.TextContent));
             return;
         }
 
@@ -166,11 +225,11 @@ public static class OdfXmlWriter
             string attrPrefix = GetNamespacePrefix(attr.Key.NamespaceUri, node.GetAttributePrefix(attr.Key), nsDict);
             if (!string.IsNullOrEmpty(attr.Key.NamespaceUri))
             {
-                writer.WriteAttributeString(attrPrefix, attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value);
+                writer.WriteAttributeString(attrPrefix, attr.Key.LocalName, attr.Key.NamespaceUri, RemoveInvalidXmlCharacters(attr.Value));
             }
             else
             {
-                writer.WriteAttributeString(attr.Key.LocalName, attr.Value);
+                writer.WriteAttributeString(attr.Key.LocalName, RemoveInvalidXmlCharacters(attr.Value));
             }
         }
 

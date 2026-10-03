@@ -24,7 +24,7 @@ namespace OdfKit.Conversion;
 /// 將 <see cref="TextDocument"/> (ODT) 轉換為 DOCX 格式的轉換器。
 /// 支援段落樣式、字元格式、標題、表格、圖片與追蹤修訂。
 /// </summary>
-public static class OdfToDocxConverter
+public static partial class OdfToDocxConverter
 {
     private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
 
@@ -55,6 +55,24 @@ public static class OdfToDocxConverter
         ConvertHeaderFooter(odtDocument, mainPart, body);
 
         EnsureBodyEndsWithParagraph(body);
+
+        if (ctx.Numbering.HasContent)
+        {
+            mainPart.AddNewPart<NumberingDefinitionsPart>().Numbering = ctx.Numbering.Build();
+        }
+
+        // 轉換器逐項附加屬性，順序取決於呼叫順序；Word 要求依 schema 序列，輸出前統一整理。
+        OoxmlSchemaOrder.Normalize(mainPart.Document);
+        OoxmlSchemaOrder.Normalize(mainPart.StyleDefinitionsPart?.Styles);
+        foreach (HeaderPart headerPart in mainPart.HeaderParts)
+        {
+            OoxmlSchemaOrder.Normalize(headerPart.Header);
+        }
+
+        foreach (FooterPart footerPart in mainPart.FooterParts)
+        {
+            OoxmlSchemaOrder.Normalize(footerPart.Footer);
+        }
 
         wordDoc.Save();
     }
@@ -200,6 +218,42 @@ public static class OdfToDocxConverter
             LoadStyles(document.Package);
             LoadStyles(document.StylesDom);
             LoadStyles(document.ContentDom);
+            RegisterListStyles(document.StylesDom);
+            RegisterListStyles(document.ContentDom);
+        }
+
+        /// <summary>
+        /// ODF 清單樣式（<c>text:list-style</c>），以樣式名稱為鍵。
+        /// </summary>
+        public Dictionary<string, OdfNode> ListStyles { get; } = new Dictionary<string, OdfNode>(StringComparer.Ordinal);
+
+        /// <summary>
+        /// 轉換期間收集的編號定義。
+        /// </summary>
+        public NumberingBuilder Numbering { get; } = new NumberingBuilder();
+
+        private void RegisterListStyles(OdfNode root)
+        {
+            foreach (string sectionName in new[] { "automatic-styles", "styles" })
+            {
+                OdfNode? section = FindOfficeChildSection(root, sectionName);
+                if (section is null)
+                {
+                    continue;
+                }
+
+                foreach (OdfNode node in section.Children)
+                {
+                    if (node.NamespaceUri == OdfNamespaces.Text && node.LocalName == "list-style")
+                    {
+                        string name = node.GetAttribute("name", OdfNamespaces.Style) ?? string.Empty;
+                        if (name.Length > 0)
+                        {
+                            ListStyles[name] = node;
+                        }
+                    }
+                }
+            }
         }
 
         private void LoadStyles(OdfNode root)
@@ -446,6 +500,10 @@ public static class OdfToDocxConverter
                 else if (child.LocalName == "section")
                 {
                     ConvertBodyNodes(child, target, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                }
+                else if (child.LocalName == "list")
+                {
+                    ConvertList(child, target, mainPart, ctx, odtPackage, imagePartCache, trackedChanges, 0, null, null);
                 }
             }
             else if (child.LocalName == "table" && child.NamespaceUri == OdfNamespaces.Table)

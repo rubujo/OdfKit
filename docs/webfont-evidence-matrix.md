@@ -31,6 +31,20 @@ WebFont 套件的「工程完成」只以 repository 內可由 .NET、NuGet、�
 | 4 runtime worker | 已實證（有界單機） | bounded Channel、single-flight、檔案 cache；兩個 OS process 僅產生一次、lease owner 強制終止後接手；verifier 拒絕截斷、內容損毀與超限展開長度的真實 WOFF2；真實來源、TTF／WOFF／WOFF2 與直接 CFF／CFF2 table 共 736 組 deterministic mutation 經有界結構入口驗證，無越界或非預期例外；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString；真實 CNS managed engine 的 128 路有界負載記錄 elapsed、CPU、peak working set 與 allocation JSON 證據並套用 CI 資源上限；多節點能力依原始範圍維持關閉閘門，不宣稱支援 | 無 | 長時間 soak、不同硬體容量基線、object store、fencing token、跨節點失敗注入與第三方安全測試；coverage-guided fuzz 僅為外部可選證據，不納入套件或 CI 目標 |
 | 5 工程發布 | 已實證（工程閘門） | 共用版本／pack／Public API／snupkg／DocFX／Markdown 機制；OpenType 雙 TFM、Public API、全量 pack consumer、WebFont 真實產字 clean consumer 與 net48 CLR smoke 已在遠端 CI 通過；同批 nupkg 產生可重現 SPDX 2.3 SBOM，並由 Linux、Windows x64／ARM64 與 macOS ARM64 consumer 對提交、SHA-256、32 個跨平台相依聯集及 nuspec 授權宣告重新驗證；發布演練將同批 nupkg 實際 push 至隔離本機 feed，以 SBOM 精確 source mapping 供乾淨 net10 consumer／CLI 還原，並以 NuGet Audit `all` 對 moderate 以上 advisory 與 audit 來源故障 fail closed；演練撤除 OpenType nupkg、清空 cache、證明 restore 失敗，再由同批 SHA-256 快照復原並重新 restore／build／run；OpenType／Unicode／W3C 規範每 90 天複查，direct NuGet 在線上 CI 比對官方最新穩定版，唯一 Preview 傳遞相依具到期例外；tag workflow 會為發布資產建立 GitHub Sigstore provenance，並將 SPDX SBOM attestation 繫結 WebFont nupkg | 無 | 真實 GitHub Release、平台端復原快照、設計夥伴、市場採用、維護責任、外部法律與第三方安全審查 |
 
+## 真實系統字型驗證（2026-10-03）
+
+以 Windows 系統字型（不屬於 repository 的鎖定 corpus）做一輪外部驗證，目的是找出合成測試與鎖定 corpus 看不到的缺陷：
+
+- **逐一產生子集**：238 個字型（`.ttf`、`.otf`、`.ttc` 的第一個 face）以 `odfkit-webfonts build` 產生 WOFF2，229 個成功；
+  其餘 9 個是符號或圖示字型（沒有拉丁字母與數字，請求的字元不存在而被正確拒絕）與標頭無效的 `mstmc.ttf`。
+- **Chrome 渲染比對**：arial、consolas、kaiu（標楷體）的子集與原字型在同一條字母基線上繪製，像素逐點相同（兩種字級）。
+  子集不含空白字元，行高與文字框的垂直度量取自後備字型，這是 unicode-range 子集在瀏覽器裡的一般行為。
+- **找到並修正三個缺陷**（見 [CHANGELOG](../CHANGELOG.md)）：標楷體 GSUB coverage 尾端的 0xFFFF 使整個字型被拒絕；
+  新細明體 EBLC 的 `indexTablesSize` 低估與範圍重疊使整個字型被拒絕；新細明體字圖旗標的保留位元（bit 7）使輸出被
+  Chrome 拒絕載入。每一項都有不依賴字型檔的單元測試。
+
+這一輪只驗證 Chrome（Blink）；Firefox 與 Safari、Windows 以外的字型與複雜文字 shaping 沒有納入。
+
 ## 目前不能宣稱的事項
 
 - 不得把有界 repository 工程閘門完成解讀為任意客戶字型、任意部署或 production-ready。

@@ -63,6 +63,7 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 | `LibreOfficeOpensOdfKitConvertedDocxWithListsNotesBreaksAndFooter` | DOCX → ODT | 清單、註腳、分頁符號、頁尾欄位、表格儲存格內的清單 | `txt` / `pdf` / `docx` | 專案符號與巢狀編號、註腳引用與內文、PDF 恰為兩頁、頁尾欄位與儲存格清單保留 | ✅ |
 | `LibreOfficeOpensOdfKitConvertedDocxWithSectionsAndHyperlinkFields` | DOCX → ODT | 直向與橫向兩個章節各有頁首、`HYPERLINK` 複雜欄位 | `pdf` / `docx` | PDF 兩頁且同時含直向與橫向頁面；匯出的 DOCX 含兩個章節的頁首文字，超連結目標保留在關係檔 | ✅ |
 | `LibreOfficeOpensOdfKitConvertedDocxWithTocBookmarksColumnsAndPageNumbering` | DOCX → ODT | 目錄欄位、標題書籤、連續雙欄章節、起始頁碼 | `txt` / `docx` | 目錄與各章節內文都在文字裡；匯出的 DOCX 還原出 `TOC` 欄位、`_Toc1` 書籤、`w:cols w:num="2"` 與 `w:pgNumType w:start="5"` | ✅ |
+| `LibreOfficeAuthoredOdtKeepsAllTextInEveryExportFormat` | LibreOffice ODT → DOCX／HTML／Markdown／RTF／PDF／重新儲存 | 含清單（有序、無序、巢狀）、表格（標題列與合併）、超連結、換行與圖片的真實 LibreOffice ODT | `txt` / `fodg`（PDF 匯入）/ Open XML SDK | 各格式的文字都完整；DOCX 通過 Open XML SDK 驗證；重新儲存的 ODT 能被 LibreOffice 開啟 | ✅ |
 | `OdfKitLoadsLibreOfficeSpreadsheetCompletelyAndKeepsItOnSave` | LibreOffice 儲存的 ODS | 儲存格帶有宣告在根元素的 `calcext:` 前綴、表格超過 8 KB | （OdfKit 載入、修改、儲存） | DOM 載入後資料完整，修改後儲存再載入仍完整（修正前整張工作表被讀成空表） | ✅ |
 | `OdfKitKeepsSpaceBetweenSpansOfLibreOfficeWrittenOdt` | LibreOffice 儲存的 ODT | 兩個 `text:span` 之間的單一空格 | （OdfKit 載入、儲存） | 載入與儲存後 `</text:span> 與 <text:span` 的空格仍在 | ✅ |
 
