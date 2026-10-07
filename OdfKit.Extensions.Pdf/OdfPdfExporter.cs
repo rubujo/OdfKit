@@ -1077,13 +1077,20 @@ internal sealed class OdfPdfFontResolver : IFontResolver
         foreach (string candidate in Styles.OdfFontContext.Default.GetFontFallbackCandidates(faceName))
         {
             string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(candidate);
-            if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
+            if (fontPath is not null && File.Exists(fontPath))
             {
-                return File.ReadAllBytes(fontPath);
-            }
+                byte[] data = File.ReadAllBytes(fontPath);
+                if (!Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
+                {
+                    return data;
+                }
 
-            if (fontPath is not null && Styles.OdfFontContext.IsTrueTypeCollection(fontPath))
-            {
+                byte[]? firstFace = TryExtractFirstFace(data);
+                if (firstFace is not null)
+                {
+                    return firstFace;
+                }
+
                 OdfKitDiagnostics.Warn(
                     OdfLocalizer.GetMessage("Diag_OdfPdfExporter_TrueTypeCollectionFontFallback", candidate));
             }
@@ -1123,6 +1130,70 @@ internal sealed class OdfPdfFontResolver : IFontResolver
     private static bool IsUsablePdfFont(string familyName)
     {
         string? fontPath = Styles.OdfFontContext.Default.ResolveFontPath(familyName);
-        return fontPath is not null && !Styles.OdfFontContext.IsTrueTypeCollection(fontPath);
+        return fontPath is not null && File.Exists(fontPath);
+    }
+
+    // 將 TrueType Collection 的第一個字型面重組為獨立 TTF，供不支援 .ttc 的 PDFsharp 使用。
+    private static byte[]? TryExtractFirstFace(byte[] ttc)
+    {
+        try
+        {
+            if (ttc.Length < 16)
+            {
+                return null;
+            }
+
+            static uint U32(byte[] b, int o) => (uint)((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]);
+            static int U16(byte[] b, int o) => (b[o] << 8) | b[o + 1];
+
+            if (U32(ttc, 0) != 0x74746366u || U32(ttc, 8) == 0)
+            {
+                return null;
+            }
+
+            int faceOffset = checked((int)U32(ttc, 12));
+            int tableCount = U16(ttc, faceOffset + 4);
+            int headerSize = 12 + (16 * tableCount);
+            var records = new (uint Tag, uint Checksum, int Offset, int Length)[tableCount];
+            long total = headerSize;
+            for (int i = 0; i < tableCount; i++)
+            {
+                int r = faceOffset + 12 + (16 * i);
+                records[i] = (U32(ttc, r), U32(ttc, r + 4), checked((int)U32(ttc, r + 8)), checked((int)U32(ttc, r + 12)));
+                if ((long)records[i].Offset + records[i].Length > ttc.Length)
+                {
+                    return null;
+                }
+
+                total += (records[i].Length + 3L) & ~3L;
+            }
+
+            if (total > int.MaxValue)
+            {
+                return null;
+            }
+
+            var output = new byte[total];
+            Array.Copy(ttc, faceOffset, output, 0, 12);
+            int position = headerSize;
+            for (int i = 0; i < tableCount; i++)
+            {
+                int r = 12 + (16 * i);
+                Array.Copy(ttc, faceOffset + r, output, r, 8);
+                output[r + 8] = (byte)(position >> 24);
+                output[r + 9] = (byte)(position >> 16);
+                output[r + 10] = (byte)(position >> 8);
+                output[r + 11] = (byte)position;
+                Array.Copy(ttc, faceOffset + r + 12, output, r + 12, 4);
+                Array.Copy(ttc, records[i].Offset, output, position, records[i].Length);
+                position += (records[i].Length + 3) & ~3;
+            }
+
+            return output;
+        }
+        catch (Exception ex) when (ex is ArgumentException or OverflowException or IndexOutOfRangeException)
+        {
+            return null;
+        }
     }
 }

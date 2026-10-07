@@ -43,6 +43,7 @@ public sealed class OdfFontContext
         ["Microsoft JhengHei"] = ["Noto Sans CJK TC", "Source Han Sans TC", "Noto Sans TC", "DejaVu Sans"],
         ["MingLiU"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
         ["PMingLiU"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
+        ["DFKai-SB"] = ["標楷體", "BiauKai", "Noto Serif CJK TC", "Source Han Serif TC", "Noto Sans CJK TC", "Microsoft JhengHei", "PMingLiU", "MingLiU", "PingFang TC", "Microsoft YaHei", "SimSun", "Malgun Gothic", "Arial Unicode MS"],
         ["Times New Roman"] = ["Liberation Serif", "DejaVu Serif"],
         ["微軟正黑體"] = ["Noto Sans CJK TC", "Source Han Sans TC", "Noto Sans TC", "DejaVu Sans"],
         ["細明體"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
