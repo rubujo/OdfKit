@@ -1,4 +1,4 @@
-﻿name: CI Build & Test
+name: CI Build & Test
 
 on:
   push:
@@ -363,7 +363,7 @@ jobs:
 
       - name: Upload WebFont real evidence
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: webfont-real-evidence
           path: |
@@ -438,7 +438,7 @@ jobs:
 
       - name: Upload full regression diagnostics
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: full-regression-${{ matrix.framework }}
           path: artifacts/test-results/full-${{ matrix.framework }}/
@@ -454,7 +454,7 @@ jobs:
 
       - name: Upload code coverage
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: code-coverage-full-${{ matrix.framework }}
           path: artifacts/test-results/full-${{ matrix.framework }}/**/coverage.cobertura.xml
@@ -662,7 +662,7 @@ jobs:
 
       - name: Upload test diagnostics
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.framework }}
           path: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}/
