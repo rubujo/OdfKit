@@ -15,6 +15,13 @@ spec.loader.exec_module(matrix)
 
 
 class MatrixExtractionTests(unittest.TestCase):
+    def test_schema_lock_accepts_checkout_line_endings_but_not_content_changes(self):
+        for prefix in (b"", b"\xef\xbb\xbf"):
+            lf = prefix + b'<grammar>\n  <empty/> \n</grammar>\n'
+            self.assertEqual(matrix.schema_sha(lf), matrix.schema_sha(lf.replace(b"\n", b"\r\n")))
+            self.assertNotEqual(matrix.schema_sha(lf), matrix.schema_sha(lf.replace(b"empty", b"text")))
+            self.assertNotEqual(matrix.schema_sha(lf), matrix.schema_sha(lf.replace(b"/> ", b"/>")))
+
     def test_number_with_visual_margin_does_not_merge_into_title(self):
         rows = matrix.read_html('<h2><a id="scope"><span style="margin-right:0.1cm">1.1</span></a>Scope</h2><p>Documents shall declare their version.</p>')
         self.assertEqual(["1.1"], [row["clause"] for row in rows])

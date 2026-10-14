@@ -34,6 +34,25 @@ public static partial class OdfSchemaPatternValidator
         string value,
         OdfSchemaPatternMatchContext context)
     {
+        if (node.DataType is "QName" or "xsd:QName")
+        {
+            // XML Schema 的 QName whiteSpace facet 固定為 collapse；只有 XML 四種空白參與正規化。
+            value = string.Join(" ", value.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
+            if (!IsQName(value))
+            {
+                return false;
+            }
+            int separator = value.IndexOf(':');
+            if (separator > 0)
+            {
+                string prefix = value.Substring(0, separator);
+                if (prefix == "xmlns" || context.NamespaceContext?.GetNamespaceOfPrefix(prefix) is null)
+                {
+                    return false;
+                }
+            }
+        }
+
         if (!MatchesDataType(node, value))
         {
             return false;

@@ -78,6 +78,7 @@
 | `Test-OdfExternalSourceContracts.ps1` | 檢查 OASIS inventory／採用 manifest 與 OPF 固定版本／例外的對應。 |
 | `Build-OdfConformanceMatrix.py` | 從已取得的固定 OASIS 出版物建立 1.0～1.4 條款索引；`--verify` 檢查重建一致性，PDF 部分需 pypdf。 |
 | `Test-OdfConformanceMatrix.ps1` | 離線檢查逐條合規矩陣的來源／schema hash、條款 ID 與人工 audit／測試證據對應；見 [合規矩陣](../docs/odf-conformance-matrix.md)。 |
+| `Build-OdfObligationInventory.py` | 建立逐句來源定位與精確人工裁決對應，包含核准勘誤；`--check-contracts` 離線驗證，`--require-complete` 拒絕未完成的裁決。見 [義務裁決](../docs/odf-obligation-adjudication.md)。 |
 | `Test-OfficeGuiSmoke.ps1` | 執行 Microsoft Office GUI／COM 的 ODT／ODS／ODP 讀取煙霧驗收（僅 Windows，手動）。 |
 
 產品品質分層與發版前建議清單見 [docs/product-quality-gates.md](../docs/product-quality-gates.md)。

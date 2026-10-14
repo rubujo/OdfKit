@@ -73,7 +73,7 @@ $opf = ./eng/Install-OpfOdfValidator.ps1 -DestinationRoot artifacts/external-too
 | 排除 ODF 1.2 generator／規範來源範本 | 3 | 提供產生流程，不是帶有可執行分類預期的 fixture。 |
 
 OASIS repository 根 LICENSE 為 TC IPR policy，不能假設整個 repository 採 Apache-2.0。
-manifest 使用明確的 download-only 來源標記並連結該 LICENSE；只保存中繼資料，由測試
+manifest 使用明確的 download-only 來源標記並連結該 LICENSE；只保留中繼資料，由測試
 取得官方公開檔案，不重新散布實體文件、不覆蓋其原有授權或宣稱其為 CC0。
 
 ```powershell
@@ -89,7 +89,7 @@ $tdf = ./eng/Install-OdfValidator.ps1 -DestinationRoot artifacts/external-tools/
 
 ## OASIS 工具盤點
 
-另盤點 `src/test` 下 53 份 Java／XSLT／shell 工具檔與根目錄兩份執行入口（共 55 份），逐項 hash 與決定亦保存在 inventory。
+另盤點 `src/test` 下 53 份 Java／XSLT／shell 工具檔與根目錄兩份執行入口（共 55 份），逐項 hash 與決定亦保留在 inventory。
 目前沒有適合直接作為一般 ODF 文件 gate 的工具，因此不新增 Maven／Saxon 相依：
 
 - `DefaultValueTest.java` 的測試方法為空，不能提供通過證據。
@@ -139,11 +139,11 @@ hash 下載，不把第三方 binary 複製進單元測試。既有自訂 patter
 - 官方 RELAX NG schema 能提供結構／資料型別的證據，不能單獨證明所有語意、跨串流
   關係、公式結果、數位簽章真實性或 consumer 行為。
 - 核心驗證對裸 MathML 根節點有明確 schema pattern 豁免，不能以該 gate 的通過宣稱
-  MathML 已完整驗證；formula 保存／來回讀寫亦不代表完整 OpenFormula 重算。
+  MathML 已完整驗證；formula 保留／來回讀寫亦不代表完整 OpenFormula 重算。
 - 已建立 [ODF 1.0～1.4 條款矩陣](odf-conformance-matrix.md)，保留結構證據、人工裁決、
   未涵蓋與範圍界線。所有 normative obligation 的逐句裁決與完整跨產品互通證據仍未完成，
   不能把條款索引的完整登錄解讀為全部合規。
 
-目前可支持的說法是：OdfKit 以 OASIS 官方 schema 與版本化 profile 為依據，對列明的
+目前可支援的說法是：OdfKit 以 OASIS 官方 schema 與版本化 profile 為依據，對列明的
 文件與操作提供可重現的結構、封裝及來回讀寫驗證，另以 Jing／TDF／OPF 交叉檢查；
 各自的例外與未涵蓋部分另列，不宣稱完整 ODF 合規認證。

@@ -179,24 +179,23 @@ internal static partial class OdfProfileRuleValidator
                 return;
             }
 
-            // 為了防止 foreign elements 與 attributes 干擾 schema pattern 驗證，
-            // 遞迴移除不屬於 ODF 標準命名空間的元素和屬性。
-            SanitizeForeignContentForSchemaValidation(document.Root);
+            // Extended 才能先處理 foreign content；Strict 必須直接比對原始 grammar，
+            // 由 schema 決定哪些擴充位置合法，不可先刪除不合法屬性讓它通過。
+            if (FindRule(profile, "RequireForeignExtensionIsolation") is not null)
+            {
+                SanitizeForeignContentForSchemaValidation(document.Root);
+            }
 
             var body = document.Root.Element(XName.Get("body", OdfNamespaces.Office));
             if (body is not null)
             {
-                if (body.Element(XName.Get("formula", OdfNamespaces.Office)) is not null ||
-                    body.Element(XName.Get("database", OdfNamespaces.Office)) is not null ||
-                    body.Element(XName.Get("image", OdfNamespaces.Office)) is not null ||
-                    body.Element(XName.Get("chart", OdfNamespaces.Office)) is not null)
+                if (body.Element(XName.Get("formula", OdfNamespaces.Office)) is not null)
                 {
-                    // 官方 document grammar 不涵蓋這兩個 body；豁免限於 body 內容，
-                    // 外層、屬性與 styles 等兄弟節點仍須比對，不能整份文件直接放行。
+                    // office:formula 是 SDK 的相容形狀，官方 Formula package 使用裸 MathML。
+                    // 此豁免不適用於官方 grammar 已定義的 database、image 或 chart。
                     foreach (XElement child in body.Elements().ToList())
                     {
-                        if (child.Name == XName.Get("formula", OdfNamespaces.Office) ||
-                            child.Name == XName.Get("database", OdfNamespaces.Office))
+                        if (child.Name == XName.Get("formula", OdfNamespaces.Office))
                         {
                             issues.Add(new OdfValidationIssue(
                                 OdfIssueSeverity.Warning,

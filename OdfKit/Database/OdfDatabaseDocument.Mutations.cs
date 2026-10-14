@@ -25,6 +25,10 @@ public partial class OdfDatabaseDocument
     /// Adds a table description.
     /// 新增資料表描述。
     /// </summary>
+    /// <remarks>
+    /// A table command is SDK metadata stored in a foreign namespace for Extended conformance; ODF defines db:command for queries, not table representations.
+    /// 資料表命令是以獨立命名空間保留的 SDK 中繼資料，須使用 Extended profile；ODF 的 db:command 適用於查詢，不適用於資料表描述。
+    /// </remarks>
     /// <param name="name">The table name. / 資料表名稱。</param>
     /// <param name="command">The optional table command or source name. / 選用的資料表命令或來源名稱。</param>
     /// <returns>The added table node. / 新增的資料表節點。</returns>
@@ -45,7 +49,7 @@ public partial class OdfDatabaseDocument
         table.SetAttribute("name", DatabaseNamespace, name, "db");
         if (!string.IsNullOrWhiteSpace(command))
         {
-            table.SetAttribute("command", DatabaseNamespace, command!, "db");
+            table.SetAttribute("command", TableCommandNamespace, command!, "odfkitdb");
         }
 
         tableRepresentations.AppendChild(table);
@@ -131,6 +135,10 @@ public partial class OdfDatabaseDocument
     /// Updates the command of an existing table description.
     /// 更新既有資料表描述的命令。
     /// </summary>
+    /// <remarks>
+    /// Commands use SDK metadata in a foreign namespace for Extended conformance; updating also removes the legacy unsupported db:command attribute.
+    /// 命令以獨立命名空間的 SDK 中繼資料保留，須使用 Extended profile；更新時一併移除舊版不合規的 db:command 屬性。
+    /// </remarks>
     /// <param name="name">The table name. / 資料表名稱。</param>
     /// <param name="command">The table command; a blank value removes the command. / 資料表命令；空白值會移除命令。</param>
     /// <returns><see langword="true"/> if the table was updated; otherwise <see langword="false"/>. / 若成功更新資料表則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
@@ -150,13 +158,14 @@ public partial class OdfDatabaseDocument
             return false;
         }
 
+        table.RemoveAttribute("command", DatabaseNamespace);
         if (string.IsNullOrWhiteSpace(command))
         {
-            table.RemoveAttribute("command", DatabaseNamespace);
+            table.RemoveAttribute("command", TableCommandNamespace);
         }
         else
         {
-            table.SetAttribute("command", DatabaseNamespace, command!, "db");
+            table.SetAttribute("command", TableCommandNamespace, command!, "odfkitdb");
         }
 
         return true;

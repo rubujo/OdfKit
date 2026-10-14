@@ -199,6 +199,7 @@ internal static partial class OdfSchemaPatternContentMatcher
         }
 
         OdfSchemaPatternMatchContext childContext = context.CreateChildContext();
+        childContext.NamespaceContext = childElements[index];
         return OdfSchemaPatternValidator.MatchesElementNode(node, childElements[index], childContext)
             ? context.GetSingletonSet(index + 1)
             : s_emptyMatch;

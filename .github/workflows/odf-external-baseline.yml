@@ -16,6 +16,10 @@ on:
       - 'eng/Test-OdfExternalSourceContracts.ps1'
       - 'eng/Test-OdfConformanceMatrix.ps1'
       - 'eng/Build-OdfConformanceMatrix.py'
+      - 'eng/Build-OdfObligationInventory.py'
+      - 'eng/testdata/Test-OdfObligationInventory.py'
+      - 'docs/odf-obligation-decisions.json'
+      - 'docs/odf-obligation-inventory/**'
       - 'docs/odf-conformance-audits.json'
       - 'docs/odf-conformance-matrix/**'
       - 'OdfKit.Tests/OdfConformanceGapTests.cs'
@@ -51,6 +55,10 @@ on:
       - 'eng/Test-OdfExternalSourceContracts.ps1'
       - 'eng/Test-OdfConformanceMatrix.ps1'
       - 'eng/Build-OdfConformanceMatrix.py'
+      - 'eng/Build-OdfObligationInventory.py'
+      - 'eng/testdata/Test-OdfObligationInventory.py'
+      - 'docs/odf-obligation-decisions.json'
+      - 'docs/odf-obligation-inventory/**'
       - 'docs/odf-conformance-audits.json'
       - 'docs/odf-conformance-matrix/**'
       - 'OdfKit.Tests/OdfConformanceGapTests.cs'
@@ -149,6 +157,12 @@ jobs:
         run: |
           ./eng/Test-OdfExternalSourceContracts.ps1
           ./eng/Test-OdfConformanceMatrix.ps1
+          python eng/testdata/Test-OdfConformanceMatrix.py
+          if ($LASTEXITCODE -ne 0) { throw 'Conformance source extraction regressions failed.' }
+          python eng/testdata/Test-OdfObligationInventory.py
+          if ($LASTEXITCODE -ne 0) { throw 'Obligation inventory extraction regressions failed.' }
+          python eng/Build-OdfObligationInventory.py --check-contracts
+          if ($LASTEXITCODE -ne 0) { throw 'Obligation inventory contracts failed.' }
           $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
           $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
           $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -227,6 +241,7 @@ jobs:
           "schema_path=$schemaPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Validate internal ODF corpus
+        id: internal-corpus
         shell: pwsh
         run: ./eng/Test-OdfCorpus.ps1
 
@@ -287,7 +302,7 @@ jobs:
             -SkipInternalValidation
 
       - name: Validate real JAR positive and negative canaries
-        if: always()
+        if: ${{ always() && steps.install.outcome == 'success' && steps.internal-corpus.outcome == 'success' }}
         shell: pwsh
         env:
           ODFKIT_ODFVALIDATOR_JAR: ${{ steps.install.outputs.jar_path }}

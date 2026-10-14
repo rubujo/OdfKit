@@ -894,7 +894,15 @@ namespace OdfKit.Tests
             XElement invalidNCName = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">bad:name</text:span>");
             XElement validQName = XElement.Parse(
+                "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\">style:family</text:span>");
+            XElement undeclaredQName = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">style:family</text:span>");
+            XElement normalizedQName = XElement.Parse(
+                "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:other=\"urn:test\"> &#x9;other:family&#xA; </text:span>");
+            XElement inheritedQName = XElement.Parse(
+                "<root xmlns:other=\"urn:test\"><text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">other:family</text:span></root>").Elements().Single();
+            XElement builtinQName = XElement.Parse(
+                "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">xml:lang</text:span>");
             XElement invalidQName = XElement.Parse(
                 "<text:span xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">style:bad:name</text:span>");
             XElement validHexBinary = XElement.Parse(
@@ -935,6 +943,10 @@ namespace OdfKit.Tests
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validNCName, schema, "ncname-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidNCName, schema, "ncname-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validQName, schema, "qname-text").IsMatch);
+            Assert.False(OdfSchemaPatternValidator.ValidateElement(undeclaredQName, schema, "qname-text").IsMatch);
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(normalizedQName, schema, "qname-text").IsMatch);
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(inheritedQName, schema, "qname-text").IsMatch);
+            Assert.True(OdfSchemaPatternValidator.ValidateElement(builtinQName, schema, "qname-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidQName, schema, "qname-text").IsMatch);
             Assert.True(OdfSchemaPatternValidator.ValidateElement(validHexBinary, schema, "hex-binary-text").IsMatch);
             Assert.False(OdfSchemaPatternValidator.ValidateElement(invalidHexBinary, schema, "hex-binary-text").IsMatch);
@@ -1013,7 +1025,9 @@ namespace OdfKit.Tests
             using (OdfPackage package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 OdfValidationReport registered = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
-                Assert.True(registered.IsValid, string.Join(", ", registered.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+                // metadata 登錄改變 namespace 掃描，但沒有提供 grammar 時不能讓原生 Strict schema 放行新元素。
+                Assert.DoesNotContain(registered.Issues, issue => issue.RuleId == "DisallowInvalidOdfNamespaceExtensions");
+                Assert.Contains(registered.Issues, issue => issue.RuleId == "ODF3101");
                 Assert.NotNull(OdfSchemaRegistry.GetSchema(OdfVersion.Odf14).FindElement(OdfNamespaces.Text, "generated-element"));
             }
 

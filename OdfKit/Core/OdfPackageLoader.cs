@@ -116,7 +116,7 @@ internal static class OdfPackageLoader
             return;
 
         // 1.0／1.1 的 manifest 未定義 version。解密完成後只讀核心 XML 根節點，
-        // 避免載入時回退到 1.4，導致再儲存改掉版本；完整 XML 錯誤仍由驗證器回報。
+        // 避免載入時回復到 1.4，導致再儲存改掉版本；完整 XML 錯誤仍由驗證器回報。
         foreach (string entryName in new[] { "content.xml", "styles.xml", "meta.xml", "settings.xml" })
         {
             if (!ctx.Entries.TryGetValue(entryName, out OdfPackageEntry? entry) ||

@@ -3,6 +3,7 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Chart;
 using OdfKit.Image;
+using OdfKit.Database;
 using OdfKit.Styles;
 using System.Xml.Linq;
 using Xunit;
@@ -12,6 +13,77 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Compliance)]
 public class OdfConformanceGapTests
 {
+    [Fact]
+    public void DatabaseTableCommandsUseIsolatedSdkMetadataAndMigrateOnUpdate()
+    {
+        using DatabaseDocument database = DatabaseDocument.Create();
+        database.AddTable("Customers", "SELECT * FROM Customers");
+        var table = Assert.Single(database.GetTables());
+        Assert.Equal("SELECT * FROM Customers", table.Command);
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream);
+        OdfValidationReport extended = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended);
+        Assert.True(extended.IsValid, extended.ToJson());
+        OdfValidationReport strict = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+        Assert.Contains(strict.Issues, issue => issue.RuleId == "ODF3101");
+
+        var node = database.AddTable("Legacy");
+        node.SetAttribute("command", OdfNamespaces.Database, "old", "db");
+        Assert.Equal("old", database.FindTable("Legacy")?.Command);
+        Assert.True(database.UpdateTable("Legacy", "new"));
+        Assert.Null(node.GetAttribute("command", OdfNamespaces.Database));
+        Assert.Equal("new", database.FindTable("Legacy")?.Command);
+        Assert.True(database.UpdateTable("Legacy", null));
+        Assert.Null(database.FindTable("Legacy")?.Command);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("AQID")]
+    public void FlatBinaryDataDoesNotConsumeFollowingFrameMetadata(string base64)
+    {
+        string xml = $"<office:document xmlns:office=\"{OdfNamespaces.Office}\" xmlns:draw=\"{OdfNamespaces.Draw}\" xmlns:svg=\"{OdfNamespaces.Svg}\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.image\"><office:body><office:image><draw:frame><draw:image><office:binary-data>{base64}</office:binary-data></draw:image><svg:title>Title</svg:title><svg:desc>Description</svg:desc></draw:frame></office:image></office:body></office:document>";
+        using var input = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        using FlatImageDocument image = FlatImageDocument.Load(input);
+        OdfImageFrameInfo frame = Assert.Single(image.GetImageFrames());
+        Assert.Equal("Title", frame.Title);
+        Assert.Equal("Description", frame.Description);
+        Assert.Equal(Convert.FromBase64String(base64), image.GetImageBytes());
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void QNameDatatypeUsesCurrentAndInheritedNamespaceDeclarations(OdfVersion version)
+    {
+        using OdfChartDocument chart = OdfChartDocument.Create();
+        using var stream = new MemoryStream();
+        chart.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream);
+        using Stream content = package.GetEntryStream("content.xml");
+        XDocument document = XDocument.Load(content);
+        XElement element = document.Descendants(XName.Get("chart", OdfNamespaces.Chart)).Single();
+        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(version);
+        element.SetAttributeValue(XName.Get("class", OdfNamespaces.Chart), "custom:bar");
+        Assert.False(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+        document.Root!.SetAttributeValue(XNamespace.Xmlns + "custom", "urn:test:chart");
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+        element.SetAttributeValue(XName.Get("class", OdfNamespaces.Chart), " \tcustom:bar\n ");
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+
+        XElement plot = element.Element(XName.Get("plot-area", OdfNamespaces.Chart))!;
+        XElement series = new(XName.Get("series", OdfNamespaces.Chart),
+            new XAttribute(XName.Get("class", OdfNamespaces.Chart), "missing:line"));
+        plot.Add(series);
+        Assert.False(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+        series.SetAttributeValue(XNamespace.Xmlns + "missing", "urn:test:series");
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+    }
+
     [Theory]
     [InlineData(OdfVersion.Odf12, "formula", OdfDocumentKind.Formula)]
     [InlineData(OdfVersion.Odf13, "formula", OdfDocumentKind.Formula)]
@@ -19,12 +91,28 @@ public class OdfConformanceGapTests
     [InlineData(OdfVersion.Odf12, "database", OdfDocumentKind.Database)]
     [InlineData(OdfVersion.Odf13, "database", OdfDocumentKind.Database)]
     [InlineData(OdfVersion.Odf14, "database", OdfDocumentKind.Database)]
-    public void UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation(OdfVersion version, string body, OdfDocumentKind kind)
+    public void BodyChecksDoNotExemptEnvelopeFromSchemaValidation(OdfVersion version, string body, OdfDocumentKind kind)
     {
-        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body><office:{body}/></office:body></office:document-content>";
+        string bodyContent = body == "database"
+            ? $"<office:database><db:data-source xmlns:db=\"{OdfNamespaces.Database}\"><db:connection-data><db:connection-resource xmlns:xlink=\"{OdfNamespaces.XLink}\" xlink:type=\"simple\" xlink:href=\"\"/></db:connection-data></db:data-source></office:database>"
+            : "<office:formula/>";
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body>{bodyContent}</office:body></office:document-content>";
         OdfValidationReport valid = ValidateContent(xml, kind, version);
         Assert.True(valid.IsValid, string.Join("; ", valid.Issues.Select(issue => issue.Message)));
-        Assert.Contains(valid.Issues, issue => issue.RuleId == "ODF3103" && issue.PackagePath == "content.xml");
+        if (body == "formula")
+        {
+            Assert.Contains(valid.Issues, issue => issue.RuleId == "ODF3103" && issue.PackagePath == "content.xml");
+        }
+        else
+        {
+            Assert.DoesNotContain(valid.Issues, issue => issue.RuleId == "ODF3103");
+            string missingDataSource = xml.Replace(bodyContent, "<office:database/>", StringComparison.Ordinal);
+            Assert.Contains(ValidateContent(missingDataSource, kind, version).Issues,
+                issue => issue.RuleId == "ODF3101" && issue.PackagePath == "content.xml");
+            string invalidChild = xml.Replace("</office:database>", "<office:text/></office:database>", StringComparison.Ordinal);
+            Assert.Contains(ValidateContent(invalidChild, kind, version).Issues,
+                issue => issue.RuleId == "ODF3101" && issue.PackagePath == "content.xml");
+        }
 
         string invalidAttribute = xml.Replace("<office:body>", "<office:body office:version=\"1.4\">", StringComparison.Ordinal);
         OdfValidationReport invalid = ValidateContent(invalidAttribute, kind, version);

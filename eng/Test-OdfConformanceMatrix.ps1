@@ -38,8 +38,19 @@ foreach ($source in $metadata.sources) {
 }
 foreach ($schema in $metadata.schemas) {
     $path = [IO.Path]::GetFullPath((Join-Path $root $schema.path))
-    if (-not $path.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
-        (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $schema.sha256) {
+    if (-not $path.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Schema path escapes the repository: $($schema.path)"
+    }
+    # Decode bytes rather than ReadAllText, which strips a UTF-8 BOM. Only CRLF
+    # checkout conversion is permitted; all other byte changes still fail.
+    $normalized = [Text.Encoding]::UTF8.GetBytes([Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($path)).Replace("`r`n", "`n"))
+    $hasher = [Security.Cryptography.SHA256]::Create()
+    try {
+        $actualHash = [Convert]::ToHexString($hasher.ComputeHash($normalized)).ToLowerInvariant()
+    } finally {
+        $hasher.Dispose()
+    }
+    if ($actualHash -cne $schema.sha256) {
         throw "Schema changed; review and rebuild the matrix: $($schema.path)"
     }
 }

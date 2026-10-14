@@ -33,8 +33,8 @@
       "scope": "validator",
       "status": "fixed",
       "priority": "P0",
-      "requirement": "Formula/Database 豁免不可放行整個文件 envelope。",
-      "assessment": "僅替換未涵蓋的 body 分支供外層 grammar 比對；保留所有兄弟節點與 body 屬性。豁免內容仍未完整驗證。",
+      "requirement": "未完整驗證的 SDK 相容 Formula body 不可放行整份 envelope，Database 須使用官方 grammar。",
+      "assessment": "office:formula 相容形狀仍以 body proxy 驗證外層並回報警告；已移除 Database 豁免，1.2～1.4 以官方 office-database grammar 比對必需 datasource 與子節點。",
       "clauses": [
         "ODF-1.2/schema/2.2.10",
         "ODF-1.2/schema/2.2.9",
@@ -49,7 +49,7 @@
       "tests": [
         {
           "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
-          "symbol": "UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation"
+          "symbol": "BodyChecksDoNotExemptEnvelopeFromSchemaValidation"
         }
       ],
       "nextAction": ""
@@ -191,10 +191,10 @@
     {
       "id": "EXEMPT-002",
       "scope": "validator",
-      "status": "validator-gap",
+      "status": "partial",
       "priority": "P1",
-      "requirement": "Database/Formula body 內部內容仍需可驗證的 grammar。",
-      "assessment": "通用官方 document grammar 不定義 office:database/office:formula body；目前有 namespace 掃描，但不能驗證其全部結構、值域與關係。",
+      "requirement": "Database 使用官方 grammar；SDK office:formula 相容形狀不能視為原生 ODF Formula 合規。",
+      "assessment": "更正原先官方 grammar 不定義 office:database 的誤判。Database 結構豁免已移除；資料庫參照與處理語意尚需證據。office:formula 非官方 body 分支，仍有明示相容豁免；原生 Formula package 的裸 MathML grammar 缺口由 EXEMPT-001 追蹤。",
       "clauses": [
         "ODF-1.2/schema/2.2.10",
         "ODF-1.2/schema/2.2.9",
@@ -210,10 +210,10 @@
       "tests": [
         {
           "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
-          "symbol": "UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation"
+          "symbol": "BodyChecksDoNotExemptEnvelopeFromSchemaValidation"
         }
       ],
-      "nextAction": "以官方適用外部格式及 db 子 grammar 逐分支驗證，避免自行發明 OASIS grammar。"
+      "nextAction": "核對 Database 跨節點參照，並區分 SDK FlatFormula 相容格式與官方 Formula document 的合規宣稱。"
     },
     {
       "id": "GAP-001",
@@ -282,10 +282,10 @@
     {
       "id": "GAP-003",
       "scope": "validator",
-      "status": "validator-gap",
+      "status": "partial",
       "priority": "P1",
       "requirement": "QName/namespacedToken 的前綴需要 namespace context。",
-      "assessment": "IsQName 只驗證 NCName 組合；未把值中的 prefix 對應到目前元素的 namespace 宣告。",
+      "assessment": "QName data 節點已依目前元素的 namespace context 檢查前綴，包含繼承與 xml 內建前綴，並套用 XML Schema 的 XML whitespace collapse。literal QName 的展開名稱相等比較與完整 facet 證據仍未完成。",
       "clauses": [
         "ODF-1.2/packages/7.2",
         "ODF-1.2/packages/7.3.1",
@@ -301,10 +301,20 @@
         "ODF-1.4/schema/18.3.20"
       ],
       "implementation": [
-        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Primitives.cs"
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs",
+        "OdfKit/Compliance/OdfSchemaPatternMatchContext.cs"
       ],
-      "tests": [],
-      "nextAction": "補未宣告 prefix、重綁 prefix 與同 URI 不同 prefix 的正負測試，先限定有明確 namespace 語意的值。"
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "QNameDatatypeUsesCurrentAndInheritedNamespaceDeclarations"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "SchemaPatternValidatorHandlesAdditionalXmlSchemaDatatypes"
+        }
+      ],
+      "nextAction": "補齊 QName literal 的 namespace-aware 相等比較及外部 datatype 差異語料。"
     },
     {
       "id": "GAP-004",
@@ -756,7 +766,7 @@
       "status": "fixed",
       "priority": "P1",
       "requirement": "draw:frame 的影像內容必須位於 accessibility 子元素之前。",
-      "assessment": "SetImage 的新增/替換先插入 draw:image，再保留 svg:title/desc；非法逆序仍被 matcher 拒絕。",
+      "assessment": "image 內容位於 svg:title/desc 之前；另修正 Flat XML 二進位解碼後跳過下一節點的 consumer 缺陷，避免正確排序後標題遺失。",
       "clauses": [
         "ODF-1.2/schema/10.4.2",
         "ODF-1.2/schema/19.197.10",
@@ -772,7 +782,8 @@
         "ODF-1.4/schema/19.514.2"
       ],
       "implementation": [
-        "OdfKit/Image/OdfImageDocument.cs"
+        "OdfKit/Image/OdfImageDocument.cs",
+        "OdfKit/Core/OdfPackageFlatXmlLoader.cs"
       ],
       "tests": [
         {
@@ -782,6 +793,68 @@
         {
           "path": "OdfKit.Tests/DocumentKindApiUsabilityTests.cs",
           "symbol": "CreateLoadImageWithEmbeddedPicture"
+        },
+        {
+          "path": "OdfKit.Tests/ImageVariantRoundTripTests.cs",
+          "symbol": "ImageDocumentCreateFlatDocumentRoundTripsBackToZip"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "PRODUCER-003",
+      "scope": "producer",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "table-representation 不可使用 query 專屬的 db:command；保留 SDK 命令時須隔離為擴充 metadata。",
+      "assessment": "AddTable/UpdateTable 改寫 urn:odfkit:database:compatibility 的 command，讀取器保留舊版 db:command 相容讀取，更新時移除舊屬性。含命令的資料表使用 Extended profile；沒有命令時仍是原生結構。",
+      "clauses": [
+        "ODF-1.2/schema/12.33",
+        "ODF-1.3/schema/12.33",
+        "ODF-1.4/schema/12.33"
+      ],
+      "implementation": [
+        "OdfKit/Database/OdfDatabaseDocument.cs",
+        "OdfKit/Database/OdfDatabaseDocument.Mutations.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "DatabaseTableCommandsUseIsolatedSdkMetadataAndMigrateOnUpdate"
+        },
+        {
+          "path": "OdfKit.Tests/DocumentKindApiUsabilityTests.cs",
+          "symbol": "CreateLoadDatabaseWithConnectionAndTable"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-007",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "Strict 以原始 XML 比對官方 grammar；僅 Extended 得按其規則處理 foreign content。",
+      "assessment": "不再對 Strict 先做 foreign-content sanitization。由官方 grammar 決定擴充位置是否合法，不能先刪除非法屬性或子節點使輸入通過。只有 metadata 的自訂 schema 登錄不等於提供自訂 grammar。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.1",
+        "ODF-1.2/schema/2.2.2",
+        "ODF-1.3/schema/2.2.1",
+        "ODF-1.3/schema/2.2.2",
+        "ODF-1.4/schema/2.2.1",
+        "ODF-1.4/schema/2.2.2"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "DatabaseTableCommandsUseIsolatedSdkMetadataAndMigrateOnUpdate"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "SchemaRegistryRegistrationFeedsValidatorsAndRestoresPreviousSchema"
         }
       ],
       "nextAction": ""

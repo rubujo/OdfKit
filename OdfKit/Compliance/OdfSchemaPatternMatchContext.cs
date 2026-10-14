@@ -151,6 +151,9 @@ internal sealed class OdfSchemaPatternMatchContext
     /// </summary>
     public OdfSchemaSet Schema { get; }
 
+    // QName datatype 的值必須使用目前元素的 in-scope namespace，而不是固定的 ODF 前綴表。
+    internal XElement? NamespaceContext { get; set; }
+
     /// <summary>
     /// 進入具名參照；若已於作用中堆疊則回傳 false（偵測循環參照）。
     /// </summary>
@@ -172,7 +175,10 @@ internal sealed class OdfSchemaPatternMatchContext
     public OdfSchemaPatternMatchContext? CreateRecursiveContext() =>
         _recursiveDepth >= MaxRecursiveDepth
             ? null
-            : new OdfSchemaPatternMatchContext(Schema, _recursiveDepth + 1, _elementMatchCache, _strippedRootCache);
+            : new OdfSchemaPatternMatchContext(Schema, _recursiveDepth + 1, _elementMatchCache, _strippedRootCache)
+            {
+                NamespaceContext = NamespaceContext
+            };
 
     /// <summary>
     /// 建立比對子元素用的新內容：循環參照防護從空白開始，但共用「模式節點對元素」的比對快取。

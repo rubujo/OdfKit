@@ -1,0 +1,875 @@
+{
+  "schemaVersion": 1,
+  "fullNormativeAdjudication": false,
+  "fullConformanceClaim": false,
+  "decisions": [
+    {
+      "id": "SENT-PKG-001",
+      "scope": "package-validator",
+      "status": "partial",
+      "requirement": "ZIP 容器只容許 STORED 與 DEFLATED。",
+      "conditions": [],
+      "assessment": "SDK 具有 ZIP 載入與 MMF compression method 中繼資料；此句同時含 ZIP 外部規範要求，尚缺所有載入路徑與 ZIP 方言的句子級證據。",
+      "implementation": [
+        "OdfKit/Core/OdfPackageZipLoader.cs",
+        "OdfKit/Core/OdfMmfZipInfo.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00132/S001",
+          "sentenceSha256": "ea809e93075790fb3174ff189b664ab079e0717d54c9df5e4a098bd801f9853e"
+        },
+        {
+          "id": "ODF-1.4/packages/B00132/S002",
+          "sentenceSha256": "2c2286d9e7548be4d41f601a7adb9010d0b7b458850149758b3c35df1d7c9386"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-002",
+      "scope": "package-validator",
+      "status": "partial",
+      "requirement": "manifest 必須存在、XML 合法、根元素正確並符合對應 grammar。",
+      "conditions": [
+        "套用於 OpenDocument Package，不只 SDK 產生的文件。"
+      ],
+      "assessment": "缺檔、根元素及版本 grammar 已有檢查；完整 RNG 等價性與 XML 外部標準的所有條件尚未證明。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00133/S001",
+          "sentenceSha256": "cf83ffd890e8cf655aa8579ee8d4e3808a0f5198533e70ac1dfa9563cd10ddf9"
+        },
+        {
+          "id": "ODF-1.4/packages/B00133/S002",
+          "sentenceSha256": "3f4628d90b4979069983c2194631a8e0235e2a62ce6c952f0bb1e438c1dc6bc5"
+        },
+        {
+          "id": "ODF-1.4/packages/B00134/S001",
+          "sentenceSha256": "bdf080e49c94395ab583fe9dcc138c65b8175a559fe5d7ee76fc0bc483b4d62b"
+        },
+        {
+          "id": "ODF-1.4/packages/B00135/S001",
+          "sentenceSha256": "cd067978dd77c9a2ebba090b9b85ae7ff1bdc348255ca75e8285a2bea1ce2ea8"
+        },
+        {
+          "id": "ODF-1.4/packages/B00136/S001",
+          "sentenceSha256": "205ca9735b73a8e926848cf67342fdfc77f3d3d73531d60354d9e8c0d019d3ec"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-003",
+      "scope": "package-validator",
+      "status": "product-profile-limit",
+      "requirement": "區分 mimetype 的 should 建議與存在根 manifest entry 後的 shall 條件。",
+      "conditions": [
+        "根 manifest entry 存在時，mimetype 必須存在。",
+        "mimetype 存在時，根 manifest entry 必須存在。",
+        "種類特定的 document 另外有 mimetype 必要條件。"
+      ],
+      "assessment": "SDK 文件種類 profile 強制 mimetype 與根 entry；不可據此宣稱接受所有一般 conforming package。無 mimetype 的一般 package 不等於種類完整的 conforming document。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.MimeType.cs",
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00137/S001",
+          "sentenceSha256": "93de441ffb4c00832682813f057ee48c3b6c22f951bfcbea4625a3ba274bfc03"
+        },
+        {
+          "id": "ODF-1.4/packages/B00174/S001",
+          "sentenceSha256": "88f7e050eef1ad5d49a7561275a985ce1a0691d5bec530c76a8a62b44a6175d8"
+        },
+        {
+          "id": "ODF-1.4/packages/B00174/S002",
+          "sentenceSha256": "6a79986bb9a510144d214fa6ce7b0bd12024ab212db5e906a9a5c7a6c8a4dad6"
+        },
+        {
+          "id": "ODF-1.4/packages/B00174/S003",
+          "sentenceSha256": "360f537dfedcc9b9a1d8efe11f9ac73eb4d1f48c38e052bc6af474b4ec9e0b06"
+        },
+        {
+          "id": "ODF-1.4/packages/B00176/S001",
+          "sentenceSha256": "7da4c085d6a9beb89676bcd91fc8faa330d1e3621a9234007f838e533e0d2a51"
+        },
+        {
+          "id": "ODF-1.4/packages/B00176/S002",
+          "sentenceSha256": "e9a03e9148f104306e90f0fc75eb6817f18d9245afe168ed2918abf40e08f570"
+        },
+        {
+          "id": "ODF-1.4/packages/B00176/S003",
+          "sentenceSha256": "e1fa963c376e9dcfc81bad1643385f26eb568a710f5b1e6a3a988b941b52def4"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-004",
+      "scope": "signature-validator",
+      "status": "partial",
+      "requirement": "選擇性簽章檔一旦存在，即須檢查 XML、dsig root 與 dsig grammar。",
+      "conditions": [
+        "相對路徑以 META-INF/ 開頭且檔名含 signatures。"
+      ],
+      "assessment": "可選的 may 不豁免簽章檔出現時的所有 shall。已有 metadata grammar 路徑；驗證報告不等於密碼學簽章或全範圍簽署覆蓋證明。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00138/S001",
+          "sentenceSha256": "12601283001a776dde13239ae49702ba53284d98fd82f79ed05a59c3b1d0637b"
+        },
+        {
+          "id": "ODF-1.4/packages/B00138/S002",
+          "sentenceSha256": "887da2ffe6b66066fefb618fc7e9388b14b44b75d23dc8d381a60324ca1a52fa"
+        },
+        {
+          "id": "ODF-1.4/packages/B00139/S001",
+          "sentenceSha256": "303258ca6afe6a1a2f0112d212e10307478d9000da44351ae7cba9db72496953"
+        },
+        {
+          "id": "ODF-1.4/packages/B00140/S001",
+          "sentenceSha256": "45d299f27cc8ab44824140791e2e3735f78a482b9807ad53bc8f4429ee08118b"
+        },
+        {
+          "id": "ODF-1.4/packages/B00141/S001",
+          "sentenceSha256": "d8e1d76679422d5fba988c74963d6f6d92ac5ccc7828c15c9b9e08d072000919"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-005",
+      "scope": "package-validator",
+      "status": "validator-gap",
+      "requirement": "Strict package 禁止未列出的 META-INF 檔案與替代 implementation-defined IRI；Extended 僅豁免指定 E 項。",
+      "conditions": [],
+      "assessment": "一般安全路徑檢查不等於 Strict META-INF 白名單與 IRI 規則。Extended 不能連帶豁免 manifest、簽章、XML 或 ZIP 的其他要求。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs",
+        "OdfKit/Compliance/OdfComplianceProfiles.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00142/S001",
+          "sentenceSha256": "ed072caf3ecbb4d6dfdb56efdee7de2412cb9366471f256f83a8b272d6d20bef"
+        },
+        {
+          "id": "ODF-1.4/packages/B00147/S001",
+          "sentenceSha256": "8063bb88b9f7f39948947f6d31676b0552eb35abb09b37d40bc60a1a7590f55e"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-006",
+      "scope": "package-validator",
+      "status": "partial",
+      "requirement": "manifest 與簽章 XML 另須符合 Namespaces 及 xml:id。",
+      "conditions": [],
+      "assessment": "XML reader 已按 namespace 解析。主內容的 xml:id 唯一性修正不可自動當成所有 metadata XML 與 XML-ID 處理規則已覆蓋。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00144/S001",
+          "sentenceSha256": "7b46d1d92bbab807fda2e88ccc3f7a8ffd97ef60804cf9c175409ca50ab34eda"
+        },
+        {
+          "id": "ODF-1.4/packages/B00145/S001",
+          "sentenceSha256": "3c0cf1b30369af2c7efead53598ddca8b265ea516ced098e2a7fced839bf3942"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-007",
+      "scope": "package-producer",
+      "status": "evidence-gap",
+      "requirement": "Producer 的 conforming 模式與 implementation-defined 文件是產品義務。",
+      "conditions": [],
+      "assessment": "SDK 可建立多種 package；單一樣本通過不是任意 API 組合的輸出證明。已有個別 implementation-defined 說明，尚無所有值的完整登錄。",
+      "implementation": [
+        "OdfKit/Core/OdfDocumentFactory.cs",
+        "OdfKit/Core/OdfEncryption.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00151/S001",
+          "sentenceSha256": "34bfec12ddf20d15f5bb00419ea821f01881e85d17fe6225674c65c55925caef"
+        },
+        {
+          "id": "ODF-1.4/packages/B00152/S001",
+          "sentenceSha256": "7683e65d685f9f7f065160f22a7b5e6294836da78b7733830800b65db6231be4"
+        },
+        {
+          "id": "ODF-1.4/packages/B00154/S001",
+          "sentenceSha256": "fa5ae9b3dd0c72dd54d083311d4bf10fbd69224f051f9190ae0866a057eb7569"
+        },
+        {
+          "id": "ODF-1.4/packages/B00154/S002",
+          "sentenceSha256": "7683e65d685f9f7f065160f22a7b5e6294836da78b7733830800b65db6231be4"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-008",
+      "scope": "package-consumer",
+      "status": "partial",
+      "requirement": "Consumer 應讀取 conforming 與 extended packages，但可不解釋每個值的語意。",
+      "conditions": [],
+      "assessment": "不要求 GUI renderer，並不允許跳過 ZIP、XML 或 namespace 必要處理。現有載入與保存證據只是部分格式覆蓋。",
+      "implementation": [
+        "OdfKit/Core/OdfPackageLoader.cs",
+        "OdfKit/Core/OdfPackageZipLoader.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00157/S001",
+          "sentenceSha256": "37e9757e317203877669d61efbb19d5dbf0c1921f4b8c9be781e30ceccd161d2"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-009",
+      "scope": "package-consumer",
+      "status": "security-policy-limit",
+      "requirement": "XML processor 的標準義務與 SDK 的 DTD/資源限制須分別記錄。",
+      "conditions": [],
+      "assessment": "SDK 刻意禁止 DTD、外部實體與不受限資源。安全限制不是 OASIS 豁免，不能宣稱無限制的 XML 1.0／XML-ID processor 合規，也不應為消除標記而放寬安全防線。",
+      "implementation": [
+        "OdfKit/Core/OdfPackageLoader.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00159/S001",
+          "sentenceSha256": "264f9a00c06f5d4e95de98a0a5ff0d268d732c26aa69a7776f2c8ce975cace7f"
+        },
+        {
+          "id": "ODF-1.4/packages/B00160/S001",
+          "sentenceSha256": "4d5c17f18241d349125d0315bb36c2d60fb9ab4b03a22b761f145af05386990d"
+        },
+        {
+          "id": "ODF-1.4/packages/B00161/S001",
+          "sentenceSha256": "a40ecda9c50ff3fed589932ab43ef4d30cd7445b6f5badded2f0aa9d876c266a"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-010",
+      "scope": "package-validator",
+      "status": "partial",
+      "requirement": "manifest 列出 payload MIME 與解密資料，每個非排除檔案恰有一個 entry，且不可列自身或 mimetype。",
+      "conditions": [],
+      "assessment": "已檢查缺檔、重複 full-path、MIME 與排除項；解密資料的完整語意與所有錯誤組合仍須另附證據。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs",
+        "OdfKit/Core/OdfPackageManifestWriter.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00167/S001",
+          "sentenceSha256": "ff42871c118dd6a04afcd117dcc537913b99c51f415147a3016be2e690603b19"
+        },
+        {
+          "id": "ODF-1.4/packages/B00167/S002",
+          "sentenceSha256": "d4d39dde96c48d0edff60f8f47543d87b3c0f97ba71bdf0421044eb9eb629c0c"
+        },
+        {
+          "id": "ODF-1.4/packages/B00167/S003",
+          "sentenceSha256": "654954f9cd9ea1f9811ee5a79ddb19099fba9585f23f27e20104b251ee649fe6"
+        },
+        {
+          "id": "ODF-1.4/packages/B00168/S001",
+          "sentenceSha256": "c0ce67b62f4b43564632f76454f377e70193c24bf7e777a38eba5353083aadd8"
+        },
+        {
+          "id": "ODF-1.4/packages/B00169/S001",
+          "sentenceSha256": "b95772c7a9776ade31eec3db8ad2d669232ecad92f0e1e8fedcff87a0920f87a"
+        },
+        {
+          "id": "ODF-1.4/packages/B00170/S001",
+          "sentenceSha256": "5304bada275a7780c578fd45ce7b6b6aca19d440e5244547cb51ddb0f5091c3d"
+        },
+        {
+          "id": "ODF-1.4/packages/B00171/S001",
+          "sentenceSha256": "f0b4bbcbf632cfb519ed44ab2f9d9cf20c54cac5a129c97440e7bb8f5f6cbc67"
+        },
+        {
+          "id": "ODF-1.4/packages/B00172/S001",
+          "sentenceSha256": "9be6c70f9045e9fa42cea07738d391d1ce157bb9cc3bfe5832adf2e3699c38d3"
+        },
+        {
+          "id": "ODF-1.4/packages/B00173/S001",
+          "sentenceSha256": "f1cf61b8cd5e7eca6d9504cc0a8aecc78e0a26399c2ba692212577cbca5c786e"
+        },
+        {
+          "id": "ODF-1.4/packages/B00173/S002",
+          "sentenceSha256": "946708082ea5cdc5cb6312f6a49b0a40487a4b66da3da9f9ef8cb58cfea56c50"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-011",
+      "scope": "package-validator",
+      "status": "validator-gap",
+      "requirement": "mimetype 的 ZIP local header 必須第一筆、STORED 且無 extra field。",
+      "conditions": [],
+      "assessment": "SDK 檢查 entry order 與 WasStoredInZip，但 ValidateMimeTypeEntry 沒有檢查 local header extra-field 長度。產生器輸出合格不可填補接受非法輸入的缺口。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.MimeType.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00177/S001",
+          "sentenceSha256": "57b9eceb46e34e21d785ddd5002e65b921164a58b1f5a921ecf338dd701daa35"
+        },
+        {
+          "id": "ODF-1.4/packages/B00177/S002",
+          "sentenceSha256": "5f45d076720cdf9257e9155c64c367c0dba430ddf14025eca1cb70a929336848"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-012",
+      "scope": "package-validator",
+      "status": "partial",
+      "requirement": "根 manifest MIME 與 mimetype 的雙向存在及值一致條件。",
+      "conditions": [],
+      "assessment": "有 root media-type 一致檢查；通用 package 的無 root/no MIME 分支受 SDK 文件 profile 限制，不能用單一 unconditional 必填規則取代此條件。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs",
+        "OdfKit/Compliance/OdfPackageValidator.MimeType.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00178/S001",
+          "sentenceSha256": "243a1753cae0e96fc1a28cb2c52f697e7ef7f87f099a1e9a44afdd2eb9b97582"
+        }
+      ]
+    },
+    {
+      "id": "SENT-PKG-013",
+      "scope": "encryption",
+      "status": "partial",
+      "requirement": "加密檔須先 deflate、ZIP 標 STORED、保存原始 size，manifest 不得加密且可恢復精確明文。",
+      "conditions": [
+        "僅於 package 選擇加密時觸發；may 不免除選擇加密後的條件。"
+      ],
+      "assessment": "SDK 有加密互通 corpus；不能把 API 成功與已測算法組合提升為每個加密格式/宣告組合全覆蓋。",
+      "implementation": [
+        "OdfKit/Core/OdfPackageLoader.cs",
+        "OdfKit/Core/OdfPackageManifestWriter.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/packages/B00185/S001",
+          "sentenceSha256": "7a4555f47a1f58b8d8942e6c9b23f7d8738e14ce2abeb63a82310049c0bbff05"
+        },
+        {
+          "id": "ODF-1.4/packages/B00185/S002",
+          "sentenceSha256": "6ca3cdca2ae6ad42677dbec717a2fa9b177e42401bbe72f1065175bc92a7c6bc"
+        },
+        {
+          "id": "ODF-1.4/packages/B00186/S001",
+          "sentenceSha256": "ded61ed32c2e8cb6dba13d2c7883b84f8edbb42e475488d93c11d7ae2ae619ef"
+        },
+        {
+          "id": "ODF-1.4/packages/B00187/S001",
+          "sentenceSha256": "4dc778b6a28013d5c74ceebfe7d52e30272bf7d506af99912c47e7e499801f25"
+        },
+        {
+          "id": "ODF-1.4/packages/B00188/S001",
+          "sentenceSha256": "0d76e2abf24d31944a881252c9d0ca9d2a8ca996d8e16aea4527e9a7e404b34a"
+        },
+        {
+          "id": "ODF-1.4/packages/B00189/S001",
+          "sentenceSha256": "92587a996e3e9a8701fb0f0fedefe69106bf3e7c3b234148f0972d80375a1854"
+        },
+        {
+          "id": "ODF-1.4/packages/B00189/S002",
+          "sentenceSha256": "9085d489527424e2b922af6c7d9b306a6f1f7024937551f266d59fb4a1868f96"
+        },
+        {
+          "id": "ODF-1.4/packages/B00190/S001",
+          "sentenceSha256": "9493a43b713be1e754827759f4ab1e1eb76ff90d03658e10fee758eda5fd217e"
+        },
+        {
+          "id": "ODF-1.4/packages/B00190/S002",
+          "sentenceSha256": "8fbafab2c01cd950f42c2246acf3ac09bda8dcfc0b258f1b5c1be17a0a600166"
+        },
+        {
+          "id": "ODF-1.4/packages/B00190/S003",
+          "sentenceSha256": "7df3dee7ee7ddea0c95fb0c8e922e2fc04bf4976f6ef2fc9a6bafe2f7e9f0c22"
+        },
+        {
+          "id": "ODF-1.4/packages/B00190/S004",
+          "sentenceSha256": "d7df5a4f3f379e0c80b74268ba52760e1e0795012a3d9cbf68f60ef0363e1a08"
+        },
+        {
+          "id": "ODF-1.4/packages/B00191/S001",
+          "sentenceSha256": "cfcfe7f449886d48d74cc55a97b8d68906a9965f457de9fd87d03bae150651c3"
+        },
+        {
+          "id": "ODF-1.4/packages/B00193/S001",
+          "sentenceSha256": "1cd94d5fe3f5918fcc46673e90214e309f8101f638b34dc28c73da10c958b189"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-001",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "Document package 必須先滿足 package 規範，且至少含 content.xml 或 styles.xml。",
+      "conditions": [],
+      "assessment": "條件同時含 package 與 document 層級依賴；不可將一般 package 的 optional mimetype 建議移植為所有 document 都可省略。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.XmlRoots.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00251/S001",
+          "sentenceSha256": "23877e550383cbcbc1756ca998c91f94337dd063c4e0fe1a55d2e7b51ea9114d"
+        },
+        {
+          "id": "ODF-1.4/schema/B00252/S001",
+          "sentenceSha256": "771237f43df17d6a8183f2543dad4ea90d672242fc2e59891ec35f4c2e3cd5c4"
+        },
+        {
+          "id": "ODF-1.4/schema/B00253/S001",
+          "sentenceSha256": "88f0bc9652c40589e2293e68cbb8521c5317d9256313e4e953044e4a75d6ab7d"
+        },
+        {
+          "id": "ODF-1.4/schema/B00254/S001",
+          "sentenceSha256": "cfd3ea9e93904ef0ce7cd072ba3a9eb5f674c989753dbdead19a30bb5a627d27"
+        },
+        {
+          "id": "ODF-1.4/schema/B00254/S002",
+          "sentenceSha256": "82d8f1a99f583d6201297d5f77994380c3a3a737bdc51a1bdc5d1c0dcbc2e758"
+        },
+        {
+          "id": "ODF-1.4/schema/B00255/S001",
+          "sentenceSha256": "1c32a64dc2479a7fcc8b5dd9e0ec9bd476d211372302231a4f3a7923378af97f"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-002",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "存在的四個核心 XML 檔案須合法、根元素符合名稱並通過對應 schema。",
+      "conditions": [],
+      "assessment": "已有 root 與 grammar 驗證入口；完整 schema 等價性、外部 XML 規則及拒絕政策仍分開追蹤。",
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.XmlRoots.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00256/S001",
+          "sentenceSha256": "7524a526d68f3c209a1186fac4cb991cce08d306becf0466189d0e1eff3141bc"
+        },
+        {
+          "id": "ODF-1.4/schema/B00257/S001",
+          "sentenceSha256": "c8bb16b5e321817075bd2d23467a92db3aaf16f4d780155ac4a0dae76a056961"
+        },
+        {
+          "id": "ODF-1.4/schema/B00258/S001",
+          "sentenceSha256": "0eb42ee11eca8db8baf817a640efffdc0afe603a6bc5c51c3bcfc15924664b92"
+        },
+        {
+          "id": "ODF-1.4/schema/B00259/S001",
+          "sentenceSha256": "e41a5f60756d365eb760b6a89161450ce750171d81e6f9644e37fccbd6e3c634"
+        },
+        {
+          "id": "ODF-1.4/schema/B00260/S001",
+          "sentenceSha256": "41c2c6eb3fbfa561f7b3520bc53a6c0f59ef8338f56bb878495fa683fadb295d"
+        },
+        {
+          "id": "ODF-1.4/schema/B00261/S001",
+          "sentenceSha256": "423043ec0458ae8306f61d0128bf022cfcfc9f83be22153d2dc63f475186e93a"
+        },
+        {
+          "id": "ODF-1.4/schema/B00262/S001",
+          "sentenceSha256": "453da4402b1cabe01c827ea696256a5403ca5108dd90a56f63f17390f900ff78"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-003",
+      "scope": "document-validator",
+      "status": "validator-gap",
+      "requirement": "Formula content.xml 的 MathML 2.0 grammar 與根元素仍是 SDK 驗證責任。",
+      "conditions": [
+        "content.xml 根為 math:math；Formula document 另有專屬根要求。"
+      ],
+      "assessment": "裸 MathML 路徑回報 ODF3103 後跳過完整 grammar；有警告不等於該句義務已滿足。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [
+        "OdfKit.Tests/OdfConformanceGapTests.cs"
+      ],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00263/S001",
+          "sentenceSha256": "1285d1b5d4617e72fd4fced76dd00d0c1d7d0d4c19b6d9458702d66409fcb9cf"
+        },
+        {
+          "id": "ODF-1.4/schema/B00316/S001",
+          "sentenceSha256": "85e8b9248ad78db6765e979ad2091f247d03ec70d6974937549fb4642b8b59c6"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-004",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "Flat 文件要求 well-formed XML、office:document root 與 appendix grammar。",
+      "conditions": [],
+      "assessment": "已有 flat grammar 與 root 驗證；OPF 上游 flat 版本限制不構成 SDK 豁免。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs",
+        "docs/opf-baseline-exceptions.json"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00264/S001",
+          "sentenceSha256": "176b09ea88f6ec5e4a731fc753c7d714aad48320c596bbcc31c0db6ae0062058"
+        },
+        {
+          "id": "ODF-1.4/schema/B00265/S001",
+          "sentenceSha256": "75e2ae0163e68188d5d593fe5e56119630546517d344284035a88a31021d85d7"
+        },
+        {
+          "id": "ODF-1.4/schema/B00266/S001",
+          "sentenceSha256": "57c0b931cfd09bcb329c747010d041f4bc2a4022a64313d10de0aae9b67c09e9"
+        },
+        {
+          "id": "ODF-1.4/schema/B00267/S001",
+          "sentenceSha256": "89206deea754bb32478b3e498de90134104f2cd18731e737f1023151b7d03592"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-005",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "核心 XML 與 flat 文件須符合 Namespaces 與 XML-ID。",
+      "conditions": [],
+      "assessment": "每 XML stream xml:id 唯一性已補強；完整 XML-ID 處理、跨文件 IDREF 與 grammar 仍分別追蹤，不能以 xml:id 去重測試取代全部。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs"
+      ],
+      "tests": [
+        "OdfKit.Tests/OdfConformanceGapTests.cs"
+      ],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00269/S001",
+          "sentenceSha256": "a68ec8e372668d2925f6e4ad92cd873015d2cd40d7ee00384a1f8e44c9ed154b"
+        },
+        {
+          "id": "ODF-1.4/schema/B00270/S001",
+          "sentenceSha256": "ef7c4a948f235bc18ac001a9c77c24414eb99de7e5511e80af086adef69d9e44"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-006",
+      "scope": "formula-validator",
+      "status": "validator-gap",
+      "requirement": "依版本與文件 conformance class 判斷公式 prefix namespace、無 prefix 預設及 Part 4 語法語意。",
+      "conditions": [
+        "1.4 未加 namespace prefix 的 expression 有 OpenFormula 預設語意。",
+        "Strict spreadsheet 的 table:formula prefix 另有 OF namespace 約束。",
+        "Extended 的 E 項豁免不可推廣到其他結構規則。"
+      ],
+      "assessment": "RNG string datatype 與 Safe Large 公式執行成功都不等於 Strict 文件全部公式屬性符合 Part 4。Extended 章節明確列出的豁免必須保留，不能全面拒絕 calcext 或任意外部公式格式。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs",
+        "docs/openformula-conformance-manifest.json"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00271/S001",
+          "sentenceSha256": "5ca16ace88d77720f8a7557529e04c18f219c87c71195430f1e1170a7fb59c89"
+        },
+        {
+          "id": "ODF-1.4/schema/B00271/S002",
+          "sentenceSha256": "177bfc26fca1567ed6348c48c19f1b648b1a33e75575c2c0a623962b5a10b87b"
+        },
+        {
+          "id": "ODF-1.4/schema/B00291/S001",
+          "sentenceSha256": "91aba4bae999d0671afeaeb83daad260c23e6bf71fb751f69aec5500339d2a8f"
+        },
+        {
+          "id": "ODF-1.4/schema/B00292/S001",
+          "sentenceSha256": "d43a1cc42c15dd63f61bfddbfbd2de8fd7340922ae078c7aae0fb7551092ac29"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-007",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "Extended 僅移除指定條件，foreign content 還須按 3.17 處理再做 grammar 驗證。",
+      "conditions": [],
+      "assessment": "已有 foreign content sanitization；刪除 foreign subtree 本身不是 office:process-content 所有分支的符合性證明。",
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.NamespaceRules.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00274/S001",
+          "sentenceSha256": "3065725e16b28e9602a16e2f89a9410fb63b133dbc1941ad4e341cdbbd4544fb"
+        },
+        {
+          "id": "ODF-1.4/schema/B00275/S001",
+          "sentenceSha256": "c1f62fc1652b9268c54fb89bb9e0c2666e11b4cdbd1f47c3fb86f92ee0334c57"
+        },
+        {
+          "id": "ODF-1.4/schema/B00276/S001",
+          "sentenceSha256": "8e31443c374f749eccd2edf1df5a3b6924e28f0cc0091abf6a22521a057ae8b6"
+        },
+        {
+          "id": "ODF-1.4/schema/B00277/S001",
+          "sentenceSha256": "60667c59ae1c5196d3d75420a939423f9963dbaf9ded127a181c121cd0a4e562"
+        },
+        {
+          "id": "ODF-1.4/schema/B00278/S001",
+          "sentenceSha256": "6e946c70dfe928fad1cef960cf4c4ec09b5b5ca718f7ca52d1eade93ec057ed5"
+        },
+        {
+          "id": "ODF-1.4/schema/B00279/S001",
+          "sentenceSha256": "0af2f4cdad18520312cb668ab0592b1314ca35924d9778159c734902fa301839"
+        },
+        {
+          "id": "ODF-1.4/schema/B00280/S001",
+          "sentenceSha256": "21a39fbc0bfb440acf3a8ead6700d2e9edb2edfb1345a6f76f95c205a7f6f5ab"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-008",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "Text 四種 MIME 與 office:text body 具有種類一致義務。",
+      "conditions": [],
+      "assessment": "新 text-master-template 已有偵測、建立與 OASIS fixture 證據；尚未證明任意 body/XML 欄位皆合規。",
+      "implementation": [
+        "OdfKit/Compliance/OdfDocumentKindDetector.cs",
+        "OdfKit/Compliance/OdfComplianceProfiles.cs"
+      ],
+      "tests": [
+        "OdfKit.Tests/OasisOdf13RegressionTests.cs"
+      ],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00283/S001",
+          "sentenceSha256": "7334477ffff807f7d8bc83c9858ef37356dd6e79894859d469ca7f8d9911c605"
+        },
+        {
+          "id": "ODF-1.4/schema/B00284/S001",
+          "sentenceSha256": "865cb0209f89bdcb4861801c60369a83f2452a9db7fa111cc298b0bf08156b79"
+        },
+        {
+          "id": "ODF-1.4/schema/B00285/S001",
+          "sentenceSha256": "74b616803c860ea303db9c241971e0e1c1427c9b6007319f9e637749d6f692ae"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-009",
+      "scope": "document-validator",
+      "status": "partial",
+      "requirement": "各文件種類有 MIME/根與 body 的專屬條件，不能僅憑副檔名決定合規。",
+      "conditions": [],
+      "assessment": "已有種類偵測與 MIME/body 相容性規則，Database 已移除豁免並用官方 grammar 比對；資料庫跨節點參照與全部語意仍須證據。規範轉檔文字含可疑空白及交叉參照，保留官方 locator，不能自行把轉錄錯誤視為新 MIME。",
+      "implementation": [
+        "OdfKit/Compliance/OdfDocumentKindDetector.cs",
+        "OdfKit/Compliance/OdfPackageValidator.MimeType.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00288/S001",
+          "sentenceSha256": "87d6ca243be7feb7e3559b1e38b16fe3a739f12b11a7a0ee3bb77feba8487646"
+        },
+        {
+          "id": "ODF-1.4/schema/B00289/S001",
+          "sentenceSha256": "b262e26cbf4c732ea0750c610b4311b284d936ae78e1fdee478b0c3ff2893dbd"
+        },
+        {
+          "id": "ODF-1.4/schema/B00290/S001",
+          "sentenceSha256": "2681cab1dd897714b6e7c40a507e2b09dbff1409faa2cb2ed7e68f0f83280691"
+        },
+        {
+          "id": "ODF-1.4/schema/B00295/S001",
+          "sentenceSha256": "2cc4901562b57caefa4e0cdc334bbf57da8322db321bebc70731b8ac7baa0b5c"
+        },
+        {
+          "id": "ODF-1.4/schema/B00296/S001",
+          "sentenceSha256": "29e7a77414fa7117a34a354a9afdc96585e402275d3dad59a21efd1b272c2328"
+        },
+        {
+          "id": "ODF-1.4/schema/B00297/S001",
+          "sentenceSha256": "f800572c2050ee6aac5a3921de2f17605c3f467f7bb20deaad879c8fbdd8959a"
+        },
+        {
+          "id": "ODF-1.4/schema/B00300/S001",
+          "sentenceSha256": "7f056ef222e506ef76d06785a759168caf71a4b520132ef463dc220e67157159"
+        },
+        {
+          "id": "ODF-1.4/schema/B00301/S001",
+          "sentenceSha256": "1fad5e5aa21ba13d0a06f5d4dcc6d6767a8047349c189ecd1b3b4c0392d82585"
+        },
+        {
+          "id": "ODF-1.4/schema/B00302/S001",
+          "sentenceSha256": "8f3eb19d6200a1f0814f80977d1fbabe60217acf9d4429054bfa7faaebb2b993"
+        },
+        {
+          "id": "ODF-1.4/schema/B00305/S001",
+          "sentenceSha256": "eb3089fa102132a308f769efbcc5bf36cb4d7041194c9f0e8174ac03c9670d4f"
+        },
+        {
+          "id": "ODF-1.4/schema/B00306/S001",
+          "sentenceSha256": "076d83fda25b14c308a1bb9665d89b75e6e94fd4e5217396e68a7a2c1a5e9dd4"
+        },
+        {
+          "id": "ODF-1.4/schema/B00307/S001",
+          "sentenceSha256": "ec0a74f728f219f2533d6cbc3fc7d0b379c4fef4e7d2eba87595d7c24105b7d2"
+        },
+        {
+          "id": "ODF-1.4/schema/B00310/S001",
+          "sentenceSha256": "5555497712820591aa1b880dd2587c6abd3e2892f911770d095da040ae90eedb"
+        },
+        {
+          "id": "ODF-1.4/schema/B00311/S001",
+          "sentenceSha256": "87ed5a6894881c6167a73ff80a9d728f85c8feaa2c453ca4aa14f8b39f6ccf67"
+        },
+        {
+          "id": "ODF-1.4/schema/B00312/S001",
+          "sentenceSha256": "c88c1b3a04792812774a3136c84e5bc207f2eb29aa97dc8e77880ea73e6be7cc"
+        },
+        {
+          "id": "ODF-1.4/schema/B00315/S001",
+          "sentenceSha256": "94aa9cb231d091dd4c014de182eeda509f75e80b67ae9163b0bc98471bf1b020"
+        },
+        {
+          "id": "ODF-1.4/schema/B00319/S001",
+          "sentenceSha256": "99d5a2233fd46d93bb7deecfcae1c3cea8381b22387b77b9262651c5cb5414a4"
+        },
+        {
+          "id": "ODF-1.4/schema/B00320/S001",
+          "sentenceSha256": "2c4ff496d9cdd8bb738253653b7b0c3c01210d365dbbbcaaa70c74d104ed85ef"
+        },
+        {
+          "id": "ODF-1.4/schema/B00321/S001",
+          "sentenceSha256": "0b98d8c49eaee8fba55f4e40a78feffac8483e3b61e3d5ed85e40b857c806a67"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DOC-010",
+      "scope": "document-producer",
+      "status": "evidence-gap",
+      "requirement": "Producer conforming 模式、implementation-defined 與 foreign extension 說明是各自獨立要求。",
+      "conditions": [],
+      "assessment": "有 strict/extended profile 不能證明所有產生路徑。產品需彙整 implementation-defined/extension 登錄；must 與 should 的證據及偏離理由不得混用。",
+      "implementation": [
+        "OdfKit/Core/OdfDocumentFactory.cs",
+        "OdfKit/Compliance/OdfComplianceProfiles.cs"
+      ],
+      "tests": [],
+      "units": [
+        {
+          "id": "ODF-1.4/schema/B00325/S001",
+          "sentenceSha256": "b8285b3d8b5f7e9a35885b4223e72b03c2c52f8da5e563dfcb3420c448b44d60"
+        },
+        {
+          "id": "ODF-1.4/schema/B00326/S001",
+          "sentenceSha256": "f9b67ff4f518993c373eaccb9f2c013e54c6123450d931b31044c8f0cd159357"
+        },
+        {
+          "id": "ODF-1.4/schema/B00329/S001",
+          "sentenceSha256": "6ffabc50a8c4953c46ad62fa6dcebf9cfe25e940b116da08a37f770df0a5042e"
+        },
+        {
+          "id": "ODF-1.4/schema/B00330/S001",
+          "sentenceSha256": "d3791015fddcfb82992375eb821d8527059b829f556d5940487efd0a1798dabb"
+        }
+      ]
+    },
+    {
+      "id": "SENT-DTYPE-001",
+      "scope": "datatype-validator",
+      "status": "partial",
+      "requirement": "namespacedToken 是有前綴的 XML Schema QName；值中的 prefix 需依目前元素 namespace context 解析。",
+      "conditions": [
+        "1.2～1.4 document 與 package datatype。",
+        "允許任意合法 prefix 名稱與繼承宣告；XML 四種空白須 collapse。"
+      ],
+      "assessment": "已修正 QName data 節點的未宣告 prefix 與 whitespace collapse，回歸涵蓋三版 native chart-class、巢狀 series、繼承宣告及 xml 內建 prefix。QName value literal 的 namespace-aware 相等比較與全部 XML Schema facet 義務仍無完整證據，故此句整體為 partial。",
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs",
+        "OdfKit/Compliance/OdfSchemaPatternMatchContext.cs"
+      ],
+      "tests": [
+        "OdfKit.Tests/OdfConformanceGapTests.cs",
+        "OdfKit.Tests/ComplianceTests.cs"
+      ],
+      "units": [
+        {
+          "id": "ODF-1.2/schema/B04374/S001",
+          "sentenceSha256": "2db50a2ef19e1dd1571fb93ba546c4fd915054ac7dc17bc1f943a5804c03a4df"
+        },
+        {
+          "id": "ODF-1.2/packages/B00437/S001",
+          "sentenceSha256": "2db50a2ef19e1dd1571fb93ba546c4fd915054ac7dc17bc1f943a5804c03a4df"
+        },
+        {
+          "id": "ODF-1.3/packages/B00508/S001",
+          "sentenceSha256": "2db50a2ef19e1dd1571fb93ba546c4fd915054ac7dc17bc1f943a5804c03a4df"
+        },
+        {
+          "id": "ODF-1.3/schema/B04448/S001",
+          "sentenceSha256": "dcc89bc32c23d4ffd689b3836eec2d9c4fa0f778fd26a6b66e0d64260e185daa"
+        },
+        {
+          "id": "ODF-1.4/packages/B00510/S001",
+          "sentenceSha256": "2db50a2ef19e1dd1571fb93ba546c4fd915054ac7dc17bc1f943a5804c03a4df"
+        },
+        {
+          "id": "ODF-1.4/schema/B04540/S001",
+          "sentenceSha256": "dcc89bc32c23d4ffd689b3836eec2d9c4fa0f778fd26a6b66e0d64260e185daa"
+        }
+      ]
+    }
+  ]
+}

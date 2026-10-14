@@ -16,6 +16,7 @@ namespace OdfKit.Database;
 public partial class OdfDatabaseDocument : OdfDocument
 {
     private const string DatabaseNamespace = "urn:oasis:names:tc:opendocument:xmlns:database:1.0";
+    private const string TableCommandNamespace = "urn:odfkit:database:compatibility";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfDatabaseDocument"/> class with the specified ODF package.
@@ -199,6 +200,7 @@ public partial class OdfDatabaseDocument : OdfDocument
             {
                 tables.Add(new OdfDatabaseTableInfo(
                     child.GetAttribute("name", DatabaseNamespace) ?? string.Empty,
+                    child.GetAttribute("command", TableCommandNamespace) ??
                     child.GetAttribute("command", DatabaseNamespace)));
             }
         }

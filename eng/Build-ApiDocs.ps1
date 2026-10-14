@@ -97,8 +97,9 @@ try {
     $projectDocsResources = @($docfxConfig.build.resource | Where-Object { $_.src -eq '../docs' })
     if ($projectDocsResources.Count -ne 1 -or
         @($projectDocsResources[0].files) -notcontains '**/*.json' -or
+        @($projectDocsResources[0].files) -notcontains '**/*.csv' -or
         $projectDocsResources[0].dest -ne 'project-docs') {
-        throw 'DocFX 必須將 docs 下的 JSON 證據資源發布到 project-docs。'
+        throw 'DocFX 必須將 docs 下的 JSON 與 CSV 證據資源發布到 project-docs。'
     }
     if ($docfxConfig.build.globalMetadata._appLogoPath -ne 'images/odfkit-mark.svg') {
         throw 'modern 導覽列缺少 OdfKit 標誌。'
@@ -304,7 +305,7 @@ try {
         if ($_.Extension -eq '.md') {
             $publishedRepoPaths[$repoPath] = 'project-docs/' + [IO.Path]::ChangeExtension($docsPath, '.html')
         }
-        elseif ($_.Extension -eq '.json') {
+        elseif ($_.Extension -in @('.json', '.csv')) {
             $publishedRepoPaths[$repoPath] = 'project-docs/' + $docsPath
         }
         elseif ($_.Name -eq 'toc.yml') {
@@ -464,7 +465,7 @@ try {
         if ($_.Extension -eq '.md' -or $_.Name -eq 'toc.yml') {
             [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($relative, '.html'))
         }
-        elseif ($_.Extension -eq '.json') {
+        elseif ($_.Extension -in @('.json', '.csv')) {
             [void]$allowedProjectDocs.Add($relative)
         }
     }
@@ -473,7 +474,7 @@ try {
     foreach ($repoPath in $repositoryContentFiles) {
         [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($repoPath, '.html'))
     }
-    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/Manage-WebFontSidecarService.ps1', 'eng/scripts/PdfVisualDiff.py', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
+    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/Manage-WebFontSidecarService.ps1', 'eng/Test-OpfOdfBaseline.ps1', 'eng/scripts/PdfVisualDiff.py', 'OdfKit.Tests/OdfConformanceGapTests.cs', 'OdfKit.Tests/OasisOdf13RegressionTests.cs', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
         [void]$allowedProjectDocs.Add($repoPath)
     }
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'

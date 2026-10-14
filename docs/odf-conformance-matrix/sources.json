@@ -181,9 +181,10 @@
     },
     {
       "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.4-schema.rng",
-      "sha256": "a877fea926440a0666b61561662f3f3dc7c5baa9444ec019f472b90be493295a"
+      "sha256": "4034ec6be29205d5fc1ee5f42468ac6ef824287b3aba6d9289032af4fafbda7f"
     }
   ],
+  "schemaHashEncoding": "bytes with CRLF normalized to LF; preserve BOM and other whitespace",
   "clauseCount": 12256,
   "statusCounts": {
     "evidence-gap": 3207,

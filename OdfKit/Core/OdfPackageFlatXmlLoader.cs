@@ -64,8 +64,10 @@ internal static class OdfPackageFlatXmlLoader
         using (var reader = XmlReader.Create(xmlStream, settings))
         using (var writer = XmlWriter.Create(cleanXmlStream, new XmlWriterSettings { Encoding = new UTF8Encoding(false), CloseOutput = false, Indent = false }))
         {
-            while (reader.Read())
+            bool hasCurrentNode = false;
+            while (hasCurrentNode || reader.Read())
             {
+                hasCurrentNode = false;
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
@@ -120,6 +122,8 @@ internal static class OdfPackageFlatXmlLoader
                             writer.WriteStartElement("office", "binary-data", OdfNamespaces.Office);
                             writer.WriteAttributeString("office", "binary-index", OdfNamespaces.Office, binaryCounter.ToString(CultureInfo.InvariantCulture));
                             writer.WriteEndElement();
+                            // ReadElementContentAsBase64 已移到 binary-data 後的節點；下一輪不可再 Read 跳過。
+                            hasCurrentNode = !reader.EOF;
                         }
                         else
                         {

@@ -29,6 +29,12 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def schema_sha(data):
+    # Git text checkout may use CRLF. Preserve every other byte, including BOM,
+    # whitespace and XML content, so this lock survives core.autocrlf changes.
+    return sha(data.replace(b"\r\n", b"\n"))
+
+
 class Clauses(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -203,7 +209,7 @@ def schema_names():
                 if "name" in node.attrib:
                     names.add(node.attrib["name"])
         result.setdefault(version, set()).update(names)
-        locks.append({"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path.read_bytes())})
+        locks.append({"path": path.relative_to(ROOT).as_posix(), "sha256": schema_sha(path.read_bytes())})
     return result, locks
 
 
@@ -272,6 +278,7 @@ def main():
     metadata = {"schemaVersion": 1, "fullConformanceClaim": False,
                 "granularity": "published-numbered-clause; not atomized normative obligations",
                 "sources": sources, "schemas": locks,
+                "schemaHashEncoding": "bytes with CRLF normalized to LF; preserve BOM and other whitespace",
                 "clauseCount": len(rows), "statusCounts": dict(sorted(Counter(row["status"] for row in rows).items())),
                 "limitations": ["PDF rows are the published table of contents; normative paragraph counts/hashes are not available for 1.0/1.1.",
                                 "A schema name association proves neither matcher equivalence nor semantic conformance.",
