@@ -48,7 +48,7 @@
     },
     {
       "id": "Microsoft.Extensions.Hosting.WindowsServices",
-      "version": "10.0.12"
+      "version": "10.0.13"
     },
     {
       "id": "Microsoft.NETFramework.ReferenceAssemblies.net48",
@@ -60,11 +60,11 @@
     },
     {
       "id": "System.Text.Encoding.CodePages",
-      "version": "10.0.12"
+      "version": "10.0.13"
     },
     {
       "id": "System.Text.Json",
-      "version": "10.0.12"
+      "version": "10.0.13"
     }
   ],
   "prereleaseExceptions": [
