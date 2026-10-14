@@ -17,6 +17,11 @@ internal static partial class OdfSchemaPatternContentMatcher
         bool hasChildElements,
         OdfSchemaPatternMatchContext context)
     {
+        // 同一序列中的 rng:text 與 label 等元素可共存；choice 的文字分支仍須獨立判斷。
+        if (hasChildElements && nodes.Count > 1 && nodes.Any(node => node.Kind == OdfSchemaPatternNodeKind.Text))
+        {
+            return true;
+        }
         return AnyNode(nodes, (hasChildElements, context), static (node, s) => ContentAllowsDirectText(node, s.Item1, s.Item2));
     }
 

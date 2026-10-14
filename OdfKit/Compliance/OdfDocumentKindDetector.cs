@@ -85,6 +85,7 @@ public static class OdfDocumentKindDetector
         new(".odt", TextMimeType, OdfDocumentKind.Text, OdfDocumentKind.Text, false),
         new(".ott", "application/vnd.oasis.opendocument.text-template", OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, false),
         new(".odm", "application/vnd.oasis.opendocument.text-master", OdfDocumentKind.TextMaster, OdfDocumentKind.Text, false),
+        new(".otm", "application/vnd.oasis.opendocument.text-master-template", OdfDocumentKind.TextMasterTemplate, OdfDocumentKind.Text, false),
         new(".ods", SpreadsheetMimeType, OdfDocumentKind.Spreadsheet, OdfDocumentKind.Spreadsheet, false),
         new(".ots", "application/vnd.oasis.opendocument.spreadsheet-template", OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, false),
         new(".odp", PresentationMimeType, OdfDocumentKind.Presentation, OdfDocumentKind.Presentation, false),
@@ -239,7 +240,7 @@ public static class OdfDocumentKindDetector
     {
         return kind switch
         {
-            OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => OdfDocumentKind.Text,
+            OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextMasterTemplate or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => OdfDocumentKind.Text,
             OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => OdfDocumentKind.Spreadsheet,
             OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => OdfDocumentKind.Presentation,
             OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => OdfDocumentKind.Graphics,
@@ -318,6 +319,7 @@ public static class OdfDocumentKindDetector
     public static bool IsTemplateKind(OdfDocumentKind kind)
     {
         return kind == OdfDocumentKind.TextTemplate ||
+            kind == OdfDocumentKind.TextMasterTemplate ||
             kind == OdfDocumentKind.SpreadsheetTemplate ||
             kind == OdfDocumentKind.PresentationTemplate ||
             kind == OdfDocumentKind.GraphicsTemplate ||
@@ -335,6 +337,6 @@ public static class OdfDocumentKindDetector
     /// <returns>若是 ODF 主控文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool IsMasterKind(OdfDocumentKind kind)
     {
-        return kind == OdfDocumentKind.TextMaster;
+        return kind is OdfDocumentKind.TextMaster or OdfDocumentKind.TextMasterTemplate;
     }
 }

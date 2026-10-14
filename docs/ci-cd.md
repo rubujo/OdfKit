@@ -1,4 +1,4 @@
-﻿# CI/CD 驗證設計
+# CI/CD 驗證設計
 
 本文件是 OdfKit GitHub Actions 驗證與交付流程的長期說明。它不是臨時計畫檔，
 而是維護 CI/CD 分層、逾時與診斷輸出的規則來源。
@@ -47,7 +47,7 @@ testhost 收尾不穩。
 | 工作流程 | 目的 | 是否自動跑 |
 |----------|------|------------|
 | `odf-corpus.yml` | repo 內 ODF corpus 與可選外部 corpus 驗證 | PR / main |
-| `odf-external-baseline.yml` | 以固定版本 Jing 與 ODF Validator 驗證完整 RELAX NG／package 對標 | PR / main / 手動 |
+| `odf-external-baseline.yml` | 固定版本 Jing、TDF 與獨立 OPF baseline，另驗證採用的 OASIS odf-tc corpus | PR / main / 手動 |
 | `odf-policy.yml` | 安全與政策規則測試 | PR / main |
 | `typed-dom-coverage.yml` | typed DOM coverage floor 與產物 | PR / main |
 | `trim-smoke.yml` | 核心 NativeAOT／trim smoke，以及 net48 WebFont sidecar NativeAOT 實測 | PR / main |
@@ -176,6 +176,18 @@ Jing 20241231 會直接以 repo 內 OASIS ODF 1.0～1.4 schema 驗證該 schema 
 另對適用的 ZIP package 執行容器／分類對標與正負 canary。Database 因該版本拒絕其合法
 mimetype，Formula／FormulaTemplate 因該版本在 ODF 1.4 觸發上游 NPE，僅從 ODF Validator
 集合排除。兩條外部 baseline 都是阻擋 gate。
+
+另以 OPF ODF Validator 0.20-beta-1 對完整 278 份 corpus 執行獨立 gate，不沿用 TDF 的
+格式排除。初次實測 165 份一致、103 份差異，以固定版本、fixture ID 與完整錯誤特徵
+記錄在 `docs/opf-baseline-exceptions.json`，差異不計為分類一致；例外消失或出現新錯誤
+都會失敗。另加入固定 OASIS odf-tc commit 的 37 份 ODF 1.3 文件（31 正向、6 負向），由 OdfKit／TDF／OPF
+交叉驗證及來回讀寫。維護活動、授權邊界與 58 份文件／55 份工具的採用理由見
+[來源稽核](odf-external-source-audit.md)。OPF 不啟用典藏政策，不新增產品相依或排程。
+  同一 job 另以 `Test-OdfConformanceMatrix.ps1` 離線檢查 [1.0～1.4 條款矩陣](odf-conformance-matrix.md) 的
+  schema hash 與人工需求／測試對應；此閘門不代表完整合規，也不重新下載規範全文。
+新增兩條外部引擎測試與 OASIS corpus 後，專用 job timeout 為 40 分鐘；工具和文件皆採
+immutable cache 並在命中後重驗 SHA-256，結果不快取。OPF JSON 報告只在失敗時上傳，
+保留 7 天。
 
 ## 逾時與診斷
 

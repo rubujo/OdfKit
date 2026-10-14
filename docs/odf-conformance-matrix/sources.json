@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "fullConformanceClaim": false,
+  "granularity": "published-numbered-clause; not atomized normative obligations",
+  "sources": [
+    {
+      "version": "1.0",
+      "part": "spec",
+      "uri": "https://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf",
+      "file": "1.0-spec.pdf",
+      "sha256": "0bc359c2ac6ee1ea6cb2515021098e0f89fefd8b6b1f9924ea90a4917daf3f08",
+      "clauseCount": 993,
+      "extraction": "published-pdf-toc"
+    },
+    {
+      "version": "1.1",
+      "part": "spec",
+      "uri": "https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf",
+      "file": "1.1-spec.pdf",
+      "sha256": "a0ff9fcfee5639ae061809ea846482fa57a8ac81cdb4c360422a17a6bbf43565",
+      "clauseCount": 1000,
+      "extraction": "published-pdf-toc"
+    },
+    {
+      "version": "1.2",
+      "part": "introduction",
+      "uri": "https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os.html",
+      "file": "1.2-part0.html",
+      "sha256": "cb8dd7c390e78b0b0e2ea922f876f99bb4deb6163834dca5bcae1677748f4dbc",
+      "clauseCount": 9,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.2",
+      "part": "schema",
+      "uri": "https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html",
+      "file": "1.2-part1.html",
+      "sha256": "1c13eec1eaf9bc1ac9a9aaa776b4e023e5c4739b7c4a589afadd1c08f203ba70",
+      "clauseCount": 2739,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.2",
+      "part": "formula",
+      "uri": "https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part2.html",
+      "file": "1.2-part2.html",
+      "sha256": "d0a86709eb3106282c0c1b47ac9383de91e386c65ccb7f3b930d5b2f895c1ef4",
+      "clauseCount": 555,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.2",
+      "part": "packages",
+      "uri": "https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part3.html",
+      "file": "1.2-part3.html",
+      "sha256": "80e6337e609b84d06250832c94f1d5e4bbe382cb0c6b3e3dabef56140f2dd9dc",
+      "clauseCount": 76,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.3",
+      "part": "introduction",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part1-introduction/OpenDocument-v1.3-os-part1-introduction.html",
+      "file": "1.3-part1-introduction.html",
+      "sha256": "cc6f4a401b59c93899cf2e21d114a5825fa008645f8400a31d56d6b4891527b9",
+      "clauseCount": 7,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.3",
+      "part": "packages",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part2-packages/OpenDocument-v1.3-os-part2-packages.html",
+      "file": "1.3-part2-packages.html",
+      "sha256": "776ce08ca5e6191f952698a835ccce619c03537b47f192b699fbf313df867aec",
+      "clauseCount": 86,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.3",
+      "part": "schema",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part3-schema/OpenDocument-v1.3-os-part3-schema.html",
+      "file": "1.3-part3-schema.html",
+      "sha256": "9bbec3efb39376fa9f077bb0f7dba8ceefeb8ac3f1eb91ccc54105925b9ea7d7",
+      "clauseCount": 2775,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.3",
+      "part": "formula",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html",
+      "file": "1.3-part4-formula.html",
+      "sha256": "c965e8fb143d66fbeb55f16aae90f62c62fbd4dc29fbee6bd8aab6a5cecbc03f",
+      "clauseCount": 560,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.4",
+      "part": "introduction",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part1-introduction/OpenDocument-v1.4-os-part1-introduction.html",
+      "file": "1.4-part1-introduction.html",
+      "sha256": "36db83521ad87739ffbc97e0d15ede89894f6cc39e90713eda4de67f96d830cb",
+      "clauseCount": 7,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.4",
+      "part": "packages",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part2-packages/OpenDocument-v1.4-os-part2-packages.html",
+      "file": "1.4-part2-packages.html",
+      "sha256": "88b9ffa7ef299ad44c40abbf9f2edc5f02d42e19400b5d585c931fab177cb76b",
+      "clauseCount": 86,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.4",
+      "part": "schema",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part3-schema/OpenDocument-v1.4-os-part3-schema.html",
+      "file": "1.4-part3-schema.html",
+      "sha256": "b80bf56d3a44fd8b01584ea2f8b8638f758fd8d4200010f8005432039e4b287f",
+      "clauseCount": 2802,
+      "extraction": "numbered-html-headings"
+    },
+    {
+      "version": "1.4",
+      "part": "formula",
+      "uri": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/part4-formula/OpenDocument-v1.4-os-part4-formula.html",
+      "file": "1.4-part4-formula.html",
+      "sha256": "0ba4c423868cff9a28ccb28dd4f8dfa68c4687727a5ccf8a4265d546ee841e7a",
+      "clauseCount": 561,
+      "extraction": "numbered-html-headings"
+    }
+  ],
+  "schemas": [
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-manifest-schema-v1.0-os.rng",
+      "sha256": "0354d930ca81419b6d460b3c2481eb37dff2c50bfd02879b6057dc4530dd6790"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-manifest-schema-v1.1.rng",
+      "sha256": "ac128b2aecd8d5fd2f2b856448b8cc6cafea382424e6d0848886bc1b51ed5718"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.0-os.rng",
+      "sha256": "1284ae860f4a72f591b99f21fc0356b87ac30ad95dc457f7d7a5421658a5423f"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.1.rng",
+      "sha256": "430edbfbae1b61d4e68d6c7e637547d048b1a0f6cadb4b071188122a6200ed40"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-dsig-schema.rng",
+      "sha256": "22f1875554433e20223c6c4bb649f89cec7c274e33a1a2e706ffa66a6cdec6ed"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-manifest-schema.rng",
+      "sha256": "d31bfb55c8e4fdc303c36ea8608651f3f90ed332668636846a79fb46e1d7cfb6"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng",
+      "sha256": "ca5d2510858c6f922b20cd27dc76d34959c1a976b9dfc6b5caeadbebfc83dbbb"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-dsig-schema.rng",
+      "sha256": "2e127abc77c7814f221b251ee8a726b3474d0b54d39ea09eaea17aabf6bc34ee"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-manifest-schema.rng",
+      "sha256": "e21f3db918532719b0811a307bfb267c2f1590c5f46f805b2699472eb36df447"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-schema.rng",
+      "sha256": "40bad03efdbb02825230d357da0aa6ac679934c5bf56c6281752c0c24d58e4e6"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.4-dsig-schema.rng",
+      "sha256": "f4048d489f2cf78de64101cfeba47cdd2aa34cd654f521074fe62f278715ed4b"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.4-manifest-schema.rng",
+      "sha256": "3e1628be435f4aaa2fb4ce3ca11f7c1aaeef165d1f59386f9dd4d6a25dd0cb79"
+    },
+    {
+      "path": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.4-schema.rng",
+      "sha256": "a877fea926440a0666b61561662f3f3dc7c5baa9444ec019f472b90be493295a"
+    }
+  ],
+  "clauseCount": 12256,
+  "statusCounts": {
+    "evidence-gap": 3207,
+    "informative": 60,
+    "partial-formula-profile": 1669,
+    "structure-only": 7320
+  },
+  "limitations": [
+    "PDF rows are the published table of contents; normative paragraph counts/hashes are not available for 1.0/1.1.",
+    "A schema name association proves neither matcher equivalence nor semantic conformance.",
+    "All unreviewed prose obligations remain evidence gaps; modal-word counts are navigation hints, not obligation counts.",
+    "Formula evidence is the existing Safe Large manifest, which explicitly disclaims official Large conformance."
+  ]
+}

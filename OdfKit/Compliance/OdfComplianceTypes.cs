@@ -172,7 +172,13 @@ public enum OdfDocumentKind
     /// <summary>
     /// ODF 影像範本文件 (.oti)。
     /// </summary>
-    ImageTemplate
+    ImageTemplate,
+
+    /// <summary>
+    /// ODF master text template (.otm), introduced in ODF 1.3.
+    /// ODF 1.3 新增的主控文字文件範本 (.otm)。
+    /// </summary>
+    TextMasterTemplate
 }
 
 /// <summary>

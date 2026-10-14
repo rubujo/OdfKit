@@ -2,9 +2,12 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
+using OdfKit.Core;
+using OdfKit.Cli;
 using OdfKit.Text;
 using Xunit;
 
@@ -234,6 +237,84 @@ public class OdfExternalValidatorAsyncTests
         {
             TryDelete(validPath);
             TryDelete(invalidPath);
+        }
+    }
+
+    /// <summary>
+    /// Verifies real JAR extended validation and CLI profile selection without masking conforming-mode errors.
+    /// 驗證真實 JAR 的擴充模式與 CLI profile 選擇，並保留一般一致性模式的拒絕結果。
+    /// </summary>
+    [Fact]
+    public async Task ValidateWithOdfValidatorRealJarUsesProfileConformanceMode()
+    {
+        string? jarPath = Environment.GetEnvironmentVariable(OdfExternalValidator.OdfValidatorJarEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(jarPath) || !File.Exists(jarPath))
+        {
+            Assert.Skip("未設定 ODFKIT_ODFVALIDATOR_JAR，略過真實擴充模式驗收。");
+        }
+        string path = Path.Combine(Path.GetTempPath(), "odfkit_extended_" + Guid.NewGuid().ToString("N") + ".ods");
+        string manifestPath = path + ".json";
+        try
+        {
+            using var stream = new MemoryStream();
+            using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Spreadsheet, OdfVersion.Odf13, true))
+            {
+                const string content = """
+                    <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                      xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                      xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                      xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" office:version="1.3">
+                      <office:body><office:spreadsheet><table:table table:name="Sheet1"><table:table-column/><table:table-row>
+                        <table:table-cell office:value-type="string" calcext:value-type="string"><text:p>Value</text:p></table:table-cell>
+                      </table:table-row></table:table></office:spreadsheet></office:body>
+                    </office:document-content>
+                    """;
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(content), "text/xml");
+                package.Save();
+            }
+            File.WriteAllBytes(path, stream.ToArray());
+            OdfExternalValidatorResult conforming = await OdfExternalValidator.ValidateWithOdfValidatorAsync(
+                path, jarPath, null, 30000, false, TestContext.Current.CancellationToken);
+            Assert.False(conforming.IsValid);
+            Assert.True((conforming.StandardOutput + conforming.StandardError).Contains("value-type", StringComparison.Ordinal),
+                conforming.StandardOutput + conforming.StandardError);
+            OdfExternalValidatorResult extended = await OdfExternalValidator.ValidateWithOdfValidatorAsync(
+                path, jarPath, null, 30000, true, TestContext.Current.CancellationToken);
+            Assert.True(extended.IsValid, extended.StandardOutput + extended.StandardError);
+
+            using var output = new StringWriter();
+            using var error = new StringWriter();
+            int exitCode = OdfKitCli.Run([
+                "validate", path, "--profile", "OASIS_ODF_1_3_Extended", "--baseline", "odf-validator",
+                "--baseline-jar", jarPath!, "--format", "json"
+            ], output, error);
+            Assert.Equal(0, exitCode);
+            using JsonDocument result = JsonDocument.Parse(output.ToString());
+            Assert.Equal(0, result.RootElement.GetProperty("summary").GetProperty("baselineMismatchCount").GetInt32());
+            Assert.Equal(string.Empty, error.ToString());
+
+            File.WriteAllText(manifestPath, JsonSerializer.Serialize(new
+            {
+                fixtures = new[] { new
+                {
+                    id = "extended", path = Path.GetFileName(path), source = "generated", license = "generated-no-copyright",
+                    kind = "Spreadsheet", version = "1.3", profile = "OASIS_ODF_1_3_Extended", expected = "valid", roundTrip = "semantic-equivalent"
+                } }
+            }));
+            using var corpusOutput = new StringWriter();
+            using var corpusError = new StringWriter();
+            int corpusExitCode = OdfKitCli.Run([
+                "validate-corpus", manifestPath, "--root", Path.GetDirectoryName(path)!, "--baseline", "odf-validator",
+                "--baseline-jar", jarPath!, "--format", "json"
+            ], corpusOutput, corpusError);
+            Assert.Equal(0, corpusExitCode);
+            using JsonDocument corpusResult = JsonDocument.Parse(corpusOutput.ToString());
+            Assert.Equal(1, corpusResult.RootElement.GetProperty("summary").GetProperty("passedCount").GetInt32());
+        }
+        finally
+        {
+            TryDelete(path);
+            TryDelete(manifestPath);
         }
     }
 

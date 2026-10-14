@@ -276,7 +276,7 @@ namespace OdfKit.Tests
                                     children: null,
                                     dataParameters: new[]
                                     {
-                                        new KeyValuePair<string, string>("pattern", @"^\d{3}-\d{2}-\d{4}$")
+                                        new KeyValuePair<string, string>("pattern", @"\d{3}-\d{2}-\d{4}")
                                     })
                             }),
                         new OdfSchemaPatternNode(
@@ -853,7 +853,7 @@ namespace OdfKit.Tests
                                                     OdfSchemaPatternNodeKind.Data, "exactlyOne", "", "", "", "string", "",
                                                     nameClasses: null,
                                                     children: null,
-                                                    dataParameters: new[] { new KeyValuePair<string, string>("pattern", @"^[A-Z]{3}$") })
+                                                    dataParameters: new[] { new KeyValuePair<string, string>("pattern", @"[A-Z]{3}") })
                                             })
                                     }),
                                 new OdfSchemaPatternNode(

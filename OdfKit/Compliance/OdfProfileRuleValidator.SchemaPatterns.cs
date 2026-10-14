@@ -151,13 +151,31 @@ internal static partial class OdfProfileRuleValidator
                 return;
             }
 
-            // ODF 公式文件（application/vnd.oasis.opendocument.formula）的 content.xml 採用真實
-            // LibreOffice 慣用的特殊封裝慣例：根節點直接是裸 MathML math:math 元素，並未包裹於
-            // office:document-content/office:body/office:formula 結構內。此為該文件類型獨有的合法
-            // 形狀（已透過真實 LibreOffice 26.x headless 驗證可正確開啟），schema pattern 比對應予豁免。
+            string? declaredVersion = document.Root.Attribute(XName.Get("version", OdfNamespaces.Office))?.Value;
+            schema = ResolveEntrySchema(packagePath, declaredVersion, schema);
+            if (packagePath is not null && IsEmbeddedOdfXmlEntry(packagePath) &&
+                declaredVersion is not null && !OdfVersionInfo.TryParseVersionString(declaredVersion, out _))
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Error,
+                    "ODF0401",
+                    "Embedded ODF XML entry declares an unrecognized office:version.",
+                    packagePath,
+                    "/" + document.Root.Name.LocalName + "/@office:version",
+                    profileId: profile.Id));
+            }
+
+            // 裸 MathML 沒有內建的完整 grammar；保留互通形狀，但明確回報未驗證的範圍。
             if (document.Root.Name.NamespaceName == "http://www.w3.org/1998/Math/MathML" &&
                 document.Root.Name.LocalName == "math")
             {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Warning,
+                    "ODF3103",
+                    "MathML content was not validated against a complete MathML schema.",
+                    packagePath,
+                    "/math",
+                    profileId: profile.Id));
                 return;
             }
 
@@ -173,7 +191,23 @@ internal static partial class OdfProfileRuleValidator
                     body.Element(XName.Get("image", OdfNamespaces.Office)) is not null ||
                     body.Element(XName.Get("chart", OdfNamespaces.Office)) is not null)
                 {
-                    return;
+                    // 官方 document grammar 不涵蓋這兩個 body；豁免限於 body 內容，
+                    // 外層、屬性與 styles 等兄弟節點仍須比對，不能整份文件直接放行。
+                    foreach (XElement child in body.Elements().ToList())
+                    {
+                        if (child.Name == XName.Get("formula", OdfNamespaces.Office) ||
+                            child.Name == XName.Get("database", OdfNamespaces.Office))
+                        {
+                            issues.Add(new OdfValidationIssue(
+                                OdfIssueSeverity.Warning,
+                                "ODF3103",
+                                $"Schema validation excludes the '{child.Name.LocalName}' body content; the document envelope is still validated.",
+                                packagePath,
+                                "/" + document.Root.Name.LocalName + "/body/" + child.Name.LocalName,
+                                profileId: profile.Id));
+                            child.ReplaceWith(new XElement(XName.Get("text", OdfNamespaces.Office)));
+                        }
+                    }
                 }
             }
 
@@ -185,7 +219,8 @@ internal static partial class OdfProfileRuleValidator
                 : OdfVersionInfo.ToVersionString(OdfVersion.Odf14);
             var versionAttr = document.Root.Attribute(XName.Get("version", OdfNamespaces.Office))
                 ?? document.Root.Attribute("version");
-            if (versionAttr is not null && versionAttr.Value != schemaVersionString)
+            if (!OdfSchemaRegistry.HasNativeSchema(schema.Version) &&
+                versionAttr is not null && versionAttr.Value != schemaVersionString)
             {
                 versionAttr.Value = schemaVersionString;
             }
@@ -267,6 +302,13 @@ internal static partial class OdfProfileRuleValidator
                 packagePath,
                 profileId: profile.Id));
         }
+    }
+
+    private static OdfSchemaSet ResolveEntrySchema(string? packagePath, string? declaredVersion, OdfSchemaSet schema)
+    {
+        return packagePath is not null && IsEmbeddedOdfXmlEntry(packagePath) &&
+            OdfVersionInfo.TryParseVersionString(declaredVersion, out OdfVersion version)
+            ? OdfSchemaRegistry.GetSchema(version) : schema;
     }
 
     private static List<string> ResolveRootPatternNames(OdfSchemaSet schema, XElement root, string? packagePath)

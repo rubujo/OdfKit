@@ -318,5 +318,15 @@
     "uri": "https://raw.githubusercontent.com/LibreOffice/core/libreoffice-26.2.4.2/schema/libreoffice/OpenDocument-v1.4+libreoffice-manifest-schema.rng",
     "sha256": "d3b34ec638a4e013fd740ebc74dcd34ba8baff15e6939a4486b26a7a92c8058d",
     "role": "僅在外部 baseline 下載，用於驗證 LibreOffice 26.2.4.2 wholesome encryption manifest；不隨 OdfKit 套件散布。"
+  },
+  "opfOdfValidator": {
+    "source": "github-openpreserve",
+    "cacheRevision": "1",
+    "version": "0.20-beta-1",
+    "fileName": "odf-validator-0.20-beta-1-all.jar",
+    "uri": "https://github.com/openpreserve/odf-validator/releases/download/v0.20-beta-1/odf-validator-0.20-beta-1-all.jar",
+    "sha256": "7a2922e7f0f8674c527ff0260c47a0041697f7e3eb2fbf2bc27c94011ab8b5e6",
+    "minimumJavaVersion": "11",
+    "role": "Independent OPF baseline; preservation policy is not ODF conformance."
   }
 }

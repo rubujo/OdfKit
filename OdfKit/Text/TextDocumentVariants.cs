@@ -121,8 +121,8 @@ public sealed class TextTemplateDocument : TextDocument
 }
 
 /// <summary>
-/// Represents an ODF master text document (ODM).
-/// 表示 ODF 主控文字文件（ODM）。
+/// Represents an ODF master text document or master text template (ODM or OTM).
+/// 表示 ODF 主控文字文件或主控文字文件範本（ODM 或 OTM）。
 /// </summary>
 public sealed class TextMasterDocument : TextDocument
 {

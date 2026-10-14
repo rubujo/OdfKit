@@ -153,7 +153,7 @@ public class DocumentKindApiUsabilityTests
 
         Assert.Equal("application/vnd.oasis.opendocument.chart", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());
-        Assert.Equal("bar", loaded.ChartClass);
+        Assert.Equal("chart:bar", loaded.ChartClass);
         Assert.Equal("營收", loaded.ChartTitle);
         Assert.Equal("both", loaded.DataSourceHasLabels);
         Assert.Equal("top", loaded.LegendPosition);

@@ -1729,7 +1729,7 @@ namespace OdfKit.Tests
         [Fact]
         public void DocumentKindDetectorExposesSupportedFormatMetadata()
         {
-            Assert.Equal(24, OdfDocumentKindDetector.SupportedFormats.Count);
+            Assert.Equal(25, OdfDocumentKindDetector.SupportedFormats.Count);
 
             Assert.True(OdfDocumentKindDetector.TryGetFormatByFileName(".fods", out OdfFormatInfo? flatSpreadsheet));
             Assert.Equal(OdfDocumentKind.FlatSpreadsheet, flatSpreadsheet!.Kind);

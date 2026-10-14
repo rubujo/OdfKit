@@ -95,7 +95,7 @@ public static class OdfKitCli
                     Profile = parsedOptions.Profile
                 });
 
-            ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions.BaselineOptions);
+            ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions.BaselineOptions, parsedOptions.Profile);
             bool documentedException = baselineExceptions.Contains(
                 file,
                 parsedOptions.Baseline,
@@ -154,7 +154,7 @@ public static class OdfKitCli
                     Profile = fixture.Profile
                 });
 
-            ValidateBaselineResult? baseline = ValidateWithBaseline(path, parsedOptions.BaselineOptions);
+            ValidateBaselineResult? baseline = ValidateWithBaseline(path, parsedOptions.BaselineOptions, fixture.Profile);
             ValidateCorpusRoundTripResult? roundTrip = report.IsValid
                 ? RunCorpusRoundTrip(path, fixture)
                 : null;
@@ -1219,7 +1219,7 @@ public static class OdfKitCli
         return true;
     }
 
-    private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateBaselineOptions options)
+    private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateBaselineOptions options, OdfComplianceProfile? profile)
     {
         if (options.Baseline == ValidateBaselineKind.None)
         {
@@ -1232,7 +1232,8 @@ public static class OdfKitCli
                 file,
                 options.BaselineJarPath,
                 javaPath: null,
-                timeoutMilliseconds: options.TimeoutMilliseconds),
+                timeoutMilliseconds: options.TimeoutMilliseconds,
+                extendedConformance: profile?.Rules.Any(rule => rule.Id == "RequireForeignExtensionIsolation") == true),
             ValidateBaselineKind.Command => OdfExternalValidator.ValidateWithCommand(
                 options.BaselineCommandPath ?? throw new ArgumentException(OdfLocalizer.GetMessage("Cli_UsageWithCmd", "--baseline-command path")),
                 file,

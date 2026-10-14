@@ -13,7 +13,8 @@
 | ODF Validator Maven metadata | `https://mvnrepository.com/artifact/org.odftoolkit/odfvalidator` | 檢查可取得版本與 artifact 名稱。 | no |
 | Jing 20241231 release | `https://github.com/relaxng/jing-trang/releases/tag/V20241231` | 獨立執行 OASIS ODF RELAX NG schema 的固定版驗證器；archive 與必要 JAR 皆以 SHA-256 固定。 | no |
 | LibreOffice 26.2.4.2 extended manifest schema | `https://github.com/LibreOffice/core/blob/libreoffice-26.2.4.2/schema/libreoffice/OpenDocument-v1.4%2Blibreoffice-manifest-schema.rng` | 驗證 wholesome encryption 使用的 Argon2id 與 `loext:*` manifest 擴充；外部 baseline 依 `eng/external-tools.json` 固定來源與 SHA-256，僅測試時下載。 | no |
-| OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 獨立數位典藏用途 validator；名稱相近但不是 ODF Toolkit baseline。 | no |
+| OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 已納入獨立 `opf-odf-validator` baseline，釘選 0.20-beta-1 與 SHA-256；不啟用額外典藏政策。 | no |
+| OASIS odf-tc 測試文件與工具 | `https://github.com/oasis-tcs/odf-tc/tree/16a59d945875bd74834e82e166bebded316478da/src/test` | 58 份文件、55 份工具逐項盤點；37 份 ODF 1.3 文件（31 正向、6 負向）納入 OdfKit／TDF／OPF 驗證。維護證據與排除原因見 [來源稽核](odf-external-source-audit.md)。 | no（只提交來源與 hash，測試時下載） |
 | OASIS ODF 1.0 RNG schema | `https://www.oasis-open.org/committees/download.php/12571/OpenDocument-schema-v1.0-os.rng` | OASIS Standard（2005-05-01）頁面列出的官方獨立 RELAX NG schema。舊下載端點目前會重新導向，儲存庫副本取自 TDF ODF Toolkit，並與 Debian Sources 的歷史副本逐位元組比對；SHA-256 為 `1284AE860F4A72F591B99F21FC0356B87AC30AD95DC457F7D7A5421658A5423F`。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.0-os.rng`） |
 | OASIS ODF 1.1 RNG schema | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | OASIS Standard（2007-02-01）官方獨立 RELAX NG schema，`OdfSchemaRegistry`／`OdfComplianceProfiles.OasisOdf11` 用以產生真實 ODF 1.1 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.1.rng`） |
 | OASIS ODF 1.2 RNG schema | `https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng` | OASIS Standard（2011-09-29）官方獨立 RELAX NG schema，供 `ISO_IEC_26300` profile 使用真實 ODF 1.2 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng`） |
@@ -40,8 +41,10 @@
 ## Baseline 命名
 
 本儲存庫的 `--baseline odf-validator` 指的是 ODF Toolkit / TDF ODF Validator。
-OPF 的 `odf-validator` 是另一套工具，不應混入同一份 baseline manifest；若未來要支援，
-必須新增獨立 baseline 名稱與 documented exception 集合。
+OPF 的 `odf-validator` 是另一套工具，已透過 `eng/Test-OpfOdfBaseline.ps1` 納入獨立
+`opf-odf-validator` baseline，例外集合為 `docs/opf-baseline-exceptions.json`，不混入 TDF
+baseline。適用範圍、維護狀態、OASIS corpus 與工具盤點見
+[ODF 外部驗證來源稽核](odf-external-source-audit.md)。
 
 ## 完成線
 

@@ -1,0 +1,1183 @@
+{
+  "validator": "opf-odf-validator",
+  "validatorVersion": "0.20-beta-1",
+  "exceptions": [
+    {
+      "fixtureId": "repo-generated-minimal-flat-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-realistic-review-memo-flat-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-minimal-flat-spreadsheet",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-minimal-flat-presentation",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-minimal-flat-graphics",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-page-layout-interleave-flat-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-manifest-rdf-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "PKG-5:An OpenDocument Package SHALL only contain the 'META-INF/manifest.xml' and files containg the term 'signatures' in their name in the 'META-INF' folder. File META-INF/manifest.rdf does not meet this criteria."
+      ],
+      "reason": "OPF applies the conforming-package META-INF restriction even in extended mode; ODF 1.4 Part 2 section 2.2.2 exempts extended packages from 2.2.1 E.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf14-decorative-image",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: attribute \"draw:decorative\" not allowed here; expected attribute \"draw:auto-grow-height\", \"draw:auto-grow-width\", \"draw:blue\", \"draw:caption-angle\", \"draw:caption-angle-type\", \"draw:caption-escape\", \"draw:caption-escape-direction\", \"draw:caption-fit-line-length\", \"draw:caption-gap\", \"draw:caption-line-length\", \"draw:caption-type\", \"draw:color-inversion\", \"draw:color-mode\", \"draw:contrast\", \"draw:decimal-places\", \"draw:draw-aspect\", \"draw:end-guide\", \"draw:end-line-spacing-horizontal\", \"draw:end-line-spacing-vertical\", \"draw:fill\", \"draw:fill-color\", \"draw:fill-gradient-name\", \"draw:fill-hatch-name\", \"draw:fill-hatch-solid\", \"draw:fill-image-height\", \"draw:fill-image-name\", \"draw:fill-image-ref-point\", \"draw:fill-image-ref-point-x\", \"draw:fill-image-ref-point-y\", \"draw:fill-image-width\", \"draw:fit-to-contour\", \"draw:fit-to-size\", \"draw:frame-display-border\", \"draw:frame-display-scrollbar\", \"draw:frame-margin-horizontal\", \"draw:frame-margin-vertical\", \"draw:gamma\", \"draw:gradient-step-count\", \"draw:green\", \"draw:guide-distance\", \"draw:guide-overhang\", \"draw:image-opacity\", \"draw:line-distance\", \"draw:luminance\", \"draw:marker-end\", \"draw:marker-end-center\", \"draw:marker-end-width\", \"draw:marker-start\", \"draw:marker-start-center\", \"draw:marker-start-width\", \"draw:measure-align\", \"draw:measure-vertical-align\", \"draw:ole-draw-aspect\", \"draw:opacity\", \"draw:opacity-name\", \"draw:parallel\", \"draw:placing\", \"draw:red\", \"draw:secondary-fill-color\", \"draw:shadow\", \"draw:shadow-color\", \"draw:shadow-offset-x\", \"draw:shadow-offset-y\", \"draw:shadow-opacity\", \"draw:show-unit\", \"draw:start-guide\", \"draw:start-line-spacing-horizontal\", \"draw:start-line-spacing-vertical\", \"draw:stroke\", \"draw:stroke-dash\", \"draw:stroke-dash-names\", \"draw:stroke-linejoin\", \"draw:symbol-color\", \"draw:textarea-horizontal-align\", \"draw:textarea-vertical-align\", \"draw:tile-repeat-offset\", \"draw:unit\", \"draw:visible-area-height\", \"draw:visible-area-left\", \"draw:visible-area-top\", \"draw:visible-area-width\", \"draw:wrap-influence-on-position\", \"ns1:ambient-color\", \"ns1:back-scale\", \"ns1:backface-culling\", \"ns1:close-back\", \"ns1:close-front\", \"ns1:depth\", \"ns1:diffuse-color\", \"ns1:edge-rounding\", \"ns1:edge-rounding-mode\", \"ns1:emissive-color\", \"ns1:end-angle\", \"ns1:horizontal-segments\", \"ns1:lighting-mode\", \"ns1:normals-direction\", \"ns1:normals-kind\", \"ns1:shadow\", \"ns1:shininess\", \"ns1:specular-color\", \"ns1:texture-filter\", \"ns1:texture-generation-mode-x\", \"ns1:texture-generation-mode-y\", \"ns1:texture-kind\", \"ns1:texture-mode\", \"ns1:vertical-segments\", \"ns2:anchor-page-number\", \"ns2:anchor-type\", \"ns2:animation\", \"ns2:animation-delay\", \"ns2:animation-direction\", \"ns2:animation-repeat\", \"ns2:animation-start-inside\", \"ns2:animation-steps\", \"ns2:animation-stop-inside\", \"ns3:background-color\", \"ns3:border\", \"ns3:border-bottom\", \"ns3:border-left\", \"ns3:border-right\", \"ns3:border-top\", \"ns3:clip\", \"ns3:margin\", \"ns3:margin-bottom\", \"ns3:margin-left\", \"ns3:margin-right\", \"ns3:margin-top\", \"ns3:max-height\", \"ns3:max-width\", \"ns3:min-height\", \"ns3:min-width\", \"ns3:padding\", \"ns3:padding-bottom\", \"ns3:padding-left\", \"ns3:padding-right\", \"ns3:padding-top\", \"ns3:wrap-option\", \"style:background-transparency\", \"style:border-line-width\", \"style:border-line-width-bottom\", \"style:border-line-width-left\", \"style:border-line-width-right\", \"style:border-line-width-top\", \"style:editable\", \"style:flow-with-text\", \"style:horizontal-pos\", \"style:horizontal-rel\", \"style:mirror\", \"style:number-wrapped-paragraphs\", \"style:overflow-behavior\", \"style:print-content\", \"style:protect\", \"style:rel-height\", \"style:rel-width\", \"style:repeat\", \"style:run-through\", \"style:shadow\", \"style:shrink-to-fit\", \"style:vertical-pos\", \"style:vertical-rel\", \"style:wrap\", \"style:wrap-contour\", \"style:wrap-contour-mode\", \"style:wrap-dynamic-threshold\", \"style:writing-mode\", \"svg:fill-rule\", \"svg:height\", \"svg:stroke-color\", \"svg:stroke-linecap\", \"svg:stroke-opacity\", \"svg:stroke-width\", \"svg:width\", \"svg:x\" or \"svg:y\" (with xmlns:ns1=\"urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0\" xmlns:ns2=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:ns3=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\").",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf14-table-in-shape",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf14-zero-based-list",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"text:start-value\" is invalid; must be an integer greater than or equal to 1."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf10-minimal-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf11-minimal-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-odf12-minimal-text",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "repo-generated-mathml-formula",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatchart-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatformula-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatgraphics-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatimage-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatpresentation-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flatspreadsheet-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-flattext-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: value of attribute \"office:version\" is invalid; must be equal to \"1.3\"."
+      ],
+      "reason": "OPF OdfXmlValidator hardcodes ODF 1.3 for single XML regardless of declared version. ODF 1.4 grammar changes are consequently rejected; generic grammar also lacks office:formula.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formula-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-block-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-enriched",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-extended-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-media-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-metadata",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-minimal",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-multi-element",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-roundtrip-rich",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-strict-profile",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    },
+    {
+      "fixtureId": "bulk-formulatemplate-structure-content",
+      "expected": "valid",
+      "actual": "invalid",
+      "errorSignatures": [
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:body\" incomplete; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\".",
+        "XML-4:Not a valid XML document. Validation exception at line * and column *: element \"office:formula\" not allowed here; expected element \"office:chart\", \"office:database\", \"office:drawing\", \"office:image\", \"office:presentation\", \"office:spreadsheet\" or \"office:text\"."
+      ],
+      "reason": "OPF applies the generic document grammar to Formula/FormulaTemplate. That grammar does not define office:formula; the result does not validate MathML or formula semantics.",
+      "source": "https://github.com/openpreserve/odf-validator/tree/06e6b6365cfaffe347b6672b1318b277bf62ec0a",
+      "reviewedAt": "2026-10-14"
+    }
+  ]
+}

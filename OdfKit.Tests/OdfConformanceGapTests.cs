@@ -1,0 +1,214 @@
+﻿using System.Text;
+using OdfKit.Compliance;
+using OdfKit.Core;
+using OdfKit.Chart;
+using OdfKit.Image;
+using OdfKit.Styles;
+using System.Xml.Linq;
+using Xunit;
+
+namespace OdfKit.Tests;
+
+[Trait(TestCategories.Kind, TestCategories.Compliance)]
+public class OdfConformanceGapTests
+{
+    [Theory]
+    [InlineData(OdfVersion.Odf12, "formula", OdfDocumentKind.Formula)]
+    [InlineData(OdfVersion.Odf13, "formula", OdfDocumentKind.Formula)]
+    [InlineData(OdfVersion.Odf14, "formula", OdfDocumentKind.Formula)]
+    [InlineData(OdfVersion.Odf12, "database", OdfDocumentKind.Database)]
+    [InlineData(OdfVersion.Odf13, "database", OdfDocumentKind.Database)]
+    [InlineData(OdfVersion.Odf14, "database", OdfDocumentKind.Database)]
+    public void UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation(OdfVersion version, string body, OdfDocumentKind kind)
+    {
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body><office:{body}/></office:body></office:document-content>";
+        OdfValidationReport valid = ValidateContent(xml, kind, version);
+        Assert.True(valid.IsValid, string.Join("; ", valid.Issues.Select(issue => issue.Message)));
+        Assert.Contains(valid.Issues, issue => issue.RuleId == "ODF3103" && issue.PackagePath == "content.xml");
+
+        string invalidAttribute = xml.Replace("<office:body>", "<office:body office:version=\"1.4\">", StringComparison.Ordinal);
+        OdfValidationReport invalid = ValidateContent(invalidAttribute, kind, version);
+        Assert.Contains(invalid.Issues, issue => issue.RuleId == "ODF3101" && issue.Severity == OdfIssueSeverity.Error);
+
+        string invalidSibling = xml.Replace("<office:body>", "<office:text/><office:body>", StringComparison.Ordinal);
+        Assert.Contains(ValidateContent(invalidSibling, kind, version).Issues,
+            issue => issue.RuleId == "ODF3101" && issue.PackagePath == "content.xml");
+    }
+
+    [Fact]
+    public void BareMathmlExemptionIsVisibleInValidationReport()
+    {
+        OdfValidationReport report = ValidateContent("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>",
+            OdfDocumentKind.Formula, OdfVersion.Odf14);
+        Assert.Contains(report.Issues, issue => issue.RuleId == "ODF3103" && issue.Severity == OdfIssueSeverity.Warning);
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf10)]
+    [InlineData(OdfVersion.Odf11)]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void NativeSchemaDoesNotRepairInvalidVersionBeforeMatching(OdfVersion version)
+    {
+        // 主文件決定 schema，另一串流的非法 version 不可先改寫成合法值才驗證。
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body><office:text/></office:body></office:document-content>";
+        string styles = $"<office:document-styles xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"bogus\"><office:styles/></office:document-styles>";
+        OdfValidationReport report = ValidateContent(xml, OdfDocumentKind.Text, version, styles);
+        Assert.Contains(report.Issues, issue => issue.RuleId == "ODF0401" && issue.PackagePath == "styles.xml");
+        if (version is not (OdfVersion.Odf10 or OdfVersion.Odf11))
+        {
+            Assert.Contains(report.Issues, issue => issue.RuleId == "ODF3101" && issue.PackagePath == "styles.xml");
+        }
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf10)]
+    [InlineData(OdfVersion.Odf11)]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void ProducedManifestUsesOnlyAttributesDefinedBySelectedVersion(OdfVersion version)
+    {
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body><office:text/></office:body></office:document-content>";
+        OdfValidationReport report = ValidateContent(xml, OdfDocumentKind.Text, version);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+        Assert.DoesNotContain(report.Issues, issue => issue.PackagePath == "META-INF/manifest.xml");
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void XmlIdsAreUniqueWithinEachStreamAndCanRepeatAcrossEmbeddedDocuments(OdfVersion version)
+    {
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" xmlns:text=\"{OdfNamespaces.Text}\" office:version=\"{OdfVersionInfo.ToVersionString(version)}\"><office:body><office:text><text:p xml:id=\"first\">A</text:p><text:p xml:id=\"second\">B</text:p></office:text></office:body></office:document-content>";
+        OdfValidationReport valid = ValidateContent(xml, OdfDocumentKind.Text, version, embedded: xml);
+        Assert.True(valid.IsValid, string.Join("; ", valid.Issues.Select(issue => issue.Message)));
+        string duplicate = xml.Replace("xml:id=\"second\"", "xml:id=\"first\"", StringComparison.Ordinal);
+        Assert.Contains(ValidateContent(duplicate, OdfDocumentKind.Text, version).Issues,
+            issue => issue.RuleId == "ODF3104" && issue.PackagePath == "content.xml");
+        Assert.Contains(ValidateContent(xml, OdfDocumentKind.Text, version, embedded: duplicate).Issues,
+            issue => issue.RuleId == "ODF3104" && issue.PackagePath == "Object1/content.xml");
+    }
+
+    [Theory]
+    [InlineData("1.0", true)]
+    [InlineData("1.1", true)]
+    [InlineData("1.2", true)]
+    [InlineData("1.3", true)]
+    [InlineData("1.4", true)]
+    [InlineData("bogus", false)]
+    public void EmbeddedDocumentsUseTheirOwnDeclaredSchemaVersion(string embeddedVersion, bool expected)
+    {
+        string xml = $"<office:document-content xmlns:office=\"{OdfNamespaces.Office}\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
+        string embedded = xml.Replace("office:version=\"1.4\"", $"office:version=\"{embeddedVersion}\"", StringComparison.Ordinal);
+        OdfValidationReport report = ValidateContent(xml, OdfDocumentKind.Text, OdfVersion.Odf14, embedded: embedded);
+        Assert.Equal(expected, report.IsValid);
+        if (!expected)
+        {
+            Assert.Contains(report.Issues, issue => issue.RuleId == "ODF0401" && issue.PackagePath == "Object1/content.xml");
+        }
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf10)]
+    [InlineData(OdfVersion.Odf11)]
+    public async Task LegacyPackageVersionSurvivesSynchronousAndAsynchronousLoadAndResave(OdfVersion version)
+    {
+        using var original = new MemoryStream();
+        using (OdfPackage writer = OdfDocumentFactory.CreatePackage(original, OdfDocumentKind.Text, version, true))
+        {
+            writer.Save();
+        }
+        original.Position = 0;
+        using (OdfPackage loaded = OdfPackage.Open(original, true))
+        {
+            Assert.Equal(version, loaded.Version);
+            using var saved = new MemoryStream();
+            loaded.SaveToStream(saved);
+            saved.Position = 0;
+            using OdfPackage reloaded = OdfPackage.Open(saved);
+            Assert.Equal(version, reloaded.Version);
+            Assert.True(OdfPackageValidator.Validate(reloaded, version == OdfVersion.Odf10
+                ? OdfComplianceProfiles.OasisOdf10 : OdfComplianceProfiles.OasisOdf11).IsValid);
+        }
+        original.Position = 0;
+        await using OdfPackage asyncLoaded = await OdfPackage.OpenAsync(original, leaveOpen: true,
+            cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal(version, asyncLoaded.Version);
+    }
+
+    [Theory]
+    [InlineData("bar")]
+    [InlineData("chart:bar")]
+    public void ChartApiWritesNamespacedClassTokens(string chartClass)
+    {
+        using OdfChartDocument chart = OdfChartDocument.Create();
+        chart.ChartClass = chartClass;
+        Assert.Equal("chart:bar", chart.ChartClass);
+        using var stream = new MemoryStream();
+        chart.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream);
+        using Stream content = package.GetEntryStream("content.xml");
+        XElement element = XDocument.Load(content).Descendants(XName.Get("chart", OdfNamespaces.Chart)).Single();
+        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(OdfVersion.Odf14);
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+        element.SetAttributeValue(XName.Get("class", OdfNamespaces.Chart), "bar");
+        Assert.False(OdfSchemaPatternValidator.ValidateElement(element, schema, "chart-chart").IsMatch);
+    }
+
+    [Fact]
+    public void ImageApiKeepsAccessibilityMetadataAfterImageContentWhenReplacingImage()
+    {
+        using ImageDocument image = ImageDocument.Create();
+        image.SetImageLayout(OdfLength.FromCentimeters(0), OdfLength.FromCentimeters(0),
+            OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), "Image", "Title", "Description");
+        byte[] bytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j8ioAAAAASUVORK5CYII=");
+        image.SetImage(bytes, "first.png");
+        image.SetImage(bytes, "second.png");
+        using var stream = new MemoryStream();
+        image.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream);
+        using Stream content = package.GetEntryStream("content.xml");
+        XElement frame = XDocument.Load(content).Descendants(XName.Get("frame", OdfNamespaces.Draw)).Single();
+        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(OdfVersion.Odf14);
+        Assert.True(OdfSchemaPatternValidator.ValidateElement(frame, schema, "draw-frame").IsMatch);
+        Assert.Equal("Title", frame.Element(XName.Get("title", OdfNamespaces.Svg))?.Value);
+        XElement imageElement = Assert.Single(frame.Elements(XName.Get("image", OdfNamespaces.Draw)));
+        imageElement.Remove();
+        frame.Add(imageElement);
+        Assert.False(OdfSchemaPatternValidator.ValidateElement(frame, schema, "draw-frame").IsMatch);
+    }
+
+    private static OdfValidationReport ValidateContent(string content, OdfDocumentKind kind, OdfVersion version, string? styles = null, string? embedded = null)
+    {
+        using var stream = new MemoryStream();
+        using (OdfPackage writer = OdfDocumentFactory.CreatePackage(stream, kind, version, true))
+        {
+            writer.WriteEntry("content.xml", Encoding.UTF8.GetBytes(content), "text/xml");
+            if (styles is not null)
+            {
+                writer.WriteEntry("styles.xml", Encoding.UTF8.GetBytes(styles), "text/xml");
+            }
+            if (embedded is not null)
+            {
+                writer.WriteEntry("Object1/content.xml", Encoding.UTF8.GetBytes(embedded), "text/xml");
+            }
+            writer.Save();
+        }
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream);
+        OdfComplianceProfile profile = version switch
+        {
+            OdfVersion.Odf10 => OdfComplianceProfiles.OasisOdf10,
+            OdfVersion.Odf11 => OdfComplianceProfiles.OasisOdf11,
+            OdfVersion.Odf12 => OdfComplianceProfiles.OasisOdf12Extended,
+            OdfVersion.Odf13 => OdfComplianceProfiles.OasisOdf13Extended,
+            _ => OdfComplianceProfiles.OasisOdf14Extended
+        };
+        return OdfPackageValidator.Validate(package, profile);
+    }
+}

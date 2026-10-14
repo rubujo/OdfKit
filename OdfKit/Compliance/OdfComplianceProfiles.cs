@@ -155,8 +155,8 @@ public static class OdfComplianceProfiles
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf13),
-        [.. PackagedExtensions, .. FlatExtensions],
-        OpenDocumentMimeTypes,
+        [.. PackagedExtensions, .. FlatExtensions, ".otm"],
+        [.. OpenDocumentMimeTypes, "application/vnd.oasis.opendocument.text-master-template"],
         [.. StandardRules, Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
@@ -173,8 +173,8 @@ public static class OdfComplianceProfiles
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf13),
-        [.. PackagedExtensions, .. FlatExtensions],
-        OpenDocumentMimeTypes,
+        [.. PackagedExtensions, .. FlatExtensions, ".otm"],
+        [.. OpenDocumentMimeTypes, "application/vnd.oasis.opendocument.text-master-template"],
         [.. StandardRules, Rule("RequireStrictPackageConformance", "Strict package conformance permits only the manifest and signature XML files below META-INF.", OdfIssueSeverity.Error), Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
@@ -191,8 +191,8 @@ public static class OdfComplianceProfiles
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf13),
-        [.. PackagedExtensions, .. FlatExtensions],
-        OpenDocumentMimeTypes,
+        [.. PackagedExtensions, .. FlatExtensions, ".otm"],
+        [.. OpenDocumentMimeTypes, "application/vnd.oasis.opendocument.text-master-template"],
         [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
@@ -209,8 +209,8 @@ public static class OdfComplianceProfiles
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf14),
-        [.. PackagedExtensions, .. FlatExtensions],
-        OpenDocumentMimeTypes,
+        [.. PackagedExtensions, .. FlatExtensions, ".otm"],
+        [.. OpenDocumentMimeTypes, "application/vnd.oasis.opendocument.text-master-template"],
         [.. StandardRules, Rule("RequireStrictPackageConformance", "Strict package conformance permits only the manifest and signature XML files below META-INF.", OdfIssueSeverity.Error), Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 
@@ -227,8 +227,8 @@ public static class OdfComplianceProfiles
         OdfPolicyAuthorityLevel.Normative,
         OdfProfileVerificationStatus.VerifiedOfficial,
         OdfVersionRange.Exact(OdfVersion.Odf14),
-        [.. PackagedExtensions, .. FlatExtensions],
-        OpenDocumentMimeTypes,
+        [.. PackagedExtensions, .. FlatExtensions, ".otm"],
+        [.. OpenDocumentMimeTypes, "application/vnd.oasis.opendocument.text-master-template"],
         [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)],
         null);
 

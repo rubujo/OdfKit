@@ -72,6 +72,12 @@
 | `Test-EvidenceClaims.ps1` | 依 `docs/claims.json` 驗證能力宣稱的維度與驗證層級，見 [evidence-index.md](../docs/evidence-index.md)。 |
 | `Test-NetFramework48Smoke.ps1` | 以本機 nupkg 在 .NET Framework 4.8 消費端執行四主格式 round-trip 與 extension 入口煙霧測試。 |
 | `Test-OdfRelaxNgBaseline.ps1` | 以固定版本 Jing 對 corpus 執行 RELAX NG 外部對標，需先以 `Install-Jing.ps1` 取得 JAR。 |
+| `Install-OpfOdfValidator.ps1` | 下載固定版本與 SHA-256 的 OPF Validator，cache 命中仍重驗雜湊。 |
+| `Test-OpfOdfBaseline.ps1` | 執行獨立 OPF corpus baseline，分列分類一致、精確記錄的差異與失敗；工具故障不得算成 invalid。 |
+| `Initialize-OasisOdfTcCorpus.ps1` | 依固定 commit 與逐檔 SHA-256 取得已盤點的 OASIS ODF 1.3 測試文件，不重新散布 binary。 |
+| `Test-OdfExternalSourceContracts.ps1` | 檢查 OASIS inventory／採用 manifest 與 OPF 固定版本／例外的對應。 |
+| `Build-OdfConformanceMatrix.py` | 從已取得的固定 OASIS 出版物建立 1.0～1.4 條款索引；`--verify` 檢查重建一致性，PDF 部分需 pypdf。 |
+| `Test-OdfConformanceMatrix.ps1` | 離線檢查逐條合規矩陣的來源／schema hash、條款 ID 與人工 audit／測試證據對應；見 [合規矩陣](../docs/odf-conformance-matrix.md)。 |
 | `Test-OfficeGuiSmoke.ps1` | 執行 Microsoft Office GUI／COM 的 ODT／ODS／ODP 讀取煙霧驗收（僅 Windows，手動）。 |
 
 產品品質分層與發版前建議清單見 [docs/product-quality-gates.md](../docs/product-quality-gates.md)。

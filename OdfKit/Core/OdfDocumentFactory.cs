@@ -397,6 +397,7 @@ public static class OdfDocumentFactory
         kind == OdfDocumentKind.Text ||
         kind == OdfDocumentKind.TextTemplate ||
         kind == OdfDocumentKind.TextMaster ||
+        kind == OdfDocumentKind.TextMasterTemplate ||
         kind == OdfDocumentKind.TextWeb;
 
     private static string CreateMetaXml(string version)
@@ -420,6 +421,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Text => "application/vnd.oasis.opendocument.text",
             OdfDocumentKind.TextTemplate => "application/vnd.oasis.opendocument.text-template",
             OdfDocumentKind.TextMaster => "application/vnd.oasis.opendocument.text-master",
+            OdfDocumentKind.TextMasterTemplate => "application/vnd.oasis.opendocument.text-master-template",
             OdfDocumentKind.Spreadsheet => "application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind.SpreadsheetTemplate => "application/vnd.oasis.opendocument.spreadsheet-template",
             OdfDocumentKind.Presentation => "application/vnd.oasis.opendocument.presentation",
@@ -442,7 +444,7 @@ public static class OdfDocumentFactory
     {
         return kind switch
         {
-            OdfDocumentKind.Text or OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => "text",
+            OdfDocumentKind.Text or OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextMasterTemplate or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => "text",
             OdfDocumentKind.Spreadsheet or OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => "spreadsheet",
             OdfDocumentKind.Presentation or OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => "presentation",
             OdfDocumentKind.Graphics or OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => "drawing",
@@ -556,6 +558,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Text => new TextDocument(package),
             OdfDocumentKind.TextTemplate => new TextTemplateDocument(package),
             OdfDocumentKind.TextMaster => new TextMasterDocument(package),
+            OdfDocumentKind.TextMasterTemplate => new TextMasterDocument(package),
             OdfDocumentKind.FlatText => new FlatTextDocument(package),
             OdfDocumentKind.Spreadsheet => new SpreadsheetDocument(package),
             OdfDocumentKind.SpreadsheetTemplate => new SpreadsheetTemplateDocument(package),

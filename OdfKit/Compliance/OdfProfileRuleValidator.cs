@@ -30,7 +30,7 @@ internal static partial class OdfProfileRuleValidator
         }
 
         ValidateMacroEntries(package, profile, issues);
-        ValidatePackageMetadataSchemas(package, profile, issues);
+        ValidatePackageMetadataSchemas(package, profile, schema.Version, issues);
         ValidateStrictPackageMetadataEntries(package, profile, issues);
         ValidatePackageSchemaPatterns(package, profile, schema, issues);
 

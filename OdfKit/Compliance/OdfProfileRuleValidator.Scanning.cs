@@ -79,6 +79,8 @@ internal static partial class OdfProfileRuleValidator
         };
 
         OdfPolicyRule? accessRule = FindRule(profile, "RequireAccessibilityMetadata");
+        OdfPolicyRule? schemaRule = FindRule(profile, "RequireSchemaPatternValidation");
+        HashSet<string> xmlIds = new(StringComparer.Ordinal);
         Stack<ValidationStackFrame> stack = [];
 
         using XmlReader reader = XmlReader.Create(stream, settings);
@@ -121,10 +123,30 @@ internal static partial class OdfProfileRuleValidator
                 }
                 else
                 {
+                    schema = ResolveEntrySchema(packagePath, reader.GetAttribute("version", OdfNamespaces.Office), schema);
                     currentXPath = $"/{qName}[1]";
                 }
 
                 // 2. 執行驗證檢查
+                if (schemaRule is not null)
+                {
+                    string? xmlId = reader.GetAttribute("id", "http://www.w3.org/XML/1998/namespace");
+                    if (xmlId is not null)
+                    {
+                        // xml:id 的唯一性是同一 XML 文件的跨節點條件，不可只比對葉節點 datatype。
+                        string normalizedId = string.Join(" ", xmlId.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
+                        if (!xmlIds.Add(normalizedId))
+                        {
+                            issues.Add(new OdfValidationIssue(
+                                schemaRule.DefaultSeverity,
+                                "ODF3104",
+                                "An xml:id value is duplicated within this XML document.",
+                                packagePath,
+                                currentXPath + "/@xml:id",
+                                profileId: profile.Id));
+                        }
+                    }
+                }
                 ValidateOdfNamespaceElement(reader, packagePath, currentXPath, profile, schema, issues);
                 ValidateOdfNamespaceAttributes(reader, packagePath, currentXPath, profile, schema, issues);
                 ValidateForeignExtensionElement(reader, packagePath, currentXPath, profile, issues);

@@ -1,0 +1,588 @@
+{
+  "reviewedAt": "2026-10-14",
+  "revision": "16a59d945875bd74834e82e166bebded316478da",
+  "documentCount": 58,
+  "documents": [
+    {
+      "path": "src/test/resources/html-export/input/default-styles.ods",
+      "sha256": "7fbbce9aefbd439a6107481e28c726e8e4b89958d688c0d3926fadf66a51c753",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/DefaultSquare.odt",
+      "sha256": "8db3d75a9d1c9bbf7270b9633d5b2d4fb27cac20097876734f8793ba5f5685b9",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/floating_image_as_character.odt",
+      "sha256": "b60fdbab44162a0061640ea7b8a9f711e389e4daa0c7617d44a6a20762f223e8",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/floating.odt",
+      "sha256": "e2617ab3ef4f7f11381acc99735026a5d34d87021d3ed7e2424fb5d84cef7ef9",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/frames-without-wrap.odg",
+      "sha256": "296a0480f89dbd775a8616bb1b97221d4c5e55e5c12598e830a4a0f0d1315e0f",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/RedSquare.odt",
+      "sha256": "c50192f8b851d7deda0e39563ef3374baeb6c94a9fbe6a62732179e03ce079ac",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/tdf146264.odt",
+      "sha256": "3cd85ab2154aa3ce3a7cf193bd67c54e17ed0c3e6b69d5e83ba5b64482510807",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/html-export/input/tdf156093-image.odt",
+      "sha256": "b3e88c43c45cccb47cf9a2c7dfe6e6b439becd487a021576e4506a9ef39074a5",
+      "decision": "excluded-html-rendering-oracle"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/formulas-testsuite-generator/examples/OpenDocument-formula-20100119.odt",
+      "sha256": "7e43d22e165925b1869d8000ced452ea03613cdfab86b65cbc5f93fdd248ae61",
+      "decision": "excluded-generator-template-or-spec-source"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/formulas-testsuite-generator/examples/openformula-testsuite-20060724.ods",
+      "sha256": "706bb1483ba4767019a7b9b30334098a5e1967d8067981603dd05103019c9c8b",
+      "decision": "excluded-generator-template-or-spec-source"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/formulas-testsuite-generator/generator/template.ods",
+      "sha256": "d3ce7220721dee2c954ac5bb5fbdb304c3f635fe35fe7313cc4aa6d2f88296c7",
+      "decision": "excluded-generator-template-or-spec-source"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/1148 Extrapolate.ods",
+      "sha256": "397f34601a37fd375d3c2605858e3a9da796368c57832a597d0826df9eb55313",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/1828 3860 Engineering number format code.ods",
+      "sha256": "77bdd41e3b90f3c2cea82064e4861eb24da6edd38b5ab96652b154d40ff51974",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/1832 number_date-style.ods",
+      "sha256": "0e5fde4ed9e53ff7c63518a0b88e2b79e1f0839421eec9f89c78dfb322c3ea61",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/2173 table_tab-color.ods",
+      "sha256": "1eb597df7d3bd497aa432b311df26cec6aac10dbd093c92ead181b19b23de3aa",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/2580 empty master template.otm",
+      "sha256": "8d1cd4adbe87344bbcbbb098b33cf9bd670fd726f39a29a5d03287b4320cf9fb",
+      "decision": "adopted",
+      "note": "OdfKit defect fixed: missing ODF 1.3 master-template MIME/extension classification and profile allowance."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3662 interpolation step.ods",
+      "sha256": "17eb0e64f75b18bfe474cde40e460d16c0229ab8589cca7b014f0b337c23fda5",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3665 NamedRangeGlobal.ods",
+      "sha256": "1eddaab5216fa5061db2171ee4d1b88ab297dcf5fd773c211b9aa6ecc60fcf03",
+      "decision": "adopted",
+      "note": "OdfKit defect fixed: XML Schema pattern literal dollar was interpreted as a .NET end anchor."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3695 diverse_fraction.ods",
+      "sha256": "986ebc347d6c0fedf11d2e678fa1bd47287483c57b0e33417878d11bdc7e8cdc",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3695 min-decimal-placed.ods",
+      "sha256": "587a17a2e79cf4b532c4c73437c5fde43d2159ed1cf57f614d699f3e4cabe767",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3742 linecap combine draw with svg.odp",
+      "sha256": "4fb38a082820a196046ad41116c4f0d1916cebd2902eb7fbdbb925686d09ec31",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3765 number_fill-character.ods",
+      "sha256": "89658964eab80592ad011780afa9c84b2b4f9adf2263ca81b90428d1557ea42a",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3767 contextual spacing section.odt",
+      "sha256": "7ab10f948254d215ae6ef33b059985ebf427e6b30a80a88083cec98aadceedae",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3767 contextual spacing Space1cm.odt",
+      "sha256": "93d992c472a9c86c2c4699041cbfafbc4a12458dfce0fa33c8c9290883472be3",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3776 meta_creator-initials.odt",
+      "sha256": "85c4ca375c022152d06d05a43fdfdfc8547fb5239628ff5249d04538ea4d39e1",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. unexpected attribute \"draw:fill\""
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3789 Header Footer First.odt",
+      "sha256": "2ce0ee8de2e35fd3b4974d9e3f7b41afc77474c142272264f58e0543fff7f71b",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. unexpected attribute \"draw:fill\""
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3821 Luminance.odp",
+      "sha256": "c5abcc0e265d09c4c48f81003cedf5071a2312d85e4ff07cebdca8ac8293aa4b",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3857 PrintOnSeveralPagesW3H2.ods",
+      "sha256": "ffdc2ecd832f816f3f86dcd744c38cf9436dee5d9f2fc8d513d5e0edd6d30997",
+      "decision": "adopted",
+      "note": "OdfKit defect fixed: XML Schema pattern literal dollar was interpreted as a .NET end anchor."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3881 dropdown input list.odt",
+      "sha256": "b41768141789692dfd52848aa84019a7d5174bea623d6d262598aaca549f924a",
+      "decision": "adopted",
+      "note": "OdfKit defect fixed: rng:text was incorrectly rejected when label child elements were present."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3883 chart_legend width height.ods",
+      "sha256": "67698605b5de92c09dfc5f62f87d006a6289f8a8490ada613932e56d58701e5a",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3906 DCOUNT and DCOUNTA second parameter.ods",
+      "sha256": "5e9a2a1ff9419d71621ea0e4a82ac2471f530461ec90a00b762ba0ce79f150e3",
+      "decision": "adopted",
+      "note": "OdfKit defect fixed: XML Schema pattern literal dollar was interpreted as a .NET end anchor."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3923 Page Number 0.odt",
+      "sha256": "138d74a3d7162a3d6a05f06d8ad2df6ac84a9b20472cb975612738f25a117260",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. unexpected attribute \"draw:fill\""
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3923 Start0Inside0.odt",
+      "sha256": "2f0eed78ff7f10e563607e4c45f53c2a968f21f4fe7aa23b6552007550ae626e",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. unexpected attribute \"draw:fill\""
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3928 CoordinateRegionPiechart.ods",
+      "sha256": "1660ab5040b494b3d0c0165efcf65bf63ca2422a66b2a503cc1543e7a267313d",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3928 CoordinateRegionXYchart_3D.ods",
+      "sha256": "5e25b261d96696398f76b6a7e9a2ad20213d3edb5cb57ef57f6e7bee8b14ebbf",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3928 CoordinateRegionXYchart.ods",
+      "sha256": "fa5f37cb7c26d53a9440c60d87037894ed19c78d02c4ed76fdca9dccd4b3b7b7",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3933 fill-image flat format.odg",
+      "sha256": "03380a98975b28a5720c75052b318347f2c4dcce9adf1dc688df04ea20f4ec58",
+      "decision": "excluded-flat-xml-with-package-extension"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BackgroundColor border.odg",
+      "sha256": "7f09f1704c3f44880b6abb7206f48ed60bb26a6a59a3773a0d4a1d68c5cd28f0",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BackgroundColor border.odt",
+      "sha256": "f0b8ee1eb4e4ebf169358ee7612606b6920897890f8fa8c7e8b684f0458e826c",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BackgroundColor full.odg",
+      "sha256": "09b3b76aa396cb9187be046f7d55a76ded2eed32cde316a2def6d9f9225cf9c5",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BackgroundColor full.odt",
+      "sha256": "4e9478f24450f23e41dcefeb36d1678d7f0455fe8fa88a194a219a3cdcf129bb",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BitmapFixSize border.odt",
+      "sha256": "e6e3f188a0318d409ae1a71770077ef594763b60b1f36cb8c8d0919d62d70269",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 BitmapFixSize full.odt",
+      "sha256": "921d0c80d4d1980b5185b33a8f629442c27b644b7e15cc6dcaddf75b376574b9",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 HatchBackground border.odg",
+      "sha256": "08ba892bc7a2eab1c444b3c56274e663bfeb6dae00f386475024a6bcdc54a7e0",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. tag name \"style:graphic-properties\" is not allowed. Possible tag names are: <drawing-page-properties>,<map>"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 HatchBackground border.odt",
+      "sha256": "9a0c0963e046398a34e626933fc5408a2f074c439cbad5a7d454e758a81804d0",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 HatchBackground full.odg",
+      "sha256": "356670ff59582a226ba4a8f7b64ccc30985f69af11e01fe2bca6c90cadf7fc8b",
+      "decision": "adopted-negative",
+      "note": "TDF and OPF agree invalid. tag name \"style:graphic-properties\" is not allowed. Possible tag names are: <drawing-page-properties>,<map>"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3937 HatchBackground full.odt",
+      "sha256": "a992aa6623b4b1035438865575b656956337d1b63d51353304e23c4b9d1897b2",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3941 index link entry TableObject.odt",
+      "sha256": "ddcad45602e40c2df25c4d71832d653f827a089905a07fe669a0b5cabe0b3a1c",
+      "decision": "excluded-validator-infrastructure-failure",
+      "note": "TDF 0.13.0 throws NullPointerException while validating embedded MathML. Root schema diagnostics are present, but engine failure is not a classification oracle."
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3943 mimetype of image diverse.odp",
+      "sha256": "95950cc0e6c609d65fb3a86d9a11a71b1a9184bf089c251936c27e6a0fa0e187",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3958 polynomialregressionXY.ods",
+      "sha256": "cdb13cff662415cac5050b44db441670e434e0eeebded7ac0d04de9df2cf12f7",
+      "decision": "adopted"
+    },
+    {
+      "path": "src/test/resources/odf1.3/testfiles/3959 MovingAveragePeriod.ods",
+      "sha256": "5eab72f71781b1409cbd6b9c99e9be27edf9d4650b176f6369b28000dea7a60e",
+      "decision": "excluded-invalid-embedded-chart",
+      "note": "TDF 0.13.0 rejects Object 1/content.xml[22,93]: chart:symbol-image is not allowed. OdfKit/OPF root-stream acceptance cannot prove embedded chart validity."
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/ByteFunctions_20260214.ods",
+      "sha256": "1e545e41a09d35e4d36c0aee7781cb7c4434c8e7bbbfdf488604547c3ca6e7c2",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/Function_INFO_Testresults.ods",
+      "sha256": "f0ea47f48fb1ea05fd9e79b1d162e0ae351e087baea0e31f6d62d4a8431e9ab3",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/ROWS_COLUMNS_ROW_COLUMN.ods",
+      "sha256": "6f2d06f40151a6c28fd36c19f37c3052a22f72b3aa2e66914e47b5229a76e5a0",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/Testmaterial_INFO.ods",
+      "sha256": "8b87105f1cff7f7ca2c31435350fed0e05db95417c9a23b2711b6442fd22ecdd",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/XLOOKUP_NoWildcard_NotToWholeCell_draft_20240519.ods",
+      "sha256": "80e2fe537b2d9561c80f4a9aed330fd99a424db3ae73ec136cd9c1695f822004",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/XLOOKUP_NoWildcard_WholeCell_draft_20240519.ods",
+      "sha256": "28df79784d990f9e8f59060b7b48da30f04f9039d69a6a220847dedf698079d6",
+      "decision": "excluded-draft-1.5"
+    },
+    {
+      "path": "src/test/resources/odf1.5/testfiles/XLOOKUP_Wildcard_on_Regex_off_only_linear_draft_20240602.ods",
+      "sha256": "6a5069b8b5d1855e29f0fa90f51b2193b7ef20343c55532df0611aa6ff96b140",
+      "decision": "excluded-draft-1.5"
+    }
+  ],
+  "toolCount": 55,
+  "tools": [
+    {
+      "path": "src/test/java/org/oasis_open/odf_tc/DefaultValueTest.java",
+      "sha256": "832dd02a9a3cd330f476666b79ec53e307f39fe880f16dfdc15c83a7b999ff4d",
+      "decision": "excluded-empty-test"
+    },
+    {
+      "path": "src/test/java/org/oasis_open/odf_tc/Unzip.java",
+      "sha256": "17ec903359119b80f1a3f91830fac3040bcd9145491545a2b66ac9f3bb074c7a",
+      "decision": "excluded-unbounded-archive-helper"
+    },
+    {
+      "path": "src/test/java/org/oasis_open/odf_tc/Zip.java",
+      "sha256": "caa3c87e838a661d0149f7ba7d4b41b2f67d0c7c2b1fa0d3926319a519b89d52",
+      "decision": "excluded-unbounded-archive-helper"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/create-embedded-xref.xsl",
+      "sha256": "52f7a571983596f35b316b031e4d49f5e2ef4ceeca3ad79d16106868a46b9fca",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/create-flat-schema.xsl",
+      "sha256": "3d6c9581efdd70dc4e2dc4c807b55310483b21620c20adbff28083ca98e96ea7",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/formulas-testsuite-generator/generator/step1.xsl",
+      "sha256": "fad8402d2e87ce37ed39bb9002a3c1edb0243a459f7e890f3bc8866157a05505",
+      "decision": "deferred-formula-generator-contract"
+    },
+    {
+      "path": "src/test/resources/odf1.2/tools/formulas-testsuite-generator/generator/step2.xsl",
+      "sha256": "9c03a4d90f4e78405c6ac52eb88ef8c8a238208cea6daa19d596bec6ffa5706d",
+      "decision": "deferred-formula-generator-contract"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/addMathJax.xsl",
+      "sha256": "d6754e30a71a51e89d10152ed29dd29cb00e6a99b89b229c508881f444abd901",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/create-embedded-xref.xsl",
+      "sha256": "665ab34194f3e3d386e3f1d7731de4ddca45a135dab6278aa1a8787ba49bb22c",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/create-flat-schema.xsl",
+      "sha256": "87b73ca721d570a29ad1c0d5ebb5b734a1665962f0afec45218acfb0c6fa3a4e",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/getAttributeDefaults.xsl",
+      "sha256": "9620f35fc6094e066c4f3a6718c2a6ff805613ae74bfb697f774114e0a81ae50",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/insert-anchors.xsl",
+      "sha256": "4d7dc3f1b1bd9953eca9577a6d737611d78492bcedc78ff8a6f639bc4e5a8724",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/common/copy.xsl",
+      "sha256": "02025995f31c7223e6c6e44bce56b32a3f8f439dc79d79fc8fd7b6c4abc90408",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/common/math.xsl",
+      "sha256": "721ef2565b4c4b420e60123f18305842d72e52fed645413572b20e4c86085ec6",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/common/measure_conversion.xsl",
+      "sha256": "756f5693a533e2d0761f688f2d7cb4e53a3e907cf363bddc0554ceae0620b0af",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/body.xsl",
+      "sha256": "27c3881f2c73fe952b6faef938be6cb9ae9674f31bbcab7dc172e98d40498e09",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/table_of_content.xsl",
+      "sha256": "21507047718eb90c6cc747a7d11bb3d8515dd519c3b75d07704b4ddc71f6f43b",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/styles/style_collector.xsl",
+      "sha256": "9a8b885a96decd88eca6e1afae3197e00c2fdddcaca58bb52130bbfa3e3c17cf",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/styles/style_mapping_css.xsl",
+      "sha256": "2bed6c99851d8786ee5a65b521d654ef71f90eeabc4546aad3f4fda5c22a68d9",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/table/table_cells.xsl",
+      "sha256": "e4c496fef5bd73776d9bca3470e9e6855b70e5bc23e1c730c50566e4fe3fea07",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/table/table_columns.xsl",
+      "sha256": "d921a1dcace2c3f39bc7cf05df7dd7e548d92726868247a812cf3f0f617554c2",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/table/table_rows.xsl",
+      "sha256": "f584e2e40f27907dffe3213cbd16db59a55560589d71369b512449b85a58a4e4",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/common/table/table.xsl",
+      "sha256": "12dc2fa71d4d955500c469fa698d5d83bcc781bcea8125b89c6e8cef4ce0146c",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/xhtml/body.xsl",
+      "sha256": "7e978fb349f2840d317575a9c7841bcd9bb7e4aaca3a9285be88bcb943f87983",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/xhtml/header.xsl",
+      "sha256": "b87212605e2f8607edc6e6f31a9f7673ae88d853acf149cda9e59ee4a0f1dbda",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/xhtml/opendoc2xhtml.xsl",
+      "sha256": "3c1348f21618f99e7299742ccf19323d271eccf88f7a7b5a21c8b53109d791b8",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/odf2html/export/xhtml/table.xsl",
+      "sha256": "35ee298ef9fddfbb91de94f6fd1de742c7066d216b2bc2ed7e437787504d6cdb",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.3/tools/rng2html/addRefs4rng-html.xsl",
+      "sha256": "afa82b24ac5642c35b6c3fa568c53e44a43169be34bd66573157bd66c1136494",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/addMathJax.xsl",
+      "sha256": "d6754e30a71a51e89d10152ed29dd29cb00e6a99b89b229c508881f444abd901",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/copy-xslt-defaultvalues-output-from-target-to-references.sh",
+      "sha256": "99c8f0944a477e1ff4651d105dfb34e29ad4607aa17157a1a82be4d587a91f81",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/copy-xslt-html-output-from-target-to-references.sh",
+      "sha256": "9843167f252d8c19c9f11fe758abb224e593a8ddfe67438a3e0f9dc8c2240bd7",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/copy-xslt-rnghtml-output-from-target-to-references.sh",
+      "sha256": "7d3a20e4c9c5dde4451f92bba1f97a621294204a7d33c78f4f9d16bd5310b25c",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/create-embedded-xref.xsl",
+      "sha256": "bb7d9188f4bbaa792ffd0ad985177962ccd8b68fa301c8cd6c67505e657177fb",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/create-flat-schema.xsl",
+      "sha256": "87b73ca721d570a29ad1c0d5ebb5b734a1665962f0afec45218acfb0c6fa3a4e",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/getAttributeDefaults.xsl",
+      "sha256": "5b1857453a44e6e7b28c3a7a4169964f3072378ff6a1d1ab3306ad43d949318f",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/ident.xsl",
+      "sha256": "ca9aaa4e412ec72b92934f4d5d7bf6fb579d6793a8412ba3e2f50ef822c608d6",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/insert-anchors.xsl",
+      "sha256": "91edc87dc0ec503e532445c4d24ae1afc1427916312041008c2467273f281526",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/common/copy.xsl",
+      "sha256": "02025995f31c7223e6c6e44bce56b32a3f8f439dc79d79fc8fd7b6c4abc90408",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/common/math.xsl",
+      "sha256": "721ef2565b4c4b420e60123f18305842d72e52fed645413572b20e4c86085ec6",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/common/measure_conversion.xsl",
+      "sha256": "756f5693a533e2d0761f688f2d7cb4e53a3e907cf363bddc0554ceae0620b0af",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/body.xsl",
+      "sha256": "4ab109c1c40938c989bcd938d6195f6b059d5502fc56879f4b823dd10628c599",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/table_of_content.xsl",
+      "sha256": "4021095179cdaf462d8edb4c6ef52774c351848a8af3504f78cdcf9be9025dbd",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/styles/style_collector.xsl",
+      "sha256": "191bb288064625dc39fed6eaa6a512cde149b4c0a3717823334d163b6fd8a93f",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/styles/style_mapping_css.xsl",
+      "sha256": "bd2b74863e92b825a203acb0e59cff9fe9f2dc46811f308fbf52b57c27a8d31d",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/table/table_cells.xsl",
+      "sha256": "e4c496fef5bd73776d9bca3470e9e6855b70e5bc23e1c730c50566e4fe3fea07",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/table/table_columns.xsl",
+      "sha256": "d921a1dcace2c3f39bc7cf05df7dd7e548d92726868247a812cf3f0f617554c2",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/table/table_rows.xsl",
+      "sha256": "f584e2e40f27907dffe3213cbd16db59a55560589d71369b512449b85a58a4e4",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/common/table/table.xsl",
+      "sha256": "8f1d225041022b0ec1edd64caad2813b69d1ff2b52e3309deb012c07c7e0a63b",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/xhtml/body.xsl",
+      "sha256": "2983ffb6c8fa38ce6a0a03776f7fbb7389d0adddde7992055543dd10346bd23d",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/xhtml/header.xsl",
+      "sha256": "65bb5dd038c27808e7a4e0c8a5bafe015507b890840ac9de8965bc8e115bcc52",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/xhtml/opendoc2xhtml.xsl",
+      "sha256": "d343394b89a475c64d5e58b81a6931ba597c69538ce1c911840b142ab27bea23",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/odf2html/export/xhtml/table.xsl",
+      "sha256": "35ee298ef9fddfbb91de94f6fd1de742c7066d216b2bc2ed7e437787504d6cdb",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "src/test/resources/odf1.4/tools/rng2html/addRefs4rng-html.xsl",
+      "sha256": "afa82b24ac5642c35b6c3fa568c53e44a43169be34bd66573157bd66c1136494",
+      "decision": "excluded-spec-publication-tool"
+    },
+    {
+      "path": "xslt-regression-test.sh",
+      "sha256": "1dec960022c8e0f796e3eae614fa58333f8141edc5f38f94720287355e95e201",
+      "decision": "excluded-html-export-tool"
+    },
+    {
+      "path": "pom.xml",
+      "sha256": "81a17aa461c3311cd6103128f0354a782d0d1b07896f1bc29349ffc3f5c2a643",
+      "decision": "excluded-spec-publication-tool"
+    }
+  ]
+}

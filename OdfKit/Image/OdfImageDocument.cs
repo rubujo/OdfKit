@@ -314,7 +314,14 @@ public partial class OdfImageDocument : OdfDocument
         image.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         image.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         image.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
-        frame.AppendChild(image);
+        if (frame.Children.Count > 0)
+        {
+            frame.InsertBefore(image, frame.Children[0]);
+        }
+        else
+        {
+            frame.AppendChild(image);
+        }
         if (frame.Parent is null)
         {
             imageRoot.AppendChild(frame);

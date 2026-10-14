@@ -56,6 +56,19 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
+    /// Validates a document with the ODF Validator, optionally using extended conformance.
+    /// 使用 ODF Validator 驗證文件，並可選擇擴充一致性模式。
+    /// </summary>
+    /// <param name="filePath">Document path. / 文件路徑。</param>
+    /// <param name="jarPath">Validator JAR path, or null to use the environment variable. / 驗證器 JAR 路徑，null 表示使用環境變數。</param>
+    /// <param name="javaPath">Java executable path, or null to use java. / Java 執行檔路徑，null 表示使用 java。</param>
+    /// <param name="timeoutMilliseconds">Process timeout in milliseconds. / 程序逾時毫秒數。</param>
+    /// <param name="extendedConformance">Whether to pass the validator's extended conformance flag. / 是否傳入驗證器的擴充一致性旗標。</param>
+    /// <returns>The external validation result. / 外部驗證結果。</returns>
+    public static OdfExternalValidatorResult ValidateWithOdfValidator(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, bool extendedConformance) =>
+        OdfSynchronousTask.Run(() => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds, extendedConformance, default));
+
+    /// <summary>
     /// Short overload of ValidateWithOdfValidatorAsync that accepts filePath; remaining optional parameters use defaults and forward to the full overload.
     /// 便利多載：提供 filePath；其餘可選參數使用預設值並轉呼叫最長 ValidateWithOdfValidatorAsync 多載。
     /// </summary>
@@ -98,6 +111,20 @@ public static class OdfExternalValidator
     /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出</exception>
     /// <exception cref="TimeoutException">當外部程序逾時時擲出</exception>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, CancellationToken cancellationToken)
+        => ValidateWithOdfValidatorAsync(filePath, jarPath, javaPath, timeoutMilliseconds, false, cancellationToken);
+
+    /// <summary>
+    /// Asynchronously validates a document with optional extended conformance.
+    /// 非同步驗證文件，並可選擇擴充一致性模式。
+    /// </summary>
+    /// <param name="filePath">Document path. / 文件路徑。</param>
+    /// <param name="jarPath">Validator JAR path, or null to use the environment variable. / 驗證器 JAR 路徑，null 表示使用環境變數。</param>
+    /// <param name="javaPath">Java executable path, or null to use java. / Java 執行檔路徑，null 表示使用 java。</param>
+    /// <param name="timeoutMilliseconds">Process timeout in milliseconds. / 程序逾時毫秒數。</param>
+    /// <param name="extendedConformance">Whether to pass the extended conformance flag. / 是否傳入擴充一致性旗標。</param>
+    /// <param name="cancellationToken">Cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task containing the external validation result. / 包含外部驗證結果的工作。</returns>
+    public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(string filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, bool extendedConformance, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileCannotBeEmpty_2"), nameof(filePath));
@@ -117,7 +144,7 @@ public static class OdfExternalValidator
         string resolvedJavaPath = string.IsNullOrWhiteSpace(javaPath) ? "java" : javaPath!;
         return RunProcessAsync(
             resolvedJavaPath,
-            ["-jar", resolvedJarPath!, filePath],
+            extendedConformance ? ["-jar", resolvedJarPath!, "-e", filePath] : ["-jar", resolvedJarPath!, filePath],
             timeoutMilliseconds,
             cancellationToken);
     }

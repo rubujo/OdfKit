@@ -10,6 +10,18 @@ on:
       - 'OdfKit.Tests/OpenPgpExternalInteropTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
+      - 'eng/Install-OpfOdfValidator.ps1'
+      - 'eng/Test-OpfOdfBaseline.ps1'
+      - 'eng/Initialize-OasisOdfTcCorpus.ps1'
+      - 'eng/Test-OdfExternalSourceContracts.ps1'
+      - 'eng/Test-OdfConformanceMatrix.ps1'
+      - 'eng/Build-OdfConformanceMatrix.py'
+      - 'docs/odf-conformance-audits.json'
+      - 'docs/odf-conformance-matrix/**'
+      - 'OdfKit.Tests/OdfConformanceGapTests.cs'
+      - 'docs/opf-baseline-exceptions.json'
+      - 'docs/oasis-odf-tc-inventory.json'
+      - 'docs/examples/oasis-odf-tc-corpus/**'
       - 'eng/Install-Jing.ps1'
       - 'eng/Install-LibreOfficeManifestSchema.ps1'
       - 'eng/Test-OdfRelaxNgBaseline.ps1'
@@ -33,6 +45,18 @@ on:
       - 'OdfKit.Tests/OpenPgpExternalInteropTests.cs'
       - 'tests/fixtures/corpus/**'
       - 'eng/Install-OdfValidator.ps1'
+      - 'eng/Install-OpfOdfValidator.ps1'
+      - 'eng/Test-OpfOdfBaseline.ps1'
+      - 'eng/Initialize-OasisOdfTcCorpus.ps1'
+      - 'eng/Test-OdfExternalSourceContracts.ps1'
+      - 'eng/Test-OdfConformanceMatrix.ps1'
+      - 'eng/Build-OdfConformanceMatrix.py'
+      - 'docs/odf-conformance-audits.json'
+      - 'docs/odf-conformance-matrix/**'
+      - 'OdfKit.Tests/OdfConformanceGapTests.cs'
+      - 'docs/opf-baseline-exceptions.json'
+      - 'docs/oasis-odf-tc-inventory.json'
+      - 'docs/examples/oasis-odf-tc-corpus/**'
       - 'eng/Install-Jing.ps1'
       - 'eng/Install-LibreOfficeManifestSchema.ps1'
       - 'eng/Test-OdfRelaxNgBaseline.ps1'
@@ -57,7 +81,7 @@ permissions:
 jobs:
   validate-with-odf-validator:
     runs-on: windows-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -118,6 +142,47 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ steps.validator.outputs.java_version }}
+
+      - name: Check external source contracts and read OPF and OASIS metadata
+        id: external-sources
+        shell: pwsh
+        run: |
+          ./eng/Test-OdfExternalSourceContracts.ps1
+          ./eng/Test-OdfConformanceMatrix.ps1
+          $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
+          $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
+          $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
+          "opf_source=$($tool.source)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "opf_revision=$($tool.cacheRevision)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "opf_version=$($tool.version)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "opf_sha256=$($tool.sha256)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "opf_root=$(Join-Path $env:RUNNER_TOOL_CACHE "odfkit/opf/$($tool.source)/r$($tool.cacheRevision)/$($tool.version)/$($tool.sha256)")" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "oasis_revision=$($corpus.revision)" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "oasis_sha256=$corpusHash" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "oasis_root=$(Join-Path $env:RUNNER_TOOL_CACHE "odfkit/oasis-odf-tc/r1/$($corpus.revision)/$corpusHash")" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Cache pinned OPF Validator
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ steps.external-sources.outputs.opf_root }}
+          key: opf-validator-${{ runner.os }}-${{ steps.external-sources.outputs.opf_source }}-r${{ steps.external-sources.outputs.opf_revision }}-${{ steps.external-sources.outputs.opf_version }}-${{ steps.external-sources.outputs.opf_sha256 }}
+
+      - name: Install and verify OPF Validator
+        id: install-opf
+        shell: pwsh
+        run: |
+          $jarPath = ./eng/Install-OpfOdfValidator.ps1 -DestinationRoot '${{ steps.external-sources.outputs.opf_root }}'
+          "jar_path=$jarPath" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Cache pinned OASIS test documents
+        uses: ./.github/actions/cache-odfkit
+        with:
+          path: ${{ steps.external-sources.outputs.oasis_root }}
+          key: oasis-odf-tc-${{ runner.os }}-r1-${{ steps.external-sources.outputs.oasis_revision }}-${{ steps.external-sources.outputs.oasis_sha256 }}
+
+      - name: Download and verify OASIS test documents
+        shell: pwsh
+        run: ./eng/Initialize-OasisOdfTcCorpus.ps1 -DestinationRoot '${{ steps.external-sources.outputs.oasis_root }}'
 
       - name: Cache pinned ODF Validator
         uses: ./.github/actions/cache-odfkit
@@ -232,4 +297,37 @@ jobs:
             --framework net10.0 `
             --no-build `
             --no-restore `
-            --filter 'FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidatorRealJarDetectsValidAndInvalidDocuments'
+            --filter 'FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidatorRealJarDetectsValidAndInvalidDocuments|FullyQualifiedName=OdfKit.Tests.OdfExternalValidatorAsyncTests.ValidateWithOdfValidatorRealJarUsesProfileConformanceMode'
+
+      - name: Validate independent OPF baseline
+        shell: pwsh
+        run: |
+          ./eng/Test-OpfOdfBaseline.ps1 `
+            -ValidatorJar '${{ steps.install-opf.outputs.jar_path }}' `
+            -RequireAllExceptions
+
+      - name: Validate OASIS test documents with OdfKit and TDF
+        shell: pwsh
+        run: |
+          ./eng/Test-OdfCorpus.ps1 -SkipBuild -SkipInternalValidation `
+            -ExternalRoot '${{ steps.external-sources.outputs.oasis_root }}' `
+            -ExternalManifest docs/examples/oasis-odf-tc-corpus/manifest.json `
+            -BaselineJar '${{ steps.install.outputs.jar_path }}'
+
+      - name: Validate OASIS test documents with OPF
+        shell: pwsh
+        run: |
+          ./eng/Test-OpfOdfBaseline.ps1 `
+            -ValidatorJar '${{ steps.install-opf.outputs.jar_path }}' `
+            -Manifest docs/examples/oasis-odf-tc-corpus/manifest.json `
+            -CorpusRoot '${{ steps.external-sources.outputs.oasis_root }}' `
+            -ReportPath artifacts/opf-oasis-baseline.json
+
+      - name: Upload OPF diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: opf-baseline-diagnostics
+          path: artifacts/opf*-baseline.json
+          retention-days: 7
+          if-no-files-found: ignore

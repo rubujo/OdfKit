@@ -1,0 +1,790 @@
+{
+  "schemaVersion": 1,
+  "fullConformanceClaim": false,
+  "requirements": [
+    {
+      "id": "VAL-001",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "原始版本值須按選定 grammar 驗證，不可先改寫合法值。",
+      "assessment": "1.0/1.1 官方 version 型別為 string，未知值由 ODF0401 拒絕；1.2 以上另有 grammar 值域檢查。",
+      "clauses": [
+        "ODF-1.0/spec/2.1.2",
+        "ODF-1.1/spec/2.1.2",
+        "ODF-1.2/schema/19.386",
+        "ODF-1.3/schema/19.390",
+        "ODF-1.4/schema/19.390"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs",
+        "OdfKit/Compliance/OdfPackageValidator.XmlRoots.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "NativeSchemaDoesNotRepairInvalidVersionBeforeMatching"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-002",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "Formula/Database 豁免不可放行整個文件 envelope。",
+      "assessment": "僅替換未涵蓋的 body 分支供外層 grammar 比對；保留所有兄弟節點與 body 屬性。豁免內容仍未完整驗證。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.10",
+        "ODF-1.2/schema/2.2.9",
+        "ODF-1.3/schema/2.2.10",
+        "ODF-1.3/schema/2.2.9",
+        "ODF-1.4/schema/2.2.10",
+        "ODF-1.4/schema/2.2.9"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-003",
+      "scope": "producer",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "1.0/1.1 manifest 不可輸出未定義的 manifest:version。",
+      "assessment": "根節點與根 file-entry 均依目標版本輸出；較新版仍輸出 version。",
+      "clauses": [
+        "ODF-1.0/spec/17.7.2",
+        "ODF-1.1/spec/17.7.2",
+        "ODF-1.2/packages/4.8.14",
+        "ODF-1.3/packages/4.16.14",
+        "ODF-1.4/packages/4.16.14"
+      ],
+      "implementation": [
+        "OdfKit/Core/OdfPackageManifestWriter.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "ProducedManifestUsesOnlyAttributesDefinedBySelectedVersion"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-004",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "無版本的舊版 manifest 需使用舊版 schema；有宣告時 package/document 版本獨立。",
+      "assessment": "使用已偵測的文件版本作無 manifest:version 的 fallback；不覆寫已宣告的 package 版本。",
+      "clauses": [
+        "ODF-1.0/spec/17.7.2",
+        "ODF-1.1/spec/17.7.2",
+        "ODF-1.2/packages/4.2",
+        "ODF-1.2/packages/4.8.14.2",
+        "ODF-1.3/packages/4.16.14.2",
+        "ODF-1.3/packages/4.2",
+        "ODF-1.4/packages/4.16.14.2",
+        "ODF-1.4/packages/4.2"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "ProducedManifestUsesOnlyAttributesDefinedBySelectedVersion"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorSelectsManifestSchemaIndependentlyFromContentVersion"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-005",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "同一 XML 文件內 xml:id 必須唯一。",
+      "assessment": "ODF3104 在串流掃描中拒絕重複；嵌入的獨立 XML 文件可重複使用同一 ID。此修正不代表 IDREF 全部可解析。",
+      "clauses": [
+        "ODF-1.2/schema/19.914",
+        "ODF-1.3/schema/19.920",
+        "ODF-1.4/schema/19.920"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "XmlIdsAreUniqueWithinEachStreamAndCanRepeatAcrossEmbeddedDocuments"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "VAL-006",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "嵌入 ODF 文件使用自己的宣告版本，不可改寫成外層版本。",
+      "assessment": "pattern 與 namespace 掃描共用版本選擇；未知版本明確回報 ODF0401。",
+      "clauses": [
+        "ODF-1.2/schema/3.1.3",
+        "ODF-1.2/schema/3.1.3.2",
+        "ODF-1.2/schema/3.1.3.3",
+        "ODF-1.3/schema/3.1.3",
+        "ODF-1.3/schema/3.1.3.2",
+        "ODF-1.3/schema/3.1.3.3",
+        "ODF-1.4/schema/3.1.3",
+        "ODF-1.4/schema/3.1.3.2",
+        "ODF-1.4/schema/3.1.3.3"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "EmbeddedDocumentsUseTheirOwnDeclaredSchemaVersion"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "EXEMPT-001",
+      "scope": "validator",
+      "status": "validator-gap",
+      "priority": "P1",
+      "requirement": "Formula 的裸 MathML 需要完整語法驗證。",
+      "assessment": "目前僅保留 root 互通形狀，沒有完整 MathML grammar；新增 ODF3103 警告，仍不能證明 MathML 合規。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.9",
+        "ODF-1.3/schema/2.2.9",
+        "ODF-1.4/schema/2.2.9"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs",
+        "OdfKit/Compliance/OdfPackageValidator.XmlRoots.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "BareMathmlExemptionIsVisibleInValidationReport"
+        }
+      ],
+      "nextAction": "建立版本適用的 MathML grammar 與非法子元素、屬性、datatype 正負 corpus；不得用警告當修正完成。"
+    },
+    {
+      "id": "EXEMPT-002",
+      "scope": "validator",
+      "status": "validator-gap",
+      "priority": "P1",
+      "requirement": "Database/Formula body 內部內容仍需可驗證的 grammar。",
+      "assessment": "通用官方 document grammar 不定義 office:database/office:formula body；目前有 namespace 掃描，但不能驗證其全部結構、值域與關係。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.10",
+        "ODF-1.2/schema/2.2.9",
+        "ODF-1.3/schema/2.2.10",
+        "ODF-1.3/schema/2.2.9",
+        "ODF-1.4/schema/2.2.10",
+        "ODF-1.4/schema/2.2.9"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.SchemaPatterns.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.NamespaceRules.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "UnsupportedBodyDoesNotExemptEnvelopeFromSchemaValidation"
+        }
+      ],
+      "nextAction": "以官方適用外部格式及 db 子 grammar 逐分支驗證，避免自行發明 OASIS grammar。"
+    },
+    {
+      "id": "GAP-001",
+      "scope": "validator",
+      "status": "validator-gap",
+      "priority": "P1",
+      "requirement": "ID/IDREF 與名稱參照不能只驗證葉節點 lexical type。",
+      "assessment": "MatchesDataType 對 IDREF 僅檢查 NCName；沒有建立全文件 IDREF 目標解析。style、named range 與跨串流參照亦缺完整規範對照。",
+      "clauses": [
+        "ODF-1.2/packages/7.2",
+        "ODF-1.2/schema/18.2",
+        "ODF-1.2/schema/19.593.8",
+        "ODF-1.2/schema/19.673.10",
+        "ODF-1.2/schema/19.914",
+        "ODF-1.2/schema/9.4.12",
+        "ODF-1.3/packages/7.2",
+        "ODF-1.3/schema/18.2",
+        "ODF-1.3/schema/19.597.8",
+        "ODF-1.3/schema/19.677.10",
+        "ODF-1.3/schema/19.920",
+        "ODF-1.3/schema/9.4.12",
+        "ODF-1.4/packages/7.2",
+        "ODF-1.4/schema/18.2",
+        "ODF-1.4/schema/19.597.8",
+        "ODF-1.4/schema/19.677.10",
+        "ODF-1.4/schema/19.920",
+        "ODF-1.4/schema/9.4.12"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs"
+      ],
+      "tests": [],
+      "nextAction": "依各版本與各參照種類建立 scope；補不存在、重複、前向及跨串流目標案例。"
+    },
+    {
+      "id": "GAP-002",
+      "scope": "validator",
+      "status": "evidence-gap",
+      "priority": "P1",
+      "requirement": "RELAX NG matcher 與 XML Schema datatype/facet 的語義要有逐條差異證據。",
+      "assessment": "已修正 $/^ 與完整字串匹配，但 .NET regex 轉譯不是完整 XML Schema regex 引擎；所有 whitespace、Unicode、class、facet/value-space 組合尚無完整 oracle。",
+      "clauses": [
+        "ODF-1.0/spec/1.4",
+        "ODF-1.0/spec/17.7.1",
+        "ODF-1.1/spec/1.4",
+        "ODF-1.1/spec/17.7.1",
+        "ODF-1.2/packages/7.2",
+        "ODF-1.2/schema/18.2",
+        "ODF-1.3/packages/7.2",
+        "ODF-1.3/schema/18.2",
+        "ODF-1.4/packages/7.2",
+        "ODF-1.4/schema/18.2"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Facets.cs",
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OasisOdf13RegressionTests.cs",
+          "symbol": "XmlSchemaPatternKeepsLiteralAnchorsAndCharacterClasses"
+        }
+      ],
+      "nextAction": "依官方 RNG 實際用到的型別/facet/pattern 產生有界正負樣本，與 Jing 交叉比對；不能只增加相同實作的單元測試。"
+    },
+    {
+      "id": "GAP-003",
+      "scope": "validator",
+      "status": "validator-gap",
+      "priority": "P1",
+      "requirement": "QName/namespacedToken 的前綴需要 namespace context。",
+      "assessment": "IsQName 只驗證 NCName 組合；未把值中的 prefix 對應到目前元素的 namespace 宣告。",
+      "clauses": [
+        "ODF-1.2/packages/7.2",
+        "ODF-1.2/packages/7.3.1",
+        "ODF-1.2/schema/18.2",
+        "ODF-1.2/schema/18.3.19",
+        "ODF-1.3/packages/7.2",
+        "ODF-1.3/packages/7.3.1",
+        "ODF-1.3/schema/18.2",
+        "ODF-1.3/schema/18.3.19",
+        "ODF-1.4/packages/7.2",
+        "ODF-1.4/packages/7.3.1",
+        "ODF-1.4/schema/18.2",
+        "ODF-1.4/schema/18.3.20"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Primitives.cs"
+      ],
+      "tests": [],
+      "nextAction": "補未宣告 prefix、重綁 prefix 與同 URI 不同 prefix 的正負測試，先限定有明確 namespace 語意的值。"
+    },
+    {
+      "id": "GAP-004",
+      "scope": "validator",
+      "status": "evidence-gap",
+      "priority": "P1",
+      "requirement": "RDF metadata manifest 的列舉、相對 IRI 與 ontology 關係需另驗證。",
+      "assessment": "SDK 有 RDF 讀寫 API；profile 的 grammar gate 未提供 pkg ontology 的完整語意證據。不能視為 SDK 範圍外。",
+      "clauses": [
+        "ODF-1.2/packages/3.6",
+        "ODF-1.2/packages/6",
+        "ODF-1.2/packages/6.6",
+        "ODF-1.2/packages/6.7",
+        "ODF-1.2/schema/4",
+        "ODF-1.3/packages/3.6",
+        "ODF-1.3/packages/6",
+        "ODF-1.3/packages/6.6",
+        "ODF-1.3/packages/6.7",
+        "ODF-1.3/schema/4",
+        "ODF-1.4/packages/3.6",
+        "ODF-1.4/packages/6",
+        "ODF-1.4/packages/6.6",
+        "ODF-1.4/packages/6.7",
+        "ODF-1.4/schema/4"
+      ],
+      "implementation": [
+        "OdfKit/Core/OdfPackageRdfMetadataEngine.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [],
+      "nextAction": "先建立未列舉 metadata、錯誤相對 IRI 與 pkg:hasPart/media-type 不一致的來源鎖定 corpus。"
+    },
+    {
+      "id": "GAP-005",
+      "scope": "consumer",
+      "status": "evidence-gap",
+      "priority": "P1",
+      "requirement": "Package consumer 的相對 IRI 解析要逐步符合規範。",
+      "assessment": "安全 ZIP 路徑檢查不等於 package base、fragment、百分比編碼與父路徑解析合規；不應以禁止所有父路徑當作替代。",
+      "clauses": [
+        "ODF-1.0/spec/17.5",
+        "ODF-1.1/spec/17.5",
+        "ODF-1.2/packages/3.7",
+        "ODF-1.3/packages/3.7",
+        "ODF-1.4/packages/3.7"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.NamespaceRules.cs"
+      ],
+      "tests": [],
+      "nextAction": "盤點各 resolver 與簽章 reference resolver；對照官方解析步驟建立 corpus，外部網路存取維持明確 policy。"
+    },
+    {
+      "id": "GAP-006",
+      "scope": "consumer",
+      "status": "fixed",
+      "priority": "P0",
+      "requirement": "載入未宣告 manifest version 的舊版 package 仍應保留文件版本。",
+      "assessment": "解密完成後由核心 XML 根節點恢復版本；同步、非同步及再儲存保留 1.0/1.1。",
+      "clauses": [
+        "ODF-1.0/spec/1.5",
+        "ODF-1.0/spec/17.7.2",
+        "ODF-1.1/spec/1.5",
+        "ODF-1.1/spec/17.7.2"
+      ],
+      "implementation": [
+        "OdfKit/Core/OdfPackageLoader.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "LegacyPackageVersionSurvivesSynchronousAndAsynchronousLoadAndResave"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-001",
+      "scope": "validator",
+      "status": "partial",
+      "priority": "P2",
+      "requirement": "ZIP mimetype 第一項、未壓縮及 MIME/media-type 一致性。",
+      "assessment": "已有非破壞性 package 檢查與正負測試；不代表所有 ZIP feature 與 package conformance 都已覆蓋。",
+      "clauses": [
+        "ODF-1.0/spec/17.4",
+        "ODF-1.1/spec/17.4",
+        "ODF-1.2/packages/3.3",
+        "ODF-1.3/packages/3.3",
+        "ODF-1.4/packages/3.3"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.MimeType.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsMimetypeEntryNotFirst"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsCompressedMimetypeEntry"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsManifestRootMimetypeMismatch"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-002",
+      "scope": "validator",
+      "status": "partial",
+      "priority": "P2",
+      "requirement": "Manifest payload、必要屬性與重複路徑。",
+      "assessment": "已有 required attributes、duplicate paths、payload/media-type 比對；完整 directory/subdocument/encryption 組合仍缺逐條語意證據。",
+      "clauses": [
+        "ODF-1.0/spec/17.7.3",
+        "ODF-1.1/spec/17.7.3",
+        "ODF-1.2/packages/3.2",
+        "ODF-1.2/packages/4.3",
+        "ODF-1.2/packages/4.8.14.1",
+        "ODF-1.3/packages/3.2",
+        "ODF-1.3/packages/4.16.14.1",
+        "ODF-1.3/packages/4.3",
+        "ODF-1.4/packages/3.2",
+        "ODF-1.4/packages/4.16.14.1",
+        "ODF-1.4/packages/4.3"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfPackageValidator.Manifest.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsManifestFileEntryMissingRequiredAttributes"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsDuplicateManifestFullPaths"
+        },
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "ValidatorReportsManifestEntriesWithoutPackagePayload"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-003",
+      "scope": "validator",
+      "status": "partial",
+      "priority": "P2",
+      "requirement": "Strict/Extended 外來擴充與 ODF namespace validity。",
+      "assessment": "有移除 foreign 內容後 grammar 比對與 namespace scan，且 TDF mode 已對齊；foreign removal/namespace universe 等仍須逐條證據。",
+      "clauses": [
+        "ODF-1.2/packages/2.2.2",
+        "ODF-1.2/schema/2.2.2",
+        "ODF-1.2/schema/3.17",
+        "ODF-1.3/packages/2.2.2",
+        "ODF-1.3/schema/2.2.2",
+        "ODF-1.3/schema/3.17",
+        "ODF-1.4/packages/2.2.2",
+        "ODF-1.4/schema/2.2.2",
+        "ODF-1.4/schema/3.17"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.NamespaceRules.cs",
+        "tools/OdfKit.Cli/OdfKitCli.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/ComplianceTests.cs",
+          "symbol": "StrictProfileReportsUnknownOdfNamespaceElement"
+        },
+        {
+          "path": "OdfKit.Tests/OdfExternalValidatorAsyncTests.cs",
+          "symbol": "ValidateWithOdfValidatorRealJarUsesProfileConformanceMode"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-004",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P1",
+      "requirement": "Named range 絕對位址的 $ 必須以 XML Schema 語法處理。",
+      "assessment": "三份官方 OASIS 文件裁決與最小正負案例；不代表所有 datatype 已證明。",
+      "clauses": [
+        "ODF-1.2/schema/19.593.8",
+        "ODF-1.2/schema/19.673.10",
+        "ODF-1.2/schema/9.4.12",
+        "ODF-1.3/schema/19.597.8",
+        "ODF-1.3/schema/19.677.10",
+        "ODF-1.3/schema/9.4.12",
+        "ODF-1.4/schema/19.597.8",
+        "ODF-1.4/schema/19.677.10",
+        "ODF-1.4/schema/9.4.12"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Facets.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OasisOdf13RegressionTests.cs",
+          "symbol": "NamedRangeUsesXmlSchemaAddressPattern"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-005",
+      "scope": "validator",
+      "status": "fixed",
+      "priority": "P1",
+      "requirement": "Drop-down label 與 rng:text 可以共存。",
+      "assessment": "保留 choice 分支隔離，不放行非法屬性與子元素。",
+      "clauses": [
+        "ODF-1.3/schema/19.841.7",
+        "ODF-1.3/schema/7.4.16",
+        "ODF-1.4/schema/19.841.7",
+        "ODF-1.4/schema/7.4.16"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfSchemaPatternValidator.Content.Repetition.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OasisOdf13RegressionTests.cs",
+          "symbol": "DropDownAllowsLabelsAndSelectedTextWithoutAllowingInvalidAttributes"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "STRUCT-006",
+      "scope": "producer",
+      "status": "fixed",
+      "priority": "P1",
+      "requirement": "ODF 1.3/1.4 主控文字範本的 MIME 與格式支援。",
+      "assessment": "補 TextMasterTemplate 與 .otm；1.2 profile 仍拒絕。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.3",
+        "ODF-1.3/schema/2.2.3",
+        "ODF-1.4/schema/2.2.3"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfDocumentKindDetector.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OasisOdf13RegressionTests.cs",
+          "symbol": "MasterTextTemplateIsDetectedValidatedAndPreserved"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "CRYPTO-001",
+      "scope": "validator",
+      "status": "partial",
+      "priority": "P1",
+      "requirement": "數位簽章 grammar 與 cryptographic verification 是不同證據。",
+      "assessment": "profile 驗證 dsig grammar；密碼學、reference digest、信任鏈與撤銷須另呼叫簽章驗證 API，且線上行為依 policy。",
+      "clauses": [
+        "ODF-1.2/packages/3.5",
+        "ODF-1.2/packages/5",
+        "ODF-1.2/packages/5.3",
+        "ODF-1.3/packages/3.5",
+        "ODF-1.3/packages/5",
+        "ODF-1.3/packages/5.3",
+        "ODF-1.4/packages/3.5",
+        "ODF-1.4/packages/5",
+        "ODF-1.4/packages/5.3"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs",
+        "OdfKit/Core/OdfSigner.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfSignatureX509UtilitiesTests.cs",
+          "symbol": "CertDigestMismatchReturnsLocalizedErrorMessage"
+        }
+      ],
+      "nextAction": "建立 conformance mode 可審核的簽章驗證範圍，不能把 grammar 通過稱為簽章真實。"
+    },
+    {
+      "id": "CRYPTO-002",
+      "scope": "producer-consumer",
+      "status": "partial",
+      "priority": "P1",
+      "requirement": "版本適用的 encryption metadata 與實際解密。",
+      "assessment": "已有官方 manifest grammar 與外部加密 corpus；所有 cipher/profile 組合與新舊版本拒絕矩陣未完全逐條對應。",
+      "clauses": [
+        "ODF-1.0/spec/17.3",
+        "ODF-1.1/spec/17.3",
+        "ODF-1.2/packages/3.4",
+        "ODF-1.2/packages/3.4.2",
+        "ODF-1.3/packages/3.4",
+        "ODF-1.3/packages/3.4.2",
+        "ODF-1.4/packages/3.4",
+        "ODF-1.4/packages/3.4.2"
+      ],
+      "implementation": [
+        "OdfKit/Core/OdfPackageManifestWriter.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.PackageSchemas.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/EncryptionInteropCorpusTests.cs",
+          "symbol": "ForeignEncryptedPackageDecryptsToExpectedText"
+        }
+      ],
+      "nextAction": "補每版本支援/拒絕演算法與簽章交互行為矩陣。"
+    },
+    {
+      "id": "FORMULA-001",
+      "scope": "formula-engine",
+      "status": "partial",
+      "priority": "P1",
+      "requirement": "完整 OpenFormula evaluator conformance 不能由 Safe Large 函式數量推得。",
+      "assessment": "核心已有計算引擎、388 函式與代表性 OASIS oracle。manifest 明示 officialLargeConformanceClaim=false；公式計算不是整體 SDK 範圍外。",
+      "clauses": [
+        "ODF-1.2/formula/2.3.4",
+        "ODF-1.3/formula/2.3",
+        "ODF-1.3/formula/2.3.4",
+        "ODF-1.4/formula/2.3",
+        "ODF-1.4/formula/2.3.4"
+      ],
+      "implementation": [
+        "OdfKit/Formula/DefaultFormulaEvaluator.cs",
+        "docs/openformula-conformance-manifest.json"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OpenFormulaNormativeCorpusTests.cs",
+          "symbol": "EverySafeLargeFunctionMatchesNormativeOracle"
+        }
+      ],
+      "nextAction": "逐條對照 expression、type conversion、error、variance、function semantics；既有 Safe profile 不提升為官方 Large。"
+    },
+    {
+      "id": "FORMULA-002",
+      "scope": "external-execution",
+      "status": "security-exclusion",
+      "priority": "P2",
+      "requirement": "DDE 外部程序/遠端資料執行。",
+      "assessment": "Safe profile 刻意排除 DDE；可保存/診斷語法，不自動連線或執行。這項偏差必須保留在 profile 合規限制。",
+      "clauses": [
+        "ODF-1.2/formula/6.11.2",
+        "ODF-1.3/formula/6.11.2",
+        "ODF-1.4/formula/6.11.2"
+      ],
+      "implementation": [
+        "docs/openformula-conformance-manifest.json",
+        "OdfKit/Formula/DefaultFormulaEvaluator.cs"
+      ],
+      "tests": [],
+      "nextAction": ""
+    },
+    {
+      "id": "SCOPE-001",
+      "scope": "interactive-application",
+      "status": "out-of-sdk-scope",
+      "priority": "P2",
+      "requirement": "GUI authoring tool 的提示、鍵盤互動與輔助技術操作。",
+      "assessment": "這些操作不是文件 SDK 的自動驗證功能；相關 XML accessibility metadata 的結構與保存仍屬 SDK，不一併豁免。",
+      "clauses": [
+        "ODF-1.2/schema/D.1.1",
+        "ODF-1.2/schema/D.1.2",
+        "ODF-1.3/schema/D.1.1",
+        "ODF-1.3/schema/D.1.2",
+        "ODF-1.4/schema/D.1.1",
+        "ODF-1.4/schema/D.1.2"
+      ],
+      "implementation": [],
+      "tests": [],
+      "nextAction": ""
+    },
+    {
+      "id": "SCOPE-002",
+      "scope": "external-execution",
+      "status": "out-of-sdk-scope",
+      "priority": "P2",
+      "requirement": "自動執行文件 script/macro 或實際連線資料庫。",
+      "assessment": "SDK 可讀寫、保存及以 policy 診斷相關元素；不提供不受信任 script host/SQL server。文件語法與 metadata 仍需驗證。",
+      "clauses": [
+        "ODF-1.2/schema/2.2.10",
+        "ODF-1.2/schema/3.12",
+        "ODF-1.2/schema/3.13",
+        "ODF-1.3/schema/2.2.10",
+        "ODF-1.3/schema/3.12",
+        "ODF-1.3/schema/3.13",
+        "ODF-1.4/schema/2.2.10",
+        "ODF-1.4/schema/3.12",
+        "ODF-1.4/schema/3.13"
+      ],
+      "implementation": [
+        "OdfKit/Compliance/OdfProfileRuleValidator.Scanning.cs",
+        "OdfKit/Compliance/OdfProfileRuleValidator.NamespaceRules.cs"
+      ],
+      "tests": [],
+      "nextAction": ""
+    },
+    {
+      "id": "PRODUCER-001",
+      "scope": "producer",
+      "status": "fixed",
+      "priority": "P1",
+      "requirement": "chart:class 必須輸出 namespacedToken。",
+      "assessment": "ChartClass setter 將未加前綴的名稱正規化為 chart: 名稱；getter/round-trip 傳回 canonical token，已有前綴保持。",
+      "clauses": [
+        "ODF-1.2/schema/11.1",
+        "ODF-1.2/schema/19.15",
+        "ODF-1.2/schema/19.539.1",
+        "ODF-1.2/schema/19.571.1",
+        "ODF-1.2/schema/19.910.3",
+        "ODF-1.3/schema/11.1",
+        "ODF-1.3/schema/19.15",
+        "ODF-1.3/schema/19.543.1",
+        "ODF-1.3/schema/19.575.1",
+        "ODF-1.3/schema/19.916.3",
+        "ODF-1.4/schema/11.1",
+        "ODF-1.4/schema/19.15",
+        "ODF-1.4/schema/19.543.1",
+        "ODF-1.4/schema/19.575.1",
+        "ODF-1.4/schema/19.916.3"
+      ],
+      "implementation": [
+        "OdfKit/Chart/OdfChartDocument.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "ChartApiWritesNamespacedClassTokens"
+        },
+        {
+          "path": "OdfKit.Tests/DocumentKindApiUsabilityTests.cs",
+          "symbol": "CreateLoadChartWithTitleLegendAndSeries"
+        }
+      ],
+      "nextAction": ""
+    },
+    {
+      "id": "PRODUCER-002",
+      "scope": "producer",
+      "status": "fixed",
+      "priority": "P1",
+      "requirement": "draw:frame 的影像內容必須位於 accessibility 子元素之前。",
+      "assessment": "SetImage 的新增/替換先插入 draw:image，再保留 svg:title/desc；非法逆序仍被 matcher 拒絕。",
+      "clauses": [
+        "ODF-1.2/schema/10.4.2",
+        "ODF-1.2/schema/19.197.10",
+        "ODF-1.2/schema/19.219.13",
+        "ODF-1.2/schema/19.510.2",
+        "ODF-1.3/schema/10.4.2",
+        "ODF-1.3/schema/19.197.10",
+        "ODF-1.3/schema/19.219.13",
+        "ODF-1.3/schema/19.514.2",
+        "ODF-1.4/schema/10.4.2",
+        "ODF-1.4/schema/19.197.10",
+        "ODF-1.4/schema/19.219.13",
+        "ODF-1.4/schema/19.514.2"
+      ],
+      "implementation": [
+        "OdfKit/Image/OdfImageDocument.cs"
+      ],
+      "tests": [
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "ImageApiKeepsAccessibilityMetadataAfterImageContentWhenReplacingImage"
+        },
+        {
+          "path": "OdfKit.Tests/DocumentKindApiUsabilityTests.cs",
+          "symbol": "CreateLoadImageWithEmbeddedPicture"
+        }
+      ],
+      "nextAction": ""
+    }
+  ]
+}

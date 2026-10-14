@@ -39,7 +39,9 @@ internal static class OdfPackageManifestWriter
                 _ => "1.4"
             };
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
+            bool hasManifestVersion = ctx.Version is not (OdfVersion.Odf10 or OdfVersion.Odf11);
+            if (hasManifestVersion)
+                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
 
             // ODF 1.3+ 將 package-wide OpenPGP key transport 放在 manifest 根層，
             // 且必須排在所有 file-entry 之前。各 entry 共用同一把 session key。
@@ -49,7 +51,8 @@ internal static class OdfPackageManifestWriter
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
             writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, ctx.MimeType ?? "application/vnd.oasis.opendocument.text");
-            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
+            if (hasManifestVersion)
+                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
             writer.WriteEndElement();
 
             var directories = new Dictionary<string, string>(StringComparer.Ordinal);

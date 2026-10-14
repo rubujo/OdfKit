@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -57,7 +58,7 @@ public static partial class OdfSchemaPatternValidator
             case "pattern":
                 try
                 {
-                    return Regex.IsMatch(value, parameterValue, RegexOptions.None, TimeSpan.FromSeconds(2));
+                    return Regex.IsMatch(value, TranslateXmlSchemaPattern(parameterValue), RegexOptions.None, TimeSpan.FromSeconds(2));
                 }
                 catch (ArgumentException)
                 {
@@ -72,6 +73,40 @@ public static partial class OdfSchemaPatternValidator
             default:
                 return true;
         }
+    }
+
+    private static string TranslateXmlSchemaPattern(string pattern)
+    {
+        // XML Schema 的 ^ 與 $ 是一般字元，pattern 隱含完整字串比對。
+        var translated = new StringBuilder(pattern.Length);
+        int characterClassDepth = 0;
+        for (int index = 0; index < pattern.Length; index++)
+        {
+            char character = pattern[index];
+            if (character == '\\')
+            {
+                translated.Append(character);
+                if (index + 1 < pattern.Length)
+                {
+                    translated.Append(pattern[++index]);
+                }
+                continue;
+            }
+            if (character == '[')
+            {
+                characterClassDepth++;
+            }
+            else if (character == ']')
+            {
+                characterClassDepth--;
+            }
+            else if (characterClassDepth == 0 && character is '^' or '$')
+            {
+                translated.Append('\\');
+            }
+            translated.Append(character);
+        }
+        return "\\A(?:" + translated.ToString() + ")\\z";
     }
 
     private static int CompareFacetValues(string value, string parameterValue)

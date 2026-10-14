@@ -550,6 +550,7 @@ OdfKit.Compliance.OdfDocumentKind.Spreadsheet = 4 -> OdfKit.Compliance.OdfDocume
 OdfKit.Compliance.OdfDocumentKind.SpreadsheetTemplate = 5 -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Compliance.OdfDocumentKind.Text = 1 -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Compliance.OdfDocumentKind.TextMaster = 3 -> OdfKit.Compliance.OdfDocumentKind
+OdfKit.Compliance.OdfDocumentKind.TextMasterTemplate = 25 -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Compliance.OdfDocumentKind.TextTemplate = 2 -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Compliance.OdfDocumentKind.TextWeb = 21 -> OdfKit.Compliance.OdfDocumentKind
 OdfKit.Compliance.OdfDocumentKind.Unknown = 0 -> OdfKit.Compliance.OdfDocumentKind
@@ -19155,10 +19156,12 @@ static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! f
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! filePath, string? jarPath) -> OdfKit.Compliance.OdfExternalValidatorResult!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! filePath, string? jarPath, string? javaPath) -> OdfKit.Compliance.OdfExternalValidatorResult!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! filePath, string? jarPath, string? javaPath, int timeoutMilliseconds) -> OdfKit.Compliance.OdfExternalValidatorResult!
+static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidator(string! filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, bool extendedConformance) -> OdfKit.Compliance.OdfExternalValidatorResult!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath, string? javaPath) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath, string? javaPath, int timeoutMilliseconds) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
+static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, bool extendedConformance, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfExternalValidator.ValidateWithOdfValidatorAsync(string! filePath, string? jarPath, string? javaPath, int timeoutMilliseconds, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<OdfKit.Compliance.OdfExternalValidatorResult!>!
 static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream) -> OdfKit.Compliance.OdfValidationReport!
 static OdfKit.Compliance.OdfFlatDocumentValidator.Validate(System.IO.Stream! stream, OdfKit.Compliance.OdfValidationOptions! options) -> OdfKit.Compliance.OdfValidationReport!

@@ -15,6 +15,7 @@ internal static partial class OdfProfileRuleValidator
     private static void ValidatePackageMetadataSchemas(
         OdfPackage package,
         OdfComplianceProfile profile,
+        OdfVersion version,
         List<OdfValidationIssue> issues)
     {
         OdfPolicyRule? schemaRule = FindRule(profile, "RequirePackageSchemaValidation");
@@ -23,16 +24,20 @@ internal static partial class OdfProfileRuleValidator
             return;
         }
 
+        // 1.0／1.1 的 manifest 沒有 version，須以文件版本選 schema；
+        // 有宣告時仍保留 package 與 document 各自版本的既有契約。
+        OdfVersion metadataVersion = package.ManifestRootInfo?.Version is null ? version : package.Version;
+
         ValidatePackageMetadataEntry(
             package,
             ManifestPath,
-            OdfPackageSchemaRegistry.GetManifestSchema(package.Version),
+            OdfPackageSchemaRegistry.GetManifestSchema(metadataVersion),
             "start",
             schemaRule,
             profile,
             issues);
 
-        OdfSchemaSet? signatureSchema = OdfPackageSchemaRegistry.GetDigitalSignatureSchema(package.Version);
+        OdfSchemaSet? signatureSchema = OdfPackageSchemaRegistry.GetDigitalSignatureSchema(metadataVersion);
         foreach (string entryName in package.Entries.Keys)
         {
             if (!IsDigitalSignatureEntry(entryName))

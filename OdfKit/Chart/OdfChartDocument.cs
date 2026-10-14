@@ -123,10 +123,15 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// Gets or sets the chart class (type).
     /// 取得或設定圖表類型。
     /// </summary>
+    /// <remarks>
+    /// Unprefixed class names are stored and returned as namespaced tokens using the chart prefix.
+    /// 未加前綴的類型名稱會以 chart 前綴的命名空間 token 儲存與傳回。
+    /// </remarks>
     public string ChartClass
     {
         get => GetChartNode().GetAttribute("class", OdfNamespaces.Chart) ?? "line";
-        set => GetChartNode().SetAttribute("class", OdfNamespaces.Chart, value, "chart");
+        set => GetChartNode().SetAttribute("class", OdfNamespaces.Chart,
+            global::OdfKit.Internal.OdfStringHelper.Contains(value, ":", StringComparison.Ordinal) ? value : "chart:" + value, "chart");
     }
 
     /// <summary>
