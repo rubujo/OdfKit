@@ -317,38 +317,82 @@ internal static partial class OdfProfileRuleValidator
             namespaceUri == "http://www.w3.org/XML/1998/namespace";
     }
 
-    private static void SanitizeForeignContentForSchemaValidation(XElement element)
-    {
-        var defaultSchema = OdfSchemaRegistry.DefaultOdf14;
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<OdfSchemaSet, HashSet<XName>> TextPermittedElements = new();
 
+    private static HashSet<XName> BuildTextPermittedElements(OdfSchemaSet schema)
+    {
+        var names = new HashSet<XName>();
+        var pending = new Stack<OdfSchemaPatternNode>();
+        foreach (OdfSchemaPatternDefinition pattern in schema.Patterns.Values)
+            foreach (OdfSchemaPatternNode root in pattern.Roots)
+                pending.Push(root);
+
+        var context = new OdfSchemaPatternMatchContext(schema);
+        while (pending.Count > 0)
+        {
+            OdfSchemaPatternNode node = pending.Pop();
+            if (node.Kind == OdfSchemaPatternNodeKind.Element)
+            {
+                if (!string.IsNullOrEmpty(node.LocalName) &&
+                    OdfSchemaPatternContentMatcher.ContentAllowsDirectText(node.Children, false, context))
+                    names.Add(XName.Get(node.LocalName, node.NamespaceUri));
+                continue;
+            }
+            if (node.Kind == OdfSchemaPatternNodeKind.Attribute)
+                continue;
+            foreach (OdfSchemaPatternNode child in node.Children)
+                pending.Push(child);
+        }
+        return names;
+    }
+
+    private static void SanitizeForeignContentForSchemaValidation(
+        XElement element,
+        OdfSchemaSet schema,
+        HashSet<XName> textPermittedElements,
+        bool inlineContext = false,
+        OdfSchemaNamespaceContext? parentNamespaceContext = null)
+    {
+        var namespaceContext = new OdfSchemaNamespaceContext(element, parentNamespaceContext);
+        element.AddAnnotation(namespaceContext);
         // 移除 foreign 屬性
         var foreignAttrs = element.Attributes()
             .Where(a => !a.IsNamespaceDeclaration &&
                         !IsInfrastructureOrMathNamespace(a.Name.NamespaceName) &&
-                        (!IsStandardNamespace(a.Name.NamespaceName) ||
-                         defaultSchema.FindAttribute(a.Name.NamespaceName, a.Name.LocalName) is null))
+                        !IsStandardNamespace(a.Name.NamespaceName))
             .ToList();
         foreach (var attr in foreignAttrs)
         {
             attr.Remove();
         }
 
-        // 遞迴處理子元素並移除 foreign 子元素
+        bool textAnchor = element.Name.NamespaceName == OdfNamespaces.Text &&
+            (element.Name.LocalName is "p" or "h" ||
+             (schema.Version >= OdfVersion.Odf13 && element.Name.LocalName == "ruby-base"));
+        inlineContext = (inlineContext || textAnchor) &&
+            (!IsStandardNamespace(element.Name.NamespaceName) || textPermittedElements.Contains(element.Name));
+
+        // inline foreign 元素只移除標籤，內容仍須通過 grammar；其他位置移除整個子樹。
         var children = element.Elements().ToList();
         foreach (var child in children)
         {
-            if (IsInfrastructureOrMathNamespace(child.Name.NamespaceName))
+            if (!IsStandardNamespace(child.Name.NamespaceName))
             {
-                SanitizeForeignContentForSchemaValidation(child);
-            }
-            else if (!IsStandardNamespace(child.Name.NamespaceName) ||
-                     defaultSchema.FindElement(child.Name.NamespaceName, child.Name.LocalName) is null)
-            {
-                child.Remove();
+                if (inlineContext)
+                {
+                    SanitizeForeignContentForSchemaValidation(child, schema, textPermittedElements, true, namespaceContext);
+                    List<XNode> nodes = child.Nodes().ToList();
+                    child.RemoveNodes();
+                    child.ReplaceWith(nodes);
+                }
+                else
+                {
+                    child.Remove();
+                }
             }
             else
             {
-                SanitizeForeignContentForSchemaValidation(child);
+                SanitizeForeignContentForSchemaValidation(child, schema, textPermittedElements, inlineContext, namespaceContext);
             }
         }
     }

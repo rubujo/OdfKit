@@ -54,6 +54,7 @@ public static partial class OdfPackageValidator
 
     private static void ValidateMimeTypeEntry(
         OdfPackage package,
+        OdfVersion version,
         string? profileId,
         List<OdfValidationIssue> issues)
     {
@@ -67,19 +68,23 @@ public static partial class OdfPackageValidator
             return;
         }
 
-        if (package.EntryOrder.Count > 0 &&
-            !string.Equals(package.EntryOrder[0], "mimetype", StringComparison.Ordinal))
+        package.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry);
+        if (mimeEntry?.WasFirstLocalEntryInZip is false ||
+            (mimeEntry?.WasFirstLocalEntryInZip is null && package.EntryOrder.Count > 0 &&
+             !string.Equals(package.EntryOrder[0], "mimetype", StringComparison.Ordinal)))
         {
+            bool isRecommendation = version is OdfVersion.Odf10 or OdfVersion.Odf11;
             issues.Add(new OdfValidationIssue(
-                OdfIssueSeverity.Error,
+                isRecommendation ? OdfIssueSeverity.Warning : OdfIssueSeverity.Error,
                 "ODF0003",
-                "ODF package mimetype entry must be the first ZIP entry.",
+                isRecommendation
+                    ? "ODF package mimetype entry should be the first ZIP entry."
+                    : "ODF package mimetype entry must be the first ZIP entry.",
                 "mimetype",
                 profileId: profileId));
         }
 
-        if (package.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry) &&
-            mimeEntry.WasStoredInZip is false)
+        if (mimeEntry?.WasStoredInZip is false)
         {
             issues.Add(new OdfValidationIssue(
                 OdfIssueSeverity.Error,
@@ -87,6 +92,67 @@ public static partial class OdfPackageValidator
                 "ODF package mimetype entry must be stored without compression.",
                 "mimetype",
                 profileId: profileId));
+        }
+
+        if (mimeEntry?.LocalHeaderExtraFieldLength > 0)
+        {
+            issues.Add(new OdfValidationIssue(
+                OdfIssueSeverity.Error,
+                "ODF0005",
+                "ODF package mimetype entry must not have a ZIP local header extra field.",
+                "mimetype",
+                profileId: profileId));
+        }
+
+        if (mimeEntry is not null)
+        {
+            ReadOnlySpan<byte> bytes = mimeEntry.GetBytesSpan();
+            string expected = package.MimeType ?? string.Empty;
+            bool exactAscii = bytes.Length == expected.Length;
+            for (int index = 0; exactAscii && index < bytes.Length; index++)
+                exactAscii = bytes[index] <= 0x7f && bytes[index] == expected[index];
+
+            if (!exactAscii)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Error,
+                    "ODF0006",
+                    "ODF package mimetype entry must contain exactly the ASCII media type without a byte order mark or surrounding whitespace.",
+                    "mimetype",
+                    profileId: profileId));
+            }
+        }
+    }
+
+    private static void ValidateZipCompressionMethods(
+        OdfPackage package,
+        OdfVersion version,
+        string? profileId,
+        List<OdfValidationIssue> issues)
+    {
+        if (package.IsFlatXml || version < OdfVersion.Odf12)
+            return;
+
+        foreach (OdfPackageEntry entry in package.Entries.Values)
+        {
+            if (entry.ZipCompressionMethod is { } method && method is not 0 and not 8)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Error,
+                    "ODF0007",
+                    "ODF package entries must use ZIP STORED or DEFLATED compression.",
+                    entry.Name,
+                    profileId: profileId));
+            }
+            else if (entry.ZipCompressionMetadataMissing)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Warning,
+                    "ODF0008",
+                    "The original ZIP compression method is unavailable; compression conformance was not verified for this entry.",
+                    entry.Name,
+                    profileId: profileId));
+            }
         }
     }
 

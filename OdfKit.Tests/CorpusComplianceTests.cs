@@ -51,7 +51,7 @@ namespace OdfKit.Tests
             {
                 ZipArchiveEntry mimetype = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
                 using (Stream stream = mimetype.Open())
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
                 {
                     writer.Write("application/vnd.oasis.opendocument.text");
                 }

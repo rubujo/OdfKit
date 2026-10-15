@@ -3972,20 +3972,20 @@
     }
   ],
   "rowCount": 123633,
-  "manualReviewedUnitCount": 121,
-  "decisionCount": 24,
+  "manualReviewedUnitCount": 356,
+  "decisionCount": 38,
   "statusCounts": {
-    "evidence-gap": 106914,
+    "evidence-gap": 106706,
     "navigation": 12119,
-    "partial": 93,
-    "product-profile-limit": 7,
+    "partial": 304,
+    "product-profile-limit": 6,
     "publication-context": 4487,
     "security-policy-limit": 3,
-    "validator-gap": 10
+    "validator-gap": 8
   },
   "reviewCounts": {
-    "reviewed": 121,
-    "unreviewed": 120921,
+    "reviewed": 356,
+    "unreviewed": 120686,
     "unreviewed-object": 2591
   },
   "limitations": [

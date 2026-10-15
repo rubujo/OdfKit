@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
 /// <summary>
@@ -46,7 +47,11 @@ public static partial class OdfSchemaPatternValidator
             if (separator > 0)
             {
                 string prefix = value.Substring(0, separator);
-                if (prefix == "xmlns" || context.NamespaceContext?.GetNamespaceOfPrefix(prefix) is null)
+                XElement? namespaceElement = context.NamespaceContext;
+                XNamespace? boundNamespace = namespaceElement?.Annotation<OdfSchemaNamespaceContext>() is { } originalContext
+                    ? originalContext.ResolvePrefix(prefix)
+                    : namespaceElement?.GetNamespaceOfPrefix(prefix);
+                if (prefix == "xmlns" || boundNamespace is null)
                 {
                     return false;
                 }

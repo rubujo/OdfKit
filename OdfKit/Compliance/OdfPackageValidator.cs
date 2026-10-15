@@ -87,12 +87,13 @@ public static partial class OdfPackageValidator
         OdfDocumentKind documentKind = mimeKind != OdfDocumentKind.Unknown ? mimeKind : bodyKind;
 
         ValidateMimeType(mimeType, mimeKind, profile, profileId, issues);
-        ValidateMimeTypeEntry(package, profileId, issues);
         ValidateBodyKind(mimeKind, bodyKind, profileId, issues);
         ValidateExtensionKind(extensionKind, mimeKind, fileName, profileId, issues);
         ValidateEntryPaths(package, profileId, issues);
 
         OdfVersion detectedVersion = DetectVersion(package, issues, profileId);
+        ValidateMimeTypeEntry(package, detectedVersion, profileId, issues);
+        ValidateZipCompressionMethods(package, detectedVersion, profileId, issues);
         ValidateCoreXmlVersions(package, detectedVersion, issues, profileId);
         ValidateManifest(package, mimeType, detectedVersion, profileId, issues);
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);

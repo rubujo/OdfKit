@@ -173,7 +173,7 @@ public static partial class OdfPackageValidator
         foreach (string entryName in package.Entries.Keys)
         {
             if (entryName == "mimetype" ||
-                entryName == "META-INF/manifest.xml" ||
+                entryName.StartsWith("META-INF/", StringComparison.Ordinal) ||
                 global::OdfKit.Internal.OdfStringHelper.EndsWith(entryName, '/'))
             {
                 continue;
@@ -182,7 +182,7 @@ public static partial class OdfPackageValidator
             if (!package.Manifest.ContainsKey(entryName))
             {
                 issues.Add(new OdfValidationIssue(
-                    OdfIssueSeverity.Warning,
+                    detectedVersion >= OdfVersion.Odf12 ? OdfIssueSeverity.Error : OdfIssueSeverity.Warning,
                     "ODF0102",
                     "Package entry is not listed in META-INF/manifest.xml.",
                     entryName,
@@ -258,20 +258,6 @@ public static partial class OdfPackageValidator
 
         ValidateEncryptionMetadata(package, profileId, issues);
 
-        if (package.HasEntry(OdfSignerConstants.SignaturePath) &&
-            !package.Manifest.ContainsKey(OdfSignerConstants.SignaturePath))
-        {
-            issues.Add(new OdfValidationIssue(
-                OdfIssueSeverity.Error,
-                "ODF0110",
-                "Digital signature entry must be listed in META-INF/manifest.xml.",
-                OdfSignerConstants.SignaturePath,
-                profileId: profileId,
-                details: ManifestDetails(
-                    entryPath: OdfSignerConstants.SignaturePath,
-                    expectedManifestEntry: "present",
-                    actualManifestEntry: "missing")));
-        }
     }
 
     private static Dictionary<string, string?> ManifestDetails(

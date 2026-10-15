@@ -474,7 +474,7 @@ try {
     foreach ($repoPath in $repositoryContentFiles) {
         [void]$allowedProjectDocs.Add([IO.Path]::ChangeExtension($repoPath, '.html'))
     }
-    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/Manage-WebFontSidecarService.ps1', 'eng/Test-OpfOdfBaseline.ps1', 'eng/scripts/PdfVisualDiff.py', 'OdfKit.Tests/OdfConformanceGapTests.cs', 'OdfKit.Tests/OasisOdf13RegressionTests.cs', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
+    foreach ($repoPath in @('.editorconfig', '.github/workflows/api-docs.yml', 'eng/Build-ApiDocs.ps1', 'eng/Manage-WebFontSidecarService.ps1', 'eng/Test-OpfOdfBaseline.ps1', 'eng/scripts/PdfVisualDiff.py', 'OdfKit.Tests/OdfConformanceGapTests.cs', 'OdfKit.Tests/OasisOdf13RegressionTests.cs', 'OdfKit.Tests/OdfZipMimeTypeConformanceTests.cs', 'OdfKit.Tests/OdfPackageSignatureConformanceTests.cs', 'tests/fixtures/ooxml-visual-golden/manifest.json')) {
         [void]$allowedProjectDocs.Add($repoPath)
     }
     $projectDocsDirectory = Join-Path $siteDir 'project-docs'

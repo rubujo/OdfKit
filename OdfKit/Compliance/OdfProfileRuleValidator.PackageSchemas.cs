@@ -103,9 +103,7 @@ internal static partial class OdfProfileRuleValidator
             return false;
         }
 
-        string fileName = entryName.Substring("META-INF/".Length);
-        return fileName.IndexOf('/') < 0 &&
-            global::OdfKit.Internal.OdfStringHelper.Contains(fileName, "signatures", StringComparison.Ordinal);
+        return global::OdfKit.Internal.OdfStringHelper.Contains(entryName, "signatures", StringComparison.Ordinal);
     }
 
     private static void ValidatePackageMetadataEntry(
@@ -148,10 +146,23 @@ internal static partial class OdfProfileRuleValidator
                 return;
             }
 
+            if (schema.Version >= OdfVersion.Odf12)
+            {
+                var xmlIds = new HashSet<string>(StringComparer.Ordinal);
+                foreach (XElement element in document.Root.DescendantsAndSelf())
+                {
+                    string? xmlId = (string?)element.Attribute(XNamespace.Xml + "id");
+                    if (xmlId is not null)
+                        ValidateXmlId(xmlId, xmlIds, entryName, "/" + element.Name.LocalName + "/@xml:id", rule, profile, issues);
+                }
+            }
+
             OdfSchemaPatternValidationResult result = OdfSchemaPatternValidator.ValidateElement(
                 document.Root,
                 schema,
                 patternName);
+            if (IsDigitalSignatureEntry(entryName))
+                ValidateDigitalSignatureSemantics(document.Root, entryName, rule, profile, issues);
             if (result.IsMatch)
             {
                 return;
@@ -194,6 +205,71 @@ internal static partial class OdfProfileRuleValidator
                 $"Package metadata XML failed security validation: {ex.Message}",
                 entryName,
                 profileId: profile.Id));
+        }
+    }
+
+    private static void ValidateDigitalSignatureSemantics(
+        XElement root,
+        string entryName,
+        OdfPolicyRule rule,
+        OdfComplianceProfile profile,
+        List<OdfValidationIssue> issues)
+    {
+        XNamespace signatureNamespace = "http://www.w3.org/2000/09/xmldsig#";
+        var identifiers = new HashSet<string>(StringComparer.Ordinal);
+        foreach (XElement signature in root.Elements(signatureNamespace + "Signature"))
+        {
+            string? identifier = (string?)signature.Attribute("Id");
+            if (string.IsNullOrWhiteSpace(identifier) || !identifiers.Add(identifier!))
+            {
+                issues.Add(new OdfValidationIssue(
+                    rule.DefaultSeverity,
+                    "ODF3114",
+                    "Each ODF digital signature must have a nonempty unique Id attribute.",
+                    entryName,
+                    "/document-signatures/Signature/@Id",
+                    profileId: profile.Id));
+            }
+
+            if (signature.Elements(signatureNamespace + "KeyInfo").Count() != 1)
+            {
+                issues.Add(new OdfValidationIssue(
+                    rule.DefaultSeverity,
+                    "ODF3115",
+                    "Each ODF digital signature must contain exactly one ds:KeyInfo element.",
+                    entryName,
+                    "/document-signatures/Signature/KeyInfo",
+                    profileId: profile.Id));
+            }
+
+            foreach (XElement reference in signature.Elements(signatureNamespace + "SignedInfo")
+                         .Elements(signatureNamespace + "Reference"))
+            {
+                string? uri = (string?)reference.Attribute("URI");
+                if (string.IsNullOrEmpty(uri) || uri![0] == '#' || Uri.TryCreate(uri, UriKind.Absolute, out _))
+                    continue;
+
+                foreach (XElement transform in reference.Elements(signatureNamespace + "Transforms")
+                             .Elements(signatureNamespace + "Transform"))
+                {
+                    string? algorithm = (string?)transform.Attribute("Algorithm");
+                    if (algorithm is "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                        or "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"
+                        or "http://www.w3.org/2006/12/xml-c14n11"
+                        or "http://www.w3.org/2006/12/xml-c14n11#WithComments"
+                        or "http://www.w3.org/2001/10/xml-exc-c14n#"
+                        or "http://www.w3.org/2001/10/xml-exc-c14n#WithComments")
+                        continue;
+
+                    issues.Add(new OdfValidationIssue(
+                        rule.DefaultSeverity,
+                        "ODF3116",
+                        "ODF signature references to package files may only use canonicalization transforms.",
+                        entryName,
+                        "/document-signatures/Signature/SignedInfo/Reference/Transforms/Transform",
+                        profileId: profile.Id));
+                }
+            }
         }
     }
 }

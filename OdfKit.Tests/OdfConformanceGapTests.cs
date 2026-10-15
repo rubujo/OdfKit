@@ -13,6 +13,19 @@ namespace OdfKit.Tests;
 [Trait(TestCategories.Kind, TestCategories.Compliance)]
 public class OdfConformanceGapTests
 {
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void ForeignElementXmlIdsStillRequireNcNames(OdfVersion version)
+    {
+        string xml = $"<office:document-content xmlns:office='{OdfNamespaces.Office}' xmlns:text='{OdfNamespaces.Text}' xmlns:f='urn:test:foreign' office:version='{OdfVersionInfo.ToVersionString(version)}'><office:body><office:text><f:opaque xml:id='bad:id'/><text:p>Text</text:p></office:text></office:body></office:document-content>";
+        Assert.Contains(ValidateContent(xml, OdfDocumentKind.Text, version).Issues,
+            issue => issue.RuleId == "ODF3105" && issue.PackagePath == "content.xml");
+        Assert.DoesNotContain(ValidateContent(xml.Replace("bad:id", " valid ", StringComparison.Ordinal), OdfDocumentKind.Text, version).Issues,
+            issue => issue.RuleId == "ODF3105");
+    }
+
     [Fact]
     public void DatabaseTableCommandsUseIsolatedSdkMetadataAndMigrateOnUpdate()
     {
@@ -271,6 +284,51 @@ public class OdfConformanceGapTests
         Assert.False(OdfSchemaPatternValidator.ValidateElement(frame, schema, "draw-frame").IsMatch);
     }
 
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void InlineForeignContentIsValidatedInsteadOfDiscarded(OdfVersion version)
+    {
+        string valid = WrapForeignText(version, "<text:p><f:outer>before<f:inner><text:span>after</text:span></f:inner></f:outer></text:p>");
+        OdfValidationReport accepted = ValidateContent(valid, OdfDocumentKind.Text, version);
+        Assert.True(accepted.IsValid, string.Join("; ", accepted.Issues.Select(issue => issue.Message)));
+        string invalid = WrapForeignText(version, "<text:p><f:outer><f:inner><text:p>illegal nested paragraph</text:p></f:inner></f:outer></text:p>");
+        Assert.Contains(ValidateContent(invalid, OdfDocumentKind.Text, version).Issues, issue => issue.RuleId == "ODF3101");
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void ForeignContentRequiresAnUnbrokenTextPermittingAncestorChain(OdfVersion version)
+    {
+        string outside = WrapForeignText(version, "<f:outer><text:p>outside mixed text</text:p></f:outer>");
+        string blocked = WrapForeignText(version, "<text:p><text:bookmark-start text:name='mark'><f:outer><text:p>ignored foreign content</text:p></f:outer></text:bookmark-start></text:p>");
+        foreach (string content in new[] { outside, blocked })
+        {
+            OdfValidationReport report = ValidateContent(content, OdfDocumentKind.Text, version);
+            Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+        }
+    }
+
+    [Theory]
+    [InlineData(OdfVersion.Odf12)]
+    [InlineData(OdfVersion.Odf13)]
+    [InlineData(OdfVersion.Odf14)]
+    public void InlineForeignUnwrapPreservesQNameBindings(OdfVersion version)
+    {
+        const string Shape = "<draw:custom-shape draw:engine='q:custom' svg:width='1cm' svg:height='1cm' svg:x='0cm' svg:y='0cm'/>";
+        string valid = WrapForeignText(version, $"<text:p><f:outer xmlns:q='urn:test:drawing-engine'>{Shape}</f:outer></text:p>");
+        OdfValidationReport report = ValidateContent(valid, OdfDocumentKind.Text, version);
+        Assert.True(report.IsValid, string.Join("; ", report.Issues.Select(issue => issue.Message)));
+        string unbound = valid.Replace(" xmlns:q='urn:test:drawing-engine'", string.Empty, StringComparison.Ordinal);
+        Assert.Contains(ValidateContent(unbound, OdfDocumentKind.Text, version).Issues, issue => issue.RuleId == "ODF3101");
+    }
+
+    private static string WrapForeignText(OdfVersion version, string body) =>
+        $"<office:document-content xmlns:office='{OdfNamespaces.Office}' xmlns:text='{OdfNamespaces.Text}' xmlns:draw='{OdfNamespaces.Draw}' xmlns:svg='{OdfNamespaces.Svg}' xmlns:f='urn:test:foreign' office:version='{OdfVersionInfo.ToVersionString(version)}'><office:body><office:text>{body}</office:text></office:body></office:document-content>";
+
     private static OdfValidationReport ValidateContent(string content, OdfDocumentKind kind, OdfVersion version, string? styles = null, string? embedded = null)
     {
         using var stream = new MemoryStream();
@@ -297,6 +355,9 @@ public class OdfConformanceGapTests
             OdfVersion.Odf13 => OdfComplianceProfiles.OasisOdf13Extended,
             _ => OdfComplianceProfiles.OasisOdf14Extended
         };
-        return OdfPackageValidator.Validate(package, profile);
+        byte[] original = (byte[])package.ReadEntry("content.xml").Clone();
+        OdfValidationReport report = OdfPackageValidator.Validate(package, profile);
+        Assert.Equal(original, package.ReadEntry("content.xml"));
+        return report;
     }
 }

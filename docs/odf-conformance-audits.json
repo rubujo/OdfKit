@@ -396,8 +396,8 @@
       "scope": "validator",
       "status": "partial",
       "priority": "P2",
-      "requirement": "ZIP mimetype 第一項、未壓縮及 MIME/media-type 一致性。",
-      "assessment": "已有非破壞性 package 檢查與正負測試；不代表所有 ZIP feature 與 package conformance 都已覆蓋。",
+      "requirement": "ZIP mimetype 的版本別順序強度、STORED、local extra field、原始 ASCII 及 MIME/media-type 一致性。",
+      "assessment": "補上原始位元組與 local extra field 檢查，實體順序不受中央目錄排序影響。1.0／1.1 順序為 should，1.2～1.4 為 shall；全部載入路徑有回歸，仍不代表所有 ZIP feature 與 package conformance 都已覆蓋。",
       "clauses": [
         "ODF-1.0/spec/17.4",
         "ODF-1.1/spec/17.4",
@@ -420,6 +420,18 @@
         {
           "path": "OdfKit.Tests/ComplianceTests.cs",
           "symbol": "ValidatorReportsManifestRootMimetypeMismatch"
+        },
+        {
+          "path": "OdfKit.Tests/OdfZipMimeTypeConformanceTests.cs",
+          "symbol": "MimeTypeLocalExtraFieldIsRejectedAcrossLoadPaths"
+        },
+        {
+          "path": "OdfKit.Tests/OdfZipMimeTypeConformanceTests.cs",
+          "symbol": "MimeTypeOrderUsesLocalHeadersInsteadOfCentralDirectory"
+        },
+        {
+          "path": "OdfKit.Tests/OdfZipMimeTypeConformanceTests.cs",
+          "symbol": "MimeTypeEncodingIsValidatedBeforeReaderNormalization"
         }
       ],
       "nextAction": ""
@@ -469,7 +481,7 @@
       "status": "partial",
       "priority": "P2",
       "requirement": "Strict/Extended 外來擴充與 ODF namespace validity。",
-      "assessment": "有移除 foreign 內容後 grammar 比對與 namespace scan，且 TDF mode 已對齊；foreign removal/namespace universe 等仍須逐條證據。",
+      "assessment": "已修正 Extended 無條件刪除 foreign subtree 的缺陷；1.2～1.4 inline 內容依允許 character data 的祖先鏈參與 grammar，提升節點保留原始 QName scope，標準 namespace 的未知屬性不再被清除。舊版 office:process-content、ruby-base 專項回歸與逐版本 namespace universe 仍缺證據。",
       "clauses": [
         "ODF-1.2/packages/2.2.2",
         "ODF-1.2/schema/2.2.2",
@@ -493,6 +505,18 @@
         {
           "path": "OdfKit.Tests/OdfExternalValidatorAsyncTests.cs",
           "symbol": "ValidateWithOdfValidatorRealJarUsesProfileConformanceMode"
+        },
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "InlineForeignContentIsValidatedInsteadOfDiscarded"
+        },
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "ForeignContentRequiresAnUnbrokenTextPermittingAncestorChain"
+        },
+        {
+          "path": "OdfKit.Tests/OdfConformanceGapTests.cs",
+          "symbol": "InlineForeignUnwrapPreservesQNameBindings"
         }
       ],
       "nextAction": ""
@@ -664,7 +688,7 @@
       "status": "security-exclusion",
       "priority": "P2",
       "requirement": "DDE 外部程序/遠端資料執行。",
-      "assessment": "Safe profile 刻意排除 DDE；可保存/診斷語法，不自動連線或執行。這項偏差必須保留在 profile 合規限制。",
+      "assessment": "Safe profile 刻意排除 DDE；可保留/診斷語法，不自動連線或執行。這項偏差必須保留在 profile 合規限制。",
       "clauses": [
         "ODF-1.2/formula/6.11.2",
         "ODF-1.3/formula/6.11.2",
@@ -683,7 +707,7 @@
       "status": "out-of-sdk-scope",
       "priority": "P2",
       "requirement": "GUI authoring tool 的提示、鍵盤互動與輔助技術操作。",
-      "assessment": "這些操作不是文件 SDK 的自動驗證功能；相關 XML accessibility metadata 的結構與保存仍屬 SDK，不一併豁免。",
+      "assessment": "這些操作不是文件 SDK 的自動驗證功能；相關 XML accessibility metadata 的結構與保留仍屬 SDK，不一併豁免。",
       "clauses": [
         "ODF-1.2/schema/D.1.1",
         "ODF-1.2/schema/D.1.2",
@@ -702,7 +726,7 @@
       "status": "out-of-sdk-scope",
       "priority": "P2",
       "requirement": "自動執行文件 script/macro 或實際連線資料庫。",
-      "assessment": "SDK 可讀寫、保存及以 policy 診斷相關元素；不提供不受信任 script host/SQL server。文件語法與 metadata 仍需驗證。",
+      "assessment": "SDK 可讀寫、保留及以 policy 診斷相關元素；不提供不受信任 script host/SQL server。文件語法與 metadata 仍需驗證。",
       "clauses": [
         "ODF-1.2/schema/2.2.10",
         "ODF-1.2/schema/3.12",

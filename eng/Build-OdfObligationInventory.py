@@ -80,6 +80,7 @@ def odt_blocks(path):
         raise ValueError(f"Missing text body: {path}")
     blocks, exclusions, objects = [], [], []
     heading = "publication-frontmatter"
+    heading_stack = {}
     started = False
 
     def walk(node, address):
@@ -94,6 +95,11 @@ def odt_blocks(path):
         if node.tag == TEXT + "h":
             value = clean(inline_text(node))
             heading = value or heading
+            level = max(1, int(node.get(TEXT + "outline-level", "1")))
+            for depth in list(heading_stack):
+                if depth >= level:
+                    del heading_stack[depth]
+            heading_stack[level] = heading
             started = True
         if node.tag in (TEXT + "p", TEXT + "h"):
             value = clean(inline_text(node))
@@ -101,10 +107,13 @@ def odt_blocks(path):
                 bookmarks = [child.get(TEXT + "name") for child in node.iter()
                              if child.tag in (TEXT + "bookmark", TEXT + "bookmark-start")]
                 blocks.append({"locator": address, "text": value, "heading": heading,
+                               "headingPath": [heading_stack[depth] for depth in sorted(heading_stack)],
+                               "style": node.get(TEXT + "style-name", ""),
                                "kind": "heading" if node.tag == TEXT + "h" else "paragraph",
                                "frontmatter": not started, "bookmarks": bookmarks})
         if node.tag in (DRAW + "image", DRAW + "object", DRAW + "object-ole"):
             objects.append({"locator": address, "kind": node.tag.split("}")[-1],
+                            "headingPath": [heading_stack[depth] for depth in sorted(heading_stack)],
                             "href": node.get(XLINK + "href", ""),
                             "sha256": hashlib.sha256(ET.tostring(node)).hexdigest()})
         counts = Counter()

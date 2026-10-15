@@ -59,6 +59,48 @@ internal static partial class OdfProfileRuleValidator
         public bool HasAltText { get; } = hasAltText;
     }
 
+    private static void ValidateXmlId(
+        string value,
+        HashSet<string> identifiers,
+        string? packagePath,
+        string xPath,
+        OdfPolicyRule rule,
+        OdfComplianceProfile profile,
+        List<OdfValidationIssue> issues)
+    {
+        string normalized = string.Join(" ", value.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
+        bool valid = normalized.Length > 0;
+        try
+        {
+            if (valid)
+                XmlConvert.VerifyNCName(normalized);
+        }
+        catch (XmlException)
+        {
+            valid = false;
+        }
+        if (!valid)
+        {
+            issues.Add(new OdfValidationIssue(
+                rule.DefaultSeverity,
+                "ODF3105",
+                "An xml:id value must be an NCName after XML whitespace normalization.",
+                packagePath,
+                xPath,
+                profileId: profile.Id));
+        }
+        if (!identifiers.Add(normalized))
+        {
+            issues.Add(new OdfValidationIssue(
+                rule.DefaultSeverity,
+                "ODF3104",
+                "An xml:id value is duplicated within this XML document.",
+                packagePath,
+                xPath,
+                profileId: profile.Id));
+        }
+    }
+
     private static void ScanXml(
         Stream stream,
         string? packagePath,
@@ -133,18 +175,7 @@ internal static partial class OdfProfileRuleValidator
                     string? xmlId = reader.GetAttribute("id", "http://www.w3.org/XML/1998/namespace");
                     if (xmlId is not null)
                     {
-                        // xml:id 的唯一性是同一 XML 文件的跨節點條件，不可只比對葉節點 datatype。
-                        string normalizedId = string.Join(" ", xmlId.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
-                        if (!xmlIds.Add(normalizedId))
-                        {
-                            issues.Add(new OdfValidationIssue(
-                                schemaRule.DefaultSeverity,
-                                "ODF3104",
-                                "An xml:id value is duplicated within this XML document.",
-                                packagePath,
-                                currentXPath + "/@xml:id",
-                                profileId: profile.Id));
-                        }
+                        ValidateXmlId(xmlId, xmlIds, packagePath, currentXPath + "/@xml:id", schemaRule, profile, issues);
                     }
                 }
                 ValidateOdfNamespaceElement(reader, packagePath, currentXPath, profile, schema, issues);

@@ -29,6 +29,10 @@ internal class OdfPackageEntry : IDisposable
     private TaskCompletionSource<bool>? _prefetchCompletion;
 #endif
     internal OdfMmfEntryInfo? MmfEntry => _mmfEntry;
+    internal ushort? LocalHeaderExtraFieldLength { get; set; }
+    internal bool? WasFirstLocalEntryInZip { get; set; }
+    internal ushort? ZipCompressionMethod { get; set; }
+    internal bool ZipCompressionMetadataMissing { get; set; }
     internal bool HasPublishedParserPointer => _viewAccessor is not null;
 
     private System.IO.MemoryMappedFiles.MemoryMappedViewAccessor? _viewAccessor;

@@ -183,7 +183,8 @@ internal static partial class OdfProfileRuleValidator
             // 由 schema 決定哪些擴充位置合法，不可先刪除不合法屬性讓它通過。
             if (FindRule(profile, "RequireForeignExtensionIsolation") is not null)
             {
-                SanitizeForeignContentForSchemaValidation(document.Root);
+                SanitizeForeignContentForSchemaValidation(
+                    document.Root, schema, TextPermittedElements.GetValue(schema, BuildTextPermittedElements));
             }
 
             var body = document.Root.Element(XName.Get("body", OdfNamespaces.Office));

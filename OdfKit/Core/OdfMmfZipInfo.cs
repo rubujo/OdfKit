@@ -45,6 +45,8 @@ internal sealed class OdfMmfEntryInfo
     /// </summary>
     public ushort CompressionMethod { get; }
 
+    internal ushort LocalHeaderExtraFieldLength { get; init; }
+
     /// <summary>
     /// 取得專案的 CRC-32 校驗值。
     /// </summary>
@@ -226,6 +228,8 @@ internal static class OdfZipDirectoryParser
                     stream.Position += 4; // 跳過版本
                     ushort flags = reader.ReadUInt16();
                     ushort compressionMethod = reader.ReadUInt16();
+                    if (compressionMethod is not 0 and not 8)
+                        return null;
                     uint timeDate = reader.ReadUInt32();
                     uint crc32 = reader.ReadUInt32();
                     uint compressedSize = reader.ReadUInt32();
@@ -272,7 +276,10 @@ internal static class OdfZipDirectoryParser
                         duplicateEntryNames.Add(sanitized);
                     }
 
-                    entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
+                    entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate)
+                    {
+                        LocalHeaderExtraFieldLength = lfhExtraLen
+                    };
                     stream.Position = savedPos;
                 }
 

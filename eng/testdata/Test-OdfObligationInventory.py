@@ -44,6 +44,26 @@ class ObligationExtractionTests(unittest.TestCase):
         self.assertEqual(2, len(exclusions))
         self.assertEqual([], objects)
         self.assertEqual(len(blocks), len({block["locator"] for block in blocks}))
+        self.assertTrue(all(block["headingPath"] == ["Requirements"] for block in blocks))
+
+    def test_heading_paths_reset_for_siblings_and_follow_opaque_objects(self):
+        xml = '''<office:document-content
+        xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+        xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+        xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
+        <office:body><office:text>
+        <text:h text:outline-level="1">Document Structure</text:h>
+        <text:h text:outline-level="2">Nested</text:h><text:p>First.</text:p>
+        <text:h text:outline-level="1">Tables</text:h><text:p>Second.<draw:image/></text:p>
+        </office:text></office:body></office:document-content>'''
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, "w") as package:
+            package.writestr("content.xml", xml)
+        stream.seek(0)
+        blocks, _, objects = inventory.odt_blocks(stream)
+        self.assertEqual(["Document Structure", "Nested"], blocks[2]["headingPath"])
+        self.assertEqual(["Tables"], blocks[4]["headingPath"])
+        self.assertEqual(["Tables"], objects[0]["headingPath"])
 
     def test_manual_review_cannot_float_to_a_changed_or_duplicate_sentence(self):
         row = {"id": "unit", "sentenceSha256": "original"}

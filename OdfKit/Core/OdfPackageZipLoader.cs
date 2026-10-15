@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -73,12 +74,12 @@ internal static class OdfPackageZipLoader
                 {
                     ResetMmfLoadState(package, ctx);
                 }
-                else
-                {
-                    mmf?.Dispose();
-                }
-
                 OdfKitDiagnostics.Warn($"[OdfPackage] 無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
+            }
+            finally
+            {
+                if (!handedOffToPackage)
+                    mmf?.Dispose();
             }
         }
 
@@ -88,6 +89,7 @@ internal static class OdfPackageZipLoader
                 OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", archive.Entries.Count, ctx.LoadOptions.MaxZipEntries));
         }
 
+        var mimeTypeHeader = ReadFirstMimeTypeHeader(ctx.UnderlyingStream);
         long totalUncompressedSize = 0;
         List<OdfPackageEntry> entriesToPreload = new();
         HashSet<string> entryOrderSet = new(ctx.EntryOrder, StringComparer.Ordinal);
@@ -127,8 +129,15 @@ internal static class OdfPackageZipLoader
                 pkgEntry = new OdfPackageEntry(name, entryBytes);
             }
 
-            bool wasStored = TryDetectStoredCompression(entry);
+            bool wasStored = TryDetectStoredCompression(entry, out ushort? compressionMethod);
+            pkgEntry.ZipCompressionMethod = compressionMethod;
+            pkgEntry.ZipCompressionMetadataMissing = compressionMethod is null;
             pkgEntry.WasStoredInZip = wasStored;
+            if (name == "mimetype")
+            {
+                pkgEntry.LocalHeaderExtraFieldLength = ReadMimeTypeExtraFieldLength(ctx.UnderlyingStream, entry, mimeTypeHeader.ExtraLength);
+                pkgEntry.WasFirstLocalEntryInZip = mimeTypeHeader.IsFirst;
+            }
             pkgEntry.IsCompressed = !wasStored;
             if (ctx.Entries.ContainsKey(name))
                 ctx.DuplicateEntryNames.Add(name);
@@ -209,12 +218,12 @@ internal static class OdfPackageZipLoader
                 {
                     ResetMmfLoadState(package, ctx);
                 }
-                else
-                {
-                    mmf?.Dispose();
-                }
-
                 OdfKitDiagnostics.Warn($"[OdfPackage] 非同步作業無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
+            }
+            finally
+            {
+                if (!handedOffToPackage)
+                    mmf?.Dispose();
             }
         }
 
@@ -224,6 +233,7 @@ internal static class OdfPackageZipLoader
                 OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", archive.Entries.Count, ctx.LoadOptions.MaxZipEntries));
         }
 
+        var mimeTypeHeader = ReadFirstMimeTypeHeader(ctx.UnderlyingStream);
         long totalUncompressedSize = 0;
         List<OdfPackageEntry> entriesToPreload = new();
         HashSet<string> entryOrderSet = new(ctx.EntryOrder, StringComparer.Ordinal);
@@ -265,8 +275,15 @@ internal static class OdfPackageZipLoader
                 pkgEntry = new OdfPackageEntry(name, entryBytes);
             }
 
-            bool wasStored = TryDetectStoredCompression(entry);
+            bool wasStored = TryDetectStoredCompression(entry, out ushort? compressionMethod);
+            pkgEntry.ZipCompressionMethod = compressionMethod;
+            pkgEntry.ZipCompressionMetadataMissing = compressionMethod is null;
             pkgEntry.WasStoredInZip = wasStored;
+            if (name == "mimetype")
+            {
+                pkgEntry.LocalHeaderExtraFieldLength = ReadMimeTypeExtraFieldLength(ctx.UnderlyingStream, entry, mimeTypeHeader.ExtraLength);
+                pkgEntry.WasFirstLocalEntryInZip = mimeTypeHeader.IsFirst;
+            }
             pkgEntry.IsCompressed = !wasStored;
             if (ctx.Entries.ContainsKey(name))
                 ctx.DuplicateEntryNames.Add(name);
@@ -547,6 +564,72 @@ internal static class OdfPackageZipLoader
         return owned;
     }
 
+    private static (bool? IsFirst, ushort? ExtraLength) ReadFirstMimeTypeHeader(Stream? stream)
+    {
+        if (stream is null || !stream.CanSeek || stream.Length < 38)
+            return (null, null);
+
+        long position = stream.Position;
+        try
+        {
+            // 只讀取固定長度標頭；不依據不可信長度配置記憶體或掃描封裝內容。
+            stream.Position = 0;
+            byte[] header = new byte[38];
+            int count = 0;
+            while (count < header.Length)
+            {
+                int read = stream.Read(header, count, header.Length - count);
+                if (read == 0)
+                    return (null, null);
+                count += read;
+            }
+            if (BinaryPrimitives.ReadUInt32LittleEndian(header) != 0x04034b50 ||
+                BinaryPrimitives.ReadUInt16LittleEndian(header.AsSpan(26)) != 8 ||
+                !header.AsSpan(30).SequenceEqual("mimetype"u8))
+                return (false, null);
+
+            return (true, BinaryPrimitives.ReadUInt16LittleEndian(header.AsSpan(28)));
+        }
+        finally
+        {
+            stream.Position = position;
+        }
+    }
+
+    private static ushort? ReadMimeTypeExtraFieldLength(Stream? stream, ZipArchiveEntry entry, ushort? knownLength)
+    {
+        if (knownLength.HasValue || stream is null || !stream.CanSeek)
+            return knownLength;
+
+        long position = stream.Position;
+        try
+        {
+            if (LocalHeaderOffsetField?.GetValue(entry) is not long offset || offset < 0 || offset > stream.Length - 30)
+                return null;
+            stream.Position = offset;
+            byte[] header = new byte[30];
+            int count = 0;
+            while (count < header.Length)
+            {
+                int read = stream.Read(header, count, header.Length - count);
+                if (read == 0)
+                    return null;
+                count += read;
+            }
+            return BinaryPrimitives.ReadUInt32LittleEndian(header) == 0x04034b50
+                ? BinaryPrimitives.ReadUInt16LittleEndian(header.AsSpan(28)) : null;
+        }
+        catch (Exception ex)
+        {
+            OdfKitDiagnostics.Warn("[OdfPackage] 無法讀取 mimetype local header 的 extra field 長度。", ex);
+            return null;
+        }
+        finally
+        {
+            stream.Position = position;
+        }
+    }
+
     private static void ResetMmfLoadState(OdfPackage package, OdfPackage.OdfPackageLoadCollaborators ctx)
     {
         // MMF handoff 發生在任何高階 XML／manifest 物件化之前；失敗時只需回復 entry 註冊與
@@ -568,14 +651,20 @@ internal static class OdfPackageZipLoader
     // 靜態快取 BCL 私有欄位的反射結果：只在型別初始化時探測一次，
     // 之後每個 entry 直接讀取；欄位在未來 .NET 版本消失或反射受限（如 AOT）時
     // 整體改採至長度比對啟發式，且不得讓探測例外升級為 TypeInitializationException。
-    private static readonly FieldInfo? CompressionMethodField = ProbeCompressionMethodField();
+    private static readonly FieldInfo? CompressionMethodField = ProbeEntryField("_storedCompressionMethod", "_compressionMethod", "m_compressionMethod");
+    private static readonly FieldInfo? LocalHeaderOffsetField = ProbeEntryField("_offsetOfLocalHeader", "m_offsetOfLocalHeader");
 
-    private static FieldInfo? ProbeCompressionMethodField()
+    private static FieldInfo? ProbeEntryField(params string[] names)
     {
         try
         {
-            return typeof(ZipArchiveEntry).GetField("_compressionMethod", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?? typeof(ZipArchiveEntry).GetField("m_compressionMethod", BindingFlags.NonPublic | BindingFlags.Instance);
+            foreach (string name in names)
+            {
+                FieldInfo? field = typeof(ZipArchiveEntry).GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
+                if (field is not null)
+                    return field;
+            }
+            return null;
         }
         catch
         {
@@ -583,8 +672,9 @@ internal static class OdfPackageZipLoader
         }
     }
 
-    private static bool TryDetectStoredCompression(ZipArchiveEntry entry)
+    private static bool TryDetectStoredCompression(ZipArchiveEntry entry, out ushort? compressionMethod)
     {
+        compressionMethod = null;
         try
         {
             FieldInfo? fieldInfo = CompressionMethodField;
@@ -599,8 +689,8 @@ internal static class OdfPackageZipLoader
             if (val is null)
                 return entry.CompressedLength == entry.Length;
 
-            int intVal = Convert.ToInt32(val, System.Globalization.CultureInfo.InvariantCulture);
-            return intVal == 0;
+            compressionMethod = checked((ushort)Convert.ToInt32(val, System.Globalization.CultureInfo.InvariantCulture));
+            return compressionMethod == 0;
         }
         catch (Exception ex)
         {
@@ -656,6 +746,9 @@ internal static class OdfPackageZipLoader
             }
 
             bool wasStored = mmfEntry.CompressionMethod == 0;
+            pkgEntry.ZipCompressionMethod = mmfEntry.CompressionMethod;
+            pkgEntry.LocalHeaderExtraFieldLength = mmfEntry.LocalHeaderExtraFieldLength;
+            pkgEntry.WasFirstLocalEntryInZip = mmfEntry.LocalHeaderOffset == 0;
             pkgEntry.WasStoredInZip = wasStored;
             pkgEntry.IsCompressed = !wasStored;
             if (ctx.Entries.ContainsKey(name))
