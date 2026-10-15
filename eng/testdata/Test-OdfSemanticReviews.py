@@ -29,6 +29,14 @@ class SemanticContracts(unittest.TestCase):
         self.assertEqual(2, result["implementationPendingGroups"])
         self.assertFalse(result["semanticClassificationComplete"])
 
+    def test_closed_group_keeps_review_history_without_reducing_other_backlog(self):
+        self.groups["g"]["requiresFollowUp"] = False
+        result = semantic.validate(self.document, self.groups, self.members)
+        self.assertEqual(1, result["semanticReviewedGroups"])
+        self.assertEqual(1, result["semanticPendingGroups"])
+        self.assertEqual(1, result["implementationPendingGroups"])
+        self.assertFalse(result["semanticClassificationComplete"])
+
     def test_changed_group_missing_foreign_or_duplicate_member_fails(self):
         for units in (["a"], ["a", "foreign"], ["a", "b", "b"]):
             document = copy.deepcopy(self.document)

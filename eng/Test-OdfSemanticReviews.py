@@ -19,8 +19,8 @@ def validate(document, groups, members, root=ROOT):
     seen = set()
     for review in document["reviews"]:
         identifier = review["groupId"]
-        if identifier in seen or identifier not in groups or not groups[identifier]["requiresFollowUp"]:
-            raise ValueError("Duplicate, unknown or inapplicable review group")
+        if identifier in seen or identifier not in groups:
+            raise ValueError("Duplicate or unknown review group")
         seen.add(identifier)
         group = groups[identifier]
         if review["memberSha256"] != group["memberSha256"]:
@@ -61,9 +61,10 @@ def validate(document, groups, members, root=ROOT):
         if covered != members[identifier]:
             raise ValueError("Semantic review does not cover the whole group")
     total = sum(group["requiresFollowUp"] for group in groups.values())
+    reviewed_pending = sum(groups[identifier]["requiresFollowUp"] for identifier in seen)
     return {"followUpGroups": total, "semanticReviewedGroups": len(seen),
-            "semanticPendingGroups": total - len(seen), "implementationPendingGroups": total,
-            "semanticClassificationComplete": len(seen) == total, "fullConformanceClaim": False}
+            "semanticPendingGroups": total - reviewed_pending, "implementationPendingGroups": total,
+            "semanticClassificationComplete": reviewed_pending == total, "fullConformanceClaim": False}
 
 
 def main():
