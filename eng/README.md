@@ -80,6 +80,7 @@
 | `Test-OdfConformanceMatrix.ps1` | 離線檢查逐條合規矩陣的來源／schema hash、條款 ID 與人工 audit／測試證據對應；見 [合規矩陣](../docs/odf-conformance-matrix.md)。 |
 | `Build-OdfObligationInventory.py` | 建立逐句來源定位與精確人工裁決對應，包含核准勘誤；`--check-contracts` 離線驗證，`--require-complete` 拒絕未完成的裁決。見 [義務裁決](../docs/odf-obligation-adjudication.md)。 |
 | `Build-OdfObligationClassification.py` | 依官方來源結構分派主題佇列與跨版本候選工作群組；`--verify` 核對來源重建，`--check-contracts` 離線確認完整分派、hash、群組成員及既有裁決。分組不等於語意相同、SDK 範圍或合規裁決，見 [分類統計](../docs/odf-obligation-classification.md)。 |
+| `Test-OdfSemanticReviews.py` | 核對群組語意分類的完整成員、版本、SDK 責任與豁免依據；`--require-complete` 拒絕尚未分類的群組。語意分類不等於實作符合，見 `docs/odf-semantic-reviews.json`。 |
 | `Test-OfficeGuiSmoke.ps1` | 執行 Microsoft Office GUI／COM 的 ODT／ODS／ODP 讀取煙霧驗收（僅 Windows，手動）。 |
 
 產品品質分層與發版前建議清單見 [docs/product-quality-gates.md](../docs/product-quality-gates.md)。

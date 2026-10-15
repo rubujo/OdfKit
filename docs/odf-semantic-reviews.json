@@ -1,0 +1,2686 @@
+{
+  "schemaVersion": 1,
+  "fullConformanceClaim": false,
+  "reviews": [
+    {
+      "groupId": "ODFG-5156b2617989a1529efa",
+      "memberSha256": "94ea2ce2bb63a3f08c3c8e4a19e92acbf3418e9ecf5b0d491fab1bf86b5ff0cd",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "1.2 inline 例外以 text:p／text:h 為祖先，且至該祖先的路徑都須容許 character data；1.3／1.4 另列 text:ruby-base。1.2 仍提及 office:process-content，1.3／1.4 本節刪除此句。舊版處理方式只有歷史 note，須回到 1.0／1.1 來源另裁決，不能跨版本覆寫。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題只定位來源，不獨立施加義務。",
+          "conditions": "只適用列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00518/S001",
+            "ODF-1.3/schema/B00532/S001",
+            "ODF-1.4/schema/B00534/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "consumer"
+          ],
+          "assessment": "允許 extended 文件使用 foreign markup；1.2 另述 office:process-content 控制內容處理。這是受其他合法性要求約束的權限，不能直接推論可接受保留標準命名空間的未知名稱。",
+          "conditions": "適用 extended 文件與對應 consumer／producer 角色；inline 條件與版本差異見群組版本判定。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00519/S001",
+            "ODF-1.2/schema/B00522/S001",
+            "ODF-1.3/schema/B00533/S001",
+            "ODF-1.4/schema/B00535/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator"
+          ],
+          "assessment": "foreign 指 schema 未定義的元素與屬性；須和保留標準命名空間內的未知名稱分開判定。",
+          "conditions": "適用 extended 文件與對應 consumer／producer 角色；inline 條件與版本差異見群組版本判定。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00519/S002",
+            "ODF-1.3/schema/B00533/S002",
+            "ODF-1.4/schema/B00535/S002"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "foreign 元素及屬性不得使用本版 1.5 節三張表列出的命名空間；驗證與輸出均屬 SDK 責任。",
+          "conditions": "適用 extended 文件與對應 consumer／producer 角色；inline 條件與版本差異見群組版本判定。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00519/S003",
+            "ODF-1.3/schema/B00533/S003",
+            "ODF-1.4/schema/B00535/S003"
+          ]
+        },
+        {
+          "kind": "recommendation",
+          "sdkResponsibilities": [
+            "consumer",
+            "producer"
+          ],
+          "assessment": "包含非 inline foreign content 的 consumer 解讀及保留建議、extended producer 優先使用標準功能的建議，以及未知標準屬性值的預設值／忽略 fallback。這些是 SHOULD 語意，不能一概當作強制拒絕輸入或 GUI 豁免。",
+          "conditions": "適用 extended 文件與對應 consumer／producer 角色；inline 條件與版本差異見群組版本判定。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00521/S001",
+            "ODF-1.2/schema/B00524/S001",
+            "ODF-1.2/schema/B00525/S001",
+            "ODF-1.2/schema/B00526/S001",
+            "ODF-1.2/schema/B00527/S001",
+            "ODF-1.3/schema/B00535/S001",
+            "ODF-1.3/schema/B00536/S001",
+            "ODF-1.3/schema/B00537/S001",
+            "ODF-1.3/schema/B00538/S001",
+            "ODF-1.3/schema/B00539/S001",
+            "ODF-1.4/schema/B00537/S001",
+            "ODF-1.4/schema/B00538/S001",
+            "ODF-1.4/schema/B00539/S001",
+            "ODF-1.4/schema/B00540/S001",
+            "ODF-1.4/schema/B00541/S001"
+          ]
+        },
+        {
+          "kind": "historical-context",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "此 note 回述 1.0／1.1 的 office:process-content 行為；不另建立 1.2 義務，也不解除舊版對應來源的義務。",
+          "conditions": "適用 extended 文件與對應 consumer／producer 角色；inline 條件與版本差異見群組版本判定。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00523/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "consumer"
+          ],
+          "assessment": "consumer 可以解讀符合 inline 條件的 foreign 元素內容；同一句 SHALL 要求文件在移除 foreign wrapper 後仍通過 schema。MAY 不解除此有效性義務。",
+          "conditions": "依本版祖先與 character data 路徑條件適用；1.3／1.4 另列 ruby-base。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00520/S001",
+            "ODF-1.3/schema/B00534/S001",
+            "ODF-1.4/schema/B00536/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-e5c2cd771e97e91e2824",
+      "memberSha256": "d0786b6413278ab1a0cb241ef46f433e93f160deaaf38195186b59bce9cc261f",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "已逐一比對 1.2、1.3、1.4 定義，規範指向同一類 QName 與 PrefixedName 限制；參照文件版本與全部 datatype facets 仍留在實作裁決階段。此群組不包含 1.0、1.1，不能外推。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題只定位來源，不獨立施加義務。",
+          "conditions": "只適用列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04373/S001",
+            "ODF-1.3/schema/B04447/S001",
+            "ODF-1.4/schema/B04539/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "namespacedToken 同時受 XML Schema QName 與 XML Namespaces PrefixedName 約束；不是任意含冒號字串。驗證及產生值的合法性屬 SDK 責任，外部標準依賴不構成豁免。",
+          "conditions": "在 schema 使用 namespacedToken 的位置適用；前綴須依元素的 namespace context 解析。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04374/S001",
+            "ODF-1.3/schema/B04448/S001",
+            "ODF-1.4/schema/B04540/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-011be2d269550d5ae3c6",
+      "memberSha256": "417b9a204e5e9e0db0dcd7e65edfde30861d499e8dde555de0cc36f148400426",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B11520/S001",
+            "ODF-1.3/schema/B11674/S001",
+            "ODF-1.4/schema/B11834/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "text:name 定義名稱語意；本 General 子節未定義唯一性或參照解析，不能憑此增加全域唯一規則。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B11521/S001",
+            "ODF-1.3/schema/B11675/S001",
+            "ODF-1.4/schema/B11835/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0343482ed80a31b6ce1c",
+      "memberSha256": "01fad4857caf9c024f914b7713106576dd3df5b8b9ebd71ca1f8fae9d3257cc8",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04391/S001",
+            "ODF-1.3/schema/B04465/S001",
+            "ODF-1.4/schema/B04557/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "safeCURIE 以 RDFa 第 7 節定義型別，須把外部語法約束列入驗證責任；不能因 RNG 接受字串就宣告符合。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04392/S001",
+            "ODF-1.3/schema/B04466/S001",
+            "ODF-1.4/schema/B04558/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-039d3600341ed37d032c",
+      "memberSha256": "23e5f73d143f7a78a72b29f89ec41b306d9c738e9ebee019db82cfa873b503f4",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B02856/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "presentation:dim 定義 shape 填色；結構限 animation-group／animations，列出 color、shape-id 與 sound 子元素。deprecated 不構成豁免；填色解讀與結構驗證分屬 consumer 與 validator 責任。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B02857/S001",
+            "ODF-1.4/schema/B02858/S001",
+            "ODF-1.4/schema/B02859/S001",
+            "ODF-1.4/schema/B02860/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0477ec6a22cf528f3fae",
+      "memberSha256": "a262720bd9e0c39d8df3403d279a3fdbd5fdb66705e39417b8ebc00e319aec02",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B10017/S001",
+            "ODF-1.3/schema/B10153/S001",
+            "ODF-1.4/schema/B10312/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "table:name 定義名稱語意；唯一性、各元素上的型別及參照條件須由其他子節帶入，這一組不能獨立證明全部限制。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B10018/S001",
+            "ODF-1.3/schema/B10154/S001",
+            "ODF-1.4/schema/B10313/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-06ab6935a7be1aae49c5",
+      "memberSha256": "c826dacde74d35adce456d8eaf264afd1604a345af8afe0cb66a460f0451fb0a",
+      "versions": [
+        "1.3"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.3/schema/B02774/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "show-text 定義文字顯現效果，執行前 shape 與文字均不可見；另列合法父元素、屬性及 sound 子元素。deprecated 不豁免結構驗證；播放語意須另核對 SDK 是否提供相應 consumer 能力。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.3/schema/B02775/S001",
+            "ODF-1.3/schema/B02775/S002",
+            "ODF-1.3/schema/B02776/S001",
+            "ODF-1.3/schema/B02777/S001",
+            "ODF-1.3/schema/B02778/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-07414d7eb5c9eea167ab",
+      "memberSha256": "1724890d7959751b6549f740055fbf377993e3584378de83f7142bc685f95112",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B06350/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "draw:name 在 dr3d:rotate 上提供可參照名稱，資料型別 string；本組未規定 NCName 或全域唯一，不得自行擴張為此限制。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B06351/S001",
+            "ODF-1.4/schema/B06352/S001",
+            "ODF-1.4/schema/B06353/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0821ce2c892e1c091303",
+      "memberSha256": "7112cafd1dfdb4fa487aab1304ea06f207e34ab24acb3d12356aad389b16529f",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04077/S001",
+            "ODF-1.3/schema/B04151/S001",
+            "ODF-1.4/schema/B04231/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "table column style 是 style:style 且 family 為 table-column；屬樣式家族與文件結構語意，驗證及產生皆在 SDK 責任內。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04078/S001",
+            "ODF-1.3/schema/B04152/S001",
+            "ODF-1.4/schema/B04232/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0832bfaf5f9507b3f7e7",
+      "memberSha256": "941835ba01523e2b0a4eac3168638df3d0664a01faa010fcc7e8abe5d603fbeb",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04288/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "chart:symbol-image 定義圖表資料點影像；父元素為 style:chart-properties，屬性為 xlink:href，沒有子元素。影像呈現不免除結構及資源參照驗證。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04289/S001",
+            "ODF-1.2/schema/B04291/S001",
+            "ODF-1.2/schema/B04292/S001",
+            "ODF-1.2/schema/B04293/S001"
+          ]
+        },
+        {
+          "kind": "recommendation",
+          "sdkResponsibilities": [
+            "producer",
+            "validator"
+          ],
+          "assessment": "symbol-image 建議只在 chart:symbol-type=image 時使用；這是 SHOULD 條件，不能直接升格為 SHALL 錯誤，也不能忽略建議的適用性。",
+          "conditions": "使用 chart:symbol-image 時。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04290/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0a47d1774d865d54f272",
+      "memberSha256": "08c5a1b3e247256fbade1957395c1df59c7daf3cb72a2a6124e6903f1d447d3c",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04200/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style:paragraph-properties 定義段落格式，列出 default-style／style 父元素、合法屬性與 background-image／drop-cap／tab-stops 子元素。型別與跨屬性限制須沿各參照條款展開，不能由清單推論全部已驗證。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04201/S001",
+            "ODF-1.2/schema/B04202/S001",
+            "ODF-1.2/schema/B04203/S001",
+            "ODF-1.2/schema/B04204/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0b948c4a7284059ce2e0",
+      "memberSha256": "84a3e274380fa001bfc9d9d8a2761901033d4e5533c719e32fb49f06c175c166",
+      "versions": [
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.3/schema/B04072/S001",
+            "ODF-1.4/schema/B04152/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "ruby style 以 style:style 的 style:family=ruby 表示；屬文件樣式編碼及驗證責任，並未要求 SDK 提供畫面排版器。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.3/schema/B04073/S001",
+            "ODF-1.4/schema/B04153/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-0d256ad8c228afcca005",
+      "memberSha256": "a3a731bdfe1a17025d360514c12dda300ea0efe0203f5c947db24acd35146216",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04215/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "drop-cap 定義跨多行的大型首字，限 paragraph-properties 下，列出 distance／length／lines／style-name 且無子元素。格式語意、結構與屬性值驗證須分開裁決。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04216/S001",
+            "ODF-1.2/schema/B04217/S001",
+            "ODF-1.2/schema/B04218/S001",
+            "ODF-1.2/schema/B04219/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-1036f96f2ba156a78877",
+      "memberSha256": "42e1d25aed306b0634e25f922f7861d902a7afccebd4328ddafc4bc5b738a220",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00763/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "consumer",
+            "producer"
+          ],
+          "assessment": "編號段落未指定 list style 時，依序沿同 list 前一段、較高層前一段及 default style 回退；缺少 list-level style 時套用 list-item 規則。這是條件式樣式解讀規則，不是可一律拒絕缺省樣式的語法錯誤。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00764/S001",
+            "ODF-1.2/schema/B00764/S002",
+            "ODF-1.2/schema/B00764/S003",
+            "ODF-1.2/schema/B00765/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-14380a4c3e3d5e0414ca",
+      "memberSha256": "1f1bb72fec68e6bef16f5e0c2304a19ae279ac3d66d9d44f360f3c8f943754ec",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B06936/S001",
+            "ODF-1.3/schema/B07013/S001",
+            "ODF-1.4/schema/B07142/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "form:max-value 表示使用者可輸入的最大值；本組是屬性語意。序列化與值驗證屬 SDK 責任，互動輸入限制是否由 SDK 執行須沿相應控制項與 consumer 實作裁決，不能整組視為 GUI 豁免。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06937/S001",
+            "ODF-1.3/schema/B07014/S001",
+            "ODF-1.4/schema/B07143/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-17c33a1c811fd120ecce",
+      "memberSha256": "8bf38175e8632074394670027a00b7fa5a8aead4eeb35a03e668393eddd544e3",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04240/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "column-sep 定義欄間分隔線，父元素為 columns，列出 color／height／style／vertical-align／width 且無子元素；呈現與結構／值驗證分開處理。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04241/S001",
+            "ODF-1.2/schema/B04242/S001",
+            "ODF-1.2/schema/B04243/S001",
+            "ODF-1.2/schema/B04244/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-186049042b4adc6b1489",
+      "memberSha256": "1160b966dc89fdd1e490f7060247bf5a27b90eaa8b3b55cec00aa423de5c331d",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B05069/S001",
+            "ODF-1.3/schema/B05142/S001",
+            "ODF-1.4/schema/B05238/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "db:style-name 依所在元素指定對應 style family 的樣式名稱；屬樣式參照語意，不因 database 章節而排除 SDK 驗證責任。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B05070/S001",
+            "ODF-1.3/schema/B05143/S001",
+            "ODF-1.4/schema/B05239/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-1be5c628c95312fc54a5",
+      "memberSha256": "3276e146c278c48833ea16f5e130ab46c44a6e041bb6a83b23446333069d3923",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04302/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "drawing-page-properties 定義 draw:page 格式，列出 default-style／style 父元素、屬性及 sound 子元素；動畫與背景顯示相關屬性仍有結構與值驗證責任。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04303/S001",
+            "ODF-1.2/schema/B04304/S001",
+            "ODF-1.2/schema/B04305/S001",
+            "ODF-1.2/schema/B04306/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-1f798dc639ad70a1f0e4",
+      "memberSha256": "dc3af04849a6177a0fc33055422b88ee06612da0f7db8d259ed2983baf7df27b",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00277/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "Drawing document 須符合 Conforming Document，再滿足 flat root MIME、package mimetype 及 office:body/office:drawing 條件。來源印出的 graphics MIME 使用點分隔且 template 拼字亦有疑義，必須核對適用勘誤與規範上下文後裁決，不能直接照抄成接受清單。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00278/S001",
+            "ODF-1.2/schema/B00279/S001",
+            "ODF-1.2/schema/B00280/S001",
+            "ODF-1.2/schema/B00281/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-203e25a6c93d506846a6",
+      "memberSha256": "fa5a56afd43ecc93df202e86f2ed50e09a6db9127ee139bb64693244a1ab4cef",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04342/S001",
+            "ODF-1.3/schema/B04416/S001",
+            "ODF-1.4/schema/B04508/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "cellRangeAddress 定義導向 9.2.3 的 cell range address 語法；驗證義務須展開所引用章節，不能以定義很短或沒有 SHALL 當作非規範性。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04343/S001",
+            "ODF-1.3/schema/B04417/S001",
+            "ODF-1.4/schema/B04509/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-2107e52ba9f39170a8ba",
+      "memberSha256": "3c4dd4909a30a68c2c6bb39c5c2968df93a13382e91757180826bc9b066bfdd9",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只審閱本組列出的單一版本；未推論其他版本或其他標題群組語意相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B00287/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer"
+          ],
+          "assessment": "Chart document 須符合 Conforming Document，flat root 與 package mimetype 使用 chart／chart-template 對應 MIME，body 的子元素為 office:chart；依 flat／package 條件分別驗證。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B00288/S001",
+            "ODF-1.2/schema/B00289/S001",
+            "ODF-1.2/schema/B00290/S001",
+            "ODF-1.2/schema/B00291/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-22cf9df3fdbd10c3efe4",
+      "memberSha256": "5a29147fd4f704561754eb31802db2bd2a1cc3fb40777865d9d7d0902b5e1bb2",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組各版本來源，這些句子的核心定義與責任相同；引用條款與外部標準的有效版本仍須分版核對，不外推整個父章節相等。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B08757/S001",
+            "ODF-1.3/schema/B08867/S001",
+            "ODF-1.4/schema/B09025/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style:type 定義 tab stop 類型；列舉值、父元素適用性及排版解讀由其他子節決定，這一 General 定義不單獨證明實作完整。",
+          "conditions": "該版所列元素／屬性及適用文件種類；引用條款的附加限制須在實作裁決中一併核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B08758/S001",
+            "ODF-1.3/schema/B08868/S001",
+            "ODF-1.4/schema/B09026/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-243825089537d15141bb",
+      "memberSha256": "89300c74c5a2a56c65c57581f4d5d9ce4647eb335a39ffdc4079c001f6910353",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "1.2 原文以 8-bit hexadecimal digits 描述每通道；1.3／1.4 明確寫成 pairs of hexadecimal digits。1.2／1.3 引 XSL §5.9.11，1.4 改引 §5.9.9；引用版本與細節須分版核對，不能只依相同章節號綁定。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04350/S001",
+            "ODF-1.3/schema/B04424/S001",
+            "ODF-1.4/schema/B04516/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "color 定義 RGB 的 #rrggbb 表示法；每個通道為兩個十六進位數字，型別與輸出驗證屬 SDK 責任，不能當作任意 CSS color 字串。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04351/S001",
+            "ODF-1.3/schema/B04425/S001",
+            "ODF-1.4/schema/B04517/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-258e1c80e52937e78973",
+      "memberSha256": "302ddce41413934c9daea0fb6d28d9c42d566cf078c36b1099634277e628be82",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04363/S001",
+            "ODF-1.3/schema/B04437/S001",
+            "ODF-1.4/schema/B04529/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "distance 定義兩點間長度；具體 lexical、單位與值域須沿 schema 及被引用型別核對，本句未授權任意單位。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04364/S001",
+            "ODF-1.3/schema/B04438/S001",
+            "ODF-1.4/schema/B04530/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-27bf16cc035aff1e0a9a",
+      "memberSha256": "9cf2c63cf7f22a898deb688913cdf756ed8e4185fc32addf700a35f62d93a287",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04371/S001",
+            "ODF-1.3/schema/B04445/S001",
+            "ODF-1.4/schema/B04537/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "length 可以正或負，包含量值與單位，受 XSL Units of Measure 約束；外部標準引用是驗證依賴，不是 SDK 豁免。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04372/S001",
+            "ODF-1.3/schema/B04446/S001",
+            "ODF-1.4/schema/B04538/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-2c21287c199c74415f91",
+      "memberSha256": "b1a2d32afae0a564d71103c777e65f5c27274824d8f67553e8b82c6115337d44",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B11944/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "text:start-value 在 numbered-paragraph 重新開始目前項目的編號，型別為 nonNegativeInteger；讀寫與型別驗證屬 SDK 責任，不能自行改成只接受正整數。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B11945/S001",
+            "ODF-1.2/schema/B11946/S001",
+            "ODF-1.2/schema/B11947/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-2cbb2d27249d9ae021ae",
+      "memberSha256": "75b5ff4feb6ed052b777d6c1b237773c58f2d8a4171623a7433430d198a26a92",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B04133/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "num-list-format 定義 list level 顯示數字字串，限 automatic-styles／styles 下，列出 style:name 及 num-list-label／text 子元素；1.4 功能不能任意套用較舊版。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B04134/S001",
+            "ODF-1.4/schema/B04135/S001",
+            "ODF-1.4/schema/B04136/S001",
+            "ODF-1.4/schema/B04137/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-2e501e21ca171dfb6794",
+      "memberSha256": "55d4a2b9c2e583ee55438c1cad3aec207564078e8b30d2e6f39d74a765e2d27a",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B03990/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "text style 由 style:style 且 style:family=text 表示；這是文件表示的定義，不是 GUI 功能豁免。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B03991/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-3121ffd8ae83bce225a5",
+      "memberSha256": "7620e6472fa55ab298412fa0a74f06a9ecccfdd86e025cf4d1e07f8d4e26d1b1",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B04587/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "nonNegativePercent 定義 XSL 所述的非負百分比；有 lexical 與非負值域約束，不能只看 schema 的基礎字串。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B04588/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-31f8ca8484973f506f0c",
+      "memberSha256": "9c4590d11b210826e08a151053a1612e90bbcadd343c460bda6b95cccd403d3a",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B03992/S001"
+          ]
+        },
+        {
+          "kind": "conditional-permission-and-requirement",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "paragraph style 以 style:family=paragraph 表示；允許同時定義 text properties，除非後代元素指定 text style 覆寫，否則套用於段落字元內容。可選 properties 的啟用不解除繼承與覆寫語意。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B03993/S001",
+            "ODF-1.2/schema/B03994/S001",
+            "ODF-1.2/schema/B03994/S002"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-33f2eb24ec9c160badcc",
+      "memberSha256": "ea17ef52e927db85d184f344cd06e413ac1d5c9ffd1c78e4230edab52b82612b",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04969/S001",
+            "ODF-1.3/schema/B05042/S001",
+            "ODF-1.4/schema/B05138/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "db:name 表示 database 或 component 名稱；本 General 小節不單獨規定所有名稱唯一性或引用有效性。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04970/S001",
+            "ODF-1.3/schema/B05043/S001",
+            "ODF-1.4/schema/B05139/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-37928d58ca227186715e",
+      "memberSha256": "8c8dcfbdfaa9e1b3d6891ece00dfc4ea8435fcef07625e1efd50841b4a3ccf55",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "僅裁定本組列出的單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04205/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "tab-stops 是 tab-stop 容器，限 paragraph-properties 下，沒有屬性；結構驗證須核對可接受的子元素及 schema cardinality，不能自行由英文單數推定只能一個。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04206/S001",
+            "ODF-1.2/schema/B04207/S001",
+            "ODF-1.2/schema/B04208/S001",
+            "ODF-1.2/schema/B04209/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-38ccfe86f5080c446951",
+      "memberSha256": "27d42e5872626a697b976387a26a8d126b3eea87fd5ca860383983e0ea481294",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B10589/S001",
+            "ODF-1.3/schema/B10732/S001",
+            "ODF-1.4/schema/B10889/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "table:type 定義 table 類型；各適用元素上的列舉值及作用須沿子節核對，未由 General 定義證明全部已驗證。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B10590/S001",
+            "ODF-1.3/schema/B10733/S001",
+            "ODF-1.4/schema/B10890/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-3cdf548f92cdc54c9e88",
+      "memberSha256": "23858c5ef514d74846eeae18b617dd98ddaa854056ec19a4ac5214e3d123d226",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "1.3／1.4 加入 style:style 與 style:family 的條號，並有重複 whose 排印文字；與 1.2 核心參照家族語意一致，不把排印差異當成額外義務。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B06304/S001",
+            "ODF-1.3/schema/B06382/S001",
+            "ODF-1.4/schema/B06511/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "draw:style-name 指向 style:style，所需 family 依所在元素而變；參照目標家族不能只驗證為任意存在的 style。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B06305/S001",
+            "ODF-1.3/schema/B06383/S001",
+            "ODF-1.4/schema/B06512/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-3e6c771b8afa208ee955",
+      "memberSha256": "6624b2d5b712cda1a4a10017d17d07a8fc69438de6ed42d8fad377a1f330c48f",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04411/S001",
+            "ODF-1.3/schema/B04485/S001",
+            "ODF-1.4/schema/B04577/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "valueType 定義 value types 的清單；具體允許值與 schema 約束仍須展開，不因描述短或沒有 SHALL 而判為非規範性。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04412/S001",
+            "ODF-1.3/schema/B04486/S001",
+            "ODF-1.4/schema/B04578/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-3f5ad0ffd27a6d58377e",
+      "memberSha256": "16d5058a24313ef716539e6359b00b91e4f90900330fc4b2e09daab6bdfd1abc",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B10275/S001",
+            "ODF-1.3/schema/B10416/S001",
+            "ODF-1.4/schema/B10575/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "table:protected 指定 table protection；語意、序列化及值驗證屬 SDK 責任，不能把它直接等同檔案加密或整體安全權限。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B10276/S001",
+            "ODF-1.3/schema/B10417/S001",
+            "ODF-1.4/schema/B10576/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-3fb0052c491259c4d69e",
+      "memberSha256": "182f2fb155dc31c55445cf023b0fd7119f5ced30ac8f139f1b9cdcbef9df4af8",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B05964/S001",
+            "ODF-1.3/schema/B06038/S001",
+            "ODF-1.4/schema/B06147/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "draw:id 定義元素識別碼；本 General 小節未單獨規定全域唯一性或 ID datatype，須沿各適用元素與 schema 核對，不能直接套用 xml:id 的全部規則。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B05965/S001",
+            "ODF-1.3/schema/B06039/S001",
+            "ODF-1.4/schema/B06148/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-4248dd44a3dae72dae5b",
+      "memberSha256": "748a4bba8c59101dcd958399fd58050f99e688d86e42b39b09a25e2844386a8d",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04346/S001",
+            "ODF-1.3/schema/B04420/S001",
+            "ODF-1.4/schema/B04512/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "character 定義僅有一個 character 的字串；實作裁決須核對 XML／Unicode 字元與 UTF-16 code unit 的差異，不得直接以 C# string.Length==1 宣告符合。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04347/S001",
+            "ODF-1.3/schema/B04421/S001",
+            "ODF-1.4/schema/B04513/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-4283dc688aa209a966eb",
+      "memberSha256": "727ad753ce08997edadfcb093570204dbb5a0f50ae649f75fd389791227f800c",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B14959/S001",
+            "ODF-1.3/schema/B15194/S001",
+            "ODF-1.4/schema/B15438/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style:protect 定義內容保護；其值及適用內容須由各子節帶入，不能因 SDK 不提供編輯 GUI 而豁免資料驗證與保留。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B14960/S001",
+            "ODF-1.3/schema/B15195/S001",
+            "ODF-1.4/schema/B15439/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-44f24c35e21326b41bea",
+      "memberSha256": "b2909dd78f3fe7a8674d38f10d90648b74b2213bd7e234cb73095748fa902995",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B14934/S001",
+            "ODF-1.3/schema/B15169/S001",
+            "ODF-1.4/schema/B15413/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style:print-content 定義內容是否列印；資料表示及驗證仍屬 SDK 責任，實際列印操作的宿主範圍須另有具體證據才可排除。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B14935/S001",
+            "ODF-1.3/schema/B15170/S001",
+            "ODF-1.4/schema/B15414/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-45e472512326a413c658",
+      "memberSha256": "95f29c862d8bdee420d4ebdcffe562861eb29f9dc9303c8f96ee6243971bbd25",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B09501/S001",
+            "ODF-1.3/schema/B09636/S001",
+            "ODF-1.4/schema/B09789/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "table:data-type 定義 table 的資料型別；這一 General 定義未列出具體值，不能以 table cell 的 value-type 規則直接替代所有分支。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B09502/S001",
+            "ODF-1.3/schema/B09637/S001",
+            "ODF-1.4/schema/B09790/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-47a68b2ef0644831797d",
+      "memberSha256": "28a7bf9e0c1672e03be90fe300462c72be5f5eb7dffad07deb3eb24233281ad9",
+      "versions": [
+        "1.2",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對本組所列版本，核心定義與角色一致；引用依賴仍依各版規範處理，不能外推父章節或其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B01031/S001",
+            "ODF-1.4/schema/B01054/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "document fields 顯示目前文件或其部分資訊；本概述不單獨要求重算每個 field，仍須核對各 field 的儲存、解讀與更新規則。",
+          "conditions": "在該版使用所列型別、屬性或元素時；具體資料型別及交叉參照義務須於實作裁決中展開。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B01032/S001",
+            "ODF-1.4/schema/B01055/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-4b77eb7f1c4901af89a8",
+      "memberSha256": "f37f239a7231d183b78a89ead0094e3a7f7b7805d9d9c9d499c9e3d4fa8bbc7e",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B16357/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "chart:major-origin 定義一個 major tick 的位置，限 chart-properties，型別 double；型別合法性與圖表軸語意需分別核對。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B16358/S001",
+            "ODF-1.4/schema/B16359/S001",
+            "ODF-1.4/schema/B16360/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-4dae74575e715d1cf9a8",
+      "memberSha256": "02c9d866b309c271450758fcb270d77091d7de0b5d0591fd034b6894cb5bbf02",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04417/S001",
+            "ODF-1.3/schema/B04491/S001",
+            "ODF-1.4/schema/B04583/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "zeroToHundredPercent 依 XSL 百分比語法且範圍為含端點的 0% 至 100%；字串語法與數值邊界均屬驗證責任。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04418/S001",
+            "ODF-1.3/schema/B04492/S001",
+            "ODF-1.4/schema/B04584/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-50d57b4efc5ea80ee95c",
+      "memberSha256": "4a724bff70e433f8a55aa2665991ffca88f99a6403ac8a409d4f350105915f14",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04340/S001",
+            "ODF-1.3/schema/B04414/S001",
+            "ODF-1.4/schema/B04506/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "cellAddress 指向 9.2.1 的 cell address 定義；語法、相對／絕對參照與工作表名稱等限制須由被引用條款展開，不因無 modal word 豁免。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04341/S001",
+            "ODF-1.3/schema/B04415/S001",
+            "ODF-1.4/schema/B04507/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-522b2a1324f9e1195cb1",
+      "memberSha256": "3b166b105a7fe3b017b2037529d0564a55034043e144473a28e47b8131fcb918",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B04138/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "num-list-label 限 num-list-format 下，使用 text:level 且無子元素；顯示替換與高層級 placeholder 忽略要求另列 consumer 規則。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B04141/S001",
+            "ODF-1.4/schema/B04142/S001",
+            "ODF-1.4/schema/B04143/S001"
+          ]
+        },
+        {
+          "kind": "requirement",
+          "sdkResponsibilities": [
+            "consumer"
+          ],
+          "assessment": "顯示時 placeholder 依 text:level 取項目編號並用該層 num-format 格式化；高於引用 num-list-format-name 的 list level 的 placeholder SHALL 忽略，不能先強制生成不存在的高層標籤。",
+          "conditions": "consumer 進行該 number label 的顯示替換時。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B04139/S001",
+            "ODF-1.4/schema/B04140/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-527e1f3cb2fd5f26f8bb",
+      "memberSha256": "21f84eec1e642639c1b9360d7b18bcbfcec80cbac52ffe1afe4739ad93813eb2",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04174/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "文件可有多個 style elements；formatting properties 作為 formatting-properties element 的屬性或子元素，後者位於 style 下。能以 CSS2／XSLT 定址是此容器結構的說明，不代表 SDK 必須提供 CSS2 或 XSLT 執行引擎。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04175/S001",
+            "ODF-1.2/schema/B04175/S002",
+            "ODF-1.2/schema/B04175/S003",
+            "ODF-1.2/schema/B04176/S001"
+          ]
+        },
+        {
+          "kind": "permission",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style 允許包含 formatting properties 之外的額外資訊；必須同時遵守對應 schema 與 extended markup 規則，不能把此 MAY 當成任意標準命名空間資料均合法。",
+          "conditions": "style 包含其他資訊時。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04177/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-549da56936a8271ec2b4",
+      "memberSha256": "5f6f44e70daac4a494bf2455127f042d9d53f7c623decf4f7ed17459a4f21065",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B06346/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "draw:name 在 dr3d:extrude 上提供可參照名稱，型別 string；本組未獨立要求 XML NCName 或全域唯一性。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B06347/S001",
+            "ODF-1.4/schema/B06348/S001",
+            "ODF-1.4/schema/B06349/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-56abdf5cdde956d2f574",
+      "memberSha256": "5f052b5b4d115a892335df883fc87c8dec9ea4be28ae267cb2623cd25f8d4549",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04344/S001",
+            "ODF-1.3/schema/B04418/S001",
+            "ODF-1.4/schema/B04510/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "cellRangeAddressList 導向 9.2.5 的 range address list 定義；須沿引用展開驗證語法，不能當作任意空白字串。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04345/S001",
+            "ODF-1.3/schema/B04419/S001",
+            "ODF-1.4/schema/B04511/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-56c6aa96584f1f30b817",
+      "memberSha256": "5b76e7fbd81f6955fffd78f0058984223fe5f32a27dbb1ed15243c097d635686",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B02846/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "hide-shape 定義使 shape 隱藏的時機與效果，執行前可見；另列合法父元素、屬性與 sound。deprecated 不豁免資料結構、輸出及適用 consumer 解讀責任。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B02847/S001",
+            "ODF-1.4/schema/B02847/S002",
+            "ODF-1.4/schema/B02848/S001",
+            "ODF-1.4/schema/B02849/S001",
+            "ODF-1.4/schema/B02850/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-57fe27357c618ea64e23",
+      "memberSha256": "58ba27faa68591aba06c95e7072c7db161e7cf6b86ee23ab99bf5924955605ed",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B08612/S001",
+            "ODF-1.3/schema/B08722/S001",
+            "ODF-1.4/schema/B08855/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "next-style-name 指定 pages／paragraphs 使用的後續 style；參照目標與適用家族須沿子節核對，不是任意存在的 style 即可。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B08613/S001",
+            "ODF-1.3/schema/B08723/S001",
+            "ODF-1.4/schema/B08856/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-588241eb890861732510",
+      "memberSha256": "5dd43c4d8ecbc13a0f41c0f2ef6ce2ff394985a4e5e5160ff53beb972f19fa34",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04413/S001",
+            "ODF-1.3/schema/B04487/S001",
+            "ODF-1.4/schema/B04579/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "variableName 定義變數名稱字串；本句本身未定義 NCName 或特定公式識別符語法，須由使用位置帶入其他限制。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04414/S001",
+            "ODF-1.3/schema/B04488/S001",
+            "ODF-1.4/schema/B04580/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-58b0625c9cb19a095831",
+      "memberSha256": "bb9467a25cff3b1544f4153b28e865326756582176a2a2f2232d1068b5c1705f",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04381/S001",
+            "ODF-1.3/schema/B04455/S001",
+            "ODF-1.4/schema/B04547/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "percent 允許正或負，依 XSL 的百分比定義；不能套用只容許 0 至 100 的不同型別限制。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04382/S001",
+            "ODF-1.3/schema/B04456/S001",
+            "ODF-1.4/schema/B04548/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-58d180ce9a6b3d4cb519",
+      "memberSha256": "5d38019d1702d2a7a114cebb1456f55bf805206026aa8dd710c7697926299c54",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04389/S001",
+            "ODF-1.3/schema/B04463/S001",
+            "ODF-1.4/schema/B04555/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "relativeLength 是正整數後接 U+002A 星號；零、負數或沒有星號不能僅憑可轉換數字視為有效，精確 lexical 要再核對對應 schema。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04390/S001",
+            "ODF-1.3/schema/B04464/S001",
+            "ODF-1.4/schema/B04556/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-5ab97032e554011c461c",
+      "memberSha256": "fa3c1431607da240b1b412b351bc2fa58adc296327d74cc1230b07bbc5f52547",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "1.2 使用 sorting，1.3／1.4 使用 organizing；分類保留這項差異，實作裁決須沿適用元素釐清，不先宣告規範行為等價。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B10188/S001",
+            "ODF-1.3/schema/B10329/S001",
+            "ODF-1.4/schema/B10488/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "table:orientation 的 General 定義涉及表格組織方向；1.2 用 sorting，後兩版改 organizing，需在實作裁決對照各適用元素，不直接認定跨版行為完全相等。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B10189/S001",
+            "ODF-1.3/schema/B10330/S001",
+            "ODF-1.4/schema/B10489/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-5ca7190c766702069a2e",
+      "memberSha256": "fd920218af1b5c320590e8e27cbf8115089f6767b8bc1eefe1ba3897b8036363",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B08793/S001",
+            "ODF-1.3/schema/B08903/S001",
+            "ODF-1.4/schema/B09061/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "style:width 定義寬度，具體型別、單位與值域由各使用位置及子節決定，不能由此 General 小節統一成任意正長度。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B08794/S001",
+            "ODF-1.3/schema/B08904/S001",
+            "ODF-1.4/schema/B09062/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-5e4728a6528e28735e3d",
+      "memberSha256": "78eeac1f11a555654cb880a76d5732d2ad06c7b5a1d32c486168d98753b84856",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "逐一比對所列版本核心定義；外部依賴與引用目標仍須分版核對，未外推整章語意相同。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04401/S001",
+            "ODF-1.3/schema/B04475/S001",
+            "ODF-1.4/schema/B04567/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "styleNameRefs 是以空白分隔的 XML Schema NCName 清單，名稱指向 styles；lexical 及參照語意屬 SDK 責任，外部規範引用不豁免。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04402/S001",
+            "ODF-1.3/schema/B04476/S001",
+            "ODF-1.4/schema/B04568/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-5e4d31f0a0ee41ecbacb",
+      "memberSha256": "41cc9e3a3b98c99a3f6d6b3e5156b02fa0d3cf22daaa49879b8a3586247dc29d",
+      "versions": [
+        "1.2"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B04225/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "section-properties 定義 section styles 的格式；列出 default-style／style 父元素、格式屬性與 background-image／columns／notes-configuration 子元素。結構定義不證明所有跨屬性規則都已驗證。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B04226/S001",
+            "ODF-1.2/schema/B04227/S001",
+            "ODF-1.2/schema/B04228/S001",
+            "ODF-1.2/schema/B04229/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-600189d0c7e98d75256e",
+      "memberSha256": "f15fa20d394fdeeed9bb5c8e3d9bf28fe7f17b29069fc93ba2ce18d14b43a4e1",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B16490/S001"
+          ]
+        },
+        {
+          "kind": "recommendation",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "從非 ODF 簡報匯入 table 時，建議保留表格結構並儲存為嵌入式 spreadsheet，以供輔助科技存取。適用於提供此匯入功能的 consumer／producer；SHOULD 不能轉成無條件拒絕所有其他表格表示的驗證錯誤。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B16491/S001",
+            "ODF-1.4/schema/B16491/S002"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-603a100af9cdd2ff4fff",
+      "memberSha256": "7df42852a76b0a6272d8041285fb9193fb3ed75ab86b345993a0a5144f735794",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "1.4 來源抽取把以段落樣式編排的 BiDi 非規範性附錄標題放在 Further Guidelines 群組內；本次逐單位按實際文字背景判定，不依錯置的候選標題路徑做整章豁免。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B16492/S001"
+          ]
+        },
+        {
+          "kind": "informative-context",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "此組包含明示 non-normative Accessibility Guidelines 的外部指引，以及以文字標出 Non Normative 的 BiDi appendix 標題與範圍介紹；這些單位不是獨立強制義務，不豁免其他章節的 accessibility 或雙向文字要求。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B16493/S001",
+            "ODF-1.4/schema/B16493/S002",
+            "ODF-1.4/schema/B16494/S001",
+            "ODF-1.4/schema/B16495/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-60bf6abbcf5b46097db0",
+      "memberSha256": "b26f210499a4703d30378e37587a41e75399525661de02ae523984a8609b9c82",
+      "versions": [
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "versionAssessment": "1.2 寫 start value，1.3／1.4 寫 starting or restarting，並有重複句點；保留語意說明差異，不把排印錯誤當作新義務。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.2/schema/B11924/S001",
+            "ODF-1.3/schema/B12081/S001",
+            "ODF-1.4/schema/B12241/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "text:start-value 指定編號開始值；1.3／1.4 明確擴充描述為開始或重新開始。具體型別及適用元素須沿子節處理，不由 General 句子推論全域單一值域。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.2/schema/B11925/S001",
+            "ODF-1.3/schema/B12082/S001",
+            "ODF-1.4/schema/B12242/S001"
+          ]
+        }
+      ]
+    },
+    {
+      "groupId": "ODFG-623e2504fd6218a13d94",
+      "memberSha256": "0587ba79c8a2370b28993172934878349f9f1275fcd14c484a601bed7fec3638",
+      "versions": [
+        "1.4"
+      ],
+      "versionAssessment": "只裁定本組單一版本，未外推其他版本。",
+      "implementationAdjudication": "pending",
+      "rules": [
+        {
+          "kind": "source-heading",
+          "sdkResponsibilities": [
+            "source-context"
+          ],
+          "assessment": "章節標題定位來源，不獨立施加義務。",
+          "conditions": "僅列出的標題單位。",
+          "exemption": "non-obligation",
+          "units": [
+            "ODF-1.4/schema/B16361/S001"
+          ]
+        },
+        {
+          "kind": "definition",
+          "sdkResponsibilities": [
+            "validator",
+            "producer",
+            "consumer"
+          ],
+          "assessment": "chart:minor-logarithmic 是 chart-properties 下的 boolean；true 表示對數轉換後 minor tick 等距，false 表示轉換前等距。屬性型別驗證與圖表軸語意分開裁決。",
+          "conditions": "只適用本版所列內容；所引用條款與啟用功能的條件仍須在後續實作裁決逐項核對。",
+          "exemption": "none",
+          "units": [
+            "ODF-1.4/schema/B16362/S001",
+            "ODF-1.4/schema/B16362/S002",
+            "ODF-1.4/schema/B16363/S001",
+            "ODF-1.4/schema/B16364/S001"
+          ]
+        }
+      ]
+    }
+  ]
+}

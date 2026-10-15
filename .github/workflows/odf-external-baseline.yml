@@ -18,6 +18,9 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
+      - 'eng/Test-OdfSemanticReviews.py'
+      - 'eng/testdata/Test-OdfSemanticReviews.py'
+      - 'docs/odf-semantic-reviews.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -61,6 +64,9 @@ on:
       - 'eng/Build-OdfConformanceMatrix.py'
       - 'eng/Build-OdfObligationInventory.py'
       - 'eng/Build-OdfObligationClassification.py'
+      - 'eng/Test-OdfSemanticReviews.py'
+      - 'eng/testdata/Test-OdfSemanticReviews.py'
+      - 'docs/odf-semantic-reviews.json'
       - 'eng/testdata/Test-OdfObligationClassification.py'
       - 'eng/testdata/Test-OdfObligationInventory.py'
       - 'docs/odf-obligation-decisions.json'
@@ -175,6 +181,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Obligation classification regressions failed.' }
           python eng/Build-OdfObligationClassification.py --check-contracts
           if ($LASTEXITCODE -ne 0) { throw 'Obligation classification contracts failed.' }
+          python eng/testdata/Test-OdfSemanticReviews.py
+          if ($LASTEXITCODE -ne 0) { throw 'Semantic review regressions failed.' }
+          python eng/Test-OdfSemanticReviews.py
+          if ($LASTEXITCODE -ne 0) { throw 'Semantic review contracts failed.' }
           $tool = (Get-Content eng/external-tools.json -Raw | ConvertFrom-Json).opfOdfValidator
           $corpus = Get-Content docs/examples/oasis-odf-tc-corpus/manifest.json -Raw | ConvertFrom-Json
           $corpusHash = (Get-FileHash docs/examples/oasis-odf-tc-corpus/manifest.json -Algorithm SHA256).Hash.ToLowerInvariant()
