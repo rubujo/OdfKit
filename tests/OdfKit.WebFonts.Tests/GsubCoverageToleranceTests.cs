@@ -1,4 +1,4 @@
-using OdfKit.WebFonts.OpenType;
+﻿using OdfKit.WebFonts.OpenType;
 
 namespace OdfKit.WebFonts.Tests;
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using OdfKit.Extensions.Imaging;
 using Xunit;
 using SkiaSharp;

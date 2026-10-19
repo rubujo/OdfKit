@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using OdfKit.Collaboration;
 using OdfKit.Text;
 using Xunit;
