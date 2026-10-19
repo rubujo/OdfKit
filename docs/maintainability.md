@@ -27,8 +27,7 @@
 1. 新增功能前，先確認是否可放進既有領域 partial（見檔名與 `///` 區塊註解）。  
 2. 單型別跨檔總行數長期 **> ~1500–2000** 時，優先**抽協作者型別**（collaborator），而非再切 partial。  
 3. 診斷：`pwsh eng/Analyze-PartialSplits.ps1`、`pwsh eng/List-LargeCsFiles.ps1`。  
-4. 歷史 `Split-*`／`Merge-*`／`Migrate-*`／`Rename-*` 已移至 `eng/historical-refactor/`，**預設不要重跑**。  
-5. `Analyze-PartialSplits.ps1` 應輸出 **MERGE: 0 | REVIEW: 0**；新 REVIEW 須人工評估後升格 KEEP 或合併。
+4. `Analyze-PartialSplits.ps1` 應輸出 **MERGE: 0 | REVIEW: 0**；新 REVIEW 須人工評估後升格 KEEP 或合併。
 
 ## 2. 在地化字典（OdfLocalizer）
 
@@ -113,7 +112,6 @@
 |------|------|
 | 在地化拆檔 | `OdfLocalizer.Exceptions.<culture>.cs` × 12 + 入口 |
 | 語系鍵值對等 | `Test-LocalizerKeyParity.ps1` + 契約測試；補齊缺漏鍵 |
-| 歷史腳本歸檔 | `eng/historical-refactor/` |
 | 產生碼 README | DOM／Compliance `Generated/` |
 | 一行式 summary 閘門 | `eng/Test-OneLineXmlSummary.ps1` |
 | ProjectReference 競態閘門 | `PublishAot` 移除集中於 `Directory.Build.props`；`eng/Test-ProjectReferenceRaceSafety.ps1` 阻擋單一 TFM 被釘 `SetTargetFramework` 與分裂型 metadata 不一致 |

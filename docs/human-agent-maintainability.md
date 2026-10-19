@@ -29,7 +29,6 @@
 2. 把同一方法拆到多檔卻無邊界註解。  
 3. 產生弱 partial（&lt; ~90 行的 Helpers／Candidates）。  
 4. 為了讓 Agent「一次改比較少 token」而切碎語意。  
-5. 重跑 `eng/historical-refactor/Split-*`。
 
 ## 對 Agent 的操作契約
 

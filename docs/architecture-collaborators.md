@@ -8,7 +8,6 @@ façade + 協作者／partial 邊界維護，**禁止**再以機械 `Split-*` �
 1. 公開型別可為 façade；重邏輯進 **engine／collaborator／partial 領域檔**。  
 2. 單檔 > ~1000 行或跨檔總量 > ~2000 行時，優先抽協作者，而非再切無意義 partial。  
 3. 診斷：`pwsh eng/Analyze-PartialSplits.ps1`、`pwsh eng/List-LargeCsFiles.ps1`。  
-4. 歷史腳本僅在 `eng/historical-refactor/`，預設不重跑。
 
 ## 已收斂的重大邊界（v0.0.1）
 

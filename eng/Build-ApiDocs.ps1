@@ -152,7 +152,7 @@ try {
         Get-Item api-docs/index.md
         Get-ChildItem docs -Recurse -File -Include *.md
         Get-Item README.md, CHANGELOG.md, THIRD-PARTY-NOTICES.md, AGENTS.md,
-            eng/README.md, eng/historical-refactor/README.md, samples/README.md,
+            eng/README.md, samples/README.md,
             samples/WebFonts.AspNetCore/README.md, samples/WebFonts.WebForms/README.md,
             tools/README.md, OdfKit/PublicAPI/README.md, OdfKit/Compliance/i18n/README.md
         Get-ChildItem OdfKit, OdfKit.Extensions.*, OdfKit.WebFonts.* -Recurse -File -Filter *.cs |
@@ -318,7 +318,6 @@ try {
         'THIRD-PARTY-NOTICES.md',
         'AGENTS.md',
         'eng/README.md',
-        'eng/historical-refactor/README.md',
         'samples/README.md',
         'samples/OdfKit.HighLevelApi/README.md',
         'samples/WebFonts.AspNetCore/README.md',

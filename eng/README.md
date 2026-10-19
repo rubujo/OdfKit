@@ -3,13 +3,10 @@
 本目錄收錄 OdfKit 的建置、測試、封裝與開發輔助腳本。多數為 PowerShell 7+
 (`#Requires -Version 7.0`)，少數為 Python（視覺差異比對）。
 
-`eng/` 下的腳本分兩大類：
-
-1. **常用維護腳本**（下表列出）：CI 與本機開發會持續呼叫，文件（`AGENTS.md`、各
-   `docs/*.md`）會個別引用其中部分腳本。
-2. **歷史性一次性重構腳本**（`Split-*`／`Merge-*`／`Migrate-*`／`Rename-*`）：
-   已移至 [`historical-refactor/`](historical-refactor/README.md)，**預設不要重跑**。
-   Partial／在地化準則見 [docs/maintainability.md](../docs/maintainability.md)。
+`eng/` 下的腳本是 CI 與本機開發會持續呼叫的維護腳本，文件（`AGENTS.md`、各
+`docs/*.md`）會個別引用其中部分腳本。一次性的 god class 拆分腳本已從 repo 移除
+（commit 歷史 `7b6f1f79`～`f5189e8d` 等可查）；Partial／在地化準則見
+[docs/maintainability.md](../docs/maintainability.md)。
 
 ## 常用維護腳本
 
@@ -174,11 +171,3 @@ cache 命中時仍會重新驗證雜湊。
 | 檔案 | 用途 |
 |------|------|
 | `performance-baselines.json` | `Benchmark-Regression.ps1` 比對用的效能基準線資料。 |
-
-## 歷史重構腳本
-
-`Split-*`／`Merge-*`／`Migrate-*`／`Rename-*` 已全部移至
-[`historical-refactor/`](historical-refactor/README.md)（約 102 個腳本）。
-它們是 god class 拆分計畫（commit 歷史 `7b6f1f79`～`f5189e8d` 等）的**一次性**產物，
-**預設不要重跑**。日常 partial 準則見 [docs/maintainability.md](../docs/maintainability.md)；
-診斷用 `Analyze-PartialSplits.ps1`／`List-LargeCsFiles.ps1`。

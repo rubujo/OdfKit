@@ -49,8 +49,7 @@
   不可手改；修改其產生器或來源後重產。
 - 核心預設內建 ODF 1.0～1.4 官方 schema 是產品不變量；不得為瘦身套件而拆成可選套件
   或刪減多版本覆蓋。
-- 禁止因行數、token 或機械 KPI 切割 partial／大型型別，也不得重跑
-  `eng/historical-refactor/Split-*`。
+- 禁止因行數、token 或機械 KPI 切割 partial／大型型別。
 - **不得在方案根目錄直接執行無專案範圍的 `dotnet format`**。雙 TFM 測試專案可能被
   寫入合併衝突標記；一律使用 `eng/Format-Safe.ps1`。
 
