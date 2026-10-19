@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  OPENOFFICE_VERSION: 4.1.16
-  OPENOFFICE_SHA256: 0ea97aedb1c77838b9c6ee9e7a9c5161933b35b703e4ccbafa6a9abde7f669ca
+  OPENOFFICE_VERSION: 4.1.17
+  OPENOFFICE_SHA256: dd56646e4cb7183c9144b9ee1c9ae1f4d24edbb5a92b04f5d9573ac00f80a992
 
 jobs:
   apache-openoffice-interop:

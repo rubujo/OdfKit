@@ -79,7 +79,7 @@ Windows 版 Apache OpenOffice 不提供可靠的 LibreOffice `--convert-to` CLI�
 runtime 開啟、另存與匯出。`PYTHONPATH` 只設定於 bridge 子程序，不污染 runner 全域環境。
 未明確要求時，沒有安裝 AOO 會略過；`-RequireOpenOffice` 會設定 fail-closed 模式，找不到
 官方 runtime、UNO 連線失敗或路徑偽冒時皆失敗。
-GitHub Actions 的手動 workflow 釘選 Apache OpenOffice 4.1.16，下載後依 Apache 官方
+GitHub Actions 的手動 workflow 釘選 Apache OpenOffice 4.1.17，下載後依 Apache 官方
 SHA-256 驗證。CI 使用 MSI administrative image 取得隔離的可攜執行樹，不修改 runner
 的全機 Office 安裝；確認 `soffice.exe` 的公司為 Apache Software Foundation 後，再執行
 net8.0 與 net10.0。

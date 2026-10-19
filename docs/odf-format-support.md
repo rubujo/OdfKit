@@ -528,7 +528,7 @@ inflate 後大小等於 `manifest:size`。金鑰為 `Argon2id(SHA-256(密碼), s
 還原任一項修正都會讓對應素材失敗（已實測）。
 
 **寫入方向的一般互通已納入專用排程驗證**：`libreoffice-interop.yml` 在同一個 Windows runner
-安裝一次 LibreOffice（目前釘選 26.8.0），以 `--filter FullyQualifiedName~LibreOfficeInteropTests`
+安裝一次 LibreOffice（目前釘選 26.8.1），以 `--filter FullyQualifiedName~LibreOfficeInteropTests`
 依序對 net8.0 與 net10.0 執行 `LibreOfficeInteropTests.cs` 整個測試類別——涵蓋追蹤修訂、圖表、
 樞紐分析表、範本／母片／Flat XML、公式、內嵌字型等大量文件類型與功能面向的真機開啟／轉檔驗證；
 缺少 Python UNO runtime 時該排程會失敗，不會以略過偽裝成功。2026-09-12 已以 workflow_dispatch
