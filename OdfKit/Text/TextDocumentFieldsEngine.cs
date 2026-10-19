@@ -127,8 +127,14 @@ internal static class TextDocumentFieldsEngine
     internal static void AddAuthorField(OdfParagraph paragraph) =>
         paragraph.Node.AppendChild(OdfNodeFactory.CreateElement("author-name", OdfNamespaces.Text, "text"));
 
-    internal static void AddChapterField(OdfParagraph paragraph) =>
-        paragraph.Node.AppendChild(OdfNodeFactory.CreateElement("chapter", OdfNamespaces.Text, "text"));
+    internal static void AddChapterField(OdfParagraph paragraph)
+    {
+        // text:display 與 text:outline-level 為必要屬性；預設顯示第一層章節名稱。
+        var fNode = OdfNodeFactory.CreateElement("chapter", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("display", OdfNamespaces.Text, "name", "text");
+        fNode.SetAttribute("outline-level", OdfNamespaces.Text, "1", "text");
+        paragraph.Node.AppendChild(fNode);
+    }
 
     internal static void AddSequenceField(OdfParagraph paragraph, string name, string numFormat)
     {
@@ -173,6 +179,8 @@ internal static class TextDocumentFieldsEngine
     {
         var fNode = OdfNodeFactory.CreateElement("variable-set", OdfNamespaces.Text, "text");
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+        // office:value-type 為必要屬性；文字內容是字串變數的值。
+        fNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
         fNode.TextContent = value;
         paragraph.Node.AppendChild(fNode);
     }
