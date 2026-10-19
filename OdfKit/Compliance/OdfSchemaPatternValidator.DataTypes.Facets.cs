@@ -83,6 +83,12 @@ public static partial class OdfSchemaPatternValidator
             char character = pattern[index];
             if (character == '\\')
             {
+                if (index + 1 < pattern.Length && pattern[index + 1] is 'i' or 'c' or 'I' or 'C')
+                {
+                    // XML Schema 的 \i、\c 是名稱起始字元與名稱字元，.NET 沒有對應的跳脫序列。
+                    translated.Append(TranslateNameCharacterClass(pattern[++index], characterClassDepth > 0));
+                    continue;
+                }
                 translated.Append(character);
                 if (index + 1 < pattern.Length)
                 {
@@ -105,6 +111,23 @@ public static partial class OdfSchemaPatternValidator
             translated.Append(character);
         }
         return "\\A(?:" + translated.ToString() + ")\\z";
+    }
+
+    // XML 1.0 第五版的 NameStartChar 與 NameChar（僅基本多文種平面；補充平面以代理字元表示，無法放入字元類別）。
+    private const string NameStartRanges = ":A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
+
+    private const string NameCharRanges = NameStartRanges + "\\-.0-9\u00B7\u0300-\u036F\u203F-\u2040";
+
+    private static string TranslateNameCharacterClass(char escape, bool insideCharacterClass)
+    {
+        string ranges = escape is 'i' or 'I' ? NameStartRanges : NameCharRanges;
+        if (insideCharacterClass)
+        {
+            // 字元類別內無法巢狀取補集；\I、\C 在官方 schema 沒有出現，保留原跳脫讓正則失敗而不是靜默放行。
+            return escape is 'i' or 'c' ? ranges : "\\" + escape;
+        }
+
+        return (escape is 'i' or 'c' ? "[" : "[^") + ranges + "]";
     }
 
     private static int CompareFacetValues(string value, string parameterValue)
