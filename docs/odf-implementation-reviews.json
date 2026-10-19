@@ -35094,7 +35094,7 @@
     {
       "groupId": "ODFG-236af6a084c137aa34af",
       "memberSha256": "1879e4b409ba2fc9be199e4f49f3a324ece66e0da7f99aa93a1f6f8f28bd4f61",
-      "semanticReviewSha256": "89a5a4b848d9a7e840595269232b0a85c027f9db6538938b316beaab222b5982",
+      "semanticReviewSha256": "d3ae1fe215774f0763eb92609414a40404f1a8362091b82ac6ae8e2da4ee058c",
       "versions": [
         "1.2",
         "1.3",
@@ -35136,7 +35136,7 @@
             "checkNode.SetAttribute(\"state\"",
             "radioNode.SetAttribute(\"selected\""
           ],
-          "sha256": "3d9734397bdb095fa14ef65fb6dc5f5b066eea8adfbee5505b2f50785828e48b"
+          "sha256": "2246b868f845adb32400e79ed06b2c37df3c5f389deb60d2ee8052685d2b43e1"
         },
         {
           "path": "OdfKit/DOM/OdfXmlReader.cs",
@@ -35292,23 +35292,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0.trx",
-          "reportSha256": "28d7e366bf2544bac03b0cc868c2f4970bb98c010e47d542671cfab84956a085",
-          "sourceEvidenceSha256": "cadbc566cbfe0abf00c5d9843f81cd21d634143bad274e770a72694a96725816"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0-r2.trx",
+          "reportSha256": "b0ef0fd647676cd6cca15965f81c8d9f5d5e422196b4903198056700c3654ee3",
+          "sourceEvidenceSha256": "13ca2526264dfbd8e956c64b179121f5e7d58db3e5b566482fbd3d39d22c90f3"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0.trx",
-          "reportSha256": "43ad45020bd891fdbe696849eaf818886ad4ce72da39c0c986ba5c033ec2609c",
-          "sourceEvidenceSha256": "cadbc566cbfe0abf00c5d9843f81cd21d634143bad274e770a72694a96725816"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0-r2.trx",
+          "reportSha256": "242676a8487bce24ac30182c066f6b7434c611c7695a1c2a4329bff2c1245e1d",
+          "sourceEvidenceSha256": "13ca2526264dfbd8e956c64b179121f5e7d58db3e5b566482fbd3d39d22c90f3"
         }
       ],
       "decisions": [
@@ -85320,7 +85320,7 @@
             "ParseValue",
             "XmlConvert.ToString"
           ],
-          "sha256": "6fd41cc5e4af3c9a11dd2c81417dcdc67547385d91b2c1398813d9ed78a50542"
+          "sha256": "c2e17438ce0367ab5233a1a88178e22d95dbd316137282f59f189cf83dfdcbc1"
         },
         {
           "path": "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs",
@@ -85447,23 +85447,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4998,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/metadata-reseal-net10.0.trx",
-          "reportSha256": "bf476d5752e56d7edeb97d97bdb135904ffaa7d2e3f35102a0926dcdff927b59",
-          "sourceEvidenceSha256": "c35e6bbf07e7f798aacc3139441b12093533206bc71df3bfdc2903c807fdae66"
+          "localReport": "artifacts/odf-regression/metadata-reseal-net10.0-r2.trx",
+          "reportSha256": "058207045acd151d5248a2433adf869524880dbbb45a5474559ec6080849a4d8",
+          "sourceEvidenceSha256": "cbe09232983a6e2e27706b68763b52716d12b23f242b7d06d5fc435f7582004a"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4998,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/metadata-reseal-net8.0.trx",
-          "reportSha256": "0e55cb03e740c8da3849c866acf84c465113ea0909432c1474b9fac5218c1d0b",
-          "sourceEvidenceSha256": "c35e6bbf07e7f798aacc3139441b12093533206bc71df3bfdc2903c807fdae66"
+          "localReport": "artifacts/odf-regression/metadata-reseal-net8.0-r2.trx",
+          "reportSha256": "cb9091d0c6f7f1b523dc7a21d8c1352d53cab77081c7fbb9ac6ae9951baa5291",
+          "sourceEvidenceSha256": "cbe09232983a6e2e27706b68763b52716d12b23f242b7d06d5fc435f7582004a"
         }
       ],
       "decisions": [
@@ -142339,7 +142339,7 @@
             "AddListBox",
             "option.TextContent = item"
           ],
-          "sha256": "3d9734397bdb095fa14ef65fb6dc5f5b066eea8adfbee5505b2f50785828e48b"
+          "sha256": "2246b868f845adb32400e79ed06b2c37df3c5f389deb60d2ee8052685d2b43e1"
         },
         {
           "path": "OdfKit/Compliance/OdfSchemaPatternValidator.ElementMatching.cs",
@@ -142397,23 +142397,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0.trx",
-          "reportSha256": "28d7e366bf2544bac03b0cc868c2f4970bb98c010e47d542671cfab84956a085",
-          "sourceEvidenceSha256": "0736e22d34ea7450b3f1a4cfb5a1548682c71b8b957a296bfdf24f07aefcddb6"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0-r2.trx",
+          "reportSha256": "b0ef0fd647676cd6cca15965f81c8d9f5d5e422196b4903198056700c3654ee3",
+          "sourceEvidenceSha256": "9199889566d90103b2ecf3c1a17286f24fd374309d98e233b3d43fa383f86955"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0.trx",
-          "reportSha256": "43ad45020bd891fdbe696849eaf818886ad4ce72da39c0c986ba5c033ec2609c",
-          "sourceEvidenceSha256": "0736e22d34ea7450b3f1a4cfb5a1548682c71b8b957a296bfdf24f07aefcddb6"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0-r2.trx",
+          "reportSha256": "242676a8487bce24ac30182c066f6b7434c611c7695a1c2a4329bff2c1245e1d",
+          "sourceEvidenceSha256": "9199889566d90103b2ecf3c1a17286f24fd374309d98e233b3d43fa383f86955"
         }
       ],
       "decisions": [
@@ -151149,7 +151149,7 @@
             "ParseValue",
             "XmlConvert.ToString"
           ],
-          "sha256": "6fd41cc5e4af3c9a11dd2c81417dcdc67547385d91b2c1398813d9ed78a50542"
+          "sha256": "c2e17438ce0367ab5233a1a88178e22d95dbd316137282f59f189cf83dfdcbc1"
         },
         {
           "path": "OdfKit/Compliance/OdfSchemaPatternValidator.DataTypes.Matching.cs",
@@ -151276,23 +151276,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4998,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/metadata-reseal-net10.0.trx",
-          "reportSha256": "bf476d5752e56d7edeb97d97bdb135904ffaa7d2e3f35102a0926dcdff927b59",
-          "sourceEvidenceSha256": "c35e6bbf07e7f798aacc3139441b12093533206bc71df3bfdc2903c807fdae66"
+          "localReport": "artifacts/odf-regression/metadata-reseal-net10.0-r2.trx",
+          "reportSha256": "058207045acd151d5248a2433adf869524880dbbb45a5474559ec6080849a4d8",
+          "sourceEvidenceSha256": "cbe09232983a6e2e27706b68763b52716d12b23f242b7d06d5fc435f7582004a"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4998,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=metadata-reseal-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/metadata-reseal-net8.0.trx",
-          "reportSha256": "0e55cb03e740c8da3849c866acf84c465113ea0909432c1474b9fac5218c1d0b",
-          "sourceEvidenceSha256": "c35e6bbf07e7f798aacc3139441b12093533206bc71df3bfdc2903c807fdae66"
+          "localReport": "artifacts/odf-regression/metadata-reseal-net8.0-r2.trx",
+          "reportSha256": "cb9091d0c6f7f1b523dc7a21d8c1352d53cab77081c7fbb9ac6ae9951baa5291",
+          "sourceEvidenceSha256": "cbe09232983a6e2e27706b68763b52716d12b23f242b7d06d5fc435f7582004a"
         }
       ],
       "decisions": [
@@ -157670,7 +157670,7 @@
             "AddListBox",
             "option.TextContent = item"
           ],
-          "sha256": "3d9734397bdb095fa14ef65fb6dc5f5b066eea8adfbee5505b2f50785828e48b"
+          "sha256": "2246b868f845adb32400e79ed06b2c37df3c5f389deb60d2ee8052685d2b43e1"
         },
         {
           "path": "OdfKit/Compliance/OdfSchemaPatternValidator.ElementMatching.cs",
@@ -157728,23 +157728,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0.trx",
-          "reportSha256": "28d7e366bf2544bac03b0cc868c2f4970bb98c010e47d542671cfab84956a085",
-          "sourceEvidenceSha256": "0736e22d34ea7450b3f1a4cfb5a1548682c71b8b957a296bfdf24f07aefcddb6"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0-r2.trx",
+          "reportSha256": "b0ef0fd647676cd6cca15965f81c8d9f5d5e422196b4903198056700c3654ee3",
+          "sourceEvidenceSha256": "9199889566d90103b2ecf3c1a17286f24fd374309d98e233b3d43fa383f86955"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0.trx",
-          "reportSha256": "43ad45020bd891fdbe696849eaf818886ad4ce72da39c0c986ba5c033ec2609c",
-          "sourceEvidenceSha256": "0736e22d34ea7450b3f1a4cfb5a1548682c71b8b957a296bfdf24f07aefcddb6"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0-r2.trx",
+          "reportSha256": "242676a8487bce24ac30182c066f6b7434c611c7695a1c2a4329bff2c1245e1d",
+          "sourceEvidenceSha256": "9199889566d90103b2ecf3c1a17286f24fd374309d98e233b3d43fa383f86955"
         }
       ],
       "decisions": [
@@ -207709,7 +207709,7 @@
             "SetCustomProperty",
             "FindCustomPropertyNode"
           ],
-          "sha256": "6fd41cc5e4af3c9a11dd2c81417dcdc67547385d91b2c1398813d9ed78a50542"
+          "sha256": "c2e17438ce0367ab5233a1a88178e22d95dbd316137282f59f189cf83dfdcbc1"
         },
         {
           "path": "OdfKit.Tests/OdfMetadataNameConformanceTests.cs",
@@ -207999,23 +207999,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=definitions-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=definitions-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
           "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/definitions-net10.0.trx",
-          "reportSha256": "08639251a5a2583db586596f6cecc224958ebb39a8a939112e3667d0daae6e1b",
-          "sourceEvidenceSha256": "cf1a56249638f470898b2bc9c9678416672a35520df09494c2514b2dcb6c4a4b"
+          "localReport": "artifacts/odf-regression/definitions-net10.0-r2.trx",
+          "reportSha256": "eb91e9157b6c39984b08df495651a334032833e586dcbe5c8bebfb21477f7110",
+          "sourceEvidenceSha256": "71f2d6883784d2e2e6f98344ad823f32870661f88ab6873a6cfb501ce8dbd451"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=definitions-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=definitions-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
           "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/definitions-net8.0.trx",
-          "reportSha256": "b679cd0c4b8126bdbe7069481b6ac5d695248c4988e609a1940f87dab92310e7",
-          "sourceEvidenceSha256": "cf1a56249638f470898b2bc9c9678416672a35520df09494c2514b2dcb6c4a4b"
+          "localReport": "artifacts/odf-regression/definitions-net8.0-r2.trx",
+          "reportSha256": "aa73758ca6920cfd2c64682c937aff4d5af7e94cc7f585de710106114676383c",
+          "sourceEvidenceSha256": "71f2d6883784d2e2e6f98344ad823f32870661f88ab6873a6cfb501ce8dbd451"
         }
       ],
       "decisions": [
@@ -220275,7 +220275,7 @@
             "checkNode.SetAttribute(\"state\"",
             "radioNode.SetAttribute(\"selected\""
           ],
-          "sha256": "3d9734397bdb095fa14ef65fb6dc5f5b066eea8adfbee5505b2f50785828e48b"
+          "sha256": "2246b868f845adb32400e79ed06b2c37df3c5f389deb60d2ee8052685d2b43e1"
         },
         {
           "path": "OdfKit/DOM/OdfXmlReader.cs",
@@ -220431,23 +220431,23 @@
       "testRuns": [
         {
           "framework": "net10.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net10.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0.trx",
-          "reportSha256": "28d7e366bf2544bac03b0cc868c2f4970bb98c010e47d542671cfab84956a085",
-          "sourceEvidenceSha256": "cadbc566cbfe0abf00c5d9843f81cd21d634143bad274e770a72694a96725816"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net10.0-r2.trx",
+          "reportSha256": "b0ef0fd647676cd6cca15965f81c8d9f5d5e422196b4903198056700c3654ee3",
+          "sourceEvidenceSha256": "13ca2526264dfbd8e956c64b179121f5e7d58db3e5b566482fbd3d39d22c90f3"
         },
         {
           "framework": "net8.0",
-          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
-          "passed": 4891,
+          "command": "dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net8.0 --no-restore -p:RunAnalyzersDuringBuild=true --filter \"Category=Compliance|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesNumericResult|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.HyperlinkPreservesTextAndErrors|FullyQualifiedName~OpenFormulaExtendedEvaluatorTests.TrimUsesOpenFormulaSpaceCharacters|FullyQualifiedName~TypedDomParityTests|FullyQualifiedName~OptimizedRefactoringTests|FullyQualifiedName~DomTest|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityAndWriterBoundaryTests|FullyQualifiedName~XmlNestingDepthLimitTests|FullyQualifiedName~FlatXmlMediaEncodingTests|FullyQualifiedName~OdfSchemaGeneratorTests|FullyQualifiedName~NumberFormatEngineTests|FullyQualifiedName~TextAdvancedFidelityTests|FullyQualifiedName~FormulaAndStylesLengthTests\" --logger \"trx;LogFileName=style-batch-reviewed-net8.0-r2.trx\" --results-directory artifacts/odf-regression -- xUnit.Explicit=on",
+          "passed": 23091,
           "failed": 0,
           "skipped": 0,
-          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0.trx",
-          "reportSha256": "43ad45020bd891fdbe696849eaf818886ad4ce72da39c0c986ba5c033ec2609c",
-          "sourceEvidenceSha256": "cadbc566cbfe0abf00c5d9843f81cd21d634143bad274e770a72694a96725816"
+          "localReport": "artifacts/odf-regression/style-batch-reviewed-net8.0-r2.trx",
+          "reportSha256": "242676a8487bce24ac30182c066f6b7434c611c7695a1c2a4329bff2c1245e1d",
+          "sourceEvidenceSha256": "13ca2526264dfbd8e956c64b179121f5e7d58db3e5b566482fbd3d39d22c90f3"
         }
       ],
       "decisions": [
