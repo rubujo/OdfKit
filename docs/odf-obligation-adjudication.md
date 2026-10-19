@@ -282,8 +282,8 @@ Strict 與 Extended 給出相同結果：Jing 接受的正例驗證器也接受�
 驗證器同樣拒絕，省略屬性的判定與官方 schema 一致（可選就可缺省，缺省本身不是錯誤；規範文字另有
 條件時驗證器可再以其他規則編號拒絕，但不得出現 schema 錯誤），列舉屬性的其餘定義值也逐一驗證。
 固定資料為 [OdfAttributeCases.jsonl.gz](../OdfKit.Tests/TestData/OdfAttributeCases.jsonl.gz)
-（7,110 個案例、1,355 個群組），以[差異測試](../OdfKit.Tests/OdfAttributeDefinitionConformanceTests.cs)
-逐群組逐版本執行，並可用 `eng/Test-OdfAttributeFixture.py` 單獨以 Jing 重驗全部 20,375 份文件。
+（8,358 個案例、1,674 個群組），以[差異測試](../OdfKit.Tests/OdfAttributeDefinitionConformanceTests.cs)
+逐群組逐版本執行，並可用 `eng/Test-OdfAttributeFixture.py` 單獨以 Jing 重驗全部 23,604 份文件。
 這批發現並修正兩個驗證器缺陷：一、XML Schema 正則的 `\i`、`\c` 名稱字元跳脫沒有翻譯成 .NET
 正則，導致 CURIE／SafeCURIE 樣式整個失敗，Strict 設定檔誤拒 `xhtml:about`、`xhtml:property`
 等屬性；二、Extended 剝除外來屬性時連 ODF schema 定義的四個 RDFa 屬性一併剝除，使只寫一半的
@@ -296,7 +296,11 @@ RDFa 屬性組被接受，現改為保留。`draw:z-index` 在 dr3d 場景子層
 （10,704 個案例、265 個群組），以[差異測試](../OdfKit.Tests/OdfElementDefinitionConformanceTests.cs)
 執行，`eng/Test-OdfElementFixture.py` 可單獨以 Jing 重算全部判定，兩者皆無不一致。
 含說明性條件句（should、may 等）的元素群組保留待個別裁決。兩框架各 21,689 項回歸通過，
-直接裁決累計 **1,022 組、4,840 組待裁決**（1,000 組具執行期實作與測試證據）。
+ODF 1.1 的 RELAX NG 片段群組（說明文字加上 `<define>`／`<attribute>` 片段，共 127 個單一屬性群組）
+以版本自己的 schema 推導載體元素（每組最多驗證 25 種），沿用同一套 Jing 差異做法；1.1 schema 以
+`combine="choice"` 定義的內容須只選一個分支，合成器已據此處理。這批沒有發現新的驗證器差異。
+含條件句或複合定義的 1.1 群組（約 190 組）保留待個別裁決。兩框架各 22,965 項回歸通過，
+直接裁決累計 **1,149 組、4,713 組待裁決**（1,127 組具執行期實作與測試證據）。
 
 表單型別批次已修正並完整核驗兩項不同的驗證缺口，三個型別子節已計入直接裁決：
 CLR 的 `XmlConvert` 會接受 `Infinity`、`nan` 等 XML Schema 不允許的特殊詞彙，
