@@ -33,6 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="TestData\OdfAttributeCases.jsonl.gz" LogicalName="OdfAttributeCases.jsonl.gz" />
+    <EmbeddedResource Include="TestData\OdfAttributeCases.manifest.txt" LogicalName="OdfAttributeCases.manifest.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Rendering\OdfKit.Extensions.Rendering.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Pdf\OdfKit.Extensions.Pdf.csproj" />
