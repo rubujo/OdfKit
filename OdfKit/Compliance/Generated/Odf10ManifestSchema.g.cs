@@ -267,5 +267,11 @@ namespace OdfKit.Compliance
             var generated = new OdfSchemaSet(OdfVersion.Odf10, new Uri("https://www.oasis-open.org/committees/download.php/12570/OpenDocument-manifest-schema-v1.0-os.rng"), "2005-05-01", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
+
+        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>
+            namespaceUri switch
+            {
+                _ => false
+            };
     }
 }

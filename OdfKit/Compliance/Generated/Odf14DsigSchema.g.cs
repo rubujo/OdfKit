@@ -121,5 +121,12 @@ namespace OdfKit.Compliance
             var generated = new OdfSchemaSet(OdfVersion.Odf14, new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.4/os/schemas/OpenDocument-v1.4-dsig-schema.rng"), "2025-10-06", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
+
+        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>
+            namespaceUri switch
+            {
+                "http://www.w3.org/2000/09/xmldsig#" => localName is "Signature",
+                _ => false
+            };
     }
 }

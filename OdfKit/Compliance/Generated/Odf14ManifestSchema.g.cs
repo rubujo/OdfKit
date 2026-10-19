@@ -559,5 +559,12 @@ namespace OdfKit.Compliance
             var generated = new OdfSchemaSet(OdfVersion.Odf14, new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.4/os/schemas/OpenDocument-v1.4-manifest-schema.rng"), "2025-10-06", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
+
+        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>
+            namespaceUri switch
+            {
+                "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" => localName is "CipherValue" or "PGPKeyID" or "PGPKeyPacket",
+                _ => false
+            };
     }
 }

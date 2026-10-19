@@ -467,5 +467,11 @@ namespace OdfKit.Compliance
             var generated = new OdfSchemaSet(OdfVersion.Odf12, new Uri("https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-manifest-schema.rng"), "2011-09-29", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
+
+        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>
+            namespaceUri switch
+            {
+                _ => false
+            };
     }
 }

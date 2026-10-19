@@ -14,6 +14,9 @@ public sealed class RelaxNgSchemaMetadataReader
 {
     private const string RelaxNgNamespace = "http://relaxng.org/ns/structure/1.0";
 
+    // RELAX NG 4.2：語法 token 移除 XML 邊緣空白，value／param 內容則保留。
+    private static string? NormalizeSchemaToken(string? value) => value?.Trim(' ', '\t', '\r', '\n');
+
     /// <summary>
     /// 從 RELAX NG 檔案及其相對 include 圖譜讀取結構描述中繼資料。
     /// </summary>
@@ -63,7 +66,7 @@ public sealed class RelaxNgSchemaMetadataReader
         {
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
-            IgnoreWhitespace = true,
+            IgnoreWhitespace = false,
             MaxCharactersFromEntities = 0,
             CloseInput = false
         };
@@ -133,7 +136,7 @@ public sealed class RelaxNgSchemaMetadataReader
 
     private static void AddName(XmlReader reader, Dictionary<string, SchemaNameMetadata> names, string? inheritedNamespace)
     {
-        string? name = reader.GetAttribute("name");
+        string? name = NormalizeSchemaToken(reader.GetAttribute("name"));
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -166,10 +169,11 @@ public sealed class RelaxNgSchemaMetadataReader
         }
         else
         {
-            namespaceUri = reader.GetAttribute("ns") ?? inheritedNamespace;
+            namespaceUri = reader.GetAttribute("ns") ??
+                (reader.LocalName == "attribute" ? string.Empty : inheritedNamespace ?? string.Empty);
         }
 
-        if (string.IsNullOrWhiteSpace(namespaceUri) || string.IsNullOrWhiteSpace(localName))
+        if (namespaceUri == null || string.IsNullOrWhiteSpace(localName))
         {
             return null;
         }
@@ -268,7 +272,7 @@ public sealed class RelaxNgSchemaMetadataReader
         string? inheritedNamespace,
         string? inheritedDatatypeLibrary)
     {
-        string? name = reader.GetAttribute("name");
+        string? name = NormalizeSchemaToken(reader.GetAttribute("name"));
         if (string.IsNullOrWhiteSpace(name))
         {
             return;
@@ -280,9 +284,11 @@ public sealed class RelaxNgSchemaMetadataReader
             return;
         }
 
-        string? combine = reader.GetAttribute("combine");
+        string? combine = NormalizeSchemaToken(reader.GetAttribute("combine"));
+        var namespaces = (reader as IXmlNamespaceResolver)?.GetNamespacesInScope(XmlNamespaceScope.All);
         using XmlReader subtree = reader.ReadSubtree();
-        var document = XDocument.Load(subtree, LoadOptions.None);
+        var document = XDocument.Load(subtree, LoadOptions.PreserveWhitespace);
+        ApplyInheritedXmlNamespaces(document.Root, namespaces);
         ApplyInheritedNamespace(document.Root, inheritedNamespace);
         ApplyInheritedDatatypeLibrary(document.Root, inheritedDatatypeLibrary);
         var roots = new List<SchemaPatternNodeMetadata>();
@@ -309,8 +315,10 @@ public sealed class RelaxNgSchemaMetadataReader
             return;
         }
 
+        var namespaces = (reader as IXmlNamespaceResolver)?.GetNamespacesInScope(XmlNamespaceScope.All);
         using XmlReader subtree = reader.ReadSubtree();
-        var document = XDocument.Load(subtree, LoadOptions.None);
+        var document = XDocument.Load(subtree, LoadOptions.PreserveWhitespace);
+        ApplyInheritedXmlNamespaces(document.Root, namespaces);
         ApplyInheritedNamespace(document.Root, inheritedNamespace);
         ApplyInheritedDatatypeLibrary(document.Root, inheritedDatatypeLibrary);
         foreach (XElement child in document.Root?.Elements() ?? Enumerable.Empty<XElement>())
@@ -319,6 +327,21 @@ public sealed class RelaxNgSchemaMetadataReader
         }
 
         ReadDefineElement(document.Root, pattern, state, "exactlyOne", insideExcept: false);
+    }
+
+    private static void ApplyInheritedXmlNamespaces(XElement? root, IDictionary<string, string>? namespaces)
+    {
+        if (root == null || namespaces == null)
+            return;
+
+        foreach (var binding in namespaces)
+        {
+            if (binding.Key is "xml" or "xmlns")
+                continue;
+            XName name = binding.Key.Length == 0 ? XName.Get("xmlns") : XNamespace.Xmlns + binding.Key;
+            if (root.Attribute(name) == null)
+                root.SetAttributeValue(name, binding.Value);
+        }
     }
 
     private static void ApplyInheritedNamespace(XElement? root, string? inheritedNamespace)
@@ -423,7 +446,7 @@ public sealed class RelaxNgSchemaMetadataReader
         {
             if (element.Name.LocalName == "element" || element.Name.LocalName == "attribute")
             {
-                string? name = (string?)element.Attribute("name");
+                string? name = NormalizeSchemaToken((string?)element.Attribute("name"));
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     SchemaNameMetadata? parsed = ParseName(element, name);
@@ -437,32 +460,32 @@ public sealed class RelaxNgSchemaMetadataReader
             else if (element.Name.LocalName == "ref" ||
                 element.Name.LocalName == "parentRef")
             {
-                node.ReferenceName = ((string?)element.Attribute("name")) ?? string.Empty;
+                node.ReferenceName = NormalizeSchemaToken((string?)element.Attribute("name")) ?? string.Empty;
             }
             else if (element.Name.LocalName == "data")
             {
-                node.DataType = ((string?)element.Attribute("type")) ?? string.Empty;
+                node.DataType = NormalizeSchemaToken((string?)element.Attribute("type")) ?? string.Empty;
                 node.DataTypeLibrary = GetInheritedRelaxNgDatatypeLibrary(element) ?? string.Empty;
                 foreach (XElement parameter in element.Elements().Where(child =>
                     child.Name.NamespaceName == RelaxNgNamespace &&
                     child.Name.LocalName == "param"))
                 {
-                    string? parameterName = (string?)parameter.Attribute("name");
+                    string? parameterName = NormalizeSchemaToken((string?)parameter.Attribute("name"));
                     if (!string.IsNullOrWhiteSpace(parameterName))
                     {
                         node.DataParameters.Add(new SchemaDatatypeParameterMetadata
                         {
                             Name = parameterName,
-                            Value = parameter.Value.Trim()
+                            Value = parameter.Value
                         });
                     }
                 }
             }
             else if (element.Name.LocalName == "value")
             {
-                node.DataType = ((string?)element.Attribute("type")) ?? string.Empty;
+                node.DataType = NormalizeSchemaToken((string?)element.Attribute("type")) ?? string.Empty;
                 node.DataTypeLibrary = GetInheritedRelaxNgDatatypeLibrary(element) ?? string.Empty;
-                node.Value = element.Value.Trim();
+                node.Value = element.Value;
             }
 
             SchemaNameClassMetadata? nameClass = CreateNameClass(element, insideExcept);
@@ -522,7 +545,7 @@ public sealed class RelaxNgSchemaMetadataReader
             else if (element.Name.LocalName == "ref" ||
                 element.Name.LocalName == "parentRef")
             {
-                string? referenceName = (string?)element.Attribute("name");
+                string? referenceName = NormalizeSchemaToken((string?)element.Attribute("name"));
                 if (!string.IsNullOrWhiteSpace(referenceName) && !pattern.References.Contains(referenceName, StringComparer.Ordinal))
                 {
                     pattern.References.Add(referenceName);
@@ -620,7 +643,7 @@ public sealed class RelaxNgSchemaMetadataReader
 
     private static SchemaNameClassMetadata? CreateNameClassFromNameElement(XElement element, bool insideExcept)
     {
-        string text = element.Value.Trim();
+        string text = element.Value.Trim(' ', '\t', '\r', '\n');
         if (string.IsNullOrWhiteSpace(text))
         {
             return null;
@@ -672,7 +695,7 @@ public sealed class RelaxNgSchemaMetadataReader
 
     private static IEnumerable<SchemaNameMetadata> ParseDeclaredNames(XElement element)
     {
-        string? attributeName = (string?)element.Attribute("name");
+        string? attributeName = NormalizeSchemaToken((string?)element.Attribute("name"));
         if (!string.IsNullOrWhiteSpace(attributeName))
         {
             SchemaNameMetadata? parsedAttribute = ParseName(element, attributeName);
@@ -700,7 +723,7 @@ public sealed class RelaxNgSchemaMetadataReader
                 ancestor.Name.NamespaceName == RelaxNgNamespace &&
                 ancestor.Name.LocalName == "except")))
         {
-            string childName = nameElement.Value.Trim();
+            string childName = nameElement.Value.Trim(' ', '\t', '\r', '\n');
             SchemaNameMetadata? parsedName = string.IsNullOrWhiteSpace(childName)
                 ? null
                 : ParseName(nameElement, childName);
@@ -730,10 +753,12 @@ public sealed class RelaxNgSchemaMetadataReader
         }
         else
         {
-            namespaceUri = GetInheritedRelaxNgNamespace(element);
+            namespaceUri = element.Name.LocalName == "attribute"
+                ? (string?)element.Attribute("ns") ?? string.Empty
+                : GetInheritedRelaxNgNamespace(element) ?? string.Empty;
         }
 
-        if (string.IsNullOrWhiteSpace(namespaceUri) || string.IsNullOrWhiteSpace(localName))
+        if (namespaceUri == null || string.IsNullOrWhiteSpace(localName))
         {
             return null;
         }

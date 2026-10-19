@@ -44036,6 +44036,24 @@ namespace OdfKit.Compliance
             var generated = new OdfSchemaSet(OdfVersion.Odf14, new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.4/os/schemas/OpenDocument-v1.4-schema.rng"), "2025-10-06", elements, attributes, nameClasses, patterns);
             return baseSchema == null ? generated : baseSchema.MergeWith(generated);
         }
+
+        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>
+            namespaceUri switch
+            {
+                "http://purl.org/dc/elements/1.1/" => localName is "creator" or "date" or "description" or "language" or "subject" or "title",
+                "http://www.w3.org/1998/Math/MathML" => localName is "math",
+                "urn:oasis:names:tc:opendocument:xmlns:config:1.0" => localName is "config-item",
+                "urn:oasis:names:tc:opendocument:xmlns:database:1.0" => localName is "data-source-setting-value" or "table-filter-pattern" or "table-type",
+                "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" => localName is "currency-symbol" or "embedded-text" or "fill-character" or "text",
+                "urn:oasis:names:tc:opendocument:xmlns:form:1.0" => localName is "item" or "option",
+                "urn:oasis:names:tc:opendocument:xmlns:meta:1.0" => localName is "creation-date" or "creator-initials" or "date-string" or "editing-cycles" or "editing-duration" or "generator" or "initial-creator" or "keyword" or "print-date" or "printed-by" or "user-defined",
+                "urn:oasis:names:tc:opendocument:xmlns:office:1.0" => localName is "binary-data" or "script",
+                "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" => localName is "date-time-decl" or "footer-decl" or "header-decl",
+                "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" => localName is "desc" or "title",
+                "urn:oasis:names:tc:opendocument:xmlns:table:1.0" => localName is "desc" or "title",
+                "urn:oasis:names:tc:opendocument:xmlns:text:1.0" => localName is "a" or "author-initials" or "author-name" or "bibliography-mark" or "bookmark-ref" or "chapter" or "character-count" or "conditional-text" or "creation-date" or "creation-time" or "creator" or "database-display" or "database-name" or "database-row-number" or "date" or "dde-connection" or "description" or "drop-down" or "editing-cycles" or "editing-duration" or "execute-macro" or "expression" or "file-name" or "h" or "hidden-paragraph" or "hidden-text" or "image-count" or "index-entry-span" or "index-title-template" or "initial-creator" or "keywords" or "linenumbering-separator" or "measure" or "meta" or "meta-field" or "modification-date" or "modification-time" or "note-citation" or "note-continuation-notice-backward" or "note-continuation-notice-forward" or "note-ref" or "number" or "object-count" or "p" or "page-continuation" or "page-count" or "page-number" or "page-variable-get" or "page-variable-set" or "paragraph-count" or "placeholder" or "print-date" or "print-time" or "printed-by" or "reference-ref" or "ruby-base" or "ruby-text" or "script" or "sender-city" or "sender-company" or "sender-country" or "sender-email" or "sender-fax" or "sender-firstname" or "sender-initials" or "sender-lastname" or "sender-phone-private" or "sender-phone-work" or "sender-position" or "sender-postal-code" or "sender-state-or-province" or "sender-street" or "sender-title" or "sequence" or "sequence-ref" or "sheet-name" or "span" or "subject" or "table-count" or "table-formula" or "template-name" or "text-input" or "time" or "title" or "user-defined" or "user-field-get" or "user-field-input" or "variable-get" or "variable-input" or "variable-set" or "word-count",
+                _ => false
+            };
     }
 
     internal static partial class OdfGeneratedSchemaProvider

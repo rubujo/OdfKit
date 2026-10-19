@@ -803,13 +803,13 @@ public class OdfSchemaGeneratorTests
             item.NamespaceUri == officeNamespace &&
             item.LocalName == "body");
         Assert.Contains(metadata.Attributes, item =>
-            item.NamespaceUri == officeNamespace &&
+            item.NamespaceUri == string.Empty &&
             item.LocalName == "version");
 
         SchemaPatternMetadata root = metadata.Patterns.Single(pattern => pattern.Name == "root");
         SchemaPatternNodeMetadata rootElement = Assert.Single(root.PatternTree);
         Assert.Equal(officeNamespace, rootElement.NamespaceUri);
-        Assert.Equal(officeNamespace, rootElement.Children[0].NamespaceUri);
+        Assert.Equal(string.Empty, rootElement.Children[0].NamespaceUri);
         Assert.Equal(officeNamespace, rootElement.Children[1].NamespaceUri);
         SchemaPatternNodeMetadata dynamicElementName = rootElement.Children[2].Children[0];
         Assert.Equal("name", dynamicElementName.Kind);

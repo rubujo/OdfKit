@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -165,6 +166,7 @@ public sealed class SchemaMetadataCSharpWriter
         writer.WriteLine(", elements, attributes, nameClasses, patterns);");
         writer.WriteLine("            return baseSchema == null ? generated : baseSchema.MergeWith(generated);");
         writer.WriteLine("        }");
+        WriteCharacterContentPredicate(metadata, writer);
         writer.WriteLine("    }");
 
         if (includeProviderHook)
@@ -184,6 +186,85 @@ public sealed class SchemaMetadataCSharpWriter
         }
 
         writer.WriteLine("}");
+    }
+
+    private static void WriteCharacterContentPredicate(SchemaMetadata metadata, TextWriter writer)
+    {
+        Dictionary<string, SchemaPatternMetadata> patterns = metadata.Patterns.ToDictionary(pattern => pattern.Name, StringComparer.Ordinal);
+        var names = metadata.Patterns.SelectMany(pattern => FlattenPatternNodes(pattern.PatternTree))
+            .Where(node => node.Kind == "element" && AllowsCharacterContent(node.Children, patterns, new HashSet<string>(StringComparer.Ordinal)))
+            .SelectMany(GetElementNames)
+            .Distinct()
+            .OrderBy(name => name.NamespaceUri, StringComparer.Ordinal)
+            .ThenBy(name => name.LocalName, StringComparer.Ordinal);
+
+        writer.WriteLine();
+        writer.WriteLine("        internal static bool AllowsCharacterData(string namespaceUri, string localName) =>");
+        writer.WriteLine("            namespaceUri switch");
+        writer.WriteLine("            {");
+        foreach (var group in names.GroupBy(name => name.NamespaceUri, StringComparer.Ordinal))
+        {
+            writer.Write("                ");
+            WriteStringLiteral(writer, group.Key);
+            writer.Write(" => localName is ");
+            bool first = true;
+            foreach (var name in group)
+            {
+                if (!first)
+                    writer.Write(" or ");
+                WriteStringLiteral(writer, name.LocalName);
+                first = false;
+            }
+            writer.WriteLine(",");
+        }
+        writer.WriteLine("                _ => false");
+        writer.WriteLine("            };");
+    }
+
+    private static bool AllowsCharacterContent(IEnumerable<SchemaPatternNodeMetadata> nodes,
+        IReadOnlyDictionary<string, SchemaPatternMetadata> patterns, HashSet<string> references)
+    {
+        foreach (SchemaPatternNodeMetadata node in nodes)
+        {
+            if (node.Kind is "attribute" or "element" or "empty" or "notAllowed")
+                continue;
+            if (node.Kind is "text" or "data" or "value" or "list" or "mixed")
+                return true;
+            if (node.Kind is "ref" or "parentRef")
+            {
+                if (references.Add(node.ReferenceName) && patterns.TryGetValue(node.ReferenceName, out SchemaPatternMetadata? definition) &&
+                    AllowsCharacterContent(definition.PatternTree, patterns, references))
+                    return true;
+            }
+            else if (AllowsCharacterContent(node.Children, patterns, references))
+                return true;
+        }
+        return false;
+    }
+
+    private static IEnumerable<(string NamespaceUri, string LocalName)> GetElementNames(SchemaPatternNodeMetadata node)
+    {
+        if (node.LocalName.Length != 0)
+        {
+            yield return (node.NamespaceUri, node.LocalName);
+            yield break;
+        }
+        // 無 name 屬性的 element，其第一個子模式是名稱類別；不可混入內容中的子元素名稱。
+        if (node.Children.Count == 0)
+            yield break;
+        foreach (SchemaNameClassMetadata name in FlattenPatternNodes([node.Children[0]]).SelectMany(child => child.NameClasses))
+            if (name.Kind == "name" && !name.IsExcept && name.LocalName.Length != 0)
+                yield return (name.NamespaceUri, name.LocalName);
+    }
+
+    private static IEnumerable<SchemaPatternNodeMetadata> FlattenPatternNodes(IEnumerable<SchemaPatternNodeMetadata> nodes)
+    {
+        foreach (SchemaPatternNodeMetadata node in nodes)
+        {
+            yield return node;
+            foreach (SchemaPatternNodeMetadata child in FlattenPatternNodes(node.Children))
+                yield return child;
+        }
     }
 
     private static string MapVersionToEnumName(string version)
