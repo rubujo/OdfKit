@@ -12,9 +12,9 @@
     },
     {
       "id": "Unicode",
-      "version": "17.0.0",
+      "version": "18.0.0",
       "status": "current",
-      "uri": "https://www.unicode.org/versions/Unicode17.0.0/"
+      "uri": "https://www.unicode.org/versions/Unicode18.0.0/"
     },
     {
       "id": "WOFF",
@@ -36,9 +36,9 @@
     },
     {
       "id": "IFT",
-      "version": "2025-11-18",
+      "version": "2026-10-13",
       "status": "candidate-recommendation-draft",
-      "uri": "https://www.w3.org/TR/2025/CRD-IFT-20251118/"
+      "uri": "https://www.w3.org/TR/2026/CRD-IFT-20261013/"
     }
   ],
   "latestStablePackages": [

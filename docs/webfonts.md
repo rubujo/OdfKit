@@ -741,7 +741,7 @@ scalar 執行：256 code-point bucket 產生 8 個 WOFF2，兩輪 hash 一致；
 - [W3C Incremental Font Transfer](https://www.w3.org/TR/IFT/)
 - [WebFont IFT 標準追蹤與相容性閘門](webfont-ift-tracking.md)
 - [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
-- [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
+- [Unicode 18.0.0](https://www.unicode.org/versions/Unicode18.0.0/)
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [Microsoft ASP.NET Core rate limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0)
 - [Microsoft .NET bounded channels](https://learn.microsoft.com/en-us/dotnet/core/extensions/channels)

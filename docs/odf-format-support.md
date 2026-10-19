@@ -119,7 +119,7 @@ CNS 11643 官方語意相容或認證。
 OdfKit 核心處理**與 Unicode 版本無關**：文字內容以 Unicode 原樣通過 XML 層，字型分段以
 Unicode 平面（plane）為單位路由而非以區塊（block）為單位，因此新版 Unicode 於既有平面新增的
 區塊（例如 Unicode 17.0 於 Plane 3 新增的 CJK Ext J，U+323B0–U+33479）會自動歸入既有平面
-路由，不需要修改程式碼。
+路由，不需要修改程式碼。Unicode 18.0（2026-09）另在 Plane 2 的 CJK Ext D 末端多收一個字（U+2B81E），同樣不需修改程式碼。
 
 內建對應表的 Plane 3（Ext G／H／J）覆蓋現況：
 

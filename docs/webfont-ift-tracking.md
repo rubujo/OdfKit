@@ -1,6 +1,6 @@
 # WebFont IFT 標準追蹤與相容性閘門
 
-> 基準日期：2026-07-19
+> 基準日期：2026-10-19
 >
 > 狀態：追蹤中；OdfKit 尚未實作或宣稱支援 Incremental Font Transfer。
 
@@ -9,7 +9,7 @@
 W3C 的 [Incremental Font Transfer](https://www.w3.org/TR/IFT/) 目前是 Candidate
 Recommendation Draft。W3C
 [出版歷史](https://www.w3.org/standards/history/IFT/)顯示 2025-07-31 曾發布 Candidate
-Recommendation Snapshot，2025-11-18 發布後續 Candidate Recommendation Draft。這仍是可變動的候選
+Recommendation Snapshot，其後持續發布 Candidate Recommendation Draft（目前最新為 2026-10-13）。這仍是可變動的候選
 標準，不是已完成互通報告的 W3C Recommendation；W3C 最新發布頁亦明載目前沒有完成的
 implementation report，測試套件仍在開發。版本由
 `eng/webfont-standards-dependency-policy.json` 鎖定，超過 90 天未複查會使發布閘門失敗。
@@ -19,6 +19,11 @@ implementation report，測試套件仍在開發。版本由
 | 複查日期 | 標準狀態 | 結論 |
 | --- | --- | --- |
 | 2026-07-20 | 仍為 Candidate Recommendation Draft（2025-11-18） | 閘門維持關閉 |
+| 2026-10-19 | 仍為 Candidate Recommendation Draft，最新版為 2026-10-13；未成為 Recommendation | 閘門維持關閉；基準改為 2026-10-13 |
+
+2026-10-19 複查：W3C 發布頁（`https://www.w3.org/TR/IFT/`）的狀態行為 Candidate Recommendation
+Draft，日期 2026-10-13，仍未成為 Recommendation；本次只核對狀態與日期，沒有重新核對 implementation
+report、測試套件與各項實作前提，因此閘門維持關閉。
 
 2026-07-20 複查：W3C 發布頁顯示 IFT 自 2025-11-18 的 Candidate Recommendation Draft
 起未再前進，仍未成為 Recommendation。[Web Fonts WG 章程](https://www.w3.org/2025/03/webfonts-wg.html)

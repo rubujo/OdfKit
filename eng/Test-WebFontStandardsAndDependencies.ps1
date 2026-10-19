@@ -51,7 +51,7 @@ foreach ($requiredStandard in $requiredStandards) {
 }
 if ([string]$standardsById.OpenType.version -ne "1.9.1" `
     -or [string]::IsNullOrWhiteSpace([string]$standardsById.OpenType.errataUri) `
-    -or [string]$standardsById.IFT.version -ne "2025-11-18" `
+    -or [string]$standardsById.IFT.version -ne "2026-10-13" `
     -or [string]$standardsById.IFT.status -ne "candidate-recommendation-draft") {
     throw "WebFont OpenType／IFT 規範基準不是目前已稽核版本。"
 }

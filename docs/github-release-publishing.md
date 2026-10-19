@@ -123,7 +123,7 @@ SHA-256 不可變套件快照復原，並重新通過 restore、build 與 run。
 `eng/Test-WebFontStandardsAndDependencies.ps1` 另在封裝前向 NuGet 官方 flat-container 查詢
 WebFont 所有 direct package 的最新穩定版本，並委派全專案 GitHub Actions SHA 政策檢查。
 Preview 只能存在於具精確版本、理由、移除條件與複查期限的例外。規範政策
-每 90 天失效，OpenType 除版本外也必須追蹤官方 errata；IFT 依 2025-11-18 Candidate
+每 90 天失效，OpenType 除版本外也必須追蹤官方 errata；IFT 依 2026-10-13 Candidate
 Recommendation Draft 追蹤，不把 draft 誤列為已支援功能。
 
 ## 版本策略

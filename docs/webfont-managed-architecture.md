@@ -442,8 +442,8 @@ Phase 是能力閘門，不是日期。不得因已存在 API、mock engine 或�
   有界結構測試；所有有效 CFF／CFF2 產物另由公開 verifier 逐 glyph 驗證 CharString。
 - 同批 `0.0.1` nupkg 安裝的 library 與 dotnet tool clean consumer，以真實 CNS 字型完成三格式產字與 byte-identical 重建。
 - 同批 WebFont nupkg 的 SPDX 2.3 SBOM、SHA-256、完整 NuGet 相依版本與 nuspec 授權漂移閘門。
-- OpenType 1.9.1 加官方 errata、Unicode 17.0、W3C WOFF／WOFF2／CSS Fonts Level 4 與 IFT
-  2025-11-18 CRD 的 90 天複查閘門；WebFont direct NuGet 相依須在線上 CI 比對官方最新穩定版。
+- OpenType 1.9.1 加官方 errata、Unicode 18.0、W3C WOFF／WOFF2／CSS Fonts Level 4 與 IFT
+  2026-10-13 CRD 的 90 天複查閘門；WebFont direct NuGet 相依須在線上 CI 比對官方最新穩定版。
   Preview 相依必須有精確版本、理由、移除條件及到期日。目前唯一例外是經由 OdfKit core
   傳遞的 `CSharpMath 1.0.0-pre.2`，WebFont 本身未直接參照，且到期前必須重新評估拆除 core
   localization 相依或升級至相容穩定版。
@@ -524,7 +524,7 @@ oracle job」的規定。
 - [W3C WOFF 2.0](https://www.w3.org/TR/WOFF2/)
 - [W3C CSS Fonts Level 4](https://www.w3.org/TR/css-fonts-4/)
 - [OpenType 1.9.1 font file 與 color tables](https://learn.microsoft.com/en-us/typography/opentype/spec/otff)
-- [Unicode 17.0.0](https://www.unicode.org/versions/Unicode17.0.0/)
+- [Unicode 18.0.0](https://www.unicode.org/versions/Unicode18.0.0/)
 - [Unicode Ideographic Variation Database](https://www.unicode.org/ivd/)
 - [Unicode UTS #37](https://www.unicode.org/reports/tr37/)
 - [.NET `BrotliEncoder`](https://learn.microsoft.com/en-us/dotnet/api/system.io.compression.brotliencoder?view=net-10.0)
